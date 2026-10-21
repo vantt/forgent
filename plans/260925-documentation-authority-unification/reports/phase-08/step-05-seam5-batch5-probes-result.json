@@ -1,0 +1,222 @@
+{
+  "baselineFailures": 0,
+  "passed": 19,
+  "total": 19,
+  "negativeProbes": [
+    {
+      "name": "drop an original dynamic tuple",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j4-coverage",
+          "where": "test/report/capability-plan-lint.test.mjs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "forge complete pinned source digest",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j4-pins",
+          "where": "test/report/enduser-index.test.mjs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "weaken owning assertions",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j4-ownership",
+          "where": "test/report/enduser-index.test.mjs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "forge fixture source mode",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j4-receipts",
+          "where": "test/cli/fgos-approve-3.test.mjs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "claim passing replay for preserve without executing",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j4-receipts",
+          "where": "test/report/enduser-index.test.mjs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "erase a passage-specific generator park",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j4-receipts",
+          "where": "test/report/enduser-index.test.mjs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "forge pinned search evidence",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j5-search",
+          "where": "exact all-root searches and alias lookups",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "invent candidate patch without a co-cut/replay",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j4-pins",
+          "where": "test/report/enduser-index.test.mjs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "reject a docs/history comment inconsistently",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j5-uniform-history",
+          "where": "test/cli/fgos-edit-2.test.mjs:reference-003953",
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\nAssertionError\n"
+        }
+      ]
+    },
+    {
+      "name": "admit a pure in-memory fixture string",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j5-fixtures",
+          "where": "test/scripts/doc-decision-conservation.test.mjs:reference-004935",
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\nAssertionError\n"
+        }
+      ]
+    },
+    {
+      "name": "admit a temporary-root constructor",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j5-fixtures",
+          "where": "test/scripts/knowledge-classifier.test.mjs:dynamic-033478",
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\nAssertionError\n"
+        },
+        {
+          "rule": "j5-fixtures",
+          "where": "test/scripts/knowledge-classifier.test.mjs:dynamic-033478",
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\nAssertionError\n"
+        }
+      ]
+    },
+    {
+      "name": "drop a retired basename successor",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j5-successors",
+          "where": "test/docs/decisions-corpus-retired.test.mjs:dynamic-018736",
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\nAssertionError\n"
+        }
+      ]
+    },
+    {
+      "name": "unpark the document-bearing gateway roots array",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j5-review-closure",
+          "where": "all explicit Lead rulings",
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 38, in closures\n    dead='test/runner/dead-vocabulary-guard.test.mjs';a=slot(dead,'dynamic-023891');b=slot(dead,'dynamic-023892');c=slot(dead,'reference-004371');assert a['admission']=='ADMIT' and a['disposition']=='parked' and a['blockedReason']==b['blockedReason'] and a['dependency']==b['dependency'] and a['pathOperand']==\"path.join('docs', 'specs')\" and c['resolverWitness']['treeRetires'] is True\nAssertionError\n"
+        }
+      ]
+    },
+    {
+      "name": "lose test-title P5 dependency",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j5-review-closure",
+          "where": "all explicit Lead rulings",
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 39, in closures\n    title=slot(dead,'reference-004372');assert title['admission']=='ADMIT' and title['disposition']=='preserve' and 'P5' in title['reason'] and 'baseline key' in title['reason']\nAssertionError\n"
+        }
+      ]
+    },
+    {
+      "name": "call ui-spec moved without seam6 retention",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j5-review-closure",
+          "where": "all explicit Lead rulings",
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 41, in closures\n    a=slot('apps/fgos-gateway/web/src/App.test.tsx','reference-000201');assert a['admission']=='ADMIT' and a['disposition']=='preserve' and 'docs/ui-spec retained (seam 6 rule)' in a['reason']\nAssertionError\n"
+        }
+      ]
+    },
+    {
+      "name": "preserve architecture-map reader despite missing headings",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j5-review-closure",
+          "where": "all explicit Lead rulings",
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 43, in closures\n    a=slot('test/docs/decisions-corpus-retired.test.mjs','reference-004035');assert a['disposition']=='parked' and '0010/0015/0017' in a['blockedReason'] and 'Step 7' in a['blockedReason'] and a['retentionHeadingEvidence']['proposedPresent'] is False\nAssertionError\n"
+        }
+      ]
+    },
+    {
+      "name": "discard source-only proof-navigation patch",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j5-review-closure",
+          "where": "all explicit Lead rulings",
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 46, in closures\n    a=slot('test/runner/dispatch-worker-session.test.mjs','reference-004380');assert a['admission']=='ADMIT' and a['disposition']=='patch';j.assert_patch(by['test/runner/dispatch-worker-session.test.mjs'],next(x for x in m.read('step-05-seam5-batch4-parity-receipts.json')['receipts'] if x['id']==a['receiptId']),m.pinned(by['test/runner/dispatch-worker-session.test.mjs']['authorInputCommit'],'test/runner/dispatch-worker-session.test.mjs'))\nAssertionError\n"
+        }
+      ]
+    },
+    {
+      "name": "omit a changed/added file from this-turn review",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j5-review-delta",
+          "where": "review changed or added sources only",
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 50, in delta\n    closure=m.read('step-05-seam5-batch5-review-closure.json');changed={e['file'] for e in closure['changedRecords']};added={r['file'] for r in m.rows('step-05-records/tests-judgment-batch5.jsonl')};assert len(added)==40 and set(listing['reviewThisTurn'])==changed|added and len(listing['reviewThisTurn'])==len(changed)+len(added)\nAssertionError\n"
+        }
+      ]
+    },
+    {
+      "name": "forge inverse comment patch",
+      "passed": true,
+      "caught": [
+        {
+          "rule": "j4-pins",
+          "where": "test/runner/dispatch-worker-session.test.mjs",
+          "error": "condition false"
+        }
+      ]
+    }
+  ],
+  "failures": []
+}

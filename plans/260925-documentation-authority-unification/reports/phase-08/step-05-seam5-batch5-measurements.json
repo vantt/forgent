@@ -1,0 +1,78 @@
+{
+  "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+  "reviewClosure": {
+    "reports": 5,
+    "changedOldFiles": 24,
+    "changedItems": 135,
+    "admissionFlips": 107,
+    "dispositionChanges": 3
+  },
+  "newJudgments": {
+    "files": 40,
+    "references": 280,
+    "dynamicTuples": 3530,
+    "supplementalSlots": 96,
+    "sourceBytes": 1611520,
+    "actions": [
+      {
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "count": 18
+      },
+      {
+        "admission": "ADMIT",
+        "disposition": "preserve",
+        "count": 136
+      },
+      {
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "count": 3752
+      }
+    ]
+  },
+  "rootTriage": {
+    "files": 404,
+    "newNeutralFiles": 0
+  },
+  "conservation": {
+    "populationFiles": 704,
+    "closedFiles": 340,
+    "remainingFiles": 364,
+    "populationReferences": 1203,
+    "closedReferences": 443,
+    "remainingReferences": 760,
+    "populationTuples": 25007,
+    "closedTuples": 7928,
+    "remainingTuples": 17079,
+    "uniqueOriginalIds": true,
+    "originalCarries": 3
+  },
+  "unchangedRecordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-prompt-goldens.jsonl",
+      "sha256": "6f7aaa44bc6da3619bd9bbb1ba32e6faa9f66691bb04e8fa06738214c78cf423"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "sha256": "7ece1cb25d2b5a48c70ad1431672d96c415428291f76a01bb1291e3b519e9a92"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "sha256": "9f3dbb93e32401ffee73df61fb16c6dc4ad97a0313a875ef0e88121930cfbad4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+      "sha256": "2706ac0823a05e8e066648ddcc0f736c5b888ddd08f4560777e7750c5c59f3b2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file-batch3.jsonl",
+      "sha256": "be4bb4dbb0dff9f27ab6f6112804f236e92a7181f4f353e634a2b932120994e5"
+    }
+  ],
+  "pending": [
+    "independent Lead review",
+    "Step 7 final-pin assembly and parked dependencies",
+    "Phase 9 npm/cargo full-suite parity"
+  ]
+}

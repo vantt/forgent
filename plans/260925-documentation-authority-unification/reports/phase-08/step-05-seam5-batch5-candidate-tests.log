@@ -1,0 +1,16 @@
+✔ C2: a session name resolves to that session own socket, never the default one (1.184699ms)
+✔ C2: a session name that could escape its directory is refused (0.351436ms)
+✔ C3: launching into the session the caller is sitting in is refused by name (0.154752ms)
+✔ C3: the default session is refused even when the caller reports no session at all (0.098131ms)
+✔ C3: a distinct session name passes (0.080965ms)
+✔ C2: the env handed to a worker points at its own session and drops the caller pane identity (0.135053ms)
+✔ isolatedSessionEnv does not mutate the caller env it was handed (0.492362ms)
+✔ C3 is enforced inside isolatedSessionEnv too, not only when asked separately (0.109422ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 44.805628

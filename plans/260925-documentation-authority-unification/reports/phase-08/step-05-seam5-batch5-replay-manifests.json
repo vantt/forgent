@@ -1,0 +1,77 @@
+{
+  "manifests": [
+    {
+      "side": "current",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "files": [
+        {
+          "path": "src/runner/dispatch/worker-session.mjs",
+          "sha256": "35e0cfe18540bad339abbf93a2ecdb99b1924249f637ae5f54b48c532892c3b0",
+          "bytes": 5602,
+          "mode": "100644"
+        },
+        {
+          "path": "test/helpers/process-tmp-root.mjs",
+          "sha256": "c3045ffb679fa83174048d2fb14ee62336bd4f3bada5510fb4a5c9f206ef952a",
+          "bytes": 2600,
+          "mode": "100644"
+        },
+        {
+          "path": "test/runner/dispatch-worker-session.test.mjs",
+          "sha256": "ce16de65fa9b60c94ae08b26ad37e9d8ac4c6f4766796d3a6570be0cbfa0c6c4",
+          "bytes": 4752,
+          "mode": "100644"
+        }
+      ],
+      "exit": 0
+    },
+    {
+      "side": "candidate",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "files": [
+        {
+          "path": "src/runner/dispatch/worker-session.mjs",
+          "sha256": "35e0cfe18540bad339abbf93a2ecdb99b1924249f637ae5f54b48c532892c3b0",
+          "bytes": 5602,
+          "mode": "100644"
+        },
+        {
+          "path": "test/helpers/process-tmp-root.mjs",
+          "sha256": "c3045ffb679fa83174048d2fb14ee62336bd4f3bada5510fb4a5c9f206ef952a",
+          "bytes": 2600,
+          "mode": "100644"
+        },
+        {
+          "path": "test/runner/dispatch-worker-session.test.mjs",
+          "sha256": "62840b8a69393be40cb96387a30a80124c2691aaf528e3184a915d33864ff051",
+          "bytes": 4751,
+          "mode": "100644"
+        }
+      ],
+      "exit": 0
+    }
+  ],
+  "proofs": [
+    {
+      "side": "current",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/runner/dispatch-worker-session.test.mjs",
+      "cwd": "disposable scratch materialized from immutable git objects",
+      "status": "pass",
+      "exit": 0,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-current-tests.log",
+      "logSha256": "90afecdffca1dbebec29a4117b7aad77b2c3788501e4305fdb532a58ce86fb78",
+      "owningBehavior": "All original worker-session test declarations and assertions; only source header pointer differs."
+    },
+    {
+      "side": "candidate",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/runner/dispatch-worker-session.test.mjs",
+      "cwd": "disposable scratch materialized from immutable git objects",
+      "status": "pass",
+      "exit": 0,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-candidate-tests.log",
+      "logSha256": "e73d409d3fca2998080af3adbe466340d5e6c2f7ba09863f80c425545f331bed",
+      "owningBehavior": "All original worker-session test declarations and assertions; only source header pointer differs."
+    }
+  ],
+  "equalOutcomes": true
+}

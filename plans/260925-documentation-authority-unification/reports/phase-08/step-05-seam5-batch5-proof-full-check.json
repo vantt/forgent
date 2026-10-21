@@ -1,0 +1,24 @@
+{
+  "label": "full-check",
+  "command": [
+    "/usr/bin/python3",
+    "-B",
+    "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+    "--output",
+    "step-05-full-check-result.json"
+  ],
+  "exit": 0,
+  "elapsedSeconds": 409.597,
+  "resultFresh": true,
+  "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-full-check.log",
+  "logSha256": "7e6ef443f3fe4e79d9de1b414c35f268288444e5e2f9cb7b5835df2b5e686adb",
+  "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+  "resultSha256": "587477d7026e02a646958a5fc8c658c2835c1b7b460d8f9426960f76a9bb3788",
+  "sourceSha256": "5346a543f4e23d332a8728b61b00c27f68d9f473f10f399bd644fb671ec42b7f",
+  "counts": {
+    "files": 631,
+    "literalReferences": 2862,
+    "dynamicTuples": 13582,
+    "failureCount": 0
+  }
+}

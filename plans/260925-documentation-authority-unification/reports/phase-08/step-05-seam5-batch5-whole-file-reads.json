@@ -1,0 +1,282 @@
+[
+  {
+    "file": "test/report/capability-plan-lint.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "fa7f7835aa885dd3f314b02e1f99c1dbde0c6f88bf612b5057cc1ce506e9c8fb",
+    "bytes": 25701,
+    "lines": 721
+  },
+  {
+    "file": "test/report/enduser-index.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+    "bytes": 22650,
+    "lines": 468
+  },
+  {
+    "file": "test/cli/fgos-approve-3.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "39e53aca8b9f830f9b39e6588d4888847265fd8581b8833cc562ce0fa55df7d4",
+    "bytes": 15596,
+    "lines": 345
+  },
+  {
+    "file": "test/cli/fgos-claim.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "8c0f4c7cf58cc4cfc87da19661e815ea96e043f4ba56f49a509712af04bdfacb",
+    "bytes": 33812,
+    "lines": 703
+  },
+  {
+    "file": "test/cli/fgos-disconnected-worktree-guard.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "548338077b0c615afee5d60db3e112ce42bc3a7140b7a43698cad097cece5dc8",
+    "bytes": 14035,
+    "lines": 282
+  },
+  {
+    "file": "test/cli/fgos-handoff.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "295561470e68e5556ba50b0be448cb08928dac4b088d21013df1f33b5fcccbee",
+    "bytes": 13783,
+    "lines": 322
+  },
+  {
+    "file": "test/cli/fgos-iron-law-gate.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "bfbf43dde292fdccadea4df2f2a2e3129669c1269c4478f0918b287e4d42970d",
+    "bytes": 15204,
+    "lines": 295
+  },
+  {
+    "file": "test/cli/fgos-merge.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "c146fc58884efcf7c83de274beadcb3f65c7c7bb7adac0bd21f1b68bfb2ba4d9",
+    "bytes": 73462,
+    "lines": 1321
+  },
+  {
+    "file": "test/cli/fgos-post-merge-2.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "ec9c7c1d6f3ed42d71963f957da50e7d5239ae7fbe40a80b3350ac576907d07f",
+    "bytes": 10194,
+    "lines": 277
+  },
+  {
+    "file": "test/cli/fgos-post-merge-4.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "2ff903a64036dfcfa8aca6609941132f8eb97e837f7ddc8ab47a2d1cf138e60a",
+    "bytes": 21746,
+    "lines": 469
+  },
+  {
+    "file": "test/cli/fgos-post-merge.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "38bb42272cd89d9055f6ef4d635b54bc05bd5355a996253a2fcaf7afb7932008",
+    "bytes": 14262,
+    "lines": 341
+  },
+  {
+    "file": "test/cli/fgos-preflight.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "84d56aa66d8f83228fc693b14c5c628c8c7f4528301902f1cd32f234f16a5581",
+    "bytes": 7102,
+    "lines": 156
+  },
+  {
+    "file": "test/cli/fgos-read-3.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "d2d85fac54d5d35a48e945bb6f9477fb3425c798130b863ad3ad93147559d1b7",
+    "bytes": 18516,
+    "lines": 407
+  },
+  {
+    "file": "test/cli/fgos-return.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "4712d857b0e7bb6ea48c4a71589f9bd06bfed9c591fcda1feaf63be0bb3ae128",
+    "bytes": 70705,
+    "lines": 1264
+  },
+  {
+    "file": "test/cli/fgos-stage-3.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "66dfb03edc2f64d20fb0cb83f85b14a691c46b094ef655f16b44f2054caf3ab9",
+    "bytes": 10230,
+    "lines": 243
+  },
+  {
+    "file": "test/cli/fgos-stage.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "9c971cae27e82dc5fd9d97fb387e213f1cef196f39f159677192f0e2ccacdf02",
+    "bytes": 15867,
+    "lines": 350
+  },
+  {
+    "file": "test/cli/knowledge-attest-gate.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "81c9d4a3c7763d7f214b837eb0a3022b65f4eb0b2bba619d5090fb4daf0ab9b7",
+    "bytes": 7397,
+    "lines": 137
+  },
+  {
+    "file": "test/cli/take-pick-claim-eligibility.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "e1607207cf0bc45388a3191e86376e2897324aa0582bd4eddeb5e3441469da91",
+    "bytes": 8638,
+    "lines": 199
+  },
+  {
+    "file": "test/direct/fgos-edit.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "0a892f411569e54e220deb61396800fc8ba9ca5f1b57f03f2b62221c5d0ff290",
+    "bytes": 20580,
+    "lines": 460
+  },
+  {
+    "file": "test/direct/fgos-step.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "0dc3df50f530296d21ce1676e52aaa8ea28e648726671af16cf712a3fdb09cf7",
+    "bytes": 17039,
+    "lines": 450
+  },
+  {
+    "file": "test/e2e/coexistence-canary.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "34f89393684c25c9bf0616441acf75bb2e418058f0ffd8c32cc08cce293544df",
+    "bytes": 17091,
+    "lines": 350
+  },
+  {
+    "file": "test/e2e/domain-aware-stage-literals.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "12475831574b086c96d9bf6410d4f9e14845656e91541f06ff00be2dc8e4285e",
+    "bytes": 22679,
+    "lines": 440
+  },
+  {
+    "file": "test/e2e/fixture-marketing-domain.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "bf40546d55d5637bec14a42905750c0d2aca6dd4646a522331367b10f49d3406",
+    "bytes": 21292,
+    "lines": 394
+  },
+  {
+    "file": "test/e2e/rebuild-determinism.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "140ea9ad521d8894714ac084d0da87fd34d95a94300bced4bb4fb9bc1377a8d4",
+    "bytes": 10010,
+    "lines": 211
+  },
+  {
+    "file": "test/e2e/runner-loop.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "704b3daafb5fe4158deb6dcadda7fe4274a2d3e89c43926dfc0abf965095b8bd",
+    "bytes": 66898,
+    "lines": 1196
+  },
+  {
+    "file": "test/e2e/self-improve-loop.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "09a45ecc69e197c2f6be9343827a22a5d879c3b062f7cab020a80fde1f88106b",
+    "bytes": 19006,
+    "lines": 365
+  },
+  {
+    "file": "test/intake/discovery.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "6f0c906c086a86af8f91b66b380dc16cf13261e69aaf02efcf30c3280f136bf6",
+    "bytes": 39132,
+    "lines": 680
+  },
+  {
+    "file": "test/intake/plan.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "924bc6f16c5ad86a3cb1c8c3f1f8bbd9acc8683651d5f401e1c6681cb8cdfee5",
+    "bytes": 82206,
+    "lines": 1669
+  },
+  {
+    "file": "test/report/authoritative-match.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "0e8e60587368313ee811d6dbf2146974ab361e1b7e1d811589625a03b49dd87b",
+    "bytes": 12193,
+    "lines": 275
+  },
+  {
+    "file": "test/report/context-render.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "b106b8b1ead5bf3f02a5be789df38299f395fee0078e4d2fa7c5a47e18a83660",
+    "bytes": 14360,
+    "lines": 321
+  },
+  {
+    "file": "test/report/decision-index.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "2cb72204dfb9304619663af3becca8553ac5c7ba24b11563fa8bf09b7fb94c32",
+    "bytes": 11002,
+    "lines": 223
+  },
+  {
+    "file": "test/report/knowledge-resolver.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "b13c51ad41071317dbe2be1b9e36b6e7d1cfd1f644a2f34af808cf8c784eb22c",
+    "bytes": 12166,
+    "lines": 242
+  },
+  {
+    "file": "test/runner/assignment-dispatch.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "2522aab5f1c7b09bd31e527233b506bed9262be4662e972c31217e1f49783564",
+    "bytes": 139866,
+    "lines": 2811
+  },
+  {
+    "file": "test/runner/assignment.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "20f40f4cd6cea1cd5e2554c77515bd7b3b7c6cce9bad4a390d5510efbb259651",
+    "bytes": 29566,
+    "lines": 591
+  },
+  {
+    "file": "test/runner/claim-port.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "4211cd020c09487bba723faf418cd6cce74b3674995eb0664a494b5e534d4e5d",
+    "bytes": 44214,
+    "lines": 803
+  },
+  {
+    "file": "test/runner/dispatch.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "b4a3a0ff90b14b420f76533064355896454bd2b28bb9de08fa6dc21b5fbe48ab",
+    "bytes": 265793,
+    "lines": 5448
+  },
+  {
+    "file": "test/runner/driver-rununit.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "6f624b58ed69f848dea60129fa9f3c9242fd55c617ec23f8a6072e3aab5ba63d",
+    "bytes": 28272,
+    "lines": 482
+  },
+  {
+    "file": "test/runner/loop.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "7347f51285b4cd61982206913d6132c28b5bd2ee59e6a440867926846b65af0e",
+    "bytes": 204202,
+    "lines": 3939
+  },
+  {
+    "file": "test/runner/merge-quoted-paths.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "b5bbb8e6b49884e8c7ebef388796ce89e7a93e2cb8dac5952e8ff1f0489d493c",
+    "bytes": 7093,
+    "lines": 172
+  },
+  {
+    "file": "test/runner/merge.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb",
+    "bytes": 127960,
+    "lines": 2375
+  }
+]

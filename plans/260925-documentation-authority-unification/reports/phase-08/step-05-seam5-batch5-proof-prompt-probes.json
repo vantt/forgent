@@ -1,0 +1,20 @@
+{
+  "label": "prompt-probes",
+  "command": [
+    "/usr/bin/python3",
+    "-B",
+    "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes.py"
+  ],
+  "exit": 0,
+  "elapsedSeconds": 686.084,
+  "resultFresh": true,
+  "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-prompt-probes.log",
+  "logSha256": "c7c971886c9a796a269b675de4b9e604bfe663d4d4181c087d1265089dad9d4b",
+  "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes-result.json",
+  "resultSha256": "b71b3416580bf68d7743090d15d1756073cef27a1b87008366b3f29999d7ed01",
+  "sourceSha256": "0daa372358e106547a09b6ab2c59c13d51601552b702a686b3e208571a865928",
+  "counts": {
+    "passed": 13,
+    "total": 13
+  }
+}

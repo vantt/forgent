@@ -1,0 +1,177 @@
+{
+  "timestamp": "2026-10-21T00:07:01.797439+00:00",
+  "status": "pass",
+  "proofs": [
+    {
+      "label": "full-check",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+        "--output",
+        "step-05-full-check-result.json"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 409.597,
+      "resultFresh": true,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-full-check.log",
+      "logSha256": "7e6ef443f3fe4e79d9de1b414c35f268288444e5e2f9cb7b5835df2b5e686adb",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+      "resultSha256": "587477d7026e02a646958a5fc8c658c2835c1b7b460d8f9426960f76a9bb3788",
+      "sourceSha256": "5346a543f4e23d332a8728b61b00c27f68d9f473f10f399bd644fb671ec42b7f",
+      "counts": {
+        "files": 631,
+        "literalReferences": 2862,
+        "dynamicTuples": 13582,
+        "failureCount": 0
+      }
+    },
+    {
+      "label": "pilot-probes",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 486.364,
+      "resultFresh": true,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-pilot-probes.log",
+      "logSha256": "ed5a4641a73331a1c84a2cdcfc76a1f7bc1170db25a5ff214213f49b7cd12c57",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
+      "resultSha256": "1c657c27239de46a4712a71565346ea6bf19d8c642900f0867b34eb166ebb63b",
+      "sourceSha256": "a59d36f661d03d96cc8d168ec8dd316b79161904145d04d3e8a50e0b63df7cf5",
+      "counts": {
+        "passed": 44,
+        "total": 44
+      }
+    },
+    {
+      "label": "generator-probes",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 768.519,
+      "resultFresh": true,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-generator-probes.log",
+      "logSha256": "be6baada3498e9392aed50f2a1eae7c314e3baf667ac54ad2bbdaec53886bace",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes-result.json",
+      "resultSha256": "079f8336d8931ef7c4b08388fea47808ce35723043191d9f5e0c3cb86e7a3662",
+      "sourceSha256": "a19c43384269bb457a4de2ad2f9629d42eab2cec4f849fa0e832056fd0b9c5f5",
+      "counts": {
+        "passed": 34,
+        "total": 34
+      }
+    },
+    {
+      "label": "prompt-probes",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes.py"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 686.084,
+      "resultFresh": true,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-prompt-probes.log",
+      "logSha256": "c7c971886c9a796a269b675de4b9e604bfe663d4d4181c087d1265089dad9d4b",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes-result.json",
+      "resultSha256": "b71b3416580bf68d7743090d15d1756073cef27a1b87008366b3f29999d7ed01",
+      "sourceSha256": "0daa372358e106547a09b6ab2c59c13d51601552b702a686b3e208571a865928",
+      "counts": {
+        "passed": 13,
+        "total": 13
+      }
+    },
+    {
+      "label": "batch2-probes",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes.py"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 75.711,
+      "resultFresh": true,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-batch2-probes.log",
+      "logSha256": "90e4e4fb6e58f963c438f5619f78603815013fa36c73d6f85708f62583224cff",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes-result.json",
+      "resultSha256": "eda386a899c7af10acc888cfb895eebb7386be99c9173f7f6d3f018c0666fc4c",
+      "sourceSha256": "a41e9243dd18de7029d909f8e1a009d626eff4c6dab8ebe4c5b87cd4e7abc79e",
+      "counts": {
+        "passed": 18,
+        "total": 18
+      }
+    },
+    {
+      "label": "batch3-probes",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes.py"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 154.487,
+      "resultFresh": true,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-batch3-probes.log",
+      "logSha256": "5d2603d8e219a93aadee79ed6945da5f41a999e014654d78a62902827adae8b1",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes-result.json",
+      "resultSha256": "2e192488be537d058fad959b4e9071ae54268c8fc1aafd089009780026cecac1",
+      "sourceSha256": "eaed7aa4684604d7c5ed16eec9278b6477cd6ef8addabfb9580484bc9b070138",
+      "counts": {
+        "passed": 19,
+        "total": 19
+      }
+    },
+    {
+      "label": "batch4-probes",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-probes.py"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 265.978,
+      "resultFresh": true,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-batch4-probes.log",
+      "logSha256": "dccc15d40aa1c7781314fb22c5bfd637bffb36a020d9bcc6b0010bcb28a21e3a",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-probes-result.json",
+      "resultSha256": "0b7f8f5aede3a29acfc58201aaf4c2faf7be5bc2c27d2faccbdf13d2810aac35",
+      "sourceSha256": "58fbece70a1dcc940b3f277a50382d018b575d467b5ea5c996bc93bedcfea412",
+      "counts": {
+        "passed": 29,
+        "total": 29,
+        "positivePassed": 15,
+        "positiveTotal": 15
+      }
+    },
+    {
+      "label": "new-probes",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes.py"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 168.042,
+      "resultFresh": true,
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-new-probes.log",
+      "logSha256": "4d5306df7ae9c082fa7581aa47913b31788c0e35a8f52f654a0b345a210b3652",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes-result.json",
+      "resultSha256": "81b96cd83161ad410bb36f4d84217f46a709e65f61256b490e5bc25b1c245c76",
+      "sourceSha256": "26e8efb19b0d1a6e9385cb065cda8295a83c363b6c2a7378ea2115a37542704e",
+      "counts": {
+        "passed": 19,
+        "total": 19
+      }
+    }
+  ],
+  "negativePassed": 176,
+  "negativeTotal": 176,
+  "authorVerificationOnly": true,
+  "independentReview": "pending Lead",
+  "phase9FullSuite": "pending"
+}

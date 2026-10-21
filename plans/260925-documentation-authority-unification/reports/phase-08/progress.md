@@ -1150,3 +1150,15 @@ R21 closes **42 new neutral files / 2 references / 727 tuples / 347,516 pinned b
 Final integrated checker: **591 records / 2,582 references / 10,052 tuples / 0 failures**. All **157/157 negative probes reject**; **15/15 new positive checks pass**. Final source/log/result hashes and freshness validate. Initial inline-reassignment refusal failure was caught and corrected before final verification. Wrapped ADR0027 provenance and the pinned web-package S01 proof command are included in the final replay.
 
 Review list: **35 cumulative judgment files**; **265 mechanical/neutral files** separately listed. Continuation: **404 files / 1,040 references / 20,609 tuples**, all original carries retained. Exact set conservation: **704 files / 1,203 references / 25,007 tuples**. Independent window review, Step 7 composition and Phase 9 npm/cargo parity remain Lead custody. Records only; runner owns commits; no product edits, fgOS CLI, git write, build/service or live-state/secrets read. Scratch stays under `/tmp/fgos-work/`; preview remains Lead custody. `needsWrites: []`. See `step-05-seam5-batch4-handback.md`.
+
+## Seam 5 batch 5 — started (2026-10-21)
+
+Review closure L12-80 and uniform admission sweep in progress; then at least 40 judgment files, checker and rejecting probes. Records only; runner owns commits.
+
+## Seam 5 batch 5 — authoring complete (2026-10-21)
+
+L12-80 closes author rework from five reviews: **24 changed old files / 135 changed items / 107 admission flips / three disposition changes**. Full judgment sweep has 43 history-pointer, 276 fixture/root and 40 successor checks. R21 triage: **404 files / zero new neutral closures**. New authoring: **40 judgment files / 280 references / 3,530 tuples / 96 supplemental slots; 154 admits (18 parks, 136 preserves), 3,752 rejects**.
+
+Final integrated checker: **631 records / 2,862 references / 13,582 tuples / zero failures**. **176/176 negative probes reject** (19 new rule-specific); root-positive 15/15, prior positives and HEAD-only drift pass. Source-only worker-session navigation patch replays 8/8 on each side, with exact inverse, co-cut grep, complete import provenance and ten identical holder members. Standalone checks and raw proof hashes are refreshed.
+
+Continuation: **364 files / 760 references / 17,079 tuples**; full original sets and three carries conserved. **75 cumulative judgment / 265 mechanical-neutral closures**; Lead review list separates **24 changed old + 40 added** files. See `step-05-seam5-batch5-handback.md`, `step-05-seam5-batch5-final-proof.json` and `step-05-seam5-batch5-verification.json`. Independent review, Step 7 final assembly/park resolution and Phase 9 full-suite parity remain pending. Records-only scope; no git writes or fgOS CLI; `needsWrites: []`.

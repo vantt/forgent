@@ -1,0 +1,7 @@
+{
+  "builder": "step-05-seam5-batch4-author-judgment.py",
+  "builderSha256": "b5fee8397ff34bf7c2c0363cd075e32420e36977caa9145b08b2ac7f1ac6471c",
+  "reused": "schema helper definitions and complete record/receipt authoring loop; batch-specific classification is supplied here",
+  "sourceBytesRead": 1611520,
+  "files": 40
+}

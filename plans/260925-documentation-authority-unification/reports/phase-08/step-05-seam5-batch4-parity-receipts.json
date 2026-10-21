@@ -7167,15 +7167,57 @@
         {
           "path": "test/runner/dispatch-worker-session.test.mjs",
           "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sha256": "ce16de65fa9b60c94ae08b26ad37e9d8ac4c6f4766796d3a6570be0cbfa0c6c4",
-          "bytes": 4752,
+          "sha256": "62840b8a69393be40cb96387a30a80124c2691aaf528e3184a915d33864ff051",
+          "bytes": 4751,
           "mode": "100644",
           "provenance": "immutable git object; source bytes only, no test execution or authority promotion"
         }
       ],
       "comparison": {
-        "currentOutputSet": [],
-        "candidateOutputSet": [],
+        "currentOutputSet": [
+          {
+            "file": "test/runner/dispatch-worker-session.test.mjs",
+            "outcomes": [
+              "✔ C2: a session name resolves to that session own socket, never the default one",
+              "✔ C2: a session name that could escape its directory is refused",
+              "✔ C3: launching into the session the caller is sitting in is refused by name",
+              "✔ C3: the default session is refused even when the caller reports no session at all",
+              "✔ C3: a distinct session name passes",
+              "✔ C2: the env handed to a worker points at its own session and drops the caller pane identity",
+              "✔ isolatedSessionEnv does not mutate the caller env it was handed",
+              "✔ C3 is enforced inside isolatedSessionEnv too, not only when asked separately",
+              "ℹ tests 8",
+              "ℹ pass 8",
+              "ℹ fail 0",
+              "ℹ cancelled 0",
+              "ℹ skipped 0",
+              "ℹ todo 0"
+            ],
+            "normalization": "Only wall-clock durations stripped; exact test titles, pass/fail and counts preserved."
+          }
+        ],
+        "candidateOutputSet": [
+          {
+            "file": "test/runner/dispatch-worker-session.test.mjs",
+            "outcomes": [
+              "✔ C2: a session name resolves to that session own socket, never the default one",
+              "✔ C2: a session name that could escape its directory is refused",
+              "✔ C3: launching into the session the caller is sitting in is refused by name",
+              "✔ C3: the default session is refused even when the caller reports no session at all",
+              "✔ C3: a distinct session name passes",
+              "✔ C2: the env handed to a worker points at its own session and drops the caller pane identity",
+              "✔ isolatedSessionEnv does not mutate the caller env it was handed",
+              "✔ C3 is enforced inside isolatedSessionEnv too, not only when asked separately",
+              "ℹ tests 8",
+              "ℹ pass 8",
+              "ℹ fail 0",
+              "ℹ cancelled 0",
+              "ℹ skipped 0",
+              "ℹ todo 0"
+            ],
+            "normalization": "Only wall-clock durations stripped; exact test titles, pass/fail and counts preserved."
+          }
+        ],
         "normalization": "none; no outputs produced and no replay claimed",
         "comparedFields": [
           "exact conserved claim/assertion mapping",
@@ -7184,7 +7226,9 @@
           "golden/source co-edit",
           "immutable fixture mode/hash/origin"
         ],
-        "intentionalDeltas": [],
+        "intentionalDeltas": [
+          "Comment navigation pointer only; all test names and assertions unchanged."
+        ],
         "unexpectedDeltas": [],
         "assertionOwnership": [
           {
@@ -7305,27 +7349,208 @@
           "mode": "100644",
           "provenance": "immutable git object; source bytes only, no test execution or authority promotion"
         },
-        "candidateScope": "unchanged pinned source only; no candidate output or passing full-suite claim"
+        "candidateScope": "Complete pinned current/candidate replay of comment-only navigation change; no post-retirement claim."
       },
       "proofs": [
         {
-          "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/runner/dispatch-worker-session.test.mjs",
-          "owningBehavior": "Exact test declarations/assertion lines in assertionOwnership",
-          "exit": null,
-          "logPath": null,
-          "logSha256": null,
-          "status": "not-run",
-          "reason": "R22: no Phase 9 patch in this file; Phase 9 full suite owns preserve/park parity."
+          "side": "current",
+          "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/runner/dispatch-worker-session.test.mjs",
+          "cwd": "disposable scratch materialized from immutable git objects",
+          "status": "pass",
+          "exit": 0,
+          "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-current-tests.log",
+          "logSha256": "90afecdffca1dbebec29a4117b7aad77b2c3788501e4305fdb532a58ce86fb78",
+          "owningBehavior": "All original worker-session test declarations and assertions; only source header pointer differs."
+        },
+        {
+          "side": "candidate",
+          "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/runner/dispatch-worker-session.test.mjs",
+          "cwd": "disposable scratch materialized from immutable git objects",
+          "status": "pass",
+          "exit": 0,
+          "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-candidate-tests.log",
+          "logSha256": "e73d409d3fca2998080af3adbe466340d5e6c2f7ba09863f80c425545f331bed",
+          "owningBehavior": "All original worker-session test declarations and assertions; only source header pointer differs."
         }
       ],
       "blockedBy": [],
-      "cutoverSpecifications": [],
+      "cutoverSpecifications": [
+        {
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "file": "test/runner/dispatch-worker-session.test.mjs",
+          "sourceSha256": "ce16de65fa9b60c94ae08b26ad37e9d8ac4c6f4766796d3a6570be0cbfa0c6c4",
+          "mode": "100644",
+          "symbolOrPassage": "module-header live-probe pointer L15",
+          "oldText": "import '../helpers/process-tmp-root.mjs';\nimport { test } from 'node:test';\nimport assert from 'node:assert/strict';\nimport {\n  socketPathForSession,\n  assertNotOperatorSession,\n  isolatedSessionEnv,\n  WorkerSessionError,\n} from '../../src/runner/dispatch/worker-session.mjs';\n\n// Phase 01 group C2/C3. These are pure functions over strings and an env object:\n// no herdr server is started here, and nothing in this file touches the operator's\n// live session. The parts that genuinely need a running server are proved by the\n// live probes under\n// docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/,\n// which measured that a named session starts headless with its own socket, that a\n// pane created inside it is handed THAT session's socket rather than the\n// operator's, and that from inside it sees only its own panes.\n//\n// The rule under test is C3: a worker must never be launched into the operator's\n// own session. That is an assertion, not a convention, because the failure it\n// prevents has already happened once in this project -- a dispatch typing into a\n// live session belonging to someone else, with an item parked awaiting a human as\n// the sharpest case.\n\ntest('C2: a session name resolves to that session own socket, never the default one', () => {\n  const home = '/home/someone';\n  assert.equal(\n    socketPathForSession('fgos-workers', { home }),\n    '/home/someone/.config/herdr/sessions/fgos-workers/herdr.sock',\n  );\n  assert.equal(\n    socketPathForSession('default', { home }),\n    '/home/someone/.config/herdr/herdr.sock',\n    'the default session keeps its own top-level socket path',\n  );\n});\n\ntest('C2: a session name that could escape its directory is refused', () => {\n  for (const bad of ['../default', 'a/b', '', '.', '..', 'has space', 'UPPER']) {\n    assert.throws(\n      () => socketPathForSession(bad, { home: '/home/someone' }),\n      (err) => err instanceof WorkerSessionError && err.code === 'invalid-session-name',\n      `expected refusal for session name: ${JSON.stringify(bad)}`,\n    );\n  }\n});\n\ntest('C3: launching into the session the caller is sitting in is refused by name', () => {\n  assert.throws(\n    () => assertNotOperatorSession('cockpit', { HERDR_SESSION: 'cockpit' }),\n    (err) => {\n      assert.ok(err instanceof WorkerSessionError);\n      assert.equal(err.code, 'operator-session');\n      return true;\n    },\n  );\n});\n\ntest('C3: the default session is refused even when the caller reports no session at all', () => {\n  // A caller outside herdr has no HERDR_SESSION, but `default` is still the\n  // operator's cockpit on this machine -- absence of the variable is not evidence\n  // that targeting default is safe.\n  assert.throws(\n    () => assertNotOperatorSession('default', {}),\n    (err) => err instanceof WorkerSessionError && err.code === 'operator-session',\n  );\n});\n\ntest('C3: a distinct session name passes', () => {\n  assert.equal(assertNotOperatorSession('fgos-workers', { HERDR_SESSION: 'cockpit' }), true);\n  assert.equal(assertNotOperatorSession('fgos-workers', {}), true);\n});\n\ntest('C2: the env handed to a worker points at its own session and drops the caller pane identity', () => {\n  const callerEnv = {\n    PATH: '/usr/bin',\n    HERDR_SESSION: 'cockpit',\n    HERDR_SOCKET_PATH: '/home/someone/.config/herdr/herdr.sock',\n    HERDR_PANE_ID: 'wS:p231',\n    HERDR_TAB_ID: 'wS:t7T',\n    HERDR_WORKSPACE_ID: 'wS',\n  };\n  const env = isolatedSessionEnv(callerEnv, 'fgos-workers', { home: '/home/someone' });\n\n  assert.equal(env.HERDR_SESSION, 'fgos-workers');\n  assert.equal(env.HERDR_SOCKET_PATH, '/home/someone/.config/herdr/sessions/fgos-workers/herdr.sock');\n  assert.equal(env.PATH, '/usr/bin', 'unrelated variables pass through');\n\n  // The caller's own pane identity must not travel with the worker: it names a\n  // pane in the operator's cockpit, which is exactly what the worker must not be\n  // able to address.\n  for (const k of ['HERDR_PANE_ID', 'HERDR_TAB_ID', 'HERDR_WORKSPACE_ID']) {\n    assert.equal(env[k], undefined, `${k} must not reach the worker`);\n  }\n});\n\ntest('isolatedSessionEnv does not mutate the caller env it was handed', () => {\n  const callerEnv = { HERDR_PANE_ID: 'wS:p231', HERDR_SESSION: 'cockpit' };\n  const before = { ...callerEnv };\n  isolatedSessionEnv(callerEnv, 'fgos-workers', { home: '/home/someone' });\n  assert.deepEqual(callerEnv, before, 'the caller keeps its own environment intact');\n});\n\ntest('C3 is enforced inside isolatedSessionEnv too, not only when asked separately', () => {\n  assert.throws(\n    () => isolatedSessionEnv({ HERDR_SESSION: 'cockpit' }, 'cockpit', { home: '/home/someone' }),\n    (err) => err instanceof WorkerSessionError && err.code === 'operator-session',\n  );\n});\n",
+          "newText": "import '../helpers/process-tmp-root.mjs';\nimport { test } from 'node:test';\nimport assert from 'node:assert/strict';\nimport {\n  socketPathForSession,\n  assertNotOperatorSession,\n  isolatedSessionEnv,\n  WorkerSessionError,\n} from '../../src/runner/dispatch/worker-session.mjs';\n\n// Phase 01 group C2/C3. These are pure functions over strings and an env object:\n// no herdr server is started here, and nothing in this file touches the operator's\n// live session. The parts that genuinely need a running server are proved by the\n// live probes under\n// docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/,\n// which measured that a named session starts headless with its own socket, that a\n// pane created inside it is handed THAT session's socket rather than the\n// operator's, and that from inside it sees only its own panes.\n//\n// The rule under test is C3: a worker must never be launched into the operator's\n// own session. That is an assertion, not a convention, because the failure it\n// prevents has already happened once in this project -- a dispatch typing into a\n// live session belonging to someone else, with an item parked awaiting a human as\n// the sharpest case.\n\ntest('C2: a session name resolves to that session own socket, never the default one', () => {\n  const home = '/home/someone';\n  assert.equal(\n    socketPathForSession('fgos-workers', { home }),\n    '/home/someone/.config/herdr/sessions/fgos-workers/herdr.sock',\n  );\n  assert.equal(\n    socketPathForSession('default', { home }),\n    '/home/someone/.config/herdr/herdr.sock',\n    'the default session keeps its own top-level socket path',\n  );\n});\n\ntest('C2: a session name that could escape its directory is refused', () => {\n  for (const bad of ['../default', 'a/b', '', '.', '..', 'has space', 'UPPER']) {\n    assert.throws(\n      () => socketPathForSession(bad, { home: '/home/someone' }),\n      (err) => err instanceof WorkerSessionError && err.code === 'invalid-session-name',\n      `expected refusal for session name: ${JSON.stringify(bad)}`,\n    );\n  }\n});\n\ntest('C3: launching into the session the caller is sitting in is refused by name', () => {\n  assert.throws(\n    () => assertNotOperatorSession('cockpit', { HERDR_SESSION: 'cockpit' }),\n    (err) => {\n      assert.ok(err instanceof WorkerSessionError);\n      assert.equal(err.code, 'operator-session');\n      return true;\n    },\n  );\n});\n\ntest('C3: the default session is refused even when the caller reports no session at all', () => {\n  // A caller outside herdr has no HERDR_SESSION, but `default` is still the\n  // operator's cockpit on this machine -- absence of the variable is not evidence\n  // that targeting default is safe.\n  assert.throws(\n    () => assertNotOperatorSession('default', {}),\n    (err) => err instanceof WorkerSessionError && err.code === 'operator-session',\n  );\n});\n\ntest('C3: a distinct session name passes', () => {\n  assert.equal(assertNotOperatorSession('fgos-workers', { HERDR_SESSION: 'cockpit' }), true);\n  assert.equal(assertNotOperatorSession('fgos-workers', {}), true);\n});\n\ntest('C2: the env handed to a worker points at its own session and drops the caller pane identity', () => {\n  const callerEnv = {\n    PATH: '/usr/bin',\n    HERDR_SESSION: 'cockpit',\n    HERDR_SOCKET_PATH: '/home/someone/.config/herdr/herdr.sock',\n    HERDR_PANE_ID: 'wS:p231',\n    HERDR_TAB_ID: 'wS:t7T',\n    HERDR_WORKSPACE_ID: 'wS',\n  };\n  const env = isolatedSessionEnv(callerEnv, 'fgos-workers', { home: '/home/someone' });\n\n  assert.equal(env.HERDR_SESSION, 'fgos-workers');\n  assert.equal(env.HERDR_SOCKET_PATH, '/home/someone/.config/herdr/sessions/fgos-workers/herdr.sock');\n  assert.equal(env.PATH, '/usr/bin', 'unrelated variables pass through');\n\n  // The caller's own pane identity must not travel with the worker: it names a\n  // pane in the operator's cockpit, which is exactly what the worker must not be\n  // able to address.\n  for (const k of ['HERDR_PANE_ID', 'HERDR_TAB_ID', 'HERDR_WORKSPACE_ID']) {\n    assert.equal(env[k], undefined, `${k} must not reach the worker`);\n  }\n});\n\ntest('isolatedSessionEnv does not mutate the caller env it was handed', () => {\n  const callerEnv = { HERDR_PANE_ID: 'wS:p231', HERDR_SESSION: 'cockpit' };\n  const before = { ...callerEnv };\n  isolatedSessionEnv(callerEnv, 'fgos-workers', { home: '/home/someone' });\n  assert.deepEqual(callerEnv, before, 'the caller keeps its own environment intact');\n});\n\ntest('C3 is enforced inside isolatedSessionEnv too, not only when asked separately', () => {\n  assert.throws(\n    () => isolatedSessionEnv({ HERDR_SESSION: 'cockpit' }, 'cockpit', { home: '/home/someone' }),\n    (err) => err instanceof WorkerSessionError && err.code === 'operator-session',\n  );\n});\n",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 96,
+              "columnStart": 4,
+              "line": 15,
+              "text": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/"
+            }
+          ],
+          "diff": "--- a/test/runner/dispatch-worker-session.test.mjs\n+++ b/test/runner/dispatch-worker-session.test.mjs\n@@ -12,7 +12,7 @@\n // no herdr server is started here, and nothing in this file touches the operator's\n // live session. The parts that genuinely need a running server are proved by the\n // live probes under\n-// docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/,\n+// docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/,\n // which measured that a named session starts headless with its own socket, that a\n // pane created inside it is handed THAT session's socket rather than the\n // operator's, and that from inside it sees only its own panes.\n",
+          "expectedAfterSha256": "62840b8a69393be40cb96387a30a80124c2691aaf528e3184a915d33864ff051",
+          "targetOwner": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/",
+          "claimAnchorProof": {
+            "directoryMembers": [
+              {
+                "source": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-findings.md",
+                "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-findings.md",
+                "sha256": "4ca49578ffd3359d78ac8d3520eb7d0e72d292ce8f90919ee3ba8fd905697308",
+                "byteIdentical": true
+              },
+              {
+                "source": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-probe.sh",
+                "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-probe.sh",
+                "sha256": "c70d088c8a324b769fe38d0ebadae7e93d439390b53c5041c0bd11c594f2f1db",
+                "byteIdentical": true
+              },
+              {
+                "source": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/env-probe.sh",
+                "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/env-probe.sh",
+                "sha256": "71b37fd4ead0bd167513a32b3c5b3176065574b008bb965245c4ad7b22795a9c",
+                "byteIdentical": true
+              },
+              {
+                "source": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/findings.md",
+                "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/findings.md",
+                "sha256": "05a73ff3855f133d32e9f223be63a59d0145db16c142c48bfe0d361ac9ae99e2",
+                "byteIdentical": true
+              },
+              {
+                "source": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-findings.md",
+                "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-findings.md",
+                "sha256": "403c52c47968ec432897ac8ba23c4bf74769830266bd9fbc2000f7f742d2409b",
+                "byteIdentical": true
+              },
+              {
+                "source": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-probe.sh",
+                "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-probe.sh",
+                "sha256": "5bb1a8960f7e739177f4f25c68b35280600014a3aa7e0f7e3d987870dc2dee22",
+                "byteIdentical": true
+              },
+              {
+                "source": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/provisioned-worker-probe.sh",
+                "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/provisioned-worker-probe.sh",
+                "sha256": "3605c13dd0bef6a87ce7fee55877caa0fe20d8808d82167b31ed15e75903ed9d",
+                "byteIdentical": true
+              },
+              {
+                "source": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/session-findings.md",
+                "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/session-findings.md",
+                "sha256": "be03987e3306b6a0d6d06a230cfdac3034e6bc63b33447920e4ebc0ec755dd26",
+                "byteIdentical": true
+              },
+              {
+                "source": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/skip-permissions-probe.sh",
+                "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/skip-permissions-probe.sh",
+                "sha256": "86604b250428d52b4b400cd157d42de0a4136f0ca9f8f26d039105dce047c20d",
+                "byteIdentical": true
+              },
+              {
+                "source": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/socket-probe.sh",
+                "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/socket-probe.sh",
+                "sha256": "10c87fb8d7e7cdefce1b0df3243039005915f58a6178465b60fa3672177f8a2a",
+                "byteIdentical": true
+              }
+            ],
+            "anchor": null
+          },
+          "receiptId": "real-file-tests-goldens-batch4-dispatch-worker-session",
+          "coCutPaths": [
+            "test/runner/dispatch-worker-session.test.mjs",
+            "CHANGELOG.md"
+          ],
+          "expectedOutputSets": [
+            {
+              "file": "test/runner/dispatch-worker-session.test.mjs",
+              "outcomes": [
+                "✔ C2: a session name resolves to that session own socket, never the default one",
+                "✔ C2: a session name that could escape its directory is refused",
+                "✔ C3: launching into the session the caller is sitting in is refused by name",
+                "✔ C3: the default session is refused even when the caller reports no session at all",
+                "✔ C3: a distinct session name passes",
+                "✔ C2: the env handed to a worker points at its own session and drops the caller pane identity",
+                "✔ isolatedSessionEnv does not mutate the caller env it was handed",
+                "✔ C3 is enforced inside isolatedSessionEnv too, not only when asked separately",
+                "ℹ tests 8",
+                "ℹ pass 8",
+                "ℹ fail 0",
+                "ℹ cancelled 0",
+                "ℹ skipped 0",
+                "ℹ todo 0"
+              ],
+              "normalization": "Only wall-clock durations stripped; exact test titles, pass/fail and counts preserved."
+            }
+          ],
+          "testTargets": [
+            "test/runner/dispatch-worker-session.test.mjs"
+          ],
+          "intentionalBehaviorDeltas": [
+            "Comment navigation pointer only; all test names and assertions unchanged."
+          ],
+          "prerequisites": [
+            "Phase 9 holder promotion and Step 7 final-pin composition"
+          ],
+          "order": "atomic source-only comment change, with release changelog",
+          "rollbackDiff": "--- a/test/runner/dispatch-worker-session.test.mjs\n+++ b/test/runner/dispatch-worker-session.test.mjs\n@@ -12,7 +12,7 @@\n // no herdr server is started here, and nothing in this file touches the operator's\n // live session. The parts that genuinely need a running server are proved by the\n // live probes under\n-// docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/,\n+// docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/,\n // which measured that a named session starts headless with its own socket, that a\n // pane created inside it is handed THAT session's socket rather than the\n // operator's, and that from inside it sees only its own panes.\n",
+          "timing": "phase9",
+          "readiness": "pending independent review and Phase 9 full suite",
+          "coCutTestGreps": [
+            {
+              "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+              "oldPointer": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/",
+              "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+              "needles": [
+                "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/",
+                "docs\\/architect\\/agent-coordination\\/verification\\/visibility-herdr\\/proofs\\/2026-09-06-isolation\\/"
+              ],
+              "matches": [
+                {
+                  "file": "test/runner/dispatch-worker-session.test.mjs",
+                  "line": 15,
+                  "text": "// docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/,",
+                  "sourceSha256": "ce16de65fa9b60c94ae08b26ad37e9d8ac4c6f4766796d3a6570be0cbfa0c6c4"
+                }
+              ]
+            }
+          ]
+        }
+      ],
       "readiness": "pending independent window review and Phase 9 full suite; record closure only",
       "review": {
         "status": "pending",
         "reviewer": null,
         "report": null
-      }
+      },
+      "coCutPaths": [
+        "test/runner/dispatch-worker-session.test.mjs",
+        "CHANGELOG.md"
+      ],
+      "coCutTestGreps": [
+        {
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "oldPointer": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/",
+            "docs\\/architect\\/agent-coordination\\/verification\\/visibility-herdr\\/proofs\\/2026-09-06-isolation\\/"
+          ],
+          "matches": [
+            {
+              "file": "test/runner/dispatch-worker-session.test.mjs",
+              "line": 15,
+              "text": "// docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/,",
+              "sourceSha256": "ce16de65fa9b60c94ae08b26ad37e9d8ac4c6f4766796d3a6570be0cbfa0c6c4"
+            }
+          ]
+        }
+      ],
+      "replayManifest": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-replay-manifests.json",
+      "replayManifestSha256": "6ce51b3d83b447c53c5409ab5c146dbc1bcfe2ca9b67964745e6b76f61d37a25"
     },
     {
       "id": "real-file-tests-goldens-batch4-codex-cli-glm-cli-live-executors",
