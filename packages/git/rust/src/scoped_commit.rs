@@ -108,6 +108,28 @@ pub(crate) fn paths(bytes: &[u8]) -> Result<Vec<String>> {
         })
         .collect()
 }
+/// Splits `show --name-only -z --format=%H%x00%T%x00%P%x00`: three NUL-ended
+/// header fields, the format's own terminator, then (only when the commit
+/// changed paths) Git's single newline separator and the NUL-ended paths.
+/// Any other shape is refused rather than guessed.
+fn split_observation(bytes: &[u8]) -> Result<(String, String, String, Vec<String>)> {
+    let invalid = || recovery("commit-header-invalid");
+    let mut rest = bytes;
+    let mut header = Vec::with_capacity(3);
+    for _ in 0..3 {
+        let end = rest.iter().position(|b| *b == 0).ok_or_else(invalid)?;
+        header.push(std::str::from_utf8(&rest[..end]).map_err(|_| invalid())?.to_owned());
+        rest = &rest[end + 1..];
+    }
+    let rest = rest.strip_prefix(&[0]).ok_or_else(invalid)?;
+    let rest = match rest.strip_prefix(b"\n") {
+        Some(names) => names,
+        None if rest.is_empty() => rest,
+        None => return Err(invalid()),
+    };
+    let [observed, tree, parents]: [String; 3] = header.try_into().map_err(|_| invalid())?;
+    Ok((observed, tree, parents, paths(rest)?))
+}
 pub(crate) fn root(repo: &RepoHandle) -> Result<&Path> {
     repo.work_tree
         .as_deref()
@@ -1251,13 +1273,23 @@ impl GitDriver {
                 request.message.as_bytes(),
                 true,
             )?;
-            // One immutable header observation binds oid, tree and parents together.
-            let header = self.checkout_text(repo, scope, &["show", "-s", "--format=%H%x00%T%x00%P%x00", "HEAD"])?;
-            let mut fields = header.split_terminator('\0');
-            let observed = fields.next().ok_or_else(|| recovery("commit-header-invalid"))?.to_owned();
-            let actual_tree = fields.next().ok_or_else(|| recovery("commit-header-invalid"))?;
-            let parents = fields.next().ok_or_else(|| recovery("commit-header-invalid"))?;
-            if fields.next().is_some() { return Err(recovery("commit-header-invalid")); }
+            // One immutable observation binds oid, tree, parents and the committed
+            // paths together: the paths are the commit's own change against its
+            // parent, which is the baseline whenever the parent check below holds.
+            let observation = self.checkout_bytes(
+                repo,
+                scope,
+                &[
+                    "show",
+                    "--name-only",
+                    "--no-renames",
+                    "--no-relative",
+                    "-z",
+                    "--format=%H%x00%T%x00%P%x00",
+                    "HEAD",
+                ],
+            )?;
+            let (observed, actual_tree, parents, shown) = split_observation(&observation)?;
             if observed == baseline.head {
                 // Keep the attempt durable. Retrying uses a new id after a fresh preflight.
                 if !out.success {
@@ -1270,32 +1302,47 @@ impl GitDriver {
                 }
                 return Err(recovery("commit-effect-unknown"));
             }
-            let actual = paths(&self.checkout_bytes(
-                repo,
-                scope,
-                &[
-                    "diff",
-                    "--name-only",
-                    "--no-renames",
-                    "-z",
-                    &baseline.head,
-                    &observed,
-                ],
-            )?)?;
+            let actual = if parents.split_whitespace().collect::<Vec<_>>()
+                == vec![baseline.head.as_str()]
+            {
+                shown
+            } else {
+                paths(&self.checkout_bytes(
+                    repo,
+                    scope,
+                    &[
+                        "diff",
+                        "--name-only",
+                        "--no-renames",
+                        "-z",
+                        &baseline.head,
+                        &observed,
+                    ],
+                )?)?
+            };
             let violation = !out.success
                 || actual_tree != tree
                 || actual != selected
                 || parents.split_whitespace().collect::<Vec<_>>()
                     != vec![baseline.head.as_str()];
             let oid = Oid::parse(&observed, repo.object_format()).map_err(failure)?;
-            crate::refs::sync_refs(repo, &RefName::parse(&baseline.reference).map_err(failure)?)?;
+            // The ref's directories are made durable while the receipt's own bytes
+            // are synced, and the receipt's name is installed only after both
+            // finished: the receipt never exists before the ref is durable.
+            let reference = RefName::parse(&baseline.reference).map_err(failure)?;
+            let ref_durable = || {
+                crate::refs::sync_refs(repo, &reference)
+                    .map_err(|e| std::io::Error::other(e.cause))
+            };
             recorded_terminal = Some(
-                wal.append(
+                wal.append_ordered(
                     &attempted,
                     Phase::Outcome(Outcome::Commit {
                         observed,
                         contract_violation: violation,
                     }),
+                    Some(&ref_durable),
+                    &mut || Ok(()),
                 )
                 .map_err(failure)?,
             );
@@ -1627,6 +1674,37 @@ mod saved_permissions {
         {
             let _ = d;
             Err(serde::de::Error::custom("snapshot-platform-unsupported"))
+        }
+    }
+}
+
+#[cfg(test)]
+mod observation_tests {
+    use super::split_observation;
+    const HEAD: &str = "aaaa\0bbbb\0cccc\0";
+    #[test]
+    fn observation_splits_header_and_paths() {
+        let bytes = format!("{HEAD}\0\nb\0d e\0\nnl\0");
+        let (oid, tree, parents, files) = split_observation(bytes.as_bytes()).unwrap();
+        assert_eq!((oid.as_str(), tree.as_str(), parents.as_str()), ("aaaa", "bbbb", "cccc"));
+        // The first path may itself begin with a newline: only Git's one separator is dropped.
+        assert_eq!(files, ["b", "d e", "\nnl"]);
+    }
+    #[test]
+    fn observation_of_a_commit_without_paths_has_none() {
+        let bytes = format!("{HEAD}\0");
+        assert!(split_observation(bytes.as_bytes()).unwrap().3.is_empty());
+    }
+    #[test]
+    fn observation_in_any_other_shape_is_refused() {
+        for bad in [
+            "".to_owned(),
+            "aaaa\0bbbb\0".to_owned(),
+            HEAD.to_owned(),
+            format!("{HEAD}\0x\0"),
+            format!("{HEAD}extra"),
+        ] {
+            assert!(split_observation(bad.as_bytes()).is_err(), "{bad:?}");
         }
     }
 }

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5159cb13b668843453126ab0dbff034899d5437ef69da719e4de59eab553d35e",
+  "payloadDigest": "c095fa0a30e48e9ba1666031b1428134f5acf0838d7af5c36e4ec8000cb316de",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -305,7 +305,7 @@
     "packages/git/rust/src/remote.rs": "5d4be338ec334daf9270869bfd7ae7a392a74a80636666206a9e0744734873e4",
     "packages/git/rust/src/repository_config.rs": "fee7b1369e589ad300f19174d8464b3eaef005b49d77d39b98b2be0c3ae58b2e",
     "packages/git/rust/src/restore.rs": "83be51119cf4ca3611fc04bcbef1c6a789ddd81dc370f60f28a4b8980d5c88d5",
-    "packages/git/rust/src/scoped_commit.rs": "aa8e543cedf224e676fef9327342de176c650693c7c52b9a52fade1a671320e6",
+    "packages/git/rust/src/scoped_commit.rs": "d3a1eceb159b84fa9723570ffbfd1713eb95a4af163b506fb2ba1b5d8c11e9c8",
     "packages/git/rust/src/sync.rs": "103096ec5cc98194be1acb9987e9cd71d0edc5f0a885ccd1929f31f0bff73f4e",
     "packages/git/rust/src/wal.rs": "d795a14faac0bcfea6d76c4cde6edadc0f82cc292353cbf974037aba42bb54ae",
     "packages/git/rust/src/worktree.rs": "7cb972be0cde38a9df3726ecf84fe13d7e0b3e0a65f3ba525a48253042aa0beb",
@@ -562,8 +562,8 @@
     "scripts/git/e1-power-cut.sh": "e8dca0019ff393f0d51b406ada77d3cbcaa5f3738948c29856bb4c9ba0d2c6cd",
     "scripts/git/e3-bench.mjs": "324b205b6ac185b7d1f1d5e1c10070de9d6261714bb5c4ae334a35307d68e003",
     "scripts/git/p-release-checks.sh": "08bb9b3c32e7915b27f645f7aa68d42cba0dbddd2a7dc9adc45d43a75b4d0056",
-    "scripts/git/p-space-resource.mjs": "2e8dda349394e47f57633274905a5fb63b008d952c8ca7cb594b0ed48dce0328",
-    "scripts/git/p-space.sh": "68c57e76c5f866f46db3cebcb5f0b2e741c9bf49981c42d67481593a8ea734bd",
+    "scripts/git/p-space-resource.mjs": "31e12327e2782a769a341cb6819f7e1e24d63e78de732c1ad210e430433aad06",
+    "scripts/git/p-space.sh": "2cd07cbc9e0c58d9dc40a32a711fd3fcde40ada1d7f0ad859cdf5fc16da452d3",
     "scripts/herdr-cockpit-notify.mjs": "f3e1cd7e31438e75a113b2cc2481ca6472c1fadaf94a16ed781204d50ed2ac0e",
     "scripts/herdr-cockpit.sh": "486b87ae6e1ffd877971dd21b0fec7d375c8b83d0e83f1972cfa4b700720eddd",
     "scripts/install-git-hooks.mjs": "5d37cb2d1596d02d89df9e52bc0773ccbb33cdee58c8d692215e88474d69ffce",

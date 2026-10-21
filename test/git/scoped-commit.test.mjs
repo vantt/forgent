@@ -28,8 +28,9 @@ test('ScopedCommit requires exact custody, preserves pre-existing dirt and liter
     fs.writeFileSync(path.join(f.linked,'old-dirt'),'keep');
     const baseline=f.port.preflight({},f.held);
     fs.writeFileSync(path.join(f.linked,'a'),'changed');fs.writeFileSync(path.join(f.linked,'[literal]'),'literal');fs.writeFileSync(path.join(f.linked,'outside'),'outside');
-    const args={operationId:'exact',baseline,request:{writes:['a','[literal]','old-dirt'],message:'custom subject\n\nbody\n',cutoverGrant:null}};
-    const result=f.port.commit(args,f.held);assert.equal(result.status,'committed');assert.deepEqual(result.files,['[literal]','a']);
+    fs.writeFileSync(path.join(f.linked,'sp ace'),'space');fs.mkdirSync(path.join(f.linked,'dir'));fs.writeFileSync(path.join(f.linked,'dir','é'),'accent');
+    const args={operationId:'exact',baseline,request:{writes:['a','[literal]','old-dirt','sp ace','dir/é'],message:'custom subject\n\nbody\n',cutoverGrant:null}};
+    const result=f.port.commit(args,f.held);assert.equal(result.status,'committed');assert.deepEqual(result.files,['[literal]','a','dir/é','sp ace']);
     assert.equal(execFileSync('git',['-C',f.linked,'show','-s','--format=%B'],{encoding:'utf8'}),'custom subject\n\nbody\n\n');
     assert.equal(f.port.commit(args,f.held).oid,result.oid);
     assert.equal(fs.readFileSync(path.join(f.linked,'old-dirt'),'utf8'),'keep');
@@ -262,7 +263,7 @@ test('ScopedCommit probes config and formats once per loan and once after hooks'
       assert.equal(probes(before.gitExecs,probe),1,`preflight ${probe}`);
       assert.equal(probes(after.gitExecs,probe),2,`commit entry + post-hook ${probe}`);
     }
-    assert.equal(before.gitExecCount + after.gitExecCount,30);
+    assert.equal(before.gitExecCount + after.gitExecCount,29);
     for (const phase of ['land-prepare','land-publish','land-legacy']) {
       assert.ok(census.phases[phase].gitExecCount > 0,phase);
     }
