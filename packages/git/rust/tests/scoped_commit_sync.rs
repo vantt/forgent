@@ -1409,32 +1409,68 @@ fn unknown_commit_recovery_is_an_error_but_pending_intent_can_be_abandoned() {
     assert!(wal::Wal::open(&f.repo).unwrap().inspect("missing").is_err());
 }
 
-/// Counts `object-durable` and checks, at each one, that the operation has no
-/// receipt yet. Optionally refuses the n-th (1-based) one.
+/// Counts the durability steps of a scoped commit and checks, at each one, the
+/// order it must hold: `staged-object-durable` runs while the branch still names
+/// the baseline, `object-durable` after the branch moved and before any receipt.
+/// Optionally refuses the n-th (1-based) step of either kind.
 struct ObjectSteps {
     common: PathBuf,
+    tree: PathBuf,
+    base: String,
     id: &'static str,
+    staged: AtomicU64,
     seen: AtomicU64,
+    refuse_staged_at: Option<u64>,
     refuse_at: Option<u64>,
 }
 impl ObjectSteps {
     fn new(f: &Fixture, id: &'static str, refuse_at: Option<u64>) -> Self {
-        Self { common: f.repo.common_dir().to_path_buf(), id, seen: AtomicU64::new(0), refuse_at }
+        Self {
+            common: f.repo.common_dir().to_path_buf(),
+            tree: f.tree.clone(),
+            base: git(&f.tree, &["rev-parse", "HEAD"]),
+            id,
+            staged: AtomicU64::new(0),
+            seen: AtomicU64::new(0),
+            refuse_staged_at: None,
+            refuse_at,
+        }
+    }
+    /// The branch tip the operation started from, when it is not the current one.
+    fn based_on(mut self, base: &str) -> Self {
+        self.base = base.to_owned();
+        self
+    }
+    fn refusing_staged_at(mut self, n: u64) -> Self {
+        self.refuse_staged_at = Some(n);
+        self
     }
     fn seen(&self) -> u64 {
         self.seen.load(Ordering::SeqCst)
     }
+    fn staged(&self) -> u64 {
+        self.staged.load(Ordering::SeqCst)
+    }
 }
 impl wal::FileSystem for ObjectSteps {
     fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
-        if step != "object-durable" {
-            return Ok(());
-        }
-        let wal = wal::Wal::open_existing(&self.common, wal::OsFileSystem).unwrap();
-        assert!(wal.inspect(self.id).unwrap().outcome().is_none(), "receipt installed before the objects were durable");
-        let n = self.seen.fetch_add(1, Ordering::SeqCst) + 1;
-        if self.refuse_at == Some(n) {
-            return Err(std::io::Error::other("injected object-durable fault"));
+        let head = git(&self.tree, &["rev-parse", "HEAD"]);
+        let (counter, refuse) = match step {
+            "staged-object-durable" => {
+                assert_eq!(head, self.base, "branch moved before the staged objects were durable");
+                (&self.staged, self.refuse_staged_at)
+            }
+            "object-durable" => {
+                assert_ne!(head, self.base, "commit objects synced before the branch moved");
+                let wal = wal::Wal::open_existing(&self.common, wal::OsFileSystem).unwrap();
+                assert!(wal.inspect(self.id).unwrap().outcome().is_none(), "receipt installed before the objects were durable");
+                (&self.seen, self.refuse_at)
+            }
+            _ => return Ok(()),
+        };
+        let n = counter.fetch_add(1, Ordering::SeqCst) + 1;
+        if refuse == Some(n) {
+            return Err(std::io::Error::other(format!("injected {step} fault")));
         }
         Ok(())
     }
@@ -1450,9 +1486,26 @@ fn nested_request() -> CommitRequest {
 fn objects_of_commit(f: &Fixture, base: &str) -> u64 {
     git(&f.tree, &["rev-list", "--objects", "HEAD", &format!("^{base}")]).lines().count() as u64
 }
+/// A nested file is written and committed with the commit's receipt refused at
+/// its first object: the commit is on the branch, the chain has no outcome.
+fn unacknowledged_nested_commit(f: &Fixture, id: &'static str) -> String {
+    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+    fs::create_dir_all(f.tree.join("deep/er")).unwrap();
+    fs::write(f.tree.join("deep/er/file"), "new blob").unwrap();
+    let refusing = ObjectSteps::new(f, id, Some(1));
+    assert!(f
+        .driver
+        .scoped_commit_with_filesystem(&f.repo, f.held(), &baseline, &nested_request(), "fixture", id, &refusing)
+        .is_err());
+    assert_eq!(objects_of_commit(f, &baseline.head), 5);
+    baseline.head
+}
+fn loose_object(f: &Fixture, oid: &str) -> PathBuf {
+    f.repo.common_dir().join("objects").join(&oid[..2]).join(&oid[2..])
+}
 
 #[test]
-fn scoped_commit_makes_each_new_object_durable_before_the_receipt() {
+fn scoped_commit_makes_staged_objects_durable_before_the_branch_moves_and_the_commit_before_the_receipt() {
     let f = Fixture::new();
     let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
     fs::create_dir_all(f.tree.join("deep/er")).unwrap();
@@ -1463,30 +1516,57 @@ fn scoped_commit_makes_each_new_object_durable_before_the_receipt() {
         .scoped_commit_with_filesystem(&f.repo, f.held(), &baseline, &nested_request(), "fixture", "durable", &steps)
         .unwrap();
     assert_eq!(result.status, ResultCode::Committed);
-    // Commit, root tree, two subtrees and the blob.
+    // Commit, root tree, two subtrees and the blob; the commit alone is new after the branch moved.
     assert_eq!(objects_of_commit(&f, &baseline.head), 5);
+    assert_eq!(steps.staged(), 4);
     assert_eq!(steps.seen(), 5);
+}
+
+#[test]
+fn a_refused_staged_object_sync_never_reaches_git_commit() {
+    let f = Fixture::new();
+    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+    fs::create_dir_all(f.tree.join("deep/er")).unwrap();
+    fs::write(f.tree.join("deep/er/file"), "new blob").unwrap();
+    let steps = ObjectSteps::new(&f, "refused", None).refusing_staged_at(2);
+    let refused = f.driver.scoped_commit_with_filesystem(
+        &f.repo, f.held(), &baseline, &nested_request(), "fixture", "refused", &steps,
+    );
+    assert!(refused.is_err());
+    assert_eq!(git(&f.tree, &["rev-parse", "HEAD"]), baseline.head);
+    assert_eq!(git(&f.tree, &["diff", "--cached", "--name-only"]), "");
+    assert_eq!(fs::read_to_string(f.tree.join("deep/er/file")).unwrap(), "new blob");
+    assert_eq!(steps.seen(), 0);
 }
 
 #[test]
 fn recovery_makes_the_new_objects_durable_before_it_reports_the_commit() {
     let f = Fixture::new();
-    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
-    fs::create_dir_all(f.tree.join("deep/er")).unwrap();
-    fs::write(f.tree.join("deep/er/file"), "new blob").unwrap();
-    let refusing = ObjectSteps::new(&f, "interrupted", Some(2));
-    let refused = f.driver.scoped_commit_with_filesystem(
-        &f.repo, f.held(), &baseline, &nested_request(), "fixture", "interrupted", &refusing,
-    );
-    assert!(refused.is_err());
-    // The commit exists, but no receipt was installed.
-    let committed = objects_of_commit(&f, &baseline.head);
-    assert_eq!(committed, 5);
-    let recovering = ObjectSteps::new(&f, "interrupted", None);
+    let base = unacknowledged_nested_commit(&f, "interrupted");
+    let recovering = ObjectSteps::new(&f, "interrupted", None).based_on(&base);
     let outcome = f
         .driver
         .recover_scoped_commit_with_filesystem(&f.repo, f.held(), "fixture", "interrupted", &recovering)
         .unwrap();
     assert!(matches!(outcome, wal::Outcome::Commit { contract_violation: false, .. }), "{outcome:?}");
-    assert_eq!(recovering.seen(), committed);
+    assert_eq!(recovering.seen(), objects_of_commit(&f, &base));
+}
+
+#[test]
+fn recovery_of_a_tip_with_an_unreadable_object_names_the_cause_and_keeps_the_evidence() {
+    for (id, lost) in [("lost-blob", "HEAD:deep/er/file"), ("lost-commit", "HEAD")] {
+        let f = Fixture::new();
+        unacknowledged_nested_commit(&f, id);
+        let tip = git(&f.tree, &["rev-parse", "HEAD"]);
+        let object = git(&f.tree, &["rev-parse", lost]);
+        let file = loose_object(&f, &object);
+        fs::set_permissions(&file, std::os::unix::fs::PermissionsExt::from_mode(0o644)).unwrap();
+        fs::remove_file(&file).unwrap();
+        let error = f.driver.recover_scoped_commit(&f.repo, f.held(), "fixture", id).unwrap_err();
+        assert_eq!(error.code, ResultCode::RecoveryRequired, "{lost}");
+        assert_eq!(error.cause, "commit-objects-unreadable", "{lost}");
+        // The branch is not reset and the chain stays open for the owner.
+        assert_eq!(git(&f.tree, &["rev-parse", "HEAD"]), tip);
+        assert!(wal::Wal::open(&f.repo).unwrap().inspect(id).unwrap().outcome().is_none());
+    }
 }

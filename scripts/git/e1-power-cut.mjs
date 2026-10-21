@@ -162,11 +162,12 @@ async function workload(args) {
   input?.close();
 }
 
-/** Post-cut invariants of a scoped workload. Judged state is what was acknowledged: the producer
- * branch holds the last acknowledged commit with every tree and blob readable, its WAL chain is
- * terminal, and `git fsck --full` is clean. Git moves the branch inside `git commit`, before the
- * receipt, so a commit after the last acknowledged one may sit on the branch with objects that are
- * not durable yet; fsck errors that name only such unacknowledged objects are excused. */
+/** Post-cut invariants of a scoped workload. Judged state: the producer branch tip is fully
+ * readable at every replay point, whether or not the operation that made it was acknowledged: its
+ * history lists, every tree and blob opens, and `git fsck --full` is clean (the staged blobs and
+ * trees are durable before `git commit` moves the branch, the commit object before its ref). The
+ * last acknowledged commit is on the branch, its WAL chain terminal. No fsck error is excused: a
+ * missing commit object with the branch still at the previous readable commit is not an error. */
 async function checkScoped(args) {
   const root = path.resolve(args.root);
   const { repo, state } = layoutScoped(root);
@@ -188,25 +189,21 @@ async function checkScoped(args) {
   const tip = tipShown.ok ? String(tipShown.out).trim() : null;
   const floor = lastAck?.next ?? plan.find((p) => p.kind === 'intent' && p.i === 0)?.expected ?? null;
   const ahead = Boolean(tip && floor && tip !== floor);
-  // Objects an acknowledgement promised: everything reachable from the last acknowledged commit.
-  let promised = new Set();
   if (lastAck) {
     if (!tip) violations.push(`${SCOPED_REF}: absent after acked ${lastAck.id} (${lastAck.next})`);
     else if (!run(['merge-base', '--is-ancestor', lastAck.next, SCOPED_REF]).ok) violations.push(`${SCOPED_REF}: ${tip} does not contain acked ${lastAck.id} (${lastAck.next})`);
-    const listed = run(['rev-list', '--objects', lastAck.next]);
-    if (!listed.ok) violations.push(`acked ${lastAck.id}: objects not listable: ${String(listed.out).trim().slice(0, 300)}`);
-    else promised = new Set(String(listed.out).split('\n').map((l) => l.split(' ')[0]).filter(Boolean));
-    // Reading the archive opens every tree and blob of the acknowledged commit.
-    const read = runQuiet(['archive', '--format=tar', lastAck.next]);
-    if (!read.ok) violations.push(`acked ${lastAck.id}: tree not fully readable: ${read.out.trim().slice(0, 300)}`);
+  }
+  // Reading the archive opens every tree and blob of a commit; the tip may be ahead of the last
+  // acknowledgement and must be as readable as an acknowledged commit.
+  for (const [label, commit] of [['acked ' + lastAck?.id, lastAck?.next], ['branch tip', ahead ? tip : null]]) {
+    if (!commit) continue;
+    const listed = run(['rev-list', '--objects', commit]);
+    if (!listed.ok) violations.push(`${label}: objects not listable: ${String(listed.out).trim().slice(0, 300)}`);
+    const read = runQuiet(['archive', '--format=tar', commit]);
+    if (!read.ok) violations.push(`${label}: tree not fully readable: ${read.out.trim().slice(0, 300)}`);
   }
   const fsck = run(['fsck', '--full', '--no-dangling']);
-  if (!fsck.ok) {
-    const named = (line) => [...line.matchAll(/\b([0-9a-f]{40}|[0-9a-f]{64})\b|objects\/([0-9a-f]{2})\/([0-9a-f]{38}|[0-9a-f]{62})/g)].map((m) => m[1] ?? `${m[2]}${m[3]}`);
-    const excused = (line) => { const oids = named(line); return ahead && oids.length > 0 && oids.every((oid) => !promised.has(oid)); };
-    const rest = String(fsck.out).split('\n').filter((l) => l.trim() && !excused(l));
-    if (rest.length) violations.push(`git fsck: ${rest.join('\n').trim().slice(0, 400)}`);
-  }
+  if (!fsck.ok) violations.push(`git fsck: ${String(fsck.out).trim().slice(0, 400)}`);
   const { index, loader } = await loaders(args.descriptor);
   let recovery;
   try { recovery = index.createGitRecovery({ stateRoot: state, repoPath: repo, trustedMain: repo, writer: WRITER }, loader); } catch (e) {
@@ -343,7 +340,9 @@ const ok = (text) => /= 0$/.test(text) || /= 0 /.test(text);
  *  for a ScopedCommit, whose `next` is only its baseline (R2 cannot see its objects), every loose object
  *  created between its plan `intent` line and its outcome record:
  *  R5 its fan-out directory and `objects/` fsynced after the object is linked and before the outcome;
- *  R6 its file fsynced (under the temp name before the link, or its own name) before the outcome. */
+ *  R6 its file fsynced (under the temp name before the link, or its own name) before the outcome;
+ *  R7 every blob and tree of them (all but the commit object) has its file, fan-out directory and `objects/`
+ *     fsynced before the ref rename that moves the branch to name them. */
 export function checkOrder(trace) {
   const list = calls(trace);
   const writes = new Map(), installs = [], fsyncs = [], refRenames = [], objectLinks = [], planIntents = [], violations = [];
@@ -417,6 +416,20 @@ export function checkOrder(trace) {
         // A temp file keeps its fsync under its own name; a file synced afterwards, under its final one.
         const synced = fsyncs.some((x) => x.at < outcome.at && (x.path === l.to || x.path === l.from || (path.basename(l.from).startsWith('tmp_obj_') && path.basename(x.path ?? '') === path.basename(l.from))));
         if (!synced) violations.push(`R6 ${op}: loose object ${oid.slice(0, 12)} file not fsynced before the outcome`);
+      }
+      const observed = outcome.body.match(/\\"observed\\":\\"([0-9a-f]+)\\"/)?.[1];
+      const move = refRenames.filter((x) => x.at > from && x.at < outcome.at).at(-1);
+      if (!observed || !move) violations.push(`R7 ${op}: ${observed ? 'no ref rename' : 'no observed commit'} between its plan intent and its outcome (trace incomplete)`);
+      else {
+        const staged = made.filter((l) => path.basename(path.dirname(l.to)) + path.basename(l.to) !== observed);
+        row.stagedObjects = staged.length;
+        for (const l of staged) {
+          const oid = path.basename(path.dirname(l.to)) + path.basename(l.to);
+          const fanout = path.dirname(l.to), objects = path.dirname(fanout);
+          const named = (x) => x.path === l.to || x.path === l.from || (path.basename(l.from).startsWith('tmp_obj_') && path.basename(x.path ?? '') === path.basename(l.from));
+          if (!fsyncs.some((x) => x.at < move.at && named(x))) violations.push(`R7 ${op}: staged object ${oid.slice(0, 12)} file not fsynced before the ref rename`);
+          if (!fsyncedAfter(fanout, l.at, move.at) || !fsyncedAfter(objects, l.at, move.at)) violations.push(`R7 ${op}: staged object ${oid.slice(0, 12)} fan-out directory or objects/ not fsynced before the ref rename`);
+        }
       }
     }
     if (prepared && next && !scoped) {

@@ -199,6 +199,25 @@ fn sync_commit_effects(
     }
     Ok(())
 }
+/// Makes the staged blobs and trees durable (file, fan-out, `objects/` in one
+/// concurrent batch) before `git commit` can move the branch to name them.
+fn sync_staged_objects(repo: &RepoHandle, staged: &[Oid], filesystem: &dyn wal::FileSystem) -> Result<()> {
+    crate::objects::sync_loose_objects(repo.common_dir(), staged, true).map_err(failure)?;
+    for _ in staged {
+        filesystem.checkpoint("staged-object-durable").map_err(failure)?;
+    }
+    Ok(())
+}
+/// A Git walk over an unacknowledged tip failed: the tip names an object the
+/// repository cannot read. The branch is never reset and the chain stays open
+/// as evidence; recovery is the owner's.
+fn unreadable_objects(mut error: OperationError) -> OperationError {
+    if error.cause == "checkout-command-failed" {
+        error.code = ResultCode::RecoveryRequired;
+        error.cause = "commit-objects-unreadable".into();
+    }
+    error
+}
 fn object_ids(repo: &RepoHandle, oids: impl IntoIterator<Item = String>) -> Result<Vec<Oid>> {
     oids.into_iter()
         .collect::<BTreeSet<_>>()
@@ -555,7 +574,7 @@ impl GitDriver {
                 "--format=%H%x00%P%x00%T%x00%B%x00",
                 &reference,
             ],
-        )?;
+        ).map_err(unreadable_objects)?;
         let mut candidates = Vec::new();
         let fields: Vec<_> = raw.split(|b| *b == 0).collect();
         let mut seen = BTreeSet::new();
@@ -713,14 +732,14 @@ impl GitDriver {
                         &baseline.head,
                         &observed,
                     ],
-                )?)?;
+                ).map_err(unreadable_objects)?)?;
                 let created = object_ids(
                     repo,
                     String::from_utf8(self.checkout_bytes(
                         repo,
                         &scope,
                         &["rev-list", "--objects", "--end-of-options", &observed, &format!("^{}", baseline.head)],
-                    )?)
+                    ).map_err(unreadable_objects)?)
                     .map_err(failure)?
                     .lines()
                     .filter_map(|line| line.split(' ').next())
@@ -1320,10 +1339,37 @@ impl GitDriver {
         let mut recorded_terminal = None;
         let mut prepared = (|| {
             self.stage_paths(repo, scope, &["add", "-A"], &selected)?;
-            if self.staged(repo, scope)? != selected {
+            let tree = self.checkout_text(repo, scope, &["write-tree"])?;
+            // The staged change as a tree diff: the same set check the index diff
+            // gave, plus the oid of every blob and tree the commit will name.
+            let staged = raw_entries(&self.checkout_bytes(
+                repo,
+                scope,
+                &[
+                    "diff-tree",
+                    "--raw",
+                    "-t",
+                    "-r",
+                    "--no-abbrev",
+                    "--no-renames",
+                    "-z",
+                    &baseline.head,
+                    &tree,
+                ],
+            )?)?;
+            if staged.iter().filter(|e| e.is_file()).map(|e| &e.path).ne(selected.iter()) {
                 return Err(failure("staged-set-mismatch"));
             }
-            let tree = self.checkout_text(repo, scope, &["write-tree"])?;
+            // `git add` and `write-tree` do not fsync what they write, and `git
+            // commit` moves the branch before anything else could: make the
+            // blobs and trees durable first, so a branch tip never names an
+            // object a power cut can still lose.
+            let staged_objects = object_ids(
+                repo,
+                std::iter::once(tree.clone())
+                    .chain(staged.iter().filter_map(RawEntry::new_object).map(str::to_owned)),
+            )?;
+            sync_staged_objects(repo, &staged_objects, filesystem)?;
             let kind = OperationKind::ScopedCommit(Box::new(wal::ScopedCommitIntent {
                 worktree: baseline.worktree.clone(),
                 baseline: serde_json::to_string(baseline).map_err(failure)?,
