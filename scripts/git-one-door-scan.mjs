@@ -235,6 +235,12 @@ function enclosing(spans, index) {
 const budget = { steps: 0, limit: 300000, memo: new Map(), stack: [] };
 const MAX_CYCLE_ROUNDS = 4;
 const valueKey = (v) => JSON.stringify([v.lit, v.external, v.unknown, v.self, v.param, v.fn?.from, v.file?.name, v.path, v.object, v.at, v.bound]);
+// One copy of each value: a binding reached through several call paths otherwise multiplies
+// per step until one array overflows the stack in a spread push.
+function uniqueValues(values) {
+  const seen = new Set();
+  return values.filter((v) => !seen.has(valueKey(v)) && seen.add(valueKey(v)));
+}
 function memoized(key, compute) {
   const { memo, stack } = budget;
   const known = memo.get(key);
@@ -657,7 +663,7 @@ class JsFile {
       else if (v.lit !== undefined || v.self) continue; // a string has no property that is a binary
       else out.push(v.unknown !== undefined ? v : { unknown: label });
     }
-    return out;
+    return uniqueValues(out);
   }
 
   /** Values a bound object receives after its literal: `name.key = x` and `name[expr] = x`. */
