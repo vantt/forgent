@@ -290,3 +290,43 @@ test('the committed forgentX config binds every seat of every shipped workflow',
   const result = await checkSeatBindingDryBind(root, { packageRoot: root, loadRunnerConfig: loadRunnerConfigFromDir });
   assert.equal(result.passed, true, result.message);
 });
+
+const PERSONA_WORKFLOW = `
+id: persona-fixture
+title: Persona fixture
+steps:
+  - id: blind-proposals
+    title: Blind proposals
+    units:
+      - id: propose
+        template:
+          capability: fixture:draft
+          pattern: solo
+          persona: panelist
+          blind: true
+          objective: Propose without seeing the others
+`;
+
+test('a unit with a persona and blind is bound as the run starts it: the persona taste of the seat decides its tier', async () => {
+  const config = runnerConfig({ 'fixture:draft': { ...prefer('alpha'), personas: { panelist: { tier: 'frontier' } } } });
+  config.modelPolicies.claude = { standard: 'm' };
+  const packageRoot = mkPackageRoot(PERSONA_WORKFLOW);
+  try {
+    const result = await checkSeatBindingDryBind(os.tmpdir(), { packageRoot, loadRunnerConfig: () => config });
+    assert.equal(result.passed, false, 'the persona raises the seat to a tier the family has no cell for');
+    assert.match(result.message, /seat producer refused for tier-cell-missing: .*frontier/);
+  } finally {
+    fs.rmSync(packageRoot, { recursive: true, force: true });
+  }
+});
+
+test('the doctor, --seats and the runner start the same unit from a template', async () => {
+  const { workflowUnitContract } = await import('../../src/setup/workflow-definition-files.mjs');
+  const { unitFieldsOfTemplate } = await import('../../src/workflow/steps.mjs');
+  const template = { capability: 'fixture:draft', pattern: 'panel', persona: 'panelist', blind: true, prefer: ['alpha'], seats: [], objective: 'o' };
+  const unit = workflowUnitContract({ id: 'u', template });
+  assert.deepEqual(unit, { id: 'u', objective: 'o', ...unitFieldsOfTemplate(template) });
+  assert.equal(unit.persona, 'panelist');
+  assert.equal(unit.blind, true);
+  assert.deepEqual(unit.prefer, ['alpha']);
+});

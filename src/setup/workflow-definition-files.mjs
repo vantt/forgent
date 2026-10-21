@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { workflowFilesIn } from '../workflow/loader.mjs';
+import { unitFieldsOfTemplate } from '../workflow/steps.mjs';
 import { describeYamlError, parseYaml } from '../util/yaml.mjs';
 
 function workflowDefinitionFiles(root) {
@@ -97,19 +98,8 @@ export function withUnreadableDefinitions(result, unreadable) {
   };
 }
 
-/**
- * The unit contract subset a Workflow unit stands for, as the runner would build it from its template.
- * The one place doctor checks turn a definition's unit into something `simulateUnitBindings` can drive.
- */
+/** The unit a Workflow definition's unit stands for, as the runner would start it (one projection, `unitFieldsOfTemplate`). */
 export function workflowUnitContract(unit) {
   const template = unit?.template ?? {};
-  return {
-    id: unit.id,
-    objective: template.objective ?? '',
-    capability: template.capability,
-    rigor: template.rigor,
-    writes: template.writes ?? [],
-    pattern: template.params ? { pattern: template.pattern, params: template.params } : template.pattern,
-    ...(template.seats ? { seats: template.seats } : {}),
-  };
+  return { id: unit.id, objective: template.objective ?? '', ...unitFieldsOfTemplate(template) };
 }

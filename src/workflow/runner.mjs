@@ -44,6 +44,7 @@ import { CaseAdmissionRefusedError } from '../runner/execution/case-admission-po
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
 import { closeCaseUnderHold } from './case-close.mjs';
 import { workflowPersonaScope } from './loader.mjs';
+import { unitFieldsOfTemplate } from './steps.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 
@@ -265,21 +266,10 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
             const unitData = {
               id: u.id,
               objective: handoff.objective || `Execute unit ${u.id} in step ${step.id}`,
-              capability: u.template.capability,
-              pattern: u.template.pattern || 'solo',
-              rigor: u.template.rigor,
-              writes: u.template.writes || [],
+              ...unitFieldsOfTemplate(u.template),
               dependsOn: u.dependsOn || [],
               inputs: handoff.inputs,
               stanceOptions: state.stanceOptions?.length ? state.stanceOptions : u.template.stanceOptions,
-              ...(u.template.anonymizeInputs ? { anonymizeInputs: true } : {}),
-              ...(u.template.blind ? { blind: true } : {}),
-              ...(u.template.prefer ? { prefer: u.template.prefer } : {}),
-              ...(u.template.persona ? { persona: u.template.persona } : {}),
-              ...(u.template.seats ? { seats: u.template.seats } : {}),
-              ...(u.template.timeoutMs !== undefined ? { timeoutMs: u.template.timeoutMs } : {}),
-              ...(u.template.verify !== undefined ? { verify: u.template.verify } : {}),
-              ...(u.template.skills !== undefined ? { skills: u.template.skills } : {}),
             };
 
             // A unit left `running` with a recorded Unit run id was started by a controller that died:

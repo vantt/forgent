@@ -15,6 +15,7 @@ import crypto from 'node:crypto';
 
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { validateWorkflowChecked } from './checked.mjs';
+import { unitFieldsOfTemplate } from './steps.mjs';
 
 export const SEAT_MIN_ENTRIES = 2;
 export const SEAT_MIN_CHARS = 3;
@@ -180,15 +181,7 @@ export function expandWorkflowSeats(base, rawSeats, { contextRefs = [], personas
   };
 }
 
-/** The panel units an expansion touched, as dry-bindable units: { id, objective, capability, rigor, writes, pattern, seats }. */
+/** The panel units an expansion touched, as the units a run would start (see `unitFieldsOfTemplate`). */
 export function seatedPanelUnits(workflow) {
-  return panelUnits(workflow).map(({ unit }) => ({
-    id: unit.id,
-    objective: unit.template.objective ?? '',
-    capability: unit.template.capability,
-    rigor: unit.template.rigor,
-    writes: unit.template.writes ?? [],
-    pattern: { pattern: 'panel', params: unit.template.params },
-    seats: unit.template.seats,
-  }));
+  return panelUnits(workflow).map(({ unit }) => ({ id: unit.id, objective: unit.template.objective ?? '', ...unitFieldsOfTemplate(unit.template) }));
 }
