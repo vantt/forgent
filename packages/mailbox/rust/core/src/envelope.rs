@@ -54,7 +54,12 @@ pub struct Header {
     pub from_generation: Option<Generation>,
     pub to: WriterKey,
     pub to_generation: Generation,
+    /// The derived parent (spec §5.4); only this link feeds the guards.
     pub reply_to: Option<MessageId>,
+    /// The caller's `--reply-to`, validated and kept for display only.
+    pub reply_to_hint: Option<MessageId>,
+    /// Chain depth, stored at append time so removing an ancestor never
+    /// changes it.
     pub depth: u32,
     /// The sender's immutable permission to wake the recipient.
     pub wake: bool,

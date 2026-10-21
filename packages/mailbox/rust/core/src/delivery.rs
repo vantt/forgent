@@ -1,4 +1,5 @@
 //! Send, claim, emit, finish and the read-only inbox (spec §5.2).
+use crate::counters::CounterReason;
 use crate::envelope::{Header, Kind, MessageState, RefusalReason};
 use crate::ids::{AttemptToken, Cli, Generation, IdSource, MessageId, ShortName, WriterKey};
 use crate::limits::Limits;
@@ -11,6 +12,10 @@ use std::fmt;
 /// The label of a notice's sender: the mailbox itself, which no head can
 /// take, because every short name has the shape `<project>-<cli>-<suffix>`.
 const SYSTEM_LABEL: &str = "mailbox";
+
+/// The recipient label a refusal is counted under when the typed name did
+/// not resolve; never the typed text, which is unbounded.
+const UNRESOLVED: &str = "unresolved";
 
 /// How many characters of a sender's key label a sender with no head.
 const UNREGISTERED_LABEL_CHARS: usize = 8;
@@ -41,17 +46,58 @@ pub struct SendOutcome {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Refusal {
     Group,
-    UnknownName { candidates: Vec<ShortName> },
-    AmbiguousName { candidates: Vec<ShortName> },
+    UnknownName {
+        candidates: Vec<ShortName>,
+    },
+    AmbiguousName {
+        candidates: Vec<ShortName>,
+    },
+    ReplyToNotOffered,
+    TooLarge {
+        max_bytes: u64,
+    },
+    SessionBudget {
+        budget: u32,
+        window_sec: u64,
+    },
+    LifetimeCap {
+        cap: u32,
+    },
+    TooDeep {
+        max_depth: u32,
+    },
+    Loop {
+        max_per_window: u32,
+        window_sec: u64,
+    },
+    QueueFull {
+        cap: u32,
+    },
+    SenderShareFull {
+        per_sender: u32,
+    },
 }
 
 impl Refusal {
     /// A stable code per reason.
     pub const fn code(&self) -> &'static str {
+        self.reason().code()
+    }
+
+    /// The counter this refusal bumps.
+    pub const fn reason(&self) -> CounterReason {
         match self {
-            Self::Group => "group",
-            Self::UnknownName { .. } => "unknown-name",
-            Self::AmbiguousName { .. } => "ambiguous-name",
+            Self::Group => CounterReason::Group,
+            Self::UnknownName { .. } => CounterReason::UnknownName,
+            Self::AmbiguousName { .. } => CounterReason::AmbiguousName,
+            Self::ReplyToNotOffered => CounterReason::ReplyToNotOffered,
+            Self::TooLarge { .. } => CounterReason::TooLarge,
+            Self::SessionBudget { .. } => CounterReason::SessionBudget,
+            Self::LifetimeCap { .. } => CounterReason::LifetimeCap,
+            Self::TooDeep { .. } => CounterReason::TooDeep,
+            Self::Loop { .. } => CounterReason::Loop,
+            Self::QueueFull { .. } => CounterReason::QueueFull,
+            Self::SenderShareFull { .. } => CounterReason::SenderShareFull,
         }
     }
 }
@@ -205,21 +251,36 @@ impl MailboxState {
     ) -> Result<SendOutcome, Refusal> {
         self.sweep(now, limits, ids);
         let now = self.last_now;
-        let recipient = self.resolve(&req.to)?;
-        let (to, to_name, to_generation) = (
-            recipient.key.clone(),
-            recipient.name.clone(),
-            recipient.generation,
-        );
+        let account = self.account(&req.from);
+        let from_generation = self.current_generation(&req.from);
+        self.count_attempt(&account, &req.from, from_generation, now, limits);
+        let admitted = match self.admit(&req, &account, from_generation, now, limits) {
+            Ok(admitted) => admitted,
+            Err(refusal) => {
+                let to = match self.resolve(&req.to) {
+                    Ok(recipient) => self.account(&recipient.key).as_str().to_string(),
+                    Err(_) => UNRESOLVED.to_string(),
+                };
+                self.counters
+                    .bump(refusal.reason(), account.as_str(), &to, now, limits);
+                return Err(refusal);
+            }
+        };
+        let parent = admitted.parent.map(|i| {
+            let parent = &mut self.messages[i];
+            parent.answered = true;
+            parent.id.clone()
+        });
         let header = Header {
             id: MessageId::mint(ids),
             kind: Kind::Message,
-            from_generation: self.current_generation(&req.from),
+            from_generation,
             from: req.from,
-            to,
-            to_generation,
-            reply_to: None,
-            depth: 0,
+            to: admitted.to,
+            to_generation: admitted.to_generation,
+            reply_to: parent,
+            reply_to_hint: req.reply_to,
+            depth: admitted.depth,
             wake: req.wake,
             effective_wake: req.wake,
             body_bytes: req.body.len() as u64,
@@ -232,8 +293,8 @@ impl MailboxState {
         };
         let outcome = SendOutcome {
             id: header.id.clone(),
-            to: to_name,
-            to_generation,
+            to: admitted.to_name,
+            to_generation: header.to_generation,
             depth: header.depth,
             reply_to: header.reply_to.clone(),
             effective_wake: header.effective_wake,

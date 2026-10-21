@@ -214,3 +214,40 @@ impl Pair {
         Timestamp::from_millis(since.plus_secs(secs).as_millis() + 1)
     }
 }
+
+use fgos_mailbox_core::{Refusal, SendOutcome};
+
+impl Pair {
+    pub fn try_send(&mut self, req: SendRequest, now: Timestamp) -> Result<SendOutcome, Refusal> {
+        self.state.send(req, now, &self.limits, &mut self.ids)
+    }
+
+    /// Registers one more Codex head and returns its short name.
+    pub fn add_head(&mut self, key_text: &str, now: Timestamp) -> String {
+        register_new(
+            &mut self.state,
+            request(key_text, "codex", None, &format!("head-{key_text}")),
+            now,
+            &self.limits,
+            &mut self.ids,
+        )
+    }
+
+    /// The head of `key_text` takes its pending mail at a step checkpoint
+    /// and finishes the claim: the frame was emitted.
+    pub fn deliver(&mut self, key_text: &str, now: Timestamp) -> Claim {
+        let generation = self.state.binding(&key(key_text)).unwrap().generation;
+        let claim = self.state.claim(
+            &key(key_text),
+            generation,
+            Checkpoint::Step,
+            now,
+            &self.limits,
+            &mut self.ids,
+        );
+        if let Some(token) = &claim.token {
+            self.state.finish(&key(key_text), generation, token, now);
+        }
+        claim
+    }
+}

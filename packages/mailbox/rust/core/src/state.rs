@@ -4,14 +4,15 @@
 //! Snapshot rule: every field round-trips through `serde_json` from an owned
 //! `String`. Collections are `BTreeMap` or `Vec`, every map key is a `String`
 //! newtype, every enum is a serde enum and no field borrows.
-use crate::counters::BoundedCounters;
+use crate::counters::{Account, BoundedCounters};
 use crate::envelope::Header;
 use crate::ids::{MessageId, WriterKey};
 use crate::notices::{Notice, NoticeMark};
+use crate::policy::LifetimeKey;
 use crate::registry::Binding;
 use crate::time::Timestamp;
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, VecDeque};
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MailboxState {
@@ -27,6 +28,11 @@ pub struct MailboxState {
     /// the lane so delivering a notice does not lift the window.
     pub(crate) notice_last: BTreeMap<NoticeMark, Timestamp>,
     pub(crate) counters: BoundedCounters,
+    /// Send attempts per account inside the rolling window, at most
+    /// `session.budget + 1` each.
+    pub(crate) budget: BTreeMap<Account, VecDeque<Timestamp>>,
+    /// Send attempts per registered sender generation; never reset.
+    pub(crate) lifetime: BTreeMap<LifetimeKey, u32>,
 }
 
 impl MailboxState {

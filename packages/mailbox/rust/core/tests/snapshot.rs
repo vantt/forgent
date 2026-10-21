@@ -90,6 +90,22 @@ fn populated_state() -> MailboxState {
         &mut ids,
     );
 
+    // k2 answers the offered message with a hint: the parent becomes
+    // answered and the hint is kept. Every send above filled the budget
+    // window and the lifetime counts.
+    let offered = state.messages().nth(2).unwrap().id.clone();
+    let mut reply = plain("k2", "forgent-claude-2b", "thanks");
+    reply.reply_to = Some(offered.clone());
+    let reply = state
+        .send(reply, e.plus_secs(50), &limits, &mut ids)
+        .unwrap();
+    assert_eq!(reply.reply_to, Some(offered.clone()));
+    assert!(state.message(&offered).unwrap().answered);
+    assert_eq!(
+        state.message(&reply.id).unwrap().reply_to_hint,
+        Some(offered)
+    );
+
     let notice_states: Vec<&NoticeState> = state.notices().map(|n| &n.state).collect();
     assert!(matches!(
         notice_states[..],
@@ -107,6 +123,7 @@ fn populated_state() -> MailboxState {
             MessageState::Refused { .. },
             MessageState::Offered { .. },
             MessageState::InFlight { .. },
+            MessageState::Recorded,
             MessageState::Recorded
         ]
     ));

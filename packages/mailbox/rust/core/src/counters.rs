@@ -13,10 +13,34 @@ use std::collections::BTreeMap;
 /// (the runner, the `fgos` CLI), so a rotating `from` cannot grow a map.
 pub const UNREGISTERED: &str = "unregistered";
 
+/// Who a sender is for every per-sender policy and counter: its key when
+/// it names a binding, otherwise the shared `unregistered`. A `String`
+/// newtype so it can key a snapshot map.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct Account(String);
+
+impl Account {
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
 /// One variant per refusal and notice reason.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum CounterReason {
+    Group,
+    UnknownName,
+    AmbiguousName,
+    ReplyToNotOffered,
+    TooLarge,
+    SessionBudget,
+    LifetimeCap,
+    TooDeep,
+    Loop,
+    QueueFull,
+    SenderShareFull,
     RecordTtl,
     OfferCap,
     /// The sender of a refused message has no head or a newer generation.
@@ -34,6 +58,17 @@ pub enum CounterReason {
 impl CounterReason {
     pub const fn code(self) -> &'static str {
         match self {
+            Self::Group => "group",
+            Self::UnknownName => "unknown-name",
+            Self::AmbiguousName => "ambiguous-name",
+            Self::ReplyToNotOffered => "reply-to-not-offered",
+            Self::TooLarge => "too-large",
+            Self::SessionBudget => "session-budget",
+            Self::LifetimeCap => "lifetime-cap",
+            Self::TooDeep => "too-deep",
+            Self::Loop => "loop",
+            Self::QueueFull => "queue-full",
+            Self::SenderShareFull => "sender-share-full",
             Self::RecordTtl => "record-ttl",
             Self::OfferCap => "offer-cap",
             Self::NoticeUndeliverable => "notice-undeliverable",
@@ -142,11 +177,11 @@ impl MailboxState {
 
     /// The accounting identity of `key`: its own key when it names a
     /// binding, otherwise the shared `unregistered`.
-    pub(crate) fn account(&self, key: &WriterKey) -> String {
+    pub(crate) fn account(&self, key: &WriterKey) -> Account {
         if self.bindings.contains_key(key) {
-            key.as_str().to_string()
+            Account(key.as_str().to_string())
         } else {
-            UNREGISTERED.to_string()
+            Account(UNREGISTERED.to_string())
         }
     }
 
@@ -159,6 +194,7 @@ impl MailboxState {
         limits: &Limits,
     ) {
         let (from, to) = (self.account(from), self.account(to));
-        self.counters.bump(reason, &from, &to, now, limits);
+        self.counters
+            .bump(reason, from.as_str(), to.as_str(), now, limits);
     }
 }

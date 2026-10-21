@@ -133,9 +133,14 @@ fn the_notices_lane_drops_its_oldest_notice_when_it_overflows() {
     let cap = pair.limits.notices.cap as u64;
     let spacing = pair.limits.notices.window_sec + 1;
     let ttl = pair.limits.record.ttl_sec;
-    // Sent one notice window apart, so each refusal makes its own notice.
+    // Sent one notice window apart, so each refusal makes its own notice,
+    // and spread over two recipients so no queue share fills first.
+    let c_name = pair.add_head("c", t(0));
     let ids: Vec<_> = (0..=cap)
-        .map(|i| pair.send("a", B_NAME, "never claimed", t(i * spacing)))
+        .map(|i| {
+            let to = if i % 2 == 0 { B_NAME } else { c_name.as_str() };
+            pair.send("a", to, "never claimed", t(i * spacing))
+        })
         .collect();
     for i in 0..=cap {
         pair.sweep(Pair::after(t(i * spacing), ttl));

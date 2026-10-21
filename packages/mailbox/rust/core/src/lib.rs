@@ -18,12 +18,13 @@ mod ids;
 mod limits;
 mod names;
 mod notices;
+mod policy;
 mod registry;
 mod state;
 mod sweep;
 mod time;
 
-pub use counters::{BoundedCounters, CounterReason, Party, PartyKey, UNREGISTERED};
+pub use counters::{Account, BoundedCounters, CounterReason, Party, PartyKey, UNREGISTERED};
 pub use delivery::{
     Checkpoint, Claim, ClaimedItem, Finished, MessageView, NoticeFacts, Refusal, SendOutcome,
     SendRequest,
@@ -38,6 +39,7 @@ pub use limits::{
 };
 pub use names::ResolveRefusal;
 pub use notices::{Notice, NoticeMark, NoticeState};
+pub use policy::LifetimeKey;
 pub use registry::{Binding, Liveness, RegisterRefusal, RegisterRequest, Registered, StoredHead};
 pub use state::MailboxState;
 pub use time::Timestamp;
