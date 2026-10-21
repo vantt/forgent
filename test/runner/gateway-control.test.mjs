@@ -252,6 +252,117 @@ test('stopGateway: escalates to SIGKILL when the process ignores SIGTERM, and st
   }
 });
 
+test('stopGateway never signals a process that is not the recorded gateway: a registry entry whose pid belongs to an unrelated child gets no signal and stop refuses by name', () => {
+  if (os.platform() !== 'linux') return;
+  const { repoRoot, fgosDir } = mkFgosDir();
+  const child = spawnThrowaway();
+  try {
+    // The recorded start time predates the pid's real start by decades, so
+    // the registry entry cannot describe this process (pid reuse).
+    writeRegistry(fgosDir, { pid: child.pid, port: 4170, startedAt: '1999-01-01T00:00:00.000Z', logPath: '/dev/null' });
+    let refusal = null;
+    try {
+      stopGateway(fgosDir);
+    } catch (err) {
+      refusal = err;
+    }
+    assert.equal(isAlive(child.pid), true, 'the unrelated process must not receive any signal');
+    assert.ok(refusal instanceof GatewayControlError, 'stop must refuse with the named GatewayControlError');
+  } finally {
+    child.kill('SIGKILL');
+    cleanup(repoRoot);
+  }
+});
+
+// The gateway binary exits at once. The child is a zombie of this very
+// process until libuv reaps it, and startGateway's blocking poll keeps the
+// loop from reaping, so a pid-exists probe says alive for the full timeout.
+// Run in a subprocess with a hard cap so a red run costs seconds, not 30 s.
+test('startGateway reports an immediate exit within one poll, not after the 30 s timeout', () => {
+  if (os.platform() !== 'linux') return;
+  const { repoRoot, fgosDir } = mkFgosDir();
+  const gatewayDir = path.join(repoRoot, 'apps', 'fgos-gateway');
+  const binDir = path.join(repoRoot, 'bin-shim');
+  const releaseDir = path.join(gatewayDir, 'target', 'release');
+  fs.mkdirSync(gatewayDir, { recursive: true });
+  fs.mkdirSync(binDir, { recursive: true });
+  const binary = path.join(releaseDir, 'fgos-gateway');
+  fs.writeFileSync(path.join(binDir, 'cargo'), [
+    '#!/bin/sh',
+    `mkdir -p ${JSON.stringify(releaseDir)}`,
+    `printf '#!/bin/sh\\necho boom >&2\\nexit 1\\n' > ${JSON.stringify(binary)}`,
+    `chmod +x ${JSON.stringify(binary)}`,
+    '',
+  ].join('\n'), { mode: 0o755 });
+  const script = `
+    import { startGateway } from ${JSON.stringify(GATEWAY_CONTROL_MOD_PATH)};
+    try {
+      startGateway(${JSON.stringify(repoRoot)}, ${JSON.stringify(fgosDir)});
+      console.log(JSON.stringify({ started: true }));
+    } catch (err) {
+      console.log(JSON.stringify({ started: false, message: err.message }));
+    }
+  `;
+  const env = { ...process.env, PATH: `${binDir}${path.delimiter}${process.env.PATH}` };
+  try {
+    const t0 = Date.now();
+    const run = spawnSync(process.execPath, ['--input-type=module', '-e', script], { env, encoding: 'utf8', timeout: 6000 });
+    const elapsed = Date.now() - t0;
+    assert.ok(!run.error, `startGateway did not return within 6 s (${run.error && run.error.code}); a dead gateway was still judged alive`);
+    assert.ok(elapsed < 3000, `expected one poll, took ${elapsed} ms`);
+    const result = JSON.parse(run.stdout.trim().split('\n').pop());
+    assert.equal(result.started, false);
+    assert.match(result.message, /exited immediately/);
+  } finally {
+    cleanup(repoRoot);
+  }
+});
+
+test('a gateway that is already a zombie is dead at once: stopGateway clears the registry within one poll and sends nothing', () => {
+  if (os.platform() !== 'linux') return;
+  const { repoRoot, fgosDir } = mkFgosDir();
+  // `sleep` (never reaps) becomes the parent of a child that exits at once:
+  // a zombie that stays a zombie. Both pids are written to files.
+  const zombieFile = path.join(repoRoot, 'zombie.pid');
+  const parentFile = path.join(repoRoot, 'parent.pid');
+  execFileSync('sh', ['-c',
+    `setsid sh -c 'sh -c "exit 0" & echo $! > "$0"; echo $$ > "$1"; exec sleep 300' "$0" "$1" </dev/null >/dev/null 2>&1 &`,
+    zombieFile, parentFile]);
+  let parentPid = null;
+  try {
+    const deadline = Date.now() + 5000;
+    let zombiePid = null;
+    for (;;) {
+      try {
+        zombiePid = parseInt(fs.readFileSync(zombieFile, 'utf8').trim(), 10);
+        parentPid = parseInt(fs.readFileSync(parentFile, 'utf8').trim(), 10);
+        const stat = fs.readFileSync(`/proc/${zombiePid}/stat`, 'utf8');
+        if (stat.slice(stat.lastIndexOf(')') + 2, stat.lastIndexOf(')') + 3) === 'Z') break;
+      } catch {
+        // not written yet
+      }
+      assert.ok(Date.now() < deadline, 'the fixture never produced a zombie');
+      execFileSync('sleep', ['0.05']);
+    }
+    writeRegistry(fgosDir, { pid: zombiePid, port: 4170, startedAt: new Date().toISOString(), logPath: '/dev/null' });
+    const t0 = Date.now();
+    const result = stopGateway(fgosDir);
+    const elapsed = Date.now() - t0;
+    assert.equal(result.alreadyStopped, true);
+    assert.ok(elapsed < 2000, `a zombie is dead; expected one poll, took ${elapsed} ms`);
+    assert.equal(fs.existsSync(path.join(fgosDir, 'gateway.json')), false);
+  } finally {
+    if (parentPid) {
+      try {
+        process.kill(parentPid, 'SIGKILL');
+      } catch {
+        // already gone
+      }
+    }
+    cleanup(repoRoot);
+  }
+});
+
 test('startGateway: refuses with no side effects when the registry already names a live pid', () => {
   const { repoRoot, fgosDir } = mkFgosDir();
   const child = spawnThrowaway();
