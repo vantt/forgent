@@ -230,7 +230,15 @@ async function space(args) {
       const s = fs.statfsSync(root);
       const fill = Math.max(0, s.bavail * s.bsize - k);
       const fd = fs.openSync(ballast, 'w');
-      try { for (let left = fill; left > 0; left -= 1 << 20) fs.writeSync(fd, Buffer.alloc(Math.min(left, 1 << 20))); } catch {} finally { fs.fsyncSync(fd); fs.closeSync(fd); }
+      try {
+        for (let left = fill; left > 0; left -= 1 << 20) fs.writeSync(fd, Buffer.alloc(Math.min(left, 1 << 20)));
+      } catch {}
+      // A 1 MiB chunk that meets ENOSPC writes nothing (extent metadata takes part of the space), so
+      // top up block by block until only `k` bytes stay free or the filesystem refuses.
+      try {
+        const block = Buffer.alloc(s.bsize);
+        while (fs.statfsSync(root).bavail * s.bsize > k) fs.writeSync(fd, block);
+      } catch {} finally { fs.fsyncSync(fd); fs.closeSync(fd); }
       return { freeBytes: fs.statfsSync(root).bavail * s.bsize };
     }, () => fs.rmSync(ballast, { recursive: true, force: true }));
     runs.push(r);
