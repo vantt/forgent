@@ -8,7 +8,7 @@ function facts() {
   try { return nativeDoor().process; } catch (err) {
     const code = NAMED[err.code];
     if (!code) throw err;
-    const cause = code === 'process-door-not-shipped' ? 'onboard this project with fgctl init' : err.message.replace(/^git-addon-unavailable: /, '');
+    const cause = code === 'process-door-not-shipped' ? 'onboard this project with fgctl init' : `${err.message.replace(/^git-addon-unavailable: /, '')}; restage the active release with fgctl init`;
     throw Object.assign(new Error(`${code}: ${cause}`), { code, cause: err });
   }
 }
