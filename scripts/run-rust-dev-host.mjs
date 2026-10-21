@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { nativeAddonLibraryName } from './build-rust-distribution.mjs';
 import { devHostEnv, devHostManifest } from './lib/dev-host-manifest.mjs';
-import { ensureGitAddon } from './lib/git-addon-stage.mjs';
+import { gitAddonDirectory } from './lib/git-addon-stage.mjs';
 import { processesInside } from '../src/runner/dispatch/stop-processes-inside.mjs';
 
 const checkoutRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -78,9 +78,34 @@ function forwardResult(result, description) {
   return result.status ?? 1;
 }
 
-/** Stage this checkout's addon and host and point the launcher's own environment at them. */
-export function stageLauncherDoor() {
-  ensureGitAddon(process.env, checkoutRoot);
+/**
+ * Point this launcher's own environment at a persistent staged copy of the addon and host that cargo just built,
+ * so the process door loads from a directory the launcher never deletes (a per-run copy is removed at the end,
+ * which a loaded addon forbids on Windows). Nothing is built here; unchanged bytes are not rewritten.
+ */
+export function stageLauncherDoor(targetDir = path.resolve(checkoutRoot, process.env.CARGO_TARGET_DIR ?? 'target')) {
+  const dir = gitAddonDirectory(checkoutRoot);
+  assertLocalPath(path.relative(checkoutRoot, dir).split(path.sep).join('/'));
+  fs.mkdirSync(dir, { recursive: true });
+  const stage = (name, source, mode) => {
+    const destination = path.join(dir, name);
+    const bytes = fs.readFileSync(source);
+    if (!fs.existsSync(destination) || !fs.readFileSync(destination).equals(bytes)) {
+      atomicWrite(destination, (temporary) => {
+        fs.writeFileSync(temporary, bytes);
+        fs.chmodSync(temporary, mode);
+      });
+    }
+    return destination;
+  };
+  const fgosBin = stage(process.platform === 'win32' ? 'fgos.exe' : 'fgos', path.join(targetDir, 'debug', process.platform === 'win32' ? 'fgos.exe' : 'fgos'), 0o755);
+  const addonFile = stage('fgos.node', path.join(targetDir, 'debug', nativeAddonLibraryName()), 0o644);
+  const manifestPath = path.join(dir, 'manifest.json');
+  atomicWrite(manifestPath, (temporary) => {
+    fs.writeFileSync(temporary, `${JSON.stringify(devHostManifest({ checkoutRoot, fgosBin, addonFile }), null, 2)}\n`);
+    fs.chmodSync(temporary, 0o644);
+  });
+  Object.assign(process.env, devHostEnv({}, { fgosBin, checkoutRoot, manifestPath }));
 }
 
 function main() {
@@ -100,9 +125,7 @@ function main() {
   assertLocalPath('bin/fgos.mjs');
   const runtimeBase = path.join(checkoutRoot, runtimeBaseRelative);
   fs.mkdirSync(runtimeBase, { recursive: true });
-  // The launcher has no manifest of its own: load the process door from the persistent staged addon, never
-  // from a per-run copy that is about to be deleted.
-  stageLauncherDoor();
+  stageLauncherDoor(targetDir);
   pruneRunDirs(runtimeBase);
   const runtimeDir = fs.mkdtempSync(path.join(runtimeBase, 'run-'));
   let child;
