@@ -35,6 +35,16 @@ net_size: "Node −33 / Rust +185 / tests −170 (estimate)"
 - H8: per OQ-3 (c) (owner 17:43), T0 only moves the existing per-process verification into the leaf; the cross-process fix is handed to T9 with H13.
 - Per-process verification key in the leaf (criteria 2 and 3 for every channel, Sec-F1): `${artifactDigest}:${entry.digest}:${dev}:${ino}:${size}:${mtimeNs}:${ctimeNs}` — `ctimeNs` and the manifest digest are added to today's key (`native.mjs:50`), and the addon path is refused when it is a symlink (as `verify.rs:151` does).
 
+## GIT lane review conditions (2026-10-21 17:55, approved with these)
+
+1. **Same payload rule for the door.** `src/git/native.mjs:29-35` accepts a manifest only when its `components.legacyNode.root` realpath equals `OWN_PAYLOAD_ROOT`, else it falls back to `native-addon.json`. The leaf's lookup order (`FGOS_HOST_BIN` → `resolveActiveHostBin({cwd})` → `native-addon.json`) keeps that check on **both** host lookups: the cwd's activation is not the running payload's release, so a dev host or an older-release payload in a project activated at another release must never load that release's addon.
+2. **One addon per process, one memo.** The leaf keeps the single loaded `{file, addon}`. `loadNativeAddon({descriptor})` naming the same file returns it; a different file is refused by name (`git-addon-second-load`) **before** `require`, not by the socket after `dlopen`. Script consumers that pass an explicit descriptor keep working: `scripts/git/e3-bench.mjs`, the power-loss driver, `store-increment-worker`, `forge-probe`, `scripts/git-addon.mjs`, `scripts/lib/git-ports.mjs`, `src/event-store/native.mjs` `loaderOptions`. One `native-load.test.mjs` case: door first, then Git with the same descriptor gives the same object; with another file, a named refusal.
+3. **Whoever loads first, Git still sees its facts.** `nativeHelperExe(addon)` (the `helperExes` WeakMap, set from manifest `entries.fgos`) and `registerGitHandover` must hold when the door loaded the addon before any Git call: set `helperExes` inside the leaf, or derive it in Git's wrapper from the leaf's memo. Handover stays registered lazily on the first Git call (`withNativeLocks`).
+4. **`versions()` stays fail-closed** for the `git`/`eventStore` fields with the same text `git-addon-unavailable: combined addon ABI mismatch`. The per-process key adds `ctimeNs` and the manifest digest; symlinks are refused.
+5. **Census and one-door after the move:** run `node scripts/git-one-door-scan.mjs --write-census` and doctor `git-mutation-one-door`; smoke-load the script consumers (`node scripts/git-addon.mjs`, `node scripts/git/e3-bench.mjs --help` or one quick row).
+
+Coordination: GIT's M3 lead touches `src/setup/git-checks.mjs` and the Rust Recovery/Inspect read side, which does not overlap this phase; GIT warns before touching `packages/git/node-addon/src/git.rs`.
+
 ## Files
 
 **Create**
