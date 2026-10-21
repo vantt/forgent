@@ -1,5 +1,5 @@
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
-import { checkGit, checkMutationOneDoor, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories, fixLandRecovery } from './git-checks.mjs';
+import { checkGit, checkMutationOneDoor, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories, fixLandRecovery, checkLandRetainedCandidates } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
 // D1/D2, docs/history/setup-doctor-config-registry/): the one place a module
@@ -6546,6 +6546,11 @@ for (const id of ['git-worktree-recovery', 'git-component-compatible', 'git-tran
     'git-durability-capability': 'Measured Git durability guarantees',
   }[id], check: (cwd) => checkGit(cwd, id) });
 }
+registerCheck({
+  id: 'git-land-recovery',
+  description: 'Finished Land operations whose candidate worktree and pins are still retained awaiting Work acknowledgement (read-only; warns, never fails)',
+  check: (cwd) => checkLandRetainedCandidates(cwd),
+});
 registerCheck({
   id: 'git-mutation-one-door',
   description: 'The release mutation census lists no Git or hook spawn outside the fgos-git driver and matches the payload it was built from',

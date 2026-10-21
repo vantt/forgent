@@ -351,41 +351,13 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             .map_err(|e| err(format!("directory-fsync: {e}")))?;
         self.point("publication-directory-fsync")
     }
-    /// Fsync `dirs` together (one fsync each, issued concurrently so the
-    /// filesystem can serve them with one journal commit). Each must be a
-    /// real directory, never a symlink.
-    fn sync_dirs(&self, dirs: &[PathBuf]) -> Result<()> {
-        for path in dirs {
-            let meta = fs::symlink_metadata(path).map_err(|e| err(e.to_string()))?;
-            if !meta.is_dir() || meta.file_type().is_symlink() {
-                return Err(err("untrusted-publication-directory"));
-            }
-        }
-        let paths: Vec<&Path> = dirs.iter().map(PathBuf::as_path).collect();
-        fgos_durable_file::sync_directories(&paths)
-            .map_err(|e| err(format!("directory-fsync: {e}")))?;
-        for _ in dirs {
-            self.point("publication-directory-fsync")?;
-        }
-        Ok(())
-    }
-    /// The loose-object fan-out directory (when present) and `objects/`.
-    fn object_dirs(repo: &RepoHandle, oid: &Oid) -> Vec<PathBuf> {
-        let objects = repo.common_dir().join("objects");
-        let fanout = objects.join(&oid.as_str()[..2]);
-        let mut dirs = Vec::new();
-        if fanout.exists() {
-            dirs.push(fanout);
-        }
-        dirs.push(objects);
-        dirs
-    }
-    /// Make the object's directory entries durable, unless this process
-    /// already did for the same loose file (no write of ours intervened).
+    /// Make the object's loose file and its directory entries durable, unless
+    /// this process already did for the same loose file.
     fn sync_object(&self, repo: &RepoHandle, oid: &Oid) -> Result<()> {
-        if !durable_objects::durable(repo, oid) {
-            self.sync_dirs(&Self::object_dirs(repo, oid))?;
-            durable_objects::remember(repo, oid);
+        let synced = crate::objects::sync_loose_objects(repo.common_dir(), std::slice::from_ref(oid), false)
+            .map_err(|e| err(format!("directory-fsync: {e}")))?;
+        for _ in &synced {
+            self.point("publication-directory-fsync")?;
         }
         self.point("object-durable")
     }
@@ -1117,56 +1089,6 @@ fn sync_ref_chain(dirs: &[PathBuf]) -> std::io::Result<()> {
         other => other,
     };
     synced.map_err(|e| std::io::Error::new(e.kind(), format!("directory-fsync: {e}")))
-}
-
-/// Loose objects this process made durable (file fsynced by Git under
-/// `core.fsync`, fan-out and `objects/` directories fsynced by the port), by
-/// common dir, oid and the loose file's inode. While the same file is still
-/// at its name, that name is durable: no fsync of ours is needed again.
-/// Bounded in size and age.
-mod durable_objects {
-    use crate::{Oid, RepoHandle};
-    use std::collections::HashMap;
-    use std::path::PathBuf;
-    use std::sync::Mutex;
-    use std::time::{Duration, Instant};
-    const KEEP: Duration = Duration::from_secs(600);
-    const BOUND: usize = 4096;
-    type Key = (PathBuf, String);
-    /// Device, inode and birth time of the loose file, and durability time.
-    type Seen = HashMap<Key, ((u64, u64, u128), Instant)>;
-    static SEEN: Mutex<Option<Seen>> = Mutex::new(None);
-    #[cfg(unix)]
-    fn loose(repo: &RepoHandle, oid: &Oid) -> Option<(u64, u64, u128)> {
-        let s = oid.as_str();
-        let m = std::fs::symlink_metadata(repo.common_dir().join("objects").join(&s[..2]).join(&s[2..])).ok()?;
-        m.is_file().then(|| crate::wal::durable_identity(&m)).flatten()
-    }
-    #[cfg(not(unix))]
-    fn loose(_: &RepoHandle, _: &Oid) -> Option<(u64, u64, u128)> {
-        None
-    }
-    pub(super) fn remember(repo: &RepoHandle, oid: &Oid) {
-        let Some(file) = loose(repo, oid) else { return };
-        if let Ok(mut seen) = SEEN.lock() {
-            let seen = seen.get_or_insert_with(HashMap::new);
-            if seen.len() >= BOUND {
-                seen.retain(|_, (_, at)| at.elapsed() < KEEP);
-                if seen.len() >= BOUND {
-                    seen.clear();
-                }
-            }
-            seen.insert((repo.common_dir().to_path_buf(), oid.as_str().to_owned()), (file, Instant::now()));
-        }
-    }
-    /// The loose file this process made durable is still the one at its name.
-    pub(super) fn durable(repo: &RepoHandle, oid: &Oid) -> bool {
-        let known = SEEN.lock().ok().and_then(|seen| {
-            seen.as_ref()
-                .and_then(|seen| seen.get(&(repo.common_dir().to_path_buf(), oid.as_str().to_owned())).copied())
-        });
-        matches!(known, Some((file, at)) if at.elapsed() < KEEP && loose(repo, oid) == Some(file))
-    }
 }
 
 fn kind_name(kind: ObjectType) -> &'static str {

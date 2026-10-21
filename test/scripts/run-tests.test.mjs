@@ -329,6 +329,11 @@ test('buildTestEnv drops an inherited NODE_TEST_CONTEXT so a nested node --test 
   assert.equal(env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS, '1');
 });
 
+test('buildTestEnv points the claude CLI at a missing binary unless the caller names one, so no test reaches the real claude', () => {
+  assert.equal(buildTestEnv({ PATH: '/usr/bin' }).FGOS_CLAUDE_COMMAND, '/nonexistent/fgos-test-claude-binary');
+  assert.equal(buildTestEnv({ PATH: '/usr/bin', FGOS_CLAUDE_COMMAND: '/fixture/claude' }).FGOS_CLAUDE_COMMAND, '/fixture/claude');
+});
+
 test('buildTestEnv drops an inherited FGOS_STATE_ROOT so fixtures that set FGOS_STATE_HOME stay in their own state root', () => {
   const env = buildTestEnv({ PATH: '/usr/bin', FGOS_STATE_ROOT: '/real/state/fgos', FGOS_STATE_HOME: '/fixture/state' });
   assert.equal('FGOS_STATE_ROOT' in env, false);

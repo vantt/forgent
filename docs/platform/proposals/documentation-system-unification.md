@@ -540,6 +540,31 @@ Partial supersession requires claim- or clause-level modeling. A document-level
 “latest ADR wins” rule is unsafe when a newer decision replaces only terminology
 or one constraint while leaving the rest of an older decision active.
 
+> **Existing foundation (note added 2026-10-21, rule-management lane).** The
+> decision-recording half of this reducer already exists as
+> canonical-decision-projection (work item `tsk-1lv`, done): `fgos decision
+> --relation none|supersedes:<id>|touches:<id>` with a write-time citation sweep
+> (`src/state/store.mjs`), `docs/decisions/index.md` generated from
+> `state.decisions` (`src/report/decision-index.mjs`), four retrospective doors
+> (`src/state/retrospective-doors.mjs`), and `authoritative_for` skeleton-match
+> (`src/report/authoritative-match.mjs`). The reducer must read that chain, not
+> start a parallel one. Gaps measured on `main` on 2026-10-21: `relation` is
+> decision-level only, and by their own text 5 of the 7 recorded platform
+> relations replace only part of the older decision; at least 4 platform
+> decisions (D-ADR0055, 0056, 0062, 0033) state supersession only in prose; some
+> supersession targets are not decisions (locked-law clauses, a document hash).
+> Evidence: `plans/reports/research-261021-1643-canonical-decision-projection-component.md`
+> and `plans/reports/research-261021-1707-doc-plan-dedup-components.md`.
+>
+> **Boundary map reminder.** `docs/platform/component-boundary.md` has no row for
+> the Knowledge and Documentation Engine, the Agent Context Engine, or the
+> decision projection above; its nearest row ("Knowledge, Learning, And
+> Documentation Registry") does not mention decisions. Whoever lands H2 or H3, or
+> gives the `tsk-1lv` pieces an owner, must update that map (and its detailed
+> source `docs/architect/proposals/component-authority-boundary-map.md` while it
+> is still the source) under that file's Update Rule, or record `No
+> component-boundary change`.
+
 The projection compiler should select content using registry metadata and real
 task context: target repo/domain/component/area/subcomponent, document authority,
 changed paths or declared footprint, skill/command, and host. Selection must be
@@ -676,6 +701,33 @@ Its subcomponents are:
 The existing `src/state/knowledge-registry.mjs`, knowledge resolver/projection,
 decision state/projection, end-user index, and future constitution belong on this
 side of the boundary after consolidation.
+
+> **Starting point, not a new build (note added 2026-10-21, rule-management
+> lane).** This engine begins from the Knowledge Registry that already runs on
+> `main`, not from an empty slate. Measured on 2026-10-21: the registry holds 479
+> topics and 479 documents, all end-user documents under `docs/knowledge`,
+> `docs/explanation`, `docs/how-to` and `docs/reference` (about 15% of the `.md`
+> files under `docs/`); none under `docs/platform`, `docs/architect` or
+> `docs/specs`. It already provides document identity, a five-state lifecycle,
+> path aliases, provenance (`sourceCaptureIds`, attest) and generated read
+> models. What this section adds that does not exist in code today: claim
+> identity, typed graph relationships, closed vocabularies for type, audience and
+> authority kind, clause-level supersession, coverage of the platform documents,
+> and a machine-readable constitution.
+>
+> Constraints from earlier locked decisions that this engine must keep (the
+> canonical-decision-projection work, `tsk-1lv`): no stored graph or daemon (the
+> typed graph is a regenerable derivation, D2), and no second decision store
+> (decisions are read from `state.decisions`, D3).
+>
+> Defects to fix before generalizing, because the engine would inherit them:
+> `doc-provisional-aged` can never fire (it subtracts a number from an ISO
+> string), 332 of 479 documents remain `provisional`, three index files list
+> documents in parallel (`docs/enduser-docs-index.json`, `docs/doc-registry.json`,
+> `.fgos/docs/enduser-docs-index.json`) and disagree, 365 distinct roles exist
+> where the design expects a small closed set, and the registry has no area spec
+> under `docs/specs/`. Evidence:
+> `plans/reports/research-261021-1759-knowledge-registry-vs-knowledge-doc-engine-synthesis.md`.
 
 #### 4.7.2. Agent Context Engine
 

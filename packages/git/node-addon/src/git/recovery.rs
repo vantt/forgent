@@ -65,6 +65,17 @@ impl GitRecovery {
                         .map_err(error)?,
                 )
                 .map_err(operation),
+            "listRetainedLand" => self
+                .driver
+                .list_retained_land(
+                    &self.repo,
+                    args.get("bound")
+                        .and_then(Value::as_u64)
+                        .unwrap_or(100_000)
+                        .try_into()
+                        .map_err(error)?,
+                )
+                .map_err(operation),
             "reconcile" => {
                 let id = text(&args, "operationId")?;
                 let inspected = self

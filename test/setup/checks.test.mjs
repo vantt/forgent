@@ -151,6 +151,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'terminal-control',
       'git-component-compatible',
       'git-worktree-recovery',
+      'git-land-recovery',
       'git-transport-config',
       'git-trust-topology',
       'git-operation-journal',

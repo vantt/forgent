@@ -108,11 +108,11 @@ pub(crate) fn paths(bytes: &[u8]) -> Result<Vec<String>> {
         })
         .collect()
 }
-/// Splits `show --name-only -z --format=%H%x00%T%x00%P%x00`: three NUL-ended
+/// Splits `show --raw -t -r -z --format=%H%x00%T%x00%P%x00`: three NUL-ended
 /// header fields, the format's own terminator, then (only when the commit
-/// changed paths) Git's single newline separator and the NUL-ended paths.
+/// changed anything) Git's single newline separator and the raw diff records.
 /// Any other shape is refused rather than guessed.
-fn split_observation(bytes: &[u8]) -> Result<(String, String, String, Vec<String>)> {
+fn split_observation(bytes: &[u8]) -> Result<(String, String, String, &[u8])> {
     let invalid = || recovery("commit-header-invalid");
     let mut rest = bytes;
     let mut header = Vec::with_capacity(3);
@@ -123,12 +123,107 @@ fn split_observation(bytes: &[u8]) -> Result<(String, String, String, Vec<String
     }
     let rest = rest.strip_prefix(&[0]).ok_or_else(invalid)?;
     let rest = match rest.strip_prefix(b"\n") {
-        Some(names) => names,
+        Some(records) => records,
         None if rest.is_empty() => rest,
         None => return Err(invalid()),
     };
     let [observed, tree, parents]: [String; 3] = header.try_into().map_err(|_| invalid())?;
-    Ok((observed, tree, parents, paths(rest)?))
+    Ok((observed, tree, parents, rest))
+}
+/// One record of `--raw -t -r -z --no-abbrev --no-renames`: a changed file or
+/// tree with its mode and object on the new side.
+#[derive(Debug, PartialEq, Eq)]
+struct RawEntry {
+    old_mode: u32,
+    new_mode: u32,
+    new_oid: String,
+    path: String,
+}
+const TREE_MODE: u32 = 0o040000;
+const GITLINK_MODE: u32 = 0o160000;
+impl RawEntry {
+    /// A path that is (or was) not a directory: what `--name-only` lists.
+    fn is_file(&self) -> bool {
+        [self.old_mode, self.new_mode].iter().any(|m| *m != 0 && *m != TREE_MODE)
+    }
+    /// The object this record created in this repository: a blob or a tree,
+    /// never a deletion or a gitlink's commit in another repository.
+    fn new_object(&self) -> Option<&str> {
+        (self.new_mode != 0 && self.new_mode != GITLINK_MODE).then_some(self.new_oid.as_str())
+    }
+}
+fn raw_entries(bytes: &[u8]) -> Result<Vec<RawEntry>> {
+    let invalid = || recovery("commit-header-invalid");
+    let mut rest = bytes;
+    let mut entries = Vec::new();
+    while !rest.is_empty() {
+        let mut field = || -> Result<&[u8]> {
+            let end = rest.iter().position(|b| *b == 0).ok_or_else(invalid)?;
+            let (head, tail) = (&rest[..end], &rest[end + 1..]);
+            rest = tail;
+            Ok(head)
+        };
+        let meta = std::str::from_utf8(field()?).map_err(|_| invalid())?.strip_prefix(':').ok_or_else(invalid)?.to_owned();
+        let path = fgos_write_scope::path_text(field()?).map(str::to_owned).map_err(failure)?;
+        let [old_mode, new_mode, _old_oid, new_oid, status]: [&str; 5] =
+            meta.split(' ').collect::<Vec<_>>().try_into().map_err(|_| invalid())?;
+        if status.len() != 1 || new_oid.is_empty() || !new_oid.bytes().all(|b| b.is_ascii_hexdigit()) {
+            return Err(invalid());
+        }
+        let mode = |m: &str| u32::from_str_radix(m, 8).map_err(|_| invalid());
+        entries.push(RawEntry { old_mode: mode(old_mode)?, new_mode: mode(new_mode)?, new_oid: new_oid.to_owned(), path });
+    }
+    Ok(entries)
+}
+/// Makes the commit's new loose objects and its ref's directory chain durable
+/// in one concurrent batch; packed objects need nothing. Called before the
+/// receipt is installed, so a receipt never names an object whose file or
+/// directory entry a power cut can still lose.
+fn sync_commit_effects(
+    repo: &RepoHandle,
+    reference: &RefName,
+    created: &[Oid],
+    filesystem: &dyn wal::FileSystem,
+) -> Result<()> {
+    std::thread::scope(|scope| {
+        let objects = scope.spawn(|| crate::objects::sync_loose_objects(repo.common_dir(), created, true));
+        let refs = crate::refs::sync_refs(repo, reference);
+        let objects = objects
+            .join()
+            .unwrap_or_else(|_| Err(std::io::Error::other("object sync panicked")));
+        refs?;
+        objects.map_err(failure)
+    })?;
+    for _ in created {
+        filesystem.checkpoint("object-durable").map_err(failure)?;
+    }
+    Ok(())
+}
+/// Makes the staged blobs and trees durable (file, fan-out, `objects/` in one
+/// concurrent batch) before `git commit` can move the branch to name them.
+fn sync_staged_objects(repo: &RepoHandle, staged: &[Oid], filesystem: &dyn wal::FileSystem) -> Result<()> {
+    crate::objects::sync_loose_objects(repo.common_dir(), staged, true).map_err(failure)?;
+    for _ in staged {
+        filesystem.checkpoint("staged-object-durable").map_err(failure)?;
+    }
+    Ok(())
+}
+/// A Git walk over an unacknowledged tip failed: the tip names an object the
+/// repository cannot read. The branch is never reset and the chain stays open
+/// as evidence; recovery is the owner's.
+fn unreadable_objects(mut error: OperationError) -> OperationError {
+    if error.cause == "checkout-command-failed" {
+        error.code = ResultCode::RecoveryRequired;
+        error.cause = "commit-objects-unreadable".into();
+    }
+    error
+}
+fn object_ids(repo: &RepoHandle, oids: impl IntoIterator<Item = String>) -> Result<Vec<Oid>> {
+    oids.into_iter()
+        .collect::<BTreeSet<_>>()
+        .into_iter()
+        .map(|oid| Oid::parse(&oid, repo.object_format()).map_err(failure))
+        .collect()
 }
 pub(crate) fn root(repo: &RepoHandle) -> Result<&Path> {
     repo.work_tree
@@ -479,7 +574,7 @@ impl GitDriver {
                 "--format=%H%x00%P%x00%T%x00%B%x00",
                 &reference,
             ],
-        )?;
+        ).map_err(unreadable_objects)?;
         let mut candidates = Vec::new();
         let fields: Vec<_> = raw.split(|b| *b == 0).collect();
         let mut seen = BTreeSet::new();
@@ -548,6 +643,17 @@ impl GitDriver {
         held: Vec<BorrowedHandle<'_>>,
         writer: &str,
         id: &str,
+    ) -> Result<Outcome> {
+        self.recover_scoped_commit_with_filesystem(repo, held, writer, id, &wal::OsFileSystem)
+    }
+    /// `recover_scoped_commit` with the filesystem seam of `scoped_commit_with_filesystem`.
+    pub fn recover_scoped_commit_with_filesystem(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        writer: &str,
+        id: &str,
+        filesystem: &dyn wal::FileSystem,
     ) -> Result<Outcome> {
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
@@ -626,10 +732,25 @@ impl GitDriver {
                         &baseline.head,
                         &observed,
                     ],
-                )?)?;
-                crate::refs::sync_refs(
+                ).map_err(unreadable_objects)?)?;
+                let created = object_ids(
+                    repo,
+                    String::from_utf8(self.checkout_bytes(
+                        repo,
+                        &scope,
+                        &["rev-list", "--objects", "--end-of-options", &observed, &format!("^{}", baseline.head)],
+                    ).map_err(unreadable_objects)?)
+                    .map_err(failure)?
+                    .lines()
+                    .filter_map(|line| line.split(' ').next())
+                    .map(str::to_owned)
+                    .collect::<Vec<_>>(),
+                )?;
+                sync_commit_effects(
                     repo,
                     &RefName::parse(&baseline.reference).map_err(failure)?,
+                    &created,
+                    filesystem,
                 )?;
                 Outcome::Commit {
                     observed,
@@ -855,11 +976,27 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<CommitResult> {
+        self.scoped_commit_with_filesystem(repo, held, baseline, request, writer, id, &wal::OsFileSystem)
+    }
+    /// `scoped_commit` with the filesystem seam: `object-durable` is reached
+    /// once for each new object, before the receipt is installed.
+    #[allow(clippy::too_many_arguments)]
+    pub fn scoped_commit_with_filesystem(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        baseline: &CommitBaseline,
+        request: &CommitRequest,
+        writer: &str,
+        id: &str,
+        filesystem: &dyn wal::FileSystem,
+    ) -> Result<CommitResult> {
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
         let scope = scope(repo, held)?;
-        self.commit_scoped(repo, &scope, baseline, request, writer, id)
+        self.commit_scoped(repo, &scope, baseline, request, writer, id, filesystem)
     }
+    #[allow(clippy::too_many_arguments)]
     fn commit_scoped(
         &self,
         repo: &RepoHandle,
@@ -868,6 +1005,7 @@ impl GitDriver {
         request: &CommitRequest,
         writer: &str,
         id: &str,
+        filesystem: &dyn wal::FileSystem,
     ) -> Result<CommitResult> {
         if request.message.is_empty()
             || request.message.contains('\0')
@@ -1201,10 +1339,37 @@ impl GitDriver {
         let mut recorded_terminal = None;
         let mut prepared = (|| {
             self.stage_paths(repo, scope, &["add", "-A"], &selected)?;
-            if self.staged(repo, scope)? != selected {
+            let tree = self.checkout_text(repo, scope, &["write-tree"])?;
+            // The staged change as a tree diff: the same set check the index diff
+            // gave, plus the oid of every blob and tree the commit will name.
+            let staged = raw_entries(&self.checkout_bytes(
+                repo,
+                scope,
+                &[
+                    "diff-tree",
+                    "--raw",
+                    "-t",
+                    "-r",
+                    "--no-abbrev",
+                    "--no-renames",
+                    "-z",
+                    &baseline.head,
+                    &tree,
+                ],
+            )?)?;
+            if staged.iter().filter(|e| e.is_file()).map(|e| &e.path).ne(selected.iter()) {
                 return Err(failure("staged-set-mismatch"));
             }
-            let tree = self.checkout_text(repo, scope, &["write-tree"])?;
+            // `git add` and `write-tree` do not fsync what they write, and `git
+            // commit` moves the branch before anything else could: make the
+            // blobs and trees durable first, so a branch tip never names an
+            // object a power cut can still lose.
+            let staged_objects = object_ids(
+                repo,
+                std::iter::once(tree.clone())
+                    .chain(staged.iter().filter_map(RawEntry::new_object).map(str::to_owned)),
+            )?;
+            sync_staged_objects(repo, &staged_objects, filesystem)?;
             let kind = OperationKind::ScopedCommit(Box::new(wal::ScopedCommitIntent {
                 worktree: baseline.worktree.clone(),
                 baseline: serde_json::to_string(baseline).map_err(failure)?,
@@ -1281,7 +1446,10 @@ impl GitDriver {
                 scope,
                 &[
                     "show",
-                    "--name-only",
+                    "--raw",
+                    "-t",
+                    "-r",
+                    "--no-abbrev",
                     "--no-renames",
                     "--no-relative",
                     "-z",
@@ -1302,17 +1470,20 @@ impl GitDriver {
                 }
                 return Err(recovery("commit-effect-unknown"));
             }
-            let actual = if parents.split_whitespace().collect::<Vec<_>>()
+            let entries = if parents.split_whitespace().collect::<Vec<_>>()
                 == vec![baseline.head.as_str()]
             {
-                shown
+                raw_entries(shown)?
             } else {
-                paths(&self.checkout_bytes(
+                raw_entries(&self.checkout_bytes(
                     repo,
                     scope,
                     &[
                         "diff",
-                        "--name-only",
+                        "--raw",
+                        "-t",
+                        "-r",
+                        "--no-abbrev",
                         "--no-renames",
                         "-z",
                         &baseline.head,
@@ -1320,18 +1491,26 @@ impl GitDriver {
                     ],
                 )?)?
             };
+            let actual: Vec<String> = entries.iter().filter(|e| e.is_file()).map(|e| e.path.clone()).collect();
             let violation = !out.success
                 || actual_tree != tree
                 || actual != selected
                 || parents.split_whitespace().collect::<Vec<_>>()
                     != vec![baseline.head.as_str()];
             let oid = Oid::parse(&observed, repo.object_format()).map_err(failure)?;
-            // The ref's directories are made durable while the receipt's own bytes
-            // are synced, and the receipt's name is installed only after both
-            // finished: the receipt never exists before the ref is durable.
+            // The commit's new loose objects and the ref's directories are made
+            // durable while the receipt's own bytes are synced, and the receipt's
+            // name is installed only after all finished: the receipt never exists
+            // before the commit's objects and ref are durable.
             let reference = RefName::parse(&baseline.reference).map_err(failure)?;
+            let created = object_ids(
+                repo,
+                [observed.clone(), actual_tree.clone()]
+                    .into_iter()
+                    .chain(entries.iter().filter_map(RawEntry::new_object).map(str::to_owned)),
+            )?;
             let ref_durable = || {
-                crate::refs::sync_refs(repo, &reference)
+                sync_commit_effects(repo, &reference, &created, filesystem)
                     .map_err(|e| std::io::Error::other(e.cause))
             };
             recorded_terminal = Some(
@@ -1522,6 +1701,7 @@ impl GitDriver {
             },
             writer,
             id,
+            &wal::OsFileSystem,
         )
     }
 }
@@ -1680,18 +1860,23 @@ mod saved_permissions {
 
 #[cfg(test)]
 mod observation_tests {
-    use super::split_observation;
+    use super::{raw_entries, split_observation, RawEntry};
     const HEAD: &str = "aaaa\0bbbb\0cccc\0";
-    #[test]
-    fn observation_splits_header_and_paths() {
-        let bytes = format!("{HEAD}\0\nb\0d e\0\nnl\0");
-        let (oid, tree, parents, files) = split_observation(bytes.as_bytes()).unwrap();
-        assert_eq!((oid.as_str(), tree.as_str(), parents.as_str()), ("aaaa", "bbbb", "cccc"));
-        // The first path may itself begin with a newline: only Git's one separator is dropped.
-        assert_eq!(files, ["b", "d e", "\nnl"]);
+    const ZERO: &str = "0000000000000000000000000000000000000000";
+    const BLOB: &str = "1111111111111111111111111111111111111111";
+    const TREE: &str = "2222222222222222222222222222222222222222";
+    fn record(old: &str, new: &str, oid: &str, status: &str, path: &str) -> String {
+        format!(":{old} {new} {ZERO} {oid} {status}\0{path}\0")
     }
     #[test]
-    fn observation_of_a_commit_without_paths_has_none() {
+    fn observation_splits_header_from_the_raw_records() {
+        let bytes = format!("{HEAD}\0\n{}", record("000000", "100644", BLOB, "A", "x"));
+        let (oid, tree, parents, rest) = split_observation(bytes.as_bytes()).unwrap();
+        assert_eq!((oid.as_str(), tree.as_str(), parents.as_str()), ("aaaa", "bbbb", "cccc"));
+        assert_eq!(rest, record("000000", "100644", BLOB, "A", "x").as_bytes());
+    }
+    #[test]
+    fn observation_of_a_commit_without_changes_has_no_records() {
         let bytes = format!("{HEAD}\0");
         assert!(split_observation(bytes.as_bytes()).unwrap().3.is_empty());
     }
@@ -1705,6 +1890,46 @@ mod observation_tests {
             format!("{HEAD}extra"),
         ] {
             assert!(split_observation(bad.as_bytes()).is_err(), "{bad:?}");
+        }
+    }
+    #[test]
+    fn raw_records_separate_changed_files_from_trees_and_name_new_objects() {
+        let bytes = [
+            record("040000", "040000", TREE, "M", "d"),
+            record("000000", "100644", BLOB, "A", "d/\nnl"),
+            record("100644", "000000", ZERO, "D", "gone"),
+            record("160000", "160000", BLOB, "M", "sub"),
+        ]
+        .concat();
+        let entries = raw_entries(bytes.as_bytes()).unwrap();
+        let files: Vec<_> = entries.iter().filter(|e| e.is_file()).map(|e| e.path.as_str()).collect();
+        assert_eq!(files, ["d/\nnl", "gone", "sub"]);
+        let created: Vec<_> = entries.iter().filter_map(RawEntry::new_object).collect();
+        assert_eq!(created, [TREE, BLOB]);
+    }
+    #[test]
+    fn a_path_replaced_by_a_directory_is_one_deleted_file() {
+        let bytes = [
+            record("100644", "000000", ZERO, "D", "p"),
+            record("000000", "040000", TREE, "A", "p"),
+            record("000000", "100644", BLOB, "A", "p/f"),
+        ]
+        .concat();
+        let entries = raw_entries(bytes.as_bytes()).unwrap();
+        let files: Vec<_> = entries.iter().filter(|e| e.is_file()).map(|e| e.path.as_str()).collect();
+        assert_eq!(files, ["p", "p/f"]);
+    }
+    #[test]
+    fn raw_records_in_any_other_shape_are_refused() {
+        for bad in [
+            "x\0p\0".to_owned(),
+            format!(":100644 100644 {ZERO} {BLOB}\0p\0"),
+            format!(":zz 100644 {ZERO} {BLOB} M\0p\0"),
+            format!(":100644 100644 {ZERO} nothex M\0p\0"),
+            format!(":100644 100644 {ZERO} {BLOB} M\0"),
+            format!(":100644 100644 {ZERO} {BLOB} MM\0p\0"),
+        ] {
+            assert!(raw_entries(bad.as_bytes()).is_err(), "{bad:?}");
         }
     }
 }
