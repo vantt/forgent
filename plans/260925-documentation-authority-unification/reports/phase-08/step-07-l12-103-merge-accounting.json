@@ -1,0 +1,83 @@
+{
+  "merge": "cef806a1ecbe14ea19f41254a409a5faed0519ff",
+  "firstParent": "81c36f374a215489f0b902ad38e187d792d115e0",
+  "main": "ffc0f903f19fd257e8e6cd250a8c962d0e9254ac",
+  "base": "81c36f374a215489f0b902ad38e187d792d115e0",
+  "mainCommits": [
+    "ffc0f903f19fd257e8e6cd250a8c962d0e9254ac docs(board): record the follow-up seat-binding landing that clears the one-door census",
+    "f315b99c7545c27e7c08d889e64ca510ecf55417 Merge remote-tracking branch 'origin/main' into seat-onedoor-fix",
+    "a4db2b947545eaec642270c13254c5031316b202 fix(config): strip config comments by a JSON round trip so the one-door scan resolves the binary",
+    "d91c0374593a22ce1f2ccf6de656db7ff665381c docs(board): record the seat-binding, git durability and T0 landing on the owner machine"
+  ],
+  "changedPaths": [
+    "packages/git/contracts/mutation-census.v1.json",
+    "plans/261017-1313-fgos-platform-program-board/log.md",
+    "plans/261017-1313-fgos-platform-program-board/plan.md",
+    "plans/reports/landing-261022-0311-seat-git-durability-t0-owner-machine.md",
+    "src/runner/dispatch/config.mjs"
+  ],
+  "changedCandidateFiles": [],
+  "changedDocs": [],
+  "evidenceRelocation": {
+    "command": "node scripts/check-evidence-relocation.mjs --manifest plans/260925-documentation-authority-unification/reports/phase-08/step-06-evidence-relocation-manifest.json --before",
+    "exit": 0,
+    "entries": 867,
+    "violations": 0,
+    "consumerTableChanged": false,
+    "runtimeReader": false
+  },
+  "ratchet": {
+    "command": "node scripts/check-legacy-docs-ratchet.mjs",
+    "exit": 0,
+    "legacyFiles": 997,
+    "accountedEdits": 28,
+    "accountedNewFiles": 3,
+    "exceptionLedgerChanged": false,
+    "testCommand": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/check-legacy-docs-ratchet.test.mjs",
+    "testExit": 0,
+    "testsPassed": 28
+  },
+  "step0": {
+    "changedCandidateFiles": 0,
+    "inboundTargetOwnerBindings": 0,
+    "directBindingsChecked": 0,
+    "groupMembersChecked": 0,
+    "driftedBindings": 0,
+    "rebindingsApplied": 0,
+    "remainingTargetDigestDrift": 0,
+    "method": "No changed candidate document exists. The L12-65 procedure therefore has no target unit to extract or content-and-neighbour placement to perform; no ledger shard was edited."
+  },
+  "overlaps": {
+    "step3": [
+      "batch-002.jsonl:5", "batch-040.jsonl:11", "batch-041.jsonl:4", "batch-064.jsonl:7",
+      "batch-075.jsonl:8", "batch-089.jsonl:14", "batch-094.jsonl:1", "batch-115.jsonl:6"
+    ],
+    "step4": ["step04-009.jsonl:1", "step04-023.jsonl:1", "step04-033.jsonl:3"],
+    "step5": [
+      "runtime-judgment-part-22.jsonl:2,13,16,23,27",
+      "runtime-judgment-part-25.jsonl:21",
+      "runtime-judgment-part-26.jsonl:24,29,36",
+      "runtime-judgment-part-27.jsonl:6,13,26,35",
+      "runtime-judgment-part-28.jsonl:26,30",
+      "runtime-judgment-part-29.jsonl:22",
+      "tests-judgment-batch4.jsonl:1,2",
+      "tests-judgment-batch6.jsonl:1,10,18",
+      "tests-judgment-batch7.jsonl:130,135,185"
+    ],
+    "deferredTo": "Step 7 final atomic assembly under L12-58(1)"
+  },
+  "headDrift": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+    "exit": 0,
+    "headCommit": "775836a7cc4fd8517efe78859d090efcd1d7626c",
+    "entries": 382,
+    "failing": false,
+    "checker": {
+      "files": 1481,
+      "literalReferences": 7223,
+      "dynamicTuples": 39876,
+      "failureCount": 0
+    }
+  },
+  "acceptance": "Accounting only: no authority/content approval, consumer rewrite, target rebind, or approval carry. Ordinary L12-11 actual-commit accounting and independent review remain owed."
+}

@@ -1,0 +1,14 @@
+{
+  "merge": "cef806a1ecbe14ea19f41254a409a5faed0519ff",
+  "method": "L12-65 Step 0 traversal: identify changed candidate documents, then use both unchanged embedded extractors and content plus neighbouring blocks for every inbound target binding. The five imported paths include no candidate document, so no extraction or placement is applicable.",
+  "changedCandidateFiles": [],
+  "extractorsAgree": true,
+  "checkedBindings": 0,
+  "checkedGroupMembers": 0,
+  "driftedBindings": 0,
+  "reboundBindings": 0,
+  "parked": [],
+  "remainingTargetDigestDrift": 0,
+  "ledgerChanged": false,
+  "approvalCarry": false
+}
