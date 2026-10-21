@@ -60,7 +60,7 @@ Học từ audit 09-28 và hội đồng 10-15:
 
 ## 3. Tiêu chuẩn cải thiện: một thay đổi phải qua những cổng nào
 
-Mọi thay đổi do HARDEN đề ra phải qua cả tám cổng sau thì mới được merge:
+Mọi thay đổi do HARDEN đề ra phải qua cả chín cổng sau thì mới được merge:
 
 1. **Tốt hơn đo được:** có bảng trước/sau trên ít nhất một trục A–F. Ví dụ: test đỏ chuyển xanh, p95 giảm, số dòng hoặc số đường giảm, số nơi cùng làm một việc giảm.
 2. **Không to hơn:** không thêm tính năng, lớp hay cơ chế mới. Số dòng thực của component nên ≤ 0; nếu tăng thì phải nêu lý do.
@@ -69,7 +69,8 @@ Mọi thay đổi do HARDEN đề ra phải qua cả tám cổng sau thì mới 
 5. **Không lùi hiệu năng:** p95 của các route đã có ngân sách (identity mint, lock, seat-binding) không được tăng quá nhiễu đo.
 6. **Hướng dẫn cho agent rõ, nhẹ, không trùng** (owner 10:01): instruction, skill, help và thông báo lỗi mà agent đọc phải tường minh, dùng ít token nhất có thể, không lặp lại cùng một luật ở nhiều chỗ và không mâu thuẫn nhau. Đổi hành vi thì sửa luôn hướng dẫn trong cùng đợt; hướng dẫn thừa hoặc trùng thì gỡ.
 7. **Spec đi cùng code:** sự thật thay đổi thì sửa spec của area trong cùng commit.
-8. **Ý tưởng thêm để riêng:** mọi đề xuất thêm tính năng gom vào một mục riêng của báo cáo. Mỗi ý ghi vấn đề thật, bằng chứng, lợi ích, và chỉ làm khi owner chọn.
+8. **Doctor check và setup của component** (owner 11:17): mỗi component chỉ có một hoặc vài doctor row sức khoẻ, đứng tên component đó (không một row cho mỗi khoá config). Row phải chạy nhanh, báo lỗi có tên, nói bước sửa, và có `--fix` khi sửa an toàn. Cơ chế bị xoá thì row và bước `fgos setup` của nó bị xoá trong cùng đợt. Thêm row mới phải nêu row nào nó thay hoặc gộp. Thước đo của tầng: số row của tầng không tăng, row trùng hay row mồ côi về 0.
+9. **Ý tưởng thêm để riêng:** mọi đề xuất thêm tính năng gom vào một mục riêng của báo cáo. Mỗi ý ghi vấn đề thật, bằng chứng, lợi ích, và chỉ làm khi owner chọn.
 
 ## 4. Phương pháp làm việc (rev 2, theo owner 09:12)
 
@@ -112,6 +113,8 @@ Thứ tự lấy từ phụ thuộc crate thật (`packages/*/rust/Cargo.toml`) 
    - spec đã cập nhật.
 
    **Tầng dưới chưa đóng thì không mở hội đồng của tầng trên.**
+
+**Packaging-distribution cắt ngang mọi tầng** (owner 11:17 đồng ý): mỗi tầng soát luôn doctor row, bước `fgos setup` và phần đóng gói/activate của chính component tầng đó, theo cổng 8; không làm thành một đợt riêng.
 
 **Land:** theo từng tầng (owner 10:01): mỗi tầng đóng thì lên main, build release, activate ba workspace, doctor, smoke, đo lại.
 
@@ -211,11 +214,12 @@ Còn lại big lead tự quyết trong khung đã duyệt rồi báo.
 - **Làm sau:** chỗ phải viết logic mới trong Rust.
 - **Không làm:** chỗ chuyển xong không làm gọn hơn.
 
-Mỗi lần chuyển đều phải qua tám cổng của mục 3.
+Mỗi lần chuyển đều phải qua chín cổng của mục 3.
 
 ## 5. Owner quyết
 
-Đã quyết 10:01: chuyển Rust ưu tiên tầng thấp, đưa trọn về Rust, chấp nhận chi phí; land theo từng tầng; không giới hạn ngân sách model; điều tra test một lần ở T0, rà từng tầng sâu hơn; thêm trục G (bề mặt cho agent) và cổng 6 (hướng dẫn cho agent). Còn chờ:
+Đã duyệt:
+- 10:01: chuyển Rust ưu tiên tầng thấp, đưa trọn về Rust, chấp nhận chi phí; land theo từng tầng; không giới hạn ngân sách model; điều tra test tổng một lần ở T0, rà từng tầng sâu hơn; thêm trục G và cổng 6.
+- 11:17: **kết thúc ở T5**; Packaging-distribution soát theo từng tầng; thêm **cổng 8 (doctor check và setup của component)**.
 
-1. Thêm **T5 (kết thúc): Execution Core + Dispatch Transport & Confinement + Seat Binding + Run Result Evaluator**; dừng trước Workflow/Work/Mailbox/Surface/Packaging (đang thiết kế lại hoặc chưa xây). Anh duyệt?
-2. Duyệt toàn bộ đề xuất để em lập plan (`ak-plan`, red-team + validate) và mở T0?
+Đề xuất đã đủ để lập plan.
