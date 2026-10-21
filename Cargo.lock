@@ -252,6 +252,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-mailbox-core"
+version = "0.2.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "fgos-node-addon"
 version = "0.2.0"
 dependencies = [
