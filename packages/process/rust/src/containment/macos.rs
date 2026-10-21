@@ -275,3 +275,22 @@ fn apply_stdio(cmd: &mut Command, spec: &SpawnSpec) {
     cmd.env_clear().envs(&spec.env).current_dir(&spec.cwd);
     cmd.stdin(pick(&spec.stdin)).stdout(pick(&spec.stdout)).stderr(pick(&spec.stderr));
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A dead root and a member of the tree that this observer cannot judge (another host's record) is not
+    /// an empty domain: nothing proves that member is gone.
+    #[test]
+    fn tree_state_reports_unknown_when_a_seen_member_cannot_be_judged() {
+        let mut child = Command::new("/usr/bin/true").spawn().unwrap();
+        let observer = facts::observer();
+        let root = ProcTuple { host: observer.host, boot_id: observer.boot_id, pid_ns: observer.pid_ns, pid: ProcId(child.id()), start_time: "0".into() };
+        child.wait().unwrap();
+        let foreign = ProcTuple { host: "other-host".into(), ..root.clone() };
+        assert_eq!(facts::judge_here(&root.to_record()), Verdict::Dead, "the root fixture is gone");
+        assert_eq!(facts::judge_here(&foreign.to_record()), Verdict::Unknown, "the fixture member must be one this observer cannot judge");
+        assert_eq!(tree_state(&root, &[foreign]), DomainState::Unknown);
+    }
+}

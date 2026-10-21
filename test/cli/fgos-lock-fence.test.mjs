@@ -228,3 +228,41 @@ test('lock fence state: an unreadable record needs --attest-stopped, then the re
     child.kill('SIGKILL');
   }
 });
+
+// The holder dies after it was judged alive and listed but before any signal
+// goes out (the confirm step is where that window is observable). The fence
+// must see the death, send nothing and clear the record at once; it must not
+// wait out TERM_WAIT_MS + KILL_WAIT_MS and then claim the dead holder is
+// still holding. Pin: this window is green on current code. The narrower
+// window, death between the judge and the identity read, makes the identity's
+// start time null and `null === null` passes the identity check; it cannot be
+// set up from outside without a race, so its proof belongs with the fix.
+test('fenceHotRecord on a holder that died between judge and signal returns at once and clears the record; it never waits TERM_WAIT_MS on a dead pid', async () => {
+  const { fenceLock } = await import('../../src/runner/lock-fence.mjs');
+  const { getBootId, getPidNs, getProcessStartTime } = await import('../../src/runner/dispatch/process-identity.mjs');
+  const cwd = initGitCwdFast();
+  const fgosDir = path.join(cwd, '.fgos');
+  fs.mkdirSync(path.join(fgosDir, 'locks'), { recursive: true });
+  const record = path.join(fgosDir, 'locks', 'state.hot');
+  const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
+  const exited = new Promise((resolve) => child.on('exit', resolve));
+  try {
+    fs.writeFileSync(record, JSON.stringify({ v: 1, pid: child.pid, startTime: getProcessStartTime(child.pid), bootId: getBootId(), pidNs: getPidNs() }));
+    const started = Date.now();
+    const result = await fenceLock({
+      name: 'state',
+      fgosDir,
+      confirm: async () => {
+        child.kill('SIGKILL');
+        await exited; // reaped: the pid no longer exists
+        return true;
+      },
+    });
+    const elapsed = Date.now() - started;
+    assert.ok(elapsed < 1000, `a dead holder must not be waited on; took ${elapsed} ms`);
+    assert.equal(result.status, 'fenced');
+    assert.equal(fs.existsSync(record), false, 'the record of the dead holder is cleared');
+  } finally {
+    child.kill('SIGKILL');
+  }
+});
