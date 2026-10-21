@@ -203,3 +203,14 @@ pub fn plain(from: &str, to: &str, body: &str) -> SendRequest {
         reply_to: None,
     }
 }
+
+impl Pair {
+    pub fn sweep(&mut self, now: Timestamp) {
+        self.state.sweep(now, &self.limits, &mut self.ids);
+    }
+
+    /// The first time strictly after `secs` seconds from `since`.
+    pub fn after(since: Timestamp, secs: u64) -> Timestamp {
+        Timestamp::from_millis(since.plus_secs(secs).as_millis() + 1)
+    }
+}

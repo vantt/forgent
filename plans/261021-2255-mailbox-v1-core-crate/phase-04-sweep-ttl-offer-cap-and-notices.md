@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Lazy sweep: deadlines, offer cap, record TTL, notices lane, retention"
-status: pending
+status: done
 priority: P2
 effort: "4h"
 dependencies: [3]
@@ -91,3 +91,16 @@ node scripts/git-one-door-scan.mjs --write-census
 
 - **Dead heads' bindings are never retired in V1.** Owner question Q2 is answered before V2, where liveness is available.
 - **Notices for a sender with no head (the runner, the CLI) are dropped by design and counted.** `status` (V7) shows the count.
+
+## Implementation notes (2026-10-21)
+
+- Deviations (smallest correct fix):
+  - `sweep` takes `&mut dyn IdSource` (`sweep(now, &Limits, ids)`): a notice gets a fresh id, and plan decision 2 forbids minting ids anywhere but `IdSource`. `send`, `claim` and `register` already hold one.
+  - A notice's reason is the existing `RefusalReason` (same two variants as the planned `NoticeReason`; one type, not two). `Notice.about_to` is the recipient's `WriterKey`; the claim turns it into a label (`ClaimedItem.notice.about_to`), so the counters can attribute notice events to the same accounting identities as refusals.
+  - `ClaimedItem` gains `notice: Option<NoticeFacts { reason, about, about_to }>` (`Some` exactly for a notice) so phase 7 can render a notice from a `ClaimedItem` as planned. A notice's `from_label` is `mailbox`, which no head can take (every short name is `<project>-<cli>-<suffix>`).
+  - Notices are claimed only at `Step` already in this phase (the plan states it here; phase 6 narrows `Stop` for messages).
+  - The sweep's refusals (`record-ttl`, `offer-cap`) are counted too: they are refusal reasons and spec §9 signal 2 counts refusals per reason.
+  - `register` runs the sweep after the judgement check, so a mismatched judgement still changes nothing (phase 2 test 6).
+  - `BoundedCounters` orders eviction by a bump sequence number, so "least recently bumped" stays exact when timestamps tie.
+  - The account helper (`MailboxState::account`, shared `unregistered` identity of decision 12) lands here because the counters need it; phase 5 reuses it.
+- Test 7 parts the two retention rules with ordinary configuration: `record.bodyRetentionSec` set to the contract's `loop.windowSec` value, so the body goes before the header; a second half checks that with the contract values both go at the same instant.

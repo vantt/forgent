@@ -11,18 +11,22 @@
 #![forbid(unsafe_code)]
 #![deny(clippy::print_stdout, clippy::print_stderr)]
 
+mod counters;
 mod delivery;
 mod envelope;
 mod ids;
 mod limits;
 mod names;
+mod notices;
 mod registry;
 mod state;
 mod sweep;
 mod time;
 
+pub use counters::{BoundedCounters, CounterReason, Party, PartyKey, UNREGISTERED};
 pub use delivery::{
-    Checkpoint, Claim, ClaimedItem, Finished, MessageView, Refusal, SendOutcome, SendRequest,
+    Checkpoint, Claim, ClaimedItem, Finished, MessageView, NoticeFacts, Refusal, SendOutcome,
+    SendRequest,
 };
 pub use envelope::{Header, Kind, MessageState, RefusalReason};
 pub use ids::{
@@ -33,6 +37,7 @@ pub use limits::{
     QueueLimits, RecordLimits, SessionLimits, WakeLimits,
 };
 pub use names::ResolveRefusal;
+pub use notices::{Notice, NoticeMark, NoticeState};
 pub use registry::{Binding, Liveness, RegisterRefusal, RegisterRequest, Registered, StoredHead};
 pub use state::MailboxState;
 pub use time::Timestamp;

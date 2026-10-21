@@ -4,8 +4,10 @@
 //! Snapshot rule: every field round-trips through `serde_json` from an owned
 //! `String`. Collections are `BTreeMap` or `Vec`, every map key is a `String`
 //! newtype, every enum is a serde enum and no field borrows.
+use crate::counters::BoundedCounters;
 use crate::envelope::Header;
 use crate::ids::{MessageId, WriterKey};
+use crate::notices::{Notice, NoticeMark};
 use crate::registry::Binding;
 use crate::time::Timestamp;
 use serde::{Deserialize, Serialize};
@@ -19,6 +21,12 @@ pub struct MailboxState {
     pub(crate) bindings: BTreeMap<WriterKey, Binding>,
     /// Message headers in the order they were recorded.
     pub(crate) messages: Vec<Header>,
+    /// The notices lane, oldest first.
+    pub(crate) notices: Vec<Notice>,
+    /// When each sender last got a notice of each reason; kept apart from
+    /// the lane so delivering a notice does not lift the window.
+    pub(crate) notice_last: BTreeMap<NoticeMark, Timestamp>,
+    pub(crate) counters: BoundedCounters,
 }
 
 impl MailboxState {

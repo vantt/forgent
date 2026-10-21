@@ -1,7 +1,9 @@
 mod common;
 
 use common::{key, plain, register_new, request, spec_limits, t, SeqIds};
-use fgos_mailbox_core::{Checkpoint, Generation, MailboxState, MessageState};
+use fgos_mailbox_core::{
+    Checkpoint, CounterReason, Generation, MailboxState, MessageState, NoticeState,
+};
 
 /// Builds a state in which every field of the snapshot holds a value.
 fn populated_state() -> MailboxState {
@@ -19,44 +21,90 @@ fn populated_state() -> MailboxState {
     with_handle.handle = Some("thread-2".to_string());
     let codex = register_new(&mut state, with_handle, t(200), &limits, &mut ids);
 
-    // One message per state: offered, in flight, recorded.
-    let k2 = key("k2");
+    // Two messages that the record TTL refuses, one from each head, so the
+    // notices lane, the notice marks and both counter tiers hold values.
+    state
+        .send(plain("k1", &codex, "refused"), t(250), &limits, &mut ids)
+        .unwrap();
+    state
+        .send(
+            plain("k2", "forgent-claude-2b", "refused too"),
+            t(250),
+            &limits,
+            &mut ids,
+        )
+        .unwrap();
+    let e = t(250).plus_secs(limits.record.ttl_sec).plus_secs(1);
+    let (k1, k2) = (key("k1"), key("k2"));
+
+    // Then one message per remaining state: offered, in flight, recorded.
+    // k2 claims at Stop, which never takes notices, so its notice stays
+    // recorded; k1's notice is claimed and left in flight.
     let mut wake = plain("k1", &codex, "offered");
     wake.wake = true;
-    state.send(wake, t(300), &limits, &mut ids).unwrap();
+    state.send(wake, e, &limits, &mut ids).unwrap();
     let claim = state.claim(
         &k2,
         Generation::FIRST,
-        Checkpoint::Step,
-        t(310),
+        Checkpoint::Stop,
+        e.plus_secs(10),
         &limits,
         &mut ids,
     );
-    state.finish(&k2, Generation::FIRST, &claim.token.unwrap(), t(311));
+    state.finish(
+        &k2,
+        Generation::FIRST,
+        &claim.token.unwrap(),
+        e.plus_secs(11),
+    );
     state
-        .send(plain("k1", &codex, "in flight"), t(320), &limits, &mut ids)
+        .send(
+            plain("k1", &codex, "in flight"),
+            e.plus_secs(20),
+            &limits,
+            &mut ids,
+        )
         .unwrap();
     state.claim(
         &k2,
         Generation::FIRST,
-        Checkpoint::Step,
-        t(320),
+        Checkpoint::Stop,
+        e.plus_secs(20),
         &limits,
         &mut ids,
     );
     state
         .send(
             plain("unregistered-cli", &codex, "recorded"),
-            t(330),
+            e.plus_secs(30),
             &limits,
             &mut ids,
         )
         .unwrap();
+    state.claim(
+        &k1,
+        Generation::FIRST,
+        Checkpoint::Step,
+        e.plus_secs(40),
+        &limits,
+        &mut ids,
+    );
+
+    let notice_states: Vec<&NoticeState> = state.notices().map(|n| &n.state).collect();
+    assert!(matches!(
+        notice_states[..],
+        [NoticeState::InFlight { .. }, NoticeState::Recorded]
+            | [NoticeState::Recorded, NoticeState::InFlight { .. }]
+    ));
+    assert!(state.counters().party_count() > 0);
+    assert_eq!(state.counters().total(CounterReason::RecordTtl), 2);
 
     let states: Vec<&MessageState> = state.messages().map(|h| &h.state).collect();
     assert!(matches!(
         states[..],
         [
+            MessageState::Refused { .. },
+            MessageState::Refused { .. },
             MessageState::Offered { .. },
             MessageState::InFlight { .. },
             MessageState::Recorded

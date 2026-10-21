@@ -117,7 +117,8 @@ impl MailboxState {
         if self.bindings.contains_key(&req.key) != judged.is_some() {
             return Err(RegisterRefusal::JudgementMismatch);
         }
-        let now = self.advance(now);
+        self.sweep(now, limits, ids);
+        let now = self.last_now;
         let Some(judged) = judged else {
             return self.create(req, now, limits, ids);
         };

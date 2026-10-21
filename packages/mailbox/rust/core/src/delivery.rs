@@ -1,11 +1,16 @@
 //! Send, claim, emit, finish and the read-only inbox (spec §5.2).
-use crate::envelope::{Header, Kind, MessageState};
+use crate::envelope::{Header, Kind, MessageState, RefusalReason};
 use crate::ids::{AttemptToken, Cli, Generation, IdSource, MessageId, ShortName, WriterKey};
 use crate::limits::Limits;
 use crate::names::{self, ResolveRefusal};
+use crate::notices::{Notice, NoticeState};
 use crate::state::MailboxState;
 use crate::time::Timestamp;
 use std::fmt;
+
+/// The label of a notice's sender: the mailbox itself, which no head can
+/// take, because every short name has the shape `<project>-<cli>-<suffix>`.
+const SYSTEM_LABEL: &str = "mailbox";
 
 /// How many characters of a sender's key label a sender with no head.
 const UNREGISTERED_LABEL_CHARS: usize = 8;
@@ -88,6 +93,18 @@ pub struct ClaimedItem {
     pub sender_has_head: bool,
     /// The offer count including this one, printed in the frame.
     pub attempt: u32,
+    /// What a notice is about; `Some` exactly when `kind` is `Notice`.
+    pub notice: Option<NoticeFacts>,
+}
+
+/// What a claimed notice reports.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NoticeFacts {
+    pub reason: RefusalReason,
+    /// The refused message.
+    pub about: MessageId,
+    /// The label of the refused message's recipient.
+    pub about_to: String,
 }
 
 /// What one claim took. `token` is `None` when nothing was claimed.
@@ -123,6 +140,27 @@ pub struct MessageView {
     pub recorded_at: Timestamp,
     pub offers: u32,
     pub in_flight: bool,
+}
+
+/// The token, deadline and generation one claim puts on what it takes.
+struct Hold<'a> {
+    token: &'a AttemptToken,
+    deadline: Timestamp,
+    generation: Generation,
+}
+
+/// Whether a notice is taken by a claim at this checkpoint: never at
+/// `Stop`, which wakes the head only for mail.
+fn notice_eligible(
+    notice: &Notice,
+    to: &WriterKey,
+    generation: Generation,
+    checkpoint: Checkpoint,
+) -> bool {
+    checkpoint == Checkpoint::Step
+        && notice.state == NoticeState::Recorded
+        && &notice.to == to
+        && notice.to_generation == generation
 }
 
 /// Whether a header is taken by a claim at this checkpoint.
@@ -165,7 +203,7 @@ impl MailboxState {
         limits: &Limits,
         ids: &mut dyn IdSource,
     ) -> Result<SendOutcome, Refusal> {
-        self.sweep(now, limits);
+        self.sweep(now, limits, ids);
         let now = self.last_now;
         let recipient = self.resolve(&req.to)?;
         let (to, to_name, to_generation) = (
@@ -219,53 +257,112 @@ impl MailboxState {
         if self.current_generation(key) != Some(generation) {
             return Claim::empty();
         }
-        self.sweep(now, limits);
+        self.sweep(now, limits, ids);
         let now = self.last_now;
-        if !self
+        let any_mail = self
             .messages
             .iter()
-            .any(|h| eligible(h, key, generation, checkpoint))
-        {
+            .any(|h| eligible(h, key, generation, checkpoint));
+        let any_notice = self
+            .notices
+            .iter()
+            .any(|n| notice_eligible(n, key, generation, checkpoint));
+        if !any_mail && !any_notice {
             return Claim::empty();
         }
         let token = AttemptToken::mint(ids);
         let deadline = now.plus_secs(limits.in_flight_ttl_sec);
-        let mut taken = Vec::new();
-        for header in &mut self.messages {
-            if eligible(header, key, generation, checkpoint) {
-                header.offers += 1;
-                header.changed_at = now;
-                header.state = MessageState::InFlight {
-                    token: token.clone(),
-                    deadline,
-                    generation,
-                };
-                taken.push((
-                    header.id.clone(),
-                    header.kind,
-                    header.from.clone(),
-                    header.offers,
-                ));
-            }
-        }
-        let items = taken
-            .into_iter()
-            .map(|(id, kind, from, attempt)| {
-                let sender = self.binding(&from);
-                ClaimedItem {
-                    id,
-                    kind,
-                    from_label: self.sender_label(&from),
-                    from_cli: sender.map(|b| b.cli.clone()),
-                    sender_has_head: sender.is_some(),
-                    attempt,
-                }
-            })
-            .collect();
+        let hold = Hold {
+            token: &token,
+            deadline,
+            generation,
+        };
+        let mut items = self.take_messages(key, checkpoint, &hold, now);
+        items.extend(self.take_notices(key, checkpoint, &hold));
         Claim {
             token: Some(token),
             items,
         }
+    }
+
+    /// Moves the eligible mail to in-flight under `hold`, oldest first.
+    fn take_messages(
+        &mut self,
+        key: &WriterKey,
+        checkpoint: Checkpoint,
+        hold: &Hold<'_>,
+        now: Timestamp,
+    ) -> Vec<ClaimedItem> {
+        let mut taken = Vec::new();
+        for header in &mut self.messages {
+            if eligible(header, key, hold.generation, checkpoint) {
+                header.offers += 1;
+                header.changed_at = now;
+                header.state = MessageState::InFlight {
+                    token: hold.token.clone(),
+                    deadline: hold.deadline,
+                    generation: hold.generation,
+                };
+                taken.push((header.id.clone(), header.from.clone(), header.offers));
+            }
+        }
+        taken
+            .into_iter()
+            .map(|(id, from, attempt)| {
+                let sender = self.binding(&from);
+                ClaimedItem {
+                    id,
+                    kind: Kind::Message,
+                    from_label: self.sender_label(&from),
+                    from_cli: sender.map(|b| b.cli.clone()),
+                    sender_has_head: sender.is_some(),
+                    attempt,
+                    notice: None,
+                }
+            })
+            .collect()
+    }
+
+    /// Moves the eligible notices to in-flight under `hold`, oldest first.
+    /// A notice is offered once, so its attempt is always the first.
+    fn take_notices(
+        &mut self,
+        key: &WriterKey,
+        checkpoint: Checkpoint,
+        hold: &Hold<'_>,
+    ) -> Vec<ClaimedItem> {
+        let mut taken = Vec::new();
+        for notice in &mut self.notices {
+            if notice_eligible(notice, key, hold.generation, checkpoint) {
+                notice.state = NoticeState::InFlight {
+                    token: hold.token.clone(),
+                    deadline: hold.deadline,
+                    generation: hold.generation,
+                };
+                taken.push((
+                    notice.id.clone(),
+                    notice.reason,
+                    notice.about.clone(),
+                    notice.about_to.clone(),
+                ));
+            }
+        }
+        taken
+            .into_iter()
+            .map(|(id, reason, about, about_to)| ClaimedItem {
+                id,
+                kind: Kind::Notice,
+                from_label: SYSTEM_LABEL.to_string(),
+                from_cli: None,
+                sender_has_head: false,
+                attempt: 1,
+                notice: Some(NoticeFacts {
+                    reason,
+                    about,
+                    about_to: self.sender_label(&about_to),
+                }),
+            })
+            .collect()
     }
 
     /// Finishes a claim after its frame was emitted. Each message still in
@@ -280,37 +377,59 @@ impl MailboxState {
         now: Timestamp,
     ) -> Finished {
         let current = self.current_generation(key);
+        // Offered only when the finishing generation is both the address's
+        // current one and the one that claimed.
+        let accepts =
+            |claimed_by: Generation| current == Some(generation) && claimed_by == generation;
         let mut finished = Finished {
             offered: Vec::new(),
             ignored: Vec::new(),
         };
-        let held: Vec<usize> = self
-            .messages
-            .iter()
-            .enumerate()
-            .filter(|(_, h)| {
-                &h.to == key
-                    && matches!(&h.state, MessageState::InFlight { token: t, .. } if t == token)
-            })
-            .map(|(i, _)| i)
-            .collect();
-        if held.is_empty() {
-            return finished;
-        }
-        let now = self.advance(now);
-        for index in held {
-            let header = &mut self.messages[index];
-            let claimed_by = match &header.state {
-                MessageState::InFlight { generation, .. } => *generation,
-                _ => continue,
+        let at = self.last_now.max(now);
+        let mut touched = false;
+        for header in &mut self.messages {
+            let MessageState::InFlight {
+                token: held,
+                generation: claimed_by,
+                ..
+            } = &header.state
+            else {
+                continue;
             };
-            if current == Some(generation) && claimed_by == generation {
-                header.state = MessageState::Offered { at: now };
-                header.changed_at = now;
+            if &header.to != key || held != token {
+                continue;
+            }
+            touched = true;
+            if accepts(*claimed_by) {
+                header.state = MessageState::Offered { at };
+                header.changed_at = at;
                 finished.offered.push(header.id.clone());
             } else {
                 finished.ignored.push(header.id.clone());
             }
+        }
+        let mut kept = Vec::with_capacity(self.notices.len());
+        for notice in std::mem::take(&mut self.notices) {
+            match &notice.state {
+                NoticeState::InFlight {
+                    token: held,
+                    generation: claimed_by,
+                    ..
+                } if &notice.to == key && held == token => {
+                    touched = true;
+                    if accepts(*claimed_by) {
+                        finished.offered.push(notice.id.clone());
+                        continue;
+                    }
+                    finished.ignored.push(notice.id.clone());
+                }
+                _ => {}
+            }
+            kept.push(notice);
+        }
+        self.notices = kept;
+        if touched {
+            self.last_now = at;
         }
         finished
     }
