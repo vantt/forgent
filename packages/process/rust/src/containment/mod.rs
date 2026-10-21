@@ -14,6 +14,8 @@ use crate::{Domain, DomainState, FdSlot, KillOutcome};
 
 #[cfg(target_os = "linux")]
 pub(crate) mod linux;
+#[cfg(unix)]
+mod pgroup;
 #[cfg(target_os = "macos")]
 pub(crate) mod macos;
 #[cfg(windows)]

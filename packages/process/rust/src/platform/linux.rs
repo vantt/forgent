@@ -5,6 +5,7 @@ use std::fs::{self, File};
 use std::io;
 use std::path::PathBuf;
 use std::process::{Child, Command};
+use std::sync::OnceLock;
 
 use super::{as_pid_t, unix_hostname, ProcessPlatform};
 use crate::control::{self, Signal, SignalOutcome};
@@ -23,34 +24,42 @@ impl ProcessPlatform for Linux {
         unix_hostname()
     }
 
+    /// Read once: the boot id never changes while this process runs.
     fn boot_id(&self) -> Option<String> {
-        fs::read_to_string("/proc/sys/kernel/random/boot_id")
-            .ok()
-            .map(|s| s.trim().to_string())
-            .filter(|s| !s.is_empty())
+        static BOOT_ID: OnceLock<Option<String>> = OnceLock::new();
+        BOOT_ID
+            .get_or_init(|| {
+                fs::read_to_string("/proc/sys/kernel/random/boot_id")
+                    .ok()
+                    .map(|s| s.trim().to_string())
+                    .filter(|s| !s.is_empty())
+            })
+            .clone()
     }
 
+    /// Read once: fgOS never unshares its pid namespace in a process that
+    /// judges (the gate is a separate process), so the link cannot move.
     fn pid_ns(&self) -> PidNs {
-        match fs::read_link("/proc/self/ns/pid") {
-            Ok(link) => {
-                let id = link.to_string_lossy().into_owned();
-                let is_initial = id == INIT_PID_NS;
-                PidNs { id, is_initial }
-            }
-            Err(_) => PidNs { id: "unknown".to_string(), is_initial: false },
-        }
+        static PID_NS: OnceLock<PidNs> = OnceLock::new();
+        PID_NS
+            .get_or_init(|| match fs::read_link("/proc/self/ns/pid") {
+                Ok(link) => {
+                    let id = link.to_string_lossy().into_owned();
+                    let is_initial = id == INIT_PID_NS;
+                    PidNs { id, is_initial }
+                }
+                Err(_) => PidNs { id: "unknown".to_string(), is_initial: false },
+            })
+            .clone()
     }
 
     fn observe(&self, pid: ProcId) -> Observed {
         let Some(raw) = as_pid_t(pid) else {
             return Observed::Absent;
         };
-        match fs::read_to_string(format!("/proc/{}/stat", pid.0)) {
-            Ok(stat) => match facts::parse_proc_stat(&stat) {
-                Some(('Z', _)) | Some(('X', _)) => Observed::Zombie,
-                Some((_, start_time)) => Observed::Live { start_time },
-                None => Observed::Unreadable(UnreadableCause::DriverMissing),
-            },
+        match read_stat(pid.0) {
+            Ok(stat) if stat.is_gone() => Observed::Zombie,
+            Ok(stat) => Observed::Live { start_time: stat.start_ticks.to_string() },
             Err(err) => match err.kind() {
                 // A pid hidden by `hidepid` reads as missing too; signal 0
                 // tells a hidden process (EPERM) from no process (ESRCH).
@@ -252,6 +261,12 @@ fn read_relation_and_leader(proc_dir: &File, pid: ProcId, buf: &mut [u8; 4096]) 
     let relation = facts::parse_relation(pid, &line)?;
     let exit_signal = facts::proc_stat_fields(&line)?.nth(35)?;
     Some((relation, exit_signal != "-1"))
+}
+
+/// `/proc/<pid>/stat` through the one parser; an unparsable line is
+/// `InvalidData`.
+pub(crate) fn read_stat(pid: u32) -> io::Result<facts::Stat> {
+    facts::parse_stat(&fs::read_to_string(format!("/proc/{pid}/stat"))?).ok_or_else(|| io::Error::from(io::ErrorKind::InvalidData))
 }
 
 /// Signal 0: does any process (even one `/proc` hides from us) own `pid`?
