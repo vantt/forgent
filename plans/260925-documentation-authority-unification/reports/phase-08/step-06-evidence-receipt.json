@@ -1,26 +1,30 @@
 {
   "contract": {
     "id": "step-06-evidence-receipt",
-    "version": 1
+    "version": 2
   },
-  "timestamp": "2026-10-21T18:00:00.000Z",
-  "sourceCommit": "916116b0419d04637bab19c3a16cd5aac3205229",
+  "timestamp": "2026-10-21T11:31:32.188Z",
+  "sourceCommit": "38bddcdd7bd6cf3cf5eaf0680fd4cf59074cddd9",
   "manifestPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-06-evidence-relocation-manifest.json",
+  "consumerTablePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-06-evidence-consumer-table.json",
   "commands": [
     {
       "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-evidence-relocation.mjs --manifest plans/260925-documentation-authority-unification/reports/phase-08/step-06-evidence-relocation-manifest.json --before",
       "exit": 0,
-      "summary": "PASS: before mode verified (867 entries, 0 violations)"
+      "summary": "PASS: before mode verified (867 entries, 0 violations; classified consumer table reproduced)"
     },
     {
       "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/check-evidence-relocation.test.mjs",
       "exit": 0,
-      "summary": "9 tests passed, 0 failed, 0 skipped"
+      "summary": "40 tests passed, 0 failed, 0 skipped"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-evidence-relocation.mjs --manifest plans/260925-documentation-authority-unification/reports/phase-08/step-06-evidence-relocation-manifest.json --after --json",
+      "exit": 1,
+      "summary": "Expected pre-cutover failure: 907 violations (867 remaining legacy payloads, 40 maintained-text repoint/delete items)"
     }
   ],
   "counts": {
-    "trackedArchitectFiles": 981,
-    "trackedPlatformFiles": 1189,
     "architectPayloadFiles": 867,
     "platformPayloadFiles": 867,
     "identicalMirrorCount": 867,
@@ -30,54 +34,505 @@
     "markdownPayloads": 302,
     "otherPayloads": 565,
     "totalPayloadBytes": 17176516,
-    "consumerMeasurements": {
-      "command": "git ls-files scanning for agent-coordination/verification outside payload trees and plan directory",
+    "manifestSortOrder": "codepoint-ascending",
+    "broadConsumerMeasurements": {
+      "method": "git ls-files; outside both payload trees and this plan directory; fixed agent-coordination/verification forms",
       "totalConsumerFiles": 214,
-      "legacyFormHits": 196,
-      "fullPathHits": 184,
-      "platformFormHits": 21,
-      "groupBreakdown": {
-        "archive": 114,
-        "docs/platform": 37,
-        "docs/architect": 24,
-        "test": 14,
-        "docs/how-to": 9,
-        "plans": 6,
-        "src": 3,
-        ".fgos": 2,
-        "docs/history": 2,
-        "CHANGELOG.md": 1,
-        "docs/knowledge": 1,
-        "scripts": 1
-      }
+      "legacyFormHits": 197,
+      "fullPathHits": 185,
+      "platformFormHits": 21
+    },
+    "classifiedConsumerMeasurements": {
+      "scope": "git-tracked code, tests, scripts, binaries, apps, packages, skills, agent instructions and hooks; exact legacy root plus manifest collection names",
+      "total": 44,
+      "runtimeReaders": 0,
+      "unclassifiedConsumers": 0,
+      "readErrors": 0
     }
   },
+  "afterComparison": {
+    "reviewedImplementation": {
+      "maintainedTextViolations": 53,
+      "missedLegacyFormFiles": 25,
+      "falsePositiveHistoryFixtureChangelog": 28
+    },
+    "reworkedImplementation": {
+      "maintainedTextViolations": 40,
+      "remainingLegacyPayloads": 867,
+      "totalViolations": 907
+    },
+    "remainingRepointOrDeleteSet": [
+      "docs/architect/agent-coordination/architecture/run-handle.md",
+      "docs/architect/agent-coordination/architecture/runtime-recovery-design.md",
+      "docs/architect/agent-coordination/contracts/coordination-session.md",
+      "docs/architect/agent-coordination/contracts/flow-definition.md",
+      "docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+      "docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+      "docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+      "docs/architect/agent-coordination/decisions/README.md",
+      "docs/architect/agent-coordination/documentation-standardization-plan.md",
+      "docs/architect/agent-coordination/intent-preservation-ledger.md",
+      "docs/architect/agent-coordination/playbooks/coordination-operating-harness.md",
+      "docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md",
+      "docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+      "docs/architect/architecture-intent.md",
+      "docs/architect/proposals/coordination-envelope-progress.md",
+      "docs/architect/proposals/group-thinking-plan-loop.md",
+      "docs/architect/proposals/step-09-group-thinking-substrate.md",
+      "docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "docs/how-to/author-a-plan-loop-track.md",
+      "docs/how-to/coordination-examples/architecture-advisory-panel-v1-alternative-and-composite-reopen.md",
+      "docs/how-to/coordination-examples/architecture-advisory-panel-v1-clarification-and-challenge.md",
+      "docs/how-to/coordination-examples/architecture-advisory-panel-v1-clear-start.md",
+      "docs/how-to/coordination-examples/architecture-advisory-panel-v1-decision-request-and-resume.md",
+      "docs/how-to/coordination-examples/architecture-advisory-panel-v1-final-decision-and-defer.md",
+      "docs/how-to/coordination-examples/architecture-advisory-panel-v1-material-context-reopen.md",
+      "docs/how-to/coordination-examples/architecture-advisory-panel-v1-unclear-start.md",
+      "docs/how-to/use-fgos-architecture-panel.md",
+      "docs/knowledge/why-hook-registrations-guard-against-gitignored-scripts/hook-registration-guard.md",
+      "docs/platform/proposals/step-09-group-thinking-substrate.md",
+      "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "scripts/check-legacy-docs-ratchet.baseline.json",
+      "src/runner/dispatch/config.mjs",
+      "src/runner/dispatch/trust-store.mjs",
+      "src/runner/dispatch/worker-home.mjs",
+      "test/runner/dispatch-executor-profile.test.mjs",
+      "test/runner/dispatch-worker-home.test.mjs",
+      "test/runner/dispatch-worker-session.test.mjs"
+    ]
+  },
+  "classificationPolicy": {
+    "history": "classifyPath(...).kind === history",
+    "evidencePayload": "classifyPath(...).kind === evidence-payload",
+    "recordedData": [
+      "test/fixtures/**",
+      "CHANGELOG.md",
+      ".fgos/**"
+    ],
+    "immutableRecords": [
+      "archive/**",
+      "plans/**"
+    ],
+    "syntheticProofs": "exact paths classified synthetic-test in the committed consumer table",
+    "aliasTable": "exact DEFAULT_ALIAS_TABLE_PATH only"
+  },
+  "consumerTable": [
+    {
+      "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+      "classification": "gate-record",
+      "matches": [
+        "collection:architecture-advisory-panel",
+        "collection:code-implementation-track-policy",
+        "collection:code-panel-multicell-facade",
+        "collection:confinement-authority-implementation",
+        "collection:coordination-envelope",
+        "collection:dispatch-operability-implementation",
+        "collection:executor-policy-dispatch-seams",
+        "collection:group-thinking-plan-loop",
+        "collection:runtime-recovery",
+        "collection:rust-host-r1-kernel",
+        "collection:step-07-mvp",
+        "collection:step-08-standalone-coordination",
+        "collection:step-09-group-thinking-mvp1-mvp2",
+        "collection:step-09-mvp3-to-mvp5",
+        "collection:step-09-mvp6-to-mvp9",
+        "collection:team-dispatch-v1",
+        "collection:visibility-herdr",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "classification": "gate-record",
+      "matches": [
+        "collection:architecture-advisory-panel",
+        "collection:runtime-recovery"
+      ]
+    },
+    {
+      "path": "scripts/measure-p08-performance.mjs",
+      "classification": "code-comment",
+      "matches": [
+        "collection:rust-host-r1-kernel"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/assignment-policy.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/assignment-runner.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/assignment.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/config.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:executor-policy-dispatch-seams",
+        "collection:visibility-herdr",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/operation-prompt-templates.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:architecture-advisory-panel"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/provider-capacity.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/recovery.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:runtime-recovery"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/run-lock.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:runtime-recovery"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/trust-store.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:visibility-herdr",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/worker-home.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:visibility-herdr",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "src/setup/executor-profile-warnings.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "test/fixtures/.fgos/coordination/sessions/architecture-advisory-panel--p00-1/events.jsonl",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:architecture-advisory-panel"
+      ]
+    },
+    {
+      "path": "test/fixtures/run-outcome/legacy-derivation.json",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:code-panel-multicell-facade",
+        "collection:dispatch-operability-implementation",
+        "collection:executor-policy-dispatch-seams",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/fixtures/run-result/real-shapes/03-v1-done-inferred.json",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:code-panel-multicell-facade",
+        "collection:executor-policy-dispatch-seams",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/fixtures/run-result/real-shapes/04-v1-done-verified.json",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:code-panel-multicell-facade"
+      ]
+    },
+    {
+      "path": "test/fixtures/run-result/real-shapes/05-v1-done-reported.json",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:code-panel-multicell-facade",
+        "collection:dispatch-operability-implementation",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/fixtures/run-result/real-shapes/14-v2-completed-blocked-reported.json",
+      "classification": "recorded-fixture",
+      "matches": [
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/fixtures/run-result/real-shapes/15-v2-completed-not-applicable-failed.json",
+      "classification": "recorded-fixture",
+      "matches": [
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/fixtures/usage/codex-cli-grep-tokens-used.stderr.log",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:dispatch-operability-implementation"
+      ]
+    },
+    {
+      "path": "test/fixtures/usage/codex-cli-nested-tokens-used.stderr.log",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:architecture-advisory-panel"
+      ]
+    },
+    {
+      "path": "test/fixtures/usage/pi-multiturn-no-agent-end.jsonl",
+      "classification": "recorded-fixture",
+      "matches": [
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/fixtures/usage/pi-multiturn-normal.jsonl",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:architecture-advisory-panel",
+        "collection:code-implementation-track-policy",
+        "collection:confinement-authority-implementation",
+        "collection:dispatch-operability-implementation",
+        "collection:executor-policy-dispatch-seams",
+        "collection:group-thinking-plan-loop",
+        "collection:runtime-recovery",
+        "collection:rust-host-r1-kernel",
+        "collection:step-07-mvp",
+        "collection:step-09-mvp3-to-mvp5",
+        "collection:step-09-mvp6-to-mvp9",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/runner/assignment-dispatch.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:executor-policy-dispatch-seams",
+        "collection:runtime-recovery"
+      ]
+    },
+    {
+      "path": "test/runner/assignment.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "test/runner/dispatch-assignment-id-claim-concurrency.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "test/runner/dispatch-confinement-authority.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:confinement-authority-implementation"
+      ]
+    },
+    {
+      "path": "test/runner/dispatch-executor-profile.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:visibility-herdr",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/runner/dispatch-policy-baseline-snapshot.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "test/runner/dispatch-worker-home.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:visibility-herdr",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/runner/dispatch-worker-session.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:visibility-herdr",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/runner/operation-prompt-templates.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:architecture-advisory-panel"
+      ]
+    },
+    {
+      "path": "test/runner/provider-capacity.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "test/runner/run-result-v2.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "test/scripts/check-doc-conservation.test.mjs",
+      "classification": "synthetic-test",
+      "matches": [
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/scripts/check-doc-retirement.test.mjs",
+      "classification": "synthetic-test",
+      "matches": [
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/scripts/check-evidence-relocation.test.mjs",
+      "classification": "synthetic-test",
+      "matches": [
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/scripts/doc-candidate-conservation.test.mjs",
+      "classification": "synthetic-test",
+      "matches": [
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:architecture-advisory-panel"
+      ]
+    },
+    {
+      "path": "test/setup/checks.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:executor-policy-dispatch-seams",
+        "collection:rust-host-r1-kernel"
+      ]
+    },
+    {
+      "path": "test/setup/skill-wrappers.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:code-panel-multicell-facade",
+        "collection:dispatch-operability-implementation"
+      ]
+    }
+  ],
   "exceptionalConsumers": {
     "runtimeReaders": [],
     "unclassifiedConsumers": [],
-    "mirrorDigestModeMismatches": []
+    "mirrorDigestModeBlobMismatches": []
   },
   "reusedPrimitives": [
     {
-      "symbol": "computeSha256",
-      "location": "scripts/check-legacy-docs-ratchet.mjs:112",
-      "purpose": "Deterministic SHA-256 calculation for file contents"
+      "symbol": "normalizePosix",
+      "source": "scripts/check-legacy-docs-ratchet.mjs:43",
+      "callSites": [
+        "scripts/check-evidence-relocation.mjs:44",
+        "scripts/check-evidence-relocation.mjs:267"
+      ]
     },
     {
-      "symbol": "normalizePosix",
-      "location": "scripts/check-legacy-docs-ratchet.mjs:43",
-      "purpose": "POSIX path normalization across platforms"
+      "symbol": "computeSha256",
+      "source": "scripts/check-legacy-docs-ratchet.mjs:112",
+      "callSites": [
+        "scripts/check-evidence-relocation.mjs:299",
+        "scripts/check-evidence-relocation.mjs:315"
+      ]
     },
     {
       "symbol": "isEvidenceMirrorPath",
-      "location": "scripts/check-doc-inventory-gates.mjs:1009",
-      "purpose": "Classification of evidence payload paths nested below verification"
+      "source": "scripts/check-doc-inventory-gates.mjs:1009",
+      "callSites": [
+        "scripts/check-evidence-relocation.mjs:56",
+        "scripts/check-evidence-relocation.mjs:116",
+        "scripts/check-evidence-relocation.mjs:184",
+        "scripts/check-evidence-relocation.mjs:288"
+      ]
     },
     {
       "symbol": "classifyPath",
-      "location": "scripts/check-doc-constitution.mjs:170",
-      "purpose": "Placement and constitution document kind classification"
+      "source": "scripts/check-doc-constitution.mjs:170",
+      "callSites": [
+        "scripts/check-evidence-relocation.mjs:250"
+      ]
+    },
+    {
+      "symbol": "isMainModule",
+      "source": "scripts/lib/is-main-module.mjs:25",
+      "callSites": [
+        "scripts/check-evidence-relocation.mjs:425"
+      ]
     }
   ],
-  "blockers": []
+  "blockers": [
+    {
+      "id": "standing-verifier-run",
+      "reason": "No standing live --before invocation is registered in npm test; this slice cannot edit the test runner or package scripts."
+    },
+    {
+      "id": "retirement-gate-evidence-digests",
+      "reason": "scripts/check-doc-retirement.mjs still reports evidence-digests blocked until the verifier is registered in the Phase 9 tooling slice."
+    }
+  ],
+  "verificationLimits": [
+    "impact-analysis provider was unavailable in this worker tool surface; symbol callers were cross-checked with rg instead"
+  ]
 }

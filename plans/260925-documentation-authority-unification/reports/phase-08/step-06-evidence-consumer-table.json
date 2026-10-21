@@ -1,0 +1,361 @@
+{
+  "version": 1,
+  "sourceCommit": "38bddcdd7bd6cf3cf5eaf0680fd4cf59074cddd9",
+  "scanScope": "git-tracked code, tests, scripts, binaries, apps, packages, skills, agent instructions and hooks; exact legacy root plus manifest collection names",
+  "consumers": [
+    {
+      "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+      "classification": "gate-record",
+      "matches": [
+        "collection:architecture-advisory-panel",
+        "collection:code-implementation-track-policy",
+        "collection:code-panel-multicell-facade",
+        "collection:confinement-authority-implementation",
+        "collection:coordination-envelope",
+        "collection:dispatch-operability-implementation",
+        "collection:executor-policy-dispatch-seams",
+        "collection:group-thinking-plan-loop",
+        "collection:runtime-recovery",
+        "collection:rust-host-r1-kernel",
+        "collection:step-07-mvp",
+        "collection:step-08-standalone-coordination",
+        "collection:step-09-group-thinking-mvp1-mvp2",
+        "collection:step-09-mvp3-to-mvp5",
+        "collection:step-09-mvp6-to-mvp9",
+        "collection:team-dispatch-v1",
+        "collection:visibility-herdr",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "classification": "gate-record",
+      "matches": [
+        "collection:architecture-advisory-panel",
+        "collection:runtime-recovery"
+      ]
+    },
+    {
+      "path": "scripts/measure-p08-performance.mjs",
+      "classification": "code-comment",
+      "matches": [
+        "collection:rust-host-r1-kernel"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/assignment-policy.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/assignment-runner.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/assignment.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/config.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:executor-policy-dispatch-seams",
+        "collection:visibility-herdr",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/operation-prompt-templates.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:architecture-advisory-panel"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/provider-capacity.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/recovery.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:runtime-recovery"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/run-lock.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:runtime-recovery"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/trust-store.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:visibility-herdr",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/worker-home.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:visibility-herdr",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "src/setup/executor-profile-warnings.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "classification": "identifier-or-code-comment",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "test/fixtures/.fgos/coordination/sessions/architecture-advisory-panel--p00-1/events.jsonl",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:architecture-advisory-panel"
+      ]
+    },
+    {
+      "path": "test/fixtures/run-outcome/legacy-derivation.json",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:code-panel-multicell-facade",
+        "collection:dispatch-operability-implementation",
+        "collection:executor-policy-dispatch-seams",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/fixtures/run-result/real-shapes/03-v1-done-inferred.json",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:code-panel-multicell-facade",
+        "collection:executor-policy-dispatch-seams",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/fixtures/run-result/real-shapes/04-v1-done-verified.json",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:code-panel-multicell-facade"
+      ]
+    },
+    {
+      "path": "test/fixtures/run-result/real-shapes/05-v1-done-reported.json",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:code-panel-multicell-facade",
+        "collection:dispatch-operability-implementation",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/fixtures/run-result/real-shapes/14-v2-completed-blocked-reported.json",
+      "classification": "recorded-fixture",
+      "matches": [
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/fixtures/run-result/real-shapes/15-v2-completed-not-applicable-failed.json",
+      "classification": "recorded-fixture",
+      "matches": [
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/fixtures/usage/codex-cli-grep-tokens-used.stderr.log",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:dispatch-operability-implementation"
+      ]
+    },
+    {
+      "path": "test/fixtures/usage/codex-cli-nested-tokens-used.stderr.log",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:architecture-advisory-panel"
+      ]
+    },
+    {
+      "path": "test/fixtures/usage/pi-multiturn-no-agent-end.jsonl",
+      "classification": "recorded-fixture",
+      "matches": [
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/fixtures/usage/pi-multiturn-normal.jsonl",
+      "classification": "recorded-fixture",
+      "matches": [
+        "collection:architecture-advisory-panel",
+        "collection:code-implementation-track-policy",
+        "collection:confinement-authority-implementation",
+        "collection:dispatch-operability-implementation",
+        "collection:executor-policy-dispatch-seams",
+        "collection:group-thinking-plan-loop",
+        "collection:runtime-recovery",
+        "collection:rust-host-r1-kernel",
+        "collection:step-07-mvp",
+        "collection:step-09-mvp3-to-mvp5",
+        "collection:step-09-mvp6-to-mvp9",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/runner/assignment-dispatch.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:executor-policy-dispatch-seams",
+        "collection:runtime-recovery"
+      ]
+    },
+    {
+      "path": "test/runner/assignment.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "test/runner/dispatch-assignment-id-claim-concurrency.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "test/runner/dispatch-confinement-authority.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:confinement-authority-implementation"
+      ]
+    },
+    {
+      "path": "test/runner/dispatch-executor-profile.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:visibility-herdr",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/runner/dispatch-policy-baseline-snapshot.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "test/runner/dispatch-worker-home.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:visibility-herdr",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/runner/dispatch-worker-session.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:visibility-herdr",
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/runner/operation-prompt-templates.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:architecture-advisory-panel"
+      ]
+    },
+    {
+      "path": "test/runner/provider-capacity.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "test/runner/run-result-v2.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:executor-policy-dispatch-seams"
+      ]
+    },
+    {
+      "path": "test/scripts/check-doc-conservation.test.mjs",
+      "classification": "synthetic-test",
+      "matches": [
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/scripts/check-doc-retirement.test.mjs",
+      "classification": "synthetic-test",
+      "matches": [
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/scripts/check-evidence-relocation.test.mjs",
+      "classification": "synthetic-test",
+      "matches": [
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/scripts/doc-candidate-conservation.test.mjs",
+      "classification": "synthetic-test",
+      "matches": [
+        "legacy-root"
+      ]
+    },
+    {
+      "path": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:architecture-advisory-panel"
+      ]
+    },
+    {
+      "path": "test/setup/checks.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:executor-policy-dispatch-seams",
+        "collection:rust-host-r1-kernel"
+      ]
+    },
+    {
+      "path": "test/setup/skill-wrappers.test.mjs",
+      "classification": "test-reference",
+      "matches": [
+        "collection:code-panel-multicell-facade",
+        "collection:dispatch-operability-implementation"
+      ]
+    }
+  ]
+}

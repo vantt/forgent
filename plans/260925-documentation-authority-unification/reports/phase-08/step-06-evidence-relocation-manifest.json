@@ -1,28 +1,8 @@
 {
   "version": 1,
-  "sourceCommit": "916116b0419d04637bab19c3a16cd5aac3205229",
+  "sourceCommit": "38bddcdd7bd6cf3cf5eaf0680fd4cf59074cddd9",
   "generatedBy": "scripts/check-evidence-relocation.mjs",
   "entries": [
-    {
-      "collection": "architecture-advisory-panel",
-      "before": "docs/architect/agent-coordination/verification/architecture-advisory-panel/current-cell.md",
-      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/current-cell.md",
-      "sha256": "26412dd84e3ae4fccf8587ed7cf20404963e8b93d31674b8c34a71032f7090a8",
-      "bytes": 3305,
-      "mode": "100644",
-      "gitBlob": "f32f9f926950e54c97d36d440adc88c50b75a9da",
-      "relation": "identical-mirror"
-    },
-    {
-      "collection": "architecture-advisory-panel",
-      "before": "docs/architect/agent-coordination/verification/architecture-advisory-panel/index.md",
-      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/index.md",
-      "sha256": "2becc5d17a36e793e00bbfde6385f95db525437640a2acb86e270bca79aebba1",
-      "bytes": 19103,
-      "mode": "100644",
-      "gitBlob": "73af6f4c69411a6a71443a819498439f9a1255e6",
-      "relation": "identical-mirror"
-    },
     {
       "collection": "architecture-advisory-panel",
       "before": "docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md",
@@ -131,6 +111,26 @@
       "bytes": 15227,
       "mode": "100644",
       "gitBlob": "746c1b264fa9a1abf08b4f219b9a9e9b22b69356",
+      "relation": "identical-mirror"
+    },
+    {
+      "collection": "architecture-advisory-panel",
+      "before": "docs/architect/agent-coordination/verification/architecture-advisory-panel/current-cell.md",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/current-cell.md",
+      "sha256": "26412dd84e3ae4fccf8587ed7cf20404963e8b93d31674b8c34a71032f7090a8",
+      "bytes": 3305,
+      "mode": "100644",
+      "gitBlob": "f32f9f926950e54c97d36d440adc88c50b75a9da",
+      "relation": "identical-mirror"
+    },
+    {
+      "collection": "architecture-advisory-panel",
+      "before": "docs/architect/agent-coordination/verification/architecture-advisory-panel/index.md",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/index.md",
+      "sha256": "2becc5d17a36e793e00bbfde6385f95db525437640a2acb86e270bca79aebba1",
+      "bytes": 19103,
+      "mode": "100644",
+      "gitBlob": "73af6f4c69411a6a71443a819498439f9a1255e6",
       "relation": "identical-mirror"
     },
     {
@@ -3885,16 +3885,6 @@
     },
     {
       "collection": "confinement-authority-implementation",
-      "before": "docs/architect/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md",
-      "after": "docs/platform/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md",
-      "sha256": "35a09e646eae5bcc368bf961f818582aaf35f7ada65554df83120c1940e377e9",
-      "bytes": 7886,
-      "mode": "100644",
-      "gitBlob": "52eb2d1a66262af714597dd091171bfe625c49a9",
-      "relation": "identical-mirror"
-    },
-    {
-      "collection": "confinement-authority-implementation",
       "before": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P00.md",
       "after": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P00.md",
       "sha256": "c3d5f819bbaf4a0de177b3b3c3eae13e9eec0fdf4646e87f5ba4f670d593f413",
@@ -3981,6 +3971,16 @@
       "bytes": 11943,
       "mode": "100644",
       "gitBlob": "0bee4adda0c4ce30dad50b4542079e0bb89a3ba2",
+      "relation": "identical-mirror"
+    },
+    {
+      "collection": "confinement-authority-implementation",
+      "before": "docs/architect/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md",
+      "after": "docs/platform/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md",
+      "sha256": "35a09e646eae5bcc368bf961f818582aaf35f7ada65554df83120c1940e377e9",
+      "bytes": 7886,
+      "mode": "100644",
+      "gitBlob": "52eb2d1a66262af714597dd091171bfe625c49a9",
       "relation": "identical-mirror"
     },
     {
@@ -4115,6 +4115,36 @@
     },
     {
       "collection": "group-thinking-plan-loop",
+      "before": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "after": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sha256": "1ec797b388254eaee043cc4ff6d403bda0cc0703d7e6437789bd6fb4f2955beb",
+      "bytes": 124073,
+      "mode": "100644",
+      "gitBlob": "05efb5d027cd7b8d09c6002c82a832f4063322e6",
+      "relation": "identical-mirror"
+    },
+    {
+      "collection": "group-thinking-plan-loop",
+      "before": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
+      "after": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
+      "sha256": "142c1051f595bb6eddacfd99222b5877ec55dd3b47f2c8410efd4f5ca9d180ce",
+      "bytes": 41731,
+      "mode": "100644",
+      "gitBlob": "a7f8f67113db7e15f3975fa44f3488546bc804a7",
+      "relation": "identical-mirror"
+    },
+    {
+      "collection": "group-thinking-plan-loop",
+      "before": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P03.1.md",
+      "after": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P03.1.md",
+      "sha256": "d1bae74693a7c38eb902dd69facb8d4f87041f586f109da751ed723ee66d4482",
+      "bytes": 47026,
+      "mode": "100644",
+      "gitBlob": "07f45ebae6bf45551248c0467facf1d5e2c2293a",
+      "relation": "identical-mirror"
+    },
+    {
+      "collection": "group-thinking-plan-loop",
       "before": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P01.1.md",
       "after": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/current-cell-P01.1.md",
       "sha256": "1e2c0a0cb8fe41676031a40679a61a3935f713a0f6c1850ae528f52d5a26d397",
@@ -4151,36 +4181,6 @@
       "bytes": 14011,
       "mode": "100644",
       "gitBlob": "0e3e7cd128e13927c043b01ff23fb742614c9ea3",
-      "relation": "identical-mirror"
-    },
-    {
-      "collection": "group-thinking-plan-loop",
-      "before": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
-      "after": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
-      "sha256": "1ec797b388254eaee043cc4ff6d403bda0cc0703d7e6437789bd6fb4f2955beb",
-      "bytes": 124073,
-      "mode": "100644",
-      "gitBlob": "05efb5d027cd7b8d09c6002c82a832f4063322e6",
-      "relation": "identical-mirror"
-    },
-    {
-      "collection": "group-thinking-plan-loop",
-      "before": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
-      "after": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
-      "sha256": "142c1051f595bb6eddacfd99222b5877ec55dd3b47f2c8410efd4f5ca9d180ce",
-      "bytes": 41731,
-      "mode": "100644",
-      "gitBlob": "a7f8f67113db7e15f3975fa44f3488546bc804a7",
-      "relation": "identical-mirror"
-    },
-    {
-      "collection": "group-thinking-plan-loop",
-      "before": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P03.1.md",
-      "after": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P03.1.md",
-      "sha256": "d1bae74693a7c38eb902dd69facb8d4f87041f586f109da751ed723ee66d4482",
-      "bytes": 47026,
-      "mode": "100644",
-      "gitBlob": "07f45ebae6bf45551248c0467facf1d5e2c2293a",
       "relation": "identical-mirror"
     },
     {
@@ -4455,26 +4455,6 @@
     },
     {
       "collection": "step-07-mvp",
-      "before": "docs/architect/agent-coordination/verification/step-07-mvp/current-cell.md",
-      "after": "docs/platform/agent-coordination/verification/step-07-mvp/current-cell.md",
-      "sha256": "9818be755de4ba9b5ce00a46f7ffda1062c5d41c627f85432e7edfe10bef0e36",
-      "bytes": 312,
-      "mode": "100644",
-      "gitBlob": "dd7edc95c281fd9bc7f86c61c48f35749ba33729",
-      "relation": "identical-mirror"
-    },
-    {
-      "collection": "step-07-mvp",
-      "before": "docs/architect/agent-coordination/verification/step-07-mvp/index.md",
-      "after": "docs/platform/agent-coordination/verification/step-07-mvp/index.md",
-      "sha256": "3ec50d7db56e8c106d7d6d8b55ec0a5a2b6a656425ce35a5d23ff91f9141c6de",
-      "bytes": 18090,
-      "mode": "100644",
-      "gitBlob": "a75810911e2fe9e2a1e84ce3b9c2a8989cfb021a",
-      "relation": "identical-mirror"
-    },
-    {
-      "collection": "step-07-mvp",
       "before": "docs/architect/agent-coordination/verification/step-07-mvp/P01.1.md",
       "after": "docs/platform/agent-coordination/verification/step-07-mvp/P01.1.md",
       "sha256": "6d96716bcc0a3015fd4bafd93ac4bafe9b310ef02cc170f97f52e443805d9a73",
@@ -4571,6 +4551,26 @@
       "bytes": 29221,
       "mode": "100644",
       "gitBlob": "0ecf15649f13d5ff4491da05ab1a9062042cad84",
+      "relation": "identical-mirror"
+    },
+    {
+      "collection": "step-07-mvp",
+      "before": "docs/architect/agent-coordination/verification/step-07-mvp/current-cell.md",
+      "after": "docs/platform/agent-coordination/verification/step-07-mvp/current-cell.md",
+      "sha256": "9818be755de4ba9b5ce00a46f7ffda1062c5d41c627f85432e7edfe10bef0e36",
+      "bytes": 312,
+      "mode": "100644",
+      "gitBlob": "dd7edc95c281fd9bc7f86c61c48f35749ba33729",
+      "relation": "identical-mirror"
+    },
+    {
+      "collection": "step-07-mvp",
+      "before": "docs/architect/agent-coordination/verification/step-07-mvp/index.md",
+      "after": "docs/platform/agent-coordination/verification/step-07-mvp/index.md",
+      "sha256": "3ec50d7db56e8c106d7d6d8b55ec0a5a2b6a656425ce35a5d23ff91f9141c6de",
+      "bytes": 18090,
+      "mode": "100644",
+      "gitBlob": "a75810911e2fe9e2a1e84ce3b9c2a8989cfb021a",
       "relation": "identical-mirror"
     },
     {
@@ -4785,36 +4785,6 @@
     },
     {
       "collection": "step-08-standalone-coordination",
-      "before": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md",
-      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/current-cell.md",
-      "sha256": "bbca28a6b23db02c131ca567c8392e64aab8ff6d714542ffaf6dc9b590b429e0",
-      "bytes": 1121,
-      "mode": "100644",
-      "gitBlob": "a88c6aa6df4a1af8154d62fe77a4b50b5aa3efa9",
-      "relation": "identical-mirror"
-    },
-    {
-      "collection": "step-08-standalone-coordination",
-      "before": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md",
-      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md",
-      "sha256": "d1894ead685351da39199eb027dbd7e135bbfb70e6546d4e982ac51d656ba00c",
-      "bytes": 12214,
-      "mode": "100644",
-      "gitBlob": "efe6c66bd40cfd3e1b9797aa9663518186b9ce6d",
-      "relation": "identical-mirror"
-    },
-    {
-      "collection": "step-08-standalone-coordination",
-      "before": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md",
-      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/index.md",
-      "sha256": "e05d8f8a9bce116cbe2b1c7389ba6b31691fd955c7368f65a5f55b79058861ca",
-      "bytes": 29170,
-      "mode": "100644",
-      "gitBlob": "44bc17848e502ad621c63839c8ecd631ab3967df",
-      "relation": "identical-mirror"
-    },
-    {
-      "collection": "step-08-standalone-coordination",
       "before": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
       "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
       "sha256": "55dc113e5e3f0d8d9abccc4d1a6d9e3cc74e6af5c0e979e53fad6517c0d18639",
@@ -4995,12 +4965,32 @@
     },
     {
       "collection": "step-08-standalone-coordination",
-      "before": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
-      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
-      "sha256": "66cb2406cf7e904beaffa3c106c3e8cff9947c1f0c4fdb5cb43442e7fa9c6c14",
-      "bytes": 665658,
+      "before": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/current-cell.md",
+      "sha256": "bbca28a6b23db02c131ca567c8392e64aab8ff6d714542ffaf6dc9b590b429e0",
+      "bytes": 1121,
       "mode": "100644",
-      "gitBlob": "b29f85bf3e788dc23ce867e7c89411c8c3d11de7",
+      "gitBlob": "a88c6aa6df4a1af8154d62fe77a4b50b5aa3efa9",
+      "relation": "identical-mirror"
+    },
+    {
+      "collection": "step-08-standalone-coordination",
+      "before": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md",
+      "sha256": "d1894ead685351da39199eb027dbd7e135bbfb70e6546d4e982ac51d656ba00c",
+      "bytes": 12214,
+      "mode": "100644",
+      "gitBlob": "efe6c66bd40cfd3e1b9797aa9663518186b9ce6d",
+      "relation": "identical-mirror"
+    },
+    {
+      "collection": "step-08-standalone-coordination",
+      "before": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/index.md",
+      "sha256": "e05d8f8a9bce116cbe2b1c7389ba6b31691fd955c7368f65a5f55b79058861ca",
+      "bytes": 29170,
+      "mode": "100644",
+      "gitBlob": "44bc17848e502ad621c63839c8ecd631ab3967df",
       "relation": "identical-mirror"
     },
     {
@@ -7534,23 +7524,13 @@
       "relation": "identical-mirror"
     },
     {
-      "collection": "step-09-group-thinking-mvp1-mvp2",
-      "before": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/current-cell.md",
-      "after": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/current-cell.md",
-      "sha256": "d1565201149417659be6d82a7297d047896973acddccd20bc4741f1b217e6577",
-      "bytes": 11292,
+      "collection": "step-08-standalone-coordination",
+      "before": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+      "sha256": "66cb2406cf7e904beaffa3c106c3e8cff9947c1f0c4fdb5cb43442e7fa9c6c14",
+      "bytes": 665658,
       "mode": "100644",
-      "gitBlob": "c6d6114741a15c86138321c06135f0738d9fbbc3",
-      "relation": "identical-mirror"
-    },
-    {
-      "collection": "step-09-group-thinking-mvp1-mvp2",
-      "before": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md",
-      "after": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md",
-      "sha256": "5a49c8665a1eac9d782ce604e452bbbe84109eed54e3c1718b4d5bfa7d129865",
-      "bytes": 40184,
-      "mode": "100644",
-      "gitBlob": "9ee79ddebc7739341f2d4dfe4e790a04b98c2fa4",
+      "gitBlob": "b29f85bf3e788dc23ce867e7c89411c8c3d11de7",
       "relation": "identical-mirror"
     },
     {
@@ -7615,6 +7595,26 @@
     },
     {
       "collection": "step-09-group-thinking-mvp1-mvp2",
+      "before": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/current-cell.md",
+      "after": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/current-cell.md",
+      "sha256": "d1565201149417659be6d82a7297d047896973acddccd20bc4741f1b217e6577",
+      "bytes": 11292,
+      "mode": "100644",
+      "gitBlob": "c6d6114741a15c86138321c06135f0738d9fbbc3",
+      "relation": "identical-mirror"
+    },
+    {
+      "collection": "step-09-group-thinking-mvp1-mvp2",
+      "before": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md",
+      "after": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md",
+      "sha256": "5a49c8665a1eac9d782ce604e452bbbe84109eed54e3c1718b4d5bfa7d129865",
+      "bytes": 40184,
+      "mode": "100644",
+      "gitBlob": "9ee79ddebc7739341f2d4dfe4e790a04b98c2fa4",
+      "relation": "identical-mirror"
+    },
+    {
+      "collection": "step-09-group-thinking-mvp1-mvp2",
       "before": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log",
       "after": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log",
       "sha256": "e36851c448668276e6f5bb5c9a41262fc3c0b27019dffab7083b04db252a840c",
@@ -7631,26 +7631,6 @@
       "bytes": 6233,
       "mode": "100644",
       "gitBlob": "f01f64c1fce38f10ff5844ac5ee68b3b569878ef",
-      "relation": "identical-mirror"
-    },
-    {
-      "collection": "step-09-mvp3-to-mvp5",
-      "before": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md",
-      "after": "docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md",
-      "sha256": "67a5b4801cdf690a19deb42e7780109a09f03c43351993a744f93d96c7f3a499",
-      "bytes": 496,
-      "mode": "100644",
-      "gitBlob": "500f389ccf4fe8ee9fe149a66917372da4f69510",
-      "relation": "identical-mirror"
-    },
-    {
-      "collection": "step-09-mvp3-to-mvp5",
-      "before": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md",
-      "after": "docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md",
-      "sha256": "f5cad6b1e3a53caca2ba7209dd1d78e9b8b836c551caeb3e1e7144ca96ab6600",
-      "bytes": 22179,
-      "mode": "100644",
-      "gitBlob": "5890fef32a7a5e449e1501076269f6175b6d5499",
       "relation": "identical-mirror"
     },
     {
@@ -7724,23 +7704,23 @@
       "relation": "identical-mirror"
     },
     {
-      "collection": "step-09-mvp6-to-mvp9",
-      "before": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/current-cell.md",
-      "after": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/current-cell.md",
-      "sha256": "ce8e285152aeec56d3a85c3fd0ffbe2ac43ea22e3925d80c4a2f82610c94ee2f",
-      "bytes": 844,
+      "collection": "step-09-mvp3-to-mvp5",
+      "before": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md",
+      "after": "docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md",
+      "sha256": "67a5b4801cdf690a19deb42e7780109a09f03c43351993a744f93d96c7f3a499",
+      "bytes": 496,
       "mode": "100644",
-      "gitBlob": "340cf293e7963a41ada54803259e1c47981b48e4",
+      "gitBlob": "500f389ccf4fe8ee9fe149a66917372da4f69510",
       "relation": "identical-mirror"
     },
     {
-      "collection": "step-09-mvp6-to-mvp9",
-      "before": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md",
-      "after": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md",
-      "sha256": "1bfba148b178533605bf6996be8982b4e5cfe745df71ccf77e270a6f28bec6e4",
-      "bytes": 86481,
+      "collection": "step-09-mvp3-to-mvp5",
+      "before": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md",
+      "after": "docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md",
+      "sha256": "f5cad6b1e3a53caca2ba7209dd1d78e9b8b836c551caeb3e1e7144ca96ab6600",
+      "bytes": 22179,
       "mode": "100644",
-      "gitBlob": "4f7b122f6301c86315d261eff8594b78d2906042",
+      "gitBlob": "5890fef32a7a5e449e1501076269f6175b6d5499",
       "relation": "identical-mirror"
     },
     {
@@ -8204,6 +8184,26 @@
       "relation": "identical-mirror"
     },
     {
+      "collection": "step-09-mvp6-to-mvp9",
+      "before": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/current-cell.md",
+      "after": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/current-cell.md",
+      "sha256": "ce8e285152aeec56d3a85c3fd0ffbe2ac43ea22e3925d80c4a2f82610c94ee2f",
+      "bytes": 844,
+      "mode": "100644",
+      "gitBlob": "340cf293e7963a41ada54803259e1c47981b48e4",
+      "relation": "identical-mirror"
+    },
+    {
+      "collection": "step-09-mvp6-to-mvp9",
+      "before": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md",
+      "after": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md",
+      "sha256": "1bfba148b178533605bf6996be8982b4e5cfe745df71ccf77e270a6f28bec6e4",
+      "bytes": 86481,
+      "mode": "100644",
+      "gitBlob": "4f7b122f6301c86315d261eff8594b78d2906042",
+      "relation": "identical-mirror"
+    },
+    {
       "collection": "team-dispatch-v1",
       "before": "docs/architect/agent-coordination/verification/team-dispatch-v1/current-cell.md",
       "after": "docs/platform/agent-coordination/verification/team-dispatch-v1/current-cell.md",
@@ -8565,6 +8565,16 @@
     },
     {
       "collection": "visibility-herdr",
+      "before": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md",
+      "after": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md",
+      "sha256": "e571f8c9e09863fb9df430e9d36e323fd7d8f905488446080c017780e9903422",
+      "bytes": 5740,
+      "mode": "100644",
+      "gitBlob": "5d6585ef3d39f7c4aeb9516e71d549b1edd73e3e",
+      "relation": "identical-mirror"
+    },
+    {
+      "collection": "visibility-herdr",
       "before": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-1-smoke.sh",
       "after": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-1-smoke.sh",
       "sha256": "49f9700f25a5625f896dab25a4ec92b582e01bf4ea0ca2033d00b62151935bd1",
@@ -8631,16 +8641,6 @@
       "bytes": 2718,
       "mode": "100755",
       "gitBlob": "e405c3e7a9c8ebbec16b740ffa20048c174e7600",
-      "relation": "identical-mirror"
-    },
-    {
-      "collection": "visibility-herdr",
-      "before": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md",
-      "after": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md",
-      "sha256": "e571f8c9e09863fb9df430e9d36e323fd7d8f905488446080c017780e9903422",
-      "bytes": 5740,
-      "mode": "100644",
-      "gitBlob": "5d6585ef3d39f7c4aeb9516e71d549b1edd73e3e",
       "relation": "identical-mirror"
     },
     {

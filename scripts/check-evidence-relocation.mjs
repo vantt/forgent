@@ -3,672 +3,423 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
-import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { computeSha256, normalizePosix } from './check-legacy-docs-ratchet.mjs';
 import { isEvidenceMirrorPath } from './check-doc-inventory-gates.mjs';
-import { classifyPath } from './check-doc-constitution.mjs';
+import { classifyPath, DEFAULT_CONSTITUTION_PATH } from './check-doc-constitution.mjs';
+import { DEFAULT_ALIAS_TABLE_PATH } from './doc-alias-resolver.mjs';
+import { isMainModule } from './lib/is-main-module.mjs';
 
-/**
- * Reused primitives cited per policy §4.5 and brief:
- * - computeSha256: scripts/check-legacy-docs-ratchet.mjs:112
- * - normalizePosix: scripts/check-legacy-docs-ratchet.mjs:43
- * - isEvidenceMirrorPath: scripts/check-doc-inventory-gates.mjs:1009
- * - classifyPath: scripts/check-doc-constitution.mjs:170
- */
+export const DEFAULT_CONSUMER_TABLE_PATH =
+  'plans/260925-documentation-authority-unification/reports/phase-08/step-06-evidence-consumer-table.json';
 
-/**
- * Checks whether an entry git mode (100755 vs 100644) matches filesystem permissions.
- */
-function checkFileMode(fullPath, expectedGitMode) {
-  const stat = fs.statSync(fullPath);
-  const isExec = (stat.mode & 0o111) !== 0;
-  const expectedExec = expectedGitMode === '100755';
-  return {
-    matches: isExec === expectedExec,
-    actualMode: isExec ? '100755' : '100644',
-    size: stat.size,
-  };
+const MANIFEST_KEYS = ['entries', 'generatedBy', 'sourceCommit', 'version'];
+const ENTRY_KEYS = ['after', 'before', 'bytes', 'collection', 'gitBlob', 'mode', 'relation', 'sha256'];
+const CONSUMER_ROOTS = [
+  '.agents/', '.claude/', '.githooks/', 'apps/', 'bin/', 'core/', 'domains/',
+  'packages/', 'plugins/', 'scripts/', 'src/', 'test/',
+];
+const HEX_40 = /^[0-9a-f]{40}$/;
+const HEX_64 = /^[0-9a-f]{64}$/;
+
+function codepointCompare(a, b) {
+  return a < b ? -1 : a > b ? 1 : 0;
 }
 
-/**
- * Finds all platform payload files present on disk under docs/platform.
- */
+function git(repoRoot, args) {
+  return execFileSync('git', args, {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024,
+  });
+}
+
+function gitIndex(repoRoot) {
+  const raw = git(repoRoot, ['ls-files', '-s', '-z']);
+  const entries = new Map();
+  for (const record of raw.split('\0').filter(Boolean)) {
+    const match = /^(\d+) ([0-9a-f]+) (\d)\t([\s\S]+)$/.exec(record);
+    if (!match) throw new Error(`Cannot parse git index record: ${record}`);
+    if (match[3] !== '0') throw new Error(`Unmerged git index entry: ${match[4]}`);
+    entries.set(normalizePosix(match[4]), { mode: match[1], blob: match[2] });
+  }
+  return entries;
+}
+
+function trackedFiles(repoRoot) {
+  return git(repoRoot, ['ls-files', '-z']).split('\0').filter(Boolean).map(normalizePosix);
+}
+
+function existingTrackedPayloads(repoRoot, tree, index = gitIndex(repoRoot)) {
+  const prefix = `docs/${tree}/`;
+  return [...index.keys()]
+    .filter((rel) => rel.startsWith(prefix) && isEvidenceMirrorPath(rel))
+    .filter((rel) => fs.existsSync(path.resolve(repoRoot, rel)))
+    .sort(codepointCompare);
+}
+
 export function scanPlatformPayloads(repoRoot) {
-  const platDir = path.resolve(repoRoot, 'docs/platform');
-  const payloads = [];
-  if (!fs.existsSync(platDir)) return payloads;
-
-  function walk(current) {
-    const entries = fs.readdirSync(current, { withFileTypes: true });
-    for (const entry of entries) {
-      const full = path.join(current, entry.name);
-      if (entry.isDirectory()) {
-        walk(full);
-      } else if (entry.isFile() || entry.isSymbolicLink()) {
-        const rel = normalizePosix(path.relative(repoRoot, full));
-        if (isEvidenceMirrorPath(rel)) {
-          payloads.push(rel);
-        }
-      }
-    }
-  }
-
-  walk(platDir);
-  payloads.sort((a, b) => a.localeCompare(b));
-  return payloads;
+  return existingTrackedPayloads(repoRoot, 'platform');
 }
 
-/**
- * Finds any legacy payload file remaining on disk under docs/architect.
- */
 export function scanLegacyPayloads(repoRoot) {
-  const archDir = path.resolve(repoRoot, 'docs/architect');
-  const payloads = [];
-  if (!fs.existsSync(archDir)) return payloads;
-
-  function walk(current) {
-    const entries = fs.readdirSync(current, { withFileTypes: true });
-    for (const entry of entries) {
-      const full = path.join(current, entry.name);
-      if (entry.isDirectory()) {
-        walk(full);
-      } else if (entry.isFile() || entry.isSymbolicLink()) {
-        const rel = normalizePosix(path.relative(repoRoot, full));
-        if (isEvidenceMirrorPath(rel)) {
-          payloads.push(rel);
-        }
-      }
-    }
-  }
-
-  walk(archDir);
-  payloads.sort((a, b) => a.localeCompare(b));
-  return payloads;
+  return existingTrackedPayloads(repoRoot, 'architect');
 }
 
-/**
- * Scans maintained text outside history, archive, plans, and the alias table
- * for mentions of legacy payload paths.
- */
-export function scanMaintainedTextMentions(repoRoot, legacyPaths, { manifestPath = null } = {}) {
-  const violations = [];
-  const normManifestPath = manifestPath
-    ? normalizePosix(path.relative(repoRoot, path.resolve(manifestPath)))
-    : null;
+function isSafeRepoPath(value) {
+  return typeof value === 'string' && value.length > 0 &&
+    !value.startsWith('/') && !value.includes('\\') &&
+    value.split('/').every((segment) => segment !== '' && segment !== '.' && segment !== '..');
+}
 
-  const targetSet = new Set();
-  for (const lp of legacyPaths) {
-    if (!lp) continue;
-    targetSet.add(lp);
-    if (lp.startsWith('docs/')) {
-      targetSet.add(lp.slice(5));
+function exactKeys(value) {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? Object.keys(value).sort(codepointCompare)
+    : [];
+}
+
+function sameKeys(value, expected) {
+  const actual = exactKeys(value);
+  const wanted = [...expected].sort(codepointCompare);
+  return actual.length === wanted.length && actual.every((key, index) => key === wanted[index]);
+}
+
+function collectionOf(before) {
+  const match = /^docs\/architect\/(?:.+\/)?verification\/([^/]+)\//.exec(before);
+  return match?.[1] ?? null;
+}
+
+export function validateManifest(manifest) {
+  if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) {
+    throw new Error('Malformed manifest: root must be an object');
+  }
+  if (!sameKeys(manifest, MANIFEST_KEYS)) {
+    throw new Error(`Malformed manifest: root keys must be exactly ${MANIFEST_KEYS.join(', ')}`);
+  }
+  if (manifest.version !== 1) throw new Error(`Unsupported manifest version: ${manifest.version}`);
+  if (typeof manifest.sourceCommit !== 'string' || manifest.sourceCommit.length === 0) {
+    throw new Error('Malformed manifest: sourceCommit must be a non-empty string');
+  }
+  if (typeof manifest.generatedBy !== 'string' || manifest.generatedBy.length === 0) {
+    throw new Error('Malformed manifest: generatedBy must be a non-empty string');
+  }
+  if (!Array.isArray(manifest.entries)) throw new Error('Malformed manifest: entries must be an array');
+
+  const beforeSeen = new Set();
+  const afterSeen = new Set();
+  let previous = null;
+  for (const [index, entry] of manifest.entries.entries()) {
+    const label = `entries[${index}]`;
+    if (!sameKeys(entry, ENTRY_KEYS)) {
+      throw new Error(`Malformed manifest: ${label} keys must be exactly ${ENTRY_KEYS.join(', ')}`);
     }
+    if (!isSafeRepoPath(entry.before) || !entry.before.startsWith('docs/architect/') || !isEvidenceMirrorPath(entry.before)) {
+      throw new Error(`Malformed manifest: ${label}.before must be a legacy evidence payload path`);
+    }
+    const expectedAfter = entry.before.replace(/^docs\/architect\//, 'docs/platform/');
+    if (entry.after !== null && entry.after !== expectedAfter) {
+      throw new Error(`Malformed manifest: ${label}.after must be null or ${expectedAfter}`);
+    }
+    if (entry.collection !== collectionOf(entry.before)) {
+      throw new Error(`Malformed manifest: ${label}.collection does not match its path`);
+    }
+    if (!HEX_64.test(entry.sha256)) throw new Error(`Malformed manifest: ${label}.sha256 must be 64 lowercase hex characters`);
+    if (!Number.isSafeInteger(entry.bytes) || entry.bytes < 0) throw new Error(`Malformed manifest: ${label}.bytes must be a non-negative integer`);
+    if (entry.mode !== '100644' && entry.mode !== '100755') throw new Error(`Malformed manifest: ${label}.mode must be 100644 or 100755`);
+    if (!HEX_40.test(entry.gitBlob)) throw new Error(`Malformed manifest: ${label}.gitBlob must be 40 lowercase hex characters`);
+    const expectedRelation = entry.after === null ? 'moved' : 'identical-mirror';
+    if (entry.relation !== expectedRelation) throw new Error(`Malformed manifest: ${label}.relation must be ${expectedRelation}`);
+    if (beforeSeen.has(entry.before)) throw new Error(`Malformed manifest: duplicate before path ${entry.before}`);
+    if (entry.after !== null && afterSeen.has(entry.after)) throw new Error(`Malformed manifest: duplicate after path ${entry.after}`);
+    if (previous !== null && codepointCompare(previous, entry.before) >= 0) {
+      throw new Error('Malformed manifest: entries must be unique and sorted by before in codepoint order');
+    }
+    beforeSeen.add(entry.before);
+    if (entry.after !== null) afterSeen.add(entry.after);
+    previous = entry.before;
   }
-  const legacyArray = Array.from(targetSet);
+  return manifest;
+}
 
-  function isExcludedDir(relDir) {
-    const parts = relDir.split('/');
-    const first = parts[0];
-    if (first === '.git' || first === 'node_modules' || first === '.fgos' || first === 'target' || first === 'dist' || first === '.gitnexus') return true;
-    if (parts.includes('target') || parts.includes('node_modules') || parts.includes('.git') || parts.includes('.cargo') || parts.includes('.gitnexus')) return true;
-    if (first === 'archive' || first === 'plans') return true;
-    if (relDir === 'docs/history' || relDir.startsWith('docs/history/')) return true;
-    if (relDir === 'docs/platform/history' || relDir.startsWith('docs/platform/history/')) return true;
-    return false;
+function validateConsumerTable(table) {
+  if (!table || typeof table !== 'object' || Array.isArray(table) || table.version !== 1 || !Array.isArray(table.consumers)) {
+    throw new Error('Malformed consumer table: expected version 1 with a consumers array');
   }
-
-  function isExcludedFile(relFile) {
-    const base = path.basename(relFile);
-    if (base.includes('alias-table')) return true;
-    if (normManifestPath && relFile === normManifestPath) return true;
-    if (isEvidenceMirrorPath(relFile)) return true;
-    return false;
+  const seen = new Set();
+  for (const [index, row] of table.consumers.entries()) {
+    if (!row || typeof row !== 'object' || !isSafeRepoPath(row.path) ||
+        typeof row.classification !== 'string' || row.classification.length === 0 ||
+        !Array.isArray(row.matches) || row.matches.length === 0 ||
+        row.matches.some((match) => typeof match !== 'string' || match.length === 0)) {
+      throw new Error(`Malformed consumer table: consumers[${index}] is invalid`);
+    }
+    if (seen.has(row.path)) throw new Error(`Malformed consumer table: duplicate path ${row.path}`);
+    const sorted = [...new Set(row.matches)].sort(codepointCompare);
+    if (sorted.length !== row.matches.length || sorted.some((value, i) => value !== row.matches[i])) {
+      throw new Error(`Malformed consumer table: matches for ${row.path} must be unique and codepoint-sorted`);
+    }
+    seen.add(row.path);
   }
-  function walk(dir) {
-    const relDir = normalizePosix(path.relative(repoRoot, dir));
-    if (relDir && isExcludedDir(relDir)) return;
+  return table;
+}
 
-    let entries;
+function isConsumerScope(rel) {
+  return CONSUMER_ROOTS.some((prefix) => rel.startsWith(prefix)) ||
+    rel === 'AGENTS.md' || rel === 'CLAUDE.md' ||
+    rel.endsWith('/AGENTS.md') || rel.endsWith('/CLAUDE.md') || rel.endsWith('/SKILL.md');
+}
+
+function consumerMatches(content, collections) {
+  const matches = [];
+  const legacyConsumerRoot = ['docs', 'architect', 'agent-coordination', 'verification'].join('/');
+  if (content.includes(legacyConsumerRoot) || content.includes(legacyConsumerRoot.slice(5))) matches.push('legacy-root');
+  for (const collection of collections) if (content.includes(collection)) matches.push(`collection:${collection}`);
+  return matches.sort(codepointCompare);
+}
+
+export function scanConsumerTable(repoRoot, collections) {
+  const hits = [];
+  const readErrors = [];
+  for (const rel of trackedFiles(repoRoot).filter(isConsumerScope).sort(codepointCompare)) {
+    if (rel === 'scripts/check-evidence-relocation.mjs' || isEvidenceMirrorPath(rel)) continue;
     try {
-      entries = fs.readdirSync(dir, { withFileTypes: true });
-    } catch {
-      return;
-    }
-
-    for (const entry of entries) {
-      const full = path.join(dir, entry.name);
-      const rel = normalizePosix(path.relative(repoRoot, full));
-      if (entry.isDirectory()) {
-        walk(full);
-      } else if (entry.isFile()) {
-        if (isExcludedFile(rel)) continue;
-
-        try {
-          const content = fs.readFileSync(full, 'utf8');
-          // Fast filter: all legacy payload paths involve 'verification'
-          if (!content.includes('verification')) continue;
-
-          for (const lp of legacyArray) {
-            if (content.includes(lp)) {
-              violations.push({
-                type: 'maintained-text-legacy-mention',
-                phase: 'after',
-                path: rel,
-                legacyPath: lp,
-                message: `${rel}: maintained text mentions legacy payload path ${lp}`,
-              });
-              break;
-            }
-          }
-        } catch {
-          // Skip binary or unreadable files
-        }
-      }
+      const content = fs.readFileSync(path.resolve(repoRoot, rel), 'utf8');
+      const matches = consumerMatches(content, collections);
+      if (matches.length > 0) hits.push({ path: rel, matches });
+    } catch (error) {
+      readErrors.push({ path: rel, error: error.message });
     }
   }
+  return { hits, readErrors };
+}
 
-  walk(repoRoot);
-  violations.sort((a, b) => a.path.localeCompare(b.path) || a.message.localeCompare(b.message));
+function verifyConsumers(repoRoot, manifest, consumerTable) {
+  const violations = [];
+  const collections = [...new Set(manifest.entries.map((entry) => entry.collection))].sort(codepointCompare);
+  const { hits, readErrors } = scanConsumerTable(repoRoot, collections);
+  const expected = new Map(validateConsumerTable(consumerTable).consumers.map((row) => [row.path, row]));
+  const actual = new Map(hits.map((row) => [row.path, row]));
+  for (const { path: rel, error } of readErrors) {
+    violations.push({ type: 'consumer-read-error', phase: 'before', path: rel, message: `${rel}: cannot read tracked consumer candidate: ${error}` });
+  }
+  for (const hit of hits) {
+    const row = expected.get(hit.path);
+    if (!row) {
+      violations.push({ type: 'unclassified-consumer', phase: 'before', path: hit.path, message: `${hit.path}: consumer hit is absent from the classified consumer table (${hit.matches.join(', ')})` });
+      continue;
+    }
+    if (row.classification === 'runtime-reader') {
+      violations.push({ type: 'runtime-reader', phase: 'before', path: hit.path, message: `${hit.path}: runtime reader blocks evidence relocation readiness` });
+    }
+    if (row.matches.length !== hit.matches.length || row.matches.some((value, i) => value !== hit.matches[i])) {
+      violations.push({ type: 'consumer-drift', phase: 'before', path: hit.path, message: `${hit.path}: consumer matches changed (expected ${row.matches.join(', ')}, got ${hit.matches.join(', ')})` });
+    }
+  }
+  for (const row of expected.values()) {
+    if (!actual.has(row.path)) {
+      violations.push({ type: 'consumer-table-stale', phase: 'before', path: row.path, message: `${row.path}: classified consumer no longer matches the legacy root or a collection name` });
+    }
+  }
+  return { hits, violations };
+}
+
+function loadConstitution(repoRoot, constitution) {
+  if (constitution) return constitution;
+  return JSON.parse(fs.readFileSync(path.resolve(repoRoot, DEFAULT_CONSTITUTION_PATH), 'utf8'));
+}
+
+function legacyRoots(manifest) {
+  const roots = new Set();
+  for (const entry of manifest.entries) {
+    const marker = `/${entry.collection}/`;
+    const prefix = entry.before.slice(0, entry.before.indexOf(marker) + marker.length - 1);
+    const verificationRoot = entry.before.slice(0, entry.before.indexOf('/verification/') + '/verification'.length);
+    roots.add(prefix);
+    roots.add(verificationRoot);
+    if (prefix.startsWith('docs/')) roots.add(prefix.slice(5));
+    if (verificationRoot.startsWith('docs/')) roots.add(verificationRoot.slice(5));
+  }
+  return [...roots].sort(codepointCompare);
+}
+
+function excludedMaintainedText(rel, constitution, manifestRel, legacyPayloads, syntheticTests) {
+  if (rel === manifestRel || rel === DEFAULT_ALIAS_TABLE_PATH || rel === 'CHANGELOG.md') return true;
+  if (rel === 'scripts/check-evidence-relocation.mjs' || syntheticTests.has(rel)) return true;
+  if (legacyPayloads.has(rel)) return true;
+  if (rel.startsWith('archive/') || rel.startsWith('plans/') || rel.startsWith('.fgos/') || rel.startsWith('test/fixtures/')) return true;
+  const { kind } = classifyPath(rel, constitution);
+  return kind === 'history' || kind === 'evidence-payload';
+}
+
+export function scanMaintainedTextMentions(repoRoot, manifest, {
+  manifestPath = null,
+  constitution = null,
+  consumerTable = null,
+} = {}) {
+  const violations = [];
+  const roots = legacyRoots(manifest);
+  const rules = loadConstitution(repoRoot, constitution);
+  const legacyPayloads = new Set(manifest.entries.map((entry) => entry.before));
+  const syntheticTests = new Set((consumerTable?.consumers ?? [])
+    .filter((row) => row.classification === 'synthetic-test')
+    .map((row) => row.path));
+  const manifestRel = manifestPath
+    ? normalizePosix(path.relative(repoRoot, path.resolve(repoRoot, manifestPath)))
+    : null;
+  for (const rel of trackedFiles(repoRoot).sort(codepointCompare)) {
+    if (excludedMaintainedText(rel, rules, manifestRel, legacyPayloads, syntheticTests)) continue;
+    try {
+      const content = fs.readFileSync(path.resolve(repoRoot, rel), 'utf8');
+      const legacyRoot = roots.find((root) => content.includes(root));
+      if (legacyRoot) {
+        violations.push({ type: 'maintained-text-legacy-mention', phase: 'after', path: rel, legacyPath: legacyRoot, message: `${rel}: maintained text mentions legacy payload root ${legacyRoot}` });
+      }
+    } catch (error) {
+      violations.push({ type: 'maintained-text-read-error', phase: 'after', path: rel, message: `${rel}: cannot read tracked maintained text: ${error.message}` });
+    }
+  }
+  return violations.sort((a, b) => codepointCompare(a.path, b.path) || codepointCompare(a.message, b.message));
+}
+
+export function generateManifest({ repoRoot = process.cwd(), sourceCommit = null, generatedBy = 'scripts/check-evidence-relocation.mjs' } = {}) {
+  const commit = sourceCommit ?? git(repoRoot, ['rev-parse', 'HEAD']).trim();
+  const index = gitIndex(repoRoot);
+  const legacy = [...index.entries()]
+    .filter(([rel]) => rel.startsWith('docs/architect/') && isEvidenceMirrorPath(rel))
+    .sort(([a], [b]) => codepointCompare(a, b));
+  const entries = legacy.map(([before, beforeMeta]) => {
+    const afterPath = before.replace(/^docs\/architect\//, 'docs/platform/');
+    const afterMeta = index.get(afterPath);
+    const bytes = fs.readFileSync(path.resolve(repoRoot, before));
+    if (afterMeta && (afterMeta.mode !== beforeMeta.mode || afterMeta.blob !== beforeMeta.blob)) {
+      throw new Error(`Mirror mismatch while generating manifest: ${before} <> ${afterPath}`);
+    }
+    return {
+      collection: collectionOf(before), before, after: afterMeta ? afterPath : null,
+      sha256: computeSha256(bytes), bytes: bytes.length, mode: beforeMeta.mode,
+      gitBlob: beforeMeta.blob, relation: afterMeta ? 'identical-mirror' : 'moved',
+    };
+  });
+  return validateManifest({ version: 1, sourceCommit: commit, generatedBy, entries });
+}
+
+function verifyFile(repoRoot, rel, entry, phase, target, index) {
+  const violations = [];
+  const full = path.resolve(repoRoot, rel);
+  if (!fs.existsSync(full)) return [{ type: 'missing-file', phase, target, path: rel, message: `${target} file missing: ${rel}` }];
+  try {
+    const stat = fs.lstatSync(full);
+    if (stat.isSymbolicLink()) return [{ type: 'symlink-payload', phase, target, path: rel, message: `${target} payload must not be a symlink: ${rel}` }];
+    if (!stat.isFile()) return [{ type: 'not-a-file', phase, target, path: rel, message: `${target} payload is not a regular file: ${rel}` }];
+    const bytes = fs.readFileSync(full);
+    const sha256 = computeSha256(bytes);
+    if (sha256 !== entry.sha256) violations.push({ type: 'changed-byte', phase, target, path: rel, expected: entry.sha256, actual: sha256, message: `${target} file hash mismatch: ${rel} (expected ${entry.sha256}, got ${sha256})` });
+    if (bytes.length !== entry.bytes) violations.push({ type: 'bytes-mismatch', phase, target, path: rel, expected: entry.bytes, actual: bytes.length, message: `${target} file size mismatch: ${rel} (expected ${entry.bytes}, got ${bytes.length})` });
+    const fsMode = (stat.mode & 0o111) !== 0 ? '100755' : '100644';
+    if (fsMode !== entry.mode) violations.push({ type: 'wrong-mode', phase, target, path: rel, expected: entry.mode, actual: fsMode, message: `${target} filesystem mode mismatch: ${rel} (expected ${entry.mode}, got ${fsMode})` });
+    const metadata = index.get(rel);
+    if (!metadata) violations.push({ type: 'git-index-missing', phase, target, path: rel, message: `${target} payload is absent from the git index: ${rel}` });
+    else {
+      if (metadata.mode !== entry.mode) violations.push({ type: 'wrong-git-mode', phase, target, path: rel, expected: entry.mode, actual: metadata.mode, message: `${target} git mode mismatch: ${rel} (expected ${entry.mode}, got ${metadata.mode})` });
+      if (metadata.blob !== entry.gitBlob) violations.push({ type: 'git-blob-mismatch', phase, target, path: rel, expected: entry.gitBlob, actual: metadata.blob, message: `${target} git blob mismatch: ${rel} (expected ${entry.gitBlob}, got ${metadata.blob})` });
+    }
+  } catch (error) {
+    violations.push({ type: 'io-error', phase, target, path: rel, message: `error reading ${target} file ${rel}: ${error.message}` });
+  }
   return violations;
 }
 
-/**
- * Generates the deterministic relocation manifest from the working tree.
- */
-export function generateManifest({
-  repoRoot = process.cwd(),
-  sourceCommit = null,
-  generatedBy = 'scripts/check-evidence-relocation.mjs',
-} = {}) {
-  let commit = sourceCommit;
-  if (!commit) {
-    try {
-      commit = execFileSync('git', ['rev-parse', 'HEAD'], {
-        cwd: repoRoot,
-        encoding: 'utf8',
-      }).trim();
-    } catch {
-      commit = 'unknown';
-    }
-  }
-
-  let lsLines = [];
-  try {
-    const raw = execFileSync(
-      'git',
-      ['ls-files', '-s', 'docs/architect', 'docs/platform'],
-      { cwd: repoRoot, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }
-    );
-    lsLines = raw.trim().split('\n').filter(Boolean);
-  } catch {
-    // If not a git repo, fallback to directory scan
-  }
-
-  const archMap = new Map();
-  const platMap = new Map();
-
-  for (const line of lsLines) {
-    const parts = line.split(/\s+/);
-    const mode = parts[0];
-    const blob = parts[1];
-    const p = parts.slice(3).join(' ');
-    if (isEvidenceMirrorPath(p)) {
-      if (p.startsWith('docs/architect/')) {
-        archMap.set(p, { mode, blob });
-      } else if (p.startsWith('docs/platform/')) {
-        platMap.set(p, { mode, blob });
-      }
-    }
-  }
-
-  // If git ls-files was not populated, scan from disk
-  if (archMap.size === 0) {
-    const archOnDisk = scanLegacyPayloads(repoRoot);
-    for (const p of archOnDisk) {
-      const full = path.resolve(repoRoot, p);
-      const stat = fs.statSync(full);
-      const mode = (stat.mode & 0o111) !== 0 ? '100755' : '100644';
-      archMap.set(p, { mode, blob: null });
-    }
-    const platOnDisk = scanPlatformPayloads(repoRoot);
-    for (const p of platOnDisk) {
-      const full = path.resolve(repoRoot, p);
-      const stat = fs.statSync(full);
-      const mode = (stat.mode & 0o111) !== 0 ? '100755' : '100644';
-      platMap.set(p, { mode, blob: null });
-    }
-  }
-
-  const entries = [];
-  for (const [before, meta] of archMap) {
-    const after = before.replace(/^docs\/architect\//, 'docs/platform/');
-    const match = before.match(
-      /^docs\/architect\/(?:.+\/)?verification\/([^/]+)\//
-    );
-    const collection = match ? match[1] : 'unknown';
-
-    const fullBefore = path.resolve(repoRoot, before);
-    const stat = fs.statSync(fullBefore);
-    const buf = fs.readFileSync(fullBefore);
-    const sha = computeSha256(buf);
-
-    entries.push({
-      collection,
-      before,
-      after: platMap.has(after) ? after : null,
-      sha256: sha,
-      bytes: stat.size,
-      mode: meta.mode,
-      gitBlob: meta.blob,
-      relation: platMap.has(after) ? 'identical-mirror' : 'moved',
-    });
-  }
-
-  entries.sort((a, b) => a.before.localeCompare(b.before));
-
-  return {
-    version: 1,
-    sourceCommit: commit,
-    generatedBy,
-    entries,
-  };
-}
-
-/**
- * Validates evidence relocation in --before or --after mode.
- */
-export function checkEvidenceRelocation({
-  manifest,
-  manifestPath = null,
-  repoRoot = process.cwd(),
-  mode = 'before',
-} = {}) {
-  if (!manifest || typeof manifest !== 'object') {
-    throw new Error('Malformed manifest: must be an object');
-  }
-  if (manifest.version !== 1) {
-    throw new Error(`Unsupported manifest version: ${manifest.version}`);
-  }
-  if (!Array.isArray(manifest.entries)) {
-    throw new Error('Malformed manifest: entries must be an array');
-  }
-  if (mode !== 'before' && mode !== 'after') {
-    throw new Error(`Invalid mode: ${mode} (expected 'before' or 'after')`);
-  }
-
+export function checkEvidenceRelocation({ manifest, manifestPath = null, consumerTable = null, repoRoot = process.cwd(), mode = 'before', constitution = null } = {}) {
+  validateManifest(manifest);
+  if (mode !== 'before' && mode !== 'after') throw new Error(`Invalid mode: ${mode} (expected 'before' or 'after')`);
+  if (mode === 'before' && !consumerTable) throw new Error('Missing classified consumer table for --before');
   const violations = [];
-  const manifestAfterSet = new Set();
-  const legacyPaths = [];
-
-  for (const entry of manifest.entries) {
-    if (entry.after) manifestAfterSet.add(entry.after);
-    if (entry.before) legacyPaths.push(entry.before);
-  }
-
+  const index = gitIndex(repoRoot);
+  const beforeSet = new Set(manifest.entries.map((entry) => entry.before));
+  const afterSet = new Set(manifest.entries.flatMap((entry) => entry.after ? [entry.after] : []));
   if (mode === 'before') {
-    // 1. Verify every entry: legacy and platform file exist, match sha256, mode, and bytes
     for (const entry of manifest.entries) {
-      // Legacy file check
-      if (entry.before) {
-        const fullLegacy = path.resolve(repoRoot, entry.before);
-        if (!fs.existsSync(fullLegacy)) {
-          violations.push({
-            type: 'missing-file',
-            phase: 'before',
-            target: 'legacy',
-            path: entry.before,
-            message: `legacy file missing: ${entry.before}`,
-          });
-        } else {
-          try {
-            const buf = fs.readFileSync(fullLegacy);
-            const sha = computeSha256(buf);
-            if (sha !== entry.sha256) {
-              violations.push({
-                type: 'changed-byte',
-                phase: 'before',
-                target: 'legacy',
-                path: entry.before,
-                expected: entry.sha256,
-                actual: sha,
-                message: `legacy file hash mismatch: ${entry.before} (expected ${entry.sha256}, got ${sha})`,
-              });
-            }
-            const modeCheck = checkFileMode(fullLegacy, entry.mode);
-            if (!modeCheck.matches) {
-              violations.push({
-                type: 'wrong-mode',
-                phase: 'before',
-                target: 'legacy',
-                path: entry.before,
-                expected: entry.mode,
-                actual: modeCheck.actualMode,
-                message: `legacy file mode mismatch: ${entry.before} (expected ${entry.mode}, got ${modeCheck.actualMode})`,
-              });
-            }
-            if (modeCheck.size !== entry.bytes) {
-              violations.push({
-                type: 'bytes-mismatch',
-                phase: 'before',
-                target: 'legacy',
-                path: entry.before,
-                expected: entry.bytes,
-                actual: modeCheck.size,
-                message: `legacy file size mismatch: ${entry.before} (expected ${entry.bytes}, got ${modeCheck.size})`,
-              });
-            }
-          } catch (err) {
-            violations.push({
-              type: 'io-error',
-              phase: 'before',
-              target: 'legacy',
-              path: entry.before,
-              message: `error reading legacy file ${entry.before}: ${err.message}`,
-            });
-          }
-        }
-      }
-
-      // Platform file check
-      if (entry.after) {
-        const fullPlatform = path.resolve(repoRoot, entry.after);
-        if (!fs.existsSync(fullPlatform)) {
-          violations.push({
-            type: 'missing-file',
-            phase: 'before',
-            target: 'platform',
-            path: entry.after,
-            message: `platform file missing: ${entry.after}`,
-          });
-        } else {
-          try {
-            const buf = fs.readFileSync(fullPlatform);
-            const sha = computeSha256(buf);
-            if (sha !== entry.sha256) {
-              violations.push({
-                type: 'changed-byte',
-                phase: 'before',
-                target: 'platform',
-                path: entry.after,
-                expected: entry.sha256,
-                actual: sha,
-                message: `platform file hash mismatch: ${entry.after} (expected ${entry.sha256}, got ${sha})`,
-              });
-            }
-            const modeCheck = checkFileMode(fullPlatform, entry.mode);
-            if (!modeCheck.matches) {
-              violations.push({
-                type: 'wrong-mode',
-                phase: 'before',
-                target: 'platform',
-                path: entry.after,
-                expected: entry.mode,
-                actual: modeCheck.actualMode,
-                message: `platform file mode mismatch: ${entry.after} (expected ${entry.mode}, got ${modeCheck.actualMode})`,
-              });
-            }
-            if (modeCheck.size !== entry.bytes) {
-              violations.push({
-                type: 'bytes-mismatch',
-                phase: 'before',
-                target: 'platform',
-                path: entry.after,
-                expected: entry.bytes,
-                actual: modeCheck.size,
-                message: `platform file size mismatch: ${entry.after} (expected ${entry.bytes}, got ${modeCheck.size})`,
-              });
-            }
-          } catch (err) {
-            violations.push({
-              type: 'io-error',
-              phase: 'before',
-              target: 'platform',
-              path: entry.after,
-              message: `error reading platform file ${entry.after}: ${err.message}`,
-            });
-          }
-        }
-      }
+      violations.push(...verifyFile(repoRoot, entry.before, entry, mode, 'legacy', index));
+      if (entry.after) violations.push(...verifyFile(repoRoot, entry.after, entry, mode, 'platform', index));
     }
-
-    // 2. No platform payload file exists that is absent from the manifest
-    const platformPayloads = scanPlatformPayloads(repoRoot);
-    for (const p of platformPayloads) {
-      if (!manifestAfterSet.has(p)) {
-        violations.push({
-          type: 'unlisted-payload',
-          phase: 'before',
-          target: 'platform',
-          path: p,
-          message: `unlisted platform payload: ${p}`,
-        });
-      }
-    }
-  } else if (mode === 'after') {
-    // 1. No legacy file remains
+    for (const rel of existingTrackedPayloads(repoRoot, 'architect', index)) if (!beforeSet.has(rel)) violations.push({ type: 'unlisted-payload', phase: mode, target: 'legacy', path: rel, message: `unlisted legacy payload: ${rel}` });
+    for (const rel of existingTrackedPayloads(repoRoot, 'platform', index)) if (!afterSet.has(rel)) violations.push({ type: 'unlisted-payload', phase: mode, target: 'platform', path: rel, message: `unlisted platform payload: ${rel}` });
+    violations.push(...verifyConsumers(repoRoot, manifest, consumerTable).violations);
+  } else {
     for (const entry of manifest.entries) {
-      if (entry.before) {
-        const fullLegacy = path.resolve(repoRoot, entry.before);
-        if (fs.existsSync(fullLegacy)) {
-          violations.push({
-            type: 'remaining-legacy-file',
-            phase: 'after',
-            target: 'legacy',
-            path: entry.before,
-            message: `legacy file still exists: ${entry.before}`,
-          });
-        }
-      }
+      if (fs.existsSync(path.resolve(repoRoot, entry.before))) violations.push({ type: 'remaining-legacy-file', phase: mode, target: 'legacy', path: entry.before, message: `legacy file still exists: ${entry.before}` });
+      if (entry.after) violations.push(...verifyFile(repoRoot, entry.after, entry, mode, 'platform', index));
     }
-
-    const legacyPayloads = scanLegacyPayloads(repoRoot);
-    for (const lp of legacyPayloads) {
-      if (!violations.some((v) => v.type === 'remaining-legacy-file' && v.path === lp)) {
-        violations.push({
-          type: 'remaining-legacy-file',
-          phase: 'after',
-          target: 'legacy',
-          path: lp,
-          message: `legacy payload still exists: ${lp}`,
-        });
-      }
-    }
-
-    // 2. Every platform file hashes to recorded sha256 and modes match
-    for (const entry of manifest.entries) {
-      if (entry.after) {
-        const fullPlatform = path.resolve(repoRoot, entry.after);
-        if (!fs.existsSync(fullPlatform)) {
-          violations.push({
-            type: 'missing-file',
-            phase: 'after',
-            target: 'platform',
-            path: entry.after,
-            message: `platform file missing: ${entry.after}`,
-          });
-        } else {
-          try {
-            const buf = fs.readFileSync(fullPlatform);
-            const sha = computeSha256(buf);
-            if (sha !== entry.sha256) {
-              violations.push({
-                type: 'changed-byte',
-                phase: 'after',
-                target: 'platform',
-                path: entry.after,
-                expected: entry.sha256,
-                actual: sha,
-                message: `platform file hash mismatch: ${entry.after} (expected ${entry.sha256}, got ${sha})`,
-              });
-            }
-            const modeCheck = checkFileMode(fullPlatform, entry.mode);
-            if (!modeCheck.matches) {
-              violations.push({
-                type: 'wrong-mode',
-                phase: 'after',
-                target: 'platform',
-                path: entry.after,
-                expected: entry.mode,
-                actual: modeCheck.actualMode,
-                message: `platform file mode mismatch: ${entry.after} (expected ${entry.mode}, got ${modeCheck.actualMode})`,
-              });
-            }
-            if (modeCheck.size !== entry.bytes) {
-              violations.push({
-                type: 'bytes-mismatch',
-                phase: 'after',
-                target: 'platform',
-                path: entry.after,
-                expected: entry.bytes,
-                actual: modeCheck.size,
-                message: `platform file size mismatch: ${entry.after} (expected ${entry.bytes}, got ${modeCheck.size})`,
-              });
-            }
-          } catch (err) {
-            violations.push({
-              type: 'io-error',
-              phase: 'after',
-              target: 'platform',
-              path: entry.after,
-              message: `error reading platform file ${entry.after}: ${err.message}`,
-            });
-          }
-        }
-      }
-    }
-
-    // 3. No unlisted platform payload exists
-    const platformPayloads = scanPlatformPayloads(repoRoot);
-    for (const p of platformPayloads) {
-      if (!manifestAfterSet.has(p)) {
-        violations.push({
-          type: 'unlisted-payload',
-          phase: 'after',
-          target: 'platform',
-          path: p,
-          message: `unlisted platform payload: ${p}`,
-        });
-      }
-    }
-
-    // 4. No maintained text outside history, archive, and alias table names a legacy payload path
-    const textViolations = scanMaintainedTextMentions(repoRoot, legacyPaths, { manifestPath });
-    for (const tv of textViolations) {
-      violations.push(tv);
-    }
+    for (const rel of existingTrackedPayloads(repoRoot, 'architect', index)) if (!beforeSet.has(rel)) violations.push({ type: 'remaining-legacy-file', phase: mode, target: 'legacy', path: rel, message: `legacy payload still exists outside manifest: ${rel}` });
+    for (const rel of existingTrackedPayloads(repoRoot, 'platform', index)) if (!afterSet.has(rel)) violations.push({ type: 'unlisted-payload', phase: mode, target: 'platform', path: rel, message: `unlisted platform payload: ${rel}` });
+    violations.push(...scanMaintainedTextMentions(repoRoot, manifest, { manifestPath, constitution, consumerTable }));
   }
-
-  // Deterministic sort of violations
-  violations.sort((a, b) =>
-    (a.path || '').localeCompare(b.path || '') ||
-    (a.type || '').localeCompare(b.type || '') ||
-    (a.message || '').localeCompare(b.message || '')
-  );
-
-  return {
-    ok: violations.length === 0,
-    mode,
-    checkedCount: manifest.entries.length,
-    violations,
-  };
+  violations.sort((a, b) => codepointCompare(a.path ?? '', b.path ?? '') || codepointCompare(a.type ?? '', b.type ?? '') || codepointCompare(a.message ?? '', b.message ?? ''));
+  return { ok: violations.length === 0, mode, checkedCount: manifest.entries.length, violations };
 }
 
 export function parseArgs(argv) {
-  let manifestPath = null;
-  let mode = null;
-  let repoRoot = process.cwd();
-  let json = false;
-  let generate = false;
-
+  const result = { manifestPath: null, consumerTablePath: DEFAULT_CONSUMER_TABLE_PATH, mode: null, repoRoot: null, json: false, generate: false };
+  const takeValue = (flag, index) => {
+    const value = argv[index + 1];
+    if (!value || value.startsWith('--')) throw new Error(`${flag} requires a value`);
+    return value;
+  };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
-    if (arg === '--manifest') {
-      manifestPath = argv[++i];
-    } else if (arg === '--before') {
-      mode = 'before';
-    } else if (arg === '--after') {
-      mode = 'after';
-    } else if (arg === '--generate') {
-      generate = true;
-    } else if (arg === '--repo-root') {
-      repoRoot = argv[++i];
-    } else if (arg === '--json') {
-      json = true;
-    }
+    if (arg === '--manifest') result.manifestPath = takeValue(arg, i++);
+    else if (arg === '--consumer-table') result.consumerTablePath = takeValue(arg, i++);
+    else if (arg === '--before' || arg === '--after') {
+      const mode = arg.slice(2);
+      if (result.mode && result.mode !== mode) throw new Error('--before and --after are mutually exclusive');
+      result.mode = mode;
+    } else if (arg === '--generate') result.generate = true;
+    else if (arg === '--repo-root') result.repoRoot = takeValue(arg, i++);
+    else if (arg === '--json') result.json = true;
+    else throw new Error(`Unknown argument: ${arg}`);
   }
+  if (result.generate && result.mode) throw new Error('--generate cannot be combined with --before or --after');
+  return result;
+}
 
-  return { manifestPath, mode, repoRoot, json, generate };
+function loadJson(fullPath, label) {
+  try {
+    return JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+  } catch (error) {
+    throw new Error(`Cannot read ${label}: ${error.message}`);
+  }
 }
 
 export function runCli(argv, defaultRoot = process.cwd()) {
-  const args = parseArgs(argv);
-  const repoRoot = args.repoRoot || defaultRoot;
-
-  if (args.generate) {
-    const manifest = generateManifest({ repoRoot });
-    const outputJson = JSON.stringify(manifest, null, 2) + '\n';
-    if (args.manifestPath) {
-      const fullOut = path.resolve(repoRoot, args.manifestPath);
-      fs.mkdirSync(path.dirname(fullOut), { recursive: true });
-      fs.writeFileSync(fullOut, outputJson, 'utf8');
-      console.log(`[check-evidence-relocation] Generated manifest at ${args.manifestPath} (${manifest.entries.length} entries)`);
-    } else {
-      process.stdout.write(outputJson);
-    }
-    return 0;
-  }
-
-  if (!args.manifestPath) {
-    console.error('Usage: check-evidence-relocation.mjs --manifest <path> [--before | --after] [--repo-root <path>] [--json]');
-    return 2;
-  }
-
-  if (args.mode !== 'before' && args.mode !== 'after') {
-    console.error('Error: specify either --before or --after mode.');
-    return 2;
-  }
-
-  const fullManifestPath = path.resolve(repoRoot, args.manifestPath);
-  if (!fs.existsSync(fullManifestPath)) {
-    console.error(`Error: manifest file not found: ${args.manifestPath}`);
-    return 2;
-  }
-
-  let manifest;
   try {
-    manifest = JSON.parse(fs.readFileSync(fullManifestPath, 'utf8'));
-  } catch (err) {
-    console.error(`Error parsing manifest JSON: ${err.message}`);
+    const args = parseArgs(argv);
+    const repoRoot = path.resolve(args.repoRoot ?? defaultRoot);
+    if (args.generate) {
+      const manifest = generateManifest({ repoRoot });
+      const output = `${JSON.stringify(manifest, null, 2)}\n`;
+      if (args.manifestPath) {
+        const destination = path.resolve(repoRoot, args.manifestPath);
+        fs.mkdirSync(path.dirname(destination), { recursive: true });
+        fs.writeFileSync(destination, output, 'utf8');
+        console.log(`[check-evidence-relocation] Generated manifest at ${args.manifestPath} (${manifest.entries.length} entries)`);
+      } else process.stdout.write(output);
+      return 0;
+    }
+    if (!args.manifestPath || !args.mode) throw new Error('Usage: --manifest <path> (--before | --after) [--consumer-table <path>] [--repo-root <path>] [--json]');
+    const manifest = loadJson(path.resolve(repoRoot, args.manifestPath), 'manifest');
+    const consumerTable = loadJson(path.resolve(repoRoot, args.consumerTablePath), 'consumer table');
+    const result = checkEvidenceRelocation({ manifest, manifestPath: args.manifestPath, consumerTable, repoRoot, mode: args.mode });
+    if (args.json) console.log(JSON.stringify(result, null, 2));
+    else if (result.ok) console.log(`[check-evidence-relocation] PASS: ${args.mode} mode verified (${result.checkedCount} entries, 0 violations)`);
+    else {
+      console.error(`[check-evidence-relocation] FAIL: ${args.mode} mode found ${result.violations.length} violation(s):`);
+      for (const violation of result.violations) console.error(`  - [${violation.type}] ${violation.message}`);
+    }
+    return result.ok ? 0 : 1;
+  } catch (error) {
+    console.error(`[check-evidence-relocation] ERROR: ${error.message}`);
     return 2;
   }
-
-  const result = checkEvidenceRelocation({
-    manifest,
-    manifestPath: args.manifestPath,
-    repoRoot,
-    mode: args.mode,
-  });
-
-  if (args.json) {
-    console.log(JSON.stringify(result, null, 2));
-  } else if (result.ok) {
-    console.log(`[check-evidence-relocation] PASS: ${args.mode} mode verified (${result.checkedCount} entries, 0 violations)`);
-  } else {
-    console.error(`[check-evidence-relocation] FAIL: ${args.mode} mode found ${result.violations.length} violation(s):`);
-    for (const v of result.violations) {
-      console.error(`  - [${v.type}] ${v.message}`);
-    }
-  }
-
-  return result.ok ? 0 : 1;
 }
 
-function isMainModule(metaUrl) {
-  if (!process.argv[1]) return false;
-  return fileURLToPath(metaUrl) === path.resolve(process.argv[1]);
-}
-
-if (isMainModule(import.meta.url)) {
-  process.exitCode = runCli(process.argv.slice(2), process.cwd());
-}
+if (isMainModule(import.meta.url)) process.exitCode = runCli(process.argv.slice(2), process.cwd());
