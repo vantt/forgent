@@ -83,6 +83,6 @@ test('group-cognition debate step: a pool of two families cannot seat an indepen
   assert.notEqual(state.status, 'completed');
   assert.equal(unit.outcome, 'policy-refusal');
   const judge = unit.results.find((r) => r.seat === 'judge');
-  assert.equal(judge.refused?.reason ?? judge.runResult?.refused?.reason, 'independence');
+  assert.equal(judge.refused?.reason ?? judge.runResult?.refused?.reason, 'independence-unsatisfiable');
   assert.equal(state.steps['action-synthesis'].units['synthesize-action'], undefined, 'no synthesis runs on an unruled debate');
 });

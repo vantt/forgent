@@ -92,9 +92,7 @@ import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, SEAT_BINDING
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
-import { bind } from '../runner/execution/bind.mjs';
-import { walkStateOf } from '../runner/execution/account-rotation.mjs';
-import { bindSeatOf, capabilityEntriesOf, hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
+import { capabilityEntriesOf, hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork, StoreError } from '../state/store.mjs';
@@ -600,72 +598,6 @@ export function checkRunnerPatternsConfig(cwd) {
     return { passed: true, message: `warning: ${warnings.join('; ')}` };
   }
   return { passed: true, message: 'runner patterns configuration is valid at every configured level' };
-}
-
-export function checkMutatingAssignmentBindingSnapshot(cwd) {
-  const root = cwd ?? process.cwd();
-  const assignmentsDir = path.join(root, '.fgos', 'assignments');
-  if (!fs.existsSync(assignmentsDir)) {
-    return { passed: true, message: 'no assignments directory present' };
-  }
-
-  const problems = [];
-  const units = new Map();
-  try {
-    for (const run of listAssignmentRuns(path.join(root, '.fgos'))) {
-      const [unitId, seat, round] = run.assignmentId.split('/');
-      if (!seat || !round) continue;
-      if (!units.has(unitId)) {
-        const unitJsonPath = path.join(assignmentsDir, unitId, 'unit.json');
-        let unitRecord = null;
-        try {
-          if (fs.lstatSync(unitJsonPath).isFile()) {
-            try {
-              unitRecord = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
-            } catch {
-              problems.push(`corrupted unit.json in unit run "${unitId}"`);
-            }
-          }
-        } catch {}
-        units.set(unitId, unitRecord);
-      }
-      const unitRecord = units.get(unitId);
-      if (!unitRecord) continue;
-      const resultFile = path.join(run.runDir, 'result.json');
-      try {
-        if (!fs.lstatSync(resultFile).isFile()) continue;
-        const resultData = JSON.parse(fs.readFileSync(resultFile, 'utf8'));
-        if (resultData.binding && resultData.role) {
-          const recomputed = bind(
-            {
-              unit: unitRecord.unit,
-              ...bindSeatOf(unitRecord, seat),
-              readOnly: false,
-              overrides: unitRecord.overrides || [],
-            },
-            {
-              runnerConfig: unitRecord.configSnapshot?.runner,
-              session: {},
-            },
-            // A fallback attempt lives at `<round>-fb<n>`; its walk state is read from the seat's
-            // `<seat>/<round>` chain exactly as the write gate reads it.
-            { walk: walkStateOf(unitRecord, { seat, round: round.replace(/-fb\d+$/, ''), assignmentId: run.assignmentId }) },
-          );
-          if (recomputed.refused || recomputed.executor !== resultData.binding.executor) {
-            problems.push(`unit run "${unitId}" seat "${seat}" round "${round}" attempt "${run.attempt}" binding mismatches unit.json snapshot`);
-          }
-        }
-      } catch {
-        // Unsettled or unreadable results have no binding evidence to compare.
-      }
-    }
-  } catch (err) {
-    return { passed: false, message: `error scanning assignments: ${err.message}` };
-  }
-
-  return problems.length > 0
-    ? { passed: false, message: problems.join('; ') }
-    : { passed: true, message: 'every mutating assignment RunResult binding matches its unit.json snapshot' };
 }
 
 export function checkTierVocabularyDeadKeys(cwd) {
@@ -1427,12 +1359,6 @@ registerCheck({
   id: 'runner-patterns-config',
   description: 'project and global runner patterns configuration is present, well-formed, and cumulative',
   check: (cwd) => checkRunnerPatternsConfig(cwd),
-});
-
-registerCheck({
-  id: 'mutating-assignment-binding-snapshot',
-  description: 'every mutating assignment RunResult binding matches its unit.json snapshot',
-  check: (cwd) => checkMutatingAssignmentBindingSnapshot(cwd),
 });
 
 registerCheck({

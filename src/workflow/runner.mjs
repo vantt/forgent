@@ -39,13 +39,13 @@ import {
   unitOverridesOf,
   unitPatternOf,
 } from './unit-handoff.mjs';
-import { runUnit, snapshotRunnerConfig, detectHerdrPresent } from '../runner/execution/run.mjs';
+import { runUnit, detectHerdrPresent } from '../runner/execution/run.mjs';
 import { CaseAdmissionRefusedError } from '../runner/execution/case-admission-port.mjs';
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
 import { closeCaseUnderHold } from './case-close.mjs';
 import { workflowPersonaScope } from './loader.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
-import { RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError, ensureRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 
 /** One log line for the events that mark a step's progress, null for every other event. */
 function progressLine({ ts, type, payload }) {
@@ -372,7 +372,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                 overrides: await (async () => {
                   let unitAccount = state.account ?? null;
                   if (unitAccount !== null) {
-                    const runnerConfig = snapshotRunnerConfig(mainRoot).runner;
+                    const runnerConfig = ensureRunnerConfigForDir(mainRoot);
                     const testOverrides = unitOverridesOf(u, state.seats?.personas, {
                       effort: state.effort,
                       timeoutMs: state.timeoutMs,

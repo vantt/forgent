@@ -15,7 +15,7 @@ import { deriveProviderFamily } from '../dispatch/resolve.mjs';
 import { checkProviderDisallowed, renderedEffortLevels } from '../dispatch/provider-adapter.mjs';
 import { canApplyPosture, resolvePostureInvocation } from '../dispatch/confinement/policies.mjs';
 import { MODEL_POLICY_TIERS, RunnerConfigError, assertReasoningEffort, assertRunTimeoutMs } from '../dispatch/config.mjs';
-import { credentialSourceForCli, credentialStoreOf, providerAccountInventory } from '../dispatch/provider-capacity.mjs';
+import { credentialSourceForCli, credentialStoreOf, providerAccountInventory, readAccountStates } from '../dispatch/provider-capacity.mjs';
 import { parseTierCell } from '../dispatch/tier-cell.mjs';
 import { legacyStateKey } from '../dispatch/llm-accounts.mjs';
 import { DEFAULT_RUN_CAPABILITY, PRODUCER_POSTURE, capabilityEntriesOf, effectiveRigorOf } from './seat-resolver.mjs';
@@ -176,9 +176,13 @@ function readInventory(runnerConfig) {
 /**
  * The pools a seat may be served by and the accounts each declares: a pool is named by a cell entry or is
  * the family itself. An account lists the CLIs it holds a login store for (never where it is kept).
- * Quarantine, leases and probes are the lease's business and are not part of this view.
+ * With `accounts` ({ runtimeDir, assignmentId }) the view also carries what the lease state says, read here
+ * and not under the lock: the account this assignment already holds, until when an account is quarantined,
+ * and whether a quarantined login may be lifted by one real call (offered, unprobed, only when no account of
+ * the pool is healthy). Without it the view is the config alone, which is what a replay and a read-only
+ * explanation rank from.
  */
-function accountViewOf(runnerConfig, launchView) {
+function accountViewOf(runnerConfig, launchView, accounts = null, now = Date.now()) {
   const inventory = readInventory(runnerConfig);
   const clis = [...new Set(Object.values(launchView.executors).flatMap((facts) => facts.invocations.map((inv) => inv.cli).filter(Boolean)))];
   const pools = new Set(Object.values(launchView.executors).map((facts) => facts.family));
@@ -190,13 +194,25 @@ function accountViewOf(runnerConfig, launchView) {
       } catch { /* a malformed cell is the config validator's to report */ }
     }
   }
-  return {
-    pools: Object.fromEntries([...pools].map((pool) => [pool, Object.entries(inventory[legacyStateKey(pool)]?.accounts ?? {}).map(([id, account]) => ({
-      id,
-      clis: clis.filter((cli) => credentialSourceForCli(account, cli)),
-      ...(account.disabled === true ? { disabled: true } : {}),
-    }))])),
+  const poolOf = (pool) => {
+    const states = accounts ? readAccountStates({ provider: legacyStateKey(pool), assignmentId: accounts.assignmentId, runtimeDir: accounts.runtimeDir, now }) : {};
+    const declared = Object.entries(inventory[legacyStateKey(pool)]?.accounts ?? {});
+    const out = (state) => state?.quarantinedUntil != null && state.quarantinedUntil > now;
+    const healthy = declared.some(([id, account]) => account.disabled !== true && !out(states[id]));
+    return declared.map(([id, account]) => {
+      const state = states[id];
+      const liftable = out(state) && state.probeable && !healthy;
+      return {
+        id,
+        clis: clis.filter((cli) => credentialSourceForCli(account, cli)),
+        ...(account.disabled === true ? { disabled: true } : {}),
+        ...(state?.sticky ? { sticky: true } : {}),
+        ...(out(state) && !liftable ? { quarantinedUntil: state.quarantinedUntil } : {}),
+        ...(out(state) && state.probeFailed ? { probe: 'failed' } : {}),
+      };
+    });
   };
+  return { pools: Object.fromEntries([...pools].map((pool) => [pool, poolOf(pool)])) };
 }
 
 // ---- the ask ------------------------------------------------------------------------------------
@@ -299,7 +315,7 @@ function requestOf(ask, ctx, walk) {
       runnerConfig,
       peers,
       walk: walkOf(walk),
-      accountView: accountViewOf(runnerConfig, launchView),
+      accountView: accountViewOf(runnerConfig, launchView, ctx?.accounts),
       launchView,
     },
   };
@@ -360,6 +376,7 @@ function timeoutOf(matchingOverride, unit) {
 function fallbackFrom(previous, binding, { reason, rotation, detail, runnerConfig }) {
   const base = { executor: previous.executor, invocation: previous.invocation ?? null, transport: previous.transport ?? null, pool: previous.pool ?? null, reason };
   if (rotation) return { ...base, kind: 'account-rotation', ...detail };
+  if (reason === 'lease-conflict') return { ...base, kind: 'lease-conflict' };
   const sameFamily = getProviderFamily(runnerConfig, previous.executor) === getProviderFamily(runnerConfig, binding.executor);
   return { ...base, kind: 'next-candidate', walk: sameFamily ? 'entry' : 'family' };
 }
@@ -461,6 +478,9 @@ function bindingOf({ out, prep, ask, ctx, walk }) {
   }
   if (matchingOverride?.origin) provenance.overridesOrigin = { value: matchingOverride.origin, source: 'override' };
 
+  // What was decided from, without the config body and without account facts: what a replay needs to
+  // recompute the answer and an audit needs to see what the seat was asked.
+  const { now, ...bindingInput } = out.bindingInput;
   const binding = {
     contractVersion: BIND_CONTRACT_VERSION,
     executor: cand.executor,
@@ -474,8 +494,11 @@ function bindingOf({ out, prep, ask, ctx, walk }) {
     timeoutMs: timeout.timeoutMs,
     mechanism,
     posture,
+    // The account the lease takes: named here, taken under the lock, re-ranked (a new bind) when it cannot be.
+    ...(cand.pool && cand.account ? { leaseAccount: cand.account } : {}),
     ...(account ? { account } : {}),
     provenance,
+    ...(inlineFallback ? {} : { bindingInput: { ...bindingInput, hostVersion: out.hostVersion } }),
   };
   const from = walk?.from ?? walk?.tried?.at(-1);
   if (from && !inlineFallback) {

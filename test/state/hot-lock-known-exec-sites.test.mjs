@@ -35,8 +35,8 @@ before(() => {
     skipReason = `not measured: baseline commit ${BASELINE} is not available in this clone`;
     return;
   }
-  // The lock under test, and the files that must agree with it, from this checkout.
-  for (const file of ['src/state/hot-lock.mjs', 'src/state/event-log.mjs', 'src/state/events.mjs', 'packages/holder-lock/contracts/lock-registry.v1.json']) {
+  // The lock under test, and the files that must agree with it (the lock-held counter and the identity guard that reads it), from this checkout.
+  for (const file of ['src/state/hot-lock.mjs', 'src/state/event-log.mjs', 'src/state/events.mjs', 'src/util/state-lock-held.mjs', 'src/util/session-identity.mjs', 'packages/holder-lock/contracts/lock-registry.v1.json']) {
     fs.copyFileSync(path.join(ROOT, file), path.join(tree, file));
   }
   // The lock door the hot lock calls through, whole, so its modules agree with each other.
@@ -52,6 +52,14 @@ export function withEventsLock(logPath, fn, fgosDir = path.dirname(logPath)) {
   return withStateTx(root, () => fn(), { resource: porting ? 'porting-events' : 'state' });
 }
 `);
+  // The baseline files that note a held lock import the counter from the identity module; it now lives in its own.
+  for (const file of ['src/state/runtime-coordination.mjs']) {
+    const full = path.join(tree, file);
+    fs.writeFileSync(full, fs.readFileSync(full, 'utf8').replace(
+      "import { noteLockHeld, noteLockReleased, resolveWriterIdentity } from '../util/session-identity.mjs';",
+      "import { resolveWriterIdentity } from '../util/session-identity.mjs';\nimport { noteLockHeld, noteLockReleased } from '../util/state-lock-held.mjs';",
+    ));
+  }
   fs.symlinkSync(path.join(ROOT, 'node_modules'), path.join(tree, 'node_modules'));
 });
 

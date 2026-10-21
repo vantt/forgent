@@ -18,6 +18,7 @@ import { IDENTITY_ENV_KEYS } from '../../src/util/session-identity.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
 const FACADE_URL = new URL('../../src/util/session-identity.mjs', import.meta.url).href;
+const LOCK_URL = new URL('../../src/util/state-lock-held.mjs', import.meta.url).href;
 const CONTRACTS = path.join(REPO_ROOT, 'packages', 'session-identity', 'contracts');
 const HOST = process.env.FGOS_HOST_BIN;
 const UNIX = process.platform !== 'win32';
@@ -48,6 +49,7 @@ function cleanEnv(extra = {}) {
  * Node process and returns what it prints as JSON. */
 function inFreshProcess(body, { env = cleanEnv(), cwd = REPO_ROOT, viaShell = 0 } = {}) {
   const script = `const facade = await import(${JSON.stringify(FACADE_URL)});
+const lock = await import(${JSON.stringify(LOCK_URL)});
 const out = await (async () => { ${body} })();
 process.stdout.write(JSON.stringify(out));`;
   let command = process.execPath;
@@ -155,9 +157,9 @@ test('the env-branch cache key stays the same when the fgos dir is created under
     const fs = await import('node:fs');
     const first = facade.resolveWriterIdentity(${JSON.stringify(fgosDir)});
     fs.mkdirSync(${JSON.stringify(fgosDir)}, { recursive: true });
-    facade.noteLockHeld();
+    lock.noteLockHeld();
     const second = facade.resolveWriterIdentity(${JSON.stringify(fgosDir)});
-    facade.noteLockReleased();
+    lock.noteLockReleased();
     return [first, second];`, { env: cleanEnv({ FGOS_HOST_BIN: wrapper, FGOS_SESSION_ID: 'sess-sym' }) });
   assert.deepEqual(first, { id: 'sess-sym', source: 'env' });
   assert.deepEqual(second, first);
@@ -282,14 +284,14 @@ test('no exec while a lock is held: a cache miss and a direct probe both refuse 
   const wrapper = standIn(dir, 'host', `exec "${host}" "$@"`);
   const result = inFreshProcess(`
     const codes = [];
-    facade.noteLockHeld();
+    lock.noteLockHeld();
     try { facade.resolveWriterIdentity(); } catch (err) { codes.push(err.code); }
     try { facade.probeIdentity(${JSON.stringify(wrapper)}); } catch (err) { codes.push(err.code); }
-    facade.noteLockReleased();
+    lock.noteLockReleased();
     const after = facade.resolveWriterIdentity();
-    facade.noteLockHeld();
+    lock.noteLockHeld();
     const cached = facade.resolveWriterIdentity();
-    facade.noteLockReleased();
+    lock.noteLockReleased();
     return { codes, after, cached };`, { env: cleanEnv({ FGOS_HOST_BIN: wrapper, FGOS_SESSION_ID: 'locked' }) });
   assert.deepEqual(result.codes, ['identity-in-lock', 'identity-in-lock']);
   assert.deepEqual(result.after, { id: 'locked', source: 'env' });

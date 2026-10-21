@@ -7,7 +7,8 @@ import os from 'node:os';
 import path from 'node:path';
 
 import {
-  acquireProviderAccountLease,
+  acquireNamedAccountLease,
+  LEASE_CONFLICT_REASON,
   credentialSourceForCli,
   credentialStoreDir,
   providerAccountDir,
@@ -99,19 +100,23 @@ test('the lease of a pinned CLI hands over that CLI store, and skips an account 
       multi: perCliAccount(w),
       codexOnly: { credentialSources: { codex: { kind: 'codex-home', home: w.codexHome } } },
     });
-    const pi = acquireProviderAccountLease({ runnerConfig: cfg, provider: 'openai-codex', runId: 'run-pi', assignmentId: 'as-pi', runtimeDir: w.runtimeDir, cli: 'pi' });
+    const codexOnly = acquireNamedAccountLease({ runnerConfig: cfg, provider: 'openai-codex', accountId: 'codexOnly', runId: 'run-codex-only', runtimeDir: w.runtimeDir, cli: 'pi' });
+    assert.equal(codexOnly.status, 'refused', 'the codex-only account cannot serve pi');
+    assert.equal(codexOnly.reason, LEASE_CONFLICT_REASON);
+    const pi = acquireNamedAccountLease({ runnerConfig: cfg, provider: 'openai-codex', accountId: 'multi', runId: 'run-pi', assignmentId: 'as-pi', runtimeDir: w.runtimeDir, cli: 'pi' });
     assert.equal(pi.status, 'selected');
-    assert.equal(pi.accountId, 'multi', 'the codex-only account cannot serve pi');
+    assert.equal(pi.accountId, 'multi');
     assert.equal(pi.credentialSource.home, w.piHome);
     assert.equal(pi.credentialSource.cli, 'pi');
 
-    const none = acquireProviderAccountLease({ runnerConfig: cfg, provider: 'openai-codex', runId: 'run-omp', runtimeDir: w.runtimeDir, cli: 'omp' });
+    const none = acquireNamedAccountLease({ runnerConfig: cfg, provider: 'openai-codex', accountId: 'multi', runId: 'run-omp', runtimeDir: w.runtimeDir, cli: 'omp' });
     assert.equal(none.status, 'refused');
-    assert.equal(none.reason, 'provider-capacity.no-account-for-cli');
+    assert.equal(none.reason, LEASE_CONFLICT_REASON);
+    assert.match(none.detail, /holds no "omp" login store/);
 
-    const single = acquireProviderAccountLease({
+    const single = acquireNamedAccountLease({
       runnerConfig: runnerConfig({ s: { credentialSource: { kind: 'codex-home', home: w.codexHome } } }),
-      provider: 'openai-codex', runId: 'run-single', runtimeDir: w.runtimeDir, cli: 'pi',
+      provider: 'openai-codex', accountId: 's', runId: 'run-single', runtimeDir: w.runtimeDir, cli: 'pi',
     });
     assert.equal(single.status, 'selected');
     assert.deepEqual(single.credentialSource, { kind: 'codex-home', home: w.codexHome });
@@ -147,7 +152,7 @@ test('provisioning copies the pi store for a pi launch and the codex store for a
   try {
     const cfg = runnerConfig({ acct: perCliAccount(w) });
     // Unpinned: the lease does not know the CLI yet; the launch resolves it from the command.
-    const selection = acquireProviderAccountLease({ runnerConfig: cfg, provider: 'openai-codex', runId: 'run-1', runtimeDir: w.runtimeDir });
+    const selection = acquireNamedAccountLease({ runnerConfig: cfg, provider: 'openai-codex', accountId: 'acct', runId: 'run-1', runtimeDir: w.runtimeDir });
     assert.equal(selection.credentialSource, null);
 
     const pi = await provisionFor(w, '/usr/local/bin/pi', selection, 'disp_pi');
@@ -166,7 +171,7 @@ test('provisioning copies the pi store for a pi launch and the codex store for a
 test('a launch whose CLI the account declares no store for is refused before the worker starts', async () => {
   const w = workspace();
   try {
-    const selection = acquireProviderAccountLease({ runnerConfig: runnerConfig({ acct: perCliAccount(w) }), provider: 'openai-codex', runId: 'run-2', runtimeDir: w.runtimeDir });
+    const selection = acquireNamedAccountLease({ runnerConfig: runnerConfig({ acct: perCliAccount(w) }), provider: 'openai-codex', accountId: 'acct', runId: 'run-2', runtimeDir: w.runtimeDir });
     await assert.rejects(provisionFor(w, 'omp', selection, 'disp_omp'), (err) => err.code === 'credential-provisioning' && /no credential source for CLI "omp"/.test(err.message));
   } finally { w.cleanup(); }
 });
@@ -183,7 +188,7 @@ test('a single-source selection serves every store key; an invocation that reads
 test('the store key the invocation declares picks the login store, not the basename of its command', () => {
   const w = workspace();
   try {
-    const selection = acquireProviderAccountLease({ runnerConfig: runnerConfig({ acct: perCliAccount(w) }), provider: 'openai-codex', runId: 'run-use', runtimeDir: w.runtimeDir });
+    const selection = acquireNamedAccountLease({ runnerConfig: runnerConfig({ acct: perCliAccount(w) }), provider: 'openai-codex', accountId: 'acct', runId: 'run-use', runtimeDir: w.runtimeDir });
     const wrapped = providerCapacityForInvocation(selection, { command: '/opt/bin/agent-wrapper', credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR' } });
     assert.equal(wrapped.credentialSource.home, w.piHome);
     const inferred = providerCapacityForInvocation(selection, { command: '/usr/local/bin/codex', resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }] });

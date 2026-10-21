@@ -13,7 +13,7 @@ import {
 } from './case-admission-port.mjs';
 import { expandGenerated, partitionPaths } from '../dispatch/write-scope.mjs';
 import { bind } from './bind.mjs';
-import { credentialFaultPools, inspectAccountRotation, keptBindingOf, mayRotateAccount, triedBindingsOf } from './account-rotation.mjs';
+import { credentialFaultPools, failedAccountsOf, inspectAccountRotation, keptBindingOf, mayRotateAccount, triedBindingsOf } from './account-rotation.mjs';
 import { assertPinnedAccountsUsable, runnerConfigForBinding } from './account-pin.mjs';
 import { simulateUnitBindings } from './dry-bind.mjs';
 import { worktreeSnapshot, writesSince } from './partial-writes.mjs';
@@ -29,6 +29,7 @@ import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { resolveMutatingCwdPosture } from '../dispatch/execution-contract.mjs';
 import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
+import { accountInventoryConfigOf, LEASE_CONFLICT_REASON } from '../dispatch/provider-capacity.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs, stripConfigComments } from '../dispatch/config.mjs';
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
 import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
@@ -160,9 +161,12 @@ export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
   });
   const serialized = JSON.stringify(filtered);
   const hash = crypto.createHash('sha256').update(serialized).digest('hex');
+  // The account inventory (`llmAccounts`, `providers`) holds the places logins are kept. It is machine
+  // config read live at every bind and launch, so a unit record never carries it.
+  const { llmAccounts, providers, ...runner } = cfg;
   return {
     hash,
-    runner: cfg,
+    runner,
   };
 }
 
@@ -539,6 +543,26 @@ function holdCancelOnSignal(options) {
   };
 }
 
+/** How many times in a row a seat's named account may be taken from it before the seat is refused. */
+const MAX_LEASE_CONFLICTS = 8;
+
+/** Whether an attempt ended because the lease refused the account Seat Binding named (nothing ran). */
+function isLeaseConflict(runResult) {
+  const failure = runResult?.classification?.failure;
+  return failure?.code === 'provider-capacity-refused' && String(failure.message ?? '').includes(LEASE_CONFLICT_REASON);
+}
+
+/** The receipt the lease wrote for the run an attempt ended on, or null when it leased nothing. */
+function readLeaseReceipt(assignmentsDir, assignmentId) {
+  try {
+    const attempt = currentAttemptOf(assignmentsDir, assignmentId);
+    if (!attempt) return null;
+    return JSON.parse(fs.readFileSync(path.join(attempt.dir, 'provider-capacity-selection.json'), 'utf8')).leaseReceipt ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function runUnitBody(options, scope) {
   if (options.resumeUnitRunId && options.stanceOptions !== undefined) {
     throw new RunnerConfigError('cannot provide stanceOptions when resuming a unit run: the stored question is immutable');
@@ -560,6 +584,13 @@ async function runUnitBody(options, scope) {
   const worktreePath = options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot;
   const caseRef = normalizeCaseRef(options.caseRef);
   const port = options.caseAdmission === undefined ? null : assertCaseAdmissionPort(options.caseAdmission);
+
+  // The config this run reads live: the account inventory comes from it (never from unit.json), and a fresh
+  // run snapshots the rest of it.
+  // Read at first use, so a resume that is refused for its record never needs the config.
+  let liveConfigRead;
+  const liveConfig = () => (liveConfigRead ??= options.runnerConfig ?? ensureRunnerConfigForDir(mainRoot));
+  const withAccounts = (runner) => ({ ...runner, ...accountInventoryConfigOf(liveConfig()) });
 
   let unit;
   let unitRunId;
@@ -622,7 +653,7 @@ async function runUnitBody(options, scope) {
     assertNoStrayCommit(unitRunId, unitRecord, mainRoot);
 
     assertPinnedAccountsUsable(lastAttempts(unitRecord).filter((a) => a.outcome !== 'pass').map((a) => a.binding ?? {}), {
-      runnerConfig: unitRecord.configSnapshot?.runner,
+      runnerConfig: withAccounts(unitRecord.configSnapshot?.runner ?? {}),
       runtimeDir: options.providerCapacityRuntimeDir,
       what: `cannot resume unit run "${unitRunId}"`,
     });
@@ -672,13 +703,13 @@ async function runUnitBody(options, scope) {
     for (const ov of options.overrides ?? []) {
       if (ov && typeof ov === 'object' && ov.timeoutMs !== undefined) assertRunTimeoutMs(ov.timeoutMs, 'override timeoutMs');
     }
-    const configSnapshot = snapshotRunnerConfig(mainRoot, options.runnerConfig);
+    const configSnapshot = snapshotRunnerConfig(mainRoot, liveConfig());
     // The seats the pattern fills, resolved once before anything exists: an undeclared or invalid seat
     // list refuses the run here, and the record keeps the list so a resume never recomputes it.
     const seats = resolveSeats({ pattern: chosenPattern(options, unit), unit, runnerConfig: configSnapshot.runner });
     // A pinned account is checked before the unit run exists: every seat it applies to must bind an
     // executor whose provider lists it, and it must not be quarantined now.
-    await assertDoorChoicesBeforeRun(unit, configSnapshot.runner, options);
+    await assertDoorChoicesBeforeRun(unit, withAccounts(configSnapshot.runner), options);
     // A sync ref is resolved to its commit once, before the run exists; a resume merges that commit.
     const sync = seedSync(unit, { worktree: worktreePath, mainRoot });
     const writing = unit.writes.length > 0 || Boolean(sync);
@@ -856,7 +887,7 @@ async function runUnitBody(options, scope) {
   // One dispatch of an already-bound role. Returns the settled outcome of that attempt.
   const dispatchBound = async ({ bound, seat, round, readOnly, assignmentId, assignmentDir, session, inputs = [], objective = unit.objective, admission }) => {
     // A pinned account leases from an inventory holding only that account (account-pin.mjs).
-    const runnerConfig = runnerConfigForBinding(unitRecord.configSnapshot.runner, bound);
+    const runnerConfig = runnerConfigForBinding(withAccounts(unitRecord.configSnapshot.runner), bound);
     fs.mkdirSync(assignmentDir, { recursive: true });
 
     // What the unit names (already resolved to paths), then the accounts of the seats whose
@@ -949,6 +980,9 @@ async function runUnitBody(options, scope) {
       // The admission identity of this dispatch: a resume of an attempt whose outcome was never read
       // finds that attempt again (and its settled result) instead of admitting a new one.
       ...admission,
+      // What the write gate replays a mutating seat's binding against: the config this run reads live, never the
+      // copy kept in unit.json.
+      committedRunnerConfig: liveConfig(),
       providerCredentialProbe: createCredentialProbe(),
       providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),
       cliOverride: {
@@ -958,8 +992,9 @@ async function runUnitBody(options, scope) {
         preferInvocation: bound.invocation,
         tier: bound.tier,
         model: bound.model,
-        // The pool that serves `model`; the lease takes the account from it.
+        // The pool that serves `model` and the account Seat Binding named in it: the lease takes exactly that one.
         ...(bound.pool ? { pool: bound.pool } : {}),
+        ...(bound.leaseAccount ? { leaseAccount: bound.leaseAccount, accountViewDigest: bound.bindingInput?.accountViewDigest ?? null } : {}),
         // A level bind() accepted from an override; the launch renders it into the CLI's flag.
         ...(bound.reasoningEffort ? { reasoningEffort: bound.reasoningEffort } : {}),
       },
@@ -992,7 +1027,7 @@ async function runUnitBody(options, scope) {
     assertSeatId(seatId);
     const seatTag = { seat: seatId, role: seat.role, posture: seat.posture };
     const readOnly = seat.posture.readOnly;
-    const runnerConfig = unitRecord.configSnapshot.runner;
+    const runnerConfig = withAccounts(unitRecord.configSnapshot.runner);
     const session = {
       provider: options.session?.provider,
       tier: options.session?.tier,
@@ -1011,12 +1046,15 @@ async function runUnitBody(options, scope) {
       ...(seat.persona ? { persona: seat.persona } : {}),
       ...bindContextOf(unitRecord, rUnit || unit, seat, options),
       readOnly,
-      independentOf: seatLedger.resolve(independentOf),
+      // Independence is symmetric: a seat bound earlier that must differ from this one holds this seat to it too.
+      independentOf: [...seatLedger.resolve(independentOf), ...seatLedger.dependentExecutors(seatId)],
       ...(preferIndependentOf.length > 0 ? { preferIndependentOf: seatLedger.seats(preferIndependentOf) } : {}),
       overrides: unitRecord.overrides || [],
       ...(unit.blind ? { blind: true } : {}),
     });
-    const bindCtx = { runnerConfig, session };
+    const assignmentIdOf = (n) => (n === 0 ? `${unitRunId}/${seatId}/${round}` : `${unitRunId}/${seatId}/${round}-fb${n}`);
+    // The lease state is read for the attempt about to run (the account this assignment already holds ranks first).
+    const bindCtxFor = (n) => ({ runnerConfig, session, accounts: { runtimeDir: options.providerCapacityRuntimeDir, assignmentId: assignmentIdOf(n) } });
 
     const key = `${seatId}/${round}`;
     const recorded = unitRecord.bindings[key] ?? [];
@@ -1029,8 +1067,11 @@ async function runUnitBody(options, scope) {
       bound = await seatLedger.serialize(() => {
         // A seat that already ran an earlier round of this unit keeps that round's executor, model and effort.
         const kept = keptBindingOf(unitRecord, seatId, round);
-        const first = recorded.length > 0 ? recorded[recorded.length - 1].binding : bind(askOf(), bindCtx, kept ? { walk: { continuity: kept } } : {});
-        if (!first.refused) seatLedger.note(seatId, first.executor);
+        const first = recorded.length > 0 ? recorded[recorded.length - 1].binding : bind(askOf(), bindCtxFor(attemptNo), kept ? { walk: { continuity: kept } } : {});
+        if (!first.refused) {
+          seatLedger.note(seatId, first.executor);
+          seatLedger.noteDependence(seatId, independentOf);
+        }
         return first;
       });
     } finally {
@@ -1238,9 +1279,43 @@ async function runUnitBody(options, scope) {
 
       attempts[attemptNo].outcome = result.outcome;
       attempts[attemptNo].runId = result.runResult?.runId ?? null;
+      const receipt = readLeaseReceipt(assignmentsDir, assignmentId);
+      if (receipt) attempts[attemptNo].leaseReceipt = receipt;
       const credentialFault = result.outcome === 'provider-limit' && result.runResult?.classification?.failure?.cause === 'credential';
       if (credentialFault) attempts[attemptNo].failureCause = 'credential';
       persistUnitRecord();
+
+      // The account Seat Binding named could not be taken any more: nothing ran. The seat is bound again, in
+      // the queue, from a fresh view of the accounts and the same policy (a family change is checked against
+      // the seats bound before it); this is a rebind, not a step of the walk and not a launch.
+      if (result.outcome === 'provider-limit' && isLeaseConflict(result.runResult)) {
+        attempts[attemptNo].leaseConflict = true;
+        persistUnitRecord();
+        // A pinned account is hard: it is never answered with another account or executor.
+        if (bound.account) {
+          return { ...result, fallbackExhausted: { from: { executor: bound.executor, invocation: bound.invocation, transport: bound.transport }, reason: 'account-pinned', detail: `account "${bound.account.pool}/${bound.account.id}" was pinned, but it cannot be leased now; pin another account or wait for this one` } };
+        }
+        const rebound = attempts.filter((a) => a.leaseConflict === true).length > MAX_LEASE_CONFLICTS ? null : await seatLedger.serialize(() => {
+          const kept = keptBindingOf(unitRecord, seatId, round);
+          const next = bind(askOf(), bindCtxFor(attemptNo + 1), {
+            walk: {
+              from: bound,
+              reason: 'lease-conflict',
+              failedAccounts: failedAccountsOf(attempts),
+              excludePools: [...credentialFaultPoolSet],
+              ...(kept ? { continuity: kept } : {}),
+            },
+          });
+          if (!next.refused && next.mechanism !== 'inline') seatLedger.note(seatId, next.executor);
+          return next;
+        });
+        if (!rebound || rebound.refused || rebound.mechanism === 'inline') {
+          return { outcome: 'policy-refusal', ...seatTag, round, refused: rebound?.refused ?? { reason: 'lease-conflict', detail: `the seat's account could not be leased ${MAX_LEASE_CONFLICTS + 1} times in a row` } };
+        }
+        bound = rebound;
+        attemptNo += 1;
+        continue;
+      }
 
       if (result.outcome !== 'provider-limit') return result;
 
@@ -1289,7 +1364,7 @@ async function runUnitBody(options, scope) {
       const rotation = bound.pool ? inspectAccountRotation({ runnerConfig, pool: bound.pool, runtimeDir: options.providerCapacityRuntimeDir }) : null;
       if (mayRotateAccount(rotation, rotationsSpent)) {
         // The same candidate again: the lease picks the next account of its pool.
-        const again = bind(askOf(), bindCtx, { walk: { continuity: bound, from: bound, rotation: true, detail: { accountsHealthy: rotation.healthy } } });
+        const again = bind(askOf(), bindCtxFor(attemptNo + 1), { walk: { continuity: bound, from: bound, rotation: true, failedAccounts: failedAccountsOf(attempts), detail: { accountsHealthy: rotation.healthy } } });
         if (!again.refused) {
           bound = again;
           attemptNo += 1;
@@ -1305,7 +1380,7 @@ async function runUnitBody(options, scope) {
       const current = bound;
       const kept = keptBindingOf(unitRecord, seatId, round);
       const next = await seatLedger.serialize(() => {
-        const candidate = bind(askOf(), bindCtx, {
+        const candidate = bind(askOf(), bindCtxFor(attemptNo + 1), {
           walk: {
             from: current,
             tried: triedBindingsOf(attempts, attemptNo + 1),

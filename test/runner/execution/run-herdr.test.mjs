@@ -17,7 +17,7 @@ const fixtureDir = (prefix) => makeFixtureDir(prefix);
 test('guards: the run path reads bound.transport and walks through bind', () => {
   const runSource = fs.readFileSync(new URL('../../../src/runner/execution/run.mjs', import.meta.url), 'utf8');
   assert.match(runSource, /bound\.transport/);
-  assert.match(runSource, /bind\(askOf\(\), bindCtx, \{\s*walk:/);
+  assert.match(runSource, /bind\(askOf\(\), bindCtxFor\(attemptNo \+ 1\), \{\s*walk:/);
 });
 
 test('Claude reads blind inputs without granting the assignment or store root, preserving operator directories', () => {

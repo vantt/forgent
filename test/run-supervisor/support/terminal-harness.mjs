@@ -176,7 +176,8 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
             ],
           }])),
           modelPolicies: Object.fromEntries(executorIds.map((id) => [id, { standard: 'sonnet' }])),
-          capabilities: { 'docs:write': { prefer: executorIds.map((id) => ({ executor: id, invocation: `${id}-cli` })) } },
+          // A bare executor id leaves the transport to bind(): a named invocation is a hard pin and herdr never replaces it.
+          capabilities: { 'docs:write': { prefer: executorIds.map((id) => ({ executor: id })) } },
         },
       }, null, 2));
       const unitFile = path.join(repoDir, 'unit.json');

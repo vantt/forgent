@@ -10,7 +10,8 @@ import os from 'node:os';
 import path from 'node:path';
 
 import {
-  acquireProviderAccountLease,
+  acquireNamedAccountLease,
+  LEASE_CONFLICT_REASON,
   inspectProviderCapacity,
   providerAccountInventory,
   providerCapacityStatePaths,
@@ -123,18 +124,21 @@ test('a store no invocation declares files for leaves that CLI out of the accoun
   assert.deepEqual(unusable.map((u) => `${u.pool}/${u.account}/${u.cli}`), ['openrouter/or-a/agy']);
 
   const runtimeDir = mkRuntimeDir();
-  const refused = acquireProviderAccountLease({ runnerConfig: runner, provider: 'openrouter', runId: 'run1', runtimeDir, cli: 'agy' });
+  const refused = acquireNamedAccountLease({ runnerConfig: runner, provider: 'openrouter', accountId: 'or-a', runId: 'run1', runtimeDir, cli: 'agy' });
   assert.equal(refused.status, 'refused');
-  assert.equal(refused.reason, 'provider-capacity.no-account-for-cli');
+  assert.equal(refused.reason, LEASE_CONFLICT_REASON);
+  assert.match(refused.detail, /holds no "agy" login store/);
 
   const inspected = inspectProviderCapacity({ runnerConfig: runner, runtimeDir });
   assert.equal(inspected.providers.openrouter.accounts['or-a'].unusableFor[0].cli, 'agy');
 });
 
-test('a disabled account is skipped by the lease and shown by inspect', () => {
+test('a disabled account is refused by the lease and shown by inspect', () => {
   const runner = config({ openrouter: { ...openrouter, 'or-a': { ...openrouter['or-a'], disabled: true } } });
   const runtimeDir = mkRuntimeDir();
-  const selected = acquireProviderAccountLease({ runnerConfig: runner, provider: 'openrouter', runId: 'run1', runtimeDir, cli: 'pi' });
+  const refused = acquireNamedAccountLease({ runnerConfig: runner, provider: 'openrouter', accountId: 'or-a', runId: 'run0', runtimeDir, cli: 'pi' });
+  assert.equal(refused.reason, LEASE_CONFLICT_REASON);
+  const selected = acquireNamedAccountLease({ runnerConfig: runner, provider: 'openrouter', accountId: 'or-b', runId: 'run1', runtimeDir, cli: 'pi' });
   assert.equal(selected.accountId, 'or-b');
   assert.equal(inspectProviderCapacity({ runnerConfig: runner, runtimeDir }).providers.openrouter.accounts['or-a'].disabled, true);
 });
@@ -147,11 +151,11 @@ test('pools keep separate leases and quarantine: quarantining one pool leaves an
   const runtimeDir = mkRuntimeDir();
   quarantineProviderAccount({ provider: 'openrouter', accountId: 'main', reasonCode: 'auth-token', quarantineKind: 'manual-clear', runtimeDir });
 
-  const blocked = acquireProviderAccountLease({ runnerConfig: runner, provider: 'openrouter', runId: 'run1', runtimeDir });
+  const blocked = acquireNamedAccountLease({ runnerConfig: runner, provider: 'openrouter', accountId: 'main', runId: 'run1', runtimeDir });
   assert.equal(blocked.status, 'refused');
-  assert.equal(blocked.reason, 'provider-capacity.exhausted-or-quarantined');
+  assert.equal(blocked.reason, LEASE_CONFLICT_REASON);
 
-  const free = acquireProviderAccountLease({ runnerConfig: runner, provider: 'deepseek', runId: 'run2', runtimeDir });
+  const free = acquireNamedAccountLease({ runnerConfig: runner, provider: 'deepseek', accountId: 'main', runId: 'run2', runtimeDir });
   assert.equal(free.status, 'selected');
   assert.equal(free.accountId, 'main');
 
@@ -165,23 +169,30 @@ test('pools keep separate leases and quarantine: quarantining one pool leaves an
 test('the pool openai keeps its legacy state key, so a lease taken under the old inventory is the same account', () => {
   const runtimeDir = mkRuntimeDir();
   const oldConfig = config(undefined, { providers: { 'openai-codex': { accounts: { tetnu: { credentialSource: { kind: 'codex-home', home: '/srv/codex/tetnu' } } } } } });
-  const first = acquireProviderAccountLease({ runnerConfig: oldConfig, provider: 'openai-codex', assignmentId: 'asgn', runId: 'run1', runtimeDir });
+  const first = acquireNamedAccountLease({ runnerConfig: oldConfig, provider: 'openai-codex', accountId: 'tetnu', assignmentId: 'asgn', runId: 'run1', runtimeDir });
   assert.equal(first.accountId, 'tetnu');
   quarantineProviderAccount({ provider: 'openai-codex', accountId: 'tetnu', reasonCode: 'quota-limit', until: '2999-01-01T00:00:00.000Z', runtimeDir });
 
   const newConfig = config({ openai: { tetnu: { credentialStore: { codex: '/srv/codex/tetnu' } }, spare: { credentialStore: { codex: '/srv/codex/spare' } } } });
-  const second = acquireProviderAccountLease({ runnerConfig: newConfig, provider: 'openai-codex', assignmentId: 'other', runId: 'run2', runtimeDir });
-  assert.equal(second.accountId, 'spare', 'the quarantine written under the old inventory still applies to tetnu');
+  assert.equal(
+    acquireNamedAccountLease({ runnerConfig: newConfig, provider: 'openai-codex', accountId: 'tetnu', assignmentId: 'other', runId: 'run2', runtimeDir }).reason,
+    LEASE_CONFLICT_REASON,
+    'the quarantine written under the old inventory still applies to tetnu',
+  );
+  const second = acquireNamedAccountLease({ runnerConfig: newConfig, provider: 'openai-codex', accountId: 'spare', assignmentId: 'other', runId: 'run3', runtimeDir });
+  assert.equal(second.accountId, 'spare');
   const state = JSON.parse(fs.readFileSync(providerCapacityStatePaths(runtimeDir).statePath, 'utf8'));
   assert.deepEqual(Object.keys(state.providers), ['openai-codex']);
 });
 
-test('a pinned account narrows the llmAccounts pool, so the lease takes the pinned account and not the first declared', () => {
+test('a pinned account narrows the llmAccounts pool, so the lease can take only the pinned account', () => {
   const runner = config({ openrouter, deepseek: { main: { credentialStore: { pi: '/srv/pi/ds-main' } } } });
   const pinned = configPinnedToAccount(runner, { provider: 'openrouter', accountId: 'or-b' });
   assert.deepEqual(Object.keys(pinned.llmAccounts.openrouter), ['or-b']);
   assert.deepEqual(Object.keys(pinned.llmAccounts.deepseek), ['main'], 'another pool is left alone');
-  const selected = acquireProviderAccountLease({ runnerConfig: pinned, provider: 'openrouter', runId: 'run1', runtimeDir: mkRuntimeDir(), cli: 'pi' });
+  const dropped = acquireNamedAccountLease({ runnerConfig: pinned, provider: 'openrouter', accountId: 'or-a', runId: 'run0', runtimeDir: mkRuntimeDir(), cli: 'pi' });
+  assert.equal(dropped.reason, LEASE_CONFLICT_REASON, 'the narrowed pool no longer lists the other accounts');
+  const selected = acquireNamedAccountLease({ runnerConfig: pinned, provider: 'openrouter', accountId: 'or-b', runId: 'run1', runtimeDir: mkRuntimeDir(), cli: 'pi' });
   assert.equal(selected.accountId, 'or-b');
 });
 

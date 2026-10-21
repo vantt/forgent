@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import {
-  acquireProviderAccountLease,
+  acquireNamedAccountLease,
   inspectProviderCapacity,
   probeQuarantinedAccounts,
   providerCapacityStatePaths,
@@ -50,7 +50,7 @@ test('an account locked for a dead credential is unlocked by one successful call
   assert.deepEqual(calls, ['a']);
   assert.deepEqual(tried, [{ accountId: 'a', unlocked: true, detail: null }]);
   assert.equal(quarantineOf(ctx, 'a'), null);
-  const lease = acquireProviderAccountLease({ runnerConfig: ctx.runnerConfig, provider: PROVIDER, runId: 'run-1', runtimeDir: ctx.runtimeDir });
+  const lease = acquireNamedAccountLease({ runnerConfig: ctx.runnerConfig, provider: PROVIDER, accountId: 'a', runId: 'run-1', runtimeDir: ctx.runtimeDir });
   assert.equal(lease.status, 'selected');
   const state = JSON.parse(fs.readFileSync(providerCapacityStatePaths(ctx.runtimeDir).statePath, 'utf8'));
   assert.equal(state.audit.at(-1).action, 'clear-quarantine');

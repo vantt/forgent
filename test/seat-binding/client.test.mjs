@@ -16,7 +16,7 @@ import {
   SEAT_BINDING_TIMEOUT_MS,
 } from '../../src/seat-binding/client.mjs';
 import { golden, caseInput } from './golden-cases.helper.mjs';
-import { noteLockHeld, noteLockReleased } from '../../src/util/session-identity.mjs';
+import { noteLockHeld, noteLockReleased } from '../../src/util/state-lock-held.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const HOST_BIN = process.env.FGOS_HOST_BIN;

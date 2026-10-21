@@ -8,6 +8,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { snapshotRunnerConfig } from '../../../src/runner/execution/run.mjs';
+import { accountInventoryConfigOf } from '../../../src/runner/dispatch/provider-capacity.mjs';
 
 const runner = () => ({
   defaults: { tier: 'standard' },
@@ -58,6 +59,16 @@ test('the retired rigorToTier is not part of the hash', () => {
 test('the snapshot hands back the config it was given, and the hash is a sha-256 hex digest', () => {
   const cfg = runner();
   const snap = snapshotRunnerConfig('/unused', cfg);
-  assert.equal(snap.runner, cfg);
+  assert.deepEqual(snap.runner, cfg);
   assert.match(snap.hash, /^[0-9a-f]{64}$/);
+});
+
+test('a snapshot keeps no account inventory: llmAccounts and providers are machine config read live, never recorded in unit.json', () => {
+  const cfg = { ...runner(), llmAccounts: { alpha: { a1: { credentialStore: { pi: '/srv/pi/a1' } } } }, providers: { claude: { accounts: { c1: { credentialSource: { kind: 'codex-home', home: '/srv/c1' } } } } } };
+  const snapshot = snapshotRunnerConfig('/unused', cfg);
+  assert.equal(snapshot.runner.llmAccounts, undefined);
+  assert.equal(snapshot.runner.providers, undefined);
+  assert.equal(snapshot.runner.executors.claude.command, 'claude', 'what seat choice and the run read stays');
+  assert.equal(snapshot.hash, snapshotRunnerConfig('/unused', runner()).hash, 'the inventory is not part of the hash either');
+  assert.deepEqual(accountInventoryConfigOf(cfg), { llmAccounts: cfg.llmAccounts, providers: cfg.providers });
 });

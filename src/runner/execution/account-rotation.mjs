@@ -58,7 +58,9 @@ export function mayRotateAccount(rotation, rotationsSpent) {
 export function triedBindingsOf(attempts, at) {
   if (!Array.isArray(attempts) || at <= 0) return [];
   const own = attempts[at]?.binding ? bindingIdentity(attempts[at].binding) : null;
+  // An attempt that never launched (its account could not be leased) is not a step of the walk.
   return attempts.slice(0, at)
+    .filter((attempt) => attempt?.leaseConflict !== true)
     .map((attempt) => attempt?.binding)
     .filter((binding) => binding && Object.hasOwn(binding, 'pool') && bindingIdentity(binding) !== own);
 }
@@ -81,9 +83,26 @@ export function walkStateOf(unitRecord, { seat, round, assignmentId }) {
   const kept = keptBindingOf(unitRecord, seat, round);
   return {
     tried: Array.isArray(attempts) ? triedBindingsOf(attempts, at) : [],
+    failedAccounts: Array.isArray(attempts) && at > 0 ? failedAccountsOf(attempts.slice(0, at)) : [],
     excludePools: [...credentialFaultPools(unitRecord, { boundBefore: Number.isFinite(boundAt) ? boundAt : -Infinity })],
     ...(kept ? { continuity: kept } : {}),
   };
+}
+
+/**
+ * The accounts a seat's earlier attempts failed on (a provider limit, or a lease that could not be taken):
+ * a bind that goes on from them never names one of these again.
+ *
+ * @returns {Array<{ pool: string, account: string }>}
+ */
+export function failedAccountsOf(attempts) {
+  const seen = new Map();
+  for (const attempt of attempts ?? []) {
+    const { pool, leaseAccount } = attempt?.binding ?? {};
+    if (!pool || !leaseAccount || (attempt.outcome !== 'provider-limit' && attempt.leaseConflict !== true)) continue;
+    seen.set(`${pool}\u0000${leaseAccount}`, { pool, account: leaseAccount });
+  }
+  return [...seen.values()];
 }
 
 /**

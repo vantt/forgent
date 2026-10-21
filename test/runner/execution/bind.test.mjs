@@ -3,6 +3,9 @@
 import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { bind, BIND_CONTRACT_VERSION } from '../../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 
@@ -1078,4 +1081,93 @@ test('bind: a seat that keeps its candidate keeps executor, model and effort; a 
   const retired = createMockRunnerConfig();
   retired.modelPolicies.claude.standard = 'claude-retired';
   assert.equal(bind(implementAsk, { runnerConfig: retired, session: {} }, { walk: { continuity: first } }).refused.reason, 'seat-continuity-unavailable', 'a kept model the config no longer offers');
+});
+
+// ---- the account the lease takes is named by the bind --------------------------------------------------
+
+function accountConfig(accounts) {
+  return {
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
+    modelPolicies: { alpha: { standard: 'alpha-m' } },
+    capabilities: { 'docs:write': { prefer: [{ executor: 'alpha' }] } },
+    executors: {
+      alpha: {
+        kind: 'agent', providerModel: 'alpha', command: 'pi',
+        invocations: [{ id: 'alpha-cli', via: 'cli', adapter: 'cli-spawn', command: 'pi', confinement: { backend: 'bwrap' }, credentialStore: { use: 'pi', homeEnv: 'PI_HOME', files: ['auth.json'] } }],
+      },
+    },
+    llmAccounts: { alpha: accounts },
+  };
+}
+const piStore = (name) => ({ credentialStore: { pi: `/srv/pi/${name}` } });
+const docsAsk = { unit: { id: 'u', capability: 'docs:write', writes: [] }, role: 'producer' };
+
+test('bind names the account the lease takes: the first enabled account of the pool in declared order', () => {
+  const runnerConfig = accountConfig({ off: { ...piStore('off'), disabled: true }, first: piStore('first'), second: piStore('second'), codexOnly: { credentialStore: { codex: '/srv/codex/c' } } });
+  const result = bind(docsAsk, { runnerConfig, session: {} });
+  assert.equal(result.leaseAccount, 'first', 'a disabled account is never named');
+  assert.equal(result.account, undefined, 'naming an account is not a pin');
+  assert.match(result.bindingInput.accountViewDigest, /^sha256:/);
+  assert.equal(result.bindingInput.walk.tried.length, 0);
+  assert.ok(result.bindingInput.hostVersion);
+  assert.equal(result.bindingInput.now, undefined, 'the decision time is not part of the recorded input');
+});
+
+test('bind never names an account that holds no login store for the CLI the launch reads', () => {
+  const runnerConfig = accountConfig({ codexOnly: { credentialStore: { codex: '/srv/codex/c' } } });
+  const result = bind(docsAsk, { runnerConfig, session: {} });
+  assert.equal(result.refused.reason, 'pool-unusable');
+  assert.match(result.refused.detail, /no enabled account of pool "alpha" holds a "pi" login store/);
+});
+
+test('bind reads the lease state: a quarantined account is skipped, the account this assignment holds ranks first, a dead login is offered only when nothing else is usable', async () => {
+  const { quarantineProviderAccount, providerCapacityStatePaths } = await import('../../../src/runner/dispatch/provider-capacity.mjs');
+  const runtimeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bind-accounts-'));
+  const runnerConfig = accountConfig({ a: piStore('a'), b: piStore('b'), c: piStore('c') });
+  const ctxFor = (assignmentId) => ({ runnerConfig, session: {}, accounts: { runtimeDir, assignmentId } });
+
+  quarantineProviderAccount({ provider: 'alpha', accountId: 'a', reasonCode: 'quota-limit', until: new Date(Date.now() + 3_600_000).toISOString(), runtimeDir });
+  assert.equal(bind(docsAsk, ctxFor('asgn')).leaseAccount, 'b', 'the quarantined account is out until its end time');
+
+  // The account an assignment already holds ranks first (sticky), even when another comes before it.
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+  state.assignments['alpha:asgn'] = { accountId: 'c', selectedAt: new Date().toISOString() };
+  fs.writeFileSync(statePath, JSON.stringify(state));
+  assert.equal(bind(docsAsk, ctxFor('asgn')).leaseAccount, 'c');
+  assert.equal(bind(docsAsk, ctxFor('other')).leaseAccount, 'b', 'another assignment is not held to it');
+
+  // Every account dead: a dead login is offered (one real call may lift it) instead of refusing the seat.
+  for (const accountId of ['b', 'c']) quarantineProviderAccount({ provider: 'alpha', accountId, reasonCode: 'auth-token', quarantineKind: 'manual-clear', runtimeDir });
+  quarantineProviderAccount({ provider: 'alpha', accountId: 'a', reasonCode: 'auth-token', quarantineKind: 'manual-clear', runtimeDir });
+  assert.ok(bind(docsAsk, ctxFor('asgn')).leaseAccount, 'a dead login is probeable, so it is offered');
+  const afterProbe = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+  for (const accountId of ['a', 'b', 'c']) afterProbe.providers.alpha.accounts[accountId].quarantine.probe = { attemptedAt: new Date().toISOString(), status: 'failed' };
+  fs.writeFileSync(statePath, JSON.stringify(afterProbe));
+  assert.equal(bind(docsAsk, ctxFor('asgn')).refused.reason, 'no-account-available', 'every login failed its probe: the seat is refused by name');
+});
+
+test('bind after a lease conflict names another account of the same candidate from the same policy', () => {
+  const runnerConfig = accountConfig({ a: piStore('a'), b: piStore('b') });
+  const first = bind(docsAsk, { runnerConfig, session: {} });
+  assert.equal(first.leaseAccount, 'a');
+  const again = bind(docsAsk, { runnerConfig, session: {} }, { walk: { from: first, reason: 'lease-conflict', failedAccounts: [{ pool: 'alpha', account: 'a' }] } });
+  assert.deepEqual([again.executor, again.pool, again.leaseAccount], ['alpha', 'alpha', 'b']);
+  assert.equal(again.provenance.fallbackFrom.kind, 'lease-conflict');
+  const none = bind(docsAsk, { runnerConfig, session: {} }, { walk: { from: first, reason: 'lease-conflict', failedAccounts: [{ pool: 'alpha', account: 'a' }, { pool: 'alpha', account: 'b' }] } });
+  assert.equal(none.refused.reason, 'no-account-available');
+});
+
+test('a replay (a bind without lease state) names the candidate the runner bound even after its account was quarantined', async () => {
+  const { quarantineProviderAccount } = await import('../../../src/runner/dispatch/provider-capacity.mjs');
+  const runtimeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bind-replay-'));
+  const runnerConfig = accountConfig({ only: piStore('only') });
+  const bound = bind(docsAsk, { runnerConfig, session: {}, accounts: { runtimeDir, assignmentId: 'asgn' } });
+  assert.equal(bound.leaseAccount, 'only');
+  quarantineProviderAccount({ provider: 'alpha', accountId: 'only', reasonCode: 'quota-limit', until: new Date(Date.now() + 3_600_000).toISOString(), runtimeDir });
+  // The runner's own bind sees the quarantine; the replay the write gate runs reads no lease state, so it still
+  // arrives at the executor, pool, model and tier the seat was bound to.
+  assert.equal(bind(docsAsk, { runnerConfig, session: {}, accounts: { runtimeDir, assignmentId: 'asgn' } }).refused.reason, 'no-account-available');
+  const replayed = bind(docsAsk, { runnerConfig, session: {} });
+  assert.deepEqual([replayed.executor, replayed.pool, replayed.model, replayed.tier], [bound.executor, bound.pool, bound.model, bound.tier]);
 });

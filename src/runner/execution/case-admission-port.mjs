@@ -70,5 +70,6 @@ export function normalizeCaseRef(value) {
 /** Every attempt a Unit run has launched so far, from its record: the one count the ceiling is held against. */
 export function seatLaunchesUsed(unitRecord) {
   return Object.values(unitRecord.bindings ?? {})
-    .reduce((sum, attempts) => sum + attempts.filter((a) => a.dispatchRetryId !== undefined).length, 0);
+    // An attempt whose account could not be leased never started a worker: it is not a launch.
+    .reduce((sum, attempts) => sum + attempts.filter((a) => a.dispatchRetryId !== undefined && a.leaseConflict !== true).length, 0);
 }

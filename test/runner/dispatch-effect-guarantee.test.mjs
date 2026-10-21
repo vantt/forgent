@@ -2,12 +2,10 @@ import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
 import { assessBwrap } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import {
   assess,
-  resolveFallback,
   ASSESS_OUTCOMES,
   REPEAT_MODE_VALUES,
   RecoveryError,
@@ -83,33 +81,6 @@ test('the dispatch policy rejects a repeatMode value outside REPEAT_MODE_VALUES'
 test('assess parks as effect-unknown when the plan carries no provider endpoint at all', () => {
   assert.equal(assess({}, 'pre-delivery', null, null), 'effect-unknown');
   assert.equal(assess(null, 'post-delivery', null, null), 'effect-unknown');
-});
-
-test('a resolveFallback result that never reached "scoped" always parks as effect-unknown ("fallback compiler mismatch")', () => {
-  const notGoverned = resolveFallback({ policy: { executorPreference: ['claude'] }, provenance: {} }, 'nope', {
-    compilePlan: () => { throw new Error('unreachable'); },
-  });
-  assert.equal(notGoverned.status, 'candidate-not-governed');
-  assert.equal(assess(notGoverned, 'post-delivery', { policy: { controls: fullControls('allow') } }, { outcome: 'enforced' }), 'effect-unknown');
-
-  // Same proof against a REAL compiler-mismatch, chaining the actual
-  // compiler's refusal through resolveFallback and into assess.
-  const cfg = {
-    modelPolicies: { claude: { nano: 'claude-haiku', standard: 'claude-sonnet', advanced: 'claude-sonnet', flagship: 'claude-opus', frontier: 'claude-opus' } },
-    executors: { claude: { command: 'claude', args: [] } },
-  };
-  const assignment = {
-    operation: 'review-item',
-    role: 'reviewer',
-    policy: { preferExecutor: 'claude', fallbackExecutors: ['ghost'] },
-    skills: [],
-  };
-  const originalPlan = compileDispatchPlan(cfg, { assignment });
-  const compilerMismatch = resolveFallback(originalPlan, 'ghost', {
-    compilePlan: (id) => compileDispatchPlan(cfg, { assignment, cliOverride: { preferExecutor: id } }),
-  });
-  assert.equal(compilerMismatch.status, 'compiler-mismatch');
-  assert.equal(assess(compilerMismatch, 'post-delivery', {}, { outcome: 'enforced' }), 'effect-unknown');
 });
 
 // ─── pre-delivery: allowed today, unconditionally ───

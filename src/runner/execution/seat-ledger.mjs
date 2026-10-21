@@ -20,8 +20,22 @@
  */
 export function createSeatLedger() {
   const executorsBySeat = new Map();
+  // Which seats must differ from a seat (those that listed it in `independentOf`): independence is symmetric,
+  // so a seat that binds again (a rebind after a lease conflict, a later round) is held to the seats that
+  // depend on it as well.
+  const dependentsBySeat = new Map();
   let tail = Promise.resolve();
   return {
+    noteDependence(seat, independentOfIds) {
+      for (const id of independentOfIds ?? []) {
+        if (!dependentsBySeat.has(id)) dependentsBySeat.set(id, new Set());
+        dependentsBySeat.get(id).add(seat);
+      }
+    },
+    /** The executors of every seat bound earlier that must differ from `seat`. */
+    dependentExecutors(seat) {
+      return [...(dependentsBySeat.get(seat) ?? [])].flatMap((dependent) => [...(executorsBySeat.get(dependent) ?? [])]);
+    },
     note(seat, executorId) {
       if (!executorId) return;
       if (!executorsBySeat.has(seat)) executorsBySeat.set(seat, new Set());

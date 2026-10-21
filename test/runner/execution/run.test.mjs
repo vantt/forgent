@@ -11,7 +11,8 @@ import { execFileSync } from 'node:child_process';
 import { resolveSeats } from '../../../src/runner/execution/seat-resolver.mjs';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { runUnit as coreRunUnit, recordInlineRun, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
-import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError, loadRunnerConfigFromDir } from '../../../src/runner/dispatch/config.mjs';
+import { seatConfigDigestOf } from '../../../src/runner/execution/seat-policy.mjs';
 import { writeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 import { installCancelOnSignal, resetCancelRequest } from '../../../src/run-supervisor/cancel-registry.mjs';
@@ -399,21 +400,28 @@ async function mutatingGateFixture({ writeUnitJson = true, corrupt = false, twoC
   const unitRunId = 'unit-run-gate-' + Math.random().toString(36).slice(2, 8);
   const unitDir = path.join(repoRoot, '.fgos', 'assignments', unitRunId);
   fs.mkdirSync(unitDir, { recursive: true });
-  const record = {
-    unit: { id: 'u-gate', objective: 'Gate probe', capability: 'docs:write', writes: ['file.txt'] },
-    overrides: [],
-    configSnapshot: snapshotRunnerConfig(repoRoot),
-    worktree: fs.realpathSync(worktreeDir),
-  };
   if (twoCandidates) {
-    // A second executor behind the first, so a fallback walk has somewhere to go.
-    const runner = record.configSnapshot.runner;
+    // A second executor behind the first, so a fallback walk has somewhere to go. The replay reads the
+    // committed config, so the second executor is committed to the project config.
+    const file = path.join(repoRoot, '.fgos', 'config.json');
+    const committed = JSON.parse(fs.readFileSync(file, 'utf8'));
+    const runner = committed.runner;
     runner.executors['test-node-2'] = { ...runner.executors['test-node'], providerModel: 'node2' };
     runner.capabilities['docs:write'].prefer = [{ executor: 'test-node' }, { executor: 'test-node-2' }];
     runner.modelPolicies.node2 = runner.modelPolicies.node;
+    fs.writeFileSync(file, JSON.stringify(committed, null, 2));
   }
-  if (attempts) record.bindings = { 'producer/1': attempts(unitRunId) };
-  if (bindings) record.bindings = bindings(unitRunId);
+  const record = {
+    unit: { id: 'u-gate', objective: 'Gate probe', capability: 'docs:write', writes: ['file.txt'] },
+    overrides: [],
+    // Taking the snapshot fills in the config's missing defaults, so the digest is read after it.
+    configSnapshot: snapshotRunnerConfig(repoRoot),
+    worktree: fs.realpathSync(worktreeDir),
+  };
+  // What a bind records: the digest of the seat config it was bound under.
+  const configDigest = seatConfigDigestOf(loadRunnerConfigFromDir(repoRoot)).digest;
+  if (attempts) record.bindings = { 'producer/1': attempts(unitRunId, configDigest) };
+  if (bindings) record.bindings = bindings(unitRunId, configDigest);
   if (writeUnitJson) {
     fs.writeFileSync(path.join(unitDir, 'unit.json'), corrupt ? '{not json' : JSON.stringify(record, null, 2));
   }
@@ -429,7 +437,7 @@ async function mutatingGateFixture({ writeUnitJson = true, corrupt = false, twoC
     writes: ['file.txt'],
   };
   const run = (assignment) => executeAssignment(assignment, { cwd: worktreeDir, repoRoot, isReadOnlyMode: false });
-  return { baseAssignment, run, record };
+  return { baseAssignment, run, record, repoRoot, configDigest };
 }
 
 test('mutating gate: refuses a unit-run assignment whose unit.json is missing', async () => {
@@ -447,14 +455,25 @@ test('mutating gate: refuses a unit-run assignment that carries no binding', asy
   await assert.rejects(() => run(baseAssignment), /carries no binding/);
 });
 
+// What bind() records for each fixture executor: its own family is its pool, its cell's model, and the digest of
+// the seat config it was bound under.
+const gateBinding = (executor, configDigest) => ({ executor, invocation: 'cli-default', pool: executor === 'test-node' ? 'node' : 'node2', model: 'node-std', bindingInput: { configDigest } });
+const gateAttempt = (unitRunId, n, executor, outcome, configDigest) => ({
+  role: 'producer',
+  round: 1,
+  assignmentId: n === 0 ? `${unitRunId}/producer/1` : `${unitRunId}/producer/1-fb${n}`,
+  binding: gateBinding(executor, configDigest),
+  ...(outcome ? { outcome } : {}),
+});
+
 test('mutating gate: refuses a binding that differs from the one bind() recomputes', async () => {
-  const { baseAssignment, run } = await mutatingGateFixture();
+  const { baseAssignment, run } = await mutatingGateFixture({ attempts: (id, digest) => [gateAttempt(id, 0, 'test-node', undefined, digest)] });
   const forged = { ...baseAssignment, binding: { executor: 'some-other-executor', tier: 'standard', posture: 'write' } };
   await assert.rejects(() => run(forged), /binding mismatch/);
 });
 
 test('mutating gate: refuses an assignment that pins an executor other than the verified binding', async () => {
-  const { baseAssignment, run, record } = await mutatingGateFixture();
+  const { baseAssignment, run, record } = await mutatingGateFixture({ attempts: (id, digest) => [gateAttempt(id, 0, 'test-node', undefined, digest)] });
   const { bind } = await import('../../../src/runner/execution/bind.mjs');
   const verified = bind(
     { unit: record.unit, role: 'producer', readOnly: false, overrides: [] },
@@ -469,21 +488,47 @@ test('mutating gate: refuses an assignment that pins an executor other than the 
   await assert.rejects(() => run(pinned), /pins executor "rogue-executor"/);
 });
 
-// What bind() records for each fixture executor: its own family is its pool, and its cell's model.
-const gateBinding = (executor) => ({ executor, invocation: 'cli-default', pool: executor === 'test-node' ? 'node' : 'node2', model: 'node-std' });
-const gateAttempt = (unitRunId, n, executor, outcome) => ({
-  role: 'producer',
-  round: 1,
-  assignmentId: n === 0 ? `${unitRunId}/producer/1` : `${unitRunId}/producer/1-fb${n}`,
-  binding: gateBinding(executor),
-  ...(outcome ? { outcome } : {}),
+test('mutating gate: an assignment whose attempt the runner never recorded has no binding input to replay', async () => {
+  const { baseAssignment, run } = await mutatingGateFixture();
+  const forged = { ...baseAssignment, binding: { executor: 'test-node', tier: 'standard', posture: 'workspace-write' } };
+  await assert.rejects(() => run(forged), (err) => err.code === 'binding-replay-snapshot-missing');
+});
+
+test('mutating gate: a config committed after the bind refuses the write, whatever copy of the config unit.json holds', async () => {
+  const { baseAssignment, run, record, repoRoot, configDigest } = await mutatingGateFixture({ attempts: (id, digest) => [gateAttempt(id, 0, 'test-node', undefined, digest)] });
+  const verified = (await import('../../../src/runner/execution/bind.mjs')).bind(
+    { unit: record.unit, role: 'producer', readOnly: false, overrides: [] },
+    { runnerConfig: loadRunnerConfigFromDir(repoRoot), session: {} },
+  );
+  const assignment = { ...baseAssignment, binding: { executor: verified.executor, pool: verified.pool, tier: verified.tier, posture: verified.posture } };
+  // The snapshot kept in unit.json still carries the config the seat was bound under; the committed one moved on.
+  const file = path.join(repoRoot, '.fgos', 'config.json');
+  const committed = JSON.parse(fs.readFileSync(file, 'utf8'));
+  committed.runner.defaults.tier = 'advanced';
+  committed.runner.modelPolicies.node.advanced = 'node-adv';
+  fs.writeFileSync(file, JSON.stringify(committed, null, 2));
+  assert.notEqual(seatConfigDigestOf(loadRunnerConfigFromDir(repoRoot)).digest, configDigest);
+  await assert.rejects(() => run(assignment), (err) => err.code === 'binding-replay-config-mismatch');
+});
+
+test('mutating gate: a recorded bindingInput that carries a config copy of its own is ignored; only its digest is read', async () => {
+  const { baseAssignment, run, record, repoRoot } = await mutatingGateFixture({
+    attempts: (id, digest) => [{ ...gateAttempt(id, 0, 'test-node', undefined, digest), binding: { ...gateBinding('test-node', digest), bindingInput: { configDigest: digest, config: { modelPolicies: { node: { standard: 'forged-model' } } } } } }],
+  });
+  const verified = (await import('../../../src/runner/execution/bind.mjs')).bind(
+    { unit: record.unit, role: 'producer', readOnly: false, overrides: [] },
+    { runnerConfig: loadRunnerConfigFromDir(repoRoot), session: {} },
+  );
+  const assignment = { ...baseAssignment, binding: { executor: verified.executor, pool: verified.pool, tier: verified.tier, posture: verified.posture } };
+  // Reaches the point after the gate: the executable it would spawn is not the point of this test.
+  await run(assignment).catch((err) => { assert.doesNotMatch(String(err.message), /binding (mismatch|input)|different seat config/); });
 });
 
 test('mutating gate: a fallback attempt must follow a provider-limit attempt the runner recorded', async () => {
   // Attempt 0 settled as a pass, yet the assignment claims the second candidate.
   const { baseAssignment, run } = await mutatingGateFixture({
     twoCandidates: true,
-    attempts: (id) => [gateAttempt(id, 0, 'test-node', 'pass'), gateAttempt(id, 1, 'test-node-2')],
+    attempts: (id, digest) => [gateAttempt(id, 0, 'test-node', 'pass', digest), gateAttempt(id, 1, 'test-node-2', undefined, digest)],
   });
   const forged = { ...baseAssignment, assignmentId: `${baseAssignment.unitRunId}/producer/1-fb1`, binding: { executor: 'test-node-2', tier: 'standard', posture: 'workspace-write' } };
   await assert.rejects(() => run(forged), /binding mismatch/);
@@ -492,38 +537,38 @@ test('mutating gate: a fallback attempt must follow a provider-limit attempt the
 test('mutating gate: an assignment the runner never recorded cannot claim a fallback binding', async () => {
   const { baseAssignment, run } = await mutatingGateFixture({
     twoCandidates: true,
-    attempts: (id) => [gateAttempt(id, 0, 'test-node', 'provider-limit')],
+    attempts: (id, digest) => [gateAttempt(id, 0, 'test-node', 'provider-limit', digest)],
   });
   const forged = { ...baseAssignment, assignmentId: `${baseAssignment.unitRunId}/producer/1-fb1`, binding: { executor: 'test-node-2', tier: 'standard', posture: 'workspace-write' } };
-  await assert.rejects(() => run(forged), /binding mismatch/);
+  await assert.rejects(() => run(forged), (err) => err.code === 'binding-replay-snapshot-missing');
 });
 
 test('mutating gate: a recorded fallback attempt cannot be rebound to the candidate that already hit its limit', async () => {
   const { baseAssignment, run } = await mutatingGateFixture({
     twoCandidates: true,
-    attempts: (id) => [gateAttempt(id, 0, 'test-node', 'provider-limit'), gateAttempt(id, 1, 'test-node-2')],
+    attempts: (id, digest) => [gateAttempt(id, 0, 'test-node', 'provider-limit', digest), gateAttempt(id, 1, 'test-node-2', undefined, digest)],
   });
   const replay = { ...baseAssignment, assignmentId: `${baseAssignment.unitRunId}/producer/1-fb1`, binding: { executor: 'test-node', tier: 'standard', posture: 'workspace-write' } };
   await assert.rejects(() => run(replay), /binding mismatch/);
 });
 
 test('mutating gate: a producer cannot borrow the fallback attempt of another role or round', async () => {
-  const other = (id, role, round) => [
-    { role, round, assignmentId: `${id}/${role}/${round}`, binding: gateBinding('test-node'), outcome: 'provider-limit' },
-    { role, round, assignmentId: `${id}/${role}/${round}-fb1`, binding: gateBinding('test-node-2') },
+  const other = (id, role, round, digest) => [
+    { role, round, assignmentId: `${id}/${role}/${round}`, binding: gateBinding('test-node', digest), outcome: 'provider-limit' },
+    { role, round, assignmentId: `${id}/${role}/${round}-fb1`, binding: gateBinding('test-node-2', digest) },
   ];
   const { baseAssignment, run } = await mutatingGateFixture({
     twoCandidates: true,
-    bindings: (id) => ({
-      'producer/1': [gateAttempt(id, 0, 'test-node', 'pass')],
-      'checker/1': other(id, 'checker', 1),
-      'producer/2': other(id, 'producer', 2),
+    bindings: (id, digest) => ({
+      'producer/1': [gateAttempt(id, 0, 'test-node', 'pass', digest)],
+      'checker/1': other(id, 'checker', 1, digest),
+      'producer/2': other(id, 'producer', 2, digest),
     }),
   });
   const claimed = { executor: 'test-node-2', tier: 'standard', posture: 'workspace-write' };
   for (const borrowed of ['checker/1-fb1', 'producer/2-fb1']) {
     const forged = { ...baseAssignment, assignmentId: `${baseAssignment.unitRunId}/${borrowed}`, binding: claimed };
-    await assert.rejects(() => run(forged), /binding mismatch/, borrowed);
+    await assert.rejects(() => run(forged), (err) => err.code === 'binding-replay-snapshot-missing', borrowed);
   }
 });
 

@@ -197,7 +197,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'runner-coordination-orgPolicy-shape',
       'runner-patterns-config',
       'runner-generated-paths',
-      'mutating-assignment-binding-snapshot',
       'shadow-binder-divergence',
       'tier-vocabulary-dead-keys',
       'model-policy-tier-coverage',

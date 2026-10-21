@@ -517,7 +517,6 @@ export async function settleRunOutcome({
   modelWarnings = [],
   providerCapacitySelection = null,
   providerCapacityEvidence = null,
-  fallbackEvidence = null,
   executionError = null,
   launchCommandId = null,
   receipt = null,
@@ -727,7 +726,6 @@ export async function settleRunOutcome({
     artifacts: workerArtifacts,
     tests: [],
     ...(providerCapacityFault ? { providerCapacity: providerCapacityFault } : {}),
-    ...(fallbackEvidence ? { fallback: fallbackEvidence } : {}),
   };
   fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
   const stdoutPath = path.join(runDir, 'stdout.log');

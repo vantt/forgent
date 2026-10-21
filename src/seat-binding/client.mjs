@@ -15,7 +15,7 @@
 
 import { spawnSync } from 'node:child_process';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
-import { stateLockHeld } from '../util/session-identity.mjs';
+import { stateLockHeld } from '../util/state-lock-held.mjs';
 import { OWN_PAYLOAD_ROOT, releasePayloadRoot, realpathOrNull } from '../run-supervisor/payload-root.mjs';
 import { routeEnv } from '../holder-lock/driver.mjs';
 

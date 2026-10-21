@@ -231,7 +231,6 @@ export async function settleAttempt({ runDir, envelope }) {
       modelWarnings: context.modelCheck ? collectModelWarnings(context.modelCheck, { stdout: stdoutText, stderr: stderrText }) : [],
       providerCapacitySelection: context.providerCapacitySelection ?? null,
       providerCapacityEvidence: context.providerCapacityEvidence ?? null,
-      fallbackEvidence: context.fallbackEvidence ?? null,
       opts: {
         cwd: envelope.cwd,
         repoRoot: context.repoRoot ?? envelope.cwd,

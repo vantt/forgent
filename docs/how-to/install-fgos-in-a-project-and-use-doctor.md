@@ -310,7 +310,6 @@ Mostly relevant after the project has real work items.
 
 | Id | Checks | Typical failing message | Who | Fix |
 |---|---|---|---|---|
-| `mutating-assignment-binding-snapshot` | Every mutating assignment result matches its unit snapshot | `error scanning assignments` or a mismatch | you | Report it; do not edit the assignment files |
 | `coordination-protocol-dead-vocabulary` | Coordination protocols and workflows do not use retired `minTier` / `minRigor` | names the file | you | Edit the named definition |
 | `task-specs-resolve` | Every domain's task spec and every core task spec resolves to a real file | `missing task-spec file(s): coding.operations.discovery[judge-ambiguity] -> ... not found` | you | Resolved against the fgOS install doctor runs from, not the project, so a plain project without fgOS's own `domains/` and `core/` trees passes. A failure means the installed release itself is incomplete: run `fgctl repair` |
 | `agent-claims-resolve` | Every agent type's claims name real task specs | names the unresolved claim | info | Same as above |

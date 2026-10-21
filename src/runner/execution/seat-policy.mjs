@@ -101,7 +101,8 @@ export function seatPolicy(ask, runnerConfig) {
  */
 export function seatBinding({ ask, runnerConfig, peers = [], walk = {}, accountView = { pools: {} }, launchView = { executors: {} } }) {
   const { config, digest } = seatConfigDigestOf(runnerConfig);
-  return bindSeat({ ask, config, configDigest: digest, peers, walk, accountView, launchView, now: Date.now() });
+  const accountViewDigest = `sha256:${crypto.createHash('sha256').update(canonicalJson(accountView)).digest('hex')}`;
+  return bindSeat({ ask, config, configDigest: digest, peers, walk, accountView, accountViewDigest, launchView, now: Date.now() });
 }
 
 /** For tests: forget every cached answer. */

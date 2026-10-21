@@ -256,6 +256,8 @@ test('fast path: uncontended acquire and release is not more than 10% slower tha
     }
     const url = (rel) => pathToFileURL(path.join(ROOT, rel)).href;
     oldSource = oldSource
+      // The lock-held counter now lives in its own module; the baseline file still names it in the identity import.
+      .replace("import { noteLockHeld, noteLockReleased, resolveWriterIdentity } from '../util/session-identity.mjs';", `import { resolveWriterIdentity } from '../util/session-identity.mjs';\nimport { noteLockHeld, noteLockReleased } from '${url('src/util/state-lock-held.mjs')}';`)
       .replace("from './work.mjs'", `from '${url('src/state/work.mjs')}'`)
       .replace("from '../util/session-identity.mjs'", `from '${url('src/util/session-identity.mjs')}'`)
       .replace("from '../util/unique-tmp-tag.mjs'", `from '${url('src/util/unique-tmp-tag.mjs')}'`);

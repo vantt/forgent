@@ -17,7 +17,7 @@ import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { expandWorkflowSeats, normalizeSeats, personaNameOf, seatedPanelUnits } from './seats.mjs';
 import { digestContextRefs, digestText } from './ref-digests.mjs';
 import { resolveAgentDefinition } from '../runner/agent-definitions.mjs';
-import { RunnerConfigError, assertReasoningEffort, parseRunTimeout, assertRunTimeoutMs } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError, assertReasoningEffort, ensureRunnerConfigForDir, parseRunTimeout, assertRunTimeoutMs } from '../runner/dispatch/config.mjs';
 import { providerAccountInventory } from '../runner/dispatch/provider-capacity.mjs';
 import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
 import { parseAccountPin } from '../runner/execution/account-pin.mjs';
@@ -229,7 +229,7 @@ function resolveStart(params) {
 export async function preflightWorkflowSeats(params = {}) {
   if (params.seats === undefined) return { warnings: [] };
   const { mainRoot, workflow } = resolveStart(params);
-  const runnerConfig = snapshotRunnerConfig(mainRoot).runner;
+  const runnerConfig = ensureRunnerConfigForDir(mainRoot);
   const session = { headless: true, herdrPresent: detectHerdrPresent() };
   const warnings = [];
   const refused = [];
@@ -276,11 +276,12 @@ export function prepareWorkflowRun(params) {
   const { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account } = resolveStart(params);
   // A frame flag that widens the guide's defaults refuses here, so it creates no run.
   const frame = resolveFrame(workflow.guide, params.frame);
-  const configSnapshot = snapshotRunnerConfig(mainRoot);
+  const liveConfig = ensureRunnerConfigForDir(mainRoot);
+  const configSnapshot = snapshotRunnerConfig(mainRoot, liveConfig);
   if (account !== null) {
     const pin = parseAccountPin(account);
     if (pin.refused) throw new RunnerConfigError(`--account: ${pin.refused.detail}`);
-    const accounts = providerAccountInventory(configSnapshot.runner)[legacyStateKey(pin.pool)]?.accounts;
+    const accounts = providerAccountInventory(liveConfig)[legacyStateKey(pin.pool)]?.accounts;
     if (!accounts || !Object.hasOwn(accounts, pin.id)) {
       throw new RunnerConfigError(`account "${account}" is not configured: pool "${pin.pool}" has no account "${pin.id}" in runner.llmAccounts`);
     }
