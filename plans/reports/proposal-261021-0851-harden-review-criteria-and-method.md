@@ -21,9 +21,9 @@
 
 ## 2. Tiêu chuẩn đánh giá: soát cái gì, coi gì là phát hiện
 
-### 2.1 Sáu trục soát
+### 2.1 Bảy trục soát
 
-Mỗi component được soát theo sáu trục, mỗi trục có câu hỏi kiểm được:
+Mỗi component được soát theo bảy trục, mỗi trục có câu hỏi kiểm được:
 
 | Trục | Câu hỏi | Bằng chứng chấp nhận |
 |---|---|---|
@@ -33,6 +33,12 @@ Mỗi component được soát theo sáu trục, mỗi trục có câu hỏi ki�
 | **D. Nhẹ** | Có gì thừa không: code chết, đường song song, file/route không ai dùng, test lặp? | `rg` hoặc GitNexus chỉ ra không có caller; danh sách cụ thể |
 | **E. Đơn giản, một cửa** | Một việc có bị làm nhiều cách không (ví dụ "liveness judged nine-plus ways" ở audit 09-28)? Có lớp trung gian thừa không? Lớp dưới có biết lớp trên không? | Danh sách các nơi làm cùng một việc; vi phạm layering (`test/architecture.test.mjs`) |
 | **F. Contract rõ** | API, signature, mã lỗi có tường minh, dễ dùng không? Mã lỗi có tên, có nói bước tiếp không? Spec và code có khớp không? | Đối chiếu spec với code; mã lỗi không tên hay bị nuốt |
+
+Thêm trục thứ bảy (owner 10:01):
+
+| Trục | Câu hỏi | Bằng chứng chấp nhận |
+|---|---|---|
+| **G. Bề mặt cho agent (agent-native, agent-friendly)** | Agent dùng component này có dễ không? Có output máy đọc được (`--json`) không? Mã lỗi có tên và nói bước tiếp không? Có không cần tương tác (không prompt) không? Có idempotent, có `explain`/dry-run không? Help và instruction có tìm được, rõ, nhẹ token, không trùng và không mâu thuẫn không? | Chạy thử như một agent không có lịch sử chat (L5); đo token của instruction và help mà agent phải đọc; liệt kê chỗ trùng hoặc mâu thuẫn giữa AGENTS.md, skill, help và spec |
 
 ### 2.2 Mức độ
 
@@ -54,15 +60,16 @@ Học từ audit 09-28 và hội đồng 10-15:
 
 ## 3. Tiêu chuẩn cải thiện: một thay đổi phải qua những cổng nào
 
-Mọi thay đổi do HARDEN đề ra phải qua cả bảy cổng sau thì mới được merge:
+Mọi thay đổi do HARDEN đề ra phải qua cả tám cổng sau thì mới được merge:
 
 1. **Tốt hơn đo được:** có bảng trước/sau trên ít nhất một trục A–F. Ví dụ: test đỏ chuyển xanh, p95 giảm, số dòng hoặc số đường giảm, số nơi cùng làm một việc giảm.
 2. **Không to hơn:** không thêm tính năng, lớp hay cơ chế mới. Số dòng thực của component nên ≤ 0; nếu tăng thì phải nêu lý do.
 3. **Đổi contract thì đổi trọn (L10):** chuyển mọi caller và xoá đường cũ trong cùng đợt. Không để alias, không giữ đường song song.
 4. **Một bằng chứng (nguyên tắc 8):** mỗi hành vi có đúng một test chủ ở tầng thấp nhất. Gỡ cơ chế nào thì gỡ test của nó và ghi rõ test nào giờ sở hữu hành vi đó. Không làm yếu test.
 5. **Không lùi hiệu năng:** p95 của các route đã có ngân sách (identity mint, lock, seat-binding) không được tăng quá nhiễu đo.
-6. **Spec đi cùng code:** sự thật thay đổi thì sửa spec của area trong cùng commit.
-7. **Ý tưởng thêm để riêng:** mọi đề xuất thêm tính năng gom vào một mục riêng của báo cáo. Mỗi ý ghi vấn đề thật, bằng chứng, lợi ích, và chỉ làm khi owner chọn.
+6. **Hướng dẫn cho agent rõ, nhẹ, không trùng** (owner 10:01): instruction, skill, help và thông báo lỗi mà agent đọc phải tường minh, dùng ít token nhất có thể, không lặp lại cùng một luật ở nhiều chỗ và không mâu thuẫn nhau. Đổi hành vi thì sửa luôn hướng dẫn trong cùng đợt; hướng dẫn thừa hoặc trùng thì gỡ.
+7. **Spec đi cùng code:** sự thật thay đổi thì sửa spec của area trong cùng commit.
+8. **Ý tưởng thêm để riêng:** mọi đề xuất thêm tính năng gom vào một mục riêng của báo cáo. Mỗi ý ghi vấn đề thật, bằng chứng, lợi ích, và chỉ làm khi owner chọn.
 
 ## 4. Phương pháp làm việc (rev 2, theo owner 09:12)
 
@@ -78,11 +85,12 @@ Thứ tự lấy từ phụ thuộc crate thật (`packages/*/rust/Cargo.toml`) 
 | **T1** | **Holder-lock** (L1), **Session Identity**, **Convention** | process, host-runtime | `src/state/hot-lock.mjs`, `src/util/session-identity.mjs`, `src/convention` |
 | **T2** | **Git**, **Terminal-control** (L2) | holder-lock, process, durable-file | `src/git/*` (13 file), `src/terminal-control/client.mjs` |
 | **T3** | **Agent protocol** (L3), **Event Store** (khi ES xong phần store) | git, holder-lock, canonical-json | `src/state/events*.mjs`, `legacy-event-git-adapter.mjs` |
-| **T4 (kết thúc)** | **Run Supervisor + Launch gate** (L4) | mọi tầng dưới | `src/run-supervisor/*` (15 file), phần giám sát attempt trong `src/runner/dispatch` |
+| **T4** | **Run Supervisor + Launch gate** (L4) | mọi tầng dưới | `src/run-supervisor/*` (15 file), phần giám sát attempt trong `src/runner/dispatch` |
+| **T5 (kết thúc)** | **Execution Core** (Unit, `runUnit`, `bind()`, Pattern), **Dispatch Transport & Confinement**, **Seat Binding** (khi tới nơi thì SEAT đã land), **Run Result Evaluator** (`fgos-run-result`) | run supervisor, terminal-control, agent-protocol, observe | `src/runner/dispatch` (28 579 dòng, 64 file — khối Node lớn nhất; audit 09-28 thấy 5 binder "shadow" và hơn 9 nơi phán liveness), `src/runner/execution` (5 162 dòng) |
 
 - **Component khởi đầu:** Process Facts & Control (cùng ba crate lá).
-- **Component kết thúc:** Run Supervisor + Launch gate.
-- **Ngoài plan này** (tầng trên, có plan riêng): Observe, run-result, work-state, Seat Binding, Mailbox, Workflow, Execution Core.
+- **Component kết thúc:** Execution Core (kèm Dispatch Transport & Confinement, Seat Binding, Run Result Evaluator). Observe (`fgos-observe`, dựa trên git, holder-lock, identity) soát ở T3.
+- **Ngoài plan này** (tầng trên T5, plan riêng khi tới): Workflow (guide + case), Work Lifecycle (luồng WORK đang giữ), Agent Mailbox (chưa xây), Host & Surface (CLI `bin/fgos.mjs`, gateway, herdr-dashboard), Packaging-Distribution (`fgctl`, setup, doctor; `src/setup` 13 846 dòng). Lý do dừng ở T5: tầng trên đang thiết kế lại (Workflow, Work) hoặc chưa xây (Mailbox); soát chúng lúc này dễ phải làm lại.
 
 ### 4.2 Mỗi tầng là một vòng khép kín
 
@@ -93,7 +101,7 @@ Thứ tự lấy từ phụ thuộc crate thật (`packages/*/rust/Cargo.toml`) 
    - đơn giản và contract;
    - red-team, khác family với các ghế kia.
 
-   Hội đồng soát theo sáu trục ở mục 2 và đánh giá chuyển Rust theo mục 4.3.
+   Hội đồng soát theo bảy trục ở mục 2 và đánh giá chuyển Rust theo mục 4.3.
 3. **Big lead phân xử và viết plan của tầng** (`ak-plan`, có red-team và validate). Các đề xuất thêm tính năng để riêng cho owner chọn.
 4. **Thực hiện:** mỗi lead Sonnet một worktree; chạy song song khi các lead sửa file khác nhau.
 5. **Verify độc lập** theo 4.5, rồi merge vào main.
@@ -105,7 +113,7 @@ Thứ tự lấy từ phụ thuộc crate thật (`packages/*/rust/Cargo.toml`) 
 
    **Tầng dưới chưa đóng thì không mở hội đồng của tầng trên.**
 
-**Land.** Mỗi tầng lên main ngay khi đóng. Việc activate ba workspace thì đề xuất gộp theo mốc (sau T1, sau T3, sau T4), để không phải dừng toàn bộ năm lần.
+**Land:** theo từng tầng (owner 10:01): mỗi tầng đóng thì lên main, build release, activate ba workspace, doctor, smoke, đo lại.
 
 ### 4.3 Đánh giá chuyển Node sang Rust ở mỗi tầng
 
@@ -115,7 +123,8 @@ Thứ tự lấy từ phụ thuộc crate thật (`packages/*/rust/Cargo.toml`) 
   - Nó là primitive dùng chung cho cả hệ thống.
 
   **Không chuyển** phần Node chỉ là adapter mỏng (gọi route, định dạng output), hay là logic của tầng trên.
-- **Trình tự:** chỉ chuyển trong tầng đang soát, và chỉ sau khi đã sửa xong lỗi của tầng đó. Tầng trên chỉ dựa vào tầng dưới sau khi tầng dưới đã chuyển xong.
+- **Ưu tiên tầng thấp, đưa trọn về Rust** (owner 10:01): foundation nửa Node nửa Rust thì mất ổn định. Mục tiêu của T0–T4 là **không còn logic quyết định nào ở Node**; Node chỉ còn client mỏng gọi route. Chấp nhận chi phí chuyển (kể cả phần chuyển không làm gọn ngay) cho các tầng này. Từ T5 trở lên mới áp tiêu chí "lợi ích gọn / công chuyển".
+- **Trình tự:** chỉ chuyển trong tầng đang soát, sau khi đã sửa xong lỗi của tầng đó; tầng dưới chuyển trọn rồi tầng trên mới dựa vào.
 - **Cách làm**, theo mẫu đã chạy được ở identity, convention và seat-binding:
   - Rust giữ quyết định.
   - Node thành client mỏng gọi route `fgos internal …`, fail closed, không có fallback JS.
@@ -185,6 +194,7 @@ Còn lại big lead tự quyết trong khung đã duyệt rồi báo.
   - truy lịch sử: test tăng ở đâu, vì quy trình nào, so với số đã xoá.
 
   Kết quả là danh sách nguyên nhân có số liệu, và một đề xuất sửa **quy trình tạo test** để nó không phình lại (ví dụ: cổng trong cook/lead brief bắt phải tìm test chủ và gỡ test của cơ chế bị thay).
+- **Rà tổng quát chỉ làm một lần ở T0** (owner 10:01: đã rà tổng nhiều lần mà vẫn chưa ổn). **Rà từng tầng phải sâu và nghiêm túc hơn:** đọc từng dòng của crate và mặt tiền Node của tầng, mỗi phát hiện quan trọng có test tái hiện đỏ-trước, red-team đi tìm phần bị bỏ sót, không đóng tầng khi còn phát hiện chưa tái hiện ở mức High trở lên.
 - **Ở mỗi tầng:** soát test của chính component đó:
   - dời test xuống tầng thấp nhất chứng minh được;
   - gỡ test lặp giữa Rust và Node, và test của cơ chế đã xoá;
@@ -201,12 +211,11 @@ Còn lại big lead tự quyết trong khung đã duyệt rồi báo.
 - **Làm sau:** chỗ phải viết logic mới trong Rust.
 - **Không làm:** chỗ chuyển xong không làm gọn hơn.
 
-Mỗi lần chuyển đều phải qua bảy cổng của mục 3.
+Mỗi lần chuyển đều phải qua tám cổng của mục 3.
 
 ## 5. Owner quyết
 
-1. Thứ tự tầng T0 → T4: khởi đầu ở **Process Facts & Control**, kết thúc ở **Run Supervisor + Launch gate**. Đặt Git cùng Terminal-control ở T2, Event Store ở T3: anh duyệt hay sửa?
-2. Sáu trục, thang mức độ, bảy cổng (mục 2–3) và tiêu chí chuyển Rust (mục 4.3): duyệt, sửa hay thêm?
-3. Land gộp theo mốc (sau T1, sau T3, sau T4), hay land sau từng tầng?
-4. Hội đồng bốn ghế: có giới hạn ngân sách model không?
-5. Điều tra test chậm/thừa: làm một lần ở T0 cho toàn hệ, rồi soát test theo từng tầng; luồng TEST giữ luật chung và công cụ đo. Anh duyệt cách chia này chứ?
+Đã quyết 10:01: chuyển Rust ưu tiên tầng thấp, đưa trọn về Rust, chấp nhận chi phí; land theo từng tầng; không giới hạn ngân sách model; điều tra test một lần ở T0, rà từng tầng sâu hơn; thêm trục G (bề mặt cho agent) và cổng 6 (hướng dẫn cho agent). Còn chờ:
+
+1. Thêm **T5 (kết thúc): Execution Core + Dispatch Transport & Confinement + Seat Binding + Run Result Evaluator**; dừng trước Workflow/Work/Mailbox/Surface/Packaging (đang thiết kế lại hoặc chưa xây). Anh duyệt?
+2. Duyệt toàn bộ đề xuất để em lập plan (`ak-plan`, red-team + validate) và mở T0?
