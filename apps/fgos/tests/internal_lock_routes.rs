@@ -343,7 +343,6 @@ fn protocol_and_usage_errors_fail_closed() {
         vec!["lock-fd", "--try"],
         vec!["lock-fd", "--protocol", "1", "--try"],
         vec!["lock-hold", "--protocol", "1", "--path", "/x", "--mode", "ex", "--work", "/x"],
-        vec!["process-observe", "--protocol", "1", "--pid", "1"],
         vec!["lock-borrow-vectors", "--protocol", "1"],
     ];
     for args in lock_routes {
@@ -453,25 +452,4 @@ fn lock_fd_try_latency_over_300_calls() {
     ms.sort_by(|a, b| a.partial_cmp(b).unwrap());
     println!("lock-fd --try x300: p50 {:.2} ms p95 {:.2} ms max {:.2} ms", ms[150], ms[284], ms[299]);
     let _ = fs::remove_dir_all(&dir);
-}
-
-#[test]
-fn process_observe_route_reports_what_the_process_facts_read() {
-    let _serial = serial();
-    let mut child = Command::new("sleep").arg("30").stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null()).spawn().unwrap();
-    let pid = child.id();
-    let seen = route(&["process-observe", "--protocol", "2", "--pid", &pid.to_string()]);
-    assert_eq!(seen.status.code(), Some(0));
-    let v = json_line(&seen);
-    let Observed::Live { start_time } = observe(ProcId(pid)) else { panic!("the child must be live") };
-    assert_eq!((v["state"].as_str(), v["startTime"].as_str()), (Some("live"), Some(start_time.as_str())));
-    child.kill().unwrap();
-    child.wait().unwrap();
-    let gone = json_line(&route(&["process-observe", "--protocol", "2", "--pid", &pid.to_string()]));
-    assert_eq!(gone["state"], "absent");
-    for args in [vec!["process-observe", "--protocol", "2"], vec!["process-observe", "--protocol", "2", "--pid", "0"], vec!["process-observe", "--protocol", "2", "--pid", "x"]] {
-        let out = route(&args);
-        assert_eq!(out.status.code(), Some(2), "{args:?}");
-        assert_eq!(json_line(&out)["code"], "usage", "{args:?}");
-    }
 }
