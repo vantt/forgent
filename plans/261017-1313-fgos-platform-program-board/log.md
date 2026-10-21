@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-21 21:30 (GIT/ES điều phối): ScopedCommit `git add`/`write-tree` chạy với `core.fsync=loose-object`; object rỗng/hỏng có sẵn được chữa hoặc từ chối `object-file-corrupt`; fixture E1 `pack-refs` fsync. Trace không quyền: scoped 48 → 0 vi phạm, publication 0. p95 ấm ~164 ms. Main ed45bb84c ([báo cáo](../reports/phase-lead-261021-2020-git-scoped-commit-empty-object-poisoning.md)). Chờ owner chạy lại E1.
+
 - 2026-10-21 20:20 (GIT/ES điều phối): E1 gốc (owner chạy, main 6048ab647) **violated**: Publication 2/1036 do fixture `pack-refs` không fsync (không phải sản phẩm); ScopedCommit 24/435 do blob của `git add` rỗng sau cắt điện. Đã tái hiện: `git add` không ghi lại object rỗng có sẵn → commit sau trỏ object hỏng = lỗi sản phẩm thật. Lead đang sửa; E1 chạy lại sau. Land hoãn tới khi E1 held.
 
 - 2026-10-21 18:50 (forgent-f8, TEST): **hai lô TEST lên main.** RS5 `4bb8058dc` (gỡ 5 test run-supervisor có chủ khác). Lô 2 tới `4ebf60748`: D1 (test chủ cho `sync --no-push`, gốc `porting/`, controller sống; xoá check rank JS trùng), H4 (`buildTestEnv` chặn mọi tiến trình test gọi `claude` thật — trước đó suite chạy `plugin marketplace add`/`plugin install` với HOME thật), H5 (`help-routes` 95 s → 14 s), H1 (dòng `suite:` về thay đổi, cảnh báo spawn CLI không lý do, `--cli-cost`, checklist `fgos-run` §4). Gate: npm 8777/0 fail, cargo 1221/0, coverage 0 nguồn mất. H2 chờ đo sau phase 3; H3 chờ H13. Đảo lại nếu suite trên máy owner thấy test nào cần `claude` thật: đặt `FGOS_CLAUDE_COMMAND` riêng trong test đó.
