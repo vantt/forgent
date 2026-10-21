@@ -66,6 +66,17 @@ SECTORS="$(blockdev --getsz "$DATA")"
 # sudo leaves HOME at root's; the owner's Git state, cargo and node need the owner's own.
 RUN_HOME="$(getent passwd "$RUN_AS" | cut -d: -f6)"
 as_user() { runuser -u "$RUN_AS" -- env HOME="$RUN_HOME" "$@"; }
+# A process the check started can still be closing files in the mount for a moment
+# after the check returns: retry, and record who held it the first time.
+release_mount() {
+  local i
+  for ((i = 0; i < 50; i++)); do
+    umount "$MNT" 2>/dev/null && return 0
+    [ "$i" -eq 0 ] && { echo "umount busy at entry ${cur:-?}:"; fuser -vm "$MNT" 2>&1 || true; } >> "$OUT/umount-busy.log"
+    sleep 0.2
+  done
+  umount "$MNT"
+}
 
 # Addon descriptor and host binary are built as the checkout's owner, outside the device.
 DESCRIPTOR="$(as_user "$NODE" "$CHECKOUT/scripts/git/e1-power-cut.mjs" descriptor --root "$OUT")"
@@ -115,7 +126,7 @@ run_kind() {
       else
         verdict="{\"acked\":$acked,\"violations\":$([ "$acked" -gt 0 ] && echo '["workload directory missing"]' || echo '[]')}"
       fi
-      umount "$MNT"
+      release_mount
     else
       verdict="{\"acked\":$acked,\"violations\":[\"mount failed: $(tr -d '"\n' < "$kout/mount.err")\"]}"
     fi
