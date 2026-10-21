@@ -213,13 +213,17 @@ test('checkAdmission does not flag a marker on the line immediately above the vi
   assert.deepEqual(checkAdmission(changed), []);
 });
 
+// Built from parts, so this file's own lines are not spawn sites for the rule they test.
+const SPAWN_SYNC = 'spawnSync';
+const SPAWN = 'spawn';
+
 test('checkAdmission flags a new CLI, host or fgctl spawn in a test unless the line or the one above gives a boundary reason', () => {
   const marked = '  // boundary: proves the exit code the shell sees';
   const changed = [
-    { file: 'test/cli/x.test.mjs', line: 3, text: "  const r = spawnSync(process.execPath, [FGOS, 'list'], { cwd });", prevText: null },
-    { file: 'test/cli/x.test.mjs', line: 7, text: "  spawnSync(process.execPath, [FGOS, 'list'], { cwd });", prevText: marked },
-    { file: 'test/rust-host/y.test.mjs', line: 9, text: "  spawn(FGCTL_BIN, ['init']);", prevText: null },
-    { file: 'test/cli/x.test.mjs', line: 12, text: "  spawnSync('git', ['status'], { cwd });", prevText: null },
+    { file: 'test/cli/x.test.mjs', line: 3, text: `  const r = ${SPAWN_SYNC}(process.execPath, [FGOS, 'list'], { cwd });`, prevText: null },
+    { file: 'test/cli/x.test.mjs', line: 7, text: `  ${SPAWN_SYNC}(process.execPath, [FGOS, 'list'], { cwd });`, prevText: marked },
+    { file: 'test/rust-host/y.test.mjs', line: 9, text: `  ${SPAWN}(FGCTL_BIN, ['init']);`, prevText: null },
+    { file: 'test/cli/x.test.mjs', line: 12, text: `  ${SPAWN_SYNC}('git', ['status'], { cwd });`, prevText: null },
   ];
   const violations = checkAdmission(changed);
   assert.deepEqual(violations.map((v) => [v.ruleId, v.line]), [['new-cli-spawn-without-reason', 3], ['new-cli-spawn-without-reason', 9]]);
@@ -234,8 +238,8 @@ test('suiteChange counts test() lines added and removed under test/ and the CLI 
     "+test('new title', () => {",
     "+test('another', () => {",
     "+  // boundary: the exit code",
-    "+  spawnSync(process.execPath, [FGOS, 'list']);",
-    "+  spawnSync(HOST_BIN, ['version']);",
+    `+  ${SPAWN_SYNC}(process.execPath, [FGOS, 'list']);`,
+    `+  ${SPAWN_SYNC}(HOST_BIN, ['version']);`,
   ].join('\n');
   assert.deepEqual(suiteChange({ baseRef: 'base', readPatch: () => patch }), { added: 2, removed: 1, spawns: 2, unexplained: 1 });
 });
