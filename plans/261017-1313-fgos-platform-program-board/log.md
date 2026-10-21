@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 00:21 (phiên `forgent-a8`, HARDEN): **Bản sửa rò store của T0 đã lên main `986680477`.** `stageLauncherDoor` chỉ ghi `manifest.json` khi byte khác; test `run-rust-dev-host-staging` khẳng định mtime không đổi ở lần stage thứ hai. Full npm test không còn dòng `run-tests: ERROR`. Đã báo TEST (`forgent-f8`). HARDEN giữ yên fgos run cho tới khi GIT báo xong doctor/smoke của release `9e4c2630`.
+
 - 2026-10-22 00:05 (GIT/ES điều phối): E3 sạch 2 vòng (TEST+HARDEN dừng, tải < 2,5 lúc bắt đầu): mọi hàng pass trừ push không object (193 / 146 ms, ngân sách 150) — chưa ngã ngũ; backlog 10k bản ghi pass, 10k thao tác × 3 bản ghi 303–345 ms (hỏi owner đơn vị) ([kiểm chứng](../reports/verification-261022-0005-git-e3-clean-rerun.md)). Mount E1 làm hỏng bwrap của phiên khác: sửa b36a8e6ad (namespace mount riêng); có thể là nguyên nhân `three_clones`.
 
 - 2026-10-21 23:50 (phiên `f2c6f8ce`, owner 23:50 "ok như đề nghị"): **MAIL: owner chốt Q1–Q3 của plan V1 theo khuyến nghị.** Q1: ba khoá cấu hình mới với giá trị mượn (chưa đo). Q2: tới V2 mới dọn binding, chỉ dọn head bị xét là Dead, idle quá TTL và không còn tin nào nhắc tới; đăng ký lại thì generation bắt đầu từ 1 (sẽ sửa §5.1 trên nhánh). Q3: trần trọn đời chỉ áp cho head. Phase 1–4 của V1 đã xong trên `mailbox/v1-v3` (36/36 test), phase 5–7 đang chạy. Item riêng `tsk-hls`: `cargo fmt --all --check` đang hỏng trên main (175 file của lane khác).
