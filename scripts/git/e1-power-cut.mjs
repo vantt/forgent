@@ -50,6 +50,9 @@ function prepare(root) {
   fs.mkdirSync(fence, { recursive: true });
   fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ at: 'e1 fixture', v: 1, lock: 'activation', by: 'fgos git' }) + '\n');
   fs.mkdirSync(state, { recursive: true, mode: 0o700 });
+  // The fixture predates every judged operation: `git init` does not fsync HEAD or config, and
+  // ext4 delays their data, so make the whole filesystem durable before the first write we judge.
+  execFileSync('sync', ['--file-system', root]);
   return { repo: fs.realpathSync(repo), state: fs.realpathSync(state), git };
 }
 function appendDurably(file, line) {
@@ -102,8 +105,9 @@ async function check(args) {
   const run = (argv) => { try { return { ok: true, out: git(argv, { stdio: ['ignore', 'pipe', 'pipe'] }) }; } catch (e) { return { ok: false, out: `${e.stdout ?? ''}${e.stderr ?? ''}` }; } };
   // Before the first acknowledgement the repository may be absent or half-initialised (its
   // creation is not an acknowledged operation); after it, it must be a readable repository.
-  if (!fs.existsSync(repo) || !run(['--git-dir', repo, 'rev-parse', '--git-dir']).ok) {
-    if (acked > 0) violations.push('repository missing or unreadable after acknowledged operations');
+  const opened = fs.existsSync(repo) ? run(['--git-dir', repo, 'rev-parse', '--git-dir']) : { ok: false, out: 'absent' };
+  if (!opened.ok) {
+    if (acked > 0) violations.push(`repository missing or unreadable after acknowledged operations: ${String(opened.out).trim().slice(0, 300)}`);
     return finish({ acked, violations });
   }
   const fsck = run(['--git-dir', repo, 'fsck', '--full', '--no-dangling']);
