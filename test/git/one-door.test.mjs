@@ -106,6 +106,7 @@ test('doctor refuses a census that lists a site, or whose files do not match the
     fs.writeFileSync(path.join(root, MUTATION_CENSUS_PATH), JSON.stringify(doc));
   };
   const built = census(scan({ root }));
+  assert.equal('outsideProduct' in built, false, 'the persisted census records the product only');
   assert.equal(verifyCensus(built, root).passed, false, 'a listed site fails the check');
   assert.match(verifyCensus(built, root).message, /bin\/status\.mjs:\d+ \(spawn\)/);
 
