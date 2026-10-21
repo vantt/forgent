@@ -11,7 +11,7 @@
 # Needs root, device-mapper (dm-log-writes, dm-snapshot) and xfstests' replay-log. Never run it on a
 # device that holds data: both devices are overwritten.
 #
-#   sudo scripts/git/e1-power-cut.sh --work /var/tmp/fgos-e1 [--ops 24] [--size-mib 256]
+#   sudo env "PATH=$PATH" scripts/git/e1-power-cut.sh --work /var/tmp/fgos-e1 [--ops 24] [--size-mib 256]
 #        [--data /dev/X --log /dev/Y] [--replay-log /path/to/replay-log] [--user $SUDO_USER]
 #
 # Without --data/--log it makes loop devices from files under --work, which must sit on the real
@@ -27,7 +27,7 @@ while [ $# -gt 0 ]; do
   esac
 done
 CHECKOUT="$(cd "$(dirname "$0")/../.." && pwd)"
-NODE="$(command -v node)"
+NODE="$(command -v node)" || { echo 'e1: node is not on PATH; run it as sudo env "PATH=$PATH" scripts/git/e1-power-cut.sh ...' >&2; exit 1; }
 die() { echo "e1: $*" >&2; exit 1; }
 [ "$(id -u)" = 0 ] || die "needs root (dm-log-writes, mount)"
 [ -n "$WORK" ] || die "--work <dir on the ext4 disk under test> is required"
