@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "8bbaa4a7c36410d69c1bc902500fd0cb90669691dd1c12b046566ae806cd57bb",
+  "payloadDigest": "4bf479886ad9018085473c40507147bffa8fc2d5d0021127de24a9fd82680821",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -835,7 +835,7 @@
     "src/setup/lock-record-checks.mjs": "08afa6351e5aa874f3fa45c57d81fc1f7266f47cf7f300005bd2e0a5de56c647",
     "src/setup/model-pool-checks.mjs": "9a5f4c2319d630932b4c1ef3bf97ba90c41a2147271725fa1c87e64b472b1ec1",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "78ff854a0f0a1399f7b4bcb85418b8c007fcb4cd1963dc824d9c2276fb3a6165",
+    "src/setup/registrations.mjs": "48318dfdf87e29122678e9cb04e4d239ab874097d7766d47986a0afc7af4d3a4",
     "src/setup/run-supervisor-checks.mjs": "4e8a05f500564f67fbfa7684cd71d160281c4cc345ec1bbecd74505994a9f1fb",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
     "src/setup/skill-wrappers.mjs": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
@@ -2856,14 +2856,14 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6376,
+      "line": 6220,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6627,
+      "line": 6471,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:121",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
