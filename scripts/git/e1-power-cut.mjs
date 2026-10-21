@@ -4,10 +4,17 @@
 // scripts/git/e1-power-cut.sh drives the root-only device part; this file is the unprivileged
 // half it calls:
 //
-//   node scripts/git/e1-power-cut.mjs workload --root <dir> --descriptor <file> --plan <file> [--ops N] [--handshake]
-//   node scripts/git/e1-power-cut.mjs check    --root <dir> --descriptor <file> --plan <file> --acked <n>
-//   node scripts/git/e1-power-cut.mjs trace    --root <fresh dir> [--ops N]     (strace; no root)
+//   node scripts/git/e1-power-cut.mjs workload --root <dir> --descriptor <file> --plan <file> [--kind publication|scoped] [--ops N] [--handshake]
+//   node scripts/git/e1-power-cut.mjs check    --root <dir> --descriptor <file> --plan <file> --acked <n> [--kind publication|scoped]
+//   node scripts/git/e1-power-cut.mjs trace    --root <fresh dir> [--kind publication|scoped] [--ops N] [--addon <.so> --host <fgos>]  (strace; no root)
 //   node scripts/git/e1-power-cut.mjs order    --trace <strace log>             (checks a trace)
+//
+// `--kind scoped` runs ScopedCommit instead of Publication: each operation commits a new file in a
+// new nested directory, so a blob, two trees and a commit are new loose objects every time. Its
+// check adds what only a scoped commit can lose: an acknowledged commit must be on the producer
+// branch with every tree and blob readable (`git fsck --full` reports an empty loose object).
+// `--addon`/`--host` stage a prebuilt addon and host instead of the checkout's build, to compare
+// two binaries on the same workload.
 //
 // The workload records every operation in --plan, which must live OUTSIDE the device under test:
 // an `intent` line before the CAS and an `ack` line after the receipt returns. With --handshake it
@@ -63,7 +70,64 @@ function readPlan(file) {
   return fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));
 }
 
+const SCOPED_REF = 'refs/heads/producer';
+/** One repository with a linked worktree under --root, the activation fence and the state root. */
+function layoutScoped(root) {
+  return { repo: path.join(root, 'scoped/repo'), linked: path.join(root, 'scoped/linked'), state: path.join(root, 'state') };
+}
+function prepareScoped(root) {
+  const { repo, linked, state } = layoutScoped(root);
+  fs.mkdirSync(path.dirname(repo), { recursive: true, mode: 0o700 });
+  const git = sandboxGit(root);
+  git(['init', '-q', '--initial-branch=trunk', repo]);
+  git(['-C', repo, 'config', 'user.name', IDENTITY.name]);
+  git(['-C', repo, 'config', 'user.email', IDENTITY.email]);
+  fs.writeFileSync(path.join(repo, 'base'), 'base\n');
+  git(['-C', repo, 'add', 'base']);
+  git(['-C', repo, 'commit', '-qm', 'base']);
+  git(['-C', repo, 'worktree', 'add', '-qb', 'producer', linked]);
+  const fence = path.join(repo, '.fgos/locks/activation.lock');
+  fs.mkdirSync(fence, { recursive: true });
+  fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ at: 'e1 fixture', v: 1, lock: 'activation', by: 'fgos git' }) + '\n');
+  fs.mkdirSync(state, { recursive: true, mode: 0o700 });
+  // Everything above is fixture, not a judged operation: make it durable first.
+  execFileSync('sync', ['--file-system', root]);
+  return { repo: fs.realpathSync(repo), linked: fs.realpathSync(linked), state: fs.realpathSync(state) };
+}
+async function scopedWorkload(args) {
+  const ops = Number(args.ops ?? 12);
+  const { repo, linked, state } = prepareScoped(path.resolve(args.root));
+  const { index, loader } = await loaders(args.descriptor);
+  const { acquireSync, createLockScope } = await import('../../src/holder-lock/index.mjs');
+  const lease = acquireSync(createLockScope(), 'dispatch-cwd', { fgosDir: path.join(repo, '.fgos'), cwd: linked });
+  if (lease.result !== 'acquired') throw new Error(`custody of ${linked}: ${lease.result}`);
+  const held = [lease.handle];
+  const port = index.createGitScopedCommit({ stateRoot: state, repoPath: linked, trustedMain: repo, writer: WRITER }, loader);
+  const input = args.handshake ? readline.createInterface({ input: process.stdin }) : null;
+  const lines = input ? input[Symbol.asyncIterator]() : null;
+  try {
+    for (let i = 0; i < ops; i++) {
+      const baseline = port.preflight({}, held);
+      // A fresh nested directory every operation: a new blob, two new trees and a new commit.
+      const file = `d${i}/n/f${i}`;
+      fs.mkdirSync(path.join(linked, path.dirname(file)), { recursive: true });
+      fs.writeFileSync(path.join(linked, file), `e1 payload ${i}\n`);
+      const id = `e1-${i}`;
+      appendDurably(args.plan, JSON.stringify({ kind: 'intent', i, id, ref: SCOPED_REF, expected: baseline.head, files: [file] }));
+      const receipt = port.commit({ operationId: id, baseline, request: { writes: [file], message: `e1 ${i}\n`, cutoverGrant: null } }, held);
+      if (receipt.status !== 'committed') throw new Error(`${id}: ${JSON.stringify(receipt)}`);
+      appendDurably(args.plan, JSON.stringify({ kind: 'ack', i, id, ref: SCOPED_REF, next: receipt.oid, files: receipt.files }));
+      if (lines) { process.stdout.write(`ack ${i}\n`); await lines.next(); }
+    }
+  } finally {
+    lease.handle.release();
+    // The open stdin reader would keep the process alive, and the root driver waits for its exit.
+    input?.close();
+  }
+}
+
 async function workload(args) {
+  if (args.kind === 'scoped') return scopedWorkload(args);
   const ops = Number(args.ops ?? 24);
   const { repo, state, git } = prepare(path.resolve(args.root));
   const { index, loader } = await loaders(args.descriptor);
@@ -98,9 +162,74 @@ async function workload(args) {
   input?.close();
 }
 
+/** Post-cut invariants of a scoped workload. Judged state is what was acknowledged: the producer
+ * branch holds the last acknowledged commit with every tree and blob readable, its WAL chain is
+ * terminal, and `git fsck --full` is clean. Git moves the branch inside `git commit`, before the
+ * receipt, so a commit after the last acknowledged one may sit on the branch with objects that are
+ * not durable yet; fsck errors that name only such unacknowledged objects are excused. */
+async function checkScoped(args) {
+  const root = path.resolve(args.root);
+  const { repo, state } = layoutScoped(root);
+  const gitDir = path.join(repo, '.git');
+  const acked = Number(args.acked);
+  const plan = readPlan(args.plan);
+  const violations = [];
+  const git = sandboxGit(root);
+  const run = (argv) => { try { return { ok: true, out: git(['--git-dir', gitDir, ...argv], { stdio: ['ignore', 'pipe', 'pipe'] }) }; } catch (e) { return { ok: false, out: `${e.stdout ?? ''}${e.stderr ?? ''}` }; } };
+  // The reader may drain a whole tree; discard it instead of buffering.
+  const runQuiet = (argv) => { try { git(['--git-dir', gitDir, ...argv], { stdio: ['ignore', 'ignore', 'pipe'] }); return { ok: true, out: '' }; } catch (e) { return { ok: false, out: `${e.stderr ?? ''}` }; } };
+  const opened = fs.existsSync(gitDir) ? run(['rev-parse', '--git-dir']) : { ok: false, out: 'absent' };
+  if (!opened.ok) {
+    if (acked > 0) violations.push(`repository missing or unreadable after acknowledged operations: ${String(opened.out).trim().slice(0, 300)}`);
+    return finish({ acked, violations });
+  }
+  const lastAck = plan.filter((p) => p.kind === 'ack' && p.i < acked).at(-1);
+  const tipShown = run(['rev-parse', '--verify', '-q', SCOPED_REF]);
+  const tip = tipShown.ok ? String(tipShown.out).trim() : null;
+  const floor = lastAck?.next ?? plan.find((p) => p.kind === 'intent' && p.i === 0)?.expected ?? null;
+  const ahead = Boolean(tip && floor && tip !== floor);
+  // Objects an acknowledgement promised: everything reachable from the last acknowledged commit.
+  let promised = new Set();
+  if (lastAck) {
+    if (!tip) violations.push(`${SCOPED_REF}: absent after acked ${lastAck.id} (${lastAck.next})`);
+    else if (!run(['merge-base', '--is-ancestor', lastAck.next, SCOPED_REF]).ok) violations.push(`${SCOPED_REF}: ${tip} does not contain acked ${lastAck.id} (${lastAck.next})`);
+    const listed = run(['rev-list', '--objects', lastAck.next]);
+    if (!listed.ok) violations.push(`acked ${lastAck.id}: objects not listable: ${String(listed.out).trim().slice(0, 300)}`);
+    else promised = new Set(String(listed.out).split('\n').map((l) => l.split(' ')[0]).filter(Boolean));
+    // Reading the archive opens every tree and blob of the acknowledged commit.
+    const read = runQuiet(['archive', '--format=tar', lastAck.next]);
+    if (!read.ok) violations.push(`acked ${lastAck.id}: tree not fully readable: ${read.out.trim().slice(0, 300)}`);
+  }
+  const fsck = run(['fsck', '--full', '--no-dangling']);
+  if (!fsck.ok) {
+    const named = (line) => [...line.matchAll(/\b([0-9a-f]{40}|[0-9a-f]{64})\b|objects\/([0-9a-f]{2})\/([0-9a-f]{38}|[0-9a-f]{62})/g)].map((m) => m[1] ?? `${m[2]}${m[3]}`);
+    const excused = (line) => { const oids = named(line); return ahead && oids.length > 0 && oids.every((oid) => !promised.has(oid)); };
+    const rest = String(fsck.out).split('\n').filter((l) => l.trim() && !excused(l));
+    if (rest.length) violations.push(`git fsck: ${rest.join('\n').trim().slice(0, 400)}`);
+  }
+  const { index, loader } = await loaders(args.descriptor);
+  let recovery;
+  try { recovery = index.createGitRecovery({ stateRoot: state, repoPath: repo, trustedMain: repo, writer: WRITER }, loader); } catch (e) {
+    violations.push(`WAL open: ${e.message.slice(0, 400)}`);
+    return finish({ acked, violations });
+  }
+  for (const p of plan.filter((q) => q.kind === 'ack' && q.i < acked)) {
+    try {
+      const seen = recovery.inspectOperation({ operationId: p.id });
+      if (JSON.stringify(seen).includes('"pending"')) violations.push(`${p.id}: acknowledged but pending in WAL`);
+    } catch (e) { violations.push(`${p.id}: ${e.message.slice(0, 300)}`); }
+  }
+  return finish({ acked, ahead, violations });
+  function finish(verdict) {
+    process.stdout.write(JSON.stringify(verdict) + '\n');
+    if (verdict.violations.length) process.exitCode = 1;
+  }
+}
+
 /** Post-cut invariants on a replayed image, given the acknowledgements that reached the log
  * before the cut. Prints one JSON verdict; exits 1 on any violation. */
 async function check(args) {
+  if (args.kind === 'scoped') return checkScoped(args);
   const root = path.resolve(args.root);
   const { repo, state } = layout(root);
   const acked = Number(args.acked);
@@ -210,10 +339,15 @@ const ok = (text) => /= 0$/.test(text) || /= 0 /.test(text);
  *     directory fsynced after it, and for record 0 the operations directory too;
  *  R2 the fan-out directory of the published commit fsynced before the `prepared` record;
  *  R3 the target ref's directory fsynced after Git's ref rename and before the outcome record;
- *  R4 no plain rename(2) ever installs a WAL record (rename overwrites). */
+ *  R4 no plain rename(2) ever installs a WAL record (rename overwrites);
+ *  for a ScopedCommit, whose `next` is only its baseline (R2 cannot see its objects), every loose object
+ *  created between its plan `intent` line and its outcome record:
+ *  R5 its fan-out directory and `objects/` fsynced after the object is linked and before the outcome;
+ *  R6 its file fsynced (under the temp name before the link, or its own name) before the outcome. */
 export function checkOrder(trace) {
   const list = calls(trace);
-  const writes = new Map(), installs = [], fsyncs = [], refRenames = [], violations = [];
+  const writes = new Map(), installs = [], fsyncs = [], refRenames = [], objectLinks = [], planIntents = [], violations = [];
+  const cwds = new Map();
   // fgos-git installs through `/proc/self/fd/<dirfd>/<name>`; resolve those from openat results.
   const fds = new Map();
   const real = (pid, p) => {
@@ -223,10 +357,18 @@ export function checkOrder(trace) {
     return dir ? dir + (m[2] ?? '') : p;
   };
   list.forEach(({ pid, text }, at) => {
+    const here = text.match(/AT_FDCWD<([^>]+)>/);
+    if (here) cwds.set(pid, here[1]);
     const o = text.match(/^openat\(.*\) = (\d+)<([^>]+)>$/);
     if (o) { fds.set(`${pid}:${o[1]}`, o[2]); fds.set(o[1], o[2]); }
     const w = text.match(/^(?:write|pwrite64)\(\d+<([^>]+)>, "(.*)", \d+/);
     if (w) writes.set(w[1], (writes.get(w[1]) ?? '') + w[2]);
+    if (w && path.basename(w[1]) === 'plan.jsonl' && w[2].includes('\\"kind\\":\\"intent\\"')) planIntents.push({ at, id: w[2].match(/\\"id\\":\\"([^"\\]+)\\"/)?.[1] });
+    const lk = text.match(/^link\("([^"]+)", "([^"]+)"\) = 0/);
+    if (lk) {
+      const from = path.resolve(cwds.get(pid) ?? '/', lk[1]), to = path.resolve(cwds.get(pid) ?? '/', lk[2]);
+      if (/\/objects\/[0-9a-f]{2}\/[0-9a-f]{38,62}$/.test(to)) objectLinks.push({ at, from, to });
+    }
     const f = text.match(/^f(?:data)?sync\(/);
     if (f && ok(text)) fsyncs.push({ at, path: fdPath(text) });
     const r2 = text.match(/^renameat2\(-?\w+<?([^>,]*)>?, "([^"]+)", -?\w+<?([^>,]*)>?, "([^"]+)", RENAME_NOREPLACE\)/);
@@ -261,8 +403,23 @@ export function checkOrder(trace) {
     const reference = intent?.body.match(/\\"resourceSet\\":\[\\"([^\\]+)\\"/)?.[1];
     const prepared = chain.find((r) => r.phase === 'prepared');
     const outcome = chain.find((r) => r.phase === 'outcome');
+    const scoped = /\\"ScopedCommit\\"/.test(intent?.body ?? '');
     const row = { op, records: chain.map((r) => r.phase), next: next ?? null };
-    if (prepared && next) {
+    if (scoped && outcome) {
+      const from = planIntents.find((p) => p.id === op)?.at ?? intent.at;
+      const made = objectLinks.filter((l) => l.at > from && l.at < outcome.at);
+      row.objects = made.length;
+      if (!made.length) violations.push(`R5 ${op}: no loose object linked between its plan intent and its outcome (trace incomplete)`);
+      for (const l of made) {
+        const oid = path.basename(path.dirname(l.to)) + path.basename(l.to);
+        const fanout = path.dirname(l.to), objects = path.dirname(fanout);
+        if (!fsyncedAfter(fanout, l.at, outcome.at) || !fsyncedAfter(objects, l.at, outcome.at)) violations.push(`R5 ${op}: ${oid.slice(0, 12)} fan-out directory or objects/ not fsynced between its link and the outcome`);
+        // A temp file keeps its fsync under its own name; a file synced afterwards, under its final one.
+        const synced = fsyncs.some((x) => x.at < outcome.at && (x.path === l.to || x.path === l.from || (path.basename(l.from).startsWith('tmp_obj_') && path.basename(x.path ?? '') === path.basename(l.from))));
+        if (!synced) violations.push(`R6 ${op}: loose object ${oid.slice(0, 12)} file not fsynced before the outcome`);
+      }
+    }
+    if (prepared && next && !scoped) {
       const fan = fsyncs.find((s) => s.at < prepared.at && s.path?.endsWith(`/objects/${next.slice(0, 2)}`));
       row.fanoutFsynced = Boolean(fan);
       if (!fan) violations.push(`R2 ${op}: objects/${next.slice(0, 2)} not fsynced before prepared`);
@@ -282,22 +439,40 @@ async function traceMode(args) {
   const root = path.resolve(args.root);
   if (fs.existsSync(root) && fs.readdirSync(root).length) throw new Error(`root must be fresh: ${root}`);
   fs.mkdirSync(root, { recursive: true, mode: 0o700 });
-  const descriptor = args.descriptor ?? await stageDescriptor(root);
+  const descriptor = args.descriptor ?? await stageDescriptor(root, { ...args, cleanup: true });
   const out = path.join(root, 'e1.strace');
   const plan = path.join(root, 'plan.jsonl');
   execFileSync('strace', ['-f', '-qq', '-yy', '-s', '4096', '-e', 'trace=write,pwrite64,fsync,fdatasync,rename,renameat,renameat2,link,linkat,openat,mkdir,mkdirat', '-o', out,
-    process.execPath, SELF, 'workload', '--root', path.join(root, 'device'), '--descriptor', descriptor, '--plan', plan, '--ops', String(args.ops ?? 12)], { stdio: 'inherit' });
+    process.execPath, SELF, 'workload', '--root', path.join(root, 'device'), '--descriptor', descriptor, '--plan', plan, '--kind', args.kind ?? 'publication', '--ops', String(args.ops ?? 12)], { stdio: 'inherit' });
   const verdict = checkOrder(fs.readFileSync(out, 'utf8'));
   verdict.trace = out;
   verdict.filesystem = execFileSync('findmnt', ['-T', root, '-n', '-o', 'FSTYPE'], { encoding: 'utf8' }).trim();
   process.stdout.write(JSON.stringify(verdict, null, 2) + '\n');
   if (verdict.violations.length) process.exitCode = 1;
 }
-/** A descriptor for the checkout's built addon (scripts/git-addon.mjs builds it). */
-async function stageDescriptor(root) {
+/** A descriptor for the checkout's built addon (scripts/git-addon.mjs builds it), or for the
+ * prebuilt `--addon` and `--host` binaries, staged beside it and exported to the workload. */
+async function stageDescriptor(root, args = {}) {
+  const file = path.join(root, 'addon-descriptor.json');
+  if (args.addon) {
+    if (!args.host) throw new Error('--addon needs --host');
+    const { devHostManifest } = await import('../lib/dev-host-manifest.mjs');
+    // A release manifest names its files relative to the release root, so stage inside the checkout.
+    const staging = path.join(CHECKOUT, '.fgos/runtime/tmp', `e1-addon-${process.pid}`);
+    fs.mkdirSync(staging, { recursive: true, mode: 0o700 });
+    if (args.cleanup) process.on('exit', () => fs.rmSync(staging, { recursive: true, force: true }));
+    const addon = path.join(staging, 'fgos.node'), host = path.join(staging, 'fgos');
+    fs.copyFileSync(args.addon, addon); fs.chmodSync(addon, 0o644);
+    fs.copyFileSync(args.host, host); fs.chmodSync(host, 0o755);
+    const manifest = devHostManifest({ checkoutRoot: CHECKOUT, fgosBin: host, addonFile: addon });
+    const manifestFile = path.join(staging, 'manifest.json');
+    fs.writeFileSync(manifestFile, JSON.stringify(manifest));
+    Object.assign(process.env, { FGOS_HOST_BIN: host, FGOS_ACTIVE_RELEASE_PATH: CHECKOUT, FGOS_ACTIVE_MANIFEST_PATH: manifestFile });
+    fs.writeFileSync(file, JSON.stringify({ manifest, releaseRoot: CHECKOUT }));
+    return file;
+  }
   const { ensureGitAddon } = await import('../git-addon.mjs');
   const built = ensureGitAddon();
-  const file = path.join(root, 'addon-descriptor.json');
   fs.writeFileSync(file, JSON.stringify({ manifest: JSON.parse(fs.readFileSync(built.manifest, 'utf8')), releaseRoot: CHECKOUT }));
   return file;
 }
@@ -308,7 +483,7 @@ if (process.argv[1] === SELF) {
   const modes = {
     workload, check, trace: traceMode,
     order: async (a) => { const v = checkOrder(fs.readFileSync(a.trace, 'utf8')); process.stdout.write(JSON.stringify(v, null, 2) + '\n'); if (v.violations.length) process.exitCode = 1; },
-    descriptor: async (a) => { fs.mkdirSync(a.root, { recursive: true }); process.stdout.write(await stageDescriptor(a.root) + '\n'); },
+    descriptor: async (a) => { fs.mkdirSync(a.root, { recursive: true }); process.stdout.write(await stageDescriptor(a.root, a) + '\n'); },
   };
   if (!modes[mode]) { console.error(`usage: e1-power-cut.mjs ${Object.keys(modes).join('|')} ...`); process.exit(2); }
   await modes[mode](args);
