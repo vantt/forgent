@@ -12,6 +12,10 @@ Phần dưới đây là prompt, dán nguyên văn cho một phiên agent mới.
 
 Bạn nhận luồng **quản lý luật** của repo fgOS. Checkout chính ở máy viết handoff là `/home/vantt/projects/forgentX`; trên máy đang soạn bản bổ sung này thư mục đó không tồn tại và checkout là `/home/vantt/projects/forgent`. Hãy dùng checkout chính của máy bạn đang đứng. Máy là Linux, shell zsh, múi giờ Asia/Saigon. Owner xưng **anh**, bạn xưng **em**, trả lời bằng tiếng Việt.
 
+### 0. Thứ tự với doc plan 260925 (owner quyết 2026-10-21, ghi L12-91)
+
+Phân tích và thiết kế làm tự do ngay. Nhưng **mọi thay đổi ghi vào `AGENTS.md`, `CLAUDE.md`, `docs/platform-foundations.md` và `docs/specs/platform-foundations.md` chỉ land SAU cutover Phase 9 của doc plan 260925**, và land trên cây mới (`docs/platform/**`). Lý do: Phase 9 viết lại mọi chỗ đọc các file đó và cho `docs/specs/**` nghỉ hưu. Phụ thuộc một chiều: cutover không bao giờ chờ luồng này; nếu luồng chưa xong, luật hiện có đi theo cutover và luồng làm tiếp trên cây mới. Cutover Phase 9 cũng land ba guard tài liệu thay ratchet cũ (không file mới dưới gốc đã nghỉ hưu; kiểm vị trí qua các dòng placement-glob của convention; kiểm link/anchor trong `docs/platform/**`) — luồng này dùng chúng, không làm cái thứ hai. Hỏi thẳng phiên `forgentx-5f` (luồng DOC) khi cần biết cutover đã land chưa.
+
 ### 1. Mục tiêu
 
 Luật của repo (instruction, rule, nguyên tắc, luật khoá, quyết định) phải đạt bảy điều:
