@@ -5,7 +5,7 @@ import { EventEmitter } from 'node:events';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
 import { pathToFileURL } from 'node:url';
 
@@ -2025,6 +2025,38 @@ test('an interrupted staging is reported once its writer is gone and it has sat 
     const found = inspectRetainedCredentialCopies({ runtimeDir: w.runtimeDir, now: Date.now() });
     assert.deepEqual(found.map((c) => [c.provider, c.accountId, c.kind]), [['xai', 'acct', 'staging']]);
   } finally { w.cleanup(); }
+});
+
+test('a staging whose writer is a zombie is reported: a writer that has exited is gone even before its parent reaps it', () => {
+  if (process.platform !== 'linux') return;
+  const w = interruptedStagingWorkspace();
+  const files = path.join(w.runtimeDir, 'zombie-fixture');
+  fs.mkdirSync(files, { recursive: true });
+  const zombieFile = path.join(files, 'zombie.pid');
+  const parentFile = path.join(files, 'parent.pid');
+  // `sleep` never reaps: it is the parent of a child that exited at once, which stays a zombie.
+  execFileSync('sh', ['-c', `setsid sh -c 'sh -c "exit 0" & echo $! > "$0"; echo $$ > "$1"; exec sleep 300' "$0" "$1" </dev/null >/dev/null 2>&1 &`, zombieFile, parentFile]);
+  let parentPid = null;
+  try {
+    const deadline = Date.now() + 5000;
+    let zombiePid;
+    for (;;) {
+      try {
+        zombiePid = Number(fs.readFileSync(zombieFile, 'utf8').trim());
+        parentPid = Number(fs.readFileSync(parentFile, 'utf8').trim());
+        const stat = fs.readFileSync(`/proc/${zombiePid}/stat`, 'utf8');
+        if (stat.slice(stat.lastIndexOf(')') + 2, stat.lastIndexOf(')') + 3) === 'Z') break;
+      } catch { /* not written yet */ }
+      assert.ok(Date.now() < deadline, 'the fixture never produced a zombie');
+      execFileSync('sleep', ['0.05']);
+    }
+    w.put(`.tmp-${zombiePid}-zzzz`, { 'auth.json': 'PART' });
+    const found = inspectRetainedCredentialCopies({ runtimeDir: w.runtimeDir, now: Date.now() });
+    assert.deepEqual(found.map((c) => c.kind), ['staging']);
+  } finally {
+    if (parentPid) { try { process.kill(parentPid, 'SIGKILL'); } catch { /* gone */ } }
+    w.cleanup();
+  }
 });
 
 test('the sweep removes an interrupted staging only when it is empty or identical to a kept copy, and never one that is young or has a live writer', () => {

@@ -7,6 +7,7 @@ import path from 'node:path';
 import http from 'node:http';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { observe } from '../../src/runner/dispatch/process-identity.mjs';
 import { startGateway, stopGateway, gatewayStatus, acquireGatewayLock, GatewayControlError } from '../../src/runner/gateway-control.mjs';
 
 const GATEWAY_CONTROL_MOD_PATH = fileURLToPath(new URL('../../src/runner/gateway-control.mjs', import.meta.url));
@@ -33,14 +34,8 @@ function cleanup(repoRoot) {
   }
 }
 
-function isAlive(pid) {
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (err) {
-    return err.code === 'EPERM';
-  }
-}
+// A zombie awaiting its reaper is dead, as the door judges it.
+const isAlive = (pid) => observe(pid).kind === 'live';
 
 /** A real, throwaway long-lived process this test controls entirely --
  * gives a genuinely live pid without depending on the real fgos-gateway
@@ -90,6 +85,13 @@ function spawnThrowaway() {
       }
     },
   };
+}
+
+/** The full identity the registry carries for a live gateway: what startGateway records. */
+function liveRecord(pid) {
+  const { kind, ...record } = observe(pid);
+  assert.equal(kind, 'live');
+  return record;
 }
 
 function writeRegistry(fgosDir, entry) {
@@ -144,7 +146,7 @@ test('gatewayStatus: a live pid whose port serves /v1/contract reports running:t
   try {
     await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
     const port = server.address().port;
-    writeRegistry(fgosDir, { pid: child.pid, port, startedAt: new Date().toISOString(), logPath: '/dev/null' });
+    writeRegistry(fgosDir, { pid: child.pid, record: liveRecord(child.pid), port, startedAt: new Date().toISOString(), logPath: '/dev/null' });
     const status = await gatewayStatus(fgosDir);
     assert.equal(status.running, true);
     assert.equal(status.reachable, true);
@@ -163,7 +165,7 @@ test('gatewayStatus: a live pid but nothing listening on the recorded port repor
   try {
     // Port 1 is a real, always-unbound-by-anyone-here low port -- fetch
     // fails with a real connection error, exercising the catch branch.
-    writeRegistry(fgosDir, { pid: child.pid, port: 1, startedAt: new Date().toISOString(), logPath: '/dev/null' });
+    writeRegistry(fgosDir, { pid: child.pid, record: liveRecord(child.pid), port: 1, startedAt: new Date().toISOString(), logPath: '/dev/null' });
     const status = await gatewayStatus(fgosDir);
     assert.equal(status.running, true);
     assert.equal(status.reachable, false);
@@ -200,7 +202,7 @@ test('stopGateway: a live pid is genuinely SIGTERM-ed and the registry is cleare
   const { repoRoot, fgosDir } = mkFgosDir();
   const child = spawnThrowaway();
   try {
-    writeRegistry(fgosDir, { pid: child.pid, port: 4170, startedAt: new Date().toISOString(), logPath: '/dev/null' });
+    writeRegistry(fgosDir, { pid: child.pid, record: liveRecord(child.pid), port: 4170, startedAt: new Date().toISOString(), logPath: '/dev/null' });
     const result = stopGateway(fgosDir);
     assert.equal(result.alreadyStopped, false);
     assert.equal(result.pid, child.pid);
@@ -234,7 +236,7 @@ test('stopGateway: escalates to SIGKILL when the process ignores SIGTERM, and st
       assert.ok(Date.now() < readyDeadline, 'throwaway process never reached its SIGTERM-handler line');
       await new Promise((resolve) => setTimeout(resolve, 10));
     }
-    writeRegistry(fgosDir, { pid: child.pid, port: 4170, startedAt: new Date().toISOString(), logPath: '/dev/null' });
+    writeRegistry(fgosDir, { pid: child.pid, record: liveRecord(child.pid), port: 4170, startedAt: new Date().toISOString(), logPath: '/dev/null' });
     const start = Date.now();
     const result = stopGateway(fgosDir);
     assert.equal(result.alreadyStopped, false);
@@ -252,13 +254,12 @@ test('stopGateway: escalates to SIGKILL when the process ignores SIGTERM, and st
   }
 });
 
-test('stopGateway never signals a process that is not the recorded gateway: a registry entry whose pid belongs to an unrelated child gets no signal and stop refuses by name', () => {
+test('stopGateway never signals a process that is not the recorded gateway: an entry with no verifiable identity (an old pid-only entry) gets no signal and stop refuses by name', () => {
   if (os.platform() !== 'linux') return;
   const { repoRoot, fgosDir } = mkFgosDir();
   const child = spawnThrowaway();
   try {
-    // The recorded start time predates the pid's real start by decades, so
-    // the registry entry cannot describe this process (pid reuse).
+    // A pid-only entry has no start time, so it cannot say which process it names.
     writeRegistry(fgosDir, { pid: child.pid, port: 4170, startedAt: '1999-01-01T00:00:00.000Z', logPath: '/dev/null' });
     let refusal = null;
     try {
@@ -268,6 +269,41 @@ test('stopGateway never signals a process that is not the recorded gateway: a re
     }
     assert.equal(isAlive(child.pid), true, 'the unrelated process must not receive any signal');
     assert.ok(refusal instanceof GatewayControlError, 'stop must refuse with the named GatewayControlError');
+    assert.match(refusal.message, /gateway-stop-identity-unknown/);
+    assert.equal(fs.existsSync(path.join(fgosDir, 'gateway.json')), true, 'an unjudgeable entry is kept');
+  } finally {
+    child.kill('SIGKILL');
+    cleanup(repoRoot);
+  }
+});
+
+test('stopGateway: a registry identity whose start time is not the live pid\'s (a reused pid) is cleared and nothing is signalled', () => {
+  if (os.platform() !== 'linux') return;
+  const { repoRoot, fgosDir } = mkFgosDir();
+  const child = spawnThrowaway();
+  try {
+    const record = liveRecord(child.pid);
+    writeRegistry(fgosDir, { pid: child.pid, record: { ...record, startTime: String(Number(record.startTime) - 1000000) }, port: 4170, startedAt: new Date().toISOString(), logPath: '/dev/null' });
+    const result = stopGateway(fgosDir);
+    assert.equal(result.alreadyStopped, true);
+    assert.equal(isAlive(child.pid), true, 'the unrelated process must not receive any signal');
+    assert.equal(fs.existsSync(path.join(fgosDir, 'gateway.json')), false);
+  } finally {
+    child.kill('SIGKILL');
+    cleanup(repoRoot);
+  }
+});
+
+test('gatewayStatus: an old pid-only entry whose pid lives reports identity unknown, not running', async () => {
+  if (os.platform() !== 'linux') return;
+  const { repoRoot, fgosDir } = mkFgosDir();
+  const child = spawnThrowaway();
+  try {
+    writeRegistry(fgosDir, { pid: child.pid, port: 1, startedAt: new Date().toISOString(), logPath: '/dev/null' });
+    const status = await gatewayStatus(fgosDir);
+    assert.equal(status.running, null);
+    assert.equal(status.staleRegistry, false);
+    assert.equal(status.identity, 'unknown');
   } finally {
     child.kill('SIGKILL');
     cleanup(repoRoot);
@@ -367,12 +403,25 @@ test('startGateway: refuses with no side effects when the registry already names
   const { repoRoot, fgosDir } = mkFgosDir();
   const child = spawnThrowaway();
   try {
-    writeRegistry(fgosDir, { pid: child.pid, port: 4170, startedAt: new Date().toISOString(), logPath: '/dev/null' });
+    writeRegistry(fgosDir, { pid: child.pid, record: liveRecord(child.pid), port: 4170, startedAt: new Date().toISOString(), logPath: '/dev/null' });
     assert.throws(() => startGateway(repoRoot, fgosDir), GatewayControlError);
     // Refusal happens before ever touching apps/fgos-gateway/ -- no apps/fgos-gateway
     // dir exists in this fixture at all, proving the check really is
     // ordered before any cargo/binary work, not just coincidentally fast.
     assert.equal(fs.existsSync(path.join(repoRoot, 'apps', 'fgos-gateway')), false);
+  } finally {
+    child.kill('SIGKILL');
+    cleanup(repoRoot);
+  }
+});
+
+test('startGateway: refuses by name when the registry names a live pid without a verifiable identity', () => {
+  if (os.platform() !== 'linux') return;
+  const { repoRoot, fgosDir } = mkFgosDir();
+  const child = spawnThrowaway();
+  try {
+    writeRegistry(fgosDir, { pid: child.pid, port: 4170, startedAt: new Date().toISOString(), logPath: '/dev/null' });
+    assert.throws(() => startGateway(repoRoot, fgosDir), /gateway-start-identity-unknown/);
   } finally {
     child.kill('SIGKILL');
     cleanup(repoRoot);

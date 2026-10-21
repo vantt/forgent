@@ -17,7 +17,7 @@ const KILL_ALLOWED = new Map([
   ['src/runner/dispatch/transport.mjs', 'kills the process group of its own spawned child'],
   ['src/runner/dispatch/provider-credential-probe.mjs', 'kills the process group of its own spawned probe child'],
   ['src/holder-lock/index.mjs', 'kills the process group of its own spawned lock-hold child'],
-  ['src/runner/dispatch/process-identity.mjs', 'the thin Node client of the door, until it is emptied'],
+  ['src/setup/registrations.mjs', 'doctor checks that probe a claim holder by signal 0, until they ask the door'],
 ]);
 const PROC_ALLOWED = new Map([
   ['src/holder-lock/driver.mjs', 'fd scan for lock holders'],
@@ -26,7 +26,7 @@ const PROC_ALLOWED = new Map([
   ['src/setup/run-supervisor-checks.mjs', 'doctor check of the run supervisor'],
   ['src/runner/dispatch/confinement/probes/harness.mjs', 'confinement probe harness'],
   ['src/runner/dispatch/confinement/drivers/bwrap.mjs', 'bwrap confinement driver'],
-  ['src/runner/dispatch/process-identity.mjs', 'the thin Node client of the door, until it is emptied'],
+  ['src/setup/registrations.mjs', 'doctor check that reads a claim holder\'s /proc entry, until it asks the door'],
 ]);
 
 /** The source with comments blanked, strings and template text kept. */

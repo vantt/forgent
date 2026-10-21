@@ -488,12 +488,15 @@ test('reclaimOrphanedSessions cleans a dead-pid orphan, keeps a live session, an
     const orphan = createSession(repoRoot, { sessionId: 'orphan', sessionsDir });
     const divergedOrphan = createSession(repoRoot, { sessionId: 'diverged-orphan', sessionsDir });
     const danglingSha = commitInside(divergedOrphan.worktreePath);
+    // An entry written before identities were recorded names a live pid and nothing else: it is kept, never reclaimed.
+    createSession(repoRoot, { sessionId: 'legacy-live', sessionsDir });
 
     // Mark the two orphans' recorded pids dead; leave the live one as us.
     const dead = deadPid();
-    const registry = readRegistry(repoRoot).map((e) =>
-      e.sessionId === 'orphan' || e.sessionId === 'diverged-orphan' ? { ...e, pid: dead } : e,
-    );
+    const registry = readRegistry(repoRoot).map((e) => {
+      if (e.sessionId === 'legacy-live') return { ...e, record: undefined };
+      return e.sessionId === 'orphan' || e.sessionId === 'diverged-orphan' ? { ...e, pid: dead, record: { ...e.record, pid: dead } } : e;
+    });
     writeRegistry(repoRoot, registry);
 
     const result = reclaimOrphanedSessions(repoRoot);
@@ -504,7 +507,7 @@ test('reclaimOrphanedSessions cleans a dead-pid orphan, keeps a live session, an
     const remaining = listSessions(repoRoot)
       .map((e) => e.sessionId)
       .sort();
-    assert.deepEqual(remaining, ['diverged-orphan', 'live'], 'live + diverged-orphan kept; clean orphan dropped');
+    assert.deepEqual(remaining, ['diverged-orphan', 'legacy-live', 'live'], 'live, pid-only live and diverged-orphan kept; clean orphan dropped');
     assert.ok(!fs.existsSync(orphan.worktreePath), 'clean orphan worktree removed');
     assert.ok(fs.existsSync(divergedOrphan.worktreePath), 'diverged orphan worktree preserved (dangling commit kept)');
     assert.ok(fs.existsSync(live.worktreePath), 'live session worktree untouched');
@@ -531,7 +534,7 @@ test('reclaimOrphanedSessions spares a dead-pid orphan with uncommitted (never-c
     const dead = deadPid();
     writeRegistry(
       repoRoot,
-      readRegistry(repoRoot).map((e) => (e.sessionId === 'dirty-orphan' ? { ...e, pid: dead } : e)),
+      readRegistry(repoRoot).map((e) => (e.sessionId === 'dirty-orphan' ? { ...e, pid: dead, record: { ...e.record, pid: dead } } : e)),
     );
 
     const result = reclaimOrphanedSessions(repoRoot);
@@ -563,7 +566,7 @@ test('reclaimOrphanedSessions never reclaims the caller\'s own worktree, even wi
     // for.
     const dead = deadPid();
     const registry = readRegistry(repoRoot).map((e) =>
-      e.sessionId === 'self' || e.sessionId === 'other-orphan' ? { ...e, pid: dead } : e,
+      e.sessionId === 'self' || e.sessionId === 'other-orphan' ? { ...e, pid: dead, record: { ...e.record, pid: dead } } : e,
     );
     writeRegistry(repoRoot, registry);
 

@@ -26,6 +26,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 
+import { resolveHolderLiveness } from './process-identity.mjs';
 import { acquireAccountLock, tryAcquireAccountLock, credentialStoreDir, expandCredentialHome } from './provider-capacity.mjs';
 import {
   credentialProbeCommand,
@@ -704,7 +705,7 @@ function listInterruptedStagings(storeDir) {
 function stagingWriterAlive(dir) {
   const pid = Number(STAGING_NAME.exec(path.basename(dir))?.[1]);
   if (!Number.isInteger(pid) || pid <= 0) return true;
-  try { process.kill(pid, 0); return true; } catch (err) { return err?.code !== 'ESRCH'; }
+  return resolveHolderLiveness({ pid }) !== 'dead';
 }
 
 // Whether a staging is old enough to be left behind: its own change time and that of what it holds.

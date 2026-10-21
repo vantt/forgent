@@ -211,8 +211,9 @@ test('lock fence state: an unreadable record needs --attest-stopped, then the re
   // A live holder: a real process whose full tuple is in the record.
   const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
   try {
-    const { getBootId, getPidNs, getProcessStartTime } = await import('../../src/runner/dispatch/process-identity.mjs');
-    fs.writeFileSync(record, JSON.stringify({ v: 1, pid: child.pid, startTime: getProcessStartTime(child.pid), bootId: getBootId(), pidNs: getPidNs() }));
+    const { observe } = await import('../../src/runner/dispatch/process-identity.mjs');
+    const { pid, startTime, bootId, pidNs } = observe(child.pid);
+    fs.writeFileSync(record, JSON.stringify({ v: 1, pid, startTime, bootId, pidNs }));
     const unconfirmed = await runAsync(cwd, ['lock', 'fence', 'state']);
     assert.notEqual(unconfirmed.status, 0);
     assert.match(unconfirmed.stderr, /nothing was signalled/);
@@ -233,13 +234,12 @@ test('lock fence state: an unreadable record needs --attest-stopped, then the re
 // goes out (the confirm step is where that window is observable). The fence
 // must see the death, send nothing and clear the record at once; it must not
 // wait out TERM_WAIT_MS + KILL_WAIT_MS and then claim the dead holder is
-// still holding. Pin: this window is green on current code. The narrower
-// window, death between the judge and the identity read, makes the identity's
-// start time null and `null === null` passes the identity check; it cannot be
-// set up from outside without a race, so its proof belongs with the fix.
+// still holding. The narrower window, death between the judge and a second
+// identity read, cannot occur: the fence signals the record's own tuple through
+// the door, so a vanished holder is not-found and nothing is sent (asserted below).
 test('fenceHotRecord on a holder that died between judge and signal returns at once and clears the record; it never waits TERM_WAIT_MS on a dead pid', async () => {
   const { fenceLock } = await import('../../src/runner/lock-fence.mjs');
-  const { getBootId, getPidNs, getProcessStartTime } = await import('../../src/runner/dispatch/process-identity.mjs');
+  const { observe } = await import('../../src/runner/dispatch/process-identity.mjs');
   const cwd = initGitCwdFast();
   const fgosDir = path.join(cwd, '.fgos');
   fs.mkdirSync(path.join(fgosDir, 'locks'), { recursive: true });
@@ -247,7 +247,8 @@ test('fenceHotRecord on a holder that died between judge and signal returns at o
   const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
   const exited = new Promise((resolve) => child.on('exit', resolve));
   try {
-    fs.writeFileSync(record, JSON.stringify({ v: 1, pid: child.pid, startTime: getProcessStartTime(child.pid), bootId: getBootId(), pidNs: getPidNs() }));
+    const { pid, startTime, bootId, pidNs } = observe(child.pid);
+    fs.writeFileSync(record, JSON.stringify({ v: 1, pid, startTime, bootId, pidNs }));
     const started = Date.now();
     const result = await fenceLock({
       name: 'state',
@@ -262,7 +263,32 @@ test('fenceHotRecord on a holder that died between judge and signal returns at o
     assert.ok(elapsed < 1000, `a dead holder must not be waited on; took ${elapsed} ms`);
     assert.equal(result.status, 'fenced');
     assert.equal(fs.existsSync(record), false, 'the record of the dead holder is cleared');
+    assert.deepEqual([result.terminated, result.killed], [[], []], 'the holder vanished before the signal: the door sent nothing');
   } finally {
     child.kill('SIGKILL');
   }
+});
+
+// A record whose pid is already dead is judged dead before anything else: the fence returns at once and
+// never signals, whatever process the pid may name by now.
+test('fenceHotRecord on a record whose holder is already dead signals nothing and clears the record at once', async () => {
+  const { fenceLock } = await import('../../src/runner/lock-fence.mjs');
+  const { observe } = await import('../../src/runner/dispatch/process-identity.mjs');
+  const cwd = initGitCwdFast();
+  const fgosDir = path.join(cwd, '.fgos');
+  fs.mkdirSync(path.join(fgosDir, 'locks'), { recursive: true });
+  const record = path.join(fgosDir, 'locks', 'state.hot');
+  const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
+  const exited = new Promise((resolve) => child.on('exit', resolve));
+  const { pid, startTime, bootId, pidNs } = observe(child.pid);
+  child.kill('SIGKILL');
+  await exited;
+  fs.writeFileSync(record, JSON.stringify({ v: 1, pid, startTime, bootId, pidNs }));
+  let asked = false;
+  const started = Date.now();
+  const result = await fenceLock({ name: 'state', fgosDir, confirm: async () => { asked = true; return true; } });
+  assert.ok(Date.now() - started < 1000, 'a dead holder is not waited on');
+  assert.equal(asked, false, 'nothing to confirm: no holder');
+  assert.deepEqual([result.status, result.terminated, result.killed], ['attested-free', [], []]);
+  assert.equal(fs.existsSync(record), false);
 });

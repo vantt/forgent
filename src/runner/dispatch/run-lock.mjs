@@ -22,23 +22,16 @@
 // proof (`isProcessAlive` returns false), never elapsed time alone.
 
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { getBootId, getProcessStartTime, resolveHolderLiveness as resolveHolderLivenessByIdentity } from './process-identity.mjs';
+import { observe, selfRecord, resolveHolderLiveness } from './process-identity.mjs';
 
 // --- PID liveness --------------------------------------------------------
 
-/** Signal-0 liveness probe (mirrors main-checkout-lock.mjs's isPidAlive).
- * EPERM means the pid exists under another user -- still alive. */
+/** Whether a process with `pid` exists (a zombie counts). Kept by name for the assignment runner's callers;
+ * the observation is the process door's. */
 export function isProcessAlive(pid) {
-  if (!Number.isInteger(pid) || pid <= 0) return false;
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (err) {
-    return err.code === 'EPERM';
-  }
+  return Number.isInteger(pid) && pid > 0 && observe(pid).kind !== 'absent';
 }
 
 // --- Control holder identity (H1) -----------------------------------------
@@ -49,26 +42,13 @@ export function isProcessAlive(pid) {
  * `id` alone (the pre-H1 shape) let a PID reused by an unrelated process
  * after the real holder died be mistaken for the same holder. */
 export function buildRunControlHolder(id) {
-  return {
-    id,
-    pid: process.pid,
-    bootId: getBootId(),
-    processStartTime: getProcessStartTime(process.pid),
-    host: os.hostname(),
-  };
+  const self = selfRecord();
+  return { id, ...self, processStartTime: self.startTime };
 }
 
-/** Whether a recorded control holder is still the live process that
- * acquired the lock. Thin backward-compatible wrapper (dispatch-engine-
- * liveness-hardening Phase 1): the actual bootId/processStartTime judge now
- * lives in process-identity.mjs as a pure function taking an injected
- * liveness fact, so it can be reused without pulling `process.kill` (this
- * file's own control-plane probe, `isProcessAlive`) into that fs-only leaf.
- * Full decision-table doc lives on process-identity.mjs's own
- * resolveHolderLiveness. */
-export function resolveHolderLiveness(holder) {
-  return resolveHolderLivenessByIdentity(holder, isProcessAlive(holder?.pid));
-}
+/** Whether a recorded control holder is still the live process that acquired the lock: the process door's
+ * judge; `dead` only when it proves death. Kept here for the assignment runner's importers. */
+export { resolveHolderLiveness };
 
 // --- Fsynced atomic publication -------------------------------------------
 

@@ -266,31 +266,6 @@ export function runStateRootRoute({ fgosDir, env = process.env } = {}) {
   return { stateRoot: line.stateRoot, lockRoot: line.lockRoot, source: line.source };
 }
 
-/** Run `fgos internal process-observe --pid N` once: `{ state: 'live' |
- * 'zombie' | 'absent' | 'unreadable', startTime?, cause? }`, the reading of
- * the process facts crate. The Node payload asks it where it has no process
- * table of its own to read (a Windows creation time). */
-export function runProcessObserveRoute({ fgosDir, pid } = {}) {
-  const bin = hostBin({ fgosDir });
-  const res = spawnSync(bin, ['internal', 'process-observe', '--protocol', String(PROTOCOL), '--pid', String(pid)], {
-    env: routeEnv(),
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe'],
-    timeout: ROUTE_CALL_TIMEOUT_MS,
-    killSignal: 'SIGKILL',
-    maxBuffer: MAX_OUTPUT_BYTES,
-    windowsHide: true,
-  });
-  const line = interpretRoute(res, bin, 'process-observe');
-  if (line.result === 'killed') {
-    throw new HolderLockError('lock-route-error', `${bin} process-observe did not answer within ${ROUTE_CALL_TIMEOUT_MS} ms and was killed`);
-  }
-  if (!['live', 'zombie', 'absent', 'unreadable'].includes(line.state) || (line.state === 'live' && typeof line.startTime !== 'string')) {
-    throw new HolderLockError('lock-route-bad-output', `${bin} process-observe answered without a usable state: ${String(res.stdout ?? '').slice(0, 200)}`);
-  }
-  return line;
-}
-
 function fdTargetMatches(target, real) {
   return target === real || target === `${real} (deleted)`;
 }

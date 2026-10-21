@@ -4,7 +4,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { devHostEnv } from '../../scripts/lib/dev-host-manifest.mjs';
 import { pruneRunDirs, releaseRunDir, STALE_RUN_DIR_MS } from '../../scripts/run-rust-dev-host.mjs';
 
@@ -71,4 +72,18 @@ test('the dev door points FGOS_HOST_BIN at the staged host, replacing any inheri
   assert.equal(env.FGOS_ACTIVE_RELEASE_PATH, '/checkout');
   assert.equal(env.FGOS_ACTIVE_MANIFEST_PATH, '/stage/run-x/manifest.json');
   assert.equal(env.KEEP, '1');
+});
+
+test('the launcher scans for processes inside a run directory that does not exist yet, with no host variables inherited', { skip: linuxOnly }, () => {
+  const env = { ...process.env };
+  for (const name of Object.keys(env)) if (name.startsWith('FGOS_')) delete env[name];
+  const launcher = fileURLToPath(new URL('../../scripts/run-rust-dev-host.mjs', import.meta.url));
+  const stop = fileURLToPath(new URL('../../src/runner/dispatch/stop-processes-inside.mjs', import.meta.url));
+  const script = `import { stageLauncherDoor } from ${JSON.stringify(launcher)};
+    import { processesInside } from ${JSON.stringify(stop)};
+    stageLauncherDoor();
+    console.log(JSON.stringify(processesInside('/nonexistent-fgos-run-dir')));`;
+  const run = spawnSync(process.execPath, ['--input-type=module', '-e', script], { env, encoding: 'utf8' });
+  assert.equal(run.status, 0, run.stderr);
+  assert.deepEqual(JSON.parse(run.stdout.trim().split('\n').pop()), []);
 });

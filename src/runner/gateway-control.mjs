@@ -29,7 +29,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { resolveLogsDir } from './paths.mjs';
-import { pidExists } from './dispatch/process-identity.mjs';
+import { observe, judge, signalByIdentity } from './dispatch/process-identity.mjs';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
 
 const REGISTRY_FILE = 'gateway.json';
@@ -58,17 +58,32 @@ function sleepSync(ms) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 }
 
-/** Poll (blocking, via sleepSync) until `pid` is no longer alive or
- * `deadline` (an absolute Date.now() timestamp) passes. Returns whether
- * it actually died. Shared by both the graceful (SIGTERM) and forced
- * (SIGKILL) wait phases in `stopGateway` — each phase gets its OWN full
- * window, since a signal taking effect is never instantaneous. */
-function waitUntilDeadOrDeadline(pid, deadline) {
-  while (pidExists(pid)) {
-    if (Date.now() >= deadline) return false;
+/** Poll (blocking, via sleepSync) while the process `record` names is
+ * alive, until `deadline` (an absolute Date.now() timestamp) passes.
+ * Returns the verdict it ended on: 'dead', 'unknown', or 'alive' at the
+ * deadline. Shared by both the graceful (SIGTERM) and forced (SIGKILL)
+ * wait phases in `stopGateway` — each phase gets its OWN full window,
+ * since a signal taking effect is never instantaneous. */
+function waitUntilDeadOrDeadline(record, deadline) {
+  for (;;) {
+    const verdict = judge(record);
+    if (verdict !== 'alive' || Date.now() >= deadline) return verdict;
     sleepSync(STOP_POLL_MS);
   }
-  return true;
+}
+
+/** The identity tuple a registry entry carries; an old entry written before
+ * identities were recorded is its bare pid, which judges `unknown` while live. */
+const recordOf = (entry) => entry.record ?? entry;
+
+/** Send `signal` to the recorded gateway only while it is still that process.
+ * Returns 'sent', 'gone' (nothing was sent: the process is no longer the
+ * recorded one) or 'unsupported' (no graceful signal on this platform). */
+function signalGateway(entry, signal) {
+  const outcome = signalByIdentity(recordOf(entry), signal);
+  if (outcome === 'sent' || outcome === 'unsupported') return outcome;
+  if (outcome === 'identity-mismatch' || outcome === 'not-found') return 'gone';
+  throw new GatewayControlError(`sending ${signal} to gateway pid ${entry.pid} failed: ${outcome}`, { pid: entry.pid });
 }
 
 /** The first pid the kernel lists as holding `name`'s lock file, or null
@@ -174,7 +189,14 @@ export function startGateway(repoRoot, fgosDir) {
   const lock = acquireGatewayLock(fgosDir);
   try {
     const existing = readRegistry(fgosDir);
-    if (existing && pidExists(existing.pid)) {
+    const existingVerdict = existing ? judge(recordOf(existing)) : 'dead';
+    if (existingVerdict === 'unknown') {
+      throw new GatewayControlError(
+        `gateway-start-identity-unknown: the registry names pid ${existing.pid} without a verifiable identity; confirm it is not a gateway, then delete ${registryPath(fgosDir)}`,
+        { pid: existing.pid, port: existing.port },
+      );
+    }
+    if (existingVerdict === 'alive') {
       throw new GatewayControlError(
         `gateway is already running (pid ${existing.pid}, port ${existing.port}) — stop it first with "fgos gateway stop" if you meant to restart it`,
         { pid: existing.pid, port: existing.port },
@@ -221,9 +243,17 @@ export function startGateway(repoRoot, fgosDir) {
     // exit without taking the gateway down with it.
     child.unref();
 
+    // An absent or zombie child at this moment is the immediate exit named below.
+    const seen = observe(child.pid);
+    if (seen.kind === 'unreadable') {
+      throw new GatewayControlError(`gateway-start-identity-unreadable: pid ${child.pid} cannot be observed (${seen.cause}); see "${logPath}"`, { logPath, pid: child.pid });
+    }
+    const { kind, ...identity } = seen;
+    const record = kind === 'live' ? identity : null;
     const port = resolveConfiguredPort();
     const entry = {
       pid: child.pid,
+      record,
       port,
       startedAt: new Date().toISOString(),
       logPath,
@@ -236,7 +266,7 @@ export function startGateway(repoRoot, fgosDir) {
     // moment later (e.g. a missing gateway.token, a port already in use).
     const deadline = Date.now() + STARTUP_TIMEOUT_MS;
     for (;;) {
-      if (!pidExists(child.pid)) {
+      if (!record || judge(record) !== 'alive') {
         let tail = '';
         try {
           tail = fs.readFileSync(logPath, 'utf8').split('\n').slice(-20).join('\n');
@@ -284,16 +314,17 @@ export function stopGateway(fgosDir) {
     if (!entry) {
       return { alreadyStopped: true };
     }
-    if (!pidExists(entry.pid)) {
+    const record = recordOf(entry);
+    const first = judge(record);
+    if (first === 'dead') {
       writeRegistry(fgosDir, null);
       return { alreadyStopped: true, pid: entry.pid };
     }
-    try {
-      process.kill(entry.pid, 'SIGTERM');
-    } catch (err) {
-      if (err.code !== 'ESRCH') {
-        throw new GatewayControlError(`sending SIGTERM to gateway pid ${entry.pid} failed: ${err.message}`, { pid: entry.pid });
-      }
+    if (first === 'unknown') {
+      throw new GatewayControlError(
+        `gateway-stop-identity-unknown: the registry names pid ${entry.pid} without a verifiable identity; nothing was signalled. Confirm it is not a gateway, then delete ${registryPath(fgosDir)}`,
+        { pid: entry.pid },
+      );
     }
 
     // Graceful phase: wait up to STOP_TIMEOUT_MS for SIGTERM to take
@@ -302,13 +333,22 @@ export function stopGateway(fgosDir) {
     // liveness only once, immediately after sending SIGKILL, and giving
     // up right away if it had not been reaped that exact instant, which
     // treated a real (if brief) kernel delay as "still alive forever".
-    if (!waitUntilDeadOrDeadline(entry.pid, Date.now() + STOP_TIMEOUT_MS)) {
-      try {
-        process.kill(entry.pid, 'SIGKILL');
-      } catch (err) {
-        if (err.code !== 'ESRCH') throw new GatewayControlError(`sending SIGKILL to gateway pid ${entry.pid} failed: ${err.message}`, { pid: entry.pid });
-      }
-      waitUntilDeadOrDeadline(entry.pid, Date.now() + STOP_TIMEOUT_MS); // best-effort; proceed regardless of the outcome
+    // Only a 'dead' verdict clears the registry.
+    const settle = (signal) => {
+      const sent = signalGateway(entry, signal);
+      if (sent === 'unsupported') return 'alive';
+      return sent === 'gone' ? judge(record) : waitUntilDeadOrDeadline(record, Date.now() + STOP_TIMEOUT_MS);
+    };
+    let verdict = settle('term');
+    if (verdict === 'alive') verdict = settle('kill');
+    if (verdict === 'unknown') {
+      throw new GatewayControlError(
+        `gateway-stop-unresolved: pid ${entry.pid} can no longer be judged after the signal; see ${entry.logPath}, then delete ${registryPath(fgosDir)} once it is gone`,
+        { pid: entry.pid, logPath: entry.logPath },
+      );
+    }
+    if (verdict === 'alive') {
+      throw new GatewayControlError(`gateway-stop-failed: pid ${entry.pid} survived SIGKILL; see ${entry.logPath}`, { pid: entry.pid, logPath: entry.logPath });
     }
 
     writeRegistry(fgosDir, null);
@@ -333,9 +373,12 @@ export async function gatewayStatus(fgosDir) {
   if (!entry) {
     return { running: false, reachable: false };
   }
-  const alive = pidExists(entry.pid);
-  if (!alive) {
+  const verdict = judge(recordOf(entry));
+  if (verdict === 'dead') {
     return { running: false, reachable: false, pid: entry.pid, port: entry.port, staleRegistry: true };
+  }
+  if (verdict === 'unknown') {
+    return { running: null, reachable: false, pid: entry.pid, port: entry.port, staleRegistry: false, identity: 'unknown' };
   }
   let reachable = false;
   try {

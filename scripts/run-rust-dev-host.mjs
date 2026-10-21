@@ -5,6 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { nativeAddonLibraryName } from './build-rust-distribution.mjs';
 import { devHostEnv, devHostManifest } from './lib/dev-host-manifest.mjs';
+import { ensureGitAddon } from './lib/git-addon-stage.mjs';
 import { processesInside } from '../src/runner/dispatch/stop-processes-inside.mjs';
 
 const checkoutRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -77,6 +78,11 @@ function forwardResult(result, description) {
   return result.status ?? 1;
 }
 
+/** Stage this checkout's addon and host and point the launcher's own environment at them. */
+export function stageLauncherDoor() {
+  ensureGitAddon(process.env, checkoutRoot);
+}
+
 function main() {
   const build = spawnSync('cargo', ['build', '--locked', '--package', 'fgos', '--package', 'fgos-node-addon'], {
     cwd: checkoutRoot,
@@ -94,6 +100,9 @@ function main() {
   assertLocalPath('bin/fgos.mjs');
   const runtimeBase = path.join(checkoutRoot, runtimeBaseRelative);
   fs.mkdirSync(runtimeBase, { recursive: true });
+  // The launcher has no manifest of its own: load the process door from the persistent staged addon, never
+  // from a per-run copy that is about to be deleted.
+  stageLauncherDoor();
   pruneRunDirs(runtimeBase);
   const runtimeDir = fs.mkdtempSync(path.join(runtimeBase, 'run-'));
   let child;

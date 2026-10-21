@@ -25,7 +25,7 @@ import {
 import { readGateKillGraceMs, readCancelWaitMs, DEFAULT_GATE_KILL_GRACE_MS } from '../../src/run-supervisor/gate-kill-grace.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../../src/verbs/dispatch/recover.mjs';
 import { descriptionHolders } from '../../src/holder-lock/driver.mjs';
-import { getProcessStartTime } from '../../src/runner/dispatch/process-identity.mjs';
+import { selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
 
 const HOST_BIN = process.env.FGOS_HOST_BIN;
 const HAS_FLOCK = spawnSync('flock', ['--version'], { stdio: 'ignore' }).status === 0;
@@ -388,7 +388,7 @@ test('legacy-attempts-stuck: a run with a live recorded process is kept and the 
   const w = legacyWorkspace('legacy-alive');
   const generation = path.join(w.herdr, 'control', 'generations', '0000000001.json');
   const record = JSON.parse(fs.readFileSync(generation, 'utf8'));
-  record.holder = { id: 'live', pid: process.pid, processStartTime: getProcessStartTime(process.pid) };
+  record.holder = { id: 'live', pid: process.pid, processStartTime: selfRecord().startTime };
   fs.writeFileSync(generation, JSON.stringify(record));
 
   const res = checkLegacyAttemptsStuck(w.root, { confinementRoot: w.confinementRoot });
