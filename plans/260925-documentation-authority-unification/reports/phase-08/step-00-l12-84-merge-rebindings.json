@@ -1,0 +1,147 @@
+{
+  "inputHEAD": "8461ef5fccff574465b01cdc4ff10df03ed6f5f8",
+  "prior": "ab3c971a4ba71d33379968734f849f07d091a22d",
+  "merge": "8461ef5fccff574465b01cdc4ff10df03ed6f5f8",
+  "main": "5538b9484acfd5191b4205549a1dd3998df47b48",
+  "base": "cef8b532e82530f365ab1d3acb1a9b1d49e635a8",
+  "accountedMerges": [
+    {
+      "merge": "9c5dfe10a020e63ea7a2f72d7d002ba0f33c76e5",
+      "firstParent": "2de11f371f5b9b0efd1c0b638d9f212681ee3dc0",
+      "main": "56461cc790598f4b062a0568fd714cb05a2318f1",
+      "base": "cef8b532e82530f365ab1d3acb1a9b1d49e635a8",
+      "mainCommits": 5,
+      "changedPaths": [
+        "packages/git/contracts/mutation-census.v1.json",
+        "plans/261017-1313-fgos-platform-program-board/plan.md",
+        "plans/reports/guide-261021-0606-owner-machine-git07-08-landing.md",
+        "plans/reports/landing-261021-0606-git07-08-this-machine.md",
+        "plans/reports/landing-261021-0841-git07-08-owner-machine.md",
+        "scripts/event-store/forge-probe.sh",
+        "scripts/event-store/power-loss-driver.mjs",
+        "scripts/event-store/power-loss.sh"
+      ],
+      "changedCandidateFiles": []
+    },
+    {
+      "merge": "8461ef5fccff574465b01cdc4ff10df03ed6f5f8",
+      "firstParent": "bbc6ba468755618fe4d634ccfc2ccda9912601b7",
+      "main": "5538b9484acfd5191b4205549a1dd3998df47b48",
+      "base": "56461cc790598f4b062a0568fd714cb05a2318f1",
+      "mainCommits": 19,
+      "changedPaths": [
+        "AGENTS.md",
+        "packages/git/rust/src/publication.rs",
+        "plans/261017-1313-fgos-platform-program-board/log.md",
+        "plans/261017-1313-fgos-platform-program-board/plan.md",
+        "plans/reports/handoff-261021-1021-rule-management-tight-no-conflict-right-place.md",
+        "plans/reports/proposal-261021-0851-harden-review-criteria-and-method.md",
+        "plans/reports/review-261021-1008-rules-that-grow-the-system.md",
+        "scripts/event-store/power-loss.sh",
+        "scripts/git/e1-power-cut.sh"
+      ],
+      "changedCandidateFiles": []
+    }
+  ],
+  "mainCommits": 24,
+  "changedPaths": [
+    "AGENTS.md",
+    "packages/git/contracts/mutation-census.v1.json",
+    "packages/git/rust/src/publication.rs",
+    "plans/261017-1313-fgos-platform-program-board/log.md",
+    "plans/261017-1313-fgos-platform-program-board/plan.md",
+    "plans/reports/guide-261021-0606-owner-machine-git07-08-landing.md",
+    "plans/reports/handoff-261021-1021-rule-management-tight-no-conflict-right-place.md",
+    "plans/reports/landing-261021-0606-git07-08-this-machine.md",
+    "plans/reports/landing-261021-0841-git07-08-owner-machine.md",
+    "plans/reports/proposal-261021-0851-harden-review-criteria-and-method.md",
+    "plans/reports/review-261021-1008-rules-that-grow-the-system.md",
+    "scripts/event-store/forge-probe.sh",
+    "scripts/event-store/power-loss-driver.mjs",
+    "scripts/event-store/power-loss.sh",
+    "scripts/git/e1-power-cut.sh"
+  ],
+  "changedCandidateFiles": [],
+  "changedDocs": [
+    "AGENTS.md"
+  ],
+  "mainPathCommits": {
+    "AGENTS.md": [
+      "5538b9484 docs(agents): read the program board only when a lane changes and keep its log in a separate file"
+    ],
+    "packages/git/contracts/mutation-census.v1.json": [
+      "293898dc0 chore(git): refresh the mutation census to the released payload"
+    ],
+    "packages/git/rust/src/publication.rs": [
+      "a8a306a35 fix(git): write Publication trees through the fsynced object write"
+    ],
+    "plans/261017-1313-fgos-platform-program-board/log.md": [
+      "5538b9484 docs(agents): read the program board only when a lane changes and keep its log in a separate file"
+    ],
+    "plans/261017-1313-fgos-platform-program-board/plan.md": [
+      "56461cc79 docs(board): record the Git 07-08 land on the owner machine",
+      "831ea9f06 docs(board): record the Git 07-08 merge, the landing on the second machine and the owner-machine guide",
+      "5538b9484 docs(agents): read the program board only when a lane changes and keep its log in a separate file",
+      "c5dd9e886 docs(reports): hand off rule management to its own lane",
+      "c2a7645a4 docs(board): record the rule location inventory",
+      "002b6f9a6 docs(reports): review which rules make the system grow",
+      "89a7a5e6a docs(reports): extend the hardening review to the execution core and the agent surface",
+      "39035b7f8 docs(board): record the mdview daemon move to the current release",
+      "a7d42e9ad docs(board): record the hardening review revision",
+      "45d03ba43 docs(board): propose the hardening review criteria and method",
+      "63db5c61c docs(board): open the lane that keeps briefs out of shell panes"
+    ],
+    "plans/reports/guide-261021-0606-owner-machine-git07-08-landing.md": [
+      "831ea9f06 docs(board): record the Git 07-08 merge, the landing on the second machine and the owner-machine guide"
+    ],
+    "plans/reports/handoff-261021-1021-rule-management-tight-no-conflict-right-place.md": [
+      "c5dd9e886 docs(reports): hand off rule management to its own lane"
+    ],
+    "plans/reports/landing-261021-0606-git07-08-this-machine.md": [
+      "831ea9f06 docs(board): record the Git 07-08 merge, the landing on the second machine and the owner-machine guide"
+    ],
+    "plans/reports/landing-261021-0841-git07-08-owner-machine.md": [
+      "56461cc79 docs(board): record the Git 07-08 land on the owner machine"
+    ],
+    "plans/reports/proposal-261021-0851-harden-review-criteria-and-method.md": [
+      "89a7a5e6a docs(reports): extend the hardening review to the execution core and the agent surface",
+      "7dc2c33ed docs(reports): add dead paths, slow and duplicate tests and easy Rust moves to the hardening review",
+      "405bfdf92 docs(reports): order the hardening review by component layer, bottom up",
+      "45d03ba43 docs(board): propose the hardening review criteria and method"
+    ],
+    "plans/reports/review-261021-1008-rules-that-grow-the-system.md": [
+      "00cd5f9fc docs(reports): inventory where rules live and why they do not reach the work",
+      "002b6f9a6 docs(reports): review which rules make the system grow"
+    ],
+    "scripts/event-store/forge-probe.sh": [
+      "516f068ef fix(event-store): find the staged addon where scripts/git-addon.mjs now puts it"
+    ],
+    "scripts/event-store/power-loss-driver.mjs": [
+      "516f068ef fix(event-store): find the staged addon where scripts/git-addon.mjs now puts it"
+    ],
+    "scripts/event-store/power-loss.sh": [
+      "70a56032d fix(event-store): run the power-loss writer with the invoking user's HOME",
+      "516f068ef fix(event-store): find the staged addon where scripts/git-addon.mjs now puts it",
+      "a8a306a35 fix(git): write Publication trees through the fsynced object write"
+    ],
+    "scripts/git/e1-power-cut.sh": [
+      "a9fd9e372 fix(git): run the power-cut experiment's user steps with the owner's HOME",
+      "31ca928c8 fix(git): read replay-log's usage text instead of its exit status",
+      "03c63deeb fix(git): say why the power-cut experiment stops when sudo drops node from PATH"
+    ]
+  },
+  "extractorsAgree": true,
+  "checkedBindings": [],
+  "successorGroupMemberChecks": [],
+  "entries": [],
+  "parked": [],
+  "needsWrites": [],
+  "counts": {
+    "directChecked": 0,
+    "groupMembersChecked": 0,
+    "changedBindings": 0,
+    "pendingReview": 0
+  },
+  "phase9ConservationUnionAdditions": [],
+  "acceptance": "Author binding verification only; independent changed-binding review and real runner commit L12-11 accounting remain owed."
+}

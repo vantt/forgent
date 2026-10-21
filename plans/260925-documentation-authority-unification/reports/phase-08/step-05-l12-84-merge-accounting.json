@@ -1,0 +1,2466 @@
+{
+  "merge": "8461ef5fccff574465b01cdc4ff10df03ed6f5f8",
+  "prior": "ab3c971a4ba71d33379968734f849f07d091a22d",
+  "main": "5538b9484acfd5191b4205549a1dd3998df47b48",
+  "base": "cef8b532e82530f365ab1d3acb1a9b1d49e635a8",
+  "accountedMerges": [
+    {
+      "merge": "9c5dfe10a020e63ea7a2f72d7d002ba0f33c76e5",
+      "firstParent": "2de11f371f5b9b0efd1c0b638d9f212681ee3dc0",
+      "main": "56461cc790598f4b062a0568fd714cb05a2318f1",
+      "base": "cef8b532e82530f365ab1d3acb1a9b1d49e635a8",
+      "mainCommits": 5,
+      "changedPaths": [
+        "packages/git/contracts/mutation-census.v1.json",
+        "plans/261017-1313-fgos-platform-program-board/plan.md",
+        "plans/reports/guide-261021-0606-owner-machine-git07-08-landing.md",
+        "plans/reports/landing-261021-0606-git07-08-this-machine.md",
+        "plans/reports/landing-261021-0841-git07-08-owner-machine.md",
+        "scripts/event-store/forge-probe.sh",
+        "scripts/event-store/power-loss-driver.mjs",
+        "scripts/event-store/power-loss.sh"
+      ]
+    },
+    {
+      "merge": "8461ef5fccff574465b01cdc4ff10df03ed6f5f8",
+      "firstParent": "bbc6ba468755618fe4d634ccfc2ccda9912601b7",
+      "main": "5538b9484acfd5191b4205549a1dd3998df47b48",
+      "base": "56461cc790598f4b062a0568fd714cb05a2318f1",
+      "mainCommits": 19,
+      "changedPaths": [
+        "AGENTS.md",
+        "packages/git/rust/src/publication.rs",
+        "plans/261017-1313-fgos-platform-program-board/log.md",
+        "plans/261017-1313-fgos-platform-program-board/plan.md",
+        "plans/reports/handoff-261021-1021-rule-management-tight-no-conflict-right-place.md",
+        "plans/reports/proposal-261021-0851-harden-review-criteria-and-method.md",
+        "plans/reports/review-261021-1008-rules-that-grow-the-system.md",
+        "scripts/event-store/power-loss.sh",
+        "scripts/git/e1-power-cut.sh"
+      ]
+    }
+  ],
+  "mainCommits": 24,
+  "changedPaths": [
+    "AGENTS.md",
+    "packages/git/contracts/mutation-census.v1.json",
+    "packages/git/rust/src/publication.rs",
+    "plans/261017-1313-fgos-platform-program-board/log.md",
+    "plans/261017-1313-fgos-platform-program-board/plan.md",
+    "plans/reports/guide-261021-0606-owner-machine-git07-08-landing.md",
+    "plans/reports/handoff-261021-1021-rule-management-tight-no-conflict-right-place.md",
+    "plans/reports/landing-261021-0606-git07-08-this-machine.md",
+    "plans/reports/landing-261021-0841-git07-08-owner-machine.md",
+    "plans/reports/proposal-261021-0851-harden-review-criteria-and-method.md",
+    "plans/reports/review-261021-1008-rules-that-grow-the-system.md",
+    "scripts/event-store/forge-probe.sh",
+    "scripts/event-store/power-loss-driver.mjs",
+    "scripts/event-store/power-loss.sh",
+    "scripts/git/e1-power-cut.sh"
+  ],
+  "changedCandidateFiles": [],
+  "changedDocs": [
+    "AGENTS.md"
+  ],
+  "overlaps": {
+    "step3": {
+      "count": 0,
+      "records": []
+    },
+    "step4": {
+      "count": 1,
+      "records": [
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+          "line": 1,
+          "hit": [
+            "AGENTS.md"
+          ]
+        }
+      ]
+    },
+    "step5": {
+      "count": 295,
+      "records": [
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 1,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".githooks/pre-commit"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 2,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "bin/fgos.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 3,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/cli/command-registry.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 4,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/intake/plan.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 5,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/intake/verify-pattern-check.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 6,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/runner/claim-port.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 7,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/runner/merge.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 8,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/runner/worktree.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 9,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/state/events-jsonl-truncation-guard.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+          "line": 1,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "apps/fgos-gateway/src/gateway.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+          "line": 2,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "apps/fgos-gateway/src/mcp.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-decision-index.jsonl",
+          "line": 1,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "docs/decisions/index.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-decision-index.jsonl",
+          "line": 2,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/report/decision-index.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-doc-registry.jsonl",
+          "line": 1,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "docs/doc-registry.json"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-doc-registry.jsonl",
+          "line": 2,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "docs/doc-registry.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-doc-registry.jsonl",
+          "line": 3,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/report/knowledge-projection.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+          "line": 1,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "docs/enduser-docs-index.json"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+          "line": 2,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/report/authoritative-match.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+          "line": 3,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/report/enduser-index-generate.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+          "line": 4,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/report/enduser-index.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+          "line": 5,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/report/frontmatter.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+          "line": 6,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/report/item-trace.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+          "line": 7,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/report/knowledge-resolver.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-instructions.jsonl",
+          "line": 1,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/instructions/platform-laws.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-instructions.jsonl",
+          "line": 2,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/instruction-projections.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 1,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/_shared/capability-catalog.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 2,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/_shared/catchup-self-recovery.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 3,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/_shared/coding-cell-policy.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 4,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/_shared/coding-worker-contract.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 5,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/_shared/executor-dispatch-fallback.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 6,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/_shared/fgos-cli-fallback.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 7,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/_shared/planning-capability-awareness.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 8,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/distill/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 9,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/distill/references/consult-protocol.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 10,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/distill/references/deep-dive-protocol.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 11,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/distill/references/extract-rules.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 12,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/distill/scripts/distill.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 13,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 14,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-clarifying/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 15,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-discovering/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 16,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-exploring/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 17,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-exploring/references/gate-mechanics.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 18,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 19,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 20,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-implement/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 21,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-implement/references/implement-and-collaboration.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 22,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 23,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 24,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-knowledge/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 25,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-planning/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 26,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-planning/references/approach-and-shape.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 27,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 28,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 29,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-shaping/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 30,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-validating/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 31,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 32,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 33,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-indexing/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 34,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-researching/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 35,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".agents/skills/fgos-routing/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 36,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".claude/skills/distill/scripts/distill.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 37,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": ".claude/skills/distill/scripts/migrate-porting-state-backfill.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 38,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/agents/code-reviewer.yaml"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 39,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/agents/council-assumptions.yaml"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 40,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/agents/council-feedback-loops.yaml"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 41,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/agents/council-ship-maintain.yaml"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 42,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/agents/debugger.yaml"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 43,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/agents/docs-manager.yaml"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 44,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/agents/fgos-placeholder.yaml"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 45,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/agents/fullstack-developer.yaml"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 46,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/agents/planner.yaml"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 47,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/agents/researcher.yaml"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 48,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/_shared/capability-catalog.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 49,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/_shared/catchup-self-recovery.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 50,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/_shared/coding-worker-contract.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 51,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/_shared/executor-dispatch-fallback.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 52,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/_shared/fgos-cli-fallback.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 53,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/_shared/planning-capability-awareness.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 54,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/distill/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 55,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/distill/references/consult-protocol.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 56,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/distill/references/deep-dive-protocol.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 57,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/distill/references/extract-rules.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 58,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/distill/scripts/distill.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 59,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/distill/scripts/migrate-porting-state-backfill.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 60,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/fgos-clarifying/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 61,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/fgos-indexing/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 62,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/fgos-researching/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 63,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/fgos-routing/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 64,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/skills/instruction-audit/scripts/instruction-audit.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 65,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "core/task-specs/fgos-indexing.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 66,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "docs/backlog.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 67,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "docs/transitional-switchboard.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 68,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/harness/enrich-and-validate-contract.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 69,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/_shared/coding-cell-policy.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 70,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-discovering/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 71,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-exploring/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 72,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 73,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 74,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 75,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-implement/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 76,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 77,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 78,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 79,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-knowledge/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 80,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-planning/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 81,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 82,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 83,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 84,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-shaping/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 85,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-validating/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 86,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 87,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 88,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/coding/task-specs/shape-plan.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 89,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/marketing/agents/buyer-channel-skeptic.yaml"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 90,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/marketing/agents/offer-pricing-critic.yaml"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 91,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/marketing/agents/solo-capacity-checker.yaml"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 92,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "domains/marketing/agents/value-chain-strategist.yaml"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 93,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/dogfood-fixture/skills/list/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 94,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/_shared/capability-catalog.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 95,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/_shared/catchup-self-recovery.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 96,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/_shared/coding-cell-policy.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 97,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/_shared/coding-worker-contract.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 98,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 99,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/_shared/fgos-cli-fallback.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 100,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/_shared/planning-capability-awareness.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 101,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/answer/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 102,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/approve/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 103,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/ask/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 104,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/cleanup-loop/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 105,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/cleanup-next/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 106,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/coding-shape-distill/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 107,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/coding-shape/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 108,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/conflicts/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 109,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/deliver/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 110,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/discover-next/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 111,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/discover/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 112,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-clarifying/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 113,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 114,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-exploring/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 115,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-exploring/references/gate-mechanics.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 116,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 117,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 118,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-implement/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 119,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-implement/references/implement-and-collaboration.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 120,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 121,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-implement/references/worker-contract-and-orient.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 122,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 123,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-planning/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 124,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-planning/references/approach-and-shape.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 125,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 126,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 127,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 128,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-validating/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 129,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 130,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 131,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-indexing/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 132,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-researching/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 133,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-routing/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 134,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/goal/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 135,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/graph/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 136,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/list/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 137,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/merge-list/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 138,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/merge-loop/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 139,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/merge-next/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 140,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/move/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 141,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/pick/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 142,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/plan-next/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 143,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/plan/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 144,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/ready/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 145,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/retro-loop/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 146,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/retro-next/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 147,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/return/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 148,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/rollup/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 149,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/show/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 150,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/stale/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 151,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/submit/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 152,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/terminal-close/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 153,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/terminal-close/close.sh"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 154,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/terminal/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 155,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/terminal/rename.sh"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 156,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/terminal/terminal-port.sh"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 157,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "plugins/fgOS/skills/triage/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 158,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/backfill-status-category.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 159,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/backfill-unit-summaries.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 160,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/build-domain-registry.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 161,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/build-rust-distribution.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 162,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/build-skill-wrappers.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 163,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/check-backlog-reconciliation.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 164,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/check-decision-codes.baseline.json"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 165,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/check-decision-codes.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 166,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/check-decision-supersession.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 167,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/check-doc-candidate-status.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 168,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/check-doc-constitution.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 169,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/check-doc-inventory-gates.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 170,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/check-doc-retirement.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 171,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/check-glibc-ceiling.sh"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 172,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/check-hook-registrations-guarded.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 173,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/check-locked-decisions-heading-drift.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 174,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/ci-asset-server.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 175,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/ci-external-consumer.ps1"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 176,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/ci-external-consumer.sh"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 177,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/decision-question-hook.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 178,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/dispatch-decide-hook.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 179,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/doc-alias-resolver.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 180,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/doc-binding-repair.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 181,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/doc-inventory-artifact.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 182,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/doc-link-pass.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 183,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/doc-rationale-facts.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 184,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/event-store/v-spawn-bench.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 185,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/events-jsonl-truncation-guard.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 186,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/explain-command-route.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 187,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/export-command-selectors.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 188,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/fgos-session-start-hook.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 189,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/fgos-shell-integration.sh"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 190,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/generate-doc-inventory.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 191,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/generate-shipped-path-inventory.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 192,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/git/e3-bench.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 193,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/herdr-cockpit-notify.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 194,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/herdr-cockpit.sh"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 195,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/install-git-hooks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 196,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/install.ps1"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 197,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/knowledge-bootstrap.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 198,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/knowledge-canary.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 199,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/knowledge-classifier.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 200,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/knowledge-migration.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 201,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/lib/full-suite-queue.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 202,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/lib/is-main-module.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 203,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/lib/test-file-watchdog.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 204,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/lib/test-git-config-guard.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 205,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/list-doc-anchors.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 206,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/measure-coordination-baseline.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 207,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/measure-p08-performance.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 208,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/measure-verify-cost.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 209,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/migrate-actor-to-role.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 210,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/migrate-status-proposed-to-awaiting-approval.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 211,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/migration-proof-2a.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 212,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/next-doc-id.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 213,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/package-release-assets.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 214,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/prepare-release.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 215,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/probe-storytelling-material.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 216,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/project-agents.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 217,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/propose-doc-decisions.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 218,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/regenerate-observe-fixtures.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 219,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/run-rust-dev-host.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 220,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/run-test-canary.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 221,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/run-tests.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 222,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/stress-test-files.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 223,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/test-ownership-lint.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 224,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/test-proof-inventory.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 225,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/test-select-compare.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 226,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/test-select-coverage-map.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 227,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/test-select-mutate.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 228,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/test-select-promote-report.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 229,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/test-select-promote.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 230,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/test-select-run-plan.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 231,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/test-select.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 232,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/test-timing.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 233,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/verify-fanout-overlap.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 234,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/verify-phase-01.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 235,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/verify-phase-02.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 236,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/write-test-marker.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 237,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "scripts/write-wrapper-script.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 238,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/report/capability-plan-lint.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 239,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/report/context-render.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 240,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/report/knowledge-resolver.mjs; apps/fgos-gateway/web/src/lib/network.ts"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 1,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/agent-cli-trust.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 2,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/agent-hooks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 3,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/agy-permissions.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 4,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/ansi.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 5,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/bin-discovery.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 6,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/blind-steps-proven-pools.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 7,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/checks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 8,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/config-merge.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 9,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/event-store-checks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 10,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/event-store-fixes.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 11,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/executor-posture-coverage.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 12,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/executor-profile-warnings.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 13,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/git-checks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 14,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/git-hooks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 15,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/holder-lock-checks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 16,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/instruction-composition.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 17,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/instruction-registry.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 18,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/lock-record-checks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 19,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/model-pool-checks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 20,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/project-launcher.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 21,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/registrations.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 22,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/run-supervisor-checks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 23,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/shell-rc.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 24,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/skill-wrappers.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 25,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/terminal-control-checks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 26,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "src/setup/workflow-pool-independence.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+          "line": 38,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "test/docs/run-doors-doctrine.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file-batch3.jsonl",
+          "line": 1,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "test/docs/rul104-anchor-phrase.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
+          "line": 1,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "test/docs/decisions-corpus-retired.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
+          "line": 2,
+          "hit": [
+            "AGENTS.md"
+          ],
+          "file": "test/docs/rul11-anchor-phrase.test.mjs"
+        }
+      ]
+    }
+  },
+  "step0Receipt": "step-00-l12-84-binding-check.json",
+  "ratchet": {
+    "exit": 0,
+    "log": "step-00-l12-84-ratchet.log"
+  },
+  "ratchetTests": {
+    "exit": 0,
+    "passed": 28,
+    "log": "step-00-l12-84-ratchet-tests.log"
+  },
+  "exceptionsChanged": false,
+  "refreshedExceptions": [],
+  "rebindingsApplied": 0,
+  "acceptance": "Author accounting; independent review and actual runner-commit accounting remain owed.",
+  "logHashes": {
+    "step-00-l12-84-ratchet.log": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319",
+    "step-00-l12-84-ratchet-tests.log": "b4f503b5d7b1116320a934fa8eab23989322f99d04ba8a7704873e969b40f664"
+  }
+}
