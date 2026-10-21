@@ -95,6 +95,49 @@ impl GitDriver {
         }
         Ok(json!({"operations":operations,"complete":scan.complete}))
     }
+    /// Land chains that finished (delivered, abandoned or lost) but whose
+    /// candidate worktree and pins are still held: the consumer has not yet
+    /// acknowledged them, so the live chain is the retention marker and the
+    /// compaction ledger never lists one. Read-only; nothing is released here.
+    pub fn list_retained_land(&self, repo: &RepoHandle, bound: usize) -> Result<Value> {
+        let wal = match Wal::open_existing(repo.common_dir(), wal::OsFileSystem) {
+            Ok(wal) => wal,
+            // No journal yet means no Land ever ran here.
+            Err(wal::WalError::Io(io)) if io.kind() == std::io::ErrorKind::NotFound => {
+                return Ok(json!({"candidates":[],"complete":true}));
+            }
+            Err(e) => return Err(failure(e)),
+        };
+        let scan = wal.scan(bound).map_err(failure)?;
+        let mut candidates = vec![];
+        for e in &scan.entries {
+            if let Some(error) = &e.error {
+                return Err(failure(format!(
+                    "git-wal-unreadable: {}: {error}",
+                    e.operation_id
+                )));
+            }
+            if !e.terminal || wal.compacted(&e.operation_id).map_err(failure)?.is_some() {
+                continue;
+            }
+            let chain = wal.inspect(&e.operation_id).map_err(failure)?;
+            let OperationKind::Land(land) = &chain.intent().kind else {
+                continue;
+            };
+            let updated_at_ms = wal
+                .last_change(&e.operation_id)
+                .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+                .map(|d| d.as_millis() as u64);
+            candidates.push(json!({
+                "operationId": e.operation_id,
+                "worktree": land.candidate.worktree,
+                "worktreePresent": land.candidate.worktree.exists(),
+                "candidateRef": format!("refs/fgos/git-operations/{}/candidate", e.operation_id),
+                "updatedAtMs": updated_at_ms,
+            }));
+        }
+        Ok(json!({"candidates":candidates,"complete":scan.complete}))
+    }
     /// Publication delegates through its caller-held seal; it cannot be inferred
     /// from a supervisor lock. No network request is replayed here.
     pub fn reconcile_operation(

@@ -509,7 +509,17 @@ fn current_target_is_pinned_after_destination_acquisition_and_replays_after_clea
     let verification = evidence(&session);
     let receipt = f.driver.publish_land(&f.repo, &mut session, &verification).unwrap();
     drop(session);
+    let retained = f.driver.list_retained_land(&f.repo, 100).unwrap();
+    assert_eq!(retained["complete"], true);
+    assert_eq!(retained["candidates"].as_array().unwrap().len(), 1);
+    let kept = &retained["candidates"][0];
+    assert_eq!(kept["operationId"], "current");
+    assert_eq!(kept["worktree"], candidate.worktree.to_string_lossy().as_ref());
+    assert_eq!(kept["worktreePresent"], true);
+    assert_eq!(kept["candidateRef"], "refs/fgos/git-operations/current/candidate");
+    assert!(kept["updatedAtMs"].as_u64().unwrap() > 0);
     assert!(f.driver.acknowledge_land(&f.repo, "fixture", "current", "durable-consumer-ack").unwrap().is_empty());
+    assert!(f.driver.list_retained_land(&f.repo, 100).unwrap()["candidates"].as_array().unwrap().is_empty());
     assert!(!candidate.worktree.exists());
     git(&f.main, &["update-ref", "refs/heads/trunk", &f.request.target]);
     let replay = f.driver.prepare_land(&f.repo, vec![], &request, "fixture", "current").unwrap();

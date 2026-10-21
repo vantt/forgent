@@ -1,26 +1,30 @@
-# Land retained candidates in doctor: stopped, no release command exists
+# Retained Land candidates in doctor (owner decision: doctor visibility only)
 
-Date 2026-10-21, branch `git/followups`. Nothing implemented; no product file touched.
+Date 2026-10-21, branch `git/followups`. Supersedes the earlier NEEDS_CONTEXT version of this report.
 
-## Finding: no operator-runnable release exists today
+## What changed
 
-The task says to stop and report if no existing verb releases a retained candidate. Evidence:
+- Rust read (`packages/git/rust/src/recovery.rs`): `list_retained_land` lists live terminal Land chains. A chain is compacted only after Work's acknowledgement releases the candidate, so a terminal live Land chain is the retention marker. Each row: operation id, candidate worktree path, whether it is still on disk, candidate pin ref, WAL last-change time (ms). No WAL yet means an empty list. Read-only.
+- Addon: one dispatch arm `listRetainedLand` in `packages/git/node-addon/src/git/recovery.rs`, next to `listPending`; Node name added to `src/git/recovery.mjs`. Not touched: `lib.rs`, `Cargo.toml`, `native.mjs`, `git.rs` (the Recovery dispatch lives in `git/recovery.rs`, outside the files the coordinator reserved).
+- Doctor: `checkLandRetainedCandidates` in `src/setup/git-checks.mjs`, registered as check `git-land-recovery` (the id of the existing fix, so one row has check and fix). Pass when none; pass with a `warning:` message (the repo's warn convention) listing id, path, pin and age when any exist; the message states no manual release command exists today and the sweep comes with the Work lane. Never fails for retention.
+- Reused: Recovery port and addon door, `listPending`'s scan, `fixLandRecovery` row id. No new scanner, no release verb, no cleanup.
+- Spec: new `git-land-recovery` row in the doctor table, `listRetainedLand` in the Recovery contract text, and a "Deferred: release of retained Land candidates" paragraph. CHANGELOG line, doctor registry doc list, mutation census regenerated (`--write-census`).
 
-- The only release path is `GitLand.recover({ operationId, consumerAcknowledgement })`, called from `acknowledgeLand` (`src/runner/merge.mjs:1315`) and `src/workflow/runner.mjs:627`. Both run inside merge verbs, right after Work records its decision.
-- `fgos --help` lists no verb that calls it. `fgos merge` has only `list|next`. `fgos dispatch recover` is for standalone Runs. `fgos worktree gc` spares worktrees it does not own as session entries and does not touch Land pins or the WAL.
-- `fgos doctor --fix` (`git-land-recovery`, `fixLandRecovery`, `src/setup/git-checks.mjs:119`) only calls `Recovery.reconcile`. Its own comment says candidates "stay until Work acknowledges them".
-- The acknowledgement string (`work-decision:<id>:<seq>`) names a Work decision. A copy-paste command would have to invent the string or a new verb (for example `fgos land release <id> --ack ...`), which this task forbids.
+## Proofs (principle 8)
 
-## Second finding: the data is not exposed either
+- Rust owning proof: extended `current_target_is_pinned_after_destination_acquisition_and_replays_after_cleanup` (tests/land.rs): listed after publish, empty after acknowledgement.
+- Node wiring proof: `doctor warns, never fails, about a finished Land whose candidate is still retained` (test/git/recovery.test.mjs): pass before, warning after.
+- `test/setup/checks.test.mjs` registered-id list gained `git-land-recovery`.
 
-`Recovery.list_pending` (`packages/git/rust/src/recovery.rs:81`) returns only operations with `!terminal`. A Land that succeeded or abandoned and has an unreleased candidate is terminal, so it is not listed. `git-operation-journal` counts only the same pending set. Doctor therefore cannot see a retained candidate without a Rust read-side change (list terminal Land chains whose candidate pin still exists, plus candidate path and age). The spec (§ retention, "consumer acknowledgement debt") says doctor reports this debt, so the read side is the intended place, but it is more than 30 lines and outside "only if data not already exposed" minimal scope.
+## Gates
 
-## What is needed to proceed (owner decision)
+- `cargo clippy --workspace --all-targets -- -D warnings`: clean. `cargo test -p fgos-git`: all ok.
+- Full `npm test` with the tracked `.fgos/config.json` restored for the run (stub restored and skip-worktree re-set afterwards, not committed): 8678 pass, 0 fail.
+- `suite: 581 files, 8088 test() calls, 489 s wall (baseline 581 / 8087 / 202 s at 78334ff1d)`
 
-1. Release command: choose one.
-   a. Report-only with the manual procedure stated as "needs Work's acknowledgement; release happens when the Work lane resumes the sweep" (no copy-paste command; deviates from the acceptance text).
-   b. Add a minimal operator verb that calls `recover` with an explicit `--ack <string>` (new door, extends scope).
-2. Authorize the Rust read-side addition (terminal Land chains with a retained candidate: operation id, candidate path/ref, WAL timestamp) feeding the existing `git-land-recovery` row as a check beside its fix (reuse, no parallel scanner).
-3. Spec open list: record the sweep as deferred until the Work acknowledgement reader exists (not yet written).
+## Notes
 
-Status: NEEDS_CONTEXT
+- A candidate whose worktree was already removed but whose chain is not yet compacted shows as "already gone".
+- Compaction of an interrupted release is outside this read; such a chain still lists until Land resumes it.
+
+Status: DONE
