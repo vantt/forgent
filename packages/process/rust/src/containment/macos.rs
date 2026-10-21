@@ -5,13 +5,13 @@
 
 use std::fs::File;
 use std::io;
-use std::process::{Command, Stdio};
-use std::time::{Duration, Instant};
+use std::process::Command;
+use std::time::Duration;
 
+use super::pgroup::{self, apply_stdio, wait_until, ListFn, Members, Unlistable, POLL};
 use super::{ContainmentDomain, ContainmentDriver, ContainmentError, Guarantee, GuaranteeLevel, SpawnSpec, Spawned};
 use crate::control::{self, Signal};
-use crate::facts::{self, ProcTuple, Verdict};
-use crate::platform::as_pid_t;
+use crate::facts::{self, Observed, ProcTuple, Verdict};
 use crate::{signal_settled, Domain, DomainState, FdSlot, KillOutcome, ProcId};
 
 /// `proc_listpids` selector: processes of one process group.
@@ -23,7 +23,6 @@ const PROC_PPID_ONLY: u32 = 6;
 /// flight at the first look is visible by then. A constant because the driver
 /// is best-effort.
 const RESCAN: Duration = Duration::from_millis(500);
-const POLL: Duration = Duration::from_millis(10);
 
 /// `macos-tree`.
 pub struct MacosTree;
@@ -71,7 +70,7 @@ impl ContainmentDriver for MacosTree {
             return DomainState::Unknown;
         };
         if facts::judge_here(&root.to_record()) == Verdict::Alive {
-            remember_tree(&root, &mut domain.seen);
+            pgroup::remember_tree(members, &root, &mut domain.seen);
         }
         prune_dead(&root, &mut domain.seen);
         tree_state(&root, &domain.seen)
@@ -83,8 +82,9 @@ impl ContainmentDriver for MacosTree {
         };
         if grace_ms > 0 {
             // Snapshot first: a gate that ends on SIGTERM takes the tree links with it.
-            remember_tree(&root, &mut domain.seen);
-            let _ = signal_group(&root, libc::SIGTERM);
+            if pgroup::remember_tree(members, &root, &mut domain.seen) {
+                let _ = pgroup::signal_group(&root, libc::SIGTERM);
+            }
             wait_until(Duration::from_millis(grace_ms), || tree_state(&root, &domain.seen) == DomainState::Empty);
         }
         let wait = domain.empty_wait();
@@ -130,15 +130,12 @@ fn list_pids(selector: u32, info: u32) -> Vec<u32> {
     Vec::new()
 }
 
-/// The live (non-zombie) process under `pid`, with its identity.
-fn live_tuple(pid: u32) -> Option<ProcTuple> {
-    crate::platform::current().identity_of(ProcId(pid))
-}
-
 /// Every live descendant of `root` by parent links and every live process in
 /// the group `pgid`, `root` itself excluded. The tree is walked only while
 /// `root` is still the recorded leader: a dead leader's pid may name anyone.
-fn members(root: u32, walk_tree: bool, pgid: Option<u32>) -> Vec<ProcTuple> {
+/// A process that is gone or a zombie is left out; one this observer cannot
+/// read is counted, never dropped.
+fn members(root: u32, walk_tree: bool, pgid: Option<u32>) -> Result<Members, Unlistable> {
     let mut pids: Vec<u32> = Vec::new();
     if walk_tree {
         let mut frontier = vec![root];
@@ -158,33 +155,25 @@ fn members(root: u32, walk_tree: bool, pgid: Option<u32>) -> Vec<ProcTuple> {
             }
         }
     }
-    pids.into_iter().filter_map(live_tuple).collect()
-}
-
-/// Add the live descendants of the leader to what the domain has seen.
-fn remember_tree(root: &ProcTuple, seen: &mut Vec<ProcTuple>) {
-    for tuple in members(root.pid.0, true, None) {
-        if !seen.contains(&tuple) {
-            seen.push(tuple);
+    let platform = crate::platform::current();
+    let observer = facts::observer();
+    let mut tuples = Vec::new();
+    let mut unreadable = 0;
+    for pid in pids {
+        match platform.observe(ProcId(pid)) {
+            Observed::Live { start_time } => {
+                tuples.push(ProcTuple { host: observer.host.clone(), boot_id: observer.boot_id.clone(), pid_ns: observer.pid_ns.clone(), pid: ProcId(pid), start_time })
+            }
+            Observed::Absent | Observed::Zombie => {}
+            Observed::Unreadable(_) => unreadable += 1,
         }
     }
+    Ok(Members { tuples, unreadable })
 }
 
-/// The state of a `macos-tree` domain: the root is dead, nobody is left in its
-/// group, and no process seen in its tree is still alive.
+/// The state of a `macos-tree` domain; see [`pgroup::state`].
 pub(crate) fn tree_state(root: &ProcTuple, seen: &[ProcTuple]) -> DomainState {
-    match facts::judge_here(&root.to_record()) {
-        Verdict::Alive => return DomainState::NotEmpty,
-        Verdict::Unknown => return DomainState::Unknown,
-        Verdict::Dead => {}
-    }
-    if !members(root.pid.0, false, Some(root.pid.0)).is_empty() {
-        return DomainState::NotEmpty;
-    }
-    if seen.iter().any(|tuple| tuple != root && facts::judge_here(&tuple.to_record()) == Verdict::Alive) {
-        return DomainState::NotEmpty;
-    }
-    DomainState::Empty
+    pgroup::state(members as ListFn, root, seen)
 }
 
 /// Forget what has died: a dead process cannot return, and every poll judges
@@ -204,76 +193,9 @@ pub(crate) fn tree_state_adopt(root: &ProcTuple) -> DomainState {
     tree_state(root, &[])
 }
 
-/// `killpg` while the root is provably the group's leader, then kill by
-/// identity everything seen in the tree or the group, until a pass finds none.
+/// Ends a `macos-tree` domain; see [`pgroup::kill`].
 pub(crate) fn tree_kill(root: &ProcTuple, seen: &mut Vec<ProcTuple>, empty_wait: Duration) -> KillOutcome {
-    let mut refused = false;
-    for _ in 0..10 {
-        let root_alive = facts::judge_here(&root.to_record()) == Verdict::Alive;
-        if root_alive {
-            remember_tree(root, seen);
-            let _ = signal_group(root, libc::SIGKILL);
-        }
-        let mut targets = members(root.pid.0, root_alive, Some(root.pid.0));
-        targets.extend(seen.iter().filter(|tuple| *tuple != root).cloned());
-        if root_alive {
-            targets.push(root.clone());
-        }
-        let mut live = false;
-        for tuple in targets {
-            if facts::judge_here(&tuple.to_record()) != Verdict::Alive {
-                continue;
-            }
-            live = true;
-            if !seen.contains(&tuple) && tuple != *root {
-                seen.push(tuple.clone());
-            }
-            if !signal_settled(&control::signal_by_identity(&tuple, Signal::Kill)) {
-                refused = true;
-            }
-        }
-        if !live && tree_state(root, seen) == DomainState::Empty {
-            return KillOutcome::Ok;
-        }
-        std::thread::sleep(POLL);
-    }
-    wait_until(empty_wait, || tree_state(root, seen) == DomainState::Empty);
-    if !refused && tree_state(root, seen) == DomainState::Empty {
-        KillOutcome::Ok
-    } else {
-        KillOutcome::Refused
-    }
-}
-
-/// `killpg`, only while the root is the process that was recorded.
-fn signal_group(root: &ProcTuple, sig: libc::c_int) -> bool {
-    if facts::judge_here(&root.to_record()) != Verdict::Alive {
-        return false;
-    }
-    let Some(pgid) = as_pid_t(root.pid) else {
-        return false;
-    };
-    // SAFETY: killpg with the pgid of a leader just judged alive.
-    unsafe { libc::killpg(pgid, sig) == 0 }
-}
-
-fn wait_until(limit: Duration, mut done: impl FnMut() -> bool) -> bool {
-    let start = Instant::now();
-    loop {
-        if done() {
-            return true;
-        }
-        if start.elapsed() >= limit {
-            return false;
-        }
-        std::thread::sleep(POLL);
-    }
-}
-
-fn apply_stdio(cmd: &mut Command, spec: &SpawnSpec) {
-    let pick = |file: &Option<File>| file.as_ref().and_then(|f| f.try_clone().ok()).map_or_else(Stdio::null, Stdio::from);
-    cmd.env_clear().envs(&spec.env).current_dir(&spec.cwd);
-    cmd.stdin(pick(&spec.stdin)).stdout(pick(&spec.stdout)).stderr(pick(&spec.stderr));
+    pgroup::kill(members as ListFn, root, seen, empty_wait)
 }
 
 #[cfg(test)]
