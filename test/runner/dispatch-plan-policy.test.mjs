@@ -2,12 +2,22 @@ import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
+import { effectiveDispatchPolicy as policyOf } from '../../src/runner/dispatch/plan.mjs';
+import { bindable } from '../helpers/work-seat-config.mjs';
 import { RunnerConfigError, supportsPolicyTier } from '../../src/runner/dispatch/config.mjs';
 import { deriveProviderFamily, resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
 import { resolveStrongerRigor } from '../../src/runner/rigor.mjs';
 import { workRigorFor } from '../../src/runner/work-dispatch.mjs';
 
+
+const ALL_TIER_MODELS = { nano: 'm', mini: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' };
+// The config of a caller that states none: two agent executors, claude and pi.
+const twoExecutorConfig = () => ({
+  executor: { command: 'claude' },
+  executors: { claude: { kind: 'agent', providerModel: 'claude', command: 'claude', args: ['{prompt}'] }, pi: { kind: 'agent', providerModel: 'pi', command: 'pi', args: ['{prompt}'] } },
+  modelPolicies: { claude: ALL_TIER_MODELS, pi: ALL_TIER_MODELS },
+});
+const effectiveDispatchPolicy = (args) => policyOf({ ...args, runnerConfig: bindable(args.runnerConfig ?? twoExecutorConfig()) });
 
 // A runner config as a project writes it: the tier a seat runs at is declared, never derived from rigor.
 const claudeConfig = (extra = {}) => ({
@@ -65,7 +75,7 @@ test('a family with no cell at the tier is refused as tier-cell-missing, naming 
     () => effectiveDispatchPolicy({ assignment, runnerConfig }),
     (err) => err instanceof RunnerConfigError
       && err.code === 'tier-cell-missing'
-      && err.message === 'tier-cell-missing: no model for tier "standard" under family "claude" (runner.modelPolicies.claude.standard)',
+      && /^tier-cell-missing: .*standard — no allowed executor has a cell; change /.test(err.message),
   );
 });
 
@@ -119,7 +129,7 @@ test('CLI/human explicit override wins over Assignment policy preference', () =>
 
   const cliOverride = {
     preferExecutor: 'claude',
-    tier: 'frontier',
+    tier: 'nano',
     preferPersona: 'custom-reviewer',
     visibility: 'visible',
   };
@@ -130,7 +140,7 @@ test('CLI/human explicit override wins over Assignment policy preference', () =>
   });
 
   assert.equal(effective.executorId, 'claude');
-  assert.equal(effective.tier, 'frontier');
+  assert.equal(effective.tier, 'nano');
   assert.equal(effective.persona, 'custom-reviewer');
   assert.equal(effective.visibility, 'visible');
 });
@@ -271,7 +281,7 @@ test('the dispatch policy agrees with resolve.mjs\'s resolveExecutorConfig on pr
       kind: 'agent',
       allowCrossProvider: true,
       invocations: [
-        { via: 'cli', adapter: 'cli-spawn', command: 'codex', args: ['exec', '{prompt}'] },
+        { id: 'codex-cli-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'codex', args: ['exec', '{prompt}'], confinement: { backend: 'bwrap' } },
       ],
     },
   };
@@ -337,59 +347,13 @@ test('the dispatch policy rejects an unregistered preferExecutor before spawn wh
     executors: {
       claude: { kind: 'agent', command: 'claude' },
     },
+    modelPolicies: { claude: { standard: 'claude-3-7-sonnet-20250219' } },
   };
 
   assert.throws(
     () => effectiveDispatchPolicy({ assignment, runnerConfig }),
-    (err) => err instanceof RunnerConfigError && /totally-made-up-executor/.test(err.message) && /not a registered executor/i.test(err.message),
+    (err) => err instanceof RunnerConfigError && /totally-made-up-executor/.test(err.message) && /not registered/i.test(err.message),
   );
-});
-
-test('the dispatch policy never validates preferExecutor registration when runnerConfig declares no executors registry at all (config genuinely unavailable to check against)', () => {
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'validate-plan',
-    policy: { preferExecutor: 'pi' },
-  });
-  const runnerConfig = {
-    executor: { command: 'claude' },
-    modelPolicies: { claude: { standard: 'claude-3-7-sonnet-20250219' }, pi: { standard: 'pi-default-model' } },
-  };
-
-  // No `executors` map on runnerConfig -- nothing to check registration
-  // against, so this must NOT throw (matches every other optional-runnerConfig
-  // treatment in this file).
-  const effective = effectiveDispatchPolicy({ assignment, runnerConfig });
-  assert.equal(effective.executorId, 'pi');
-});
-
-test('the dispatch policy derives providerModel via deriveProviderFamily on the isImplicitDefaultExecutor exemption, not the raw executor id (Phase 00 R6 fix F1)', () => {
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'validate-plan',
-  });
-  const runnerConfig = {
-    executor: { command: 'claude' },
-    // Non-empty registry that does NOT list 'claude' -- the real scenario
-    // (this machine's own .fgos/config.json registers 'pi' but not
-    // 'claude') that forced the isImplicitDefaultExecutor exemption.
-    executors: {
-      pi: { kind: 'agent', command: 'pi' },
-    },
-    modelPolicies: {
-      claude: { standard: 'claude-3-7-sonnet-20250219' },
-    },
-  };
-
-  // preferExecutor left at its default -> primaryExecutor resolves to 'claude'.
-  const effective = effectiveDispatchPolicy({ assignment, runnerConfig });
-
-  assert.equal(effective.executorId, 'claude');
-  // Pinned expected value: deriveProviderFamily({command: 'claude'}, 'claude')
-  // resolves through CLAUDE_CLI_COMMANDS to 'claude' -- correctly derived,
-  // not merely coincidentally equal to the raw executor id.
-  assert.equal(effective.providerModel, 'claude');
-  assert.equal(effective.model, 'claude-3-7-sonnet-20250219');
 });
 
 test('governance disallowedProviders (family) and disallowedExecutors (id) are independent checks (Phase 00 R6 fix F2)', () => {
@@ -436,69 +400,6 @@ test('governance disallowedProviders (family) and disallowedExecutors (id) are i
   assert.equal(notBlockedByExecutorList.providerModel, 'z-ai');
 });
 
-test('the dispatch policy fails closed with a named RunnerConfigError when governance options are present but runnerConfig.executors is absent (Phase 00 R6 fix RT1)', () => {
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'validate-plan',
-    policy: { preferExecutor: 'glm-cli' },
-  });
-  const runnerConfig = {
-    executor: { command: 'claude' },
-    // No `executors` registry at all -- the exact RT1 live-reproduction shape.
-    modelPolicies: {
-      claude: { standard: 'claude-3-7-sonnet-20250219' },
-      'z-ai': { standard: 'glm-4.6' },
-    },
-  };
-  const cliOverride = { preferExecutor: 'glm-cli' };
-
-  assert.throws(
-    () =>
-      effectiveDispatchPolicy({
-        assignment,
-        runnerConfig,
-        cliOverride,
-        options: { disallowedProviders: ['z-ai'] },
-      }),
-    (err) =>
-      err instanceof RunnerConfigError &&
-      /runnerConfig\.executors is absent/.test(err.message) &&
-      /"glm-cli"/.test(err.message),
-  );
-
-  // Same shape with `disallowedExecutors` instead must throw too.
-  assert.throws(
-    () =>
-      effectiveDispatchPolicy({
-        assignment,
-        runnerConfig,
-        cliOverride,
-        options: { disallowedExecutors: ['glm-cli'] },
-      }),
-    (err) => err instanceof RunnerConfigError && /runnerConfig\.executors is absent/.test(err.message),
-  );
-});
-
-test('the dispatch policy does not require an executors registry when no governance options are present (no regression to the F1 exemption path)', () => {
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'validate-plan',
-    policy: { preferExecutor: 'pi' },
-  });
-  const runnerConfig = {
-    executor: { command: 'claude' },
-    modelPolicies: { claude: { standard: 'claude-3-7-sonnet-20250219' }, pi: { standard: 'pi-default-model' } },
-  };
-
-  // No `executors` map, no governance options -- must resolve successfully,
-  // same as the pre-existing "genuinely unavailable to check against" test.
-  const effective = effectiveDispatchPolicy({ assignment, runnerConfig, options: {} });
-  assert.equal(effective.executorId, 'pi');
-
-  const effectiveNoOptions = effectiveDispatchPolicy({ assignment, runnerConfig });
-  assert.equal(effectiveNoOptions.executorId, 'pi');
-});
-
 // --- Phase 00 R7: field-level policy provenance ---
 
 test('the dispatch policy attaches field-level provenance additively, without changing the existing flat fields', () => {
@@ -510,7 +411,7 @@ test('the dispatch policy attaches field-level provenance additively, without ch
   // The caller states a tier and a model: a seat the runner already bound is taken as given.
   const cliOverride = { tier: 'frontier', model: 'bound-model' };
 
-  const effective = effectiveDispatchPolicy({ assignment, cliOverride, runnerConfig: claudeConfig() });
+  const effective = effectiveDispatchPolicy({ assignment, cliOverride, runnerConfig: twoExecutorConfig() });
 
   // Flat fields still present, unchanged in shape.
   assert.equal(effective.role, 'reviewer');
@@ -526,28 +427,17 @@ test('the dispatch policy attaches field-level provenance additively, without ch
   assert.ok(Object.isFrozen(effective.provenance));
 });
 
-test('provenance.model.source and provenance.persona.source default to {scope: "default"} objects, never undefined, when no runnerConfig and no persona override apply (Phase 00 R7 fix F4)', () => {
-  // `shape-plan` (unlike `validate-plan`) declares no `policy` block at all
-  // in feature.yaml -- role `implementer`, no `preferPersona` of its own --
-  // so nothing but the role-based reviewer default could ever supply a
-  // persona, and that default does not fire for this non-reviewer role.
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'shape-plan',
-  });
-
-  // No runnerConfig at all -> no model source can resolve. Non-reviewer role
-  // and no persona override -> no persona source can resolve either.
-  const effective = effectiveDispatchPolicy({ assignment });
-
-  assert.equal(effective.role, 'implementer');
-  assert.equal(effective.persona, undefined);
-  assert.equal(effective.model, null);
-
-  assert.deepEqual(effective.provenance.model.source, { scope: 'default' });
-  assert.deepEqual(effective.provenance.persona.source, { scope: 'default' });
+test('a policy with no runner config and no bound tier and model is refused by name, never decided in Node', () => {
+  const assignment = buildAssignment({ stage: 'planning', operation: 'shape-plan' });
+  assert.throws(
+    () => policyOf({ assignment }),
+    (err) => err instanceof RunnerConfigError && err.code === 'runner-config-missing',
+  );
+  const bound = policyOf({ assignment, cliOverride: { tier: 'standard', model: 'bound-model' } });
+  assert.equal(bound.model, 'bound-model');
+  assert.deepEqual(bound.provenance.model.source, { scope: 'cliOverride' });
+  assert.deepEqual(bound.provenance.persona.source, { scope: 'default' });
 });
-
 // --- Phase 00 R8: pure provider capability validation ---
 
 test('supportsPolicyTier is a pure boolean query with no I/O -- true only for a declared string model', () => {

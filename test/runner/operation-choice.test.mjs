@@ -18,7 +18,9 @@ import {
 } from '../../src/runner/operation-choice.mjs';
 import { operationsForStep, getDomain } from '../../src/state/domain-registry.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { bindableExecute } from '../helpers/work-seat-config.mjs';
+const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { resolveRunWorkerArtifactPath } from '../../src/runner/dispatch/settlement.mjs';
 import { listAssignmentRuns } from '../../src/runner/dispatch/assignment-layout.mjs';
 import { runOnce as loopRunOnce } from '../../src/runner/loop.mjs';

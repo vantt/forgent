@@ -124,6 +124,9 @@ function executorFacts(id, entry, { runnerConfig, executors, session }) {
   const supported = Array.isArray(entry.supports?.reasoningEffort) ? entry.supports.reasoningEffort : null;
   const herdrPresent = session.herdrPresent === true;
   const ctx = { runnerConfig, executors, herdrPresent };
+  // A caller that binds only to learn who, which model and what tier (not to launch this binding) leaves
+  // the posture to the launch: the confinement authority judges it when the assignment starts.
+  const atLaunch = session.postureAtLaunch === true;
   const invocations = (entry.invocations ?? []).filter((inv) => typeof inv?.id === 'string' && inv.id).map((inv) => {
     const store = credentialStoreOf({ ...inv, command: commandOf(runnerConfig, entry, inv) });
     const efforts = renderedEffortLevels(commandOf(runnerConfig, entry, inv));
@@ -131,15 +134,22 @@ function executorFacts(id, entry, { runnerConfig, executors, session }) {
       id: inv.id,
       ...(store?.use ? { cli: store.use } : {}),
       efforts: supported ? efforts.filter((level) => supported.includes(level)) : efforts,
-      carriesPosture: canApplyPosture({ executor: id, invocation: inv.id }, 'read-only', ctx),
+      carriesPosture: atLaunch || canApplyPosture({ executor: id, invocation: inv.id }, 'read-only', ctx),
     };
   });
   let defaultInvocation;
-  const approved = resolvePostureInvocation({ executor: id, invocation: null }, 'read-only', ctx);
+  let approved = resolvePostureInvocation({ executor: id, invocation: null }, 'read-only', ctx);
+  if (!approved.ok && atLaunch) approved = { ok: true, invocation: invocations[0]?.id ?? null };
   if (approved.ok && approved.invocation) {
     defaultInvocation = approved.invocation;
     const herdr = (entry.invocations ?? []).find((inv) => inv?.via === 'cli' && inv?.adapter === 'herdr-spawn' && typeof inv.id === 'string' && inv.id);
     if (herdrPresent && invocations.find((inv) => inv.id === herdr?.id)?.carriesPosture) defaultInvocation = herdr.id;
+  }
+  // An executor that declares no invocation runs its own command: for a caller that does not launch this
+  // binding, that command is the one invocation whose effort levels are judged.
+  if (atLaunch && invocations.length === 0) {
+    invocations.push({ id: 'command', efforts: renderedEffortLevels(commandOf(runnerConfig, entry, {})), carriesPosture: true });
+    defaultInvocation = 'command';
   }
   const disallowed = disallowedReason(runnerConfig, id, entry, family);
   return {
@@ -541,6 +551,22 @@ export function bind(ask, ctx, { walk = {} } = {}) {
   const decided = decide(ask, ctx, walk);
   if (decided.refused) return { refused: decided.refused };
   return bindingOf({ out: decided.out, prep: decided.prep, ask, ctx, walk });
+}
+
+/**
+ * The seat a Work operation or a raw dispatch runs, by the same crate call a unit run makes (one headless
+ * producer seat; the posture is judged when the assignment launches, not here). A pinned executor, a tier or an effort the caller stated come in as one override. A
+ * refusal throws, named; there is no policy of its own behind it.
+ *
+ * @param {object} args `{ runnerConfig, unit, role, readOnly, overrides }`; `unit` is `{ id, capability, rigor }`
+ */
+export function bindWorkSeat({ runnerConfig, unit, role = 'producer', readOnly = false, overrides = [] }) {
+  const bound = bind(
+    { unit: { ...unit, writes: readOnly ? [] : ['scratch/placeholder'] }, seat: 'producer', role, readOnly, overrides, raiseAuthorized: false },
+    { runnerConfig, session: { headless: true, postureAtLaunch: true } },
+  );
+  if (bound.refused) throw new RunnerConfigError(`${bound.refused.reason}: ${bound.refused.detail}`, { code: bound.refused.reason });
+  return bound;
 }
 
 /**

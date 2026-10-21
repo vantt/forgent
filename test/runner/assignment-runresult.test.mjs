@@ -7,10 +7,12 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
+import { bindableExecute } from '../helpers/work-seat-config.mjs';
 import {
-  executeAssignment,
+  executeAssignment as executeAssignmentRaw,
   snapshotDirtyBeforeFiles,
 } from '../../src/runner/dispatch/assignment-runner.mjs';
+const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { findMutatedDirtyBeforeFiles, safeGitStatusFiles, safeGitCommittedDiffFiles } from '../../src/runner/dispatch/settlement.mjs';
 import { sha256FileSync } from '../../src/runner/dispatch/proof-helpers.mjs';
 import { validateRunResultV2, validateRunResultV3, runOutcome } from '../../src/runner/dispatch/run-result.mjs';

@@ -8,7 +8,9 @@ import crypto from 'node:crypto';
 import { execSync, execFileSync, execFile, spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import { executeAssignment, commitRunSettlement, settleRunOutcome, resolveWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment as executeAssignmentRaw, commitRunSettlement, settleRunOutcome, resolveWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { bindable, bindableExecute } from '../helpers/work-seat-config.mjs';
+const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { RunnerConfigError, FRESH_PROJECT_RUNNER_CONFIG } from '../../src/runner/dispatch/config.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
@@ -310,7 +312,7 @@ test('compileDispatchPlan produces selector.type: "assignment" and resolves exec
     operation: 'validate-plan',
   });
 
-  const plan = compileDispatchPlan(cfg, {
+  const plan = compileDispatchPlan(bindable(cfg), {
     assignment: assignment.assignmentId,
     assignmentItem: assignment,
   });
@@ -339,7 +341,7 @@ test('decideExecutorCli resolves dispatch plan for an assignment', async () => {
   // a machine without one (a CI runner) cannot satisfy.
   fs.writeFileSync(
     path.join(tempDir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: structuredClone(FRESH_PROJECT_RUNNER_CONFIG) }, null, 2),
+    JSON.stringify({ runner: bindable(structuredClone(FRESH_PROJECT_RUNNER_CONFIG)) }, null, 2),
   );
 
   const decided = await decideExecutorCli(undefined, {
@@ -935,6 +937,8 @@ test('tool executors bypass provider capacity selection even with matching provi
     cwd: tempDir,
     repoRoot: tempDir,
     runnerConfig,
+    // A tool executor is not an agent seat: Seat Binding chooses nothing for it, so the caller states the tier and model.
+    cliOverride: { tier: 'standard', model: 'gpt-test-standard' },
     providerCapacityRuntimeDir: runtimeDir,
   });
 
@@ -1248,7 +1252,7 @@ function spawnExecuteAssignment(tempDir, assignment, runnerConfig, extraOpts = {
 }
 
 function admissionRunnerConfig(executorScript) {
-  return { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
+  return bindable({ executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 });
 }
 
 test('executeAssignment: the same (retryId, destination, payloadDigest) tuple returns the identical committed Run without dispatching a second executor', async () => {

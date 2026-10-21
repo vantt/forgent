@@ -24,7 +24,9 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { bindableExecute } from '../helpers/work-seat-config.mjs';
+const executeAssignment = bindableExecute(executeAssignmentRaw);
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cwd-mutex-test-'));

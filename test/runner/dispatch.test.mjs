@@ -1,3 +1,4 @@
+import { bindable } from '../helpers/work-seat-config.mjs';
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -19,7 +20,7 @@ import {
   decideDispatchMechanism,
   decideExecutorDispatchMechanism,
   decideExecutorCli,
-  compileDispatchPlan,
+  compileDispatchPlan as compileDispatchPlanRaw,
   RunnerConfigError,
   DispatchError,
   DEFAULT_ADAPTER,
@@ -48,6 +49,9 @@ import { dispatchCwdHolder } from '../../src/runner/dispatch/cwd-lock.mjs';
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time. No real agent CLI is
 // ever invoked, and nothing here writes `.fgos/` or touches the main repo.
+
+// A config with an executors block is given what Seat Binding needs to bind a Work seat (see the helper).
+const compileDispatchPlan = (cfg, ...rest) => compileDispatchPlanRaw(cfg?.executors ? bindable(cfg) : cfg, ...rest);
 
 function mkTempDir() {
   return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dispatch-test-')));
@@ -3056,29 +3060,6 @@ function writeRunnerConfigFixture(root, cfg) {
   fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({ runner: { ...cfg, capabilities, patterns } }, null, 2));
 }
 
-test('executeExecutorCli resolves a cross-provider executor\'s own providerModel through modelForTier, picking that provider\'s model over the default (claude) policy (D9\'s reported agy/Gemini bug)', async () => {
-  const dir = mkTempDir();
-  const scriptPath = writeEchoExecutor(dir);
-  const root = mkTempDir();
-  writeRunnerConfigFixture(root, {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: {
-      agy: { kind: 'agent', command: process.execPath, provider: 'agy', args: [scriptPath, '--model', '{model}', '{prompt}'], allowCrossProvider: true, providerModel: 'gemini' },
-    },
-    modelPolicies: {
-      claude: { standard: 'sonnet' },
-      gemini: { standard: 'gemini-pro' },
-    },
-    timeoutMs: 5000,
-  });
-  const result = await executeExecutorCli('agy', { sharedCwd: true, prompt: 'classify this', repoRoot: root, tier: 'standard' });
-  assert.equal(result.mechanism, 'out-of-process');
-  assert.equal(result.provider, 'agy');
-  assert.equal(result.model, 'gemini-pro');
-  const payload = JSON.parse(result.stdout);
-  assert.deepEqual(payload.args, ['--model', 'gemini-pro', 'classify this']);
-});
-
 test('executeExecutorCli fails closed when the executorId is not in cfg.executors at all (F4 intentional contract adjustment)', async () => {
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
@@ -3111,26 +3092,6 @@ test('executeExecutorCli honors a caller-supplied model override over both the e
   assert.equal(result.model, 'opus');
   const payload = JSON.parse(result.stdout);
   assert.deepEqual(payload.args, ['opus:classify this']);
-});
-
-test('executeExecutorCli honors a caller-supplied tier override, feeding it into modelForTier when no model is also supplied', async () => {
-  const dir = mkTempDir();
-  const scriptPath = writeEchoExecutor(dir);
-  const root = mkTempDir();
-  writeRunnerConfigFixture(root, {
-    executor: { command: process.execPath, args: [scriptPath, '{model}:{prompt}'], allowCrossProvider: true },
-    modelPolicies: { claude: { nano: 'flash-3.5', standard: 'sonnet' }, node: { nano: 'flash-3.5', standard: 'sonnet' }, agy: { nano: 'flash-3.5', standard: 'sonnet' } },
-    timeoutMs: 5000,
-  });
-  // 'light', deliberately NOT `DEFAULTS.tier` ('standard', work.mjs) — a
-  // tier equal to the default would pass even with no override plumbing
-  // at all (the pre-existing `executor?.tier ?? DEFAULTS.tier` fallback
-  // already lands on 'standard' with no executor match), so it would not
-  // actually prove the override path works.
-  const result = await executeExecutorCli('claude', { sharedCwd: true, prompt: 'x', repoRoot: root, tier: 'nano' });
-  assert.equal(result.model, 'flash-3.5');
-  const payload = JSON.parse(result.stdout);
-  assert.deepEqual(payload.args, ['flash-3.5:x']);
 });
 
 // --- tsk-5tm-3 D5: `executeExecutorCli` / `execute <executorId>` — the
@@ -3167,7 +3128,7 @@ test('executeExecutorCli falls to out-of-process and self-executes (never hands 
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const result = await executeExecutorCli('my-agent-executor', { sharedCwd: true, repoRoot: root, prompt: 'hello' });
+  const result = await executeExecutorCli('my-agent-executor', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, prompt: 'hello' });
   assert.equal(result.mechanism, 'out-of-process');
   assert.equal(result.status, 0);
   const payload = JSON.parse(result.stdout);
@@ -3184,7 +3145,7 @@ test('executeExecutorCli self-executes a kind:"cli" executor via EXECUTOR_ADAPTE
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const result = await executeExecutorCli('submit-assist-classify', { sharedCwd: true, repoRoot: root, prompt: 'classify this' });
+  const result = await executeExecutorCli('submit-assist-classify', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, prompt: 'classify this' });
   assert.equal(result.mechanism, 'out-of-process');
   assert.equal(result.status, 0);
   assert.equal(result.signal, null);
@@ -3233,7 +3194,7 @@ test('executeExecutorCli prints a "fgos: dispatch ..." chokepoint line to stderr
   let captured = '';
   process.stderr.write = (chunk) => { captured += chunk; return true; };
   try {
-    await executeExecutorCli('submit-assist-classify', { sharedCwd: true, repoRoot: root, prompt: 'classify this' });
+    await executeExecutorCli('submit-assist-classify', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, prompt: 'classify this' });
   } finally {
     process.stderr.write = original;
   }
@@ -3251,8 +3212,8 @@ test('executeExecutorCli resolves purpose-based (--for) the same way a positiona
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const byPurpose = await executeExecutorCli(undefined, { sharedCwd: true, repoRoot: root, for: 'judge', prompt: 'p' });
-  const byName = await executeExecutorCli('judge-decompose', { sharedCwd: true, repoRoot: root, prompt: 'p' });
+  const byPurpose = await executeExecutorCli(undefined, { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, for: 'judge', prompt: 'p' });
+  const byName = await executeExecutorCli('judge-decompose', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, prompt: 'p' });
   assert.equal(byPurpose.executorId, 'judge-decompose');
   assert.equal(byPurpose.status, 0);
   assert.equal(byName.executorId, undefined);
@@ -3268,11 +3229,25 @@ test('executeExecutorCli returns outcome:"unsignaled" without commit evidence wh
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const result = await executeExecutorCli('test-executor', { sharedCwd: true, repoRoot: root, cwd: process.cwd(), prompt: 'test' });
+  const result = await executeExecutorCli('test-executor', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, cwd: process.cwd(), prompt: 'test' });
   assert.equal(result.mechanism, 'out-of-process');
   assert.equal(result.outcome, 'unsignaled');
   assert.equal(result.headBefore, undefined);
   assert.equal(result.headAfter, undefined);
+});
+
+test('executeExecutorCli chooses neither tier nor model: a caller that bound no seat, with none declared on the executor, is refused before anything starts', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: process.execPath, args: ['-e', '0', '{prompt}'] },
+    executors: { plain: { kind: 'agent', command: process.execPath, args: ['-e', '0', '{prompt}'], allowCrossProvider: true } },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+    timeoutMs: 5000,
+  });
+  await assert.rejects(
+    executeExecutorCli('plain', { sharedCwd: true, repoRoot: root, prompt: 'p' }),
+    (err) => err instanceof RunnerConfigError && err.code === 'seat-not-bound',
+  );
 });
 
 test('executeExecutorCli omits outcome and head shas when stdout contains [DONE] or [BLOCKED]', async () => {
@@ -3293,12 +3268,12 @@ test('executeExecutorCli omits outcome and head shas when stdout contains [DONE]
     timeoutMs: 5000,
   });
 
-  const resDone = await executeExecutorCli('done-executor', { sharedCwd: true, repoRoot: root, cwd: process.cwd(), prompt: 'p' });
+  const resDone = await executeExecutorCli('done-executor', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, cwd: process.cwd(), prompt: 'p' });
   assert.equal(resDone.outcome, undefined);
   assert.equal(resDone.headBefore, undefined);
   assert.equal(resDone.headAfter, undefined);
 
-  const resBlocked = await executeExecutorCli('blocked-executor', { sharedCwd: true, repoRoot: root, cwd: process.cwd(), prompt: 'p' });
+  const resBlocked = await executeExecutorCli('blocked-executor', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, cwd: process.cwd(), prompt: 'p' });
   assert.equal(resBlocked.outcome, undefined);
   assert.equal(resBlocked.headBefore, undefined);
   assert.equal(resBlocked.headAfter, undefined);
@@ -3322,10 +3297,10 @@ test('read-only executor tokens never certify a commit', async () => {
     timeoutMs: 5000,
   });
 
-  const resDone = await executeExecutorCli('done-executor', { sharedCwd: true, repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
+  const resDone = await executeExecutorCli('done-executor', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
   assert.equal(resDone.verifiedSha, undefined);
 
-  const resBlocked = await executeExecutorCli('blocked-executor', { sharedCwd: true, repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
+  const resBlocked = await executeExecutorCli('blocked-executor', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
   assert.equal(resBlocked.verifiedSha, undefined);
 });
 
@@ -3353,12 +3328,12 @@ test('executeExecutorCli returns outcome:"unsignaled" when [DONE] or [BLOCKED] a
     timeoutMs: 5000,
   });
 
-  const resQuoted = await executeExecutorCli('quoted-executor', { sharedCwd: true, repoRoot: root, cwd: process.cwd(), prompt: 'p' });
+  const resQuoted = await executeExecutorCli('quoted-executor', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, cwd: process.cwd(), prompt: 'p' });
   assert.equal(resQuoted.outcome, 'unsignaled');
   assert.equal(resQuoted.headBefore, undefined);
   assert.equal(resQuoted.headAfter, undefined);
 
-  const resQuotedAndDone = await executeExecutorCli('quoted-and-done-executor', { sharedCwd: true, repoRoot: root, cwd: process.cwd(), prompt: 'p' });
+  const resQuotedAndDone = await executeExecutorCli('quoted-and-done-executor', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, cwd: process.cwd(), prompt: 'p' });
   assert.equal(resQuotedAndDone.outcome, undefined);
 });
 
@@ -3499,7 +3474,7 @@ test('an unsupervised writer with a missing cwd receives custody refusal context
   cliExecutorFixture(repoRoot, writeEchoExecutor(mkTempDir()));
   const missing = path.join(repoRoot, 'gone-worktree');
   await assert.rejects(
-    () => executeExecutorCli('cli-executor', {  repoRoot, cwd: missing, prompt: 'test' }),
+    () => executeExecutorCli('cli-executor', { tier: 'standard', model: 'sonnet',  repoRoot, cwd: missing, prompt: 'test' }),
     (err) => err instanceof DispatchError && err.errorClass === 'custody-domain-required' && err.cwd === missing && err.executorId === 'cli-executor' && typeof err.capability === 'string',
   );
 });
@@ -4076,7 +4051,7 @@ test('executeExecutorCli resolves a purpose-named executorId via capabilities.<n
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const result = await executeExecutorCli('fgos-coding-implement', { sharedCwd: true, repoRoot: root, prompt: 'do the thing' });
+  const result = await executeExecutorCli('fgos-coding-implement', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, prompt: 'do the thing' });
   assert.equal(result.mechanism, 'out-of-process');
   assert.equal(result.status, 0);
   const payload = JSON.parse(result.stdout);
@@ -4112,19 +4087,19 @@ test('executeExecutorCli now enforces options.disallowedProviders/disallowedExec
 
   // Blocked by provider family.
   await assert.rejects(
-    executeExecutorCli('fgos-coding-implement', { sharedCwd: true, repoRoot: root, prompt: 'p', options: { disallowedProviders: ['gemini'] } }),
+    executeExecutorCli('fgos-coding-implement', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, prompt: 'p', options: { disallowedProviders: ['gemini'] } }),
     (err) => err instanceof RunnerConfigError && /governance gate rejected provider "gemini"/.test(err.message),
   );
 
   // Blocked by executor id, independently.
   await assert.rejects(
-    executeExecutorCli('fgos-coding-implement', { sharedCwd: true, repoRoot: root, prompt: 'p', options: { disallowedExecutors: ['agy'] } }),
+    executeExecutorCli('fgos-coding-implement', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, prompt: 'p', options: { disallowedExecutors: ['agy'] } }),
     (err) => err instanceof RunnerConfigError && /governance gate rejected executor "agy"/.test(err.message),
   );
 
   // A disallow list that names neither this provider nor this executor
   // does not block -- the same dispatch still succeeds.
-  const allowed = await executeExecutorCli('fgos-coding-implement', { sharedCwd: true, repoRoot: root, prompt: 'p', options: { disallowedProviders: ['some-other-provider'] } });
+  const allowed = await executeExecutorCli('fgos-coding-implement', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, prompt: 'p', options: { disallowedProviders: ['some-other-provider'] } });
   assert.equal(allowed.status, 0);
 });
 
@@ -4139,7 +4114,7 @@ test('executeExecutorCli honors an explicit caller model with a capability rigor
     modelPolicies: { claude: { standard: 'sonnet', flagship: 'opus' }, node: { standard: 'sonnet', flagship: 'opus' } },
     timeoutMs: 5000,
   });
-  const result = await executeExecutorCli('fgos-coding-implement', { sharedCwd: true, repoRoot: root, prompt: 'p', model: 'caller-explicit-model' });
+  const result = await executeExecutorCli('fgos-coding-implement', { tier: 'standard', sharedCwd: true, repoRoot: root, prompt: 'p', model: 'caller-explicit-model' });
   assert.equal(result.model, 'caller-explicit-model');
 });
 
@@ -4599,8 +4574,8 @@ test('executeExecutorCli resolves purpose-based (--for) to the same command a po
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' }, agy: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const byPurpose = await executeExecutorCli(undefined, { sharedCwd: true, repoRoot: root, for: 'judge', carries: 'repo-content', prompt: 'p' });
-  const byName = await executeExecutorCli('gather', { sharedCwd: true, repoRoot: root, carries: 'repo-content', prompt: 'p' });
+  const byPurpose = await executeExecutorCli(undefined, { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, for: 'judge', carries: 'repo-content', prompt: 'p' });
+  const byName = await executeExecutorCli('gather', { tier: 'standard', model: 'sonnet', sharedCwd: true, repoRoot: root, carries: 'repo-content', prompt: 'p' });
   assert.equal(byPurpose.executorId, 'gather');
   assert.equal(byPurpose.provider, 'agy');
   assert.equal(byPurpose.model, 'sonnet');
@@ -5235,7 +5210,7 @@ test('compileDispatchPlan applies the capability\'s tier and rigor when synthesi
     executors: {
       'agy-herdr': {
         kind: 'agent',
-        invocations: [{ via: 'cli', adapter: 'herdr-spawn', command: 'agy', args: ['{prompt}', '--model', '{model}'] }],
+        invocations: [{ id: 'agy-herdr-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'agy', args: ['{prompt}', '--model', '{model}'] }],
         providerModel: 'gemini',
         allowCrossProvider: true,
       },

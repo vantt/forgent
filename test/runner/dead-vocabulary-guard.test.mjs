@@ -223,7 +223,9 @@ test('dead vocabulary guard: loadRunnerConfig rejects dead keys with actionable 
   );
 });
 
-import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
+import { effectiveDispatchPolicy as policyOf } from '../../src/runner/dispatch/plan.mjs';
+import { bindable } from '../helpers/work-seat-config.mjs';
+const effectiveDispatchPolicy = (args) => policyOf({ ...args, runnerConfig: bindable(args.runnerConfig) });
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 
 test('dead vocabulary guard: capabilities.<cap>.rigor is a demand that moves no tier, and capabilities.*.overrides is rejected (D19)', () => {

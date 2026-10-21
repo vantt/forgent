@@ -132,7 +132,7 @@ test('an unsupervised mutating executor is refused before its process starts', {
     modelPolicies: { fake: { standard: 'fake-standard' } },
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000,
   };
-  await assert.rejects(() => executeExecutorCli('fake', { cwd: f.cwd, repoRoot: f.cwd, runnerConfig, for: 'execute' }), (err) => {
+  await assert.rejects(() => executeExecutorCli('fake', { tier: 'standard', model: 'sonnet', cwd: f.cwd, repoRoot: f.cwd, runnerConfig, for: 'execute' }), (err) => {
     assert.equal(err.code, 'custody-domain-required');
     assert.equal(err.cwd, f.cwd);
     assert.equal(err.executorId, 'fake');

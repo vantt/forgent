@@ -7,15 +7,16 @@
 // and reasonCodes into a canonical DispatchPlan object.
 
 import { MODEL_POLICY_TIERS, RunnerConfigError, assertReasoningEffort } from './config.mjs';
-import { resolveExecutorAndOverrides, resolveExecutorConfig, tierCellMissingDetail } from './resolve.mjs';
+import { resolveExecutorAndOverrides, resolveExecutorConfig } from './resolve.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { refuseWorkItemInput } from './work-item-input.mjs';
 import { resolveExecutorProvider, resolveExecutorGovernance } from './executor-governance.mjs';
 import { REPEAT_MODE_VALUES } from './execution-contract.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
 import { deriveOperationCapability } from '../operation-capability.mjs';
-import { SEAT_ROLES, capabilityRigorOf } from '../execution/seat-resolver.mjs';
-import { seatPolicy } from '../execution/seat-policy.mjs';
+import { SEAT_ROLES, capabilityRigorOf, effectiveRigorOf } from '../execution/seat-resolver.mjs';
+import { isReadOnlyAssignment } from './assignment.mjs';
+import { bindWorkSeat } from '../execution/bind.mjs';
 
 // Additive check for the `capability.unknown` reason code (never changes
 // `mechanism`): is `name` a real entry key, or a declared `aliases[]` member,
@@ -31,24 +32,16 @@ function isKnownCapabilityName(cfg, name) {
 
 
 /**
- * The first model of a seat policy's cell for `family`: the cell entries Seat Binding returned at the
- * tier it decided. Undefined when the family serves no cell at that tier.
- */
-function modelOfCell(policy, family) {
-  return policy.cells?.[family]?.[0]?.model;
-}
-
-/**
  * The effective dispatch policy of an assignment: the executor and provider it runs on, the tier and
  * the model of that tier's cell, the persona, the visibility, the repeat mode, the constraints and the
  * governance verdict, each with where it came from.
  *
- * Nothing here chooses a tier or a model. A caller that already bound the seat (a unit run) passes both
- * as `cliOverride.tier` and `cliOverride.model` and they are taken as given. Otherwise the tier is
- * Seat Binding's answer for the assignment's capability (an explicit tier from the assignment or the
- * caller is an override, which may keep or lower the tier but never raise it) and the model is the first
- * entry of the executor family's cell at that tier. Rigor is recorded as the demand it is (checker
- * count, independence) and never moves the tier or the effort.
+ * Nothing here chooses an executor, a tier or a model. A caller that already bound the seat (a unit run)
+ * passes both as `cliOverride.tier` and `cliOverride.model` and they are taken as given. Every other
+ * caller gets Seat Binding's answer through `bind()` (the same crate call a unit run makes): a pinned
+ * executor, tier or effort is an override it judges, and the model is the one it names. With no runner
+ * config and no bound tier and model the policy is refused (`runner-config-missing`). Rigor is recorded
+ * as the demand it is (checker count, independence) and never moves the tier or the effort.
  *
  * @param {object} params
  * @param {object} params.assignment Assignment object (required). Its own `rigor` and `domain` are the
@@ -81,55 +74,35 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride 
 
   const opId = assignment.operation;
 
-  // Rigor: the strongest explicit demand wins; the implicit standard is only a final fallback. It sets
-  // checker count and independence, so it is recorded here and never read as a tier.
-  const rigorStrength = (r) => RIGOR_VALUES.indexOf(r);
+  // Rigor: the strongest explicit demand of the operation, the assignment and the caller. It is a demand
+  // (checker count, independence), never a tier; the capability's own rigor joins it in `effectiveRigorOf`.
   const checkedRigor = (value, label) => {
     if (!RIGOR_VALUES.includes(value)) {
       throw new RunnerConfigError(`invalid ${label} rigor "${value}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
     }
     return value;
   };
-  let effectiveRigor = opPolicy.rigor !== undefined ? checkedRigor(opPolicy.rigor, 'operation') : 'standard';
-  let rigorSource = opPolicy.rigor !== undefined ? { scope: 'opPolicy', id: opId } : { scope: 'default' };
-  const raiseRigor = (value, source) => {
-    if (rigorSource.scope === 'default' || rigorStrength(value) > rigorStrength(effectiveRigor)) {
-      effectiveRigor = rigorSource.scope === 'default' ? value : resolveStrongerRigor(effectiveRigor, value);
-      rigorSource = source;
-    }
-  };
-  if (assignment.rigor !== undefined) {
-    raiseRigor(checkedRigor(assignment.rigor, 'assignment'), { scope: 'assignment', id: assignment.assignmentId ?? assignment.workId ?? null });
-  }
   const derivedCapability = deriveOperationCapability(
     { id: assignment.operation, policy: opPolicy, result: assignment.result ?? { kind: assignment.resultKind } },
     { domain: assignment.domain, primaryCapability: assignment.primaryCapability },
     runnerConfig,
   );
   const targetCap = opPolicy.capability ?? assignment.capability ?? derivedCapability.name;
-  const capRigor = targetCap ? capabilityRigorOf(runnerConfig, targetCap) : undefined;
-  if (capRigor !== undefined) raiseRigor(checkedRigor(capRigor, `capability "${targetCap}"`), { scope: 'capability', id: targetCap });
-  if (cliOverride.rigor !== undefined) {
-    raiseRigor(checkedRigor(cliOverride.rigor, 'override'), cliOverride.policyProvenance?.rigor ?? { scope: 'cliOverride' });
-  }
-
-  // Executor preference: the caller's pin, else the operation's, else the global default executor.
-  const primaryExecutor =
-    cliOverride.preferExecutor ??
-    opPolicy.preferExecutor ??
-    runnerConfig?.executor?.command ??
-    (runnerConfig?.executor?.invocations?.[0]?.command ?? runnerConfig?.executor?.invocations?.[0]?.id) ??
-    'claude';
-  const executorSource = cliOverride.preferExecutor
-    ? (cliOverride.policyProvenance?.executor ?? { scope: 'cliOverride' })
-    : opPolicy.preferExecutor
-      ? { scope: 'opPolicy', id: opId }
-      : { scope: 'default' };
+  const demands = [
+    opPolicy.rigor !== undefined ? [checkedRigor(opPolicy.rigor, 'operation'), { scope: 'opPolicy', id: opId }] : null,
+    assignment.rigor !== undefined ? [checkedRigor(assignment.rigor, 'assignment'), { scope: 'assignment', id: assignment.assignmentId ?? assignment.workId ?? null }] : null,
+    cliOverride.rigor !== undefined ? [checkedRigor(cliOverride.rigor, 'override'), cliOverride.policyProvenance?.rigor ?? { scope: 'cliOverride' }] : null,
+  ].filter(Boolean);
+  const [demandRigor, demandSource] = demands.reduce((best, d) => (!best || RIGOR_VALUES.indexOf(d[0]) > RIGOR_VALUES.indexOf(best[0]) ? d : best), null) ?? [undefined, { scope: 'default' }];
+  const effectiveRigor = effectiveRigorOf({ rigor: demandRigor, capability: targetCap }, runnerConfig, { fallback: 'standard' });
+  const rigorSource = effectiveRigor !== demandRigor && effectiveRigor === capabilityRigorOf(runnerConfig, targetCap)
+    ? { scope: 'capability', id: targetCap }
+    : demandSource;
 
   // Reasoning effort: only an explicit level is rendered into the launch. Rigor never sets one; without
   // a level the seat runs at its invocation's own default.
   const explicitEffort = cliOverride.reasoningEffort ?? opPolicy.reasoningEffort;
-  const reasoningEffort = explicitEffort === undefined ? undefined : assertReasoningEffort(explicitEffort);
+  if (explicitEffort !== undefined) assertReasoningEffort(explicitEffort);
   const reasoningEffortSource = explicitEffort === undefined
     ? { scope: 'default' }
     : cliOverride.reasoningEffort ? { scope: 'cliOverride' } : { scope: 'opPolicy', id: opId };
@@ -147,17 +120,11 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride 
         ? { scope: 'default', id: assignment.role }
         : { scope: 'default' };
 
-  // Registry validation and provider derivation.
-  const { resolvedProvider, registeredExecutorEntry } = resolveExecutorProvider({ runnerConfig, primaryExecutor, options });
-  const providerSource = registeredExecutorEntry
-    ? { scope: 'registeredExecutor', id: primaryExecutor }
-    : executorSource;
-
-  // Tier and model.
-  let effectiveTier;
-  let tierSource;
-  let resolvedModel = null;
-  let modelSource = { scope: 'default' };
+  // Executor, tier, model and effort. A caller that already bound the seat (a unit run) passes the tier and
+  // the model and they are taken as given. Every other caller asks Seat Binding through `bind()`: a pinned
+  // executor (the caller's, else the operation's) is an override, a tier or effort stated by the assignment
+  // or the caller is one too, and with no pin the capability's pool decides.
+  const pinnedExecutor = cliOverride.preferExecutor ?? opPolicy.preferExecutor;
   const explicitTier = cliOverride.tier ?? opPolicy.tier;
   if (explicitTier !== undefined && !MODEL_POLICY_TIERS.includes(explicitTier)) {
     throw new RunnerConfigError(`invalid explicit tier "${explicitTier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
@@ -166,28 +133,54 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride 
   if (cliOverride.tier !== undefined && tierProvenance !== undefined && !['actor', 'assignment', 'cli', 'cliOverride'].includes(tierProvenance.scope)) {
     throw new RunnerConfigError(`explicit tier provenance scope "${tierProvenance.scope}" is not allowed; tier may be explicit only at actor, assignment, or CLI scope`);
   }
-  if (cliOverride.tier !== undefined && cliOverride.model !== undefined) {
-    // The seat was bound upstream: its tier and the model of its cell are taken as given.
+  const boundUpstream = cliOverride.tier !== undefined && cliOverride.model !== undefined;
+  let bound = null;
+  if (!boundUpstream) {
+    if (!runnerConfig) {
+      throw new RunnerConfigError('the dispatch policy needs the runner config to choose a tier and a model: pass it, or pass both the tier and the model', { code: 'runner-config-missing' });
+    }
+    const override = {
+      ...(pinnedExecutor ? { executor: pinnedExecutor, ...(cliOverride.preferInvocation ? { invocation: cliOverride.preferInvocation } : {}) } : {}),
+      ...(explicitTier !== undefined ? { tier: explicitTier } : {}),
+      ...(explicitEffort !== undefined ? { reasoningEffort: explicitEffort } : {}),
+    };
+    bound = bindWorkSeat({
+      runnerConfig,
+      unit: { id: opId ?? 'work-seat', capability: targetCap ?? '', rigor: effectiveRigor, ...(pinnedExecutor ? { prefer: [pinnedExecutor] } : {}) },
+      role: SEAT_ROLES.includes(assignment.role) ? assignment.role : 'producer',
+      readOnly: isReadOnlyAssignment(assignment),
+      overrides: Object.keys(override).length > 0 ? [override] : [],
+    });
+  }
+  // A pin is hard: an executor Seat Binding did not take (not registered, or unable to serve the seat) is refused.
+  if (bound && pinnedExecutor && bound.executor !== pinnedExecutor) {
+    throw new RunnerConfigError(`pin-unsatisfiable: preferExecutor "${pinnedExecutor}" is not registered or cannot serve this seat; Seat Binding chose "${bound.executor}"`, { code: 'pin-unsatisfiable' });
+  }
+  const primaryExecutor = bound?.executor
+    ?? pinnedExecutor
+    ?? runnerConfig?.executor?.command
+    ?? (runnerConfig?.executor?.invocations?.[0]?.command ?? runnerConfig?.executor?.invocations?.[0]?.id)
+    ?? 'claude';
+  const executorSource = pinnedExecutor
+    ? (cliOverride.preferExecutor ? (cliOverride.policyProvenance?.executor ?? { scope: 'cliOverride' }) : { scope: 'opPolicy', id: opId })
+    : bound ? { scope: 'seat-binding', id: bound.provenance.executor.source } : { scope: 'default' };
+  const { resolvedProvider, registeredExecutorEntry } = resolveExecutorProvider({ runnerConfig, primaryExecutor, options });
+  const providerSource = registeredExecutorEntry
+    ? { scope: 'registeredExecutor', id: primaryExecutor }
+    : executorSource;
+
+  let effectiveTier;
+  let tierSource;
+  let resolvedModel = null;
+  let modelSource = { scope: 'default' };
+  if (boundUpstream) {
     effectiveTier = cliOverride.tier;
     tierSource = tierProvenance ?? { scope: 'cliOverride' };
     resolvedModel = cliOverride.model;
     modelSource = { scope: 'cliOverride' };
-  } else if (runnerConfig) {
-    const decided = seatPolicy({
-      capability: targetCap ?? '',
-      seat: 'producer',
-      role: SEAT_ROLES.includes(assignment.role) ? assignment.role : 'producer',
-      label: opId ?? null,
-      selectors: {},
-      raiseAuthorized: false,
-      ...(explicitTier !== undefined ? { override: { tier: explicitTier } } : {}),
-      effectiveRigor,
-    }, runnerConfig);
-    if (decided.refused) {
-      throw new RunnerConfigError(`${decided.refused.reason}: ${decided.refused.detail}`, { code: decided.refused.reason });
-    }
-    effectiveTier = decided.policy.tier;
-    tierSource = { scope: 'seat-binding', id: decided.policy.tierSource };
+  } else {
+    effectiveTier = bound.tier;
+    tierSource = { scope: 'seat-binding', id: bound.provenance.tier.source };
     if (cliOverride.model) {
       resolvedModel = cliOverride.model;
       modelSource = { scope: 'cliOverride' };
@@ -195,24 +188,12 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride 
       resolvedModel = opPolicy.model;
       modelSource = { scope: 'opPolicy', id: opId };
     } else {
-      resolvedModel = modelOfCell(decided.policy, resolvedProvider);
-      if (resolvedModel === undefined) {
-        throw new RunnerConfigError(`tier-cell-missing: ${tierCellMissingDetail(resolvedProvider, effectiveTier)}`, { code: 'tier-cell-missing' });
-      }
+      resolvedModel = bound.model;
       modelSource = { scope: 'placement-policy', id: `${resolvedProvider}.${effectiveTier}` };
     }
-  } else {
-    // With no runner config nothing can decide a tier or a cell: only what the caller itself stated stands.
-    effectiveTier = explicitTier;
-    tierSource = cliOverride.tier !== undefined ? (tierProvenance ?? { scope: 'cliOverride' }) : opPolicy.tier !== undefined ? { scope: 'opPolicy', id: opId } : { scope: 'default' };
-    if (cliOverride.model) {
-      resolvedModel = cliOverride.model;
-      modelSource = { scope: 'cliOverride' };
-    } else if (opPolicy.model) {
-      resolvedModel = opPolicy.model;
-      modelSource = { scope: 'opPolicy', id: opId };
-    }
   }
+  // Only a level somebody stated (the caller, the operation or the tier's cell) is rendered into the launch.
+  const reasoningEffort = bound && bound.provenance.reasoningEffort.source !== 'invocation-default' ? bound.reasoningEffort : explicitEffort;
 
   // Visibility and repeat mode.
   const resolvedVisibility = cliOverride.visibility ?? opPolicy.visibility ?? 'headless';

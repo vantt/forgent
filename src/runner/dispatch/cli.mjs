@@ -21,11 +21,10 @@ class StoreError extends Error {
 
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir, loadRunnerConfigFromDir, MODEL_POLICY_TIERS, normalizePreferCandidates, withDefaultExecutor } from './config.mjs';
-import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
-import { resolveExecutorAndOverrides, deriveProviderFamily, resolveCapabilityDetailsFromHints, tierCellMissingDetail } from './resolve.mjs';
+import { RIGOR_VALUES } from '../rigor.mjs';
+import { resolveExecutorAndOverrides, resolveCapabilityDetailsFromHints } from './resolve.mjs';
 import { WORK_ITEM_KEYS, refuseWorkItemInput } from './work-item-input.mjs';
 import { resolveExecutorProvider, resolveExecutorGovernance } from './executor-governance.mjs';
-import { seatPolicy } from '../execution/seat-policy.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, DispatchError } from './transport.mjs';
 import { executeThroughConfinement, buildConfinementAttestation } from './confinement/authority.mjs';
@@ -46,7 +45,6 @@ import { buildAssignment, claimAssignmentId } from './assignment.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
 
 import { resolveFgosBin } from '../../setup/bin-discovery.mjs';
-import { capabilityRigorOf } from '../execution/seat-resolver.mjs';
 
 // Resolved once at import against THIS MODULE's own location, preferring a
 // tier-0 resolution when present with the same fallback resolveFgosBin
@@ -567,7 +565,6 @@ export async function executeExecutorCli(
   // at), then from the executor entry's own declaration. A caller that gives neither asks Seat Binding
   // for the capability's tier and takes the first model of the executor family's cell at that tier.
   const capabilityName = anchorCapability ?? capabilityIdentity ?? purpose ?? executorIdArg;
-  const capabilityRigor = capabilityRigorOf(cfg, capabilityName);
   if (tierOverride !== undefined && !MODEL_POLICY_TIERS.includes(tierOverride)) {
     throw new RunnerConfigError(`invalid tier "${tierOverride}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
   }
@@ -577,28 +574,12 @@ export async function executeExecutorCli(
   if (rigorOverride !== undefined && !RIGOR_VALUES.includes(rigorOverride)) {
     throw new RunnerConfigError(`invalid rigor "${rigorOverride}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
   }
-  const effectiveRigor = (rigorOverride && capabilityRigor)
-    ? resolveStrongerRigor(rigorOverride, capabilityRigor)
-    : (rigorOverride ?? capabilityRigor);
-  const providerFamily = deriveProviderFamily(executor);
-  let tier = tierOverride ?? executor?.tier;
-  let model = modelOverride ?? executor?.model;
+  // This door chooses neither tier nor model: the caller that bound the seat passes them (the assignment
+  // runner does), or the executor declares them. Seat Binding is the only chooser.
+  const tier = tierOverride ?? executor?.tier;
+  const model = modelOverride ?? executor?.model;
   if (tier === undefined || model === undefined) {
-    const decided = seatPolicy({
-      capability: capabilityName ?? '',
-      seat: 'producer',
-      role: 'producer',
-      selectors: {},
-      raiseAuthorized: false,
-      effectiveRigor: effectiveRigor ?? 'standard',
-      ...(tier !== undefined ? { override: { tier } } : {}),
-    }, cfg);
-    if (decided.refused) throw new RunnerConfigError(`${decided.refused.reason}: ${decided.refused.detail}`, { code: decided.refused.reason });
-    tier ??= decided.policy.tier;
-    if (model === undefined) {
-      model = decided.policy.cells?.[providerFamily]?.[0]?.model;
-      if (model === undefined) throw new RunnerConfigError(`tier-cell-missing: ${tierCellMissingDetail(providerFamily, tier)}`, { code: 'tier-cell-missing' });
-    }
+    throw new RunnerConfigError('seat-not-bound: executeExecutorCli takes the tier and the model from the caller that bound the seat (or from the executor entry); it does not choose them', { code: 'seat-not-bound' });
   }
   // `primaryExecutor`/`explicitProviderModel` mirror exactly what the
   // former the dispatch policy

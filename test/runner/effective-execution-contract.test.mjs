@@ -19,7 +19,9 @@ import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { renderAssignmentPrompt } from '../../src/runner/dispatch/assignment.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { renderBrief, briefPaths } from '../../src/runner/dispatch/brief.mjs';
-import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { bindable, bindableExecute } from '../helpers/work-seat-config.mjs';
+const executeAssignment = bindableExecute(executeAssignmentRaw);
 
 function mkTempDir() {
   const p = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-effective-contract-test-'));
@@ -438,6 +440,7 @@ test('PRODUCTION-DOOR FIXTURE: executeAssignment persists effective-execution-co
     },
     executors: {
       'mock-cli': {
+        providerModel: 'claude',
         command: 'mock-cli',
         adapter: 'cli-spawn',
       },
@@ -446,7 +449,7 @@ test('PRODUCTION-DOOR FIXTURE: executeAssignment persists effective-execution-co
 
   const fgosDir = path.join(tempDir, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify(runnerCfg, null, 2));
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify(bindable(runnerCfg), null, 2));
 
   // Write a mock script that acts as the executor CLI:
   // It verifies effective-execution-contract.json ALREADY exists when it runs,
@@ -549,8 +552,8 @@ process.exit(0);
   assert.deepEqual(contractOnDisk.workspace.writeScope, []);
   assert.equal(contractOnDisk.limits.executorTimeoutMs, 25000);
   assert.equal(contractOnDisk.resultClaim.path, path.join(runDir, 'agent-result.json'));
-  // No executor is selected, so the configured default executor's command identifies it.
-  assert.equal(contractOnDisk.executorId, updatedCfg.executor.command);
+  // No executor is pinned, so Seat Binding picks one from the pool; the family the default executor serves names it.
+  assert.equal(contractOnDisk.executorId, 'claude');
   assert.equal(contractOnDisk.adapter, 'cli-spawn');
   assert.equal(contractOnDisk.adapterFamily, 'cli-spawn');
   assert.equal(contractOnDisk.enforcementPosture, 'instructed');

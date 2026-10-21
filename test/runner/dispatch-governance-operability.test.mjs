@@ -14,7 +14,9 @@ import {
   RunnerConfigError,
   loadRunnerConfig,
 } from '../../src/runner/dispatch/config.mjs';
-import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { bindableExecute } from '../helpers/work-seat-config.mjs';
+const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { showRunUseCase, readRunSnapshot } from '../../src/verbs/dispatch/show-run.mjs';
 import { watchRunUseCase } from '../../src/verbs/dispatch/watch.mjs';

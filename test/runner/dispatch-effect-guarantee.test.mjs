@@ -2,7 +2,9 @@ import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
+import { effectiveDispatchPolicy as policyOf } from '../../src/runner/dispatch/plan.mjs';
+// These cases are about repeatMode, not the seat: the caller states the tier and the model it bound.
+const effectiveDispatchPolicy = (args) => policyOf({ cliOverride: { tier: 'standard', model: 'bound-model' }, ...args });
 import { assessBwrap } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import {
   assess,

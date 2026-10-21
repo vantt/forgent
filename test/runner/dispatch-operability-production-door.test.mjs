@@ -8,7 +8,9 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { bindableExecute } from '../helpers/work-seat-config.mjs';
+const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 import { invokeDispatchReconcileOperation } from '../../src/verbs/dispatch/reconcile.mjs';
 import { planReconciliation } from '../../src/runner/dispatch/reconciliation-planner.mjs';

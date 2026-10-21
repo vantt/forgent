@@ -28,7 +28,9 @@ import {
   validateEffectiveExecutionContract,
 } from '../../src/runner/dispatch/effective-execution-contract.mjs';
 
-import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { bindableExecute } from '../helpers/work-seat-config.mjs';
+const executeAssignment = bindableExecute(executeAssignmentRaw);
 const loadCoordinationProtocol = () => null;
 const discoverCoordinationProtocols = () => [];
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
