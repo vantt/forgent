@@ -1,7 +1,7 @@
 ---
 phase: 08
 title: "Close: independent verification, re-measure, closing report, landing on both machines"
-status: pending
+status: done
 depends_on: [06]
 parallel: "sequential, last; after phase 07 when SEAT has landed, otherwise phase 07 stays open and is listed in the close report"
 effort: ~1d (plus the quiet-window wait for landing)

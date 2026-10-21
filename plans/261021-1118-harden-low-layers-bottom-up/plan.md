@@ -58,7 +58,7 @@ Also out of scope:
 | # | Phase | Depends on | Status |
 |---|---|---|---|
 | 00 | [T0 baseline + one-time whole-suite test investigation](phase-00-baseline-and-test-investigation.md) | — (TEST lane is told, not waited on) | done 10-21 13:40: [T0 baseline](../reports/research-261021-1210-harden-t0-baseline.md), [test investigation](../reports/research-261021-1210-harden-test-suite-investigation.md) |
-| 01 | [T0 Process Facts & Control + leaf crates](phase-01-t0-process-facts-and-leaf-crates.md) | 00 | council running ([brief](../reports/council-261021-1324-harden-t0-council-brief.md)) |
+| 01 | [T0 Process Facts & Control + leaf crates](phase-01-t0-process-facts-and-leaf-crates.md) | 00 | **landed** 10-21 22:06 on the second machine (main `7d1f1c1b2`, release `613dfa84…`); [closing report](../reports/closing-261021-2213-harden-t0-process-facts-door.md); owner machine by [guide](../reports/guide-261021-2213-harden-t0-owner-machine-landing.md); open: SEAT carry list (sub-plan phase 7), owner ask 2 on net size |
 | 02 | [T1 Holder-lock, Session Identity, Convention](phase-02-t1-holder-lock-identity-convention.md) | 01 closed; **SEAT landed** (T0 carry list and T1 identity/convention edits wait for it) | pending |
 | 03 | [T2 Git, Terminal-control](phase-03-t2-git-terminal-control.md) | 02 closed | pending |
 | 04 | [T3 Agent protocol, Observe, Event Store](phase-04-t3-agent-protocol-observe-event-store.md) | 03 closed; 04b also needs the ES store layer finished | pending |
