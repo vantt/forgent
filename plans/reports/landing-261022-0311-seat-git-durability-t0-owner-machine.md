@@ -73,3 +73,20 @@ Landed 2026-10-22 02:50–03:10 (Asia/Saigon) by `forgentx-95`. The owner author
    - for mdview and mcp-skill-hub, also `.fgos/config.json` from its `.pre-seat-binding-*` backup. The old release refuses the converted config.
 4. Restore `~/.fgos/config.json` and `cp fgctl.prev ~/.local/bin/fgctl`.
 5. Run `fgctl verify`.
+
+## Follow-up land (04:10–04:25)
+
+- **Release:** `sha256:a2b19d78900265cd6eb60b3b4f0868f47a6f134ae3d744644ef7bf024d21f3d3`, built from main `f315b99c7`, active in all three workspaces. Its fix is `a4db2b947`.
+  - **Cause of the one-door failure:** the recursive `stripConfigComments` rebuilt the config object, so the scanner could not trace the executor command to file data.
+  - **Fix:** a JSON round trip; the census now has 0 sites.
+  - It arrived with the main-into-track merge `d7c0256ed`; the `172c9d138` census in git was stale, which is why it read 0.
+- **Proof:** full suite at `a4db2b947` plus solo reruns. Only the known reds remained: the fgctl fixture under umask 002, `dev-host`, and cargo `holder_lock_gate` (load; it passes alone).
+- **Steps:** the full stop was coordinated with `forgentx-5f`; an orphan test-fixture node (pid 894459, from this session's suite) was killed.
+- **Upgrade refusal:** the first `fgctl upgrade` was refused with `git-predecessor-writer-live`. The gate took this session's own shell (cwd in the workspace, argv naming Git) for an older Git writer; that is correct, conservative behaviour. A rerun from a clean script with cwd `/tmp` passed.
+- **Doctor:** `git-mutation-one-door` passes in all three (964 files, payload digest `e11f0d9c7050`), and so does every required row. The other failing rows are the same as before this land.
+- **Smoke:**
+  - A read-only `fgos run` once ended `execution-failure`: omp exited to the shell before the brief was sent, so `terminal:foreground-not-agent` cancelled the run (`unit-run-1792617622427-55f5d158`).
+  - The retry passed (`unit-run-1792617651330-03b23a36`).
+- **Digest note:** the round trip drops keys whose value is `undefined`. A bind-input digest of a unit bound before this release and resumed after it could differ. No unit was in flight across the stop.
+- **Rollback to the first land:** `fgctl upgrade --from ~/.local/state/fgos/releases/sha256:52a7e0ac…`.
+
