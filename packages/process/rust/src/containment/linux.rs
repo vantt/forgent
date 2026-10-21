@@ -584,6 +584,19 @@ mod tests {
         bystander.wait().unwrap();
     }
 
+    /// A dead leader and a member of the tree that this observer cannot judge (another host's record) is
+    /// not an empty domain: nothing proves that member is gone.
+    #[test]
+    fn pgroup_state_reports_unknown_when_a_seen_member_cannot_be_judged() {
+        let mut child = Command::new("/bin/true").spawn().unwrap();
+        assert!(wait_until(Duration::from_secs(5), || matches!(facts::observe(ProcId(child.id())), facts::Observed::Zombie)));
+        let leader = tuple_of(ProcId(child.id())).expect("zombie identity");
+        child.wait().unwrap();
+        let foreign = ProcTuple { host: "other-host".into(), ..leader.clone() };
+        assert_eq!(facts::judge_here(&foreign.to_record()), Verdict::Unknown, "the fixture member must be one this observer cannot judge");
+        assert_eq!(pgroup_state(&leader, &[foreign]), DomainState::Unknown);
+    }
+
     #[test]
     fn bwrap_report_names_the_gate_pid() {
         assert_eq!(parse_child_pid(br#"{"child-pid": 4242}"#), Some(4242));
