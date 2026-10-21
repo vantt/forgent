@@ -1452,3 +1452,11 @@ generated handoff outputs together must remain below 6,000,000 bytes while
 preserving deterministic reruns and the exact final-pin command. Reason: the
 handoff must distinguish non-consumers from applied edits and remain small
 enough to review and transport without weakening row conservation.
+
+## L12-101 — Account local-main merge 2cf668766 (Doer, 2026-10-21)
+
+Local merge `2cf6687669b6582faa11e4bdd901f28d836099dd` imports local main `b4e25c4429c576fda1c723c24a9d0a7c496a9a50` (first parent `d274f1fc8728beb1a0a78b6f44d555d6e32ad35d`; 208 main commits and 7,480 changed paths). The complete path and family inventory, including every changed docs/platform, docs/specs, source, test, package, skill, workflow, plan, report and generated surface, is pinned in `step-07-l12-101-merge-accounting.json`. The conflict in `docs/platform/component-boundary.md` was verified against both parents: candidate metadata and Provenance remain, main's `Last reviewed: 2026-10-21` is taken, and main's redundant Source type line is omitted.
+
+Live evidence relocation `--before` passes 867 entries with zero violations. The merge removed the final legacy/collection token from `src/runner/dispatch/assignment-policy.mjs`, so its stale classified row was removed; `src/runner/dispatch/config.mjs` remains an `identifier-or-code-comment` consumer with `collection:visibility-herdr` and `legacy-root`. No runtime reader exists. Ratchet exits 0 and its test passes after six legacy digest refreshes, each with exact main-commit provenance in the exceptions ledger.
+
+Both embedded Step 0 extractors locate all 31 affected target anchors by content. The 31 target digests across six decision shards were rebound, all reviews remain pending with no approval carry, and there are zero parked or remaining target drifts (`step-07-l12-101-merge-rebindings.json`). Step 3/4/5 intersecting records remain deferred to Step 7 under L12-58(1); regenerated ownership/head-drift evidence is non-failing. L12-11 pair accounting appends the sole exact pair, `88b9ce43725ba95539f847ef2490702e93052a92` / `step-07-accounting-brief-2cf668766.md`, to both manifests. The reporter finds zero unaccounted pairs; its overall A remains non-green only for existing historical-offender accounting on uncommitted bytes. `needsWrites: []`.

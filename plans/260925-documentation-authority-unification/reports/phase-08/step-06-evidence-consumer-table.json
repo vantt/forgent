@@ -46,14 +46,6 @@
       "matchLinesSha256": "9df5a444ce20d5076e0e5be41f1423403353a22e3bad8491fdb71843d3c6f6ee"
     },
     {
-      "path": "src/runner/dispatch/assignment-policy.mjs",
-      "classification": "identifier-or-code-comment",
-      "matches": [
-        "collection:executor-policy-dispatch-seams"
-      ],
-      "matchLinesSha256": "e4f491896ab4cedbf6e0ffee628cb2f88d7964cd2f24fce4ea53494d50700ce6"
-    },
-    {
       "path": "src/runner/dispatch/assignment-runner.mjs",
       "classification": "identifier-or-code-comment",
       "matches": [
@@ -73,11 +65,10 @@
       "path": "src/runner/dispatch/config.mjs",
       "classification": "identifier-or-code-comment",
       "matches": [
-        "collection:executor-policy-dispatch-seams",
         "collection:visibility-herdr",
         "legacy-root"
       ],
-      "matchLinesSha256": "3de1623b4448afd8a0a9943c4434334f8a97b167f52add66aae36a392deb7497"
+      "matchLinesSha256": "60c6a6f0922e5a85ffd9a93ff49139e36be64fac151ca61c69f20208b464f83f"
     },
     {
       "path": "src/runner/dispatch/operation-prompt-templates.mjs",
