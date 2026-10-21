@@ -1428,3 +1428,27 @@ items; A34, PF-I022/PF-I023, reading-map and holder-lock-header reconciliation;
 P7-DOC-GAP-05 and P7-DOC-GAP-06. This is a dry-run receipt only and makes no
 readiness or cutover claim. The exact final-pin rerun command is recorded in
 `step-07-preassembly-report.md`.
+
+**Correction:** L12-100 supersedes L12-99's `applied-safe` interpretation and
+its uncompressed output shape; L12-99 remains the historical first-run record.
+
+## L12-100 — Separate rejected census references and compact Step 7 outputs (Lead, A42)
+
+No Phase 8 row is `applied-safe`: L12-9 applied no consumer edit on this
+branch. The 36,191 `REJECT` + `preserve` rows are census references rather than
+consumers and therefore use the separate `rejected-not-consumer` class. Every
+such row must resolve a non-null `nonDocumentUseOrCustody` value from its
+source record; a null is a stop. Review joins consumer rows to the four
+consumer classes and counts/checks rejected rows separately. `applied-safe`
+stays in the vocabulary at zero; any future row in that class requires
+explicit applied-edit evidence or assembly fails.
+
+Step 7 artifacts reference their source record, line, reference and row id;
+they do not repeat source spans, diff bodies or other long record content.
+Custody values and record paths use deterministic catalogs, readiness contains
+per-row entries only for blocked rows plus aggregate counts, and patch order
+retains diff digests and record references without copying diff text. All four
+generated handoff outputs together must remain below 6,000,000 bytes while
+preserving deterministic reruns and the exact final-pin command. Reason: the
+handoff must distinguish non-consumers from applied edits and remain small
+enough to review and transport without weakening row conservation.

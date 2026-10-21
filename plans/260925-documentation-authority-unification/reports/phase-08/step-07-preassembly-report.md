@@ -1,21 +1,33 @@
 # Step 7 preassembly dry run
 
-Pinned source commit: `9f708a7ebc9b8ab80710b4dd47007515b1bb7081`.
+Pinned source commit: `36f195a64f9ab4968bd0b4b529dca7704dc60bd2`.
 
 This is a deterministic pre-pin assembly. It changes no disposition and makes no readiness claim.
 
 ## Counts
 
-- `applied-safe`: 36191
+- `applied-safe`: 0
 - `prepared-for-cutover`: 376
 - `preserved-history/fixture`: 7526
 - `individually parked`: 2311
-- `unmatched`: 0
+- `rejected-not-consumer`: 36191
+- consumer-class rows: 10213 (5,249 ADMIT; 4,964 admission-unspecified)
+- rejected rows checked separately: 36191
+- blocked row-readiness entries: 2687
 - patch specifications: 204
 - changed-candidate union: 48
 - park families: 23; members: 2311
 - alias writer violations: 0
 - rows fitting no class/family: 0
+
+All REJECT rows use `rejected-not-consumer`; every one resolves a non-null value through the matrix custody catalog. `applied-safe` remains in the vocabulary at zero and the assembler stops if a future row lacks applied-edit evidence.
+
+## Output sizes
+
+- `step-07-consumer-cutover-matrix.json`: 4059788 bytes
+- `step-07-patch-order.json`: 163400 bytes
+- `step-07-readiness.json`: 245413 bytes
+- all four generated outputs: 4470421 bytes (limit: < 6000000 bytes)
 
 ## Explicit blockers
 

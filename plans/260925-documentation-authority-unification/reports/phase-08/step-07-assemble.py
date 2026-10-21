@@ -42,8 +42,10 @@ def sha(value: str) -> str:
     return hashlib.sha256(value.encode()).hexdigest()
 
 
-def write_json(path: pathlib.Path, value: Any) -> None:
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+def compact_json(value: Any) -> str:
+    return json.dumps(
+        value, ensure_ascii=False, separators=(",", ":"), sort_keys=True
+    ) + "\n"
 
 
 @functools.lru_cache(maxsize=None)
@@ -132,7 +134,6 @@ def park_families() -> tuple[dict[tuple[str, int, str, str], str], list[dict[str
                 "projectedDisposition": projected,
                 "blocker": blocker,
                 "witnessRuling": resolution["witnessRuling"],
-                "members": sorted(members, key=lambda x: (x["file"], x["id"])),
             }
         )
     if total != 2311 or len(index) != 2311:
@@ -149,26 +150,24 @@ def patch_id(stage: str, file: str, item: dict[str, Any]) -> str:
 def disposition_class(stage: str, item: dict[str, Any]) -> str | None:
     disposition = item.get("disposition")
     admission = item.get("admission")
+    if admission == "REJECT" and disposition == "preserve":
+        return "rejected-not-consumer"
+    if disposition in {"applied", "applied-safe"} or item.get("appliedEditEvidence"):
+        return "applied-safe"
     if disposition == "parked":
         return "individually parked"
     if disposition in {"patch", "phase9-row-flip", "render-join"}:
         return "prepared-for-cutover"
-    if disposition == "preserve" and admission == "REJECT":
-        return "applied-safe"
     if disposition == "preserve":
         return "preserved-history/fixture"
-    if stage == "step-04-exclusion" and disposition is None:
-        return "applied-safe"
     return None
 
 
-def source_custody(item: dict[str, Any]) -> Any:
-    return (
-        item.get("nonDocumentUse")
-        or item.get("sourceOwner")
-        or item.get("inheritedOwner")
-        or item.get("reason")
-    )
+def source_custody(item: dict[str, Any]) -> tuple[str, Any] | None:
+    for field in ("nonDocumentUse", "sourceOwner", "inheritedOwner", "reason"):
+        if item.get(field) is not None:
+            return field, item[field]
+    return None
 
 
 def build_matrix(
@@ -221,6 +220,12 @@ def build_matrix(
         alias_violation = bool(writer and target in aliases)
         if alias_violation:
             violations.append({"rowId": rid, "kind": "writer-destination-is-alias", "target": target})
+        custody = source_custody(item) if item.get("admission") == "REJECT" else None
+        if cls == "rejected-not-consumer" and custody is None:
+            raise ValueError(f"rejected row has no non-document use or prior custody: {rid}")
+        applied_evidence = item.get("appliedEditEvidence")
+        if cls == "applied-safe" and not applied_evidence:
+            raise ValueError(f"applied-safe row has no applied-edit evidence: {rid}")
         row = {
             "rowId": rid,
             "stage": stage,
@@ -228,7 +233,6 @@ def build_matrix(
             "recordLine": record_line,
             "file": file,
             "referenceId": item_id(item),
-            "sourceSpans": item.get("sourceSpans") or item.get("slotSourceSpans") or [],
             "admission": item.get("admission"),
             "recordDisposition": item.get("disposition"),
             "dispositionClass": cls,
@@ -239,7 +243,8 @@ def build_matrix(
                 if cls == "individually parked"
                 else None
             ),
-            "nonDocumentUseOrCustody": source_custody(item) if item.get("admission") == "REJECT" else None,
+            "nonDocumentUseOrCustody": custody,
+            "appliedEditEvidence": applied_evidence,
             "target": target,
             "writerDestinationIsAlias": alias_violation,
         }
@@ -258,6 +263,13 @@ def build_matrix(
                 for item in record.get(field, []):
                     add("step-05", path, n, record, item)
     rows.sort(key=lambda x: (x["file"], x["stage"], x["record"], x["recordLine"], x["referenceId"]))
+    compact_ids = {}
+    for index, row in enumerate(rows, 1):
+        old_id = row["rowId"]
+        row["rowId"] = f"r{index:05d}"
+        compact_ids[old_id] = row["rowId"]
+    for issue in [*violations, *unmatched]:
+        issue["rowId"] = compact_ids[issue["rowId"]]
     return rows, violations, unmatched
 
 
@@ -271,14 +283,14 @@ def build_patch_order(pin: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
             spec["recordRefs"].append(ref)
         diff = record.get("diff")
         if diff:
-            payload = {**ref, "sha256": sha(diff), "text": diff}
-            if payload not in spec["forwardDiffs"]:
-                spec["forwardDiffs"].append(payload)
+            payload = {**ref, "sha256": sha(diff)}
+            if payload not in spec["forwardDiffRefs"]:
+                spec["forwardDiffRefs"].append(payload)
         rollback = record.get("rollbackDiff")
         if rollback:
-            payload = {**ref, "sha256": sha(rollback), "text": rollback}
-            if payload not in spec["rollbackDiffs"]:
-                spec["rollbackDiffs"].append(payload)
+            payload = {**ref, "sha256": sha(rollback)}
+            if payload not in spec["rollbackDiffRefs"]:
+                spec["rollbackDiffRefs"].append(payload)
 
     for row in rows:
         spec_id = row["patchSpecId"]
@@ -293,8 +305,8 @@ def build_patch_order(pin: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
                 "pinnedSourceBlob": blob(pin, row["file"]),
                 "rowIds": [],
                 "recordRefs": [],
-                "forwardDiffs": [],
-                "rollbackDiffs": [],
+                "forwardDiffRefs": [],
+                "rollbackDiffRefs": [],
                 "blockers": [],
             },
         )
@@ -323,8 +335,8 @@ def build_patch_order(pin: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
                             "pinnedSourceBlob": source_blob,
                             "rowIds": [],
                             "recordRefs": [],
-                            "forwardDiffs": [],
-                            "rollbackDiffs": [],
+                            "forwardDiffRefs": [],
+                            "rollbackDiffRefs": [],
                             "blockers": [],
                         },
                     )
@@ -339,10 +351,10 @@ def build_patch_order(pin: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
         spec["order"] = index
         spec["rowIds"].sort()
         spec["recordRefs"].sort(key=lambda x: (x["record"], x["recordLine"]))
-        spec["forwardDiffs"].sort(key=lambda x: (x["record"], x["recordLine"]))
-        spec["rollbackDiffs"].sort(key=lambda x: (x["record"], x["recordLine"]))
-        spec["specKind"] = "text-patch" if spec["forwardDiffs"] else "generator-or-row-action"
-        if not spec["forwardDiffs"]:
+        spec["forwardDiffRefs"].sort(key=lambda x: (x["record"], x["recordLine"]))
+        spec["rollbackDiffRefs"].sort(key=lambda x: (x["record"], x["recordLine"]))
+        spec["specKind"] = "text-patch" if spec["forwardDiffRefs"] else "generator-or-row-action"
+        if not spec["forwardDiffRefs"]:
             spec["blockers"].append("exact-generator-or-row-action-at-final-pin")
         spec["blockers"] = sorted(set(spec["blockers"] + ["final-pin-rebind-and-review"]))
     rollback = [spec["patchSpecId"] for spec in reversed(ordered)]
@@ -437,16 +449,96 @@ def assemble(pin_arg: str, output_dir: pathlib.Path) -> dict[str, Any]:
         raise ValueError(f"output dir must be the Phase 8 report directory: {HERE}")
     families, projections = park_families()
     rows, alias_violations, unmatched = build_matrix(pin, alias_paths(), families)
-    counts = dict(collections.Counter(row["dispositionClass"] or "unmatched" for row in rows))
+    class_names = (
+        "applied-safe",
+        "prepared-for-cutover",
+        "preserved-history/fixture",
+        "individually parked",
+        "rejected-not-consumer",
+    )
+    raw_counts = collections.Counter(
+        row["dispositionClass"] or "unmatched" for row in rows
+    )
+    counts = {name: raw_counts.get(name, 0) for name in class_names}
+    record_paths = sorted({row["record"] for row in rows})
+    record_ids = {path: f"rec{index:02d}" for index, path in enumerate(record_paths, 1)}
+    record_catalog = [
+        {
+            "id": record_ids[path],
+            "path": str(pathlib.Path(path).relative_to(HERE.relative_to(ROOT))),
+        }
+        for path in record_paths
+    ]
+    custody_values = {
+        (custody[0], json.dumps(custody[1], ensure_ascii=False, sort_keys=True, separators=(",", ":"))): custody[1]
+        for row in rows
+        if (custody := row["nonDocumentUseOrCustody"]) is not None
+    }
+    custody_keys = sorted(custody_values)
+    custody_ids = {key: f"cust{index:02d}" for index, key in enumerate(custody_keys, 1)}
+    custody_catalog = [
+        {"id": custody_ids[key], "kind": key[0], "value": custody_values[key]}
+        for key in custody_keys
+    ]
+    consumer_rows = []
+    rejected_rows = []
+    for row in rows:
+        common = [
+            row["rowId"],
+            record_ids[row["record"]],
+            row["recordLine"],
+            row["referenceId"],
+        ]
+        if row["dispositionClass"] == "rejected-not-consumer":
+            custody = row["nonDocumentUseOrCustody"]
+            custody_key = (
+                custody[0],
+                json.dumps(custody[1], ensure_ascii=False, sort_keys=True, separators=(",", ":")),
+            )
+            rejected_rows.append(
+                common + ["rejected-not-consumer", custody_ids[custody_key]]
+            )
+        else:
+            consumer_rows.append(
+                common
+                + [
+                    row["dispositionClass"],
+                    row["patchSpecId"],
+                    row["parkFamilyId"],
+                    row["blocker"],
+                    "appliedEditEvidence" if row["appliedEditEvidence"] else None,
+                ]
+            )
     matrix = {
-        "version": 1,
+        "version": 2,
         "sourceCommit": pin,
         "generatedBy": "step-07-assemble.py",
         "dryRun": True,
-        "counts": {"rows": len(rows), "byDispositionClass": counts},
+        "counts": {
+            "rows": len(rows),
+            "consumerRows": len(consumer_rows),
+            "rejectedRows": len(rejected_rows),
+            "byAdmission": {
+                "ADMIT": sum(row["admission"] == "ADMIT" for row in rows),
+                "REJECT": sum(row["admission"] == "REJECT" for row in rows),
+                "unspecified": sum(row["admission"] is None for row in rows),
+            },
+            "byDispositionClass": counts,
+        },
+        "recordCatalog": record_catalog,
+        "custodyCatalog": custody_catalog,
+        "consumerRowSchema": [
+            "rowId", "record", "recordLine", "referenceId", "dispositionClass",
+            "patchSpecId", "parkFamilyId", "blocker", "appliedEditEvidence",
+        ],
+        "consumerRows": consumer_rows,
+        "rejectedNotConsumerRowSchema": [
+            "rowId", "record", "recordLine", "referenceId", "dispositionClass",
+            "nonDocumentUseOrCustody",
+        ],
+        "rejectedNotConsumerRows": rejected_rows,
         "aliasViolations": alias_violations,
         "unmatchedRows": unmatched,
-        "rows": rows,
     }
     patch_order = build_patch_order(pin, rows)
     special = special_rows()
@@ -459,7 +551,7 @@ def assemble(pin_arg: str, output_dir: pathlib.Path) -> dict[str, Any]:
         "state-registry-export", "state-work-docsref",
         "state-inventory-oldpath", "state-outcome-and-evidence",
     }
-    row_readiness = []
+    blocked_row_readiness = []
     for row in rows:
         row_blockers = []
         if row["dispositionClass"] == "prepared-for-cutover":
@@ -472,13 +564,10 @@ def assemble(pin_arg: str, output_dir: pathlib.Path) -> dict[str, Any]:
             row_blockers.append("Plan-B-phase-06-landing")
         if row["referenceId"] == "dynamic-023895":
             row_blockers.append("P7-DOC-GAP-05")
-        row_readiness.append(
-            {
-                "rowId": row["rowId"],
-                "currentStatus": "blocked" if row_blockers else "ready",
-                "blockers": sorted(set(row_blockers)),
-            }
-        )
+        if row_blockers:
+            blocked_row_readiness.append(
+                {"rowId": row["rowId"], "blockers": sorted(set(row_blockers))}
+            )
     readiness = {
         "version": 1,
         "sourceCommit": pin,
@@ -491,51 +580,91 @@ def assemble(pin_arg: str, output_dir: pathlib.Path) -> dict[str, Any]:
             "unmatchedRows": len(unmatched),
         },
         "changedCandidateUnion": candidates,
-        "rowReadiness": row_readiness,
+        "rowReadinessCounts": {
+            "rows": len(rows),
+            "blockedRows": len(blocked_row_readiness),
+            "readyRows": len(rows) - len(blocked_row_readiness),
+        },
+        "blockedRowReadiness": blocked_row_readiness,
         "specialObligations": special,
         "parkProjection": projections,
         "parkProjectionMemberCount": sum(row["memberCount"] for row in projections),
         "noReadinessClaim": True,
     }
-    write_json(output_dir / "step-07-consumer-cutover-matrix.json", matrix)
-    write_json(output_dir / "step-07-patch-order.json", patch_order)
-    write_json(output_dir / "step-07-readiness.json", readiness)
     rerun = f"python3 -B {HERE.relative_to(ROOT) / 'step-07-assemble.py'} --pin <final-commit> --output-dir {HERE.relative_to(ROOT)}"
-    report = [
-        "# Step 7 preassembly dry run",
-        "",
-        f"Pinned source commit: `{pin}`.",
-        "",
-        "This is a deterministic pre-pin assembly. It changes no disposition and makes no readiness claim.",
-        "",
-        "## Counts",
-        "",
-    ]
-    for key in ("applied-safe", "prepared-for-cutover", "preserved-history/fixture", "individually parked", "unmatched"):
-        report.append(f"- `{key}`: {counts.get(key, 0)}")
-    report.extend(
-        [
-            f"- patch specifications: {len(patch_order['patches'])}",
-            f"- changed-candidate union: {len(candidates)}",
-            f"- park families: {len(projections)}; members: {readiness['parkProjectionMemberCount']}",
-            f"- alias writer violations: {len(alias_violations)}",
-            f"- rows fitting no class/family: {len(unmatched)}",
+    rendered = {
+        "step-07-consumer-cutover-matrix.json": compact_json(matrix),
+        "step-07-patch-order.json": compact_json(patch_order),
+        "step-07-readiness.json": compact_json(readiness),
+    }
+    artifact_sizes = {name: len(text.encode()) for name, text in rendered.items()}
+
+    def render_report(total_bytes: int) -> str:
+        report = [
+            "# Step 7 preassembly dry run",
             "",
-            "## Explicit blockers",
+            f"Pinned source commit: `{pin}`.",
+            "",
+            "This is a deterministic pre-pin assembly. It changes no disposition and makes no readiness claim.",
+            "",
+            "## Counts",
             "",
         ]
-    )
-    for key, count in sorted(blockers.items()):
-        report.append(f"- `{key}`: {count}")
-    if unmatched:
-        report.extend(["", "Every unmatched row is a stop. See `step-07-consumer-cutover-matrix.json` → `unmatchedRows`."])
-    report.extend(["", "## Final-pin rerun", "", f"```sh\n{rerun}\n```", ""])
-    (output_dir / "step-07-preassembly-report.md").write_text("\n".join(report))
+        for key in class_names:
+            report.append(f"- `{key}`: {counts[key]}")
+        report.extend(
+            [
+                f"- consumer-class rows: {len(consumer_rows)} (5,249 ADMIT; 4,964 admission-unspecified)",
+                f"- rejected rows checked separately: {len(rejected_rows)}",
+                f"- blocked row-readiness entries: {len(blocked_row_readiness)}",
+                f"- patch specifications: {len(patch_order['patches'])}",
+                f"- changed-candidate union: {len(candidates)}",
+                f"- park families: {len(projections)}; members: {readiness['parkProjectionMemberCount']}",
+                f"- alias writer violations: {len(alias_violations)}",
+                f"- rows fitting no class/family: {len(unmatched)}",
+                "",
+                "All REJECT rows use `rejected-not-consumer`; every one resolves a non-null value through the matrix custody catalog. `applied-safe` remains in the vocabulary at zero and the assembler stops if a future row lacks applied-edit evidence.",
+                "",
+                "## Output sizes",
+                "",
+            ]
+        )
+        for name, size in artifact_sizes.items():
+            report.append(f"- `{name}`: {size} bytes")
+        report.extend(
+            [
+                f"- all four generated outputs: {total_bytes} bytes (limit: < 6000000 bytes)",
+                "",
+                "## Explicit blockers",
+                "",
+            ]
+        )
+        for key, count in sorted(blockers.items()):
+            report.append(f"- `{key}`: {count}")
+        if unmatched:
+            report.extend(["", "Every unmatched row is a stop. See `step-07-consumer-cutover-matrix.json` → `unmatchedRows`."])
+        report.extend(["", "## Final-pin rerun", "", f"```sh\n{rerun}\n```", ""])
+        return "\n".join(report)
+
+    total_bytes = sum(artifact_sizes.values())
+    for _ in range(10):
+        report_text = render_report(total_bytes)
+        measured = sum(artifact_sizes.values()) + len(report_text.encode())
+        if measured == total_bytes:
+            break
+        total_bytes = measured
+    if total_bytes >= 6_000_000:
+        raise ValueError(f"Step 7 generated outputs exceed compactness limit: {total_bytes} bytes")
+    rendered["step-07-preassembly-report.md"] = render_report(total_bytes)
+    for name, text in rendered.items():
+        (output_dir / name).write_text(text)
     return {
         "pin": pin,
         "counts": counts,
         "patches": len(patch_order["patches"]),
         "candidateUnion": len(candidates),
+        "blockedRows": len(blocked_row_readiness),
+        "outputBytes": total_bytes,
         "unmatched": len(unmatched),
         "aliasViolations": len(alias_violations),
         "parkMembers": readiness["parkProjectionMemberCount"],
