@@ -65,7 +65,8 @@ async function workload(args) {
   const { repo, state, git } = prepare(path.resolve(args.root));
   const { index, loader } = await loaders(args.descriptor);
   const tips = new Map(REFS.map((ref) => [ref, null]));
-  const lines = args.handshake ? readline.createInterface({ input: process.stdin })[Symbol.asyncIterator]() : null;
+  const input = args.handshake ? readline.createInterface({ input: process.stdin }) : null;
+  const lines = input ? input[Symbol.asyncIterator]() : null;
   for (let i = 0; i < ops; i++) {
     const ref = REFS[i % REFS.length];
     // One port at a time: a Publication port holds the repository's publication borrow.
@@ -85,6 +86,8 @@ async function workload(args) {
     if (i === Math.floor(ops / 2)) git(['--git-dir', repo, 'pack-refs', '--all']);
     if (lines) { process.stdout.write(`ack ${i}\n`); await lines.next(); }
   }
+  // The open stdin reader would keep the process alive, and the root driver waits for its exit.
+  input?.close();
 }
 
 /** Post-cut invariants on a replayed image, given the acknowledgements that reached the log

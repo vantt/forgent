@@ -71,10 +71,11 @@ dmsetup message "$LW" 0 mark mkfs
 mount "/dev/mapper/$LW" "$MNT"; mkdir "$MNT/w"; chown "$RUN_AS" "$MNT/w"
 PLAN="$OUT/plan.jsonl"; : > "$PLAN"; chown "$RUN_AS" "$PLAN"
 coproc WORKLOAD { as_user env -C "$CHECKOUT" "$NODE" scripts/git/e1-power-cut.mjs workload --root "$MNT/w" --descriptor "$DESCRIPTOR" --plan "$PLAN" --ops "$OPS" --handshake; }
+WORKLOAD_CHILD="$WORKLOAD_PID"  # bash unsets WORKLOAD_PID once the coprocess exits
 while IFS= read -r line <&"${WORKLOAD[0]}"; do
   case "$line" in ack\ *) dmsetup message "$LW" 0 mark "ack-${line#ack }"; echo ok >&"${WORKLOAD[1]}" ;; esac
 done
-wait "$WORKLOAD_PID" || die "workload failed"
+wait "$WORKLOAD_CHILD" || die "workload failed"
 umount "$MNT"
 dmsetup message "$LW" 0 mark done
 dmsetup remove "$LW"
