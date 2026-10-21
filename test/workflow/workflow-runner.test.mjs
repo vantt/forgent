@@ -1638,9 +1638,11 @@ test('workflow root context refs persist and reach only root Units across resume
 });
 
 test('producer expertise gate parks clearly on malformed packets and remains answerable across resume', async (t) => {
-  const validPackets = [{ 'missing expertise': ['database sizing', 'security review'] }, { 'missing expertise': [] }];
-  const invalidPackets = [{}, { 'missing expertise': '' }, { 'missing expertise': 'security' }, { 'missing expertise': [''] }, { 'missing expertise': [' '] }];
-  for (const packet of [...validPackets, ...invalidPackets, '```json\n{"missing expertise":[]}\n```', '# Advice\n{"missing expertise":[]}', 'Here is the recommendation: {"missing expertise":[]}']) {
+  // Each packet shape is owned by test/workflow/unit-handoff.test.mjs; here one readable packet and
+  // one of each refusal the runner turns into a manual gate: a wrong shape and a report that is not JSON.
+  const validPackets = [{ 'missing expertise': ['database sizing', 'security review'] }];
+  const invalidPackets = [{ 'missing expertise': 'security' }];
+  for (const packet of [...validPackets, ...invalidPackets, '```json\n{"missing expertise":[]}\n```']) {
     const tmp = setupTestRepo();
     t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
     fs.writeFileSync(path.join(tmp, 'echo-worker.mjs'), `
@@ -1683,15 +1685,11 @@ test('producer expertise gate parks clearly on malformed packets and remains ans
   }
 });
 
-test('expertise gate reads the settled report, then an untouched packet file beside it, with either key spelling', async (t) => {
+test('an expertise gate reads the packet file a producer wrote beside its prose report, judged against the settlement time the run recorded', async (t) => {
+  // Every report and packet-file case is owned by test/workflow/unit-handoff.test.mjs; this one
+  // proves a real settled run hands the gate its settlement time, so the packet file counts.
   const cases = [
-    { name: 'underscore key in the raw JSON report', report: JSON.stringify({ missing_expertise: ['database sizing'] }), expect: '["database sizing"]' },
-    { name: 'prose report with a packet file using the spaced key', report: '# Advice in prose', packet: JSON.stringify({ 'missing expertise': [] }), expect: '[]' },
     { name: 'prose report with a packet file using the underscore key', report: '# Advice in prose', packet: JSON.stringify({ missing_expertise: ['security review'] }), expect: '["security review"]' },
-    { name: 'the report wins over a packet file', report: JSON.stringify({ 'missing expertise': ['from report'] }), packet: JSON.stringify({ missing_expertise: ['from packet'] }), expect: '["from report"]' },
-    { name: 'packet file touched after the report settled is ignored', report: '# Advice in prose', packet: JSON.stringify({ missing_expertise: [] }), future: true, parks: true },
-    { name: 'malformed packet file is ignored', report: '# Advice in prose', packet: '{ not json', parks: true },
-    { name: 'packet file without the key is ignored', report: '# Advice in prose', packet: JSON.stringify({ verdict: 'x' }), parks: true },
   ];
   for (const scenario of cases) {
     const tmp = setupTestRepo();
@@ -1996,7 +1994,7 @@ function consumerWorkspace(t, { families = ['alpha', 'beta', 'gamma', 'delta'] }
 const seatedParams = (tmp, seats) => ({ workflowId: 'two-round', seats, request: 'Which retainer?', repoRoot: tmp, cwd: tmp, worktree: tmp });
 const sha256 = (text) => crypto.createHash('sha256').update(text).digest('hex');
 
-test('a named persona lands on its own seat only, mixed with a lens and an installed persona, in a consumer workspace', { timeout: 4 * STANCE_CLI_CALL_TIMEOUT_MS }, async (t) => {
+test('a named persona lands on its own seat only, mixed with a lens and an installed persona, in a consumer workspace; a resume after the file is edited uses the text pinned at start', { timeout: 6 * STANCE_CLI_CALL_TIMEOUT_MS }, async (t) => {
   const tmp = consumerWorkspace(t);
   const personaText = FINANCE_PERSONA();
   writeWorkspacePersona(tmp, 'finance-controller', personaText);
@@ -2050,11 +2048,20 @@ test('a named persona lands on its own seat only, mixed with a lens and an insta
   const synthesizer = seatBrief(tmp, unitRunId, 'synthesizer');
   assert.ok(!synthesizer.includes('Plain controller voice') && !synthesizer.includes('assumption testing'));
   assert.match(synthesizer, /resolved persona "panelist"/);
+
+  writeWorkspacePersona(tmp, 'finance-controller', FINANCE_PERSONA(' EDITED AFTER START'));
+  const done = await answerWorkflow(state.workflowRunId, { stepId: 'again', answer: 'go', approved: true, repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(done.status, 'completed', JSON.stringify(done.steps));
+  const brief = seatBrief(tmp, done.steps.again.units['panel-two'].unitRunId, 'panelist-2');
+  assert.ok(brief.includes('Voice: Plain controller voice\n'), 'edited: the pinned voice reaches the later round');
+  assert.ok(!brief.includes('EDITED AFTER START'), 'edited: the live file must not be re-read');
+  assert.ok(brief.includes('Description: Weighs the cash impact of {objective}'), 'edited');
+  assert.equal(done.seats.personas[0].digest, state.seats.personas[0].digest);
 });
 
-test('resume uses the persona text pinned at start after the file is edited or deleted', { timeout: 6 * STANCE_CLI_CALL_TIMEOUT_MS }, async (t) => {
+test('resume uses the persona text pinned at start after the file is deleted', { timeout: 4 * STANCE_CLI_CALL_TIMEOUT_MS }, async (t) => {
+  // The edited-file case runs on the parked run of the seat test above.
   for (const [label, change] of [
-    ['edited', (tmp) => writeWorkspacePersona(tmp, 'finance-controller', FINANCE_PERSONA(' EDITED AFTER START'))],
     ['deleted', (tmp) => fs.rmSync(path.join(tmp, 'fgos', 'agents', 'finance-controller.yaml'))],
   ]) {
     const tmp = consumerWorkspace(t);
