@@ -1,0 +1,1671 @@
+{
+  "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+  "removedOccurrences": [
+    {
+      "file": "bin/fgos.mjs",
+      "id": "reference-000264"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "id": "dynamic-001318"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "id": "dynamic-001323"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "id": "dynamic-001328"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "id": "dynamic-001341"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "id": "dynamic-001351"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "id": "dynamic-001486"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "id": "dynamic-001487"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "id": "dynamic-001488"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "id": "dynamic-001565"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "id": "dynamic-001580"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "id": "dynamic-001581"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "id": "dynamic-001583"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "id": "dynamic-001584"
+    },
+    {
+      "file": "packages/distribution/rust/src/git_gate.rs",
+      "id": "dynamic-002313"
+    },
+    {
+      "file": "packages/distribution/rust/src/workspace.rs",
+      "id": "reference-002296"
+    },
+    {
+      "file": "packages/distribution/rust/src/workspace.rs",
+      "id": "dynamic-002751"
+    },
+    {
+      "file": "packages/distribution/rust/src/workspace.rs",
+      "id": "dynamic-002752"
+    },
+    {
+      "file": "packages/distribution/rust/src/workspace.rs",
+      "id": "dynamic-002753"
+    },
+    {
+      "file": "packages/distribution/rust/src/workspace.rs",
+      "id": "dynamic-002754"
+    },
+    {
+      "file": "packages/git/rust/src/driver.rs",
+      "id": "dynamic-003443"
+    },
+    {
+      "file": "packages/git/rust/src/driver.rs",
+      "id": "dynamic-003459"
+    },
+    {
+      "file": "packages/git/rust/src/driver.rs",
+      "id": "dynamic-003460"
+    },
+    {
+      "file": "packages/git/rust/src/driver.rs",
+      "id": "dynamic-003551"
+    },
+    {
+      "file": "packages/git/rust/src/driver.rs",
+      "id": "dynamic-003552"
+    },
+    {
+      "file": "packages/git/rust/src/driver.rs",
+      "id": "dynamic-003553"
+    },
+    {
+      "file": "packages/git/rust/src/driver.rs",
+      "id": "dynamic-003554"
+    },
+    {
+      "file": "packages/git/rust/src/driver.rs",
+      "id": "dynamic-003555"
+    },
+    {
+      "file": "packages/git/rust/src/driver.rs",
+      "id": "dynamic-003556"
+    },
+    {
+      "file": "packages/git/rust/src/driver.rs",
+      "id": "dynamic-003557"
+    },
+    {
+      "file": "packages/git/rust/src/driver.rs",
+      "id": "dynamic-003558"
+    },
+    {
+      "file": "packages/git/rust/src/driver.rs",
+      "id": "dynamic-003559"
+    },
+    {
+      "file": "packages/git/rust/src/inspect.rs",
+      "id": "dynamic-003573"
+    },
+    {
+      "file": "packages/git/rust/src/refs.rs",
+      "id": "dynamic-003652"
+    },
+    {
+      "file": "packages/git/rust/src/repository_config.rs",
+      "id": "dynamic-003667"
+    },
+    {
+      "file": "packages/git/rust/src/repository_config.rs",
+      "id": "dynamic-003669"
+    },
+    {
+      "file": "packages/git/rust/src/worktree.rs",
+      "id": "dynamic-003815"
+    },
+    {
+      "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "id": "dynamic-004275"
+    },
+    {
+      "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "id": "dynamic-004276"
+    },
+    {
+      "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "id": "dynamic-004277"
+    },
+    {
+      "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "id": "dynamic-004278"
+    },
+    {
+      "file": "packages/holder-lock/rust/src/borrow_vectors.rs",
+      "id": "dynamic-004343"
+    },
+    {
+      "file": "packages/holder-lock/rust/src/borrow_vectors.rs",
+      "id": "dynamic-004344"
+    },
+    {
+      "file": "packages/holder-lock/rust/src/route.rs",
+      "id": "dynamic-004427"
+    },
+    {
+      "file": "packages/holder-lock/rust/src/route.rs",
+      "id": "dynamic-004429"
+    },
+    {
+      "file": "packages/observe/rust/src/metrics_cli/harness.rs",
+      "id": "dynamic-004865"
+    },
+    {
+      "file": "packages/observe/rust/src/metrics_cli/harness.rs",
+      "id": "dynamic-004866"
+    },
+    {
+      "file": "packages/observe/rust/src/sources/claude_transcripts.rs",
+      "id": "dynamic-004957"
+    },
+    {
+      "file": "packages/observe/rust/src/sources/repo.rs",
+      "id": "dynamic-004970"
+    },
+    {
+      "file": "packages/observe/rust/src/sources/repo.rs",
+      "id": "dynamic-004972"
+    },
+    {
+      "file": "packages/observe/rust/src/sources/repo.rs",
+      "id": "dynamic-004973"
+    },
+    {
+      "file": "packages/observe/rust/src/sources/repo.rs",
+      "id": "dynamic-004974"
+    },
+    {
+      "file": "packages/observe/rust/src/sources/repo.rs",
+      "id": "dynamic-004975"
+    },
+    {
+      "file": "packages/observe/rust/src/sources/repo.rs",
+      "id": "dynamic-004976"
+    },
+    {
+      "file": "src/holder-lock/fences.mjs",
+      "id": "dynamic-009416"
+    },
+    {
+      "file": "src/holder-lock/fences.mjs",
+      "id": "dynamic-009417"
+    },
+    {
+      "file": "src/holder-lock/fences.mjs",
+      "id": "dynamic-009472"
+    },
+    {
+      "file": "src/runner/claim-liveness.mjs",
+      "id": "dynamic-010038"
+    },
+    {
+      "file": "src/runner/dispatch/assignment-runner.mjs",
+      "id": "dynamic-010169"
+    },
+    {
+      "file": "src/runner/dispatch/assignment-runner.mjs",
+      "id": "dynamic-010171"
+    },
+    {
+      "file": "src/runner/dispatch/assignment-runner.mjs",
+      "id": "dynamic-010172"
+    },
+    {
+      "file": "src/runner/dispatch/assignment-runner.mjs",
+      "id": "dynamic-010217"
+    },
+    {
+      "file": "src/runner/dispatch/assignment-runner.mjs",
+      "id": "dynamic-010341"
+    },
+    {
+      "file": "src/runner/dispatch/assignment-runner.mjs",
+      "id": "dynamic-010349"
+    },
+    {
+      "file": "src/runner/dispatch/provider-capacity.mjs",
+      "id": "dynamic-011711"
+    },
+    {
+      "file": "src/runner/dispatch/provider-credential-probe.mjs",
+      "id": "dynamic-011729"
+    },
+    {
+      "file": "src/runner/dispatch/provider-credential-probe.mjs",
+      "id": "dynamic-011730"
+    },
+    {
+      "file": "src/runner/dispatch/resolve.mjs",
+      "id": "dynamic-011916"
+    },
+    {
+      "file": "src/runner/dispatch/settlement.mjs",
+      "id": "dynamic-012047"
+    },
+    {
+      "file": "src/runner/execution/account-pin.mjs",
+      "id": "dynamic-012322"
+    },
+    {
+      "file": "src/runner/execution/account-pin.mjs",
+      "id": "dynamic-012323"
+    },
+    {
+      "file": "src/runner/execution/account-pin.mjs",
+      "id": "dynamic-012324"
+    },
+    {
+      "file": "src/runner/execution/account-pin.mjs",
+      "id": "dynamic-012325"
+    },
+    {
+      "file": "src/runner/execution/account-pin.mjs",
+      "id": "dynamic-012327"
+    },
+    {
+      "file": "src/runner/execution/account-rotation.mjs",
+      "id": "dynamic-012328"
+    },
+    {
+      "file": "src/runner/execution/bind.mjs",
+      "id": "dynamic-012336"
+    },
+    {
+      "file": "src/runner/execution/bind.mjs",
+      "id": "dynamic-012337"
+    },
+    {
+      "file": "src/runner/execution/bind.mjs",
+      "id": "dynamic-012338"
+    },
+    {
+      "file": "src/runner/execution/bind.mjs",
+      "id": "dynamic-012339"
+    },
+    {
+      "file": "src/runner/execution/bind.mjs",
+      "id": "dynamic-012340"
+    },
+    {
+      "file": "src/runner/execution/bind.mjs",
+      "id": "dynamic-012341"
+    },
+    {
+      "file": "src/runner/execution/bind.mjs",
+      "id": "dynamic-012342"
+    },
+    {
+      "file": "src/runner/execution/bind.mjs",
+      "id": "dynamic-012343"
+    },
+    {
+      "file": "src/runner/execution/bind.mjs",
+      "id": "dynamic-012344"
+    },
+    {
+      "file": "src/runner/execution/bind.mjs",
+      "id": "dynamic-012345"
+    },
+    {
+      "file": "src/runner/execution/bind.mjs",
+      "id": "dynamic-012346"
+    },
+    {
+      "file": "src/runner/execution/bind.mjs",
+      "id": "dynamic-012347"
+    },
+    {
+      "file": "src/runner/execution/bind.mjs",
+      "id": "dynamic-012348"
+    },
+    {
+      "file": "src/runner/execution/run.mjs",
+      "id": "dynamic-012484"
+    },
+    {
+      "file": "src/runner/execution/run.mjs",
+      "id": "dynamic-012503"
+    },
+    {
+      "file": "src/runner/execution/run.mjs",
+      "id": "dynamic-012512"
+    },
+    {
+      "file": "src/runner/execution/run.mjs",
+      "id": "dynamic-012513"
+    },
+    {
+      "file": "src/runner/execution/run.mjs",
+      "id": "dynamic-012514"
+    },
+    {
+      "file": "src/runner/execution/run.mjs",
+      "id": "dynamic-012515"
+    },
+    {
+      "file": "src/runner/execution/run.mjs",
+      "id": "dynamic-012516"
+    },
+    {
+      "file": "src/runner/execution/run.mjs",
+      "id": "dynamic-012517"
+    },
+    {
+      "file": "src/runner/execution/run.mjs",
+      "id": "dynamic-012518"
+    },
+    {
+      "file": "src/runner/execution/run.mjs",
+      "id": "dynamic-012519"
+    },
+    {
+      "file": "src/runner/execution/run.mjs",
+      "id": "dynamic-012549"
+    },
+    {
+      "file": "src/runner/execution/run.mjs",
+      "id": "dynamic-012567"
+    },
+    {
+      "file": "src/runner/execution/run.mjs",
+      "id": "dynamic-012568"
+    },
+    {
+      "file": "src/runner/execution/run.mjs",
+      "id": "dynamic-012575"
+    },
+    {
+      "file": "src/runner/loop.mjs",
+      "id": "dynamic-012803"
+    },
+    {
+      "file": "src/runner/loop.mjs",
+      "id": "dynamic-012870"
+    },
+    {
+      "file": "src/runner/loop.mjs",
+      "id": "dynamic-012871"
+    },
+    {
+      "file": "src/runner/loop.mjs",
+      "id": "dynamic-012903"
+    },
+    {
+      "file": "src/runner/main-fgos-checkpoint.mjs",
+      "id": "dynamic-012913"
+    },
+    {
+      "file": "src/runner/main-fgos-checkpoint.mjs",
+      "id": "dynamic-012914"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "reference-003748"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "reference-003758"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "reference-003760"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "reference-003763"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "reference-003764"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "reference-003769"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "reference-003770"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012915"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012916"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012917"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012918"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012920"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012922"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012924"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012925"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012927"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012928"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012929"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012930"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012931"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012932"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012933"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012934"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012935"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012936"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012937"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012938"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012939"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012940"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012941"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012942"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012943"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012944"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012945"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012946"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012947"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012948"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012951"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012956"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012957"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012958"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012960"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012961"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012962"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012963"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012964"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012965"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012966"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012968"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012969"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012971"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012972"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012973"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012974"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012975"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012976"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012977"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012978"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012981"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012982"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012987"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012991"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012992"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012993"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012994"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012995"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-012996"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-013006"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-013010"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-013011"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-013012"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-013013"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-013014"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-013016"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-013017"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-013018"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-013019"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-013020"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-013022"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-013023"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "dynamic-013024"
+    },
+    {
+      "file": "src/runner/operation-choice.mjs",
+      "id": "dynamic-013141"
+    },
+    {
+      "file": "src/runner/paths.mjs",
+      "id": "dynamic-013196"
+    },
+    {
+      "file": "src/runner/paths.mjs",
+      "id": "dynamic-013197"
+    },
+    {
+      "file": "src/runner/paths.mjs",
+      "id": "dynamic-013200"
+    },
+    {
+      "file": "src/runner/promote-preflight.mjs",
+      "id": "dynamic-013208"
+    },
+    {
+      "file": "src/runner/repo-locks.mjs",
+      "id": "dynamic-013217"
+    },
+    {
+      "file": "src/runner/repo-locks.mjs",
+      "id": "dynamic-013218"
+    },
+    {
+      "file": "src/runner/repo-locks.mjs",
+      "id": "dynamic-013219"
+    },
+    {
+      "file": "src/runner/repo-locks.mjs",
+      "id": "dynamic-013224"
+    },
+    {
+      "file": "src/runner/repo-locks.mjs",
+      "id": "dynamic-013225"
+    },
+    {
+      "file": "src/runner/repo-locks.mjs",
+      "id": "dynamic-013226"
+    },
+    {
+      "file": "src/runner/repo-locks.mjs",
+      "id": "dynamic-013230"
+    },
+    {
+      "file": "src/runner/session.mjs",
+      "id": "dynamic-013271"
+    },
+    {
+      "file": "src/runner/session.mjs",
+      "id": "dynamic-013277"
+    },
+    {
+      "file": "src/runner/session.mjs",
+      "id": "dynamic-013287"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "reference-003782"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "reference-003787"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "reference-003792"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013359"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013360"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013361"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013362"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013363"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013364"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013371"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013372"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013373"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013374"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013376"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013382"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013383"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013386"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013387"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013389"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013390"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013391"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013392"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013394"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013398"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013400"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013402"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013403"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013404"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013405"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013406"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013407"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013408"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013409"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013412"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013413"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013414"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013416"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013426"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013432"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013433"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013448"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "dynamic-013449"
+    },
+    {
+      "file": "src/state/cleanup-harness.mjs",
+      "id": "dynamic-015333"
+    },
+    {
+      "file": "src/state/cleanup-harness.mjs",
+      "id": "dynamic-015337"
+    },
+    {
+      "file": "src/state/cleanup-harness.mjs",
+      "id": "dynamic-015344"
+    },
+    {
+      "file": "src/state/drift-status.mjs",
+      "id": "dynamic-015380"
+    },
+    {
+      "file": "src/state/drift-status.mjs",
+      "id": "dynamic-015384"
+    },
+    {
+      "file": "src/state/events-jsonl-truncation-guard.mjs",
+      "id": "dynamic-015437"
+    },
+    {
+      "file": "src/state/postland-drift.mjs",
+      "id": "dynamic-015628"
+    },
+    {
+      "file": "src/state/postland-drift.mjs",
+      "id": "dynamic-015631"
+    },
+    {
+      "file": "src/state/postland-drift.mjs",
+      "id": "dynamic-015632"
+    },
+    {
+      "file": "src/state/store.mjs",
+      "id": "dynamic-015756"
+    },
+    {
+      "file": "src/verbs/merge/approve.mjs",
+      "id": "reference-003937"
+    },
+    {
+      "file": "src/verbs/merge/approve.mjs",
+      "id": "reference-003939"
+    },
+    {
+      "file": "src/verbs/merge/approve.mjs",
+      "id": "dynamic-016129"
+    },
+    {
+      "file": "src/verbs/merge/approve.mjs",
+      "id": "dynamic-016152"
+    },
+    {
+      "file": "src/verbs/state/edit.mjs",
+      "id": "dynamic-016254"
+    },
+    {
+      "file": "src/verbs/state/edit.mjs",
+      "id": "dynamic-016255"
+    },
+    {
+      "file": "src/verbs/state/edit.mjs",
+      "id": "dynamic-016256"
+    },
+    {
+      "file": "src/verbs/state/edit.mjs",
+      "id": "dynamic-016275"
+    },
+    {
+      "file": "src/verbs/state/edit.mjs",
+      "id": "dynamic-016276"
+    },
+    {
+      "file": "src/verbs/state/edit.mjs",
+      "id": "dynamic-016277"
+    },
+    {
+      "file": "src/verbs/state/edit.mjs",
+      "id": "dynamic-016278"
+    },
+    {
+      "file": "src/verbs/state/edit.mjs",
+      "id": "dynamic-016282"
+    },
+    {
+      "file": "src/verbs/state/move.mjs",
+      "id": "dynamic-016283"
+    },
+    {
+      "file": "src/workflow/dir-guard.mjs",
+      "id": "dynamic-016383"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016503"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016504"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016505"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016506"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016507"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016508"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016509"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016510"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016511"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016512"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016513"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016514"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016515"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016516"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016517"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016518"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016519"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016520"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016521"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016522"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016523"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016524"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016525"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016526"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016527"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016528"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016529"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016530"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016531"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016532"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016533"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016534"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016535"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016536"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016537"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016538"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016539"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016540"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016541"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016542"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016543"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016544"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016545"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016546"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016547"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016548"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016549"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016550"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016551"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016552"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016553"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016554"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016555"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016556"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016557"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016558"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016559"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016560"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016561"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016562"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016563"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016564"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016565"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016566"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016567"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016568"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016569"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016570"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016571"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016572"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016573"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016574"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016575"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016576"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016577"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016578"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016579"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016580"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016581"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016582"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016587"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016589"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016592"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016593"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016594"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016595"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016596"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016597"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016598"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016600"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016601"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016602"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016603"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016604"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016605"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016606"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016607"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016608"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016609"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016611"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016613"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016617"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016618"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016621"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016623"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016624"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016625"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016626"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016627"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016628"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016629"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016630"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016631"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016632"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016633"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016634"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016635"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016638"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016639"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016640"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016641"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016642"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016643"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016644"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016645"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016646"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016647"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016648"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016649"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016650"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016651"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016652"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016653"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016654"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016655"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016656"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016657"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016658"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016659"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016660"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016661"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016662"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016663"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016664"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016665"
+    },
+    {
+      "file": "src/workflow/runner.mjs",
+      "id": "dynamic-016666"
+    }
+  ],
+  "remainingUnresolved": [],
+  "method": "Whole-line unchanged mapping; only exact replacement hunk with unique best source-line match may relocate a changed occurrence. No global same-text fallback."
+}

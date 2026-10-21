@@ -1,0 +1,109 @@
+{
+  "carries": [
+    {
+      "operation": "Hard-coded retiring classifier prefixes are already seam-4-owned; join, never duplicate or modify their record.",
+      "sourceFile": "scripts/generate-doc-inventory.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "sourceSpans": [
+        {
+          "line": 339,
+          "text": "  { prefix: 'docs/specs', useRatchetClassify: true, area: 'Legacy spec (unmapped)', authorityStatus: 'legacy-current', corpus: 'platform-authority', gap: true },"
+        },
+        {
+          "line": 340,
+          "text": "  { prefix: 'docs/architect', useRatchetClassify: true, area: 'Legacy architect (unmapped)', authorityStatus: 'legacy-current', corpus: 'platform-authority', gap: true },"
+        }
+      ],
+      "existingOwners": [
+        {
+          "file": "test/scripts/check-doc-constitution.test.mjs",
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+          "recordLine": 23,
+          "recordSha256": "9cc74e2be1364556092e69d4be4e757ac1d575bf7791d04fa119da8d75c4032f",
+          "authorInputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "8a8ee46f147829962f637dadcd068564548908e6f1d4c09af07e902ee36ddf8f",
+          "slots": [
+            {
+              "id": "reference-004650",
+              "disposition": "preserve",
+              "expression": "docs/specs/<name>.md"
+            },
+            {
+              "id": "reference-004652",
+              "disposition": "preserve",
+              "expression": "docs/specs/runner.md"
+            },
+            {
+              "id": "reference-004653",
+              "disposition": "preserve",
+              "expression": "docs/specs/runner.md"
+            },
+            {
+              "id": "reference-004654",
+              "disposition": "preserve",
+              "expression": "docs/specs/fixture.md"
+            },
+            {
+              "id": "reference-004656",
+              "disposition": "preserve",
+              "expression": "docs/specs/runner.md"
+            },
+            {
+              "id": "reference-004664",
+              "disposition": "preserve",
+              "expression": "docs/specs/runner.md"
+            },
+            {
+              "id": "dynamic-031978",
+              "disposition": "preserve",
+              "expression": "path: 'docs/specs/runner.md'"
+            },
+            {
+              "id": "dynamic-032001",
+              "disposition": "preserve",
+              "expression": "sourcePath: 'docs/specs/runner.md'"
+            }
+          ]
+        },
+        {
+          "file": "scripts/generate-doc-inventory.mjs",
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 190,
+          "recordSha256": "7d97317c2ac03a17b8f4f28fcc93f7123b61d3bdf518849d51173d9f7edf577e",
+          "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+          "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+          "slots": [
+            {
+              "id": "reference-003560",
+              "disposition": "preserve",
+              "expression": "docs/specs"
+            },
+            {
+              "id": "reference-003568",
+              "disposition": "preserve",
+              "expression": "docs/architect"
+            }
+          ]
+        }
+      ],
+      "coCutPaths": [
+        "scripts/generate-doc-inventory.mjs",
+        "test/scripts/check-doc-constitution.test.mjs"
+      ],
+      "fixture": {
+        "file": "test/scripts/check-doc-constitution.test.mjs",
+        "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "sourceSha256": "8a8ee46f147829962f637dadcd068564548908e6f1d4c09af07e902ee36ddf8f",
+        "sourceSpans": [
+          {
+            "line": 718,
+            "text": "    const source = 'docs/specs/fixture.md';"
+          }
+        ]
+      },
+      "status": "frozen-gate identity preserved now under R13; Phase 9 retirement obligations and fixture co-cut remain with the named owner"
+    }
+  ],
+  "scope": "Existing source/fixture records only; no extra census file or new semantic approval."
+}
