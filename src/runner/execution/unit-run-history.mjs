@@ -4,7 +4,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { deriveOutcome } from '../dispatch/run-result.mjs';
+import { deriveOutcome, LEASE_CONFLICT_FAILURE_CODE } from '../dispatch/run-result.mjs';
 
 function compareRunNames(a, b) {
   return Number(a) - Number(b) || a.localeCompare(b);
@@ -28,7 +28,7 @@ export function outcomeOfRunResult(runResult) {
   if (category === 'policy') return 'policy-refusal';
   // A provider whose capacity is exhausted or quarantined is the same situation as a provider limit hit
   // mid-run: the seat moves to the next candidate of the pool instead of counting as done.
-  if (category === 'infra' && (failureCode === 'provider-limit' || failureCode === 'paused-limit' || failureCode === 'provider-capacity-refused')) return 'provider-limit';
+  if (category === 'infra' && (failureCode === 'provider-limit' || failureCode === 'paused-limit' || failureCode === 'provider-capacity-refused' || failureCode === LEASE_CONFLICT_FAILURE_CODE)) return 'provider-limit';
   return 'execution-failure';
 }
 

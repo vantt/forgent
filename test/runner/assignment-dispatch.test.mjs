@@ -693,7 +693,7 @@ test('provider capacity refusal after Run admission settles the attempt (never a
   assert.equal(result.status, 'failed');
   assert.equal(result.classification.execution.status, 'failed');
   assert.equal(result.classification.failure.family, 'provider');
-  assert.equal(result.classification.failure.code, 'provider-capacity-refused');
+  assert.equal(result.classification.failure.code, 'provider-capacity-lease-conflict');
   assert.match(result.classification.failure.message, /provider capacity refused/);
   // "needs-input" -- not a terminal contract violation -- matches the
   // bounded settle-and-reattempt spirit: a caller may retry with
@@ -883,7 +883,7 @@ test('a renewal function that throws never fails the dispatch, and an unconfined
       providerCredentialRenew: async () => { throw new Error('renewal exploded'); },
     },
   );
-  assert.notEqual(throwing.classification?.failure?.code, 'provider-capacity-refused');
+  assert.notEqual(throwing.classification?.failure?.code, 'provider-capacity-lease-conflict');
   assert.equal(fs.existsSync(confined.codexConfinedExecutor.argvCapturePath), true, 'the launch went on');
 
   const unconfinedDir = mkTempDir();
@@ -2396,7 +2396,7 @@ test('a dispatch whose only account is locked for a dead login tries one real ca
   });
 
   assert.deepEqual(calls, ['claude-acct']);
-  assert.notEqual(result.classification?.failure?.code, 'provider-capacity-refused');
+  assert.notEqual(result.classification?.failure?.code, 'provider-capacity-lease-conflict');
   const state = JSON.parse(fs.readFileSync(providerCapacityStatePaths(runtimeDir).statePath, 'utf8'));
   assert.equal(state.providers.claude.accounts['claude-acct'].quarantine, null);
   assert.equal(state.audit.at(-1).actor, 'fgos provider-capacity probe');
@@ -2415,8 +2415,8 @@ test('a dispatch whose locked account still fails the call is refused as before,
   const first = await dispatch('tsk-probe-fails-1');
   const second = await dispatch('tsk-probe-fails-2');
 
-  assert.equal(first.classification.failure.code, 'provider-capacity-refused');
-  assert.equal(second.classification.failure.code, 'provider-capacity-refused');
+  assert.equal(first.classification.failure.code, 'provider-capacity-lease-conflict');
+  assert.equal(second.classification.failure.code, 'provider-capacity-lease-conflict');
   assert.deepEqual(calls, ['claude-acct'], 'one call in the cooldown, however many dispatches ask');
 });
 
@@ -2427,5 +2427,5 @@ test('without a probe function a locked account is refused and nothing is called
 
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, cliOverride: { leaseAccount: 'claude-acct' }, providerCapacityRuntimeDir: runtimeDir });
 
-  assert.equal(result.classification.failure.code, 'provider-capacity-refused');
+  assert.equal(result.classification.failure.code, 'provider-capacity-lease-conflict');
 });

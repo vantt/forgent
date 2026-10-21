@@ -29,7 +29,8 @@ import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { resolveMutatingCwdPosture } from '../dispatch/execution-contract.mjs';
 import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
-import { accountInventoryConfigOf, LEASE_CONFLICT_REASON } from '../dispatch/provider-capacity.mjs';
+import { accountInventoryConfigOf } from '../dispatch/provider-capacity.mjs';
+import { LEASE_CONFLICT_FAILURE_CODE } from '../dispatch/run-result.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs, stripConfigComments } from '../dispatch/config.mjs';
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
 import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
@@ -548,8 +549,7 @@ const MAX_LEASE_CONFLICTS = 8;
 
 /** Whether an attempt ended because the lease refused the account Seat Binding named (nothing ran). */
 function isLeaseConflict(runResult) {
-  const failure = runResult?.classification?.failure;
-  return failure?.code === 'provider-capacity-refused' && String(failure.message ?? '').includes(LEASE_CONFLICT_REASON);
+  return runResult?.classification?.failure?.code === LEASE_CONFLICT_FAILURE_CODE;
 }
 
 /** The receipt the lease wrote for the run an attempt ended on, or null when it leased nothing. */
