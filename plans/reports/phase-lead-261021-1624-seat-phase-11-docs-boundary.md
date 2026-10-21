@@ -46,3 +46,44 @@ Node src shrinks in the files that held the old authorities and grows by the new
 
 - Tests run alone: skill, doctrine, wrapper, registration, architecture, handoff-refs and run tests (15 files) all pass; the docs and prepare-release tests pass. `npm test` not run.
 - No Rust change in these phases.
+
+## Addendum: pre-merge fix pass (commits 2e9ac5c98, 26284749a, fe7710af3)
+
+Base: `84d12f2ca` (seat-p09 plus latest main, fast-forwarded).
+
+### D1: one projection of a template into a unit
+
+`unitFieldsOfTemplate` (`src/workflow/steps.mjs`) is the one projection. The runner, `seatedPanelUnits` (`--seats`) and `workflowUnitContract` (doctor, blind-steps row) call it and their copies are gone, so the doctor now binds the unit with its `persona`, `blind` and `prefer`, as the run does. Note: the doctor and `--seats` projections used to pass `{pattern, params}`; the runner never passed `params`, so the shared projection follows the runner. Proof (extending `seat-binding-dry-bind.test`): a unit with a persona and `blind` is bound with the persona's tier taste, and the three callers produce the same unit from a template.
+
+### Work path asks Seat Binding
+
+- `effectiveDispatchPolicy` (`plan.mjs`) now binds through `bind()` via `bindWorkSeat` (`bind.mjs`): a pinned executor (the caller's, else the operation's) is a hard override plus a `prefer`, a stated tier or effort is an override, rigor is `effectiveRigorOf` over the strongest explicit demand, and executor, tier, model and effort come from the binding. A caller that already bound the seat (tier and model given) is taken as given, as before. Deleted: the `claude` and global-executor default, `cells[family][0]` (`modelOfCell`), the no-config tier decision, the second rigor composition, `executorPreference`, and the `tierCellMissingDetail` use here.
+- `executeExecutorCli` (`cli.mjs`) no longer picks tier or model: both come from the caller that bound the seat (the assignment runner does) or from the executor entry, else `seat-not-bound`. The raw door has no policy left, so I did not route it through `bind` (the lead's "do exactly that" cannot apply to a door that is only handed a bound seat).
+- Refusals, named: no runner config and no bound tier and model (`runner-config-missing`), a pin the pool does not take (`pin-unsatisfiable`), a capability with no pool (`headless-no-executor`, as `fgos run`).
+- Decision, flagged: a Work seat is bound with `session.postureAtLaunch`, so bind does not require a bwrap-capable invocation to admit an executor (the confinement authority judges posture when the assignment launches), and an executor with no invocation counts its own command as the one invocation whose effort levels are judged. Without it every fixture executor and every workspace using a plain default executor would be refused `posture-unavailable`. Unit-run seats do not use it.
+- Behaviour a reviewer must know: the global default executor still runs, but only when a pool names its family (`tierFallback` or `prefer`). Unit-run seats and the `fgos run` path are unchanged, since they pass tier and model.
+
+### Tests (retired with owners, migrated)
+
+- Retired: dispatch.test (raw door picks a model through a tier cell, and the cross-provider variant; owners: crate golden vectors and the new `seat-not-bound` test), dispatch-plan-policy (no-registry, implicit-default-executor and governance-without-registry cases, behaviour removed; the no-config case is now `runner-config-missing`), dispatch-execute-for-capability (capability tier picking the raw-door model; owners: `bind.test`, golden vectors).
+- Migrated: about 130 tests in 22 files now state a pool through `test/helpers/work-seat-config.mjs` (`bindable`, `bindableExecute`: `tierFallback` from the registered executors, the global executor serving the first family with cells) or pass the bound tier and model.
+- `assignment-enumerator-guard` allow-lists the drain row's one listing of top-level unit directories (found by the guard; the row was added in phase 09).
+
+### Safe-now trims
+
+- `seat-policy.mjs` reuses `stripConfigComments`.
+- Deleted `test/seat-binding/golden.test.mjs` (the Rust golden owns the 83 cases, `client.test` the wire), the tool-executor-seats snapshot and its test (refactor pin; the one behaviour is a golden case), and nine `bind-tier-composition` tests with a golden twin (the workflow-recommendation naming test stays).
+
+### Delta lines vs `84d12f2ca`
+
+| Part | Added | Removed | Net |
+|---|---|---|---|
+| Node src | 142 | 163 | -21 |
+| Tests (fixtures included) | 212 | 1035 | -823 |
+| Rust | 0 | 0 | 0 |
+
+By commit: D1 src +31/-35 tests +40; trims src +2/-7 tests +4/-781; Work path src +109/-121 tests +168/-254.
+
+### Verification
+
+393 test files (runner, runner/execution, cli, e2e, direct, verbs, workflow, setup, seat-binding, parity, intake, scripts, docs, architecture) each run alone: all pass except `active-release-drift-check` (needs a release build; red on the base). `test/run-supervisor/terminal-cutover` and `terminal-crash-matrix` fail the same way on the track checkout without these changes (they need a real release host and a fake herdr). `npm test` and cargo not run.
