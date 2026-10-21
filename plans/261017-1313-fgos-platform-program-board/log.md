@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-21 23:00 (phiên thực hiện luồng RULE, owner 23:00): **đã thử điều kiện (b) của WAIT.** (T1) `fgos workflow start --units … --foreground` trong lệnh nền: thoát sau 15 giây, `completed`/`pass`, phiên được đánh thức. (T2) SIGTERM giữa chừng rồi `fgos workflow resume --foreground`: tiếp tục đúng unit run cũ, hoàn thành `pass`, ghế dở chạy lại thành lần 02, phiên được đánh thức. Phát hiện: mã thoát là 0 cả khi run `failed`, nên phải đọc `status` trong JSON; Unit ad-hoc không `--provider` cần capability có `prefer` (`review` không có). Chưa thử: cổng người và run dài. Chi tiết trong hàng WAIT. Đảo lại khi: thử ở cổng người hoặc run dài cho kết quả khác.
+
 - 2026-10-21 22:55 (phiên `f2c6f8ce`, owner 22:52 "em lead lane này", "làm rust đó nhé"): **MAIL có lead**: phiên `f2c6f8ce` trên máy owner nhận luồng, không còn chờ máy khác. Đi từng bậc của thang V1–V7: plan bằng ak-plan (validate + red-team), rồi lead khác triển khai bằng ak-cook. Bắt đầu với V1 (`fgos-mailbox-core`, Rust thuần). Hàng chuyển `ready` → `planning`.
 
 - 2026-10-21 22:48 (phiên thực hiện luồng RULE, owner 22:48): **bổ sung hàng WAIT** theo lời owner: skill và help viết có điều kiện theo CLI (chỉ CLI có lệnh nền kèm báo khi thoát mới dùng `--foreground`), và thử một run nhỏ thật trước khi viết skill (hành vi ở cổng, giới hạn thời gian lệnh nền, resume sau khi tiến trình foreground bị giết). Mailbox và engine gọi lại ghi là hướng khác, chỉ cần khi báo cho phiên không phải người gọi. Hàng vẫn `held`, chưa sửa skill hay help.
