@@ -86,7 +86,12 @@ async function workload(args) {
     port.close();
     tips.set(ref, next);
     // Halfway through, move every ref into packed-refs so later CASes start from a packed ref.
-    if (i === Math.floor(ops / 2)) git(['--git-dir', repo, 'pack-refs', '--all']);
+    if (i === Math.floor(ops / 2)) {
+      git(['--git-dir', repo, 'pack-refs', '--all']);
+      // Packing is fixture preparation, not a judged operation: Git writes packed-refs without
+      // a directory fsync, so make it durable before the next judged write.
+      execFileSync('sync', ['--file-system', repo]);
+    }
     if (lines) { process.stdout.write(`ack ${i}\n`); await lines.next(); }
   }
   // The open stdin reader would keep the process alive, and the root driver waits for its exit.
@@ -133,7 +138,10 @@ async function check(args) {
     return finish({ acked, violations });
   }
   let pending;
-  try { pending = recovery.listPending({}); } catch (e) { violations.push(`WAL scan: ${e.message.slice(0, 400)}`); }
+  try { pending = recovery.listPending({}); } catch (e) {
+    // Before the first acknowledgement the WAL directory may not exist yet; after it, it must scan.
+    if (acked > 0 || !e.message.includes('NotFound')) violations.push(`WAL scan: ${e.message.slice(0, 400)}`);
+  }
   for (const p of plan.filter((q) => q.kind === 'ack' && q.i < acked)) {
     try {
       const seen = recovery.inspectOperation({ operationId: p.id });
