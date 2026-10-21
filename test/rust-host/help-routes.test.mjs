@@ -2,12 +2,15 @@
 // bin/ only has the installed `fgos`, so `fgos --help --json` and
 // `fgos <verb> --help --json` must work through the host for every route
 // kind, never run the verb, and keep R3 (an unlisted selector fails closed).
-// Runs the real `fgos:dev` door (scripts/run-rust-dev-host.mjs: real manifest,
-// real host, real Node payload); only Cargo is substituted, by a stub that
-// installs the already-built host binary (FGOS_HOST_BIN, which `npm test`
-// builds from this checkout) and the real native addon the door also builds.
+// The cases run the installed door itself: one release staged from this
+// checkout per file (real manifest, real host, real Node payload), whose
+// `bin/fgos` finds its own manifest. One case also goes through the `fgos:dev`
+// door (scripts/run-rust-dev-host.mjs), which stages a release per call; there
+// only Cargo is substituted, by a stub that installs the already-built host
+// binary (FGOS_HOST_BIN, which `npm test` builds from this checkout) and the
+// real native addon the door also builds.
 import '../helpers/process-tmp-root.mjs';
-import { test, after } from 'node:test';
+import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -15,7 +18,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { HELP_SELECTORS } from '../../src/cli/command-registry.mjs';
-import { nativeAddonLibraryName } from '../../scripts/build-rust-distribution.mjs';
+import { buildRustDistribution, nativeAddonLibraryName } from '../../scripts/build-rust-distribution.mjs';
 import { ensureGitAddon } from '../helpers/git-addon.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -25,6 +28,8 @@ const HOST_BIN = process.env.FGOS_HOST_BIN;
 
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-help-routes-'));
 after(() => fs.rmSync(scratch, { recursive: true, force: true }));
+const release = path.join(scratch, 'release');
+before(() => buildRustDistribution({ outDir: release, repoRoot: REPO_ROOT }));
 
 function stubCargo() {
   const dir = path.join(scratch, 'cargo-stub');
@@ -43,7 +48,15 @@ function stubCargo() {
 let builtAddon;
 const nativeAddon = () => (builtAddon ??= ensureGitAddon().addon);
 
+/** The installed `fgos` of the staged release; it finds its own manifest. */
 function host(args, cwd) {
+  const env = { ...process.env };
+  for (const key of ['CLAUDE_CODE_SESSION_ID', 'FGOS_ACTIVE_RELEASE_PATH', 'FGOS_ACTIVE_MANIFEST_PATH', 'FGOS_RUST_HOST_RECURSION_GUARD']) delete env[key];
+  return spawnSync(path.join(release, 'bin', BINARY_NAME), args, { cwd, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 60000, env });
+}
+
+/** The `fgos:dev` door: stages a release from this checkout for each call. */
+function devDoor(args, cwd) {
   assert.ok(HOST_BIN && fs.existsSync(HOST_BIN), `set FGOS_HOST_BIN to a host built from this checkout (npm test does): ${HOST_BIN}`);
   const env = { ...process.env };
   for (const key of ['CLAUDE_CODE_SESSION_ID', 'FGOS_ACTIVE_RELEASE_PATH', 'FGOS_ACTIVE_MANIFEST_PATH', 'FGOS_RUST_HOST_RECURSION_GUARD']) delete env[key];
@@ -86,8 +99,8 @@ test('fgos --help --json through the host is the whole manifest, byte-identical 
   const cwd = emptyCwd('top-level');
   const expected = node(['--help', '--json'], cwd).stdout;
   assert.ok(expected.length > 64 * 1024, `manifest unexpectedly small (${expected.length} bytes): the truncation check needs a large one`);
-  for (const door of ['--help', '-h']) {
-    const result = host([door, '--json'], cwd);
+  for (const [door, run] of [['--help', devDoor], ['--help', host], ['-h', host]]) {
+    const result = run([door, '--json'], cwd);
     assert.equal(result.status, 0, `${door}: ${result.stderr}`);
     assert.equal(result.stdout, expected, `${door} --json through the host differs from the Node payload (${result.stdout.length} vs ${expected.length} bytes)`);
     assert.ok(JSON.parse(result.stdout).commands.length > 0);
