@@ -101,10 +101,13 @@ export function stageLauncherDoor(targetDir = path.resolve(checkoutRoot, process
   const fgosBin = stage(process.platform === 'win32' ? 'fgos.exe' : 'fgos', path.join(targetDir, 'debug', process.platform === 'win32' ? 'fgos.exe' : 'fgos'), 0o755);
   const addonFile = stage('fgos.node', path.join(targetDir, 'debug', nativeAddonLibraryName()), 0o644);
   const manifestPath = path.join(dir, 'manifest.json');
-  atomicWrite(manifestPath, (temporary) => {
-    fs.writeFileSync(temporary, `${JSON.stringify(devHostManifest({ checkoutRoot, fgosBin, addonFile }), null, 2)}\n`);
-    fs.chmodSync(temporary, 0o644);
-  });
+  const manifestBytes = `${JSON.stringify(devHostManifest({ checkoutRoot, fgosBin, addonFile }), null, 2)}\n`;
+  if (!fs.existsSync(manifestPath) || fs.readFileSync(manifestPath, 'utf8') !== manifestBytes) {
+    atomicWrite(manifestPath, (temporary) => {
+      fs.writeFileSync(temporary, manifestBytes);
+      fs.chmodSync(temporary, 0o644);
+    });
+  }
   Object.assign(process.env, devHostEnv({}, { fgosBin, checkoutRoot, manifestPath }));
 }
 
