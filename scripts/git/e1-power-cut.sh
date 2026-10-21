@@ -11,7 +11,7 @@
 # Needs root, device-mapper (dm-log-writes, dm-snapshot) and xfstests' replay-log. Never run it on a
 # device that holds data: both devices are overwritten.
 #
-#   sudo scripts/git/e1-power-cut.sh --work /var/tmp/fgos-e1 [--ops 24] [--size-mib 256]
+#   sudo env "PATH=$PATH" scripts/git/e1-power-cut.sh --work /var/tmp/fgos-e1 [--ops 24] [--size-mib 256]
 #        [--data /dev/X --log /dev/Y] [--replay-log /path/to/replay-log] [--user $SUDO_USER]
 #
 # Without --data/--log it makes loop devices from files under --work, which must sit on the real
@@ -27,13 +27,15 @@ while [ $# -gt 0 ]; do
   esac
 done
 CHECKOUT="$(cd "$(dirname "$0")/../.." && pwd)"
-NODE="$(command -v node)"
+NODE="$(command -v node)" || { echo 'e1: node is not on PATH; run it as sudo env "PATH=$PATH" scripts/git/e1-power-cut.sh ...' >&2; exit 1; }
 die() { echo "e1: $*" >&2; exit 1; }
 [ "$(id -u)" = 0 ] || die "needs root (dm-log-writes, mount)"
 [ -n "$WORK" ] || die "--work <dir on the ext4 disk under test> is required"
 [ -n "$RUN_AS" ] && [ "$RUN_AS" != root ] || die "--user <the checkout's owner> is required (Git refuses repositories of another owner)"
 [ -x "$REPLAY_LOG" ] || die "replay-log not found: build xfstests (git clone https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git && make -C xfstests-dev) and pass --replay-log xfstests-dev/src/log-writes/replay-log"
-"$REPLAY_LOG" --help 2>&1 | grep -q -- '--next-fua' || die "$REPLAY_LOG lacks --find/--next-fua"
+# replay-log prints its usage and exits 1 for --help; under pipefail read the text, not the status.
+usage="$("$REPLAY_LOG" --help 2>&1 || true)"
+grep -q -- '--next-fua' <<<"$usage" && grep -q -- '--find' <<<"$usage" || die "$REPLAY_LOG lacks --find/--next-fua"
 modprobe dm-log-writes 2>/dev/null || true
 dmsetup targets | grep -q '^log-writes' || die "kernel has no dm-log-writes target"
 dmsetup targets | grep -q '^snapshot' || modprobe dm-snapshot
@@ -54,7 +56,9 @@ loop() { truncate -s "$2" "$WORK/$1.img"; local l; l="$(losetup --show -f "$WORK
 [ -n "$LOG" ] || LOG="$(loop log "$((SIZE_MIB * 4))M")"
 REPLAY="$(loop replay "${SIZE_MIB}M")"; COW="$(loop cow "${SIZE_MIB}M")"
 SECTORS="$(blockdev --getsz "$DATA")"
-as_user() { runuser -u "$RUN_AS" -- "$@"; }
+# sudo leaves HOME at root's; the owner's Git state, cargo and node need the owner's own.
+RUN_HOME="$(getent passwd "$RUN_AS" | cut -d: -f6)"
+as_user() { runuser -u "$RUN_AS" -- env HOME="$RUN_HOME" "$@"; }
 
 # Addon descriptor and host binary are built as the checkout's owner, outside the device.
 DESCRIPTOR="$(as_user "$NODE" "$CHECKOUT/scripts/git/e1-power-cut.mjs" descriptor --root "$OUT")"

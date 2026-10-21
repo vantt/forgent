@@ -22,6 +22,8 @@
 #   --size-mb N       image size (default 512)
 #   --seal-every N    seal after every N appends (default 7; 0 = never)
 #   --out FILE        JSON lines result (default <image-dir>/power-loss.jsonl)
+#   --keep-failed     stop at the first failed run and keep its post-cut filesystem as
+#                     <image-dir>/failed-run-<N>.img (readable as the user with debugfs)
 set -euo pipefail
 
 checkout=$(cd "$(dirname "$0")/../.." && pwd)
@@ -31,6 +33,7 @@ runs=20
 size_mb=512
 seal_every=7
 out=""
+keep_failed=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --image-dir) image_dir=$2; shift 2 ;;
@@ -38,6 +41,7 @@ while [ $# -gt 0 ]; do
     --runs) runs=$2; shift 2 ;;
     --size-mb) size_mb=$2; shift 2 ;;
     --seal-every) seal_every=$2; shift 2 ;;
+    --keep-failed) keep_failed=1; shift ;;
     --out) out=$2; shift 2 ;;
     *) echo "unknown option: $1" >&2; exit 2 ;;
   esac
@@ -106,9 +110,17 @@ for run in $(seq 1 "$runs"); do
   umount "$mnt"
   load "$allow"
   mount "/dev/mapper/$name" "$mnt"
-  result=$(cd "$checkout" && as_user "$node" scripts/event-store/power-loss-driver.mjs verify "$mnt/store" "$ack") || failures=$((failures + 1))
+  failed=""
+  result=$(cd "$checkout" && as_user "$node" scripts/event-store/power-loss-driver.mjs verify "$mnt/store" "$ack") || { failures=$((failures + 1)); failed=1; }
   echo "{\"run\":$run,\"device\":\"$device\",\"sealEvery\":$seal_every,\"result\":${result:-null}}" | as_user tee -a "$out"
   umount "$mnt"
+  if [ -n "$failed" ] && [ -n "$keep_failed" ]; then
+    kept="$image_dir/failed-run-$run.img"
+    dd if="/dev/mapper/$name" of="$kept" bs=4M status=none conv=fsync
+    chown "$SUDO_UID:$SUDO_GID" "$kept"
+    echo "power-loss: run $run failed; its filesystem is kept at $kept"
+    break
+  fi
 done
 echo "power-loss: $runs runs, $failures failed; results in $out"
 [ "$failures" = 0 ]

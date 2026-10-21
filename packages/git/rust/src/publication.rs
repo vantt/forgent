@@ -1194,12 +1194,23 @@ fn identity(i: &Identity, date: &str) -> Result<String> {
     }
     Ok(format!("{} <{}> {date}", i.name, i.email))
 }
+/// The binary object id a tree entry stores (the hex id decoded).
+fn raw_oid(oid: &Oid) -> Result<Vec<u8>> {
+    let hex = oid.as_str().as_bytes();
+    let nibble = |b: u8| match b {
+        b'0'..=b'9' => Ok(b - b'0'),
+        b'a'..=b'f' => Ok(b - b'a' + 10),
+        _ => Err(err("invalid-object-id")),
+    };
+    hex.chunks(2)
+        .map(|pair| Ok(nibble(pair[0])? << 4 | nibble(pair[1])?))
+        .collect()
+}
 impl<F: FileSystem> Publication for PublicationPort<'_, F> {
     fn write_blob(&self, repo: &RepoHandle, bytes: &[u8]) -> Result<Oid> {
         self.object_write(repo, "blob", bytes)
     }
     fn write_tree(&self, repo: &RepoHandle, entries: &[TreeEntry]) -> Result<Oid> {
-        let mut input = Vec::new();
         let mut seen = BTreeSet::new();
         for e in entries {
             self.check_oid(repo, &e.oid)?;
@@ -1212,20 +1223,31 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
             {
                 return Err(err("invalid-literal-tree-entry"));
             }
-            let kind = match e.mode {
-                0o100644 | 0o100755 | 0o120000 => "blob",
-                0o40000 => "tree",
-                0o160000 => "commit",
-                _ => return Err(err("invalid-tree-mode")),
-            };
-            input.extend_from_slice(format!("{:o} {kind} {}\t", e.mode, e.oid.as_str()).as_bytes());
-            input.extend_from_slice(&e.name);
-            input.push(0);
+            if !matches!(e.mode, 0o100644 | 0o100755 | 0o120000 | 0o40000 | 0o160000) {
+                return Err(err("invalid-tree-mode"));
+            }
         }
-        let out = self.call(repo, &["-c", "core.fsync=all", "mktree", "-z"], &input)?;
-        let oid = self.oid(repo, &out)?;
-        self.sync_object(repo, &oid)?;
-        Ok(oid)
+        // The canonical tree bytes go through the same fsynced object write as blobs and commits:
+        // `git mktree` does not fsync the loose object it writes (git 2.53, even with
+        // core.fsync=all), so a power cut after the ref moved could leave the tree empty.
+        // Git orders entries by name bytes, a tree compared as if its name ended in '/'.
+        let order = |e: &TreeEntry| {
+            let mut key = e.name.clone();
+            if e.mode == 0o40000 {
+                key.push(b'/');
+            }
+            key
+        };
+        let mut sorted: Vec<&TreeEntry> = entries.iter().collect();
+        sorted.sort_by_key(|e| order(e));
+        let mut bytes = Vec::new();
+        for e in sorted {
+            bytes.extend_from_slice(format!("{:o} ", e.mode).as_bytes());
+            bytes.extend_from_slice(&e.name);
+            bytes.push(0);
+            bytes.extend_from_slice(&raw_oid(&e.oid)?);
+        }
+        self.object_write(repo, "tree", &bytes)
     }
     fn write_commit(&self, repo: &RepoHandle, input: &CommitInput) -> Result<Oid> {
         self.check_oid(repo, &input.tree)?;
