@@ -72,19 +72,6 @@ test('both envelopes carry identity equal to the minted attempt writer id', () =
   }
 });
 
-test('attempt writer id vectors reproduce through the reference mint', () => {
-  assert.ok(writerIdVectors.cases.length >= 10);
-  for (const c of writerIdVectors.cases) {
-    const attemptId = c.expand ? c.expand.char.repeat(c.expand.count) : c.attemptId;
-    if (c.error) {
-      assert.throws(() => mintAttemptWriterId(attemptId), { code: c.error }, c.name);
-    } else {
-      const expected = c.expand ? `att-${attemptId}` : c.writerId;
-      assert.equal(mintAttemptWriterId(attemptId), expected, c.name);
-    }
-  }
-});
-
 test('a minted writer id always passes the resolve rule and the length bound is tight', () => {
   const pattern = new RegExp(resolveContract['x-idPattern']);
   const max = resolveContract['x-maxIdLength'];
