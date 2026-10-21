@@ -850,19 +850,26 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
                 .validate_publication_borrow(chain.intent())
                 .map_err(werr)?;
             let id = &chain.last().operation_id;
-            if chain.outcome().is_some() {
-                self.release_pin_and_compact(repo, id)?;
-                continue;
-            }
-            match self.recover(repo, id) {
-                Ok(_) => {
-                    self.release_pin_and_compact(repo, id)?;
+            // A chain whose pin release cannot finish (for example a native
+            // lock held on the ref store) stays retained and is reported by
+            // id; it never stops recovery of the other chains.
+            let settled = if chain.outcome().is_some() {
+                true
+            } else {
+                match self.recover(repo, id) {
+                    Ok(_) => true,
+                    Err(e) if e.code == ResultCode::RecoveryRequired => {
+                        pending.push(id.clone());
+                        false
+                    }
+                    Err(e) if e.code == ResultCode::Stale || e.code == ResultCode::Superseded => {
+                        true
+                    }
+                    Err(e) => return Err(e),
                 }
-                Err(e) if e.code == ResultCode::RecoveryRequired => pending.push(id.clone()),
-                Err(e) if e.code == ResultCode::Stale || e.code == ResultCode::Superseded => {
-                    self.release_pin_and_compact(repo, id)?;
-                }
-                Err(e) => return Err(e),
+            };
+            if settled && self.release_pin_and_compact(repo, id).is_err() {
+                pending.push(id.clone());
             }
         }
         Ok(pending)

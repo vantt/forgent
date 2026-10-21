@@ -136,6 +136,12 @@ Today Git hardcodes `select(&Default::default())` (`driver.rs:264`); the run sup
 
 Method: the existing E3 harness, interleaved main/branch ×2, same host class, idle, `powersave`; add (a) census per operation: domains opened vs contained children vs borrowed; (b) micro rows: per-child in-domain vs per-child bwrap vs uncontained vs borrowed; (c) open/close cost; (d) `rollbackWithLiveProcesses` and kill-point suites unchanged (0 lost). Acceptance for a future implementation: conformance suite green on Linux (bwrap and pgroup), Windows and macOS CI; Land contained-spawn share of wall time ≤10%; no E3 safety row regresses; `npm test` and `cargo test --workspace` green; bwrap `borrow_deadline` ignored test still passes.
 
+### Input from HARDEN T0 (2026-10-21)
+
+The HARDEN T0 council (plans/reports/council-261021-1507-harden-t0-arbitration.md §4, item D3) measured the per-process containment cost outside typed operations: every CLI process pays about 2 ms for the bwrap probe (`containment::select`, called from `GitDriver::new`), then about 1.4 ms extra per git child in a pid namespace (1.98 ms against 0.56 ms bare), with 5-6 git calls per CLI call, so about 10 ms of a ~250 ms CLI call. T0 adds no probe cache (every caller spawns right after `select`; an unprobed driver breaks hosts without user namespaces). Whether read-only git children need a pid namespace at all is a question for this design (§4 shared set, Q2), not changed before the council.
+
+E3 of 2026-10-21 (performance governor, plans/reports/verification-261021-1323-git-e3-performance-governor.md): Land p95 0.54 s (budget 1.6 s, met); ScopedCommit p95 207 ms against legacy 77 ms (2.69 ×, budget 1.5 ×, missed; per-step breakdown in progress).
+
 ## 10. Risks
 
 | Risk | L×I | Mitigation |

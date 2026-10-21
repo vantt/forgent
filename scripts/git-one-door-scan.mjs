@@ -2499,10 +2499,10 @@ export function scan({ root = REPO, files, openInspect } = {}) {
   return { sites: finalSites, families, classes, classCounts, files: digests, outsideProduct };
 }
 
-/** The census written by the build: zero sites expected; the digest binds it to the scanned payload. */
+/** The census written by the build: zero sites expected; the digest binds it to the scanned payload. It records the product only: counts of files outside it change with every plan or report and are printed by the scan, never persisted. */
 export function census(result) {
   const payloadDigest = sha256(JSON.stringify(Object.entries(result.files).sort(([a], [b]) => a.localeCompare(b))));
-  return { schema: 'mutation-census.v1', payloadDigest, files: result.files, outsideProduct: result.outsideProduct ?? {}, sites: result.sites, classes: result.classes };
+  return { schema: 'mutation-census.v1', payloadDigest, files: result.files, sites: result.sites, classes: result.classes };
 }
 
 export function censusDigestMatches(doc) {

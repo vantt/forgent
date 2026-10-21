@@ -138,6 +138,34 @@ fn registration(kind: &OperationKind) -> Result<&str> {
     }
 }
 impl GitDriver {
+    /// The one literal ref grammar for base and delivery names: a full `refs/`
+    /// name, or a short name tried as a branch, a tag, then a remote-tracking
+    /// ref. Returns the name that matched with its direct value; `None` when no
+    /// candidate exists.
+    pub fn resolve_literal_ref(
+        &self,
+        repo: &RepoHandle,
+        name: &str,
+    ) -> Result<Option<(RefName, Oid)>> {
+        let names = if name.starts_with("refs/") {
+            vec![name.to_owned()]
+        } else {
+            vec![
+                format!("refs/heads/{name}"),
+                format!("refs/tags/{name}"),
+                format!("refs/remotes/{name}"),
+            ]
+        };
+        for full in names {
+            let full = RefName::parse(&full).map_err(failure)?;
+            match self.resolve_ref(repo, &full)? {
+                RefValue::Direct(oid) => return Ok(Some((full, oid))),
+                RefValue::Absent => (),
+                RefValue::Symbolic(_) => return Err(failure("worktree-base-not-direct")),
+            }
+        }
+        Ok(None)
+    }
     /// Resolve a literal base once; the mutation binds the resulting commit.
     pub fn resolve_worktree_base(&self, repo: &RepoHandle, base: Option<&str>) -> Result<Oid> {
         let base = match base {
@@ -152,28 +180,9 @@ impl GitDriver {
         let oid = if let Ok(oid) = Oid::parse(base, repo.object_format()) {
             oid
         } else {
-            let names = if base.starts_with("refs/") {
-                vec![base.to_owned()]
-            } else {
-                vec![
-                    format!("refs/heads/{base}"),
-                    format!("refs/tags/{base}"),
-                    format!("refs/remotes/{base}"),
-                ]
-            };
-            let mut found = None;
-            for name in names {
-                let name = RefName::parse(&name).map_err(failure)?;
-                match self.resolve_ref(repo, &name)? {
-                    RefValue::Direct(oid) => {
-                        found = Some(oid);
-                        break;
-                    }
-                    RefValue::Absent => (),
-                    RefValue::Symbolic(_) => return Err(failure("worktree-base-not-direct")),
-                }
-            }
-            found.ok_or_else(|| failure("worktree-base-not-direct"))?
+            self.resolve_literal_ref(repo, base)?
+                .map(|(_, oid)| oid)
+                .ok_or_else(|| failure("worktree-base-not-direct"))?
         };
         let peeled = self.checked(
             repo,

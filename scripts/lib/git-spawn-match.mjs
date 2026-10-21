@@ -51,10 +51,16 @@ export function shellRunsGit(text) {
 }
 
 /** The repository paths a sandbox-door Git call names, which must all lie under its sandbox root: its
- * `cwd` when given, every `-C`/`--git-dir` operand (resolved from that cwd) and every absolute argument.
- * The door refuses a call that names none; door and spy both judge a call by this list. */
+ * `cwd` when given, every `-C`, `--git-dir` and `--work-tree` operand (separate or `=` form, resolved
+ * from that cwd) and every absolute argument. The door refuses a call that names none; door and spy
+ * both judge a call by this list. */
 export function sandboxNamedPaths(args, cwd) {
   const base = path.resolve(cwd ?? process.cwd());
-  const repos = args.flatMap((arg, i) => ((arg === '-C' || arg === '--git-dir') && i + 1 < args.length ? [path.resolve(base, String(args[i + 1]))] : []));
+  const repos = args.flatMap((arg, i) => {
+    if (typeof arg !== 'string') return [];
+    if (arg === '-C' || arg === '--git-dir' || arg === '--work-tree') return i + 1 < args.length ? [path.resolve(base, String(args[i + 1]))] : [];
+    const inline = /^--(?:git-dir|work-tree)=(.*)$/s.exec(arg);
+    return inline ? [path.resolve(base, inline[1])] : [];
+  });
   return [...(cwd === undefined ? [] : [base]), ...repos, ...args.filter((arg) => typeof arg === 'string' && path.isAbsolute(arg))];
 }

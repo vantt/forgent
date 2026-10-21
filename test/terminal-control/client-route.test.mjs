@@ -38,23 +38,24 @@ const herdrEnv = { FAKE_HERDR_LOG: log, FAKE_HERDR_SOCKET: socketPath, HERDR_SOC
 const client = (extra = {}) => createTerminalControl({ hostBin: HOST_BIN, herdrBin: FAKE_HERDR, env: herdrEnv, ...extra });
 const calls = () => (fs.existsSync(log) ? fs.readFileSync(log, 'utf8').split('\n').filter(Boolean).map((l) => l.replace(/\t+$/, '').split('\t').join(' ')) : []);
 
-test('capabilities reports the driver and the live server incarnation', () => {
-  const result = client().capabilities();
-  assert.equal(result.result, 'capabilities');
-  assert.equal(result.driver, 'herdr');
-  for (const name of ['tab.create', 'pane.split', 'pane.close', 'layout.geometry', 'server.incarnation']) {
-    assert.ok(result.capabilities.includes(name), name);
-  }
-  assert.equal(result.serverIncarnation.endpoint, socketPath);
-  assert.equal(result.serverIncarnation.pid, process.pid);
-});
-
 // Only the shell is in the pane's foreground, so a close is provably safe.
 const shellForeground = { env: { ...herdrEnv, FAKE_HERDR_FOREGROUND: 'shell' } };
 
+// The one wiring proof of the port: every operation reaches the Rust core through the route and
+// comes back as the contract says. What each operation decides (close guards, launch-once,
+// capability probing, the incarnation owner) is owned by the crate's own tests.
 test('every operation of the port answers through the route', () => {
   const tc = client(shellForeground);
   const display = { label: 'client-route', role: 'worker' };
+
+  const capabilities = tc.capabilities();
+  assert.equal(capabilities.result, 'capabilities');
+  assert.equal(capabilities.driver, 'herdr');
+  for (const name of ['tab.create', 'pane.split', 'pane.close', 'layout.geometry', 'server.incarnation']) {
+    assert.ok(capabilities.capabilities.includes(name), name);
+  }
+  assert.equal(capabilities.serverIncarnation.endpoint, socketPath);
+  assert.equal(capabilities.serverIncarnation.pid, process.pid);
 
   const slot = tc.allocate({ key: 'k-one', groupKey: 'g-one', display });
   assert.equal(slot.result, 'slot');
@@ -82,38 +83,18 @@ test('every operation of the port answers through the route', () => {
   assert.equal(scan.result, 'scan');
   assert.ok(Array.isArray(scan.findings));
 
+  // The fake herdr reports a foreground process that does not exist, so the root is never
+  // identified: the route answers not-started, and the launch request reached herdr once.
+  const launcher = client({ config: { launchIdentifyTimeoutMs: 200 } });
+  assert.equal(launcher.allocate({ key: 'k-launch', groupKey: 'g-launch', display }).result, 'slot');
+  const runsBefore = calls().filter((c) => c.startsWith('pane run')).length;
+  const launched = launcher.launch({ key: 'k-launch', launchSpec: { command: 'sleep', args: ['300'], cwd: scratch, env: {} } });
+  assert.equal(launched.result, 'not-started');
+  assert.equal(calls().filter((c) => c.startsWith('pane run')).length, runsBefore + 1);
+
   assert.deepEqual(tc.release({ key: 'k-attached', disposition: 'retain', until: null }), { result: 'released', disposition: 'retain' });
   assert.deepEqual(tc.release({ key: 'k-one', disposition: 'close' }), { result: 'released', disposition: 'close' });
   assert.ok(calls().some((c) => c.startsWith('pane close')), 'the allocated pane was closed');
-});
-
-test('a close is refused while a foreign process holds the foreground, and goes through once only the shell is left', () => {
-  const display = { label: 'foreign', role: 'worker' };
-  const slot = client().allocate({ key: 'k-foreign', groupKey: 'g-foreign', display });
-  assert.equal(slot.result, 'slot');
-  const closesBefore = calls().filter((c) => c.startsWith('pane close')).length;
-  const kept = client().release({ key: 'k-foreign', disposition: 'close' });
-  assert.equal(kept.result, 'kept-unknown');
-  assert.match(kept.reason, /foreground/);
-  assert.equal(calls().filter((c) => c.startsWith('pane close')).length, closesBefore, 'the pane stays');
-  assert.deepEqual(client(shellForeground).release({ key: 'k-foreign', disposition: 'close' }), { result: 'released', disposition: 'close' });
-  assert.equal(calls().filter((c) => c.startsWith('pane close')).length, closesBefore + 1);
-});
-
-test('launch keeps the slot after a request and never launches into it twice', () => {
-  // The fake herdr reports a foreground process that does not exist, so the
-  // root is never identified: the route must say not-started, not guess.
-  const tc = client({ config: { launchIdentifyTimeoutMs: 200 } });
-  const slot = tc.allocate({ key: 'k-launch', groupKey: 'g-launch', display: { label: 'launch' } });
-  assert.equal(slot.result, 'slot');
-  const spec = { command: 'sleep', args: ['300'], cwd: scratch, env: {} };
-  const first = tc.launch({ key: 'k-launch', launchSpec: spec });
-  assert.equal(first.result, 'not-started');
-  assert.match(first.reason, /not identified/);
-  const second = tc.launch({ key: 'k-launch', launchSpec: spec });
-  assert.equal(second.result, 'not-started');
-  assert.match(second.reason, /already requested/);
-  assert.equal(calls().filter((c) => c.startsWith('pane run')).length, 1);
 });
 
 test('unknown keys and a missing herdr come back as results, not exceptions', () => {

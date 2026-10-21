@@ -16,7 +16,7 @@ Các lần cải thiện trước nhắm vào **cách chạy** (tách file cho c
 3. **Một nhóm nhỏ test dựng cả môi trường thật cho từng ca.** 1 223 test (15%) chạy từ 1 s trở lên và chiếm **88%** tổng thời gian test. 5 651 test dưới 0,1 s chỉ tốn 41 s. Riêng 8 file `test/rust-host/fgctl-*` và `release-tree` tốn 1 223 s: mỗi ca chạy `fgctl init` thật (6–23 s, vì nó chạy cả `fgos doctor` 145 row) và build lại release (`build-rust-distribution.mjs`, khoảng 10 s một lần).
 4. **Cơ chế chạy làm mất khoảng một phần ba wall time.** Suite xếp file theo thứ tự tìm thấy. File dài nhất (`fgctl-upgrade`, 323 s) tới giây 164 mới bắt đầu, nên 40% thời gian cuối chỉ còn 1–4 file chạy. Xếp file chậm chạy trước thì wall có thể từ 488 s xuống khoảng 330 s, không phải sửa test nào. Thêm vào đó, cạnh tranh CPU trong suite làm file chậm hơn khoảng 40% so với chạy riêng.
 
-Vì sao "cải thiện nhiều lần" không giữ được: tài liệu của chính repo ([knowledge 08-27](../../docs/knowledge/why-splitting-test-files-hits-a-floor-and-why-narrowing-veri/why-splitting-test-files-hits-a-floor-and-narrowing-verify-never-helped.md)) đã đo ra rằng tách file chạm sàn, và đòn bẩy duy nhất là **giảm tổng CPU**: spawn ít tiến trình thật hơn, chặn những gì đắt mà test không cần. Nhưng các vòng sau vẫn đi tiếp đường tách file: 10-14 tách `fgctl init` thành 5 file song song, 10-17 thêm queue toàn máy. Trong khi đó chi phí mỗi tiến trình của sản phẩm tăng (addon 10-18, containment port 10-18, Git 07 đưa mọi lệnh git qua addon và bwrap). Không có cổng nào đo chi phí mỗi lần gọi CLI hay chi phí của test mới thêm, nên mỗi tính năng làm chậm một chút mà không ai thấy.
+Vì sao "cải thiện nhiều lần" không giữ được: tài liệu của chính repo ([knowledge 08-27](../../docs/knowledge/why-splitting-test-files-hits-a-floor-and-why-narrowing-veri/why-splitting-test-files-hits-a-floor-and-narrowing-verify-never-helped.md)) đã đo ra rằng tách file chạm sàn, và đòn bẩy duy nhất là **giảm tổng CPU**: spawn ít tiến trình thật hơn, chặn những gì đắt mà test không cần. Nhưng các vòng sau vẫn đi tiếp đường tách file: 10-14 tách `fgctl init` thành 5 file song song, 10-17 thêm queue toàn máy. Trong khi đó chi phí mỗi tiến trình của sản phẩm tăng (addon 10-18, containment port 10-18, Git 07 đưa mọi lệnh git qua addon và bwrap). Không có cổng nào đo chi phí mỗi lần gọi CLI hay chi phí của test mới thêm, nên mỗi tính năng làm chậm một chút mà không ai thấy. Ví dụ rõ nhất đo được: chỉ trong một ngày (10-20 18:13 → 10-21), Git 07 làm mỗi lần gọi CLI trong test tăng từ 354 lên 657 ms trung bình, cùng số lần gọi; baseline 202 s ghi lúc đó lại đo khi các file nặng nhất đang lỗi nhanh, nên không ai thấy (mục 10).
 
 ## 1. Đo ở đâu, đo thế nào
 
@@ -123,7 +123,7 @@ Tổng theo loại (cộng mọi file):
 
 Với khoảng 3 450 lần gọi CLI trong suite, riêng việc băm addon tốn khoảng 260 s CPU.
 
-**`fgctl init` 6–23 s mỗi lần.** Trong test, mỗi ca của các file `rust-host/fgctl-*` chạy `fgctl init` thật. Bước này gọi `fgos doctor`, và doctor trên workspace thật mất 40,7 s cho 145 row ([baseline T0 §4](research-261021-1210-harden-t0-baseline.md)). Ngoài ra mỗi file build lại release một lần (`build-rust-distribution.mjs`, khoảng 10 s). `help-routes` (119 s) gọi dev door 28 lần, mỗi lần stage lại host và payload (khoảng 4,2 s).
+**`fgctl init` 6–23 s mỗi lần.** Trong test, mỗi ca của các file `rust-host/fgctl-*` chạy `fgctl init` thật. Bước này gọi `fgos doctor`, và doctor trên workspace thật mất 40,7 s cho 145 row ([baseline T0 §4](research-261021-1210-harden-t0-baseline.md)). Quan sát trực tiếp lúc 13:25, trong suite của lane TEST: doctor bên trong `fgctl init` chạy `claude` **thật** (`claude --version`, `plugin marketplace list --json`, `plugin marketplace add vantt/forgent`, mỗi lệnh khoảng 1 s và có gọi mạng tới GitHub), vì không file `test/rust-host/*` nào đặt `FGOS_CLAUDE_COMMAND` (`src/setup/registrations.mjs:3226,3300`). HOME của các tiến trình đó là thư mục tạm, nên config thật không bị đụng, nhưng suite phụ thuộc mạng và một CLI bên ngoài. Đây đúng là lỗi đã sửa ngày 08-27 cho `checks.test.mjs` (`NO_CLAUDE_ENV`), nay tái phát ở nhóm test mới tách ra ngày 10-14. Ngoài ra mỗi file build lại release một lần (`build-rust-distribution.mjs`, khoảng 10 s). `help-routes` (119 s) gọi dev door 28 lần, mỗi lần stage lại host và payload (khoảng 4,2 s).
 
 ## 5. Lịch sử tăng
 
@@ -182,7 +182,7 @@ Chưa có lần nào đo hay chặn **chi phí của một lần gọi CLI** ho�
 | 2 | Test chứng minh qua CLI hoặc qua môi trường thật trong khi tầng thấp hơn đủ: `fgctl init` thật cho mỗi ca, build release mỗi file, dev door mỗi ca | test (H1) | file `rust-host` 1 338 s và `cli` 1 634 s là nhóm chính |
 | 3 | Thứ tự file không theo thời gian: file dài bắt đầu muộn | cơ chế chạy | khoảng 150 s wall (ước tính, cần kiểm) |
 | 4 | Quy trình tạo test chỉ thêm, kể cả khi chuyển sang Rust | quy trình (H3, H2) | không đổi ra giây; là lý do số test tăng đều |
-| 5 | `fgos doctor` 40,7 s, và `fgctl init` chạy doctor | sản phẩm (T9, mỗi tầng phần gate 8) | phần lớn trong 934 s `fgctl init` |
+| 5 | `fgos doctor` 40,7 s, và `fgctl init` chạy doctor; trong test, doctor gọi `claude` thật qua mạng vì test không chặn nó | sản phẩm (T9, mỗi tầng phần gate 8) và test (thiếu `FGOS_CLAUDE_COMMAND` ở `test/rust-host/fgctl-*`) | phần lớn trong 934 s `fgctl init`; khoảng 3 s mỗi doctor chỉ cho `claude` |
 
 ## 8. Đề xuất cho quy trình tạo test (giao TEST và luồng quản lý luật; HARDEN không xây cơ chế)
 
@@ -218,16 +218,23 @@ Gán theo tầng **thấp nhất** mà file import (theo đường `src/` hoặc
 
 Danh sách đầy đủ từng file theo tầng, kèm wall và các dấu (`w` số chỗ chờ theo giờ, `cli`, `h` herdr, `b` bwrap), nằm ở `/tmp/fgos-work/harden-p00/layer-lists.md` và `layers.json`. Phụ lục cuối báo cáo chép lại bản đó.
 
-## 10. Kiểm baseline 202 s ở `f38dfd1d0`
+## 10. Kiểm baseline 202 s ở `f38dfd1d0`, và phần tăng trong một ngày
 
-- `test/suite-baseline.json` ghi `wallSeconds: 202` từ commit `4c4ecded3` (10-20 18:22). Commit không ghi máy, tải, hay cách đo. `wallSeconds` chỉ tính thời gian spawn `node --test`, không tính queue và build.
-- Lane TEST làm trên máy này, nên 202 s gần như chắc là đo ở máy này. Sau đó, cùng máy: khoảng 380 s trên main (báo cáo landing 10-21 06:06), 483 s cho nhánh Git 07 (cùng báo cáo), 488 s hôm nay. Máy owner 1 046–1 316 s là máy khác, nên không so trực tiếp với 202 s được.
-- Kiểm lại bằng một lần chạy `f38dfd1d0` trên chính máy này: **chưa chạy**. Lane GIT đang cần máy yên cho phép đo E3. Em sẽ chạy ngay sau E3 và ghi kết quả vào đây.
+`test/suite-baseline.json` ghi `wallSeconds: 202` từ commit `4c4ecded3` (10-20 18:22), không kèm máy, tải hay cách đo. Em chạy lại suite ở `f38dfd1d0` trên chính máy này, cùng phương pháp và cùng probe (13:24–13:30, load khoảng 15, worktree `harden-p00-f38`).
+
+- Dòng `suite:` báo **212 s** wall, khớp với 202 s. Nhưng lần chạy **có 88 test lỗi trong 19 file**, phần lớn là `rust-host/fgctl-*` và `holder-lock/fences-*`. Các file đó thoát sớm: tổng 42 s ở `f38dfd1d0`, trong khi hôm nay xanh và tốn 1 343 s. **Vậy 202 s là con số của một suite mà các file nặng nhất đang lỗi nhanh, không phải mốc so được.** Các file `fgctl-*` lỗi vì sao ở `f38dfd1d0` thì em không truy (đã sửa trên main sau đó).
+- Trên **553 file xanh ở cả hai lần**, tổng wall tăng từ 3 438 s lên 5 155 s (×1,5), dù lần chạy `f38dfd1d0` chịu tải nặng hơn. Số lần gọi CLI gần như không đổi (3 441 và 3 443), nhưng **mỗi lần gọi CLI tăng từ 354 lên 657 ms trung bình**. Spawn git trực tiếp từ test giảm từ 41 526 xuống 16 299, vì git đã chuyển vào addon.
+- Nguyên nhân: ở `f38dfd1d0`, `fgos list` gọi `git rev-parse` trực tiếp (strace: 17 lần git, không bwrap, không addon) và mất 111 ms. Hôm nay, sau Git 07, cùng lệnh đó nạp addon (đọc rồi băm 86 MB ở bản debug), gọi 5–6 lần git trong bwrap cộng một probe bwrap, và mất 232 ms. Hai số này đo ở load 8, `f38dfd1d0` không có addon được stage.
+- File tăng nhiều nhất: `runner/loop` 116 → 246 s, `cli/fgos-merge` 56 → 148 s, `e2e/runner-loop` 58 → 143 s, `cli/fgos-return` 54 → 122 s, `runner/worktree-admin-multiprocess` 4 → 67 s, `runner/worktree` 7 → 58 s. Toàn là file gọi CLI hoặc thao tác worktree dày.
+- 9 file mới từ đó tới nay chỉ thêm 85 s.
+
+Kết luận: phần tăng 212 s → 488 s trong một ngày gồm (a) các file `fgctl-*` từ lỗi nhanh chuyển sang xanh và chạy thật (khoảng 1 300 s tổng file), và (b) Git 07 làm mỗi lần gọi CLI đắt gần gấp đôi trong test (khoảng 1 700 s tổng file). Không phần nào do test mới.
+
+Lần chạy suite thứ hai ở mức tải khác không chạy nữa. Hai lần chạy (load 5 và load 15) đã cho hai mức tải, và lần `f38dfd1d0` thay cho nó với giá trị cao hơn.
 
 ## Câu hỏi còn mở
 
-1. Lần chạy `f38dfd1d0` và lần chạy suite thứ hai ở mức tải khác còn chờ E3 xong. Hai số này có thể đổi ước lượng ở mục 3 và mục 10, nhưng không đổi thứ hạng nguyên nhân.
-2. Đề xuất ở mục 8 cần luồng TEST và luồng quản lý luật nhận. HARDEN chỉ gửi.
+1. Đề xuất ở mục 8 cần luồng TEST và luồng quản lý luật nhận. HARDEN chỉ gửi.
 
 ## Phụ lục: file test theo tầng
 
