@@ -11,6 +11,7 @@ use crate::notices::{Notice, NoticeMark};
 use crate::policy::LifetimeKey;
 use crate::registry::Binding;
 use crate::time::Timestamp;
+use crate::wake::{Exchange, ExchangeKey, WakeLifetimeKey};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, VecDeque};
 
@@ -33,6 +34,10 @@ pub struct MailboxState {
     pub(crate) budget: BTreeMap<Account, VecDeque<Timestamp>>,
     /// Send attempts per registered sender generation; never reset.
     pub(crate) lifetime: BTreeMap<LifetimeKey, u32>,
+    /// One exchange per pair of accounting identities.
+    pub(crate) exchanges: BTreeMap<ExchangeKey, Exchange>,
+    /// Effective wakes per registered sender generation and recipient.
+    pub(crate) wake_lifetime: BTreeMap<WakeLifetimeKey, u32>,
 }
 
 impl MailboxState {

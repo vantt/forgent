@@ -23,6 +23,7 @@ mod registry;
 mod state;
 mod sweep;
 mod time;
+mod wake;
 
 pub use counters::{Account, BoundedCounters, CounterReason, Party, PartyKey, UNREGISTERED};
 pub use delivery::{
@@ -43,3 +44,4 @@ pub use policy::LifetimeKey;
 pub use registry::{Binding, Liveness, RegisterRefusal, RegisterRequest, Registered, StoredHead};
 pub use state::MailboxState;
 pub use time::Timestamp;
+pub use wake::{Exchange, ExchangeKey, WakeDrop, WakeLifetimeKey};

@@ -57,13 +57,11 @@ fn populated_state() -> MailboxState {
         &claim.token.unwrap(),
         e.plus_secs(11),
     );
+    // A Stop claim takes only effective wakes, so this one wakes too.
+    let mut in_flight = plain("k1", &codex, "in flight");
+    in_flight.wake = true;
     state
-        .send(
-            plain("k1", &codex, "in flight"),
-            e.plus_secs(20),
-            &limits,
-            &mut ids,
-        )
+        .send(in_flight, e.plus_secs(20), &limits, &mut ids)
         .unwrap();
     state.claim(
         &k2,
@@ -105,6 +103,11 @@ fn populated_state() -> MailboxState {
         state.message(&reply.id).unwrap().reply_to_hint,
         Some(offered)
     );
+
+    // Exchanges and wake lifetime counts are filled by the sends above.
+    let snapshot = serde_json::to_value(&state).unwrap();
+    assert!(!snapshot["exchanges"].as_object().unwrap().is_empty());
+    assert!(!snapshot["wake_lifetime"].as_object().unwrap().is_empty());
 
     let notice_states: Vec<&NoticeState> = state.notices().map(|n| &n.state).collect();
     assert!(matches!(

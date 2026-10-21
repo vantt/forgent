@@ -7,6 +7,7 @@ use crate::names::{self, ResolveRefusal};
 use crate::notices::{Notice, NoticeState};
 use crate::state::MailboxState;
 use crate::time::Timestamp;
+use crate::wake::{WakeDrop, WakeParties};
 use std::fmt;
 
 /// The label of a notice's sender: the mailbox itself, which no head can
@@ -40,6 +41,8 @@ pub struct SendOutcome {
     pub depth: u32,
     pub reply_to: Option<MessageId>,
     pub effective_wake: bool,
+    /// Why the sender's wake did not take effect, when it asked for one.
+    pub wake_dropped: Option<WakeDrop>,
 }
 
 /// A refused send: answered to the sender, never recorded (spec §5.3).
@@ -209,14 +212,19 @@ fn notice_eligible(
         && notice.to_generation == generation
 }
 
-/// Whether a header is taken by a claim at this checkpoint.
+/// Whether a header is taken by a claim at this checkpoint: everything
+/// pending at `Step`, only effective wakes at `Stop`. The sender's `wake`
+/// is never read here.
 fn eligible(
     header: &Header,
     to: &WriterKey,
     generation: Generation,
-    _checkpoint: Checkpoint,
+    checkpoint: Checkpoint,
 ) -> bool {
-    header.state == MessageState::Recorded && &header.to == to && header.to_generation == generation
+    header.state == MessageState::Recorded
+        && &header.to == to
+        && header.to_generation == generation
+        && (checkpoint == Checkpoint::Step || header.effective_wake)
 }
 
 impl MailboxState {
@@ -271,6 +279,19 @@ impl MailboxState {
             parent.answered = true;
             parent.id.clone()
         });
+        let to_account = self.account(&admitted.to);
+        let (effective_wake, wake_dropped) = self.effective_wake(
+            &WakeParties {
+                account: &account,
+                to_account: &to_account,
+                from: &req.from,
+                from_generation,
+                to: &admitted.to,
+            },
+            req.wake,
+            now,
+            limits,
+        );
         let header = Header {
             id: MessageId::mint(ids),
             kind: Kind::Message,
@@ -282,7 +303,7 @@ impl MailboxState {
             reply_to_hint: req.reply_to,
             depth: admitted.depth,
             wake: req.wake,
-            effective_wake: req.wake,
+            effective_wake,
             body_bytes: req.body.len() as u64,
             body_kept: true,
             recorded_at: now,
@@ -297,7 +318,8 @@ impl MailboxState {
             to_generation: header.to_generation,
             depth: header.depth,
             reply_to: header.reply_to.clone(),
-            effective_wake: header.effective_wake,
+            effective_wake,
+            wake_dropped,
         };
         self.messages.push(header);
         Ok(outcome)

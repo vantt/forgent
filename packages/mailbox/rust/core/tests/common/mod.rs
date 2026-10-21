@@ -251,3 +251,12 @@ impl Pair {
         claim
     }
 }
+
+impl Pair {
+    /// A send with the sender's wake permission set.
+    pub fn send_wake(&mut self, from: &str, to: &str, now: Timestamp) -> SendOutcome {
+        let mut req = plain(from, to, "wake up");
+        req.wake = true;
+        self.try_send(req, now).unwrap()
+    }
+}
