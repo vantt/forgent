@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-21 23:50 (phiên `f2c6f8ce`, owner 23:50 "ok như đề nghị"): **MAIL: owner chốt Q1–Q3 của plan V1 theo khuyến nghị.** Q1: ba khoá cấu hình mới với giá trị mượn (chưa đo). Q2: tới V2 mới dọn binding, chỉ dọn head bị xét là Dead, idle quá TTL và không còn tin nào nhắc tới; đăng ký lại thì generation bắt đầu từ 1 (sẽ sửa §5.1 trên nhánh). Q3: trần trọn đời chỉ áp cho head. Phase 1–4 của V1 đã xong trên `mailbox/v1-v3` (36/36 test), phase 5–7 đang chạy. Item riêng `tsk-hls`: `cargo fmt --all --check` đang hỏng trên main (175 file của lane khác).
+
 - 2026-10-21 23:40 (GIT/ES điều phối, nhận từ HARDEN, owner 23:37): máy owner land T0 cùng lần land GIT tới (H15, chủ GIT); hướng dẫn GIT gộp bước 6 kiểm corpus canonical-JSON của T0.
 
 - 2026-10-21 23:36 (GIT/ES điều phối, owner chạy sudo): **E1 held cả hai loại** trên main ed45bb84c — Publication 1040 điểm, ScopedCommit 554 điểm, 0 lỗi, trace thứ tự 0 vi phạm ([kiểm chứng](../reports/verification-261021-2336-git-e1-publication-and-scoped-commit.md)). Tiếp: E3 sạch (xin TEST + HARDEN), rồi land kèm T0.
