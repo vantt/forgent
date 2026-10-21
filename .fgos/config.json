@@ -280,7 +280,8 @@
             "executor": "claude"
           }
         ],
-        "rigor": "high"
+        "rigor": "high",
+        "tier": "flagship"
       },
       "architecture:shape": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
@@ -301,7 +302,9 @@
             "executor": "deepseek"
           }
         ],
-        "rigor": "critical"
+        "rigor": "critical",
+        "tier": "flagship",
+        "maxTier": "frontier"
       },
       "architecture:critique": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
@@ -322,7 +325,14 @@
             "executor": "claude"
           }
         ],
-        "rigor": "high"
+        "rigor": "high",
+        "tier": "flagship",
+        "maxTier": "frontier",
+        "seats": {
+          "producer": {
+            "tier": "frontier"
+          }
+        }
       },
       "architecture:synthesize": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
@@ -343,7 +353,14 @@
             "executor": "openai"
           }
         ],
-        "rigor": "critical"
+        "rigor": "critical",
+        "tier": "flagship",
+        "maxTier": "frontier",
+        "seats": {
+          "producer": {
+            "tier": "frontier"
+          }
+        }
       },
       "architecture:explain": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
@@ -364,7 +381,8 @@
             "executor": "deepseek"
           }
         ],
-        "rigor": "critical"
+        "rigor": "critical",
+        "tier": "flagship"
       },
       "business:frame": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
@@ -390,22 +408,11 @@
       "business:perspectives": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
-          {
-            "executor": "claude"
-          },
-          {
-            "executor": "openai"
-          },
-          {
-            "executor": "gemini"
-          },
-          {
-            "executor": "xai"
-          },
-          {
-            "executor": "glm",
-            "invocation": "pi-cli-bwrap"
-          }
+          "gemini",
+          "deepseek",
+          "glm",
+          "claude",
+          "openai"
         ]
       },
       "business:critique": {
@@ -448,7 +455,8 @@
             "executor": "glm",
             "invocation": "pi-cli-bwrap"
           }
-        ]
+        ],
+        "tier": "standard"
       },
       "business:plan": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
@@ -474,22 +482,11 @@
       "delphi:propose": {
         "description": "Workflow unit capability \"delphi:propose\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
-          {
-            "executor": "claude"
-          },
-          {
-            "executor": "openai"
-          },
-          {
-            "executor": "gemini"
-          },
-          {
-            "executor": "xai"
-          },
-          {
-            "executor": "glm",
-            "invocation": "pi-cli-bwrap"
-          }
+          "gemini",
+          "deepseek",
+          "glm",
+          "claude",
+          "openai"
         ]
       },
       "delphi:synthesize": {
@@ -511,27 +508,17 @@
             "executor": "glm",
             "invocation": "pi-cli-bwrap"
           }
-        ]
+        ],
+        "tier": "standard"
       },
       "group-cognition:explore": {
         "description": "Workflow unit capability \"group-cognition:explore\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
-          {
-            "executor": "claude"
-          },
-          {
-            "executor": "openai"
-          },
-          {
-            "executor": "gemini"
-          },
-          {
-            "executor": "xai"
-          },
-          {
-            "executor": "glm",
-            "invocation": "pi-cli-bwrap"
-          }
+          "gemini",
+          "deepseek",
+          "glm",
+          "claude",
+          "openai"
         ]
       },
       "group-cognition:critique": {
@@ -579,22 +566,11 @@
       "nominal-group:generate": {
         "description": "Workflow unit capability \"nominal-group:generate\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
-          {
-            "executor": "claude"
-          },
-          {
-            "executor": "openai"
-          },
-          {
-            "executor": "gemini"
-          },
-          {
-            "executor": "xai"
-          },
-          {
-            "executor": "glm",
-            "invocation": "pi-cli-bwrap"
-          }
+          "gemini",
+          "deepseek",
+          "glm",
+          "claude",
+          "openai"
         ]
       },
       "nominal-group:share": {
@@ -766,6 +742,24 @@
           "outputKind": "change",
           "domain": "docs",
           "mutates": true
+        }
+      },
+      "code:*": {
+        "roles": {
+          "red-team": {
+            "prefer": [
+              "xai"
+            ]
+          }
+        }
+      },
+      "marketing:*": {
+        "roles": {
+          "red-team": {
+            "prefer": [
+              "claude"
+            ]
+          }
         }
       }
     },
@@ -1271,6 +1265,14 @@
       "maxRoots": 4,
       "maxLeavesPerRoot": 4
     },
+    "$comment": [
+      "nano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote",
+      "mini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ",
+      "standard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả",
+      "advanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan",
+      "flagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel",
+      "frontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng"
+    ],
     "modelPolicies": {
       "claude": {
         "nano": "haiku",
@@ -1327,12 +1329,6 @@
         "frontier": "deepseek/deepseek-v4-pro@openrouter"
       }
     },
-    "rigorToTier": {
-      "low": "nano",
-      "standard": "standard",
-      "high": "flagship",
-      "critical": "frontier"
-    },
     "maxTier": "flagship",
     "confinement": {
       "strict": false
@@ -1364,6 +1360,9 @@
             "tester"
           ]
         }
+      },
+      "seatBinding": {
+        "schema": 1
       }
     },
     "generatedPaths": [
@@ -1410,7 +1409,17 @@
         "openai",
         "gemini",
         "xai"
+      ],
+      "mini": [
+        "gemini",
+        "deepseek",
+        "z-ai",
+        "claude",
+        "openai"
       ]
+    },
+    "defaults": {
+      "tier": "standard"
     }
   },
   "gateBypass": {
