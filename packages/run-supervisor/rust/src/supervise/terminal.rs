@@ -28,7 +28,7 @@ use fgos_agent_protocol::terminal::{adapter_for, ExitCommand, FsOutbox, Terminal
 use fgos_process::facts::{self, ProcTuple};
 use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, ProcId};
 use fgos_terminal_control::core::{Core, Want};
-use fgos_terminal_control::port::{ExpectedProcess, LaunchOutcome, LaunchSpec, PaneState, ProcessIdentity, Refusal as TerminalRefusal};
+use fgos_terminal_control::port::{ExpectedProcess, LaunchOutcome, LaunchSpec, PaneState, ProcessIdentity, Refusal as TerminalRefusal, SendOutcome};
 use serde_json::{json, Value};
 
 use super::{os, request_stop, write_atomic, Refusal, TerminalEnd, Watch, GATE_STOP_SLACK, HEARTBEAT_EVERY, HELLO_LIMIT, TICK};
@@ -49,6 +49,8 @@ const EXIT_WAIT: Duration = Duration::from_secs(20);
 const WORK_POLL_MS: u64 = 700;
 const CARRIER_EVERY: Duration = Duration::from_secs(1);
 const SCREEN_SAMPLE_EVERY: Duration = Duration::from_secs(1);
+/// The receipt reason of an attempt whose input terminal-control refused to type into the pane.
+const FOREGROUND_NOT_AGENT: &str = "terminal:foreground-not-agent";
 
 /// What the envelope says about a terminal attempt.
 struct Plan {
@@ -465,7 +467,16 @@ impl AgentIo for TermIo<'_, '_> {
         if self.sup.finished() {
             return Err(IoError::Io("the attempt is ending".into()));
         }
-        self.core.send(self.key, input.text.as_deref(), input.keys.as_deref(), input.submit).map_err(io_err)
+        match self.core.send(self.key, input.text.as_deref(), input.keys.as_deref(), input.submit).map_err(io_err)? {
+            SendOutcome::Sent => Ok(()),
+            // Nothing was typed. The agent is not the pane's foreground program, so it cannot take a
+            // brief: the attempt ends with the reason on its receipt, a failed attempt for the settlement.
+            SendOutcome::ForegroundNotAgent { reason } => {
+                eprintln!("fgos internal supervise: nothing typed into the pane: {reason}");
+                self.sup.begin_stop("cancel", Some(FOREGROUND_NOT_AGENT));
+                Err(IoError::Io(format!("nothing was typed: {reason}")))
+            }
+        }
     }
 
     fn read(&mut self) -> Result<Vec<String>, IoError> {

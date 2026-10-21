@@ -217,6 +217,33 @@ fn the_agent_group_is_the_foreground_group_of_the_pane_tty() {
 }
 
 #[test]
+fn input_the_agent_never_read_is_dropped_before_the_pane_shell_reads_the_tty_again() {
+    if bwrap_driver("unread-input").is_none() {
+        return;
+    }
+    let ran = marker("unread-input");
+    // An agent that never reads its tty, as a CLI stuck before its input loop.
+    let options = Options::new("/bin/sh", &["-c", "sleep 1"]);
+    let (attempt, socket) = terminal_attempt("unread-input", &options, 0, false);
+    let lock = locked_file(&attempt.dir.join("attempt.lock"));
+    let listener = listen(&socket);
+    let mut pane = start_in_pane(&attempt, &socket, true, &[]);
+    // The pane's shell keeps the tty open while the sandbox runs, so what is queued on it outlives the sandbox.
+    let tty = pane.open_tty();
+    let mut stream = handshake(&listener, &attempt, &[lock.as_raw_fd()]);
+    assert_eq!(read_frame(&mut stream).expect("AGENT")["type"], "AGENT");
+    pane.type_text(&format!("echo `touch {}`\n", ran.display()));
+    assert_eq!(pane.wait_exit(LIMIT), 0);
+
+    // The pane's shell takes the tty back and reads whatever is still queued on it.
+    let mut shell = std::process::Command::new("/bin/sh").stdin(tty).stdout(std::process::Stdio::null()).stderr(std::process::Stdio::null()).spawn().unwrap();
+    std::thread::sleep(Duration::from_millis(800));
+    let _ = shell.kill();
+    let _ = shell.wait();
+    assert!(!ran.exists(), "text typed for the agent ran in the pane's shell");
+}
+
+#[test]
 fn a_pane_without_a_controlling_tty_does_not_start_the_agent() {
     if bwrap_driver("no-tty").is_none() {
         return;
