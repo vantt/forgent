@@ -86,7 +86,6 @@
         }
       ],
       "blockedBy": [
-        "Bounded state.decisions export including text/rationale/scope/ts, existing committed rows on both sides, legacy citation edits in source rows, exact union/no-empty/second-run proof. Regeneration alone re-emits persisted legacy strings.",
         "docs/decisions/index.md:41: 'docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md' requires bounded state.decisions rows and committed index union input.",
         "docs/decisions/index.md:27: 'docs/specs/runner.md' requires bounded state.decisions rows and committed index union input.",
         "docs/decisions/index.md:56: 'docs/specs/work-state.md' requires bounded state.decisions rows and committed index union input.",
@@ -165,6 +164,7 @@
         "docs/decisions/index.md:19: 'docs/decisions/0035-xac-lap-ranh-gioi-su-menh-fgos.md' requires bounded state.decisions rows and committed index union input.",
         "docs/decisions/index.md:49: 'docs/specs/seat-binding.md' requires bounded state.decisions rows and committed index union input.",
         "src/report/decision-index.mjs: This pinned emitted-document-message operation depends on the exact docs/decisions/index.md input/default destination; decide retention or content-carrying move together with every listed caller and proof.",
+        "src/report/decision-index.mjs: Pinned probe/message/result output carries docs/decisions/index.md from its owning path provider; resolve with every reader and emitted output in the one R26 unit.",
         "src/report/decision-index.mjs: This pinned path-operation operation depends on the exact docs/decisions/index.md input/default destination; decide retention or content-carrying move together with every listed caller and proof."
       ],
       "readiness": "pending independent review and same-input output/export proof",
@@ -300,7 +300,6 @@
         }
       ],
       "blockedBy": [
-        "Bounded view.topics/docs + outcomes/inventory export; docId/currentPath/aliases/sourceCaptureIds/authoritative_for and purposeTitle source correction, deterministic order and exact rendered links. Paths stay at docs root (L12-26); no manual output diffs.",
         "docs/doc-registry.json:10113: 'docs/explanation/why-merge-next-and-sync-root-resolve-verify-timeout-after-their-guards.md' requires folded view.docs/topics rows including currentPath, aliases, purposeTitle and sourceCaptureIds.",
         "docs/doc-registry.json:10116: 'docs/explanation/why-merge-next-and-sync-root-resolve-verify-timeout-after-their-guards.md' requires folded view.docs/topics rows including currentPath, aliases, purposeTitle and sourceCaptureIds.",
         "docs/doc-registry.json:10640: 'docs/explanation/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md' requires folded view.docs/topics rows including currentPath, aliases, purposeTitle and sourceCaptureIds.",
@@ -1799,7 +1798,6 @@
         }
       ],
       "blockedBy": [
-        "Same authorized bounded outcomes/topics/docs and on-disk frontmatter enumeration, current/candidate captures/aliases/authoritative_for preservation and second-run equality; real demo read at test/report/enduser-index.test.mjs:386 belongs in seam5 if changed. No generic quadrant-root move.",
         "docs/enduser-docs-index.json:1346: 'docs/explanation/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md' requires final document scan set and folded registry resolution input.",
         "docs/enduser-docs-index.json:1431: 'docs/explanation/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md' requires final document scan set and folded registry resolution input.",
         "docs/enduser-docs-index.json:1762: 'docs/explanation/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md' requires final document scan set and folded registry resolution input.",
@@ -2307,6 +2305,7 @@
         "docs/enduser-docs-index.json:2788: 'docs/explanation/why-a-vocabulary-lock-alone-cant-fix-grandfathered-risk-and-kind-values.md' requires final document scan set and folded registry resolution input.",
         "docs/enduser-docs-index.json:3137: 'docs/explanation/why-splitting-test-files-hits-a-floor-and-narrowing-verify-never-helped.md' requires final document scan set and folded registry resolution input.",
         "src/report/enduser-index-generate.mjs: This pinned path-operation operation depends on the exact docs/enduser-docs-index.json input/default destination; decide retention or content-carrying move together with every listed caller and proof.",
+        "src/report/enduser-index-generate.mjs: Pinned probe/message/result output carries docs/enduser-docs-index.json from its owning path provider; resolve with every reader and emitted output in the one R26 unit.",
         "src/report/enduser-index-generate.mjs: The decisions alias enumeration/comment/frontmatter contract depends on index.md remaining in the scanned directory or moving with the alias scan-set. Reconcile dynamic-009788/dynamic-009791 and the index generator as one unit; no retained-directory witness authorizes the move. Existing obligation: src/report/enduser-index-generate.mjs: The explanation quadrant still enumerates the decisions alias after numbered decision files retired; Phase 9 must decide whether the surviving generated index.md remains in this alias scan and prove its enumerated entries.",
         "src/report/enduser-index.mjs: The decisions alias enumeration/comment/frontmatter contract depends on index.md remaining in the scanned directory or moving with the alias scan-set. Reconcile dynamic-009788/dynamic-009791 and the index generator as one unit; no retained-directory witness authorizes the move. Existing obligation: src/report/enduser-index.mjs: QUADRANT_DIR_ALIASES still maps explanation to decisions; the retained index-only directory needs an explicit alias membership decision before the final end-user scan contract can be settled."
       ],
@@ -2472,9 +2471,7 @@
           "status": "missing"
         }
       ],
-      "blockedBy": [
-        "Bounded state decision evidence; effective-set and ledger outputs (never read live here), nondefault destinations/targets; same-input rendered block equals effectiveText after canonical platform-laws source patch and second-run unchanged. Step7 owns root/source coupling."
-      ],
+      "blockedBy": [],
       "readiness": "pending independent review and same-input output/export proof",
       "review": {
         "status": "pending",
@@ -7752,7 +7749,6 @@
         }
       ],
       "blockedBy": [
-        "Same source fixture/export full generated mode/hash sets, thin wrappers/shared assets/plugin mirrors, host package nondefault outputs and second-run determinism. 165 original pilot ids preserved (153 actual parks +12 scalar rejects). External distill sources/root and project-agents model config require bounded export. Frozen shipped-path generator excluded by L12-14.",
         ".agents/skills/_shared/executor-dispatch-fallback.md follows parked source core/skills/_shared/executor-dispatch-fallback.md: Inline tier choice must retain the Native-First reasoning/no-extra-judge rationale; resolve the missing numbered doctrine citation to its bounded governing passage.",
         ".agents/skills/_shared/executor-dispatch-fallback.md follows parked source core/skills/_shared/executor-dispatch-fallback.md: The dispatch reference list needs the governing Native-First rules governing decide, rather than a missing numbered citation; establish that exact navigation target.",
         ".agents/skills/fgos-clarifying/SKILL.md follows parked source core/skills/fgos-clarifying/SKILL.md: Clarifying must leave scope/architecture reasoning inline under doctrine rule two; resolve the missing retired citation to the conserved rule passage.",

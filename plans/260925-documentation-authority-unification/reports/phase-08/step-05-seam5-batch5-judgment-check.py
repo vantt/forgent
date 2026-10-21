@@ -55,7 +55,7 @@ def sweep(rs=None,listing=None):
   expected={e['file'] for e in latest['changedRecords'] if e['dispositionChanged']}|{e['file'] for e in prior['addedThisTurn']};assert set(prior['reviewThisTurn'])==expected
   if listing['closedBatch']!=6:
    assert listing['closedBatch']==7
-   selection=m.read('step-05-seam5-batch7-selection.json');assert [e['file'] for e in listing['addedThisTurn']]==selection['files'] and len(listing['addedThisTurn'])==selection['fileCount']
+   selection=m.read('step-05-seam5-batch7-selection.json');authoring=listing['previousReviewDeltas']['L12-83'] if listing.get('reviewClosureRuling')=='L12-85' else listing;assert [e['file'] for e in authoring['addedThisTurn']]==selection['files'] and len(authoring['addedThisTurn'])==selection['fileCount']
    assert m.admission.r26_module().review_delta(listing)
  test('j5-review-delta','review changed or added sources only',delta)
  return {'files':len(rs),'rules':RULES,'checks':counts,'failureCount':len(errors),'failures':errors,'sourceSweepEvidence':evidence}

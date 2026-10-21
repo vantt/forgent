@@ -1,0 +1,146 @@
+{
+  "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+  "patches": [
+    {
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "file": "docs/ui-spec/spec.config.yaml",
+      "sourceSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "mode": "100644",
+      "symbolOrPassage": "Product-source comment at L3; compiler config root retained",
+      "oldText": "# UI Spec configuration — herdr web dashboard\n#\n# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n# This spec adds the interaction/layout layer only; it never re-decides a\n# product question the area spec already settled.\n\nproject: herdrweb\ncontract_tag: herdrweb-contract\nentry_surface: S01\nplatforms: [desktop, mobile]\n\nsurface_dirs:\n  - screens\n  - modals\n  - components\n  - flows\n\ncross_cutting:\n  - 20-domain-rules.md\n  - 15-system-events.md\n\nextra_triggers: []\nextra_actions: []\n",
+      "newText": "# UI Spec configuration — herdr web dashboard\n#\n# Product source of truth: docs/platform/herdr-web-dashboard/spec.md (tsk-54j).\n# This spec adds the interaction/layout layer only; it never re-decides a\n# product question the area spec already settled.\n\nproject: herdrweb\ncontract_tag: herdrweb-contract\nentry_surface: S01\nplatforms: [desktop, mobile]\n\nsurface_dirs:\n  - screens\n  - modals\n  - components\n  - flows\n\ncross_cutting:\n  - 20-domain-rules.md\n  - 15-system-events.md\n\nextra_triggers: []\nextra_actions: []\n",
+      "sourceSpans": [
+        {
+          "line": 3,
+          "columnStart": 28,
+          "columnEndExclusive": 61,
+          "text": "docs/specs/herdr-web-dashboard.md"
+        }
+      ],
+      "diff": "--- a/docs/ui-spec/spec.config.yaml\n+++ b/docs/ui-spec/spec.config.yaml\n@@ -1,6 +1,6 @@\n # UI Spec configuration — herdr web dashboard\n #\n-# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n+# Product source of truth: docs/platform/herdr-web-dashboard/spec.md (tsk-54j).\n # This spec adds the interaction/layout layer only; it never re-decides a\n # product question the area spec already settled.\n \n",
+      "expectedAfterSha256": "2d7b4eff950023981f927a9a5da65ce7498bc8f537b25720abcb6f0e10e1140e",
+      "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
+      "claimAnchorProof": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-125.jsonl",
+        "recordLine": 17,
+        "recordSha256": "979622849cd9f9ce8a11796672ef46a9e71fe9a2a34edc09917ef5aa9310a5dc",
+        "edgeId": "maps-j-08490",
+        "disposition": "patch"
+      },
+      "receiptId": "ui-spec-compiler-parity",
+      "coCutPaths": [
+        "docs/ui-spec/spec.config.yaml",
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "expectedOutputSets": [],
+      "testTargets": [
+        "node .claude/skills/ui-spec/tools/validate.mjs --root docs/ui-spec",
+        "node .claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs --root docs/ui-spec"
+      ],
+      "intentionalBehaviorDeltas": [
+        "Comment-only product-source citation changes; parsed YAML and root/output behavior unchanged."
+      ],
+      "prerequisites": [
+        "Step7 final source binding review",
+        "Phase9 compiler parity proof"
+      ],
+      "order": "With settled Step3 source citations; no root migration",
+      "rollbackDiff": "--- a/docs/ui-spec/spec.config.yaml\n+++ b/docs/ui-spec/spec.config.yaml\n@@ -1,6 +1,6 @@\n # UI Spec configuration — herdr web dashboard\n #\n-# Product source of truth: docs/platform/herdr-web-dashboard/spec.md (tsk-54j).\n+# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n # This spec adds the interaction/layout layer only; it never re-decides a\n # product question the area spec already settled.\n \n",
+      "timing": "phase9",
+      "readiness": "pending review; not applied",
+      "commentOnly": true,
+      "coCutTestGreps": [
+        {
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "oldPointer": "docs/specs/herdr-web-dashboard.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/specs/herdr-web-dashboard.md",
+            "docs\\/specs\\/herdr-web-dashboard.md",
+            "docs\\/specs\\/herdr-web-dashboard\\.md"
+          ],
+          "matches": []
+        }
+      ],
+      "coCutTestEdits": []
+    },
+    {
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "file": "docs/platform/ui-spec/architecture/spec.config.yaml",
+      "sourceSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "mode": "100644",
+      "symbolOrPassage": "Product-source comment at L3; compiler config root retained",
+      "oldText": "# UI Spec configuration — herdr web dashboard\n#\n# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n# This spec adds the interaction/layout layer only; it never re-decides a\n# product question the area spec already settled.\n\nproject: herdrweb\ncontract_tag: herdrweb-contract\nentry_surface: S01\nplatforms: [desktop, mobile]\n\nsurface_dirs:\n  - screens\n  - modals\n  - components\n  - flows\n\ncross_cutting:\n  - 20-domain-rules.md\n  - 15-system-events.md\n\nextra_triggers: []\nextra_actions: []\n",
+      "newText": "# UI Spec configuration — herdr web dashboard\n#\n# Product source of truth: docs/platform/herdr-web-dashboard/spec.md (tsk-54j).\n# This spec adds the interaction/layout layer only; it never re-decides a\n# product question the area spec already settled.\n\nproject: herdrweb\ncontract_tag: herdrweb-contract\nentry_surface: S01\nplatforms: [desktop, mobile]\n\nsurface_dirs:\n  - screens\n  - modals\n  - components\n  - flows\n\ncross_cutting:\n  - 20-domain-rules.md\n  - 15-system-events.md\n\nextra_triggers: []\nextra_actions: []\n",
+      "sourceSpans": [
+        {
+          "line": 3,
+          "columnStart": 28,
+          "columnEndExclusive": 61,
+          "text": "docs/specs/herdr-web-dashboard.md"
+        }
+      ],
+      "diff": "--- a/docs/platform/ui-spec/architecture/spec.config.yaml\n+++ b/docs/platform/ui-spec/architecture/spec.config.yaml\n@@ -1,6 +1,6 @@\n # UI Spec configuration — herdr web dashboard\n #\n-# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n+# Product source of truth: docs/platform/herdr-web-dashboard/spec.md (tsk-54j).\n # This spec adds the interaction/layout layer only; it never re-decides a\n # product question the area spec already settled.\n \n",
+      "expectedAfterSha256": "2d7b4eff950023981f927a9a5da65ce7498bc8f537b25720abcb6f0e10e1140e",
+      "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
+      "claimAnchorProof": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-120.jsonl",
+        "recordLine": 9,
+        "recordSha256": "6d50eb8551c3b688dca33c723e80fabfa59377f89ce71adada5a81c35303907a",
+        "edgeId": "maps-j-07847",
+        "disposition": "patch"
+      },
+      "receiptId": "ui-spec-compiler-parity",
+      "coCutPaths": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml",
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "expectedOutputSets": [],
+      "testTargets": [
+        "node .claude/skills/ui-spec/tools/validate.mjs --root docs/ui-spec",
+        "node .claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs --root docs/ui-spec"
+      ],
+      "intentionalBehaviorDeltas": [
+        "Comment-only product-source citation changes; parsed YAML and root/output behavior unchanged."
+      ],
+      "prerequisites": [
+        "Step7 final source binding review",
+        "Phase9 compiler parity proof"
+      ],
+      "order": "With settled Step3 source citations; no root migration",
+      "rollbackDiff": "--- a/docs/platform/ui-spec/architecture/spec.config.yaml\n+++ b/docs/platform/ui-spec/architecture/spec.config.yaml\n@@ -1,6 +1,6 @@\n # UI Spec configuration — herdr web dashboard\n #\n-# Product source of truth: docs/platform/herdr-web-dashboard/spec.md (tsk-54j).\n+# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n # This spec adds the interaction/layout layer only; it never re-decides a\n # product question the area spec already settled.\n \n",
+      "timing": "phase9",
+      "readiness": "pending review; not applied",
+      "commentOnly": true,
+      "coCutTestGreps": [
+        {
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "oldPointer": "docs/specs/herdr-web-dashboard.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/specs/herdr-web-dashboard.md",
+            "docs\\/specs\\/herdr-web-dashboard.md",
+            "docs\\/specs\\/herdr-web-dashboard\\.md"
+          ],
+          "matches": []
+        }
+      ],
+      "coCutTestEdits": []
+    }
+  ],
+  "compilerRootChange": false,
+  "ratchetRetirement": {
+    "status": "parked",
+    "dependency": "Decision F Phase9 ratchet retirement",
+    "patch": null,
+    "frozenGateWitness": {
+      "scripts/check-decision-citation-drift.mjs": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+      "scripts/check-decision-citation-drift.baseline.json": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+      "scripts/check-legacy-docs-ratchet.mjs": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
+      "scripts/check-legacy-docs-ratchet.baseline.json": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8",
+      "scripts/check-legacy-docs-ratchet.exceptions.json": "3d765b091e2e3c620f557dd162ea7c4c6fed207ec33a2795b22c8a8b60298750",
+      "scripts/generate-shipped-path-inventory.mjs": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284"
+    }
+  },
+  "readiness": "pending independent review and Phase9 composed parity"
+}

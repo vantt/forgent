@@ -1,0 +1,1340 @@
+{
+  "ruling": "L12-85",
+  "reports": [
+    "review-a38-step-05-s5-b7-p01.md",
+    "review-a38-step-05-s5-b7-p02.md",
+    "review-a38-step-05-s5-b7-p03.md",
+    "review-a38-step-05-s5-b7-p04.md",
+    "review-a38-step-05-s5-b7-p05.md",
+    "review-a38-step-05-s5-b7-p06.md",
+    "review-a38-step-05-s5-b7-p07.md",
+    "review-a38-step-05-s5-b7-p08.md",
+    "review-a38-step-05-s5-b7-p09.md"
+  ],
+  "changedRecords": [
+    {
+      "file": "src/cli/command-registry.mjs",
+      "recordFile": "step-05-records/cli-help-messages.jsonl",
+      "beforeSha256": "ac5c7da56782495eebdf320560802aaa3ba64e9df6efa36498459cf7e939c104",
+      "afterSha256": "3b24d57c63dff3dc1a76f2be57f7f9886988f1e75005bb777dbfcf249d6e286f",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-003657",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s67-command-registry-manifest-861",
+          "beforeDisposition": null,
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        }
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "recordFile": "step-05-records/gateway-contract.jsonl",
+      "beforeSha256": "4b56dbf86662de114f880f4329d4c43180b5638626b0c01f4e66f49042e0c5bd",
+      "afterSha256": "fdf4d63807de51d44f8c8ae071fab6dd1d0e49dbaa4dc6b0256d23a3f362bc3b",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-000162",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "reference-000163",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "reference-000164",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "reference-000172",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000173",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "reference-000181",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000183",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "reference-000187",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "dynamic-000693",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "recordFile": "step-05-records/gateway-contract.jsonl",
+      "beforeSha256": "6d5a454ae94c51440b55372f4e9e6e8ce5d06940fabcc479033cab4c6135f09b",
+      "afterSha256": "90d60ef44a4b735890fbbbcdc6b8edc65180ba6f4639e4b6fc55f70e81547fe2",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-000190",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000191",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000192",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000196",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "dynamic-000777",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000782",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000787",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "src/report/decision-index.mjs",
+      "recordFile": "step-05-records/generators-decision-index.jsonl",
+      "beforeSha256": "87c0b66b4773f0d21a7b97b0e9b32475f0826af0316151ce0d0c1dd411dff252",
+      "afterSha256": "aa28a10d0643624091c2790ad9ba76764a99f586538d028283d90f2296dac7e7",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-003693",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003694",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003695",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-009759",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        },
+        {
+          "id": "dynamic-009760",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        }
+      ]
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "recordFile": "step-05-records/generators-enduser-index.jsonl",
+      "beforeSha256": "9cae6c0a965abfd7aa01018abc903410e3cf648e8ba9a7fec6cc5a6eca6aa207",
+      "afterSha256": "e8676b7870c81bf2a27c93478c2429a062efbd8f36e8951cb09dd7be84f366f1",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "dynamic-009772",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        },
+        {
+          "id": "dynamic-009773",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        }
+      ]
+    },
+    {
+      "file": "scripts/backfill-status-category.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "309e4f469eb73ab4444d15d0bc17e7d00df8aa9888f4ee5174b8de4139bfaf7e",
+      "afterSha256": "9b35192e29f158594b0216b854e688275c2b93e29ed9534be7ca39a1f8803e27",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-002429",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/check-decision-supersession.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "257f40a812c7079d23ad8590297fb7f22ae5099514a99e910322f2d2210d7c7b",
+      "afterSha256": "b2871c0114a5953f5b3fd7d021386152d60161042d6322e05cc1ae218608f212",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-002479",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/check-doc-candidate-status.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "c1540d344ca0f2402eff7e249fdb50bcd1650b5c4b50fd1df04ad2f11f6f4bb2",
+      "afterSha256": "f828ba65c50221c68a56b8851b87fef1ac9b70733a19c4328bb8ba49304fba86",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-002481",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/install-git-hooks.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "eda304a17bf6b660a08b719c571e4cb9982b3649f1951dd49c4f36be2e26de43",
+      "afterSha256": "9e915054977a42102e423261efab06a4cca42d013635ade8a340a0d545f0dd85",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-003607",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/next-doc-id.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "4d1ae408d968b9e6dc2e9977b16539d9f70ce80544a949d006cce8ebea96ca53",
+      "afterSha256": "96f10f0f21bfa99600f73a6d78f4fd8100125316fda41a86f32c68e0b8407ac5",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-003620",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+      "beforeSha256": "919c0817ce4126988a7b5462a519d35e9260e7df71c88fe737c4616e566c7a61",
+      "afterSha256": "b2e7b26ff127f8846ea5820b23df1d0238645b2b196f03d4b28219339c5e8726",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-003799",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "reference-003800",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "dynamic-013986",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        },
+        {
+          "id": "dynamic-013987",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        },
+        {
+          "id": "dynamic-014002",
+          "beforeDisposition": "parked",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        }
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+      "beforeSha256": "f17ef1f8352dc3071b217ca93e6d2d49b009789d7424e6fcf364bd6914aa3f7a",
+      "afterSha256": "815e0b5c3db36a472cdea755f1a0a3198bc8c1769fe3e3822b69ef0c502f42b5",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-003814",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "reference-003815",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "reference-003818",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "reference-003826",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "dynamic-014318",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014329",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014330",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014334",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014335",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014336",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014337",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014342",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "dynamic-014343",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014344",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s4-fix2-2a45460821f48dec",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s4-fix2-70cc3f725650c613",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/architecture.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch4.jsonl",
+      "beforeSha256": "04c4abf6bc6f836376a73c45a92214c07af07f8371a254b809212417e7ae308f",
+      "afterSha256": "38a6ed6e451d84886add22b0f578bef9e5e438e7b439fc72879451eeb3b206ed",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-003949",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-016721",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-016775",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-016776",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/web/src/App.test.tsx",
+      "recordFile": "step-05-records/tests-judgment-batch4.jsonl",
+      "beforeSha256": "99d60cfcf403822a1020441c507a56f3a2a0ac48e80b7f754ba3c4d0950d360e",
+      "afterSha256": "447de9543c8f7d6978558449e8c8bc98c67b0e1d566c7bed7db52612ad842963",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-000201",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/state/status-category.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch4.jsonl",
+      "beforeSha256": "062189d7f10b0c4a38e5b5dc6e8d24d02f6908384f9b647dc6ea2a1ca509d39c",
+      "afterSha256": "e94fb7d0f495fb6aa4a635ae5713c21d3a60a5e82664c57d8bd518072d3c8a5a",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-005291",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-005293",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+      "beforeSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a",
+      "afterSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-004321",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004346",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021516",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021517",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021518",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021519",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021543",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021544",
+          "beforeDisposition": "parked",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "dynamic-021550",
+          "beforeDisposition": "parked",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "dynamic-021551",
+          "beforeDisposition": "parked",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        }
+      ]
+    },
+    {
+      "file": "test/report/decision-index.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+      "beforeSha256": "8b8b598d21ba32681b26b3a0f1ad27bb1f01ac80d86b6729eae0f611602b7402",
+      "afterSha256": "e6a36dc46e9bc0ccf60f114e72ce973edec631bd6a2ffab579b5ac6d9a677563",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-004303",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/scripts/check-doc-candidate-status.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "bf697242fa0b27d98373e4add958f4d01f6d28903ae76255ca28b7ae9a3fc7ad",
+      "afterSha256": "8941457165965925f4a55973b70f5f04d34f3858fe37fe23749810c998a5f141",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "author-s67-governance-baseline-94",
+          "beforeDisposition": null,
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s67-governance-baseline-163",
+          "beforeDisposition": null,
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        }
+      ]
+    },
+    {
+      "file": "test/setup/instruction-registry.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "eba37b3aefe3a894af2063138c1c30eeb57fab390593612008c16ccae47af138",
+      "afterSha256": "8cea18281fef01eba59834e8a100e344fd38a485f4a18131eb9e11bb54774747",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-005196",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/cli/fgos-approve-6.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch7.jsonl",
+      "beforeSha256": "f10060334d94a709940f838bb4d3ebde68bcbf3ac701c7e620ce467d1276e87b",
+      "afterSha256": "9e4e10f92b5adce187a459c8601243cb1317ecc96fde4ba10b5ac18043d83d73",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "dynamic-017146",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-017147",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/cli/knowledge-verbs.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch7.jsonl",
+      "beforeSha256": "d3d2fa4a20b3067b92b31fbd9a9b83a76dea6fc6eeab79f47ec8025fac889b0e",
+      "afterSha256": "b682b63def6d195178ab54afa815b2423f285d30ca8ab003906fb9da2a99cc5a",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "dynamic-018117",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-018122",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-018124",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-018126",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-018132",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-018134",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-018135",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-018136",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-018146",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-018148",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-knowledge-verbs-72-54",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-knowledge-verbs-91-40",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-knowledge-verbs-94-23",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-knowledge-verbs-102-67",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-knowledge-verbs-104-54",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-knowledge-verbs-119-54",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-knowledge-verbs-134-55",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-knowledge-verbs-149-40",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-knowledge-verbs-152-23",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-knowledge-verbs-191-57",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-knowledge-verbs-203-55",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-knowledge-verbs-204-41",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-knowledge-verbs-206-23",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-knowledge-verbs-209-56",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/cli/run-verb.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch7.jsonl",
+      "beforeSha256": "75a0074f9117f928edbf51bb1299200cf0420e118d1508eb26f047884fdb32d0",
+      "afterSha256": "4ce46f80c4d74374f3c760bffb110e22c809b15e6bf5ea6301d3f4d63a5f6f10",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "author-s5-b7-run-verb-238-89",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-verb-243-54",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        }
+      ]
+    },
+    {
+      "file": "test/runner/assignment-runresult.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch7.jsonl",
+      "beforeSha256": "00edf9ab39391934901ffb800f69122655cfcc5d73a37b9b57f99ee97a0ca82f",
+      "afterSha256": "2ab39906ead0574ab77ba167295bbd04d90aefeae6b7497c137a613e82aa888c",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "author-s5-b7-assignment-runresult-887-71",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-assignment-runresult-1656-104",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-assignment-runresult-1701-24",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-assignment-runresult-1702-24",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-assignment-runresult-1710-51",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-assignment-runresult-1715-24",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        }
+      ]
+    },
+    {
+      "file": "test/runner/execution/handoff-refs.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch7.jsonl",
+      "beforeSha256": "e77d6cd076f4220c1568194bde290d2ef7c20edc504ce488fa6f6a6310324594",
+      "afterSha256": "38a480644ec0841b09d7719449e5a683b1e0eecb299c0327344b5b00709a1461",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "dynamic-026491",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-handoff-refs-66-86",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-handoff-refs-67-42",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-handoff-refs-100-19",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-handoff-refs-100-64",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-handoff-refs-101-7",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-handoff-refs-186-7",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-handoff-refs-192-28",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-handoff-refs-252-7",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-handoff-refs-257-28",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-handoff-refs-329-38",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-handoff-refs-336-20",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-handoff-refs-340-63",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-handoff-refs-341-80",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        }
+      ]
+    },
+    {
+      "file": "test/runner/execution/run-sync.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch7.jsonl",
+      "beforeSha256": "d8a75e00c3e9c4819b80aad09ddaaebce85cd62aa16dca5cceee417742e3e5fa",
+      "afterSha256": "bd1f592dbac3b7e839fe8917a0af9bc44d154c7b46f4ca9c135ed7e18396ff8e",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "author-s5-b7-run-sync-151-35",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-sync-174-35",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-sync-180-51",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-run-sync-380-35",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-sync-406-81",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-sync-407-35",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-sync-463-35",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/runner/execution/run.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch7.jsonl",
+      "beforeSha256": "c43b26b40686e4dc1773013bc8ce0fafc43a843b65f43d8d4bc599df99bece95",
+      "afterSha256": "0e8e9cdddd06a660f6c5dfb2d24a70efaa5a8a9d935cd3cd79444c472be795f0",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "author-s5-b7-run-716-15",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-720-22",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-769-15",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-775-22",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-1030-15",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-1037-28",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-run-1047-47",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-run-1432-123",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-1599-43",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-1618-43",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-1628-36",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-run-1629-49",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-run-1632-50",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-run-1633-57",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-run-1639-43",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-1646-36",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-run-1649-88",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-run-1656-43",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-1674-55",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-run-1686-43",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-1715-55",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-run-1722-43",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-1738-57",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-run-1818-27",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-run-1895-43",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/runner/fanout-batch-runner-commit.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch7.jsonl",
+      "beforeSha256": "232b97fcabee508d1cd35736ca09df26f457ba7c3715b846d794ab65be724326",
+      "afterSha256": "c2af8367b87a85038e5b0397f9ff22fe8499fa74579959ee5ccb9c68f99c4351",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "dynamic-027077",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/skills/fgos-coding-knowledge.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch7.jsonl",
+      "beforeSha256": "8432ab5a21193918bb224fce430ba9ff851db1a66e43082b1ca155d4b6e30621",
+      "afterSha256": "95813cb5ccea2601580f5adfb32a9be0f8dde14df566cddb88a72b1a02dab6b1",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "dynamic-037264",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-037265",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/state/state-cutover.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch7.jsonl",
+      "beforeSha256": "8f960fb486296fa13d4f1a4f41729197e80e47a353eefe57139d968c48dfa437",
+      "afterSha256": "6770dce5477093162b6bf2680eb4ecfe607f5a35cf7d963be2d3dd764ff2202f",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "dynamic-038625",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-038626",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/workflow/workflow-runner.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch7.jsonl",
+      "beforeSha256": "94006c05409d5b92c3755175134038fb18da31d7bfaa2b110552cb6df61f13a1",
+      "afterSha256": "d165aeab8e48764b1a4faa4f0cb6042229dba43fe6106912814cbda819b75149",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "author-s5-b7-workflow-runner-142-52",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-workflow-runner-1801-32",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-workflow-runner-1819-139",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b7-workflow-runner-1832-41",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-workflow-runner-1833-54",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-workflow-runner-1837-78",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b7-workflow-runner-1859-47",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": true
+        }
+      ]
+    },
+    {
+      "file": "test/docs/decisions-corpus-retired.test.mjs",
+      "recordFile": "step-05-records/tests-real-file.jsonl",
+      "beforeSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f",
+      "afterSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-004036",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004039",
+          "beforeDisposition": "parked",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004041",
+          "beforeDisposition": "parked",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/runner/dispatch-execute-effort.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch7.jsonl",
+      "beforeSha256": "fe96624a33cee20d85424dd6302e13e8297833b36f027176a10c38c783eeeb55",
+      "afterSha256": "2ebb36d0884924f2de3c5579924824ad8f358f083fd0ccbaf34a9ec1f2031009",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "dynamic-024636",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "files": 32,
+    "items": 168,
+    "dispositionChangedFiles": 8,
+    "labelOnlyFiles": 24
+  },
+  "seam8Carries": [
+    {
+      "file": "src/state/store.mjs",
+      "line": 615,
+      "operation": "checkPlanEvidence docs/history/<id>/plan.md",
+      "coupledTests": [
+        "test/cli/fgos-approve-6.test.mjs",
+        "test/state/state-cutover.test.mjs"
+      ],
+      "moveSetPaths": 0,
+      "obligation": "Seam 8 must own the production reader; no relocation implied."
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "operation": "docs/specs + docs/architect roots",
+      "coupledTests": [
+        "test/scripts/check-doc-constitution.test.mjs docs/specs/fixture.md"
+      ],
+      "obligation": "Seam 8 confirm existing seam 4 ownership and atomic fixture co-change."
+    }
+  ],
+  "independentReview": "pending Lead"
+}

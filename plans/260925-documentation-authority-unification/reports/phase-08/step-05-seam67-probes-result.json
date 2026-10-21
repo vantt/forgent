@@ -1,0 +1,282 @@
+{
+  "baselineFailures": 0,
+  "passed": 20,
+  "total": 20,
+  "probes": [
+    {
+      "name": "census tuple cannot disappear",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-coverage",
+          "where": "all original tuples",
+          "error": "condition false"
+        },
+        {
+          "rule": "s67-review",
+          "where": "all records and supplemental source slots",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "original inventory origins cannot be replaced",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-pins",
+          "where": ".claude/skills/ui-spec/tools/config.mjs:dynamic-000346",
+          "error": "condition false"
+        },
+        {
+          "rule": "s67-review",
+          "where": "all records and supplemental source slots",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "consumer source hash is checked at its own pin",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-pins",
+          "where": ".claude/skills/ui-spec/tools/config.mjs",
+          "error": "condition false"
+        },
+        {
+          "rule": "s67-patches",
+          "where": ".claude/skills/ui-spec/tools/config.mjs",
+          "error": "condition false"
+        },
+        {
+          "rule": "s67-review",
+          "where": "all records and supplemental source slots",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "operation witness cannot bind another occurrence",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-pins",
+          "where": ".claude/skills/ui-spec/tools/config.mjs:dynamic-000346",
+          "error": "condition false"
+        },
+        {
+          "rule": "s67-review",
+          "where": "all records and supplemental source slots",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "generated HTML cannot carry authored diff",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-patches",
+          "where": "docs/ui-spec/generated/wireframe-v2.html",
+          "error": "condition false"
+        },
+        {
+          "rule": "s67-review",
+          "where": "all records and supplemental source slots",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "preserved source cannot create own generated park",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-pins",
+          "where": ".agents/skills/_shared/citation-format.md:reference-000006",
+          "error": "condition false"
+        },
+        {
+          "rule": "s67-render",
+          "where": ".agents/skills/_shared/citation-format.md:reference-000006",
+          "error": "condition false"
+        },
+        {
+          "rule": "b-real-blocker",
+          "where": ".agents/skills/_shared/citation-format.md:reference-000006",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "parked canonical source cannot yield render-join",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-render",
+          "where": ".agents/skills/_shared/citation-format.md:reference-000012",
+          "error": "condition false"
+        },
+        {
+          "rule": "c-render-owner",
+          "where": ".agents/skills/_shared/citation-format.md:reference-000012",
+          "error": "condition false"
+        },
+        {
+          "rule": "s67-review",
+          "where": "all records and supplemental source slots",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "source owner locator must exist",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-render",
+          "where": ".agents/skills/_shared/citation-format.md:reference-000012",
+          "error": "condition false"
+        },
+        {
+          "rule": "b-real-blocker",
+          "where": ".agents/skills/_shared/citation-format.md:reference-000012",
+          "error": "condition false"
+        },
+        {
+          "rule": "c-render-owner",
+          "where": ".agents/skills/_shared/citation-format.md:reference-000012",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "frozen baseline hash cannot change",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-pins",
+          "where": "scripts/check-decision-citation-drift.baseline.json",
+          "error": "condition false"
+        },
+        {
+          "rule": "s67-review",
+          "where": "all records and supplemental source slots",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "missing candidate coverage cannot claim pass",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-parity",
+          "where": "citation-ratchet-roots-parity",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "unexecuted compiler output sets cannot be invented",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-parity",
+          "where": "ui-spec-compiler-parity",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "current input source pin must match exact hash",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-parity",
+          "where": "ui-spec-compiler-parity",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "review must include all authored files",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-review",
+          "where": "all records and supplemental source slots",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "supplemental source slots cannot vanish from review",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-review",
+          "where": "all records and supplemental source slots",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "R27 non-census read cannot conceal a docs target",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "r27-noncensus-document-read",
+          "where": "test/runner/fanout-batch-runner-commit.test.mjs:dynamic-027077",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "R22 patch file cannot omit its replay log hash",
+      "rejected": true
+    },
+    {
+      "name": "R22 candidate failure cannot claim replay pass",
+      "rejected": true
+    },
+    {
+      "name": "R28 transitive reader cannot disappear behind a readFile stub",
+      "rejected": true
+    },
+    {
+      "name": "module operation cannot borrow a function that already ended",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-callers",
+          "where": ".claude/skills/ui-spec/tools/config.mjs:dynamic-000358",
+          "error": "condition false"
+        },
+        {
+          "rule": "s67-review",
+          "where": "all records and supplemental source slots",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "multiline test declaration cannot lose its title and callback header",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "s67-callers",
+          "where": "test/scripts/check-decision-citation-drift.test.mjs:complete owning tests",
+          "error": "condition false"
+        },
+        {
+          "rule": "s67-review",
+          "where": "all records and supplemental source slots",
+          "error": "condition false"
+        }
+      ]
+    }
+  ],
+  "failures": []
+}

@@ -176,10 +176,6 @@
         }
       ],
       "blockedBy": [
-        "HTTP body/content-type/fresh-read/error parity missing; no HTTP runtime pass claimed.",
-        "MCP error parity missing.",
-        "A45 legacy architecture-map registry co-edit remains Phase 9 only; no contract renumbering.",
-        "Inherited reference-000161/000182 Step 4 parks: distribution row 5b carry/reconciliation before citation changes; Step 7 owns final assembly.",
         "apps/fgos-gateway/src/gateway.rs: The gateway token reader promises missing global config/token refuses startup and never self-provisions; distribution row 5b exists only in source-detail carriage, so the conserved startup refusal contract needs a live holder before rewriting this citation.",
         "apps/fgos-gateway/src/gateway.rs: This pinned reader/default operation depends on the exact docs/contracts/fgos-gateway-api-v1.yaml input/default destination; decide retention or content-carrying move together with every listed caller and proof.",
         "apps/fgos-gateway/src/gateway.rs: The module auth overview promises only fgos setup creates the machine global config with gateway.token; distribution row 5b remains in source-detail carriage and the live doctor reversal/gloss does not conserve that exact exclusive-writer claim. Carry or reconcile the auth overview claim before retargeting it.",
@@ -874,11 +870,6 @@
         }
       ],
       "blockedBy": [
-        "Generic scope/quadrant help and examples need runtime/generator co-cut; exact parked ids in records.",
-        "Unknown-target/alias write refusals remain enforced.",
-        "Exact emitted/error/refusal parity missing; Unreleased changelog co-edit is a Phase 9 prerequisite.",
-        "Example/scanner argument still describes quadrant layout. Need source construction, registered currentPath/alias-only semantics and same-input proof from generator/runtime seam before replacing it.",
-        "Generic scope/quadrant help must co-cut its owning construction and generator/default contract; no generic root substitution. Exact text candidate awaits source/default receipt.",
         "src/cli/command-registry.mjs: Quadrant help must follow src/report/enduser-index-generate.mjs dynamic-009788 and src/report/enduser-index.mjs dynamic-009791: settle explanation/decisions alias enumeration before changing this quadrant description.",
         "src/cli/command-registry.mjs: The decision command scope parameter promises an area slug mapped to docs/specs/<area>.md; the successor holder mapping is not one-to-one (distribution maps to packaging-distribution). Settle decision-scope area-to-holder resolution before changing this parameter help.",
         "src/cli/command-registry.mjs: This pinned emitted-message operation depends on the exact docs/decisions/index.md input/default destination; decide retention or content-carrying move together with every listed caller and proof.",
@@ -887,7 +878,8 @@
         "src/cli/command-registry.mjs: Quadrant enumeration description depends on src/report/enduser-index-generate.mjs dynamic-009788 and src/report/enduser-index.mjs dynamic-009791: settle the explanation/decisions alias scan before rewriting these roots.",
         "src/cli/command-registry.mjs: This pinned source-navigation operation depends on the exact docs/enduser-docs-index.json input/default destination; decide retention or content-carrying move together with every listed caller and proof.",
         "src/cli/command-registry.mjs: Quadrant glob description depends on src/report/enduser-index-generate.mjs dynamic-009788 and src/report/enduser-index.mjs dynamic-009791: settle the explanation/decisions alias scan before rewriting these roots.",
-        "src/cli/command-registry.mjs: Quadrant argument description depends on src/report/enduser-index-generate.mjs dynamic-009788 and src/report/enduser-index.mjs dynamic-009791: settle the explanation/decisions alias scan before rewriting these roots."
+        "src/cli/command-registry.mjs: Quadrant argument description depends on src/report/enduser-index-generate.mjs dynamic-009788 and src/report/enduser-index.mjs dynamic-009791: settle the explanation/decisions alias scan before rewriting these roots.",
+        "src/cli/command-registry.mjs: Emitted decision-index help output names the same generated manifest as L1725; co-cut both help slots with its generator and path decision."
       ],
       "readiness": "pending independent review and listed missing cutover proof",
       "review": {
@@ -6395,14 +6387,9 @@
         }
       ],
       "blockedBy": [
-        "State-backed aliases/currentPath/sourceCaptureIds/outcomes/inventory population export missing.",
-        "Skill/output provenance and instruction materialization join generators seam; no generated diff.",
-        "Final recursive post-retirement scan-set/finding parity missing.",
-        "Historical inventory reader is real: source-conservation reads this file, then row.oldPath and registry aliases. Bounded inventory and state export absent; keep reader until separately reviewed evidence-relocation packet.",
-        "Live distribution spec citation in git-hook installation documentation is not joined to a Step 3/4 canonical slot. Step 7 must reconcile its comment navigation with packaging-distribution source; no behavioral code edit inferred.",
-        "Generator/projection parks are blockedSeams=generators; exact remaining ids in skill-wrappers record. sourceCaptureId looksLikeDocPath predicate at registrations.mjs:4131-4133 co-cuts any later retiring-root conservation rewrite.",
         "src/setup/instruction-registry.mjs: This pinned emitted-message operation depends on the exact docs/decisions/index.md input/default destination; decide retention or content-carrying move together with every listed caller and proof.",
         "src/setup/instruction-registry.mjs: This pinned instruction-discovery operation depends on the exact docs/architecture-manifest.json input/default destination; decide retention or content-carrying move together with every listed caller and proof.",
+        "src/setup/instruction-registry.mjs: Pinned probe/message/result output carries docs/architecture-manifest.json from its owning path provider; resolve with every reader and emitted output in the one R26 unit.",
         "src/setup/instruction-registry.mjs: This pinned state-verified-decision-reader operation depends on the exact docs/decisions/index.md input/default destination; decide retention or content-carrying move together with every listed caller and proof. Existing proof obligation: src/setup/instruction-registry.mjs: readDecisionIds reads docs/decisions/index.md and accepts it only when equal to buildDecisionIndexMarkdown(listWork(fgosDir).decisions); authorized state.decisions export and same-input current/candidate parity are required (L12-72 item 6).",
         "src/setup/registrations.mjs: Source conservation loads inventory-data.json oldPath rows, counts duplicates and resolves each source through the folded registry; supply authorized retired-tree oldPath inventory and aliases before comparing conservation findings.",
         "src/setup/registrations.mjs: This pinned emitted-message operation depends on the exact docs/decisions/index.md input/default destination; decide retention or content-carrying move together with every listed caller and proof.",
@@ -6410,7 +6397,9 @@
         "src/setup/registrations.mjs: Markdown repair writes mdContent after rebuilding state; require authorized view topics/docs and same-input rendered heading/link parity before overwriting the projection.",
         "src/setup/registrations.mjs: JSON stale check reads the retained projection and compares it with jsonContent from computeKnowledgeProjection(rebuild(fgosDir)); supply authorized folded docs/topics with aliases, currentPath and sourceCaptureIds and exact JSON field parity.",
         "src/setup/registrations.mjs: JSON repair writes jsonContent after rebuilding state; require authorized registry export and same-input field, ordering and sourceCaptureIds conservation before overwriting the projection.",
+        "src/setup/registrations.mjs: Pinned probe/message/result output carries docs/enduser-docs-index.json from its owning path provider; resolve with every reader and emitted output in the one R26 unit.",
         "src/setup/registrations.mjs: This pinned non-document-message operation depends on the exact docs/decisions/index.md input/default destination; decide retention or content-carrying move together with every listed caller and proof.",
+        "src/setup/registrations.mjs: Pinned probe/message/result output carries docs/decisions/index.md from its owning path provider; resolve with every reader and emitted output in the one R26 unit.",
         "src/setup/registrations.mjs: Near-duplicate discovery recursively enumerates docs/**; the post-retirement scan set excluding docs/specs and docs/architect and including conserved holders is needed to compare discovered claim candidates.",
         "src/setup/registrations.mjs: Near-duplicate reader opens each enumerated Markdown file for real frontmatter; supply candidate bytes and authoritative_for values for relocated holders to compare the candidate input rows.",
         "src/setup/registrations.mjs: Near-duplicate candidates emit docs-relative paths into claim groups; the composed post-retirement candidate paths and claim ownership are needed to compare exact grouping and diagnostic paths.",

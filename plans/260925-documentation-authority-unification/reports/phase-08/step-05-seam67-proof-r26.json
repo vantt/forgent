@@ -1,0 +1,23 @@
+{
+  "label": "r26",
+  "command": [
+    "/usr/bin/python3",
+    "-B",
+    "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-probes.py"
+  ],
+  "startedAtNs": 1792565279591158495,
+  "exit": 0,
+  "resultFresh": true,
+  "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-probes.py",
+  "sourceSha256": "354891b56926139bedbb7bb0df4d8f916ea8a519e8ea06d4d0b0f5e0e028c950",
+  "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-r26.log",
+  "logSha256": "947d722a86c1084e7e508e793bed22b0f6f5c7022dd013690e6b1ade1c485ae2",
+  "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-probes-result.json",
+  "resultSha256": "1d7b0985a939b5bfd7789a5673166e9a18fd6eae4e950ced11f26ac2df094ac3",
+  "counts": {
+    "passed": 8,
+    "total": 8,
+    "baselineFailures": 0
+  },
+  "ok": true
+}

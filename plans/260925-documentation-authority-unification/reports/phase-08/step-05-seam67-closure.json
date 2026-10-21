@@ -1,0 +1,432 @@
+{
+  "status": "authoring complete; independent review and Phase9 parity pending",
+  "totals": {
+    "files": 35,
+    "references": 1313,
+    "tuples": 849,
+    "supplementalSlots": 17,
+    "mechanicalFiles": 0,
+    "neutralFiles": 0,
+    "judgmentFiles": 35,
+    "admitted": 1222,
+    "rejected": 957,
+    "parks": 36,
+    "patches": 2,
+    "preserves": 2116,
+    "renderJoins": 25,
+    "patchFiles": 2
+  },
+  "countSemantics": "35 original file memberships, 1313 references, 849 tuples. Admission/disposition totals include supplemental slots; render-join is separate from preserve. No mechanical/neutral admission is invented without proof.",
+  "seams": {
+    "ui-spec-compiler": {
+      "files": 25,
+      "references": 33,
+      "tuples": 381
+    },
+    "citation-ratchet-roots": {
+      "files": 10,
+      "references": 1280,
+      "tuples": 468
+    }
+  },
+  "parkDependencies": [
+    {
+      "dependency": "citation-convention-and-scan-packet",
+      "items": [
+        {
+          "file": ".agents/skills/_shared/citation-format.md",
+          "id": "reference-000004",
+          "blockedReason": ".agents/skills/_shared/citation-format.md: canonical source core/skills/_shared/citation-format.md: Area-scoped rule-home definition assumes one area spec file. Approve split-holder addressability and RUL ownership before rewriting this definition.",
+          "recordSha256": "953a0e55db948599d70015ecd87465e85171f8be107f5cbbcb570dc8d31cc079"
+        },
+        {
+          "file": ".agents/skills/_shared/citation-format.md",
+          "id": "reference-000012",
+          "blockedReason": ".agents/skills/_shared/citation-format.md: canonical source core/skills/_shared/citation-format.md: Documented citation-check command promises a flat specs markdown scan. Prove candidate scan coverage and synchronize the companion CLI defaults before changing this stated scan population.",
+          "recordSha256": "953a0e55db948599d70015ecd87465e85171f8be107f5cbbcb570dc8d31cc079"
+        },
+        {
+          "file": ".agents/skills/_shared/citation-format.md",
+          "id": "reference-000013",
+          "blockedReason": ".agents/skills/_shared/citation-format.md: canonical source core/skills/_shared/citation-format.md: Permanent decision-home convention still names retired numbered files. Specify the global-permanent index/history holder without changing ID lifetime before rewriting this definition.",
+          "recordSha256": "953a0e55db948599d70015ecd87465e85171f8be107f5cbbcb570dc8d31cc079"
+        },
+        {
+          "file": "core/skills/_shared/citation-format.md",
+          "id": "author-s67-citation-core-6-2",
+          "blockedReason": "core/skills/_shared/citation-format.md: Area-scoped rule-home definition assumes one area spec file. Approve split-holder addressability and RUL ownership before rewriting this definition.",
+          "recordSha256": "9de6c0369dbba4f572a513f7f9c94c874462c43b167592f6a822f23196175df2"
+        },
+        {
+          "file": "core/skills/_shared/citation-format.md",
+          "id": "author-s67-citation-core-96-44",
+          "blockedReason": "core/skills/_shared/citation-format.md: Documented citation-check command promises a flat specs markdown scan. Prove candidate scan coverage and synchronize the companion CLI defaults before changing this stated scan population.",
+          "recordSha256": "9de6c0369dbba4f572a513f7f9c94c874462c43b167592f6a822f23196175df2"
+        },
+        {
+          "file": "core/skills/_shared/citation-format.md",
+          "id": "author-s67-citation-core-4-51",
+          "blockedReason": "core/skills/_shared/citation-format.md: Permanent decision-home convention still names retired numbered files. Specify the global-permanent index/history holder without changing ID lifetime before rewriting this definition.",
+          "recordSha256": "9de6c0369dbba4f572a513f7f9c94c874462c43b167592f6a822f23196175df2"
+        },
+        {
+          "file": "plugins/fgOS/skills/_shared/citation-format.md",
+          "id": "reference-002308",
+          "blockedReason": "plugins/fgOS/skills/_shared/citation-format.md: canonical source core/skills/_shared/citation-format.md: Area-scoped rule-home definition assumes one area spec file. Approve split-holder addressability and RUL ownership before rewriting this definition.",
+          "recordSha256": "0c094c0894b8510ef85b4f23ece3657008a47c9d652583d13ef891557c19e2d6"
+        },
+        {
+          "file": "plugins/fgOS/skills/_shared/citation-format.md",
+          "id": "reference-002316",
+          "blockedReason": "plugins/fgOS/skills/_shared/citation-format.md: canonical source core/skills/_shared/citation-format.md: Documented citation-check command promises a flat specs markdown scan. Prove candidate scan coverage and synchronize the companion CLI defaults before changing this stated scan population.",
+          "recordSha256": "0c094c0894b8510ef85b4f23ece3657008a47c9d652583d13ef891557c19e2d6"
+        },
+        {
+          "file": "plugins/fgOS/skills/_shared/citation-format.md",
+          "id": "reference-002317",
+          "blockedReason": "plugins/fgOS/skills/_shared/citation-format.md: canonical source core/skills/_shared/citation-format.md: Permanent decision-home convention still names retired numbered files. Specify the global-permanent index/history holder without changing ID lifetime before rewriting this definition.",
+          "recordSha256": "0c094c0894b8510ef85b4f23ece3657008a47c9d652583d13ef891557c19e2d6"
+        }
+      ],
+      "count": 9
+    },
+    {
+      "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
+      "items": [
+        {
+          "file": "scripts/check-decision-citation-drift.mjs",
+          "id": "reference-002463",
+          "blockedReason": "scripts/check-decision-citation-drift.mjs: CLI decisionsDir enumeration consumes the directory including proposed-move index.md; keep metadata loader and the index decision in one co-cut unit.",
+          "recordSha256": "6774d1ffa1bb82483ed0767cee7be06dc4eb80f9e17342dd0cce7a1787c8b187"
+        },
+        {
+          "file": "scripts/check-decision-citation-drift.mjs",
+          "id": "dynamic-006492",
+          "blockedReason": "scripts/check-decision-citation-drift.mjs: Decision-metadata directory reader enumerates docs/decisions and filters numeric markdown names; proposed index move must be decided with all directory readers even though index.md does not match the numeric filter.",
+          "recordSha256": "6774d1ffa1bb82483ed0767cee7be06dc4eb80f9e17342dd0cce7a1787c8b187"
+        },
+        {
+          "file": "scripts/check-decision-citation-drift.mjs",
+          "id": "dynamic-006509",
+          "blockedReason": "scripts/check-decision-citation-drift.mjs: Decision-metadata directory reader enumerates docs/decisions and filters numeric markdown names; proposed index move must be decided with all directory readers even though index.md does not match the numeric filter.",
+          "recordSha256": "6774d1ffa1bb82483ed0767cee7be06dc4eb80f9e17342dd0cce7a1787c8b187"
+        },
+        {
+          "file": "scripts/check-decision-citation-drift.mjs",
+          "id": "dynamic-006514",
+          "blockedReason": "scripts/check-decision-citation-drift.mjs: Decision-metadata directory reader enumerates docs/decisions and filters numeric markdown names; proposed index move must be decided with all directory readers even though index.md does not match the numeric filter.",
+          "recordSha256": "6774d1ffa1bb82483ed0767cee7be06dc4eb80f9e17342dd0cce7a1787c8b187"
+        }
+      ],
+      "count": 4
+    },
+    {
+      "dependency": "citation-candidate-scan-coverage",
+      "items": [
+        {
+          "file": "scripts/check-decision-citation-drift.mjs",
+          "id": "reference-002469",
+          "blockedReason": "scripts/check-decision-citation-drift.mjs: CLI flat specsDir default selects the retiring directory when the flag is absent. Choose the replacement scan population and matching documented command without reducing coverage.",
+          "recordSha256": "6774d1ffa1bb82483ed0767cee7be06dc4eb80f9e17342dd0cce7a1787c8b187"
+        },
+        {
+          "file": "scripts/check-decision-citation-drift.mjs",
+          "id": "dynamic-006494",
+          "blockedReason": "scripts/check-decision-citation-drift.mjs: Flat specs listing joins each filtered markdown basename before reading its lines. Establish candidate membership equality, including non-recursive behavior, before the legacy directory vanishes.",
+          "recordSha256": "6774d1ffa1bb82483ed0767cee7be06dc4eb80f9e17342dd0cce7a1787c8b187"
+        },
+        {
+          "file": "scripts/check-decision-citation-drift.mjs",
+          "id": "dynamic-006495",
+          "blockedReason": "scripts/check-decision-citation-drift.mjs: Flat specs listing joins each filtered markdown basename before reading its lines. Establish candidate membership equality, including non-recursive behavior, before the legacy directory vanishes.",
+          "recordSha256": "6774d1ffa1bb82483ed0767cee7be06dc4eb80f9e17342dd0cce7a1787c8b187"
+        },
+        {
+          "file": "scripts/check-decision-citation-drift.mjs",
+          "id": "dynamic-006511",
+          "blockedReason": "scripts/check-decision-citation-drift.mjs: CLI flat specsDir default selects the retiring directory when the flag is absent. Choose the replacement scan population and matching documented command without reducing coverage.",
+          "recordSha256": "6774d1ffa1bb82483ed0767cee7be06dc4eb80f9e17342dd0cce7a1787c8b187"
+        },
+        {
+          "file": "scripts/check-decision-citation-drift.mjs",
+          "id": "dynamic-006516",
+          "blockedReason": "scripts/check-decision-citation-drift.mjs: runCli resolves the parsed specsDir against caller cwd then supplies it to loadSourceFiles. Prove flag override and missing-root behavior against the candidate population before switching this argument.",
+          "recordSha256": "6774d1ffa1bb82483ed0767cee7be06dc4eb80f9e17342dd0cce7a1787c8b187"
+        }
+      ],
+      "count": 5
+    },
+    {
+      "dependency": "decision-f-phase9-ratchet-retirement",
+      "items": [
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "reference-003545",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: classifyFile treats the specs prefix/equal-root branch as maintained authority except explicit projections. Decision F must retire that branch with the removed tree; no extension-based exemption may absorb output.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "reference-003546",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: Explicit generated-projection classification names the platform-foundations legacy projection. Decision F must settle that special case with gate retirement while preserving the frozen baseline digest.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "reference-003547",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: classifyFile treats the architect prefix/equal-root branch as maintained/history by extension and proposal status. Decision F must settle this branch with retirement, retaining current classification until then.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "reference-003548",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: Default scan-root array still governs both retiring trees. Decision F must retire this entry point together with the root deletion; no empty-root success or rebaseline is an acceptable replacement.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "reference-003549",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: Default scan-root array still governs both retiring trees. Decision F must retire this entry point together with the root deletion; no empty-root success or rebaseline is an acceptable replacement.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "reference-003550",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: classifyFile treats the specs prefix/equal-root branch as maintained authority except explicit projections. Decision F must retire that branch with the removed tree; no extension-based exemption may absorb output.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "reference-003551",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: classifyFile treats the architect prefix/equal-root branch as maintained/history by extension and proposal status. Decision F must settle this branch with retirement, retaining current classification until then.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "dynamic-007143",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: Default scan-root array still governs both retiring trees. Decision F must retire this entry point together with the root deletion; no empty-root success or rebaseline is an acceptable replacement.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "dynamic-007161",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: scanFiles optional roots argument uses the legacy default array. Decision F must close this public scanning contract when the legacy roots retire; recursive membership cannot silently narrow.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "dynamic-007162",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: scanFiles resolves each requested relative root against repoRoot before enumeration. Decision F must settle invocation/removal of this root resolution at gate retirement.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "dynamic-007163",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: scanFiles resolves each requested relative root against repoRoot before enumeration. Decision F must settle invocation/removal of this root resolution at gate retirement.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "dynamic-007164",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: Recursive scanner constructs each child path, retaining dotfiles, symlink refusal and non-regular entries. Gate retirement under Decision F owns this actual enumeration, not a relaxed replacement scan.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "dynamic-007165",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: Recursive scanner constructs each child path, retaining dotfiles, symlink refusal and non-regular entries. Gate retirement under Decision F owns this actual enumeration, not a relaxed replacement scan.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "dynamic-007166",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: Recursive scanner computes a repository-relative child path for containment checks. Gate retirement under Decision F owns the guard boundary and exact finding path spelling.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "dynamic-007167",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: Symlink target resolution feeds tree-escape refusal. Decision F must close this guard with the gate, preserving escape detection rather than hiding migration findings.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "dynamic-007172",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: generateBaseline has its own optional roots default, reachable only through explicit baseline generation. Decision F must retire that path; authoring never invokes write-baseline or changes frozen data.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "dynamic-007179",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: checkRatchet defaults still scan both legacy trees before comparing missing baseline entries. Decision F must retire this enforcement together with the tree deletion, preserving unexpected-deletion until that cut.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        },
+        {
+          "file": "scripts/check-legacy-docs-ratchet.mjs",
+          "id": "dynamic-007225",
+          "blockedReason": "scripts/check-legacy-docs-ratchet.mjs: runCli selects explicit --roots or DEFAULT_ROOTS. Decision F must retire the command and its default/help contract together; passing an empty scan is not accepted parity.",
+          "recordSha256": "2acc3ff2dde97175fd97b7f2d2a95687474268d46f74fcd0dbcbe298ca4f9bea"
+        }
+      ],
+      "count": 18
+    }
+  ],
+  "patchCoCutUnits": [
+    {
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "file": "docs/ui-spec/spec.config.yaml",
+      "sourceSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "mode": "100644",
+      "symbolOrPassage": "Product-source comment at L3; compiler config root retained",
+      "oldText": "# UI Spec configuration — herdr web dashboard\n#\n# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n# This spec adds the interaction/layout layer only; it never re-decides a\n# product question the area spec already settled.\n\nproject: herdrweb\ncontract_tag: herdrweb-contract\nentry_surface: S01\nplatforms: [desktop, mobile]\n\nsurface_dirs:\n  - screens\n  - modals\n  - components\n  - flows\n\ncross_cutting:\n  - 20-domain-rules.md\n  - 15-system-events.md\n\nextra_triggers: []\nextra_actions: []\n",
+      "newText": "# UI Spec configuration — herdr web dashboard\n#\n# Product source of truth: docs/platform/herdr-web-dashboard/spec.md (tsk-54j).\n# This spec adds the interaction/layout layer only; it never re-decides a\n# product question the area spec already settled.\n\nproject: herdrweb\ncontract_tag: herdrweb-contract\nentry_surface: S01\nplatforms: [desktop, mobile]\n\nsurface_dirs:\n  - screens\n  - modals\n  - components\n  - flows\n\ncross_cutting:\n  - 20-domain-rules.md\n  - 15-system-events.md\n\nextra_triggers: []\nextra_actions: []\n",
+      "sourceSpans": [
+        {
+          "line": 3,
+          "columnStart": 28,
+          "columnEndExclusive": 61,
+          "text": "docs/specs/herdr-web-dashboard.md"
+        }
+      ],
+      "diff": "--- a/docs/ui-spec/spec.config.yaml\n+++ b/docs/ui-spec/spec.config.yaml\n@@ -1,6 +1,6 @@\n # UI Spec configuration — herdr web dashboard\n #\n-# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n+# Product source of truth: docs/platform/herdr-web-dashboard/spec.md (tsk-54j).\n # This spec adds the interaction/layout layer only; it never re-decides a\n # product question the area spec already settled.\n \n",
+      "expectedAfterSha256": "2d7b4eff950023981f927a9a5da65ce7498bc8f537b25720abcb6f0e10e1140e",
+      "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
+      "claimAnchorProof": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-125.jsonl",
+        "recordLine": 17,
+        "recordSha256": "979622849cd9f9ce8a11796672ef46a9e71fe9a2a34edc09917ef5aa9310a5dc",
+        "edgeId": "maps-j-08490",
+        "disposition": "patch"
+      },
+      "receiptId": "ui-spec-compiler-parity",
+      "coCutPaths": [
+        "docs/ui-spec/spec.config.yaml",
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "expectedOutputSets": [],
+      "testTargets": [
+        "node .claude/skills/ui-spec/tools/validate.mjs --root docs/ui-spec",
+        "node .claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs --root docs/ui-spec"
+      ],
+      "intentionalBehaviorDeltas": [
+        "Comment-only product-source citation changes; parsed YAML and root/output behavior unchanged."
+      ],
+      "prerequisites": [
+        "Step7 final source binding review",
+        "Phase9 compiler parity proof"
+      ],
+      "order": "With settled Step3 source citations; no root migration",
+      "rollbackDiff": "--- a/docs/ui-spec/spec.config.yaml\n+++ b/docs/ui-spec/spec.config.yaml\n@@ -1,6 +1,6 @@\n # UI Spec configuration — herdr web dashboard\n #\n-# Product source of truth: docs/platform/herdr-web-dashboard/spec.md (tsk-54j).\n+# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n # This spec adds the interaction/layout layer only; it never re-decides a\n # product question the area spec already settled.\n \n",
+      "timing": "phase9",
+      "readiness": "pending review; not applied",
+      "commentOnly": true,
+      "coCutTestGreps": [
+        {
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "oldPointer": "docs/specs/herdr-web-dashboard.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/specs/herdr-web-dashboard.md",
+            "docs\\/specs\\/herdr-web-dashboard.md",
+            "docs\\/specs\\/herdr-web-dashboard\\.md"
+          ],
+          "matches": []
+        }
+      ],
+      "coCutTestEdits": []
+    },
+    {
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "file": "docs/platform/ui-spec/architecture/spec.config.yaml",
+      "sourceSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "mode": "100644",
+      "symbolOrPassage": "Product-source comment at L3; compiler config root retained",
+      "oldText": "# UI Spec configuration — herdr web dashboard\n#\n# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n# This spec adds the interaction/layout layer only; it never re-decides a\n# product question the area spec already settled.\n\nproject: herdrweb\ncontract_tag: herdrweb-contract\nentry_surface: S01\nplatforms: [desktop, mobile]\n\nsurface_dirs:\n  - screens\n  - modals\n  - components\n  - flows\n\ncross_cutting:\n  - 20-domain-rules.md\n  - 15-system-events.md\n\nextra_triggers: []\nextra_actions: []\n",
+      "newText": "# UI Spec configuration — herdr web dashboard\n#\n# Product source of truth: docs/platform/herdr-web-dashboard/spec.md (tsk-54j).\n# This spec adds the interaction/layout layer only; it never re-decides a\n# product question the area spec already settled.\n\nproject: herdrweb\ncontract_tag: herdrweb-contract\nentry_surface: S01\nplatforms: [desktop, mobile]\n\nsurface_dirs:\n  - screens\n  - modals\n  - components\n  - flows\n\ncross_cutting:\n  - 20-domain-rules.md\n  - 15-system-events.md\n\nextra_triggers: []\nextra_actions: []\n",
+      "sourceSpans": [
+        {
+          "line": 3,
+          "columnStart": 28,
+          "columnEndExclusive": 61,
+          "text": "docs/specs/herdr-web-dashboard.md"
+        }
+      ],
+      "diff": "--- a/docs/platform/ui-spec/architecture/spec.config.yaml\n+++ b/docs/platform/ui-spec/architecture/spec.config.yaml\n@@ -1,6 +1,6 @@\n # UI Spec configuration — herdr web dashboard\n #\n-# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n+# Product source of truth: docs/platform/herdr-web-dashboard/spec.md (tsk-54j).\n # This spec adds the interaction/layout layer only; it never re-decides a\n # product question the area spec already settled.\n \n",
+      "expectedAfterSha256": "2d7b4eff950023981f927a9a5da65ce7498bc8f537b25720abcb6f0e10e1140e",
+      "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
+      "claimAnchorProof": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-120.jsonl",
+        "recordLine": 9,
+        "recordSha256": "6d50eb8551c3b688dca33c723e80fabfa59377f89ce71adada5a81c35303907a",
+        "edgeId": "maps-j-07847",
+        "disposition": "patch"
+      },
+      "receiptId": "ui-spec-compiler-parity",
+      "coCutPaths": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml",
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "expectedOutputSets": [],
+      "testTargets": [
+        "node .claude/skills/ui-spec/tools/validate.mjs --root docs/ui-spec",
+        "node .claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs --root docs/ui-spec"
+      ],
+      "intentionalBehaviorDeltas": [
+        "Comment-only product-source citation changes; parsed YAML and root/output behavior unchanged."
+      ],
+      "prerequisites": [
+        "Step7 final source binding review",
+        "Phase9 compiler parity proof"
+      ],
+      "order": "With settled Step3 source citations; no root migration",
+      "rollbackDiff": "--- a/docs/platform/ui-spec/architecture/spec.config.yaml\n+++ b/docs/platform/ui-spec/architecture/spec.config.yaml\n@@ -1,6 +1,6 @@\n # UI Spec configuration — herdr web dashboard\n #\n-# Product source of truth: docs/platform/herdr-web-dashboard/spec.md (tsk-54j).\n+# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n # This spec adds the interaction/layout layer only; it never re-decides a\n # product question the area spec already settled.\n \n",
+      "timing": "phase9",
+      "readiness": "pending review; not applied",
+      "commentOnly": true,
+      "coCutTestGreps": [
+        {
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "oldPointer": "docs/specs/herdr-web-dashboard.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/specs/herdr-web-dashboard.md",
+            "docs\\/specs\\/herdr-web-dashboard.md",
+            "docs\\/specs\\/herdr-web-dashboard\\.md"
+          ],
+          "matches": []
+        }
+      ],
+      "coCutTestEdits": []
+    }
+  ],
+  "task0": {
+    "files": 32,
+    "items": 168,
+    "dispositionChangedFiles": 8,
+    "labelOnlyFiles": 24
+  },
+  "r26": {
+    "units": 43,
+    "readers": 90
+  },
+  "reviewList": "step-05-seam67-review-list.json",
+  "missingProofs": [
+    "Dedicated compiler explicit/cwd-root discovery, errors, output path/mode/hash parity",
+    "Runtime verifier ignores --root and targets frontend/docs/ui-spec: no parity inferred",
+    "Candidate citation scan coverage/finding multiplicity after old-root deletion",
+    "DecisionF Phase9 ratchet retirement, no patch/rebaseline authorized"
+  ],
+  "needsWrites": [],
+  "callerEvidence": "step-05-seam67-caller-corrections.json",
+  "verification": {
+    "fullChecker": {
+      "files": 1030,
+      "literalReferences": 4935,
+      "dynamicTuples": 31510,
+      "failureCount": 0
+    },
+    "negativeProbesPassed": 330,
+    "negativeProbesTotal": 330,
+    "currentOwningTests": 59
+  }
+}

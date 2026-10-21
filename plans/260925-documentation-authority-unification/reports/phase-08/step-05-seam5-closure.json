@@ -4,7 +4,7 @@
     "files": 704,
     "references": 1203,
     "tuples": 25007,
-    "supplementalSlots": 1117,
+    "supplementalSlots": 1119,
     "classes": {
       "judgment": {
         "files": 439,
@@ -22,30 +22,22 @@
         "tuples": 3787
       }
     },
-    "admitted": 451,
-    "rejected": 23037,
+    "admitted": 423,
+    "rejected": 23067,
     "neutralUnlabelled": 3839,
-    "parks": 82,
+    "parks": 81,
     "patches": 23,
-    "preserves": 27222,
+    "preserves": 27225,
     "patchFiles": 11,
     "deferredReplays": 6
   },
   "countSemantics": "File/reference/tuple totals are original census sets. Admission and disposition totals include supplemental slots. Neutral closures have no invented admission; priorR19Rejection remains separately nested on neutral records. Patches counts items; patchFiles counts physical files. This closes authoring only.",
   "addedThisTurn": {
-    "neutralFiles": 0,
-    "judgmentFiles": 264,
+    "files": 0,
     "references": 0,
-    "tuples": 10529,
-    "supplementalSlots": 230,
-    "admissions": {
-      "REJECT": 10706,
-      "ADMIT": 53
-    },
-    "dispositions": {
-      "preserve": 10759
-    },
-    "pinnedBytes": 3638222
+    "tuples": 0,
+    "supplementalSlots": 0,
+    "description": "Task0 reviews existing records; no new seam5 file is authored."
   },
   "parkDependencies": [
     {
@@ -72,7 +64,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
             "recordLine": 2,
-            "recordSha256": "04c4abf6bc6f836376a73c45a92214c07af07f8371a254b809212417e7ae308f"
+            "recordSha256": "38a6ed6e451d84886add22b0f578bef9e5e438e7b439fc72879451eeb3b206ed"
           }
         }
       ]
@@ -230,319 +222,15 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f"
+            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
           }
         }
       ]
     },
     {
       "dependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
-      "itemCount": 17,
+      "itemCount": 15,
       "items": [
-        {
-          "file": "test/docs/decisions-corpus-retired.test.mjs",
-          "id": "reference-004039",
-          "blockedReason": "test/docs/decisions-corpus-retired.test.mjs: The DECISIONS_DIR real enumeration/probe follows the index directory after the retention-or-move decision; preserve the numbered-corpus absence assertions and their exact negative-probe meaning.",
-          "dependencyCategory": "phase9-retention-or-move",
-          "searchWitness": {
-            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-            "roots": [
-              "docs/platform",
-              "docs/knowledge",
-              "docs/reference",
-              "docs/tutorials"
-            ],
-            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-search-evidence.json",
-            "evidenceSha256": "67bc34205cf3cdd54b84d8dcc5442de47cf6b9a5714d94128e4b44c23daabba3",
-            "aliasLookups": [
-              {
-                "legacyPath": "docs/specs/platform-foundations.md",
-                "sources": [
-                  {
-                    "path": "plans/260925-documentation-authority-unification/alias-table.json",
-                    "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
-                    "matches": []
-                  },
-                  {
-                    "path": "docs/doc-registry.json",
-                    "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-                    "matches": []
-                  }
-                ]
-              },
-              {
-                "legacyPath": "docs/specs/work-state.md",
-                "sources": [
-                  {
-                    "path": "plans/260925-documentation-authority-unification/alias-table.json",
-                    "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
-                    "matches": []
-                  },
-                  {
-                    "path": "docs/doc-registry.json",
-                    "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-                    "matches": []
-                  }
-                ]
-              },
-              {
-                "legacyPath": "docs/specs/runner.md",
-                "sources": [
-                  {
-                    "path": "plans/260925-documentation-authority-unification/alias-table.json",
-                    "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
-                    "matches": []
-                  },
-                  {
-                    "path": "docs/doc-registry.json",
-                    "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-                    "matches": []
-                  }
-                ]
-              },
-              {
-                "legacyPath": "docs/specs/system-overview.md",
-                "sources": [
-                  {
-                    "path": "plans/260925-documentation-authority-unification/alias-table.json",
-                    "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
-                    "matches": []
-                  },
-                  {
-                    "path": "docs/doc-registry.json",
-                    "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-                    "matches": []
-                  }
-                ]
-              },
-              {
-                "legacyPath": "docs/architecture-map.md",
-                "sources": [
-                  {
-                    "path": "plans/260925-documentation-authority-unification/alias-table.json",
-                    "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
-                    "matches": []
-                  },
-                  {
-                    "path": "docs/doc-registry.json",
-                    "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-                    "matches": []
-                  }
-                ]
-              }
-            ],
-            "queries": [
-              {
-                "id": "foundation-law",
-                "query": "RUL11",
-                "hitCount": 89,
-                "liveHitCount": 79,
-                "stdoutSha256": "5dce7b9f61bbb1ee99a72f239157d8a194a3e22bf2ad049a73c4fbf4bdbec43b"
-              },
-              {
-                "id": "foundation-history",
-                "query": "### 0036 — Khoá RUL11",
-                "hitCount": 0,
-                "liveHitCount": 0,
-                "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-              },
-              {
-                "id": "foundation-locked-text",
-                "query": "Việc trở nặng không vì bản chất nó lớn",
-                "hitCount": 1,
-                "liveHitCount": 1,
-                "stdoutSha256": "5e2e4f848b58c8dc7243692f500f2561a30177ab910e2a4439996c8a59be0754"
-              },
-              {
-                "id": "foundation-new-decision",
-                "query": "0054",
-                "hitCount": 17,
-                "liveHitCount": 17,
-                "stdoutSha256": "b9983216e393ab17bbf2642cd8653d91238e1cc308980b97d0d0924f11a34852"
-              },
-              {
-                "id": "team-collision",
-                "query": "### 0032 — Multi-role Team Harness",
-                "hitCount": 0,
-                "liveHitCount": 0,
-                "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-              },
-              {
-                "id": "section-marker",
-                "query": "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
-                "hitCount": 3,
-                "liveHitCount": 2,
-                "stdoutSha256": "ced2cdd50a75c8300e19403de3d12226e977b86580d48607b6f319af80ec82ab"
-              },
-              {
-                "id": "all-retired-id-headings",
-                "query": "^### (000[1-9]|00[12][0-9]|003[0-3]) ",
-                "hitCount": 59,
-                "liveHitCount": 59,
-                "stdoutSha256": "870e1e3fe78b5b7b062dfcb3db040d14322c7ea21067e0f6be427ed9d79fa733"
-              }
-            ],
-            "assessment": "test/docs/decisions-corpus-retired.test.mjs: The DECISIONS_DIR real enumeration/probe follows the index directory after the retention-or-move decision; preserve the numbered-corpus absence assertions and their exact negative-probe meaning.",
-            "gapNote": null
-          },
-          "record": {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
-            "recordLine": 1,
-            "recordSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f"
-          }
-        },
-        {
-          "file": "test/docs/decisions-corpus-retired.test.mjs",
-          "id": "reference-004041",
-          "blockedReason": "test/docs/decisions-corpus-retired.test.mjs: The DECISIONS_DIR real enumeration/probe follows the index directory after the retention-or-move decision; preserve the numbered-corpus absence assertions and their exact negative-probe meaning.",
-          "dependencyCategory": "phase9-retention-or-move",
-          "searchWitness": {
-            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-            "roots": [
-              "docs/platform",
-              "docs/knowledge",
-              "docs/reference",
-              "docs/tutorials"
-            ],
-            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-search-evidence.json",
-            "evidenceSha256": "67bc34205cf3cdd54b84d8dcc5442de47cf6b9a5714d94128e4b44c23daabba3",
-            "aliasLookups": [
-              {
-                "legacyPath": "docs/specs/platform-foundations.md",
-                "sources": [
-                  {
-                    "path": "plans/260925-documentation-authority-unification/alias-table.json",
-                    "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
-                    "matches": []
-                  },
-                  {
-                    "path": "docs/doc-registry.json",
-                    "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-                    "matches": []
-                  }
-                ]
-              },
-              {
-                "legacyPath": "docs/specs/work-state.md",
-                "sources": [
-                  {
-                    "path": "plans/260925-documentation-authority-unification/alias-table.json",
-                    "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
-                    "matches": []
-                  },
-                  {
-                    "path": "docs/doc-registry.json",
-                    "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-                    "matches": []
-                  }
-                ]
-              },
-              {
-                "legacyPath": "docs/specs/runner.md",
-                "sources": [
-                  {
-                    "path": "plans/260925-documentation-authority-unification/alias-table.json",
-                    "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
-                    "matches": []
-                  },
-                  {
-                    "path": "docs/doc-registry.json",
-                    "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-                    "matches": []
-                  }
-                ]
-              },
-              {
-                "legacyPath": "docs/specs/system-overview.md",
-                "sources": [
-                  {
-                    "path": "plans/260925-documentation-authority-unification/alias-table.json",
-                    "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
-                    "matches": []
-                  },
-                  {
-                    "path": "docs/doc-registry.json",
-                    "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-                    "matches": []
-                  }
-                ]
-              },
-              {
-                "legacyPath": "docs/architecture-map.md",
-                "sources": [
-                  {
-                    "path": "plans/260925-documentation-authority-unification/alias-table.json",
-                    "sha256": "5f039b6bdc9ab3d2dc12e22f074002309077884a0657261523ef251e1539aed0",
-                    "matches": []
-                  },
-                  {
-                    "path": "docs/doc-registry.json",
-                    "sha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-                    "matches": []
-                  }
-                ]
-              }
-            ],
-            "queries": [
-              {
-                "id": "foundation-law",
-                "query": "RUL11",
-                "hitCount": 89,
-                "liveHitCount": 79,
-                "stdoutSha256": "5dce7b9f61bbb1ee99a72f239157d8a194a3e22bf2ad049a73c4fbf4bdbec43b"
-              },
-              {
-                "id": "foundation-history",
-                "query": "### 0036 — Khoá RUL11",
-                "hitCount": 0,
-                "liveHitCount": 0,
-                "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-              },
-              {
-                "id": "foundation-locked-text",
-                "query": "Việc trở nặng không vì bản chất nó lớn",
-                "hitCount": 1,
-                "liveHitCount": 1,
-                "stdoutSha256": "5e2e4f848b58c8dc7243692f500f2561a30177ab910e2a4439996c8a59be0754"
-              },
-              {
-                "id": "foundation-new-decision",
-                "query": "0054",
-                "hitCount": 17,
-                "liveHitCount": 17,
-                "stdoutSha256": "b9983216e393ab17bbf2642cd8653d91238e1cc308980b97d0d0924f11a34852"
-              },
-              {
-                "id": "team-collision",
-                "query": "### 0032 — Multi-role Team Harness",
-                "hitCount": 0,
-                "liveHitCount": 0,
-                "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-              },
-              {
-                "id": "section-marker",
-                "query": "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
-                "hitCount": 3,
-                "liveHitCount": 2,
-                "stdoutSha256": "ced2cdd50a75c8300e19403de3d12226e977b86580d48607b6f319af80ec82ab"
-              },
-              {
-                "id": "all-retired-id-headings",
-                "query": "^### (000[1-9]|00[12][0-9]|003[0-3]) ",
-                "hitCount": 59,
-                "liveHitCount": 59,
-                "stdoutSha256": "870e1e3fe78b5b7b062dfcb3db040d14322c7ea21067e0f6be427ed9d79fa733"
-              }
-            ],
-            "assessment": "test/docs/decisions-corpus-retired.test.mjs: The DECISIONS_DIR real enumeration/probe follows the index directory after the retention-or-move decision; preserve the numbered-corpus absence assertions and their exact negative-probe meaning.",
-            "gapNote": null
-          },
-          "record": {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
-            "recordLine": 1,
-            "recordSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f"
-          }
-        },
         {
           "file": "test/docs/decisions-corpus-retired.test.mjs",
           "id": "dynamic-018734",
@@ -692,7 +380,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f"
+            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
           }
         },
         {
@@ -844,7 +532,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f"
+            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
           }
         },
         {
@@ -867,7 +555,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -890,7 +578,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -927,7 +615,30 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+          }
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004321",
+          "blockedReason": "test/report/enduser-index.test.mjs: Baseline title at L316 follows the same parked alias/membership reader as L373 title; title changes only with the owning generator/read unit.",
+          "dependencyCategory": "phase9-retention-or-move",
+          "searchWitness": {
+            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+            "roots": [
+              "docs/platform",
+              "docs/knowledge",
+              "docs/reference",
+              "docs/tutorials"
+            ],
+            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
+            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
+            "assessment": "test/report/enduser-index.test.mjs: Baseline title at L316 follows the same parked alias/membership reader as L373 title; title changes only with the owning generator/read unit."
+          },
+          "record": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+            "recordLine": 2,
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -964,7 +675,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -1001,7 +712,30 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+          }
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004346",
+          "blockedReason": "test/report/enduser-index.test.mjs: Baseline title at L316 follows the same parked alias/membership reader as L373 title; title changes only with the owning generator/read unit.",
+          "dependencyCategory": "phase9-retention-or-move",
+          "searchWitness": {
+            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+            "roots": [
+              "docs/platform",
+              "docs/knowledge",
+              "docs/reference",
+              "docs/tutorials"
+            ],
+            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
+            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
+            "assessment": "test/report/enduser-index.test.mjs: Baseline title at L316 follows the same parked alias/membership reader as L373 title; title changes only with the owning generator/read unit."
+          },
+          "record": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+            "recordLine": 2,
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -1038,7 +772,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -1075,7 +809,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -1112,7 +846,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -1149,7 +883,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -1186,7 +920,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -1223,88 +957,14 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
-          }
-        },
-        {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "dynamic-021550",
-          "blockedReason": "test/report/enduser-index.test.mjs: The decisions alias enumeration/comment/frontmatter contract depends on index.md remaining in the scanned directory or moving with the alias scan-set. Reconcile dynamic-009788/dynamic-009791 and the index generator as one unit; no retained-directory witness authorizes the move. Existing obligation: test/report/enduser-index.test.mjs: L12-81: The non-empty frontmatter assertion emits a file-specific diagnostic. Its named file must come from the final promoted decisions-index population; keep the parser result assertion and diagnostic coupled to the parked per-member reader rather than substituting an unrelated retained file.",
-          "dependencyCategory": "phase9-retention-or-move",
-          "searchWitness": {
-            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-            "roots": [
-              "docs/platform",
-              "docs/knowledge",
-              "docs/reference",
-              "docs/tutorials"
-            ],
-            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
-            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
-            "assessment": "test/report/enduser-index.test.mjs: The decisions alias enumeration/comment/frontmatter contract depends on index.md remaining in the scanned directory or moving with the alias scan-set. Reconcile dynamic-009788/dynamic-009791 and the index generator as one unit; no retained-directory witness authorizes the move. Existing obligation: test/report/enduser-index.test.mjs: L12-81: The non-empty frontmatter assertion emits a file-specific diagnostic. Its named file must come from the final promoted decisions-index population; keep the parser result assertion and diagnostic coupled to the parked per-member reader rather than substituting an unrelated retained file.",
-            "queries": [
-              "check-rollup-progress",
-              "QUADRANT_DIR_ALIASES",
-              "docs/decisions",
-              "### 0010",
-              "### 0015",
-              "### 0017",
-              "Product Gates"
-            ],
-            "aliasLookupSources": [
-              "plans/260925-documentation-authority-unification/alias-table.json",
-              "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
-              "docs/doc-registry.json"
-            ]
-          },
-          "record": {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
-            "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
-          }
-        },
-        {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "dynamic-021551",
-          "blockedReason": "test/report/enduser-index.test.mjs: The decisions alias enumeration/comment/frontmatter contract depends on index.md remaining in the scanned directory or moving with the alias scan-set. Reconcile dynamic-009788/dynamic-009791 and the index generator as one unit; no retained-directory witness authorizes the move. Existing obligation: test/report/enduser-index.test.mjs: L12-81: The frontmatter type equality reports the iterated decisions file. Its explanation value must remain checked for every real promoted member; resolve the decisions-index population before changing the diagnostic or reader.",
-          "dependencyCategory": "phase9-retention-or-move",
-          "searchWitness": {
-            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-            "roots": [
-              "docs/platform",
-              "docs/knowledge",
-              "docs/reference",
-              "docs/tutorials"
-            ],
-            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
-            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
-            "assessment": "test/report/enduser-index.test.mjs: The decisions alias enumeration/comment/frontmatter contract depends on index.md remaining in the scanned directory or moving with the alias scan-set. Reconcile dynamic-009788/dynamic-009791 and the index generator as one unit; no retained-directory witness authorizes the move. Existing obligation: test/report/enduser-index.test.mjs: L12-81: The frontmatter type equality reports the iterated decisions file. Its explanation value must remain checked for every real promoted member; resolve the decisions-index population before changing the diagnostic or reader.",
-            "queries": [
-              "check-rollup-progress",
-              "QUADRANT_DIR_ALIASES",
-              "docs/decisions",
-              "### 0010",
-              "### 0015",
-              "### 0017",
-              "Product Gates"
-            ],
-            "aliasLookupSources": [
-              "plans/260925-documentation-authority-unification/alias-table.json",
-              "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
-              "docs/doc-registry.json"
-            ]
-          },
-          "record": {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
-            "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         }
       ]
     },
     {
       "dependency": "Phase 9 retention-or-move decision for docs/doc-governance.md",
-      "itemCount": 8,
+      "itemCount": 10,
       "items": [
         {
           "file": "test/scripts/check-doc-candidate-status.test.mjs",
@@ -1326,7 +986,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
             "recordLine": 21,
-            "recordSha256": "bf697242fa0b27d98373e4add958f4d01f6d28903ae76255ca28b7ae9a3fc7ad"
+            "recordSha256": "8941457165965925f4a55973b70f5f04d34f3858fe37fe23749810c998a5f141"
           }
         },
         {
@@ -1349,7 +1009,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
             "recordLine": 21,
-            "recordSha256": "bf697242fa0b27d98373e4add958f4d01f6d28903ae76255ca28b7ae9a3fc7ad"
+            "recordSha256": "8941457165965925f4a55973b70f5f04d34f3858fe37fe23749810c998a5f141"
           }
         },
         {
@@ -1372,7 +1032,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
             "recordLine": 21,
-            "recordSha256": "bf697242fa0b27d98373e4add958f4d01f6d28903ae76255ca28b7ae9a3fc7ad"
+            "recordSha256": "8941457165965925f4a55973b70f5f04d34f3858fe37fe23749810c998a5f141"
           }
         },
         {
@@ -1395,7 +1055,53 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
             "recordLine": 21,
-            "recordSha256": "bf697242fa0b27d98373e4add958f4d01f6d28903ae76255ca28b7ae9a3fc7ad"
+            "recordSha256": "8941457165965925f4a55973b70f5f04d34f3858fe37fe23749810c998a5f141"
+          }
+        },
+        {
+          "file": "test/scripts/check-doc-candidate-status.test.mjs",
+          "id": "author-s67-governance-baseline-94",
+          "blockedReason": "test/scripts/check-doc-candidate-status.test.mjs: governanceBaselineFields(REPO_ROOT) calls the production governance-file reader while constructing this candidate-status test input; include the transitive real read and unchanged assertions.",
+          "dependencyCategory": "phase9-retention-or-move",
+          "searchWitness": {
+            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+            "roots": [
+              "docs/platform",
+              "docs/knowledge",
+              "docs/reference",
+              "docs/tutorials"
+            ],
+            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-search-evidence.json",
+            "evidenceSha256": "95faebccbae8c3fa700c53704f4a0f9272aa370ea2770d8da96257d062ff132d",
+            "assessment": "test/scripts/check-doc-candidate-status.test.mjs: governanceBaselineFields(REPO_ROOT) calls the production governance-file reader while constructing this candidate-status test input; include the transitive real read and unchanged assertions."
+          },
+          "record": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+            "recordLine": 21,
+            "recordSha256": "8941457165965925f4a55973b70f5f04d34f3858fe37fe23749810c998a5f141"
+          }
+        },
+        {
+          "file": "test/scripts/check-doc-candidate-status.test.mjs",
+          "id": "author-s67-governance-baseline-163",
+          "blockedReason": "test/scripts/check-doc-candidate-status.test.mjs: this checkCandidateMetadata call uses real REPO_ROOT. Its unconditional promotionRequired construction calls governanceBaselineFields at scripts/check-doc-candidate-status.mjs L96; that helper probes and reads real docs/doc-governance.md. Co-cut this transitive read with the direct L94 call and gate reader.",
+          "dependencyCategory": "phase9-retention-or-move",
+          "searchWitness": {
+            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+            "roots": [
+              "docs/platform",
+              "docs/knowledge",
+              "docs/reference",
+              "docs/tutorials"
+            ],
+            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-search-evidence.json",
+            "evidenceSha256": "95faebccbae8c3fa700c53704f4a0f9272aa370ea2770d8da96257d062ff132d",
+            "assessment": "test/scripts/check-doc-candidate-status.test.mjs: this checkCandidateMetadata call uses real REPO_ROOT. Its unconditional promotionRequired construction calls governanceBaselineFields at scripts/check-doc-candidate-status.mjs L96; that helper probes and reads real docs/doc-governance.md. Co-cut this transitive read with the direct L94 call and gate reader."
+          },
+          "record": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+            "recordLine": 21,
+            "recordSha256": "8941457165965925f4a55973b70f5f04d34f3858fe37fe23749810c998a5f141"
           }
         },
         {
@@ -1516,7 +1222,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -1539,7 +1245,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -1743,7 +1449,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -1780,7 +1486,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         }
       ]
@@ -1823,7 +1529,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -1860,7 +1566,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -1897,93 +1603,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
-          }
-        }
-      ]
-    },
-    {
-      "dependency": "alias-message",
-      "itemCount": 1,
-      "items": [
-        {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "dynamic-021544",
-          "blockedReason": "test/report/enduser-index.test.mjs: The failure message prints the real enumerated entry.docPath; its allowed-directory assertion is jointly dependent on explanation alias composition, rather than an unrelated scalar diagnostic.",
-          "dependencyCategory": "step5-parity",
-          "searchWitness": {
-            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-            "roots": [
-              "docs/platform",
-              "docs/knowledge",
-              "docs/reference",
-              "docs/tutorials"
-            ],
-            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
-            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
-            "assessment": "test/report/enduser-index.test.mjs: The failure message prints the real enumerated entry.docPath; its allowed-directory assertion is jointly dependent on explanation alias composition, rather than an unrelated scalar diagnostic.",
-            "queries": [
-              "check-rollup-progress",
-              "QUADRANT_DIR_ALIASES",
-              "docs/decisions",
-              "### 0010",
-              "### 0015",
-              "### 0017",
-              "Product Gates"
-            ],
-            "aliasLookupSources": [
-              "plans/260925-documentation-authority-unification/alias-table.json",
-              "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
-              "docs/doc-registry.json"
-            ]
-          },
-          "record": {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
-            "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
-          }
-        }
-      ]
-    },
-    {
-      "dependency": "alias-primary-count",
-      "itemCount": 1,
-      "items": [
-        {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "dynamic-021543",
-          "blockedReason": "test/report/enduser-index.test.mjs: The primaryExplanationCount enumerates real explanation Markdown while registry proposals move some entries into knowledge. Compose its counted legacy subset against the promoted output without replacing the count assertion with a weaker existence test.",
-          "dependencyCategory": "step5-parity",
-          "searchWitness": {
-            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-            "roots": [
-              "docs/platform",
-              "docs/knowledge",
-              "docs/reference",
-              "docs/tutorials"
-            ],
-            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
-            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
-            "assessment": "test/report/enduser-index.test.mjs: The primaryExplanationCount enumerates real explanation Markdown while registry proposals move some entries into knowledge. Compose its counted legacy subset against the promoted output without replacing the count assertion with a weaker existence test.",
-            "queries": [
-              "check-rollup-progress",
-              "QUADRANT_DIR_ALIASES",
-              "docs/decisions",
-              "### 0010",
-              "### 0015",
-              "### 0017",
-              "Product Gates"
-            ],
-            "aliasLookupSources": [
-              "plans/260925-documentation-authority-unification/alias-table.json",
-              "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
-              "docs/doc-registry.json"
-            ]
-          },
-          "record": {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
-            "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         }
       ]
@@ -2026,7 +1646,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -2063,7 +1683,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         }
       ]
@@ -2106,7 +1726,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -2143,7 +1763,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         }
       ]
@@ -2301,7 +1921,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f"
+            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
           }
         }
       ]
@@ -2464,7 +2084,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         }
       ]
@@ -2507,7 +2127,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         },
         {
@@ -2544,7 +2164,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         }
       ]
@@ -2587,6 +2207,49 @@
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
             "recordLine": 1,
             "recordSha256": "78d94901dba8de1244bb24cb16d90800f80707049f900a7f8c1a363fd7f4aa53"
+          }
+        }
+      ]
+    },
+    {
+      "dependency": "enduser-index-alias-membership-and-explanation-move",
+      "itemCount": 1,
+      "items": [
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "dynamic-021543",
+          "blockedReason": "test/report/enduser-index.test.mjs: The primaryExplanationCount enumerates real explanation Markdown while registry proposals move some entries into knowledge. Compose its counted legacy subset against the promoted output without replacing the count assertion with a weaker existence test.",
+          "dependencyCategory": "generator-cutover",
+          "searchWitness": {
+            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+            "roots": [
+              "docs/platform",
+              "docs/knowledge",
+              "docs/reference",
+              "docs/tutorials"
+            ],
+            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
+            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
+            "assessment": "test/report/enduser-index.test.mjs: The primaryExplanationCount enumerates real explanation Markdown while registry proposals move some entries into knowledge. Compose its counted legacy subset against the promoted output without replacing the count assertion with a weaker existence test.",
+            "queries": [
+              "check-rollup-progress",
+              "QUADRANT_DIR_ALIASES",
+              "docs/decisions",
+              "### 0010",
+              "### 0015",
+              "### 0017",
+              "Product Gates"
+            ],
+            "aliasLookupSources": [
+              "plans/260925-documentation-authority-unification/alias-table.json",
+              "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
+              "docs/doc-registry.json"
+            ]
+          },
+          "record": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+            "recordLine": 2,
+            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         }
       ]
@@ -2744,7 +2407,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f"
+            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
           }
         }
       ]
@@ -3196,7 +2859,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f"
+            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
           }
         }
       ]
@@ -3354,7 +3017,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f"
+            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
           }
         }
       ]
@@ -4101,7 +3764,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f"
+            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
           }
         },
         {
@@ -4253,7 +3916,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f"
+            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
           }
         }
       ]
@@ -4411,7 +4074,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f"
+            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
           }
         }
       ]
@@ -4511,7 +4174,7 @@
       "record": {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
         "recordLine": 1,
-        "recordSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f"
+        "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
       },
       "status": "unapplied; Step 7 composes source/test co-cuts and resolves parks; Phase 9 executes and proves"
     },
@@ -4563,7 +4226,7 @@
       "record": {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
         "recordLine": 2,
-        "recordSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a"
+        "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
       },
       "status": "unapplied; Step 7 composes source/test co-cuts and resolves parks; Phase 9 executes and proves"
     },
@@ -5497,8 +5160,24 @@
   "remainingFiles": [],
   "reviewList": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-review-list.json",
   "closureProofs": {
-    "fullChecker": "step-05-seam5-batch7-full-check.json",
-    "rejectingProbes": "step-05-seam5-batch7-final-proof.json"
+    "fullChecker": "step-05-seam67-full-check.json",
+    "rejectingProbes": "step-05-seam67-final-proof.json"
   },
-  "needsWrites": []
+  "needsWrites": [],
+  "previousAuthoringDelta": {
+    "neutralFiles": 0,
+    "judgmentFiles": 264,
+    "references": 0,
+    "tuples": 10529,
+    "supplementalSlots": 230,
+    "admissions": {
+      "REJECT": 10706,
+      "ADMIT": 53
+    },
+    "dispositions": {
+      "preserve": 10759
+    },
+    "pinnedBytes": 3638222
+  },
+  "task0ReviewClosure": "step-05-seam67-task0-closure.json"
 }

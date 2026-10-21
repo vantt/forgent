@@ -1,0 +1,171 @@
+{
+  "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+  "compiler": {
+    "rootSelection": {
+      "file": ".claude/skills/ui-spec/tools/config.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "startLine": 10,
+      "endLine": 59,
+      "text": "/** Find spec root by walking up from startDir looking for spec.config.yaml. */\nfunction findSpecRoot(startDir) {\n  let dir = resolve(startDir);\n  for (let i = 0; i < 10; i++) {\n    if (existsSync(join(dir, \"spec.config.yaml\"))) return dir;\n    const parent = dirname(dir);\n    if (parent === dir) break; // filesystem root\n    dir = parent;\n  }\n  return null;\n}\n\n/** Parse --root <path> from process.argv. Returns null if not present. */\nfunction parseRootArg() {\n  const idx = process.argv.indexOf(\"--root\");\n  if (idx !== -1 && process.argv[idx + 1]) {\n    return resolve(process.argv[idx + 1]);\n  }\n  return null;\n}\n\n/** Load and validate spec.config.yaml. Exits with helpful message on failure. */\nfunction loadConfig() {\n  const specRoot = parseRootArg() ?? findSpecRoot(process.cwd());\n\n  if (!specRoot) {\n    console.error(\n      \"ERROR: Cannot find spec.config.yaml.\\n\" +\n      \"  Run from a directory inside your spec, or pass --root <spec-root>.\\n\" +\n      \"  Example: node validate.mjs --root ./docs/ui-spec\"\n    );\n    process.exit(1);\n  }\n\n  const configPath = join(specRoot, \"spec.config.yaml\");\n  let config;\n  try {\n    config = yaml.load(readFileSync(configPath, \"utf8\")) || {};\n  } catch (e) {\n    console.error(`ERROR: Cannot read spec.config.yaml at ${configPath}\\n  ${e.message}`);\n    process.exit(1);\n  }\n\n  // Required fields with defaults\n  const contractTag = config.contract_tag ?? \"ui-spec-contract\";\n  const surfaceDirs = config.surface_dirs ?? [\"screens\", \"panels\", \"modals\", \"overlays\", \"components\"];\n  const crossCutting = config.cross_cutting ?? [];\n  const schemaPath = join(specRoot, config.schema_path ?? \"schema/surface-contract.schema.json\");\n\n  return { specRoot, config, contractTag, surfaceDirs, crossCutting, schemaPath };"
+    },
+    "actualInputRule": {
+      "file": ".claude/skills/ui-spec/tools/extract.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "startLine": 16,
+      "endLine": 38,
+      "text": "export function listSpecFiles() {\n  const files = [];\n\n  for (const dir of surfaceDirs) {\n    const abs = join(SPEC_ROOT, dir);\n    let entries = [];\n    try { entries = readdirSync(abs); } catch { continue; }\n    for (const e of entries) {\n      const p = join(abs, e);\n      if (statSync(p).isFile() && e.endsWith(\".md\")) files.push(p);\n    }\n  }\n\n  for (const f of crossCutting) {\n    // Support both bare filenames (relative to spec root) and absolute paths\n    const p = f.startsWith(\"/\") || /^[A-Za-z]:/.test(f) ? f : join(SPEC_ROOT, f);\n    try { if (statSync(p).isFile()) files.push(p); } catch { /* optional */ }\n  }\n\n  return files;\n}\n\n/** Extract all fenced code blocks whose info-string is `yaml <contractTag>`. */"
+    },
+    "extractPayloadAndRelativePaths": {
+      "file": ".claude/skills/ui-spec/tools/extract.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "startLine": 68,
+      "endLine": 109,
+      "text": "  const raw = readFileSync(absPath, \"utf8\");\n  const rel = relative(SPEC_ROOT, absPath).replace(/\\\\/g, \"/\");\n  const errors = [];\n\n  const fm = matter(raw);\n  const meta = fm.data || {};\n  const blocks = extractContractBlocks(fm.content);\n\n  let contract = null;\n  if (blocks.length === 0) {\n    errors.push(`no \\`yaml ${contractTag}\\` block found`);\n  } else if (blocks.length > 1) {\n    errors.push(`expected exactly 1 contract block, found ${blocks.length}`);\n  } else {\n    try {\n      contract = yaml.load(blocks[0]) || {};\n      // Auto-assign IDs to interactions missing an id\n      if (contract.interactions) {\n        contract.interactions = assignMissingInteractionIds(contract.interactions, meta.id);\n      }\n    } catch (e) {\n      errors.push(`YAML parse error: ${e.message}`);\n    }\n  }\n\n  return {\n    file: rel,\n    fileBase: basename(absPath),\n    id: meta.id,\n    meta,\n    contract,\n    blockCount: blocks.length,\n    errors,\n  };\n}\n\n/** Extract all spec files. */\nexport function extractAll() {\n  return listSpecFiles().map(extractFile);\n}\n\nexport { SPEC_ROOT };"
+    },
+    "validatorStatus": {
+      "file": ".claude/skills/ui-spec/tools/validate.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "startLine": 245,
+      "endLine": 256,
+      "text": "// ---- Report ----\nconsole.log(`Scanned ${files.length} spec files, ${actionIndex.size} actions, ${knownSurfaceIds.size} surfaces.`);\nfor (const w of warns) console.log(w);\nif (errors.length) {\n  console.error(`\\n${errors.length} ERROR(S):`);\n  for (const e of errors) console.error(e);\n  process.exit(1);\n}\nconsole.log(`\\n✓ validation passed (${warns.length} warning(s)).`);"
+    },
+    "buildOutputNames": [
+      "generated/surface-registry.yaml",
+      "generated/navigation-graph.yaml",
+      "generated/action-registry.csv",
+      "generated/coverage-report.md"
+    ],
+    "interpreterOutputs": [
+      "generated/wireframe.html",
+      "generated/wireframe-v2.html"
+    ],
+    "actualRuntimeVerifier": {
+      "file": ".claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "startLine": 6,
+      "endLine": 16,
+      "text": "\nimport { readFileSync } from \"node:fs\";\nimport { resolve, dirname } from \"node:path\";\nimport { fileURLToPath } from \"node:url\";\nimport { JSDOM, VirtualConsole } from \"jsdom\";\n\nconst __dir = dirname(fileURLToPath(import.meta.url));\n// __dir = .agents/skills/ui-spec/tools/wireframe → 5 levels up to git root\nconst HTML_PATH = resolve(__dir, \"../../../../../frontend/docs/ui-spec/generated/wireframe-v2.html\");\n\nconst errors = [];"
+    },
+    "runtimeInput": "frontend/docs/ui-spec/generated/wireframe-v2.html",
+    "runtimeRootArgUsed": false,
+    "runtimeInputExistsAtPin": false,
+    "candidateYamlPolicy": "config.mjs has no mirror selection. docs/platform/ui-spec/architecture/spec.config.yaml is parsed only if --root chooses its directory or cwd discovery finds it. No repository literal command reader was found for its full path. Both YAML files currently match; equality is not promotion.",
+    "retainedRoot": "docs/ui-spec (L12-21/26)",
+    "containment": "No loader/extractor containment or symlink refusal exists; cross_cutting allows absolute paths; stat follows symlinks. No new safety guarantee inferred.",
+    "trackedOutputSnapshots": [
+      {
+        "path": "docs/ui-spec/generated/action-registry.csv",
+        "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "mode": "100644",
+        "sha256": "9061f86a22a4aa7506e627c8bf2decf3ccdb5b75cf88f2382481851b1d5a02bc",
+        "bytes": 2078,
+        "meaning": "Existing tracked snapshot only; not a current/candidate generated result."
+      },
+      {
+        "path": "docs/ui-spec/generated/coverage-report.md",
+        "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "mode": "100644",
+        "sha256": "738eba6ed62f160d8637e9d6b012c1c74f15cd89fe87df28a53b55e0cc41c101",
+        "bytes": 571,
+        "meaning": "Existing tracked snapshot only; not a current/candidate generated result."
+      },
+      {
+        "path": "docs/ui-spec/generated/navigation-graph.yaml",
+        "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "mode": "100644",
+        "sha256": "0b28f3554b2a5fba6a70d8fa728742ebfdd6f3e5a9f0a2bfe1149721d40617de",
+        "bytes": 7359,
+        "meaning": "Existing tracked snapshot only; not a current/candidate generated result."
+      },
+      {
+        "path": "docs/ui-spec/generated/surface-registry.yaml",
+        "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "mode": "100644",
+        "sha256": "b066bdeb267eda13000e3c575293220faeb1864e52df716460e5439528aae909",
+        "bytes": 3197,
+        "meaning": "Existing tracked snapshot only; not a current/candidate generated result."
+      },
+      {
+        "path": "docs/ui-spec/generated/wireframe-v2.html",
+        "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "mode": "100644",
+        "sha256": "77894fdda0966833d6d9ba595745a315db67d64feea7c9e6d5faed34a8d2ce80",
+        "bytes": 631319,
+        "meaning": "Existing tracked snapshot only; not a current/candidate generated result."
+      }
+    ],
+    "missing": "Dedicated root discovery / error status / output mode/hash parity; no UI tool or build executed.",
+    "candidateSchemaAtDefaultPathExistsAtPin": false,
+    "candidateSchemaAssessment": "The candidate architecture directory has screens but no schema/surface-contract.schema.json at HEAD. Default schema resolution would select that absent relative file if --root chose this directory. validate.mjs checks existence and exits 1; candidate directory existence cannot prove a working root or authorize promotion.",
+    "outputModes": "writeFileSync has no explicit mode/chmod here: existing output mode is retained, newly created files use the process creation mode/umask. Pinned tracked snapshots are not proof of generated modes.",
+    "runtimeReadError": "readFileSync(HTML_PATH) occurs before the JSDOM try/catch. A missing HTML input yields an uncaught file-read error; no current runtime result is claimed."
+  },
+  "citation": {
+    "defaults": {
+      "file": "scripts/check-decision-citation-drift.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "startLine": 408,
+      "endLine": 435,
+      "text": "\nfunction parseArgs(argv) {\n  const decisionsIdx = argv.indexOf('--decisions-dir');\n  const backlogIdx = argv.indexOf('--backlog');\n  const specsIdx = argv.indexOf('--specs-dir');\n  const baselineIdx = argv.indexOf('--baseline');\n  const skillsDirs = [];\n  argv.forEach((a, i) => {\n    if (a === '--skills-dir') skillsDirs.push(argv[i + 1]);\n  });\n  return {\n    decisionsDir:\n      decisionsIdx >= 0\n        ? argv[decisionsIdx + 1]\n        : 'docs/decisions',\n    backlogPath:\n      backlogIdx >= 0\n        ? argv[backlogIdx + 1]\n        : 'docs/backlog.md',\n    specsDir:\n      specsIdx >= 0 ? argv[specsIdx + 1] : 'docs/specs',\n    skillsDirs,\n    baselinePath:\n      baselineIdx >= 0\n        ? argv[baselineIdx + 1]\n        : DEFAULT_BASELINE_PATH,\n    writeBaseline: argv.includes('--write-baseline'),\n  };"
+    },
+    "flatScan": {
+      "file": "scripts/check-decision-citation-drift.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "startLine": 264,
+      "endLine": 311,
+      "text": "  walk(dir);\n  return results;\n}\n\nfunction loadSourceFiles(\n  backlogPath,\n  specsDir,\n  skillsDirs,\n  cwd,\n) {\n  const sources = [];\n  if (fs.existsSync(backlogPath)) {\n    sources.push({\n      file: path.relative(cwd, backlogPath).replaceAll('\\\\', '/'),\n      lines: fs\n        .readFileSync(backlogPath, 'utf8')\n        .split('\\n'),\n    });\n  }\n  if (fs.existsSync(specsDir)) {\n    const specFiles = fs\n      .readdirSync(specsDir)\n      .filter((f) => f.endsWith('.md'));\n    for (const file of specFiles) {\n      const fullPath = path.join(specsDir, file);\n      sources.push({\n        file: path.relative(cwd, fullPath).replaceAll('\\\\', '/'),\n        lines: fs\n          .readFileSync(fullPath, 'utf8')\n          .split('\\n'),\n      });\n    }\n  }\n  for (const dir of skillsDirs) {\n    for (const full of collectMarkdownFiles(dir)) {\n      sources.push({\n        file: path.relative(cwd, full).replaceAll('\\\\', '/'),\n        lines: fs.readFileSync(full, 'utf8').split('\\n'),\n      });\n    }\n  }\n  return sources;\n}\n\n// `.agents/skills` (tsk-12v): the canonical dev-skill source, not reached\n// by any other root before this. `.claude/skills` needs no entry of its\n// own -- its generated wrapper is byte-derived from `.agents/skills` and\n// never carries independent citation text (confirmed by direct read)."
+    },
+    "recursiveAndWideRoots": {
+      "file": "scripts/check-decision-citation-drift.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "startLine": 305,
+      "endLine": 369,
+      "text": "  return sources;\n}\n\n// `.agents/skills` (tsk-12v): the canonical dev-skill source, not reached\n// by any other root before this. `.claude/skills` needs no entry of its\n// own -- its generated wrapper is byte-derived from `.agents/skills` and\n// never carries independent citation text (confirmed by direct read).\n// `plugins/fgOS/skills` stays in the roots too (it is NOT purely\n// redundant: ~35 launcher/orchestrator skills there -- deliver/submit/pick/\n// etc. -- have no `.agents/skills` counterpart at all). Its ~15 dev-skill\n// files ARE byte-identical mirrors of `.agents/skills` (CI-enforced,\n// `test/skills/fgos-mirror.test.mjs`), so a stale citation living in one\n// of those gets reported once per root -- a known, accepted duplicate\n// (never a missed detection, since the mirror's own byte-identity is\n// test-enforced) rather than added cross-root exclusion complexity for a\n// cosmetic double-count.\nconst WIDE_SWEEP_ROOTS = ['docs', 'src', 'plugins', 'core/skills', 'domains', '.agents/skills'];\nconst WIDE_SWEEP_EXTENSIONS = new Set(['.md', '.mjs', '.js']);\nconst WIDE_SWEEP_SKIP_DIR_NAMES = new Set(['node_modules', '.git']);\n\nfunction escapeRegExp(str) {\n  return str.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n}\n\n/**\n * Recursively collect `{file, lines}` for every markdown/JS source file\n * under `roots` (repo-root-relative), for the write-time citation sweep\n * `fgos decision --relation supersedes:<id>|touches:<id>` runs (D2/D8's\n * \"sweep docs/**+src/**+plugins/**\", not just docs/backlog.md+docs/specs/\n * *.md like this file's own CLI mode above). `excludeRelDirs` additionally\n * skips any file whose repo-relative path starts with one of the given\n * prefixes — the \"feature's own docs/history dir\" self-citation carve-out\n * (round 3 DISCUSSION: a feature citing its own in-flight D-IDs in its own\n * history folder is not stale framing).\n */\nexport function collectWideSourceFiles(cwd, { roots = WIDE_SWEEP_ROOTS, excludeRelDirs = [] } = {}) {\n  const isExcluded = (relPath) =>\n    excludeRelDirs.some((prefix) => relPath === prefix || relPath.startsWith(`${prefix}/`));\n  const sources = [];\n\n  for (const root of roots) {\n    const absRoot = path.join(cwd, root);\n    if (!fs.existsSync(absRoot)) continue;\n    const stack = [absRoot];\n    while (stack.length) {\n      const current = stack.pop();\n      for (const entry of fs.readdirSync(current, { withFileTypes: true })) {\n        const abs = path.join(current, entry.name);\n        const rel = path.relative(cwd, abs).replaceAll('\\\\', '/');\n        if (entry.isDirectory()) {\n          if (WIDE_SWEEP_SKIP_DIR_NAMES.has(entry.name) || isExcluded(rel)) continue;\n          stack.push(abs);\n          continue;\n        }\n        if (!entry.isFile()) continue;\n        if (!WIDE_SWEEP_EXTENSIONS.has(path.extname(entry.name))) continue;\n        if (isExcluded(rel)) continue;\n        sources.push({ file: rel, lines: fs.readFileSync(abs, 'utf8').split('\\n') });\n      }\n    }\n  }\n  return sources;\n}\n\n/**"
+    },
+    "sourceExample": {
+      "file": "core/skills/_shared/citation-format.md",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "startLine": 90,
+      "endLine": 103,
+      "text": "`scripts/check-decision-citation-drift.mjs` (this fragment's own\ncompanion tool, see\n`docs/history/self-contained-id-references/CONTEXT.md` for the full\ndesign record) detects two finding kinds relevant to this rule —\n`bare-citation` (an `ADR`/`RUL` id with no qualifying gloss) and\n`d-local-outside-home` (a `D<n>` id in any file that is not its own\n`CONTEXT.md`) — across `docs/backlog.md`, `docs/specs/*.md`, and any\n`--skills-dir` root given to it. It ratchets against a checked-in\nbaseline (`scripts/check-decision-citation-drift.baseline.json`): a\ncitation already known at the time the baseline was generated stays\nvisible in the tool's own output but does not fail `npm test`; a\ngenuinely new one does. `--write-baseline` regenerates the snapshot —\nrun it after a cleanup batch to shrink the baseline, never by\nhand-editing the JSON."
+    },
+    "findingSemantics": "Keep dead-framing, bare-citation, d-local-outside-home, per-occurrence baseline consumption, dangling-citation wide scan and exit codes. CLI flat scan and write-time wide scan are separate modes.",
+    "packetMembers": [
+      "scripts/check-decision-citation-drift.mjs",
+      "scripts/check-decision-citation-drift.baseline.json",
+      "core/skills/_shared/citation-format.md",
+      ".agents/skills/_shared/citation-format.md",
+      "plugins/fgOS/skills/_shared/citation-format.md",
+      "test/scripts/check-decision-citation-drift.test.mjs",
+      "scripts/check-legacy-docs-ratchet.mjs",
+      "scripts/check-legacy-docs-ratchet.baseline.json",
+      "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "test/scripts/check-legacy-docs-ratchet.test.mjs"
+    ],
+    "missing": "Candidate scan membership/finding parity and false-negative cases after root deletion."
+  },
+  "ratchet": {
+    "frozenDefaultAndClassifier": {
+      "file": "scripts/check-legacy-docs-ratchet.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "startLine": 20,
+      "endLine": 24,
+      "text": "export const DEFAULT_ROOTS = ['docs/specs', 'docs/architect'];\nexport const DEFAULT_BASELINE_PATH = 'scripts/check-legacy-docs-ratchet.baseline.json';\nexport const DEFAULT_EXCEPTIONS_PATH = 'scripts/check-legacy-docs-ratchet.exceptions.json';\n\nexport const MAINTAINED_PROSE_CLASSES = new Set(["
+    },
+    "retirement": "Decision F Phase9 obligation, explicit park and no patch. No rebaseline, new exception kind or checker change to absorb output.",
+    "historicalExceptionsRecord": "Exception census reference docs/backlog.md at L497 was removed before HEAD; entire exceptions record stays at census commit 42edba2b08d26ab8dcabe4859a301e1589fa8e6b. It is not rebound to an unrelated repeated string. HEAD drift is Step7 custody."
+  },
+  "task0GovernanceCounterEvidence": {
+    "file": "test/scripts/check-doc-candidate-status.test.mjs",
+    "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+    "startLine": 159,
+    "endLine": 164,
+    "text": "    const { findings } = checkCandidateMetadata({ files: ['docs/platform/zzz/qq/ww/ee.md'], readFile: (f) => fs.readFileSync(path.join(root, f), 'utf8'), switchboard: board, constitution, repoRoot: root });\n    assert.deepEqual(findings.map((f) => f.type), ['unplaced-document']);\n  } finally { fs.rmSync(root, { recursive: true, force: true }); }\n  const doubled = { areas: [{ area: 'A', authorityStatus: 'candidate', scopedRoutes: [{ route: 'docs/platform/a/README.md', authorityStatus: 'candidate' }] }, { area: 'B', authorityStatus: 'promoted', scopedRoutes: [{ route: 'docs/platform/a/README.md', authorityStatus: 'promoted' }] }], rootDocuments: [] };\n  const conflicted = checkCandidateMetadata({ files: ['docs/platform/a/README.md'], readFile: () => '', switchboard: doubled, constitution, repoRoot: REPO_ROOT });\n  assert.ok(conflicted.findings.some((f) => f.type === 'switchboard-route-conflict'));"
+  },
+  "actualTests": "Current two checker suites only. UI commands identified but not run; candidate roots and output sets remain missing.",
+  "task0GovernanceReaderChain": {
+    "testL94": "Direct governanceBaselineFields(REPO_ROOT) call.",
+    "testL163": "checkCandidateMetadata receives repoRoot: REPO_ROOT even with readFile stubbed; it calls governanceBaselineFields(repoRoot) unconditionally at scripts/check-doc-candidate-status.mjs L96.",
+    "readOwner": "scripts/check-doc-constitution.mjs governanceBaselineFields reads docs/doc-governance.md at L221. Both test calls must be reader slots in that same R26 unit; scalar repoRoot property tuple stays a rejection."
+  }
+}

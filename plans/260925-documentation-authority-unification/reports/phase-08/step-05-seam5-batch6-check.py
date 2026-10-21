@@ -52,10 +52,12 @@ def check():
  test('j6-review-delta','R24 changed/add split',review_delta)
  def explicit():
   for id in ['reference-004363','reference-004391','reference-004382','reference-004392','reference-004362','reference-004364']:assert ids[id][1]['admission']=='ADMIT' and ids[id][1]['disposition']=='preserve'
-  for id in ['dynamic-021547','dynamic-021548','dynamic-021549','reference-004308','reference-004343','dynamic-021550','dynamic-021551','reference-004332']:assert ids[id][1]['disposition']=='parked'
+  for id in ['dynamic-021547','dynamic-021548','dynamic-021549','reference-004308','reference-004343','reference-004332']:assert ids[id][1]['disposition']=='parked'
+  for id in ['dynamic-021550','dynamic-021551']:
+   e=ids[id][1];assert e['admission']=='REJECT' and e['disposition']=='preserve' and e['nonDocumentUse']=='caller-data-formatting'
   for id in ['reference-004421','reference-004460','reference-004241','reference-003965','dynamic-018740','dynamic-018744']:assert ids[id][1]['admission']=='ADMIT' and ids[id][1]['disposition']=='patch'
   assert ids['author-s5-b6-loop-split-786'][1]['resolverWitness']['treeRetires']
-  for id in ['reference-004312','reference-004321','reference-004346','reference-004372']:assert ids[id][1]['disposition']==('patch' if id=='reference-004312' else 'preserve') and ids[id][1]['coCutDependency']['itemIds']
+  for id in ['reference-004312','reference-004321','reference-004346','reference-004372']:assert ids[id][1]['disposition']==('patch' if id=='reference-004312' else 'parked' if id in ['reference-004321','reference-004346'] else 'preserve') and ids[id][1]['coCutDependency']['itemIds']
   assert '0026--native-first' in ids['reference-004381'][1]['successorNote']
   return True
  test('j6-review-closure','all explicit Lead outcomes',explicit)

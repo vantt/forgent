@@ -4,7 +4,7 @@ independent expressions (e.g. a role label and currentPath) are not one operand.
 """
 import re,collections,json,pathlib,importlib.util,itertools,functools,subprocess
 P=pathlib.Path(__file__).resolve().parent;ROOT=P.parents[3]
-CATEGORIES={'root-only','scalar-pass-through','state-event-store','non-document-fs-probe','clone-directory','cargo-output-directory','accumulator','guard','text-label-join','table-row-serialization','finding-path-field','caller-data-formatting','comment-or-type','config-or-metadata','generated-data-text','plans-report-artifact'}
+CATEGORIES={'non-census-document-read','root-only','scalar-pass-through','state-event-store','non-document-fs-probe','clone-directory','cargo-output-directory','accumulator','guard','text-label-join','table-row-serialization','finding-path-field','caller-data-formatting','comment-or-type','config-or-metadata','generated-data-text','plans-report-artifact'}
 RULES={'a-passage-agreement':'All pairs of overlapping operation intervals on the same line/passage agree in admission and effective disposition; independent adjacent expressions have distinct source intervals.','b-real-blocker':'No listed boilerplate or verbatim blocker shared by parks in different files; every park names the missing input/obligation for its own file.','c-render-owner':'Every generated source-copy reference/tuple derives its disposition from the exact source owner; a park cites an actually parked source owner.','d-own-operand':'Each admitted dynamic tuple has its exact document-yielding sub-expression pathOperand in its pinned passage; every rejection names a closed R5 nonDocumentUse category.','e-retired-successor':'Preserved retired decision citations carry a live successorNote with a real heading anchor.'}
 def idof(e):return e.get('referenceId',e.get('id'))
 def allitems(r):return r['references']+r['dynamicTraces']+r.get('authorAddedReferences',[])
@@ -155,6 +155,14 @@ def check(rs,context=None):
      return True
     test('c-render-owner',loc,render)
    if plans_only(r,e):test('r11-plans-boundary',loc,lambda e=e:e['admission']=='REJECT' and e.get('nonDocumentUse')=='plans-report-artifact')
+   if e.get('nonDocumentUse')=='non-census-document-read':
+    def noncensus(e=e):
+     path=e['realReadPath'];assert not path.startswith('docs/') and path in source_at(r['authorInputCommit'],f)
+     move=json.loads((P/'step-05-cutover-move-set.json').read_text());assert all(x['oldPath'].startswith('docs/') for x in move['paths'])
+     assert source_at(r['authorInputCommit'],path) and e['disposition']=='preserve' and e['admission']=='REJECT'
+     w=e['owningAssertion'];assert source_at(r['authorInputCommit'],f).splitlines()[w['line']-1]==w['text']
+     return True
+    test('r27-noncensus-document-read',loc,noncensus)
    if 'originalTuple' in e:
     def operand(e=e):
      if e['admission']=='REJECT':return e.get('nonDocumentUse') in CATEGORIES and not e.get('pathOperand')

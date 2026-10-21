@@ -1,0 +1,50 @@
+{
+  "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/check-decision-citation-drift.test.mjs test/scripts/check-legacy-docs-ratchet.test.mjs",
+  "status": "pass",
+  "exit": 0,
+  "tests": 59,
+  "pass": 59,
+  "fail": 0,
+  "skip": 0,
+  "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+  "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-current-tests.log",
+  "logSha256": "438cefbfe9617510f5fc55ee006f18ab96f11cb3a9a221fa493be8b30627fe3e",
+  "actualInputs": [
+    {
+      "path": "scripts/check-decision-citation-drift.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137"
+    },
+    {
+      "path": "scripts/check-decision-citation-drift.baseline.json",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "3d765b091e2e3c620f557dd162ea7c4c6fed207ec33a2795b22c8a8b60298750"
+    },
+    {
+      "path": "test/scripts/check-decision-citation-drift.test.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "c1255ef2d4640f712fa8b973104f29f25cd3814cda6dcbbac7aeea6995a48af0"
+    },
+    {
+      "path": "test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "409fe1ecbbab6488deb7e4c8fc3be57f21957a5f836917a7156dfc0f7d85c644"
+    }
+  ],
+  "scope": "Existing two owning test suites at current HEAD, including synthetic fixtures and live baseline checks. Historical census exceptions record remains independently pinned; this is not same-input candidate-root parity."
+}

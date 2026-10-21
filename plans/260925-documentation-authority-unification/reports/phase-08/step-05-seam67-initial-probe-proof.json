@@ -1,0 +1,74 @@
+{
+  "ok": false,
+  "proofs": [
+    {
+      "label": "full-check",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+        "--output",
+        "step-05-seam67-full-check.json"
+      ],
+      "startedAtNs": 1792558955592870051,
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+      "sourceSha256": "df0ac02d9156ecc7caa7b2da5b2843cad7d7870885ecfed1b2db607da0ae0486",
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-full-check.log",
+      "logSha256": "5801b264e375dc04bbb8406f207592c411bc22e09c195bf9a6529b91382b66d7",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-full-check.json",
+      "resultSha256": "6ec4522b7e29e068ce7ffa76fa3b0001f559f7aa95fe0ac107c7d7b62338c070",
+      "counts": {
+        "failureCount": 0,
+        "files": 1030,
+        "literalReferences": 4935,
+        "dynamicTuples": 31510
+      },
+      "ok": true
+    },
+    {
+      "label": "pilot",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py"
+      ],
+      "startedAtNs": 1792559252401191291,
+      "exit": 1,
+      "resultFresh": false,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
+      "sourceSha256": "a59d36f661d03d96cc8d168ec8dd316b79161904145d04d3e8a50e0b63df7cf5",
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-pilot.log",
+      "logSha256": "6e8171974d6be698f490e24ca8096a6335fd2dba35984ebee359a50ed3743290",
+      "resultPath": null,
+      "resultSha256": null,
+      "counts": {},
+      "ok": false
+    }
+  ],
+  "negativeProbesPassed": 0,
+  "negativeProbesTotal": 0,
+  "failures": [
+    {
+      "label": "pilot",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py"
+      ],
+      "startedAtNs": 1792559252401191291,
+      "exit": 1,
+      "resultFresh": false,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
+      "sourceSha256": "a59d36f661d03d96cc8d168ec8dd316b79161904145d04d3e8a50e0b63df7cf5",
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-pilot.log",
+      "logSha256": "6e8171974d6be698f490e24ca8096a6335fd2dba35984ebee359a50ed3743290",
+      "resultPath": null,
+      "resultSha256": null,
+      "counts": {},
+      "ok": false
+    }
+  ],
+  "scope": "Author structural verification and mutations only; independent semantic review and Phase9 parity remain pending."
+}

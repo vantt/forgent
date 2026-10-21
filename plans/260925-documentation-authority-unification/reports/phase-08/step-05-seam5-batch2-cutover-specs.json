@@ -1179,7 +1179,89 @@
             }
           ]
         }
-      ]
+      ],
+      "r22Replay": {
+        "file": "test/docs/decisions-corpus-retired.test.mjs",
+        "specFile": "step-05-seam5-batch2-cutover-specs.json",
+        "status": "pass",
+        "command": "env -u CLAUDE_CODE_SESSION_ID PYTHONDONTWRITEBYTECODE=1 python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-replay-tests.py",
+        "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-decisions-replay.log",
+        "logSha256": "4770b5153d20e0464697802c846ec34c7e9415e115df794d1d6295b98e011f75",
+        "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "equalOutcomes": true,
+        "sides": [
+          {
+            "side": "current",
+            "exit": 0,
+            "outcomes": [
+              "✔ docs/decisions/ contains no hand-authored NNNN-slug.md ADR files",
+              "✔ docs/decisions/0000-index.md (the old hand-written index) no longer exists",
+              "✔ docs/decisions/ still exists as a directory (D5: \"docs/decisions/ giữ lại là thư mục\")",
+              "✔ every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/architecture-map.md \"Lịch sử quyết định\" section",
+              "✔ the real 0032 numbering collision migrated as two distinct sections (both topics preserved, neither silently dropped)",
+              "✔ each target spec file carries the \"Lịch sử quyết định retired\" section heading exactly once",
+              "✔ AGENTS.md no longer cites a deleted docs/decisions/NNNN-*.md path for the product priority order",
+              "✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line",
+              "✔ docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line",
+              "✔ the RUL11 line matches the locked law text word-for-word",
+              "✔ the RUL11 decision narrative (D-ADR0036) is present in the \"Lịch sử quyết định\" section",
+              "✔ AGENTS.md carries the decision-question template law and points at its shared fragment",
+              "ℹ tests 12",
+              "ℹ pass 12",
+              "ℹ fail 0",
+              "ℹ cancelled 0",
+              "ℹ skipped 0",
+              "ℹ todo 0"
+            ],
+            "rawSha256": "42452c77f358cfc55eede1f5f73b46f381c0f232ebc70ff21f820d32f6d7e2b4"
+          },
+          {
+            "side": "candidate",
+            "exit": 0,
+            "outcomes": [
+              "✔ docs/decisions/ contains no hand-authored NNNN-slug.md ADR files",
+              "✔ docs/decisions/0000-index.md (the old hand-written index) no longer exists",
+              "✔ docs/decisions/ still exists as a directory (D5: \"docs/decisions/ giữ lại là thư mục\")",
+              "✔ every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/architecture-map.md \"Lịch sử quyết định\" section",
+              "✔ the real 0032 numbering collision migrated as two distinct sections (both topics preserved, neither silently dropped)",
+              "✔ each target spec file carries the \"Lịch sử quyết định retired\" section heading exactly once",
+              "✔ AGENTS.md no longer cites a deleted docs/decisions/NNNN-*.md path for the product priority order",
+              "✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line",
+              "✔ docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line",
+              "✔ the RUL11 line matches the locked law text word-for-word",
+              "✔ the RUL11 decision narrative (D-ADR0036) is present in the \"Lịch sử quyết định\" section",
+              "✔ AGENTS.md carries the decision-question template law and points at its shared fragment",
+              "ℹ tests 12",
+              "ℹ pass 12",
+              "ℹ fail 0",
+              "ℹ cancelled 0",
+              "ℹ skipped 0",
+              "ℹ todo 0"
+            ],
+            "rawSha256": "d8bd766b1692fbefe39709ace46c464421ec828f9b26bdf508ccc2fb1d68baaa"
+          }
+        ],
+        "scope": "Exact pinned current/candidate source-only substitutions with all parked legacy reader inputs retained. No post-retirement proof.",
+        "sourceSha256": "fd8b2e38773f33f71a6507876a7f5d2cc4bd1b61f9bbd8a4246e7f56a29b18b2",
+        "expectedAfterSha256": "cb78a7ab492eeb7e08262a81ad0ede7d683a141db2d7677f048a1471a67e191b",
+        "coCutPaths": [
+          "CHANGELOG.md",
+          "test/docs/decisions-corpus-retired.test.mjs",
+          "test/docs/rul11-anchor-phrase.test.mjs",
+          "test/fixtures/run-outcome/legacy-derivation.json",
+          "test/fixtures/run-result/real-shapes/09-v2-failed-needs-input-provider.json",
+          "test/fixtures/run-result/real-shapes/10-v2-failed-refuse-provider.json",
+          "test/fixtures/usage/pi-multiturn-normal.jsonl",
+          "test/scripts/check-doc-conservation.test.mjs",
+          "test/scripts/check-doc-constitution.test.mjs",
+          "test/scripts/check-doc-retirement.test.mjs",
+          "test/scripts/check-legacy-docs-ratchet.test.mjs",
+          "test/scripts/doc-alias-resolver.test.mjs",
+          "test/scripts/generate-doc-inventory.test.mjs",
+          "test/scripts/generate-shipped-path-inventory.test.mjs",
+          "test/scripts/verify-phase-02.test.mjs"
+        ]
+      }
     }
   ]
 }

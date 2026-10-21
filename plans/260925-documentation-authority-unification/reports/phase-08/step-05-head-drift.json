@@ -1,6 +1,6 @@
 {
   "kind": "Non-failing HEAD drift for Step 7 assembly; records remain at their own pins",
-  "headCommit": "d13c04251f361fe1926ba01e74fef7536e94c206",
+  "headCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
   "entries": [
     {
       "file": ".githooks/pre-commit",
@@ -74685,6 +74685,599 @@
       "movedSpans": [],
       "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
       "failing": false
+    },
+    {
+      "file": "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+      "pinnedHash": "bdc1313127994004a1ce85a0cf8d055e8b55e288e49859cc52b6719504a44703",
+      "headHash": "3d765b091e2e3c620f557dd162ea7c4c6fed207ec33a2795b22c8a8b60298750",
+      "dependency": "Step7 final-pin assembly; historical original occurrence identities remain at their own pin",
+      "failing": false,
+      "originalReferences": [
+        {
+          "id": "reference-003489",
+          "sourceSpans": [
+            {
+              "line": 257,
+              "columnStart": 16,
+              "columnEndExclusive": 104,
+              "text": "docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003490",
+          "sourceSpans": [
+            {
+              "line": 14,
+              "columnStart": 89,
+              "columnEndExclusive": 108,
+              "text": "docs/reading-map.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003491",
+          "sourceSpans": [
+            {
+              "line": 300,
+              "columnStart": 91,
+              "columnEndExclusive": 110,
+              "text": "docs/reading-map.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003492",
+          "sourceSpans": [
+            {
+              "line": 522,
+              "columnStart": 120,
+              "columnEndExclusive": 130,
+              "text": "docs/specs"
+            }
+          ]
+        },
+        {
+          "id": "reference-003493",
+          "sourceSpans": [
+            {
+              "line": 461,
+              "columnStart": 133,
+              "columnEndExclusive": 143,
+              "text": "docs/specs"
+            }
+          ]
+        },
+        {
+          "id": "reference-003494",
+          "sourceSpans": [
+            {
+              "line": 522,
+              "columnStart": 135,
+              "columnEndExclusive": 149,
+              "text": "docs/architect"
+            }
+          ]
+        },
+        {
+          "id": "reference-003495",
+          "sourceSpans": [
+            {
+              "line": 461,
+              "columnStart": 148,
+              "columnEndExclusive": 162,
+              "text": "docs/architect"
+            }
+          ]
+        },
+        {
+          "id": "reference-003496",
+          "sourceSpans": [
+            {
+              "line": 497,
+              "columnStart": 20,
+              "columnEndExclusive": 35,
+              "text": "docs/backlog.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003497",
+          "sourceSpans": [
+            {
+              "line": 97,
+              "columnStart": 16,
+              "columnEndExclusive": 36,
+              "text": "docs/specs/runner.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003498",
+          "sourceSpans": [
+            {
+              "line": 227,
+              "columnStart": 16,
+              "columnEndExclusive": 37,
+              "text": "docs/specs/observe.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003499",
+          "sourceSpans": [
+            {
+              "line": 359,
+              "columnStart": 18,
+              "columnEndExclusive": 37,
+              "text": "docs/io-contract.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003500",
+          "sourceSpans": [
+            {
+              "line": 277,
+              "columnStart": 16,
+              "columnEndExclusive": 38,
+              "text": "docs/specs/workflow.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003501",
+          "sourceSpans": [
+            {
+              "line": 304,
+              "columnStart": 18,
+              "columnEndExclusive": 38,
+              "text": "docs/specs/runner.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003502",
+          "sourceSpans": [
+            {
+              "line": 247,
+              "columnStart": 16,
+              "columnEndExclusive": 40,
+              "text": "docs/specs/work-state.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003503",
+          "sourceSpans": [
+            {
+              "line": 326,
+              "columnStart": 18,
+              "columnEndExclusive": 40,
+              "text": "docs/specs/workflow.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003504",
+          "sourceSpans": [
+            {
+              "line": 475,
+              "columnStart": 20,
+              "columnEndExclusive": 40,
+              "text": "docs/specs/runner.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003505",
+          "sourceSpans": [
+            {
+              "line": 177,
+              "columnStart": 16,
+              "columnEndExclusive": 41,
+              "text": "docs/architect/roadmap.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003506",
+          "sourceSpans": [
+            {
+              "line": 7,
+              "columnStart": 16,
+              "columnEndExclusive": 41,
+              "text": "docs/specs/reading-map.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003507",
+          "sourceSpans": [
+            {
+              "line": 348,
+              "columnStart": 18,
+              "columnEndExclusive": 41,
+              "text": "docs/decisions/index.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003508",
+          "sourceSpans": [
+            {
+              "line": 525,
+              "columnStart": 22,
+              "columnEndExclusive": 41,
+              "text": "docs/io-contract.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003509",
+          "sourceSpans": [
+            {
+              "line": 87,
+              "columnStart": 16,
+              "columnEndExclusive": 42,
+              "text": "docs/specs/distribution.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003510",
+          "sourceSpans": [
+            {
+              "line": 558,
+              "columnStart": 22,
+              "columnEndExclusive": 42,
+              "text": "docs/specs/runner.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003511",
+          "sourceSpans": [
+            {
+              "line": 293,
+              "columnStart": 18,
+              "columnEndExclusive": 43,
+              "text": "docs/specs/reading-map.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003512",
+          "sourceSpans": [
+            {
+              "line": 237,
+              "columnStart": 16,
+              "columnEndExclusive": 45,
+              "text": "docs/specs/system-overview.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003513",
+          "sourceSpans": [
+            {
+              "line": 464,
+              "columnStart": 20,
+              "columnEndExclusive": 46,
+              "text": "docs/specs/distribution.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003514",
+          "sourceSpans": [
+            {
+              "line": 315,
+              "columnStart": 18,
+              "columnEndExclusive": 47,
+              "text": "docs/specs/system-overview.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003515",
+          "sourceSpans": [
+            {
+              "line": 547,
+              "columnStart": 22,
+              "columnEndExclusive": 48,
+              "text": "docs/specs/distribution.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003516",
+          "sourceSpans": [
+            {
+              "line": 217,
+              "columnStart": 16,
+              "columnEndExclusive": 49,
+              "text": "docs/specs/herdr-web-dashboard.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003517",
+          "sourceSpans": [
+            {
+              "line": 337,
+              "columnStart": 18,
+              "columnEndExclusive": 49,
+              "text": "docs/architecture-manifest.json"
+            }
+          ]
+        },
+        {
+          "id": "reference-003518",
+          "sourceSpans": [
+            {
+              "line": 207,
+              "columnStart": 16,
+              "columnEndExclusive": 51,
+              "text": "docs/specs/confinement-authority.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003519",
+          "sourceSpans": [
+            {
+              "line": 486,
+              "columnStart": 20,
+              "columnEndExclusive": 51,
+              "text": "docs/architecture-manifest.json"
+            }
+          ]
+        },
+        {
+          "id": "reference-003520",
+          "sourceSpans": [
+            {
+              "line": 536,
+              "columnStart": 22,
+              "columnEndExclusive": 53,
+              "text": "docs/architecture-manifest.json"
+            }
+          ]
+        },
+        {
+          "id": "reference-003521",
+          "sourceSpans": [
+            {
+              "line": 157,
+              "columnStart": 16,
+              "columnEndExclusive": 54,
+              "text": "docs/architect/domainization/README.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003522",
+          "sourceSpans": [
+            {
+              "line": 573,
+              "columnStart": 20,
+              "columnEndExclusive": 54,
+              "text": "docs/specs/platform-foundations.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003523",
+          "sourceSpans": [
+            {
+              "line": 197,
+              "columnStart": 16,
+              "columnEndExclusive": 58,
+              "text": "docs/architect/workspace-topology-audit.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003524",
+          "sourceSpans": [
+            {
+              "line": 107,
+              "columnStart": 16,
+              "columnEndExclusive": 59,
+              "text": "docs/architect/agent-coordination/README.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003525",
+          "sourceSpans": [
+            {
+              "line": 137,
+              "columnStart": 16,
+              "columnEndExclusive": 59,
+              "text": "docs/architect/component-boundary/README.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003526",
+          "sourceSpans": [
+            {
+              "line": 187,
+              "columnStart": 16,
+              "columnEndExclusive": 68,
+              "text": "docs/architect/system-vision-trong-mem-ngoai-cung.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003527",
+          "sourceSpans": [
+            {
+              "line": 117,
+              "columnStart": 16,
+              "columnEndExclusive": 69,
+              "text": "docs/architect/agent-coordination/contracts/README.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003528",
+          "sourceSpans": [
+            {
+              "line": 147,
+              "columnStart": 16,
+              "columnEndExclusive": 71,
+              "text": "docs/architect/component-boundary/repo-layout-vision.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003529",
+          "sourceSpans": [
+            {
+              "line": 167,
+              "columnStart": 16,
+              "columnEndExclusive": 76,
+              "text": "docs/architect/proposals/component-authority-boundary-map.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003530",
+          "sourceSpans": [
+            {
+              "line": 57,
+              "columnStart": 16,
+              "columnEndExclusive": 78,
+              "text": "docs/architect/agent-coordination/contracts/flow-definition.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003531",
+          "sourceSpans": [
+            {
+              "line": 77,
+              "columnStart": 16,
+              "columnEndExclusive": 80,
+              "text": "docs/architect/component-boundary/component-boundary-advisory.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003532",
+          "sourceSpans": [
+            {
+              "line": 47,
+              "columnStart": 16,
+              "columnEndExclusive": 83,
+              "text": "docs/architect/agent-coordination/contracts/coordination-session.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003533",
+          "sourceSpans": [
+            {
+              "line": 279,
+              "columnStart": 828,
+              "columnEndExclusive": 841,
+              "text": "docs/specs/**"
+            }
+          ]
+        },
+        {
+          "id": "reference-003534",
+          "sourceSpans": [
+            {
+              "line": 328,
+              "columnStart": 830,
+              "columnEndExclusive": 843,
+              "text": "docs/specs/**"
+            }
+          ]
+        },
+        {
+          "id": "reference-003535",
+          "sourceSpans": [
+            {
+              "line": 17,
+              "columnStart": 16,
+              "columnEndExclusive": 88,
+              "text": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003536",
+          "sourceSpans": [
+            {
+              "line": 267,
+              "columnStart": 16,
+              "columnEndExclusive": 88,
+              "text": "docs/architect/packaging-distribution/runtime-identity-and-activation.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003537",
+          "sourceSpans": [
+            {
+              "line": 37,
+              "columnStart": 16,
+              "columnEndExclusive": 89,
+              "text": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003538",
+          "sourceSpans": [
+            {
+              "line": 67,
+              "columnStart": 16,
+              "columnEndExclusive": 89,
+              "text": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003539",
+          "sourceSpans": [
+            {
+              "line": 508,
+              "columnStart": 20,
+              "columnEndExclusive": 89,
+              "text": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003540",
+          "sourceSpans": [
+            {
+              "line": 127,
+              "columnStart": 16,
+              "columnEndExclusive": 94,
+              "text": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+            }
+          ]
+        },
+        {
+          "id": "reference-003541",
+          "sourceSpans": [
+            {
+              "line": 27,
+              "columnStart": 16,
+              "columnEndExclusive": 96,
+              "text": "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

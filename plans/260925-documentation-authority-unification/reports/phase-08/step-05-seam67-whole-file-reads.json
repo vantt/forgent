@@ -1,0 +1,323 @@
+{
+  "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+  "files": [
+    {
+      "path": ".agents/skills/_shared/citation-format.md",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+      "bytes": 4712,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.agents/skills/_shared/citation-format.md",
+      "lines": 104
+    },
+    {
+      "path": "core/skills/_shared/citation-format.md",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+      "bytes": 4536,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:core/skills/_shared/citation-format.md",
+      "lines": 103
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/citation-format.md",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+      "bytes": 4712,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:plugins/fgOS/skills/_shared/citation-format.md",
+      "lines": 104
+    },
+    {
+      "path": "scripts/check-decision-citation-drift.baseline.json",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+      "bytes": 30603,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:scripts/check-decision-citation-drift.baseline.json",
+      "lines": 290
+    },
+    {
+      "path": "scripts/check-decision-citation-drift.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+      "bytes": 17362,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:scripts/check-decision-citation-drift.mjs",
+      "lines": 515
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8",
+      "bytes": 303970,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:scripts/check-legacy-docs-ratchet.baseline.json",
+      "lines": 5984
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "3d765b091e2e3c620f557dd162ea7c4c6fed207ec33a2795b22c8a8b60298750",
+      "bytes": 78762,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:scripts/check-legacy-docs-ratchet.exceptions.json",
+      "lines": 585
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
+      "bytes": 27378,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:scripts/check-legacy-docs-ratchet.mjs",
+      "lines": 745
+    },
+    {
+      "path": "test/scripts/check-decision-citation-drift.test.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "c1255ef2d4640f712fa8b973104f29f25cd3814cda6dcbbac7aeea6995a48af0",
+      "bytes": 19431,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:test/scripts/check-decision-citation-drift.test.mjs",
+      "lines": 779
+    },
+    {
+      "path": "test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "409fe1ecbbab6488deb7e4c8fc3be57f21957a5f836917a7156dfc0f7d85c644",
+      "bytes": 46240,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "lines": 1209
+    },
+    {
+      "path": ".claude/skills/ui-spec/templates/spec.config.yaml",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "1c033c98f1fa8098264e2f7b7f5773232e2a1cc1c363774ab763d672cd919886",
+      "bytes": 910,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/templates/spec.config.yaml",
+      "lines": 29
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "a68cfd1d507c0d8eb106488df3c060f6b9b1b26a4e3b269aefbd6b94267d0003",
+      "bytes": 4061,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/build.mjs",
+      "lines": 107
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "b0d0321a9cecd2583a2c74c540d13d9bc25a49ce63c4fecd8de5b56caef7571d",
+      "bytes": 2261,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/config.mjs",
+      "lines": 63
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/extract.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "7b4d776b9890c720852a7353a4a2ccd01b1aee644a70622cb1759b8226d1868f",
+      "bytes": 4084,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/extract.mjs",
+      "lines": 120
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/interpret-wireframe.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "8c0fa98aa67c8634a415a95dfaa75c9162aeddeb6b1423ab6b2f9e250cfb7a38",
+      "bytes": 3584,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/interpret-wireframe.mjs",
+      "lines": 87
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/interpret.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "c2df4cf371ca7560dd550b4347bf02eada70fdbc08c8dfc53b306453698d7360",
+      "bytes": 35609,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/interpret.mjs",
+      "lines": 771
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/rename.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "2ac5be25f8c9862d71132fd87a95d5cd2642973d1cb5fa19de566dfcfdedd23d",
+      "bytes": 3411,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/rename.mjs",
+      "lines": 78
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/validate.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "3aad75b05175fc29da2855be2f3d5cc70948161e131b53286d4874a9ae9e969b",
+      "bytes": 11359,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/validate.mjs",
+      "lines": 253
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/ascii-normalize.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "e4b826eae06be27e2453542874696829f218910d214d8669879a1dadae25cd9b",
+      "bytes": 6624,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/wireframe/ascii-normalize.mjs",
+      "lines": 143
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/client/app-chrome.js",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "0af66631f1b8b55c567e757494ad2b4e115931d6d6b0b8a1822a249814e2499a",
+      "bytes": 5796,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/wireframe/client/app-chrome.js",
+      "lines": 113
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/client/app.js",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "03a0ffae79c2a6b678d78832f9ddc08ff2beb8161d30481a2680a3c03e28c50b",
+      "bytes": 9403,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/wireframe/client/app.js",
+      "lines": 192
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/client/flow-play.js",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "8a1bd380e42b13d5269826cbbe011fd66737db9a26192bccefd979da9ea688c9",
+      "bytes": 8073,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/wireframe/client/flow-play.js",
+      "lines": 192
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/client/graph-controls.js",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "7e8ecdbfc2dcb4799e69c87bd458986d8fe41bcfb67c911081ecc8f4f4328044",
+      "bytes": 7638,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/wireframe/client/graph-controls.js",
+      "lines": 199
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/client/region-model.js",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "966bb3c3c3404f546b31d366e1a716c579af79d596c82b0697aa0ea750779894",
+      "bytes": 5227,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/wireframe/client/region-model.js",
+      "lines": 149
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/client/render-graph.js",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "5245b1ef104aed5800d9f4a9557ace216b70a95fc217846e4c44b0040ea415bc",
+      "bytes": 7246,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/wireframe/client/render-graph.js",
+      "lines": 116
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/client/render-regionbox.js",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "4e2f412b4ded2164ecd70c3b84585dd37208113e821743388845777375bba2d4",
+      "bytes": 5125,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/wireframe/client/render-regionbox.js",
+      "lines": 123
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/client/render-storyboard.js",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "1a9e07d5af13941cf947f80668c9470f064907a884bb272c558838618d0b6691",
+      "bytes": 3609,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/wireframe/client/render-storyboard.js",
+      "lines": 100
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/extract-prose.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "2c67ed531ab3a2bdfee5cec36c40b966576949210a7a7c3b4770112883a800a7",
+      "bytes": 1962,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/wireframe/extract-prose.mjs",
+      "lines": 57
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/html-shell.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "be786ba9d49df8bce5ec09cf28ee934b71785872166bd16e85cb52fa3a5fcc1b",
+      "bytes": 8196,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/wireframe/html-shell.mjs",
+      "lines": 183
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/styles-phase2.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "c0a1b71da4898e05665c738cf59c80bf33ca735c37d17f34ed173f258c73bdc5",
+      "bytes": 4843,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/wireframe/styles-phase2.mjs",
+      "lines": 76
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/styles.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "ae8a007053200cf3cbd3dc589424949acd15fea7b50515551b8dae9018840eb6",
+      "bytes": 10910,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/wireframe/styles.mjs",
+      "lines": 181
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "4ccfe507ee89995f39dd6aacc368c483a1b97ac9beacd101a7c9e93d2666db78",
+      "bytes": 8671,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:.claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs",
+      "lines": 199
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/spec.config.yaml",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "bytes": 509,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:docs/platform/ui-spec/architecture/spec.config.yaml",
+      "lines": 23
+    },
+    {
+      "path": "docs/ui-spec/generated/wireframe-v2.html",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "77894fdda0966833d6d9ba595745a315db67d64feea7c9e6d5faed34a8d2ce80",
+      "bytes": 631319,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:docs/ui-spec/generated/wireframe-v2.html",
+      "lines": 2570
+    },
+    {
+      "path": "docs/ui-spec/spec.config.yaml",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "sha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "bytes": 509,
+      "mode": "100644",
+      "provenance": "97c9694a4b801d152e0deccfa0c58a11213c781f:docs/ui-spec/spec.config.yaml",
+      "lines": 23
+    }
+  ],
+  "fileCount": 35,
+  "sourceBytes": 1328645,
+  "method": "Complete immutable tracked source blobs only; no .fgos/env/secrets reads; no build/tool execution."
+}

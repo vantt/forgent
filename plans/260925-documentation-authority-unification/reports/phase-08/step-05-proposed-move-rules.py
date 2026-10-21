@@ -25,7 +25,10 @@ def live_holder_joined(r,e):
 def current_hash(r):return sha(json.dumps(r,ensure_ascii=False,separators=(',',':')))
 def before_current(file,current):
  rows=read('step-05-seam5-b6-review-closure.json')['changedRecords'];hit=next((e for e in rows if e['file']==file),None)
- return hit['beforeSha256'] if hit else current
+ if hit:return hit['beforeSha256']
+ newer=read('step-05-seam67-task0-closure.json')['changedRecords'] if (P/'step-05-seam67-task0-closure.json').exists() else []
+ newhit=next((e for e in newer if e['file']==file),None)
+ return newhit['beforeSha256'] if newhit else current
 @functools.lru_cache(None)
 def patch_spec(file):return next((s for s in read('step-05-seam5-b6-review-cutover-specs.json')['patches'] if s['file']==file),None)
 def module(n,f):
@@ -62,6 +65,14 @@ def assert_patch(r,receipt,body):
  return True
 
 def review_delta(ix):
+ if ix.get('reviewClosureRuling')=='L12-85':
+  old=ix['previousReviewDeltas']['L12-83'];assert review_delta(old)
+  changed=read('step-05-seam67-task0-closure.json')['changedRecords']
+  for key,flag in [('dispositionChanged',True),('labelOnly',False)]:
+   expected=[e for e in changed if e['recordFile'].split('/')[-1].startswith('tests-') and e['dispositionChanged']==flag]
+   assert ix['changedThisTurn'][key]==expected
+  assert ix['addedThisTurn']==[] and set(ix['reviewThisTurn'])=={e['file'] for e in ix['changedThisTurn']['dispositionChanged']}
+  return True
  closure=read('step-05-seam5-b6-review-closure.json');changed=closure['changedRecords'];disp={e['file'] for e in changed if e['dispositionChanged'] and e['recordFile'].split('/')[-1].startswith('tests-')};labels={e['file'] for e in changed if not e['dispositionChanged'] and e['recordFile'].split('/')[-1].startswith('tests-')}
  added=read('step-05-seam5-batch7-selection.json')['files']
  assert ix['reviewClosureRuling']=='L12-83' and [e['file'] for e in ix['addedThisTurn']]==added

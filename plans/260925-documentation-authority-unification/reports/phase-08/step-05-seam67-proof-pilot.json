@@ -1,0 +1,23 @@
+{
+  "label": "pilot",
+  "command": [
+    "/usr/bin/python3",
+    "-B",
+    "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py"
+  ],
+  "startedAtNs": 1792562720953036549,
+  "exit": 0,
+  "resultFresh": true,
+  "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
+  "sourceSha256": "a59d36f661d03d96cc8d168ec8dd316b79161904145d04d3e8a50e0b63df7cf5",
+  "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-pilot.log",
+  "logSha256": "ed5a4641a73331a1c84a2cdcfc76a1f7bc1170db25a5ff214213f49b7cd12c57",
+  "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
+  "resultSha256": "b2335caa41137e75baba492b2771e64443c542f728a82798d18d684a54d01500",
+  "counts": {
+    "passed": 44,
+    "total": 44,
+    "baselineFailures": 0
+  },
+  "ok": true
+}

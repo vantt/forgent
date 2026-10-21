@@ -1,0 +1,23 @@
+{
+  "label": "seam67",
+  "command": [
+    "/usr/bin/python3",
+    "-B",
+    "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-probes.py"
+  ],
+  "startedAtNs": 1792565283250147555,
+  "exit": 0,
+  "resultFresh": true,
+  "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-probes.py",
+  "sourceSha256": "f9d236fb7606558049b49a809e2e51795bb68c5cffe07db9cca59d9ab71af2d8",
+  "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-seam67.log",
+  "logSha256": "381a6c459f9842c0d63d71c8e6a7703259bdca6dde4f7c648bad3dc2d72751dc",
+  "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-probes-result.json",
+  "resultSha256": "46aea48b1a344b0b48ba98a82b3e78246212378d3e1f345ee30551dd9148c9d0",
+  "counts": {
+    "passed": 20,
+    "total": 20,
+    "baselineFailures": 0
+  },
+  "ok": true
+}

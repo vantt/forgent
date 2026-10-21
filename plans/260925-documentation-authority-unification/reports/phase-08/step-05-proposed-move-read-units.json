@@ -1,5 +1,5 @@
 {
-  "ruling": "L12-83/R26",
+  "ruling": "L12-85/R26/R27/R28",
   "moveSetPath": "step-05-cutover-move-set.json",
   "moveSetSha256": "3b8f1999d1e2b4b32e5219185ab61493569b8ade135ebebd784ceef5ab2cf5db",
   "units": [
@@ -172,7 +172,7 @@
         "test/setup/skill-wrappers.test.mjs"
       ],
       "readerCount": 0,
-      "status": "no actual reader in authored Step 5; co-changes only"
+      "status": "no actual reader; co-changes only"
     },
     {
       "path": "docs/architecture-manifest.json",
@@ -233,16 +233,29 @@
         },
         {
           "file": "src/setup/instruction-registry.mjs",
-          "id": "dynamic-014002",
+          "id": "dynamic-013986",
           "recordFile": "step-05-records/setup-doctor-roots.jsonl",
-          "line": 610,
-          "role": "instruction-discovery",
+          "line": 480,
+          "role": "emitted-document-path",
           "admission": "ADMIT",
           "disposition": "parked",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
           "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-          "operation": "options.manifestPath",
-          "sourceLine": "      manifestPath: options.manifestPath,"
+          "operation": "manifestPath",
+          "sourceLine": "        `Failed to parse architecture manifest at ${manifestPath}: ${err.message}`,"
+        },
+        {
+          "file": "src/setup/instruction-registry.mjs",
+          "id": "dynamic-013987",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "line": 481,
+          "role": "emitted-document-path",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+          "operation": "manifestPath",
+          "sourceLine": "        { filePath: manifestPath, code: 'MANIFEST_ERROR', cause: err },"
         },
         {
           "file": "test/architecture.test.mjs",
@@ -264,8 +277,8 @@
           "id": "reference-003657",
           "recordFile": "step-05-records/cli-help-messages.jsonl",
           "line": 7,
-          "role": "comment",
-          "admission": "REJECT",
+          "role": "comment-provenance",
+          "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
           "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
@@ -277,7 +290,7 @@
           "id": "reference-003607",
           "recordFile": "step-05-records/generators-skills-and-support.jsonl",
           "line": 6,
-          "role": "navigation",
+          "role": "comment-provenance",
           "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
@@ -290,8 +303,8 @@
           "id": "reference-003799",
           "recordFile": "step-05-records/setup-doctor-roots.jsonl",
           "line": 583,
-          "role": "comment",
-          "admission": "REJECT",
+          "role": "comment-provenance",
+          "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
           "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
@@ -303,8 +316,8 @@
           "id": "reference-003800",
           "recordFile": "step-05-records/setup-doctor-roots.jsonl",
           "line": 450,
-          "role": "comment",
-          "admission": "REJECT",
+          "role": "comment-provenance",
+          "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
           "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
@@ -420,7 +433,8 @@
         "dynamic-013983",
         "dynamic-013984",
         "dynamic-013985",
-        "dynamic-014002",
+        "dynamic-013986",
+        "dynamic-013987",
         "dynamic-016778"
       ],
       "coCutPaths": [
@@ -430,7 +444,7 @@
         "test/architecture.test.mjs",
         "test/setup/instruction-registry.test.mjs"
       ],
-      "readerCount": 5,
+      "readerCount": 6,
       "status": "decision-open"
     },
     {
@@ -1157,7 +1171,7 @@
           "id": "reference-004036",
           "recordFile": "step-05-records/tests-real-file.jsonl",
           "line": 6,
-          "role": "dated-provenance",
+          "role": "comment-provenance",
           "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
@@ -1251,7 +1265,7 @@
         "scripts/generate-shipped-path-inventory.mjs"
       ],
       "readerCount": 0,
-      "status": "no actual reader in authored Step 5; co-changes only"
+      "status": "no actual reader; co-changes only"
     },
     {
       "path": "docs/contracts/fgos-gateway-api-v1.yaml",
@@ -1356,8 +1370,8 @@
           "id": "reference-000162",
           "recordFile": "step-05-records/gateway-contract.jsonl",
           "line": 188,
-          "role": "comment",
-          "admission": "REJECT",
+          "role": "comment-provenance",
+          "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
           "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
@@ -1369,8 +1383,8 @@
           "id": "reference-000163",
           "recordFile": "step-05-records/gateway-contract.jsonl",
           "line": 254,
-          "role": "comment",
-          "admission": "REJECT",
+          "role": "comment-provenance",
+          "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
           "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
@@ -1382,8 +1396,8 @@
           "id": "reference-000164",
           "recordFile": "step-05-records/gateway-contract.jsonl",
           "line": 555,
-          "role": "comment",
-          "admission": "REJECT",
+          "role": "comment-provenance",
+          "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
           "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
@@ -1392,11 +1406,24 @@
         },
         {
           "file": "apps/fgos-gateway/src/gateway.rs",
+          "id": "reference-000172",
+          "recordFile": "step-05-records/gateway-contract.jsonl",
+          "line": 1740,
+          "role": "synthetic-fixture",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+          "operation": "docs/contracts",
+          "sourceLine": "        std::fs::create_dir_all(root.join(\"docs/contracts\")).unwrap();"
+        },
+        {
+          "file": "apps/fgos-gateway/src/gateway.rs",
           "id": "reference-000173",
           "recordFile": "step-05-records/gateway-contract.jsonl",
           "line": 1178,
-          "role": "comment",
-          "admission": "REJECT",
+          "role": "comment-provenance",
+          "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
           "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
@@ -1418,11 +1445,24 @@
         },
         {
           "file": "apps/fgos-gateway/src/gateway.rs",
+          "id": "reference-000181",
+          "recordFile": "step-05-records/gateway-contract.jsonl",
+          "line": 1248,
+          "role": "comment",
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+          "operation": "docs/contracts/fgos-gateway-",
+          "sourceLine": "    // tsk-4uh: the contract's `servers.url` (docs/contracts/fgos-gateway-"
+        },
+        {
+          "file": "apps/fgos-gateway/src/gateway.rs",
           "id": "reference-000183",
           "recordFile": "step-05-records/gateway-contract.jsonl",
           "line": 2,
-          "role": "comment",
-          "admission": "REJECT",
+          "role": "comment-provenance",
+          "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
           "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
@@ -1434,13 +1474,26 @@
           "id": "reference-000187",
           "recordFile": "step-05-records/gateway-contract.jsonl",
           "line": 40,
-          "role": "comment",
-          "admission": "REJECT",
+          "role": "comment-provenance",
+          "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
           "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
           "operation": "docs/contracts/fgos-gateway-api-v1.yaml",
           "sourceLine": "/// Default listening port — same default `docs/contracts/fgos-gateway-api-v1.yaml`'s"
+        },
+        {
+          "file": "apps/fgos-gateway/src/gateway.rs",
+          "id": "dynamic-000693",
+          "recordFile": "step-05-records/gateway-contract.jsonl",
+          "line": 1740,
+          "role": "fixture-writer",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+          "operation": "root.join(\"docs/contracts\")",
+          "sourceLine": "        std::fs::create_dir_all(root.join(\"docs/contracts\")).unwrap();"
         },
         {
           "file": "apps/fgos-gateway/src/gateway.rs",
@@ -1454,6 +1507,45 @@
           "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
           "operation": "root.join(\"docs/contracts/fgos-gateway-api-v1.yaml\")",
           "sourceLine": "        std::fs::write(root.join(\"docs/contracts/fgos-gateway-api-v1.yaml\"), \"openapi: 3.1.0\\n\").unwrap();"
+        },
+        {
+          "file": "apps/fgos-gateway/src/mcp.rs",
+          "id": "reference-000190",
+          "recordFile": "step-05-records/gateway-contract.jsonl",
+          "line": 528,
+          "role": "synthetic-fixture",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+          "operation": "docs/contracts",
+          "sourceLine": "        std::fs::create_dir_all(root.join(\"docs/contracts\")).unwrap();"
+        },
+        {
+          "file": "apps/fgos-gateway/src/mcp.rs",
+          "id": "reference-000191",
+          "recordFile": "step-05-records/gateway-contract.jsonl",
+          "line": 545,
+          "role": "synthetic-fixture",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+          "operation": "docs/contracts",
+          "sourceLine": "        std::fs::create_dir_all(root.join(\"docs/contracts\")).unwrap();"
+        },
+        {
+          "file": "apps/fgos-gateway/src/mcp.rs",
+          "id": "reference-000192",
+          "recordFile": "step-05-records/gateway-contract.jsonl",
+          "line": 562,
+          "role": "synthetic-fixture",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+          "operation": "docs/contracts",
+          "sourceLine": "        std::fs::create_dir_all(root.join(\"docs/contracts\")).unwrap();"
         },
         {
           "file": "apps/fgos-gateway/src/mcp.rs",
@@ -1499,13 +1591,26 @@
           "id": "reference-000196",
           "recordFile": "step-05-records/gateway-contract.jsonl",
           "line": 22,
-          "role": "comment",
-          "admission": "REJECT",
+          "role": "comment-provenance",
+          "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
           "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
           "operation": "docs/contracts/fgos-gateway-api-v1.yaml",
           "sourceLine": "//! **`search`** parses `docs/contracts/fgos-gateway-api-v1.yaml` (the same"
+        },
+        {
+          "file": "apps/fgos-gateway/src/mcp.rs",
+          "id": "dynamic-000777",
+          "recordFile": "step-05-records/gateway-contract.jsonl",
+          "line": 528,
+          "role": "fixture-writer",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+          "operation": "root.join(\"docs/contracts\")",
+          "sourceLine": "        std::fs::create_dir_all(root.join(\"docs/contracts\")).unwrap();"
         },
         {
           "file": "apps/fgos-gateway/src/mcp.rs",
@@ -1522,6 +1627,19 @@
         },
         {
           "file": "apps/fgos-gateway/src/mcp.rs",
+          "id": "dynamic-000782",
+          "recordFile": "step-05-records/gateway-contract.jsonl",
+          "line": 545,
+          "role": "fixture-writer",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+          "operation": "root.join(\"docs/contracts\")",
+          "sourceLine": "        std::fs::create_dir_all(root.join(\"docs/contracts\")).unwrap();"
+        },
+        {
+          "file": "apps/fgos-gateway/src/mcp.rs",
           "id": "dynamic-000783",
           "recordFile": "step-05-records/gateway-contract.jsonl",
           "line": 547,
@@ -1532,6 +1650,19 @@
           "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
           "operation": "root.join(\"docs/contracts/fgos-gateway-api-v1.yaml\")",
           "sourceLine": "            root.join(\"docs/contracts/fgos-gateway-api-v1.yaml\"),"
+        },
+        {
+          "file": "apps/fgos-gateway/src/mcp.rs",
+          "id": "dynamic-000787",
+          "recordFile": "step-05-records/gateway-contract.jsonl",
+          "line": 562,
+          "role": "fixture-writer",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+          "operation": "root.join(\"docs/contracts\")",
+          "sourceLine": "        std::fs::create_dir_all(root.join(\"docs/contracts\")).unwrap();"
         },
         {
           "file": "apps/fgos-gateway/src/mcp.rs",
@@ -1581,6 +1712,58 @@
       "decisionDependency": "Phase 9 retention-or-move decision for docs/decisions/index.md",
       "readers": [
         {
+          "file": "scripts/check-decision-citation-drift.mjs",
+          "id": "reference-002463",
+          "recordFile": "step-05-records/citation-ratchet-roots.jsonl",
+          "line": 422,
+          "role": "document-operation",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+          "operation": "docs/decisions",
+          "sourceLine": "        : 'docs/decisions',"
+        },
+        {
+          "file": "scripts/check-decision-citation-drift.mjs",
+          "id": "dynamic-006492",
+          "recordFile": "step-05-records/citation-ratchet-roots.jsonl",
+          "line": 232,
+          "role": "document-operation",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+          "operation": "path.join(decisionsDir, file)",
+          "sourceLine": "    const full = path.join(decisionsDir, file);"
+        },
+        {
+          "file": "scripts/check-decision-citation-drift.mjs",
+          "id": "dynamic-006509",
+          "recordFile": "step-05-records/citation-ratchet-roots.jsonl",
+          "line": 419,
+          "role": "document-operation",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+          "operation": "'docs/decisions'",
+          "sourceLine": "    decisionsDir:"
+        },
+        {
+          "file": "scripts/check-decision-citation-drift.mjs",
+          "id": "dynamic-006514",
+          "recordFile": "step-05-records/citation-ratchet-roots.jsonl",
+          "line": 448,
+          "role": "document-operation",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+          "operation": "path.resolve(cwd, decisionsDir)",
+          "sourceLine": "    path.resolve(cwd, decisionsDir),"
+        },
+        {
           "file": "src/cli/command-registry.mjs",
           "id": "reference-003646",
           "recordFile": "step-05-records/cli-help-messages.jsonl",
@@ -1621,6 +1804,32 @@
         },
         {
           "file": "src/report/decision-index.mjs",
+          "id": "dynamic-009759",
+          "recordFile": "step-05-records/generators-decision-index.jsonl",
+          "line": 135,
+          "role": "emitted-document-path",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+          "sourceSha256": "5ad753196470debd2f502b3c00994c1d75a9ed0c576c5cf8188eb8600f0a09a2",
+          "operation": "path.relative(repoRoot, indexPath)",
+          "sourceLine": "  return { path: path.relative(repoRoot, indexPath).split(path.sep).join('/'), changed, content: nextContent };"
+        },
+        {
+          "file": "src/report/decision-index.mjs",
+          "id": "dynamic-009760",
+          "recordFile": "step-05-records/generators-decision-index.jsonl",
+          "line": 135,
+          "role": "emitted-document-path",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+          "sourceSha256": "5ad753196470debd2f502b3c00994c1d75a9ed0c576c5cf8188eb8600f0a09a2",
+          "operation": "path.relative(repoRoot, indexPath)",
+          "sourceLine": "  return { path: path.relative(repoRoot, indexPath).split(path.sep).join('/'), changed, content: nextContent };"
+        },
+        {
+          "file": "src/report/decision-index.mjs",
           "id": "dynamic-009761",
           "recordFile": "step-05-records/generators-decision-index.jsonl",
           "line": 18,
@@ -1644,6 +1853,32 @@
           "sourceSha256": "5ad753196470debd2f502b3c00994c1d75a9ed0c576c5cf8188eb8600f0a09a2",
           "operation": "indexPathFor(repoRoot)",
           "sourceLine": "  const indexPath = indexPathFor(repoRoot);"
+        },
+        {
+          "file": "src/report/enduser-index-generate.mjs",
+          "id": "dynamic-009788",
+          "recordFile": "step-05-records/generators-enduser-index.jsonl",
+          "line": 94,
+          "role": "path-operation",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+          "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+          "operation": "path.join(repoRoot, 'docs', alias)",
+          "sourceLine": "      scanDirAsQuadrant(repoRoot, path.join(repoRoot, 'docs', alias), quadrant, docEntries);"
+        },
+        {
+          "file": "src/report/enduser-index.mjs",
+          "id": "dynamic-009791",
+          "recordFile": "step-05-records/generators-enduser-index.jsonl",
+          "line": 38,
+          "role": "path-operation",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+          "sourceSha256": "373da334b9cd862b2c3a0fbf4fffb3fe010f244872702dbfceb25eada5c5e650",
+          "operation": "'decisions'",
+          "sourceLine": "export const QUADRANT_DIR_ALIASES = Object.freeze({"
         },
         {
           "file": "src/setup/instruction-registry.mjs",
@@ -1715,7 +1950,7 @@
           "id": "dynamic-014334",
           "recordFile": "step-05-records/setup-doctor-roots.jsonl",
           "line": 3730,
-          "role": "non-document-message",
+          "role": "emitted-document-message",
           "admission": "ADMIT",
           "disposition": "parked",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
@@ -1728,7 +1963,7 @@
           "id": "dynamic-014335",
           "recordFile": "step-05-records/setup-doctor-roots.jsonl",
           "line": 3735,
-          "role": "non-document-message",
+          "role": "emitted-document-message",
           "admission": "ADMIT",
           "disposition": "parked",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
@@ -1741,7 +1976,7 @@
           "id": "dynamic-014336",
           "recordFile": "step-05-records/setup-doctor-roots.jsonl",
           "line": 3739,
-          "role": "non-document-message",
+          "role": "emitted-document-message",
           "admission": "ADMIT",
           "disposition": "parked",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
@@ -1754,7 +1989,7 @@
           "id": "dynamic-014337",
           "recordFile": "step-05-records/setup-doctor-roots.jsonl",
           "line": 3743,
-          "role": "non-document-message",
+          "role": "emitted-document-message",
           "admission": "ADMIT",
           "disposition": "parked",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
@@ -1763,69 +1998,43 @@
           "sourceLine": "    message: `${indexPathFor(root)} is stale relative to state.decisions -- run fgos decision-index`,"
         },
         {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "reference-004331",
-          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
-          "line": 346,
-          "role": "real-document-reader",
+          "file": "src/setup/registrations.mjs",
+          "id": "dynamic-014343",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "line": 3777,
+          "role": "emitted-document-path",
           "admission": "ADMIT",
           "disposition": "parked",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
-          "operation": "docs/decisions/index.md",
-          "sourceLine": "  assert.ok(generatedIndex, 'the generated docs/decisions/index.md must appear in the manifest via the alias');"
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+          "operation": "result.path",
+          "sourceLine": "    return { changed: false, message: `${result.path} already up to date` };"
         },
         {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "reference-004349",
-          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
-          "line": 345,
-          "role": "real-document-reader",
+          "file": "src/setup/registrations.mjs",
+          "id": "dynamic-014344",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "line": 3779,
+          "role": "emitted-document-path",
           "admission": "ADMIT",
           "disposition": "parked",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
-          "operation": "docs/decisions/index.md",
-          "sourceLine": "  const generatedIndex = explanationEntries.find((e) => e.docPath === 'docs/decisions/index.md');"
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+          "operation": "result.path",
+          "sourceLine": "  return { changed: true, message: `regenerated ${result.path}` };"
         },
         {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "dynamic-021545",
-          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
-          "line": 345,
-          "role": "real-document-reader",
+          "file": "src/setup/registrations.mjs",
+          "id": "author-s4-fix2-70cc3f725650c613",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "line": 3766,
+          "role": "emitted-document-path",
           "admission": "ADMIT",
           "disposition": "parked",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
-          "operation": "docPath === 'docs/decisions/index.md')",
-          "sourceLine": "  const generatedIndex = explanationEntries.find((e) => e.docPath === 'docs/decisions/index.md');"
-        },
-        {
-          "file": "test/docs/decisions-corpus-retired.test.mjs",
-          "id": "dynamic-018734",
-          "recordFile": "step-05-records/tests-real-file.jsonl",
-          "line": 31,
-          "role": "real-document-reader",
-          "admission": "ADMIT",
-          "disposition": "parked",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "fd8b2e38773f33f71a6507876a7f5d2cc4bd1b61f9bbd8a4246e7f56a29b18b2",
-          "operation": "path.join(REPO_ROOT, 'docs', 'decisions')",
-          "sourceLine": "const DECISIONS_DIR = path.join(REPO_ROOT, 'docs', 'decisions');"
-        },
-        {
-          "file": "test/docs/decisions-corpus-retired.test.mjs",
-          "id": "dynamic-018735",
-          "recordFile": "step-05-records/tests-real-file.jsonl",
-          "line": 31,
-          "role": "real-document-reader",
-          "admission": "ADMIT",
-          "disposition": "parked",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "fd8b2e38773f33f71a6507876a7f5d2cc4bd1b61f9bbd8a4246e7f56a29b18b2",
-          "operation": "path.join(REPO_ROOT, 'docs', 'decisions')",
-          "sourceLine": "const DECISIONS_DIR = path.join(REPO_ROOT, 'docs', 'decisions');"
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+          "operation": "indexPathFor(root)",
+          "sourceLine": "  if (!fs.existsSync(indexPathFor(root)) && !isFgosSourceCheckout(root)) return { changed: false, message: 'skipped -- no decision index in this project (run fgos decision-index to adopt)' };"
         },
         {
           "file": "test/report/enduser-index.test.mjs",
@@ -1855,6 +2064,84 @@
         },
         {
           "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004308",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 373,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "repo/docs/decisions/*.md",
+          "sourceLine": "test('every repo/docs/decisions/*.md file parses with parseFrontmatter to a non-empty meta.type', () => {"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004321",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 316,
+          "role": "document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/decisions/",
+          "sourceLine": "test('fgos docs-index reads BOTH the docs/decisions/ alias and the primary docs/explanation/ dir into the explanation quadrant, tagged by quadrant name not source dir name', () => {"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004331",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 346,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/decisions/index.md",
+          "sourceLine": "  assert.ok(generatedIndex, 'the generated docs/decisions/index.md must appear in the manifest via the alias');"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004343",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 376,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/decisions/",
+          "sourceLine": "  assert.ok(files.length > 0, 'expected at least one .md file under docs/decisions/ (today: the generated index.md)');"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004346",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 316,
+          "role": "document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/explanation/",
+          "sourceLine": "test('fgos docs-index reads BOTH the docs/decisions/ alias and the primary docs/explanation/ dir into the explanation quadrant, tagged by quadrant name not source dir name', () => {"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004349",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 345,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/decisions/index.md",
+          "sourceLine": "  const generatedIndex = explanationEntries.find((e) => e.docPath === 'docs/decisions/index.md');"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
           "id": "dynamic-021542",
           "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
           "line": 322,
@@ -1865,6 +2152,19 @@
           "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
           "operation": "path.join(REPO_ROOT, 'docs', 'decisions')",
           "sourceLine": "  const decisionsCount = fs.readdirSync(path.join(REPO_ROOT, 'docs', 'decisions')).filter((f) => f.endsWith('.md')).length;"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "dynamic-021545",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 345,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docPath === 'docs/decisions/index.md')",
+          "sourceLine": "  const generatedIndex = explanationEntries.find((e) => e.docPath === 'docs/decisions/index.md');"
         },
         {
           "file": "test/report/enduser-index.test.mjs",
@@ -1906,108 +2206,30 @@
           "sourceLine": "    const content = fs.readFileSync(path.join(decisionsDir, file), 'utf8');"
         },
         {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "dynamic-021550",
-          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
-          "line": 380,
-          "role": "real-document-reader",
-          "admission": "ADMIT",
-          "disposition": "parked",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
-          "operation": "`${file} must have a non-empty frontmatter type`",
-          "sourceLine": "    assert.ok(meta.type && meta.type.length > 0, `${file} must have a non-empty frontmatter type`);"
-        },
-        {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "dynamic-021551",
-          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
-          "line": 381,
-          "role": "real-document-reader",
-          "admission": "ADMIT",
-          "disposition": "parked",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
-          "operation": "`${file}'s frontmatter type must be 'explanation'`",
-          "sourceLine": "    assert.equal(meta.type, 'explanation', `${file}'s frontmatter type must be 'explanation'`);"
-        },
-        {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "reference-004308",
-          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
-          "line": 373,
-          "role": "real-document-reader",
-          "admission": "ADMIT",
-          "disposition": "parked",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
-          "operation": "repo/docs/decisions/*.md",
-          "sourceLine": "test('every repo/docs/decisions/*.md file parses with parseFrontmatter to a non-empty meta.type', () => {"
-        },
-        {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "reference-004343",
-          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
-          "line": 376,
-          "role": "real-document-reader",
-          "admission": "ADMIT",
-          "disposition": "parked",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
-          "operation": "docs/decisions/",
-          "sourceLine": "  assert.ok(files.length > 0, 'expected at least one .md file under docs/decisions/ (today: the generated index.md)');"
-        },
-        {
-          "file": "src/report/enduser-index-generate.mjs",
-          "id": "dynamic-009788",
-          "recordFile": "step-05-records/generators-enduser-index.jsonl",
-          "line": 94,
-          "role": "path-operation",
-          "admission": "ADMIT",
-          "disposition": "parked",
-          "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
-          "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
-          "operation": "path.join(repoRoot, 'docs', alias)",
-          "sourceLine": "      scanDirAsQuadrant(repoRoot, path.join(repoRoot, 'docs', alias), quadrant, docEntries);"
-        },
-        {
-          "file": "src/report/enduser-index.mjs",
-          "id": "dynamic-009791",
-          "recordFile": "step-05-records/generators-enduser-index.jsonl",
-          "line": 38,
-          "role": "path-operation",
-          "admission": "ADMIT",
-          "disposition": "parked",
-          "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
-          "sourceSha256": "373da334b9cd862b2c3a0fbf4fffb3fe010f244872702dbfceb25eada5c5e650",
-          "operation": "'decisions'",
-          "sourceLine": "export const QUADRANT_DIR_ALIASES = Object.freeze({"
-        },
-        {
           "file": "test/docs/decisions-corpus-retired.test.mjs",
-          "id": "reference-004039",
+          "id": "dynamic-018734",
           "recordFile": "step-05-records/tests-real-file.jsonl",
-          "line": 2,
-          "role": "dated-provenance",
+          "line": 31,
+          "role": "real-document-reader",
           "admission": "ADMIT",
           "disposition": "parked",
           "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
           "sourceSha256": "fd8b2e38773f33f71a6507876a7f5d2cc4bd1b61f9bbd8a4246e7f56a29b18b2",
-          "operation": "docs/decisions/*.md",
-          "sourceLine": "// hand-authored docs/decisions/*.md corpus (35 files: 34 numbered ADRs +"
+          "operation": "path.join(REPO_ROOT, 'docs', 'decisions')",
+          "sourceLine": "const DECISIONS_DIR = path.join(REPO_ROOT, 'docs', 'decisions');"
         },
         {
           "file": "test/docs/decisions-corpus-retired.test.mjs",
-          "id": "reference-004041",
+          "id": "dynamic-018735",
           "recordFile": "step-05-records/tests-real-file.jsonl",
-          "line": 3,
-          "role": "dated-provenance",
+          "line": 31,
+          "role": "real-document-reader",
           "admission": "ADMIT",
           "disposition": "parked",
           "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
           "sourceSha256": "fd8b2e38773f33f71a6507876a7f5d2cc4bd1b61f9bbd8a4246e7f56a29b18b2",
-          "operation": "docs/decisions/",
-          "sourceLine": "// 0000-index.md) is retired -- docs/decisions/ persists as a directory"
+          "operation": "path.join(REPO_ROOT, 'docs', 'decisions')",
+          "sourceLine": "const DECISIONS_DIR = path.join(REPO_ROOT, 'docs', 'decisions');"
         }
       ],
       "coChanges": [
@@ -2016,7 +2238,7 @@
           "id": "reference-003693",
           "recordFile": "step-05-records/generators-decision-index.jsonl",
           "line": 105,
-          "role": "navigation",
+          "role": "comment-provenance",
           "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
@@ -2029,7 +2251,7 @@
           "id": "reference-003694",
           "recordFile": "step-05-records/generators-decision-index.jsonl",
           "line": 26,
-          "role": "navigation",
+          "role": "comment-provenance",
           "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
@@ -2042,7 +2264,7 @@
           "id": "reference-003695",
           "recordFile": "step-05-records/generators-decision-index.jsonl",
           "line": 1,
-          "role": "navigation",
+          "role": "comment-provenance",
           "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
@@ -2159,7 +2381,7 @@
           "id": "reference-002479",
           "recordFile": "step-05-records/generators-skills-and-support.jsonl",
           "line": 140,
-          "role": "navigation",
+          "role": "comment-provenance",
           "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
@@ -2168,12 +2390,25 @@
           "sourceLine": "  // directory holding only the generated docs/decisions/index.md (fgos"
         },
         {
+          "file": "scripts/check-doc-retirement.mjs",
+          "id": "reference-002489",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "line": 57,
+          "role": "navigation",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+          "sourceSha256": "4a396fef453dbaaa1415dca5875d236e784ae0766e3aaa17bba0ee726ba2af6e",
+          "operation": "docs/decisions/index.md",
+          "sourceLine": "      data.documents.some((file) => typeof file !== 'string' || path.posix.normalize(file) !== file || !/^docs\\/.+\\.[a-z0-9]+$/.test(file) || file.startsWith('docs/platform/') || file === 'docs/decisions/index.md')) {"
+        },
+        {
           "file": "src/setup/registrations.mjs",
           "id": "reference-003814",
           "recordFile": "step-05-records/setup-doctor-roots.jsonl",
           "line": 3753,
-          "role": "comment",
-          "admission": "REJECT",
+          "role": "comment-provenance",
+          "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
           "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
@@ -2185,8 +2420,8 @@
           "id": "reference-003818",
           "recordFile": "step-05-records/setup-doctor-roots.jsonl",
           "line": 3699,
-          "role": "comment",
-          "admission": "REJECT",
+          "role": "comment-provenance",
+          "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
           "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
@@ -2198,8 +2433,8 @@
           "id": "reference-003826",
           "recordFile": "step-05-records/setup-doctor-roots.jsonl",
           "line": 3704,
-          "role": "comment",
-          "admission": "REJECT",
+          "role": "comment-provenance",
+          "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
           "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
@@ -2390,6 +2625,19 @@
         },
         {
           "file": "test/setup/checks.test.mjs",
+          "id": "reference-005174",
+          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+          "line": 695,
+          "role": "test-title",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
+          "operation": "docs/decisions",
+          "sourceLine": "test('enduser-docs-index-stale counts a doc under docs/decisions toward the explanation quadrant (alias, D6)', () => {"
+        },
+        {
+          "file": "test/setup/checks.test.mjs",
           "id": "dynamic-035209",
           "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
           "line": 743,
@@ -2403,6 +2651,19 @@
         },
         {
           "file": "test/setup/checks.test.mjs",
+          "id": "dynamic-035216",
+          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+          "line": 768,
+          "role": "non-document-operation",
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
+          "operation": "path.join(tmp, 'docs', 'decisions')",
+          "sourceLine": "  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });"
+        },
+        {
+          "file": "test/setup/checks.test.mjs",
           "id": "dynamic-035217",
           "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
           "line": 769,
@@ -2413,6 +2674,19 @@
           "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
           "operation": "path.join(tmp, 'docs', 'decisions', 'index.md')",
           "sourceLine": "  fs.writeFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), '# Decisions index\\n\\n_No platform/repo-wide decisions recorded yet._\\n');"
+        },
+        {
+          "file": "test/setup/checks.test.mjs",
+          "id": "dynamic-035224",
+          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+          "line": 796,
+          "role": "non-document-operation",
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
+          "operation": "path.join(tmp, 'docs', 'decisions')",
+          "sourceLine": "  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });"
         },
         {
           "file": "test/setup/checks.test.mjs",
@@ -2468,97 +2742,6 @@
         },
         {
           "file": "test/setup/instruction-registry.test.mjs",
-          "id": "dynamic-035994",
-          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
-          "line": 357,
-          "role": "non-document-operation",
-          "admission": "REJECT",
-          "disposition": "preserve",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "156110511f8aa5515db4d6dfe98526a1ab91fc51492447d9c1a42eb52e6c31b4",
-          "operation": "path.join(tmp, 'docs', 'decisions', 'index.md')",
-          "sourceLine": "    path.join(tmp, 'docs', 'decisions', 'index.md'),"
-        },
-        {
-          "file": "test/setup/instruction-registry.test.mjs",
-          "id": "dynamic-035997",
-          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
-          "line": 378,
-          "role": "non-document-operation",
-          "admission": "REJECT",
-          "disposition": "preserve",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "156110511f8aa5515db4d6dfe98526a1ab91fc51492447d9c1a42eb52e6c31b4",
-          "operation": "path.join(tmp, 'docs', 'decisions', 'index.md')",
-          "sourceLine": "    path.join(tmp, 'docs', 'decisions', 'index.md'),"
-        },
-        {
-          "file": "test/setup/instruction-registry.test.mjs",
-          "id": "dynamic-036002",
-          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
-          "line": 407,
-          "role": "non-document-operation",
-          "admission": "REJECT",
-          "disposition": "preserve",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "156110511f8aa5515db4d6dfe98526a1ab91fc51492447d9c1a42eb52e6c31b4",
-          "operation": "path.join(tmp, 'docs', 'decisions', 'index.md')",
-          "sourceLine": "    path.join(tmp, 'docs', 'decisions', 'index.md'),"
-        },
-        {
-          "file": "scripts/check-doc-retirement.mjs",
-          "id": "reference-002489",
-          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
-          "line": 57,
-          "role": "navigation",
-          "admission": "ADMIT",
-          "disposition": "preserve",
-          "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
-          "sourceSha256": "4a396fef453dbaaa1415dca5875d236e784ae0766e3aaa17bba0ee726ba2af6e",
-          "operation": "docs/decisions/index.md",
-          "sourceLine": "      data.documents.some((file) => typeof file !== 'string' || path.posix.normalize(file) !== file || !/^docs\\/.+\\.[a-z0-9]+$/.test(file) || file.startsWith('docs/platform/') || file === 'docs/decisions/index.md')) {"
-        },
-        {
-          "file": "test/setup/checks.test.mjs",
-          "id": "reference-005174",
-          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
-          "line": 695,
-          "role": "test-title",
-          "admission": "ADMIT",
-          "disposition": "preserve",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
-          "operation": "docs/decisions",
-          "sourceLine": "test('enduser-docs-index-stale counts a doc under docs/decisions toward the explanation quadrant (alias, D6)', () => {"
-        },
-        {
-          "file": "test/setup/checks.test.mjs",
-          "id": "dynamic-035216",
-          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
-          "line": 768,
-          "role": "non-document-operation",
-          "admission": "REJECT",
-          "disposition": "preserve",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
-          "operation": "path.join(tmp, 'docs', 'decisions')",
-          "sourceLine": "  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });"
-        },
-        {
-          "file": "test/setup/checks.test.mjs",
-          "id": "dynamic-035224",
-          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
-          "line": 796,
-          "role": "non-document-operation",
-          "admission": "REJECT",
-          "disposition": "preserve",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
-          "operation": "path.join(tmp, 'docs', 'decisions')",
-          "sourceLine": "  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });"
-        },
-        {
-          "file": "test/setup/instruction-registry.test.mjs",
           "id": "dynamic-035993",
           "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
           "line": 355,
@@ -2569,6 +2752,19 @@
           "sourceSha256": "156110511f8aa5515db4d6dfe98526a1ab91fc51492447d9c1a42eb52e6c31b4",
           "operation": "path.join(tmp, 'docs', 'decisions')",
           "sourceLine": "  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });"
+        },
+        {
+          "file": "test/setup/instruction-registry.test.mjs",
+          "id": "dynamic-035994",
+          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+          "line": 357,
+          "role": "non-document-operation",
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "156110511f8aa5515db4d6dfe98526a1ab91fc51492447d9c1a42eb52e6c31b4",
+          "operation": "path.join(tmp, 'docs', 'decisions', 'index.md')",
+          "sourceLine": "    path.join(tmp, 'docs', 'decisions', 'index.md'),"
         },
         {
           "file": "test/setup/instruction-registry.test.mjs",
@@ -2585,6 +2781,19 @@
         },
         {
           "file": "test/setup/instruction-registry.test.mjs",
+          "id": "dynamic-035997",
+          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+          "line": 378,
+          "role": "non-document-operation",
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "156110511f8aa5515db4d6dfe98526a1ab91fc51492447d9c1a42eb52e6c31b4",
+          "operation": "path.join(tmp, 'docs', 'decisions', 'index.md')",
+          "sourceLine": "    path.join(tmp, 'docs', 'decisions', 'index.md'),"
+        },
+        {
+          "file": "test/setup/instruction-registry.test.mjs",
           "id": "dynamic-036001",
           "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
           "line": 405,
@@ -2595,14 +2804,61 @@
           "sourceSha256": "156110511f8aa5515db4d6dfe98526a1ab91fc51492447d9c1a42eb52e6c31b4",
           "operation": "path.join(tmp, 'docs', 'decisions')",
           "sourceLine": "  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });"
+        },
+        {
+          "file": "test/setup/instruction-registry.test.mjs",
+          "id": "dynamic-036002",
+          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+          "line": 407,
+          "role": "non-document-operation",
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "156110511f8aa5515db4d6dfe98526a1ab91fc51492447d9c1a42eb52e6c31b4",
+          "operation": "path.join(tmp, 'docs', 'decisions', 'index.md')",
+          "sourceLine": "    path.join(tmp, 'docs', 'decisions', 'index.md'),"
+        },
+        {
+          "file": "test/docs/decisions-corpus-retired.test.mjs",
+          "id": "reference-004039",
+          "recordFile": "step-05-records/tests-real-file.jsonl",
+          "line": 2,
+          "role": "comment-provenance",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "fd8b2e38773f33f71a6507876a7f5d2cc4bd1b61f9bbd8a4246e7f56a29b18b2",
+          "operation": "docs/decisions/*.md",
+          "sourceLine": "// hand-authored docs/decisions/*.md corpus (35 files: 34 numbered ADRs +"
+        },
+        {
+          "file": "test/docs/decisions-corpus-retired.test.mjs",
+          "id": "reference-004041",
+          "recordFile": "step-05-records/tests-real-file.jsonl",
+          "line": 3,
+          "role": "comment-provenance",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "fd8b2e38773f33f71a6507876a7f5d2cc4bd1b61f9bbd8a4246e7f56a29b18b2",
+          "operation": "docs/decisions/",
+          "sourceLine": "// 0000-index.md) is retired -- docs/decisions/ persists as a directory"
         }
       ],
       "readerRecordIds": [
+        "reference-002463",
+        "dynamic-006492",
+        "dynamic-006509",
+        "dynamic-006514",
         "reference-003646",
         "reference-003651",
         "dynamic-009758",
+        "dynamic-009759",
+        "dynamic-009760",
         "dynamic-009761",
         "dynamic-009767",
+        "dynamic-009788",
+        "dynamic-009791",
         "reference-003798",
         "dynamic-013969",
         "dynamic-014034",
@@ -2612,30 +2868,30 @@
         "dynamic-014335",
         "dynamic-014336",
         "dynamic-014337",
-        "reference-004331",
-        "reference-004349",
-        "dynamic-021545",
-        "dynamic-018734",
-        "dynamic-018735",
+        "dynamic-014343",
+        "dynamic-014344",
+        "author-s4-fix2-70cc3f725650c613",
         "reference-004305",
         "reference-004307",
+        "reference-004308",
+        "reference-004321",
+        "reference-004331",
+        "reference-004343",
+        "reference-004346",
+        "reference-004349",
         "dynamic-021542",
+        "dynamic-021545",
         "dynamic-021547",
         "dynamic-021548",
         "dynamic-021549",
-        "dynamic-021550",
-        "dynamic-021551",
-        "reference-004308",
-        "reference-004343",
-        "dynamic-009788",
-        "dynamic-009791",
-        "reference-004039",
-        "reference-004041"
+        "dynamic-018734",
+        "dynamic-018735"
       ],
       "coCutPaths": [
         "docs/doc-registry.json",
         "docs/doc-registry.md",
         "docs/enduser-docs-index.json",
+        "scripts/check-decision-citation-drift.mjs",
         "scripts/check-decision-supersession.mjs",
         "scripts/check-doc-retirement.mjs",
         "src/cli/command-registry.mjs",
@@ -2652,7 +2908,7 @@
         "test/setup/checks.test.mjs",
         "test/setup/instruction-registry.test.mjs"
       ],
-      "readerCount": 33,
+      "readerCount": 40,
       "status": "decision-open"
     },
     {
@@ -2728,19 +2984,6 @@
           "sourceLine": "    norm === 'docs/distribution-vision.md' ||"
         },
         {
-          "file": "src/setup/registrations.mjs",
-          "id": "reference-003815",
-          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
-          "line": 3209,
-          "role": "comment",
-          "admission": "REJECT",
-          "disposition": "preserve",
-          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-          "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-          "operation": "docs/distribution-vision.md",
-          "sourceLine": "// docs/distribution-vision.md's \"context 3\") is just as valid a pass as a"
-        },
-        {
           "file": "scripts/propose-doc-decisions.mjs",
           "id": "reference-003628",
           "recordFile": "step-05-records/generators-skills-and-support.jsonl",
@@ -2751,8 +2994,20 @@
           "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
           "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
           "operation": "docs/distribution-vision.md",
-          "sourceLine": "const RECONCILIATION = ['docs/distribution-vision.md', 'docs/id-systems-audit.md', 'docs/work-item-lifecycle-vision.md', 'docs/backlog.md', 'docs/platform/proposals/documentation-system-unification.md'];",
-          "operationKind": "inventory-reconciliation-metadata"
+          "sourceLine": "const RECONCILIATION = ['docs/distribution-vision.md', 'docs/id-systems-audit.md', 'docs/work-item-lifecycle-vision.md', 'docs/backlog.md', 'docs/platform/proposals/documentation-system-unification.md'];"
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "id": "reference-003815",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "line": 3209,
+          "role": "comment-provenance",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+          "operation": "docs/distribution-vision.md",
+          "sourceLine": "// docs/distribution-vision.md's \"context 3\") is just as valid a pass as a"
         }
       ],
       "readerRecordIds": [],
@@ -2762,7 +3017,7 @@
         "src/setup/registrations.mjs"
       ],
       "readerCount": 0,
-      "status": "no actual reader in authored Step 5; co-changes only"
+      "status": "no actual reader; co-changes only"
     },
     {
       "path": "docs/doc-governance.md",
@@ -3001,6 +3256,32 @@
           "sourceLine": "  fs.copyFileSync(path.join(REPO_ROOT, 'docs/doc-governance.md'), path.join(root, 'docs/doc-governance.md'));"
         },
         {
+          "file": "test/scripts/check-doc-candidate-status.test.mjs",
+          "id": "author-s67-governance-baseline-94",
+          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+          "line": 94,
+          "role": "document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "e8a6498e7f68f1e2068e8f0d41741340916d7f6296fb90bf6e34427e7e06a91b",
+          "operation": "governanceBaselineFields(REPO_ROOT)",
+          "sourceLine": "  const baseline = governanceBaselineFields(REPO_ROOT);"
+        },
+        {
+          "file": "test/scripts/check-doc-candidate-status.test.mjs",
+          "id": "author-s67-governance-baseline-163",
+          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+          "line": 163,
+          "role": "transitive-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "e8a6498e7f68f1e2068e8f0d41741340916d7f6296fb90bf6e34427e7e06a91b",
+          "operation": "checkCandidateMetadata",
+          "sourceLine": "  const conflicted = checkCandidateMetadata({ files: ['docs/platform/a/README.md'], readFile: () => '', switchboard: doubled, constitution, repoRoot: REPO_ROOT });"
+        },
+        {
           "file": "test/scripts/check-doc-constitution.test.mjs",
           "id": "reference-004651",
           "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
@@ -3059,7 +3340,7 @@
           "id": "reference-002481",
           "recordFile": "step-05-records/generators-skills-and-support.jsonl",
           "line": 15,
-          "role": "navigation",
+          "role": "comment-provenance",
           "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
@@ -3106,6 +3387,8 @@
         "reference-004589",
         "dynamic-031770",
         "dynamic-031771",
+        "author-s67-governance-baseline-94",
+        "author-s67-governance-baseline-163",
         "reference-004651",
         "reference-004659",
         "dynamic-032029",
@@ -3119,7 +3402,7 @@
         "test/scripts/check-doc-constitution.test.mjs",
         "test/scripts/doc-rationale.test.mjs"
       ],
-      "readerCount": 15,
+      "readerCount": 17,
       "status": "decision-open"
     },
     {
@@ -3214,7 +3497,7 @@
           "id": "reference-003620",
           "recordFile": "step-05-records/generators-skills-and-support.jsonl",
           "line": 3,
-          "role": "navigation",
+          "role": "comment-provenance",
           "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
@@ -3233,8 +3516,7 @@
           "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
           "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
           "operation": "docs/id-systems-audit.md",
-          "sourceLine": "const RECONCILIATION = ['docs/distribution-vision.md', 'docs/id-systems-audit.md', 'docs/work-item-lifecycle-vision.md', 'docs/backlog.md', 'docs/platform/proposals/documentation-system-unification.md'];",
-          "operationKind": "inventory-reconciliation-metadata"
+          "sourceLine": "const RECONCILIATION = ['docs/distribution-vision.md', 'docs/id-systems-audit.md', 'docs/work-item-lifecycle-vision.md', 'docs/backlog.md', 'docs/platform/proposals/documentation-system-unification.md'];"
         }
       ],
       "readerRecordIds": [],
@@ -3244,7 +3526,7 @@
         "scripts/propose-doc-decisions.mjs"
       ],
       "readerCount": 0,
-      "status": "no actual reader in authored Step 5; co-changes only"
+      "status": "no actual reader; co-changes only"
     },
     {
       "path": "docs/io-contract.md",
@@ -3601,7 +3883,7 @@
         "test/scripts/check-doc-retirement.test.mjs"
       ],
       "readerCount": 0,
-      "status": "no actual reader in authored Step 5; co-changes only"
+      "status": "no actual reader; co-changes only"
     },
     {
       "path": "docs/operator-runbook-herdr-cockpit.md",
@@ -3658,19 +3940,6 @@
       "readers": [],
       "coChanges": [
         {
-          "file": "scripts/generate-shipped-path-inventory.mjs",
-          "id": "reference-003600",
-          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
-          "line": 278,
-          "role": "navigation",
-          "admission": "ADMIT",
-          "disposition": "preserve",
-          "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
-          "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
-          "operation": "docs/operator-runbook-herdr-cockpit.md",
-          "sourceLine": "    norm === 'docs/operator-runbook-herdr-cockpit.md' ||"
-        },
-        {
           "file": "plugins/fgOS/skills/terminal/SKILL.md",
           "id": "reference-002424",
           "recordFile": "step-05-records/generators-skills-and-support.jsonl",
@@ -3682,6 +3951,19 @@
           "sourceSha256": "65fdc9d4360dce4ed0c859879160e57bda72157b9edff99b3bff429b27c9e294",
           "operation": "docs/operator-runbook-herdr-cockpit.md",
           "sourceLine": "herdr chrome (per STR40 — `docs/operator-runbook-herdr-cockpit.md`),"
+        },
+        {
+          "file": "scripts/generate-shipped-path-inventory.mjs",
+          "id": "reference-003600",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "line": 278,
+          "role": "navigation",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+          "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+          "operation": "docs/operator-runbook-herdr-cockpit.md",
+          "sourceLine": "    norm === 'docs/operator-runbook-herdr-cockpit.md' ||"
         },
         {
           "file": "scripts/herdr-cockpit.sh",
@@ -3704,7 +3986,7 @@
         "scripts/herdr-cockpit.sh"
       ],
       "readerCount": 0,
-      "status": "no actual reader in authored Step 5; co-changes only"
+      "status": "no actual reader; co-changes only"
     },
     {
       "path": "docs/platform-foundations.md",
@@ -3790,7 +4072,7 @@
           "id": "reference-002429",
           "recordFile": "step-05-records/generators-skills-and-support.jsonl",
           "line": 13,
-          "role": "navigation",
+          "role": "comment-provenance",
           "admission": "ADMIT",
           "disposition": "preserve",
           "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
@@ -3912,7 +4194,7 @@
         "test/state/status-category.test.mjs"
       ],
       "readerCount": 0,
-      "status": "no actual reader in authored Step 5; co-changes only"
+      "status": "no actual reader; co-changes only"
     },
     {
       "path": "docs/routing-handoff-contract.md",
@@ -3982,7 +4264,7 @@
         "scripts/generate-shipped-path-inventory.mjs"
       ],
       "readerCount": 0,
-      "status": "no actual reader in authored Step 5; co-changes only"
+      "status": "no actual reader; co-changes only"
     },
     {
       "path": "docs/templates/architecture.md",
@@ -4066,7 +4348,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/templates/area-readme.md",
@@ -4155,7 +4437,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/templates/contract.md",
@@ -4244,7 +4526,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/templates/decision.md",
@@ -4323,7 +4605,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/templates/discussion.md",
@@ -4392,7 +4674,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/templates/generated.md",
@@ -4421,7 +4703,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/templates/intent-preservation-ledger.md",
@@ -4475,7 +4757,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/templates/spec.md",
@@ -4579,7 +4861,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/templates/subcomponent-readme.md",
@@ -4653,7 +4935,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/templates/verification.md",
@@ -4717,7 +4999,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/templates/vision.md",
@@ -4786,7 +5068,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/transitional-switchboard.md",
@@ -4840,7 +5122,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/ui-spec/00-overview.md",
@@ -4944,7 +5226,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/ui-spec/15-system-events.md",
@@ -5013,7 +5295,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/ui-spec/20-domain-rules.md",
@@ -5062,7 +5344,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/ui-spec/30-states-and-errors.md",
@@ -5236,7 +5518,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/ui-spec/components/C01-item-card.md",
@@ -5320,7 +5602,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
@@ -5394,7 +5676,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/ui-spec/flows/F02-approve-a-merge.md",
@@ -5463,7 +5745,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/ui-spec/modals/M01-answer-question.md",
@@ -5542,7 +5824,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/ui-spec/modals/M02-approve-merge.md",
@@ -5626,7 +5908,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/ui-spec/modals/M03-add-edit-item.md",
@@ -5715,7 +5997,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/ui-spec/schema/surface-contract.schema.json",
@@ -5744,7 +6026,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/ui-spec/screens/S01-sign-in.md",
@@ -5854,7 +6136,7 @@
         "apps/fgos-gateway/web/src/App.test.tsx"
       ],
       "readerCount": 0,
-      "status": "no actual reader in authored Step 5; co-changes only"
+      "status": "no actual reader; co-changes only"
     },
     {
       "path": "docs/ui-spec/screens/S02-taskboard.md",
@@ -5978,7 +6260,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/ui-spec/screens/S03-task-detail.md",
@@ -6122,7 +6404,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/ui-spec/screens/S04-questions-needing-answer.md",
@@ -6221,7 +6503,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/ui-spec/spec.config.yaml",
@@ -6250,7 +6532,7 @@
       "readerRecordIds": [],
       "coCutPaths": [],
       "readerCount": 0,
-      "status": "no authored Step 5 occurrence"
+      "status": "no authored occurrence"
     },
     {
       "path": "docs/work-item-lifecycle-vision.md",
@@ -6340,8 +6622,7 @@
           "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
           "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
           "operation": "docs/work-item-lifecycle-vision.md",
-          "sourceLine": "const RECONCILIATION = ['docs/distribution-vision.md', 'docs/id-systems-audit.md', 'docs/work-item-lifecycle-vision.md', 'docs/backlog.md', 'docs/platform/proposals/documentation-system-unification.md'];",
-          "operationKind": "inventory-reconciliation-metadata"
+          "sourceLine": "const RECONCILIATION = ['docs/distribution-vision.md', 'docs/id-systems-audit.md', 'docs/work-item-lifecycle-vision.md', 'docs/backlog.md', 'docs/platform/proposals/documentation-system-unification.md'];"
         }
       ],
       "readerRecordIds": [],
@@ -6350,7 +6631,7 @@
         "scripts/propose-doc-decisions.mjs"
       ],
       "readerCount": 0,
-      "status": "no actual reader in authored Step 5; co-changes only"
+      "status": "no actual reader; co-changes only"
     },
     {
       "path": "docs/enduser-docs-index.json",
@@ -6377,6 +6658,19 @@
           "sourceLine": "    description: '(Re)generate the end-user doc read-by-tag index, keyed by Diataxis quadrant (tutorial/how-to/reference/explanation). Enumerates docs/<quadrant>/, writes docs/enduser-docs-index.json with each entry\\'s purpose/audience (fixed quadrant mapping), docPath, title, and sourceCaptureId (the compound-learn capture that produced the doc, or null when none is recorded). Never touches .fgos/state.json, but does write a real file outside .fgos/ (externalEffect) -- skipped when the computed content is unchanged.',"
         },
         {
+          "file": "src/cli/command-registry.mjs",
+          "id": "author-s67-command-registry-manifest-861",
+          "recordFile": "step-05-records/cli-help-messages.jsonl",
+          "line": 861,
+          "role": "emitted-document-path",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+          "operation": "docs/enduser-docs-index.json",
+          "sourceLine": "    description: '(Re)generate docs/decisions/index.md, a projection of state.decisions\\' platform/repo-wide (scope-carrying) records -- never hand-edited, mirrors \"fgos docs-index\"\\'s own generate+drift shape for docs/enduser-docs-index.json (tsk-1lv-2 D4). --check never writes: reports whether the on-disk file matches a fresh regenerate, refusing (validation) on drift.',"
+        },
+        {
           "file": "src/report/enduser-index-generate.mjs",
           "id": "dynamic-009768",
           "recordFile": "step-05-records/generators-enduser-index.jsonl",
@@ -6401,6 +6695,84 @@
           "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
           "operation": "manifestPathFor(repoRoot)",
           "sourceLine": "  const manifestPath = manifestPathFor(repoRoot);"
+        },
+        {
+          "file": "src/report/enduser-index-generate.mjs",
+          "id": "dynamic-009772",
+          "recordFile": "step-05-records/generators-enduser-index.jsonl",
+          "line": 156,
+          "role": "emitted-document-path",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+          "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+          "operation": "path.relative(repoRoot, manifestPath)",
+          "sourceLine": "    path: path.relative(repoRoot, manifestPath).split(path.sep).join('/'),"
+        },
+        {
+          "file": "src/report/enduser-index-generate.mjs",
+          "id": "dynamic-009773",
+          "recordFile": "step-05-records/generators-enduser-index.jsonl",
+          "line": 156,
+          "role": "emitted-document-path",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+          "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+          "operation": "path.relative(repoRoot, manifestPath)",
+          "sourceLine": "    path: path.relative(repoRoot, manifestPath).split(path.sep).join('/'),"
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "id": "dynamic-014318",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "line": 3644,
+          "role": "emitted-document-path",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+          "operation": "manifestPathFor(root)",
+          "sourceLine": "      message: `${manifestPathFor(root)} not found -- nothing to check (project has not generated an end-user doc index yet)`,"
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "id": "dynamic-014329",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "line": 3681,
+          "role": "emitted-document-path",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+          "operation": "manifestRelPath",
+          "sourceLine": "    return { changed: false, message: `${manifestRelPath} already up to date (${count} tài liệu)` };"
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "id": "dynamic-014330",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "line": 3683,
+          "role": "emitted-document-path",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+          "operation": "manifestRelPath",
+          "sourceLine": "  return { changed: true, message: `regenerated ${manifestRelPath} (${count} tài liệu)` };"
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "id": "author-s4-fix2-2a45460821f48dec",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "line": 3678,
+          "role": "emitted-document-path",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+          "operation": "manifestPathFor(root)",
+          "sourceLine": "  if (!fs.existsSync(manifestPathFor(root))) return { changed: false, message: 'skipped -- no end-user doc index in this project (run fgos docs-index to adopt)' };"
         },
         {
           "file": "src/setup/registrations.mjs",
@@ -6440,19 +6812,6 @@
           "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
           "operation": "path.join(REPO_ROOT, 'docs', 'enduser-docs-index.json')",
           "sourceLine": "const MANIFEST_PATH = path.join(REPO_ROOT, 'docs', 'enduser-docs-index.json');"
-        },
-        {
-          "file": "test/cli/helpers/fgos-cli-harness.mjs",
-          "id": "dynamic-017973",
-          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
-          "line": 367,
-          "role": "document-path-product-output",
-          "admission": "ADMIT",
-          "disposition": "parked",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "82513627745ddfb86343c336b6f58cf283b02a7684e534b46fd91dc9369d6238",
-          "operation": "path.join(root, 'docs', 'enduser-docs-index.json')",
-          "sourceLine": "  return path.join(root, 'docs', 'enduser-docs-index.json');"
         },
         {
           "file": "test/cli/fgos-post-merge.test.mjs",
@@ -6531,6 +6890,19 @@
           "sourceSha256": "38bb42272cd89d9055f6ef4d635b54bc05bd5355a996253a2fcaf7afb7932008",
           "operation": "docsIndexManifestPath(cwd)",
           "sourceLine": "  assert.equal(JSON.parse(fs.readFileSync(docsIndexManifestPath(cwd), 'utf8')).length, 2, 'a real doc addition must still update the manifest');"
+        },
+        {
+          "file": "test/cli/helpers/fgos-cli-harness.mjs",
+          "id": "dynamic-017973",
+          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+          "line": 367,
+          "role": "document-path-product-output",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "82513627745ddfb86343c336b6f58cf283b02a7684e534b46fd91dc9369d6238",
+          "operation": "path.join(root, 'docs', 'enduser-docs-index.json')",
+          "sourceLine": "  return path.join(root, 'docs', 'enduser-docs-index.json');"
         }
       ],
       "coChanges": [
@@ -6639,19 +7011,6 @@
           "sourceLine": "test('fgos docs-index writes repo/docs/enduser-docs-index.json with the real how-to demo entry', () => {"
         },
         {
-          "file": "test/cli/helpers/fgos-cli-harness.mjs",
-          "id": "dynamic-017973",
-          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
-          "line": 367,
-          "role": "document-path-product-output",
-          "admission": "ADMIT",
-          "disposition": "parked",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "82513627745ddfb86343c336b6f58cf283b02a7684e534b46fd91dc9369d6238",
-          "operation": "path.join(root, 'docs', 'enduser-docs-index.json')",
-          "sourceLine": "  return path.join(root, 'docs', 'enduser-docs-index.json');"
-        },
-        {
           "file": "test/fixtures/run-outcome/legacy-derivation.json",
           "id": "author-s5-b6-legacy-derivation.json-4246-12",
           "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
@@ -6758,18 +7117,25 @@
       ],
       "readerRecordIds": [
         "author-s4-fix2-284fae1afd0a9579",
+        "author-s67-command-registry-manifest-861",
         "dynamic-009768",
         "dynamic-009769",
+        "dynamic-009772",
+        "dynamic-009773",
+        "dynamic-014318",
+        "dynamic-014329",
+        "dynamic-014330",
+        "author-s4-fix2-2a45460821f48dec",
         "author-s4-fix2-a8e9503a9eafcad1",
         "dynamic-021514",
         "dynamic-021515",
-        "dynamic-017973",
         "author-s5-b6-closure-manifest-reader-187",
         "author-s5-b6-closure-manifest-reader-188",
         "author-s5-b6-closure-manifest-reader-198",
         "author-s5-b6-closure-manifest-reader-201",
         "author-s5-b6-closure-manifest-reader-212",
-        "author-s5-b6-closure-manifest-reader-216"
+        "author-s5-b6-closure-manifest-reader-216",
+        "dynamic-017973"
       ],
       "generatorDependency": [
         "dynamic-009788",
@@ -6789,13 +7155,13 @@
         "test/setup/checks.test.mjs",
         "test/setup/helpers/setup-checks-harness.mjs"
       ],
-      "readerCount": 13,
+      "readerCount": 20,
       "status": "decision-open"
     }
   ],
   "unitCount": 43,
   "unitsWithReaders": 6,
-  "readerCount": 73,
-  "readerFiles": 16,
-  "scope": "All canonical Step 5 shards, seams 1–5. Proposed paths with no reader remain explicit. Fixture/title/comments are co-change entries, not fabricated reads. Manifest output coupling is explicit even though no standalone move target is in the pinned map."
+  "readerCount": 90,
+  "readerFiles": 17,
+  "scope": "All canonical authored Step5 shards, including seams6/7; every declared reader/output and comment/fixture co-change is individually pin-bound. No runtime-* shard edited."
 }

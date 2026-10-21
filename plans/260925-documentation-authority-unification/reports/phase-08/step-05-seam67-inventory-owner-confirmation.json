@@ -1,0 +1,20 @@
+{
+  "file": "scripts/generate-doc-inventory.mjs",
+  "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+  "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+  "existingOwner": "generators-projections",
+  "items": [
+    {
+      "id": "reference-003560",
+      "line": 339,
+      "disposition": "preserve"
+    },
+    {
+      "id": "reference-003568",
+      "line": 340,
+      "disposition": "preserve"
+    }
+  ],
+  "coupledTest": "test/scripts/check-doc-constitution.test.mjs:718-735 docs/specs/fixture.md",
+  "seam8Obligation": "Confirm this existing owner and preserve its fixture coupling if Phase9 changes classification; no duplicate owner or source edit added."
+}

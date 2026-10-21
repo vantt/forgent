@@ -1,0 +1,1695 @@
+{
+  "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+  "command": [
+    "git",
+    "grep",
+    "-n",
+    "-E",
+    "check-decision-citation-drift\\.mjs|check-legacy-docs-ratchet\\.mjs",
+    "97c9694a4b801d152e0deccfa0c58a11213c781f",
+    "--",
+    "README.md",
+    "docs/",
+    "core/skills/_shared/citation-format.md",
+    "package.json"
+  ],
+  "exit": 0,
+  "rawSha256": "681f6e8c8b0b3483864d986e344f11d2a3fc4a2de9d99eafd2eca329ca37ed72",
+  "hitCount": 167,
+  "references": [
+    {
+      "file": "core/skills/_shared/citation-format.md",
+      "line": 90,
+      "text": "`scripts/check-decision-citation-drift.mjs` (this fragment's own",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+          "recordLine": 4,
+          "recordSha256": "86f224f89fa21220da7521aa4faa94369e5a53ce0235d5f7fe3e30e3227d9b34"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+      "line": 6130,
+      "text": "✔ a genuinely new Nth occurrence of an already-duplicated text is not silently absorbed (tsk-1pf: count consumption, not membership, ported from check-decision-citation-drift.mjs) (0.225861ms)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+      "line": 6176,
+      "text": "✔ a genuinely new Nth occurrence of an already-duplicated text is not silently absorbed (tsk-1pf: count consumption, not membership, ported from check-decision-citation-drift.mjs) (0.13065ms)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+      "line": 6175,
+      "text": "✔ a genuinely new Nth occurrence of an already-duplicated text is not silently absorbed (tsk-1pf: count consumption, not membership, ported from check-decision-citation-drift.mjs) (0.16688ms)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+      "line": 6165,
+      "text": "✔ a genuinely new Nth occurrence of an already-duplicated text is not silently absorbed (tsk-1pf: count consumption, not membership, ported from check-decision-citation-drift.mjs) (0.135467ms)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+      "line": 6175,
+      "text": "✔ a genuinely new Nth occurrence of an already-duplicated text is not silently absorbed (tsk-1pf: count consumption, not membership, ported from check-decision-citation-drift.mjs) (0.239492ms)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+      "line": 4052,
+      "text": "✔ a genuinely new Nth occurrence of an already-duplicated text is not silently absorbed (tsk-1pf: count consumption, not membership, ported from check-decision-citation-drift.mjs) (0.360949ms)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log",
+      "line": 4835,
+      "text": "✔ a genuinely new Nth occurrence of an already-duplicated text is not silently absorbed (tsk-1pf: count consumption, not membership, ported from check-decision-citation-drift.mjs) (0.329165ms)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/explanation/citation-baseline-cleanup-calibration-slice.md",
+      "line": 7,
+      "text": "`check-decision-citation-drift.mjs` (`tsk-37i`) ratchets against a",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-063.jsonl",
+          "recordLine": 13,
+          "recordSha256": "cf26e3113a7e730c8252deb6f7fa3616c8307be673da103f648b468a5c89f138"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/explanation/fgos-preflight-verb.md",
+      "line": 25,
+      "text": "`scripts/check-decision-citation-drift.mjs` and",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-065.jsonl",
+          "recordLine": 12,
+          "recordSha256": "83ab48b377ce021f0f1c8ec5519115e1d4eb330025e423059df422e5e89d9771"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/explanation/rul11-anchor-test-citation-gloss-update.md",
+      "line": 37,
+      "text": "ever changes again. `check-decision-citation-drift.mjs` reports 0",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-067.jsonl",
+          "recordLine": 3,
+          "recordSha256": "5b2d481c4abd83d7c8f5e0087e59a1b8e629d479bb3f750f92e4fe0c1d399a96"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/backlog-execution-reconciliation/RECONCILIATION.md",
+      "line": 281,
+      "text": "decisions (`scripts/check-decision-citation-drift.mjs`), none for this.",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/canonical-decision-projection/DISCUSSION.md",
+      "line": 219,
+      "text": "- `scripts/check-decision-citation-drift.mjs` (spec:",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/canonical-decision-projection/DISCUSSION.md",
+      "line": 522,
+      "text": "`check-decision-citation-drift.mjs`. Xác nhận: **CẢ 2 script fgOS đang có",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/canonical-decision-projection/DISCUSSION.md",
+      "line": 534,
+      "text": "- Nâng `check-decision-citation-drift.mjs` + `check-decision-supersession.mjs`",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/canonical-decision-projection/DISCUSSION.md",
+      "line": 774,
+      "text": "   trong repo (`check-decision-citation-drift.mjs`,",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/canonical-decision-projection/DISCUSSION.md",
+      "line": 1138,
+      "text": "  `check-decision-citation-drift.mjs` hiện tại chỉ quét `docs/backlog.md`+",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/canonical-decision-projection/plan.md",
+      "line": 73,
+      "text": "| 1. decision-relation-and-sweep | Cao | Đổi CLI contract (`--relation` bắt buộc) — mọi caller hiện có của `fgos decision` (mọi skill + mọi project dùng fgOS, D1) phải cập nhật, breaking nếu không backward-compat. Sweep phải quét `docs/**`+`src/**`+`plugins/**` (đúng D2's \"sweep docs/**\"), KHÔNG chỉ `docs/backlog.md`+`docs/specs/*.md` như `check-decision-citation-drift.mjs` hiện đang quét — review tìm ra 32 hit thật trong `docs/enduser-docs-index.json` nằm NGOÀI phạm vi quét hiện tại | Chạy thử `fgos decision` không `--relation`, xác nhận refuse đúng thông báo; kiểm đếm caller hiện có (6 skill: discovering/exploring/planning/shaping/validating/coding-shape-distill+merge-loop, đã grep xác nhận) trước khi khoá breaking; xác nhận sweep mới bắt được ≥1 case thật ngoài phạm vi cũ |",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/canonical-decision-projection/plan.md",
+      "line": 76,
+      "text": "| 4. retire-decisions-corpus | Cao | Xoá/di chuyển 35 file đang được cite RỘNG hơn ban đầu tưởng — không chỉ `docs/backlog.md`/`docs/specs/*.md`, còn `src/runner/merge.mjs` (hardcode collision-resolve subsystem ~250 dòng), `check-decision-supersession.mjs` (throw cứng nếu thiếu `0000-index.md`) | Chạy `check-decision-citation-drift.mjs` (đã nâng cấp phạm vi quét ở mảnh 1) trên TOÀN repo SAU migrate, xác nhận 0 dangling reference — proof này giờ mới thật sự đáng tin vì phạm vi quét đã mở rộng đúng |",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/canonical-decision-projection/plan.md",
+      "line": 116,
+      "text": "    \"footprint\": [\"bin/fgos.mjs\", \"src/state/store.mjs\", \"scripts/check-decision-citation-drift.mjs\", \"scripts/check-decision-supersession.mjs\", \"test/state/decision-relation.test.mjs\"],",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/canonical-decision-projection/plan.md",
+      "line": 143,
+      "text": "    \"footprint\": [\"docs/decisions\", \"docs/specs\", \"src/runner/merge.mjs\", \"scripts/check-decision-citation-drift.mjs\", \"scripts/check-decision-supersession.mjs\", \"test/docs/decisions-corpus-retired.test.mjs\"],",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/close-distribution-spec-doctor-fix/CONTEXT.md",
+      "line": 39,
+      "text": "- `scripts/check-decision-citation-drift.mjs` baseline run: 3 pre-existing findings, none in `docs/specs/distribution.md` (they're in `docs/backlog.md` and `docs/specs/decision-citation-drift.md`, an unrelated pre-existing drift). RUL11's own citation is a local `(per D8)` — `distribution.md`'s own internal D-numbering, not the global 4-digit/ADR scheme this checker scans — so this checker doesn't gate anything in the rewrite either way. Confirmed by reading the checker's own `DECISION_ID_PATTERN`.",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/close-distribution-spec-doctor-fix/plan.md",
+      "line": 38,
+      "text": "`scripts/check-decision-citation-drift.mjs` reports no new finding in this",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/decision-code-check-enforcement/CONTEXT.md",
+      "line": 63,
+      "text": "- `scripts/check-decision-citation-drift.mjs` +",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/decision-code-check-enforcement/plan.md",
+      "line": 14,
+      "text": "(`scripts/check-decision-citation-drift.mjs`,",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/fgos-choke-point-survey/plan.md",
+      "line": 88,
+      "text": "   (`scripts/` already holds `check-decision-citation-drift.mjs` /",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/fgos-coding-implement-decide-first-prose/plan.md",
+      "line": 80,
+      "text": "(`scripts/check-decision-citation-drift.mjs:152`) — this item's own edit",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/fgos-preflight-verb/RESEARCH.md",
+      "line": 7,
+      "text": "`check-decision-citation-drift.mjs`, `check-backlog-reconciliation.mjs`)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/fgos-preflight-verb/RESEARCH.md",
+      "line": 65,
+      "text": "- `scripts/check-decision-citation-drift.mjs`: has a clean CLI contract —",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/fgos-preflight-verb/RESEARCH.md",
+      "line": 68,
+      "text": "  (`scripts/check-decision-citation-drift.mjs:437,509-513`), so it is safe",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/fgos-preflight-verb/RESEARCH.md",
+      "line": 69,
+      "text": "  to import OR to spawn as `node scripts/check-decision-citation-drift.mjs`.",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/fgos-preflight-verb/plan.md",
+      "line": 49,
+      "text": "   scripts/check-decision-citation-drift.mjs` (confirmed clean CLI",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/fgos-preflight-verb/plan.md",
+      "line": 51,
+      "text": "   `import.meta.url` guard — `scripts/check-decision-citation-drift.mjs:437,",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/herdr-web-dashboard-plan-realignment/plan.md",
+      "line": 10,
+      "text": "- **existing covered behavior** — `scripts/check-decision-citation-drift.mjs` quét `docs/backlog.md` + `docs/specs/*.md` tìm dòng còn trích quyết định đã bị supersede; D12/D13 đụng đúng vùng đó.",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/self-contained-id-references/CONTEXT.md",
+      "line": 23,
+      "text": "| D3 | The machine check for (a) extends the EXISTING `scripts/check-decision-citation-drift.mjs` — a new finding type (bare id with no gloss, covering ADR/RUL/D-local uniformly across every shape observed in scout evidence: `(D2)`, `(D2, D4)`, a heading-parenthetical `(D2 — ...)`, and a slash-list `D1/D2`; plus a separate D-local-cited-outside-its-own-CONTEXT.md finding) and a widened scan surface (`.agents/skills/**/SKILL.md` + `plugins/fgOS/skills/**/SKILL.md`, currently it only scans `docs/backlog.md` + `docs/specs/*.md`) — rather than a third sibling CLI script. `scripts/check-decision-supersession.mjs` is untouched: confirmed by reading both scripts' source that it checks a structurally different surface (internal `docs/decisions/*.md` frontmatter backward-pointer pairs, not prose citations elsewhere) — independently re-confirmed during plan review. |",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/self-contained-id-references/CONTEXT.md",
+      "line": 66,
+      "text": "- `scripts/check-decision-citation-drift.mjs` (source read directly):",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/self-contained-id-references/CONTEXT.md",
+      "line": 107,
+      "text": "  - `node scripts/check-decision-citation-drift.mjs` (no args, run live",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/self-contained-id-references/DISCUSSION.md",
+      "line": 203,
+      "text": "     `scripts/check-decision-citation-drift.mjs` (spec:",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/self-contained-id-references/DISCUSSION.md",
+      "line": 248,
+      "text": "        CHECK[\"Mở rộng scripts/check-decision-citation-drift.mjs<br/>+ check-decision-supersession.mjs (ĐÃ CÓ, chạy tay) --<br/>wire vào npm test, thêm negative-control (mảnh 1)\"]",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/self-contained-id-references/DISCUSSION.md",
+      "line": 269,
+      "text": "  SẴN trong repo (`scripts/check-decision-citation-drift.mjs`,",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/self-contained-id-references/plan.md",
+      "line": 7,
+      "text": "`scripts/check-decision-citation-drift.mjs`, which already has",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/self-contained-id-references/plan.md",
+      "line": 40,
+      "text": "script (rejected, D3 — `check-decision-citation-drift.mjs` already owns",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/self-contained-id-references/plan.md",
+      "line": 54,
+      "text": "| Extending `check-decision-citation-drift.mjs` with new finding types + widened scan surface | medium — touches a script with existing test coverage; a regression here could reintroduce false-negatives on the ALREADY-shipped dead-framing check | `npm test` green (existing dead-framing tests untouched/still passing) + new tests for the new finding types, same file |",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/self-contained-id-references/plan.md",
+      "line": 58,
+      "text": "| Baseline must cover ALL finding kinds at generation time, including the 3 pre-existing `dead-framing` findings (D6) | low once named, high if silently missed — confirmed live today: `node scripts/check-decision-citation-drift.mjs` (no args) reports exactly 3 findings, all pre-existing | the `--write-baseline` run's own output count includes all kinds; a follow-up bare run exits 0 |",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/self-contained-id-references/plan.md",
+      "line": 73,
+      "text": "1. `scripts/check-decision-citation-drift.mjs` — add the new finding types",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/self-contained-id-references/plan.md",
+      "line": 169,
+      "text": "  today (`node scripts/check-decision-citation-drift.mjs`, no args) that",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/self-contained-id-references/plan.md",
+      "line": 205,
+      "text": "  && node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/spec-docs-lifecycle-realignment/plan-tsk-1xn.md",
+      "line": 6,
+      "text": "`scripts/check-decision-citation-drift.mjs` over `docs/backlog.md`, one of this",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/spec-docs-lifecycle-realignment/plan-tsk-1xn.md",
+      "line": 114,
+      "text": "| Breaking `scripts/check-decision-citation-drift.mjs`, which scans `docs/backlog.md` | **medium** | `npm test` is the first clause of the item's own verify. |",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/spec-docs-lifecycle-realignment/plan-tsk-2t5.md",
+      "line": 124,
+      "text": "this file via scripts/check-decision-citation-drift.mjs. It does not:",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/spec-docs-lifecycle-realignment/plan-tsk-3j1.md",
+      "line": 26,
+      "text": "`scripts/check-decision-citation-drift.mjs` trên `docs/specs/*.md` thật. Đọc",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/spec-docs-lifecycle-realignment/plan.md",
+      "line": 9,
+      "text": "`scripts/check-decision-citation-drift.mjs` over `docs/specs/*.md` and",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/spec-docs-lifecycle-realignment/plan.md",
+      "line": 88,
+      "text": "| Breaking `scripts/check-decision-citation-drift.mjs`, which scans `docs/specs/*.md` and `docs/backlog.md` for superseded decision citations | **medium** | `npm test` is the first clause of every child's verify. |",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-12v-wide-sweep-agents-skills-root/plan.md",
+      "line": 12,
+      "text": "(`scripts/check-decision-citation-drift.mjs:296`) is `['docs', 'src',",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-12v-wide-sweep-agents-skills-root/plan.md",
+      "line": 34,
+      "text": "- `scripts/check-decision-citation-drift.mjs:296` — one array entry.",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-1lv-1/iron-law-evidence.md",
+      "line": 41,
+      "text": "`scripts/check-decision-citation-drift.mjs` from the parent commit into",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-1lv-1/iron-law-evidence.md",
+      "line": 46,
+      "text": "$ git checkout HEAD~1 -- bin/fgos.mjs src/state/store.mjs scripts/check-decision-citation-drift.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-1lv-1/iron-law-evidence.md",
+      "line": 52,
+      "text": "SyntaxError: The requested module '../../scripts/check-decision-citation-drift.mjs' does not provide an export named 'collectWideSourceFiles'",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-1lv-1/iron-law-evidence.md",
+      "line": 65,
+      "text": "$ git checkout HEAD -- bin/fgos.mjs src/state/store.mjs scripts/check-decision-citation-drift.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-1lv-1/iron-law-evidence.md",
+      "line": 97,
+      "text": "`scripts/check-decision-citation-drift.mjs`,",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-1lv-1/plan.md",
+      "line": 31,
+      "text": "  `docs/**`+`src/**`+`plugins/**` (`scripts/check-decision-citation-drift.mjs`'s",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-1pf-membership-and-proto-hardening/RESEARCH.md",
+      "line": 10,
+      "text": "`scripts/check-decision-citation-drift.mjs` (fresh full read, post",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-1pf-membership-and-proto-hardening/RESEARCH.md",
+      "line": 46,
+      "text": "- `check-decision-citation-drift.mjs:182` `findNewFindings`'s own",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-1pf-membership-and-proto-hardening/RESEARCH.md",
+      "line": 51,
+      "text": "- `check-decision-citation-drift.mjs:204` `baselineFromFindings`'s",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-1pf-membership-and-proto-hardening/RESEARCH.md",
+      "line": 53,
+      "text": "- `check-decision-citation-drift.mjs:388` `loadBaseline`'s `return {}`",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-1pf-membership-and-proto-hardening/plan.md",
+      "line": 20,
+      "text": "`check-decision-citation-drift.mjs`. Port the same count-consumption",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-1pf-membership-and-proto-hardening/plan.md",
+      "line": 32,
+      "text": "`check-decision-citation-drift.mjs`'s own `findNewFindings` (`remaining",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-1pf-membership-and-proto-hardening/plan.md",
+      "line": 48,
+      "text": "- `scripts/check-decision-citation-drift.mjs` — `findNewFindings`",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-1pf-membership-and-proto-hardening/plan.md",
+      "line": 87,
+      "text": "  `check-decision-codes.mjs` and `check-decision-citation-drift.mjs`.",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2sp-citation-drift-remaining-backlog/RESEARCH.md",
+      "line": 16,
+      "text": "- `scripts/check-decision-citation-drift.mjs:1-45` — header comment (fix",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2sp-citation-drift-remaining-backlog/RESEARCH.md",
+      "line": 114,
+      "text": "node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills --write-baseline",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2sp-citation-drift-remaining-backlog/plan.md",
+      "line": 81,
+      "text": "(`check-decision-citation-drift.mjs:9-20`):",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2sp-citation-drift-remaining-backlog/plan.md",
+      "line": 154,
+      "text": "    \"verify\": \"node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills --write-baseline && node -e \\\"const d=require('./scripts/check-decision-citation-drift.baseline.json'); const r=(d['docs/specs/work-state.md']||[]).filter(e=>e.startsWith('d-local-outside-home:')); if(r.length!==0){console.error('still',r.length,'d-local-outside-home findings in work-state.md');process.exit(1);} console.log('work-state.md d-local-outside-home: 0');\\\"\",",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2sp-citation-drift-remaining-backlog/plan.md",
+      "line": 155,
+      "text": "    \"action\": \"Fix the 301 d-local-outside-home findings in docs/specs/work-state.md per check-decision-citation-drift.mjs's own documented fix contract (script header, lines 9-20): inline each cited D-local id's real content and delete the id. This is the deferred remainder of tsk-2yu's own calibration file, same file, single remaining kind, per tsk-2yu's own plan.md Split section which explicitly deferred exactly this set to this follow-on planning round.\",",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2sp-citation-drift-remaining-backlog/plan.md",
+      "line": 162,
+      "text": "    \"verify\": \"node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills --write-baseline && node -e \\\"const d=require('./scripts/check-decision-citation-drift.baseline.json'); const r=(d['docs/specs/runner.md']||[]); if(r.length!==0){console.error('still',r.length,'findings in runner.md');process.exit(1);} console.log('runner.md findings: 0');\\\"\",",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2sp-citation-drift-remaining-backlog/plan.md",
+      "line": 163,
+      "text": "    \"action\": \"Fix the 412 findings in docs/specs/runner.md (304 d-local-outside-home + 108 bare-citation) per check-decision-citation-drift.mjs's own documented fix contract (script header, lines 9-20): add a one-line gloss after each bare ADR<n>/RUL<n> id, and inline+delete each D-local id cited outside its home CONTEXT.md. Isolated into its own child (largest single remaining file, load-bearing per AGENTS.md's own D-ADR0030 citation) rather than batched with the smaller docs/*.md files, so a bad edit here does not ride along with nine unrelated files in one commit.\",",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2sp-citation-drift-remaining-backlog/plan.md",
+      "line": 170,
+      "text": "    \"verify\": \"npm test && node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills --write-baseline && node -e \\\"const d=require('./scripts/check-decision-citation-drift.baseline.json'); const names=['_shared','fgos-clarifying','fgos-coding-compounding','fgos-coding-discovering','fgos-coding-driving','fgos-coding-exploring','fgos-coding-implement','fgos-coding-planning','fgos-coding-validating','fgos-fanout','fgos-indexing','fgos-researching','fgos-routing','fgos-unlock']; const fileFor=n=>n==='_shared'?'executor-dispatch-fallback.md':'SKILL.md'; let bad=[]; for (const n of names){ for (const root of ['.agents/skills/','plugins/fgOS/skills/']){ const f=root+n+'/'+fileFor(n); const arr=d[f]; if (arr && arr.length) bad.push(f+':'+arr.length); } } if(bad.length){console.error('still findings:',bad.join(', '));process.exit(1);} console.log('agents+plugin mirror skill findings: 0');\\\"\",",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2sp-citation-drift-remaining-backlog/plan.md",
+      "line": 171,
+      "text": "    \"action\": \"Fix the 270 findings in the 14 .agents/skills canonical dev-skill sources (13 SKILL.md files plus .agents/skills/_shared/executor-dispatch-fallback.md) per check-decision-citation-drift.mjs's own documented fix contract (script header, lines 9-20), then hand-copy each same edit into the matching plugins/fgOS/skills/<name>/ mirror file (byte-identical contract enforced by test/skills/fgos-mirror.test.mjs) rather than re-researching the same 270 findings a second time in the mirror copy. distill/ and fgos-coding-shaping/ carry zero findings today and are out of this child's real scope. Read docs/how-to/write-verify-for-a-skill-prose-change.md first (plan step 5's own trigger: this touches SKILL.md/skill-prose paths) -- the checker's own baseline assertion plus npm test's fgos-mirror byte-identity re-check together serve as this doc's POSITIVE (new content present, mirror still consistent) and NEGATIVE (old bare-citation/d-local pattern gone) proof, more precise here than a generic grep since the checker is a purpose-built prose-citation validator.\",",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2sp-citation-drift-remaining-backlog/plan.md",
+      "line": 178,
+      "text": "    \"verify\": \"npm test && node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills --write-baseline && node -e \\\"const d=require('./scripts/check-decision-citation-drift.baseline.json'); const mirroredNames=new Set(['_shared','distill','fgos-clarifying','fgos-coding-compounding','fgos-coding-discovering','fgos-coding-driving','fgos-coding-exploring','fgos-coding-implement','fgos-coding-planning','fgos-coding-shaping','fgos-coding-validating','fgos-fanout','fgos-indexing','fgos-researching','fgos-routing','fgos-unlock']); let total=0; for (const [f,arr] of Object.entries(d)){ if(!f.startsWith('plugins/fgOS/skills/')) continue; const name=f.slice('plugins/fgOS/skills/'.length).split('/')[0]; if (mirroredNames.has(name)) continue; total+=arr.length; } if(total!==0){console.error('still',total,'plugin-only findings');process.exit(1);} console.log('plugin-only skill findings: 0');\\\"\",",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2sp-citation-drift-remaining-backlog/plan.md",
+      "line": 179,
+      "text": "    \"action\": \"Fix the 120 findings across the 33 plugins/fgOS/skills/<name>/SKILL.md files listed in this child's own footprint (CLI-wrapper skills with no .agents/skills counterpart, standalone content), per check-decision-citation-drift.mjs's own documented fix contract (script header, lines 9-20). Read docs/how-to/write-verify-for-a-skill-prose-change.md first (same SKILL.md-path trigger as the sibling child above) -- same checker-assertion-as-POSITIVE/NEGATIVE reasoning applies, no mirror-sync step needed here since these files have no .agents/skills source to keep in lockstep with. Footprint is the exact 33-file list, disjoint by construction from the sibling child's 14-name mirror-pair footprint above (verified: zero shared literal path strings, RESEARCH.md round 1) -- never widen it back to the bare plugins/fgOS/skills directory string, which would collide with that child's own footprint entries under footprintOverlapAmong's exact-path-match check (src/state/graph-metrics.mjs:599-623).\",",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2sp-citation-drift-remaining-backlog/plan.md",
+      "line": 186,
+      "text": "    \"verify\": \"node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills --write-baseline && node -e \\\"const d=require('./scripts/check-decision-citation-drift.baseline.json'); const files=['docs/backlog.md','docs/specs/decision-citation-drift.md','docs/specs/distillery.md','docs/specs/distribution.md','docs/specs/enduser-docs-authoring.md','docs/specs/enduser-docs-index.md','docs/specs/herdr-web-dashboard.md','docs/specs/platform-foundations.md','docs/specs/reading-map.md','docs/specs/system-overview.md']; let total=0; for (const f of files){ total += (d[f]||[]).length; } if(total!==0){console.error('still',total,'findings across remaining docs files');process.exit(1);} console.log('remaining docs findings: 0');\\\"\",",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2sp-citation-drift-remaining-backlog/plan.md",
+      "line": 187,
+      "text": "    \"action\": \"Fix the 306 findings across docs/backlog.md and the 9 remaining docs/specs/*.md files (decision-citation-drift, distillery, distribution, enduser-docs-authoring, enduser-docs-index, herdr-web-dashboard, platform-foundations, reading-map, system-overview), per check-decision-citation-drift.mjs's own documented fix contract (script header, lines 9-20): add a one-line gloss after each bare ADR<n>/RUL<n> id, inline+delete each D-local id cited outside its home CONTEXT.md. Batched into one child since no single file here is large enough to warrant its own isolation the way work-state.md/runner.md do, and none of these 10 files overlap with any other child's footprint.\",",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2yu-citation-baseline-cleanup/RESEARCH.md",
+      "line": 13,
+      "text": "- `scripts/check-decision-citation-drift.mjs:1-25` — header comment naming",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2yu-citation-baseline-cleanup/RESEARCH.md",
+      "line": 26,
+      "text": "- Fix contract per kind, per `check-decision-citation-drift.mjs:9-20`",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2yu-citation-baseline-cleanup/RESEARCH.md",
+      "line": 55,
+      "text": "**Asked:** does a bare `node scripts/check-decision-citation-drift.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2yu-citation-baseline-cleanup/RESEARCH.md",
+      "line": 65,
+      "text": "`docs/specs/*.md` only, per `check-decision-citation-drift.mjs`'s own",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2yu-citation-baseline-cleanup/RESEARCH.md",
+      "line": 77,
+      "text": "node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions \\",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2yu-citation-baseline-cleanup/plan.md",
+      "line": 114,
+      "text": "    \"verify\": \"node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills --write-baseline && node -e \\\"const d=require('./scripts/check-decision-citation-drift.baseline.json'); const remaining=(d['docs/specs/work-state.md']||[]).filter(e=>e.startsWith('bare-citation:')); if(remaining.length!==0){console.error('still',remaining.length,'bare-citation findings in work-state.md'); process.exit(1);} console.log('work-state.md bare-citation findings: 0');\\\"\",",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2yu-citation-baseline-cleanup/plan.md",
+      "line": 115,
+      "text": "    \"action\": \"Fix the 124 bare-citation findings in docs/specs/work-state.md per check-decision-citation-drift.mjs's own documented fix contract (script header, lines 9-20): add a one-line gloss right after each bare ADR<n>/RUL<n> id, in the shape \\\"<ID> (<one-line gloss>)\\\". This is tsk-2yu's own proof-of-approach slice, narrowed at validating to the single easier kind in the largest file (work-state.md, 23.8% of the 1788-finding total) so the calibration signal is not muddied by mixing it with d-local-outside-home's much heavier real-rewrite effort. work-state.md's own 301 d-local-outside-home findings are deferred to the follow-on planning round, same as the other 72 files.\",",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2yu/iron-law-evidence.md",
+      "line": 33,
+      "text": "node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills --write-baseline && node -e \"const d=require('./scripts/check-decision-citation-drift.baseline.json');const n=Object.values(d).flat().length;if(n>=1788)process.exit(1);console.log('baseline count:',n)\"",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2yu/iron-law-evidence.md",
+      "line": 45,
+      "text": "$ node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills --write-baseline && node -e \"const d=require('./scripts/check-decision-citation-drift.baseline.json');const n=Object.values(d).flat().length;if(n>=1788)process.exit(1);console.log('baseline count:',n)\"",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-2yu/iron-law-evidence.md",
+      "line": 60,
+      "text": "$ node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills --write-baseline && node -e \"const d=require('./scripts/check-decision-citation-drift.baseline.json');const n=Object.values(d).flat().length;if(n>=1788)process.exit(1);console.log('baseline count:',n)\"",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-352f-generated-wrapper-d-local-citation-cleanup/RESEARCH.md",
+      "line": 19,
+      "text": "`check-decision-citation-drift.mjs`'s `d-local-outside-home` finding",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-352f-generated-wrapper-d-local-citation-cleanup/plan.md",
+      "line": 108,
+      "text": "`scripts/check-decision-citation-drift.mjs`'s rewrite and",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-3uw4-rul11-citation-gloss/RESEARCH.md",
+      "line": 27,
+      "text": "- `scripts/check-decision-citation-drift.mjs` — `CITATION_RE =",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-3uw4-rul11-citation-gloss/RESEARCH.md",
+      "line": 87,
+      "text": "&& node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-3uw4-rul11-citation-gloss/plan.md",
+      "line": 58,
+      "text": "node --test test/docs/rul11-anchor-phrase.test.mjs && node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills --write-baseline && node -e \"const d=require('./scripts/check-decision-citation-drift.baseline.json'); const r=(d['docs/specs/platform-foundations.md']||[]); if(r.length!==0){console.error('still',r.length,'findings on platform-foundations.md');process.exit(1);} console.log('platform-foundations.md findings: 0');\"",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-3x8-citation-drift-baseline-line-keying/RESEARCH.md",
+      "line": 1,
+      "text": "# RESEARCH: check-decision-citation-drift.mjs line-keyed baseline",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-3x8-citation-drift-baseline-line-keying/RESEARCH.md",
+      "line": 9,
+      "text": "**Checked:** `scripts/check-decision-citation-drift.mjs` (full read),",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-3x8-citation-drift-baseline-line-keying/RESEARCH.md",
+      "line": 15,
+      "text": "(`scripts/check-decision-citation-drift.mjs:157-164`) keys every finding",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-3x8-citation-drift-baseline-line-keying/RESEARCH.md",
+      "line": 27,
+      "text": "(`scripts/check-decision-citation-drift.mjs:315-327`) calls",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-3x8-citation-drift-baseline-line-keying/plan.md",
+      "line": 1,
+      "text": "# Plan: re-key check-decision-citation-drift.mjs's baseline by content, not line",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-3x8-citation-drift-baseline-line-keying/plan.md",
+      "line": 13,
+      "text": "`scripts/check-decision-citation-drift.mjs` to match `check-decision-codes.mjs`'s",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-3x8-citation-drift-baseline-line-keying/plan.md",
+      "line": 16,
+      "text": "`check-decision-citation-drift.mjs:157-164` vs `check-decision-codes.mjs:50-57`).",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-3x8-citation-drift-baseline-line-keying/plan.md",
+      "line": 40,
+      "text": "- `scripts/check-decision-citation-drift.mjs` — `baselineFromFindings`",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-3x8-citation-drift-baseline-line-keying/plan.md",
+      "line": 63,
+      "text": "(`scripts/check-decision-citation-drift.mjs` is new-ish, tsk-37i), so",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-3x8-citation-drift-baseline-line-keying/plan.md",
+      "line": 71,
+      "text": "`check-decision-citation-drift.mjs`'s own `runCli` and imported ONLY by",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-3xog/plan.md",
+      "line": 35,
+      "text": "   family as `scripts/check-decision-citation-drift.mjs`",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-4lh-stale-claim-release-docs/RESEARCH.md",
+      "line": 71,
+      "text": "- `scripts/check-decision-citation-drift.mjs:42-160` (repo read): the",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-4lh-stale-claim-release-docs/RESEARCH.md",
+      "line": 86,
+      "text": "attribution. Re-ran `node scripts/check-decision-citation-drift.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-539/CONTEXT.md",
+      "line": 40,
+      "text": "  15-character-ish heuristic `scripts/check-decision-citation-drift.mjs`",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-539/RESEARCH.md",
+      "line": 46,
+      "text": "  (`scripts/check-decision-citation-drift.mjs`) had two CRITICAL bugs at",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-539/plan.md",
+      "line": 68,
+      "text": "- Extending `scripts/check-decision-citation-drift.mjs` — rejected in",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-679/RESEARCH.md",
+      "line": 17,
+      "text": "**Checked:** `scripts/check-decision-citation-drift.mjs` (full read),",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-679/RESEARCH.md",
+      "line": 28,
+      "text": "   (`scripts/check-decision-citation-drift.mjs:105-160`) already",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-679/RESEARCH.md",
+      "line": 39,
+      "text": "   (`scripts/check-decision-citation-drift.mjs:371-392`), has no",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-679/RESEARCH.md",
+      "line": 57,
+      "text": "   grouping, `scripts/check-decision-citation-drift.mjs:45-46`).",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-679/RESEARCH.md",
+      "line": 87,
+      "text": "(`scripts/check-decision-citation-drift.mjs:371-392`,",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-679/iron-law-evidence.md",
+      "line": 21,
+      "text": "(`scripts/check-decision-citation-drift.mjs`, `bin/fgos.mjs`,",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-679/plan.md",
+      "line": 20,
+      "text": "`findWideCitationFindings` (`scripts/check-decision-citation-drift.mjs:371-392`)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-679/plan.md",
+      "line": 27,
+      "text": "`scripts/check-decision-citation-drift.mjs:108`) — treating it as a",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-679/plan.md",
+      "line": 46,
+      "text": "1. Add a pure helper to `scripts/check-decision-citation-drift.mjs` that",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-679/plan.md",
+      "line": 48,
+      "text": "   (`scripts/check-decision-citation-drift.mjs:45-46`) already",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-679/plan.md",
+      "line": 77,
+      "text": "- `scripts/check-decision-citation-drift.mjs` — D-local detection helper +",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-6at-citation-drift-review-round/RESEARCH.md",
+      "line": 6,
+      "text": "(commits `e4d71a09`/`57533464`) to `scripts/check-decision-citation-drift.mjs`,",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-6at-citation-drift-review-round/RESEARCH.md",
+      "line": 9,
+      "text": "**Checked:** `scripts/check-decision-citation-drift.mjs` (fresh full read",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-6at-citation-drift-review-round/RESEARCH.md",
+      "line": 17,
+      "text": "`findingKey(f)` (`check-decision-citation-drift.mjs:159-161`) is",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-6at-citation-drift-review-round/RESEARCH.md",
+      "line": 83,
+      "text": "`check-decision-citation-drift.mjs`; touching the sibling file is a",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-6at-citation-drift-review-round/RESEARCH.md",
+      "line": 160,
+      "text": "duplicate-key handling in `check-decision-citation-drift.mjs`) needed a",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-6at-citation-drift-review-round/plan.md",
+      "line": 25,
+      "text": "(`check-decision-citation-drift.mjs:163-169`) checks baseline membership",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-6at-citation-drift-review-round/plan.md",
+      "line": 58,
+      "text": "- `scripts/check-decision-citation-drift.mjs` — `findNewFindings` only",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-6at-citation-drift-review-round/plan.md",
+      "line": 91,
+      "text": "| Sibling `check-decision-codes.mjs` has the same latent shape | Out of scope for THIS item (its own description scopes to `check-decision-citation-drift.mjs`) | Flagged plainly in RESEARCH.md and this plan, not silently fixed here — a real, separate follow-up |",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-6at-citation-drift-review-round/plan.md",
+      "line": 122,
+      "text": "`check-decision-citation-drift.mjs`'s `findNewFindings`). The sibling",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-6at/iron-law-evidence.md",
+      "line": 21,
+      "text": "Ran against the pre-fix `scripts/check-decision-citation-drift.mjs`",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-zl5-post-merge-audit/RESEARCH.md",
+      "line": 23,
+      "text": "  scripts/check-decision-citation-drift.mjs) exist on disk (`ls -la`, all",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/history/tsk-zl5-post-merge-audit/REVIEW.md",
+      "line": 128,
+      "text": "`node scripts/check-decision-citation-drift.mjs` reports 3 findings, all",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "dated-history",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/how-to/fix-bare-citation-findings.md",
+      "line": 2,
+      "text": "authoritative_for: fixing a bare-citation finding, check-decision-citation-drift.mjs fix contract",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl",
+          "recordLine": 13,
+          "recordSha256": "21085224f3c993a2c03f2fa82855bb9e454411b75ae965c08bcfb56e04e4b4fc"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/how-to/fix-bare-citation-findings.md",
+      "line": 7,
+      "text": "`check-decision-citation-drift.mjs` flags a `bare-citation` finding when a",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl",
+          "recordLine": 13,
+          "recordSha256": "21085224f3c993a2c03f2fa82855bb9e454411b75ae965c08bcfb56e04e4b4fc"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/how-to/fix-bare-citation-findings.md",
+      "line": 52,
+      "text": "node scripts/check-decision-citation-drift.mjs \\",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl",
+          "recordLine": 13,
+          "recordSha256": "21085224f3c993a2c03f2fa82855bb9e454411b75ae965c08bcfb56e04e4b4fc"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/how-to/fix-d-local-outside-home-findings.md",
+      "line": 2,
+      "text": "authoritative_for: fixing a d-local-outside-home finding, check-decision-citation-drift.mjs D-local id fix contract",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl",
+          "recordLine": 14,
+          "recordSha256": "21085224f3c993a2c03f2fa82855bb9e454411b75ae965c08bcfb56e04e4b4fc"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/how-to/fix-d-local-outside-home-findings.md",
+      "line": 7,
+      "text": "`check-decision-citation-drift.mjs` flags a `d-local-outside-home`",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl",
+          "recordLine": 14,
+          "recordSha256": "21085224f3c993a2c03f2fa82855bb9e454411b75ae965c08bcfb56e04e4b4fc"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/how-to/fix-d-local-outside-home-findings.md",
+      "line": 59,
+      "text": "Same as the `bare-citation` fix — run `check-decision-citation-drift.mjs",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl",
+          "recordLine": 14,
+          "recordSha256": "21085224f3c993a2c03f2fa82855bb9e454411b75ae965c08bcfb56e04e4b4fc"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/knowledge/why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-g/why-fgos-citations-carry-a-gloss-and-check-mechanically.md",
+      "line": 48,
+      "text": "> scripts/check-decision-citation-drift.mjs... rather than writing a 3rd",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-079.jsonl",
+          "recordLine": 3,
+          "recordSha256": "342c6ed695bfc103fccaf1de08dbd8a8959fb5d74f0eed359a5cab73f376bd59"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/knowledge/why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-g/why-fgos-citations-carry-a-gloss-and-check-mechanically.md",
+      "line": 212,
+      "text": "already fixed in `check-decision-citation-drift.mjs`, dormant only because",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-079.jsonl",
+          "recordLine": 3,
+          "recordSha256": "342c6ed695bfc103fccaf1de08dbd8a8959fb5d74f0eed359a5cab73f376bd59"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/knowledge/why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-g/why-fgos-citations-carry-a-gloss-and-check-mechanically.md",
+      "line": 232,
+      "text": "scripts/check-decision-citation-drift.mjs --baseline <path>",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-079.jsonl",
+          "recordLine": 3,
+          "recordSha256": "342c6ed695bfc103fccaf1de08dbd8a8959fb5d74f0eed359a5cab73f376bd59"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+      "line": 190,
+      "text": "`scripts/check-decision-citation-drift.mjs` in a way that silently dropped",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-081.jsonl",
+          "recordLine": 4,
+          "recordSha256": "fa9bf4bc063ca2cbb6477c05bb4a0459ea615fe232ae79b793d3aa80ec1a0454"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/knowledge/why-the-decision-code-check-ratchets-against-a-baseline-inst/why-the-decision-code-check-ratchets-against-a-baseline-instead-of-blocking-everything.md",
+      "line": 21,
+      "text": "(`check-decision-citation-drift.mjs`, `check-decision-supersession.mjs`)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-081.jsonl",
+          "recordLine": 9,
+          "recordSha256": "fa9bf4bc063ca2cbb6477c05bb4a0459ea615fe232ae79b793d3aa80ec1a0454"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log",
+      "line": 6130,
+      "text": "✔ a genuinely new Nth occurrence of an already-duplicated text is not silently absorbed (tsk-1pf: count consumption, not membership, ported from check-decision-citation-drift.mjs) (0.225861ms)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-1-full-test-run.log",
+      "line": 6176,
+      "text": "✔ a genuinely new Nth occurrence of an already-duplicated text is not silently absorbed (tsk-1pf: count consumption, not membership, ported from check-decision-citation-drift.mjs) (0.13065ms)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/fix-round-2-full-test-run.log",
+      "line": 6175,
+      "text": "✔ a genuinely new Nth occurrence of an already-duplicated text is not silently absorbed (tsk-1pf: count consumption, not membership, ported from check-decision-citation-drift.mjs) (0.16688ms)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log",
+      "line": 6165,
+      "text": "✔ a genuinely new Nth occurrence of an already-duplicated text is not silently absorbed (tsk-1pf: count consumption, not membership, ported from check-decision-citation-drift.mjs) (0.135467ms)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log",
+      "line": 6175,
+      "text": "✔ a genuinely new Nth occurrence of an already-duplicated text is not silently absorbed (tsk-1pf: count consumption, not membership, ported from check-decision-citation-drift.mjs) (0.239492ms)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log",
+      "line": 4052,
+      "text": "✔ a genuinely new Nth occurrence of an already-duplicated text is not silently absorbed (tsk-1pf: count consumption, not membership, ported from check-decision-citation-drift.mjs) (0.360949ms)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log",
+      "line": 4835,
+      "text": "✔ a genuinely new Nth occurrence of an already-duplicated text is not silently absorbed (tsk-1pf: count consumption, not membership, ported from check-decision-citation-drift.mjs) (0.329165ms)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/platform/decision-citation-drift/spec.md",
+      "line": 30,
+      "text": "> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: scripts/check-decision-citation-drift.mjs:16-20; docs/decisions/index.md:1; package.json:1; scripts/check-decision-citation-drift.mjs:1-34; no tracked .bee/config.json or CI trigger. A22 rebindings are pending; no truth approval carried.",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-096.jsonl",
+          "recordLine": 1,
+          "recordSha256": "6f01c93b9a470507590c697e40a3bc253ebe417bf3a2f2499d4f3e880c1dd80c"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/platform/decision-citation-drift/spec.md",
+      "line": 44,
+      "text": "- `node scripts/check-decision-citation-drift.mjs` (from the product repo",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-096.jsonl",
+          "recordLine": 1,
+          "recordSha256": "6f01c93b9a470507590c697e40a3bc253ebe417bf3a2f2499d4f3e880c1dd80c"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/platform/decision-citation-drift/spec.md",
+      "line": 121,
+      "text": "- `scripts/check-decision-citation-drift.mjs` — pure functions",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-096.jsonl",
+          "recordLine": 1,
+          "recordSha256": "6f01c93b9a470507590c697e40a3bc253ebe417bf3a2f2499d4f3e880c1dd80c"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/platform/documentation/switchboard.md",
+      "line": 62,
+      "text": "| Decision citation drift | legacy-current | maintained-authority | `docs/specs/decision-citation-drift.md` | `scripts/check-decision-citation-drift.mjs` | Spec owns citation drift detection invariants and baseline ratchet rules. |",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-098.jsonl",
+          "recordLine": 15,
+          "recordSha256": "6378992725c38a937e3fe71108cf943031260f2ea18666f2fc96d9398dccdaf1"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/platform/migration-authoring-rules.md",
+      "line": 49,
+      "text": "   or `docs/architect` is rejected by the ratchet (`scripts/check-legacy-docs-ratchet.mjs`). New maintained",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-108.jsonl",
+          "recordLine": 1,
+          "recordSha256": "7a280461fd37d2983a585addaa82ede1f42e5137639bb1cc70f378348d27ce73"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/platform/migration-authoring-rules.md",
+      "line": 92,
+      "text": "| ratchet script | [scripts/check-legacy-docs-ratchet.mjs](../../scripts/check-legacy-docs-ratchet.mjs) |",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-108.jsonl",
+          "recordLine": 1,
+          "recordSha256": "7a280461fd37d2983a585addaa82ede1f42e5137639bb1cc70f378348d27ce73"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "line": 52,
+      "text": "- Test: `npm test` (`node --test 'test/**/*.test.mjs'`); e2e tại `test/e2e/rebuild-determinism.test.mjs` + `test/e2e/runner-loop.test.mjs` — bao gồm các kịch bản của hai stage đầu chuỗi, các kịch bản của stage lập-kế-hoạch (pass-through, chia-con-chặn-frontier, cần-người), VÀ 1 kịch bản S2-pull (submit → pass-through 2 stage → `take` người → một `fgos-runner --once` song song không giẫm claim người → người `return` xanh → `awaiting-approval`) chạy qua binary thật; round-trip cổng chờ-người tại `test/state/awaiting.test.mjs` + e2e CLI tại `test/cli/fgos.test.mjs`; unit tại `test/intake/{classify,discovery,plan}.test.mjs` + `test/state/{envelope,stage,store,frontier,work,replay}.test.mjs`; entropy-trend tại `test/report/entropy.test.mjs`. LƯU Ý phạm vi: suite KHÔNG đọc chính tài liệu này — không có test nào quét nội dung `docs/specs/*.md`, nên `npm test` xanh KHÔNG phải bằng chứng spec còn đúng với code. Bộ dò trích-dẫn-quyết-định-đã-lỗi-thời (`scripts/check-decision-citation-drift.mjs`) có quét `docs/specs/`, nhưng là script chạy tay, chỉ phát hiện, KHÔNG nối vào `npm test` (per `docs/specs/decision-citation-drift.md`)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-122.jsonl",
+          "recordLine": 1,
+          "recordSha256": "7b8c79be84c65a0efe5a9d4678b005d5487cb4f7436b6b01446beb9a16c10549"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/reading-map.md",
+      "line": 145,
+      "text": "- `scripts/check-decision-citation-drift.mjs` + `test/scripts/check-decision-citation-drift.test.mjs` — quét `docs/backlog.md` + `docs/specs/*.md` tìm dòng còn trích một quyết định đã bị supersede mà không nhắc quyết định thay thế trên cùng dòng (STR72 CoS clause 2, PBI p-2d71dfc3); chỉ phát hiện, không tự sửa; spec: docs/specs/decision-citation-drift.md",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-002.jsonl",
+          "recordLine": 4,
+          "recordSha256": "098c200cf541423eee03191dbbfcce7a68f3bb8b0a9956c9f71fc97d5e457fe0"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "line": 22,
+      "text": "- `node scripts/check-decision-citation-drift.mjs` (from the product repo",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+          "recordLine": 2,
+          "recordSha256": "c6abe0d0d1dc05b38728e9acd61da96fd0d01e2957ee7ed1bd9d406ed3a6b43b"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/specs/decision-citation-drift.md",
+      "line": 100,
+      "text": "- `scripts/check-decision-citation-drift.mjs` — pure functions",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+          "recordLine": 2,
+          "recordSha256": "c6abe0d0d1dc05b38728e9acd61da96fd0d01e2957ee7ed1bd9d406ed3a6b43b"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "line": 25,
+      "text": "- `scripts/check-decision-citation-drift.mjs` + `test/scripts/check-decision-citation-drift.test.mjs` — quét `docs/backlog.md` + `docs/specs/*.md` tìm dòng còn trích một quyết định đã bị supersede mà không nhắc quyết định thay thế trên cùng dòng (STR72 CoS clause 2, PBI p-2d71dfc3); chỉ phát hiện, không tự sửa; spec: docs/specs/decision-citation-drift.md",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+          "recordLine": 11,
+          "recordSha256": "c6abe0d0d1dc05b38728e9acd61da96fd0d01e2957ee7ed1bd9d406ed3a6b43b"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/specs/work-state.md",
+      "line": 1362,
+      "text": "- Test: `npm test` (`node --test 'test/**/*.test.mjs'`); e2e tại `test/e2e/rebuild-determinism.test.mjs` + `test/e2e/runner-loop.test.mjs` — bao gồm các kịch bản của hai stage đầu chuỗi, các kịch bản của stage lập-kế-hoạch (pass-through, chia-con-chặn-frontier, cần-người), VÀ 1 kịch bản S2-pull (submit → pass-through 2 stage → `take` người → một `fgos-runner --once` song song không giẫm claim người → người `return` xanh → `awaiting-approval`) chạy qua binary thật; round-trip cổng chờ-người tại `test/state/awaiting.test.mjs` + e2e CLI tại `test/cli/fgos.test.mjs`; unit tại `test/intake/{classify,discovery,plan}.test.mjs` + `test/state/{envelope,stage,store,frontier,work,replay}.test.mjs`; entropy-trend tại `test/report/entropy.test.mjs`. LƯU Ý phạm vi: suite KHÔNG đọc chính tài liệu này — không có test nào quét nội dung `docs/specs/*.md`, nên `npm test` xanh KHÔNG phải bằng chứng spec còn đúng với code. Bộ dò trích-dẫn-quyết-định-đã-lỗi-thời (`scripts/check-decision-citation-drift.mjs`) có quét `docs/specs/`, nhưng là script chạy tay, chỉ phát hiện, KHÔNG nối vào `npm test` (per `docs/specs/decision-citation-drift.md`)",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-041.jsonl",
+          "recordLine": 3,
+          "recordSha256": "e2fefb1a31bba3a2ec3031d5490cf47bf2d9af3f3c426961c891672b74f0884f"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    },
+    {
+      "file": "docs/transitional-switchboard.md",
+      "line": 63,
+      "text": "| Decision citation drift | legacy-current | maintained-authority | `docs/specs/decision-citation-drift.md` | `scripts/check-decision-citation-drift.mjs` | Spec owns citation drift detection invariants and baseline ratchet rules. |",
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "owningRecords": [
+        {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-130.jsonl",
+          "recordLine": 4,
+          "recordSha256": "d6b1b2caebd6ac5b0ba3e01a43022d5a5df68bc76eebf3044f110414ba619633"
+        }
+      ],
+      "contextKind": "documented-command-or-checker-pointer",
+      "cutoverObligation": "Review this existing command/pointer with the checker default/scan and source-render packet. Keep dated provenance; no automatic string replacement, baseline change or new exception is authorized."
+    }
+  ],
+  "helpBehavior": "Neither checker implements a --help branch. Their own source headers/options and documented commands are the current help surface; no new CLI flag/help mechanism is proposed.",
+  "packetDependency": "citation-convention-and-scan-packet + DecisionF Phase9 ratchet retirement",
+  "status": "unapplied co-cut review obligations; Step3/4 source owners and final Step7 composition retain custody"
+}

@@ -9336,7 +9336,9 @@
         }
       ],
       "blockedBy": [
-        "test/scripts/check-doc-candidate-status.test.mjs: The copyFileSync source reads real doc-governance bytes into the gate fixture; source and destination expressions must co-cut with governanceBaselineFields and validateConstitution."
+        "test/scripts/check-doc-candidate-status.test.mjs: The copyFileSync source reads real doc-governance bytes into the gate fixture; source and destination expressions must co-cut with governanceBaselineFields and validateConstitution.",
+        "test/scripts/check-doc-candidate-status.test.mjs: governanceBaselineFields(REPO_ROOT) calls the production governance-file reader while constructing this candidate-status test input; include the transitive real read and unchanged assertions.",
+        "test/scripts/check-doc-candidate-status.test.mjs: this checkCandidateMetadata call uses real REPO_ROOT. Its unconditional promotionRequired construction calls governanceBaselineFields at scripts/check-doc-candidate-status.mjs L96; that helper probes and reads real docs/doc-governance.md. Co-cut this transitive read with the direct L94 call and gate reader."
       ],
       "cutoverSpecifications": [],
       "readiness": "pending independent window review and Phase 9 full suite; record closure only",

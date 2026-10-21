@@ -41,6 +41,13 @@ def input_pin(entry,default):
  match=re.match(r'^([0-9a-f]{40}):',provenance)
  return entry.get('inputCommit') or (match[1] if match else default)
 
+@lru_cache(maxsize=32768)
+def _head_matching_lines(body,text):
+ # Pure lookup over immutable strings: repeat probes reuse the exact same
+ # diagnostic result, while a changed HEAD body or span has a distinct key.
+ lines=body.splitlines();width=len(text.splitlines())
+ return tuple(n for n in range(1,len(lines)+1) if '\n'.join(lines[n-1:n-1+width]).find(text)>=0)
+
 def head_drift(rs):
  """Non-failing Step 7 queue, comparing immutable pin to git HEAD (never disk)."""
  drift=[];locators={}
@@ -61,7 +68,7 @@ def head_drift(rs):
    for span in spans:
     line=span['line'];text=span['text'];lines=after.splitlines();col=span.get('columnStart',1)-1
     same=(lines[line-1][col:col+len(text)]==text) if 0<line<=len(lines) and '\n' not in text else '\n'.join(lines[line-1:line-1+len(text.splitlines())])==text
-    if not same:moved.append({'id':e.get('referenceId',e.get('id')),'pinnedSpan':span,'headMatchingLines':[n for n in range(1,len(lines)+1) if '\n'.join(lines[n-1:n-1+len(text.splitlines())]).find(text)>=0]})
+    if not same:moved.append({'id':e.get('referenceId',e.get('id')),'pinnedSpan':span,'headMatchingLines':list(_head_matching_lines(after,text))})
   drift.append({'file':f,'record':locators.get(f,{'file':f}),'inputCommit':r['authorInputCommit'],'pinnedHash':sha(before),'headHash':sha(after),'movedSpans':moved,'dependency':'Step 7 final-pin assembly; L12-58(1), L12-76 R17','failing':False})
  return drift
 
@@ -372,6 +379,11 @@ if __name__=='__main__':
   s5=ext.check();out.setdefault('extensions',{})['real-file-tests-goldens']=s5
   for key in ['files','literalReferences','dynamicTuples']:out[key]+=s5[key]
   out['failures']+=s5['failures'];out['failureCount']=len(out['failures']);out['checks'].update(s5['checks']);out['rules'].update(s5['rules']);out['headDrift']+=s5['headDrift']
+ if (P/'step-05-records/ui-spec-compiler.jsonl').exists() and (P/'step-05-records/citation-ratchet-roots.jsonl').exists():
+  extsp=importlib.util.spec_from_file_location('seam67check',P/'step-05-seam67-check.py');ext=importlib.util.module_from_spec(extsp);extsp.loader.exec_module(ext)
+  s67=ext.check();out.setdefault('extensions',{})['compiler-and-citation-roots']=s67
+  for key in ['files','literalReferences','dynamicTuples']:out[key]+=s67[key]
+  out['failures']+=s67['failures'];out['failureCount']=len(out['failures']);out['checks'].update(s67['checks']);out['rules'].update(s67['rules']);out['headDrift']+=s67['headDrift']
  r26=admission.r26_module().check();out['extensions']['proposed-move-read-units']=r26;out['failures']+=r26['failures'];out['failureCount']=len(out['failures']);out['checks'].update(r26['checks']);out['rules'].update(r26['rules'])
  (P/'step-05-head-drift.json').write_text(json.dumps({'kind':'Non-failing HEAD drift for Step 7 assembly; records remain at their own pins','headCommit':m.git('rev-parse','HEAD').decode().strip(),'entries':out['headDrift']},ensure_ascii=False,indent=2)+'\n')
  (P/args.output).write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(json.dumps(out,ensure_ascii=False));sys.exit(bool(out['failures']))

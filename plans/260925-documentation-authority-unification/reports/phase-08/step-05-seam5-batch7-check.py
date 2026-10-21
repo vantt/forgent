@@ -33,7 +33,7 @@ def check():
  test('j7-neutrality-first','R21/R20 same-pin whole-file proof',neutrality)
  def review():
   ix=read('step-05-seam5-review-list.json');assert ix['closedBatch']==7 and j.m.admission.r26_module().review_delta(ix)
-  assert [x['file'] for x in ix['addedThisTurn']]==[r['file'] for r in rs]
+  assert [x['file'] for x in (ix['previousReviewDeltas']['L12-83'] if ix.get('reviewClosureRuling')=='L12-85' else ix)['addedThisTurn']]==[r['file'] for r in rs]
   assert len(ix['deferredReplayChangedThisTurn'])==4
   return True
  test('j7-review-delta','new records separate from replay-only receipt changes',review)
