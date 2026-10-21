@@ -6,7 +6,8 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
-import { checkWorkflowPoolsSatisfyIndependence } from '../../src/setup/workflow-pool-independence.mjs';
+import { checkSeatBindingDryBind } from '../../src/setup/seat-binding-checks.mjs';
+import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
 import { simulateUnitBindings } from '../../src/runner/execution/dry-bind.mjs';
 
 // Native-agent executors carry no spawned process, so bind() accepts them for any posture without
@@ -61,6 +62,20 @@ steps:
           objective: Rank the ideas
 `;
 
+const SOLO_WORKFLOW = `
+id: solo-fixture
+title: Solo fixture
+steps:
+  - id: draft
+    title: Draft
+    units:
+      - id: write
+        template:
+          capability: fixture:draft
+          pattern: solo
+          objective: Draft the thing
+`;
+
 const REVIEWED_WORKFLOW = `
 id: reviewed-fixture
 title: Reviewed fixture
@@ -79,16 +94,18 @@ async function run(workflowYaml, capabilities) {
   const packageRoot = mkPackageRoot(workflowYaml);
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pool-independence-project-'));
   try {
-    return await checkWorkflowPoolsSatisfyIndependence(cwd, { packageRoot, loadRunnerConfig: () => runnerConfig(capabilities) });
+    return await checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConfig: () => runnerConfig(capabilities) });
   } finally {
     fs.rmSync(packageRoot, { recursive: true, force: true });
     fs.rmSync(cwd, { recursive: true, force: true });
   }
 }
 
-test('both checks are registered in the doctor registry', () => {
+test('the dry-bind row replaces the two rows it covers in the doctor registry', () => {
   const ids = DOCTOR_CHECKS.map((c) => c.id);
-  assert.ok(ids.includes('workflow-pools-satisfy-independence'));
+  assert.ok(ids.includes('seat-binding-dry-bind'));
+  assert.ok(!ids.includes('workflow-pools-satisfy-independence'));
+  assert.ok(!ids.includes('model-policy-tier-coverage'));
   assert.ok(ids.includes('agent-cli-project-trusted'));
 });
 
@@ -98,8 +115,8 @@ test('a panel whose pool has only as many families as panelists passes and repor
     'fixture:rank': prefer('alpha'),
   });
   assert.equal(result.passed, true, result.message);
-  assert.match(result.message, /panel-fixture\/ideas\/generate \(panel, capability "fixture:generate"\)/);
-  assert.match(result.message, /synthesizer=alpha shares a family with member-1/);
+  assert.match(result.message, /panel-fixture\/ideas\/generate \(capability "fixture:generate"\)/);
+  assert.match(result.message, /seat synthesizer=alpha shares a provider family with member-1/);
   assert.match(result.message, /a preference, not a failure/);
   assert.doesNotMatch(result.message, /fixture\/tally/);
 });
@@ -107,8 +124,8 @@ test('a panel whose pool has only as many families as panelists passes and repor
 test('a panel with a fourth family for the synthesizer passes', async () => {
   const result = await run(PANEL_WORKFLOW, { 'fixture:generate': prefer('alpha', 'beta', 'gamma', 'delta') });
   assert.equal(result.passed, true, result.message);
-  assert.match(result.message, /\(1\)/);
-  assert.doesNotMatch(result.message, /shares a family/);
+  assert.match(result.message, /4 seat\(s\) of 2 Workflow unit\(s\) bind/);
+  assert.doesNotMatch(result.message, /shares a provider family/);
 });
 
 test('a panel pool with two executors of one family spreads panelists over distinct families and the synthesizer shares one', async () => {
@@ -144,9 +161,7 @@ test('with enough families every panel seat and the synthesizer land on distinct
 test('a reviewed unit whose pool is a single family fails on the checker', async () => {
   const result = await run(REVIEWED_WORKFLOW, { 'fixture:draft': prefer('alpha') });
   assert.equal(result.passed, false);
-  assert.match(result.message, /reviewed-fixture\/build\/draft \(reviewed/);
-  assert.match(result.message, /reviewer refused for independence/);
-  assert.match(result.message, /producer=alpha/);
+  assert.match(result.message, /reviewed-fixture\/[a-z]+\/draft \(capability "fixture:draft"\): seat reviewer refused for independence-unsatisfiable/);
 });
 
 test('a reviewed unit with a second family passes', async () => {
@@ -154,20 +169,21 @@ test('a reviewed unit with a second family passes', async () => {
   assert.equal(result.passed, true, result.message);
 });
 
-test('a capability with no prefer pool is left to the capability check, not reported as an independence gap', async () => {
+test('a capability with no prefer pool anywhere is information, not a failure', async () => {
   const result = await run(PANEL_WORKFLOW, {});
   assert.equal(result.passed, true, result.message);
+  assert.match(result.message, /seat member-1 not bound, no pool configured \(headless-no-executor\)/);
 });
 
 test('a runner config that cannot be loaded passes with a note instead of throwing', async () => {
   const packageRoot = mkPackageRoot(PANEL_WORKFLOW);
   try {
-    const result = await checkWorkflowPoolsSatisfyIndependence(os.tmpdir(), {
+    const result = await checkSeatBindingDryBind(os.tmpdir(), {
       packageRoot,
       loadRunnerConfig: () => { throw new Error('no such file'); },
     });
     assert.equal(result.passed, true);
-    assert.match(result.message, /not evaluated: no such file/);
+    assert.match(result.message, /seats not bound: no such file/);
   } finally {
     fs.rmSync(packageRoot, { recursive: true, force: true });
   }
@@ -180,7 +196,7 @@ test('a malformed workflow definition fails the check and is named with its posi
 });
 
 test('the registered check runs against the shipped Workflows without throwing', async () => {
-  const entry = DOCTOR_CHECKS.find((c) => c.id === 'workflow-pools-satisfy-independence');
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'seat-binding-dry-bind');
   const result = await entry.check(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pool-independence-registered-')));
   assert.equal(typeof result.passed, 'boolean');
   assert.equal(typeof result.message, 'string');
@@ -207,14 +223,13 @@ steps:
 test('a debate whose pool has a third family for the judge passes with independent families', async () => {
   const result = await run(DEBATE_WORKFLOW, { 'fixture:dispute': prefer('alpha', 'beta', 'gamma') });
   assert.equal(result.passed, true, result.message);
-  assert.match(result.message, /independent provider families/);
+  assert.match(result.message, /5 seat\(s\) of 1 Workflow unit\(s\) bind/);
 });
 
 test('a debate whose pool has only two families cannot seat an independent judge and fails on the judge', async () => {
   const result = await run(DEBATE_WORKFLOW, { 'fixture:dispute': prefer('alpha', 'beta') });
   assert.equal(result.passed, false);
-  assert.match(result.message, /debate-fixture\/argue\/dispute \(debate/);
-  assert.match(result.message, /judge refused for independence/);
+  assert.match(result.message, /debate-fixture\/argue\/dispute \(capability "fixture:dispute"\): seat judge refused for independence-unsatisfiable/);
 });
 
 test('two families of three seat the sides apart and the judge on the third; one extra executor of a side family changes nothing', async () => {
@@ -227,4 +242,51 @@ test('two families of three seat the sides apart and the judge on the third; one
   assert.deepEqual(first, { thesis: 'alpha', antithesis: 'beta' }, 'the sides spread over distinct families');
   const judge = roles.find((r) => r.seat === 'judge');
   assert.equal(judge.executor, 'gamma', 'the judge takes the family neither side used, skipping the twin of a side');
+});
+
+test('a seat with no allowed cell fails naming the config line to change, and one family with a cell is enough to pass', async () => {
+  const config = runnerConfig({ 'fixture:draft': { ...prefer('alpha'), tier: 'frontier' } });
+  config.modelPolicies.claude = { standard: 'm' };
+  const packageRoot = mkPackageRoot(SOLO_WORKFLOW);
+  try {
+    const result = await checkSeatBindingDryBind(os.tmpdir(), { packageRoot, loadRunnerConfig: () => config });
+    assert.equal(result.passed, false);
+    assert.match(result.message, /seat producer refused for tier-cell-missing: .*frontier.*capabilities\."fixture:draft"\.prefer/);
+    config.modelPolicies.claude.frontier = 'm';
+    assert.equal((await checkSeatBindingDryBind(os.tmpdir(), { packageRoot, loadRunnerConfig: () => config })).passed, true);
+  } finally {
+    fs.rmSync(packageRoot, { recursive: true, force: true });
+  }
+});
+
+test('a tier lowered by maxTier is listed as information with the line that lowered it', async () => {
+  const config = runnerConfig({ 'fixture:draft': { ...prefer('alpha'), tier: 'frontier' } });
+  config.maxTier = 'advanced';
+  const packageRoot = mkPackageRoot(SOLO_WORKFLOW);
+  try {
+    const result = await checkSeatBindingDryBind(os.tmpdir(), { packageRoot, loadRunnerConfig: () => config });
+    assert.equal(result.passed, true, result.message);
+    assert.match(result.message, /seat producer runs at advanced, lowered from frontier by max-tier-cap/);
+  } finally {
+    fs.rmSync(packageRoot, { recursive: true, force: true });
+  }
+});
+
+test('a packaged workflow directory is read like a flat file', async () => {
+  const packageRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dry-bind-packaged-'));
+  try {
+    fs.mkdirSync(path.join(packageRoot, 'core', 'workflows', 'solo-fixture'), { recursive: true });
+    fs.writeFileSync(path.join(packageRoot, 'core', 'workflows', 'solo-fixture', 'wf.solo-fixture.yaml'), SOLO_WORKFLOW);
+    const result = await checkSeatBindingDryBind(os.tmpdir(), { packageRoot, loadRunnerConfig: () => runnerConfig({ 'fixture:draft': prefer('alpha') }) });
+    assert.equal(result.passed, true, result.message);
+    assert.match(result.message, /1 seat\(s\) of 1 Workflow unit\(s\) bind/);
+  } finally {
+    fs.rmSync(packageRoot, { recursive: true, force: true });
+  }
+});
+
+test('the committed forgentX config binds every seat of every shipped workflow', async () => {
+  const root = path.resolve(import.meta.dirname, '../..');
+  const result = await checkSeatBindingDryBind(root, { packageRoot: root, loadRunnerConfig: loadRunnerConfigFromDir });
+  assert.equal(result.passed, true, result.message);
 });

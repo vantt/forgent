@@ -58,11 +58,10 @@ import {
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import {
-  checkWorkflowPoolsSatisfyIndependence,
   readWorkflowDefinitionFiles,
   withUnreadableDefinitions,
   workflowRoots,
-} from './workflow-pool-independence.mjs';
+} from './workflow-definition-files.mjs';
 import {
   checkExecutorFamilyUnique,
   checkExecutorSkillsInstalled,
@@ -140,7 +139,7 @@ import { resolveHostBin, invokeHost } from '../util/host-bin.mjs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
 import { createSeatBindingClient, resolveSeatBindingHost } from '../seat-binding/client.mjs';
-import { checkSeatBindingConfig, checkSeatBindingDrain } from './seat-binding-checks.mjs';
+import { checkSeatBindingConfig, checkSeatBindingDrain, checkSeatBindingDryBind } from './seat-binding-checks.mjs';
 import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
@@ -667,43 +666,6 @@ export function checkTierVocabularyDeadKeys(cwd) {
   return problems.length > 0
     ? { passed: false, message: problems.join('; ') }
     : { passed: true, message: 'no retired tier vocabulary keys in project or global config' };
-}
-
-export function checkModelPolicyTierCoverage(cwd) {
-  const levels = [
-    ['project', readSharedConfig(cwd)?.runner],
-    ['global', loadGlobalConfig()?.runner],
-  ];
-  const problems = [];
-  for (const [level, runner] of levels) {
-    if (!runner || typeof runner !== 'object') continue;
-    // Every family must serve the tier a seat runs at when nothing names one. A tier a capability, role,
-    // persona or seat declares is that taste's own business: a family without a cell for it is skipped
-    // by the walk, never an error here.
-    const neededTiers = new Set([runner.defaults?.tier ?? 'standard']);
-    const providersChecked = new Set();
-
-    for (const [execId, exec] of Object.entries(runner.executors ?? {})) {
-      if (!exec || typeof exec !== 'object') continue;
-      const provider = deriveProviderFamily(exec);
-      if (!provider || providersChecked.has(provider)) continue;
-      providersChecked.add(provider);
-
-      const providerPolicies = runner.modelPolicies?.[provider];
-      if (!providerPolicies || typeof providerPolicies !== 'object') {
-        problems.push(`${level} provider "${provider}" for executor "${execId}" has no modelPolicies entry`);
-        continue;
-      }
-      for (const tier of neededTiers) {
-        if (!providerPolicies[tier]) {
-          problems.push(`${level} provider "${provider}" missing model for tier "${tier}" (the tier a seat runs at when nothing names one)`);
-        }
-      }
-    }
-  }
-  return problems.length > 0
-    ? { passed: false, message: problems.join('; ') }
-    : { passed: true, message: 'modelPolicies covers the default tier for every registered executor' };
 }
 
 export function checkCoordinationProtocolDeadVocabulary(cwd) {
@@ -1355,12 +1317,6 @@ registerCheck({
   id: 'tier-vocabulary-dead-keys',
   description: 'project and global configs have no retired tier vocabulary keys (runner.models, minTier, rigorOverrides, etc.)',
   check: (cwd) => checkTierVocabularyDeadKeys(cwd),
-});
-
-registerCheck({
-  id: 'model-policy-tier-coverage',
-  description: 'runner.modelPolicies covers the default tier (runner.defaults.tier) for all registered executors',
-  check: (cwd) => checkModelPolicyTierCoverage(cwd),
 });
 
 registerCheck({
@@ -4653,9 +4609,9 @@ registerCheck({
 // Async: the check drives the runner's own pattern code, which is promise-based. `fgos doctor`
 // awaits every check, so a check may return its result directly or as a promise.
 registerCheck({
-  id: 'workflow-pools-satisfy-independence',
-  description: 'for every reviewed Workflow unit, the capability prefer pool supplies a provider family different from the producer\'s (hard); a panel unit whose pool has fewer families than seats is reported as seats sharing a family, not as a failure',
-  check: (cwd) => checkWorkflowPoolsSatisfyIndependence(cwd, {
+  id: 'seat-binding-dry-bind',
+  description: 'every seat of every Workflow unit binds under the committed config in a fixed headless session (no lease, nothing started); a policy refusal fails, no pool, account state, tier caps and shared families are information',
+  check: (cwd) => checkSeatBindingDryBind(cwd, {
     packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),
     loadRunnerConfig: loadRunnerConfigFromDir,
   }),

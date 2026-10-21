@@ -42,7 +42,7 @@ function parseFile(filePath) {
  *
  * @returns {Array<{ filePath: string, workflowDir: string|null, fileName: string }>}
  */
-function workflowFilesIn(dir) {
+export function workflowFilesIn(dir) {
   const found = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     if (entry.isDirectory()) {

@@ -13,7 +13,7 @@
 import { explainSeat } from '../runner/execution/bind.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
-import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots } from './workflow-pool-independence.mjs';
+import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots, workflowUnitContract } from './workflow-definition-files.mjs';
 
 /**
  * Pairs a live canary proved blind: a worker of that provider family, run through that transport
@@ -114,16 +114,7 @@ async function evaluateBlindPools(workflows, runnerConfig) {
         evaluated += 1;
         const label = `${wf.id}/${step.id}/${u.id} (capability "${template.capability}")`;
         try {
-          const unit = {
-            id: u.id,
-            objective: template.objective ?? '',
-            capability: template.capability,
-            rigor: template.rigor,
-            writes: template.writes ?? [],
-            pattern: template.params ? { pattern: template.pattern, params: template.params } : template.pattern,
-            ...(template.seats ? { seats: template.seats } : {}),
-            blind: true,
-          };
+          const unit = { ...workflowUnitContract(u), blind: true };
           // The pattern decides which seats exist; bind() decides what each could be.
           const { seats } = await simulateUnitBindings(unit, runnerConfig, { session: SESSIONS[0] });
           const unproven = new Map();

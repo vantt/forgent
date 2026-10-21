@@ -230,7 +230,7 @@
     "src/setup/lock-record-checks.mjs": "infra",
     "src/setup/agent-cli-trust.mjs": "infra",
     "src/setup/blind-steps-proven-pools.mjs": "use-case",
-    "src/setup/workflow-pool-independence.mjs": "use-case",
+    "src/setup/workflow-definition-files.mjs": "use-case",
     "src/setup/model-pool-checks.mjs": "use-case",
     "src/setup/seat-binding-conversion.mjs": "use-case",
     "src/setup/seat-binding-checks.mjs": "use-case",

@@ -1119,62 +1119,6 @@ test('tier-vocabulary-dead-keys names a project rigorToTier as retired, and leav
   }
 });
 
-test('model-policy-tier-coverage check passes when all needed tiers are covered', () => {
-  const dir = mkTemp('checks-model-coverage-pass-');
-  const fakeHome = mkTemp('fake-home-');
-  try {
-    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
-      runner: {
-        defaults: { tier: 'standard' },
-        executors: {
-          claude: { command: 'claude', providerModel: 'claude' },
-        },
-        modelPolicies: {
-          claude: { nano: 'haiku', standard: 'sonnet', flagship: 'opus', frontier: 'opus' },
-        },
-      },
-    }));
-    withHome(fakeHome, () => {
-      const { passed, message } = checkById('model-policy-tier-coverage').check(dir);
-      assert.equal(passed, true);
-      assert.match(message, /modelPolicies covers the default tier/);
-    });
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-    fs.rmSync(fakeHome, { recursive: true, force: true });
-  }
-});
-
-test('model-policy-tier-coverage check fails when an executor provider lacks a cell for the default tier', () => {
-  const dir = mkTemp('checks-model-coverage-fail-');
-  const fakeHome = mkTemp('fake-home-');
-  try {
-    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
-      runner: {
-        defaults: { tier: 'standard' },
-        executors: {
-          claude: { command: 'claude', providerModel: 'claude' },
-          openai: { command: 'codex', providerModel: 'openai' },
-        },
-        modelPolicies: {
-          claude: { nano: 'haiku', standard: 'sonnet', flagship: 'opus', frontier: 'opus' },
-          openai: { nano: 'gpt-nano' }, // missing standard, flagship, frontier
-        },
-      },
-    }));
-    withHome(fakeHome, () => {
-      const { passed, message } = checkById('model-policy-tier-coverage').check(dir);
-      assert.equal(passed, false);
-      assert.match(message, /openai.*missing model for tier "standard"/);
-    });
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-    fs.rmSync(fakeHome, { recursive: true, force: true });
-  }
-});
-
 test('coordination-protocol-dead-vocabulary check fails when minTier is in protocol YAML', () => {
   const dir = mkTemp('checks-coord-proto-dead-');
   try {

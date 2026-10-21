@@ -4,7 +4,7 @@
 // a model (`model@pool`) or list several; runner.llmAccounts is the machine's account inventory,
 // read beside the provider account inventory the lease still uses. These checks only read.
 
-import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
+import { loadRunnerConfigFromDir, MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
 import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { parseTierCell, isExtendedTierCell } from '../runner/dispatch/tier-cell.mjs';
 import { readLlmAccounts, compareWithLegacyInventory, deriveLegacyInventory } from '../runner/dispatch/llm-accounts.mjs';
@@ -86,7 +86,9 @@ export function checkExecutorSkillsInstalled(cwd) {
 
 /**
  * A family a tier's fallback list names but that has no cell at that tier, or no agent executor, is
- * skipped by the walk and recorded. Warns, never fails: the list still works for the families that serve it.
+ * skipped by the walk and recorded; a declared `tierFallback` names every tier of the ladder, `mini`
+ * included, or a seat at the missing tier has no walk after a failure. Warns, never fails: the list still
+ * works for the families that serve it.
  */
 export function checkTierFallback(cwd) {
   const { runnerConfig, skip } = loadOrExplain(cwd);
@@ -97,7 +99,7 @@ export function checkTierFallback(cwd) {
   for (const entry of Object.values(runnerConfig.executors ?? {})) {
     if (entry?.kind === 'agent') served.add(deriveProviderFamily(entry));
   }
-  const problems = [];
+  const problems = MODEL_POLICY_TIERS.filter((tier) => runnerConfig.tierFallback[tier] === undefined).map((tier) => `${tier}: no list, so a seat at ${tier} has no walk after a failure`);
   for (const [tier, families] of declared) {
     for (const family of families) {
       if (runnerConfig.modelPolicies?.[family]?.[tier] === undefined) problems.push(`${tier}: ${family} has no modelPolicies cell at ${tier}`);

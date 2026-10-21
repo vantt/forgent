@@ -21,7 +21,7 @@ import { workflowTierOf } from './seat-resolver.mjs';
  * @param {object} [options.selectors] What the calling door chose (persona, seat, capability), as a unit run would pass it.
  * @param {boolean} [options.raiseAuthorized] Whether the calling door may raise a tier. Defaults to false.
  * @param {string} [options.workflowId] The workflow the unit belongs to, to name where a seat's recommended tier was declared.
- * @returns {Promise<{ outcome: string, seats: Array<{ seat: string, role: string, executor?: string, invocation?: string|null, account?: { provider: string, id: string }, sharesFamilyWith?: string[], refused?: { reason: string, detail: string } }> }>}
+ * @returns {Promise<{ outcome: string, seats: Array<{ seat: string, role: string, executor?: string, invocation?: string|null, tier?: string, loweredFrom?: { from: string, fromSource: string, reason: string }, account?: { provider: string, id: string }, sharesFamilyWith?: string[], refused?: { reason: string, detail: string } }> }>}
  */
 export async function simulateUnitBindings(unit, runnerConfig, { session = {}, overrides = [], selectors, raiseAuthorized = false, workflowId } = {}) {
   const ledger = createSeatLedger();
@@ -53,6 +53,8 @@ export async function simulateUnitBindings(unit, runnerConfig, { session = {}, o
         role: seat.role,
         executor: bound.executor,
         invocation: bound.invocation,
+        tier: bound.tier,
+        ...(bound.provenance?.tier?.loweredFrom ? { loweredFrom: bound.provenance.tier.loweredFrom } : {}),
         ...(bound.account ? { account: bound.account } : {}),
         ...(bound.provenance?.account?.skipped ? { accountSkipped: bound.provenance.account.skipped } : {}),
         ...(bound.provenance?.familySpread?.value.sharedWith.length ? { sharesFamilyWith: bound.provenance.familySpread.value.sharedWith } : {}),
