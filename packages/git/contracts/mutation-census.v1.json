@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e0c8af6347666eadc1facc3c7c5f243920a9071d9f7eb6da554f7e5b2f3cf00b",
+  "payloadDigest": "72b2566f136cdcc016b27cb49c6ce31d140e583fea47f34ef136a60702b99e03",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -314,7 +314,7 @@
     "packages/git/rust/tests/contracts.rs": "1c7b7e1ff100cf61f3ef40953fa6b7c71b20fbe155febeab2e724d2fb9466f59",
     "packages/git/rust/tests/head_tree.rs": "8d97e1c8768e17ff462df7739aaa089a80a5e99efbc249ae993b48e060ae7d97",
     "packages/git/rust/tests/inspect.rs": "765fe5ec0c1e162ad09762c9200099de6842ae00c48e4a0ffb4726d4ebcb6ef7",
-    "packages/git/rust/tests/land.rs": "132d172b39b2d1ab5437f8cd72b5de2a1d1be4e99e32c6e6ae745b179e0fec0b",
+    "packages/git/rust/tests/land.rs": "5e641438658a82051ef4ed4bd3483ffe2214bf2363a008a14aa4909fc743bee6",
     "packages/git/rust/tests/land_crash_matrix.rs": "3e63d7c4cd185a08e0acf3c99be37c66a2baf3f730683df2acb4c075e78a7ded",
     "packages/git/rust/tests/publication.rs": "724be72a135fc72bb8e7535d030985f3ffd1805f5e81b70c19e9108a132de205",
     "packages/git/rust/tests/recovery_matrix.rs": "ec83b3020498821602e7e8d66f0836837c8f72ae7c0bb3943b2aa221429cbaec",
