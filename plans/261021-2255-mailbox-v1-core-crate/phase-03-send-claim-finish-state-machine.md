@@ -87,3 +87,11 @@ node scripts/git-one-door-scan.mjs --write-census
   - Added proof: `tests/delivery.rs` *a sender with no head is labelled unregistered and can never pass for a head* owns the `from_label` rule, which had no owning test in the plan.
   - `tests/snapshot.rs` gains offered, in-flight and recorded messages; a refused message is first reachable through the sweep and is added in phase 4.
 - `send` takes no `SendOutcome.wake_dropped` yet; phase 6 adds the field with its type `WakeDrop` rather than carrying an always-`None` placeholder now.
+
+## Review fixes (2026-10-21, code review of phases 1-4)
+
+- **M1 `last_drain_at`** (plan-owner decision): per address on `Binding`. A drain whose address has pending mail or notices for its current generation stamps it, whether or not it takes anything; a drain of an empty address returns before the sweep and the clock, so it changes nothing and needs no snapshot write (spec §8 item 8, §9 signal 9 use it only for "pending mail and no drain"). Owning test: `tests/delivery.rs` *a drain stamps last_drain_at when mail is pending even if it takes none and an empty drain changes nothing*.
+- **M4**: `tests/delivery.rs` *a token cannot finish mail addressed to another head* owns the recipient check in `finish`. Removing the check makes it fail (checked by mutation).
+- **L1**: the label of a sender with no head is `unregistered_<8 key characters>`, with `-` mapped to `_`; it holds no `-`, while every short name holds two, so no head name can equal it. The label test now covers a project folder named `unregistered`.
+- **L6**: `inbox` lists the address's pending notices after its messages (`kind: Notice`, label `mailbox`), matching what a step claim (`inbox --claim`) takes.
+- **L7**: `SendRequest<'a>` borrows the body (`body: &'a str`); the core reads only its size, so V2 need not clone it.

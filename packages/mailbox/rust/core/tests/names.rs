@@ -103,7 +103,8 @@ fn an_ambiguous_prefix_is_refused_and_lists_both_candidates() {
 }
 
 #[test]
-fn a_unique_key_prefix_resolves_when_no_short_name_matches() {
+fn a_unique_key_prefix_resolves_when_no_short_name_matches_and_an_exact_key_wins_over_a_longer_key_it_prefixes(
+) {
     let limits = spec_limits();
     let mut ids = SeqIds::default();
     let mut state = MailboxState::new();
@@ -123,6 +124,26 @@ fn a_unique_key_prefix_resolves_when_no_short_name_matches() {
     );
 
     assert_eq!(state.resolve("0f3").unwrap().key.as_str(), "0f3a-uuid");
+    // agy heads keyed by terminal-root pid: 1234 prefixes 12345.
+    register_new(
+        &mut state,
+        request("1234", "agy", None, "h3"),
+        t(1),
+        &limits,
+        &mut ids,
+    );
+    register_new(
+        &mut state,
+        request("12345", "agy", None, "h4"),
+        t(1),
+        &limits,
+        &mut ids,
+    );
+    assert_eq!(state.resolve("1234").unwrap().key.as_str(), "1234");
+    assert!(matches!(
+        state.resolve("123"),
+        Err(ResolveRefusal::Ambiguous { .. })
+    ));
 }
 
 #[test]

@@ -2,7 +2,7 @@ mod common;
 
 use common::{key, t, Pair, B_NAME};
 use fgos_mailbox_core::{
-    CounterReason, Generation, Kind, MessageState, NoticeState, RefusalReason,
+    Checkpoint, CounterReason, Generation, Kind, MessageState, NoticeState, RefusalReason,
 };
 
 const G1: Generation = Generation::FIRST;
@@ -222,4 +222,120 @@ fn the_body_reference_goes_after_body_retention_and_the_header_after_the_longest
     assert!(spec.state.message(&id).unwrap().body_kept);
     spec.sweep(Pair::after(changed, ret));
     assert!(spec.state.message(&id).is_none());
+}
+
+/// A's message to B expires unread, so A holds one notice about it.
+fn pair_with_notice_for_a() -> (Pair, fgos_mailbox_core::Timestamp) {
+    let mut pair = Pair::new(t(0));
+    pair.send("a", B_NAME, "never read", t(0));
+    let due = Pair::after(t(0), pair.limits.record.ttl_sec);
+    pair.sweep(due);
+    assert_eq!(pair.state.notices().count(), 1);
+    (pair, due)
+}
+
+#[test]
+fn a_notice_whose_addressee_generation_ended_is_removed_before_it_reaches_the_successor() {
+    let (mut pair, due) = pair_with_notice_for_a();
+
+    let g2 = pair.take_over("a", "claude", due);
+    let claim = pair.claim("a", g2, due);
+    assert!(claim.items.is_empty());
+    assert!(pair.state.inbox(&key("a")).is_empty());
+
+    // Well inside the record TTL: only the ended generation removes it.
+    pair.sweep(due.plus_secs(1));
+
+    assert_eq!(pair.state.notices().count(), 0);
+    assert_eq!(pair.state.counters().total(CounterReason::NoticeExpired), 1);
+}
+
+#[test]
+fn a_notice_is_never_taken_at_stop() {
+    let (mut pair, due) = pair_with_notice_for_a();
+
+    let stop = pair.state.claim(
+        &key("a"),
+        G1,
+        Checkpoint::Stop,
+        due,
+        &pair.limits,
+        &mut pair.ids,
+    );
+
+    assert!(stop.items.is_empty());
+    assert_eq!(
+        pair.state.notices().next().unwrap().state,
+        NoticeState::Recorded
+    );
+}
+
+#[test]
+fn a_notice_finished_by_a_generation_that_is_not_current_is_ignored_and_stays_in_flight() {
+    let (mut pair, due) = pair_with_notice_for_a();
+    let claim = pair.claim("a", G1, due);
+    let token = claim.token.unwrap();
+
+    let finished = pair
+        .state
+        .finish(&key("a"), G1.next().unwrap(), &token, due);
+
+    assert!(finished.offered.is_empty());
+    assert_eq!(finished.ignored, vec![claim.items[0].id.clone()]);
+    assert!(matches!(
+        pair.state.notices().next().unwrap().state,
+        NoticeState::InFlight { .. }
+    ));
+}
+
+#[test]
+fn the_notices_lane_never_evicts_an_in_flight_notice_and_refuses_the_new_one_when_only_in_flight_notices_are_older(
+) {
+    let mut pair = Pair::new(t(0));
+    // One notice per address: ordinary configuration through the production path.
+    pair.limits.notices.cap = 1;
+    let ttl = pair.limits.record.ttl_sec;
+    let lapse = pair.limits.in_flight_ttl_sec + 1;
+    let c_name = pair.add_head("c", t(0));
+    let at = |base: fgos_mailbox_core::Timestamp, back_secs: u64| {
+        fgos_mailbox_core::Timestamp::from_millis(base.as_millis() - back_secs * 1000)
+    };
+    // m1 (to b) expires unread at `due`: a record-ttl notice for a.
+    pair.send("a", B_NAME, "never read", t(0));
+    let due = Pair::after(t(0), ttl);
+    // m2 (to c) is claimed maxOffers times and never finished; its last
+    // claim lapses while a's first notice is still in flight.
+    let last_claim = at(due, lapse / 2);
+    let first_claim = at(last_claim, lapse * u64::from(pair.limits.max_offers - 1));
+    pair.send("a", &c_name, "claimed, never finished", first_claim);
+    for offer in 0..pair.limits.max_offers {
+        pair.claim("c", G1, first_claim.plus_secs(lapse * u64::from(offer)));
+    }
+    pair.sweep(due);
+    let claim = pair.claim("a", G1, due);
+    let emitted = claim.items[0].id.clone();
+
+    let offer_cap_due = last_claim.plus_secs(lapse);
+    pair.sweep(offer_cap_due);
+
+    let held: Vec<_> = pair.state.notices().map(|n| n.id.clone()).collect();
+    assert_eq!(held, vec![emitted.clone()]);
+    assert_eq!(pair.state.counters().total(CounterReason::OfferCap), 1);
+    assert_eq!(pair.state.counters().total(CounterReason::NoticeDropped), 1);
+    let finished = pair
+        .state
+        .finish(&key("a"), G1, &claim.token.unwrap(), offer_cap_due);
+    assert_eq!(finished.offered, vec![emitted]);
+}
+
+#[test]
+fn inbox_lists_pending_notices_as_notices_like_the_claim_that_would_take_them() {
+    let (pair, _) = pair_with_notice_for_a();
+
+    let views = pair.state.inbox(&key("a"));
+
+    assert_eq!(views.len(), 1);
+    assert_eq!(views[0].kind, Kind::Notice);
+    assert_eq!(views[0].id, pair.state.notices().next().unwrap().id);
+    assert!(!views[0].in_flight);
 }

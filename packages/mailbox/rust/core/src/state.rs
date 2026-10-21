@@ -2,8 +2,15 @@
 //! bodies). The store (V2) persists it as is; the core never sees a file.
 //!
 //! Snapshot rule: every field round-trips through `serde_json` from an owned
-//! `String`. Collections are `BTreeMap` or `Vec`, every map key is a `String`
-//! newtype, every enum is a serde enum and no field borrows.
+//! `String`. Collections are `BTreeMap`, `Vec` or `VecDeque`; every map key
+//! is a `String` newtype or a unit-only serde enum (which `serde_json` writes
+//! as a string); every enum is a serde enum and no field borrows.
+//!
+//! Versioning: the core owns the snapshot's shape, so it owns its version.
+//! Every snapshot struct denies unknown fields, so an older core can never
+//! read a newer snapshot and silently drop what it does not know (and so
+//! reset a cap that is never reset). The store reads [`SnapshotVersion`]
+//! first and calls [`SnapshotVersion::check`] before it reads the state.
 use crate::counters::{Account, BoundedCounters};
 use crate::envelope::Header;
 use crate::ids::{MessageId, WriterKey};
@@ -15,8 +22,66 @@ use crate::wake::{Exchange, ExchangeKey, WakeLifetimeKey};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, VecDeque};
 
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+/// The version of the snapshot shape this core reads and writes.
+pub const SNAPSHOT_SCHEMA_VERSION: u32 = 1;
+
+/// The version field alone, read before the whole snapshot.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SnapshotVersion {
+    pub schema_version: u32,
+}
+
+/// Why a stored snapshot cannot be used by this core.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SnapshotVersionError {
+    /// Written by a newer core: the store must neither use nor overwrite it.
+    Newer { found: u32, supported: u32 },
+    /// Written by an older core; no migration exists yet.
+    UnsupportedOlder { found: u32, supported: u32 },
+}
+
+impl SnapshotVersionError {
+    pub const fn code(&self) -> &'static str {
+        match self {
+            Self::Newer { .. } => "snapshot-newer",
+            Self::UnsupportedOlder { .. } => "snapshot-unsupported-older",
+        }
+    }
+}
+
+impl std::fmt::Display for SnapshotVersionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let (found, supported) = match self {
+            Self::Newer { found, supported } | Self::UnsupportedOlder { found, supported } => {
+                (found, supported)
+            }
+        };
+        write!(f, "{}: found {found}, supported {supported}", self.code())
+    }
+}
+
+impl std::error::Error for SnapshotVersionError {}
+
+impl SnapshotVersion {
+    /// Accepts only the current version.
+    pub const fn check(&self) -> Result<(), SnapshotVersionError> {
+        let found = self.schema_version;
+        let supported = SNAPSHOT_SCHEMA_VERSION;
+        if found > supported {
+            Err(SnapshotVersionError::Newer { found, supported })
+        } else if found < supported {
+            Err(SnapshotVersionError::UnsupportedOlder { found, supported })
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MailboxState {
+    /// Always [`SNAPSHOT_SCHEMA_VERSION`] for a state this core made.
+    schema_version: u32,
     /// The latest time any operation has seen. A wall clock that steps back
     /// is read as this time, so no window shrinks and no deadline grows.
     pub(crate) last_now: Timestamp,
@@ -38,6 +103,24 @@ pub struct MailboxState {
     pub(crate) exchanges: BTreeMap<ExchangeKey, Exchange>,
     /// Effective wakes per registered sender generation and recipient.
     pub(crate) wake_lifetime: BTreeMap<WakeLifetimeKey, u32>,
+}
+
+impl Default for MailboxState {
+    fn default() -> Self {
+        Self {
+            schema_version: SNAPSHOT_SCHEMA_VERSION,
+            last_now: Timestamp::default(),
+            bindings: BTreeMap::new(),
+            messages: Vec::new(),
+            notices: Vec::new(),
+            notice_last: BTreeMap::new(),
+            counters: BoundedCounters::default(),
+            budget: BTreeMap::new(),
+            lifetime: BTreeMap::new(),
+            exchanges: BTreeMap::new(),
+            wake_lifetime: BTreeMap::new(),
+        }
+    }
 }
 
 impl MailboxState {

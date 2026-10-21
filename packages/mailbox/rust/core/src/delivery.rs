@@ -18,16 +18,24 @@ const SYSTEM_LABEL: &str = "mailbox";
 /// not resolve; never the typed text, which is unbounded.
 const UNRESOLVED: &str = "unresolved";
 
-/// How many characters of a sender's key label a sender with no head.
+/// How many characters of a sender's key its label shows: a display width
+/// chosen with the label's shape, not a policy value.
 const UNREGISTERED_LABEL_CHARS: usize = 8;
 
+/// The start of the label of a sender with no head. The label holds no
+/// `-`, while every short name holds at least two, so no head's name can
+/// ever equal it.
+const UNREGISTERED_LABEL: &str = "unregistered_";
+
+/// A send. The body is borrowed: the core reads only its size, and the
+/// store keeps it apart under the id `send` returns.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SendRequest {
+pub struct SendRequest<'a> {
     /// The caller's own identity; attribution only.
     pub from: WriterKey,
     /// A typed name, resolved by the core.
     pub to: String,
-    pub body: String,
+    pub body: &'a str,
     pub wake: bool,
     /// A hint only; the link is derived by the core (spec §5.4).
     pub reply_to: Option<MessageId>,
@@ -79,6 +87,10 @@ pub enum Refusal {
     SenderShareFull {
         per_sender: u32,
     },
+    /// The sender's key is longer than `frame.maxHeaderChars`.
+    SenderKeyTooLong {
+        max_chars: u32,
+    },
 }
 
 impl Refusal {
@@ -101,6 +113,7 @@ impl Refusal {
             Self::Loop { .. } => CounterReason::Loop,
             Self::QueueFull { .. } => CounterReason::QueueFull,
             Self::SenderShareFull { .. } => CounterReason::SenderShareFull,
+            Self::SenderKeyTooLong { .. } => CounterReason::SenderKeyTooLong,
         }
     }
 }
@@ -241,9 +254,15 @@ impl MailboxState {
                     .as_str()
                     .chars()
                     .take(UNREGISTERED_LABEL_CHARS)
-                    .map(|c| if names::in_name_alphabet(c) { c } else { '-' })
+                    .map(|c| {
+                        if c != '-' && names::in_name_alphabet(c) {
+                            c
+                        } else {
+                            '_'
+                        }
+                    })
                     .collect();
-                format!("unregistered-{part}")
+                format!("{UNREGISTERED_LABEL}{part}")
             }
         }
     }
@@ -252,7 +271,7 @@ impl MailboxState {
     /// it. A refused send adds no header.
     pub fn send(
         &mut self,
-        req: SendRequest,
+        req: SendRequest<'_>,
         now: Timestamp,
         limits: &Limits,
         ids: &mut dyn IdSource,
@@ -337,11 +356,14 @@ impl MailboxState {
         limits: &Limits,
         ids: &mut dyn IdSource,
     ) -> Claim {
-        if self.current_generation(key) != Some(generation) {
+        if self.current_generation(key) != Some(generation) || !self.has_pending(key, generation) {
             return Claim::empty();
         }
         self.sweep(now, limits, ids);
         let now = self.last_now;
+        if let Some(binding) = self.bindings.get_mut(key) {
+            binding.last_drain_at = Some(now);
+        }
         let any_mail = self
             .messages
             .iter()
@@ -518,11 +540,27 @@ impl MailboxState {
     }
 
     /// Pending mail (recorded or in flight) to the current generation of
-    /// `key`, oldest first. Read-only.
+    /// `key`, oldest first, then its pending notices: what a step claim
+    /// (`inbox --claim`) would take or is holding. Read-only.
     pub fn inbox(&self, key: &WriterKey) -> Vec<MessageView> {
         let Some(generation) = self.current_generation(key) else {
             return Vec::new();
         };
+        let notices = self
+            .notices
+            .iter()
+            .filter(|n| &n.to == key && n.to_generation == generation)
+            .map(|n| {
+                let in_flight = matches!(n.state, NoticeState::InFlight { .. });
+                MessageView {
+                    id: n.id.clone(),
+                    kind: Kind::Notice,
+                    from_label: SYSTEM_LABEL.to_string(),
+                    recorded_at: n.created_at,
+                    offers: u32::from(in_flight),
+                    in_flight,
+                }
+            });
         self.messages
             .iter()
             .filter(|h| &h.to == key && h.to_generation == generation)
@@ -540,6 +578,25 @@ impl MailboxState {
                 offers: h.offers,
                 in_flight: matches!(h.state, MessageState::InFlight { .. }),
             })
+            .chain(notices)
             .collect()
+    }
+
+    /// Whether `key` has mail or notices pending for `generation`: the only
+    /// case in which a drain sweeps and stamps `last_drain_at`, so a drain
+    /// of an empty address writes nothing.
+    fn has_pending(&self, key: &WriterKey, generation: Generation) -> bool {
+        let mail = self.messages.iter().any(|h| {
+            &h.to == key
+                && h.to_generation == generation
+                && matches!(
+                    h.state,
+                    MessageState::Recorded | MessageState::InFlight { .. }
+                )
+        });
+        mail || self
+            .notices
+            .iter()
+            .any(|n| &n.to == key && n.to_generation == generation)
     }
 }

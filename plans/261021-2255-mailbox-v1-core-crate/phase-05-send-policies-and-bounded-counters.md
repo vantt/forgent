@@ -105,3 +105,7 @@ node scripts/git-one-door-scan.mjs --write-census
   - Phase 4's notices-overflow test sent eleven pending messages from one sender to one recipient, which the queue share (check 10) now refuses at the eleventh. Its fixture now spreads the messages over two recipients; what it asserts is unchanged.
   - The flood test's margin is 128 bytes: only decimal digits may grow (the per-reason totals and the times held in the budget window and the counters).
 - Refusal codes and the check order match the table above and plan decision 4; `Refusal::reason()` maps each to its `CounterReason`.
+
+## Review fixes (2026-10-21, code review of phases 1-4)
+
+- **L4**: a new check 0 runs before the group check: a `from` longer than `frame.maxHeaderChars` is refused `sender-key-too-long` (`Refusal::SenderKeyTooLong`, counter `SenderKeyTooLong`), so no unbounded text reaches a header or the snapshot. This prepends one check to plan decision 4's order; the rest of the order is unchanged. Owning test in `tests/policies.rs`.

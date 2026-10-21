@@ -30,6 +30,7 @@ impl Account {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum CounterReason {
+    SenderKeyTooLong,
     Group,
     UnknownName,
     AmbiguousName,
@@ -58,6 +59,7 @@ pub enum CounterReason {
 impl CounterReason {
     pub const fn code(self) -> &'static str {
         match self {
+            Self::SenderKeyTooLong => "sender-key-too-long",
             Self::Group => "group",
             Self::UnknownName => "unknown-name",
             Self::AmbiguousName => "ambiguous-name",
@@ -102,6 +104,7 @@ impl PartyKey {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Party {
     pub count: u64,
     pub last_at: Timestamp,
@@ -110,6 +113,7 @@ pub struct Party {
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct BoundedCounters {
     totals: BTreeMap<CounterReason, u64>,
     by_party: BTreeMap<PartyKey, Party>,

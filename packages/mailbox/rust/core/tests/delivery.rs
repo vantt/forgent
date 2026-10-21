@@ -1,7 +1,7 @@
 mod common;
 
 use common::{key, plain, t, Pair, A_NAME, B_NAME};
-use fgos_mailbox_core::{AttemptToken, Generation, MessageState, Refusal};
+use fgos_mailbox_core::{AttemptToken, Checkpoint, Generation, MessageState, Refusal};
 
 const G1: Generation = Generation::FIRST;
 
@@ -208,8 +208,71 @@ fn a_sender_with_no_head_is_labelled_unregistered_and_can_never_pass_for_a_head(
     let claim = pair.claim("b", G1, t(110));
 
     let item = &claim.items[0];
-    assert_eq!(item.from_label, "unregistered-x-y-z-fo");
+    assert_eq!(item.from_label, "unregistered_x_y_z_fo");
     assert!(!item.sender_has_head);
     assert_eq!(item.from_cli, None);
     assert_ne!(item.from_label, A_NAME);
+
+    // A project folder named `unregistered` cannot make a head's name equal
+    // the label of a sender with no head whose key starts like that name.
+    let mut odd = Pair::new(t(100));
+    let mut req = common::request("k-odd", "codex", Some("01"), "head-odd");
+    req.project = "unregistered".to_string();
+    let head = common::register_new(&mut odd.state, req, t(100), &odd.limits, &mut odd.ids);
+    assert_eq!(head, "unregistered-codex-01");
+    odd.send("codex-01-rest", B_NAME, "hello", t(100));
+    let label = odd.claim("b", G1, t(110)).items[0].from_label.clone();
+    assert_ne!(label, head);
+    assert!(odd.state.bindings().all(|b| b.name.as_str() != label));
+}
+
+#[test]
+fn a_token_cannot_finish_mail_addressed_to_another_head() {
+    let mut pair = Pair::new(t(100));
+    let id = pair.send("a", B_NAME, "for b", t(100));
+    let token = pair.claim("b", G1, t(110)).token.unwrap();
+
+    let finished = pair.state.finish(&key("a"), G1, &token, t(111));
+
+    assert!(finished.offered.is_empty());
+    assert!(finished.ignored.is_empty());
+    assert!(matches!(
+        pair.state.message(&id).unwrap().state,
+        MessageState::InFlight { .. }
+    ));
+}
+
+#[test]
+fn a_drain_stamps_last_drain_at_when_mail_is_pending_even_if_it_takes_none_and_an_empty_drain_changes_nothing(
+) {
+    let mut pair = Pair::new(t(100));
+    let before = pair.state.clone();
+    let empty = pair.state.claim(
+        &key("b"),
+        G1,
+        Checkpoint::Stop,
+        t(105),
+        &pair.limits,
+        &mut pair.ids,
+    );
+    assert!(empty.items.is_empty());
+    assert_eq!(pair.state, before);
+
+    // Pending but not eligible at Stop: it carries no effective wake.
+    pair.send("a", B_NAME, "fyi", t(110));
+    let stop = pair.state.claim(
+        &key("b"),
+        G1,
+        Checkpoint::Stop,
+        t(120),
+        &pair.limits,
+        &mut pair.ids,
+    );
+
+    assert!(stop.items.is_empty());
+    assert_eq!(
+        pair.state.binding(&key("b")).unwrap().last_drain_at,
+        Some(t(120))
+    );
+    assert_eq!(pair.state.binding(&key("a")).unwrap().last_drain_at, None);
 }

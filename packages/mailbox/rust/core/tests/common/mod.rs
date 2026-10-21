@@ -194,11 +194,11 @@ impl Pair {
 }
 
 /// A plain send without wake or reply hint.
-pub fn plain(from: &str, to: &str, body: &str) -> SendRequest {
+pub fn plain<'a>(from: &str, to: &str, body: &'a str) -> SendRequest<'a> {
     SendRequest {
         from: key(from),
         to: to.to_string(),
-        body: body.to_string(),
+        body,
         wake: false,
         reply_to: None,
     }

@@ -27,7 +27,7 @@ pub enum RefusalReason {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
+#[serde(rename_all = "kebab-case", deny_unknown_fields)]
 pub enum MessageState {
     Recorded,
     InFlight {
@@ -45,6 +45,7 @@ pub enum MessageState {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Header {
     pub id: MessageId,
     pub kind: Kind,

@@ -152,11 +152,11 @@ fn a_different_head_after_the_stored_head_is_dead_replaces_it_with_exactly_one_b
         .unwrap();
 
     assert!(
-        matches!(&outcome, Registered::Replaced { generation, name: n } if *generation == Generation::FIRST.next() && n.as_str() == name),
+        matches!(&outcome, Registered::Replaced { generation, name: n } if *generation == Generation::FIRST.next().unwrap() && n.as_str() == name),
         "{outcome:?}"
     );
     let binding = state.binding(&key("k")).unwrap();
-    assert_eq!(binding.generation, Generation::FIRST.next());
+    assert_eq!(binding.generation, Generation::FIRST.next().unwrap());
     assert_eq!(binding.name.as_str(), name);
     assert_eq!(binding.head, "head-b");
     assert_eq!(binding.handle.as_deref(), Some("thread-b"));
@@ -297,4 +297,55 @@ fn a_clock_that_steps_back_is_treated_as_the_last_time_seen() {
 
     assert_eq!(state.binding(&key("k")).unwrap().last_seen, t(1000));
     assert_eq!(state.last_now(), t(1000));
+}
+
+#[test]
+fn a_takeover_at_the_last_generation_is_refused_and_leaves_the_binding_untouched() {
+    let limits = spec_limits();
+    let mut ids = SeqIds::default();
+    let mut state = MailboxState::new();
+    register_new(
+        &mut state,
+        request("k", "codex", None, "head-a"),
+        t(100),
+        &limits,
+        &mut ids,
+    );
+    // Only a corrupt or hand-edited snapshot reaches the last generation.
+    let mut snapshot = serde_json::to_value(&state).unwrap();
+    snapshot["bindings"]["k"]["generation"] = serde_json::json!(u32::MAX);
+    let mut state: MailboxState = serde_json::from_value(snapshot).unwrap();
+    let before = state.binding(&key("k")).unwrap().clone();
+
+    let refused = state.register(
+        request("k", "codex", None, "head-b"),
+        other_head(Liveness::Dead),
+        t(200),
+        &limits,
+        &mut ids,
+    );
+
+    assert_eq!(refused, Err(RegisterRefusal::GenerationExhausted));
+    assert_eq!(state.binding(&key("k")).unwrap(), &before);
+}
+
+#[test]
+fn a_writer_key_longer_than_the_header_bound_is_refused_at_registration() {
+    let limits = spec_limits();
+    let bound = limits.frame.max_header_chars as usize;
+    let mut ids = SeqIds::default();
+    let mut state = MailboxState::new();
+
+    let at_bound = request(&"k".repeat(bound), "codex", None, "h1");
+    assert!(state
+        .register(at_bound, None, t(1), &limits, &mut ids)
+        .is_ok());
+    let before = state.clone();
+    let over = request(&"k".repeat(bound + 1), "codex", None, "h2");
+
+    assert_eq!(
+        state.register(over, None, t(2), &limits, &mut ids),
+        Err(RegisterRefusal::KeyTooLong)
+    );
+    assert_eq!(state, before);
 }

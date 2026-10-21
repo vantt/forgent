@@ -38,6 +38,7 @@ impl ExchangeKey {
 /// Messages between one pair while the gap between two consecutive
 /// messages stays below `wake.exchangeGapSec`.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Exchange {
     pub last_at: Timestamp,
     pub wakes_spent: u32,

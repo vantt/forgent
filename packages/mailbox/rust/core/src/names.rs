@@ -97,7 +97,8 @@ fn names_of<'a>(bindings: impl Iterator<Item = &'a Binding>) -> Vec<ShortName> {
 
 impl MailboxState {
     /// Resolves a typed name to exactly one head: exact short name, then a
-    /// unique short-name prefix, then a unique key prefix. A name is never
+    /// unique short-name prefix, then the exact key, then a unique key
+    /// prefix. A name is never
     /// taken from message text.
     pub fn resolve(&self, query: &str) -> Result<&Binding, ResolveRefusal> {
         if query
@@ -110,10 +111,11 @@ impl MailboxState {
             if let Some(exact) = self.bindings().find(|b| b.name.as_str() == query) {
                 return Ok(exact);
             }
-            let steps: [&dyn Fn(&Binding) -> bool; 2] =
-                [&|b| b.name.as_str().starts_with(query), &|b| {
-                    b.key.as_str().starts_with(query)
-                }];
+            let steps: [&dyn Fn(&Binding) -> bool; 3] = [
+                &|b| b.name.as_str().starts_with(query),
+                &|b| b.key.as_str() == query,
+                &|b| b.key.as_str().starts_with(query),
+            ];
             for matches in steps {
                 let found: Vec<&Binding> = self.bindings().filter(|b| matches(b)).collect();
                 match found.as_slice() {

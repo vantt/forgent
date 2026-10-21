@@ -30,6 +30,7 @@ pub struct StoredHead {
 
 /// One address: a head of a CLI process and its current generation.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Binding {
     pub key: WriterKey,
     pub name: ShortName,
@@ -41,6 +42,9 @@ pub struct Binding {
     pub handle: Option<String>,
     pub registered_at: Timestamp,
     pub last_seen: Timestamp,
+    /// The last drain of this generation that found mail pending (spec
+    /// §6.4, §9 signal 9); a drain of an empty address does not write.
+    pub last_drain_at: Option<Timestamp>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -82,6 +86,11 @@ pub enum RegisterRefusal {
     Deferred,
     /// No short name fits: an empty project or a header bound too small.
     NameDoesNotFit,
+    /// The writer key is longer than `frame.maxHeaderChars`.
+    KeyTooLong,
+    /// The stored generation is the last one; only a corrupt or hand-edited
+    /// snapshot gets here, and a takeover must never keep the old number.
+    GenerationExhausted,
 }
 
 impl RegisterRefusal {
@@ -91,6 +100,8 @@ impl RegisterRefusal {
             Self::Conflict => "conflict",
             Self::Deferred => "deferred",
             Self::NameDoesNotFit => "name-does-not-fit",
+            Self::KeyTooLong => "key-too-long",
+            Self::GenerationExhausted => "generation-exhausted",
         }
     }
 }
@@ -114,6 +125,9 @@ impl MailboxState {
         limits: &Limits,
         ids: &mut dyn IdSource,
     ) -> Result<Registered, RegisterRefusal> {
+        if req.key.as_str().chars().count() > limits.frame.max_header_chars as usize {
+            return Err(RegisterRefusal::KeyTooLong);
+        }
         if self.bindings.contains_key(&req.key) != judged.is_some() {
             return Err(RegisterRefusal::JudgementMismatch);
         }
@@ -137,7 +151,11 @@ impl MailboxState {
             Liveness::Alive => Err(RegisterRefusal::Conflict),
             Liveness::Unknown => Err(RegisterRefusal::Deferred),
             Liveness::Dead => {
-                binding.generation = binding.generation.next();
+                binding.generation = binding
+                    .generation
+                    .next()
+                    .ok_or(RegisterRefusal::GenerationExhausted)?;
+                binding.last_drain_at = None;
                 binding.head = req.head;
                 binding.handle = req.handle;
                 binding.registered_at = now;
@@ -175,6 +193,7 @@ impl MailboxState {
             handle: req.handle,
             registered_at: now,
             last_seen: now,
+            last_drain_at: None,
         };
         self.bindings.insert(req.key, binding);
         Ok(Registered::Created {

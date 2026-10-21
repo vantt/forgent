@@ -119,3 +119,12 @@ node scripts/git-one-door-scan.mjs --write-census
   - `Timestamp::is_past(since, secs)` replaces the planned `secs_since`: comparisons are made in milliseconds so a sub-second remainder never rounds a deadline down.
   - The judgement check runs before the clock and (from phase 4) the sweep, so a mismatch leaves the whole state equal.
   - On `Replaced` the name and the CLI are kept from the stored binding; the head, handle and times come from the request.
+
+## Review fixes (2026-10-21, code review of phases 1-4)
+
+- **M2 snapshot version** (plan-owner decision: the core owns the shape, so it owns the version): `MailboxState` carries `schema_version` = `SNAPSHOT_SCHEMA_VERSION` (1), and every snapshot struct and struct-variant enum denies unknown fields. `SnapshotVersion { schema_version }` is read first; `SnapshotVersion::check()` returns `Newer` (the store must neither use nor overwrite the snapshot), `UnsupportedOlder` (no migration exists yet) or `Ok` for the current version. Owning tests in `tests/snapshot.rs`: unknown field rejected (top level and nested), version check (newer, older, current).
+- **L2**: resolution adds an exact-key step between the name-prefix and key-prefix steps; `tests/names.rs` test 4 now also proves `1234` beats `12345`.
+- **L3**: `Generation::next()` returns `Option`; a takeover at the last generation is refused `GenerationExhausted` and leaves the binding untouched (new test in `tests/registry.rs`, built from an edited snapshot, the only way to get there).
+- **L4**: a writer key longer than `frame.maxHeaderChars` is refused `KeyTooLong` at registration (new test). The key's meaning text in `limits.v1.json` now names writer keys; no new key or value. `head` and `handle` stay unbounded opaque store text, bounded by the store at V2.
+- **L8**: the `state.rs` comment now says map keys are `String` newtypes or unit-only enums (written as strings).
+- `Binding` gains `last_drain_at` (phase 3 note below), reset to `None` on a takeover.

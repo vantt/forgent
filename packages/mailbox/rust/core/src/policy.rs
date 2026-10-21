@@ -72,15 +72,16 @@ impl MailboxState {
         }
     }
 
-    /// Runs checks 1-10 for an attempt already counted.
+    /// Runs checks 0-10 for an attempt already counted.
     pub(crate) fn admit(
         &self,
-        req: &SendRequest,
+        req: &SendRequest<'_>,
         account: &Account,
         from_generation: Option<Generation>,
         now: Timestamp,
         limits: &Limits,
     ) -> Result<Admitted, Refusal> {
+        check_sender_key(&req.from, limits)?;
         let recipient = self.resolve(&req.to)?;
         self.check_reply_hint(req, &recipient.key)?;
         check_size(req, limits)?;
@@ -103,7 +104,7 @@ impl MailboxState {
 
     /// Check 3: a hint must name a message the recipient offered to the
     /// sender. Notices live in their own lane and never qualify.
-    fn check_reply_hint(&self, req: &SendRequest, to: &WriterKey) -> Result<(), Refusal> {
+    fn check_reply_hint(&self, req: &SendRequest<'_>, to: &WriterKey) -> Result<(), Refusal> {
         let Some(hint) = &req.reply_to else {
             return Ok(());
         };
@@ -243,8 +244,18 @@ impl MailboxState {
     }
 }
 
+/// Check 0: the sender's key fits the header bound, so no unbounded text
+/// reaches a header or the snapshot.
+fn check_sender_key(from: &WriterKey, limits: &Limits) -> Result<(), Refusal> {
+    let max_chars = limits.frame.max_header_chars;
+    if from.as_str().chars().count() > max_chars as usize {
+        return Err(Refusal::SenderKeyTooLong { max_chars });
+    }
+    Ok(())
+}
+
 /// Check 4: the body's size in UTF-8 bytes.
-fn check_size(req: &SendRequest, limits: &Limits) -> Result<(), Refusal> {
+fn check_size(req: &SendRequest<'_>, limits: &Limits) -> Result<(), Refusal> {
     if req.body.len() as u64 > limits.max_body_bytes {
         return Err(Refusal::TooLarge {
             max_bytes: limits.max_body_bytes,

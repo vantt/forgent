@@ -3,6 +3,7 @@ mod common;
 use common::{key, plain, register_new, request, spec_limits, t, SeqIds};
 use fgos_mailbox_core::{
     Checkpoint, CounterReason, Generation, MailboxState, MessageState, NoticeState,
+    SnapshotVersion, SnapshotVersionError, SNAPSHOT_SCHEMA_VERSION,
 };
 
 /// Builds a state in which every field of the snapshot holds a value.
@@ -142,4 +143,47 @@ fn a_state_with_every_field_populated_survives_a_json_round_trip_from_an_owned_s
     drop(text);
 
     assert_eq!(restored, state);
+}
+
+#[test]
+fn a_snapshot_with_an_unknown_field_is_rejected_instead_of_silently_dropping_it() {
+    let mut snapshot = serde_json::to_value(populated_state()).unwrap();
+    snapshot["a_field_from_a_newer_core"] = serde_json::json!({});
+    assert!(serde_json::from_value::<MailboxState>(snapshot).is_err());
+
+    let mut nested = serde_json::to_value(populated_state()).unwrap();
+    nested["messages"][0]["a_newer_header_field"] = serde_json::json!(1);
+    assert!(serde_json::from_value::<MailboxState>(nested).is_err());
+}
+
+#[test]
+fn the_snapshot_version_check_refuses_a_newer_version_refuses_an_older_one_as_unsupported_and_accepts_the_current_one(
+) {
+    let current = serde_json::to_string(&populated_state()).unwrap();
+    let version: SnapshotVersion = serde_json::from_str(&current).unwrap();
+    assert_eq!(version.schema_version, SNAPSHOT_SCHEMA_VERSION);
+    assert_eq!(version.check(), Ok(()));
+
+    let mut newer = serde_json::to_value(populated_state()).unwrap();
+    newer["schema_version"] = serde_json::json!(SNAPSHOT_SCHEMA_VERSION + 1);
+    newer["a_field_from_a_newer_core"] = serde_json::json!(1);
+    let version: SnapshotVersion = serde_json::from_value(newer).unwrap();
+    assert_eq!(
+        version.check(),
+        Err(SnapshotVersionError::Newer {
+            found: SNAPSHOT_SCHEMA_VERSION + 1,
+            supported: SNAPSHOT_SCHEMA_VERSION
+        })
+    );
+
+    let older = SnapshotVersion {
+        schema_version: SNAPSHOT_SCHEMA_VERSION - 1,
+    };
+    assert_eq!(
+        older.check(),
+        Err(SnapshotVersionError::UnsupportedOlder {
+            found: SNAPSHOT_SCHEMA_VERSION - 1,
+            supported: SNAPSHOT_SCHEMA_VERSION
+        })
+    );
 }

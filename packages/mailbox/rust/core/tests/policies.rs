@@ -10,7 +10,7 @@ fn code(result: &Result<fgos_mailbox_core::SendOutcome, Refusal>) -> &'static st
     }
 }
 
-fn hinted(from: &str, to: &str, hint: &MessageId) -> fgos_mailbox_core::SendRequest {
+fn hinted(from: &str, to: &str, hint: &MessageId) -> fgos_mailbox_core::SendRequest<'static> {
     let mut req = plain(from, to, "re");
     req.reply_to = Some(hint.clone());
     req
@@ -373,4 +373,25 @@ fn the_a_b_c_a_cycle_keeps_depth_0_never_trips_the_loop_guard_and_is_stopped_by_
     let counters = pair.state.counters();
     assert_eq!(counters.total(CounterReason::Loop), 0);
     assert_eq!(counters.total(CounterReason::SessionBudget), 0);
+}
+
+#[test]
+fn a_sender_key_longer_than_the_header_bound_is_refused_before_any_other_check_and_records_nothing()
+{
+    let mut pair = Pair::new(t(0));
+    let bound = pair.limits.frame.max_header_chars as usize;
+
+    let refused = pair.try_send(plain(&"s".repeat(bound + 1), "a,b", "hi"), t(1));
+
+    assert!(
+        matches!(refused, Err(Refusal::SenderKeyTooLong { .. })),
+        "{refused:?}"
+    );
+    assert_eq!(pair.state.messages().count(), 0);
+    assert_eq!(
+        pair.state.counters().total(CounterReason::SenderKeyTooLong),
+        1
+    );
+    let at_bound = pair.try_send(plain(&"s".repeat(bound), B_NAME, "hi"), t(2));
+    assert_eq!(code(&at_bound), "recorded");
 }

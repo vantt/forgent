@@ -194,8 +194,11 @@ impl Generation {
         self.0
     }
 
-    /// The generation after this one.
-    pub const fn next(self) -> Generation {
-        Generation(self.0.saturating_add(1))
+    /// The generation after this one; `None` once the last is used.
+    pub const fn next(self) -> Option<Generation> {
+        match self.0.checked_add(1) {
+            Some(n) => Some(Generation(n)),
+            None => None,
+        }
     }
 }

@@ -150,6 +150,8 @@ Each is recorded in the spec on the branch in phase 8 (L5 question 6) as an agen
 - **`Cargo.lock`** changes with the new member; CI runs `--locked`, so the lock is committed with phase 1.
 - **Workspace `Cargo.toml` already lists `packages/durable-file/rust` twice** (lines 7 and 24). Out of this plan's scope (RUL11): report it as a separate item, do not fix it on the mailbox branch.
 - **Branch drift**: main moves while the branch lives. Follow the branch sync rule above (merge, never rebase); never push or merge the branch into main.
+- **V2 snapshot size** (code review M3): the 50 ms hook measurement must include a steady-state snapshot holding a week of headers at the §12 limits (headers live `max(loop.windowSec, record.ttlSec, record.bodyRetentionSec)`, 7 days with the §12 values).
+- **V2 dead bindings** (code review, consequence of Q2 option B): until V2 prunes, dead bindings stay addressable, so a name prefix such as `forgent-codex` becomes ambiguous after the second Codex session ever, and mail to a name whose only binding is dead waits for its record TTL instead of being refused as an unknown address. V2's pruning and liveness must address both.
 - **Board**: AGENTS.md asks a lane lead to update its board row when it starts, finishes or blocks. The board lives on main; the implementer reports state to the controller, who updates row `MAIL` (the board is plan text, not mailbox code).
 
 ## Validation Log

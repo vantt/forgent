@@ -104,3 +104,9 @@ node scripts/git-one-door-scan.mjs --write-census
   - `BoundedCounters` orders eviction by a bump sequence number, so "least recently bumped" stays exact when timestamps tie.
   - The account helper (`MailboxState::account`, shared `unregistered` identity of decision 12) lands here because the counters need it; phase 5 reuses it.
 - Test 7 parts the two retention rules with ordinary configuration: `record.bodyRetentionSec` set to the contract's `loop.windowSec` value, so the body goes before the header; a second half checks that with the contract values both go at the same instant.
+
+## Review fixes (2026-10-21, code review of phases 1-4)
+
+- **M4**: new owning tests in `tests/sweep.rs`: *a notice whose addressee generation ended is removed before it reaches the successor* (sweep step 3's generation half), *a notice is never taken at Stop*, *a notice finished by a generation that is not current is ignored and stays in flight*. Each fails when its branch is removed (checked by mutation). The generation-ended test sweeps explicitly after the takeover: `register` sweeps before it bumps the generation, and a drain of the successor finds nothing pending, so the stale notice leaves at the next sweep; it is never offered meanwhile.
+- **L5**: on overflow the lane evicts the oldest *recorded* notice of the address; an in-flight notice (already emitted) is never evicted. When only in-flight notices are older, the evicted one is the new notice itself, counted `notice-dropped`. Owning test: *the notices lane never evicts an in-flight notice and refuses the new one when only in-flight notices are older* (`notices.cap` = 1 through ordinary configuration).
+- `inbox` lists notices (phase 3 note, L6); *inbox lists pending notices as notices like the claim that would take them* lives in `tests/sweep.rs`.

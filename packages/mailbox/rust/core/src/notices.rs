@@ -11,7 +11,7 @@ use crate::time::Timestamp;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
+#[serde(rename_all = "kebab-case", deny_unknown_fields)]
 pub enum NoticeState {
     Recorded,
     InFlight {
@@ -22,6 +22,7 @@ pub enum NoticeState {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Notice {
     pub id: MessageId,
     /// The sender of the refused message.
@@ -116,7 +117,11 @@ impl MailboxState {
         });
         let held = self.notices.iter().filter(|n| n.to == refused.from).count();
         if held > limits.notices.cap as usize {
-            if let Some(oldest) = self.notices.iter().position(|n| n.to == refused.from) {
+            // The oldest notice still waiting; an in-flight one was already
+            // emitted and is never evicted. When only in-flight notices are
+            // older, that is the new notice itself.
+            let waiting = |n: &Notice| n.to == refused.from && n.state == NoticeState::Recorded;
+            if let Some(oldest) = self.notices.iter().position(waiting) {
                 self.notices.remove(oldest);
                 self.count(
                     CounterReason::NoticeDropped,
