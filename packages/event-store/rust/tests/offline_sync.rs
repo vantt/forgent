@@ -65,3 +65,32 @@ fn fetch_succeeds_push_rejection_is_recorded_and_next_sync_retries() {
         a.tip()
     );
 }
+
+#[test]
+fn no_push_sync_leaves_the_remote_alone_and_records_the_tail_as_unpublished() {
+    let w = World::new();
+    let a = w.clone("a", "machine-aa");
+    a.setup();
+    a.append(1);
+    a.sync(false).unwrap();
+    let published = git(&w.remote, &["rev-parse", "refs/fgos/events/machine-aa"]);
+    a.append(1);
+    a.sync(true).unwrap();
+    assert_ne!(a.tip(), published);
+    assert_eq!(
+        git(&w.remote, &["rev-parse", "refs/fgos/events/machine-aa"]),
+        published
+    );
+    let status = fgos_event_store::sync::sync_status(&a.layout).unwrap();
+    assert!(status.error.is_none());
+    assert!(status.unpublished_since.is_some());
+    a.sync(false).unwrap();
+    assert_eq!(
+        git(&w.remote, &["rev-parse", "refs/fgos/events/machine-aa"]),
+        a.tip()
+    );
+    assert!(fgos_event_store::sync::sync_status(&a.layout)
+        .unwrap()
+        .unpublished_since
+        .is_none());
+}

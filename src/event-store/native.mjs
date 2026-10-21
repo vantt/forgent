@@ -22,7 +22,6 @@ function outsideGate(heldRanks) {
   if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');
   const ranks = ranksOf(heldRanks);
   if (ranks.includes(60)) throw refusal('event-store-seal-under-state');
-  if (ranks.some(rank => rank >= 58)) throw refusal('lock-order-violation');
   return ranks;
 }
 function call(fn) {

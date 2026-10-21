@@ -40,8 +40,11 @@ function options(argv) {
   return out;
 }
 async function loaders(descriptorFile) {
+  const { env = {}, ...descriptor } = JSON.parse(fs.readFileSync(descriptorFile, 'utf8'));
+  // The staged host travels with the descriptor: each mode runs as its own process.
+  Object.assign(process.env, env);
   const index = await import('../../src/git/index.mjs');
-  return { index, loader: { descriptor: JSON.parse(fs.readFileSync(descriptorFile, 'utf8')) } };
+  return { index, loader: { descriptor } };
 }
 /** The bare repository and state root the workload owns under --root (the device mount). */
 function layout(root) {
@@ -480,13 +483,15 @@ async function stageDescriptor(root, args = {}) {
     const manifest = devHostManifest({ checkoutRoot: CHECKOUT, fgosBin: host, addonFile: addon });
     const manifestFile = path.join(staging, 'manifest.json');
     fs.writeFileSync(manifestFile, JSON.stringify(manifest));
-    Object.assign(process.env, { FGOS_HOST_BIN: host, FGOS_ACTIVE_RELEASE_PATH: CHECKOUT, FGOS_ACTIVE_MANIFEST_PATH: manifestFile });
-    fs.writeFileSync(file, JSON.stringify({ manifest, releaseRoot: CHECKOUT }));
+    const env = { FGOS_HOST_BIN: host, FGOS_ACTIVE_RELEASE_PATH: CHECKOUT, FGOS_ACTIVE_MANIFEST_PATH: manifestFile };
+    Object.assign(process.env, env);
+    fs.writeFileSync(file, JSON.stringify({ manifest, releaseRoot: CHECKOUT, env }));
     return file;
   }
   const { ensureGitAddon } = await import('../git-addon.mjs');
   const built = ensureGitAddon();
-  fs.writeFileSync(file, JSON.stringify({ manifest: JSON.parse(fs.readFileSync(built.manifest, 'utf8')), releaseRoot: CHECKOUT }));
+  const env = Object.fromEntries(['FGOS_HOST_BIN', 'FGOS_ACTIVE_RELEASE_PATH', 'FGOS_ACTIVE_MANIFEST_PATH'].map(k => [k, process.env[k]]));
+  fs.writeFileSync(file, JSON.stringify({ manifest: JSON.parse(fs.readFileSync(built.manifest, 'utf8')), releaseRoot: CHECKOUT, env }));
   return file;
 }
 

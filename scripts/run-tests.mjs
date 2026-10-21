@@ -138,11 +138,16 @@ function stageDoorManifest(childEnv) {
  * - no inherited FGOS_STATE_ROOT: the host pins it into every payload it
  *   runs, and a suite started under fgOS would otherwise send every fixture
  *   that sets only FGOS_STATE_HOME to the real machine state root;
+ * - FGOS_CLAUDE_COMMAND naming a binary that does not exist, unless the
+ *   caller names one: doctor and setup in a fixture would otherwise run the
+ *   real `claude` CLI, reach the network and change the real user's plugin
+ *   registrations; a test that probes the claude rows sets its own;
  * - on darwin, TMPDIR/TMP/TEMP resolved through realpath (/var -> /private/var).
  */
 export function buildTestEnv(env = process.env) {
   const { NODE_TEST_CONTEXT: _enclosingRunner, FGOS_STATE_ROOT: _pinnedStateRoot, ...rest } = env;
   const childEnv = { ...rest, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };
+  childEnv.FGOS_CLAUDE_COMMAND ||= '/nonexistent/fgos-test-claude-binary';
   if (process.platform === 'darwin') {
     const tempRoot = env.TMPDIR || os.tmpdir();
     try {

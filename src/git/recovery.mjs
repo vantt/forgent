@@ -6,7 +6,7 @@ export function createGitRecovery(options, loaderOptions) {
   outside();
   const native = loadNativeAddon(loaderOptions);
   const port = new native.GitRecovery(options.stateRoot, options.repoPath, options.trustedMain, options.writer);
-  return Object.freeze(Object.fromEntries(['inspectOperation', 'listPending', 'reconcile'].map(method => [method, (args = {}, held = []) => {
+  return Object.freeze(Object.fromEntries(['inspectOperation', 'listPending', 'listRetainedLand', 'reconcile'].map(method => [method, (args = {}, held = []) => {
     outside(); return withNativeLocks(native, held, loans => port.call(method, args, loans));
   }])));
 }

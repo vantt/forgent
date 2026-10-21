@@ -113,18 +113,22 @@ async function generateCoverageMap() {
     console.log(`NODE_V8_COVERAGE not set. Collecting coverage for ${suiteFiles.length} test files (concurrency ${COVERAGE_CONCURRENCY}, ${COVERAGE_FILE_TIMEOUT_MS / 1000}s per file)...`);
     covDirToProcess = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coverage-'));
     selfGenerated = true;
-    collection = await collectPerFileCoverage(suiteFiles, {
-      repoRoot,
-      covRoot: covDirToProcess,
-      onResult: (r, done, total) => console.log(`[${done}/${total}] ${r.outcome} ${(r.durationMs / 1000).toFixed(1)}s ${r.file}`),
-    });
-    for (const r of collection.results) {
-      for (const srcRel of coveredSourceFiles(r.covDir, repoRoot)) {
-        if (!mapping[srcRel]) mapping[srcRel] = new Set();
-        mapping[srcRel].add(r.file);
+    // The raw V8 profiles run to gigabytes; a run that fails part way (a full temp dir) must not leave them behind.
+    try {
+      collection = await collectPerFileCoverage(suiteFiles, {
+        repoRoot,
+        covRoot: covDirToProcess,
+        onResult: (r, done, total) => console.log(`[${done}/${total}] ${r.outcome} ${(r.durationMs / 1000).toFixed(1)}s ${r.file}`),
+      });
+      for (const r of collection.results) {
+        for (const srcRel of coveredSourceFiles(r.covDir, repoRoot)) {
+          if (!mapping[srcRel]) mapping[srcRel] = new Set();
+          mapping[srcRel].add(r.file);
+        }
       }
+    } finally {
+      fs.rmSync(covDirToProcess, { recursive: true, force: true });
     }
-    fs.rmSync(covDirToProcess, { recursive: true, force: true });
     const timedOut = collection.results.filter((r) => r.outcome === 'coverage-collection-timeout');
     console.log(`Coverage collection finished in ${(collection.durationMs / 60000).toFixed(1)} min; ${timedOut.length} file(s) timed out${timedOut.length ? `: ${timedOut.map((r) => r.file).join(', ')}` : ''}.`);
   }

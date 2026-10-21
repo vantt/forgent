@@ -35,13 +35,6 @@ import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
 import { DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../../src/state/events-jsonl-truncation-guard.mjs';
 import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT, DEFAULT_DOC_REGISTRY_SETTINGS } from '../../src/setup/registrations.mjs';
 
-const EXTERNAL_CLAUDE_GUARDED_TEST_FILES = [
-  'test/setup/checks.test.mjs',
-  'test/setup/checks-doctor-config.test.mjs',
-  'test/setup/uninstall-wiring-2.test.mjs',
-  'test/setup/uninstall-wiring-3.test.mjs',
-];
-
 // tsk-in1-1 D1: a tool provider is declared directly in
 // `runner.executors.<id>` (`.fgos/config.json`), config-edited like every
 // other executor, never through a `fgos tool register` event.
@@ -64,24 +57,6 @@ function declareExecutor(cwd, id, fields) {
   }
   fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
 }
-
-test('setup/doctor CLI e2e tests fail closed against real Claude provider execution', () => {
-  const unsafeDoctorEnv = ['env: { ...process.env', 'HOME: homeDir }'].join(', ');
-  const unsafeSetupEnv = ["run(cwd, ['setup']", '{ HOME: home })'].join(', ');
-  for (const rel of EXTERNAL_CLAUDE_GUARDED_TEST_FILES) {
-    const source = fs.readFileSync(path.join(process.cwd(), rel), 'utf8');
-    assert.equal(
-      source.includes(unsafeDoctorEnv),
-      false,
-      `${rel} has a setup/doctor spawn using the real process env instead of NO_CLAUDE_ENV`,
-    );
-    assert.equal(
-      source.includes(unsafeSetupEnv),
-      false,
-      `${rel} runs setup without the FGOS_CLAUDE_COMMAND guard`,
-    );
-  }
-});
 
 test('tool-registry-configured passes when no tool-capable executor is declared at all (inactive — a clean skip, never a failure)', () => {
   const cwd = mkTemp('fgos-tool-registry-inactive-');

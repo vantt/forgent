@@ -163,7 +163,7 @@ Worktree WAL kinds bind canonical paths and registration names; move/remove addi
 ### Dormant Recovery and GitHub adapter contract (phase 06 units 9–13)
 
 `createGitRecovery(options)` exposes `inspectOperation({operationId})`,
-`listPending({bound?})`, and `reconcile({operationId}, held?)`. Inspection
+`listPending({bound?})`, `listRetainedLand({bound?})` (finished Land chains whose candidate is still retained) and `reconcile({operationId}, held?)`. Inspection
 returns the request digest, payload kind, terminal state and retained intent;
 compacted operations return their retained request digest and terminal outcome.
 Pending scans return `{operations, complete}`; corruption refuses by operation
@@ -597,10 +597,13 @@ Setup/init registers every default/path/dependency/config in existing config-mer
 | git-operation-journal | Chain/version/readability, pending intent, pins vs actual ref; read-only; backlog/bytes/oldest unresolved |
 | git-native-locks | Ownership uncertainty/native files; **no deletion** |
 | git-worktree-recovery | Orphan registration, dirty/stale checkout, custody/pending operations |
+| git-land-recovery | Finished Land operations whose candidate worktree and pins are still retained (Recovery `listRetainedLand`: operation id, candidate path, the pins actually present, WAL age); read-only; warns, never fails |
 | git-publication-refspecs | Correct mirror mapping, no own overwrite or default push change |
 | git-durability-capability | Explicit measured process/power-loss/fsync guarantee |
 | git-mutation-one-door | Zero undeclared product writers, one matcher |
 | Existing holder checks | Reuse semantics/borrow-vectors/holders/fences; no duplicate primitive |
+
+**Deferred: release of retained Land candidates.** `acknowledgeLand` may defer cleanup (`land-cleanup-deferred`) when the merge slot or `main-checkout` stays busy for 5 s, and a candidate also stays until Work acknowledges the result. Doctor only reports these (`git-land-recovery`) and states that no manual release command exists. The sweep that releases candidates whose acknowledgement Work has recorded is deferred until the Work lane resumes, because it needs Work's acknowledgement reader; doctor never guesses an acknowledgement.
 
 Registered fixes are separate typed operations with provenance. Incomplete `git-ops-pending` scan must not clear the way to mutate.
 

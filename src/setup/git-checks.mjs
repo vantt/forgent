@@ -140,6 +140,27 @@ export function fixLandRecovery(cwd, loaderOptions, portOptions) {
   });
 }
 
+/**
+ * Land candidates a finished Land still holds (worktree and pins stay until
+ * Work acknowledges the result). Read-only through the Recovery door; a
+ * warning, never a failure, because nothing is broken: the candidate waits
+ * for a release that needs Work's acknowledgement reader.
+ */
+export function checkLandRetainedCandidates(cwd, loaderOptions, portOptions, now = Date.now()) {
+  try {
+    const recovery = createGitRecovery(portOptions ?? gitPortOptions(resolveMainCheckoutRoot(cwd) ?? cwd), loaderOptions);
+    const { candidates, complete } = recovery.listRetainedLand();
+    if (!candidates.length) return { passed: true, message: complete ? 'no retained Land candidate' : 'warning: Land candidate scan incomplete' };
+    const rows = candidates.map(c => {
+      const age = c.updatedAtMs == null ? 'age unknown' : `${Math.max(0, Math.round((now - c.updatedAtMs) / 60000))} min old`;
+      return `${c.operationId} (${c.worktreePresent ? c.worktree : `${c.worktree} already gone`}; pins ${c.pins.join(', ') || 'none'}; ${age})`;
+    });
+    return { passed: true, message: `warning: retained Land candidates: ${rows.join('; ')}. No manual release command exists today; the release sweep arrives with the Work lane, which supplies the acknowledgement it needs. Never delete the worktree or pins by hand.` };
+  } catch (err) {
+    return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel: onboard this project with `fgctl init`' : err.message };
+  }
+}
+
 export function compatibleGitContracts(versions, floor) {
   return versions.napi === 8 && Object.entries({ gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 }).every(([key, version]) => versions.contracts?.[key] === version) && floor.supported && floor.probes.every(p => p.passed);
 }
