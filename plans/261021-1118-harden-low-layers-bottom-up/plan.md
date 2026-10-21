@@ -179,6 +179,31 @@ Per layer:
 3. **The state store's hot mutex stays in Node until WORK lands** (it belongs to the Work layer, T7, out of scope).
 4. **Council per component** (new): each layer council settles a target shape per component (Part A) before reviewing (Part B); large components get their own council (see the per-layer loop, step 2).
 
+2026-10-21 15:46, owner, T0 ask 1 ([arbitration](../reports/council-261021-1507-harden-t0-arbitration.md) §6): "1a 2b 3a, đồng ý theo khuyến nghị".
+5. **T0 target shapes approved as written** (arbitration §2): they go into each component's spec in the T0 sub-plan.
+6. **Proposed additions:** only doctor per-row timing in `--json`, in phase 07 (T9). No `durable-file::replace_atomic`, no per-machine bwrap probe cache.
+7. **T0 landing:** when T0 closes, the second machine self-lands in a quiet window (GIT/ES told first); the owner machine follows a guide at a time the owner picks on receipt.
+8. **Hand-offs must be recorded by the receiving lane in its own plan** (owner: "dặn các luồng nhận gì thì nhớ ghi và cập nhật plan của nó, không được xót"). The ledger below tracks each one until the receiver confirms.
+
+## Hand-off ledger (items HARDEN gave to other lanes)
+
+A row closes only when the receiving lane has written the item into its own plan and said where. HARDEN re-checks open rows at every layer close.
+
+| # | Item | Source | Receiver | Where the receiver records it | Status |
+|---|---|---|---|---|---|
+| H1 | Test-cost line in every lead brief / phase file (tests added/retired, new CLI/host spawns, CLI-call cost before/after) | [test investigation](../reports/research-261021-1210-harden-test-suite-investigation.md) §8 | TEST (`forgent-f8`) + rule-management lane | TEST plan `plans/261020-1757-test-governance-port-inventory-and-slow-file-extraction/plan.md`; rule-management handoff `handoff-261021-1021-…` | sent 12:58 (TEST) |
+| H2 | Run test files longest-first (488 s → ~330 s estimated) | investigation §3, §8 | TEST | TEST plan | sent 12:58 |
+| H3 | Debug vs release host/addon staging for tests | investigation §3, §8 | TEST | TEST plan | sent 12:58 |
+| H4 | `test/rust-host/fgctl-*` call the real `claude` CLI over the network (missing `FGOS_CLAUDE_COMMAND`) | investigation §4, §7 | TEST | TEST plan | sent 13:28 |
+| H5 | `help-routes.test.mjs` 119 s → ~1 s (spawn host directly, keep one dev-door case) | arbitration §3, §5 | TEST | TEST plan, phase 3 slow-file batch | accepted 15:44, plan entry pending |
+| H6 | bwrap probe per process + git in a pid namespace (~10 ms of every CLI call) | arbitration D3 | GIT (OPC design) | `plans/reports/design-261020-1035-operation-scoped-containment.md` input row | accepted 15:35, plan entry pending |
+| H7 | RT-M1 (subreaper set on the calling process) — fixed by T0, Git informed | arbitration §3 | GIT (for information) | none needed | closed |
+| H8 | Cross-process addon verification moves from GIT into the T0 loader leaf | arbitration D1, GIT 15:35 | HARDEN T0 (taken back from GIT) | T0 sub-plan acceptance criteria | GIT must drop it from its queue: pending confirmation |
+| H9 | host-runtime T9 list: `providers/external_process/**`, production `EchoProvider`/`test.fixture.echo`, tautological admission gate, empty `RouterPolicy`, `command-routes-drift` spawn cost | arbitration §2, §5 | HARDEN phase 07 (T9 handoff) | [phase 07](phase-07-closing-and-handoff.md) inputs | recorded here |
+| H10 | Doctor per-row timing in `fgos doctor --json` (owner 2b) | arbitration §6 | HARDEN phase 07 (T9) | [phase 07](phase-07-closing-and-handoff.md) inputs | recorded here |
+| H11 | Release-manifest canonical-JSON producer/verifier pair (if the corpus proof does not pass in T0) | arbitration §2 | HARDEN phase 07 (Packaging) | [phase 07](phase-07-closing-and-handoff.md) inputs | recorded here |
+| H12 | Spec/boundary/doc files T0 will change (`process/spec.md`, `component-boundary.md`, `holder-lock/spec.md:229,238,312`, `reading-map.md:57,59`, three docs listing `coordination-abandoned-claims`) | arbitration §5 | DOC (`forgentx-5f`, owner machine) | DOC plan `plans/260925-documentation-authority-unification/` | board note; message before merge |
+
 ## Red Team Review
 
 ### Session — 2026-10-21

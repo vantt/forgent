@@ -83,7 +83,7 @@ None is Critical. One High is already reproduced (gateway stop kills an unrelate
 
 ## 6. Owner ask 1 (batched)
 
-See the chat message of 2026-10-21 15:15; answers are recorded here when given.
+Asked in chat 2026-10-21 15:15. **Answered 15:46: "1a 2b 3a, đồng ý theo khuyến nghị"**: shapes approved as written; only doctor per-row timing (phase 07); T0 lands when it closes (second machine self-lands, owner machine by guide).
 
 1. Approve the Part A target shapes in §2. Each then gets written into its component's spec.
 2. Proposed additions: pick none, some or all.
