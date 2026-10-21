@@ -278,13 +278,10 @@ export const SUPPORTED_EXECUTOR_TEMPLATES = { claude: DEFAULT_RUNNER_CONFIG.exec
  * semantic config hash, because the loaders strip it from the merged runner before anything reads it.
  */
 export function stripConfigComments(value) {
-  if (Array.isArray(value)) return value.map(stripConfigComments);
-  if (value === null || typeof value !== 'object') return value;
-  const out = {};
-  for (const [key, child] of Object.entries(value)) {
-    if (key !== '$comment') out[key] = stripConfigComments(child);
-  }
-  return out;
+  if (value === undefined) return undefined;
+  // A JSON round trip, so the value stays what the config files hold (data read from disk): the one-door scan
+  // follows it as such, where a recursive rebuild of the object left it unresolved.
+  return JSON.parse(JSON.stringify(value, (key, child) => (key === '$comment' ? undefined : child)));
 }
 
 /** The capability entry keys that choose tier or taste per seat; they exist in the project config only. */
