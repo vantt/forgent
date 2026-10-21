@@ -1081,6 +1081,10 @@ payloads without modifying the input. Every result records seed count, bytes and
 source. Store-only numbers are not Work end-to-end acceptance. Ext4 latency,
 power-loss qualification and the parked Work cutover remain separate gates.
 
+2026-10-21: item 5's real-forge step (owner authorization Q3, given 2026-10-21) passed: `scripts/event-store/forge-probe.sh https://github.com/vantt/forgent` appended one event in a fresh repository, synced `refs/fgos/events/<probe-id>` to GitHub, and a second fresh repository fetched it without pushing and read the event (`verdict: PASS`, no push or fetch warnings); the probe ref was deleted afterwards. The probe uses fresh repositories with the forge as origin instead of clones, because a clone that still tracks legacy `.fgos/events` files is refused until the Work cutover's migration.
+
+2026-10-21: item 10 (filesystem crash consistency) held on ext4: `scripts/event-store/power-loss.sh --runs 20` on the second machine, 20 dm-flakey power cuts with periodic seals, 1675 acknowledged events, none lost, doubled or out of sequence, every run `PASS`. The first runs failed (19/20, `seal.json missing`) because Git's `mktree` left seal trees unsynced; fixed in the Git Publication port before this result ([verification report](../../../plans/reports/verification-261021-1202-git-e1-and-event-store-power-loss.md)).
+
 The dormant branch's repository door test is a regression census, not evidence
 that cutover V-DOOR-01 is complete: it asserts the exact pre-cutover invocation
 and retired-reader findings as a shrink-only declared list keyed by file, call
