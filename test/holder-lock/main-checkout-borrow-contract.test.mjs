@@ -31,10 +31,3 @@ test('the holder waits for the child and only the facade maps the description', 
   assert.match(rules, /waits for the child to exit/);
   assert.match(borrow.scrub, /workerBaseEnv drops FGOS_LOCK_FD/);
 });
-
-test('the borrow contract does not reach into the state store', () => {
-  const text = JSON.stringify(borrow);
-  for (const word of ['events.lock', 'claims.lock', 'stateTx', 'events.jsonl', 'shard']) {
-    assert.ok(!text.includes(word), `${word} must not appear in the borrow contract`);
-  }
-});

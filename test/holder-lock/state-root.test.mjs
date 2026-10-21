@@ -1,7 +1,9 @@
 // The state-root vectors (packages/holder-lock/contracts/state-root.vectors.v1.json)
-// through the Node facade: a pinned FGOS_STATE_ROOT is answered by Node
-// alone (no host binary needed); without a pin the route
-// `fgos internal state-root` is asked and its answer must match the vector.
+// that exercise the Node facade's one rule: a non-blank FGOS_STATE_ROOT is
+// answered by Node alone (no host binary needed); a blank one is no pin, so
+// the route `fgos internal state-root` is asked and its answer must match the
+// vector. The formula behind every other vector lives only in Rust and is
+// owned by packages/holder-lock/rust/tests/state_root_vectors.rs.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -42,7 +44,7 @@ function resolveIn(env) {
 
 test.after(() => fs.rmSync(scratch, { recursive: true, force: true }));
 
-for (const vector of vectors.vectors) {
+for (const vector of vectors.vectors.filter((v) => 'FGOS_STATE_ROOT' in v.env)) {
   const platforms = vector.platforms ?? null;
   const offPlatform = platforms && !platforms.includes(PLATFORM) ? `vector is for ${platforms.join('/')}` : false;
   const pinned = vector.expect.source === 'pinned';

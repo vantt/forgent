@@ -14,6 +14,13 @@ net_size: "Node 0 / Rust 0 / tests 0; this phase measures and prints the layer's
 
 Parent plan loop steps 6–9 and proposal §4.6 (independent verification), owner decision 7 (T0 lands when it closes: the second machine self-lands in a quiet window after telling GIT/ES; the owner machine follows a Vietnamese guide at a time the owner picks), owner decision 1 (stop-everything landing on every workspace and both machines; old data needs one read path), the [T0 baseline](../reports/research-261021-1210-harden-t0-baseline.md) §1 (call classes, machine, load class, method), the memory rules for landing (self-land here once gates pass; write the owner-machine guide and link it on the board; pull and read the board first). The big lead runs this phase, not a Sonnet lead.
 
+
+## Carried from phase 5 (big lead, 2026-10-21 20:50)
+
+- **Owner-machine canonical corpus run before activation.** Phase 5 moved `proof-helpers` and `reconciliation-planner` onto the door's `canonicalJson` after a byte-equality run over this machine's `.fgos/assignments` (12 865 documents, 4 265 981 subtrees, 0 mismatches) plus the rest of `.fgos/**` and `test/fixtures`. The owner-machine guide runs the same corpus script (its content is in the phase 5 lead report) over each of the three workspaces **before** activating; any mismatch stops the landing on that machine.
+- **Steps need the door.** An attempt step process started with a bare environment now exits 70 (fail-closed); production passes every `FGOS_*` variable (`attemptStepEnv`). Smoke must run one real attempt on each workspace after activation.
+- **Accepted exception for the canonical-json spec (phase 6):** `src/runner/dispatch/recovery-planner.mjs` keeps its own `stableStringify`, because `test/verbs/dispatch-recovery.test.mjs` pins its imports to `node:crypto` (a purity contract) and its stored records hold only hash outputs. Also kept with reasons: `effective-execution-contract.mjs` and the release-manifest pair (ledger H11), `trust-store.mjs` `sortedJson` (codex byte order).
+
 ## Requirements
 
 **Independent verification (on the merged track branch, before landing)**
