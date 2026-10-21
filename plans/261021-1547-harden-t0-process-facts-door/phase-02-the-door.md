@@ -1,7 +1,7 @@
 ---
 phase: 02
 title: "The door: T0 loader leaf, addon namespaces, versions, npm descriptor, H8"
-status: pending
+status: done
 depends_on: [01]
 parallel: "may run in parallel with phase 01 and phase 04 (disjoint files); phase 03 and 05 start after this phase merges; steps 2b/2c settled by OQ-2 (a) and OQ-3 (c), owner 17:43"
 effort: ~1.5d
