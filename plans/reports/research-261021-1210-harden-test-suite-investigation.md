@@ -123,7 +123,7 @@ Tổng theo loại (cộng mọi file):
 
 Với khoảng 3 450 lần gọi CLI trong suite, riêng việc băm addon tốn khoảng 260 s CPU.
 
-**`fgctl init` 6–23 s mỗi lần.** Trong test, mỗi ca của các file `rust-host/fgctl-*` chạy `fgctl init` thật. Bước này gọi `fgos doctor`, và doctor trên workspace thật mất 40,7 s cho 145 row ([baseline T0 §4](research-261021-1210-harden-t0-baseline.md)). Ngoài ra mỗi file build lại release một lần (`build-rust-distribution.mjs`, khoảng 10 s). `help-routes` (119 s) gọi dev door 28 lần, mỗi lần stage lại host và payload (khoảng 4,2 s).
+**`fgctl init` 6–23 s mỗi lần.** Trong test, mỗi ca của các file `rust-host/fgctl-*` chạy `fgctl init` thật. Bước này gọi `fgos doctor`, và doctor trên workspace thật mất 40,7 s cho 145 row ([baseline T0 §4](research-261021-1210-harden-t0-baseline.md)). Quan sát trực tiếp lúc 13:25, trong suite của lane TEST: doctor bên trong `fgctl init` chạy `claude` **thật** (`claude --version`, `plugin marketplace list --json`, `plugin marketplace add vantt/forgent`, mỗi lệnh khoảng 1 s và có gọi mạng tới GitHub), vì không file `test/rust-host/*` nào đặt `FGOS_CLAUDE_COMMAND` (`src/setup/registrations.mjs:3226,3300`). HOME của các tiến trình đó là thư mục tạm, nên config thật không bị đụng, nhưng suite phụ thuộc mạng và một CLI bên ngoài. Đây đúng là lỗi đã sửa ngày 08-27 cho `checks.test.mjs` (`NO_CLAUDE_ENV`), nay tái phát ở nhóm test mới tách ra ngày 10-14. Ngoài ra mỗi file build lại release một lần (`build-rust-distribution.mjs`, khoảng 10 s). `help-routes` (119 s) gọi dev door 28 lần, mỗi lần stage lại host và payload (khoảng 4,2 s).
 
 ## 5. Lịch sử tăng
 
@@ -182,7 +182,7 @@ Chưa có lần nào đo hay chặn **chi phí của một lần gọi CLI** ho�
 | 2 | Test chứng minh qua CLI hoặc qua môi trường thật trong khi tầng thấp hơn đủ: `fgctl init` thật cho mỗi ca, build release mỗi file, dev door mỗi ca | test (H1) | file `rust-host` 1 338 s và `cli` 1 634 s là nhóm chính |
 | 3 | Thứ tự file không theo thời gian: file dài bắt đầu muộn | cơ chế chạy | khoảng 150 s wall (ước tính, cần kiểm) |
 | 4 | Quy trình tạo test chỉ thêm, kể cả khi chuyển sang Rust | quy trình (H3, H2) | không đổi ra giây; là lý do số test tăng đều |
-| 5 | `fgos doctor` 40,7 s, và `fgctl init` chạy doctor | sản phẩm (T9, mỗi tầng phần gate 8) | phần lớn trong 934 s `fgctl init` |
+| 5 | `fgos doctor` 40,7 s, và `fgctl init` chạy doctor; trong test, doctor gọi `claude` thật qua mạng vì test không chặn nó | sản phẩm (T9, mỗi tầng phần gate 8) và test (thiếu `FGOS_CLAUDE_COMMAND` ở `test/rust-host/fgctl-*`) | phần lớn trong 934 s `fgctl init`; khoảng 3 s mỗi doctor chỉ cho `claude` |
 
 ## 8. Đề xuất cho quy trình tạo test (giao TEST và luồng quản lý luật; HARDEN không xây cơ chế)
 
