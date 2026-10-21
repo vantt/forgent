@@ -1,7 +1,7 @@
 ---
 phase: 01
 title: "Red tests for the seven High defects"
-status: pending
+status: done
 depends_on: []
 parallel: "runs first; may run in parallel with phase 02 (disjoint files); every fix phase (03, 04) starts after this phase is committed"
 effort: ~1d

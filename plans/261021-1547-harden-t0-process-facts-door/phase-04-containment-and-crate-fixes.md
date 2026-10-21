@@ -1,7 +1,7 @@
 ---
 phase: 04
 title: "Containment and process-crate fixes: subreaper, Unknown folding, one observer read, one stat parser, one pgroup module, bounded loops, absolute cwd"
-status: pending
+status: done
 depends_on: [01]
 parallel: "may run in parallel with phases 02 and 03 (only packages/process/rust/** changes here); phase 06 starts after it (facts.rs is shared)"
 effort: ~1.5d
