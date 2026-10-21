@@ -1,0 +1,622 @@
+{
+  "inputHEAD": "8ea7204ba24c8e1c13bbe5c4508a878011abe0b8",
+  "prior": "d70cc20cd17c733a4c7237a6a97ed06e107ea955",
+  "merge": "149f47accd7cc9a935907196549acc0738736ec5",
+  "main": "5a4b7353300f139907611b170de650314aafbe80",
+  "base": "5538b9484acfd5191b4205549a1dd3998df47b48",
+  "accountedMerges": [
+    {
+      "merge": "3a95653ea709471dc06a6d106a2e73df667568e8",
+      "firstParent": "e6f5abeca37772a927d7053d3140689edf25574f",
+      "secondParent": "302575c046adee740430e352ee0399aeddff46b5",
+      "base": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "mainCommits": 0,
+      "changedPaths": [
+        "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-05-s67-p01.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-05-s67-p02.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-05-s67-p03.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-05-s67-p05.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-05-s67-p06.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-05-s67-p07.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-admission-rules.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-check-result.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-parity-receipts.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-read-units.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-rules.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/citation-ratchet-roots.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-decision-index.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-external-parks.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-29.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r19.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r21.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-retired-source.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/ui-spec-compiler.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check-result.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-parity-receipts.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-rereview-list.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-cutover-specs.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-judgment-receipts.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-parity-receipts.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes-result.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-check.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-parity-receipts.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-check.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-closure.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-review-list.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-author.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-before-last-note-proof.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-caller-corrections.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-callers.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-check-result.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-check.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-check.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-closure.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-current-proof.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-current-tests.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-cutover-specs.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-decisions-replay.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-documented-commands.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-final-inputs.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-final-proof.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-finalize.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-full-check.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-full-check.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-handback.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-caller-corrections.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-check.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-check.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-pilot-harness.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-probe-proof.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-verification-jobs.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-inventory-owner-confirmation.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-last-notes.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-parity-receipts.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-pre-caller-verification-jobs.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-pre-final-full-check.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-pre-memo-verification-jobs.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-probes-result.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-probes.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch2.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch2.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch3.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch3.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch4.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch4.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch5.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch5.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch6.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch6.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch7.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch7.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-full-check.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-full-check.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-pilot.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-pilot.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-prompt.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-prompt.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-r26.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-r26.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-seam4.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-seam4.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-seam67.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-seam67.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-r22-patch-replay.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-refine.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-refresh.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-revalidate.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-revalidation.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-review-closure-brief.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-review-closure.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-review-list.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-seal.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-source-traces.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-task0-closure.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-task0-rules.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-verification-jobs.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-verification.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-verify.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-whole-file-reads.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-carry-joins.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check-result.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-closure.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-continuation.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-cross-seam-carries.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-head-drift.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-inherited-patches.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-occurrence-ancestry.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-parity-receipts.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-probe-results.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-progress.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-proposed-move-read-units.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-review-list.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-rulings.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-verification.json"
+      ],
+      "role": "Branch merge of the plan's own seam-8 branch; records only; carries no main content."
+    },
+    {
+      "merge": "149f47accd7cc9a935907196549acc0738736ec5",
+      "firstParent": "3a95653ea709471dc06a6d106a2e73df667568e8",
+      "main": "5a4b7353300f139907611b170de650314aafbe80",
+      "base": "5538b9484acfd5191b4205549a1dd3998df47b48",
+      "mainCommits": 61,
+      "changedPaths": [
+        "CHANGELOG.md",
+        "core/workflows/architecture-advisory-reopen.yaml",
+        "core/workflows/architecture-advisory.yaml",
+        "docs/backlog.md",
+        "docs/platform/agent-mailbox/spec.md",
+        "docs/platform/event-store/spec.md",
+        "docs/platform/git/spec.md",
+        "docs/platform/run-supervisor/spec.md",
+        "docs/platform/terminal-control/spec.md",
+        "packages/git/contracts/mutation-census.v1.json",
+        "packages/git/node-addon/src/git.rs",
+        "packages/git/node-addon/src/git/inspect.rs",
+        "packages/git/rust/src/publication.rs",
+        "packages/git/rust/src/worktree.rs",
+        "packages/git/rust/tests/publication.rs",
+        "packages/run-supervisor/rust/src/gate/unix.rs",
+        "packages/run-supervisor/rust/src/supervise/terminal.rs",
+        "packages/run-supervisor/rust/tests/gate_terminal_socket.rs",
+        "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs",
+        "packages/run-supervisor/rust/tests/support/terminal.rs",
+        "packages/terminal-control/contracts/terminal-control.port.v1.json",
+        "packages/terminal-control/rust/src/core.rs",
+        "packages/terminal-control/rust/src/port.rs",
+        "packages/terminal-control/rust/src/route.rs",
+        "packages/terminal-control/rust/tests/core_failures.rs",
+        "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh",
+        "packages/terminal-control/rust/tests/herdr_driver_fake.rs",
+        "plans/261017-1313-fgos-platform-program-board/log.md",
+        "plans/261017-1313-fgos-platform-program-board/plan.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-00-baseline-and-test-investigation.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-01-t0-process-facts-and-leaf-crates.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-02-t1-holder-lock-identity-convention.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-04-t3-agent-protocol-observe-event-store.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-05-t4-run-supervisor-launch-gate.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-06-t5-execution-core-dispatch-seat-run-result.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-07-closing-and-handoff.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/plan.md",
+        "plans/reports/council-261021-1324-harden-t0-council-brief.md",
+        "plans/reports/debug-261021-0843-herdr-brief-delivery-faults.md",
+        "plans/reports/debug-261021-1135-e1-orphan-candidate-lock.md",
+        "plans/reports/guide-261021-1132-mailbox-v1-handoff-to-another-machine.md",
+        "plans/reports/guide-261021-1236-owner-machine-durability-fixes.md",
+        "plans/reports/handoff-261021-1021-rule-management-tight-no-conflict-right-place.md",
+        "plans/reports/handoff-261021-1202-harden-low-layers-bottom-up.md",
+        "plans/reports/landing-261021-1236-durability-fixes-this-machine.md",
+        "plans/reports/phase-lead-261021-0843-herdr-brief-never-typed-into-shell.md",
+        "plans/reports/phase-lead-261021-1145-git-resumable-pin-release.md",
+        "plans/reports/phase-lead-261021-1236-git-es-foundation-followups.md",
+        "plans/reports/plan-refresh-261021-1215-work-lane-es-09-11.md",
+        "plans/reports/proposal-261021-0851-harden-review-criteria-and-method.md",
+        "plans/reports/research-261021-1054-rules-instruction-optimization-references.md",
+        "plans/reports/research-261021-1132-mailbox-spec-second-panel-explanation.md",
+        "plans/reports/research-261021-1210-harden-t0-baseline.md",
+        "plans/reports/research-261021-1210-harden-test-suite-investigation.md",
+        "plans/reports/spec-draft-261020-1017-seat-binding-component.md",
+        "plans/reports/verification-261021-1202-git-e1-and-event-store-power-loss.md",
+        "plans/reports/verification-261021-1323-git-e3-performance-governor.md",
+        "scripts/event-store/forge-probe.sh",
+        "scripts/git-one-door-scan.mjs",
+        "scripts/git/e1-power-cut.mjs",
+        "scripts/git/e1-power-cut.sh",
+        "scripts/git/p-space.sh",
+        "scripts/lib/git-spawn-match.mjs",
+        "src/cli/command-registry.mjs",
+        "src/git/inspect.mjs",
+        "src/verbs/worktree/remove.mjs",
+        "test/git/native-load.test.mjs",
+        "test/git/one-door.test.mjs",
+        "test/terminal-control/client-route.test.mjs",
+        "test/verbs/worktree-remove.test.mjs"
+      ]
+    }
+  ],
+  "mainCommits": 61,
+  "changedPaths": [
+    "CHANGELOG.md",
+    "core/workflows/architecture-advisory-reopen.yaml",
+    "core/workflows/architecture-advisory.yaml",
+    "docs/backlog.md",
+    "docs/platform/agent-mailbox/spec.md",
+    "docs/platform/event-store/spec.md",
+    "docs/platform/git/spec.md",
+    "docs/platform/run-supervisor/spec.md",
+    "docs/platform/terminal-control/spec.md",
+    "packages/git/contracts/mutation-census.v1.json",
+    "packages/git/node-addon/src/git.rs",
+    "packages/git/node-addon/src/git/inspect.rs",
+    "packages/git/rust/src/publication.rs",
+    "packages/git/rust/src/worktree.rs",
+    "packages/git/rust/tests/publication.rs",
+    "packages/run-supervisor/rust/src/gate/unix.rs",
+    "packages/run-supervisor/rust/src/supervise/terminal.rs",
+    "packages/run-supervisor/rust/tests/gate_terminal_socket.rs",
+    "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs",
+    "packages/run-supervisor/rust/tests/support/terminal.rs",
+    "packages/terminal-control/contracts/terminal-control.port.v1.json",
+    "packages/terminal-control/rust/src/core.rs",
+    "packages/terminal-control/rust/src/port.rs",
+    "packages/terminal-control/rust/src/route.rs",
+    "packages/terminal-control/rust/tests/core_failures.rs",
+    "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh",
+    "packages/terminal-control/rust/tests/herdr_driver_fake.rs",
+    "plans/261017-1313-fgos-platform-program-board/log.md",
+    "plans/261017-1313-fgos-platform-program-board/plan.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-00-baseline-and-test-investigation.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-01-t0-process-facts-and-leaf-crates.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-02-t1-holder-lock-identity-convention.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-04-t3-agent-protocol-observe-event-store.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-05-t4-run-supervisor-launch-gate.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-06-t5-execution-core-dispatch-seat-run-result.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-07-closing-and-handoff.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/plan.md",
+    "plans/reports/council-261021-1324-harden-t0-council-brief.md",
+    "plans/reports/debug-261021-0843-herdr-brief-delivery-faults.md",
+    "plans/reports/debug-261021-1135-e1-orphan-candidate-lock.md",
+    "plans/reports/guide-261021-1132-mailbox-v1-handoff-to-another-machine.md",
+    "plans/reports/guide-261021-1236-owner-machine-durability-fixes.md",
+    "plans/reports/handoff-261021-1021-rule-management-tight-no-conflict-right-place.md",
+    "plans/reports/handoff-261021-1202-harden-low-layers-bottom-up.md",
+    "plans/reports/landing-261021-1236-durability-fixes-this-machine.md",
+    "plans/reports/phase-lead-261021-0843-herdr-brief-never-typed-into-shell.md",
+    "plans/reports/phase-lead-261021-1145-git-resumable-pin-release.md",
+    "plans/reports/phase-lead-261021-1236-git-es-foundation-followups.md",
+    "plans/reports/plan-refresh-261021-1215-work-lane-es-09-11.md",
+    "plans/reports/proposal-261021-0851-harden-review-criteria-and-method.md",
+    "plans/reports/research-261021-1054-rules-instruction-optimization-references.md",
+    "plans/reports/research-261021-1132-mailbox-spec-second-panel-explanation.md",
+    "plans/reports/research-261021-1210-harden-t0-baseline.md",
+    "plans/reports/research-261021-1210-harden-test-suite-investigation.md",
+    "plans/reports/spec-draft-261020-1017-seat-binding-component.md",
+    "plans/reports/verification-261021-1202-git-e1-and-event-store-power-loss.md",
+    "plans/reports/verification-261021-1323-git-e3-performance-governor.md",
+    "scripts/event-store/forge-probe.sh",
+    "scripts/git-one-door-scan.mjs",
+    "scripts/git/e1-power-cut.mjs",
+    "scripts/git/e1-power-cut.sh",
+    "scripts/git/p-space.sh",
+    "scripts/lib/git-spawn-match.mjs",
+    "src/cli/command-registry.mjs",
+    "src/git/inspect.mjs",
+    "src/verbs/worktree/remove.mjs",
+    "test/git/native-load.test.mjs",
+    "test/git/one-door.test.mjs",
+    "test/terminal-control/client-route.test.mjs",
+    "test/verbs/worktree-remove.test.mjs"
+  ],
+  "changedCandidateFiles": [
+    "docs/platform/agent-mailbox/spec.md",
+    "docs/platform/event-store/spec.md",
+    "docs/platform/git/spec.md",
+    "docs/platform/run-supervisor/spec.md",
+    "docs/platform/terminal-control/spec.md"
+  ],
+  "changedDocs": [
+    "docs/backlog.md",
+    "docs/platform/agent-mailbox/spec.md",
+    "docs/platform/event-store/spec.md",
+    "docs/platform/git/spec.md",
+    "docs/platform/run-supervisor/spec.md",
+    "docs/platform/terminal-control/spec.md"
+  ],
+  "mainPathCommits": {
+    "CHANGELOG.md": [
+      "3a5cc1d18 Merge remote-tracking branch 'origin/main' into git/followups",
+      "f13f549ee fix(git): one stuck pin release no longer blocks publication recovery; one literal-ref grammar for worktree base and delivery",
+      "a5d0b7020 Merge branch 'main' into worktree-agent-a5c9f46bfff48ff2f",
+      "4f823e009 docs(git): record the power-cut proofs that held on ext4",
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "core/workflows/architecture-advisory-reopen.yaml": [
+      "e69fd1334 fix(workflows): stop sending the producer objective to the advisory checkers"
+    ],
+    "core/workflows/architecture-advisory.yaml": [
+      "e69fd1334 fix(workflows): stop sending the producer objective to the advisory checkers"
+    ],
+    "docs/backlog.md": [
+      "b7e3c1ab2 docs: record the herdr brief shell guard on main"
+    ],
+    "docs/platform/agent-mailbox/spec.md": [
+      "cdb41c427 docs(mailbox): drop the references to the deleted probe fixtures",
+      "ff76b65cf docs(mailbox): hand the first rung to another machine with a guide and a preserved panel report"
+    ],
+    "docs/platform/event-store/spec.md": [
+      "28ab50dec fix(event-store): probe the real forge from fresh repositories and record the pass",
+      "4f823e009 docs(git): record the power-cut proofs that held on ext4"
+    ],
+    "docs/platform/git/spec.md": [
+      "03f990748 docs(git): record V-EVENT, V-CONSUMER, P-RELEASE and E4 results of 2026-10-21",
+      "305e2bd84 fix(git): persist only product-derived data in the tracked mutation census",
+      "f13f549ee fix(git): one stuck pin release no longer blocks publication recovery; one literal-ref grammar for worktree base and delivery",
+      "4f823e009 docs(git): record the power-cut proofs that held on ext4",
+      "5d5a0de33 fix(git): resume an interrupted publication pin release"
+    ],
+    "docs/platform/run-supervisor/spec.md": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "docs/platform/terminal-control/spec.md": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "packages/git/contracts/mutation-census.v1.json": [
+      "3a5cc1d18 Merge remote-tracking branch 'origin/main' into git/followups",
+      "63590ad54 chore(git): regenerate the mutation census from the current product",
+      "305e2bd84 fix(git): persist only product-derived data in the tracked mutation census",
+      "534f0fd7a chore(git): regenerate the mutation census for the durability fixes"
+    ],
+    "packages/git/node-addon/src/git.rs": [
+      "5d5a0de33 fix(git): resume an interrupted publication pin release"
+    ],
+    "packages/git/node-addon/src/git/inspect.rs": [
+      "f13f549ee fix(git): one stuck pin release no longer blocks publication recovery; one literal-ref grammar for worktree base and delivery"
+    ],
+    "packages/git/rust/src/publication.rs": [
+      "f13f549ee fix(git): one stuck pin release no longer blocks publication recovery; one literal-ref grammar for worktree base and delivery",
+      "5d5a0de33 fix(git): resume an interrupted publication pin release"
+    ],
+    "packages/git/rust/src/worktree.rs": [
+      "f13f549ee fix(git): one stuck pin release no longer blocks publication recovery; one literal-ref grammar for worktree base and delivery"
+    ],
+    "packages/git/rust/tests/publication.rs": [
+      "f13f549ee fix(git): one stuck pin release no longer blocks publication recovery; one literal-ref grammar for worktree base and delivery",
+      "5d5a0de33 fix(git): resume an interrupted publication pin release"
+    ],
+    "packages/run-supervisor/rust/src/gate/unix.rs": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "packages/run-supervisor/rust/src/supervise/terminal.rs": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "packages/run-supervisor/rust/tests/gate_terminal_socket.rs": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "packages/run-supervisor/rust/tests/support/terminal.rs": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "packages/terminal-control/contracts/terminal-control.port.v1.json": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "packages/terminal-control/rust/src/core.rs": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "packages/terminal-control/rust/src/port.rs": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "packages/terminal-control/rust/src/route.rs": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "packages/terminal-control/rust/tests/core_failures.rs": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "packages/terminal-control/rust/tests/herdr_driver_fake.rs": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "plans/261017-1313-fgos-platform-program-board/log.md": [
+      "5a4b73533 docs(board): record the seat track merge and its three fixes",
+      "2d215a4d0 docs(harden): close phase 00 with the baseline re-run and open the T0 council",
+      "5c7181904 docs(board): record the one-door scan overflow fix",
+      "2142c074c docs(harden): record the T0 baseline and the whole-suite test investigation",
+      "b7e3c1ab2 docs: record the herdr brief shell guard on main",
+      "6cae23201 docs(board): record the durability release landing, the forge probe and the paused Work lane",
+      "753a40484 docs(board): start seat ranking cutover alongside merge triage",
+      "d65407bc7 docs(board): hand the HARDEN lane to a new session on the second machine",
+      "3aeac2cb9 docs(board): record the power-cut proofs and the two durability fixes",
+      "965b74883 docs(board): hand the hardening lane to a new owner",
+      "d33001dc7 docs(plan): record the hardening owner decisions and settle each component at the council",
+      "c4ff32f3e docs(board): decide when the cook trial runs and record the advisory checker prompt fault",
+      "7c4fac8e3 docs(plans): add the HARDEN skeleton plan for the low layers, T0 to T5",
+      "03347486b Merge remote-tracking branch 'origin/main'",
+      "ff76b65cf docs(mailbox): hand the first rung to another machine with a guide and a preserved panel report",
+      "1f5a68370 docs(board): record documentation lane step 5 progress",
+      "323caabda docs(board): bring the cook lane row up to date",
+      "f453cd941 docs(reports): approve the hardening review scope and add the component doctor gate",
+      "d1cb699e6 docs(board): record the board split and the brief typeahead fix"
+    ],
+    "plans/261017-1313-fgos-platform-program-board/plan.md": [
+      "2d215a4d0 docs(harden): close phase 00 with the baseline re-run and open the T0 council",
+      "2142c074c docs(harden): record the T0 baseline and the whole-suite test investigation",
+      "e322904e3 docs(board): drop answered model-pool questions from the waits",
+      "32baed992 docs(board): say what the model-pool config proposal really waits on",
+      "d65407bc7 docs(board): hand the HARDEN lane to a new session on the second machine",
+      "5f5a47c5d docs(reports): write the hardening lane handoff prompt",
+      "965b74883 docs(board): hand the hardening lane to a new owner",
+      "7c4fac8e3 docs(plans): add the HARDEN skeleton plan for the low layers, T0 to T5",
+      "03347486b Merge remote-tracking branch 'origin/main'",
+      "ff76b65cf docs(mailbox): hand the first rung to another machine with a guide and a preserved panel report",
+      "1f5a68370 docs(board): record documentation lane step 5 progress",
+      "323caabda docs(board): bring the cook lane row up to date",
+      "f453cd941 docs(reports): approve the hardening review scope and add the component doctor gate"
+    ],
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-00-baseline-and-test-investigation.md": [
+      "7c4fac8e3 docs(plans): add the HARDEN skeleton plan for the low layers, T0 to T5"
+    ],
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-01-t0-process-facts-and-leaf-crates.md": [
+      "7c4fac8e3 docs(plans): add the HARDEN skeleton plan for the low layers, T0 to T5"
+    ],
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-02-t1-holder-lock-identity-convention.md": [
+      "7c4fac8e3 docs(plans): add the HARDEN skeleton plan for the low layers, T0 to T5"
+    ],
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md": [
+      "7c4fac8e3 docs(plans): add the HARDEN skeleton plan for the low layers, T0 to T5"
+    ],
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-04-t3-agent-protocol-observe-event-store.md": [
+      "7c4fac8e3 docs(plans): add the HARDEN skeleton plan for the low layers, T0 to T5"
+    ],
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-05-t4-run-supervisor-launch-gate.md": [
+      "7c4fac8e3 docs(plans): add the HARDEN skeleton plan for the low layers, T0 to T5"
+    ],
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-06-t5-execution-core-dispatch-seat-run-result.md": [
+      "7c4fac8e3 docs(plans): add the HARDEN skeleton plan for the low layers, T0 to T5"
+    ],
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-07-closing-and-handoff.md": [
+      "7c4fac8e3 docs(plans): add the HARDEN skeleton plan for the low layers, T0 to T5"
+    ],
+    "plans/261021-1118-harden-low-layers-bottom-up/plan.md": [
+      "2d215a4d0 docs(harden): close phase 00 with the baseline re-run and open the T0 council",
+      "2142c074c docs(harden): record the T0 baseline and the whole-suite test investigation",
+      "d33001dc7 docs(plan): record the hardening owner decisions and settle each component at the council",
+      "7c4fac8e3 docs(plans): add the HARDEN skeleton plan for the low layers, T0 to T5"
+    ],
+    "plans/reports/council-261021-1324-harden-t0-council-brief.md": [
+      "71ba43d80 docs(harden): brief the T0 council and record the real claude CLI in fgctl tests"
+    ],
+    "plans/reports/debug-261021-0843-herdr-brief-delivery-faults.md": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "plans/reports/debug-261021-1135-e1-orphan-candidate-lock.md": [
+      "5d5a0de33 fix(git): resume an interrupted publication pin release"
+    ],
+    "plans/reports/guide-261021-1132-mailbox-v1-handoff-to-another-machine.md": [
+      "cdb41c427 docs(mailbox): drop the references to the deleted probe fixtures",
+      "ff76b65cf docs(mailbox): hand the first rung to another machine with a guide and a preserved panel report"
+    ],
+    "plans/reports/guide-261021-1236-owner-machine-durability-fixes.md": [
+      "6cae23201 docs(board): record the durability release landing, the forge probe and the paused Work lane"
+    ],
+    "plans/reports/handoff-261021-1021-rule-management-tight-no-conflict-right-place.md": [
+      "c64f3178a docs(reports): group rule-management handoff by work stream and list rule/instruction references"
+    ],
+    "plans/reports/handoff-261021-1202-harden-low-layers-bottom-up.md": [
+      "5f5a47c5d docs(reports): write the hardening lane handoff prompt"
+    ],
+    "plans/reports/landing-261021-1236-durability-fixes-this-machine.md": [
+      "6cae23201 docs(board): record the durability release landing, the forge probe and the paused Work lane"
+    ],
+    "plans/reports/phase-lead-261021-0843-herdr-brief-never-typed-into-shell.md": [
+      "53d1af4e6 docs(report): record the fix that keeps a herdr brief out of the pane's shell"
+    ],
+    "plans/reports/phase-lead-261021-1145-git-resumable-pin-release.md": [
+      "5d5a0de33 fix(git): resume an interrupted publication pin release"
+    ],
+    "plans/reports/phase-lead-261021-1236-git-es-foundation-followups.md": [
+      "8449a4f03 docs(reports): record the Git and Event Store foundation follow-ups"
+    ],
+    "plans/reports/plan-refresh-261021-1215-work-lane-es-09-11.md": [
+      "2341502d3 docs(event-store): refresh the Work lane plan against today's main"
+    ],
+    "plans/reports/proposal-261021-0851-harden-review-criteria-and-method.md": [
+      "f453cd941 docs(reports): approve the hardening review scope and add the component doctor gate"
+    ],
+    "plans/reports/research-261021-1054-rules-instruction-optimization-references.md": [
+      "c64f3178a docs(reports): group rule-management handoff by work stream and list rule/instruction references"
+    ],
+    "plans/reports/research-261021-1132-mailbox-spec-second-panel-explanation.md": [
+      "ff76b65cf docs(mailbox): hand the first rung to another machine with a guide and a preserved panel report"
+    ],
+    "plans/reports/research-261021-1210-harden-t0-baseline.md": [
+      "2142c074c docs(harden): record the T0 baseline and the whole-suite test investigation"
+    ],
+    "plans/reports/research-261021-1210-harden-test-suite-investigation.md": [
+      "2d215a4d0 docs(harden): close phase 00 with the baseline re-run and open the T0 council",
+      "71ba43d80 docs(harden): brief the T0 council and record the real claude CLI in fgctl tests",
+      "2142c074c docs(harden): record the T0 baseline and the whole-suite test investigation"
+    ],
+    "plans/reports/spec-draft-261020-1017-seat-binding-component.md": [
+      "e69fd1334 fix(workflows): stop sending the producer objective to the advisory checkers"
+    ],
+    "plans/reports/verification-261021-1202-git-e1-and-event-store-power-loss.md": [
+      "4f823e009 docs(git): record the power-cut proofs that held on ext4"
+    ],
+    "plans/reports/verification-261021-1323-git-e3-performance-governor.md": [
+      "bf199c74b docs(git): record the E3 runs under the performance governor"
+    ],
+    "scripts/event-store/forge-probe.sh": [
+      "28ab50dec fix(event-store): probe the real forge from fresh repositories and record the pass"
+    ],
+    "scripts/git-one-door-scan.mjs": [
+      "3a5cc1d18 Merge remote-tracking branch 'origin/main' into git/followups",
+      "105c73726 fix(git): keep one copy of each value in the one-door scan data flow",
+      "305e2bd84 fix(git): persist only product-derived data in the tracked mutation census"
+    ],
+    "scripts/git/e1-power-cut.mjs": [
+      "5d5a0de33 fix(git): resume an interrupted publication pin release",
+      "b43b53448 fix(git): keep fixture steps out of the power-cut verdict",
+      "720707802 fix(git): make the power-cut fixture durable before the judged operations",
+      "795c47585 fix(git): judge a half-initialised repository by whether anything was acknowledged",
+      "48aee34f0 fix(git): let the power-cut workload exit and the driver wait for it"
+    ],
+    "scripts/git/e1-power-cut.sh": [
+      "a8e06afbc fix(git): wait out udev before removing the power-cut snapshot device",
+      "e7ac7d035 fix(git): detach the power-cut experiment's loop devices on exit",
+      "136aa0f14 fix(git): read replay-log's found entry as the number before the @",
+      "48aee34f0 fix(git): let the power-cut workload exit and the driver wait for it"
+    ],
+    "scripts/git/p-space.sh": [
+      "91db66ade fix(git): apply the power-cut run's sudo lessons to the space and EIO experiment"
+    ],
+    "scripts/lib/git-spawn-match.mjs": [
+      "5b69ccbf1 fix(git): the sandbox Git door and spy judge --git-dir=/--work-tree paths in both forms"
+    ],
+    "src/cli/command-registry.mjs": [
+      "f13f549ee fix(git): one stuck pin release no longer blocks publication recovery; one literal-ref grammar for worktree base and delivery"
+    ],
+    "src/git/inspect.mjs": [
+      "f13f549ee fix(git): one stuck pin release no longer blocks publication recovery; one literal-ref grammar for worktree base and delivery"
+    ],
+    "src/verbs/worktree/remove.mjs": [
+      "f13f549ee fix(git): one stuck pin release no longer blocks publication recovery; one literal-ref grammar for worktree base and delivery"
+    ],
+    "test/git/native-load.test.mjs": [
+      "5d5a0de33 fix(git): resume an interrupted publication pin release"
+    ],
+    "test/git/one-door.test.mjs": [
+      "5b69ccbf1 fix(git): the sandbox Git door and spy judge --git-dir=/--work-tree paths in both forms",
+      "305e2bd84 fix(git): persist only product-derived data in the tracked mutation census"
+    ],
+    "test/terminal-control/client-route.test.mjs": [
+      "065cc620a fix(terminal): never let a brief typed for an agent run in the pane's shell"
+    ],
+    "test/verbs/worktree-remove.test.mjs": [
+      "f13f549ee fix(git): one stuck pin release no longer blocks publication recovery; one literal-ref grammar for worktree base and delivery"
+    ]
+  },
+  "extractorsAgree": true,
+  "checkedBindings": [],
+  "successorGroupMemberChecks": [],
+  "entries": [],
+  "parked": [],
+  "needsWrites": [],
+  "counts": {
+    "directChecked": 0,
+    "groupMembersChecked": 0,
+    "changedBindings": 0,
+    "pendingReview": 0
+  },
+  "phase9ConservationUnionAdditions": [],
+  "acceptance": "Author binding verification only; independent changed-binding review and real runner commit L12-11 accounting remain owed."
+}

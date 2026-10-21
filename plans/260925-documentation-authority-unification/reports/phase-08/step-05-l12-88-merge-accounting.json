@@ -1,0 +1,581 @@
+{
+  "merge": "149f47accd7cc9a935907196549acc0738736ec5",
+  "prior": "d70cc20cd17c733a4c7237a6a97ed06e107ea955",
+  "main": "5a4b7353300f139907611b170de650314aafbe80",
+  "base": "5538b9484acfd5191b4205549a1dd3998df47b48",
+  "accountedMerges": [
+    {
+      "merge": "3a95653ea709471dc06a6d106a2e73df667568e8",
+      "firstParent": "e6f5abeca37772a927d7053d3140689edf25574f",
+      "secondParent": "302575c046adee740430e352ee0399aeddff46b5",
+      "base": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "mainCommits": 0,
+      "changedPaths": [
+        "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-05-s67-p01.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-05-s67-p02.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-05-s67-p03.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-05-s67-p05.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-05-s67-p06.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-05-s67-p07.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-admission-rules.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-check-result.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-parity-receipts.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-read-units.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-rules.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/citation-ratchet-roots.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-decision-index.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-external-parks.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-29.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r19.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r21.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-retired-source.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/ui-spec-compiler.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check-result.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-parity-receipts.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-rereview-list.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-cutover-specs.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-judgment-receipts.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-parity-receipts.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes-result.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-check.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-parity-receipts.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-check.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-closure.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-review-list.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-author.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-before-last-note-proof.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-caller-corrections.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-callers.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-check-result.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-check.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-check.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-closure.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-current-proof.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-current-tests.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-cutover-specs.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-decisions-replay.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-documented-commands.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-final-inputs.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-final-proof.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-finalize.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-full-check.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-full-check.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-handback.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-caller-corrections.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-check.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-check.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-pilot-harness.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-probe-proof.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-initial-verification-jobs.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-inventory-owner-confirmation.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-last-notes.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-parity-receipts.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-pre-caller-verification-jobs.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-pre-final-full-check.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-pre-memo-verification-jobs.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-probes-result.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-probes.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch2.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch2.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch3.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch3.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch4.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch4.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch5.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch5.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch6.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch6.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch7.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch7.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-full-check.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-full-check.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-pilot.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-pilot.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-prompt.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-prompt.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-r26.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-r26.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-seam4.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-seam4.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-seam67.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-seam67.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-r22-patch-replay.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-refine.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-refresh.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-revalidate.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-revalidation.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-review-closure-brief.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-review-closure.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-review-list.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-seal.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-source-traces.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-task0-closure.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-task0-rules.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-verification-jobs.log",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-verification.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-verify.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-whole-file-reads.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-carry-joins.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check-result.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-closure.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-continuation.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-cross-seam-carries.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-head-drift.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-inherited-patches.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-occurrence-ancestry.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-parity-receipts.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-probe-results.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-progress.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-proposed-move-read-units.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-review-list.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-rulings.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-verification.json"
+      ],
+      "role": "Branch merge of the plan's own seam-8 branch; records only; carries no main content."
+    },
+    {
+      "merge": "149f47accd7cc9a935907196549acc0738736ec5",
+      "firstParent": "3a95653ea709471dc06a6d106a2e73df667568e8",
+      "main": "5a4b7353300f139907611b170de650314aafbe80",
+      "base": "5538b9484acfd5191b4205549a1dd3998df47b48",
+      "mainCommits": 61,
+      "changedPaths": [
+        "CHANGELOG.md",
+        "core/workflows/architecture-advisory-reopen.yaml",
+        "core/workflows/architecture-advisory.yaml",
+        "docs/backlog.md",
+        "docs/platform/agent-mailbox/spec.md",
+        "docs/platform/event-store/spec.md",
+        "docs/platform/git/spec.md",
+        "docs/platform/run-supervisor/spec.md",
+        "docs/platform/terminal-control/spec.md",
+        "packages/git/contracts/mutation-census.v1.json",
+        "packages/git/node-addon/src/git.rs",
+        "packages/git/node-addon/src/git/inspect.rs",
+        "packages/git/rust/src/publication.rs",
+        "packages/git/rust/src/worktree.rs",
+        "packages/git/rust/tests/publication.rs",
+        "packages/run-supervisor/rust/src/gate/unix.rs",
+        "packages/run-supervisor/rust/src/supervise/terminal.rs",
+        "packages/run-supervisor/rust/tests/gate_terminal_socket.rs",
+        "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs",
+        "packages/run-supervisor/rust/tests/support/terminal.rs",
+        "packages/terminal-control/contracts/terminal-control.port.v1.json",
+        "packages/terminal-control/rust/src/core.rs",
+        "packages/terminal-control/rust/src/port.rs",
+        "packages/terminal-control/rust/src/route.rs",
+        "packages/terminal-control/rust/tests/core_failures.rs",
+        "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh",
+        "packages/terminal-control/rust/tests/herdr_driver_fake.rs",
+        "plans/261017-1313-fgos-platform-program-board/log.md",
+        "plans/261017-1313-fgos-platform-program-board/plan.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-00-baseline-and-test-investigation.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-01-t0-process-facts-and-leaf-crates.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-02-t1-holder-lock-identity-convention.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-04-t3-agent-protocol-observe-event-store.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-05-t4-run-supervisor-launch-gate.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-06-t5-execution-core-dispatch-seat-run-result.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-07-closing-and-handoff.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/plan.md",
+        "plans/reports/council-261021-1324-harden-t0-council-brief.md",
+        "plans/reports/debug-261021-0843-herdr-brief-delivery-faults.md",
+        "plans/reports/debug-261021-1135-e1-orphan-candidate-lock.md",
+        "plans/reports/guide-261021-1132-mailbox-v1-handoff-to-another-machine.md",
+        "plans/reports/guide-261021-1236-owner-machine-durability-fixes.md",
+        "plans/reports/handoff-261021-1021-rule-management-tight-no-conflict-right-place.md",
+        "plans/reports/handoff-261021-1202-harden-low-layers-bottom-up.md",
+        "plans/reports/landing-261021-1236-durability-fixes-this-machine.md",
+        "plans/reports/phase-lead-261021-0843-herdr-brief-never-typed-into-shell.md",
+        "plans/reports/phase-lead-261021-1145-git-resumable-pin-release.md",
+        "plans/reports/phase-lead-261021-1236-git-es-foundation-followups.md",
+        "plans/reports/plan-refresh-261021-1215-work-lane-es-09-11.md",
+        "plans/reports/proposal-261021-0851-harden-review-criteria-and-method.md",
+        "plans/reports/research-261021-1054-rules-instruction-optimization-references.md",
+        "plans/reports/research-261021-1132-mailbox-spec-second-panel-explanation.md",
+        "plans/reports/research-261021-1210-harden-t0-baseline.md",
+        "plans/reports/research-261021-1210-harden-test-suite-investigation.md",
+        "plans/reports/spec-draft-261020-1017-seat-binding-component.md",
+        "plans/reports/verification-261021-1202-git-e1-and-event-store-power-loss.md",
+        "plans/reports/verification-261021-1323-git-e3-performance-governor.md",
+        "scripts/event-store/forge-probe.sh",
+        "scripts/git-one-door-scan.mjs",
+        "scripts/git/e1-power-cut.mjs",
+        "scripts/git/e1-power-cut.sh",
+        "scripts/git/p-space.sh",
+        "scripts/lib/git-spawn-match.mjs",
+        "src/cli/command-registry.mjs",
+        "src/git/inspect.mjs",
+        "src/verbs/worktree/remove.mjs",
+        "test/git/native-load.test.mjs",
+        "test/git/one-door.test.mjs",
+        "test/terminal-control/client-route.test.mjs",
+        "test/verbs/worktree-remove.test.mjs"
+      ]
+    }
+  ],
+  "mainCommits": 61,
+  "changedPaths": [
+    "CHANGELOG.md",
+    "core/workflows/architecture-advisory-reopen.yaml",
+    "core/workflows/architecture-advisory.yaml",
+    "docs/backlog.md",
+    "docs/platform/agent-mailbox/spec.md",
+    "docs/platform/event-store/spec.md",
+    "docs/platform/git/spec.md",
+    "docs/platform/run-supervisor/spec.md",
+    "docs/platform/terminal-control/spec.md",
+    "packages/git/contracts/mutation-census.v1.json",
+    "packages/git/node-addon/src/git.rs",
+    "packages/git/node-addon/src/git/inspect.rs",
+    "packages/git/rust/src/publication.rs",
+    "packages/git/rust/src/worktree.rs",
+    "packages/git/rust/tests/publication.rs",
+    "packages/run-supervisor/rust/src/gate/unix.rs",
+    "packages/run-supervisor/rust/src/supervise/terminal.rs",
+    "packages/run-supervisor/rust/tests/gate_terminal_socket.rs",
+    "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs",
+    "packages/run-supervisor/rust/tests/support/terminal.rs",
+    "packages/terminal-control/contracts/terminal-control.port.v1.json",
+    "packages/terminal-control/rust/src/core.rs",
+    "packages/terminal-control/rust/src/port.rs",
+    "packages/terminal-control/rust/src/route.rs",
+    "packages/terminal-control/rust/tests/core_failures.rs",
+    "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh",
+    "packages/terminal-control/rust/tests/herdr_driver_fake.rs",
+    "plans/261017-1313-fgos-platform-program-board/log.md",
+    "plans/261017-1313-fgos-platform-program-board/plan.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-00-baseline-and-test-investigation.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-01-t0-process-facts-and-leaf-crates.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-02-t1-holder-lock-identity-convention.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-04-t3-agent-protocol-observe-event-store.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-05-t4-run-supervisor-launch-gate.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-06-t5-execution-core-dispatch-seat-run-result.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-07-closing-and-handoff.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/plan.md",
+    "plans/reports/council-261021-1324-harden-t0-council-brief.md",
+    "plans/reports/debug-261021-0843-herdr-brief-delivery-faults.md",
+    "plans/reports/debug-261021-1135-e1-orphan-candidate-lock.md",
+    "plans/reports/guide-261021-1132-mailbox-v1-handoff-to-another-machine.md",
+    "plans/reports/guide-261021-1236-owner-machine-durability-fixes.md",
+    "plans/reports/handoff-261021-1021-rule-management-tight-no-conflict-right-place.md",
+    "plans/reports/handoff-261021-1202-harden-low-layers-bottom-up.md",
+    "plans/reports/landing-261021-1236-durability-fixes-this-machine.md",
+    "plans/reports/phase-lead-261021-0843-herdr-brief-never-typed-into-shell.md",
+    "plans/reports/phase-lead-261021-1145-git-resumable-pin-release.md",
+    "plans/reports/phase-lead-261021-1236-git-es-foundation-followups.md",
+    "plans/reports/plan-refresh-261021-1215-work-lane-es-09-11.md",
+    "plans/reports/proposal-261021-0851-harden-review-criteria-and-method.md",
+    "plans/reports/research-261021-1054-rules-instruction-optimization-references.md",
+    "plans/reports/research-261021-1132-mailbox-spec-second-panel-explanation.md",
+    "plans/reports/research-261021-1210-harden-t0-baseline.md",
+    "plans/reports/research-261021-1210-harden-test-suite-investigation.md",
+    "plans/reports/spec-draft-261020-1017-seat-binding-component.md",
+    "plans/reports/verification-261021-1202-git-e1-and-event-store-power-loss.md",
+    "plans/reports/verification-261021-1323-git-e3-performance-governor.md",
+    "scripts/event-store/forge-probe.sh",
+    "scripts/git-one-door-scan.mjs",
+    "scripts/git/e1-power-cut.mjs",
+    "scripts/git/e1-power-cut.sh",
+    "scripts/git/p-space.sh",
+    "scripts/lib/git-spawn-match.mjs",
+    "src/cli/command-registry.mjs",
+    "src/git/inspect.mjs",
+    "src/verbs/worktree/remove.mjs",
+    "test/git/native-load.test.mjs",
+    "test/git/one-door.test.mjs",
+    "test/terminal-control/client-route.test.mjs",
+    "test/verbs/worktree-remove.test.mjs"
+  ],
+  "changedCandidateFiles": [
+    "docs/platform/agent-mailbox/spec.md",
+    "docs/platform/event-store/spec.md",
+    "docs/platform/git/spec.md",
+    "docs/platform/run-supervisor/spec.md",
+    "docs/platform/terminal-control/spec.md"
+  ],
+  "changedDocs": [
+    "docs/backlog.md",
+    "docs/platform/agent-mailbox/spec.md",
+    "docs/platform/event-store/spec.md",
+    "docs/platform/git/spec.md",
+    "docs/platform/run-supervisor/spec.md",
+    "docs/platform/terminal-control/spec.md"
+  ],
+  "overlaps": {
+    "step3": {
+      "count": 5,
+      "records": [
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-100.jsonl",
+          "line": 1,
+          "file": "docs/platform/event-store/spec.md",
+          "consumer": null
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-101.jsonl",
+          "line": 1,
+          "file": "docs/platform/git/spec.md",
+          "consumer": null
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-114.jsonl",
+          "line": 1,
+          "file": "docs/platform/run-supervisor/spec.md",
+          "consumer": null
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-119.jsonl",
+          "line": 1,
+          "file": "docs/platform/terminal-control/spec.md",
+          "consumer": null
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
+          "line": 2,
+          "file": "docs/backlog.md",
+          "consumer": null
+        }
+      ]
+    },
+    "step4": {
+      "count": 2,
+      "records": [
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
+          "line": 1,
+          "hit": [
+            "src/cli/command-registry.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-017.jsonl",
+          "line": 1,
+          "hit": [
+            "CHANGELOG.md"
+          ]
+        }
+      ]
+    },
+    "step5": {
+      "count": 21,
+      "records": [
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 3,
+          "hit": [
+            "src/cli/command-registry.mjs"
+          ],
+          "file": "src/cli/command-registry.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 66,
+          "hit": [
+            "docs/backlog.md"
+          ],
+          "file": "docs/backlog.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+          "line": 19,
+          "hit": [
+            "packages/git/node-addon/src/git.rs"
+          ],
+          "file": "packages/git/node-addon/src/git.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+          "line": 24,
+          "hit": [
+            "packages/git/rust/src/publication.rs"
+          ],
+          "file": "packages/git/rust/src/publication.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
+          "line": 5,
+          "hit": [
+            "packages/git/rust/src/worktree.rs"
+          ],
+          "file": "packages/git/rust/src/worktree.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r19.jsonl",
+          "line": 3,
+          "hit": [
+            "packages/terminal-control/rust/src/port.rs"
+          ],
+          "file": "packages/terminal-control/rust/src/port.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+          "line": 62,
+          "hit": [
+            "packages/git/node-addon/src/git/inspect.rs"
+          ],
+          "file": "packages/git/node-addon/src/git/inspect.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+          "line": 99,
+          "hit": [
+            "packages/run-supervisor/rust/src/gate/unix.rs"
+          ],
+          "file": "packages/run-supervisor/rust/src/gate/unix.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+          "line": 104,
+          "hit": [
+            "packages/terminal-control/contracts/terminal-control.port.v1.json"
+          ],
+          "file": "packages/terminal-control/contracts/terminal-control.port.v1.json"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+          "line": 106,
+          "hit": [
+            "packages/terminal-control/rust/src/core.rs"
+          ],
+          "file": "packages/terminal-control/rust/src/core.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+          "line": 112,
+          "hit": [
+            "packages/terminal-control/rust/src/route.rs"
+          ],
+          "file": "packages/terminal-control/rust/src/route.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r21.jsonl",
+          "line": 4,
+          "hit": [
+            "packages/run-supervisor/rust/src/supervise/terminal.rs"
+          ],
+          "file": "packages/run-supervisor/rust/src/supervise/terminal.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 44,
+          "hit": [
+            "packages/run-supervisor/rust/tests/support/terminal.rs"
+          ],
+          "file": "packages/run-supervisor/rust/tests/support/terminal.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 45,
+          "hit": [
+            "packages/terminal-control/rust/tests/core_failures.rs"
+          ],
+          "file": "packages/terminal-control/rust/tests/core_failures.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 47,
+          "hit": [
+            "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh"
+          ],
+          "file": "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 187,
+          "hit": [
+            "test/terminal-control/client-route.test.mjs"
+          ],
+          "file": "test/terminal-control/client-route.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+          "line": 84,
+          "hit": [
+            "packages/git/rust/tests/publication.rs"
+          ],
+          "file": "packages/git/rust/tests/publication.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+          "line": 53,
+          "hit": [
+            "test/git/native-load.test.mjs"
+          ],
+          "file": "test/git/native-load.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+          "line": 25,
+          "hit": [
+            "packages/run-supervisor/rust/tests/gate_terminal_socket.rs"
+          ],
+          "file": "packages/run-supervisor/rust/tests/gate_terminal_socket.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+          "line": 28,
+          "hit": [
+            "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs"
+          ],
+          "file": "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+          "line": 31,
+          "hit": [
+            "packages/terminal-control/rust/tests/herdr_driver_fake.rs"
+          ],
+          "file": "packages/terminal-control/rust/tests/herdr_driver_fake.rs"
+        }
+      ]
+    }
+  },
+  "step0Receipt": "step-00-l12-88-binding-check.json",
+  "ratchet": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-legacy-docs-ratchet.mjs",
+    "exit": 0,
+    "log": "step-00-l12-88-ratchet.log"
+  },
+  "ratchetTests": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/check-legacy-docs-ratchet.test.mjs",
+    "exit": 0,
+    "passed": 28,
+    "total": 28,
+    "log": "step-00-l12-88-ratchet-tests.log"
+  },
+  "exceptionsChanged": false,
+  "refreshedExceptions": [],
+  "rebindingsApplied": 0,
+  "acceptance": "Author accounting; independent review and actual runner-commit accounting remain owed.",
+  "logHashes": {
+    "ratchet": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319",
+    "ratchetTests": "bb6a87e6fbfd0b68e5a8d5f4391a29b46f1d1331890478f88a30b416a39eac9a"
+  }
+}
