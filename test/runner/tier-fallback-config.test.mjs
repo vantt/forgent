@@ -9,7 +9,6 @@ import os from 'node:os';
 import path from 'node:path';
 import { loadRunnerConfigFromDir, ensureRunnerConfigForDir, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { snapshotRunnerConfig } from '../../src/runner/execution/run.mjs';
-import { tierFallbackOf } from '../../src/runner/dispatch/resolve.mjs';
 
 function load(tierFallback, globalRunner) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-tier-fallback-'));
@@ -38,23 +37,16 @@ function load(tierFallback, globalRunner) {
   }
 }
 
-test('a tier fallback list loads and tierFallbackOf returns it in order', () => {
+test('a tier fallback list loads in order', () => {
   const cfg = load({ advanced: ['gemini', 'claude'], flagship: ['claude'] });
-  assert.deepEqual(tierFallbackOf(cfg, 'advanced'), ['gemini', 'claude']);
-  assert.deepEqual(tierFallbackOf(cfg, 'flagship'), ['claude']);
+  assert.deepEqual(cfg.tierFallback.advanced, ['gemini', 'claude']);
+  assert.deepEqual(cfg.tierFallback.flagship, ['claude']);
 });
 
-test('a config without the key loads, and every tier reads as having no declared order', () => {
+test('a config without the key loads, and a tier the list does not name has no declared order', () => {
   const cfg = load(undefined);
   assert.equal(cfg.tierFallback, undefined);
-  assert.equal(tierFallbackOf(cfg, 'advanced'), null);
-  assert.equal(tierFallbackOf(load({ advanced: ['claude'] }), 'nano'), null);
-});
-
-test('tierFallbackOf hands out a copy, so a caller cannot reorder the config', () => {
-  const cfg = load({ advanced: ['gemini', 'claude'] });
-  tierFallbackOf(cfg, 'advanced').reverse();
-  assert.deepEqual(cfg.tierFallback.advanced, ['gemini', 'claude']);
+  assert.equal(load({ advanced: ['claude'] }).tierFallback.nano, undefined);
 });
 
 test('each shape error fails the load and names the key', () => {

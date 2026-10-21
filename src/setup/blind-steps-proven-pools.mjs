@@ -10,7 +10,7 @@
 // (the pool a first binding and a quota fallback both choose from), so nothing is dispatched, written
 // or paid for.
 
-import { listCandidates } from '../runner/execution/bind.mjs';
+import { explainSeat } from '../runner/execution/bind.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots } from './workflow-pool-independence.mjs';
@@ -68,12 +68,21 @@ function describeCandidate(runnerConfig, bound) {
 // is completed, so the proof counts it; every other filter (governance, posture, skills) is a real exclusion.
 const CONFIG_GAPS = new Set(['tier-cell-missing', 'pool-unusable']);
 
-/** Every executor/invocation a role could bind (a primary or a fallback), in pool order. */
+/** Every executor/invocation a role could bind (a primary or a fallback), in rank order. */
 function candidatesForRole(unit, seat, runnerConfig, session) {
-  return listCandidates(
+  const { ranked, launchView } = explainSeat(
     { unit, seat: seat.seat, role: seat.role, posture: seat.posture, independentOf: [], overrides: [], blind: true },
     { runnerConfig, session: { headless: true, ...session } },
-  ).candidates.filter((candidate) => !candidate.out || CONFIG_GAPS.has(candidate.out.reason)).map((candidate) => describeCandidate(runnerConfig, candidate));
+  );
+  const named = (c) => ({ executor: c.executor, invocation: c.invocation ?? null });
+  return [
+    ...(ranked?.candidates ?? []).map(named),
+    // A family with no cell is dropped before posture is judged, so the executor must itself carry it.
+    ...(ranked?.skipped ?? []).filter((skip) => CONFIG_GAPS.has(skip.reason) && launchView?.executors[skip.executor]?.defaultInvocation && !launchView.executors[skip.executor].disallowed).map((skip) => ({
+      executor: skip.executor,
+      invocation: launchView?.executors[skip.executor]?.defaultInvocation ?? null,
+    })),
+  ].map((candidate) => describeCandidate(runnerConfig, candidate));
 }
 
 /**

@@ -429,7 +429,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
         runnerConfig: unitRecord.configSnapshot?.runner || opts.runnerConfig,
         session: opts.session || {},
       },
-      walkStateOf(unitRecord, { seat: seatIdOf(asgn), round: asgn.round, assignmentId: asgn.assignmentId }),
+      { walk: walkStateOf(unitRecord, { seat: seatIdOf(asgn), round: asgn.round, assignmentId: asgn.assignmentId }) },
     );
 
     if (recomputed.refused) {
@@ -451,10 +451,11 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
       recomputed.executor !== asgnBinding.executor ||
       (recomputed.pool ?? null) !== (asgnBinding.pool ?? null) ||
       recomputed.tier !== asgnBinding.tier ||
+      (recomputed.reasoningEffort ?? null) !== (asgnBinding.reasoningEffort ?? null) ||
       recomputed.posture !== asgnBinding.posture
     ) {
       throw new RunnerConfigError(
-        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" binding mismatch: recomputed { executor: "${recomputed.executor}", pool: "${recomputed.pool ?? ''}", tier: "${recomputed.tier}", posture: "${recomputed.posture}" } does not match assignment { executor: "${asgnBinding.executor}", pool: "${asgnBinding.pool ?? ''}", tier: "${asgnBinding.tier}", posture: "${asgnBinding.posture}" } -- refused`,
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" binding mismatch: recomputed { executor: "${recomputed.executor}", pool: "${recomputed.pool ?? ''}", tier: "${recomputed.tier}", effort: "${recomputed.reasoningEffort ?? ''}", posture: "${recomputed.posture}" } does not match assignment { executor: "${asgnBinding.executor}", pool: "${asgnBinding.pool ?? ''}", tier: "${asgnBinding.tier}", effort: "${asgnBinding.reasoningEffort ?? ''}", posture: "${asgnBinding.posture}" } -- refused`,
       );
     }
     const pinnedExecutor = asgn.policy?.preferExecutor ?? opts.cliOverride?.preferExecutor;

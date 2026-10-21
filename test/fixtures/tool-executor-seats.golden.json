@@ -1,58 +1,14 @@
 {
   "bind impact-analysis headless": {
     "refused": {
-      "reason": "posture-unavailable",
-      "detail": "Candidate \"gitnexus\" cannot apply posture \"read-only\""
+      "reason": "not-an-agent-seat",
+      "detail": "u/producer: every candidate is a tool executor; Seat Binding chooses agent seats only"
     }
   },
   "bind impact-analysis lead": {
-    "contractVersion": "v1alpha1",
-    "executor": "claude",
-    "invocation": null,
-    "transport": "cli",
-    "pool": null,
-    "tier": "standard",
-    "model": "default",
-    "persona": null,
-    "timeoutMs": null,
-    "mechanism": "inline",
-    "posture": "read-only",
-    "provenance": {
-      "executor": {
-        "value": "claude",
-        "source": "session-lead-inline"
-      },
-      "invocation": {
-        "value": null,
-        "source": "none"
-      },
-      "transport": {
-        "value": "cli",
-        "source": "default-cli"
-      },
-      "tier": {
-        "value": "standard"
-      },
-      "model": {
-        "value": "default",
-        "source": "no-model-needed"
-      },
-      "persona": {
-        "value": null,
-        "source": "none"
-      },
-      "timeoutMs": {
-        "value": null,
-        "source": "none"
-      },
-      "mechanism": {
-        "value": "inline",
-        "source": "lead-producer-inline"
-      },
-      "posture": {
-        "value": "read-only",
-        "source": "read-only-ask-or-writes-empty"
-      }
+    "refused": {
+      "reason": "not-an-agent-seat",
+      "detail": "u/producer: every candidate is a tool executor; Seat Binding chooses agent seats only"
     }
   },
   "plan impact-analysis live=false": {
@@ -397,58 +353,14 @@
   },
   "bind pane-labeling headless": {
     "refused": {
-      "reason": "posture-unavailable",
-      "detail": "Candidate \"herdr\" cannot apply posture \"read-only\""
+      "reason": "not-an-agent-seat",
+      "detail": "u/producer: every candidate is a tool executor; Seat Binding chooses agent seats only"
     }
   },
   "bind pane-labeling lead": {
-    "contractVersion": "v1alpha1",
-    "executor": "claude",
-    "invocation": null,
-    "transport": "cli",
-    "pool": null,
-    "tier": "standard",
-    "model": "default",
-    "persona": null,
-    "timeoutMs": null,
-    "mechanism": "inline",
-    "posture": "read-only",
-    "provenance": {
-      "executor": {
-        "value": "claude",
-        "source": "session-lead-inline"
-      },
-      "invocation": {
-        "value": null,
-        "source": "none"
-      },
-      "transport": {
-        "value": "cli",
-        "source": "default-cli"
-      },
-      "tier": {
-        "value": "standard"
-      },
-      "model": {
-        "value": "default",
-        "source": "no-model-needed"
-      },
-      "persona": {
-        "value": null,
-        "source": "none"
-      },
-      "timeoutMs": {
-        "value": null,
-        "source": "none"
-      },
-      "mechanism": {
-        "value": "inline",
-        "source": "lead-producer-inline"
-      },
-      "posture": {
-        "value": "read-only",
-        "source": "read-only-ask-or-writes-empty"
-      }
+    "refused": {
+      "reason": "not-an-agent-seat",
+      "detail": "u/producer: every candidate is a tool executor; Seat Binding chooses agent seats only"
     }
   },
   "plan pane-labeling live=false": {
@@ -472,7 +384,7 @@
       "governance.blocked"
     ],
     "configured": true,
-    "blockedReason": "executor \"herdr\" resolves to cross-provider egress target \"herdr\" — prompt content would leave the Claude ecosystem. Set executors.herdr.allowCrossProvider: true to permit this."
+    "blockedReason": "executor \"herdr\" resolves to cross-provider egress target \"herdr\" \u2014 prompt content would leave the Claude ecosystem. Set executors.herdr.allowCrossProvider: true to permit this."
   },
   "plan pane-labeling live=true": {
     "selector": {
@@ -495,7 +407,7 @@
       "governance.blocked"
     ],
     "configured": true,
-    "blockedReason": "executor \"herdr\" resolves to cross-provider egress target \"herdr\" — prompt content would leave the Claude ecosystem. Set executors.herdr.allowCrossProvider: true to permit this."
+    "blockedReason": "executor \"herdr\" resolves to cross-provider egress target \"herdr\" \u2014 prompt content would leave the Claude ecosystem. Set executors.herdr.allowCrossProvider: true to permit this."
   },
   "plan executor gitnexus": {
     "selector": {
@@ -518,7 +430,7 @@
       "governance.blocked"
     ],
     "configured": true,
-    "blockedReason": "executor \"gitnexus\" declares \"invocations\" but none is dispatchable via \"cli\" (has: mcp) — resolveExecutorConfig only ever spawns a cli invocation; this executor cannot be dispatched this way."
+    "blockedReason": "executor \"gitnexus\" declares \"invocations\" but none is dispatchable via \"cli\" (has: mcp) \u2014 resolveExecutorConfig only ever spawns a cli invocation; this executor cannot be dispatched this way."
   },
   "plan executor herdr": {
     "selector": {
@@ -541,6 +453,6 @@
       "governance.blocked"
     ],
     "configured": true,
-    "blockedReason": "executor \"herdr\" resolves to cross-provider egress target \"herdr\" — prompt content would leave the Claude ecosystem. Set executors.herdr.allowCrossProvider: true to permit this."
+    "blockedReason": "executor \"herdr\" resolves to cross-provider egress target \"herdr\" \u2014 prompt content would leave the Claude ecosystem. Set executors.herdr.allowCrossProvider: true to permit this."
   }
 }

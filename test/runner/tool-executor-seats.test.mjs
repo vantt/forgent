@@ -1,9 +1,11 @@
 // A capability served by a tool executor (`kind: tool`: gitnexus, herdr) keeps the path it had before Seat Binding:
-// Seat Binding decides agent seats only. The golden file is the output of the code before the policy cutover for the
-// same config, captured from that code. What the cutover changes is the label of where a tier came from (a config
-// path now, never "rigor:<level>") and the reasoning effort rigor used to derive; both are removed from the golden
-// and from the live output before they are compared, so every other field (executor, mechanism, model, invocation,
-// governance, reason codes, the MCP hand-back) must be identical.
+// Seat Binding decides agent seats only, so binding it as a seat is refused `not-an-agent-seat` (the session lead
+// no longer stands in for it inline), and the dispatch plan and MCP hand-back are the path it keeps. The golden
+// file is the output of the code before the policy cutover for the same config, captured from that code, with the
+// four seat bindings replaced by that refusal. What the cutover changes in the plans is the label of where a tier
+// came from (a config path now, never "rigor:<level>") and the reasoning effort rigor used to derive; both are
+// removed from the golden and from the live output before they are compared, so every other field (executor,
+// mechanism, model, invocation, governance, reason codes, the MCP hand-back) must be identical.
 
 import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
@@ -51,7 +53,7 @@ function normalize(value) {
   return out;
 }
 
-test('tool-executor capabilities bind and plan exactly as before: executor, mechanism, model, invocation, governance and hand-back are unchanged', () => {
+test('tool-executor capabilities are refused as seats and plan exactly as before: executor, mechanism, model, invocation, governance and hand-back are unchanged', () => {
   const actual = {};
   for (const capability of ['impact-analysis', 'pane-labeling']) {
     for (const session of [{ headless: true }, { headless: false, hasNativeAgent: true, provider: 'claude' }]) {

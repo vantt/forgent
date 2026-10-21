@@ -12,8 +12,8 @@ import {
   PORT_MISSING, SEAT_LAUNCH_CEILING,
 } from './case-admission-port.mjs';
 import { expandGenerated, partitionPaths } from '../dispatch/write-scope.mjs';
-import { bind, nextCandidate, retrySameCandidate } from './bind.mjs';
-import { credentialFaultPools, inspectAccountRotation, mayRotateAccount, triedBindingsOf } from './account-rotation.mjs';
+import { bind } from './bind.mjs';
+import { credentialFaultPools, inspectAccountRotation, keptBindingOf, mayRotateAccount, triedBindingsOf } from './account-rotation.mjs';
 import { assertPinnedAccountsUsable, runnerConfigForBinding } from './account-pin.mjs';
 import { simulateUnitBindings } from './dry-bind.mjs';
 import { worktreeSnapshot, writesSince } from './partial-writes.mjs';
@@ -1027,7 +1027,9 @@ async function runUnitBody(options, scope) {
     let bound;
     try {
       bound = await seatLedger.serialize(() => {
-        const first = recorded.length > 0 ? recorded[recorded.length - 1].binding : bind(askOf(), bindCtx);
+        // A seat that already ran an earlier round of this unit keeps that round's executor, model and effort.
+        const kept = keptBindingOf(unitRecord, seatId, round);
+        const first = recorded.length > 0 ? recorded[recorded.length - 1].binding : bind(askOf(), bindCtx, kept ? { walk: { continuity: kept } } : {});
         if (!first.refused) seatLedger.note(seatId, first.executor);
         return first;
       });
@@ -1286,9 +1288,13 @@ async function runUnitBody(options, scope) {
       }
       const rotation = bound.pool ? inspectAccountRotation({ runnerConfig, pool: bound.pool, runtimeDir: options.providerCapacityRuntimeDir }) : null;
       if (mayRotateAccount(rotation, rotationsSpent)) {
-        bound = retrySameCandidate(bound, { accountsHealthy: rotation.healthy });
-        attemptNo += 1;
-        continue;
+        // The same candidate again: the lease picks the next account of its pool.
+        const again = bind(askOf(), bindCtx, { walk: { continuity: bound, from: bound, rotation: true, detail: { accountsHealthy: rotation.healthy } } });
+        if (!again.refused) {
+          bound = again;
+          attemptNo += 1;
+          continue;
+        }
       }
 
       if (credentialFault && bound.pool) credentialFaultPoolSet.add(bound.pool);
@@ -1297,10 +1303,15 @@ async function runUnitBody(options, scope) {
       // The read, the walk and the publish are one queued step, so two seats whose providers fail at once
       // never both pick their next candidate from the same stale view of each other.
       const current = bound;
+      const kept = keptBindingOf(unitRecord, seatId, round);
       const next = await seatLedger.serialize(() => {
-        const candidate = nextCandidate(current, askOf(), bindCtx, 'provider-limit', {
-          tried: triedBindingsOf(attempts, attemptNo + 1),
-          excludePools: [...credentialFaultPoolSet],
+        const candidate = bind(askOf(), bindCtx, {
+          walk: {
+            from: current,
+            tried: triedBindingsOf(attempts, attemptNo + 1),
+            excludePools: [...credentialFaultPoolSet],
+            ...(kept ? { continuity: kept } : {}),
+          },
         });
         if (!candidate.refused && candidate.mechanism !== 'inline') seatLedger.note(seatId, candidate.executor);
         return candidate;

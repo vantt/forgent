@@ -386,7 +386,7 @@ function recordWalkedSeat(cwd, { secondExecutor }) {
   const unit = { id: 'walked', capability: 'docs:write', rigor: 'standard', mode: 'mutating', writes: ['docs/x.md'] };
   const ask = { unit, role: 'producer', readOnly: false, overrides: [] };
   const first = bind(ask, { runnerConfig: runner, session: {} });
-  const second = bind(ask, { runnerConfig: runner, session: {} }, { tried: [first] });
+  const second = bind(ask, { runnerConfig: runner, session: {} }, { walk: { tried: [first] } });
   assert.deepEqual([first.executor, second.executor], ['alpha', 'beta'], 'fixture: the walk moves to the next family');
 
   const unitDir = path.join(cwd, '.fgos/assignments/walked');

@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
 import { RunnerConfigError, supportsPolicyTier } from '../../src/runner/dispatch/config.mjs';
-import { resolveTierModel, deriveProviderFamily, resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
+import { deriveProviderFamily, resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
 import { resolveStrongerRigor } from '../../src/runner/rigor.mjs';
 import { workRigorFor } from '../../src/runner/work-dispatch.mjs';
 
@@ -194,43 +194,6 @@ test('literal model override is rejected if it originates from workflow YAML pol
   assert.throws(
     () => effectiveDispatchPolicy({ assignment }),
     (err) => err instanceof RunnerConfigError && /workflow YAML cannot pin literal model names/i.test(err.message),
-  );
-});
-
-// --- Phase 00 R5: direct policy-tier resolver (fixes B1) ---
-
-test('resolveTierModel resolves policy tiers above "standard" directly against a provider table', () => {
-  const cfg = {
-    modelPolicies: {
-      claude: {
-        nano: 'claude-3-5-haiku-20241022',
-        standard: 'claude-3-7-sonnet-20250219',
-        advanced: 'claude-3-7-sonnet-20250219',
-        flagship: 'claude-opus-analytical',
-        frontier: 'claude-opus-critical',
-      },
-    },
-  };
-
-  assert.equal(resolveTierModel(cfg, 'flagship', 'claude'), 'claude-opus-analytical');
-  assert.equal(resolveTierModel(cfg, 'frontier', 'claude'), 'claude-opus-critical');
-});
-
-test('resolveTierModel fails closed with a named RunnerConfigError for an unsupported provider/tier pair', () => {
-  const cfg = {
-    modelPolicies: {
-      claude: { standard: 'claude-3-7-sonnet-20250219' },
-      'z-ai': { nano: 'glm-5.2' },
-    },
-  };
-
-  assert.throws(
-    () => resolveTierModel(cfg, 'flagship', 'claude'),
-    (err) => err instanceof RunnerConfigError && /flagship/.test(err.message) && /claude/.test(err.message),
-  );
-  assert.throws(
-    () => resolveTierModel(cfg, 'standard', 'z-ai'),
-    (err) => err instanceof RunnerConfigError && /standard/.test(err.message) && /z-ai/.test(err.message),
   );
 });
 

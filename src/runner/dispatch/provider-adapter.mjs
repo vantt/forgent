@@ -9,6 +9,7 @@
 // this module is invoked in shadow mode by tests and future compiler stages.
 import fs from 'node:fs';
 import path from 'node:path';
+import { REASONING_EFFORT_VALUES } from './tier-cell.mjs';
 
 
 /**
@@ -259,6 +260,16 @@ const REASONING_EFFORT_CONTROLS = Object.freeze({
   omp: { flag: '--thinking' },
   codex: { configKey: 'model_reasoning_effort', native: { max: 'xhigh' } },
 });
+
+/**
+ * The canonical effort levels a command's CLI can be told to run at: every level when fgOS knows the
+ * CLI's effort control (a level the CLI names differently is mapped by `renderReasoningEffortArgs`),
+ * none otherwise. Seat Binding reads this per invocation so a level no launch could render is never
+ * promised.
+ */
+export function renderedEffortLevels(command) {
+  return REASONING_EFFORT_CONTROLS[path.basename(String(command ?? ''))] ? [...REASONING_EFFORT_VALUES] : [];
+}
 
 /**
  * Renders a canonical reasoning-effort level into an invocation's args

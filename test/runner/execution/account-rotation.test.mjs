@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { bind, nextCandidate, retrySameCandidate } from '../../../src/runner/execution/bind.mjs';
-import { credentialFaultPools, inspectAccountRotation, mayRotateAccount, triedBindingsOf } from '../../../src/runner/execution/account-rotation.mjs';
+import { bind } from '../../../src/runner/execution/bind.mjs';
+import { credentialFaultPools, inspectAccountRotation, keptBindingOf, mayRotateAccount, triedBindingsOf, walkStateOf } from '../../../src/runner/execution/account-rotation.mjs';
 import { quarantineProviderAccount } from '../../../src/runner/dispatch/provider-capacity.mjs';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -84,18 +84,19 @@ test('a disabled account of a declared pool is not one to rotate to', () => {
   }
 });
 
-test('nextCandidate skips a pool the caller excludes and says it walked to the next candidate', () => {
+test('a walk step skips a pool the caller excludes and says it walked to the next candidate', () => {
   const cfg = runnerConfig(['alpha', 'alpha-lite', 'beta']);
   const first = bind(ask, ctx(cfg));
   assert.equal(first.executor, 'alpha');
-  const plain = nextCandidate(first, ask, ctx(cfg));
+  const plain = bind(ask, ctx(cfg), { walk: { tried: [first] } });
   assert.equal(plain.executor, 'alpha-lite');
   assert.equal(plain.provenance.fallbackFrom.kind, 'next-candidate');
   assert.equal(plain.provenance.fallbackFrom.walk, 'entry', 'another executor of the same family is a step within the family');
-  const excluded = nextCandidate(first, ask, ctx(cfg), 'provider-limit', { excludePools: ['alpha'] });
+  const excluded = bind(ask, ctx(cfg), { walk: { tried: [first], excludePools: ['alpha'] } });
   assert.equal(excluded.executor, 'beta');
   assert.equal(excluded.provenance.fallbackFrom.walk, 'family');
-  const none = nextCandidate(bind(ask, ctx(runnerConfig(['alpha', 'alpha-lite']))), ask, ctx(runnerConfig(['alpha', 'alpha-lite'])), 'provider-limit', { excludePools: ['alpha'] });
+  const pair = ctx(runnerConfig(['alpha', 'alpha-lite']));
+  const none = bind(ask, pair, { walk: { tried: [bind(ask, pair)], excludePools: ['alpha'] } });
   assert.equal(none.refused.reason, 'pool-excluded');
 });
 
@@ -104,14 +105,14 @@ test('the walk keeps preferring a family the sibling seats did not use', () => {
   const spreadAsk = { ...ask, preferIndependentOf: [{ role: 'sibling', executor: 'beta' }] };
   const first = bind(spreadAsk, ctx(cfg));
   assert.equal(first.executor, 'alpha');
-  const next = nextCandidate(first, spreadAsk, ctx(cfg));
+  const next = bind(spreadAsk, ctx(cfg), { walk: { tried: [first] } });
   assert.equal(next.executor, 'gamma', 'beta is in use by a sibling and gamma is not');
 });
 
 test('a retry on another account is the same binding with provenance saying so', () => {
   const cfg = runnerConfig(['alpha', 'beta']);
   const first = bind(ask, ctx(cfg));
-  const retry = retrySameCandidate(first, { accountsHealthy: 1 });
+  const retry = bind(ask, ctx(cfg), { walk: { continuity: first, from: first, rotation: true, detail: { accountsHealthy: 1 } } });
   assert.equal(retry.executor, first.executor);
   assert.equal(retry.invocation, first.invocation);
   assert.equal(retry.pool, first.pool);
@@ -155,4 +156,21 @@ test('the walk state of an attempt is the bindings before it, without the attemp
   assert.deepEqual(triedBindingsOf(attempts, 3).map((b) => b.executor), ['alpha', 'alpha', 'beta']);
   assert.deepEqual(triedBindingsOf(attempts, 4).map((b) => b.executor), ['alpha', 'alpha', 'beta'], 'an old record (no pool) is not walk state, the walk restarts at the primary for it');
   assert.deepEqual(triedBindingsOf(undefined, 2), []);
+});
+
+test('a seat in a later round keeps the binding its earlier round ended on, and the write gate recomputes with it', () => {
+  const first = { executor: 'alpha', pool: 'alpha', model: 'alpha-m', invocation: 'alpha-cli', mechanism: 'out-of-process' };
+  const fallback = { executor: 'beta', pool: 'beta', model: 'beta-m', invocation: 'beta-cli', mechanism: 'out-of-process' };
+  const unitRecord = {
+    bindings: {
+      'side/1': [{ assignmentId: 'u/side/1', binding: first }, { assignmentId: 'u/side/1-fb1', binding: fallback }],
+      'side/2': [{ assignmentId: 'u/side/2', binding: fallback }],
+      'other/1': [{ assignmentId: 'u/other/1', binding: first }],
+    },
+  };
+  assert.equal(keptBindingOf(unitRecord, 'side', 1), null, 'a first round keeps nothing');
+  assert.deepEqual(keptBindingOf(unitRecord, 'side', 2), fallback, 'the last attempt of the earlier round, not its first');
+  assert.equal(keptBindingOf(unitRecord, 'other', 2), first, 'only the same seat is kept');
+  assert.deepEqual(walkStateOf(unitRecord, { seat: 'side', round: '2', assignmentId: 'u/side/2' }).continuity, fallback);
+  assert.equal(walkStateOf(unitRecord, { seat: 'side', round: '1', assignmentId: 'u/side/1' }).continuity, undefined);
 });

@@ -410,6 +410,25 @@ test('a panel seat that walked to another provider lands on a family its sibling
   assert.equal(summaryOf(fx.repoRoot, res).sharedFamilies, undefined);
 });
 
+test('a debate side keeps in its rebuttal the candidate its first round ended on, so a primary that failed is not bound again', { skip: SKIP }, async () => {
+  const fx = setup({
+    alpha: { family: 'alpha', logins: { dead1: 'dead' } },
+    beta: { family: 'beta' },
+    gamma: { family: 'gamma' },
+    delta: { family: 'delta' },
+  });
+  const debate = { id: 'u-debate-keep', objective: 'Argue it', capability: 'docs:write', writes: [], pattern: 'debate',
+    seats: [{ seat: 'pro', role: 'producer' }, { seat: 'con', role: 'producer' }, { seat: 'judge', role: 'judge' }] };
+  const res = await run(fx, debate, { pattern: 'debate' });
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results.map((r) => [r.seat, r.outcome, r.refused])));
+  const round1 = attemptsOf(fx.repoRoot, res, 'pro/1');
+  assert.deepEqual(round1.map((a) => a.outcome), ['provider-limit', 'pass'], 'the first round walked away from the dead login');
+  const walkedTo = round1.at(-1).binding.executor;
+  assert.notEqual(walkedTo, 'alpha');
+  const round2 = attemptsOf(fx.repoRoot, res, 'pro/2');
+  assert.deepEqual(round2.map((a) => [a.binding.executor, a.outcome]), [[walkedTo, 'pass']], 'the rebuttal runs on the candidate round one ended on, with no attempt on the dead primary');
+});
+
 test('a unit-preferred executor that hits its usage limit walks on to the capability pool', { skip: SKIP }, async () => {
   const fx = setup({ spent: { family: 'spentquota' }, beta: { family: 'beta' } }, { prefer: ['beta'] });
   const res = await run(fx, { ...solo('u-prefer-limit'), prefer: ['spent'] });
@@ -497,8 +516,8 @@ test('a quarantined pinned account is refused before any unit run exists, and a 
   assert.equal(attemptsOf(fx.repoRoot, first).length, 1, 'the resume dispatched nothing');
 });
 
-test('an account of another provider is refused before any unit run exists', { skip: SKIP }, async () => {
-  const fx = setup({ alpha: { family: 'alpha', logins: { a1: 'live' } }, beta: { family: 'beta', logins: { b1: 'live' } } });
+test('an account of a provider no candidate of the seat belongs to is refused before any unit run exists', { skip: SKIP }, async () => {
+  const fx = setup({ alpha: { family: 'alpha', logins: { a1: 'live' } }, beta: { family: 'beta', logins: { b1: 'live' } } }, { prefer: ['alpha'] });
   await assert.rejects(run(fx, solo('u-pin-other'), pin('beta/b1')), /applies to no seat.*"beta\/b1".*pool "beta"/s);
   assert.deepEqual(unitRuns(fx), []);
 });

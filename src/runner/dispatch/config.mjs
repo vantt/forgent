@@ -1627,8 +1627,8 @@ export function validateRunnerPatternsShape(patterns, label) {
  * each tier map's keys drawn from `MODEL_POLICY_TIERS` and values tier
  * cells: a model, `model@pool`, a `{model, pool?, effort?}` object, or a non-empty list of those (`parseTierCell`). Partial coverage (a provider naming fewer
  * than all 6 tiers) is valid at load time, same lenient-at-load/strict-
- * at-resolve philosophy (per `resolveTierModel`'s own doc comment) — a missing tier only throws once
- * something actually asks for it.
+ * at-bind philosophy — a missing tier is refused (`tier-cell-missing`) only once
+ * a seat actually asks for it.
  */
 function validateModelPoliciesShape(modelPolicies, label) {
   if (!modelPolicies || typeof modelPolicies !== 'object' || Array.isArray(modelPolicies)) {
@@ -1704,7 +1704,7 @@ function validateRunnerDefaultsShape(defaults, label) {
  * `MODEL_POLICY_TIERS` (valid per `validateModelPoliciesShape` above) simply
  * answers `false` for the tiers it omits. Available to a future
  * Cohort-Planner-facing caller that needs to exclude an executor for an
- * activity's tier floor without triggering `resolveTierModel`'s throw. A cell
+ * activity's tier floor without a refusal. A cell
  * declares the tier when it parses to at least one entry, served by any pool.
  */
 export function supportsPolicyTier(cfg, providerModel, policyTier) {

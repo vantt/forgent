@@ -249,7 +249,7 @@ test('bind() takes a reasoningEffort override and records where it came from', (
   assert.deepEqual(bound.provenance.reasoningEffort, { value: 'high', source: 'override:human-cli' });
   const plain = bind(unitAsk([]), { runnerConfig: bindConfig(), session: {} });
   assert.equal(plain.reasoningEffort, null);
-  assert.deepEqual(plain.provenance.reasoningEffort, { value: null, source: 'none' });
+  assert.deepEqual(plain.provenance.reasoningEffort, { value: null, source: 'invocation-default' });
 });
 
 test('bind() refuses an effort outside the vocabulary or outside what the bound executor declares', () => {
@@ -257,7 +257,9 @@ test('bind() refuses an effort outside the vocabulary or outside what the bound 
   assert.equal(bad.refused.reason, 'reasoning-effort');
   assert.match(bad.refused.detail, /invalid reasoningEffort "turbo"/);
   const locked = bind(unitAsk([{ executor: 'claude', reasoningEffort: 'max', origin: 'human-cli' }]), { runnerConfig: bindConfig(), session: {} });
-  assert.match(locked.refused.detail, /executor "claude" supports reasoningEffort \[low, medium, high\], not "max"/);
+  assert.equal(locked.refused.reason, 'effort-unsupported');
+  assert.match(locked.refused.detail, /invocation "claude-cli" cannot render effort max; it renders \[low, medium, high\]/);
+  assert.deepEqual(locked.refused.rendered, ['low', 'medium', 'high']);
 });
 
 test('fgos run with an effort override renders it into the CLI the bound executor spawns', async () => {
@@ -327,7 +329,7 @@ test('fgos run --effort reaches bind() as an override, and a level the executor 
   assert.equal(res.status, 4, res.stderr);
   const { data } = JSON.parse(res.stdout);
   assert.equal(data.outcome, 'policy-refusal');
-  assert.deepEqual(data.results[0].refused, { reason: 'reasoning-effort', detail: 'executor "claude" supports reasoningEffort [low, medium, high], not "max"' });
+  assert.deepEqual(data.results[0].refused, { reason: 'effort-unsupported', detail: 'u/producer: invocation "c" cannot render effort max; it renders [low, medium, high]', rendered: ['low', 'medium', 'high'] });
 });
 
 test('fgos run --effort still reaches a role that a scoped --override does not name', () => {
@@ -342,7 +344,7 @@ test('fgos run --effort still reaches a role that a scoped --override does not n
   const runner = {
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    executors: { claude: { kind: 'agent', providerModel: 'claude', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'fgos-test-no-such-cli', args: ['-p', '{prompt}'] }] } },
+    executors: { claude: { kind: 'agent', providerModel: 'claude', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: '/nonexistent/claude', args: ['-p', '{prompt}'] }] } },
     capabilities: { 'docs:write': { prefer: [{ executor: 'claude' }], rigor: 'standard' } },
   };
   fs.mkdirSync(path.join(repo, '.fgos'));
@@ -361,7 +363,7 @@ test('fgos run --effort still reaches a role that a scoped --override does not n
   }
   const { data } = JSON.parse(out);
   assert.equal(data.outcome, 'policy-refusal');
-  assert.deepEqual(data.results[0].refused, { reason: 'reasoning-effort', detail: 'executor "claude" supports reasoningEffort [low, medium, high], not "max"' });
+  assert.deepEqual(data.results[0].refused, { reason: 'effort-unsupported', detail: 'u/producer: invocation "c" cannot render effort max; it renders [low, medium, high]', rendered: ['low', 'medium', 'high'] });
 });
 
 test('one settled run keeps effort and model drift provenance beside a correlated warning and the sandbox that ran', async () => {

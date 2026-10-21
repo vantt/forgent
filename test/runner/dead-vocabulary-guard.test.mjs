@@ -157,7 +157,6 @@ test('dead vocabulary guard: .fgos/config.json does not contain runner.models or
 
 import os from 'node:os';
 import { loadRunnerConfig, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
-import { resolveTierModel } from '../../src/runner/dispatch/resolve.mjs';
 
 function mkTempConfig(runnerObj) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dead-vocab-test-'));
@@ -224,61 +223,6 @@ test('dead vocabulary guard: loadRunnerConfig rejects dead keys with actionable 
   );
 });
 
-test('resolveTierModel: resolves tier to model via modelPolicies[provider][tier]', () => {
-  const cfg = {
-    modelPolicies: {
-      claude: {
-        nano: 'haiku',
-        standard: 'sonnet',
-        advanced: 'sonnet-advanced',
-        flagship: 'opus',
-        frontier: 'fable',
-      },
-      gemini: {
-        nano: 'flash-low',
-        standard: 'flash-medium',
-        advanced: 'flash-high',
-        flagship: 'pro-low',
-        frontier: 'pro-high',
-      },
-    },
-  };
-
-  // Valid policy tiers
-  assert.equal(resolveTierModel(cfg, 'nano', 'claude'), 'haiku');
-  assert.equal(resolveTierModel(cfg, 'standard', 'claude'), 'sonnet');
-  assert.equal(resolveTierModel(cfg, 'advanced', 'claude'), 'sonnet-advanced');
-  assert.equal(resolveTierModel(cfg, 'flagship', 'claude'), 'opus');
-  assert.equal(resolveTierModel(cfg, 'frontier', 'claude'), 'fable');
-
-  // Phase 3: light/heavy are retired from resolveTierModel
-  assert.throws(
-    () => resolveTierModel(cfg, 'light', 'gemini'),
-    (err) => err instanceof RunnerConfigError && /unrecognized tier "light"/.test(err.message),
-  );
-  assert.throws(
-    () => resolveTierModel(cfg, 'heavy', 'gemini'),
-    (err) => err instanceof RunnerConfigError && /unrecognized tier "heavy"/.test(err.message),
-  );
-  // Invalid tier throws
-  assert.throws(
-    () => resolveTierModel(cfg, 'non-existent-tier', 'claude'),
-    (err) => err instanceof RunnerConfigError && /unrecognized tier/.test(err.message),
-  );
-
-  // Missing provider throws
-  assert.throws(
-    () => resolveTierModel(cfg, 'standard', 'unknown-provider'),
-    (err) => err instanceof RunnerConfigError && /no modelPolicies configured for provider/.test(err.message),
-  );
-
-  // Missing tier in provider table throws
-  const incompleteCfg = { modelPolicies: { custom: { nano: 'only-nano' } } };
-  assert.throws(
-    () => resolveTierModel(incompleteCfg, 'standard', 'custom'),
-    (err) => err instanceof RunnerConfigError && /no model configured for tier "standard" under provider "custom"/.test(err.message),
-  );
-});
 import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 

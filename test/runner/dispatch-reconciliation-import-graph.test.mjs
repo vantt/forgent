@@ -200,6 +200,8 @@ const EXPECTED_CLOSURE = [
   // The account inventory provider-capacity.mjs reads for a pool declared in runner.llmAccounts
   // (imports only provider-adapter.mjs and provider-capacity.mjs; no process control).
   'src/runner/dispatch/llm-accounts.mjs',
+  // The effort levels provider-adapter.mjs reports as renderable (a leaf: no imports).
+  'src/runner/dispatch/tier-cell.mjs',
   'src/config/global-config.mjs',
   'src/config/shared-config-file.mjs',
   'src/setup/config-merge.mjs',

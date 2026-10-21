@@ -14,10 +14,10 @@ import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 
 const fixtureDir = (prefix) => makeFixtureDir(prefix);
 
-test('guards: the run path reads bound.transport and calls nextCandidate', () => {
+test('guards: the run path reads bound.transport and walks through bind', () => {
   const runSource = fs.readFileSync(new URL('../../../src/runner/execution/run.mjs', import.meta.url), 'utf8');
   assert.match(runSource, /bound\.transport/);
-  assert.match(runSource, /nextCandidate\(/);
+  assert.match(runSource, /bind\(askOf\(\), bindCtx, \{\s*walk:/);
 });
 
 test('Claude reads blind inputs without granting the assignment or store root, preserving operator directories', () => {

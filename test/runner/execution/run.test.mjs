@@ -605,7 +605,7 @@ test('a reviewed run with a single provider family refuses the checker instead o
   });
   assert.equal(res.outcome, 'policy-refusal');
   const checker = res.results.find((r) => r.seat === 'reviewer');
-  assert.equal(checker.refused.reason, 'independence');
+  assert.equal(checker.refused.reason, 'independence-unsatisfiable');
 });
 
 test('panel members run on different provider families', async () => {
@@ -1891,7 +1891,7 @@ test('a reviewed run at rigor high refuses the checker that no unused family can
   assert.equal(res.outcome, 'policy-refusal');
   const refused = res.results.find((r) => r.refused);
   assert.equal(refused.seat, 'red-team');
-  assert.equal(refused.refused.reason, 'independence');
+  assert.equal(refused.refused.reason, 'independence-unsatisfiable');
 });
 
 test('a reviewed run at rigor standard lets two checkers share a family, as before', async () => {

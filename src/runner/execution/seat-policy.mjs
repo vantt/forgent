@@ -91,6 +91,19 @@ export function seatPolicy(ask, runnerConfig) {
   return answer;
 }
 
+/**
+ * Both stages for one seat in one exec: the crate's whole answer (policy, ranked candidates, refusal and
+ * explanation). Unlike stage 1 alone, the answer depends on the peers, the walk and the machine facts the
+ * caller collected, so nothing is cached.
+ *
+ * @param {object} request ask, runnerConfig, peers, walk, accountView, launchView
+ * @returns {object} the crate's BindOutput plus `hostVersion`
+ */
+export function seatBinding({ ask, runnerConfig, peers = [], walk = {}, accountView = { pools: {} }, launchView = { executors: {} } }) {
+  const { config, digest } = seatConfigDigestOf(runnerConfig);
+  return bindSeat({ ask, config, configDigest: digest, peers, walk, accountView, launchView, now: Date.now() });
+}
+
 /** For tests: forget every cached answer. */
 export function resetSeatPolicyCache() {
   answers.clear();

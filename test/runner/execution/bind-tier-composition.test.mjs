@@ -169,8 +169,9 @@ test('variant C: when the cap lowers a seat to a tier that its prefer list has n
     { runnerConfig: config, session },
   );
   assert.equal(result.refused.reason, 'tier-cell-missing');
-  assert.match(result.refused.detail, /deepseek/);
   assert.match(result.refused.detail, /flagship/);
+  assert.match(result.refused.detail, /no allowed executor has a cell/);
+  assert.equal(result.refused.config, 'capabilities."architecture:shape".seats.system.prefer', 'the refusal names the config line to change');
 });
 
 test('a tier override at the resolved tier is taken; above it, the seat is refused (override above the resolved tier)', () => {

@@ -30,7 +30,6 @@ import {
   validateProviderAccountInventory,
   ProviderCapacityConfigError,
 } from '../../src/runner/dispatch.mjs';
-import { resolveTierModel } from '../../src/runner/dispatch/resolve.mjs';
 import { FRESH_PROJECT_RUNNER_CONFIG } from '../../src/runner/dispatch/config.mjs';
 import { buildPrompt, executorIdForWork } from '../../src/runner/work-compat.mjs';
 import { spawnWorker, resolveAgentTypeForWork, resolveWorkForDispatch, workDispatchHint } from '../../src/runner/work-dispatch.mjs';
@@ -1538,74 +1537,6 @@ test('detectAssistantCli delegates to tool-registry.mjs\'s shared findExecutable
   const binName = process.platform === 'win32' ? 'claude.cmd' : 'claude';
   fs.writeFileSync(path.join(dir, binName), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
   assert.equal(detectAssistantCli(['claude', 'codex'], dir), findExecutableOnPath(['claude', 'codex'], dir));
-});
-
-// --- resolveTierModel: tier -> model, unknown tier is a validation error ----
-
-test('resolveTierModel resolves each declared tier to its configured model', () => {
-  const cfg = baseConfig(['{prompt}']);
-  assert.equal(resolveTierModel(cfg, 'nano'), 'haiku');
-  assert.equal(resolveTierModel(cfg, 'standard'), 'sonnet');
-  assert.equal(resolveTierModel(cfg, 'frontier'), 'opus');
-});
-
-test('resolveTierModel throws a validation error for an unknown tier', () => {
-  const cfg = baseConfig(['{prompt}']);
-  assert.throws(() => resolveTierModel(cfg, 'ultra-mega'), (err) => {
-    assert.ok(err instanceof RunnerConfigError);
-    assert.equal(err.category, 'validation');
-    return true;
-  });
-});
-
-// --- resolveTierModel: modelPolicies (D9, tsk-5tm-5) -------------------------
-
-function modelPoliciesConfig() {
-  return {
-    executor: { command: process.execPath, args: ['{prompt}'] },
-    modelPolicies: {
-      claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' },
-      gemini: { nano: 'gemini-flash', standard: 'gemini-pro', advanced: 'gemini-pro', flagship: 'gemini-pro', frontier: 'gemini-ultra' },
-    },
-    timeoutMs: 5000,
-  };
-}
-
-test('resolveTierModel resolves the default provider (claude) when no providerModel is given, same tier->model mapping as before', () => {
-  const cfg = modelPoliciesConfig();
-  assert.equal(resolveTierModel(cfg, 'nano'), 'haiku');
-  assert.equal(resolveTierModel(cfg, 'standard'), 'sonnet');
-  assert.equal(resolveTierModel(cfg, 'frontier'), 'opus');
-});
-
-test('resolveTierModel resolves a non-Claude provider (e.g. agy/gemini) to that provider\'s own model name, not Claude\'s', () => {
-  const cfg = modelPoliciesConfig();
-  assert.equal(resolveTierModel(cfg, 'nano', 'gemini'), 'gemini-flash');
-  assert.equal(resolveTierModel(cfg, 'standard', 'gemini'), 'gemini-pro');
-  assert.equal(resolveTierModel(cfg, 'frontier', 'gemini'), 'gemini-ultra');
-});
-
-test('resolveTierModel throws when providerModel names a provider with no modelPolicies entry', () => {
-  const cfg = modelPoliciesConfig();
-  assert.throws(() => resolveTierModel(cfg, 'standard', 'mistral'), (err) => {
-    assert.ok(err instanceof RunnerConfigError);
-    assert.match(err.message, /mistral/);
-    return true;
-  });
-});
-
-test('resolveTierModel throws for retired light/heavy tiers', () => {
-  const cfg = modelPoliciesConfig();
-  assert.throws(() => resolveTierModel(cfg, 'light'), (err) => {
-    assert.ok(err instanceof RunnerConfigError);
-    assert.match(err.message, /unrecognized tier "light"/);
-    return true;
-  });
-  assert.throws(() => resolveTierModel(cfg, 'heavy'), (err) => {
-    assert.ok(err instanceof RunnerConfigError);
-    assert.match(err.message, /unrecognized tier "heavy"/);
-    return true;
-  });
 });
 
 test('loadRunnerConfig rejects a runner config declaring retired models map', () => {

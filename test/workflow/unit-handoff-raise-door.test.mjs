@@ -13,12 +13,14 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 seedFileLocalBwrapRegistry();
 
 const FAMILIES = ['claude', 'openai', 'gemini'];
+// The command is a CLI whose reasoning-effort control fgOS knows, so an effort override can be rendered.
+const COMMAND = { claude: 'claude', openai: 'codex', gemini: 'agy' };
 const executor = (family) => ({
   kind: 'agent',
   providerModel: family,
-  command: `${family}-bin`,
+  command: COMMAND[family],
   invocations: [{
-    id: `${family}-cli`, via: 'cli', adapter: 'cli-spawn', command: `${family}-bin`, confinement: { backend: 'bwrap' },
+    id: `${family}-cli`, via: 'cli', adapter: 'cli-spawn', command: COMMAND[family], confinement: { backend: 'bwrap' },
     credentialStore: { use: family, homeEnv: `${family.toUpperCase()}_HOME`, files: ['login'] },
   }],
 });

@@ -649,7 +649,7 @@ export function checkMutatingAssignmentBindingSnapshot(cwd) {
             },
             // A fallback attempt lives at `<round>-fb<n>`; its walk state is read from the seat's
             // `<seat>/<round>` chain exactly as the write gate reads it.
-            walkStateOf(unitRecord, { seat, round: round.replace(/-fb\d+$/, ''), assignmentId: run.assignmentId }),
+            { walk: walkStateOf(unitRecord, { seat, round: round.replace(/-fb\d+$/, ''), assignmentId: run.assignmentId }) },
           );
           if (recomputed.refused || recomputed.executor !== resultData.binding.executor) {
             problems.push(`unit run "${unitId}" seat "${seat}" round "${round}" attempt "${run.attempt}" binding mismatches unit.json snapshot`);

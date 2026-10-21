@@ -9,7 +9,6 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { parseTierCell, isExtendedTierCell } from '../../src/runner/dispatch/tier-cell.mjs';
-import { resolveTierModel, resolveTierCandidates } from '../../src/runner/dispatch/resolve.mjs';
 import { loadRunnerConfigFromDir, supportsPolicyTier, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { bind } from '../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
@@ -58,28 +57,7 @@ const policies = {
   },
 };
 
-test('resolveTierModel returns the first entry, unchanged for a plain string, whichever pool serves it', () => {
-  assert.equal(resolveTierModel(policies, 'standard', 'claude'), 'sonnet');
-  assert.equal(resolveTierModel(policies, 'standard', 'deepseek'), 'deepseek-v4');
-  assert.equal(resolveTierModel(policies, 'advanced', 'deepseek'), 'deepseek-v4-pro');
-});
-
-test('resolveTierModel refuses a tier the family has no cell for', () => {
-  assert.throws(() => resolveTierModel(policies, 'nano', 'deepseek'), (err) => {
-    assert.ok(err instanceof RunnerConfigError);
-    assert.match(err.message, /no model configured for tier "nano"/);
-    return true;
-  });
-});
-
-test('resolveTierCandidates lists every entry, other pools included', () => {
-  assert.deepEqual(resolveTierCandidates(policies, 'standard', 'deepseek').map((e) => `${e.model}@${e.pool}`), [
-    'deepseek-v4@openrouter',
-    'deepseek-v4-std@deepseek',
-  ]);
-});
-
-test('supportsPolicyTier answers what resolveTierModel would do, without throwing', () => {
+test('supportsPolicyTier answers whether a family has a cell at a tier, without throwing', () => {
   assert.equal(supportsPolicyTier(policies, 'deepseek', 'standard'), true);
   assert.equal(supportsPolicyTier(policies, 'deepseek', 'advanced'), true);
   assert.equal(supportsPolicyTier(policies, 'deepseek', 'nano'), false);
@@ -162,7 +140,6 @@ test('bind never runs an entry whose pool nothing can pay for, even when it is t
   const result = bind(ask, { runnerConfig: bindConfig('x@other'), ...headless });
   assert.notEqual(result.model, 'x');
   assert.notEqual(result.model, 'x@other');
-  assert.doesNotMatch(result.provenance?.model?.source ?? '', /resolveTierModel/);
 });
 
 // ---- the {model, pool?, effort?} object form ----------------------------------------------------
@@ -205,14 +182,16 @@ test('an object cell counts as extended, so a release that reads one model strin
   assert.equal(isExtendedTierCell(null), false);
 });
 
-test('resolveTierCandidates carries the effort of an object cell and resolveTierModel still returns the model', () => {
+test('an object cell\'s effort reaches the binding as the cell\'s promise, and supportsPolicyTier sees the cell', () => {
   const cfg = { modelPolicies: { claude: { advanced: [{ model: 'opus', effort: 'high' }, 'sonnet'] } } };
-  assert.deepEqual(resolveTierCandidates(cfg, 'advanced', 'claude'), [
-    { model: 'opus', pool: 'claude', explicitPool: false, effort: 'high' },
-    { model: 'sonnet', pool: 'claude', explicitPool: false },
-  ]);
-  assert.equal(resolveTierModel(cfg, 'advanced', 'claude'), 'opus');
   assert.equal(supportsPolicyTier(cfg, 'claude', 'advanced'), true);
+  const runnerConfig = bindConfig([{ model: 'opus', effort: 'high' }, 'sonnet']);
+  runnerConfig.executors.fam.command = 'claude';
+  const result = bind(ask, { runnerConfig, ...headless });
+  assert.ok(!result.refused, JSON.stringify(result.refused));
+  assert.equal(result.model, 'opus');
+  assert.equal(result.reasoningEffort, 'high');
+  assert.deepEqual(result.provenance.reasoningEffort, { value: 'high', source: 'cell' });
 });
 
 test('a project config may write object cells; a bad one fails to load and names the cell', () => {
@@ -233,7 +212,7 @@ test('the global config drops an object cell like a list cell, naming it once', 
 });
 
 test('bind runs the model of an object cell like the model of a string cell', () => {
-  const result = bind(ask, { runnerConfig: bindConfig({ model: 'm-obj', effort: 'high' }), ...headless });
+  const result = bind(ask, { runnerConfig: bindConfig({ model: 'm-obj' }), ...headless });
   assert.ok(!result.refused, JSON.stringify(result.refused));
   assert.equal(result.model, 'm-obj');
 });

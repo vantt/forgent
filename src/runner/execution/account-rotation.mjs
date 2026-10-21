@@ -72,16 +72,37 @@ export function triedBindingsOf(attempts, at) {
  *
  * @param {object} unitRecord parsed `unit.json`
  * @param {{ seat: string, round: string|number, assignmentId: string }} attempt the seat and the attempt
- * @returns {{ tried: object[], excludePools: string[] }} the `bind()` walk options
+ * @returns {{ tried: object[], excludePools: string[], continuity?: object }} the `bind()` walk state
  */
 export function walkStateOf(unitRecord, { seat, round, assignmentId }) {
   const attempts = unitRecord?.bindings?.[`${seat}/${round}`];
   const at = Array.isArray(attempts) ? attempts.findIndex((attempt) => attempt?.assignmentId === assignmentId) : -1;
   const boundAt = Date.parse(attempts?.[at]?.boundAt);
+  const kept = keptBindingOf(unitRecord, seat, round);
   return {
     tried: Array.isArray(attempts) ? triedBindingsOf(attempts, at) : [],
     excludePools: [...credentialFaultPools(unitRecord, { boundBefore: Number.isFinite(boundAt) ? boundAt : -Infinity })],
+    ...(kept ? { continuity: kept } : {}),
   };
+}
+
+/**
+ * The binding a seat keeps into round `round`: the last binding the unit recorded for the same seat in
+ * its latest earlier round. A seat that runs several rounds in one unit (a debate side's rebuttal, a
+ * producer's next pass) keeps executor, model and effort; null in its first round.
+ *
+ * @returns {object|null}
+ */
+export function keptBindingOf(unitRecord, seat, round) {
+  const current = Number(round);
+  let latest = null;
+  for (const [key, attempts] of Object.entries(unitRecord?.bindings ?? {})) {
+    const [keySeat, keyRound] = [key.slice(0, key.lastIndexOf('/')), Number(key.slice(key.lastIndexOf('/') + 1))];
+    if (keySeat !== seat || !Number.isFinite(keyRound) || keyRound >= current || !Array.isArray(attempts)) continue;
+    const binding = attempts.at(-1)?.binding;
+    if (binding && !binding.refused && binding.mechanism !== 'inline' && (latest === null || keyRound > latest.round)) latest = { round: keyRound, binding };
+  }
+  return latest?.binding ?? null;
 }
 
 /**

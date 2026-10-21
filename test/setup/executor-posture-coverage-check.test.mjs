@@ -267,7 +267,7 @@ test('executor-posture-coverage warns and provides pool configuration guidance o
 
 test('executor-posture-coverage groups failures by reason when both posture and candidate failures occur', async () => {
   const runnerConfig = {
-    modelPolicies: MODEL_POLICIES,
+    modelPolicies: { ...MODEL_POLICIES, unconfined: MODEL_POLICIES.claude },
     executors: {
       unconfinedExec: {
         kind: 'agent',

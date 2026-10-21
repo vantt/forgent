@@ -3,7 +3,7 @@
 import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { bind, nextCandidate, BIND_CONTRACT_VERSION } from '../../../src/runner/execution/bind.mjs';
+import { bind, BIND_CONTRACT_VERSION } from '../../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 
 // posture filtering consults the machine backend registry; keep it file-local
@@ -105,6 +105,8 @@ const DEBATE_POSTURE = { ...POSTURE, readOnly: true, forceOutOfProcess: true };
 
 test('bind: successfully binds producer with herdr transport when herdrPresent is true', () => {
   const runnerConfig = createMockRunnerConfig();
+  // An entry that names no invocation leaves the transport to bind(); a named one is a hard pin.
+  runnerConfig.capabilities['code:implement'].prefer[0] = { executor: 'claude' };
   const unit = {
     id: 'u1',
     capability: 'code:implement',
@@ -137,8 +139,19 @@ test('bind: successfully binds producer with herdr transport when herdrPresent i
   assert.equal(result.provenance.invocation.value, 'claude-herdr');
 });
 
+test('bind: a capability prefer entry that names an invocation is a hard pin, so herdr never swaps it', () => {
+  const result = bind(
+    { unit: { id: 'u1', capability: 'code:implement', writes: ['src/foo.js'], rigor: 'standard' }, role: 'producer', independentOf: [] },
+    { runnerConfig: createMockRunnerConfig(), session: { herdrPresent: true, hasNativeAgent: true } },
+  );
+  assert.equal(result.invocation, 'claude-cli');
+  assert.equal(result.transport, 'cli');
+  assert.equal(result.provenance.transport.source, 'prefer-pinned-invocation');
+});
+
 test('bind: a herdr invocation that cannot carry the posture leaves the transport on cli, and says why', () => {
   const runnerConfig = createMockRunnerConfig();
+  runnerConfig.capabilities['code:implement'].prefer[0] = { executor: 'claude' };
   runnerConfig.executors.claude.invocations[1] = { id: 'claude-herdr', via: 'cli', adapter: 'herdr-spawn' };
   const result = bind(
     { unit: { id: 'u1', capability: 'code:implement', writes: ['src/foo.js'], rigor: 'standard' }, role: 'producer', independentOf: [] },
@@ -264,7 +277,7 @@ test('bind: independence violation refuses, and accepting the dependence needs a
   for (const origin of ['agent', 'human-cli', undefined]) {
     const refused = bind(accepting(origin), { runnerConfig, session: {} });
     assert.ok(refused.refused, `origin ${origin}`);
-    assert.equal(refused.refused.reason, 'independence');
+    assert.equal(refused.refused.reason, 'independence-unsatisfiable');
   }
 
   // A door that was authorized may accept it.
@@ -417,7 +430,7 @@ test('bind: a blind role skips an in-process candidate for an out-of-process one
   assert.equal(plain.mechanism, 'in-process');
 });
 
-test('nextCandidate: falls back to subsequent candidate on quota/provider-limit', () => {
+test('a walk step falls back to the subsequent candidate on quota/provider-limit', () => {
   const runnerConfig = createMockRunnerConfig();
   const unit = {
     id: 'u1',
@@ -430,13 +443,13 @@ test('nextCandidate: falls back to subsequent candidate on quota/provider-limit'
   const firstBinding = bind(ask, ctx);
   assert.equal(firstBinding.executor, 'claude');
 
-  const secondBinding = nextCandidate(firstBinding, ask, ctx, 'provider-limit');
+  const secondBinding = bind(ask, ctx, { walk: { tried: [firstBinding] } });
   assert.equal(secondBinding.executor, 'codex');
   assert.equal(secondBinding.provenance.fallbackFrom.executor, 'claude');
   assert.equal(secondBinding.provenance.fallbackFrom.reason, 'provider-limit');
 });
 
-test('nextCandidate: walks the prefer pool in order, never revisits a candidate, and refuses when none is left', () => {
+test('the walk visits the prefer pool in order, never revisits a candidate, and refuses when none is left', () => {
   const runnerConfig = createMockRunnerConfig();
   runnerConfig.capabilities['code:implement'].prefer = [
     { executor: 'claude', invocation: 'claude-cli' },
@@ -448,14 +461,14 @@ test('nextCandidate: walks the prefer pool in order, never revisits a candidate,
 
   const first = bind(ask, ctx);
   assert.equal(first.invocation, 'claude-cli');
-  const second = nextCandidate(first, ask, ctx);
+  const second = bind(ask, ctx, { walk: { tried: [first] } });
   assert.equal(second.invocation, 'claude-herdr');
   assert.equal(second.executor, 'claude');
-  const third = nextCandidate(second, ask, ctx, 'provider-limit', { tried: [first, second] });
+  const third = bind(ask, ctx, { walk: { tried: [first, second] } });
   assert.equal(third.invocation, 'codex-cli');
   assert.equal(third.executor, 'codex');
   assert.equal(third.provenance.fallbackFrom.executor, 'claude');
-  const none = nextCandidate(third, ask, ctx, 'provider-limit', { tried: [first, second, third] });
+  const none = bind(ask, ctx, { walk: { tried: [first, second, third] } });
   assert.ok(none.refused, 'no candidate is left, so nothing is guessed');
 });
 
@@ -605,7 +618,7 @@ test('bind spread: families filtered out by governance are not candidates, so th
 test('bind spread: never overrides the hard independence filter', () => {
   const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
   const res = bind(spreadAsk([seatOn('member-1', 'claude')], { independentOf: ['codex', 'gemini-cli', 'claude'] }), ctx);
-  assert.equal(res.refused.reason, 'independence');
+  assert.equal(res.refused.reason, 'independence-unsatisfiable');
   const hardOnly = bind({ unit: SPREAD_UNIT, ...CHECKER, readOnly: true, independentOf: ['claude'] }, ctx);
   assert.equal(hardOnly.executor, 'codex');
   assert.equal(hardOnly.provenance.familySpread, undefined, 'no spread asked: nothing recorded');
@@ -626,7 +639,7 @@ test('bind spread: a provider-limit fallback keeps ranking the remaining candida
   const ask = spreadAsk([seatOn('member-1', 'claude')]);
   const first = bind(ask, ctx);
   assert.equal(first.executor, 'codex');
-  assert.equal(nextCandidate(first, ask, ctx).executor, 'gemini-cli');
+  assert.equal(bind(ask, ctx, { walk: { tried: [first] } }).executor, 'gemini-cli');
 });
 
 test('architecture guard: bind.mjs does NOT import src/state or src/runner/coordination', async () => {
@@ -710,7 +723,7 @@ test('bind prefer: duplicates of a unit candidate are dropped from the capabilit
   while (!bound.refused) {
     walked.push([bound.executor, bound.provenance.executor.source]);
     tried.push(bound);
-    bound = nextCandidate(bound, ask, ctx, 'provider-limit', { tried: [...tried] });
+    bound = bind(ask, ctx, { walk: { tried: [...tried] } });
   }
   assert.deepEqual(walked, [
     ['codex', 'unit-prefer'],
@@ -719,12 +732,12 @@ test('bind prefer: duplicates of a unit candidate are dropped from the capabilit
   ]);
 });
 
-test('bind prefer: nextCandidate after a unit-preferred executor walks into the capability pool', () => {
+test('bind prefer: a walk step after a unit-preferred executor walks into the capability pool', () => {
   const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
   const ask = preferAsk({ prefer: ['gemini-cli'], writes: ['src/a.js'] });
   const first = bind(ask, ctx);
   assert.equal(first.executor, 'gemini-cli');
-  const second = nextCandidate(first, ask, ctx);
+  const second = bind(ask, ctx, { walk: { tried: [first] } });
   assert.equal(second.executor, 'claude');
   assert.equal(second.provenance.executor.source, 'capabilities."code:implement".prefer');
   assert.equal(second.provenance.fallbackFrom.executor, 'gemini-cli');
@@ -739,7 +752,7 @@ test('bind prefer: a unit without prefer binds exactly as before', () => {
   assert.equal(result.executor, 'claude');
   assert.equal(result.pool, 'claude');
   assert.deepEqual(result.provenance.executor, { value: 'claude', source: 'capabilities."code:implement".prefer' });
-  assert.deepEqual(result.provenance.invocation, { value: 'claude-herdr', source: 'capabilities."code:implement".prefer' });
+  assert.deepEqual(result.provenance.invocation, { value: 'claude-cli', source: 'capabilities."code:implement".prefer' });
 });
 
 test('bind persona: the unit persona beats the capability persona and is recorded as the unit', () => {
@@ -769,10 +782,12 @@ test('bind prefer: a bare unit executor id covers every capability entry of that
   const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
   const ask = preferAsk({ prefer: ['codex'], writes: ['src/a.js'] });
   const walked = [];
+  const tried = [];
   let bound = bind(ask, ctx);
   while (!bound.refused) {
     walked.push(bound.executor);
-    bound = nextCandidate(bound, ask, ctx);
+    tried.push(bound);
+    bound = bind(ask, ctx, { walk: { tried: [...tried] } });
   }
   assert.deepEqual(walked, ['codex', 'claude', 'gemini-cli']);
 });
@@ -987,4 +1002,80 @@ test('bind: debate seats never run inline or in-process and are not asked for th
   const judge = bind({ unit: skilled, seat: 'judge', role: 'judge', posture: DEBATE_POSTURE, readOnly: true, independentOf: ['claude'] }, { runnerConfig: skillsConfig(), session: { headless: true } });
   assert.equal(judge.executor, 'codex', 'a judge is chosen on independence alone');
   assert.equal(judge.mechanism, 'out-of-process');
+});
+
+// ---- ranking owned by Seat Binding: pins, effort, inline lead, continuity ----------------------------
+
+const pinnedConfig = (entry) => {
+  const runnerConfig = createMockRunnerConfig();
+  runnerConfig.capabilities['code:implement'].prefer = [entry];
+  return runnerConfig;
+};
+const implementAsk = { unit: { id: 'u1', capability: 'code:implement', writes: ['src/foo.js'] }, role: 'producer' };
+
+test('bind: a hard pin to an invocation the executor does not have refuses the seat by name, and never swaps another invocation in', () => {
+  const result = bind(implementAsk, { runnerConfig: pinnedConfig({ executor: 'claude', invocation: 'claude-missing' }), session: { herdrPresent: true } });
+  assert.equal(result.refused.reason, 'pin-unsatisfiable');
+  assert.match(result.refused.detail, /claude-missing/);
+});
+
+test('bind: a cell effort is carried into the binding as the cell\'s promise and named as such', () => {
+  const runnerConfig = createMockRunnerConfig();
+  runnerConfig.modelPolicies.claude.standard = [{ model: 'claude-3-5-sonnet', effort: 'high' }];
+  const result = bind(implementAsk, { runnerConfig, session: {} });
+  assert.equal(result.reasoningEffort, 'high');
+  assert.deepEqual(result.provenance.reasoningEffort, { value: 'high', source: 'cell' });
+  assert.equal(bind({ ...implementAsk, overrides: [{ reasoningEffort: 'max' }] }, { runnerConfig, session: {} }).reasoningEffort, 'max', 'an override may raise the cell\'s effort');
+});
+
+test('bind: a cell without an effort records the invocation default, which is not a promise', () => {
+  const result = bind(implementAsk, { runnerConfig: createMockRunnerConfig(), session: {} });
+  assert.equal(result.reasoningEffort, null);
+  assert.deepEqual(result.provenance.reasoningEffort, { value: null, source: 'invocation-default' });
+});
+
+test('bind: an override effort below the cell\'s cannot claim the tier', () => {
+  const runnerConfig = createMockRunnerConfig();
+  runnerConfig.modelPolicies.claude.standard = [{ model: 'claude-3-5-sonnet', effort: 'high' }];
+  const result = bind({ ...implementAsk, overrides: [{ reasoningEffort: 'low' }] }, { runnerConfig: pinnedConfig({ executor: 'claude' }), session: {} });
+  assert.equal(result.reasoningEffort, 'low', 'a cell that promises no effort is lowered by nothing: the override is taken');
+  runnerConfig.capabilities['code:implement'].prefer = [{ executor: 'claude' }];
+  const refused = bind({ ...implementAsk, overrides: [{ reasoningEffort: 'low' }] }, { runnerConfig, session: {} });
+  assert.equal(refused.refused.reason, 'effort-below-cell');
+});
+
+test('bind: an effort the executor does not declare, or its CLI cannot render, refuses the seat and lists what is rendered', () => {
+  const limited = createMockRunnerConfig();
+  limited.executors.claude.supports = { reasoningEffort: ['low', 'medium'] };
+  limited.capabilities['code:implement'].prefer = [{ executor: 'claude' }];
+  const declared = bind({ ...implementAsk, overrides: [{ reasoningEffort: 'high' }] }, { runnerConfig: limited, session: {} });
+  assert.equal(declared.refused.reason, 'effort-unsupported');
+  assert.deepEqual(declared.refused.rendered, ['low', 'medium']);
+
+  const blind = createMockRunnerConfig();
+  blind.executors.claude.command = 'unknown-bin';
+  blind.capabilities['code:implement'].prefer = [{ executor: 'claude' }];
+  blind.modelPolicies.claude.standard = [{ model: 'claude-3-5-sonnet', effort: 'high' }];
+  const cannot = bind(implementAsk, { runnerConfig: blind, session: {} });
+  assert.equal(cannot.refused.reason, 'effort-unsupported', 'the cell promises an effort no launch of this CLI can render');
+});
+
+test('bind: with a lead present and every configured candidate refused the seat is refused by name, never run inline', () => {
+  const runnerConfig = createMockRunnerConfig();
+  runnerConfig.governance = { disallowedExecutors: ['claude', 'codex', 'gemini-cli'] };
+  const result = bind({ ...implementAsk, posture: { ...POSTURE, writer: true, inlineAllowed: true } }, { runnerConfig, session: { headless: false, hasNativeAgent: true, provider: 'claude' } });
+  assert.equal(result.refused.reason, 'governance');
+  assert.equal(result.mechanism, undefined);
+});
+
+test('bind: a seat that keeps its candidate keeps executor, model and effort; a failure then refuses it instead of moving it', () => {
+  const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
+  const first = bind(implementAsk, ctx);
+  const again = bind(implementAsk, ctx, { walk: { continuity: first } });
+  assert.deepEqual([again.executor, again.model, again.reasoningEffort], [first.executor, first.model, first.reasoningEffort]);
+  const walked = bind(implementAsk, ctx, { walk: { continuity: first, tried: [first] } });
+  assert.equal(walked.refused.reason, 'seat-continuity-unavailable');
+  const retired = createMockRunnerConfig();
+  retired.modelPolicies.claude.standard = 'claude-retired';
+  assert.equal(bind(implementAsk, { runnerConfig: retired, session: {} }, { walk: { continuity: first } }).refused.reason, 'seat-continuity-unavailable', 'a kept model the config no longer offers');
 });
