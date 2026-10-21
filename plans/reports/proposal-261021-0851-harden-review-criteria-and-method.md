@@ -146,9 +146,67 @@ Còn lại big lead tự quyết trong khung đã duyệt rồi báo.
 - Lead chỉ được báo kết quả đã thấy tận mắt, và phải ghi rõ đã chạy gì.
 - Mỗi lần merge main vào nhánh dài phải soát xung đột ngữ nghĩa, không chỉ xung đột text. Ví dụ đêm qua: phase 02 đổi `roles` thành `seats`, luồng D vẫn gọi `roles`, merge không báo xung đột mà milestone chết lặng.
 
+## 4.7 Ba trọng tâm owner nhấn (09:42)
+
+### a. Code thừa, nhiều đường cho một việc: thấy là tìm cách bỏ
+
+- Ở mỗi tầng, hội đồng lập danh sách các nơi **cùng làm một việc**: phán sống/chết tiến trình, ghi file atomic, tìm `.fgos`, giữ lock, gọi git, đọc config.
+- Mỗi việc chỉ giữ **một cửa**, là cửa của crate sở hữu việc đó. Các đường còn lại chuyển caller sang cửa đó rồi xoá trong cùng đợt.
+- Code không còn caller (kiểm bằng `rg`/GitNexus cộng bằng chứng chạy) thì xoá.
+- Thước đo của mỗi tầng: **số dòng Node + Rust của tầng giảm**, và số đường song song giảm về 1.
+
+### b. Test thừa và vì sao cả bộ test ngày càng chậm
+
+**Số liệu hiện có** (máy owner, 10-20/21):
+- Toàn suite chạy **1046–1316 s**, trong khi baseline ghi 202 s ở `f38dfd1d0`; cần kiểm lại baseline đó đo trên máy nào, lúc tải ra sao.
+- 581 file, khoảng 8 094 `test()`.
+- Từ 10-01 tới nay **thêm 266 file test, xoá 102**.
+- Lần chạy gần nhất có 3 file chạm trần **600 s mỗi file** (`help-routes`, `worktree`, `run-provider-failover`), và tổng thời gian các test cộng lại khoảng 22 700 s.
+- Đếm theo file test:
+  - 162 file gọi CLI hoặc host `fgos` thật;
+  - 169 file chạy `fgos init`;
+  - 49 file tạo repo git;
+  - 117 file dùng herdr hoặc bwrap thật;
+  - 156 chỗ chờ bằng `setTimeout`/`sleep`.
+- Mỗi lần verify đêm qua, khoảng 13–22 file hỏng khi chạy cả suite nhưng xanh khi chạy riêng. Test nhạy với tải là một phần của vấn đề.
+
+**Giả thuyết cần kiểm** (chưa phải kết luận):
+1. Test ở **tầng quá cao**: nhiều hành vi được chứng minh bằng cách spawn CLI/host và chạy `fgos init` thật, trong khi tầng thấp hơn (crate Rust, hàm thuần) đã có thể chứng minh. Nguyên tắc 8 chỉ mới thành luật gần đây, nên test cũ chưa được dời xuống.
+2. **Lặp giữa Rust và Node**: cùng một ca được viết ở cả `cargo test` lẫn Node.
+3. **Quy trình tạo test làm test phình**: mỗi phase/lead thêm test riêng cho cái mình làm mà không gỡ test của cơ chế bị thay, hoặc không tìm test chủ để mở rộng. Ví dụ là 266 file thêm so với 102 file xoá.
+4. **Cơ chế chạy**: concurrency, queue toàn máy, fixture dựng lại cho từng test (`fgos init`, git repo), chờ bằng thời gian thay vì chờ theo sự kiện, timeout 600 s mỗi file.
+5. **Test mang máy thật vào** (herdr, bwrap, process thật) ở những chỗ chỉ cần chứng minh logic.
+
+**Cách làm:**
+- **Ở T0, đo một lần cho toàn hệ:**
+  - thời gian theo file và theo test;
+  - phân bố chi phí: spawn, init, git, sleep;
+  - tách nguyên nhân do cơ chế chạy với nguyên nhân do bản thân test;
+  - truy lịch sử: test tăng ở đâu, vì quy trình nào, so với số đã xoá.
+
+  Kết quả là danh sách nguyên nhân có số liệu, và một đề xuất sửa **quy trình tạo test** để nó không phình lại (ví dụ: cổng trong cook/lead brief bắt phải tìm test chủ và gỡ test của cơ chế bị thay).
+- **Ở mỗi tầng:** soát test của chính component đó:
+  - dời test xuống tầng thấp nhất chứng minh được;
+  - gỡ test lặp giữa Rust và Node, và test của cơ chế đã xoá;
+  - ghi tên test chủ của từng hành vi;
+  - thay chờ theo thời gian bằng chờ theo sự kiện.
+
+  Thước đo của tầng: số test và thời gian test của tầng giảm, độ phủ hành vi giữ nguyên.
+- **Phối hợp với luồng TEST** (máy thứ hai) để không làm trùng. Luồng TEST đang chạy phase 2: mỗi port Rust giữ một test route Node, gỡ bản Node lặp ca Rust. Đề xuất: HARDEN làm phần test của từng component khi tới tầng đó, còn luồng TEST giữ luật chung và công cụ đo (`suite:`, baseline, kiểm test trùng). Nhắn phiên TEST trước khi mở T0.
+
+### c. Chuyển sang Rust: ưu tiên chỗ dễ mà làm hệ thống gọn hơn
+
+Ở mỗi tầng, xếp ứng viên theo **lợi ích gọn hơn / công chuyển**:
+- **Làm trước:** chỗ Node đang tự quyết lại việc mà crate đã quyết (xoá bản Node, Node chỉ còn gọi route). Đây là chỗ vừa dễ vừa giảm code nhiều nhất.
+- **Làm sau:** chỗ phải viết logic mới trong Rust.
+- **Không làm:** chỗ chuyển xong không làm gọn hơn.
+
+Mỗi lần chuyển đều phải qua bảy cổng của mục 3.
+
 ## 5. Owner quyết
 
 1. Thứ tự tầng T0 → T4: khởi đầu ở **Process Facts & Control**, kết thúc ở **Run Supervisor + Launch gate**. Đặt Git cùng Terminal-control ở T2, Event Store ở T3: anh duyệt hay sửa?
 2. Sáu trục, thang mức độ, bảy cổng (mục 2–3) và tiêu chí chuyển Rust (mục 4.3): duyệt, sửa hay thêm?
 3. Land gộp theo mốc (sau T1, sau T3, sau T4), hay land sau từng tầng?
 4. Hội đồng bốn ghế: có giới hạn ngân sách model không?
+5. Điều tra test chậm/thừa: làm một lần ở T0 cho toàn hệ, rồi soát test theo từng tầng; luồng TEST giữ luật chung và công cụ đo. Anh duyệt cách chia này chứ?
