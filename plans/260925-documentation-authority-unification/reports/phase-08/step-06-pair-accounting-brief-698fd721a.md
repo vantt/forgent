@@ -1,0 +1,9 @@
+# Pair accounting brief (through 698fd721a)
+
+Status: Lead brief for the next Doer turn (non-docs accounting).
+
+You are Doer for Phase 8 of plan 260925-documentation-authority-unification in the fgOS repo. One mechanical task, non-docs. You only write files; the runner commits them; never run a git write, never run the fgos CLI, never touch the .fgos directory or read the secrets env file. Writable: only the two phase-06 reproduction manifests plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json and step10-sync4d-reproduction.json. python -B. Scratch /tmp/fgos-work/.
+
+Pair accounting (L12-11), the same procedure the previous turn used in f213a92ec: run env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py, take check A's exact unaccounted commit/path pairs for each manifest (expected 70 per manifest, commits eb2575b06 through 698fd721a) and append each as {commit, path, authority} to the exceptions array of BOTH manifests in the existing format (the exceptions live inside the embedded checks.mjs script string; read how f213a92ec appended them with read-only git show/diff). Authority for each pair: the owner-answers L12 entry its commit recorded (eb2575b06 L12-90, f213a92ec L12-88, e9bf0650e/916116b04/c7ad07459/23cd6ee52/15ecf7b09 Lead briefs and review reports, 00eaad96d L12-93, 38bddcdd7 review, 636dfefef L12-95, ee3e8b64f L12-96, 698fd721a L12-97) — use the same authority wording style as existing entries. Change no other byte. Rerun the reporter: zero unaccounted pairs other than those your own runner commit will create (the two manifest paths).
+
+Final message: first line a conventional commit subject (at most 100 characters, no plan ids, phase or finding labels), then a short Vietnamese summary (anh/em).
