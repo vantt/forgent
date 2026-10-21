@@ -33,7 +33,9 @@ die() { echo "e1: $*" >&2; exit 1; }
 [ -n "$WORK" ] || die "--work <dir on the ext4 disk under test> is required"
 [ -n "$RUN_AS" ] && [ "$RUN_AS" != root ] || die "--user <the checkout's owner> is required (Git refuses repositories of another owner)"
 [ -x "$REPLAY_LOG" ] || die "replay-log not found: build xfstests (git clone https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git && make -C xfstests-dev) and pass --replay-log xfstests-dev/src/log-writes/replay-log"
-"$REPLAY_LOG" --help 2>&1 | grep -q -- '--next-fua' || die "$REPLAY_LOG lacks --find/--next-fua"
+# replay-log prints its usage and exits 1 for --help; under pipefail read the text, not the status.
+usage="$("$REPLAY_LOG" --help 2>&1 || true)"
+grep -q -- '--next-fua' <<<"$usage" && grep -q -- '--find' <<<"$usage" || die "$REPLAY_LOG lacks --find/--next-fua"
 modprobe dm-log-writes 2>/dev/null || true
 dmsetup targets | grep -q '^log-writes' || die "kernel has no dm-log-writes target"
 dmsetup targets | grep -q '^snapshot' || modprobe dm-snapshot
