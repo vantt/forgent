@@ -1401,3 +1401,30 @@ Both unchanged Step 0 extractors agree on complete units for all five changed do
 Step 3 has 5 changed-source records; Step 4 has 2 changed-consumer/source records (`step04-017.jsonl:1`, `CHANGELOG.md`; `step04-030.jsonl:9`, `core/skills/fgos-run/SKILL.md`); Step 5 has 20 changed primary-file/protected-pin records. All are deferred to Step 7 final atomic assembly under L12-58(1). The full Step 5 checker regenerates `step-05-head-drift.json` non-failing at current HEAD: 1,481 files / 7,223 references / 39,876 dynamic tuples / 0 failures / 189 head-drift entries. Runner supplies the real commit; Lead owes ordinary L12-11 actual-commit accounting and independent Step 0 review. No git write, fgOS CLI, docs/code/consumer edit, live state/secrets read, authority flip, generator/build, full npm/cargo or installed parity is claimed. `needsWrites: []`.
 
 L12-11 pair accounting then appends the reporter's exact two outstanding pairs to both protected Phase 6 manifests, changing no other byte in either file: `4be19d6cb9a7e12e97dfd0a2edee9dbcf03e95b7` / `step-06-accounting-brief-ab3eb83d7.md` under L12-98, and the carried `aa0df7deb46ca93fc855f285a59880eb36635c84` / `step-06-pair-accounting-brief-698fd721a.md` under L12-97. The post-append reporter finds zero unaccounted pairs in both manifests; its overall working-tree A remains intentionally non-green until the runner creates this round's real commit, because these authorized accounting outputs are still uncommitted. Frozen B, H and current-reader identity remain green and unchanged.
+
+## L12-99 — Step 7 pre-pin deterministic handoff assembly (Doer, 2026-10-21)
+
+Built `step-07-assemble.py` and ran it at commit
+`9f708a7ebc9b8ab80710b4dd47007515b1bb7081`. The assembler reads the final
+Step 5 owning-item join over Steps 3–5, the Step 3/4 executable record surfaces,
+the 23-family resolution plan, merge accountings and A47 source set. It emits
+the consumer matrix, ordered/rollback patch specification list, readiness
+receipt and preassembly report without editing any disposition or consumer.
+
+Dry-run counts are **46,404 owning rows**: **36,191 applied-safe**, **376
+prepared-for-cutover**, **7,526 preserved-history/fixture** and **2,311
+individually parked**. All 2,311 parks project through exactly one of the 23
+L12-96 families; there are zero unmatched rows and zero alias writer-destination
+violations. Patch ordering contains **204 file/co-cut specifications** and inverse rollback
+ordering. The changed-candidate union contains **48 paths**, conserving A47's
+original 35, L12-1's thirteen incoming paths, subsequent merge-accounting
+additions and the final `docs/platform/**` recomputation; every path remains
+`needs-rebind` in this pre-pin run.
+
+Step 7 is **not ready**. Explicit blockers remain: the final pin; the bounded
+L12-96 state export; Step 6b lease delivery and rehearsal receipts; Plan B
+phase 06 (still draft, while Plan A landed at `a004bb598`); all 16 Step 5 carry
+items; A34, PF-I022/PF-I023, reading-map and holder-lock-header reconciliation;
+P7-DOC-GAP-05 and P7-DOC-GAP-06. This is a dry-run receipt only and makes no
+readiness or cutover claim. The exact final-pin rerun command is recorded in
+`step-07-preassembly-report.md`.
