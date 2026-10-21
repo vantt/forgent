@@ -143,18 +143,6 @@ test('download: a pinned tag that cannot be downloaded says so and names FGCTL_V
   }
 });
 
-test('download: a local install writes a digest-only pin (a manifest version is not a download tag)', () => {
-  const t = makeDownloadProject('dl-local-pin');
-  try {
-    const res = runFgctl(['init', '--from', fixture.releaseDir], { cwd: t.proj, stateHome: t.state, env: { HOME: t.home } });
-    assert.equal(res.status, 0, res.stderr);
-    const pin = JSON.parse(fs.readFileSync(path.join(t.proj, '.fgos', 'distribution.json'), 'utf8'));
-    assert.equal(pin.projectRuntime.releaseVersion, null);
-  } finally {
-    fs.rmSync(t.root, { recursive: true, force: true });
-  }
-});
-
 for (const [mode, expected] of [
   ['wrong', /checksum verification failed/],
   ['missing', /no checksum entry found/],

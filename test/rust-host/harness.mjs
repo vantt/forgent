@@ -289,6 +289,11 @@ export async function runCaseOnEntry(entry, testCase, options = {}) {
       return reject(err);
     }
 
+    // A command that exits without reading its stdin closes the pipe first; its exit and output
+    // are still the result to compare, so only that EPIPE is ignored.
+    child.stdin.on("error", (err) => {
+      if (err.code !== "EPIPE") reject(err);
+    });
     if (testCase.stdin != null) {
       child.stdin.write(testCase.stdin);
       child.stdin.end();
