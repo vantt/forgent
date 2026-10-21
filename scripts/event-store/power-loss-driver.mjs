@@ -8,9 +8,10 @@ import { fileURLToPath } from 'node:url';
 import { sandboxGit } from '../lib/sandbox-git.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { openStore } from '../../src/event-store/index.mjs';
+import { gitAddonDirectory } from '../lib/git-addon-stage.mjs';
 
 const checkout = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const manifestPath = path.join(checkout, '.fgos/runtime/git-addon/manifest.json');
+const manifestPath = path.join(gitAddonDirectory(checkout), 'manifest.json');
 const contractOf = dir => path.join(dir, 'contract.json');
 const repoOf = dir => path.join(dir, 'repo');
 const stateOf = dir => path.join(dir, 'state');
