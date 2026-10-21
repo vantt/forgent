@@ -9,6 +9,7 @@ pub use restore::{RestoreRequest, RestorePreview, RestoreResult};
 mod land;
 pub use land::{LandRequest, LandFile, LandEvidence, LandCandidate, LandSession};
 mod inspect;
+mod objects;
 mod refs;
 mod worktree;
 pub use worktree::{WorktreeCreate, WorktreeDelivery, WorktreeHandle, WorktreeIssue};

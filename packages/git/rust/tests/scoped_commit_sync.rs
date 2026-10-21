@@ -1408,3 +1408,85 @@ fn unknown_commit_recovery_is_an_error_but_pending_intent_can_be_abandoned() {
     assert_eq!(wal::Wal::open(&f.repo).unwrap().compacted("pending").unwrap().unwrap().outcome().unwrap(), wal::Outcome::AbandonedBeforeAttempt);
     assert!(wal::Wal::open(&f.repo).unwrap().inspect("missing").is_err());
 }
+
+/// Counts `object-durable` and checks, at each one, that the operation has no
+/// receipt yet. Optionally refuses the n-th (1-based) one.
+struct ObjectSteps {
+    common: PathBuf,
+    id: &'static str,
+    seen: AtomicU64,
+    refuse_at: Option<u64>,
+}
+impl ObjectSteps {
+    fn new(f: &Fixture, id: &'static str, refuse_at: Option<u64>) -> Self {
+        Self { common: f.repo.common_dir().to_path_buf(), id, seen: AtomicU64::new(0), refuse_at }
+    }
+    fn seen(&self) -> u64 {
+        self.seen.load(Ordering::SeqCst)
+    }
+}
+impl wal::FileSystem for ObjectSteps {
+    fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+        if step != "object-durable" {
+            return Ok(());
+        }
+        let wal = wal::Wal::open_existing(&self.common, wal::OsFileSystem).unwrap();
+        assert!(wal.inspect(self.id).unwrap().outcome().is_none(), "receipt installed before the objects were durable");
+        let n = self.seen.fetch_add(1, Ordering::SeqCst) + 1;
+        if self.refuse_at == Some(n) {
+            return Err(std::io::Error::other("injected object-durable fault"));
+        }
+        Ok(())
+    }
+}
+fn nested_request() -> CommitRequest {
+    CommitRequest {
+        writes: vec!["deep/er/file".into()],
+        message: "nested\n".into(),
+        cutover_grant: None,
+        legacy_events: None,
+    }
+}
+fn objects_of_commit(f: &Fixture, base: &str) -> u64 {
+    git(&f.tree, &["rev-list", "--objects", "HEAD", &format!("^{base}")]).lines().count() as u64
+}
+
+#[test]
+fn scoped_commit_makes_each_new_object_durable_before_the_receipt() {
+    let f = Fixture::new();
+    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+    fs::create_dir_all(f.tree.join("deep/er")).unwrap();
+    fs::write(f.tree.join("deep/er/file"), "new blob").unwrap();
+    let steps = ObjectSteps::new(&f, "durable", None);
+    let result = f
+        .driver
+        .scoped_commit_with_filesystem(&f.repo, f.held(), &baseline, &nested_request(), "fixture", "durable", &steps)
+        .unwrap();
+    assert_eq!(result.status, ResultCode::Committed);
+    // Commit, root tree, two subtrees and the blob.
+    assert_eq!(objects_of_commit(&f, &baseline.head), 5);
+    assert_eq!(steps.seen(), 5);
+}
+
+#[test]
+fn recovery_makes_the_new_objects_durable_before_it_reports_the_commit() {
+    let f = Fixture::new();
+    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+    fs::create_dir_all(f.tree.join("deep/er")).unwrap();
+    fs::write(f.tree.join("deep/er/file"), "new blob").unwrap();
+    let refusing = ObjectSteps::new(&f, "interrupted", Some(2));
+    let refused = f.driver.scoped_commit_with_filesystem(
+        &f.repo, f.held(), &baseline, &nested_request(), "fixture", "interrupted", &refusing,
+    );
+    assert!(refused.is_err());
+    // The commit exists, but no receipt was installed.
+    let committed = objects_of_commit(&f, &baseline.head);
+    assert_eq!(committed, 5);
+    let recovering = ObjectSteps::new(&f, "interrupted", None);
+    let outcome = f
+        .driver
+        .recover_scoped_commit_with_filesystem(&f.repo, f.held(), "fixture", "interrupted", &recovering)
+        .unwrap();
+    assert!(matches!(outcome, wal::Outcome::Commit { contract_violation: false, .. }), "{outcome:?}");
+    assert_eq!(recovering.seen(), committed);
+}
