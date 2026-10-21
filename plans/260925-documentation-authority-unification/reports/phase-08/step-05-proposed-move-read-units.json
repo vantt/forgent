@@ -1,5 +1,5 @@
 {
-  "ruling": "L12-87/R26/R28/R29/R30",
+  "ruling": "L12-90/R26/R28/R29/R30/R31",
   "moveSetPath": "step-05-cutover-move-set.json",
   "moveSetSha256": "3b8f1999d1e2b4b32e5219185ab61493569b8ade135ebebd784ceef5ab2cf5db",
   "units": [
@@ -9276,5 +9276,6 @@
       "coverage": "Complete generated output already owned by exact census joins; original source-state receipt and R26 slots retain custody.",
       "joins": 507
     }
-  ]
+  ],
+  "finalReviewRegeneration": "Existing 43 path decisions and exact R26 joins retained; state-export output slots use the state source dependency, R29 comment co-changes remain with legacyWriterUnit."
 }

@@ -20,6 +20,14 @@ reviewable integration change.
 
 ## Requirements
 
+The Phase 9 cutover change must land these three documentation guards as the same-change replacement for the legacy-docs ratchet it retires (L10), per [L12-89](reports/phase-08/owner-answers.md#l12-89--documentation-guards-at-cutover-owner-2026-10-21-1609):
+
+1. refuse new files under the retired roots (docs/specs/**, docs/architect/**, retired decision files and index);
+2. placement check for new documentation files against the Phase 4 minimum constitution placement rules, installed as placement-glob rows in the existing convention component (packages/convention/contracts/convention.rules.v1.json, docs/platform/convention/spec.md §3.2 reservation) with block posture for the retired roots;
+3. link and anchor check inside docs/platform/**, owned by the doc-health body checks (decision 2026-10-07: convention owns path rules, doc-health reads bodies).
+
+Reuse existing doors (fgos convention, existing doc checkers, pre-commit and doctor registration); no second checker. fgos doc new/classify, duplicate-owner and stale-projection checks stay in Phase 10.
+
 Before source retirement, the Step 10 documentation-navigation owner must complete the independently reviewed entry-by-entry merge of `docs/specs/reading-map.md` into retained `docs/reading-map.md`, preserving its curated document and source-code navigation and checking all destinations. Repoint `AGENTS.md` and all other consumers only with the atomic cutover. The Step 5 reclassify disposition records retention, not a completed merge. Require the reviewed conservation/consumer receipts from [the Step 10 obligations](phase-06-transform-all-platform-areas-as-candidate-material.md#step-10-close) and [owner queue](reports/phase-06/owner-queue.md#root-authorities-cutover-obligations-after-closure-review). Resolve the digest-bound AGENTS two-line A34 residual before root-instruction cutover; no source-to-self retention authorizes its removal.
 
 Phase 7 cutover note (L11-23/L11-25): refresh the main-authored Holder-lock main-door/worktree-admin status header during the main-import step; retain the correct reading-map transition banner and two compounding→knowledge fixes (+10/-2 versus `eab4d617b`, accepted divergence, PARK-PROTECTED-01 closed).
@@ -102,6 +110,12 @@ Determined when this phase is authorized; deliverable paths are listed under Req
 To be detailed when this phase is explicitly authorized (plan.md §5). Deliverables and rules under Requirements are the contract.
 
 ## Success Criteria
+
+Per [L12-89](reports/phase-08/owner-answers.md#l12-89--documentation-guards-at-cutover-owner-2026-10-21-1609), the following guards land in the same cutover change as ratchet retirement:
+
+- [ ] refuse new files under the retired roots (docs/specs/**, docs/architect/**, retired decision files and index);
+- [ ] placement check for new documentation files against the Phase 4 minimum constitution placement rules, installed as placement-glob rows in the existing convention component (packages/convention/contracts/convention.rules.v1.json, docs/platform/convention/spec.md §3.2 reservation) with block posture for the retired roots;
+- [ ] link and anchor check inside docs/platform/**, owned by the doc-health body checks (decision 2026-10-07: convention owns path rules, doc-health reads bodies).
 
 - [ ] only `docs/platform/**` owns maintained platform claims;
 - [ ] no physical legacy platform authority remains;

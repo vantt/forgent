@@ -1,0 +1,4274 @@
+{
+  "inputsUnchangedDuringVerification": true,
+  "inputHashes": {
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-admission-rules.py": "a708946616c3baed8344246c64a21e0f9cc2cff1cda9554fbd97a0797441ed6b",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py": "7ea2fa0e3899f823adf11f15bc6d15daceaa9e34d449f5c60a6c1c1c8a91e291",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-cutover-move-set.json": "3b8f1999d1e2b4b32e5219185ab61493569b8ade135ebebd784ceef5ab2cf5db",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-final-review-closure.json": "7bbed95fc50150eb1713ad6d828f7f67b149641af25c164d8ed6eecd6f036683",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-final-verify.py": "853d4e135559e59d0cdc15866409b8ab0e5ef0fa3b2de15edd4390ad9ba2ec83",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-author.py": "1c00279a0a68e57f8572e4ffb9a2e43b7cf866babda8795dcf27932b96aab1a8",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-packet.py": "996524c4e3dbdf748a0e99f0c34ccbdd59a0ad85ee50de05f6a3eb69590bce2a",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-parity-receipts.json": "254eaa83423ac3a671e204e8f3b925288ffcfe8605f5af84ccb9ba7a19c39520",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-step0.py": "b87ef693f8ce722a4817c825ad306188ae48b01be92bb2087cd3a4b50583d0f2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py": "da570eb0f9be0658daa4c9a7028ae0d7b31d80e26eb5f20945a3b74ff2fd148e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-probes.py": "354891b56926139bedbb7bb0df4d8f916ea8a519e8ea06d4d0b0f5e0e028c950",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-read-units.json": "6b481f93c6e74f209bd3ea779c55dd77ed7c93a78183e1666a476a05af075157",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-rules.py": "2c50a2cfec0c31ea1ad40b2acc0aa3207cbf089b9c7b779bb67449beec1c4106",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/citation-ratchet-roots.jsonl": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl": "e87cdf03429074018e7cb4dd971cb71502dc87b28e17744d3d2c02d0d942ab67",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl": "17b7c1b7dcdcb7232f6d0f6b70bd3fb8cab7dc4bd0555125cd114b5a64f1368c",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-decision-index.jsonl": "b0d59066098cea866605bddc47e349ff3161b66916ae6fee538f013d08c9fe98",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-doc-registry.jsonl": "67ec44c029e74d7cfb9e7f764169cc808f0442ed608c33dd5f35e4267b59b0c3",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl": "2f4e393b752e560880c64117fcf68c7bf6db77608381a7b956160b61b4a4d3b1",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-instructions.jsonl": "7b581f7649fcaeb9d895cf6771a83c006566800191e8a2ae6e2bbf49d8195cb6",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-external-parks.jsonl": "4e208b1b3c88a4bcafe3fa43bc37d48439e2624b22fcaa05f7d0e2ae55f338c8",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl": "30b84c7d491da9b433d37177eb46fc72e06b4c0e87e8a83faaa5163ed14b8678",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl": "2310b97dc4717e62e892233842ddd474e3d1c190d30537eddabf7abb2ec5d711",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl": "cf13194a10a4dbbcc3e36aa5c259efb0b632a5b3010f9cff45a2e567622e6508",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl": "de25139a2e13b7c0728e7c80e8fabddf30e381c7d096075d3485980d560eaf3f",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl": "f19e1253341b1809699a851708ae8a5de23fc4af9df0496323a578d957b0812e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl": "5dfc39c71630b882fe11d4de1f78a01d9139de7b795442d5e31ab403214f533a",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-29.jsonl": "16b3243ccbbb0cb6f425ec8a8e22f499324d440f70a26b00ce8dadeef08f667a",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r19.jsonl": "4518f5cd5b9d7c7bcb2ea7011b2ec4cb713b2904a5705077d372ad97a4e08a5e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl": "41f0e5025fb09dab8bb604ceeb142db1d6e7b3f40c9f0aeefac21571e57f4a9f",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r21.jsonl": "ecb5b2fde3ce6ea7bc6d0e8106015ed41357beca2642328f484349ae94cae396",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-retired-source.jsonl": "c5a1162fe25a719fcd8b7fb7a34fba48dcd93800f0f35c04337a740dd92ff604",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl": "9f3dbb93e32401ffee73df61fb16c6dc4ad97a0313a875ef0e88121930cfbad4",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl": "09ec8fd0291f813ed77cadaa8046b6359d5ba978a2db4f8a4c6d9518cbeeb9da",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl": "1d79a8e3ba873e6294c4838537ff938d951ebedd4931cb428b86a22c9023ce46",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl": "7ece1cb25d2b5a48c70ad1431672d96c415428291f76a01bb1291e3b519e9a92",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-prompt-goldens.jsonl": "6f7aaa44bc6da3619bd9bbb1ba32e6faa9f66691bb04e8fa06738214c78cf423",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file-batch3.jsonl": "56f682625f9cbf357e4edd1a06ea290f461325a7828b00bbfc6477d383d6faf9",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl": "7b927019c9136d3199ffcfd95f371ba4e12a1ddb7deaa902883040e61514b38e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl": "2706ac0823a05e8e066648ddcc0f736c5b888ddd08f4560777e7750c5c59f3b2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/ui-spec-compiler.jsonl": "26a1696b517677964d62c387a54b503c8ecf2f2f4a6ec809d25fad60c8c8d6c7",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-author.py": "1453dcfa6dfc3ef5d610a53b3d1aca0c47f1c78520c75e461753a163c2f48fee",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-callers.py": "c74bb6c175c46374650f2bad083cf1d1a5011493997db3c68619340204444cd2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check.py": "50d9337f7e921017b2f72b66b7010b6f1a6fb49b6b20ea7988fddfbb59d0fecb",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-closure.py": "d6e9613e284fafdfab8eb22eddace334c3aa355befd55394c8aeb845572fb425",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-complete.py": "858bdff36bbd0d521ea020b20008bd33ef8829c0ccec5fd7288bd14e5245ff4d",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-field-roles.py": "698aa84fc6dc824f3735f164c0b294e257397f1545a0ac4f594e4bb5f1aa6cae",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-final-corrections.py": "d9e9a7a7c18e0ae530808e9e9de8bd6e4d2a65e285f502cd8524e1993a2fd041",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-finalize.py": "630edd98983dc704bce579a55b27decf9a30796d66d0bcc219771a287b30a673",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-complete.py": "6cddf7f7e1e476adfec19ee0b020ec5c57d1e910fe226e4655860e8a14dcd7ef",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-handback.py": "b3e5027848fbf2ebb99a63fcbb4354c049c05deba052ba6edd3f9ec511392d48",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-refinements.py": "c64025ebc37b84db575ceb527e79af813ba84cd5f77683df5a89747ac8de2f47",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-specs.py": "f9ab069822227f2ce85d07fd324c0b3f01ffded87df0e605c6bdae893687afe2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2.py": "99ce6877d15e5680a78b21805359d13b9bb75fa7dfb5f0ef82ae85da6fa2b3df",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-handback.py": "53a5dac6a691acdb6c8822edefba7e6f96f9f987b990247135d775dcb51161af",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-input-roles.py": "2c469c6c033c19aae95bbaa63fc654c1e1cce221a4ef5d54b9e945d1e521332b",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-joins.py": "2d329d6132483ce0a0fca5c87bb794acf4b5905c4134a7ac8e7001cc157d7270",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-operand-final.py": "4cba8033d82f2434ab654701f4ad98945a940d532fa3a67188be4972285bdb37",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-operands.py": "61177412731f3162c363bcca8c7d8520147c120be3e720c22c3c381a8cf6dee8",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-packet.py": "efefeaa094f76dee4509cd625c9bd93e076188d35e637ef71d16edf9fcd2f3a4",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-parity-receipts.json": "de2031434dfa546a357c869e4165162a9018da996bc134af35af785472b3cd82",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-path-operands.py": "18f4f38ae0a29c48e51192ec81e8a3aeadba9badb7143fb86f62fecfa5b8def3",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py": "6085df06c5eb26767aafa6d6a11dc92d9d9e4d390c3c5298a5ede980124500ab",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-refine.py": "05fb866bec4a2b49cc2dfb4336f430a7d35ff4f4621779a9b8f60e4a2a2f9fd5",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-rereview-list.json": "4d8d09ea79e6d2e068a6d25cb5eebc0be6cb932f2e79d51deae6c6ca3af0301e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-rulings.py": "fbaedbed8a71f621784844fabff8d4238d67470e526f74613653d9370c6348d7",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-review-closure.py": "123d9becac8dbd7c0a8595ee1ea33b55fdf6123722923e4cd3667ecb04863b84",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-review-finalize.py": "fb758b30260609470a65828e373b8b29a22c1e0dfa68657178dbdb932fff5849",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-review-refine.py": "a671933776b553ae36c4aac53fdd1d74ea92fe9112a5aace9dbcad9af6234d4f",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-review-refresh.py": "2804eb0a66274e02050d054d0174ba8922b591f966b438fdc920b12ef0bc272e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-review-replay.py": "34567bfe5f001d91f151cadb00a441d607729049cf76245ca1510a22d44cca23",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-review-verify.py": "3915d0127c41db002b2b5666a5fb72edb6f1f6643d59d4efc0b8cce82b476e6a",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes.py": "a41e9243dd18de7029d909f8e1a009d626eff4c6dab8ebe4c5b87cd4e7abc79e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-replay-tests.py": "e913384ab66048e7f2d0d8e808cba30487149b6fc2e5dd6147bc8fbeeda8f037",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-verify.py": "cab3d069c85d926e14f265aeb85c42bbc08b9299e342ac2afe1442eefeb7add0",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-author.py": "2f2eee1634be0b881cb70ddd67b151a59d8b9abc29fd89137bdf41a49a5971e2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-index.py": "f3f7522c4fea4901586d70b6763b9264d3eafa83daea8d971c9c682822e9cd7e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-judgment-check.py": "31c46cd05ab95fd706b7ac528b776f95f3176647a624829c1635cd0bd98e5895",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes.py": "eaed7aa4684604d7c5ed16eec9278b6477cd6ef8addabfb9580484bc9b070138",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-replay-tests.py": "1241514aa13293a0d677020840389bb4f0964d189d2a798fcbaa33fd2558dce5",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-verify.py": "34d31bc8737288e5c099b1760606bab2e2e082d8e810903b831611261663ae47",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-author-judgment.py": "b5fee8397ff34bf7c2c0363cd075e32420e36977caa9145b08b2ac7f1ac6471c",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-author-neutral.py": "9535d3266d4d21d5db6f337968aa10405027688db944bddcbc1295ba1f933dde",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-index.py": "7a24abedb90abcb6ff631dc7ad93fb112f8a020c3915b28607e8c294061de6fd",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py": "ec07e5925fd8a62d2d914101bb999e4f50c4a65d336f475fb07e2d648d218936",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-parity-receipts.json": "bb430424a65f9b79d9845da1c0ee5f2002cb042dde3c602d7657854fb863d02c",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-probes.py": "58fbece70a1dcc940b3f277a50382d018b575d467b5ea5c996bc93bedcfea412",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-verify.py": "24650bc90c7fa6401f8f7a59d385b97588466527c42db4cd75d475613c40450e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-author.py": "f6d5e7fda9fad7062f81731a754b0d7de5b7d3529e9a91d3a144632e25385a6b",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-index.py": "ac3a8a6ad2216d3c8c05bea3113a195b7a6b3a69062969df3691603ca7e08554",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py": "70112e78d4bff0a102ab4e40fdb2a07f603c12beb647be611801d583b084885c",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-measure.py": "f6970044e7ee8d4a5b631a19c1a6f08fd48b066ab5e04a2b6399c3af85a8ed00",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-parity-receipts.json": "d2d19099915daa8c0c31420dc99097c76c39063a60f95f248bd0b62704a033a0",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes.py": "26e8efb19b0d1a6e9385cb065cda8295a83c363b6c2a7378ea2115a37542704e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-replay.py": "b468b6f58660625cf4a8a7817fe27dbf727bcf6744dbac9ed5a9260d33f932de",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-review-closure.py": "311c14e3e27d2f7c7dc3b69e21e94b3837e7e215e46ff2624cfa8d2db7d9f589",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-verify.py": "3ed930f785d47c681e697e2fb955a5468c14544835d644a53f6bcacfbaf98afc",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-author.py": "b909fff02794c6ad6d6e3ac9dfafc5c88f51219d39b758c2a7570d568562bfe0",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-check.py": "084e41e416ba98297bc8bf82590743b84343bb935e66353a77dc584bf9e182b1",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-closure.py": "7c0d4600872fa67f60068dbf45715e614d9d7bcec29bfa1a6438cd3e09a0aacc",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-comment-audit.py": "2ffd42b1a851f08399f0e1293c72fb0c53dea431f1214f6095ff3740ca332c6c",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-finalize-records.py": "8e645b2952f222e883bf1af734b39fcb9676ef3928aa47476aa5a68a0899d10a",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-index.py": "ff27961b3f718ea0d636546725621c7bdbf9ad1483af2bcd2b75758e29fae570",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-parity-receipts.json": "59e24cfc49377d83492375889ee8d41939d00200b520b295d8c06bda357872df",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-patch-spans.py": "8bd8fb9233c295c706fb336194480110b0a318df947957c07914f38cca9c3770",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-probes.py": "6065aace9078a2a65a9c391bb46837775c8388491016628870da9ee75dac5f56",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-refine.py": "0c95afafa87beeb31cd7d11e83c803a2b23a16e3899b5a23547921a492e9db14",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-run-probes.py": "21e417250ea8962e9fe492b8e4dcc189756292abe3869483a28d0d8dc0d88764",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-author.py": "e6cc06711b897eb086b1accd62efbc1c382022748459956f065f220927216587",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-check.py": "9d7a13e482987a6ee50bf968c7e1937b613fb87533941a89eb0ff448b33d7c57",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-closure.py": "f7bdf64f98075ac05f80e0a3dccf94fac136d41d255d9d4d6ba22047434e5ac6",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-deferred.py": "9091b960402c4a99cfc6a1ec9b0f78917f7d4ade832dc86275ffaf8b7724af85",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-index.py": "5bf88c88a815612f25e207fdc3506904afa5dd7f7b95454f84f5a58aae1f95c2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-parity-receipts.json": "6239932291675cc226d47a63029eb415916c2911f3ad7d55b5cd5f23a17e5636",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-probes.py": "77d42fa47e5728d143e3b079301ced642fc5bc3691ac72066aa64f40def5c5e8",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-prompt-replay.py": "aa098e5030f19d564543fed94e99970cb11fddcb4fd88c0e430756765295a22e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-refine.py": "981af5ef04d45f92249382a0b05ee97c276d3688990d6547dcd6c1578d0e5c93",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-relocation-audit.py": "43482917c49a0629b35f5577fd459c4855e87552679c78514c128fcbf64710cb",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-seal.py": "75756df857f24bcca08f63d8eb8396a33d3b4850249ff3dd150db88d333f7de2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-triage.py": "c0ebbaa9977e1158663a5ca30733c8aa0c641d1e321497aa72f5bfb8e89893a0",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-verify.py": "525b87cc308ebf461cc3882cf915a0e8fe87a2bd803be852ffdd5f05aa1074db",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-worker-replay.py": "dbd953782329044356c50f9c04b0c46f692679f4ab8881a6d4636a84b4b18abd",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-bulk-rules.py": "b10e106669fb9147fb21e5b90c7ff000511fe18d17b603af32b30343ce93ad04",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-check.py": "7bf82a23b82e0e513f0632dcf18e6dcbe6d18f5407adb8a2eb2c10962b7e8c88",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-judgment-check.py": "ff3ade91c03d6103209f48b40a5b9d6f60ecf44aedb74cd394edcbeba6f5ae7b",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-neutral-rules.py": "d7c96a9fd7307206fe4098249a29b781d44158beafda88f83113c0fe3f12e5da",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-parity-receipts.json": "53a83643e8608ee239fbd9bd48d05c0eb9e5d3a696fb50007a0b1cf4d8a721b1",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes.py": "cf5e6fa04562cb2aa35aef2eac7890def60e4790bba7b0a0ef62d864fa4bfc61",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-review-list.json": "78979f1691bde25624f723846b48bfcb61d6d6a3f95f1d48b7b6f360522485ab",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-root-rules.py": "4caf280e5d667bad7b312a5e85bffc27184713b354c9c50f72f1e3b3b18bd8b9",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-author.py": "face21742432e0f98d3f887eaf1d53ffbddf743c60a481b24ef784fdd925d240",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-callers.py": "ff12815222b6e6c4173759a51e9c3f776b41929c6650066f79fd036936496611",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-check.py": "387fa351c6126265446803bd7584f97ed95f3a8cd571e03e6b1e0f9d3cfa4464",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-final-inputs.py": "a0eac68950cc2f6beacd684ef62ae6556e3518a6046358070ab28f9a6f12df7c",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-finalize.py": "cf70232ca50e48413c8d167291de093c592149e3820fbd728aa4e9d8b565763f",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-last-notes.py": "010d2ff22c70167683cc7174909571e8bfdbde16fb816752ae86c303836f78a3",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-parity-receipts.json": "c896ea33acb0e7ac0a370a4e71a499354a6103248e1c8fa0fcd8191edfe53543",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-probes.py": "f9d236fb7606558049b49a809e2e51795bb68c5cffe07db9cca59d9ab71af2d8",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-refine.py": "3747f40ee0399231fd50c96f3c7ac4b134524f8b6f75347744fc5f7b6c7edac2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-refresh.py": "a2aa423489ec329819bd28dbfc3bfaccb701f81b1af88d97da91477818c19de1",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-revalidate.py": "3f0e67dd540ed7b200e8bd84222fe778f979f4e5ee5030d62573c5b898e7887d",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-review-closure.py": "0dc3e6bfd68947bc833dbf39c21c0e14c9f5233675a2c8d0baf331e140dc9ba4",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-review-list.json": "8adc89bce6d99014f91f6df29d6e6f1a535c8828bb2c9c456cece30f453818ea",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-seal.py": "f054614c8fcd537587ccf005432c60855a27bb4a74a7971e4b41afa8c66c22ed",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-task0-rules.py": "c4eb5e9374a591f7e5ad34a374fa507847737c345fd8f0b4edfc57f6b2cce2b6",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-verify.py": "848f92f146c1861713d008b2f4134c3e167ce447472e380978a8f5722017ee18",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py": "a61e54041060ec2a2efd5d2b36d426af28e31bbe14aa0c629b026f45c6fa53ba",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-parity-receipts.json": "3d3adf7951965868f67d1076f67b8c9fa51a07e9d2c00a6d1f9b90a27cceb327",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-proposed-move-read-units.json": "bae9d236eba91d8d68fbf6793b12f84588d64a7448ab7c7076367ea7865de59d",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-review-list.json": "5507fcd4efd26bacb48a33a02c9470c1a40545a9fa4ccdabc71eb9d7c6448ef1",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-verify.py": "ba5f232c59cd3682e72da3b28c5b846b887d4c51814cff2986664e27f441e439",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-state-tree-sweep.json": "34a04c18c842169dc58487e620666e164efbdf78d950a31d26e99e31100fbe79"
+  },
+  "ruling": "L12-90",
+  "ok": true,
+  "proofs": [
+    {
+      "label": "full",
+      "script": "step-05-check.py",
+      "arguments": [],
+      "startedAtNs": 1792577135287351350,
+      "completedAtNs": 1792577440894105315,
+      "exit": 0,
+      "ok": true,
+      "resultFresh": true,
+      "sourceSha256": "7ea2fa0e3899f823adf11f15bc6d15daceaa9e34d449f5c60a6c1c1c8a91e291",
+      "scratchLog": "/tmp/fgos-work/final-verification/full/command.log",
+      "logSha256": "65fc2716d6dcffd97e4a4750fc819fd22c1d2d9af909cb3ac0f7d1e2652e36cb",
+      "scratchResult": "/tmp/fgos-work/final-verification/full/step-05-full-check-result.json",
+      "resultSha256": "cd689fe0a87b5658f94cb5c44f7403075be0f5bd3c2997eb14ece453b3e00425",
+      "counts": {
+        "failureCount": 0,
+        "files": 1481,
+        "literalReferences": 7223,
+        "dynamicTuples": 39876
+      }
+    },
+    {
+      "label": "pilot",
+      "script": "step-05-probes.py",
+      "arguments": [],
+      "startedAtNs": 1792577440914700730,
+      "completedAtNs": 1792577649478368515,
+      "exit": 0,
+      "ok": true,
+      "resultFresh": true,
+      "sourceSha256": "da570eb0f9be0658daa4c9a7028ae0d7b31d80e26eb5f20945a3b74ff2fd148e",
+      "scratchLog": "/tmp/fgos-work/final-verification/pilot/command.log",
+      "logSha256": "24542e1a5bfef117628b55b155fbd6a0fb7d6879a8a4adb44fa6e8905431dcc6",
+      "scratchResult": "/tmp/fgos-work/final-verification/pilot/step-05-pilot-probes-result.json",
+      "resultSha256": "70a1eb60ab0741b80ac862a0062e6d973587130c713ff1bba510dfb809275093",
+      "counts": {
+        "passed": 46,
+        "total": 46,
+        "baselineFailures": 0
+      },
+      "probeResults": {
+        "kind": "Step 5 checker mutation probes",
+        "baselineFailures": 0,
+        "rulesCovered": [
+          "a-passage-agreement",
+          "b-real-blocker",
+          "c-render-owner",
+          "co-cut-grep",
+          "coverage",
+          "d-own-operand",
+          "dynamic-operand",
+          "e-retired-successor",
+          "fixture-provenance",
+          "gateway",
+          "generated",
+          "inherited-outcome",
+          "message-deltas",
+          "missing-proof",
+          "park-index",
+          "parks",
+          "passage-outcome",
+          "patches",
+          "pinned-passage",
+          "r11-plans-boundary",
+          "r30-state-operand",
+          "receipts",
+          "rejections",
+          "retiring-retained",
+          "review",
+          "setup",
+          "source-pins",
+          "source-spans",
+          "targets"
+        ],
+        "probes": [
+          {
+            "name": "Omitting one selected literal fails complete coverage",
+            "owningRule": "coverage",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "coverage",
+                "where": "literal population",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Dropping a dynamic superset tuple cannot silently shrink admission",
+            "owningRule": "coverage",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "coverage",
+                "where": "dynamic population",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Changing a frozen original tuple is rejected",
+            "owningRule": "coverage",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "coverage",
+                "where": "apps/fgos-gateway/src/gateway.rs:dynamic-000661",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Whole-file digest drift cannot inherit acceptance",
+            "owningRule": "source-pins",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "source-pins",
+                "where": "apps/fgos-gateway/src/gateway.rs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Untrue whole-file read declaration is rejected",
+            "owningRule": "source-pins",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "source-pins",
+                "where": "apps/fgos-gateway/src/gateway.rs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A prior canonical record digest cannot be changed",
+            "owningRule": "source-pins",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "source-pins",
+                "where": "apps/fgos-gateway/src/gateway.rs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Physical token corruption is rejected",
+            "owningRule": "source-spans",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "source-spans",
+                "where": "apps/fgos-gateway/src/gateway.rs:reference-000161",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Generic unrelated rejection without own passage is rejected",
+            "owningRule": "rejections",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "rejections",
+                "where": "apps/fgos-gateway/src/gateway.rs:reference-000171",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A rejected comment cannot carry a behavioral patch",
+            "owningRule": "rejections",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "rejections",
+                "where": "apps/fgos-gateway/src/gateway.rs:reference-000171",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A park without its blocker is rejected",
+            "owningRule": "parks",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "parks",
+                "where": "apps/fgos-gateway/src/gateway.rs:reference-000161",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "An unrelated extra full-file hunk is rejected",
+            "owningRule": "patches",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "patches",
+                "where": ".githooks/pre-commit",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A wrong candidate output digest is rejected",
+            "owningRule": "patches",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "patches",
+                "where": ".githooks/pre-commit",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Missing inverse rollback is rejected",
+            "owningRule": "patches",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "patches",
+                "where": ".githooks/pre-commit",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Frozen decision-index rename copy is not a generator target",
+            "owningRule": "targets",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "targets",
+                "where": ".githooks/pre-commit:reference-000110",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "An alias writer destination is refused",
+            "owningRule": "targets",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "targets",
+                "where": ".githooks/pre-commit:reference-000110",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A diff on a generated output is refused",
+            "owningRule": "generated",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "generated",
+                "where": "docs/decisions/index.md",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A missing receipt comparison field is rejected",
+            "owningRule": "receipts",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "receipts",
+                "where": "gateway-contract-pilot",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A missing per-file seam receipt join is rejected",
+            "owningRule": "receipts",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "receipts",
+                "where": "apps/fgos-gateway/src/gateway.rs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Missing HTTP proof cannot become pass without execution log",
+            "owningRule": "missing-proof",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "missing-proof",
+                "where": "gateway-contract-pilot:HTTP body bytes/content-type/fresh read; missing/unreadable/invalid UTF-8 500 JSON fields; MCP missing/read/YAML-parse-error parity",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A proof log digest is validated against actual bytes",
+            "owningRule": "missing-proof",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "missing-proof",
+                "where": "gateway-contract-pilot:Raw body files and complete parsed OpenAPI equality; 21 operations and 7 schemas",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "HTTP file equality cannot replace missing response proof",
+            "owningRule": "gateway",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "gateway",
+                "where": "gateway-contract-pilot",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Missing-file HTTP JSON status drift is detected",
+            "owningRule": "gateway",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "gateway",
+                "where": "gateway-contract-pilot",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "An unreviewed instruction scan-root delta is detected",
+            "owningRule": "setup",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "setup",
+                "where": "setup-doctor-roots-pilot",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A dropped emitted-message intentional delta is detected",
+            "owningRule": "message-deltas",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "message-deltas",
+                "where": ".githooks/pre-commit:reference-000110",
+                "error": "condition false"
+              },
+              {
+                "rule": "message-deltas",
+                "where": ".githooks/pre-commit:reference-000111",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Oversized or unbound review payload metadata is refused",
+            "owningRule": "review",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "review",
+                "where": "historical packet step-05-pilot-p01.json",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Synthetic fixture cannot lose constructor/test provenance",
+            "owningRule": "fixture-provenance",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "fixture-provenance",
+                "where": "apps/fgos-gateway/src/gateway.rs:reference-000169",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Every admitted reference retains its owning proof command or explicit missing",
+            "owningRule": "receipts",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "receipts",
+                "where": "apps/fgos-gateway/src/gateway.rs:reference-000161",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Same-passage template cannot silently preserve a patched literal",
+            "owningRule": "passage-outcome",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "passage-outcome",
+                "where": ".githooks/pre-commit:reference-000111 / dynamic-000571",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Prior Step 4 gateway park cannot become preserve without override",
+            "owningRule": "inherited-outcome",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "inherited-outcome",
+                "where": "apps/fgos-gateway/src/gateway.rs:reference-000161:class6-l-000026",
+                "error": "'priorSlotKey'"
+              }
+            ]
+          },
+          {
+            "name": "Unpinned evidence cannot authorize inherited disposition override",
+            "owningRule": "inherited-outcome",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "inherited-outcome",
+                "where": "apps/fgos-gateway/src/gateway.rs:reference-000182:class6-l-000023",
+                "error": "'priorSlotKey'"
+              }
+            ]
+          },
+          {
+            "name": "Relocation park cannot bypass exact pinned passage check",
+            "owningRule": "pinned-passage",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "pinned-passage",
+                "where": "src/setup/instruction-registry.mjs:dynamic-014034",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Scalar metadata cannot be admitted by borrowing nearby path prose",
+            "owningRule": "dynamic-operand",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "dynamic-operand",
+                "where": "src/setup/instruction-registry.mjs:dynamic-013988",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Patch cannot omit pinned old-string test grep",
+            "owningRule": "co-cut-grep",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "co-cut-grep",
+                "where": "src/runner/merge.mjs:reference-003749",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Receipt cannot omit a matching owning test from atomic co-cut set",
+            "owningRule": "co-cut-grep",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "co-cut-grep",
+                "where": ".githooks/pre-commit:reference-000110",
+                "error": "condition false"
+              },
+              {
+                "rule": "co-cut-grep",
+                "where": ".githooks/pre-commit:reference-000111",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Array-join warning template cannot masquerade as a path operation",
+            "owningRule": "dynamic-operand",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "dynamic-operand",
+                "where": "src/setup/model-pool-checks.mjs:dynamic-014072",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Whole-file census grep cannot lose post-census comment custody",
+            "owningRule": "coverage",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "coverage",
+                "where": "whole-file census versus grep src/setup/registrations.mjs",
+                "error": "unaccounted pinned legacy-root grep hit at 6659: docs/specs/workflow.md"
+              }
+            ]
+          },
+          {
+            "name": "A retiring target cannot preserve on a retained witness",
+            "owningRule": "retiring-retained",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "retiring-retained",
+                "where": "src/setup/registrations.mjs:reference-003819",
+                "error": "retiring tree cannot be a retained witness"
+              }
+            ]
+          },
+          {
+            "name": "All-pairs shared literal/template operation cannot diverge",
+            "owningRule": "a-passage-agreement",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "a-passage-agreement",
+                "where": ".githooks/pre-commit:reference-000111/dynamic-000571",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Listed boilerplate is rejected even with a file prefix",
+            "owningRule": "b-real-blocker",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "b-real-blocker",
+                "where": "apps/fgos-gateway/src/gateway.rs:dynamic-000664",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A rendered file cannot lose its exact source owner",
+            "owningRule": "c-render-owner",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "c-render-owner",
+                "where": "apps/fgos-gateway/src/gateway.rs:reference-000161",
+                "error": "'sourceOwner'"
+              },
+              {
+                "rule": "c-render-owner",
+                "where": "apps/fgos-gateway/src/gateway.rs:reference-000162",
+                "error": "'sourceOwner'"
+              }
+            ]
+          },
+          {
+            "name": "An admitted tuple cannot omit its own pathOperand",
+            "owningRule": "d-own-operand",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "d-own-operand",
+                "where": ".githooks/pre-commit:dynamic-000571",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A preserved retired decision cannot lose its live successor",
+            "owningRule": "e-retired-successor",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "e-retired-successor",
+                "where": "apps/fgos-gateway/src/gateway.rs:reference-000162",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "R12 rejects same-file operand and line substitutions in template blockers",
+            "owningRule": "b-real-blocker",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "b-real-blocker",
+                "where": "src/cli/command-registry.mjs:reference-003641",
+                "error": "condition false"
+              },
+              {
+                "rule": "b-real-blocker",
+                "where": "src/cli/command-registry.mjs:reference-003643",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "R11 rejects a plans-only default even when called through a gate",
+            "owningRule": "r11-plans-boundary",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r11-plans-boundary",
+                "where": "scripts/check-doc-constitution.mjs:dynamic-006605",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A registry alias message cannot hide behind scalar rejection after clearing its state marker",
+            "owningRule": "r30-state-operand",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r30-state-operand",
+                "where": "src/setup/registrations.mjs:dynamic-014385",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Every park must remain in its record parked index",
+            "owningRule": "park-index",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "park-index",
+                "where": "src/setup/registrations.mjs:reference-003802",
+                "error": "condition false"
+              },
+              {
+                "rule": "park-index",
+                "where": "src/setup/registrations.mjs:reference-003816",
+                "error": "condition false"
+              }
+            ]
+          }
+        ],
+        "passed": 46,
+        "total": 46,
+        "failures": []
+      }
+    },
+    {
+      "label": "seam4",
+      "script": "step-05-seam4-probes.py",
+      "arguments": [],
+      "startedAtNs": 1792577649479088580,
+      "completedAtNs": 1792578141837753656,
+      "exit": 0,
+      "ok": true,
+      "resultFresh": true,
+      "sourceSha256": "6085df06c5eb26767aafa6d6a11dc92d9d9e4d390c3c5298a5ede980124500ab",
+      "scratchLog": "/tmp/fgos-work/final-verification/seam4/command.log",
+      "logSha256": "cf248f806da6d83f0cb605fa6ade818488156ba389516a79990bf2f4201f4220",
+      "scratchResult": "/tmp/fgos-work/final-verification/seam4/step-05-seam4-probes-result.json",
+      "resultSha256": "d44e4eeba692275610d78233b895925bf828d74e4f7ceac598df17c2fe258d27",
+      "counts": {
+        "passed": 36,
+        "total": 36,
+        "baselineFailures": 0
+      },
+      "probeResults": {
+        "kind": "Seam4 rejecting mutation probes",
+        "baselineFailures": 0,
+        "headOnlyDrift": {
+          "pass": true,
+          "reportedFiles": 253
+        },
+        "rulesCovered": [
+          "a-passage-agreement",
+          "b-real-blocker",
+          "c-render-owner",
+          "d-own-operand",
+          "e-retired-successor",
+          "park-index",
+          "r11-plans-boundary",
+          "r30-state-operand",
+          "s4-carries",
+          "s4-coverage",
+          "s4-greps",
+          "s4-inheritance",
+          "s4-lexical",
+          "s4-operand",
+          "s4-outputs",
+          "s4-parks",
+          "s4-patches",
+          "s4-pins",
+          "s4-receipts",
+          "s4-retiring-retained",
+          "s4-review",
+          "s4-spans"
+        ],
+        "passed": 36,
+        "total": 36,
+        "probes": [
+          {
+            "name": "Dropping a promoted generated-output reference cannot shrink coverage",
+            "owningRule": "s4-coverage",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-coverage",
+                "where": "reference set",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "False whole-file digest is rejected",
+            "owningRule": "s4-pins",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-pins",
+                "where": "docs/decisions/index.md",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Forged current physical token is rejected",
+            "owningRule": "s4-spans",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-spans",
+                "where": "docs/decisions/index.md:reference-000310",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Inherited source-slot identity is not a copied approval",
+            "owningRule": "s4-inheritance",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-inheritance",
+                "where": ".agents/skills/_shared/capability-catalog.md:reference-000001",
+                "error": "list index out of range"
+              }
+            ]
+          },
+          {
+            "name": "Scalar glob guard cannot become an admitted path operation",
+            "owningRule": "s4-operand",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-operand",
+                "where": "src/report/capability-plan-lint.mjs:dynamic-009709",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Document currentPath comparison cannot be discarded as unrelated scalar",
+            "owningRule": "s4-operand",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-operand",
+                "where": "src/report/knowledge-resolver.mjs:dynamic-009810",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A park must keep its own dependency",
+            "owningRule": "s4-parks",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-parks",
+                "where": "docs/decisions/index.md:reference-000310",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Retiring-root target cannot use a retained witness",
+            "owningRule": "s4-retiring-retained",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-retiring-retained",
+                "where": "scripts/check-doc-retirement.mjs:reference-002490",
+                "error": "retiring tree is not retained"
+              }
+            ]
+          },
+          {
+            "name": "Full-file after hash cannot be invented",
+            "owningRule": "s4-patches",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-patches",
+                "where": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Inverse rollback must restore pinned bytes",
+            "owningRule": "s4-patches",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-patches",
+                "where": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+                "error": "patch unexpectedly ends in middle of line\npatch: **** Only garbage was found in the patch input.\n"
+              }
+            ]
+          },
+          {
+            "name": "Test grep proof cannot disappear",
+            "owningRule": "s4-greps",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-greps",
+                "where": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Generated output cannot receive a manual diff",
+            "owningRule": "s4-outputs",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-outputs",
+                "where": "docs/decisions/index.md",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Sorted output set cannot claim an invented digest",
+            "owningRule": "s4-outputs",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-outputs",
+                "where": "static output set",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Unrun generator parity cannot become a pass",
+            "owningRule": "s4-receipts",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-receipts",
+                "where": "generators-decision-index",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "One of 165 inherited pilot ids cannot disappear",
+            "owningRule": "s4-carries",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-carries",
+                "where": "original identities",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "One original unresolved carry cannot disappear",
+            "owningRule": "s4-carries",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-carries",
+                "where": "original identities",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Whole-file lexical occurrence cannot disappear",
+            "owningRule": "s4-lexical",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-lexical",
+                "where": "complete whole-file census versus grep",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Oversized review part metadata is rejected",
+            "owningRule": "s4-review",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-review",
+                "where": "historical packet step-05-seam4-p01.json",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Missing source caller declaration is rejected",
+            "owningRule": "s4-spans",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-spans",
+                "where": "src/report/decision-index.mjs:dynamic-009758",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "An invented owning test cannot count as proof",
+            "owningRule": "s4-receipts",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-receipts",
+                "where": "generators-decision-index",
+                "error": "Command '['git', '-C', '/home/vantt/projects/forgentX-phase00-documentation-authority-unification', 'show', '95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf:test/invented-missing-proof.test.mjs']' returned non-zero exit status 128."
+              }
+            ]
+          },
+          {
+            "name": "An uncomputed generated intermediate cannot claim a candidate hash",
+            "owningRule": "s4-receipts",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-receipts",
+                "where": "generators-skills-and-support",
+                "error": "uncomputed generated intermediate cannot use current hash as candidate proof"
+              }
+            ]
+          },
+          {
+            "name": "Equal alias and capture strings cannot borrow each others field role",
+            "owningRule": "s4-spans",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s4-spans",
+                "where": "docs/doc-registry.json:reference-000387",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Literal-literal same passage admission is all-pairs",
+            "owningRule": "a-passage-agreement",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "a-passage-agreement",
+                "where": ".agents/skills/_shared/capability-catalog.md:reference-000001/reference-000002",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Dynamic-dynamic nested path operation must agree",
+            "owningRule": "a-passage-agreement",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "a-passage-agreement",
+                "where": "src/report/enduser-index-generate.mjs:dynamic-009775/dynamic-009776",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Literal-dynamic shared retained root must agree",
+            "owningRule": "a-passage-agreement",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "a-passage-agreement",
+                "where": "core/skills/distill/scripts/distill.mjs:reference-000286/dynamic-001704",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A verbatim blocker reused in different files is rejected",
+            "owningRule": "b-real-blocker",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "b-real-blocker",
+                "where": "docs/decisions/index.md:reference-000310",
+                "error": "condition false"
+              },
+              {
+                "rule": "b-real-blocker",
+                "where": "docs/decisions/index.md:reference-000311",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A generated preserve owner cannot acquire an own park",
+            "owningRule": "c-render-owner",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "c-render-owner",
+                "where": ".agents/skills/_shared/capability-catalog.md:reference-000002",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Every admitted tuple needs exact own pathOperand",
+            "owningRule": "d-own-operand",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "d-own-operand",
+                "where": "core/skills/distill/scripts/distill.mjs:dynamic-001704",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Unknown nonDocumentUse category is rejected",
+            "owningRule": "d-own-operand",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "d-own-operand",
+                "where": "docs/decisions/index.md:dynamic-001876",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Borrowed neighbouring path cannot replace own operand",
+            "owningRule": "d-own-operand",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "d-own-operand",
+                "where": "core/skills/distill/scripts/distill.mjs:dynamic-001704",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Wrapped retired citation requires its live narrative successor",
+            "owningRule": "e-retired-successor",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "e-retired-successor",
+                "where": "scripts/backfill-status-category.mjs:reference-002431",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "An existing unrelated heading cannot impersonate the decision successor",
+            "owningRule": "e-retired-successor",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "e-retired-successor",
+                "where": "scripts/backfill-status-category.mjs:reference-002431",
+                "error": "successor heading must own the cited decision id"
+              }
+            ]
+          },
+          {
+            "name": "R12 rejects operand-swapped blockers in separate passages of one file",
+            "owningRule": "b-real-blocker",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "b-real-blocker",
+                "where": "scripts/knowledge-migration.mjs:dynamic-008173",
+                "error": "condition false"
+              },
+              {
+                "rule": "b-real-blocker",
+                "where": "scripts/knowledge-migration.mjs:dynamic-008186",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "R11 rejects admission of a plan-only report constant",
+            "owningRule": "r11-plans-boundary",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r11-plans-boundary",
+                "where": "scripts/check-doc-constitution.mjs:dynamic-006605",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A registry projection output cannot become scalar pass-through",
+            "owningRule": "r30-state-operand",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r30-state-operand",
+                "where": "src/report/knowledge-projection.mjs:dynamic-009807",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A projection park must be listed in its record park index",
+            "owningRule": "park-index",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "park-index",
+                "where": "src/report/knowledge-projection.mjs:dynamic-009806",
+                "error": "condition false"
+              },
+              {
+                "rule": "park-index",
+                "where": "src/report/knowledge-projection.mjs:dynamic-009807",
+                "error": "condition false"
+              }
+            ]
+          }
+        ],
+        "failures": []
+      }
+    },
+    {
+      "label": "prompt",
+      "script": "step-05-seam5-probes.py",
+      "arguments": [],
+      "startedAtNs": 1792578141838721636,
+      "completedAtNs": 1792579012292992161,
+      "exit": 0,
+      "ok": true,
+      "resultFresh": true,
+      "sourceSha256": "cf5e6fa04562cb2aa35aef2eac7890def60e4790bba7b0a0ef62d864fa4bfc61",
+      "scratchLog": "/tmp/fgos-work/final-verification/prompt/command.log",
+      "logSha256": "00ea355b1902af878116cadc730b7776679c1712caebb92ab938cfb8d78b7f5c",
+      "scratchResult": "/tmp/fgos-work/final-verification/prompt/step-05-seam5-probes-result.json",
+      "resultSha256": "45d235bb0e28a8b776f3503d418347d6a182e629b6d10bc32dda821fc44c68e8",
+      "counts": {
+        "passed": 13,
+        "total": 13,
+        "baselineFailures": 0
+      },
+      "probeResults": {
+        "kind": "Closed seam5 batch rejecting probes",
+        "baselineFailures": 0,
+        "passed": 13,
+        "total": 13,
+        "probes": [
+          {
+            "name": "A closed reference cannot disappear",
+            "owningRule": "s5-coverage",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s5-coverage",
+                "where": "closed file and item sets",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Remaining queue must equal original population minus all closed files",
+            "owningRule": "s5-coverage",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s5-coverage",
+                "where": "remaining queue and original carries",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Whole-file docs-root coverage cannot lose a physical span",
+            "owningRule": "s5-lexical",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s5-lexical",
+                "where": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+                "error": "unaccounted docs-root token at 55"
+              }
+            ]
+          },
+          {
+            "name": "Pinned bytes cannot borrow HEAD digest",
+            "owningRule": "s5-pins",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s5-pins",
+                "where": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Passage text must match its pin",
+            "owningRule": "s5-spans",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s5-spans",
+                "where": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt:reference-003777",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Inherited Step4 source slot disposition is checked",
+            "owningRule": "s5-inheritance",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s5-inheritance",
+                "where": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt:reference-003777",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Rollback must restore whole pinned source",
+            "owningRule": "s5-patches",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s5-patches",
+                "where": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Golden cannot be updated outside atomic source unit",
+            "owningRule": "s5-atomic",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s5-atomic",
+                "where": "real-file-tests-goldens-prompt-batch-1",
+                "error": "not enough values to unpack (expected 2, got 1)"
+              }
+            ]
+          },
+          {
+            "name": "Expected complete prompt cannot lose a byte",
+            "owningRule": "s5-atomic",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s5-atomic",
+                "where": "real-file-tests-goldens-prompt-batch-1",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Unrun candidate proof cannot claim passing without a log",
+            "owningRule": "s5-receipts",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s5-receipts",
+                "where": "real-file-tests-goldens-prompt-batch-1",
+                "error": "unsupported operand type(s) for /: 'PosixPath' and 'NoneType'"
+              }
+            ]
+          },
+          {
+            "name": "Admitted item cannot be omitted from window review",
+            "owningRule": "s5-review",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "s5-review",
+                "where": "closed batch review obligations",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Mechanical reject fails when its full callback contains docs/specs/widget.md",
+            "owningRule": "r19-label-diagnostic",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r19-label-diagnostic",
+                "where": "test/runner/prompt-templates.test.mjs:dynamic-029245",
+                "error": "enclosing callback contains census-root literal"
+              }
+            ]
+          },
+          {
+            "name": "A diagnostic identifier traced to a census-root constant cannot reject mechanically",
+            "owningRule": "r19-label-diagnostic",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r19-label-diagnostic",
+                "where": "test/runner/prompt-templates.test.mjs:dynamic-029246",
+                "error": "identifier/import traces to census-root constant: ['placeholder']"
+              }
+            ]
+          }
+        ],
+        "failures": []
+      }
+    },
+    {
+      "label": "batch2",
+      "script": "step-05-seam5-batch2-probes.py",
+      "arguments": [],
+      "startedAtNs": 1792579012294971751,
+      "completedAtNs": 1792579059183327734,
+      "exit": 0,
+      "ok": true,
+      "resultFresh": true,
+      "sourceSha256": "a41e9243dd18de7029d909f8e1a009d626eff4c6dab8ebe4c5b87cd4e7abc79e",
+      "scratchLog": "/tmp/fgos-work/final-verification/batch2/command.log",
+      "logSha256": "6e23e43fa065043d297532dfacae577b973caee59b1e111131b6d7ca626b1d79",
+      "scratchResult": "/tmp/fgos-work/final-verification/batch2/step-05-seam5-batch2-probes-result.json",
+      "resultSha256": "eda386a899c7af10acc888cfb895eebb7386be99c9173f7f6d3f018c0666fc4c",
+      "counts": {
+        "passed": 18,
+        "total": 18,
+        "baselineFailures": 0
+      },
+      "probeResults": {
+        "kind": "R19 and real-reader mutation probes; no consumer writes",
+        "baselineFailures": 0,
+        "passed": 18,
+        "total": 18,
+        "probes": [
+          {
+            "name": "No initial triage file can vanish",
+            "owningRule": "r19-triage-coverage",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r19-triage-coverage",
+                "where": "all 702 initial files",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A mechanical closure cannot omit an original tuple",
+            "owningRule": "r19-tuples",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r19-tuples",
+                "where": "packages/agent-protocol/contracts/fixtures/terminal/codex/trust-dialog-folder-access.txt",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A closed file cannot claim a different immutable source hash",
+            "owningRule": "r19-pins",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r19-pins",
+                "where": "packages/agent-protocol/contracts/fixtures/terminal/codex/trust-dialog-folder-access.txt",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "An unrecognized operand cannot borrow a category label",
+            "owningRule": "r19-tuples",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r19-tuples",
+                "where": "apps/fgctl/tests/git_wal_activation_gate.rs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A file with unresolved operands cannot be closed by a flag",
+            "owningRule": "r19-closure",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r19-closure",
+                "where": "test/docs/decisions-corpus-retired.test.mjs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A mechanically rejected tuple whose enclosing operation carries a census-root literal is refused",
+            "owningRule": "r19-tuples",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r19-tuples",
+                "where": "test/distribution/source-payload.test.mjs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A traced census-root identifier refuses mechanical rejection",
+            "owningRule": "r19-tuples",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r19-tuples",
+                "where": "test/distribution/source-payload.test.mjs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A real read reference cannot disappear",
+            "owningRule": "j-coverage",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j-coverage",
+                "where": "reference and tuple identity conservation",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A pinned input cannot borrow another digest",
+            "owningRule": "j-pins",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j-pins",
+                "where": "test/docs/decisions-corpus-retired.test.mjs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A real read operation must have exact pinned passage text",
+            "owningRule": "j-spans",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j-spans",
+                "where": "test/docs/decisions-corpus-retired.test.mjs:dynamic-018732",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Document constructions must trace exact real consuming operations",
+            "owningRule": "j-spans",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j-spans",
+                "where": "test/docs/decisions-corpus-retired.test.mjs:dynamic-018734",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A summary cannot claim the missing locked heading as a conserved target",
+            "owningRule": "j-claims",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j-claims",
+                "where": "same owning assertions and real missing claim searches",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Whole-file inverse must restore the original reader",
+            "owningRule": "j-patches",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j-patches",
+                "where": "test/docs/decisions-corpus-retired.test.mjs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Exact holder heading cannot lose its live-region witness",
+            "owningRule": "j-claims",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j-claims",
+                "where": "same owning assertions and real missing claim searches",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Candidate outcome cannot claim an extra passing assertion",
+            "owningRule": "j-receipts",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j-receipts",
+                "where": "same input and honest missing proof",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Missing post-retirement proof cannot claim passing without a log",
+            "owningRule": "j-receipts",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j-receipts",
+                "where": "same input and honest missing proof",
+                "error": "unsupported operand type(s) for /: 'PosixPath' and 'NoneType'"
+              }
+            ]
+          },
+          {
+            "name": "A missing-claim park cannot omit its source search witness",
+            "owningRule": "j-search",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j-search",
+                "where": "pinned alias and all-root target search before every park",
+                "error": "'searchWitness'"
+              }
+            ]
+          },
+          {
+            "name": "Judgment rejects remain independent review obligations",
+            "owningRule": "j-review",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j-review",
+                "where": "all independent semantic obligations",
+                "error": "condition false"
+              }
+            ]
+          }
+        ],
+        "failures": []
+      }
+    },
+    {
+      "label": "batch3",
+      "script": "step-05-seam5-batch3-probes.py",
+      "arguments": [],
+      "startedAtNs": 1792579059184634866,
+      "completedAtNs": 1792579135498378384,
+      "exit": 0,
+      "ok": true,
+      "resultFresh": true,
+      "sourceSha256": "eaed7aa4684604d7c5ed16eec9278b6477cd6ef8addabfb9580484bc9b070138",
+      "scratchLog": "/tmp/fgos-work/final-verification/batch3/command.log",
+      "logSha256": "5d2603d8e219a93aadee79ed6945da5f41a999e014654d78a62902827adae8b1",
+      "scratchResult": "/tmp/fgos-work/final-verification/batch3/step-05-seam5-batch3-probes-result.json",
+      "resultSha256": "2e192488be537d058fad959b4e9071ae54268c8fc1aafd089009780026cecac1",
+      "counts": {
+        "passed": 19,
+        "total": 19,
+        "baselineFailures": 0
+      },
+      "probeResults": {
+        "kind": "R20 plus RUL104 probes",
+        "baselineFailures": 0,
+        "passed": 19,
+        "total": 19,
+        "probes": [
+          {
+            "name": "Move-set source hashes cannot be invented",
+            "rule": "r20-move-set",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r20-move-set",
+                "where": "committed sources and complete derivation"
+              }
+            ]
+          },
+          {
+            "name": "A remaining file cannot disappear from triage",
+            "rule": "r20-coverage",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r20-coverage",
+                "where": "all initial 671 files"
+              }
+            ]
+          },
+          {
+            "name": "A neutral closure cannot omit an original tuple",
+            "rule": "r20-record",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r20-record",
+                "where": "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx"
+              }
+            ]
+          },
+          {
+            "name": "Previously proved R19 rejects stay byte-for-byte",
+            "rule": "r20-record",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r20-record",
+                "where": "apps/fgos/tests/windows_predecessor_stress.rs"
+              }
+            ]
+          },
+          {
+            "name": "An unresolved file cannot close merely by a flag",
+            "rule": "r20-context",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r20-context",
+                "where": "apps/fgos-gateway/web/src/App.test.tsx"
+              }
+            ]
+          },
+          {
+            "name": "A move-set literal anywhere in the full-file context refuses neutrality",
+            "rule": "r20-context",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r20-context",
+                "where": "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx"
+              }
+            ]
+          },
+          {
+            "name": "A template below retained docs root can reach moved files",
+            "rule": "r20-context",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r20-context",
+                "where": "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx"
+              }
+            ]
+          },
+          {
+            "name": "A referenced imported move-set constant refuses neutrality",
+            "rule": "r20-context",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r20-context",
+                "where": "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx"
+              }
+            ]
+          },
+          {
+            "name": "An unresolved path-constant import refuses neutrality",
+            "rule": "r20-context",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r20-context",
+                "where": "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx"
+              }
+            ]
+          },
+          {
+            "name": "Static literal concatenation cannot conceal a retiring root",
+            "rule": "r20-context",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r20-context",
+                "where": "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx"
+              }
+            ]
+          },
+          {
+            "name": "An open root and suffix cannot borrow a later fixed filename",
+            "rule": "r20-context",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r20-context",
+                "where": "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx"
+              }
+            ]
+          },
+          {
+            "name": "An unresolved Rust path constant refuses neutrality",
+            "rule": "r20-context",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r20-context",
+                "where": "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx"
+              }
+            ]
+          },
+          {
+            "name": "A namespace path constant cannot bypass import tracing",
+            "rule": "r20-context",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r20-context",
+                "where": "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx"
+              }
+            ]
+          },
+          {
+            "name": "A CommonJS path constant cannot bypass import tracing",
+            "rule": "r20-context",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "r20-context",
+                "where": "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx"
+              }
+            ]
+          },
+          {
+            "name": "The law reader cannot be preserved without claim correspondence",
+            "rule": "j3-coverage",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j3-coverage",
+                "where": "test/docs/rul104-anchor-phrase.test.mjs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "The actual foundations read cannot be replaced by an adjacent assertion",
+            "rule": "j3-coverage",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j3-coverage",
+                "where": "test/docs/rul104-anchor-phrase.test.mjs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Exact-law search cannot claim a missing candidate match",
+            "rule": "j3-search",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j3-search",
+                "where": "test/docs/rul104-anchor-phrase.test.mjs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Current legacy proof cannot become a post-retirement candidate output",
+            "rule": "j3-receipt",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j3-receipt",
+                "where": "test/docs/rul104-anchor-phrase.test.mjs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "All RUL104 judgment rejects remain window obligations",
+            "rule": "j3-review",
+            "pass": true,
+            "caught": [
+              {
+                "rule": "j3-review",
+                "where": "test/docs/rul104-anchor-phrase.test.mjs",
+                "error": "condition false"
+              }
+            ]
+          }
+        ],
+        "positiveProbes": {
+          "retainedFixedDocumentLiteralIsNeutral": true,
+          "baselineRestored": true,
+          "headOnlyDriftIsReportedWithoutFailingPinProof": true
+        },
+        "failures": []
+      }
+    },
+    {
+      "label": "batch4",
+      "script": "step-05-seam5-batch4-probes.py",
+      "arguments": [],
+      "startedAtNs": 1792579135499785309,
+      "completedAtNs": 1792579262837675315,
+      "exit": 0,
+      "ok": true,
+      "resultFresh": true,
+      "sourceSha256": "58fbece70a1dcc940b3f277a50382d018b575d467b5ea5c996bc93bedcfea412",
+      "scratchLog": "/tmp/fgos-work/final-verification/batch4/command.log",
+      "logSha256": "dccc15d40aa1c7781314fb22c5bfd637bffb36a020d9bcc6b0010bcb28a21e3a",
+      "scratchResult": "/tmp/fgos-work/final-verification/batch4/step-05-seam5-batch4-probes-result.json",
+      "resultSha256": "0b7f8f5aede3a29acfc58201aaf4c2faf7be5bc2c27d2faccbdf13d2810aac35",
+      "counts": {
+        "passed": 29,
+        "total": 29,
+        "positivePassed": 15,
+        "positiveTotal": 15
+      },
+      "probeResults": {
+        "baselineJudgmentFailures": 0,
+        "baselineRootFailures": 0,
+        "passed": 29,
+        "total": 29,
+        "negativeProbes": [
+          {
+            "name": "repository base",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "docs base",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "docs template base",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "temporary suffix on repository base",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "dynamic external base",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "mixed local bindings",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "parent escape",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "absolute resolve suffix",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "repo caller",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "mixed callers",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "exported caller",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "escaping function",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "unknown namespace cannot impersonate os",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "named moved-root refusal",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "namespace moved-root refusal",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "CommonJS destructure moved-root refusal",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "CommonJS namespace moved-root refusal",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "Rust same-crate moved-root refusal",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "drop original tuple",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "corrupt source pin",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "weaken assertion inventory",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "claim replay passed without execution",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "drop precise park search",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "erase prior known carriage gap",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "invent patch without co-cut/replay",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "drop independent judgment review slot",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "forge preserved recorded source mode",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "forged neutral root evidence",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "force moved-root source neutral",
+            "passed": true,
+            "detail": null
+          }
+        ],
+        "positivePassed": 15,
+        "positiveTotal": 15,
+        "positiveChecks": [
+          {
+            "name": "temporary descendant",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "temporary template descendant",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "nested descendant",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "home/config root",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "state root",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "test fixture root",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "closed caller",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "Rust temporary chain",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "named fixture-root proof",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "namespace fixture-root proof",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "CommonJS destructure fixture-root proof",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "CommonJS namespace fixture-root proof",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "Rust const non-document root",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "Rust static non-document root",
+            "passed": true,
+            "detail": null
+          },
+          {
+            "name": "Rust same-crate constant proof",
+            "passed": true,
+            "detail": null
+          }
+        ]
+      }
+    },
+    {
+      "label": "batch5",
+      "script": "step-05-seam5-batch5-probes.py",
+      "arguments": [],
+      "startedAtNs": 1792579262839199924,
+      "completedAtNs": 1792579359870751382,
+      "exit": 0,
+      "ok": true,
+      "resultFresh": true,
+      "sourceSha256": "26e8efb19b0d1a6e9385cb065cda8295a83c363b6c2a7378ea2115a37542704e",
+      "scratchLog": "/tmp/fgos-work/final-verification/batch5/command.log",
+      "logSha256": "c63821897ed9a5fae8a0d1f7511c6d5f0d1fa4bd917f2f15036d31e92ac3be77",
+      "scratchResult": "/tmp/fgos-work/final-verification/batch5/step-05-seam5-batch5-probes-result.json",
+      "resultSha256": "a9e5ad8f9a24816d60081ab678ee54e7ffdaefec5dc2aecbcba132d90c321eba",
+      "counts": {
+        "passed": 19,
+        "total": 19,
+        "baselineFailures": 0
+      },
+      "probeResults": {
+        "baselineFailures": 0,
+        "passed": 19,
+        "total": 19,
+        "negativeProbes": [
+          {
+            "name": "drop an original dynamic tuple",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j4-coverage",
+                "where": "test/report/capability-plan-lint.test.mjs",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 63, in coverage\n    assert len(r['references'])==len(refs[f]) and len(r['dynamicTraces'])==len(dyn[f])\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "forge complete pinned source digest",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j4-pins",
+                "where": "test/report/enduser-index.test.mjs",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 53, in pins\n    assert sha(body)==r['sourceSha256']\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "weaken owning assertions",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j4-ownership",
+                "where": "test/report/enduser-index.test.mjs",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 88, in ownership\n    assert t['assertions']==[{'line':i,'text':ls[i-1]} for i in range(a,z+1) if re.search(pattern,ls[i-1])]\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "forge fixture source mode",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j4-receipts",
+                "where": "test/cli/fgos-approve-3.test.mjs",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 95, in receiptcheck\n    if r['diff'] is None:assert receipt['currentInputs']==receipt['candidateInputs'] and receipt['cutoverSpecifications']==[] and receipt['comparison']['currentOutputSet']==receipt['comparison']['candidateOutputSet']==[] and receipt['comparison']['intentionalDeltas']==[]\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "claim passing replay for preserve without executing",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j4-receipts",
+                "where": "test/report/enduser-index.test.mjs",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 96, in receiptcheck\n    else:assert_patch(r,receipt,body)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 12, in assert_patch\n    if m.admission.r26_module().patch_spec(r['file']):return m.admission.r26_module().assert_patch(r,receipt,body)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-rules.py\", line 60, in assert_patch\n    assert module('r26deferred','step-05-seam5-batch7-deferred.py').validate(spec,r,receipt,body)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-deferred.py\", line 32, in validate\n    assert receipt['proofs']==[{'command':d['owningTestCommand'],'owningBehavior':d['assertionEffect'],'status':'replay-deferred-phase9','exit':None,'logPath':None,'logSha256':None,'reason':'Lead R25; exact deferredReplay obligation binds pinned bytes and full co-cut unit.'}]\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "erase a passage-specific generator park",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j4-receipts",
+                "where": "test/report/enduser-index.test.mjs",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 103, in receiptcheck\n    assert r['parked']==[{'id':m.admission.idof(e),'blockedReason':e['blockedReason'],'dependency':e['dependency']} for e in m.admission.allitems(r) if e['disposition']=='parked']\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "forge pinned search evidence",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j5-search",
+                "where": "exact all-root searches and alias lookups",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 134, in batch5search\n    w=e['searchWitness'];assert w['pin']==r['authorInputCommit'] and w['roots']==search['roots'] and w['assessment']==e['blockedReason'] and w['evidenceSha256']==sha((ROOT/w['evidenceFile']).read_bytes())\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "invent candidate patch without a co-cut/replay",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j4-pins",
+                "where": "test/report/enduser-index.test.mjs",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 59, in pins\n    else:assert_patch(r,receipt,body)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 12, in assert_patch\n    if m.admission.r26_module().patch_spec(r['file']):return m.admission.r26_module().assert_patch(r,receipt,body)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-rules.py\", line 41, in assert_patch\n    assert spec['diff']==r['diff']==m.m.make_diff(r['file'],body,spec['newText'])\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "reject a docs/history comment inconsistently",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j5-uniform-history",
+                "where": "test/cli/fgos-edit-2.test.mjs:reference-003953",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "admit a pure in-memory fixture string",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j5-fixtures",
+                "where": "test/scripts/doc-decision-conservation.test.mjs:reference-004935",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "admit a temporary-root constructor",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j5-fixtures",
+                "where": "test/scripts/knowledge-classifier.test.mjs:dynamic-033478",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\nAssertionError\n"
+              },
+              {
+                "rule": "j5-fixtures",
+                "where": "test/scripts/knowledge-classifier.test.mjs:dynamic-033478",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "drop a retired basename successor",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j5-successors",
+                "where": "test/docs/decisions-corpus-retired.test.mjs:dynamic-018736",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "unpark the document-bearing gateway roots array",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j5-review-closure",
+                "where": "all explicit Lead rulings",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 38, in closures\n    dead='test/runner/dead-vocabulary-guard.test.mjs';a=slot(dead,'dynamic-023891');b=slot(dead,'dynamic-023892');c=slot(dead,'reference-004371');assert a['admission']=='ADMIT' and a['disposition']=='parked' and a['blockedReason']==b['blockedReason'] and a['dependency']==b['dependency'] and a['pathOperand']==\"path.join('docs', 'specs')\" and c['resolverWitness']['treeRetires'] is True\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "lose test-title P5 dependency",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j5-review-closure",
+                "where": "all explicit Lead rulings",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 39, in closures\n    title=slot(dead,'reference-004372');assert title['admission']=='ADMIT' and title['disposition']=='preserve' and 'P5' in title['reason'] and 'baseline key' in title['reason']\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "call ui-spec moved without seam6 retention",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j5-review-closure",
+                "where": "all explicit Lead rulings",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 41, in closures\n    a=slot('apps/fgos-gateway/web/src/App.test.tsx','reference-000201');assert a['admission']=='ADMIT' and a['disposition']=='preserve' and 'docs/ui-spec retained (seam 6 rule)' in a['reason']\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "preserve architecture-map reader despite missing headings",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j5-review-closure",
+                "where": "all explicit Lead rulings",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 43, in closures\n    a=slot('test/docs/decisions-corpus-retired.test.mjs','reference-004035');assert a['disposition']=='parked' and '0010/0015/0017' in a['blockedReason'] and 'Step 7' in a['blockedReason'] and a['retentionHeadingEvidence']['proposedPresent'] is False\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "discard source-only proof-navigation patch",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j5-review-closure",
+                "where": "all explicit Lead rulings",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 46, in closures\n    a=slot('test/runner/dispatch-worker-session.test.mjs','reference-004380');assert a['admission']=='ADMIT' and a['disposition']=='patch';j.assert_patch(by['test/runner/dispatch-worker-session.test.mjs'],next(x for x in m.read('step-05-seam5-batch4-parity-receipts.json')['receipts'] if x['id']==a['receiptId']),m.pinned(by['test/runner/dispatch-worker-session.test.mjs']['authorInputCommit'],'test/runner/dispatch-worker-session.test.mjs'))\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "omit a changed/added file from this-turn review",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j5-review-delta",
+                "where": "review changed or added sources only",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 59, in delta\n    assert m.admission.r26_module().review_delta(listing)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-rules.py\", line 74, in review_delta\n    assert ix['addedThisTurn']==[] and set(ix['reviewThisTurn'])=={e['file'] for e in ix['changedThisTurn']['dispositionChanged']}\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "name": "forge inverse comment patch",
+            "passed": true,
+            "caught": [
+              {
+                "rule": "j4-pins",
+                "where": "test/runner/dispatch-worker-session.test.mjs",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 59, in pins\n    else:assert_patch(r,receipt,body)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 21, in assert_patch\n    assert spec['rollbackDiff']==r['rollbackDiff']==m.m.make_diff(r['file'],after,body) and j.s4.apply(r['file'],after.encode(),r['rollbackDiff'])==body.encode()\nAssertionError\n"
+              }
+            ]
+          }
+        ],
+        "failures": []
+      }
+    },
+    {
+      "label": "batch6",
+      "script": "step-05-seam5-batch6-probes.py",
+      "arguments": [],
+      "startedAtNs": 1792579359872779401,
+      "completedAtNs": 1792579361880226755,
+      "exit": 0,
+      "ok": true,
+      "resultFresh": true,
+      "sourceSha256": "6065aace9078a2a65a9c391bb46837775c8388491016628870da9ee75dac5f56",
+      "scratchLog": "/tmp/fgos-work/final-verification/batch6/command.log",
+      "logSha256": "5b58b4b19fd6c7386adb4584b0f441f2b9322ac6bd6af3490452c16d0211a731",
+      "scratchResult": "/tmp/fgos-work/final-verification/batch6/step-05-seam5-batch6-probes-result.json",
+      "resultSha256": "1df941de548f7b62aacb98095c68f66bc3ae89ec4b5badbe9becdea25c237569",
+      "counts": {
+        "passed": 20,
+        "total": 20
+      },
+      "probeResults": {
+        "passed": 20,
+        "total": 20,
+        "positiveStructuralPatches": [
+          "test/runner/merge.test.mjs",
+          "test/runner/worktree.test.mjs",
+          "test/cli/fgos-merge.test.mjs",
+          "test/intake/plan.test.mjs"
+        ],
+        "negativeProbes": [
+          {
+            "file": "test/runner/merge.test.mjs",
+            "mutation": "sourceSha256",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/runner/merge.test.mjs",
+            "mutation": "sourceMode",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/runner/merge.test.mjs",
+            "mutation": "rollbackDiff",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/runner/merge.test.mjs",
+            "mutation": "expectedAfterSha256",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/runner/merge.test.mjs",
+            "mutation": "coCutPaths",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/runner/worktree.test.mjs",
+            "mutation": "sourceSha256",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/runner/worktree.test.mjs",
+            "mutation": "sourceMode",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/runner/worktree.test.mjs",
+            "mutation": "rollbackDiff",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/runner/worktree.test.mjs",
+            "mutation": "expectedAfterSha256",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/runner/worktree.test.mjs",
+            "mutation": "coCutPaths",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/cli/fgos-merge.test.mjs",
+            "mutation": "sourceSha256",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/cli/fgos-merge.test.mjs",
+            "mutation": "sourceMode",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/cli/fgos-merge.test.mjs",
+            "mutation": "rollbackDiff",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/cli/fgos-merge.test.mjs",
+            "mutation": "expectedAfterSha256",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/cli/fgos-merge.test.mjs",
+            "mutation": "coCutPaths",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/intake/plan.test.mjs",
+            "mutation": "sourceSha256",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/intake/plan.test.mjs",
+            "mutation": "sourceMode",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/intake/plan.test.mjs",
+            "mutation": "rollbackDiff",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/intake/plan.test.mjs",
+            "mutation": "expectedAfterSha256",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "file": "test/intake/plan.test.mjs",
+            "mutation": "coCutPaths",
+            "rejected": true,
+            "reason": "AssertionError"
+          }
+        ],
+        "baseline": "R22 pending; no green full-baseline claim",
+        "failures": []
+      }
+    },
+    {
+      "label": "batch7",
+      "script": "step-05-seam5-batch7-probes.py",
+      "arguments": [],
+      "startedAtNs": 1792579361882071742,
+      "completedAtNs": 1792579370781858409,
+      "exit": 0,
+      "ok": true,
+      "resultFresh": true,
+      "sourceSha256": "77d42fa47e5728d143e3b079301ced642fc5bc3691ac72066aa64f40def5c5e8",
+      "scratchLog": "/tmp/fgos-work/final-verification/batch7/command.log",
+      "logSha256": "2edc66b2540980ad5fa90923222e42786f087105d41ae0d47c88708c8a645770",
+      "scratchResult": "/tmp/fgos-work/final-verification/batch7/step-05-seam5-batch7-probes-result.json",
+      "resultSha256": "670c424a00d04dc47cb591f92c051fdcc44c7fa19768274447a878eacaff3592",
+      "counts": {
+        "passed": 106,
+        "total": 106
+      },
+      "probeResults": {
+        "passed": 106,
+        "total": 106,
+        "positiveStructuralDeferrals": [
+          "test/runner/merge.test.mjs",
+          "test/runner/worktree.test.mjs",
+          "test/cli/fgos-merge.test.mjs",
+          "test/intake/plan.test.mjs"
+        ],
+        "negativeProbes": [
+          {
+            "mutation": "missing status",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing file",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing inputCommit",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing sourceSha256",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing owningTestCommand",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing owningTests",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing assertedLines",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing assertionEffect",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing expectedStrings",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing diff",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing rollbackDiff",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing coCutPaths",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing blockerEvidence",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing phase9Obligation",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "corrupt status",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt sourceSha256",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt owningTestCommand",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt assertionEffect",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt expectedStrings",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt diff",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt rollbackDiff",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt coCutPaths",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt phase9Obligation",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "deferred replay fabricates outputs",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "Deferred replay cannot claim actual outputs"
+          },
+          {
+            "mutation": "deferred proof relabeled pass",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "mutation": "omitted changed assertions",
+            "file": "test/runner/merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "missing status",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing file",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing inputCommit",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing sourceSha256",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing owningTestCommand",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing owningTests",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing assertedLines",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing assertionEffect",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing expectedStrings",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing diff",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing rollbackDiff",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing coCutPaths",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing blockerEvidence",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing phase9Obligation",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "corrupt status",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt sourceSha256",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt owningTestCommand",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt assertionEffect",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt expectedStrings",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt diff",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt rollbackDiff",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt coCutPaths",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt phase9Obligation",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "deferred replay fabricates outputs",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "Deferred replay cannot claim actual outputs"
+          },
+          {
+            "mutation": "deferred proof relabeled pass",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "mutation": "omitted changed assertions",
+            "file": "test/runner/worktree.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "missing status",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing file",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing inputCommit",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing sourceSha256",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing owningTestCommand",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing owningTests",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing assertedLines",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing assertionEffect",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing expectedStrings",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing diff",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing rollbackDiff",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing coCutPaths",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing blockerEvidence",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing phase9Obligation",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "corrupt status",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt sourceSha256",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt owningTestCommand",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt assertionEffect",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt expectedStrings",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt diff",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt rollbackDiff",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt coCutPaths",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt phase9Obligation",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "deferred replay fabricates outputs",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "Deferred replay cannot claim actual outputs"
+          },
+          {
+            "mutation": "deferred proof relabeled pass",
+            "file": "test/cli/fgos-merge.test.mjs",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "mutation": "missing status",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing file",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing inputCommit",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing sourceSha256",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing owningTestCommand",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing owningTests",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing assertedLines",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing assertionEffect",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing expectedStrings",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing diff",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing rollbackDiff",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing coCutPaths",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing blockerEvidence",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "missing phase9Obligation",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 deferred replay missing required field"
+          },
+          {
+            "mutation": "corrupt status",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt sourceSha256",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt owningTestCommand",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt assertionEffect",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt expectedStrings",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt diff",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt rollbackDiff",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt coCutPaths",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "corrupt phase9Obligation",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "R25 obligation differs from pinned source, exact changed assertions, strings, diffs or co-cut set"
+          },
+          {
+            "mutation": "deferred replay fabricates outputs",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "Deferred replay cannot claim actual outputs"
+          },
+          {
+            "mutation": "deferred proof relabeled pass",
+            "file": "test/intake/plan.test.mjs",
+            "rejected": true,
+            "reason": "AssertionError"
+          },
+          {
+            "mutation": "forge removed occurrence text",
+            "file": "test/holder-lock/fences-v1-tombstone.test.mjs",
+            "rejected": true,
+            "reason": [
+              {
+                "rule": "j4-coverage",
+                "where": "test/holder-lock/fences-v1-tombstone.test.mjs",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 71, in coverage\n    removed=h['removedOccurrence'];assert removed['text']==opbody.splitlines()[removed['line']-1] and sha(removed['text'])==removed['sha256'] and removed['text'] not in body.splitlines() and '-'+removed['text'] in h['diff'].splitlines()\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "mutation": "forge removed occurrence sha256",
+            "file": "test/holder-lock/fences-v1-tombstone.test.mjs",
+            "rejected": true,
+            "reason": [
+              {
+                "rule": "j4-coverage",
+                "where": "test/holder-lock/fences-v1-tombstone.test.mjs",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 71, in coverage\n    removed=h['removedOccurrence'];assert removed['text']==opbody.splitlines()[removed['line']-1] and sha(removed['text'])==removed['sha256'] and removed['text'] not in body.splitlines() and '-'+removed['text'] in h['diff'].splitlines()\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "mutation": "forge removed occurrence line",
+            "file": "test/holder-lock/fences-v1-tombstone.test.mjs",
+            "rejected": true,
+            "reason": [
+              {
+                "rule": "j4-coverage",
+                "where": "test/holder-lock/fences-v1-tombstone.test.mjs",
+                "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 71, in coverage\n    removed=h['removedOccurrence'];assert removed['text']==opbody.splitlines()[removed['line']-1] and sha(removed['text'])==removed['sha256'] and removed['text'] not in body.splitlines() and '-'+removed['text'] in h['diff'].splitlines()\nAssertionError\n"
+              }
+            ]
+          },
+          {
+            "mutation": "bind repeated scalar to wrong current occurrence",
+            "file": "test/holder-lock/fences-v1-tombstone.test.mjs",
+            "rejected": true,
+            "reason": [
+              {
+                "file": "test/holder-lock/fences-v1-tombstone.test.mjs",
+                "id": "dynamic-020450",
+                "originalLine": 166,
+                "recordedCurrentLine": 166,
+                "expectedCurrentLine": 178,
+                "originalText": "  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });",
+                "expectedText": "  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });"
+              }
+            ]
+          }
+        ],
+        "failures": [],
+        "scope": "R25 structural proof only; no owning test execution or full-suite readiness claim"
+      }
+    },
+    {
+      "label": "r26",
+      "script": "step-05-proposed-move-probes.py",
+      "arguments": [],
+      "startedAtNs": 1792579370784455459,
+      "completedAtNs": 1792579373307519910,
+      "exit": 0,
+      "ok": true,
+      "resultFresh": true,
+      "sourceSha256": "354891b56926139bedbb7bb0df4d8f916ea8a519e8ea06d4d0b0f5e0e028c950",
+      "scratchLog": "/tmp/fgos-work/final-verification/r26/command.log",
+      "logSha256": "947d722a86c1084e7e508e793bed22b0f6f5c7022dd013690e6b1ade1c485ae2",
+      "scratchResult": "/tmp/fgos-work/final-verification/r26/step-05-proposed-move-probes-result.json",
+      "resultSha256": "1d7b0985a939b5bfd7789a5673166e9a18fd6eae4e950ced11f26ac2df094ac3",
+      "counts": {
+        "passed": 8,
+        "total": 8,
+        "baselineFailures": 0
+      },
+      "probeResults": {
+        "baselineFailures": 0,
+        "passed": 8,
+        "total": 8,
+        "probes": [
+          {
+            "name": "real governance copy cannot use retained preserve witness",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "r26-unit",
+                "where": "docs/doc-governance.md",
+                "error": "condition false"
+              },
+              {
+                "rule": "r26-real-read",
+                "where": "test/scripts/check-doc-candidate-status.test.mjs:dynamic-031770",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "park must name exact retention-or-move decision",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "r26-unit",
+                "where": "docs/doc-governance.md",
+                "error": "condition false"
+              },
+              {
+                "rule": "r26-real-read",
+                "where": "test/scripts/check-doc-candidate-status.test.mjs:dynamic-031770",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "unit cannot silently omit an enumerated reader",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "r26-real-read",
+                "where": "test/scripts/check-doc-candidate-status.test.mjs:dynamic-031770",
+                "error": "condition false"
+              },
+              {
+                "rule": "r26-membership",
+                "where": "test/scripts/check-doc-candidate-status.test.mjs:dynamic-031770",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "clearing both marker and member cannot hide a real read",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "r26-real-read",
+                "where": "test/scripts/check-doc-candidate-status.test.mjs:dynamic-031770",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "unit cannot omit the gate from its co-cut",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "r26-unit",
+                "where": "docs/doc-governance.md",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "proposal cannot invent a decided retention outcome",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "r26-unit",
+                "where": "docs/architecture-map.md",
+                "error": "condition false"
+              },
+              {
+                "rule": "r26-membership",
+                "where": "test/docs/decisions-corpus-retired.test.mjs:reference-004035",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "reader provenance must retain exact pin hash",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "r26-unit",
+                "where": "docs/doc-governance.md",
+                "error": "condition false"
+              },
+              {
+                "rule": "r26-membership",
+                "where": "scripts/check-doc-constitution.mjs:reference-002482",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "proposed path with no reader cannot disappear from sweep",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "r26-coverage",
+                "where": "all proposed-move paths plus coupled enduser manifest",
+                "error": "condition false"
+              }
+            ]
+          }
+        ],
+        "failures": []
+      }
+    },
+    {
+      "label": "seam67",
+      "script": "step-05-seam67-probes.py",
+      "arguments": [],
+      "startedAtNs": 1792579373310170579,
+      "completedAtNs": 1792579406070036193,
+      "exit": 0,
+      "ok": true,
+      "resultFresh": true,
+      "sourceSha256": "f9d236fb7606558049b49a809e2e51795bb68c5cffe07db9cca59d9ab71af2d8",
+      "scratchLog": "/tmp/fgos-work/final-verification/seam67/command.log",
+      "logSha256": "e4430a697135bd6e52fb778861f2d919d6be5178454feef83024448f5ab21b22",
+      "scratchResult": "/tmp/fgos-work/final-verification/seam67/step-05-seam67-probes-result.json",
+      "resultSha256": "13b971534df308857278c5d3f3f8a00acd1ee524b96522b08c2cf91ee835a270",
+      "counts": {
+        "passed": 20,
+        "total": 20,
+        "baselineFailures": 0
+      },
+      "probeResults": {
+        "baselineFailures": 0,
+        "passed": 20,
+        "total": 20,
+        "probes": [
+          {
+            "name": "census tuple cannot disappear",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-coverage",
+                "where": "all original tuples",
+                "error": "condition false"
+              },
+              {
+                "rule": "s67-review",
+                "where": "all records and supplemental source slots",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "original inventory origins cannot be replaced",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-pins",
+                "where": ".claude/skills/ui-spec/tools/config.mjs:dynamic-000346",
+                "error": "condition false"
+              },
+              {
+                "rule": "s67-review",
+                "where": "all records and supplemental source slots",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "consumer source hash is checked at its own pin",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-pins",
+                "where": ".claude/skills/ui-spec/tools/config.mjs",
+                "error": "condition false"
+              },
+              {
+                "rule": "s67-patches",
+                "where": ".claude/skills/ui-spec/tools/config.mjs",
+                "error": "condition false"
+              },
+              {
+                "rule": "s67-review",
+                "where": "all records and supplemental source slots",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "operation witness cannot bind another occurrence",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-pins",
+                "where": ".claude/skills/ui-spec/tools/config.mjs:dynamic-000346",
+                "error": "condition false"
+              },
+              {
+                "rule": "s67-review",
+                "where": "all records and supplemental source slots",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "generated HTML cannot carry authored diff",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-patches",
+                "where": "docs/ui-spec/generated/wireframe-v2.html",
+                "error": "condition false"
+              },
+              {
+                "rule": "s67-review",
+                "where": "all records and supplemental source slots",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "preserved source cannot create own generated park",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-pins",
+                "where": ".agents/skills/_shared/citation-format.md:reference-000006",
+                "error": "condition false"
+              },
+              {
+                "rule": "s67-render",
+                "where": ".agents/skills/_shared/citation-format.md:reference-000006",
+                "error": "condition false"
+              },
+              {
+                "rule": "park-index",
+                "where": ".agents/skills/_shared/citation-format.md:reference-000006",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "parked canonical source cannot yield render-join",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-render",
+                "where": ".agents/skills/_shared/citation-format.md:reference-000012",
+                "error": "condition false"
+              },
+              {
+                "rule": "c-render-owner",
+                "where": ".agents/skills/_shared/citation-format.md:reference-000012",
+                "error": "condition false"
+              },
+              {
+                "rule": "s67-review",
+                "where": "all records and supplemental source slots",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "source owner locator must exist",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-render",
+                "where": ".agents/skills/_shared/citation-format.md:reference-000012",
+                "error": "condition false"
+              },
+              {
+                "rule": "b-real-blocker",
+                "where": ".agents/skills/_shared/citation-format.md:reference-000012",
+                "error": "condition false"
+              },
+              {
+                "rule": "c-render-owner",
+                "where": ".agents/skills/_shared/citation-format.md:reference-000012",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "frozen baseline hash cannot change",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-pins",
+                "where": "scripts/check-decision-citation-drift.baseline.json",
+                "error": "condition false"
+              },
+              {
+                "rule": "s67-review",
+                "where": "all records and supplemental source slots",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "missing candidate coverage cannot claim pass",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-parity",
+                "where": "citation-ratchet-roots-parity",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "unexecuted compiler output sets cannot be invented",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-parity",
+                "where": "ui-spec-compiler-parity",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "current input source pin must match exact hash",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-parity",
+                "where": "ui-spec-compiler-parity",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "review must include all authored files",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-review",
+                "where": "all records and supplemental source slots",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "supplemental source slots cannot vanish from review",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-review",
+                "where": "all records and supplemental source slots",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "R27 non-census read cannot conceal a docs target",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "r27-noncensus-document-read",
+                "where": "test/runner/fanout-batch-runner-commit.test.mjs:dynamic-027077",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "R22 patch file cannot omit its replay log hash",
+            "rejected": true
+          },
+          {
+            "name": "R22 candidate failure cannot claim replay pass",
+            "rejected": true
+          },
+          {
+            "name": "R28 transitive reader cannot disappear behind a readFile stub",
+            "rejected": true
+          },
+          {
+            "name": "module operation cannot borrow a function that already ended",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-callers",
+                "where": ".claude/skills/ui-spec/tools/config.mjs:dynamic-000358",
+                "error": "condition false"
+              },
+              {
+                "rule": "s67-review",
+                "where": "all records and supplemental source slots",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "multiline test declaration cannot lose its title and callback header",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s67-callers",
+                "where": "test/scripts/check-decision-citation-drift.test.mjs:complete owning tests",
+                "error": "condition false"
+              },
+              {
+                "rule": "s67-review",
+                "where": "all records and supplemental source slots",
+                "error": "condition false"
+              }
+            ]
+          }
+        ],
+        "failures": []
+      }
+    },
+    {
+      "label": "seam8",
+      "script": "step-05-seam8-check.py",
+      "arguments": [
+        "--probes",
+        "--output",
+        "/tmp/fgos-work/final-verification/seam8/seam8-probes.json"
+      ],
+      "startedAtNs": 1792579406072864864,
+      "completedAtNs": 1792579553415073436,
+      "exit": 0,
+      "ok": true,
+      "resultFresh": true,
+      "sourceSha256": "a61e54041060ec2a2efd5d2b36d426af28e31bbe14aa0c629b026f45c6fa53ba",
+      "scratchLog": "/tmp/fgos-work/final-verification/seam8/command.log",
+      "logSha256": "ad0f9bcac12f2f498b5368f8d69dbab9f23e7805eee82a45be4fd7f0e21bdf5c",
+      "scratchResult": "/tmp/fgos-work/final-verification/seam8/seam8-probes.json",
+      "resultSha256": "6d123ab11792b2b3d2cd1dbc2a0cc25534d3b2c7252f7117b549cec3596ba5fb",
+      "counts": {
+        "passed": 36,
+        "total": 36,
+        "baselineFailures": 0
+      },
+      "probeResults": {
+        "baselineFailures": 0,
+        "passed": 36,
+        "total": 36,
+        "probes": [
+          {
+            "name": "Dropping a primary file cannot shrink the queue",
+            "owningRule": "s8-coverage",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-coverage",
+                "where": "all primary file/locator memberships",
+                "error": "condition false"
+              },
+              {
+                "rule": "s8-coverage",
+                "where": "every original tuple exactly once, own or exact prior join",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Dropping an exact prior census join loses its original identity",
+            "owningRule": "s8-coverage",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-coverage",
+                "where": "every original reference exactly once, own or exact prior join",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Changing an original tuple cannot create a fresh census",
+            "owningRule": "s8-tuple-identity",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-tuple-identity",
+                "where": ".github/workflows/ci.yml:dynamic-000586",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Changing an original reference span is rejected",
+            "owningRule": "s8-reference-identity",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-reference-identity",
+                "where": ".github/workflows/ci.yml:reference-000115",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Whole-file digest is bound to its own pin",
+            "owningRule": "s8-pins",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-pins",
+                "where": ".github/workflows/ci.yml",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Source mode is checked at the source pin",
+            "owningRule": "s8-pins",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-pins",
+                "where": ".github/workflows/ci.yml",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A false read declaration is rejected",
+            "owningRule": "s8-pins",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-pins",
+                "where": ".github/workflows/ci.yml",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A prior owner join cannot change its record digest",
+            "owningRule": "s8-census-join",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-census-join",
+                "where": "bin/fgos.mjs:reference-000228",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A prior owner join cannot silently change disposition",
+            "owningRule": "s8-owner-outcome",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-owner-outcome",
+                "where": ".github/workflows/ci.yml:reference-000115",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A current passage must be actual pinned text",
+            "owningRule": "s8-source-spans",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-source-spans",
+                "where": ".github/workflows/ci.yml:dynamic-000586",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Repeated equal text in another operation is not the original occurrence",
+            "owningRule": "s8-current-ancestry",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-current-ancestry",
+                "where": "src/runner/operation-choice.mjs:dynamic-013139",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Removed occurrence history needs its exact original line hash",
+            "owningRule": "s8-occurrence-ancestry",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-occurrence-ancestry",
+                "where": "bin/fgos.mjs:reference-000264",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Historical full diffs must match the immutable Git inputs",
+            "owningRule": "s8-occurrence-ancestry",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-occurrence-ancestry",
+                "where": "bin/fgos.mjs:reference-000264",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Neutral closure cannot invent semantic admissions",
+            "owningRule": "s8-neutral-proof",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-neutral-proof",
+                "where": ".github/workflows/holder-lock-cross-platform.yml",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "R19 mechanical proof cannot be replaced by an unverified verdict",
+            "owningRule": "s8-neutral-proof",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-neutral-proof",
+                "where": "packages/agent-protocol/rust/src/terminal/common.rs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "R20 context must equal the recomputed complete-file proof",
+            "owningRule": "s8-neutral-proof",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-neutral-proof",
+                "where": ".github/workflows/holder-lock-cross-platform.yml",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "External population may not claim a live read",
+            "owningRule": "s8-external",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-external",
+                "where": ".fgos/**; ignored/external instructions",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "The shared CONTEXT/plan reader cannot be disguised as scalar plumbing",
+            "owningRule": "s8-document-reader-family",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-document-reader-family",
+                "where": "src/runner/paths.mjs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A plain context byte digest remains a real document reader",
+            "owningRule": "s8-document-reader-family",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-document-reader-family",
+                "where": "src/workflow/ref-digests.mjs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A parked operation retains its own missing input",
+            "owningRule": "s8-park",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-park",
+                "where": "AGENTS.md:author-seam8-agents-decision-home-74",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Templated blocker copies do not close distinct operations",
+            "owningRule": "b-real-blocker",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "b-real-blocker",
+                "where": "bin/fgos.mjs:reference-000226",
+                "error": "condition false"
+              },
+              {
+                "rule": "b-real-blocker",
+                "where": "bin/fgos.mjs:reference-000227",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A non-docs Markdown read is not root-only",
+            "owningRule": "s8-r27-non-docs-read",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-r27-non-docs-read",
+                "where": "src/install/coexist.mjs:dynamic-009604",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Unknown operand categories cannot hide untraced calls",
+            "owningRule": "d-own-operand",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "d-own-operand",
+                "where": ".github/workflows/ci.yml:dynamic-000586",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A new active source patch cannot hide in a records-only closure",
+            "owningRule": "s8-unapplied-boundary",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-unapplied-boundary",
+                "where": ".github/workflows/ci.yml:dynamic-000586",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A source diff cannot hide behind preserve metadata",
+            "owningRule": "s8-record-boundary",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-record-boundary",
+                "where": ".github/workflows/ci.yml",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Quoted-path fixture stays coupled to the legacy decision scans",
+            "owningRule": "s8-mandatory-coupling",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-mandatory-coupling",
+                "where": "src/runner/merge.mjs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "State plan fallback keeps the approve fixture co-cut",
+            "owningRule": "s8-mandatory-coupling",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-mandatory-coupling",
+                "where": "src/state/store.mjs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Owning fixture assertions are pinned, not copied as invented proof",
+            "owningRule": "s8-owning-proof-pin",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-owning-proof-pin",
+                "where": "test/cli/knowledge-verbs.test.mjs",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Clearing an output slot and its unit still fails independent discovery",
+            "owningRule": "s8-r28-output-coverage",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-r28-output-coverage",
+                "where": "bin/fgos.mjs:docs/decisions/index.md:return { path: path.relative(repoRoot, indexPath).split(path.sep).join('/'), changed: false };",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "A result field must keep the exact proposed path, not its basename",
+            "owningRule": "s8-r26-slot",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-r26-slot",
+                "where": "bin/fgos.mjs:dynamic-001360",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Caller-only values cannot borrow a fixed generator output proof",
+            "owningRule": "s8-r26-slot",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-r26-slot",
+                "where": "bin/fgos.mjs:dynamic-001360",
+                "error": "output needs an actual fixed generator path, not a caller echo"
+              }
+            ]
+          },
+          {
+            "name": "Comments and fixed metadata remain individually enumerated co-changes",
+            "owningRule": "s8-r28-cochanges",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-r28-cochanges",
+                "where": ".github/workflows/ci.yml:63:docs/distribution-vision.md",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "Old R26 units cannot disappear from the additive supplement",
+            "owningRule": "s8-r26-population",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-r26-population",
+                "where": "all existing path decisions retained",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "R29 cannot split a native Land reader from its writers",
+            "owningRule": "s8-r29-one-tree",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-r29-one-tree",
+                "where": "src/runner/merge.mjs:reference-003747",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "R29 live reader cannot reuse a removed census identity",
+            "owningRule": "s8-r29-reader-owners",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-r29-reader-owners",
+                "where": "native Land scans",
+                "error": "condition false"
+              }
+            ]
+          },
+          {
+            "name": "R30 registry probe cannot be scalar pass-through",
+            "owningRule": "s8-r30-state-path",
+            "rejected": true,
+            "caught": [
+              {
+                "rule": "s8-r30-state-path",
+                "where": "src/state/cleanup-harness.mjs:dynamic-015349",
+                "error": "condition false"
+              }
+            ]
+          }
+        ],
+        "failures": []
+      }
+    }
+  ],
+  "negativeProbesPassed": 370,
+  "negativeProbesTotal": 370,
+  "positivePassed": 15,
+  "positiveTotal": 15,
+  "recordSetSha256": "e6397b440594f1d8a3ca42a3027ee5eee71c410fea4c7e22cdf34d3cfb16b94f",
+  "scope": "Structural source/record checking and negative mutations only. Independent review, state exports, Step7 composition and Phase9 execution/replay remain owed."
+}

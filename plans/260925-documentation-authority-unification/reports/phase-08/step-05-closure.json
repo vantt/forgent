@@ -1,5 +1,5 @@
 {
-  "ruling": "L12-87",
+  "ruling": "L12-90",
   "status": "Step5 authoring and named review-correction closure; Lead acceptance, Step7 assembly and Phase9 parity pending",
   "totals": {
     "recordMemberships": 1481,
@@ -15,17 +15,17 @@
       "neutral": 426
     },
     "admissions": {
-      "ADMIT": 5224,
-      "REJECT": 36216,
+      "ADMIT": 5249,
+      "REJECT": 36191,
       "neutral-unlabelled": 4964
     },
     "dispositions": {
-      "parked": 2283,
+      "parked": 2311,
       "render-join": 290,
-      "preserve": 43745,
+      "preserve": 43717,
       "patch": 86
     },
-    "parkDependencyGroups": 2003,
+    "parkDependencyGroups": 1998,
     "physicalPatchCoCutUnits": 37,
     "inheritedPatchOwnerUnits": 19,
     "distinctPatchFilesIncludingInherited": 52,
@@ -106,12 +106,12 @@
         "judgment": 254
       },
       "admissions": {
-        "ADMIT": 2767,
-        "REJECT": 3200
+        "ADMIT": 2784,
+        "REJECT": 3183
       },
       "dispositions": {
-        "parked": 1949,
-        "preserve": 3762,
+        "parked": 1969,
+        "preserve": 3742,
         "render-join": 252,
         "patch": 4
       }
@@ -130,14 +130,14 @@
         "neutral": 190
       },
       "admissions": {
-        "ADMIT": 414,
-        "REJECT": 7204,
+        "ADMIT": 416,
+        "REJECT": 7202,
         "neutral-unlabelled": 1125
       },
       "dispositions": {
-        "preserve": 8548,
+        "preserve": 8546,
         "patch": 34,
-        "parked": 148,
+        "parked": 150,
         "render-join": 13
       }
     },
@@ -152,13 +152,13 @@
         "judgment": 26
       },
       "admissions": {
-        "REJECT": 1607,
-        "ADMIT": 291
+        "REJECT": 1601,
+        "ADMIT": 297
       },
       "dispositions": {
-        "preserve": 1840,
+        "preserve": 1834,
         "patch": 10,
-        "parked": 48
+        "parked": 54
       }
     },
     "unassigned": {
@@ -283,11 +283,47 @@
     },
     {
       "dependency": "Authorized persisted Work.docsRef / content-root / item-context export",
-      "itemCount": 39,
+      "itemCount": 53,
       "items": [
         {
           "file": "bin/fgos.mjs",
+          "id": "reference-000226",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 13
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000227",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 13
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000271",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 13
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000272",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 13
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "dynamic-001356",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 13
+        },
+        {
+          "file": "bin/fgos.mjs",
           "id": "dynamic-001357",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 13
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "dynamic-001365",
           "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
           "recordLine": 13
         },
@@ -300,6 +336,18 @@
         {
           "file": "bin/fgos.mjs",
           "id": "dynamic-001368",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 13
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "dynamic-001369",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 13
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "dynamic-001370",
           "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
           "recordLine": 13
         },
@@ -329,13 +377,31 @@
         },
         {
           "file": "src/runner/operation-choice.mjs",
+          "id": "dynamic-013081",
+          "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+          "recordLine": 39
+        },
+        {
+          "file": "src/runner/operation-choice.mjs",
           "id": "dynamic-013082",
           "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
           "recordLine": 39
         },
         {
           "file": "src/runner/operation-choice.mjs",
+          "id": "dynamic-013113",
+          "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+          "recordLine": 39
+        },
+        {
+          "file": "src/runner/operation-choice.mjs",
           "id": "dynamic-013114",
+          "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+          "recordLine": 39
+        },
+        {
+          "file": "src/runner/operation-choice.mjs",
+          "id": "dynamic-013132",
           "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
           "recordLine": 39
         },
@@ -354,6 +420,30 @@
         {
           "file": "src/runner/operation-choice.mjs",
           "id": "dynamic-013139",
+          "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+          "recordLine": 39
+        },
+        {
+          "file": "src/runner/operation-choice.mjs",
+          "id": "dynamic-013140",
+          "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+          "recordLine": 39
+        },
+        {
+          "file": "src/runner/operation-choice.mjs",
+          "id": "dynamic-013166",
+          "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+          "recordLine": 39
+        },
+        {
+          "file": "src/runner/operation-choice.mjs",
+          "id": "dynamic-013167",
+          "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+          "recordLine": 39
+        },
+        {
+          "file": "src/runner/operation-choice.mjs",
+          "id": "dynamic-013170",
           "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
           "recordLine": 39
         },
@@ -431,6 +521,12 @@
         },
         {
           "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015649",
+          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+          "recordLine": 27
+        },
+        {
+          "file": "src/state/retrospective-doors.mjs",
           "id": "dynamic-015650",
           "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
           "recordLine": 27
@@ -461,6 +557,12 @@
         },
         {
           "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015655",
+          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+          "recordLine": 27
+        },
+        {
+          "file": "src/state/retrospective-doors.mjs",
           "id": "dynamic-015656",
           "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
           "recordLine": 27
@@ -474,24 +576,6 @@
         {
           "file": "src/state/retrospective-doors.mjs",
           "id": "dynamic-015658",
-          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-          "recordLine": 27
-        },
-        {
-          "file": "src/state/retrospective-doors.mjs",
-          "id": "dynamic-015660",
-          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-          "recordLine": 27
-        },
-        {
-          "file": "src/state/retrospective-doors.mjs",
-          "id": "dynamic-015661",
-          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-          "recordLine": 27
-        },
-        {
-          "file": "src/state/retrospective-doors.mjs",
-          "id": "dynamic-015662",
           "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
           "recordLine": 27
         },
@@ -518,6 +602,216 @@
           "id": "author-seam8-store-branch-plan-probe",
           "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
           "recordLine": 30
+        }
+      ]
+    },
+    {
+      "dependency": "Authorized persisted Work.docsRef / content-root / item-context export plus persisted item.refs source-path export",
+      "itemCount": 3,
+      "items": [
+        {
+          "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015660",
+          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+          "recordLine": 27
+        },
+        {
+          "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015661",
+          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+          "recordLine": 27
+        },
+        {
+          "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015662",
+          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+          "recordLine": 27
+        }
+      ]
+    },
+    {
+      "dependency": "Authorized persisted inventory oldPath rows / registry aliases / planned move destinations export",
+      "itemCount": 30,
+      "items": [
+        {
+          "file": "scripts/knowledge-bootstrap.mjs",
+          "id": "dynamic-008072",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 197
+        },
+        {
+          "file": "scripts/knowledge-bootstrap.mjs",
+          "id": "dynamic-008079",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 197
+        },
+        {
+          "file": "scripts/knowledge-bootstrap.mjs",
+          "id": "dynamic-008082",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 197
+        },
+        {
+          "file": "scripts/knowledge-bootstrap.mjs",
+          "id": "dynamic-008096",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 197
+        },
+        {
+          "file": "scripts/knowledge-bootstrap.mjs",
+          "id": "dynamic-008097",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 197
+        },
+        {
+          "file": "scripts/knowledge-bootstrap.mjs",
+          "id": "dynamic-008098",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 197
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008156",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008157",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008162",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008167",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008168",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008169",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008170",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008171",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008172",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008173",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008174",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008175",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008176",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008184",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008185",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008186",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008187",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008188",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "id": "dynamic-008189",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "id": "dynamic-014443",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "recordLine": 21
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "id": "dynamic-014444",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "recordLine": 21
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "id": "dynamic-014445",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "recordLine": 21
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "id": "dynamic-014446",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "recordLine": 21
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "id": "dynamic-014447",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "recordLine": 21
         }
       ]
     },
@@ -565,7 +859,7 @@
     },
     {
       "dependency": "Authorized registry docs currentPath / aliases / lifecycle export",
-      "itemCount": 27,
+      "itemCount": 33,
       "items": [
         {
           "file": "src/report/knowledge-projection.mjs",
@@ -598,10 +892,16 @@
           "recordLine": 197
         },
         {
-          "file": "scripts/knowledge-canary.mjs",
-          "id": "dynamic-008115",
+          "file": "scripts/knowledge-bootstrap.mjs",
+          "id": "dynamic-008075",
           "recordFile": "step-05-records/generators-skills-and-support.jsonl",
-          "recordLine": 198
+          "recordLine": 197
+        },
+        {
+          "file": "scripts/knowledge-bootstrap.mjs",
+          "id": "dynamic-008077",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 197
         },
         {
           "file": "scripts/knowledge-migration.mjs",
@@ -642,6 +942,12 @@
         {
           "file": "bin/fgos.mjs",
           "id": "dynamic-001327",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 13
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "dynamic-001329",
           "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
           "recordLine": 13
         },
@@ -707,7 +1013,19 @@
         },
         {
           "file": "src/setup/registrations.mjs",
+          "id": "dynamic-014385",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "recordLine": 21
+        },
+        {
+          "file": "src/setup/registrations.mjs",
           "id": "dynamic-014387",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "recordLine": 21
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "id": "dynamic-014388",
           "recordFile": "step-05-records/setup-doctor-roots.jsonl",
           "recordLine": 21
         },
@@ -726,6 +1044,18 @@
         {
           "file": "src/setup/registrations.mjs",
           "id": "dynamic-014427",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "recordLine": 21
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "id": "dynamic-014434",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "recordLine": 21
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "id": "dynamic-014435",
           "recordFile": "step-05-records/setup-doctor-roots.jsonl",
           "recordLine": 21
         }
@@ -757,6 +1087,18 @@
           "file": "AGENTS.md",
           "id": "author-seam8-agents-decision-home-74",
           "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 2
+        }
+      ]
+    },
+    {
+      "dependency": "Explanation-directory move with REAL_DEMO_DOC_PATH and generator dynamic-009788/009791 co-cut",
+      "itemCount": 1,
+      "items": [
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "dynamic-021543",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
           "recordLine": 2
         }
       ]
@@ -1609,7 +1951,7 @@
     },
     {
       "dependency": "Phase 9 retention-or-move decision for docs/enduser-docs-index.json",
-      "itemCount": 36,
+      "itemCount": 35,
       "items": [
         {
           "file": "src/cli/command-registry.mjs",
@@ -1764,12 +2106,6 @@
         {
           "file": "test/report/enduser-index.test.mjs",
           "id": "dynamic-021515",
-          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
-          "recordLine": 2
-        },
-        {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "dynamic-021543",
           "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
           "recordLine": 2
         },
@@ -1981,20 +2317,8 @@
     },
     {
       "dependency": "bin/fgos.mjs — CLI item/registry document operations",
-      "itemCount": 21,
+      "itemCount": 13,
       "items": [
-        {
-          "file": "bin/fgos.mjs",
-          "id": "reference-000226",
-          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
-          "recordLine": 13
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "id": "reference-000227",
-          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
-          "recordLine": 13
-        },
         {
           "file": "bin/fgos.mjs",
           "id": "reference-000262",
@@ -2010,18 +2334,6 @@
         {
           "file": "bin/fgos.mjs",
           "id": "reference-000269",
-          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
-          "recordLine": 13
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "id": "reference-000271",
-          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
-          "recordLine": 13
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "id": "reference-000272",
           "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
           "recordLine": 13
         },
@@ -2052,30 +2364,6 @@
         {
           "file": "bin/fgos.mjs",
           "id": "reference-000278",
-          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
-          "recordLine": 13
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "id": "dynamic-001356",
-          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
-          "recordLine": 13
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "id": "dynamic-001365",
-          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
-          "recordLine": 13
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "id": "dynamic-001369",
-          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
-          "recordLine": 13
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "id": "dynamic-001370",
           "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
           "recordLine": 13
         },
@@ -25506,72 +25794,6 @@
       ]
     },
     {
-      "dependency": "scripts/knowledge-migration.mjs: Apply constructs move.newPath destinations; the candidate move list and collision-free target occupancy must be supplied before any moveDocPathStore event can be paired with its file move.",
-      "itemCount": 1,
-      "items": [
-        {
-          "file": "scripts/knowledge-migration.mjs",
-          "id": "dynamic-008174",
-          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
-          "recordLine": 200
-        }
-      ]
-    },
-    {
-      "dependency": "scripts/knowledge-migration.mjs: Apply reads each move.oldPath from the preflighted inventory; export retired-tree source rows and prove original frontmatter and sourceCaptureIds remain readable before the physical move.",
-      "itemCount": 1,
-      "items": [
-        {
-          "file": "scripts/knowledge-migration.mjs",
-          "id": "dynamic-008173",
-          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
-          "recordLine": 200
-        }
-      ]
-    },
-    {
-      "dependency": "scripts/knowledge-migration.mjs: Preflight refuses occupied move.newPath targets except identity moves; the same inventory move destinations and candidate occupied-path set are required to prove no overwrite and unchanged collision diagnostics.",
-      "itemCount": 1,
-      "items": [
-        {
-          "file": "scripts/knowledge-migration.mjs",
-          "id": "dynamic-008188",
-          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
-          "recordLine": 200
-        }
-      ]
-    },
-    {
-      "dependency": "scripts/knowledge-migration.mjs: Preflight tests move.oldPath existence; the inventory oldPath rows under docs/specs and docs/architect need an authorized source snapshot at the cut so missing-source findings can be compared.",
-      "itemCount": 1,
-      "items": [
-        {
-          "file": "scripts/knowledge-migration.mjs",
-          "id": "dynamic-008186",
-          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
-          "recordLine": 200
-        }
-      ]
-    },
-    {
-      "dependency": "scripts/knowledge-migration.mjs: The planned target is derived from inventory topicId/role and view.topics purposeSlug; export those rows and prove that each retired-root oldPath keeps exactly one target document identity before planning moves.",
-      "itemCount": 2,
-      "items": [
-        {
-          "file": "scripts/knowledge-migration.mjs",
-          "id": "dynamic-008156",
-          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
-          "recordLine": 200
-        },
-        {
-          "file": "scripts/knowledge-migration.mjs",
-          "id": "dynamic-008157",
-          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
-          "recordLine": 200
-        }
-      ]
-    },
-    {
       "dependency": "src/cli/command-registry.mjs: Quadrant argument description depends on src/report/enduser-index-generate.mjs dynamic-009788 and src/report/enduser-index.mjs dynamic-009791: settle the explanation/decisions alias scan before rewriting these roots.",
       "itemCount": 1,
       "items": [
@@ -25658,54 +25880,6 @@
           "id": "reference-003666",
           "recordFile": "step-05-records/cli-help-messages.jsonl",
           "recordLine": 3
-        }
-      ]
-    },
-    {
-      "dependency": "src/runner/operation-choice.mjs — operation choice resolves plan and task context",
-      "itemCount": 7,
-      "items": [
-        {
-          "file": "src/runner/operation-choice.mjs",
-          "id": "dynamic-013081",
-          "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-          "recordLine": 39
-        },
-        {
-          "file": "src/runner/operation-choice.mjs",
-          "id": "dynamic-013113",
-          "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-          "recordLine": 39
-        },
-        {
-          "file": "src/runner/operation-choice.mjs",
-          "id": "dynamic-013132",
-          "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-          "recordLine": 39
-        },
-        {
-          "file": "src/runner/operation-choice.mjs",
-          "id": "dynamic-013140",
-          "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-          "recordLine": 39
-        },
-        {
-          "file": "src/runner/operation-choice.mjs",
-          "id": "dynamic-013166",
-          "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-          "recordLine": 39
-        },
-        {
-          "file": "src/runner/operation-choice.mjs",
-          "id": "dynamic-013167",
-          "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-          "recordLine": 39
-        },
-        {
-          "file": "src/runner/operation-choice.mjs",
-          "id": "dynamic-013170",
-          "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-          "recordLine": 39
         }
       ]
     },
@@ -25861,49 +26035,13 @@
     },
     {
       "dependency": "src/setup/registrations.mjs: Source conservation loads inventory-data.json oldPath rows, counts duplicates and resolves each source through the folded registry; supply authorized retired-tree oldPath inventory and aliases before comparing conservation findings.",
-      "itemCount": 3,
+      "itemCount": 1,
       "items": [
         {
           "file": "src/setup/registrations.mjs",
           "id": "reference-003802",
           "recordFile": "step-05-records/setup-doctor-roots.jsonl",
           "recordLine": 21
-        },
-        {
-          "file": "src/setup/registrations.mjs",
-          "id": "dynamic-014443",
-          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
-          "recordLine": 21
-        },
-        {
-          "file": "src/setup/registrations.mjs",
-          "id": "dynamic-014444",
-          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
-          "recordLine": 21
-        }
-      ]
-    },
-    {
-      "dependency": "src/setup/registrations.mjs: Source conservation probes each inventory oldPath on disk before resolveDocPath(view, oldPath); the cutover file-presence set and alias/currentPath resolution for retired sources must prove none becomes lost.",
-      "itemCount": 1,
-      "items": [
-        {
-          "file": "src/setup/registrations.mjs",
-          "id": "dynamic-014446",
-          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
-          "recordLine": 21
-        }
-      ]
-    },
-    {
-      "dependency": "src/state/retrospective-doors.mjs — retrospective checks persisted source/context evidence",
-      "itemCount": 1,
-      "items": [
-        {
-          "file": "src/state/retrospective-doors.mjs",
-          "id": "dynamic-015655",
-          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-          "recordLine": 27
         }
       ]
     },
@@ -27446,12 +27584,20 @@
         "review-a38-step-05-s8-p05.md",
         "review-a38-step-05-s8-p06.md"
       ]
+    },
+    {
+      "round": "final-verification-closure",
+      "closureId": "L12-90",
+      "reports": [
+        "review-a38-step-05-final-p01.md",
+        "review-a38-step-05-final-p02.md"
+      ]
     }
   ],
   "step7Carry": "step-05-step7-carry.json",
   "sweep": "step-05-state-tree-sweep.json",
-  "reviewDelta": "step-05-seam8-review-closure.json",
-  "verification": "step-05-seam8-final-proof.json",
+  "reviewDelta": "step-05-final-review-closure.json",
+  "verification": "step-05-final-proof.json",
   "checker": {
     "files": 1481,
     "literalReferences": 7223,
@@ -27459,8 +27605,12 @@
     "failureCount": 0
   },
   "negativeProbes": {
-    "passed": 366,
-    "total": 366
+    "passed": 370,
+    "total": 370
   },
-  "needsWrites": []
+  "needsWrites": [],
+  "positiveChecks": {
+    "passed": 15,
+    "total": 15
+  }
 }

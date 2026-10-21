@@ -19,6 +19,8 @@ dependencies: [9]
 
 ## Requirements
 
+Scope note ([L12-89](reports/phase-08/owner-answers.md#l12-89--documentation-guards-at-cutover-owner-2026-10-21-1609)): refusal of new files under retired roots, constitution placement-glob checks in convention, and docs/platform/** link/anchor checks in doc-health moved to Phase 9 as the same-change ratchet replacement.
+
 **Initial surfaces:**
 
 ```text

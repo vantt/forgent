@@ -122,6 +122,13 @@ def plans_only(r,e):
 RULES['b-real-blocker']='R12: no boilerplate dependency shared after quoted operands, paths, IDs and line numbers are normalized; copies join their source passage; serialized state rows use their accepted per-file input dependency.'
 RULES['r11-plans-boundary']='R11: an operation rooted only in plans/** is rejected as plans-report-artifact; trace pinned declarations and imported constants, not adjacent context.'
 
+RULES['r30-state-operand']='R30/R31: independently swept real-project state/registry document operands, including messages, exclusions and outputs, cannot be rejected as scalar pass-through; sandbox literals retain their construction owner.'
+RULES['park-index']='Every parked owning item is explicitly listed in its record parked index.'
+@functools.lru_cache(None)
+def state_operand_ids():
+ sweep=json.loads((P/'step-05-state-tree-sweep.json').read_text())
+ return {(c['file'],c['id']) for c in sweep['candidates'] if c['verdict']=='R30-state-population-park'}
+
 def check(rs,context=None):
  by={r['file']:r for r in (context or rs)};errors=[];counts=collections.Counter();blocks=collections.defaultdict(set)
  for r in (context or rs):
@@ -136,6 +143,10 @@ def check(rs,context=None):
   for a,b in pairs(r):test('a-passage-agreement',f+':'+str(idof(a))+'/'+str(idof(b)),lambda a=a,b=b:(a['admission'],effective(a))==(b['admission'],effective(b)))
   for e in allitems(r):
    loc=f+':'+str(idof(e))
+   if (f,idof(e)) in state_operand_ids():
+    test('r30-state-operand',loc,lambda e=e:e.get('admission')=='ADMIT' and e.get('disposition')=='parked' and e.get('nonDocumentUse') is None and bool(e.get('pathOperand')) and bool(e.get('dependency')))
+   if e.get('disposition')=='parked':
+    test('park-index',loc,lambda e=e,r=r:any(x.get('id',x.get('referenceId'))==idof(e) for x in r.get('parked',[])))
    if e.get('disposition')=='parked':
     def blocker(e=e):
      b=e.get('blockedReason') or ''

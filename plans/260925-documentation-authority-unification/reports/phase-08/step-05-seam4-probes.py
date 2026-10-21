@@ -80,6 +80,8 @@ def templated_block(rs,rc,ss,ix):
  for i,e in enumerate(es):e['blockedReason']=r['file']+": operation '"+str(e['originalTuple'][4])+"' at line "+str(10+i)+" requires an authorized inventory export."
 run('R12 rejects operand-swapped blockers in separate passages of one file','b-real-blocker',templated_block)
 run('R11 rejects admission of a plan-only report constant','r11-plans-boundary',lambda rs,rc,ss,ix:item(rs,'dynamic-006605').update(admission='ADMIT',nonDocumentUse=None))
+run('A registry projection output cannot become scalar pass-through','r30-state-operand',lambda rs,rc,ss,ix:item(rs,'dynamic-009807').update(admission='REJECT',disposition='preserve',nonDocumentUse='scalar-pass-through',pathOperand=None,stateExportDependency=None,dependency=None))
+run('A projection park must be listed in its record park index','park-index',lambda rs,rc,ss,ix:next(r for r in rs if r['file']=='src/report/knowledge-projection.mjs').__setitem__('parked',[]))
 assert {p['owningRule'] for p in probes}==set(m.RULES)
 out={'kind':'Seam4 rejecting mutation probes','baselineFailures':baseline['failureCount'],'headOnlyDrift':{'pass':head_only['failureCount']==0,'reportedFiles':len(head_only['headDrift'])},'rulesCovered':sorted(m.RULES),'passed':sum(p['pass'] for p in probes),'total':len(probes),'probes':probes,'failures':[p for p in probes if not p['pass']]}
 (P/'step-05-seam4-probes-result.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(json.dumps({k:v for k,v in out.items() if k!='probes'}));sys.exit(bool(out['failures']))

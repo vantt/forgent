@@ -1219,7 +1219,7 @@
       "file": "src/report/decision-index.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "aa28a10d0643624091c2790ad9ba76764a99f586538d028283d90f2296dac7e7",
+      "recordSha256": "be91dd9e6dedba916c70c180e3fc8e5280c127c255e9e2648736e58658cc9d48",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "5ad753196470debd2f502b3c00994c1d75a9ed0c576c5cf8188eb8600f0a09a2"
     },
@@ -1243,7 +1243,7 @@
       "file": "src/report/knowledge-projection.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "422a099b42a2cacf9defedd26cc4d9247bb56985ff88d289b64b62ec8a7e2788",
+      "recordSha256": "9934246ce72074956e2ba6aecabc7f48e7d5fb58159e901f9a53f38ad5058b92",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "6e3e4dbacf4da735924b5cc705d9c805a6d8af362c6182298550e708f698d832"
     },
@@ -1267,7 +1267,7 @@
       "file": "src/report/enduser-index-generate.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "e8676b7870c81bf2a27c93478c2429a062efbd8f36e8951cb09dd7be84f366f1",
+      "recordSha256": "d8346cf90939573edcb216b26792e96ad5646f615b089cc6b31621259957b92c",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15"
     },
@@ -2891,7 +2891,7 @@
       "file": "scripts/knowledge-bootstrap.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "1373b1a6ec031ab22d62a7d5e96d04d3f4061337c17112eeae1ae36687c83c3c",
+      "recordSha256": "2e5d3401fc3f3de0b6295ff758b0ea5fda73d32ed3a1d91184ec4fb538406f11",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "6ffd1b84d5ebf773b52806cd9d47007e60f4999a0f36b43bca4cc50d0f649543"
     },
@@ -2899,7 +2899,7 @@
       "file": "scripts/knowledge-canary.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "243172e28aa969c8b2887ddad4ea279bdaed994fee0257ea7645de9afa927e43",
+      "recordSha256": "bd005a11393174ee6351a07f92b75a140c1e7e42875359744152746c8d7c54ec",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "68b294c8d21c7fde8be258af6eacaa066bf1b60bf724e692e8a61da02622a529"
     },
@@ -2915,7 +2915,7 @@
       "file": "scripts/knowledge-migration.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "2dd4f7bc0b381697fdfde348d285df33366e0e1d454b2b9ffbc8cf48c2c65100",
+      "recordSha256": "8e0cd7d5f1cf921e3d69f637287a14a1c6a02eead2690dc41700ed828216dfdf",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936"
     },
@@ -3371,7 +3371,7 @@
       "file": "src/setup/instruction-registry.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "0db0c06d48f3835ac31f6c913db7c1251545ccffcf3a1875712c95e5a2267308",
+      "recordSha256": "aef992bdb96c41750628f2b4dbe7cce6cf0c7b9e620002eacc02dce495a117f4",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697"
     },
@@ -3403,7 +3403,7 @@
       "file": "src/setup/registrations.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "b909a6b219ed1c2f2ead91c4c7f8eb4135a704cc23edc9b4934d40242b373f88",
+      "recordSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518"
     },
@@ -144034,5 +144034,474 @@
         }
       ]
     }
-  ]
+  ],
+  "L12-90-reviewObligations": {
+    "changedThisTurn": {
+      "dispositionChanged": [
+        {
+          "file": "scripts/knowledge-bootstrap.mjs",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 197,
+          "beforeSha256": "1373b1a6ec031ab22d62a7d5e96d04d3f4061337c17112eeae1ae36687c83c3c",
+          "afterSha256": "2e5d3401fc3f3de0b6295ff758b0ea5fda73d32ed3a1d91184ec4fb538406f11",
+          "dispositionChanged": true,
+          "changes": [
+            {
+              "id": "dynamic-008072",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008075",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008077",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008079",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008082",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008096",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008097",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008098",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "author-s4-fix2-a440ba62f0b352d2",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "REJECT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "preserve"
+            }
+          ]
+        },
+        {
+          "file": "scripts/knowledge-canary.mjs",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 198,
+          "beforeSha256": "243172e28aa969c8b2887ddad4ea279bdaed994fee0257ea7645de9afa927e43",
+          "afterSha256": "bd005a11393174ee6351a07f92b75a140c1e7e42875359744152746c8d7c54ec",
+          "dispositionChanged": true,
+          "changes": [
+            {
+              "id": "dynamic-008115",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "REJECT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "preserve"
+            }
+          ]
+        },
+        {
+          "file": "scripts/knowledge-migration.mjs",
+          "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+          "recordLine": 200,
+          "beforeSha256": "2dd4f7bc0b381697fdfde348d285df33366e0e1d454b2b9ffbc8cf48c2c65100",
+          "afterSha256": "8e0cd7d5f1cf921e3d69f637287a14a1c6a02eead2690dc41700ed828216dfdf",
+          "dispositionChanged": true,
+          "changes": [
+            {
+              "id": "dynamic-008156",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008157",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008162",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008167",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008168",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008169",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008170",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008171",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008172",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008173",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008174",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008175",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008176",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008184",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008185",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008186",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008187",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008188",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-008189",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            }
+          ]
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "recordLine": 21,
+          "beforeSha256": "b909a6b219ed1c2f2ead91c4c7f8eb4135a704cc23edc9b4934d40242b373f88",
+          "afterSha256": "2f2315e7e294020a79630d88d36e763d2497b2d75b87e6bc1936e2192e9899fd",
+          "dispositionChanged": true,
+          "changes": [
+            {
+              "id": "dynamic-014385",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-014388",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-014434",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-014435",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-014443",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-014444",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-014445",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-014446",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-014447",
+              "beforeAdmission": "REJECT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "author-s4-fix2-637e1faa7e3c92ca",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "preserve"
+            },
+            {
+              "id": "author-s4-fix2-619b6195bf114bda",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "preserve"
+            },
+            {
+              "id": "author-s4-fix2-104d57a71afab5e4",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "preserve"
+            },
+            {
+              "id": "author-s4-fix2-6cbfeda4008ea5df",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "preserve"
+            },
+            {
+              "id": "author-s4-fix2-20e88056a2daa3aa",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "preserve"
+            },
+            {
+              "id": "author-s4-fix2-b75674e7a307ed78",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "preserve"
+            },
+            {
+              "id": "author-s4-fix2-255319fd051b6a94",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "preserve"
+            },
+            {
+              "id": "author-s4-fix2-e4573c7ac7dfcd01",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "preserve",
+              "afterDisposition": "preserve"
+            }
+          ]
+        }
+      ],
+      "labelOnly": [
+        {
+          "file": "src/report/decision-index.mjs",
+          "recordFile": "step-05-records/generators-decision-index.jsonl",
+          "recordLine": 2,
+          "beforeSha256": "aa28a10d0643624091c2790ad9ba76764a99f586538d028283d90f2296dac7e7",
+          "afterSha256": "be91dd9e6dedba916c70c180e3fc8e5280c127c255e9e2648736e58658cc9d48",
+          "dispositionChanged": false,
+          "changes": [
+            {
+              "id": "dynamic-009759",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-009760",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            }
+          ]
+        },
+        {
+          "file": "src/report/knowledge-projection.mjs",
+          "recordFile": "step-05-records/generators-doc-registry.jsonl",
+          "recordLine": 3,
+          "beforeSha256": "422a099b42a2cacf9defedd26cc4d9247bb56985ff88d289b64b62ec8a7e2788",
+          "afterSha256": "9934246ce72074956e2ba6aecabc7f48e7d5fb58159e901f9a53f38ad5058b92",
+          "dispositionChanged": false,
+          "changes": [
+            {
+              "id": "dynamic-009807",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-009808",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            }
+          ]
+        },
+        {
+          "file": "src/report/enduser-index-generate.mjs",
+          "recordFile": "step-05-records/generators-enduser-index.jsonl",
+          "recordLine": 3,
+          "beforeSha256": "e8676b7870c81bf2a27c93478c2429a062efbd8f36e8951cb09dd7be84f366f1",
+          "afterSha256": "d8346cf90939573edcb216b26792e96ad5646f615b089cc6b31621259957b92c",
+          "dispositionChanged": false,
+          "changes": [
+            {
+              "id": "dynamic-009772",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-009773",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            }
+          ]
+        },
+        {
+          "file": "src/setup/instruction-registry.mjs",
+          "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+          "recordLine": 17,
+          "beforeSha256": "0db0c06d48f3835ac31f6c913db7c1251545ccffcf3a1875712c95e5a2267308",
+          "afterSha256": "aef992bdb96c41750628f2b4dbe7cce6cf0c7b9e620002eacc02dce495a117f4",
+          "dispositionChanged": false,
+          "changes": [
+            {
+              "id": "dynamic-013986",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            },
+            {
+              "id": "dynamic-013987",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            }
+          ]
+        }
+      ]
+    },
+    "closure": "step-05-final-review-closure.json",
+    "reviewStatus": "pending Lead repack and independent semantic review"
+  },
+  "currentReviewDelta": "L12-90-reviewObligations.changedThisTurn"
 }

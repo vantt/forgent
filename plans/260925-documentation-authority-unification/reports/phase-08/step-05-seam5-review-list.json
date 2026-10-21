@@ -1735,7 +1735,7 @@
     {
       "file": "test/report/enduser-index.test.mjs",
       "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
-      "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21",
+      "recordSha256": "2217dafc7ed201b8775adbf6bbf16124f38c3964e19e61ec54c1c76a591baeb3",
       "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
       "admittedIds": [
         "reference-004304",
@@ -6730,7 +6730,7 @@
     {
       "file": "test/cli/helpers/fgos-cli-harness.mjs",
       "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
-      "recordSha256": "6a60096b7aa095e04689580a85f5c626711016eec1d8f9e50d82a0328a4a01bb",
+      "recordSha256": "bbc5f737c4a5e7809266b510c6cd90f7b04576e0ceb927ea11d747d27a8f62e0",
       "sourceSha256": "82513627745ddfb86343c336b6f58cf283b02a7684e534b46fd91dc9369d6238",
       "admittedIds": [
         "reference-004007",
@@ -81489,5 +81489,49 @@
         }
       ]
     }
-  ]
+  ],
+  "L12-90-reviewObligations": {
+    "changedThisTurn": {
+      "dispositionChanged": [],
+      "labelOnly": [
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "recordLine": 2,
+          "beforeSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21",
+          "afterSha256": "2217dafc7ed201b8775adbf6bbf16124f38c3964e19e61ec54c1c76a591baeb3",
+          "dispositionChanged": false,
+          "changes": [
+            {
+              "id": "dynamic-021543",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            }
+          ]
+        },
+        {
+          "file": "test/cli/helpers/fgos-cli-harness.mjs",
+          "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+          "recordLine": 1,
+          "beforeSha256": "6a60096b7aa095e04689580a85f5c626711016eec1d8f9e50d82a0328a4a01bb",
+          "afterSha256": "bbc5f737c4a5e7809266b510c6cd90f7b04576e0ceb927ea11d747d27a8f62e0",
+          "dispositionChanged": false,
+          "changes": [
+            {
+              "id": "dynamic-017973",
+              "beforeAdmission": "ADMIT",
+              "afterAdmission": "ADMIT",
+              "beforeDisposition": "parked",
+              "afterDisposition": "parked"
+            }
+          ]
+        }
+      ]
+    },
+    "closure": "step-05-final-review-closure.json",
+    "reviewStatus": "pending Lead repack and independent semantic review"
+  },
+  "currentReviewDelta": "L12-90-reviewObligations.changedThisTurn"
 }

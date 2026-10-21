@@ -17116,5 +17116,14 @@
         }
       ]
     }
-  ]
+  ],
+  "L12-90-reviewObligations": {
+    "changedThisTurn": {
+      "dispositionChanged": [],
+      "labelOnly": []
+    },
+    "closure": "step-05-final-review-closure.json",
+    "reviewStatus": "pending Lead repack and independent semantic review"
+  },
+  "currentReviewDelta": "L12-90-reviewObligations.changedThisTurn"
 }

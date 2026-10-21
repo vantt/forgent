@@ -82,6 +82,10 @@ def admit_plan(rs,rc,ix):
  next(e for e in r['dynamicTraces'] if e['id']=='dynamic-006605').update(admission='ADMIT',nonDocumentUse=None)
  rs.append(r)
 run('R11 rejects a plans-only default even when called through a gate','r11-plans-boundary',admit_plan)
+def scalar_state_output(rs,rc,ix):
+ e=find_dyn(rs,'dynamic-014385');e.update(admission='REJECT',disposition='preserve',nonDocumentUse='scalar-pass-through',pathOperand=None,stateExportDependency=None,dependency=None)
+run('A registry alias message cannot hide behind scalar rejection after clearing its state marker','r30-state-operand',scalar_state_output)
+run('Every park must remain in its record parked index','park-index',lambda rs,rc,ix:next(r for r in rs if any(d.get('id')=='dynamic-014385' for d in r['dynamicTraces'])).__setitem__('parked',[]))
 base=m.check(BASE,RECEIPTS,INDEX)
 assert base['failureCount']==0,base['failures'][:3]
 covered={p['owningRule'] for p in probes};assert covered==set(m.RULES)
