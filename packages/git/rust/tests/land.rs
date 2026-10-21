@@ -538,6 +538,30 @@ fn current_target_is_pinned_after_destination_acquisition_and_replays_after_clea
 }
 
 #[test]
+fn retained_listing_skips_chains_that_hold_nothing() {
+    let f = Fixture::new();
+    let mut session = f.driver.prepare_land(&f.repo, vec![], &f.request, "fixture", "gone").unwrap();
+    let candidate = session.candidate().unwrap().clone();
+    let verification = evidence(&session);
+    f.driver.publish_land(&f.repo, &mut session, &verification).unwrap();
+    drop(session);
+    let listed = || f.driver.list_retained_land(&f.repo, 100).unwrap();
+    assert_eq!(listed()["candidates"].as_array().unwrap().len(), 1);
+    // The chain is terminal and uncompacted, but its worktree and every pin are gone.
+    git(&f.main, &["worktree", "remove", "--force", candidate.worktree.to_str().unwrap()]);
+    for suffix in ["", "/source", "/target"] {
+        git(&f.main, &["update-ref", "-d", &format!("refs/fgos/git-operations/gone{suffix}/candidate")]);
+    }
+    assert!(listed()["candidates"].as_array().unwrap().is_empty());
+    // An operation directory without an intent record never created a candidate.
+    use std::os::unix::fs::DirBuilderExt;
+    fs::DirBuilder::new().mode(0o700).create(f.main.join(".git/fgos/git/operations/no-intent")).unwrap();
+    let after = listed();
+    assert!(after["candidates"].as_array().unwrap().is_empty());
+    assert_eq!(after["complete"], true);
+}
+
+#[test]
 fn declared_resolution_bytes_are_frozen_before_consumer_verification() {
     let f = Fixture::new();
     fs::write(f.main.join("a"), "target disagrees\n").unwrap();

@@ -36,3 +36,9 @@ Status: DONE
 - Gates: clippy clean, `cargo test -p fgos-git` ok, `test/git/recovery.test.mjs` 4/4, census regenerated.
 
 Status: DONE
+
+## Skip-path proof
+
+`retained_listing_skips_chains_that_hold_nothing` (tests/land.rs): a published Land chain lists once, then (a) not after its worktree and all three pins are removed, and (b) an operation directory with no intent record (made at mode 0700, as a bare directory is refused as untrusted) is not listed and the scan stays complete with no error. No fault injection was needed. clippy and `cargo test -p fgos-git` pass; census regenerated.
+
+Status: DONE
