@@ -66,6 +66,8 @@ const DRIVER_FRESH_MS = 60000;
 // match.
 export const DEFAULT_TTL_MS = 5 * 60 * 1000;
 
+// Stays a pure local key-sort serialiser: this module's import list is pinned to `node:crypto` alone (test/verbs/dispatch-recovery.test.mjs),
+// so it cannot reach the door's canonicalJson; the one canonical form for it is a later decision.
 function stableStringify(value) {
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;

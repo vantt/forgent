@@ -34,6 +34,7 @@ export function gitCapabilitiesForHost(platform = process.platform, arch = proce
  * Deterministic, key-sorted canonical JSON serializer (RFC 8785 / JCS compatible).
  * Formats objects with lexicographically sorted keys at all depths and no extra whitespace.
  */
+// Not the door's canonicalJson: this producer digests the manifest before any addon exists to load, so it cannot reach the door without a staged addon (a packaging decision).
 export function canonicalJson(value) {
   if (value === null || typeof value !== 'object') {
     return JSON.stringify(value);

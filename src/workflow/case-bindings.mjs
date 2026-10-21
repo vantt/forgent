@@ -17,6 +17,7 @@ import path from 'node:path';
 import { cwdDevIno } from '../holder-lock/registry.mjs';
 import { currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
 import { dispatchCwdHolder } from '../runner/dispatch/cwd-lock.mjs';
+import { installOnce, replaceDurably } from '../native/door.mjs';
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 
 export const SENTINEL_NAME = '.root';
@@ -48,11 +49,10 @@ export function ensureBindingsSentinel(mainRoot) {
   if (currentDispatchDepth() !== 0) return false;
   try {
     fs.mkdirSync(bindingsDir(mainRoot), { recursive: true });
-    fs.writeFileSync(sentinel, 'fgos workflow case bindings\n', { flag: 'wx' });
-    fsyncDir(bindingsDir(mainRoot));
+    installOnce(bindingsDir(mainRoot), SENTINEL_NAME, 'fgos workflow case bindings\n', 0o644);
     return true;
-  } catch (err) {
-    return err.code === 'EEXIST';
+  } catch {
+    return fs.existsSync(sentinel);
   }
 }
 
@@ -94,20 +94,9 @@ export function createPendingBinding({ mainRoot, caseId, generation, worktree, c
   if (key === null) return { created: false, answer: 'worktree-missing' };
   if (!ensureBindingsSentinel(mainRoot)) return { created: false, answer: 'binding-view-unavailable', key };
   const record = { state: 'pending', caseId, generation, worktreeRoot: fs.realpathSync(worktree), commonDir, ref, key };
-  let fd;
-  try {
-    fd = fs.openSync(recordPath(mainRoot, key), 'wx');
-  } catch (err) {
-    if (err.code === 'EEXIST') return { created: false, ...readBinding({ mainRoot, worktree, caseId }) };
-    throw err;
+  if (installOnce(bindingsDir(mainRoot), path.basename(recordPath(mainRoot, key)), JSON.stringify(record), 0o644) === 'already-exists') {
+    return { created: false, ...readBinding({ mainRoot, worktree, caseId }) };
   }
-  try {
-    fs.writeSync(fd, JSON.stringify(record));
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
-  }
-  fsyncDir(bindingsDir(mainRoot));
   return { created: true, key, record };
 }
 
@@ -118,16 +107,7 @@ export function commitBinding({ mainRoot, key, caseId, generation }) {
   if (!record || record.caseId !== caseId || record.generation !== generation || record.state !== 'pending') {
     return { committed: false, answer: 'binding-unsettled' };
   }
-  const tmp = `${file}.${process.pid}.tmp`;
-  const fd = fs.openSync(tmp, 'w');
-  try {
-    fs.writeSync(fd, JSON.stringify({ ...record, state: 'committed' }));
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
-  }
-  fs.renameSync(tmp, file);
-  fsyncDir(bindingsDir(mainRoot));
+  replaceDurably(bindingsDir(mainRoot), path.basename(file), JSON.stringify({ ...record, state: 'committed' }), 0o644);
   return { committed: true };
 }
 

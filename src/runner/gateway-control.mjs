@@ -31,6 +31,7 @@ import { execFileSync, spawn } from 'node:child_process';
 import { resolveLogsDir } from './paths.mjs';
 import { observe, judge, signalByIdentity } from './dispatch/process-identity.mjs';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
+import { replaceDurably } from '../native/door.mjs';
 
 const REGISTRY_FILE = 'gateway.json';
 const DEFAULT_PORT = 4170;
@@ -143,7 +144,7 @@ function writeRegistry(fgosDir, entry) {
     }
     return;
   }
-  fs.writeFileSync(rp, `${JSON.stringify(entry, null, 2)}\n`);
+  replaceDurably(fgosDir, path.basename(rp), `${JSON.stringify(entry, null, 2)}\n`, 0o644);
 }
 
 /** Real port this repo's gateway would bind, read the SAME way the Rust
