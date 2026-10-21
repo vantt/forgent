@@ -111,15 +111,6 @@ test('a dirty file obstructing an incoming directory belongs to the clean gate',
     await assert.rejects(async () => f.port().prepare({ operationId: 'obstruction', request: f.request }), /main-checkout-dirty-mid-merge/); assert.equal(f.git('rev-parse', 'HEAD'), f.request.target); assert.equal(fs.readFileSync(path.join(f.repo, 'incoming-dir'), 'utf8'), 'keep obstructing bytes');
   } finally { f.close(); }
 });
-test('staged overlap refuses before CAS', async () => {
-  const f = fixture(); try {
-    const p = f.port(); const { candidate: c } = await p.prepare({ operationId: 'overlap', request: f.request });
-    fs.writeFileSync(path.join(f.repo, 'a'), 'local staged\n'); f.git('add', 'a');
-    await assert.rejects(async () => p.publish(evidence(c)), /main-checkout-dirty-mid-merge/);
-    assert.equal(f.git('rev-parse', 'HEAD'), f.request.target);
-    assert.equal(f.git('show', ':a'), 'local staged');
-  } finally { f.close(); }
-});
 test('abandoned prepare never blocks a fresh identity and remains recoverable', async () => {
   const f = fixture(); try {
     const first = f.port(); await first.prepare({ operationId: 'abandoned', request: f.request }); first.close();

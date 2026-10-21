@@ -7,11 +7,47 @@
 use crate::Oid;
 use std::{
     collections::BTreeSet,
-    fs, io,
+    fs,
+    io::{self, Read},
     path::{Path, PathBuf},
 };
 
-/// Make every loose object in `oids` durable: its file, its fan-out
+/// A loose object file Git could not have left whole: empty (a power cut kept
+/// the name but lost the bytes) or not starting with a zlib header. Cheap by
+/// design (two bytes); a truncated stream behind a good header is not seen here.
+fn intact(file: &Path, len: u64) -> io::Result<bool> {
+    if len < 2 {
+        return Ok(false);
+    }
+    let mut head = [0u8; 2];
+    fs::File::open(file)?.read_exact(&mut head)?;
+    Ok(head[0] & 0x0f == 8 && (u16::from(head[0]) << 8 | u16::from(head[1])) % 31 == 0)
+}
+
+/// The oids among `oids` whose loose file is present but not intact. Git never
+/// rewrites such a file (it finds the name taken), so a caller that is about to
+/// name these objects must heal or refuse; `sync_loose_objects` refuses.
+pub(crate) fn corrupt_loose_objects(common: &Path, oids: &[Oid]) -> io::Result<Vec<Oid>> {
+    let mut corrupt = Vec::new();
+    for oid in oids {
+        let hex = oid.as_str();
+        let file = common.join("objects").join(&hex[..2]).join(&hex[2..]);
+        match fs::symlink_metadata(&file) {
+            Ok(m) if m.is_file() => {
+                if !intact(&file, m.len())? {
+                    corrupt.push(oid.clone());
+                }
+            }
+            Ok(_) => return Err(io::Error::other("untrusted-object-file")),
+            Err(e) if e.kind() == io::ErrorKind::NotFound => {}
+            Err(e) => return Err(e),
+        }
+    }
+    Ok(corrupt)
+}
+
+/// Make every loose object in `oids` durable (refusing `object-file-corrupt`
+/// for one that is empty or not zlib: syncing it would only make it permanent): its file, its fan-out
 /// directory and `objects/`, all fsynced in one concurrent batch (one
 /// journal commit instead of one per path). An object with no loose file
 /// (packed) needs nothing, and a loose file this process already made durable
@@ -33,7 +69,11 @@ pub(crate) fn sync_loose_objects(common: &Path, oids: &[Oid], sync_files: bool) 
         let fanout = objects.join(&hex[..2]);
         let file = fanout.join(&hex[2..]);
         match fs::symlink_metadata(&file) {
-            Ok(m) if m.is_file() => {}
+            Ok(m) if m.is_file() => {
+                if !intact(&file, m.len())? {
+                    return Err(io::Error::other("object-file-corrupt"));
+                }
+            }
             Ok(_) => return Err(io::Error::other("untrusted-object-file")),
             Err(e) if e.kind() == io::ErrorKind::NotFound => continue,
             Err(e) => return Err(e),
@@ -195,6 +235,23 @@ mod tests {
         git(&dir, &["repack", "-adq"], b"");
         git(&dir, &["prune-packed"], b"");
         assert!(sync_loose_objects(&common, &oids, true).unwrap().is_empty());
+        fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn an_empty_or_non_zlib_loose_file_is_reported_and_never_synced() {
+        let (dir, common) = scratch("corrupt");
+        let (empty, garbage, good) = (write(&dir, b"e"), write(&dir, b"g"), write(&dir, b"ok"));
+        let file = |oid: &Oid| fanout(&common, oid).join(&oid.as_str()[2..]);
+        for (oid, bytes) in [(&empty, &b""[..]), (&garbage, &b"not zlib at all"[..])] {
+            fs::set_permissions(file(oid), std::os::unix::fs::PermissionsExt::from_mode(0o644)).unwrap();
+            fs::write(file(oid), bytes).unwrap();
+        }
+        let oids = [empty.clone(), garbage.clone(), good.clone()];
+        assert_eq!(corrupt_loose_objects(&common, &oids).unwrap(), vec![empty, garbage]);
+        let error = sync_loose_objects(&common, &oids, true).unwrap_err();
+        assert_eq!(error.to_string(), "object-file-corrupt");
+        assert!(sync_loose_objects(&common, &[good], true).is_ok());
         fs::remove_dir_all(&dir).unwrap();
     }
 

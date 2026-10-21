@@ -188,6 +188,13 @@ test('runBorrowed prepends the gc guards to git only, refuses a released handle,
     });
     assert.equal(seen.exit, 0, seen.stderr);
     assert.deepEqual(JSON.parse(seen.stdout), { env: 'main-checkout:3', argv: ['a', 'b'] }, 'a non-git command keeps its argv and sees the slot name');
+    // Recognised by its name alone, so a script called git shows the argv a real git would get.
+    const fakeGit = path.join(dir, 'bin', 'git');
+    fs.mkdirSync(path.dirname(fakeGit));
+    fs.writeFileSync(fakeGit, `#!${process.execPath}\nprocess.stdout.write(JSON.stringify(process.argv.slice(2)));\n`, { mode: 0o755 });
+    const gitSeen = runBorrowed(handle, { command: fakeGit, args: ['commit', '-m', 'x'], env: { ...process.env } });
+    assert.equal(gitSeen.exit, 0, gitSeen.stderr);
+    assert.deepEqual(JSON.parse(gitSeen.stdout), ['-c', 'gc.auto=0', '-c', 'maintenance.auto=false', 'commit', '-m', 'x'], 'git gets the gc guards in front of its own argv');
 
     const child = runBorrowed(handle, { command: process.execPath, args: ['-e', 'setTimeout(() => {}, 300)'], env: { ...process.env } }, { sync: false });
     assert.throws(() => handle.release(), (err) => err instanceof HolderLockError && err.code === 'lock-release-while-borrowed');
