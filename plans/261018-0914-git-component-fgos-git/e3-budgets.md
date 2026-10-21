@@ -17,7 +17,7 @@ Starting points (proposals only): the DC baseline in Git spec §19 E3 row (warm 
 | Full typed operation: Land (prepare + publish, verify excluded) | p95 | ≤ 1.6 s on the owner's host class (ext4 NVMe, the measurement condition below); the ratio to today's merge path on the same fixture is reported, not budgeted (was ≤ 1.2 ×; amended 2026-10-20) |
 | Git subprocess count per typed operation | count | reported; no budget |
 | WAL amplification per completed operation | allocated bytes / inodes | ≤ 32 KiB / ≤ 12 |
-| Backlog scan of 10,000 pending records | time, completeness | ≤ 300 ms, `complete: true` |
+| Backlog scan of 10,000 pending records | time, completeness | ≤ 300 ms, `complete: true`. The unit is WAL records (owner 2026-10-22: 10,000 operations with one record each); larger chains are reported, not budgeted |
 | Full reconciliation of 100 interrupted publications | time | ≤ 10 s |
 | Rollback with live processes (P-RELEASE overlap) | outcome | refused by the C5 door or completed; zero lost or corrupt records |
 

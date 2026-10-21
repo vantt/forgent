@@ -1570,3 +1570,72 @@ fn recovery_of_a_tip_with_an_unreadable_object_names_the_cause_and_keeps_the_evi
         assert!(wal::Wal::open(&f.repo).unwrap().inspect(id).unwrap().outcome().is_none());
     }
 }
+
+/// Leaves the objects of a staged `deep/er/file` on disk as a power cut in the
+/// old window did: every blob and tree present under its name, but empty, and
+/// the index back at HEAD. With `blob_only`, only the blob is emptied. Returns
+/// the emptied oids, the blob last.
+fn leave_staged_objects_empty(f: &Fixture, blob_only: bool) -> Vec<String> {
+    use std::os::unix::fs::PermissionsExt;
+    fs::create_dir_all(f.tree.join("deep/er")).unwrap();
+    fs::write(f.tree.join("deep/er/file"), "new blob").unwrap();
+    git(&f.tree, &["add", "-A", "deep"]);
+    let root = git(&f.tree, &["write-tree"]);
+    let mut oids = vec![root.clone()];
+    oids.extend(git(&f.tree, &["ls-tree", "-r", "-t", &root, "deep"]).lines().map(|l| l.split_whitespace().nth(2).unwrap().to_owned()));
+    git(&f.tree, &["reset", "-q"]);
+    if blob_only {
+        oids = oids.split_off(oids.len() - 1);
+    }
+    for oid in &oids {
+        let file = loose_object(f, oid);
+        fs::set_permissions(&file, fs::Permissions::from_mode(0o644)).unwrap();
+        fs::write(&file, b"").unwrap();
+    }
+    oids
+}
+
+#[test]
+fn staged_objects_a_cut_left_empty_are_healed_so_the_commit_names_readable_objects() {
+    // Every object of the change emptied (Git cannot even list the trees), then only the blob.
+    for blob_only in [false, true] {
+        let f = Fixture::new();
+        let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+        let emptied = leave_staged_objects_empty(&f, blob_only);
+        assert_eq!(emptied.len(), if blob_only { 1 } else { 4 });
+        let result = f
+            .driver
+            .scoped_commit(&f.repo, f.held(), &baseline, &nested_request(), "fixture", "healed")
+            .unwrap();
+        assert_eq!(result.status, ResultCode::Committed);
+        assert_eq!(git(&f.tree, &["show", "HEAD:deep/er/file"]), "new blob");
+        git(&f.tree, &["fsck", "--full", "--strict"]);
+        for oid in &emptied {
+            assert!(fs::metadata(loose_object(&f, oid)).unwrap().len() > 0, "{oid}");
+        }
+    }
+}
+
+#[test]
+fn a_corrupt_staged_object_that_cannot_be_healed_refuses_before_git_commit() {
+    use std::os::unix::fs::{MetadataExt, PermissionsExt};
+    let f = Fixture::new();
+    // Permission bits do not stop the superuser from removing the file.
+    if fs::metadata("/proc/self").unwrap().uid() == 0 {
+        return;
+    }
+    let baseline = f.driver.preflight_commit(&f.repo, f.held()).unwrap();
+    let emptied = leave_staged_objects_empty(&f, false);
+    let blob = git(&f.tree, &["hash-object", "deep/er/file"]);
+    assert!(emptied.contains(&blob));
+    let fanout = loose_object(&f, &blob).parent().unwrap().to_owned();
+    fs::set_permissions(&fanout, fs::Permissions::from_mode(0o555)).unwrap();
+    let refused = f
+        .driver
+        .scoped_commit(&f.repo, f.held(), &baseline, &nested_request(), "fixture", "unhealable");
+    fs::set_permissions(&fanout, fs::Permissions::from_mode(0o755)).unwrap();
+    assert_eq!(refused.unwrap_err().cause, "object-file-corrupt");
+    assert_eq!(git(&f.tree, &["rev-parse", "HEAD"]), baseline.head);
+    assert_eq!(git(&f.tree, &["diff", "--cached", "--name-only"]), "");
+    assert_eq!(fs::read_to_string(f.tree.join("deep/er/file")).unwrap(), "new blob");
+}

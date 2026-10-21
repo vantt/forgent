@@ -17,6 +17,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { uniqueTmpTag } from '../../../util/unique-tmp-tag.mjs';
 
 export const ATTESTATION_CONTRACT = 'confinement-attestation.v1';
 export const ATTESTATION_REF_CONTRACT = 'confinement-attestation-ref.v1';
@@ -181,7 +182,7 @@ export function saveAttestationRecord(attestation, context = {}) {
 
   const fileName = `${attestation.dispatchId}.${attestation.phase}.json`;
   const filePath = path.join(storeDir, fileName);
-  const tmpPath = `${filePath}.tmp.${Date.now()}`;
+  const tmpPath = `${filePath}.tmp.${uniqueTmpTag()}`;
 
   fs.writeFileSync(tmpPath, JSON.stringify(attestation, null, 2), 'utf8');
   fs.renameSync(tmpPath, filePath);
@@ -209,7 +210,7 @@ export function savePlanRecord(plan, context = {}) {
 
   const fileName = `${plan.dispatchId}.plan.json`;
   const filePath = path.join(storeDir, fileName);
-  const tmpPath = `${filePath}.tmp.${Date.now()}`;
+  const tmpPath = `${filePath}.tmp.${uniqueTmpTag()}`;
 
   fs.writeFileSync(tmpPath, JSON.stringify(plan, null, 2), 'utf8');
   fs.renameSync(tmpPath, filePath);
@@ -309,7 +310,7 @@ export function saveProbeCacheRecord(fingerprint, probeResult, context = {}, { n
     const storeDir = resolveAttestationStoreDir(context);
     fs.mkdirSync(storeDir, { recursive: true });
     const filePath = probeCachePath(storeDir, fpDigest);
-    const tmpPath = `${filePath}.tmp.${Date.now()}`;
+    const tmpPath = `${filePath}.tmp.${uniqueTmpTag()}`;
     fs.writeFileSync(tmpPath, JSON.stringify(record, null, 2), 'utf8');
     fs.renameSync(tmpPath, filePath);
   } catch {

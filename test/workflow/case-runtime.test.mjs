@@ -5,6 +5,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawn } from 'node:child_process';
 
 import { validateWorkflow, createWorkflowRun, readWorkflowEvents } from '../../src/workflow/index.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
@@ -51,6 +52,22 @@ test('a gate answer is one round file made once; a second answer to an answered 
   const event = eventsOf(run).find((e) => e.type === 'gate.answer');
   assert.deepEqual([event.payload.stepId, event.payload.approved, event.payload.subjectDigest, event.payload.occurrence, event.payload.round], ['ok', true, 'sha256:copy', 1, 1]);
   assert.throws(() => answer(run), (err) => err.code === 'gate-already-answered', 'still refused once consumed');
+});
+
+test('two processes answering one gate at once: exactly one round file is made, the other is refused by name', async () => {
+  const run = gatedRun();
+  const module = new URL('../../src/workflow/case-runtime.mjs', import.meta.url).href;
+  const args = JSON.stringify({ mainRoot: run.repoRoot, caseId: run.caseId, events: eventsOf(run), stepId: 'ok', answer: 'looks right', approved: true, question: 'Approve the copy?', subjectDigest: 'sha256:copy' });
+  const code = `import { recordGateAnswerRound } from ${JSON.stringify(module)};
+    try { recordGateAnswerRound(${args}); console.log('answered'); } catch (err) { console.log(err.code); }`;
+  const outcomes = await Promise.all([1, 2, 3].map(() => new Promise((resolve) => {
+    const child = spawn(process.execPath, ['--input-type=module', '-e', code], { stdio: ['ignore', 'pipe', 'inherit'] });
+    let out = '';
+    child.stdout.on('data', (chunk) => { out += chunk; });
+    child.once('exit', () => resolve(out.trim()));
+  })));
+  assert.equal(outcomes.filter((o) => o === 'answered').length, 1, outcomes.join());
+  assert.ok(outcomes.filter((o) => o !== 'answered').every((o) => o === 'gate-already-answered'), outcomes.join());
 });
 
 test('a clarification does not settle the gate: rounds accumulate in one file until an approval, then it is immutable', () => {

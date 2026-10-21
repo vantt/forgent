@@ -178,7 +178,14 @@ export function removeWorkerHome(homePath) {
   }
   // A home is private to one dispatch: whatever still runs from it (an agent CLI's own background
   // server) is a leftover of that dispatch and would outlive the files it runs from.
-  stopProcessesInside(homePath);
+  const { left } = stopProcessesInside(homePath);
+  if (left.length > 0) {
+    throw new WorkerHomeError(
+      'worker-home-in-use',
+      `removeWorkerHome refused: pid ${left.map((view) => view.pid).join(', ')} still runs from "${homePath}" after SIGKILL or has no readable identity; stop it, then remove the home.`,
+      { homePath, pids: left.map((view) => view.pid) },
+    );
+  }
   fs.rmSync(homePath, { recursive: true, force: true });
   return true;
 }

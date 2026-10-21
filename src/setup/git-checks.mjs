@@ -148,7 +148,8 @@ export function fixLandRecovery(cwd, loaderOptions, portOptions) {
  */
 export function checkLandRetainedCandidates(cwd, loaderOptions, portOptions, now = Date.now()) {
   try {
-    const recovery = createGitRecovery(portOptions ?? gitPortOptions(resolveMainCheckoutRoot(cwd) ?? cwd), loaderOptions);
+    // The Recovery port is constructed with a writer even for reads, as the fix above is.
+    const recovery = createGitRecovery(portOptions ?? gitPortOptions(resolveMainCheckoutRoot(cwd) ?? cwd, { mutation: true }), loaderOptions);
     const { candidates, complete } = recovery.listRetainedLand();
     if (!candidates.length) return { passed: true, message: complete ? 'no retained Land candidate' : 'warning: Land candidate scan incomplete' };
     const rows = candidates.map(c => {

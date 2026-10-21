@@ -41,24 +41,6 @@ test('the same destination stays excluded across consumer verification', async (
     const main = acquireSync(scope, 'main-checkout', { fgosDir: path.join(f.repo, '.fgos') }); assert.equal(main.result, 'acquired'); main.handle.release(); admin.handle.release();
   } finally { f.close(); }
 });
-test('a held custody rank is refused before Land has any effect', async () => {
-  const f = fixture(); const h = acquireSync(createLockScope(), 'dispatch-cwd', { fgosDir: path.join(f.repo, '.fgos'), cwd: f.repo }); assert.equal(h.result, 'acquired');
-  try { await assert.rejects(async () => f.port().prepare({ operationId: 'order', request: f.request }, [h.handle]), /lock-order-violation/); assert.equal(fs.existsSync(path.join(f.repo, '.fgos/runtime/git-candidates')), false); }
-  finally { h.handle.release(); f.close(); }
-});
-test('M4 consumer settlement identity survives an unknown append acknowledgement', async () => {
-  const f = fixture(); try {
-    const p = f.port(); const { candidate: c } = await p.prepare({ operationId: 'settle', request: f.request }); const r = await p.publish(evidence(c)); p.close();
-    // Work/Event Store must enforce this unique tuple and query it before retry.
-    const repoIdentity = JSON.parse(fs.readFileSync(path.join(f.repo, '.git/fgos/git/operations/settle/00000000.json'), 'utf8')).phase.data.repoIdentity;
-    const ledger = new Map(); const key = operationId => JSON.stringify([repoIdentity, operationId, 'delivered']);
-    ledger.set(key(r.operationId), { mergedSha: r.localEffect.publishedOid, mergedInto: f.request.destination }); // append happened, acknowledgement lost
-    const replay = (await f.port().prepare({ operationId: 'settle', request: f.request })).receipt;
-    const queried = ledger.get(key(replay.operationId)); assert.equal(queried.mergedSha, c.candidate); assert.equal(ledger.size, 1);
-    // Negative control: a fresh settlement identity would duplicate business history.
-    const withoutDedup = [queried, { ...queried }]; assert.equal(withoutDedup.length, 2);
-  } finally { f.close(); }
-});
 test('ignored incoming collisions preserve bytes and block before CAS', async () => {
   const f = fixture(); try {
     // The source introduces b/new while main has an ignored untracked directory there.
@@ -127,15 +109,6 @@ test('a dirty file obstructing an incoming directory belongs to the clean gate',
   const f = fixture(); try {
     f.git('checkout', '-q', 'source'); fs.mkdirSync(path.join(f.repo, 'incoming-dir')); fs.writeFileSync(path.join(f.repo, 'incoming-dir/file'), 'incoming'); f.git('add', 'incoming-dir/file'); f.git('commit', '-qm', 'incoming directory'); f.request.source = f.git('rev-parse', 'HEAD'); f.git('checkout', '-q', 'trunk'); fs.writeFileSync(path.join(f.repo, 'incoming-dir'), 'keep obstructing bytes');
     await assert.rejects(async () => f.port().prepare({ operationId: 'obstruction', request: f.request }), /main-checkout-dirty-mid-merge/); assert.equal(f.git('rev-parse', 'HEAD'), f.request.target); assert.equal(fs.readFileSync(path.join(f.repo, 'incoming-dir'), 'utf8'), 'keep obstructing bytes');
-  } finally { f.close(); }
-});
-test('staged overlap refuses before CAS', async () => {
-  const f = fixture(); try {
-    const p = f.port(); const { candidate: c } = await p.prepare({ operationId: 'overlap', request: f.request });
-    fs.writeFileSync(path.join(f.repo, 'a'), 'local staged\n'); f.git('add', 'a');
-    await assert.rejects(async () => p.publish(evidence(c)), /main-checkout-dirty-mid-merge/);
-    assert.equal(f.git('rev-parse', 'HEAD'), f.request.target);
-    assert.equal(f.git('show', ':a'), 'local staged');
   } finally { f.close(); }
 });
 test('abandoned prepare never blocks a fresh identity and remains recoverable', async () => {

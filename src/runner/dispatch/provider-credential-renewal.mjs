@@ -24,8 +24,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { replaceDurably } from '../../native/door.mjs';
 import { createRequire } from 'node:module';
 
+import { resolveHolderLiveness } from './process-identity.mjs';
 import { acquireAccountLock, tryAcquireAccountLock, credentialStoreDir, expandCredentialHome } from './provider-capacity.mjs';
 import {
   credentialProbeCommand,
@@ -103,20 +105,7 @@ function serializeJson(doc, raw) {
 }
 
 export function writeFileAtomic(file, content) {
-  const tmp = path.join(path.dirname(file), `.${path.basename(file)}.fgos-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);
-  try {
-    const fd = fs.openSync(tmp, 'w', 0o600);
-    try {
-      fs.writeSync(fd, content);
-      fs.fsyncSync(fd);
-    } finally {
-      fs.closeSync(fd);
-    }
-    fs.renameSync(tmp, file);
-  } catch (err) {
-    try { fs.rmSync(tmp, { force: true }); } catch { /* nothing left to do */ }
-    throw err;
-  }
+  replaceDurably(path.dirname(file), path.basename(file), content, 0o600);
 }
 
 /**
@@ -704,7 +693,7 @@ function listInterruptedStagings(storeDir) {
 function stagingWriterAlive(dir) {
   const pid = Number(STAGING_NAME.exec(path.basename(dir))?.[1]);
   if (!Number.isInteger(pid) || pid <= 0) return true;
-  try { process.kill(pid, 0); return true; } catch (err) { return err?.code !== 'ESRCH'; }
+  return resolveHolderLiveness({ pid }) !== 'dead';
 }
 
 // Whether a staging is old enough to be left behind: its own change time and that of what it holds.
@@ -717,7 +706,9 @@ function stagingAgeMs(dir, now) {
 
 // Digest of every file under `dir` (names and bytes), or null when anything cannot be read or is not a plain
 // file. The shared-memory index (`-shm`) is left out: SQLite creates it inside any copy it opens and it
-// carries no data. In memory only.
+// carries no data, and neither does a temporary the durable-file crate left behind (`.durable-file-<pid>-<seq>.tmp`,
+// a crash between its write and the wrapper's cleanup). In memory only.
+const DURABLE_FILE_TEMP = /^\.durable-file-\d+-\d+\.tmp$/;
 function treeDigest(dir) {
   const hash = crypto.createHash('sha256');
   const walk = (current) => {
@@ -725,7 +716,7 @@ function treeDigest(dir) {
       const full = path.join(current, entry.name);
       if (entry.isDirectory()) { if (!walk(full)) return false; continue; }
       if (!entry.isFile()) return false;
-      if (entry.name.endsWith('-shm')) continue;
+      if (entry.name.endsWith('-shm') || DURABLE_FILE_TEMP.test(entry.name)) continue;
       hash.update(path.relative(dir, full)).update('\u0000').update(fs.readFileSync(full)).update('\u0001');
     }
     return true;

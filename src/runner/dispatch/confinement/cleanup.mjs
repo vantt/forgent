@@ -215,7 +215,10 @@ export function countCredentialKeep(dirPath, marker, now = Date.now) {
 export function removeConfinementDir(dirPath, { stopProcesses = false, now = Date.now } = {}) {
   // An attempt home is removed only by adopt's finalize-home step, never through this door.
   if (readAttemptOwnershipMarker(dirPath)) throw new Error('attempt-home-owned-by-adopt');
-  if (stopProcesses) stopProcessesInside(dirPath);
+  if (stopProcesses) {
+    const { left } = stopProcessesInside(dirPath);
+    if (left.length > 0) throw new Error(`confinement-dir-in-use: pid ${left.map((view) => view.pid).join(', ')} still runs from the directory or has no readable identity`);
+  }
   const marker = readOwnershipMarker(dirPath);
   // A marker file that is there but cannot be recognised (a writer died half-way, or it holds something
   // else) does not prove the home holds no login: leave it alone.

@@ -1,5 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
-import { test } from 'node:test';
+import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -32,11 +32,29 @@ const DEPENDENCY_DIR = 'node' + '_modules';
 // The pair a host sets for its own Node child; a staged release must not inherit the outer run's.
 const ACTIVE_RELEASE_KEYS = ['FGOS_ACTIVE_RELEASE_PATH', 'FGOS_ACTIVE_MANIFEST_PATH'];
 
+// One release tree staged from this checkout for the whole file; no case writes into it. The build
+// reads the checkout through the host it just compiled, never an inherited one: a clean checkout
+// outside an activated workspace has none, so an unusable FGOS_HOST_BIN must not matter (R1 & R2).
+const staged = { dir: null, result: null };
+before(() => {
+  staged.dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-test-'));
+  const inheritedHost = process.env.FGOS_HOST_BIN;
+  process.env.FGOS_HOST_BIN = path.join(staged.dir, 'no-such-host');
+  try {
+    staged.result = buildRustDistribution({ outDir: staged.dir, repoRoot: REPO_ROOT });
+  } finally {
+    if (inheritedHost === undefined) delete process.env.FGOS_HOST_BIN;
+    else process.env.FGOS_HOST_BIN = inheritedHost;
+  }
+});
+after(() => {
+  if (staged.dir) fs.rmSync(staged.dir, { recursive: true, force: true });
+});
+
 test('the staged legacy-node payload carries the vendored YAML parser and any declared production dependencies, and loads them', () => {
-  const tempOut = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-deps-'));
+  const tempOut = staged.dir;
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-deps-work-'));
   try {
-    buildRustDistribution({ outDir: tempOut, repoRoot: REPO_ROOT });
     const legacyNodeDir = path.join(tempOut, 'libexec', 'legacy-node');
     const declared = Object.keys(JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8')).dependencies ?? {});
 
@@ -68,15 +86,14 @@ test('the staged legacy-node payload carries the vendored YAML parser and any de
     assert.equal(res.status, 0, `${res.stdout}${res.stderr}`);
     assert.equal(res.stdout, '{"a":[1,2]}');
   } finally {
-    fs.rmSync(tempOut, { recursive: true, force: true });
     fs.rmSync(workDir, { recursive: true, force: true });
   }
 });
 
 test('R1 & R2: Release tree builder stages release tree and produces canonical manifest with reproducible artifactDigest', () => {
-  const tempOut = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-test-'));
+  const tempOut = staged.dir;
 
-  try {
+  {
     // 1. Refuse build if --out is inside checkout
     const insideOut = path.join(REPO_ROOT, 'disposable-release-tree');
     assert.throws(
@@ -85,18 +102,8 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
       'Must refuse to stage release tree inside the checkout directory'
     );
 
-    // 2. Stage tree into disposable directory. The build reads the checkout through the host it
-    // just compiled, never an inherited one: a clean checkout outside an activated workspace has
-    // none, so an unusable FGOS_HOST_BIN must not matter.
-    const inheritedHost = process.env.FGOS_HOST_BIN;
-    process.env.FGOS_HOST_BIN = path.join(tempOut, 'no-such-host');
-    let result;
-    try {
-      result = buildRustDistribution({ outDir: tempOut, repoRoot: REPO_ROOT });
-    } finally {
-      if (inheritedHost === undefined) delete process.env.FGOS_HOST_BIN;
-      else process.env.FGOS_HOST_BIN = inheritedHost;
-    }
+    // 2. The tree staged into a disposable directory, under an unusable FGOS_HOST_BIN (before()).
+    const result = staged.result;
     assert.ok(result.artifactDigest.startsWith('sha256:'));
     assert.ok(result.fileCount > 500);
 
@@ -172,19 +179,27 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
     const conventionRulesPath = 'libexec/legacy-node/packages/convention/contracts/convention.rules.v1.json';
     assert.ok(paths.includes(conventionRulesPath), 'manifest files[] must cover installed doctor rule data');
 
-    const doctorEnv = { ...process.env };
+    // The installed doctor's convention row, computed as `fgos doctor` computes each row: the
+    // staged payload's own check registry, its packaged rule data and the staged host. Only this row
+    // is run; the whole doctor on this checkout spends most of a minute on unrelated rows, and the
+    // staged door that runs the doctor verb is the one R3 drives for every route.
+    const doctorEnv = { ...process.env, FGOS_HOST_BIN: fgosBin };
     delete doctorEnv.CLAUDE_CODE_SESSION_ID;
-    delete doctorEnv.FGOS_HOST_BIN;
-    // The staged release finds its own manifest; the outer run's active-release pair names another payload.
+    // The staged payload resolves its own manifest; the outer run's active-release pair names another payload.
     for (const key of ACTIVE_RELEASE_KEYS) delete doctorEnv[key];
-    const doctor = spawnSync(fgosBin, ['doctor', '--dir', REPO_ROOT], {
+    const doctorRow = [
+      "const { DOCTOR_CHECKS } = await import(process.argv[1]);",
+      "const entry = DOCTOR_CHECKS.find((c) => c.id === 'convention-conformance');",
+      "process.stdout.write(JSON.stringify(entry ? { id: entry.id, ...(await entry.check(process.argv[2])) } : null));",
+    ].join('\n');
+    // boundary: the staged payload runs in its own process, against its own packaged files and host.
+    const doctor = spawnSync(process.execPath, ['--input-type=module', '-e', doctorRow, pathToFileURL(path.join(legacyNodeDir, 'src', 'setup', 'checks.mjs')).href, REPO_ROOT], {
       cwd: REPO_ROOT,
       encoding: 'utf8',
       env: doctorEnv,
     });
-    assert.equal(doctor.status, 0, `staged fgos doctor failed: ${doctor.stderr}`);
-    const doctorEnvelope = JSON.parse(doctor.stdout);
-    const conventionCheck = doctorEnvelope.data.checks.find((entry) => entry.id === 'convention-conformance');
+    assert.equal(doctor.status, 0, `staged doctor convention row failed: ${doctor.stderr}`);
+    const conventionCheck = JSON.parse(doctor.stdout);
     assert.ok(conventionCheck, 'staged fgos doctor must list convention-conformance');
     assert.equal(conventionCheck.passed, true);
     assert.match(conventionCheck.message, /convention violations: \d+ pre-cutoff, 0 post-cutoff/);
@@ -216,17 +231,14 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
       declaredDigest,
       'Independently recomputed artifactDigest must match declared artifactDigest'
     );
-  } finally {
-    fs.rmSync(tempOut, { recursive: true, force: true });
   }
 });
 
 test('R3: Staged release tree runs P02 harness from outside checkout with cleaned PATH/NODE_PATH', async () => {
-  const stagedDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-stage-'));
+  const stagedDir = staged.dir;
   const outsideWorkDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-outside-workdir-'));
 
   try {
-    buildRustDistribution({ outDir: stagedDir, repoRoot: REPO_ROOT });
     const stagedBinary = path.join(stagedDir, 'bin', 'fgos');
     assert.ok(fs.existsSync(stagedBinary));
 
@@ -304,7 +316,6 @@ test('R3: Staged release tree runs P02 harness from outside checkout with cleane
       for (const [key, value] of origActiveRelease) if (value !== undefined) process.env[key] = value;
     }
   } finally {
-    fs.rmSync(stagedDir, { recursive: true, force: true });
     fs.rmSync(outsideWorkDir, { recursive: true, force: true });
   }
 });

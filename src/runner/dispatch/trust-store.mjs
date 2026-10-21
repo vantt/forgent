@@ -376,6 +376,7 @@ export function removeCodexTrust(configPath, projectPath) {
 
 const DEFAULT_HOOK_TIMEOUT_SEC = 600;
 
+// Codex's own key order, not RFC 8785: the trust hash must match what codex computes, so this is not the door's canonicalJson.
 function sortedJson(value) {
   if (Array.isArray(value)) return value.map(sortedJson);
   if (value && typeof value === 'object') {

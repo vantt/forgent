@@ -17,6 +17,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
 const BASELINE = 'eab4d617b';
@@ -41,6 +42,9 @@ before(() => {
   }
   // The lock door the hot lock calls through, whole, so its modules agree with each other.
   fs.cpSync(path.join(ROOT, 'src/holder-lock'), path.join(tree, 'src/holder-lock'), { recursive: true });
+  // The process door is this checkout's own: the door loads only the addon of the payload it runs in, so the
+  // baseline tree reaches this checkout's client instead of carrying a payload (and a copy of the addon) of its own.
+  fs.writeFileSync(path.join(tree, 'src/runner/dispatch/process-identity.mjs'), `export * from ${JSON.stringify(pathToFileURL(path.join(ROOT, 'src/runner/dispatch/process-identity.mjs')).href)};\n`);
   // The baseline callers still use the pre-cutover names; give them to the
   // copied events module as thin wrappers over the real hot lock.
   fs.appendFileSync(path.join(tree, 'src/state/events.mjs'), `

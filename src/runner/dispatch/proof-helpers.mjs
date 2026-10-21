@@ -7,20 +7,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { canonicalJson, installOnce, replaceDurably } from '../../native/door.mjs';
 
-export function canonicalJson(value) {
-  if (value === null || typeof value !== 'object') {
-    return JSON.stringify(value);
-  }
-  if (Array.isArray(value)) {
-    return '[' + value.map((elem) => canonicalJson(elem)).join(',') + ']';
-  }
-  const keys = Object.keys(value).sort();
-  const entries = keys
-    .filter((k) => value[k] !== undefined)
-    .map((k) => JSON.stringify(k) + ':' + canonicalJson(value[k]));
-  return '{' + entries.join(',') + '}';
-}
+export { canonicalJson } from '../../native/door.mjs';
 
 export function computeSha256Digest(value) {
   const serialized = typeof value === 'string' ? value : canonicalJson(value);
@@ -70,59 +59,18 @@ export function normalizeAgentName(raw, { maxLength = 32 } = {}) {
   return `${cleaned.slice(0, head)}${hash}`;
 }
 
-function fsyncDirBestEffort(dir) {
-  let fd;
-  try {
-    fd = fs.openSync(dir, 'r');
-    fs.fsyncSync(fd);
-  } catch {
-  } finally {
-    if (fd !== undefined) {
-      try { fs.closeSync(fd); } catch {}
-    }
-  }
-}
-
 export function publishImmutableProof(targetPath, record) {
   const dir = path.dirname(targetPath);
   fs.mkdirSync(dir, { recursive: true });
   const content = typeof record === 'string' ? record : `${JSON.stringify(record, null, 2)}\n`;
-  const tmpPath = path.join(dir, `.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-  const fd = fs.openSync(tmpPath, 'w');
-  try {
-    fs.writeSync(fd, content);
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
-  }
-  try {
-    fs.linkSync(tmpPath, targetPath);
-  } catch (err) {
-    try { fs.unlinkSync(tmpPath); } catch {}
-    if (err.code === 'EEXIST') {
-      return false;
-    }
-    throw err;
-  }
-  try { fs.unlinkSync(tmpPath); } catch {}
-  fsyncDirBestEffort(dir);
-  return true;
+  return installOnce(dir, path.basename(targetPath), content, 0o644) === 'created';
 }
 
 export function publishMutableProjection(targetPath, record) {
   const dir = path.dirname(targetPath);
   fs.mkdirSync(dir, { recursive: true });
   const content = typeof record === 'string' ? record : `${JSON.stringify(record, null, 2)}\n`;
-  const tmpPath = path.join(dir, `.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-  const fd = fs.openSync(tmpPath, 'w');
-  try {
-    fs.writeSync(fd, content);
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
-  }
-  fs.renameSync(tmpPath, targetPath);
-  fsyncDirBestEffort(dir);
+  replaceDurably(dir, path.basename(targetPath), content, 0o644);
 }
 
 export function publishSecretSideFile(targetPath, record) {

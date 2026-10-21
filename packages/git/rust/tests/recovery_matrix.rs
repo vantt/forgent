@@ -26,7 +26,7 @@ const KINDS: [&str; 12] = [
     "PublicationCas",
 ];
 fn locked(name: &str, path: PathBuf) -> Handle {
-    match acquire(&Resource::new(name, path), Mode::Ex, Wait::Try, 2000) {
+    match acquire(&Resource::new(name, path), Mode::Ex, Wait::Ms(30_000), 2000) {
         Acquire::Acquired(h) => h,
         e => panic!("{e:?}"),
     }

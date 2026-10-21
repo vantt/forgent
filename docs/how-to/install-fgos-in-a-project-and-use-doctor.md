@@ -326,7 +326,6 @@ Mostly relevant after the project has real work items.
 | `events-compaction-verified` | Past `.fgos/events/` compactions still match their archives | names the compaction | you | Report it; do not delete archives |
 | `main-checkout-guard-warnings` | The main-checkout guard log has no recorded regressions | `1300 main checkout guard warning(s) recorded` | info | Read the log named in the message; clear only after review |
 | `no-stuck-merge-abort` | The main checkout has no lingering `MERGE_HEAD` | `merge in progress or stuck (MERGE_HEAD=...) -- run fgos main-checkout-reset ...` | you | `--fix` never acts here by design. Review `git status`, then `fgos main-checkout-reset --sha <sha> --confirm` |
-| `coordination-abandoned-claims` | No abandoned `.claim` or `.staging-*` coordination entries | `Found N demonstrably dead claims` | tool | `fgos doctor --fix` removes only provably dead ones |
 | `runner-coordination-orgPolicy-shape` | `runner.coordination.orgPolicy.dischargeOn` is an array of strings | `... dischargeOn must be an array of strings` | tool | `fgos doctor --fix` resets it to the default |
 | `coordination-protocol-fixtures-valid` | Coordination protocol definitions validate | `coordination protocol fixtures retired` | info | none |
 | `operation-prompt-templates-valid` | Operation prompt templates validate | names the template | you | Fix the named template |

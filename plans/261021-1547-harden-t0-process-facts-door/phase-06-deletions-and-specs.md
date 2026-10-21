@@ -1,7 +1,7 @@
 ---
 phase: 06
 title: "Deletions (dead doctor row, process-observe route, dead crate functions) and spec updates with the approved Part A shapes"
-status: pending
+status: done
 depends_on: [03, 04, 05]
 parallel: "sequential: after phases 03, 04 and 05; phase 07 may run beside it only when SEAT has landed (disjoint files except registrations.mjs: coordinate by commit order)"
 effort: ~1d

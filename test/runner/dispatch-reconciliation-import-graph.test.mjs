@@ -105,7 +105,8 @@ for (const banned of BANNED_FILES) {
 
 // Builtins the closure may load. Process creation (child_process, cluster)
 // and anything else is refused, whichever way it is spelled.
-const ALLOWED_BUILTINS = new Set(['fs', 'path', 'crypto', 'os', 'async_hooks', 'worker_threads', 'url', 'util']);
+const ALLOWED_BUILTINS = new Set(['fs', 'path', 'crypto', 'os', 'async_hooks', 'worker_threads', 'url', 'util', 'module']);
+// `module` is the door's `createRequire`: the leaf loads the native addon in-process, lazily, on its first call.
 const builtinName = (specifier) => specifier.replace(/^node:/, '').split('/')[0];
 
 // The lock door (src/holder-lock): the provider-capacity state that reconcile's
@@ -139,18 +140,11 @@ const BANNED_CALLS = [
   ['process.kill taken as a value', /\bprocess\s*(?:\?\.|\.)\s*kill\b(?!\s*\()/],
   ['kill destructured from process', /\{[^}]*\bkill\b[^}]*\}\s*=\s*(?:globalThis\s*\.\s*)?process\b/],
 ];
-// `process.kill(pid, 0)` delivers no signal: it only asks whether a pid exists
-// (provider-capacity.mjs's isPidAlive lease probe, and the planner's
-// `process.kill.call(process, pid, 0)`). It is liveness evidence, not process
-// control, so it is the one kill form allowed in this graph.
-const SIGNAL_ZERO_PROBE = /\bprocess\s*\.\s*kill\s*(?:\.\s*call\s*\(\s*process\s*,|\()\s*[A-Za-z_$][\w$.]*\s*,\s*0\s*\)/g;
-
 /** Banned-call findings in one source text: [label, matched text]. */
 export function bannedCalls(source) {
   const { code } = lexSource(source);
-  const scanned = code.replace(SIGNAL_ZERO_PROBE, (probe) => ' '.repeat(probe.length));
   return BANNED_CALLS.flatMap(([label, pattern]) => {
-    const m = pattern.exec(scanned);
+    const m = pattern.exec(code);
     return m ? [[label, m[0]]] : [];
   });
 }
@@ -221,9 +215,13 @@ const EXPECTED_CLOSURE = [
   // ... the auth-failure wording table, a leaf with no imports, kept apart
   // so provider-capacity never imports a process-control module for it ...
   'src/runner/dispatch/provider-auth-failure.mjs',
-  // ... and /proc boot-id/start-time reads that decide lease holder
-  // identity (node:fs only; no signals, no spawn).
+  // ... and the thin client of process facts that decides lease holder
+  // identity through the native door (no signals, no spawn, no /proc read).
   'src/runner/dispatch/process-identity.mjs',
+  // The door loads the addon lazily through node:module (never at import time);
+  // payload-root.mjs locates the release it belongs to (node:fs/node:path only).
+  'src/native/door.mjs',
+  'src/run-supervisor/payload-root.mjs',
   // ... and the lock door guarding the provider-capacity state file
   // (see LOCK_DOOR_FILES), with the host-binary lookup its driver needs.
   'src/holder-lock/index.mjs',
@@ -325,8 +323,11 @@ test('banned-call scan sees code around inline comments and every spelling of a 
   assert.deepEqual(caught('child.kill()'), ['signal sent through .kill(...)']);
   assert.deepEqual(caught('process.kill(pid, 0); process.kill(pid, 9);'), ['signal sent through .kill(...)']);
   assert.deepEqual(caught('process.kill.call(process, pid, 9);'), ['process.kill taken as a value']);
-  // The liveness probe, prose in comments, and an unrelated `kill` word are not calls.
-  assert.deepEqual(caught('const alive = process.kill(pid, 0) && process.kill.call(process, other.pid, 0);\n// process.kill(pid, 9) is never sent\n/* spawn(x) */\nconst killSwitch = 1;'), []);
+  // A signal-0 liveness probe is caught like any signal: liveness is the process door's. Prose in comments and
+  // an unrelated `kill` word are not calls.
+  assert.deepEqual(caught('const alive = process.kill(pid, 0);'), ['signal sent through .kill(...)']);
+  assert.deepEqual(caught('process.kill.call(process, other.pid, 0);'), ['process.kill taken as a value']);
+  assert.deepEqual(caught('// process.kill(pid, 9) is never sent\n/* spawn(x) */\nconst killSwitch = 1;'), []);
 });
 
 test('boundary test: src/runner/dispatch/** does not reference pick/return verbs or appendEvent (R1 / M10)', () => {

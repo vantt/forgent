@@ -34,6 +34,9 @@ function attemptHome(w, { attemptId, runDir, ageMs = 0 }) {
   return dir;
 }
 
+// A step runs with its runner's FGOS_* variables (attemptStepEnv), which is how the finalizer finds the native door.
+const stepEnv = () => ({ PATH: process.env.PATH, ...Object.fromEntries(Object.entries(process.env).filter(([name]) => name.startsWith('FGOS_') && !['FGOS_LOCK_FD', 'FGOS_LOCK_JOB'].includes(name))) });
+
 /**
  * An attempt directory a dead supervisor left: v3 envelope, free attempt lock, empty process domain, a
  * receipt, and one step that runs the real finalizer for the attempt's homes.
@@ -52,7 +55,7 @@ function deadAttempt(w, name, home, { countFile } = {}) {
     containment: { preferred: 'linux-gate' },
     deadlines: { softAt: null, idleMs: null, hardCeiling: null, gateKillGraceMs: 1000 },
     agentProtocol: { cli: 'claude', mode: 'direct' },
-    steps: [{ stepId: 'finalize-home', hostBin: process.execPath, payloadRoot: '/', argv: ['-e', script], cwd: runDir, env: { PATH: process.env.PATH }, stepTimeoutMs: 30_000 }],
+    steps: [{ stepId: 'finalize-home', hostBin: process.execPath, payloadRoot: '/', argv: ['-e', script], cwd: runDir, env: stepEnv(), stepTimeoutMs: 30_000 }],
   };
   envelope.digest = computeSha256Digest(envelope);
   fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify(envelope));

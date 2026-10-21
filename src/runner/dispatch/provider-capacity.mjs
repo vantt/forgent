@@ -5,10 +5,11 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { replaceDurably } from '../../native/door.mjs';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
 import { deriveLegacyInventory } from './llm-accounts.mjs';
 import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
-import { getProcessStartTime, pidExists, resolveHolderLiveness } from './process-identity.mjs';
+import { resolveHolderLiveness, selfRecord } from './process-identity.mjs';
 import { acquire, acquireSync, createLockScope, lockHolders, resolveLock, resolveLockRoot, runBorrowed } from '../../holder-lock/index.mjs';
 import { noteLockHeld, noteLockReleased } from '../../util/state-lock-held.mjs';
 
@@ -368,16 +369,7 @@ function readState(statePath) {
 function writeState(statePath, state) {
   const dir = path.dirname(statePath);
   fs.mkdirSync(dir, { recursive: true });
-  const content = `${JSON.stringify(state, null, 2)}\n`;
-  const tmpPath = path.join(dir, `.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-  const fd = fs.openSync(tmpPath, 'w');
-  try {
-    fs.writeSync(fd, content);
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
-  }
-  fs.renameSync(tmpPath, statePath);
+  replaceDurably(dir, path.basename(statePath), `${JSON.stringify(state, null, 2)}\n`, 0o644);
 }
 
 export class ProviderCapacityLockError extends Error {
@@ -580,7 +572,7 @@ function reclaimDeadLeases(providerState, { runIsDead = () => false, isRunWorker
   for (const [accountId, acct] of Object.entries(providerState.accounts ?? {})) {
     for (const [runId, lease] of Object.entries(acct.leases ?? {})) {
       const pidDead = lease.pid !== undefined
-        && resolveHolderLiveness({ pid: lease.pid, processStartTime: lease.processStartTime }, pidExists(lease.pid)) === 'dead';
+        && resolveHolderLiveness(lease.record ?? { pid: lease.pid, processStartTime: lease.processStartTime }) === 'dead';
       const provenDead = (pidDead && !isRunWorkerAlive(runId, lease)) || runIsDead(runId, lease);
       if (provenDead) {
         delete acct.leases[runId];
@@ -664,11 +656,13 @@ export function acquireNamedAccountLease({
     if (isQuarantined(acct, now.getTime())) return conflict(`account "${provider}/${accountId}" is quarantined`);
     const acquiredAt = now.toISOString();
     acct.lastSelectedAt = acquiredAt;
+    const self = selfRecord();
     acct.leases[runId] = {
       runId,
       assignmentId: assignmentId ?? null,
       pid: process.pid,
-      processStartTime: getProcessStartTime(process.pid),
+      processStartTime: self.startTime,
+      record: self,
       acquiredAt,
     };
     if (assignmentId) state.assignments[`${provider}:${assignmentId}`] = { accountId, selectedAt: acquiredAt };

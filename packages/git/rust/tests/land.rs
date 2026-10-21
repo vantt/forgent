@@ -92,21 +92,26 @@ fn dirty_nonoverlap_is_preserved_and_reported_lagging() {
 }
 #[test]
 fn dirty_own_paths_block_before_cas() {
-    // An own path edited, and a declared footprint path renamed away (the rename source counts).
-    for renamed in [false, true] {
+    // An own path edited, the same edit staged (the index alone differs), and a declared footprint
+    // path renamed away (the rename source counts).
+    for case in ["edited", "staged", "renamed"] {
         let f = Fixture::new();
         let mut request = f.request.clone();
-        if renamed {
+        if case == "renamed" {
             request.footprint = Some(vec!["b".into()]);
         }
         let mut s = f
             .driver
             .prepare_land(&f.repo, vec![], &request, "fixture", "own")
             .unwrap();
-        if renamed {
-            git(&f.main, &["mv", "b", "renamed"]);
-        } else {
-            fs::write(f.main.join("a"), "keep local\n").unwrap();
+        match case {
+            "renamed" => {
+                git(&f.main, &["mv", "b", "renamed"]);
+            }
+            _ => fs::write(f.main.join("a"), "keep local\n").unwrap(),
+        }
+        if case == "staged" {
+            git(&f.main, &["add", "a"]);
         }
         let e = evidence(&s);
         assert_eq!(
@@ -114,9 +119,13 @@ fn dirty_own_paths_block_before_cas() {
                 .publish_land(&f.repo, &mut s, &e)
                 .unwrap_err()
                 .cause,
-            "main-checkout-dirty-mid-merge"
+            "main-checkout-dirty-mid-merge",
+            "{case}"
         );
-        assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), request.target);
+        assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), request.target, "{case}");
+        if case == "staged" {
+            assert_eq!(git(&f.main, &["show", ":a"]), "keep local", "the staged bytes stay in the index");
+        }
     }
 }
 #[test]

@@ -189,7 +189,9 @@ impl Clone {
         let mut handle = match fgos_holder_lock::acquire(
             &fgos_holder_lock::Resource::new("event-seal", self.layout.seal_lock()),
             fgos_holder_lock::Mode::Ex,
-            fgos_holder_lock::Wait::Try,
+            // Sibling test threads fork Git children that briefly hold a copy of
+            // every descriptor until they exec; the lock is truthfully held till then.
+            fgos_holder_lock::Wait::Ms(30_000),
             2000,
         ) {
             fgos_holder_lock::Acquire::Acquired(h) => h,

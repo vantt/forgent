@@ -10,10 +10,9 @@
 // an in-process caller of the runner keeps its own signal handling.
 
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { publishImmutableProof } from '../runner/dispatch/proof-helpers.mjs';
-import { getBootId, getPidNs, getProcessStartTime } from '../runner/dispatch/process-identity.mjs';
+import { selfRecord } from '../runner/dispatch/process-identity.mjs';
 
 const POLL_MS = 50;
 const EXIT_CODES = Object.freeze({ SIGINT: 130, SIGTERM: 143 });
@@ -72,15 +71,8 @@ export function registeredRuns() {
   return [...delivered].sort();
 }
 
-function selfTuple() {
-  return {
-    host: os.hostname(),
-    bootId: getBootId(),
-    pidNs: process.platform === 'linux' ? (/\[(\d+)\]/.exec(getPidNs())?.[1] ?? '') : '',
-    pid: process.pid,
-    startTime: getProcessStartTime(process.pid) ?? '',
-  };
-}
+// The tuple as the door gives it: the form Rust compares (`pidNs` as `pid:[N]` or `none`).
+const selfTuple = selfRecord;
 
 function readEnvelope(runDir) {
   try { return JSON.parse(fs.readFileSync(path.join(runDir, 'envelope.json'), 'utf8')); } catch { return null; }

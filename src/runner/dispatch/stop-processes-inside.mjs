@@ -9,66 +9,70 @@
 // WHAT COUNTS AS "INSIDE". A process whose executable or working directory is inside `dir`. An
 // argument that merely names the directory (a `rm -rf`, an editor) does not count.
 //
-// LINUX ONLY. It reads /proc. Where /proc is absent nothing is known to be running and it stops
-// nothing; confinement itself is Linux-only, so the leak it closes is too. `processesInside` is the
+// LINUX ONLY. The process door scans /proc. Where it cannot scan nothing is known to be running and it
+// stops nothing; confinement itself is Linux-only, so the leak it closes is too. `processesInside` is the
 // same look without the stop, for a caller that must leave a directory alone while it is in use.
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { judge, scan, signalByIdentity } from './process-identity.mjs';
 
 const sleepSync = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
-
-const alive = (pid) => {
-  try { process.kill(pid, 0); return true; } catch (err) { return err.code === 'EPERM'; }
-};
 
 // readlink reports an executable that was deleted from under a running process as "<path> (deleted)".
 const withoutDeletedSuffix = (p) => (typeof p === 'string' && p.endsWith(' (deleted)') ? p.slice(0, -' (deleted)'.length) : p);
 
 /**
- * The processes (other than this one and its parent) whose executable or working directory is inside `dir`.
+ * The process views (other than this one and its parent) whose executable or working directory is inside `dir`.
+ * A view is the door's `{pid, tuple, exe, cwd, ...}`; `tuple` is null when the identity could not be read.
  * @param {string} dir
- * @returns {number[]} their pids
+ * @returns {object[]}
  */
 export function processesInside(dir) {
   let root;
   try { root = fs.realpathSync(dir); } catch { root = path.resolve(dir); }
   const inside = (p) => typeof p === 'string' && (p === root || p.startsWith(root + path.sep));
 
-  let names;
-  try { names = fs.readdirSync('/proc'); } catch { return []; }
+  const views = scan({});
+  if (views === 'unsupported') return [];
+  return views.filter((view) => view.pid !== process.pid && view.pid !== process.ppid
+    && (inside(withoutDeletedSuffix(view.exe)) || inside(withoutDeletedSuffix(view.cwd))));
+}
 
-  const found = [];
-  for (const name of names) {
-    if (!/^\d+$/.test(name)) continue;
-    const pid = Number(name);
-    if (pid === process.pid || pid === process.ppid) continue;
-    let exe = null;
-    let cwd = null;
-    try { exe = fs.readlinkSync(`/proc/${pid}/exe`); } catch { /* not ours to read, or already gone */ }
-    try { cwd = fs.readlinkSync(`/proc/${pid}/cwd`); } catch { /* same */ }
-    if (inside(withoutDeletedSuffix(exe)) || inside(withoutDeletedSuffix(cwd))) found.push(pid);
-  }
-  return found;
+const stillThere = (view) => view.tuple === null || judge(view.tuple) === 'alive';
+
+/** Poll for up to `graceMs` while any of `views` is still alive; returns whether any still is. */
+function waitWhileAlive(views, graceMs) {
+  const deadline = Date.now() + graceMs;
+  while (Date.now() < deadline && views.some(stillThere)) sleepSync(50);
+  return views.some(stillThere);
 }
 
 /**
+ * Stop what runs inside `dir`: SIGTERM, a grace window, SIGKILL, a second window. Each signal goes to the
+ * recorded identity only, so a pid reused since the scan is never hit. A view without a readable identity
+ * cannot be signalled safely and is reported in `left`, as is any view still alive after the kill window.
  * @param {string} dir directory whose processes are stopped
- * @param {{ graceMs?: number }} [options] how long SIGTERM gets before SIGKILL
- * @returns {number} how many processes were found
+ * @param {{ graceMs?: number }} [options] how long each signal gets to take effect
+ * @returns {{ found: number, stopped: number, left: object[] }}
  */
 export function stopProcessesInside(dir, { graceMs = 1500 } = {}) {
   const found = processesInside(dir);
-
-  for (const pid of found) {
-    try { process.kill(pid, 'SIGTERM'); } catch { /* gone already */ }
-  }
-  const deadline = Date.now() + graceMs;
-  while (Date.now() < deadline && found.some(alive)) sleepSync(50);
-  for (const pid of found) {
-    if (alive(pid)) {
-      try { process.kill(pid, 'SIGKILL'); } catch { /* gone already */ }
+  const signalAll = (signal) => {
+    for (const view of found) {
+      if (view.tuple === null) continue;
+      const outcome = signalByIdentity(view.tuple, signal);
+      // 'sent', or nothing was sent because the process is not that one any more; anything else is not a stop.
+      if (!['sent', 'identity-mismatch', 'not-found', 'unsupported'].includes(outcome)) {
+        throw new Error(`stop-processes-inside-signal-refused: ${signal} to pid ${view.pid} gave ${outcome}`);
+      }
     }
+  };
+  signalAll('term');
+  if (waitWhileAlive(found, graceMs)) {
+    signalAll('kill');
+    waitWhileAlive(found, graceMs);
   }
-  return found.length;
+  const left = found.filter(stillThere);
+  return { found: found.length, stopped: found.length - left.length, left };
 }

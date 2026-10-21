@@ -238,8 +238,10 @@ fn seal_refuses_state_high_ranks_and_wrong_store_guard() {
     )
     .is_err());
     drop(guard);
+    // A sibling test thread's forked child holds a copy of the lock descriptor
+    // until it execs, so the release is awaited, not tried once.
     assert!(
-        fgos_event_store::locks::acquire_seal(&r.layout, &[], 0, true)
+        fgos_event_store::locks::acquire_seal(&r.layout, &[], 0, false)
             .unwrap()
             .is_some()
     );

@@ -249,15 +249,6 @@ pub fn boot_id() -> Option<String> {
     platform::current().boot_id()
 }
 
-/// Start time of `pid` as the OS reports it; `None` when the pid is absent,
-/// a zombie, or unreadable. Use [`observe`] to tell those apart.
-pub fn start_time(pid: ProcId) -> Option<String> {
-    match platform::current().observe(pid) {
-        Observed::Live { start_time } => Some(start_time),
-        _ => None,
-    }
-}
-
 /// One look at `pid` on this platform.
 pub fn observe(pid: ProcId) -> Observed {
     platform::current().observe(pid)
@@ -449,18 +440,39 @@ pub fn relations() -> Option<Vec<Relation>> {
     platform::current().relations()
 }
 
-/// Parent, group and start time from one `/proc/<pid>/stat` line: fields
-/// are counted from the last `)`, so a command name with spaces or
-/// parentheses cannot shift them.
-pub fn parse_relation(pid: ProcId, line: &str) -> Option<Relation> {
+/// The fields of one `/proc/<pid>/stat` line that process facts use.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct Stat {
+    /// Process state letter (field 3); `Z` and `X` mean nothing runs there.
+    pub state: char,
+    pub parent: u32,
+    pub group: u32,
+    /// Start time in clock ticks since boot (field 22).
+    pub start_ticks: u64,
+}
+
+impl Stat {
+    pub(crate) fn is_gone(&self) -> bool {
+        matches!(self.state, 'Z' | 'X')
+    }
+}
+
+/// The one `/proc/<pid>/stat` parser: fields are counted from the last `)`,
+/// so a command name with spaces or parentheses cannot shift them.
+pub(crate) fn parse_stat(line: &str) -> Option<Stat> {
     let mut fields = proc_stat_fields(line)?;
-    fields.next()?; // state (field 3)
-    Some(Relation {
-        pid,
+    Some(Stat {
+        state: fields.next()?.chars().next()?,
         parent: fields.next()?.parse().ok()?,
         group: fields.next()?.parse().ok()?,
-        start_ticks: fields.nth(16)?.parse().ok()?, // field 22
+        start_ticks: fields.nth(16)?.parse().ok()?,
     })
+}
+
+/// Parent, group and start time from one `/proc/<pid>/stat` line.
+pub fn parse_relation(pid: ProcId, line: &str) -> Option<Relation> {
+    let stat = parse_stat(line)?;
+    Some(Relation { pid, parent: stat.parent, group: stat.group, start_ticks: stat.start_ticks })
 }
 
 /// What [`scan`] reads for each process.
@@ -519,15 +531,13 @@ pub fn scan(filter: &ScanFilter) -> Scan {
 /// counted from the last `)`: state is the first field after it, start
 /// time the twentieth.
 pub fn parse_proc_stat(line: &str) -> Option<(char, String)> {
-    let mut fields = proc_stat_fields(line)?;
-    let state = fields.next()?.chars().next()?;
-    let start_time = fields.nth(18)?;
-    Some((state, start_time.to_string()))
+    let stat = parse_stat(line)?;
+    Some((stat.state, stat.start_ticks.to_string()))
 }
 
 // Linux kernel lock facts belong to process, not a lock policy adapter.
 #[cfg(target_os = "linux")]
-pub use crate::platform::linux::{kcmp_same_file, lock_table_entries, locked_fds, own_lock_token, proc_self_pid, LockEntry, LockedFd};
+pub use crate::platform::linux::{lock_table_entries, locked_fds, own_lock_token, proc_self_pid, LockEntry, LockedFd};
 
 #[cfg(test)]
 mod tests {
