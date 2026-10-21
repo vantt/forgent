@@ -81,13 +81,15 @@ dmsetup message "$LW" 0 mark done
 dmsetup remove "$LW"
 
 # 2. Mark positions: ack-i is acknowledged at every replay point after its entry.
+# replay-log --find prints "<entry>@<sector>"; only the entry number is used here.
+find_entry() { local found; found="$("$REPLAY_LOG" --log "$LOG" --find "$@")" || return 1; echo "${found%%@*}"; }
 declare -a ACK_AT
-for ((i = 0; i < OPS; i++)); do ACK_AT[i]="$("$REPLAY_LOG" --log "$LOG" --find --end-mark "ack-$i")"; done
-START="$("$REPLAY_LOG" --log "$LOG" --find --end-mark mkfs)"
+for ((i = 0; i < OPS; i++)); do ACK_AT[i]="$(find_entry --end-mark "ack-$i")"; done
+START="$(find_entry --end-mark mkfs)"
 
 # 3. Replay to every FUA after mkfs and check the image through a snapshot (mount writes go to COW).
 RESULTS="$OUT/checkpoints.jsonl"; : > "$RESULTS"; FAILED=0 CHECKED=0
-cur="$("$REPLAY_LOG" --log "$LOG" --find --next-fua --start-entry "$START" || true)"
+cur="$(find_entry --next-fua --start-entry "$START" || true)"
 while [ -n "$cur" ]; do
   "$REPLAY_LOG" --log "$LOG" --replay "$REPLAY" --limit "$((cur + 1))" >/dev/null
   acked=0; for ((i = 0; i < OPS; i++)); do [ "${ACK_AT[i]}" -lt "$cur" ] && acked=$((i + 1)); done
@@ -106,7 +108,7 @@ while [ -n "$cur" ]; do
   echo "{\"entry\":$cur,\"verdict\":${verdict:-null}}" >> "$RESULTS"
   CHECKED=$((CHECKED + 1))
   echo "$verdict" | grep -q '"violations":\[\]' || FAILED=$((FAILED + 1))
-  cur="$("$REPLAY_LOG" --log "$LOG" --find --next-fua --start-entry "$((cur + 1))" || true)"
+  cur="$(find_entry --next-fua --start-entry "$((cur + 1))" || true)"
 done
 
 # 4. The same workload's syscall order (§10) on this disk, unprivileged.
