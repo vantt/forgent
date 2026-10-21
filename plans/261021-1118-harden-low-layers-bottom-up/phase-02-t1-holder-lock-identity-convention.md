@@ -14,6 +14,11 @@ Template layer: follow the loop in [plan.md](plan.md#the-per-layer-loop). The co
 
 Specs: [holder-lock](../../docs/platform/holder-lock/spec.md), [session-identity](../../docs/platform/session-identity/spec.md), [convention](../../docs/platform/convention/spec.md); [component-boundary](../../docs/platform/component-boundary.md) rows; [rules-growth review](../reports/review-261021-1008-rules-that-grow-the-system.md) R2 (`src/holder-lock` thick facade) and R4 (fences); [TEST plan](../261020-1757-test-governance-port-inventory-and-slow-file-extraction/plan.md) phase 2 holder-lock row (110 Node tests in 20 files vs 74 Rust).
 
+
+## Received from other lanes (record here, never lose)
+
+- **HL-N8 / HL-N9 (TEST → HARDEN T1, owner decision 2026-10-21 ~20:50).** Dropping the bytes-equal check in `unlinkRecordIfUnchanged` (`src/state/hot-lock.mjs`) leaves every test green, and so does dropping it in `reclaimDeadHolder`: each check covers for the other, so no single test pins either; only the contract prose `test/holder-lock/hot-lock-contract.test.mjs:30` names them. Evidence: [TEST holder-lock report](../reports/phase-lead-261021-1845-test-governance-p2-holder-lock.md) §4 and §7 (main `ff24dbde3`). T1 must add one owning proof per check (a process race in the state layer that reaches each check alone), then decide whether both checks are needed. Note: `reclaimDeadHolder` is in the T0/T1 range of `hot-lock.mjs`; check `unlinkRecordIfUnchanged`'s line range against the WORK-owned staging region (`:290-394` before T0) before editing, and coordinate with WORK if it falls inside.
+
 ## Components, crates, Node (proposal §4.1)
 
 | Component | Rust | Node around it |

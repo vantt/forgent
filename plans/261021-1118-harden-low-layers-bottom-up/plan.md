@@ -204,7 +204,13 @@ A row closes only when the receiving lane has written the item into its own plan
 | H9 | host-runtime T9 list: `providers/external_process/**`, production `EchoProvider`/`test.fixture.echo`, tautological admission gate, empty `RouterPolicy`, `command-routes-drift` spawn cost | arbitration §2, §5 | HARDEN phase 07 (T9 handoff) | [phase 07](phase-07-closing-and-handoff.md) inputs | recorded here |
 | H10 | Doctor per-row timing in `fgos doctor --json` (owner 2b) | arbitration §6 | HARDEN phase 07 (T9) | [phase 07](phase-07-closing-and-handoff.md) inputs | recorded here |
 | H11 | Release-manifest canonical-JSON producer/verifier pair (if the corpus proof does not pass in T0) | arbitration §2 | HARDEN phase 07 (Packaging) | [phase 07](phase-07-closing-and-handoff.md) inputs | recorded here |
-| H12 | Spec/boundary/doc files T0 will change (`process/spec.md`, `component-boundary.md`, `holder-lock/spec.md:229,238,312`, `reading-map.md:57,59`, three docs listing `coordination-abandoned-claims`) | arbitration §5 | DOC (`forgentx-5f`, owner machine) | DOC plan `plans/260925-documentation-authority-unification/` | board note; message before merge |
+| H12 | Spec/boundary/doc files T0 will change (`process/spec.md`, `component-boundary.md`, `holder-lock/spec.md:229,238,312`, `reading-map.md:57,59`, three docs listing `coordination-abandoned-claims`) | arbitration §5 | DOC (`forgentx-5f`, owner machine) | DOC plan `plans/260925-documentation-authority-unification/` | board note 21:30 with the full file list (log.md); waiting for `forgentx-5f` to record it in plan 260925 |
+
+### Items other lanes handed to HARDEN
+
+| # | Item | From | Recorded in | Status |
+|---|---|---|---|---|
+| R1 | HL-N8 / HL-N9: the two bytes-equal checks in `hot-lock.mjs` (`unlinkRecordIfUnchanged`, `reclaimDeadHolder`) cover for each other; no single test pins either | TEST (`forgent-f8`), owner decision ~20:50 10-21; [report](../reports/phase-lead-261021-1845-test-governance-p2-holder-lock.md) §4, §7 | [phase 02 (T1)](phase-02-t1-holder-lock-identity-convention.md) "Received from other lanes" | open, T1 |
 
 ## Red Team Review
 
