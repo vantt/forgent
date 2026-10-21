@@ -1162,3 +1162,114 @@ Applied all six independent review reports p01/p02/p03/p05/p06/p07 and the autho
 Measured review delta: **17 files / 1530 changed items**, split **1 disposition-changing / 16 label-only files**. Admission-only changes count as label-only when disposition is unchanged. The regenerated R26 manifest has **43 units / 91 reader/default/output slots / 17 reader files**. Seam6/7 totals remain 35 files / 1,313 original references / 849 original tuples / 17 supplemental slots; **1,215 admits / 964 rejects / 36 parks / 2 patch items / 2,116 preserves / 25 render joins**. The additional manifest title park is in the pre-existing seam5 file. Review indexes bind current hashes and preserve the old authoring delta as history.
 
 Fresh final full checker: **1,030 records / 4,935 references / 31,510 tuples / 0 failures**. All **330/330 negative probes reject**, with **15/15 root-positive checks**, across all 11 probe families. Current source/result hashes and invocation freshness are bound in `step-05-seam67-final-proof.json`; only the final full result is stored in `step-05-seam67-full-check.json`. Logs and intermediate results remain scratch-only. No code/docs/tests/skills/baselines, runtime-* or seam8 artifact edit; no git write, fgOS CLI, secrets/live-state read, build, cargo or service start. Markdown preview stays with Lead inside this records-only boundary. `needsWrites: []`.
+
+## L12-87 — Runtime seam review closure and complete Step 5 authoring (Doer, 2026-10-21)
+
+Records only. Integrated the committed seam-8 branch and all six
+`review-a38-step-05-s8-p01..p06.md` windows. This records author corrections,
+not independent acceptance, authority activation, Step7 composition or Phase9
+execution parity. Local-main merge `149f47acc` is intentionally left for the
+separate L12-88 accounting turn; R17 HEAD drift remains non-failing.
+
+**R29 (Lead, superseding the seam-8 reader/writer split):** the native Land
+legacy `docs/decisions/` tree family is ONE co-cut unit, all PARK on
+“Phase 9 decision for the legacy decisions-tree writer/reader (native Land)”.
+Its eight members cover nextFreeDecisionId L542, separately authored target
+and source scans L1091/L1092, numbered and old-index writers L1098/L1104,
+and their constants/assignment. Four old preserves become parks; two live
+reader slots are added and both writer parks rebound to the same dependency.
+Census 003770/003748 remain true comment/removed-operation rejects at
+L638/L640 and no longer pretend to own live reads. Quoted-path proof
+`test/runner/merge-quoted-paths.test.mjs:100–108` stays coupled with the merge
+suite. Comments and synthetic fixtures remain co-changes rather than
+independent tree-retention claims.
+
+**R30 (Lead):** a document read/probe/message/output sourced from persisted
+state or registry data is ADMIT/parked on that source population’s export;
+it cannot be closed as caller scalar pass-through. R5 continues to reject
+function-argument paths with an in-code construction owner, guards,
+non-document schema paths and synthetic fixture formatting. The all-seam
+sweep is `step-05-state-tree-sweep.json`: 1,481 record memberships / 1,470
+file-or-locator identities / 46,404 owning items scanned; 109 named-path
+rejection candidates checked, 34 of those now state-population parks and
+75 retained with recorded constructor/guard evidence. Across all categories,
+43 former rejects become ADMIT/parked; 71 existing items in 17 records have
+R30 outcome/dependency corrections. Shared dependencies identify Work.docsRef,
+registry currentPath/aliases, outcome.docPath and Work.acceptance evidence;
+each operation retains its own blocker and failure consequence. Rust
+collect_outcome_entry now shares the Node item-trace outcome-path export.
+
+Review dispositions and record text:
+
+- p01 (63 reviewed items): network.ts 000209 inherits its Step4 park and
+  carries the live R5 holder evidence to Step7. AGENTS L14 000123’s blocker
+  now applies only to its docs/specs/<area>.md operand; the adjacent index
+  operand independently preserves. The L74 bare decision-directory mention
+  is absent from the instructions census, whose instructions-018 owns only
+  adjacent docs/specs/<area>.md. No explicit exclusion is invented: a new
+  author slot conserves L74 and shares 000151’s learning-home park. HTTP route
+  templates and footprint-list formatting have accurate rejection labels.
+- p02 (98 bin items plus five supplemental slots, one manifest item): Lead
+  rejects the reported dynamic-001635 defect under R3. Exact CLI-message owner
+  reference-000228 owns its target/anchor/forward/inverse diff; 000240/000249
+  retain their exact Step4 owners. Joined patches explicitly say “target/diff
+  owned by” that edge. New R5 REJECT slots at L1719/L1814 name the CLI-built
+  argument and the separate parked registry probe owner
+  author-seam8-bin-head-doc-probe L1658. Output-slot reasons follow their
+  parks, removed cat-file occurrences have provenance labels, and index
+  comments explicitly co-change with their proposed-move unit.
+- p03 (87 reviewed items): content-root derivations name the shared
+  readLockedContext reader; the Rust temporary worktree has its real category;
+  003686 includes both physical path spans L311–312. The inherited 002301
+  comment’s unsupported absent-goalTier ordering claim is carried to Step7,
+  alongside both gateway YAML copies’ inherited template/split/live-holder
+  questions. Step3/4 owners are not reopened here.
+- p04 (120 original items plus two prior author slots) and p06 (43 items plus
+  15 retired-source tuples) share the merge.mjs defect, fixed once by R29.
+  Successor fields 003713/003723/003729/003726, worktree 003783,
+  truncation-guard 003872, work 003929 and approve 003935 name the real live
+  runner/work-state retired-history holder and heading. Work acceptance probe
+  015839 can resolve docs paths from clause.evidence and now parks on that
+  evidence population. Store L615 docs/history fallback reference 003909 and
+  tuple 015754 preserve as neutral, outside the move set; the independent
+  state-held docsRef arm and mixed candidate probes/messages remain parked.
+- p05 (108 reviewed items): new worktree L1248–1249 author slot preserves the
+  real retained docs/history comment; 003787 retains its old removed witness,
+  and 003782/003792 remain rejects. Retrospective readers 015651/015656/015660
+  admit/park with their docsRef export, as do corresponding messages/fields
+  and work-compat 013296. Cleanup probes and their diagnostics park on the
+  outcome/registry exports. Work-dispatch 013333 is the distinct workUnitFor
+  operation-pin root selector, not a duplicate readLockedContext read; it has
+  a complete operand and passage-specific blocker. Dated coordination-history
+  preserves stand. Inherited knowledge-registry source parks versus test
+  provenance preserves remain a Step7 reconciliation. Truncated operands,
+  retired-history fields and the canonical knowledge-path reason are fixed.
+
+The global `step-05-proposed-move-read-units.json` now owns all eight seams:
+43 units, 98 read/probe/output members, one unit per path. Only the 58 real
+seam-8 additions are merged into the current global population, preserving
+later L12-85/86 removals; the seam-8 manifest contains only a pointer.
+`step-05-seam8-review-list.json` binds current hashes and splits
+`changedThisTurn` into dispositionChanged and labelOnly (admission-only edits
+remain labelOnly). Re-review uses pinned bytes via
+`rtk proxy git -C <wt> show <pin>:<path>` to bypass the observed filtering hook.
+
+`step-05-step7-carry.json` records every named inherited review residual,
+previous registered overlaps and deferred parity obligations with evidence
+and proposed action. `step-05-closure.json` owns current totals across all
+seams: 5,312 unique original references / 39,861 unique original tuples /
+1,231 supplemental slots; 33 mechanical, 426 neutral, 1,020 judgment and two
+external record memberships. There are 5,224 admits / 36,216 rejects / 4,964
+neutral-unlabelled items; 2,283 item parks / 86 patch items / 43,745 preserves /
+290 render joins, 37 physical patch co-cut units, six deferred replays and two
+external parks. Exact censusJoins are validated again without double-counting
+owning census identities. The external ignored instructions and large sharded
+inventory were not read; only their dependent work stays parked.
+
+Fresh frozen-input full checker: **1,481 record memberships / 7,223 reference memberships / 39,876 tuple memberships / 0 failures**; all **366/366 negative probes reject**, with **15/15 root-positive checks**. 12 probe families ran after the full checker; every result is fresh and frozen data/checker hashes stayed unchanged. The final seam8 family was rerun after a controller-only correction from a relative to an absolute scratch output path; no checking logic or record data changed between verification windows. Review delta: **42 files / 148 changed items**, split **18 disposition-changing / 24 label-only files**. Final proof: step-05-seam8-final-proof.json; current merged-tree HEAD drift: step-05-head-drift.json. All command logs/intermediate probes remain scratch-only. Earlier interrupted/failed scratch checks are not completion evidence.
+
+No code, docs/**, test, skill or baseline edits; no git write, fgOS CLI,
+generator/build, gateway/service, installed parity, live-state or secrets read.
+All scratch logs/probes remain under /tmp/fgos-work; runner owns the commit.
+Markdown preview remains Lead custody under this records-only write boundary.
+`needsWrites: []`.

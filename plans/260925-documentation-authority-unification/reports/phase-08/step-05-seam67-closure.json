@@ -9804,5 +9804,12 @@
       "freshProof": "step-05-seam67-final-proof.json",
       "currentOwningTests": "Previous 59/59 current suite evidence retained in step-05-seam67-current-proof.json; not rerun for this records-only review closure."
     }
+  },
+  "subsequentAllSeamClosure": {
+    "ruling": "L12-87",
+    "currentTotals": "step-05-closure.json",
+    "currentReviewCorrections": "step-05-seam8-review-closure.json",
+    "currentProof": "step-05-seam8-final-proof.json",
+    "note": "Counts/proofs above retain their prior closure snapshot; current composed totals and R29/R30 outcomes are in the named all-seam closure."
   }
 }

@@ -1,6 +1,6 @@
 {
   "kind": "Non-failing HEAD drift for Step 7 assembly; records remain at their own pins",
-  "headCommit": "198372e1a96e7c1784917342e83a1866fc67f65a",
+  "headCommit": "18aac1d9090abfae28a25c49eff48448dc4426eb",
   "entries": [
     {
       "file": ".githooks/pre-commit",
@@ -235,8 +235,8 @@
     {
       "file": "bin/fgos.mjs",
       "record": {
-        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-        "recordLine": 2
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl",
+        "recordLine": 13
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "pinnedHash": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
@@ -266,7 +266,7 @@
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "pinnedHash": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
-      "headHash": "7a201ac10c3cc54d91279c2e58051e9bf01111693e154aa3aec904eeb4b6983a",
+      "headHash": "e881c6a33a912cc22a7f6e5cb4c014bdd845c15135a8782552d0066cad1bd7dd",
       "movedSpans": [],
       "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
       "failing": false
@@ -274,8 +274,8 @@
     {
       "file": "src/runner/claim-port.mjs",
       "record": {
-        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-        "recordLine": 6
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl",
+        "recordLine": 21
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "pinnedHash": "6e510ae19478f1ba71a2ab900f024d98b0150dd20da9fd255afdd407ae9c50c7",
@@ -300,8 +300,8 @@
     {
       "file": "src/runner/merge.mjs",
       "record": {
-        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-        "recordLine": 7
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl",
+        "recordLine": 38
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "pinnedHash": "8ccdb5441f10f806a1753d47394b4c74c655d02c5c7a03f7a1af56ce08024eb4",
@@ -337,7 +337,7 @@
     {
       "file": "src/runner/worktree.mjs",
       "record": {
-        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
         "recordLine": 8
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
@@ -363,8 +363,8 @@
     {
       "file": "src/state/events-jsonl-truncation-guard.mjs",
       "record": {
-        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-        "recordLine": 9
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
+        "recordLine": 15
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "pinnedHash": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",
@@ -13668,7 +13668,7 @@
       },
       "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "pinnedHash": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
-      "headHash": "8be573e3ac34b85bf6a73fcf989af84f2758daa760dabee00b658dac30f907a0",
+      "headHash": "c46ddc8847524435df1fc31af5cd3199185d372d7737deb23506e56e2372d667",
       "movedSpans": [
         {
           "id": "author-s4-19c252476bfb8f58",
@@ -44782,7 +44782,7 @@
       },
       "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
       "pinnedHash": "a361e33e19caeccae8bc81e4b3e6ec6ef4d5f28859ee77b02979acd43d1c0fcc",
-      "headHash": "ebf8a6ecf97ed9b3d8ea1a2ba2eb67eb732290403257a9d218b24f47a23c9c37",
+      "headHash": "5f19afd8b84352fef96a62b66c599ee497951c09286f3f8b8299c666b2acfa6a",
       "movedSpans": [
         {
           "id": "dynamic-019765",
@@ -44849,6 +44849,62 @@
           "headMatchingLines": []
         },
         {
+          "id": "dynamic-019785",
+          "pinnedSpan": {
+            "line": 165,
+            "text": "    assert.equal(port.fetchMappingProvenance({ remote: 'origin' }).remoteUrl, '/fixture/remote');\n    const after = addon.inspectGit(temp, repo, repo);\n    assert.equal(after.journal.pendingCount, 0);\n    assert.equal(after.fetchRefspecs.length, 3);\n    fs.writeFileSync(path.join(repo, 'config.lock'), 'native owner');\n    assert.deepEqual(addon.inspectGit(temp, repo, repo).nativeLocks, ['config.lock']);\n    assert.equal(fs.readFileSync(path.join(repo, 'config.lock'), 'utf8'), 'native owner');\n  } finally { port?.close(); fs.rmSync(temp, { recursive: true, force: true }); }\n});"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-019786",
+          "pinnedSpan": {
+            "line": 167,
+            "text": "    assert.equal(after.journal.pendingCount, 0);\n    assert.equal(after.fetchRefspecs.length, 3);\n    fs.writeFileSync(path.join(repo, 'config.lock'), 'native owner');\n    assert.deepEqual(addon.inspectGit(temp, repo, repo).nativeLocks, ['config.lock']);\n    assert.equal(fs.readFileSync(path.join(repo, 'config.lock'), 'utf8'), 'native owner');\n  } finally { port?.close(); fs.rmSync(temp, { recursive: true, force: true }); }\n});\n\ntest('native lock inspection includes symlink residue in a linked worktree git directory', { skip: process.platform === 'win32' }, () => {"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-019787",
+          "pinnedSpan": {
+            "line": 172,
+            "text": "  } finally { port?.close(); fs.rmSync(temp, { recursive: true, force: true }); }\n});\n\ntest('native lock inspection includes symlink residue in a linked worktree git directory', { skip: process.platform === 'win32' }, () => {\n  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-linked-lock-'));\n  const main = path.join(temp, 'main'), linked = path.join(temp, 'linked');\n  try {\n    execFileSync('git', ['init', '-q', main]);\n    execFileSync('git', ['-C', main, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '--allow-empty', '-qm', 'fixture']);"
+          },
+          "headMatchingLines": [
+            177
+          ]
+        },
+        {
+          "id": "dynamic-019788",
+          "pinnedSpan": {
+            "line": 173,
+            "text": "});\n\ntest('native lock inspection includes symlink residue in a linked worktree git directory', { skip: process.platform === 'win32' }, () => {\n  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-linked-lock-'));\n  const main = path.join(temp, 'main'), linked = path.join(temp, 'linked');\n  try {\n    execFileSync('git', ['init', '-q', main]);\n    execFileSync('git', ['-C', main, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '--allow-empty', '-qm', 'fixture']);\n    execFileSync('git', ['-C', main, 'worktree', 'add', '-q', '--detach', linked]);"
+          },
+          "headMatchingLines": [
+            178
+          ]
+        },
+        {
+          "id": "dynamic-019789",
+          "pinnedSpan": {
+            "line": 173,
+            "text": "});\n\ntest('native lock inspection includes symlink residue in a linked worktree git directory', { skip: process.platform === 'win32' }, () => {\n  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-linked-lock-'));\n  const main = path.join(temp, 'main'), linked = path.join(temp, 'linked');\n  try {\n    execFileSync('git', ['init', '-q', main]);\n    execFileSync('git', ['-C', main, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '--allow-empty', '-qm', 'fixture']);\n    execFileSync('git', ['-C', main, 'worktree', 'add', '-q', '--detach', linked]);"
+          },
+          "headMatchingLines": [
+            178
+          ]
+        },
+        {
+          "id": "dynamic-019791",
+          "pinnedSpan": {
+            "line": 178,
+            "text": "  try {\n    execFileSync('git', ['init', '-q', main]);\n    execFileSync('git', ['-C', main, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '--allow-empty', '-qm', 'fixture']);\n    execFileSync('git', ['-C', main, 'worktree', 'add', '-q', '--detach', linked]);\n    const gitDir = execFileSync('git', ['-C', linked, 'rev-parse', '--absolute-git-dir'], { encoding: 'utf8' }).trim();\n    fs.symlinkSync(path.join(temp, 'missing'), path.join(gitDir, 'index.lock'));\n    assert.ok(addon.inspectGit(temp, linked, main).nativeLocks.includes('index.lock'));\n  } finally { fs.rmSync(temp, { recursive: true, force: true }); }\n});"
+          },
+          "headMatchingLines": [
+            183
+          ]
+        },
+        {
           "id": "dynamic-019792",
           "pinnedSpan": {
             "line": 179,
@@ -44865,6 +44921,156 @@
           "headMatchingLines": []
         },
         {
+          "id": "dynamic-019794",
+          "pinnedSpan": {
+            "line": 191,
+            "text": "  assert.throws(() => addon.ensureGitFetchMapping('missing-state', 'missing-repo', 'missing-main', 'origin', ['+refs/fgos/events/*:refs/fgos/remotes/origin/events/*'], 'test'), /git-lockscope-unavailable-windows/);\n});\n\ntest('umask 002 driver directories are created safely, repaired by setup, and diagnosed without chmod by doctor', { skip: process.platform === 'win32' }, () => {\n  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-driver-umask-'));\n  const probe = `\n    const assert = require('node:assert/strict');\n    const fs = require('node:fs');\n    const path = require('node:path');"
+          },
+          "headMatchingLines": [
+            196
+          ]
+        },
+        {
+          "id": "dynamic-019795",
+          "pinnedSpan": {
+            "line": 195,
+            "text": "  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-driver-umask-'));\n  const probe = `\n    const assert = require('node:assert/strict');\n    const fs = require('node:fs');\n    const path = require('node:path');\n    const addon = require(process.argv[1]);\n    const root = process.argv[2];\n    const mode = p => fs.statSync(p).mode & 0o777;\n    const fresh = path.join(root, 'fresh');"
+          },
+          "headMatchingLines": [
+            200
+          ]
+        },
+        {
+          "id": "dynamic-019796",
+          "pinnedSpan": {
+            "line": 197,
+            "text": "    const assert = require('node:assert/strict');\n    const fs = require('node:fs');\n    const path = require('node:path');\n    const addon = require(process.argv[1]);\n    const root = process.argv[2];\n    const mode = p => fs.statSync(p).mode & 0o777;\n    const fresh = path.join(root, 'fresh');\n    assert.equal(process.umask(), 0o002);\n    assert.equal(addon.prepareGitDriverDirectories(fresh), true);"
+          },
+          "headMatchingLines": [
+            202
+          ]
+        },
+        {
+          "id": "dynamic-019797",
+          "pinnedSpan": {
+            "line": 199,
+            "text": "    const path = require('node:path');\n    const addon = require(process.argv[1]);\n    const root = process.argv[2];\n    const mode = p => fs.statSync(p).mode & 0o777;\n    const fresh = path.join(root, 'fresh');\n    assert.equal(process.umask(), 0o002);\n    assert.equal(addon.prepareGitDriverDirectories(fresh), true);\n    assert.equal(mode(fresh), 0o700);\n    assert.equal(mode(path.join(fresh, 'git-empty-hooks')), 0o500);"
+          },
+          "headMatchingLines": [
+            204
+          ]
+        },
+        {
+          "id": "dynamic-019798",
+          "pinnedSpan": {
+            "line": 203,
+            "text": "    const fresh = path.join(root, 'fresh');\n    assert.equal(process.umask(), 0o002);\n    assert.equal(addon.prepareGitDriverDirectories(fresh), true);\n    assert.equal(mode(fresh), 0o700);\n    assert.equal(mode(path.join(fresh, 'git-empty-hooks')), 0o500);\n    assert.equal(addon.prepareGitDriverDirectories(fresh), false);\n    const old = path.join(root, 'fgos');\n    fs.mkdirSync(old);\n    fs.mkdirSync(path.join(old, 'git-empty-hooks'));"
+          },
+          "headMatchingLines": [
+            208
+          ]
+        },
+        {
+          "id": "dynamic-019799",
+          "pinnedSpan": {
+            "line": 205,
+            "text": "    assert.equal(addon.prepareGitDriverDirectories(fresh), true);\n    assert.equal(mode(fresh), 0o700);\n    assert.equal(mode(path.join(fresh, 'git-empty-hooks')), 0o500);\n    assert.equal(addon.prepareGitDriverDirectories(fresh), false);\n    const old = path.join(root, 'fgos');\n    fs.mkdirSync(old);\n    fs.mkdirSync(path.join(old, 'git-empty-hooks'));\n    assert.equal(mode(old), 0o775);\n    const {checkGit, fixGitDriverDirectories, fixGitFetchMapping} = await import(process.argv[3]);"
+          },
+          "headMatchingLines": [
+            210
+          ]
+        },
+        {
+          "id": "dynamic-019800",
+          "pinnedSpan": {
+            "line": 207,
+            "text": "    assert.equal(mode(path.join(fresh, 'git-empty-hooks')), 0o500);\n    assert.equal(addon.prepareGitDriverDirectories(fresh), false);\n    const old = path.join(root, 'fgos');\n    fs.mkdirSync(old);\n    fs.mkdirSync(path.join(old, 'git-empty-hooks'));\n    assert.equal(mode(old), 0o775);\n    const {checkGit, fixGitDriverDirectories, fixGitFetchMapping} = await import(process.argv[3]);\n    process.env.FGOS_STATE_ROOT = old;\n    const options = { descriptor: JSON.parse(process.argv[4]) };"
+          },
+          "headMatchingLines": [
+            212
+          ]
+        },
+        {
+          "id": "dynamic-019801",
+          "pinnedSpan": {
+            "line": 210,
+            "text": "    fs.mkdirSync(old);\n    fs.mkdirSync(path.join(old, 'git-empty-hooks'));\n    assert.equal(mode(old), 0o775);\n    const {checkGit, fixGitDriverDirectories, fixGitFetchMapping} = await import(process.argv[3]);\n    process.env.FGOS_STATE_ROOT = old;\n    const options = { descriptor: JSON.parse(process.argv[4]) };\n    const before = checkGit(root, 'git-component-compatible', options);\n    assert.equal(before.passed, false);\n    assert.match(before.message, /mode 0775.*group.world writable.*fgos doctor --fix.*git-driver-directories/);"
+          },
+          "headMatchingLines": [
+            215
+          ]
+        },
+        {
+          "id": "dynamic-019802",
+          "pinnedSpan": {
+            "line": 219,
+            "text": "    assert.equal(mode(old), 0o775);\n    const fixed = fixGitDriverDirectories(root, options);\n    assert.equal(fixed.changed, true, fixed.message);\n    assert.equal(mode(old), 0o755);\n    assert.equal(mode(path.join(old, 'git-empty-hooks')), 0o500);\n    const after = checkGit(root, 'git-component-compatible', options);\n    assert.equal(after.passed, true, after.message);\n    assert.equal(mode(root), 0o700);\n    const {execFileSync} = require('node:child_process');"
+          },
+          "headMatchingLines": [
+            224
+          ]
+        },
+        {
+          "id": "dynamic-019803",
+          "pinnedSpan": {
+            "line": 224,
+            "text": "    const after = checkGit(root, 'git-component-compatible', options);\n    assert.equal(after.passed, true, after.message);\n    assert.equal(mode(root), 0o700);\n    const {execFileSync} = require('node:child_process');\n    const repo = path.join(root, 'repo');\n    const git = (...args) => execFileSync('git', ['-C', repo, ...args], {encoding:'utf8'}).trim();\n    execFileSync('git', ['init', '-q', repo]);\n    git('remote', 'add', 'upstream', '/fixture/remote');\n    git('remote', 'add', 'origin', '/fixture/origin');"
+          },
+          "headMatchingLines": [
+            229
+          ]
+        },
+        {
+          "id": "dynamic-019804",
+          "pinnedSpan": {
+            "line": 246,
+            "text": "    git('config', '--unset', 'credential.helper');\n    // A real global helper is permitted; private HOME keeps host config intact.\n    const priorHome = process.env.HOME;\n    const priorXdg = process.env.XDG_CONFIG_HOME;\n    const trustedHome = path.join(root, 'trusted-home');\n    fs.mkdirSync(trustedHome);\n    fs.writeFileSync(path.join(trustedHome, '.gitconfig'), '[credential]\\\\nhelper = trusted-helper\\\\n');\n    process.env.HOME = trustedHome;\n    process.env.XDG_CONFIG_HOME = path.join(trustedHome, '.config');"
+          },
+          "headMatchingLines": [
+            251
+          ]
+        },
+        {
+          "id": "dynamic-019805",
+          "pinnedSpan": {
+            "line": 248,
+            "text": "    const priorHome = process.env.HOME;\n    const priorXdg = process.env.XDG_CONFIG_HOME;\n    const trustedHome = path.join(root, 'trusted-home');\n    fs.mkdirSync(trustedHome);\n    fs.writeFileSync(path.join(trustedHome, '.gitconfig'), '[credential]\\\\nhelper = trusted-helper\\\\n');\n    process.env.HOME = trustedHome;\n    process.env.XDG_CONFIG_HOME = path.join(trustedHome, '.config');\n    assert.equal(checkGit(repo, 'git-transport-config', options).passed, true);\n    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);"
+          },
+          "headMatchingLines": [
+            253
+          ]
+        },
+        {
+          "id": "dynamic-019806",
+          "pinnedSpan": {
+            "line": 250,
+            "text": "    const trustedHome = path.join(root, 'trusted-home');\n    fs.mkdirSync(trustedHome);\n    fs.writeFileSync(path.join(trustedHome, '.gitconfig'), '[credential]\\\\nhelper = trusted-helper\\\\n');\n    process.env.HOME = trustedHome;\n    process.env.XDG_CONFIG_HOME = path.join(trustedHome, '.config');\n    assert.equal(checkGit(repo, 'git-transport-config', options).passed, true);\n    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);\n    const {createGitRemote} = await import(new URL('../git/index.mjs', process.argv[3]));\n    const bare = path.join(root, 'bare');"
+          },
+          "headMatchingLines": [
+            255
+          ]
+        },
+        {
+          "id": "dynamic-019807",
+          "pinnedSpan": {
+            "line": 253,
+            "text": "    process.env.HOME = trustedHome;\n    process.env.XDG_CONFIG_HOME = path.join(trustedHome, '.config');\n    assert.equal(checkGit(repo, 'git-transport-config', options).passed, true);\n    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);\n    const {createGitRemote} = await import(new URL('../git/index.mjs', process.argv[3]));\n    const bare = path.join(root, 'bare');\n    execFileSync('git', ['init', '-q', '--bare', bare]);\n    git('remote', 'add', 'helper-proof', bare);\n    const remotePort = createGitRemote({stateRoot:old,repoPath:repo,trustedMain:repo,writer:'fixture'}, options);"
+          },
+          "headMatchingLines": [
+            258
+          ]
+        },
+        {
+          "id": "dynamic-019808",
+          "pinnedSpan": {
+            "line": 254,
+            "text": "    process.env.XDG_CONFIG_HOME = path.join(trustedHome, '.config');\n    assert.equal(checkGit(repo, 'git-transport-config', options).passed, true);\n    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);\n    const {createGitRemote} = await import(new URL('../git/index.mjs', process.argv[3]));\n    const bare = path.join(root, 'bare');\n    execFileSync('git', ['init', '-q', '--bare', bare]);\n    git('remote', 'add', 'helper-proof', bare);\n    const remotePort = createGitRemote({stateRoot:old,repoPath:repo,trustedMain:repo,writer:'fixture'}, options);\n    assert.deepEqual(remotePort.inspectRemote({remoteGrant:{name:'helper-proof',pinnedUrl:bare},refs:['refs/heads/trunk']}), []);"
+          },
+          "headMatchingLines": [
+            259
+          ]
+        },
+        {
           "id": "dynamic-019809",
           "pinnedSpan": {
             "line": 257,
@@ -44879,6 +45085,166 @@
             "text": "    const {createGitRemote} = await import(new URL('../git/index.mjs', process.argv[3]));\n    const bare = path.join(root, 'bare');\n    execFileSync('git', ['init', '-q', '--bare', bare]);\n    git('remote', 'add', 'helper-proof', bare);\n    const remotePort = createGitRemote({stateRoot:old,repoPath:repo,trustedMain:repo,writer:'fixture'}, options);\n    assert.deepEqual(remotePort.inspectRemote({remoteGrant:{name:'helper-proof',pinnedUrl:bare},refs:['refs/heads/trunk']}), []);\n    if (priorHome === undefined) delete process.env.HOME; else process.env.HOME = priorHome;\n    if (priorXdg === undefined) delete process.env.XDG_CONFIG_HOME; else process.env.XDG_CONFIG_HOME = priorXdg;\n"
           },
           "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-019811",
+          "pinnedSpan": {
+            "line": 264,
+            "text": "    if (priorXdg === undefined) delete process.env.XDG_CONFIG_HOME; else process.env.XDG_CONFIG_HOME = priorXdg;\n\n    const oldOrigin = addon.gitFetchMappings('origin').find(r => r.includes('legacy*')).replaceAll('*', '');\n    git('config', '--add', 'remote.origin.fetch', oldOrigin);\n    const fence = path.join(repo, '.fgos/locks/activation.lock');\n    fs.mkdirSync(fence, {recursive:true});\n    fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({at:'fixture',v:1,lock:'activation',by:'fgos git'}));\n    fs.writeFileSync(path.join(repo, '.fgos/config.json'), JSON.stringify({eventStore:{remote:'upstream'}}));\n    const obsolete = addon.gitFetchMappings('upstream').find(r => r.includes('legacy*')).replaceAll('*', '');"
+          },
+          "headMatchingLines": [
+            269
+          ]
+        },
+        {
+          "id": "dynamic-019813",
+          "pinnedSpan": {
+            "line": 266,
+            "text": "    const oldOrigin = addon.gitFetchMappings('origin').find(r => r.includes('legacy*')).replaceAll('*', '');\n    git('config', '--add', 'remote.origin.fetch', oldOrigin);\n    const fence = path.join(repo, '.fgos/locks/activation.lock');\n    fs.mkdirSync(fence, {recursive:true});\n    fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({at:'fixture',v:1,lock:'activation',by:'fgos git'}));\n    fs.writeFileSync(path.join(repo, '.fgos/config.json'), JSON.stringify({eventStore:{remote:'upstream'}}));\n    const obsolete = addon.gitFetchMappings('upstream').find(r => r.includes('legacy*')).replaceAll('*', '');\n    git('config', '--add', 'remote.upstream.fetch', obsolete);\n    assert.equal(checkGit(repo, 'git-publication-refspecs', options).passed, false);"
+          },
+          "headMatchingLines": [
+            271
+          ]
+        },
+        {
+          "id": "dynamic-019814",
+          "pinnedSpan": {
+            "line": 267,
+            "text": "    git('config', '--add', 'remote.origin.fetch', oldOrigin);\n    const fence = path.join(repo, '.fgos/locks/activation.lock');\n    fs.mkdirSync(fence, {recursive:true});\n    fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({at:'fixture',v:1,lock:'activation',by:'fgos git'}));\n    fs.writeFileSync(path.join(repo, '.fgos/config.json'), JSON.stringify({eventStore:{remote:'upstream'}}));\n    const obsolete = addon.gitFetchMappings('upstream').find(r => r.includes('legacy*')).replaceAll('*', '');\n    git('config', '--add', 'remote.upstream.fetch', obsolete);\n    assert.equal(checkGit(repo, 'git-publication-refspecs', options).passed, false);\n    const mappingFix = fixGitFetchMapping(repo, options);"
+          },
+          "headMatchingLines": [
+            272
+          ]
+        },
+        {
+          "id": "dynamic-019816",
+          "pinnedSpan": {
+            "line": 297,
+            "text": "    const reserved = checkGit(repo, 'git-publication-refspecs', options);\n    assert.equal(reserved.passed, false); assert.ok(reserved.message.includes(badRef));\n    git('update-ref', '-d', badRef);\n\n    const other = path.join(root, 'other');\n    fs.mkdirSync(other);\n    const link = path.join(root, 'symlink');\n    fs.symlinkSync(old, link);\n    assert.equal(addon.prepareGitDriverDirectories(link), false);"
+          },
+          "headMatchingLines": [
+            302
+          ]
+        },
+        {
+          "id": "dynamic-019817",
+          "pinnedSpan": {
+            "line": 299,
+            "text": "    git('update-ref', '-d', badRef);\n\n    const other = path.join(root, 'other');\n    fs.mkdirSync(other);\n    const link = path.join(root, 'symlink');\n    fs.symlinkSync(old, link);\n    assert.equal(addon.prepareGitDriverDirectories(link), false);\n    process.env.FGOS_STATE_ROOT = link;\n    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);"
+          },
+          "headMatchingLines": [
+            304
+          ]
+        },
+        {
+          "id": "dynamic-019818",
+          "pinnedSpan": {
+            "line": 302,
+            "text": "    fs.mkdirSync(other);\n    const link = path.join(root, 'symlink');\n    fs.symlinkSync(old, link);\n    assert.equal(addon.prepareGitDriverDirectories(link), false);\n    process.env.FGOS_STATE_ROOT = link;\n    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);\n    fs.chmodSync(old, 0o775);\n    assert.equal(addon.prepareGitDriverDirectories(link), true);\n    assert.equal(mode(old), 0o755);"
+          },
+          "headMatchingLines": [
+            307
+          ]
+        },
+        {
+          "id": "dynamic-019819",
+          "pinnedSpan": {
+            "line": 310,
+            "text": "    assert.equal(mode(old), 0o755);\n    // A mis-pinned unrelated root is never chmodded.\n    assert.throws(() => addon.prepareGitDriverDirectories(other), /refusing to chmod.*FGOS_STATE_ROOT/);\n    assert.equal(mode(other), 0o775);\n    fs.symlinkSync(other, path.join(other, 'git-empty-hooks'));\n    assert.throws(() => addon.prepareGitDriverDirectories(other));\n    const hooks = path.join(old, 'git-empty-hooks');\n    fs.chmodSync(hooks, 0o700);\n    fs.writeFileSync(path.join(hooks, 'foreign'), 'foreign');"
+          },
+          "headMatchingLines": [
+            315
+          ]
+        },
+        {
+          "id": "dynamic-019820",
+          "pinnedSpan": {
+            "line": 312,
+            "text": "    assert.throws(() => addon.prepareGitDriverDirectories(other), /refusing to chmod.*FGOS_STATE_ROOT/);\n    assert.equal(mode(other), 0o775);\n    fs.symlinkSync(other, path.join(other, 'git-empty-hooks'));\n    assert.throws(() => addon.prepareGitDriverDirectories(other));\n    const hooks = path.join(old, 'git-empty-hooks');\n    fs.chmodSync(hooks, 0o700);\n    fs.writeFileSync(path.join(hooks, 'foreign'), 'foreign');\n    assert.throws(() => addon.prepareGitDriverDirectories(old), error => error.message.includes(hooks) && /inspect.*remove foreign.*doctor --fix/.test(error.message));\n    assert.equal(mode(hooks), 0o700);"
+          },
+          "headMatchingLines": [
+            317
+          ]
+        },
+        {
+          "id": "dynamic-019821",
+          "pinnedSpan": {
+            "line": 314,
+            "text": "    fs.symlinkSync(other, path.join(other, 'git-empty-hooks'));\n    assert.throws(() => addon.prepareGitDriverDirectories(other));\n    const hooks = path.join(old, 'git-empty-hooks');\n    fs.chmodSync(hooks, 0o700);\n    fs.writeFileSync(path.join(hooks, 'foreign'), 'foreign');\n    assert.throws(() => addon.prepareGitDriverDirectories(old), error => error.message.includes(hooks) && /inspect.*remove foreign.*doctor --fix/.test(error.message));\n    assert.equal(mode(hooks), 0o700);\n    fs.unlinkSync(path.join(hooks, 'foreign'));\n    fs.chmodSync(hooks, 0o000);"
+          },
+          "headMatchingLines": [
+            319
+          ]
+        },
+        {
+          "id": "dynamic-019822",
+          "pinnedSpan": {
+            "line": 317,
+            "text": "    fs.chmodSync(hooks, 0o700);\n    fs.writeFileSync(path.join(hooks, 'foreign'), 'foreign');\n    assert.throws(() => addon.prepareGitDriverDirectories(old), error => error.message.includes(hooks) && /inspect.*remove foreign.*doctor --fix/.test(error.message));\n    assert.equal(mode(hooks), 0o700);\n    fs.unlinkSync(path.join(hooks, 'foreign'));\n    fs.chmodSync(hooks, 0o000);\n    if (process.getuid() !== 0) {\n      const unreadable = checkGit(repo, 'git-component-compatible', options);\n      assert.equal(unreadable.passed, false); assert.ok(unreadable.message.includes(hooks));"
+          },
+          "headMatchingLines": [
+            322
+          ]
+        },
+        {
+          "id": "dynamic-019823",
+          "pinnedSpan": {
+            "line": 334,
+            "text": "    assert.equal(mode(other), 0o775);\n    fs.unlinkSync(hooks);\n    assert.equal(addon.prepareGitDriverDirectories(old), true);\n    // A real driver floor record also identifies a custom named fgOS root.\n    const custom = path.join(root, 'custom');\n    fs.mkdirSync(custom, {mode:0o700});\n    process.env.FGOS_STATE_ROOT = custom;\n    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);\n    fs.copyFileSync(path.join(old, 'git-floor-verdict.json'), path.join(custom, 'git-floor-verdict.json'));"
+          },
+          "headMatchingLines": [
+            339
+          ]
+        },
+        {
+          "id": "dynamic-019824",
+          "pinnedSpan": {
+            "line": 336,
+            "text": "    assert.equal(addon.prepareGitDriverDirectories(old), true);\n    // A real driver floor record also identifies a custom named fgOS root.\n    const custom = path.join(root, 'custom');\n    fs.mkdirSync(custom, {mode:0o700});\n    process.env.FGOS_STATE_ROOT = custom;\n    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);\n    fs.copyFileSync(path.join(old, 'git-floor-verdict.json'), path.join(custom, 'git-floor-verdict.json'));\n    fs.chmodSync(custom, 0o775);\n    assert.equal(addon.prepareGitDriverDirectories(custom), true);"
+          },
+          "headMatchingLines": [
+            341
+          ]
+        },
+        {
+          "id": "dynamic-019825",
+          "pinnedSpan": {
+            "line": 338,
+            "text": "    const custom = path.join(root, 'custom');\n    fs.mkdirSync(custom, {mode:0o700});\n    process.env.FGOS_STATE_ROOT = custom;\n    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);\n    fs.copyFileSync(path.join(old, 'git-floor-verdict.json'), path.join(custom, 'git-floor-verdict.json'));\n    fs.chmodSync(custom, 0o775);\n    assert.equal(addon.prepareGitDriverDirectories(custom), true);\n    assert.equal(mode(custom), 0o755);\n  `;"
+          },
+          "headMatchingLines": [
+            343
+          ]
+        },
+        {
+          "id": "dynamic-019826",
+          "pinnedSpan": {
+            "line": 338,
+            "text": "    const custom = path.join(root, 'custom');\n    fs.mkdirSync(custom, {mode:0o700});\n    process.env.FGOS_STATE_ROOT = custom;\n    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);\n    fs.copyFileSync(path.join(old, 'git-floor-verdict.json'), path.join(custom, 'git-floor-verdict.json'));\n    fs.chmodSync(custom, 0o775);\n    assert.equal(addon.prepareGitDriverDirectories(custom), true);\n    assert.equal(mode(custom), 0o755);\n  `;"
+          },
+          "headMatchingLines": [
+            343
+          ]
+        },
+        {
+          "id": "dynamic-019827",
+          "pinnedSpan": {
+            "line": 344,
+            "text": "    assert.equal(addon.prepareGitDriverDirectories(custom), true);\n    assert.equal(mode(custom), 0o755);\n  `;\n  try {\n    execFileSync('/bin/sh', ['-c', 'umask 002; exec \"$@\"', 'umask-probe', process.execPath, '--input-type=commonjs', '-e', `(async()=>{${probe}})().catch(e=>{console.error(e);process.exit(1)})`, built.addon, temp, new URL('../../src/setup/git-checks.mjs', import.meta.url).href, JSON.stringify(descriptor)], { encoding: 'utf8' });\n  } finally { fs.rmSync(temp, { recursive: true, force: true }); }\n});"
+          },
+          "headMatchingLines": [
+            349
+          ]
+        },
+        {
+          "id": "dynamic-019828",
+          "pinnedSpan": {
+            "line": 344,
+            "text": "    assert.equal(addon.prepareGitDriverDirectories(custom), true);\n    assert.equal(mode(custom), 0o755);\n  `;\n  try {\n    execFileSync('/bin/sh', ['-c', 'umask 002; exec \"$@\"', 'umask-probe', process.execPath, '--input-type=commonjs', '-e', `(async()=>{${probe}})().catch(e=>{console.error(e);process.exit(1)})`, built.addon, temp, new URL('../../src/setup/git-checks.mjs', import.meta.url).href, JSON.stringify(descriptor)], { encoding: 'utf8' });\n  } finally { fs.rmSync(temp, { recursive: true, force: true }); }\n});"
+          },
+          "headMatchingLines": [
+            349
+          ]
         }
       ],
       "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
@@ -74427,6 +74793,45 @@
       "failing": false
     },
     {
+      "file": "packages/run-supervisor/rust/tests/gate_terminal_socket.rs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+        "recordLine": 25
+      },
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "pinnedHash": "5846388415297ccca5f9ca5adde0f801c813bcf0cb9e6e3fd902afa22e0c1c7a",
+      "headHash": "41bf068fa158618b788b913ecb9ab9e1d78ad206de85f5b49e320b00433b8831",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+        "recordLine": 28
+      },
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "pinnedHash": "4e5a99938eefa472405b95a8a0b315ce49825ea22cc7c64a6cfe575793a35771",
+      "headHash": "dfc59716a887940868fb696292a94ba82831ccc7bf4e219e95903fc001488604",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "packages/terminal-control/rust/tests/herdr_driver_fake.rs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+        "recordLine": 31
+      },
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "pinnedHash": "5d9b276c54539299d45710b7737b3fe17059a48495c54bd8d69ae2586d8ebe25",
+      "headHash": "da8192017463f49681d54799d467b490d86485441436cc7e02c2a7ac2d6d0686",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
       "file": "test/state/events-compaction.test.mjs",
       "record": {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
@@ -74448,6 +74853,45 @@
       "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
       "pinnedHash": "efd771fc8479c24d4e202259803bd5b55b22ba223666739ed0708d0a1245c6ba",
       "headHash": "b808123b754461d01be2a971a49b7827f127684dcd1d8fc9d9b11d41abdfbef7",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "packages/run-supervisor/rust/tests/support/terminal.rs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 44
+      },
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "pinnedHash": "c463d2ac0ad1f63e2e0689c9160df2759e53a573f27f8c6b2dee163147b178d1",
+      "headHash": "9ffff55f8935a4f1ed73dceae014ce164cb710879480abb9c5dcf3880e8b5b99",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "packages/terminal-control/rust/tests/core_failures.rs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 45
+      },
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "pinnedHash": "5cacc9d82c3b8e69b988f276c696910591531a59cd72df2cf6acb79b8054044d",
+      "headHash": "029e75606ec2a3fd03d7ab0c2b341e62149cef99e283b2fb004876fa91348d88",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 47
+      },
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "pinnedHash": "99f68a80b5b4c7d20b515abd06a85af9f5601d24691711feb988d9d98ce36ae1",
+      "headHash": "04375ca1650b15a8578b4067cb2ae04de457b0f7838dac99fe953b59e5da2c0e",
       "movedSpans": [],
       "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
       "failing": false
@@ -74682,6 +75126,19 @@
       "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
       "pinnedHash": "534bb5ed3b891547840596c5b80ff786e62e62c1f4fc241516e7c60507f61b5d",
       "headHash": "6705d6d12d0e3f5969b80334e2a5df972e80c4d7ddf618c0bfdc1330df0f6ab9",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "test/terminal-control/client-route.test.mjs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+        "recordLine": 187
+      },
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "pinnedHash": "1d72de1295e183d52d88e6fc68172b53966b613a5b44e9dd09870287ca3dc4e7",
+      "headHash": "903d31d46e772149154d9522b7c892fd150fd4b77f928011dce2c16e093f48ac",
       "movedSpans": [],
       "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
       "failing": false
@@ -75278,6 +75735,1467 @@
           ]
         }
       ]
+    },
+    {
+      "file": "packages/git/node-addon/src/git.rs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+        "recordLine": 19
+      },
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "pinnedHash": "a036de1b76a9f2b8aa69af65a155256df1d1230d50b282832ea7a9dc50e088ea",
+      "headHash": "52bac5c46534cad262f2b760a88b5f8e5fe3d2d8fb456575a1414949110a9787",
+      "movedSpans": [
+        {
+          "id": "dynamic-003349",
+          "pinnedSpan": {
+            "line": 254,
+            "text": "        cursor = page.next_cursor;\n    }\n    let mut native_locks = [\"config.lock\", \"packed-refs.lock\", \"shallow.lock\"]\n        .iter()\n        .filter(|name| std::fs::symlink_metadata(repo.common_dir().join(name)).is_ok())\n        .collect::<Vec<_>>();\n    if std::fs::symlink_metadata(repo.git_dir().join(\"index.lock\")).is_ok() {\n        native_locks.push(&\"index.lock\");\n    }"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-003350",
+          "pinnedSpan": {
+            "line": 256,
+            "text": "    let mut native_locks = [\"config.lock\", \"packed-refs.lock\", \"shallow.lock\"]\n        .iter()\n        .filter(|name| std::fs::symlink_metadata(repo.common_dir().join(name)).is_ok())\n        .collect::<Vec<_>>();\n    if std::fs::symlink_metadata(repo.git_dir().join(\"index.lock\")).is_ok() {\n        native_locks.push(&\"index.lock\");\n    }\n    Ok(\n        json!({\"floor\":floor,\"commonDir\":repo.common_dir(),\"layout\":format!(\"{:?}\",repo.layout()),\"journal\":journal,\"nativeLocks\":native_locks,\"untrustedTransportConfig\":driver.untrusted_transport_config(&repo).map_err(operation)?,\"reservedLegacyRefs\":reserved_legacy_refs,\"obsoleteFetchMapping\":mappings.iter().any(|f| f.value == obsolete.as_bytes()),\"fetchRefspecs\":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),\"durability\":\"process-crash; file and parent sync; stable media not certified\"}),"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-003351",
+          "pinnedSpan": {
+            "line": 265,
+            "text": "    )\n}\n#[napi]\npub fn initialize_git_wal(\n    state_root: String,\n    repo_path: String,\n    trusted_main: String,\n) -> Result<()> {\n    check()?;"
+          },
+          "headMatchingLines": [
+            278
+          ]
+        },
+        {
+          "id": "dynamic-003352",
+          "pinnedSpan": {
+            "line": 266,
+            "text": "}\n#[napi]\npub fn initialize_git_wal(\n    state_root: String,\n    repo_path: String,\n    trusted_main: String,\n) -> Result<()> {\n    check()?;\n    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;"
+          },
+          "headMatchingLines": [
+            279
+          ]
+        },
+        {
+          "id": "dynamic-003353",
+          "pinnedSpan": {
+            "line": 270,
+            "text": "    repo_path: String,\n    trusted_main: String,\n) -> Result<()> {\n    check()?;\n    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;\n    match driver\n        .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))\n        .map_err(operation)?\n    {"
+          },
+          "headMatchingLines": [
+            283
+          ]
+        },
+        {
+          "id": "dynamic-003354",
+          "pinnedSpan": {
+            "line": 272,
+            "text": ") -> Result<()> {\n    check()?;\n    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;\n    match driver\n        .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))\n        .map_err(operation)?\n    {\n        ResolveRepo::Repository(repo) => {\n            wal::Wal::open(&repo).map_err(error)?;"
+          },
+          "headMatchingLines": [
+            285
+          ]
+        },
+        {
+          "id": "dynamic-003355",
+          "pinnedSpan": {
+            "line": 272,
+            "text": ") -> Result<()> {\n    check()?;\n    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;\n    match driver\n        .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))\n        .map_err(operation)?\n    {\n        ResolveRepo::Repository(repo) => {\n            wal::Wal::open(&repo).map_err(error)?;"
+          },
+          "headMatchingLines": [
+            285
+          ]
+        },
+        {
+          "id": "dynamic-003356",
+          "pinnedSpan": {
+            "line": 286,
+            "text": "\n/// Repository configuration has its own rank-80 authority, independent of a seal.\n#[napi]\npub fn ensure_git_fetch_mapping(\n    state_root: String,\n    repo_path: String,\n    trusted_main: String,\n    remote: String,\n    refspecs: Vec<String>,"
+          },
+          "headMatchingLines": [
+            299
+          ]
+        },
+        {
+          "id": "dynamic-003357",
+          "pinnedSpan": {
+            "line": 287,
+            "text": "/// Repository configuration has its own rank-80 authority, independent of a seal.\n#[napi]\npub fn ensure_git_fetch_mapping(\n    state_root: String,\n    repo_path: String,\n    trusted_main: String,\n    remote: String,\n    refspecs: Vec<String>,\n    operation_id: String,"
+          },
+          "headMatchingLines": [
+            300
+          ]
+        },
+        {
+          "id": "dynamic-003358",
+          "pinnedSpan": {
+            "line": 295,
+            "text": "    operation_id: String,\n) -> Result<Value> {\n    check()?;\n    require_lock_scope_platform().map_err(operation)?;\n    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;\n    match driver\n        .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))\n        .map_err(operation)?\n    {"
+          },
+          "headMatchingLines": [
+            308
+          ]
+        },
+        {
+          "id": "dynamic-003359",
+          "pinnedSpan": {
+            "line": 297,
+            "text": "    check()?;\n    require_lock_scope_platform().map_err(operation)?;\n    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;\n    match driver\n        .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))\n        .map_err(operation)?\n    {\n        ResolveRepo::Repository(repo) => Ok(json!(driver\n            .ensure_fetch_mapping(&repo, &remote, &refspecs, &operation_id)"
+          },
+          "headMatchingLines": [
+            310
+          ]
+        },
+        {
+          "id": "dynamic-003360",
+          "pinnedSpan": {
+            "line": 297,
+            "text": "    check()?;\n    require_lock_scope_platform().map_err(operation)?;\n    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;\n    match driver\n        .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))\n        .map_err(operation)?\n    {\n        ResolveRepo::Repository(repo) => Ok(json!(driver\n            .ensure_fetch_mapping(&repo, &remote, &refspecs, &operation_id)"
+          },
+          "headMatchingLines": [
+            310
+          ]
+        },
+        {
+          "id": "dynamic-003361",
+          "pinnedSpan": {
+            "line": 315,
+            "text": "    publication_fetch_mappings(&remote).map_err(operation)\n}\n\n#[napi]\npub fn prepare_git_driver_directories(state_root: String) -> Result<bool> {\n    check()?;\n    GitDriver::prepare_directories(Path::new(&state_root)).map_err(operation)\n}"
+          },
+          "headMatchingLines": [
+            328
+          ]
+        },
+        {
+          "id": "dynamic-003362",
+          "pinnedSpan": {
+            "line": 317,
+            "text": "\n#[napi]\npub fn prepare_git_driver_directories(state_root: String) -> Result<bool> {\n    check()?;\n    GitDriver::prepare_directories(Path::new(&state_root)).map_err(operation)\n}"
+          },
+          "headMatchingLines": [
+            330
+          ]
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "packages/git/rust/src/publication.rs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+        "recordLine": 24
+      },
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "pinnedHash": "880dbd8cec7d5ece0a8699c571f441c6fa5d428b7e3fc9270e516b1c3126362a",
+      "headHash": "d6cd0d47556378df4deb3a5285863663a5915783a7e1e302daecee8b8ec07197",
+      "movedSpans": [
+        {
+          "id": "dynamic-003610",
+          "pinnedSpan": {
+            "line": 1097,
+            "text": "/// Fsync a ref's directory chain (see `ref_dirs`), concurrently. A\n/// directory that a concurrent ref deletion pruned in the meantime has no\n/// entry left to make durable, and its removal is made durable by its parent,\n/// which is in the chain: it is skipped, never an error.\nfn sync_ref_chain(dirs: &[PathBuf]) -> std::io::Result<()> {\n    let paths: Vec<&Path> = dirs.iter().map(PathBuf::as_path).collect();\n    let synced = match fgos_durable_file::sync_directories(&paths) {\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => paths.iter().try_for_each(|dir| {\n            match fgos_durable_file::sync_directory(dir) {"
+          },
+          "headMatchingLines": [
+            1104
+          ]
+        },
+        {
+          "id": "dynamic-003611",
+          "pinnedSpan": {
+            "line": 1098,
+            "text": "/// directory that a concurrent ref deletion pruned in the meantime has no\n/// entry left to make durable, and its removal is made durable by its parent,\n/// which is in the chain: it is skipped, never an error.\nfn sync_ref_chain(dirs: &[PathBuf]) -> std::io::Result<()> {\n    let paths: Vec<&Path> = dirs.iter().map(PathBuf::as_path).collect();\n    let synced = match fgos_durable_file::sync_directories(&paths) {\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => paths.iter().try_for_each(|dir| {\n            match fgos_durable_file::sync_directory(dir) {\n                Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),"
+          },
+          "headMatchingLines": [
+            1105
+          ]
+        },
+        {
+          "id": "dynamic-003612",
+          "pinnedSpan": {
+            "line": 1098,
+            "text": "/// directory that a concurrent ref deletion pruned in the meantime has no\n/// entry left to make durable, and its removal is made durable by its parent,\n/// which is in the chain: it is skipped, never an error.\nfn sync_ref_chain(dirs: &[PathBuf]) -> std::io::Result<()> {\n    let paths: Vec<&Path> = dirs.iter().map(PathBuf::as_path).collect();\n    let synced = match fgos_durable_file::sync_directories(&paths) {\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => paths.iter().try_for_each(|dir| {\n            match fgos_durable_file::sync_directory(dir) {\n                Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),"
+          },
+          "headMatchingLines": [
+            1105
+          ]
+        },
+        {
+          "id": "dynamic-003613",
+          "pinnedSpan": {
+            "line": 1119,
+            "text": "/// Bounded in size and age.\nmod durable_objects {\n    use crate::{Oid, RepoHandle};\n    use std::collections::HashMap;\n    use std::path::PathBuf;\n    use std::sync::Mutex;\n    use std::time::{Duration, Instant};\n    const KEEP: Duration = Duration::from_secs(600);\n    const BOUND: usize = 4096;"
+          },
+          "headMatchingLines": [
+            1126
+          ]
+        },
+        {
+          "id": "dynamic-003614",
+          "pinnedSpan": {
+            "line": 1131,
+            "text": "    static SEEN: Mutex<Option<Seen>> = Mutex::new(None);\n    #[cfg(unix)]\n    fn loose(repo: &RepoHandle, oid: &Oid) -> Option<(u64, u64, u128)> {\n        let s = oid.as_str();\n        let m = std::fs::symlink_metadata(repo.common_dir().join(\"objects\").join(&s[..2]).join(&s[2..])).ok()?;\n        m.is_file().then(|| crate::wal::durable_identity(&m)).flatten()\n    }\n    #[cfg(not(unix))]\n    fn loose(_: &RepoHandle, _: &Oid) -> Option<(u64, u64, u128)> {"
+          },
+          "headMatchingLines": [
+            1138
+          ]
+        },
+        {
+          "id": "dynamic-003615",
+          "pinnedSpan": {
+            "line": 1131,
+            "text": "    static SEEN: Mutex<Option<Seen>> = Mutex::new(None);\n    #[cfg(unix)]\n    fn loose(repo: &RepoHandle, oid: &Oid) -> Option<(u64, u64, u128)> {\n        let s = oid.as_str();\n        let m = std::fs::symlink_metadata(repo.common_dir().join(\"objects\").join(&s[..2]).join(&s[2..])).ok()?;\n        m.is_file().then(|| crate::wal::durable_identity(&m)).flatten()\n    }\n    #[cfg(not(unix))]\n    fn loose(_: &RepoHandle, _: &Oid) -> Option<(u64, u64, u128)> {"
+          },
+          "headMatchingLines": [
+            1138
+          ]
+        },
+        {
+          "id": "dynamic-003616",
+          "pinnedSpan": {
+            "line": 1131,
+            "text": "    static SEEN: Mutex<Option<Seen>> = Mutex::new(None);\n    #[cfg(unix)]\n    fn loose(repo: &RepoHandle, oid: &Oid) -> Option<(u64, u64, u128)> {\n        let s = oid.as_str();\n        let m = std::fs::symlink_metadata(repo.common_dir().join(\"objects\").join(&s[..2]).join(&s[2..])).ok()?;\n        m.is_file().then(|| crate::wal::durable_identity(&m)).flatten()\n    }\n    #[cfg(not(unix))]\n    fn loose(_: &RepoHandle, _: &Oid) -> Option<(u64, u64, u128)> {"
+          },
+          "headMatchingLines": [
+            1138
+          ]
+        },
+        {
+          "id": "dynamic-003618",
+          "pinnedSpan": {
+            "line": 1604,
+            "text": "    }\n    fn sync_all_objects(&self, repo: &RepoHandle) -> Result<()> {\n        // Includes loose fanouts and pack indexes after fetch. Never traverse\n        // a symlink. The file fsync profile comes from core.fsync=all.\n        let objects = repo.common_dir().join(\"objects\");\n        for e in fs::read_dir(&objects).map_err(|e| err(e.to_string()))? {\n            let e = e.map_err(|e| err(e.to_string()))?;\n            if e.file_type().map_err(|e| err(e.to_string()))?.is_symlink() {\n                return Err(err(\"untrusted-object-directory\"));"
+          },
+          "headMatchingLines": [
+            1611
+          ]
+        },
+        {
+          "id": "dynamic-003619",
+          "pinnedSpan": {
+            "line": 1951,
+            "text": "    fn read_paths_at(\n        &self,\n        repo: &RepoHandle,\n        revision: &Oid,\n        paths: &[Vec<u8>],\n        max_blob_bytes: usize,\n    ) -> Result<Vec<PathRead>> {\n        Inspect::read_paths_at(self.driver, repo, revision, paths, max_blob_bytes)\n    }"
+          },
+          "headMatchingLines": [
+            1966
+          ]
+        },
+        {
+          "id": "dynamic-003620",
+          "pinnedSpan": {
+            "line": 1989,
+            "text": "        remote: &str,\n    ) -> Result<Option<FetchMappingProvenance>> {\n        Inspect::fetch_mapping_provenance(self.driver, r, remote)\n    }\n    fn resolve_repo(&self, path: &Path) -> Result<ResolveRepo> {\n        Inspect::resolve_repo(self.driver, path)\n    }\n}"
+          },
+          "headMatchingLines": [
+            2004
+          ]
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "packages/git/rust/src/worktree.rs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
+        "recordLine": 5
+      },
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "pinnedHash": "d16e0d490cbe40fce04b654e43ffbbfd62d2395fd326acdf52181582f561b181",
+      "headHash": "7cb972be0cde38a9df3726ecf84fe13d7e0b3e0a65f3ba525a48253042aa0beb",
+      "movedSpans": [
+        {
+          "id": "dynamic-003762",
+          "pinnedSpan": {
+            "line": 1149,
+            "text": "    }\n    /// Includes raw admin directories omitted by worktree list after a partial prune.\n    pub fn inspect_worktree_orphans(&self, repo: &RepoHandle) -> Result<Vec<WorktreeIssue>> {\n        let mut issues = vec![];\n        let directory = repo.common_dir().join(\"worktrees\");\n        if missing(&directory)? {\n            return Ok(issues);\n        }\n        #[cfg(unix)]"
+          },
+          "headMatchingLines": [
+            1158
+          ]
+        },
+        {
+          "id": "dynamic-003763",
+          "pinnedSpan": {
+            "line": 1149,
+            "text": "    }\n    /// Includes raw admin directories omitted by worktree list after a partial prune.\n    pub fn inspect_worktree_orphans(&self, repo: &RepoHandle) -> Result<Vec<WorktreeIssue>> {\n        let mut issues = vec![];\n        let directory = repo.common_dir().join(\"worktrees\");\n        if missing(&directory)? {\n            return Ok(issues);\n        }\n        #[cfg(unix)]"
+          },
+          "headMatchingLines": [
+            1158
+          ]
+        },
+        {
+          "id": "dynamic-003764",
+          "pinnedSpan": {
+            "line": 1168,
+            "text": "            let entry = entry.map_err(failure)?;\n            let name = entry.file_name().to_string_lossy().into_owned();\n            if !entry.file_type().map_err(failure)?.is_dir() {\n                issues.push(WorktreeIssue {\n                    path: entry.path(),\n                    registration: name,\n                    reason: \"partial-admin-entry\".into(),\n                });\n                continue;"
+          },
+          "headMatchingLines": [
+            1177
+          ]
+        },
+        {
+          "id": "dynamic-003765",
+          "pinnedSpan": {
+            "line": 1175,
+            "text": "                });\n                continue;\n            }\n            let admin = entry.path();\n            let backlink = fs::read_to_string(admin.join(\"gitdir\"));\n            let path = backlink\n                .as_ref()\n                .ok()\n                .map(|s| {"
+          },
+          "headMatchingLines": [
+            1184
+          ]
+        },
+        {
+          "id": "dynamic-003766",
+          "pinnedSpan": {
+            "line": 1176,
+            "text": "                continue;\n            }\n            let admin = entry.path();\n            let backlink = fs::read_to_string(admin.join(\"gitdir\"));\n            let path = backlink\n                .as_ref()\n                .ok()\n                .map(|s| {\n                    PathBuf::from(s.trim_end_matches('\\n'))"
+          },
+          "headMatchingLines": [
+            1185
+          ]
+        },
+        {
+          "id": "dynamic-003767",
+          "pinnedSpan": {
+            "line": 1180,
+            "text": "            let path = backlink\n                .as_ref()\n                .ok()\n                .map(|s| {\n                    PathBuf::from(s.trim_end_matches('\\n'))\n                        .parent()\n                        .unwrap_or(Path::new(\"/\"))\n                        .to_owned()\n                })"
+          },
+          "headMatchingLines": [
+            1189
+          ]
+        },
+        {
+          "id": "dynamic-003768",
+          "pinnedSpan": {
+            "line": 1182,
+            "text": "                .ok()\n                .map(|s| {\n                    PathBuf::from(s.trim_end_matches('\\n'))\n                        .parent()\n                        .unwrap_or(Path::new(\"/\"))\n                        .to_owned()\n                })\n                .unwrap_or_default();\n            let reason = if backlink.is_err() {"
+          },
+          "headMatchingLines": [
+            1191
+          ]
+        },
+        {
+          "id": "dynamic-003769",
+          "pinnedSpan": {
+            "line": 1190,
+            "text": "            let reason = if backlink.is_err() {\n                Some(\"partial-admin-entry\")\n            } else if missing(&path)? {\n                Some(\"missing-worktree-preserved\")\n            } else if !missing(&admin.join(\"locked\"))? {\n                Some(if lock_names_live_process(&admin.join(\"locked\")) {\n                    \"locked-by-live-process\"\n                } else {\n                    \"locked-registration\""
+          },
+          "headMatchingLines": [
+            1199
+          ]
+        },
+        {
+          "id": "dynamic-003770",
+          "pinnedSpan": {
+            "line": 1322,
+            "text": "        self.repair_worktree_registration(repo, held, id)\n    }\n    fn prune_owned_registration(\n        &self,\n        scope: &LockScope<'_>,\n        admin: &Path,\n        removed_path: &str,\n        identity: &str,\n    ) -> Result<()> {"
+          },
+          "headMatchingLines": [
+            1331
+          ]
+        },
+        {
+          "id": "dynamic-003771",
+          "pinnedSpan": {
+            "line": 1324,
+            "text": "    fn prune_owned_registration(\n        &self,\n        scope: &LockScope<'_>,\n        admin: &Path,\n        removed_path: &str,\n        identity: &str,\n    ) -> Result<()> {\n        if admin_identity(admin)? != identity {\n            return Err(recovery(\"worktree-admin-identity-changed\"));"
+          },
+          "headMatchingLines": [
+            1333
+          ]
+        },
+        {
+          "id": "dynamic-003772",
+          "pinnedSpan": {
+            "line": 1330,
+            "text": "    ) -> Result<()> {\n        if admin_identity(admin)? != identity {\n            return Err(recovery(\"worktree-admin-identity-changed\"));\n        }\n        match fs::read_to_string(admin.join(\"gitdir\")) {\n            Ok(backlink) if backlink.trim_end() == format!(\"{removed_path}/.git\") => (),\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),\n            _ => return Err(recovery(\"worktree-admin-backlink-changed\")),\n        }"
+          },
+          "headMatchingLines": [
+            1339
+          ]
+        },
+        {
+          "id": "dynamic-003773",
+          "pinnedSpan": {
+            "line": 1338,
+            "text": "        }\n        // Validate the entire remainder before removing a single file. Unknown\n        // files, symlinks, subdirectories and native locks are preserved.\n        let mut files = vec![];\n        let mut directories = vec![];\n        for entry in fs::read_dir(admin).map_err(failure)? {\n            let entry = entry.map_err(failure)?;\n            let name = entry.file_name();\n            let kind = entry.file_type().map_err(failure)?;"
+          },
+          "headMatchingLines": [
+            1347
+          ]
+        },
+        {
+          "id": "dynamic-003774",
+          "pinnedSpan": {
+            "line": 1366,
+            "text": "                return Err(recovery(\"worktree-admin-residue-uncertain\"));\n            }\n        }\n        scope.validate().map_err(failure)?;\n        if admin_identity(admin)? != identity || !missing(Path::new(removed_path))? {\n            return Err(recovery(\"worktree-admin-identity-changed\"));\n        }\n        for file in files {\n            fs::remove_file(file).map_err(failure)?;"
+          },
+          "headMatchingLines": [
+            1375
+          ]
+        },
+        {
+          "id": "dynamic-003775",
+          "pinnedSpan": {
+            "line": 1381,
+            "text": "    }\n    fn reconcile_worktree_error(\n        &self,\n        repo: &RepoHandle,\n        scope: &LockScope<'_>,\n        id: &str,\n        mut error: OperationError,\n    ) -> OperationError {\n        if self.repair_worktree_locked(repo, scope, id).is_ok() {"
+          },
+          "headMatchingLines": [
+            1390
+          ]
+        },
+        {
+          "id": "dynamic-003776",
+          "pinnedSpan": {
+            "line": 1395,
+            "text": "    }\n    fn unchanged_registration(\n        &self,\n        repo: &RepoHandle,\n        path: &Path,\n        admin: &Path,\n        identity: &str,\n        chain: &wal::Chain,\n    ) -> Result<bool> {"
+          },
+          "headMatchingLines": [
+            1404
+          ]
+        },
+        {
+          "id": "dynamic-003777",
+          "pinnedSpan": {
+            "line": 1407,
+            "text": "        if admin_identity(admin)? != identity {\n            return Err(recovery(\"worktree-admin-identity-changed\"));\n        }\n        let handle = self.worktree_handle(repo, path)?;\n        Ok(handle.git_dir == admin\n            && Tip::Oid(handle.tip.as_str().into()) == chain.intent().expected\n            && fs::read_to_string(admin.join(\"gitdir\"))\n                .map_err(failure)?\n                .trim_end()"
+          },
+          "headMatchingLines": [
+            1416
+          ]
+        },
+        {
+          "id": "dynamic-003778",
+          "pinnedSpan": {
+            "line": 1409,
+            "text": "        }\n        let handle = self.worktree_handle(repo, path)?;\n        Ok(handle.git_dir == admin\n            && Tip::Oid(handle.tip.as_str().into()) == chain.intent().expected\n            && fs::read_to_string(admin.join(\"gitdir\"))\n                .map_err(failure)?\n                .trim_end()\n                == format!(\"{}/.git\", text(path)?))\n    }"
+          },
+          "headMatchingLines": [
+            1418
+          ]
+        },
+        {
+          "id": "dynamic-003779",
+          "pinnedSpan": {
+            "line": 1424,
+            "text": "    ) -> Result<()> {\n        if held.iter().any(|h| h.as_ref().name() == \"dispatch-cwd\") {\n            return Err(failure(\"worktree-repair-custody-not-allowed\"));\n        }\n        let mut scope = self.worktree_scope(repo, held)?;\n        crate::recovery::leaf(&mut scope, repo)?;\n        self.repair_worktree_locked(repo, &scope, id)\n    }\n    fn repair_worktree_locked("
+          },
+          "headMatchingLines": [
+            1433
+          ]
+        },
+        {
+          "id": "dynamic-003780",
+          "pinnedSpan": {
+            "line": 1431,
+            "text": "    }\n    fn repair_worktree_locked(\n        &self,\n        repo: &RepoHandle,\n        scope: &LockScope<'_>,\n        id: &str,\n    ) -> Result<()> {\n        let wal = Wal::open(repo).map_err(failure)?;\n        let chain = wal.inspect(id).map_err(failure)?;"
+          },
+          "headMatchingLines": [
+            1440
+          ]
+        },
+        {
+          "id": "dynamic-003781",
+          "pinnedSpan": {
+            "line": 1465,
+            "text": "            );\n        }\n        let admin = repo\n            .common_dir()\n            .join(\"worktrees\")\n            .join(registration(kind)?);\n        // Record-only reconciliation: never repeat a possibly attempted effect.\n        let unchanged = match kind {\n            OperationKind::WorktreeCreate { path, .. } => {"
+          },
+          "headMatchingLines": [
+            1474
+          ]
+        },
+        {
+          "id": "dynamic-003782",
+          "pinnedSpan": {
+            "line": 1466,
+            "text": "        }\n        let admin = repo\n            .common_dir()\n            .join(\"worktrees\")\n            .join(registration(kind)?);\n        // Record-only reconciliation: never repeat a possibly attempted effect.\n        let unchanged = match kind {\n            OperationKind::WorktreeCreate { path, .. } => {\n                missing(&admin)?"
+          },
+          "headMatchingLines": [
+            1475
+          ]
+        },
+        {
+          "id": "dynamic-003783",
+          "pinnedSpan": {
+            "line": 1471,
+            "text": "        // Record-only reconciliation: never repeat a possibly attempted effect.\n        let unchanged = match kind {\n            OperationKind::WorktreeCreate { path, .. } => {\n                missing(&admin)?\n                    && (missing(Path::new(&**path))?\n                        || (admin_identity(Path::new(&**path)).is_ok()\n                            && fs::read_dir(&**path).map_err(failure)?.next().is_none()))\n            }\n            OperationKind::WorktreeMove {"
+          },
+          "headMatchingLines": [
+            1480
+          ]
+        },
+        {
+          "id": "dynamic-003784",
+          "pinnedSpan": {
+            "line": 1472,
+            "text": "        let unchanged = match kind {\n            OperationKind::WorktreeCreate { path, .. } => {\n                missing(&admin)?\n                    && (missing(Path::new(&**path))?\n                        || (admin_identity(Path::new(&**path)).is_ok()\n                            && fs::read_dir(&**path).map_err(failure)?.next().is_none()))\n            }\n            OperationKind::WorktreeMove {\n                source,"
+          },
+          "headMatchingLines": [
+            1481
+          ]
+        },
+        {
+          "id": "dynamic-003785",
+          "pinnedSpan": {
+            "line": 1481,
+            "text": "                destination,\n                registration_identity,\n                ..\n            } => {\n                missing(Path::new(&**destination))?\n                    && self.unchanged_registration(\n                        repo,\n                        Path::new(&**source),\n                        &admin,"
+          },
+          "headMatchingLines": [
+            1490
+          ]
+        },
+        {
+          "id": "dynamic-003786",
+          "pinnedSpan": {
+            "line": 1484,
+            "text": "            } => {\n                missing(Path::new(&**destination))?\n                    && self.unchanged_registration(\n                        repo,\n                        Path::new(&**source),\n                        &admin,\n                        registration_identity,\n                        &chain,\n                    )?"
+          },
+          "headMatchingLines": [
+            1493
+          ]
+        },
+        {
+          "id": "dynamic-003788",
+          "pinnedSpan": {
+            "line": 1496,
+            "text": "                registration_identity,\n                ..\n            } => self.unchanged_registration(\n                repo,\n                Path::new(&**path),\n                &admin,\n                registration_identity,\n                &chain,\n            )?,"
+          },
+          "headMatchingLines": [
+            1505
+          ]
+        },
+        {
+          "id": "dynamic-003789",
+          "pinnedSpan": {
+            "line": 1526,
+            "text": "            } => {\n                if admin_identity(&admin)? != registration_identity.as_ref() {\n                    return Err(recovery(\"worktree-admin-identity-changed\"));\n                }\n                if !missing(Path::new(&**source))? || missing(Path::new(&**destination))? {\n                    return Err(recovery(\"worktree-move-outcome-unknown\"));\n                }\n                // Destination gitfile must already point to this operation's admin.\n                let gitfile ="
+          },
+          "headMatchingLines": [
+            1535
+          ]
+        },
+        {
+          "id": "dynamic-003790",
+          "pinnedSpan": {
+            "line": 1526,
+            "text": "            } => {\n                if admin_identity(&admin)? != registration_identity.as_ref() {\n                    return Err(recovery(\"worktree-admin-identity-changed\"));\n                }\n                if !missing(Path::new(&**source))? || missing(Path::new(&**destination))? {\n                    return Err(recovery(\"worktree-move-outcome-unknown\"));\n                }\n                // Destination gitfile must already point to this operation's admin.\n                let gitfile ="
+          },
+          "headMatchingLines": [
+            1535
+          ]
+        },
+        {
+          "id": "dynamic-003791",
+          "pinnedSpan": {
+            "line": 1531,
+            "text": "                    return Err(recovery(\"worktree-move-outcome-unknown\"));\n                }\n                // Destination gitfile must already point to this operation's admin.\n                let gitfile =\n                    fs::read_to_string(Path::new(&**destination).join(\".git\")).map_err(failure)?;\n                if gitfile.trim_end() != format!(\"gitdir: {}\", text(&admin)?) {\n                    return Err(recovery(\"worktree-destination-identity-unknown\"));\n                }\n                self.worktree_call(repo, scope, &[\"worktree\", \"repair\", \"--\", destination])?;"
+          },
+          "headMatchingLines": [
+            1540
+          ]
+        },
+        {
+          "id": "dynamic-003792",
+          "pinnedSpan": {
+            "line": 1531,
+            "text": "                    return Err(recovery(\"worktree-move-outcome-unknown\"));\n                }\n                // Destination gitfile must already point to this operation's admin.\n                let gitfile =\n                    fs::read_to_string(Path::new(&**destination).join(\".git\")).map_err(failure)?;\n                if gitfile.trim_end() != format!(\"gitdir: {}\", text(&admin)?) {\n                    return Err(recovery(\"worktree-destination-identity-unknown\"));\n                }\n                self.worktree_call(repo, scope, &[\"worktree\", \"repair\", \"--\", destination])?;"
+          },
+          "headMatchingLines": [
+            1540
+          ]
+        },
+        {
+          "id": "dynamic-003793",
+          "pinnedSpan": {
+            "line": 1532,
+            "text": "                }\n                // Destination gitfile must already point to this operation's admin.\n                let gitfile =\n                    fs::read_to_string(Path::new(&**destination).join(\".git\")).map_err(failure)?;\n                if gitfile.trim_end() != format!(\"gitdir: {}\", text(&admin)?) {\n                    return Err(recovery(\"worktree-destination-identity-unknown\"));\n                }\n                self.worktree_call(repo, scope, &[\"worktree\", \"repair\", \"--\", destination])?;\n                let handle = self.worktree_handle(repo, Path::new(&**destination))?;"
+          },
+          "headMatchingLines": [
+            1541
+          ]
+        },
+        {
+          "id": "dynamic-003794",
+          "pinnedSpan": {
+            "line": 1536,
+            "text": "                if gitfile.trim_end() != format!(\"gitdir: {}\", text(&admin)?) {\n                    return Err(recovery(\"worktree-destination-identity-unknown\"));\n                }\n                self.worktree_call(repo, scope, &[\"worktree\", \"repair\", \"--\", destination])?;\n                let handle = self.worktree_handle(repo, Path::new(&**destination))?;\n                if handle.git_dir != admin\n                    || Tip::Oid(handle.tip.as_str().into()) != chain.intent().next\n                {\n                    return Err(recovery(\"worktree-move-identity-changed\"));"
+          },
+          "headMatchingLines": [
+            1545
+          ]
+        },
+        {
+          "id": "dynamic-003795",
+          "pinnedSpan": {
+            "line": 1544,
+            "text": "                    return Err(recovery(\"worktree-move-identity-changed\"));\n                }\n            }\n            OperationKind::WorktreeCreate { path, branch, .. } => {\n                let handle = self.worktree_handle(repo, Path::new(&**path))?;\n                if handle.git_dir != admin\n                    || handle.branch.as_deref() != branch.as_deref()\n                    || Tip::Oid(handle.tip.as_str().into()) != chain.intent().next\n                {"
+          },
+          "headMatchingLines": [
+            1553
+          ]
+        },
+        {
+          "id": "dynamic-003796",
+          "pinnedSpan": {
+            "line": 1551,
+            "text": "                    || Tip::Oid(handle.tip.as_str().into()) != chain.intent().next\n                {\n                    return Err(recovery(\"worktree-create-identity-changed\"));\n                }\n                let lock = admin.join(\"locked\");\n                if !missing(&lock)? {\n                    if fs::read_to_string(&lock).map_err(failure)?.trim() != \"initializing\" {\n                        return Err(recovery(\"worktree-lock-not-operation-owned\"));\n                    }"
+          },
+          "headMatchingLines": [
+            1560
+          ]
+        },
+        {
+          "id": "dynamic-003797",
+          "pinnedSpan": {
+            "line": 1558,
+            "text": "                        return Err(recovery(\"worktree-lock-not-operation-owned\"));\n                    }\n                    self.worktree_call(repo, scope, &[\"worktree\", \"unlock\", \"--\", path])?;\n                }\n                if !missing(&Path::new(&**path).join(\".fgos\"))? {\n                    return Err(recovery(\"worktree-create-strip-incomplete\"));\n                }\n                // A killed checkout may be partial. Preserve it for inspection.\n                self.worktree_clean(repo, Path::new(&**path))?;"
+          },
+          "headMatchingLines": [
+            1567
+          ]
+        },
+        {
+          "id": "dynamic-003798",
+          "pinnedSpan": {
+            "line": 1558,
+            "text": "                        return Err(recovery(\"worktree-lock-not-operation-owned\"));\n                    }\n                    self.worktree_call(repo, scope, &[\"worktree\", \"unlock\", \"--\", path])?;\n                }\n                if !missing(&Path::new(&**path).join(\".fgos\"))? {\n                    return Err(recovery(\"worktree-create-strip-incomplete\"));\n                }\n                // A killed checkout may be partial. Preserve it for inspection.\n                self.worktree_clean(repo, Path::new(&**path))?;"
+          },
+          "headMatchingLines": [
+            1567
+          ]
+        },
+        {
+          "id": "dynamic-003799",
+          "pinnedSpan": {
+            "line": 1562,
+            "text": "                if !missing(&Path::new(&**path).join(\".fgos\"))? {\n                    return Err(recovery(\"worktree-create-strip-incomplete\"));\n                }\n                // A killed checkout may be partial. Preserve it for inspection.\n                self.worktree_clean(repo, Path::new(&**path))?;\n            }\n            OperationKind::WorktreeRemove {\n                path,\n                registration_identity,"
+          },
+          "headMatchingLines": [
+            1571
+          ]
+        },
+        {
+          "id": "dynamic-003800",
+          "pinnedSpan": {
+            "line": 1569,
+            "text": "                path,\n                registration_identity,\n                ..\n            } => {\n                if !missing(Path::new(&**path))? {\n                    return Err(recovery(\"worktree-remove-outcome-unknown\"));\n                }\n                if !missing(&admin)? {\n                    self.prune_owned_registration(scope, &admin, path, registration_identity)?;"
+          },
+          "headMatchingLines": [
+            1578
+          ]
+        },
+        {
+          "id": "dynamic-003801",
+          "pinnedSpan": {
+            "line": 1593,
+            "text": "fn byte_path(bytes: &[u8]) -> Result<PathBuf> {\n    #[cfg(unix)]\n    {\n        use std::os::unix::ffi::OsStrExt;\n        Ok(Path::new(std::ffi::OsStr::from_bytes(bytes)).into())\n    }\n    #[cfg(not(unix))]\n    {\n        Ok(PathBuf::from(std::str::from_utf8(bytes).map_err(failure)?))"
+          },
+          "headMatchingLines": [
+            1602
+          ]
+        },
+        {
+          "id": "dynamic-003802",
+          "pinnedSpan": {
+            "line": 1597,
+            "text": "        Ok(Path::new(std::ffi::OsStr::from_bytes(bytes)).into())\n    }\n    #[cfg(not(unix))]\n    {\n        Ok(PathBuf::from(std::str::from_utf8(bytes).map_err(failure)?))\n    }\n}\n\nfn admin_identity(path: &Path) -> Result<String> {"
+          },
+          "headMatchingLines": [
+            1606
+          ]
+        },
+        {
+          "id": "dynamic-003803",
+          "pinnedSpan": {
+            "line": 1601,
+            "text": "        Ok(PathBuf::from(std::str::from_utf8(bytes).map_err(failure)?))\n    }\n}\n\nfn admin_identity(path: &Path) -> Result<String> {\n    let m = fs::symlink_metadata(path).map_err(failure)?;\n    if !m.is_dir() || m.file_type().is_symlink() {\n        return Err(recovery(\"worktree-admin-untrusted\"));\n    }"
+          },
+          "headMatchingLines": [
+            1610
+          ]
+        },
+        {
+          "id": "dynamic-003804",
+          "pinnedSpan": {
+            "line": 1649,
+            "text": "    use super::*;\n    use std::{os::unix::fs::PermissionsExt, process::Command};\n    #[test]\n    fn failed_strip_keeps_original_error_and_nonforce_rollback_preserves_bytes() {\n        let root = std::env::temp_dir().join(format!(\"fgos-strip-review-{}\", std::process::id()));\n        fs::create_dir(&root).unwrap();\n        fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();\n        let git = |args: &[&str]| {\n            let output = Command::new(\"git\")"
+          },
+          "headMatchingLines": [
+            1658
+          ]
+        },
+        {
+          "id": "dynamic-003805",
+          "pinnedSpan": {
+            "line": 1649,
+            "text": "    use super::*;\n    use std::{os::unix::fs::PermissionsExt, process::Command};\n    #[test]\n    fn failed_strip_keeps_original_error_and_nonforce_rollback_preserves_bytes() {\n        let root = std::env::temp_dir().join(format!(\"fgos-strip-review-{}\", std::process::id()));\n        fs::create_dir(&root).unwrap();\n        fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();\n        let git = |args: &[&str]| {\n            let output = Command::new(\"git\")"
+          },
+          "headMatchingLines": [
+            1658
+          ]
+        },
+        {
+          "id": "dynamic-003806",
+          "pinnedSpan": {
+            "line": 199,
+            "text": "        held: Vec<BorrowedHandle<'a>>,\n    ) -> Result<LockScope<'a>> {\n        crate::refs::adopt_worktree_admin(repo, held)\n    }\n    fn worktree_call(&self, repo: &RepoHandle, scope: &LockScope<'_>, args: &[&str]) -> Result<()> {\n        scope.validate().map_err(failure)?;\n        self.preflight(repo)?;\n        let admin = scope\n            .handle(\"worktree-admin\")"
+          },
+          "headMatchingLines": [
+            208
+          ]
+        },
+        {
+          "id": "dynamic-003807",
+          "pinnedSpan": {
+            "line": 1676,
+            "text": "            \"--allow-empty\",\n            \"-qm\",\n            \"fixture\",\n        ]);\n        let worker = root.join(\"worker\");\n        git(&[\"worktree\", \"add\", \"--detach\", worker.to_str().unwrap()]);\n        let state = worker.join(\".fgos\");\n        fs::create_dir(&state).unwrap();\n        fs::write(state.join(\"valuable\"), [0, 255, 1]).unwrap();"
+          },
+          "headMatchingLines": [
+            1685
+          ]
+        },
+        {
+          "id": "dynamic-003808",
+          "pinnedSpan": {
+            "line": 1678,
+            "text": "            \"fixture\",\n        ]);\n        let worker = root.join(\"worker\");\n        git(&[\"worktree\", \"add\", \"--detach\", worker.to_str().unwrap()]);\n        let state = worker.join(\".fgos\");\n        fs::create_dir(&state).unwrap();\n        fs::write(state.join(\"valuable\"), [0, 255, 1]).unwrap();\n        fs::set_permissions(&state, fs::Permissions::from_mode(0o500)).unwrap();\n        fs::create_dir_all(root.join(\".fgos/locks/activation.lock\")).unwrap();"
+          },
+          "headMatchingLines": [
+            1687
+          ]
+        },
+        {
+          "id": "dynamic-003809",
+          "pinnedSpan": {
+            "line": 1680,
+            "text": "        let worker = root.join(\"worker\");\n        git(&[\"worktree\", \"add\", \"--detach\", worker.to_str().unwrap()]);\n        let state = worker.join(\".fgos\");\n        fs::create_dir(&state).unwrap();\n        fs::write(state.join(\"valuable\"), [0, 255, 1]).unwrap();\n        fs::set_permissions(&state, fs::Permissions::from_mode(0o500)).unwrap();\n        fs::create_dir_all(root.join(\".fgos/locks/activation.lock\")).unwrap();\n        fs::write(\n            root.join(\".fgos/locks/activation.lock/TOMBSTONE\"),"
+          },
+          "headMatchingLines": [
+            1689
+          ]
+        },
+        {
+          "id": "dynamic-003810",
+          "pinnedSpan": {
+            "line": 1682,
+            "text": "        let state = worker.join(\".fgos\");\n        fs::create_dir(&state).unwrap();\n        fs::write(state.join(\"valuable\"), [0, 255, 1]).unwrap();\n        fs::set_permissions(&state, fs::Permissions::from_mode(0o500)).unwrap();\n        fs::create_dir_all(root.join(\".fgos/locks/activation.lock\")).unwrap();\n        fs::write(\n            root.join(\".fgos/locks/activation.lock/TOMBSTONE\"),\n            r#\"{\"lock\":\"activation\",\"by\":\"fixture\",\"at\":\"fixture\"}\"#,\n        )"
+          },
+          "headMatchingLines": [
+            1691
+          ]
+        },
+        {
+          "id": "dynamic-003811",
+          "pinnedSpan": {
+            "line": 1684,
+            "text": "        fs::write(state.join(\"valuable\"), [0, 255, 1]).unwrap();\n        fs::set_permissions(&state, fs::Permissions::from_mode(0o500)).unwrap();\n        fs::create_dir_all(root.join(\".fgos/locks/activation.lock\")).unwrap();\n        fs::write(\n            root.join(\".fgos/locks/activation.lock/TOMBSTONE\"),\n            r#\"{\"lock\":\"activation\",\"by\":\"fixture\",\"at\":\"fixture\"}\"#,\n        )\n        .unwrap();\n        let driver = GitDriver::new(&root).unwrap();"
+          },
+          "headMatchingLines": [
+            1693
+          ]
+        },
+        {
+          "id": "dynamic-003812",
+          "pinnedSpan": {
+            "line": 1693,
+            "text": "        let repo = match driver.resolve_repo(&root, &root).unwrap() {\n            ResolveRepo::Repository(r) => r,\n            _ => panic!(),\n        };\n        let scope = driver.worktree_scope(&repo, vec![]).unwrap();\n        let error = driver\n            .strip_worktree_state(&repo, &scope, &worker)\n            .unwrap_err();\n        assert!(error.cause.contains(\"Permission denied\"), \"{error:?}\");"
+          },
+          "headMatchingLines": [
+            1702
+          ]
+        },
+        {
+          "id": "dynamic-003813",
+          "pinnedSpan": {
+            "line": 1698,
+            "text": "        let error = driver\n            .strip_worktree_state(&repo, &scope, &worker)\n            .unwrap_err();\n        assert!(error.cause.contains(\"Permission denied\"), \"{error:?}\");\n        assert_eq!(fs::read(state.join(\"valuable\")).unwrap(), [0, 255, 1]);\n        assert!(root.join(\".git/worktrees/worker/gitdir\").exists());\n        drop(scope);\n        fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();\n        fs::remove_dir_all(root).unwrap();"
+          },
+          "headMatchingLines": [
+            1707
+          ]
+        },
+        {
+          "id": "dynamic-003814",
+          "pinnedSpan": {
+            "line": 1699,
+            "text": "            .strip_worktree_state(&repo, &scope, &worker)\n            .unwrap_err();\n        assert!(error.cause.contains(\"Permission denied\"), \"{error:?}\");\n        assert_eq!(fs::read(state.join(\"valuable\")).unwrap(), [0, 255, 1]);\n        assert!(root.join(\".git/worktrees/worker/gitdir\").exists());\n        drop(scope);\n        fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();\n        fs::remove_dir_all(root).unwrap();\n    }"
+          },
+          "headMatchingLines": [
+            1708
+          ]
+        },
+        {
+          "id": "dynamic-003815",
+          "pinnedSpan": {
+            "line": 178,
+            "text": "            }\n            cursor = page.next_cursor;\n        }\n    }\n    fn exclude_nested(&self, repo: &RepoHandle, path: &Path) -> Result<()> {\n        for row in self.worktree_rows(repo)? {\n            let registered = byte_path(&row.path)?;\n            let registered = if missing(&registered)? {\n                registered"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-003816",
+          "pinnedSpan": {
+            "line": 250,
+            "text": "            }\n        }\n        Ok(())\n    }\n    fn worktree_handle(&self, repo: &RepoHandle, path: &Path) -> Result<WorktreeHandle> {\n        let target = match self.resolve_repo(path, repo.trusted_main_root())? {\n            ResolveRepo::Repository(r) => r,\n            _ => return Err(recovery(\"worktree-registration-missing\")),\n        };"
+          },
+          "headMatchingLines": [
+            259
+          ]
+        },
+        {
+          "id": "dynamic-003818",
+          "pinnedSpan": {
+            "line": 257,
+            "text": "            _ => return Err(recovery(\"worktree-registration-missing\")),\n        };\n        if target.work_tree.as_deref() != Some(path)\n            || target.common_dir() != repo.common_dir()\n            || path == repo.trusted_main_root()\n        {\n            return Err(failure(\"worktree-identity-refused\"));\n        }\n        let (branch, tip) = match self.resolve_head(&target)? {"
+          },
+          "headMatchingLines": [
+            266
+          ]
+        },
+        {
+          "id": "dynamic-003820",
+          "pinnedSpan": {
+            "line": 276,
+            "text": "        #[cfg(not(unix))]\n        let creation_identity = \"unavailable-on-this-platform\".into();\n        Ok(WorktreeHandle {\n            creation_identity,\n            path: path.into(),\n            git_dir: target.git_dir,\n            branch,\n            tip,\n        })"
+          },
+          "headMatchingLines": [
+            285
+          ]
+        },
+        {
+          "id": "dynamic-003821",
+          "pinnedSpan": {
+            "line": 277,
+            "text": "        let creation_identity = \"unavailable-on-this-platform\".into();\n        Ok(WorktreeHandle {\n            creation_identity,\n            path: path.into(),\n            git_dir: target.git_dir,\n            branch,\n            tip,\n        })\n    }"
+          },
+          "headMatchingLines": [
+            286
+          ]
+        },
+        {
+          "id": "dynamic-003822",
+          "pinnedSpan": {
+            "line": 282,
+            "text": "            branch,\n            tip,\n        })\n    }\n    fn worktree_clean(&self, repo: &RepoHandle, path: &Path) -> Result<()> {\n        let target = match self.resolve_repo(path, repo.trusted_main_root())? {\n            ResolveRepo::Repository(r) => r,\n            _ => return Err(recovery(\"worktree-registration-missing\")),\n        };"
+          },
+          "headMatchingLines": [
+            291
+          ]
+        },
+        {
+          "id": "dynamic-003823",
+          "pinnedSpan": {
+            "line": 287,
+            "text": "        let target = match self.resolve_repo(path, repo.trusted_main_root())? {\n            ResolveRepo::Repository(r) => r,\n            _ => return Err(recovery(\"worktree-registration-missing\")),\n        };\n        if !missing(&path.join(\".fgos\"))? {\n            let tracked = self.checked(\n                &target,\n                &[\"ls-files\", \"-v\", \"-z\", \"--\", \".fgos\"],\n                Policy::Inspect,"
+          },
+          "headMatchingLines": [
+            296
+          ]
+        },
+        {
+          "id": "dynamic-003824",
+          "pinnedSpan": {
+            "line": 298,
+            "text": "                return Err(failure(\"worktree-worker-state-preserved\"));\n            }\n            for entry in tracked.split(|b| *b == 0).filter(|e| !e.is_empty()) {\n                if matches!(entry.first(), Some(b'S' | b's'))\n                    && !missing(&path.join(byte_path(&entry[2..])?))?\n                {\n                    return Err(failure(\"worktree-worker-state-preserved\"));\n                }\n            }"
+          },
+          "headMatchingLines": [
+            307
+          ]
+        },
+        {
+          "id": "dynamic-003825",
+          "pinnedSpan": {
+            "line": 328,
+            "text": "            .is_empty()\n        {\n            return Err(failure(\"worktree-ignored-bytes-preserved\"));\n        }\n        if !missing(&target.git_dir().join(\"locked\"))? {\n            return Err(failure(\"worktree-user-locked\"));\n        }\n        if !missing(&path.join(\".gitmodules\"))?\n            || self"
+          },
+          "headMatchingLines": [
+            337
+          ]
+        },
+        {
+          "id": "dynamic-003826",
+          "pinnedSpan": {
+            "line": 331,
+            "text": "        }\n        if !missing(&target.git_dir().join(\"locked\"))? {\n            return Err(failure(\"worktree-user-locked\"));\n        }\n        if !missing(&path.join(\".gitmodules\"))?\n            || self\n                .checked(&target, &[\"ls-files\", \"--stage\"], Policy::Inspect)?\n                .split(|b| *b == b'\\n')\n                .any(|line| line.starts_with(b\"160000 \"))"
+          },
+          "headMatchingLines": [
+            340
+          ]
+        },
+        {
+          "id": "dynamic-003828",
+          "pinnedSpan": {
+            "line": 348,
+            "text": "            \"rebase-apply\",\n            \"BISECT_START\",\n            \"index.lock\",\n        ] {\n            if !missing(&target.git_dir().join(name))? {\n                return Err(recovery(\"worktree-state-uncertain\"));\n            }\n        }\n        Ok(())"
+          },
+          "headMatchingLines": [
+            357
+          ]
+        },
+        {
+          "id": "dynamic-003829",
+          "pinnedSpan": {
+            "line": 357,
+            "text": "    }\n    fn worktree_custody(\n        &self,\n        repo: &RepoHandle,\n        scope: &LockScope<'_>,\n        path: &Path,\n    ) -> Result<()> {\n        #[cfg(unix)]\n        {"
+          },
+          "headMatchingLines": [
+            366
+          ]
+        },
+        {
+          "id": "dynamic-003830",
+          "pinnedSpan": {
+            "line": 358,
+            "text": "    fn worktree_custody(\n        &self,\n        repo: &RepoHandle,\n        scope: &LockScope<'_>,\n        path: &Path,\n    ) -> Result<()> {\n        #[cfg(unix)]\n        {\n            let lock = crate::refs::custody_lock_path(repo, path)?;"
+          },
+          "headMatchingLines": [
+            367
+          ]
+        },
+        {
+          "id": "dynamic-003831",
+          "pinnedSpan": {
+            "line": 388,
+            "text": "            return Err(failure(\"git-lockscope-unavailable-windows\"));\n        }\n        Ok(())\n    }\n    fn worktree_not_live(&self, path: &Path, warned: &mut BTreeSet<u32>) -> Result<()> {\n        use fgos_process::facts::{scan, Scan, ScanFilter};\n        match scan(&ScanFilter {\n            include_self: true,\n            ..Default::default()"
+          },
+          "headMatchingLines": [
+            397
+          ]
+        },
+        {
+          "id": "dynamic-003833",
+          "pinnedSpan": {
+            "line": 436,
+            "text": "    #[allow(clippy::too_many_arguments)]\n    fn begin_worktree<F: wal::FileSystem>(\n        &self,\n        repo: &RepoHandle,\n        scope: &LockScope<'_>,\n        wal: &Wal<F>,\n        kind: OperationKind,\n        writer: &str,\n        id: &str,"
+          },
+          "headMatchingLines": [
+            445
+          ]
+        },
+        {
+          "id": "dynamic-003834",
+          "pinnedSpan": {
+            "line": 499,
+            "text": "    }\n    fn finish_worktree<F: wal::FileSystem>(\n        &self,\n        repo: &RepoHandle,\n        scope: &LockScope<'_>,\n        wal: &Wal<F>,\n        chain: &wal::Chain,\n        completed: bool,\n        details: Vec<String>,"
+          },
+          "headMatchingLines": [
+            508
+          ]
+        },
+        {
+          "id": "dynamic-003835",
+          "pinnedSpan": {
+            "line": 505,
+            "text": "        chain: &wal::Chain,\n        completed: bool,\n        details: Vec<String>,\n    ) -> Result<()> {\n        let admin_root = repo.common_dir().join(\"worktrees\");\n        if !missing(&admin_root)? {\n            fgos_durable_file::sync_directory(&admin_root).map_err(failure)?;\n        }\n        let terminal = wal"
+          },
+          "headMatchingLines": [
+            514
+          ]
+        },
+        {
+          "id": "dynamic-003836",
+          "pinnedSpan": {
+            "line": 505,
+            "text": "        chain: &wal::Chain,\n        completed: bool,\n        details: Vec<String>,\n    ) -> Result<()> {\n        let admin_root = repo.common_dir().join(\"worktrees\");\n        if !missing(&admin_root)? {\n            fgos_durable_file::sync_directory(&admin_root).map_err(failure)?;\n        }\n        let terminal = wal"
+          },
+          "headMatchingLines": [
+            514
+          ]
+        },
+        {
+          "id": "dynamic-003837",
+          "pinnedSpan": {
+            "line": 532,
+            "text": "        input: &WorktreeCreate,\n        writer: &str,\n        id: &str,\n    ) -> Result<WorktreeHandle> {\n        let scope = self.worktree_scope(repo, held)?;\n        // Like commit/sync, cache stamp-validated facts only for this operation.\n        // Every child still revalidates topology, config stamps and its borrower.\n        let current = self.checkout_repository(repo)?;\n        self.create_worktree_locked(&current, &scope, input, writer, id, false)"
+          },
+          "headMatchingLines": [
+            541
+          ]
+        },
+        {
+          "id": "dynamic-003838",
+          "pinnedSpan": {
+            "line": 550,
+            "text": "        base: &Oid,\n        writer: &str,\n        id: &str,\n    ) -> Result<WorktreeHandle> {\n        let scope = self.worktree_scope(repo, held)?;\n        let current = self.checkout_repository(repo)?;\n        let repo = &current;\n        if !wal::valid_id(session_id) {\n            return Err(failure(\"invalid-session-id\"));"
+          },
+          "headMatchingLines": [
+            559
+          ]
+        },
+        {
+          "id": "dynamic-003839",
+          "pinnedSpan": {
+            "line": 560,
+            "text": "        let parent = parent.canonicalize().map_err(failure)?;\n        #[cfg(unix)]\n        {\n            use std::os::unix::ffi::OsStrExt;\n            let template = parent.join(format!(\"{session_id}-XXXXXX\"));\n            let mut bytes = std::ffi::CString::new(template.as_os_str().as_bytes())\n                .map_err(failure)?\n                .into_bytes_with_nul();\n            if unsafe { libc::mkdtemp(bytes.as_mut_ptr().cast()) }.is_null() {"
+          },
+          "headMatchingLines": [
+            569
+          ]
+        },
+        {
+          "id": "dynamic-003840",
+          "pinnedSpan": {
+            "line": 567,
+            "text": "                .into_bytes_with_nul();\n            if unsafe { libc::mkdtemp(bytes.as_mut_ptr().cast()) }.is_null() {\n                return Err(failure(std::io::Error::last_os_error()));\n            }\n            let path = byte_path(&bytes[..bytes.len() - 1])?;\n            let input = WorktreeCreate {\n                path: path.clone(),\n                branch: None,\n                base: base.clone(),"
+          },
+          "headMatchingLines": [
+            576
+          ]
+        },
+        {
+          "id": "dynamic-003841",
+          "pinnedSpan": {
+            "line": 569,
+            "text": "                return Err(failure(std::io::Error::last_os_error()));\n            }\n            let path = byte_path(&bytes[..bytes.len() - 1])?;\n            let input = WorktreeCreate {\n                path: path.clone(),\n                branch: None,\n                base: base.clone(),\n                session_id: Some(session_id.into()),\n            };"
+          },
+          "headMatchingLines": [
+            578
+          ]
+        },
+        {
+          "id": "dynamic-003842",
+          "pinnedSpan": {
+            "line": 580,
+            "text": "                // Never recursively remove: after Git registration every byte\n                // belongs to a potentially interrupted checkout.\n                let admin = repo\n                    .common_dir()\n                    .join(\"worktrees\")\n                    .join(path.file_name().expect(\"mkdtemp name\"));\n                if missing(&admin).unwrap_or(false) {\n                    let _ = fs::remove_dir(&path);\n                }"
+          },
+          "headMatchingLines": [
+            589
+          ]
+        },
+        {
+          "id": "dynamic-003843",
+          "pinnedSpan": {
+            "line": 581,
+            "text": "                // belongs to a potentially interrupted checkout.\n                let admin = repo\n                    .common_dir()\n                    .join(\"worktrees\")\n                    .join(path.file_name().expect(\"mkdtemp name\"));\n                if missing(&admin).unwrap_or(false) {\n                    let _ = fs::remove_dir(&path);\n                }\n            }"
+          },
+          "headMatchingLines": [
+            590
+          ]
+        },
+        {
+          "id": "dynamic-003844",
+          "pinnedSpan": {
+            "line": 598,
+            "text": "    #[allow(clippy::too_many_arguments)]\n    fn create_worktree_locked(\n        &self,\n        repo: &RepoHandle,\n        scope: &LockScope<'_>,\n        input: &WorktreeCreate,\n        writer: &str,\n        id: &str,\n        owned_empty: bool,"
+          },
+          "headMatchingLines": [
+            607
+          ]
+        },
+        {
+          "id": "dynamic-003845",
+          "pinnedSpan": {
+            "line": 607,
+            "text": "    ) -> Result<WorktreeHandle> {\n        if input.session_id.as_ref().is_some_and(|s| !wal::valid_id(s)) {\n            return Err(failure(\"invalid-session-id\"));\n        }\n        let path = canonical_destination(&input.path)?;\n        let wal = Wal::open(repo).map_err(failure)?;\n        if let Some(chain) = existing(&wal, id)? {\n            let matches = match &chain.intent().kind {\n                OperationKind::WorktreeCreate {"
+          },
+          "headMatchingLines": [
+            616
+          ]
+        },
+        {
+          "id": "dynamic-003846",
+          "pinnedSpan": {
+            "line": 612,
+            "text": "        let wal = Wal::open(repo).map_err(failure)?;\n        if let Some(chain) = existing(&wal, id)? {\n            let matches = match &chain.intent().kind {\n                OperationKind::WorktreeCreate {\n                    path: recorded,\n                    branch,\n                    session_id,\n                    ..\n                } => {"
+          },
+          "headMatchingLines": [
+            621
+          ]
+        },
+        {
+          "id": "dynamic-003850",
+          "pinnedSpan": {
+            "line": 720,
+            "text": "            .file_name()\n            .and_then(|n| n.to_str())\n            .ok_or_else(|| failure(\"worktree-path-not-utf8\"))?\n            .to_owned();\n        if !missing(&repo.common_dir().join(\"worktrees\").join(&name))? {\n            return Err(recovery(\"worktree-admin-name-in-use\"));\n        }\n        let kind = OperationKind::WorktreeCreate {\n            path: text(&path)?.into(),"
+          },
+          "headMatchingLines": [
+            729
+          ]
+        },
+        {
+          "id": "dynamic-003851",
+          "pinnedSpan": {
+            "line": 720,
+            "text": "            .file_name()\n            .and_then(|n| n.to_str())\n            .ok_or_else(|| failure(\"worktree-path-not-utf8\"))?\n            .to_owned();\n        if !missing(&repo.common_dir().join(\"worktrees\").join(&name))? {\n            return Err(recovery(\"worktree-admin-name-in-use\"));\n        }\n        let kind = OperationKind::WorktreeCreate {\n            path: text(&path)?.into(),"
+          },
+          "headMatchingLines": [
+            729
+          ]
+        },
+        {
+          "id": "dynamic-003852",
+          "pinnedSpan": {
+            "line": 724,
+            "text": "        if !missing(&repo.common_dir().join(\"worktrees\").join(&name))? {\n            return Err(recovery(\"worktree-admin-name-in-use\"));\n        }\n        let kind = OperationKind::WorktreeCreate {\n            path: text(&path)?.into(),\n            registration: name.into(),\n            branch: input.branch.as_ref().map(|r| r.as_str().into()),\n            session_id: input.session_id.clone().map(String::into_boxed_str),\n        };"
+          },
+          "headMatchingLines": [
+            733
+          ]
+        },
+        {
+          "id": "dynamic-003853",
+          "pinnedSpan": {
+            "line": 772,
+            "text": "            let worker_repo = match self.resolve_repo(&path, repo.trusted_main_root())? {\n                ResolveRepo::Repository(r) => r,\n                _ => return Err(recovery(\"worktree-registration-missing\")),\n            };\n            let state_paths = self.checked(\n                &worker_repo,\n                &[\"ls-files\", \"-z\", \"--\", \".fgos\"],\n                Policy::Inspect,\n            )?;"
+          },
+          "headMatchingLines": [
+            781
+          ]
+        },
+        {
+          "id": "dynamic-003854",
+          "pinnedSpan": {
+            "line": 777,
+            "text": "                &worker_repo,\n                &[\"ls-files\", \"-z\", \"--\", \".fgos\"],\n                Policy::Inspect,\n            )?;\n            let state_paths = state_paths\n                .split(|b| *b == 0)\n                .filter(|p| !p.is_empty())\n                .map(|p| std::str::from_utf8(p).map_err(failure))\n                .collect::<Result<Vec<_>>>()?;"
+          },
+          "headMatchingLines": [
+            786
+          ]
+        },
+        {
+          "id": "dynamic-003856",
+          "pinnedSpan": {
+            "line": 804,
+            "text": "    }\n    fn strip_worktree_state(\n        &self,\n        repo: &RepoHandle,\n        scope: &LockScope<'_>,\n        path: &Path,\n    ) -> Result<()> {\n        // Never follow a worker .fgos symlink into the shared state.\n        let worker_state = path.join(\".fgos\");"
+          },
+          "headMatchingLines": [
+            813
+          ]
+        },
+        {
+          "id": "dynamic-003857",
+          "pinnedSpan": {
+            "line": 805,
+            "text": "    fn strip_worktree_state(\n        &self,\n        repo: &RepoHandle,\n        scope: &LockScope<'_>,\n        path: &Path,\n    ) -> Result<()> {\n        // Never follow a worker .fgos symlink into the shared state.\n        let worker_state = path.join(\".fgos\");\n        if !missing(&worker_state)? {"
+          },
+          "headMatchingLines": [
+            814
+          ]
+        },
+        {
+          "id": "dynamic-003858",
+          "pinnedSpan": {
+            "line": 808,
+            "text": "        scope: &LockScope<'_>,\n        path: &Path,\n    ) -> Result<()> {\n        // Never follow a worker .fgos symlink into the shared state.\n        let worker_state = path.join(\".fgos\");\n        if !missing(&worker_state)? {\n            let metadata = fs::symlink_metadata(&worker_state).map_err(failure)?;\n            let strip = if metadata.is_dir() && !metadata.file_type().is_symlink() {\n                fs::remove_dir_all(&worker_state)"
+          },
+          "headMatchingLines": [
+            817
+          ]
+        },
+        {
+          "id": "dynamic-003859",
+          "pinnedSpan": {
+            "line": 828,
+            "text": "    pub fn remove_worktree(\n        &self,\n        repo: &RepoHandle,\n        held: Vec<BorrowedHandle<'_>>,\n        path: &Path,\n        proof: &WorktreeDelivery,\n        writer: &str,\n        id: &str,\n    ) -> Result<()> {"
+          },
+          "headMatchingLines": [
+            837
+          ]
+        },
+        {
+          "id": "dynamic-003860",
+          "pinnedSpan": {
+            "line": 846,
+            "text": "        writer: &str,\n        id: &str,\n        discarded_land: Option<&str>,\n    ) -> Result<()> {\n        let scope = self.worktree_scope(repo, held)?;\n        let path = canonical_destination(path)?;\n        let wal = Wal::open(repo).map_err(failure)?;\n        if let Some(chain) = existing(&wal, id)? {\n            let matches = match &chain.intent().kind {"
+          },
+          "headMatchingLines": [
+            855
+          ]
+        },
+        {
+          "id": "dynamic-003861",
+          "pinnedSpan": {
+            "line": 847,
+            "text": "        id: &str,\n        discarded_land: Option<&str>,\n    ) -> Result<()> {\n        let scope = self.worktree_scope(repo, held)?;\n        let path = canonical_destination(path)?;\n        let wal = Wal::open(repo).map_err(failure)?;\n        if let Some(chain) = existing(&wal, id)? {\n            let matches = match &chain.intent().kind {\n                OperationKind::WorktreeRemove {"
+          },
+          "headMatchingLines": [
+            856
+          ]
+        },
+        {
+          "id": "dynamic-003862",
+          "pinnedSpan": {
+            "line": 852,
+            "text": "        let wal = Wal::open(repo).map_err(failure)?;\n        if let Some(chain) = existing(&wal, id)? {\n            let matches = match &chain.intent().kind {\n                OperationKind::WorktreeRemove {\n                    path: recorded,\n                    delivery,\n                    ..\n                } => {\n                    recorded.as_ref() == text(&path)?"
+          },
+          "headMatchingLines": [
+            861
+          ]
+        },
+        {
+          "id": "dynamic-003863",
+          "pinnedSpan": {
+            "line": 904,
+            "text": "                &wal,\n                &chain,\n            );\n        }\n        let path = path.canonicalize().map_err(failure)?;\n        if path.parent().is_none() {\n            return Err(failure(\"worktree-root-refused\"));\n        }\n        let handle = self.worktree_handle(repo, &path)?;"
+          },
+          "headMatchingLines": [
+            913
+          ]
+        },
+        {
+          "id": "dynamic-003864",
+          "pinnedSpan": {
+            "line": 951,
+            "text": "        let registration = text(\n            handle\n                .git_dir\n                .file_name()\n                .map(Path::new)\n                .ok_or_else(|| failure(\"worktree-registration-missing\"))?,\n        )?\n        .into();\n        let chain = self.begin_worktree("
+          },
+          "headMatchingLines": [
+            960
+          ]
+        },
+        {
+          "id": "dynamic-003865",
+          "pinnedSpan": {
+            "line": 960,
+            "text": "            repo,\n            &scope,\n            &wal,\n            OperationKind::WorktreeRemove {\n                path: text(&path)?.into(),\n                registration,\n                registration_identity: admin_identity(&handle.git_dir)?.into_boxed_str(),\n                delivery: Box::new(wal::WorktreeDeliveryBinding {\n                    delivered_to: proof.delivered_to.as_str().into(),"
+          },
+          "headMatchingLines": [
+            969
+          ]
+        },
+        {
+          "id": "dynamic-003866",
+          "pinnedSpan": {
+            "line": 1013,
+            "text": "        expected: &Oid,\n        writer: &str,\n        id: &str,\n    ) -> Result<WorktreeHandle> {\n        let scope = self.worktree_scope(repo, held)?;\n        let source = canonical_destination(source)?;\n        let destination = canonical_destination(destination)?;\n        let wal = Wal::open(repo).map_err(failure)?;\n        if let Some(chain) = existing(&wal, id)? {"
+          },
+          "headMatchingLines": [
+            1022
+          ]
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "packages/terminal-control/rust/src/port.rs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r19.jsonl",
+        "recordLine": 3
+      },
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "pinnedHash": "5d6c3b741673f48b144e8fcb34b31ccf292419b628aac53cc073e32ed626b3c8",
+      "headHash": "01fc418ff83bb4d6f35029c61c88a9269b39176363b04fa4c772fa03e4025df0",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "packages/git/node-addon/src/git/inspect.rs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 62
+      },
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "pinnedHash": "427a4ba1dcb473f293b242cecf4fbaad794cc2deec5b8a76bbf6027f29fa5b74",
+      "headHash": "6751316ae2fb864008d4ef10419c3ed83b9cd3e56f8591606c91406638ee46c4",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "packages/run-supervisor/rust/src/gate/unix.rs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 99
+      },
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "pinnedHash": "8fcf595ee133bd29d48c7cfdaf98a3076d0ead2a06fd55feee4f3ec04e6ff31a",
+      "headHash": "d94e1b4e9ecf4a6cc858e21d932b1cca40f3d330db02096cc29a7344774fc498",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "packages/terminal-control/contracts/terminal-control.port.v1.json",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 104
+      },
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "pinnedHash": "2b2723fe9b5f9286da094674cc6339b89b51e4ef73891a8260a61941bc7307f9",
+      "headHash": "8447afa3de09192caed27041457c98dd07fbbdb76853104c5a5d8dd631dbf110",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "packages/terminal-control/rust/src/core.rs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 106
+      },
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "pinnedHash": "5a7926154f68ffe752494e1ed4e55bc1e77d69777aad3c885509624ee7fd3c0c",
+      "headHash": "d684bf3d1d094b9c7652b8dbfc61e78121c6a2c6f5460cb3b7b452a27cfccda6",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "packages/terminal-control/rust/src/route.rs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 112
+      },
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "pinnedHash": "ea9d3f1111922e95442bf37e149d6f3f2d488ed2de920f8884c00bb86156d640",
+      "headHash": "9d8a1dac8c0a30e259a664b364a964ab1606ab1747f4127ca4164f99c5523b1b",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "packages/run-supervisor/rust/src/supervise/terminal.rs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r21.jsonl",
+        "recordLine": 4
+      },
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "pinnedHash": "40db457a237ae133ce00b6ba3304af34d88fcd7f129afbc43dc6d8052a6c6cd3",
+      "headHash": "1ccf2b2c8c15e53d4194a9ab17bc50ebc5ffe1ef2ae5ffca1fbb6da8da6bf1af",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "src/workflow/integrate.mjs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-retired-source.jsonl",
+        "recordLine": 1
+      },
+      "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+      "pinnedHash": "62218e241e1f75e9aa4c00c807457a222a9b0ab58ce19760241b8ecc861af207",
+      "headHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "movedSpans": [
+        {
+          "id": "dynamic-016461",
+          "pinnedSpan": {
+            "line": 98,
+            "text": " * @param {string} [params.commitMessage]\n * @param {boolean} [params.squash]\n * @returns {{ merged: boolean, sourceBranch: string, targetBranch: string }}\n */\nexport function mergeWorkflowBranch({ repoRoot, sourceBranch, targetBranch, commitMessage, squash = false, scope = createLockScope('workflow-merge') }) {\n  if (!repoRoot || !sourceBranch || !targetBranch) {\n    throw new RunnerConfigError('mergeWorkflowBranch requires repoRoot, sourceBranch and targetBranch');\n  }\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-016462",
+          "pinnedSpan": {
+            "line": 99,
+            "text": " * @param {boolean} [params.squash]\n * @returns {{ merged: boolean, sourceBranch: string, targetBranch: string }}\n */\nexport function mergeWorkflowBranch({ repoRoot, sourceBranch, targetBranch, commitMessage, squash = false, scope = createLockScope('workflow-merge') }) {\n  if (!repoRoot || !sourceBranch || !targetBranch) {\n    throw new RunnerConfigError('mergeWorkflowBranch requires repoRoot, sourceBranch and targetBranch');\n  }\n\n  const msg = commitMessage || `merge: integrate workflow branch ${sourceBranch} into ${targetBranch}`;"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-016463",
+          "pinnedSpan": {
+            "line": 103,
+            "text": "  if (!repoRoot || !sourceBranch || !targetBranch) {\n    throw new RunnerConfigError('mergeWorkflowBranch requires repoRoot, sourceBranch and targetBranch');\n  }\n\n  const msg = commitMessage || `merge: integrate workflow branch ${sourceBranch} into ${targetBranch}`;\n  const mergeArgs = ['merge', '--no-ff', sourceBranch, '-m', msg];\n  if (squash) {\n    mergeArgs.splice(1, 1, '--squash');\n  }"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-016464",
+          "pinnedSpan": {
+            "line": 115,
+            "text": "  if (currentBranch === targetBranch) {\n    git(repoRoot, mergeArgs);\n  } else {\n    // Perform in temporary worktree on targetBranch\n    const tempWt = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-merge-'));\n    try {\n      addWorktreeSync(scope, repoRoot, [tempWt, targetBranch]);\n      git(tempWt, mergeArgs);\n    } finally {"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-016465",
+          "pinnedSpan": {
+            "line": 145,
+            "text": " * @param {string} [params.branch]\n * @param {boolean} [params.deleteBranch]\n */\nexport function cleanupWorkflowWorktree({ repoRoot, worktreePath, branch, deleteBranch = true }) {\n  if (!repoRoot || !worktreePath) {\n    throw new RunnerConfigError('cleanupWorkflowWorktree requires repoRoot and worktreePath');\n  }\n\n  try {"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-016466",
+          "pinnedSpan": {
+            "line": 17,
+            "text": "      stdio: ['ignore', 'pipe', 'pipe'],\n    }).trim();\n  } catch (err) {\n    const stderr = err.stderr ? err.stderr.trim() : err.message;\n    throw new RunnerConfigError(`git ${args[0]} failed in ${cwd}: ${stderr}`);\n  }\n}\n\n/**"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-016467",
+          "pinnedSpan": {
+            "line": 30,
+            "text": " * @param {string} params.branch\n * @param {string} [params.baseRef]\n * @param {string} [params.worktreeDir]\n * @param {object} [params.scope] lock scope of the caller; a fresh one when absent\n * @returns {{ worktreePath: string, branch: string }}\n */\nexport function createWorkflowWorktree({ repoRoot, branch, baseRef = 'HEAD', worktreeDir, scope = createLockScope('workflow-worktree') }) {\n  if (!repoRoot || !branch) {\n    throw new RunnerConfigError('createWorkflowWorktree requires repoRoot and branch');"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-016468",
+          "pinnedSpan": {
+            "line": 32,
+            "text": " * @param {string} [params.worktreeDir]\n * @param {object} [params.scope] lock scope of the caller; a fresh one when absent\n * @returns {{ worktreePath: string, branch: string }}\n */\nexport function createWorkflowWorktree({ repoRoot, branch, baseRef = 'HEAD', worktreeDir, scope = createLockScope('workflow-worktree') }) {\n  if (!repoRoot || !branch) {\n    throw new RunnerConfigError('createWorkflowWorktree requires repoRoot and branch');\n  }\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-016469",
+          "pinnedSpan": {
+            "line": 33,
+            "text": " * @param {object} [params.scope] lock scope of the caller; a fresh one when absent\n * @returns {{ worktreePath: string, branch: string }}\n */\nexport function createWorkflowWorktree({ repoRoot, branch, baseRef = 'HEAD', worktreeDir, scope = createLockScope('workflow-worktree') }) {\n  if (!repoRoot || !branch) {\n    throw new RunnerConfigError('createWorkflowWorktree requires repoRoot and branch');\n  }\n\n  const base = worktreeDir ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-wt-'));"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-016470",
+          "pinnedSpan": {
+            "line": 37,
+            "text": "  if (!repoRoot || !branch) {\n    throw new RunnerConfigError('createWorkflowWorktree requires repoRoot and branch');\n  }\n\n  const base = worktreeDir ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-wt-'));\n  const worktreePath = path.resolve(base);\n\n  // Check if branch already exists\n  let branchExists = false;"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-016471",
+          "pinnedSpan": {
+            "line": 37,
+            "text": "  if (!repoRoot || !branch) {\n    throw new RunnerConfigError('createWorkflowWorktree requires repoRoot and branch');\n  }\n\n  const base = worktreeDir ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-wt-'));\n  const worktreePath = path.resolve(base);\n\n  // Check if branch already exists\n  let branchExists = false;"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-016472",
+          "pinnedSpan": {
+            "line": 38,
+            "text": "    throw new RunnerConfigError('createWorkflowWorktree requires repoRoot and branch');\n  }\n\n  const base = worktreeDir ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-wt-'));\n  const worktreePath = path.resolve(base);\n\n  // Check if branch already exists\n  let branchExists = false;\n  try {"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-016473",
+          "pinnedSpan": {
+            "line": 38,
+            "text": "    throw new RunnerConfigError('createWorkflowWorktree requires repoRoot and branch');\n  }\n\n  const base = worktreeDir ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-wt-'));\n  const worktreePath = path.resolve(base);\n\n  // Check if branch already exists\n  let branchExists = false;\n  try {"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-016474",
+          "pinnedSpan": {
+            "line": 43,
+            "text": "\n  // Check if branch already exists\n  let branchExists = false;\n  try {\n    execFileSync('git', ['rev-parse', '--verify', '--quiet', `refs/heads/${branch}`], {\n      cwd: repoRoot,\n      stdio: 'ignore',\n    });\n    branchExists = true;"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-016475",
+          "pinnedSpan": {
+            "line": 59,
+            "text": "    addWorktreeSync(scope, repoRoot, ['-b', branch, worktreePath, baseRef]);\n  }\n\n  return {\n    worktreePath: fs.realpathSync(worktreePath),\n    branch,\n  };\n}\n"
+          },
+          "headMatchingLines": []
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
     }
   ]
 }

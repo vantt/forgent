@@ -1,0 +1,1920 @@
+{
+  "ruling": "L12-87",
+  "scope": "Inherited Step3/4 review flags and earlier explicit final-composition obligations. Step5 does not reopen those owners. Non-failing HEAD drift remains separate.",
+  "items": [
+    {
+      "id": "network-r5-park-to-patch",
+      "sourceReview": "review-a38-step-05-s8-p01.md",
+      "evidence": [
+        {
+          "file": "apps/fgos-gateway/web/src/lib/network.ts",
+          "id": "reference-000209",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 8,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "167d4741830756c229f6b492defa0a2d809e5f1bfc057daee54c5eaf9cf11319",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 71,
+              "columnStart": 54,
+              "line": 1,
+              "text": "docs/specs/herdr-"
+            },
+            {
+              "columnEndExclusive": 20,
+              "columnStart": 1,
+              "line": 2,
+              "text": "// web-dashboard.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-012.jsonl",
+            "recordLine": 11,
+            "recordSha256": "c8468df6da937424f3fccfeeca89d280fd4dd93d30add5c07b16d27527daab8e",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "class6-l-000067",
+            "slotKey": "{\"edgeId\":\"class6-l-000067\",\"file\":\"apps/fgos-gateway/web/src/lib/network.ts\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000067\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1},{\"edgeId\":\"class6-l-000067\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":2}]}",
+            "disposition": "parked",
+            "sourceSha256": "167d4741830756c229f6b492defa0a2d809e5f1bfc057daee54c5eaf9cf11319",
+            "sourceSpans": [
+              {
+                "line": 1,
+                "columnStart": 54,
+                "columnEndExclusive": 71,
+                "text": "docs/specs/herdr-"
+              },
+              {
+                "line": 2,
+                "columnStart": 1,
+                "columnEndExclusive": 20,
+                "text": "// web-dashboard.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        }
+      ],
+      "proposedStep7Action": "Reconcile Step4 inherited park to a comment patch at the live Business Rules R5 holder. Conserve the default 0.0.0.0 bind and non-loopback warning claim; compose exact forward/inverse diff and review at final pin.",
+      "additionalEvidence": {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+        "sha256": "7b5fe48ff585963bfbfc903ac1aa840fa7db58a80a51d72d8cbf73008d9cff80",
+        "matches": [
+          {
+            "line": 80,
+            "text": "  configured bind address (default reaches beyond loopback — binds 0.0.0.0 by default, bind address configurable, warns when non-loopback) and on port"
+          },
+          {
+            "line": 239,
+            "text": "- **R5.** Static serving defaults ON (`herdrWebDashboard.staticServing`), while gateway lifecycle is controlled by `fgos gateway start`; its default bind reaches"
+          },
+          {
+            "line": 240,
+            "text": "  beyond loopback (binds 0.0.0.0 by default, bind address configurable), with a warning raised when the bind is not loopback."
+          },
+          {
+            "line": 250,
+            "text": "- **R8.** The combination of R5 (on by default, bind beyond loopback) and the"
+          }
+        ]
+      },
+      "status": "pending Step 7; inherited Step 3/4 outcomes unchanged in Step 5"
+    },
+    {
+      "id": "triage-absent-goal-tier-claim",
+      "sourceReview": "review-a38-step-05-s8-p03.md",
+      "evidence": [
+        {
+          "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
+          "id": "reference-002301",
+          "recordFile": "step-05-records/runtime-judgment-part-24.jsonl",
+          "recordLine": 6,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "b25d732a432dbbfb144c23652cd48204cbf211b4389237dccd0ec46bbd24faf3",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 73,
+              "columnStart": 35,
+              "line": 242,
+              "text": "docs/reference/triage-table-columns.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-020.jsonl",
+            "recordLine": 1,
+            "recordSha256": "634d48697b13d07a54f997ad70efb6cddd1ed15aa84684bc55c911215efdbd83",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "class6-l-000201",
+            "slotKey": "{\"edgeId\":\"class6-l-000201\",\"file\":\"packages/herdr-fgos-common/rust/src/fgos.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000201\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":242}]}",
+            "disposition": "patch",
+            "sourceSha256": "fcaaaa8f0beabf43e8d9e312da0dac0d2392d7bd52c38d5eaa8ee4a37bc286a9",
+            "sourceSpans": [
+              {
+                "line": 242,
+                "columnStart": 35,
+                "columnEndExclusive": 73,
+                "text": "docs/reference/triage-table-columns.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "patch"
+        }
+      ],
+      "proposedStep7Action": "Reconcile inherited Step4 class6-l-000201 comment claim that the target already documents absent-goalTier-sorts-last. The moved triage-table holder documents dash rendering, not ordering; preserve the runtime sort and make the citation/comment truthful at final composition.",
+      "additionalEvidence": null,
+      "status": "pending Step 7; inherited Step 3/4 outcomes unchanged in Step 5"
+    },
+    {
+      "id": "gateway-yaml-research-split",
+      "sourceReview": "review-a38-step-05-s8-p03.md",
+      "evidence": [
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000307",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 77,
+              "columnStart": 26,
+              "line": 205,
+              "text": "docs/history/tsk-4id-task-detail-screen/RESEARCH.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01336",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 77,
+                "columnStart": 26,
+                "line": 205,
+                "text": "docs/history/tsk-4id-task-detail-screen/RESEARCH.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-002240",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 24,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 77,
+              "columnStart": 26,
+              "line": 205,
+              "text": "docs/history/tsk-4id-task-detail-screen/RESEARCH.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+            "recordLine": 1,
+            "recordSha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-06921",
+            "slotKey": null,
+            "disposition": "preserve",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 77,
+                "columnStart": 26,
+                "line": 205,
+                "text": "docs/history/tsk-4id-task-detail-screen/RESEARCH.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "preserve"
+        }
+      ],
+      "proposedStep7Action": "Unify identical L205 never-existing docs/history/tsk-4id-task-detail-screen/RESEARCH.md provenance to preserve in both Step3 owner records; keep the false historical pointer explicit and do not invent a holder.",
+      "additionalEvidence": null,
+      "status": "pending Step 7; inherited Step 3/4 outcomes unchanged in Step 5"
+    },
+    {
+      "id": "gateway-yaml-consumer-specific-parks",
+      "sourceReview": "review-a38-step-05-s8-p03.md",
+      "evidence": [
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000293",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 126,
+              "columnStart": 102,
+              "line": 456,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01340",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 126,
+                "columnStart": 102,
+                "line": 456,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000296",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 27,
+              "columnStart": 7,
+              "line": 55,
+              "text": "docs/specs/runner.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01335",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 27,
+                "columnStart": 7,
+                "line": 55,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000298",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 30,
+              "columnStart": 10,
+              "line": 607,
+              "text": "docs/specs/runner.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01341",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 30,
+                "columnStart": 10,
+                "line": 607,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000300",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 31,
+              "columnStart": 7,
+              "line": 54,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01334",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 31,
+                "columnStart": 7,
+                "line": 54,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000301",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 35,
+              "columnStart": 11,
+              "line": 739,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01345",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 35,
+                "columnStart": 11,
+                "line": 739,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000302",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 56,
+              "columnStart": 32,
+              "line": 710,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01343",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 56,
+                "columnStart": 32,
+                "line": 710,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000303",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 60,
+              "columnStart": 7,
+              "line": 51,
+              "text": "docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01332",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 60,
+                "columnStart": 7,
+                "line": 51,
+                "text": "docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000304",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 65,
+              "columnStart": 7,
+              "line": 50,
+              "text": "docs/decisions/0011-version-tuong-minh-cho-moi-contract.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01331",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 65,
+                "columnStart": 7,
+                "line": 50,
+                "text": "docs/decisions/0011-version-tuong-minh-cho-moi-contract.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000307",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 77,
+              "columnStart": 26,
+              "line": 205,
+              "text": "docs/history/tsk-4id-task-detail-screen/RESEARCH.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01336",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 77,
+                "columnStart": 26,
+                "line": 205,
+                "text": "docs/history/tsk-4id-task-detail-screen/RESEARCH.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-002226",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 24,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 126,
+              "columnStart": 102,
+              "line": 456,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+            "recordLine": 1,
+            "recordSha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-06925",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 126,
+                "columnStart": 102,
+                "line": 456,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-002229",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 24,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 27,
+              "columnStart": 7,
+              "line": 55,
+              "text": "docs/specs/runner.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+            "recordLine": 1,
+            "recordSha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-06920",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 27,
+                "columnStart": 7,
+                "line": 55,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-002231",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 24,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 30,
+              "columnStart": 10,
+              "line": 607,
+              "text": "docs/specs/runner.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+            "recordLine": 1,
+            "recordSha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-06926",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 30,
+                "columnStart": 10,
+                "line": 607,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-002233",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 24,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 31,
+              "columnStart": 7,
+              "line": 54,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+            "recordLine": 1,
+            "recordSha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-06919",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 31,
+                "columnStart": 7,
+                "line": 54,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-002234",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 24,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 35,
+              "columnStart": 11,
+              "line": 739,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+            "recordLine": 1,
+            "recordSha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-06930",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 35,
+                "columnStart": 11,
+                "line": 739,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-002235",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 24,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 56,
+              "columnStart": 32,
+              "line": 710,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+            "recordLine": 1,
+            "recordSha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-06928",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 56,
+                "columnStart": 32,
+                "line": 710,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-002236",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 24,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 60,
+              "columnStart": 7,
+              "line": 51,
+              "text": "docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+            "recordLine": 1,
+            "recordSha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-06917",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 60,
+                "columnStart": 7,
+                "line": 51,
+                "text": "docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-002237",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 24,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 65,
+              "columnStart": 7,
+              "line": 50,
+              "text": "docs/decisions/0011-version-tuong-minh-cho-moi-contract.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+            "recordLine": 1,
+            "recordSha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-06916",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 65,
+                "columnStart": 7,
+                "line": 50,
+                "text": "docs/decisions/0011-version-tuong-minh-cho-moi-contract.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        }
+      ],
+      "proposedStep7Action": "Replace inherited templated park descriptions with consumer-specific text for the two byte-identical contract copies. Preserve runtime gateway.rs L1187 and mcp.rs L127 loading custody plus API-client line-number citations; resolve any path move with readers and diagnostics in the same cut.",
+      "additionalEvidence": null,
+      "status": "pending Step 7; inherited Step 3/4 outcomes unchanged in Step 5"
+    },
+    {
+      "id": "gateway-yaml-live-state-runner-holders",
+      "sourceReview": "review-a38-step-05-s8-p03.md",
+      "evidence": [
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000293",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 126,
+              "columnStart": 102,
+              "line": 456,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01340",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 126,
+                "columnStart": 102,
+                "line": 456,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000296",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 27,
+              "columnStart": 7,
+              "line": 55,
+              "text": "docs/specs/runner.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01335",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 27,
+                "columnStart": 7,
+                "line": 55,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000298",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 30,
+              "columnStart": 10,
+              "line": 607,
+              "text": "docs/specs/runner.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01341",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 30,
+                "columnStart": 10,
+                "line": 607,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000300",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 31,
+              "columnStart": 7,
+              "line": 54,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01334",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 31,
+                "columnStart": 7,
+                "line": 54,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000301",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 35,
+              "columnStart": 11,
+              "line": 739,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01345",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 35,
+                "columnStart": 11,
+                "line": 739,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-000302",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 15,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 56,
+              "columnStart": 32,
+              "line": 710,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+            "recordLine": 1,
+            "recordSha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-01343",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 56,
+                "columnStart": 32,
+                "line": 710,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-002226",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 24,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 126,
+              "columnStart": 102,
+              "line": 456,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+            "recordLine": 1,
+            "recordSha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-06925",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 126,
+                "columnStart": 102,
+                "line": 456,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-002229",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 24,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 27,
+              "columnStart": 7,
+              "line": 55,
+              "text": "docs/specs/runner.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+            "recordLine": 1,
+            "recordSha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-06920",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 27,
+                "columnStart": 7,
+                "line": 55,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-002231",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 24,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 30,
+              "columnStart": 10,
+              "line": 607,
+              "text": "docs/specs/runner.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+            "recordLine": 1,
+            "recordSha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-06926",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 30,
+                "columnStart": 10,
+                "line": 607,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-002233",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 24,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 31,
+              "columnStart": 7,
+              "line": 54,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+            "recordLine": 1,
+            "recordSha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-06919",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 31,
+                "columnStart": 7,
+                "line": 54,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-002234",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 24,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 35,
+              "columnStart": 11,
+              "line": 739,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+            "recordLine": 1,
+            "recordSha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-06930",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 35,
+                "columnStart": 11,
+                "line": 739,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+          "id": "reference-002235",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 24,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 56,
+              "columnStart": 32,
+              "line": 710,
+              "text": "docs/specs/work-state.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+            "recordLine": 1,
+            "recordSha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6",
+            "inputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+            "edgeId": "maps-j-06928",
+            "slotKey": null,
+            "disposition": "parked",
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 56,
+                "columnStart": 32,
+                "line": 710,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        }
+      ],
+      "proposedStep7Action": "Evaluate park-to-patch candidates against live work-state and runner passages and exact anchors, paired with the eventual runtime contract-reader move. Retain independent missing history/ADR operands; no Step3 reopening here.",
+      "additionalEvidence": [
+        {
+          "path": "docs/platform/work-state/spec.md",
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sha256": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+          "matches": [
+            {
+              "line": 58,
+              "text": "## 3. Work Item Data Dictionary"
+            },
+            {
+              "line": 1039,
+              "text": "## 11. Business Rules"
+            }
+          ]
+        },
+        {
+          "path": "docs/platform/runner/spec.md",
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sha256": "e99f04b005e41adab13ff07aa37c124cfc9d916d612f064ecf6d963641d13306",
+          "matches": []
+        }
+      ],
+      "status": "pending Step 7; inherited Step 3/4 outcomes unchanged in Step 5"
+    },
+    {
+      "id": "store-comment-block-split",
+      "sourceReview": "review-a38-step-05-s8-p06.md",
+      "evidence": [
+        {
+          "file": "src/state/store.mjs",
+          "id": "reference-003908",
+          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+          "recordLine": 30,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 25,
+              "columnStart": 5,
+              "line": 1788,
+              "text": "docs/specs/<area>.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-027.jsonl",
+            "recordLine": 1,
+            "recordSha256": "12a113b6d45a4842727c805ed96fefc342876d6b8c88a3e77a45b2ddba551ab6",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "class6-l-000461",
+            "slotKey": "{\"edgeId\":\"class6-l-000461\",\"file\":\"src/state/store.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000461\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1768}]}",
+            "disposition": "parked",
+            "sourceSha256": "b8eacaa22d2f17b04f494f9671b3bec2b883306aadb9ae0909298b94b20e11c4",
+            "sourceSpans": [
+              {
+                "line": 1768,
+                "columnStart": 5,
+                "columnEndExclusive": 25,
+                "text": "docs/specs/<area>.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "src/state/store.mjs",
+          "id": "reference-003910",
+          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+          "recordLine": 30,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 46,
+              "columnStart": 23,
+              "line": 1792,
+              "text": "docs/decisions/index.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-027.jsonl",
+            "recordLine": 1,
+            "recordSha256": "12a113b6d45a4842727c805ed96fefc342876d6b8c88a3e77a45b2ddba551ab6",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "class6-l-000462",
+            "slotKey": "{\"edgeId\":\"class6-l-000462\",\"file\":\"src/state/store.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000462\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1772}]}",
+            "disposition": "preserve",
+            "sourceSha256": "b8eacaa22d2f17b04f494f9671b3bec2b883306aadb9ae0909298b94b20e11c4",
+            "sourceSpans": [
+              {
+                "line": 1772,
+                "columnStart": 23,
+                "columnEndExclusive": 46,
+                "text": "docs/decisions/index.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "preserve"
+        }
+      ],
+      "proposedStep7Action": "Reconcile inherited Step4 JSDoc example at L1784–1792: retiring docs/specs/<area>.md operand parks while docs/decisions/index.md operand preserves. Decide the final truthful scope/home example per operand and compose the whole comment without changing free-text semantics.",
+      "additionalEvidence": null,
+      "status": "pending Step 7; inherited Step 3/4 outcomes unchanged in Step 5"
+    },
+    {
+      "id": "registry-source-versus-test-provenance",
+      "sourceReview": "review-a38-step-05-s8-p05.md",
+      "evidence": [
+        {
+          "file": "src/state/knowledge-registry.mjs",
+          "id": "reference-003892",
+          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+          "recordLine": 22,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 49,
+              "columnStart": 4,
+              "line": 20,
+              "text": "docs/architect/knowledge-registry-redesign.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+            "recordLine": 11,
+            "recordSha256": "c1256c92c1e0cd9ffb5b45c132257e973180c8046369eb53a28d49feda3b0dbf",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "class6-l-000438",
+            "slotKey": "{\"edgeId\":\"class6-l-000438\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000438\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":20}]}",
+            "disposition": "parked",
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+            "sourceSpans": [
+              {
+                "line": 20,
+                "columnStart": 4,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "src/state/knowledge-registry.mjs",
+          "id": "reference-003893",
+          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+          "recordLine": 22,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 53,
+              "columnStart": 8,
+              "line": 646,
+              "text": "docs/architect/knowledge-registry-redesign.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+            "recordLine": 11,
+            "recordSha256": "c1256c92c1e0cd9ffb5b45c132257e973180c8046369eb53a28d49feda3b0dbf",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "class6-l-000442",
+            "slotKey": "{\"edgeId\":\"class6-l-000442\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000442\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":646}]}",
+            "disposition": "parked",
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+            "sourceSpans": [
+              {
+                "line": 646,
+                "columnStart": 8,
+                "columnEndExclusive": 53,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "src/state/knowledge-registry.mjs",
+          "id": "reference-003894",
+          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+          "recordLine": 22,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 53,
+              "columnStart": 8,
+              "line": 733,
+              "text": "docs/architect/knowledge-registry-redesign.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+            "recordLine": 11,
+            "recordSha256": "c1256c92c1e0cd9ffb5b45c132257e973180c8046369eb53a28d49feda3b0dbf",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "class6-l-000443",
+            "slotKey": "{\"edgeId\":\"class6-l-000443\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000443\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":733}]}",
+            "disposition": "parked",
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+            "sourceSpans": [
+              {
+                "line": 733,
+                "columnStart": 8,
+                "columnEndExclusive": 53,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "src/state/knowledge-registry.mjs",
+          "id": "reference-003895",
+          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+          "recordLine": 22,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 55,
+              "columnStart": 10,
+              "line": 537,
+              "text": "docs/architect/knowledge-registry-redesign.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+            "recordLine": 11,
+            "recordSha256": "c1256c92c1e0cd9ffb5b45c132257e973180c8046369eb53a28d49feda3b0dbf",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "class6-l-000441",
+            "slotKey": "{\"edgeId\":\"class6-l-000441\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000441\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":537}]}",
+            "disposition": "parked",
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+            "sourceSpans": [
+              {
+                "line": 537,
+                "columnStart": 10,
+                "columnEndExclusive": 55,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "src/state/knowledge-registry.mjs",
+          "id": "reference-003896",
+          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+          "recordLine": 22,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 55,
+              "columnStart": 10,
+              "line": 748,
+              "text": "docs/architect/knowledge-registry-redesign.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+            "recordLine": 11,
+            "recordSha256": "c1256c92c1e0cd9ffb5b45c132257e973180c8046369eb53a28d49feda3b0dbf",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "class6-l-000445",
+            "slotKey": "{\"edgeId\":\"class6-l-000445\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000445\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":748}]}",
+            "disposition": "parked",
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+            "sourceSpans": [
+              {
+                "line": 748,
+                "columnStart": 10,
+                "columnEndExclusive": 55,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "src/state/knowledge-registry.mjs",
+          "id": "reference-003897",
+          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+          "recordLine": 22,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 58,
+              "columnStart": 38,
+              "line": 737,
+              "text": "docs/architect/...md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+            "recordLine": 11,
+            "recordSha256": "c1256c92c1e0cd9ffb5b45c132257e973180c8046369eb53a28d49feda3b0dbf",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "class6-l-000444",
+            "slotKey": "{\"edgeId\":\"class6-l-000444\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000444\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":737}]}",
+            "disposition": "parked",
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+            "sourceSpans": [
+              {
+                "line": 737,
+                "columnStart": 38,
+                "columnEndExclusive": 58,
+                "text": "docs/architect/...md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "src/state/knowledge-registry.mjs",
+          "id": "reference-003898",
+          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+          "recordLine": 22,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 65,
+              "columnStart": 20,
+              "line": 88,
+              "text": "docs/architect/knowledge-registry-redesign.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+            "recordLine": 11,
+            "recordSha256": "c1256c92c1e0cd9ffb5b45c132257e973180c8046369eb53a28d49feda3b0dbf",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "class6-l-000439",
+            "slotKey": "{\"edgeId\":\"class6-l-000439\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000439\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":88}]}",
+            "disposition": "parked",
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+            "sourceSpans": [
+              {
+                "line": 88,
+                "columnStart": 20,
+                "columnEndExclusive": 65,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        },
+        {
+          "file": "src/state/knowledge-registry.mjs",
+          "id": "reference-003899",
+          "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+          "recordLine": 22,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+          "sourceSpans": [
+            {
+              "columnEndExclusive": 70,
+              "columnStart": 55,
+              "line": 210,
+              "text": "docs/architect/"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+            "recordLine": 11,
+            "recordSha256": "c1256c92c1e0cd9ffb5b45c132257e973180c8046369eb53a28d49feda3b0dbf",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "class6-l-000440",
+            "slotKey": "{\"edgeId\":\"class6-l-000440\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000440\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":210}]}",
+            "disposition": "parked",
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+            "sourceSpans": [
+              {
+                "line": 210,
+                "columnStart": 55,
+                "columnEndExclusive": 70,
+                "text": "docs/architect/"
+              },
+              {
+                "line": 211,
+                "columnStart": 4,
+                "columnEndExclusive": 34,
+                "text": "knowledge-registry-redesign.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "parked"
+        }
+      ],
+      "proposedStep7Action": "Compare inherited Step4 knowledge-registry source comment parks against L12-78 P03 dated test-comment preserves. Reconcile provenance treatment at the owner record, never synthesize a new live knowledge-registry holder.",
+      "additionalEvidence": null,
+      "status": "pending Step 7; inherited Step 3/4 outcomes unchanged in Step 5"
+    },
+    {
+      "id": "agents-0030-anchor-slug",
+      "sourceReview": "review-a38-step-05-s8-p01.md",
+      "evidence": [
+        {
+          "file": "AGENTS.md",
+          "id": "reference-000128",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 2,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
+          "sourceSpans": [
+            {
+              "line": 17,
+              "columnStart": 39,
+              "columnEndExclusive": 59,
+              "text": "docs/specs/runner.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+            "recordLine": 1,
+            "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "instructions-008",
+            "slotKey": "{\"edgeId\":\"instructions-008\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-008\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":17}]}",
+            "disposition": "patch",
+            "sourceSha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+            "sourceSpans": [
+              {
+                "line": 17,
+                "columnStart": 39,
+                "columnEndExclusive": 59,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "patch"
+        },
+        {
+          "file": "AGENTS.md",
+          "id": "reference-000129",
+          "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+          "recordLine": 2,
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
+          "sourceSpans": [
+            {
+              "line": 27,
+              "columnStart": 60,
+              "columnEndExclusive": 80,
+              "text": "docs/specs/runner.md"
+            }
+          ],
+          "operationWitness": null,
+          "inheritedOwner": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+            "recordLine": 1,
+            "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "instructions-009",
+            "slotKey": "{\"edgeId\":\"instructions-009\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-009\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":27}]}",
+            "disposition": "patch",
+            "sourceSha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+            "sourceSpans": [
+              {
+                "line": 27,
+                "columnStart": 60,
+                "columnEndExclusive": 80,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "currentDisposition": "patch"
+        }
+      ],
+      "proposedStep7Action": "Resolve inherited Step4 slug spelling once against the final runner history heading and compose both patch occurrences with the same valid anchor.",
+      "additionalEvidence": null,
+      "status": "pending Step 7; inherited Step 3/4 outcomes unchanged in Step 5"
+    },
+    {
+      "id": "earlier-overlap-1",
+      "sourceReview": "step-05-step7-overlap-list.json (L12-69)",
+      "evidence": {
+        "file": "src/intake/verify-pattern-check.mjs",
+        "step4": {
+          "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-015.jsonl",
+          "edgeId": "class6-l-000247",
+          "line": 21
+        },
+        "step5": {
+          "referenceId": "reference-003687",
+          "line": 28
+        },
+        "required": "Compose the two hunks over final pin once; recompute full forward/rollback diffs and expectedAfterSha256; rebind and independently review changed binding."
+      },
+      "proposedStep7Action": "Compose the two hunks over final pin once; recompute full forward/rollback diffs and expectedAfterSha256; rebind and independently review changed binding.",
+      "status": "pending Step 7"
+    },
+    {
+      "id": "earlier-overlap-2",
+      "sourceReview": "step-05-step7-overlap-list.json (L12-69)",
+      "evidence": {
+        "file": "bin/fgos.mjs",
+        "required": "Combine CLI pointer hunk with remaining runtime/generator seam hunks; no pilot after-hash certifies a combined file."
+      },
+      "proposedStep7Action": "Combine CLI pointer hunk with remaining runtime/generator seam hunks; no pilot after-hash certifies a combined file.",
+      "status": "pending Step 7"
+    },
+    {
+      "id": "earlier-overlap-3",
+      "sourceReview": "step-05-step7-overlap-list.json (L12-69)",
+      "evidence": {
+        "file": "src/cli/command-registry.mjs",
+        "required": "Combine doc-sources pointer with generator/runtime quadrant parks only after owning parity; recompute hash."
+      },
+      "proposedStep7Action": "Combine doc-sources pointer with generator/runtime quadrant parks only after owning parity; recompute hash.",
+      "status": "pending Step 7"
+    },
+    {
+      "id": "earlier-post-census-workflow",
+      "sourceReview": "step-05-step7-overlap-list.json",
+      "evidence": {
+        "file": "src/setup/registrations.mjs",
+        "line": 6659,
+        "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "operand": "docs/specs/workflow.md",
+        "evidence": "Absent at frozen census pin; exact post-census comment line/pin stored in setup receipt.",
+        "required": "Step 7 final source/census reconciliation must disposition this legacy-root comment before Phase 9 retirement; no invented frozen id, current code edit or approval carry."
+      },
+      "proposedStep7Action": "Step 7 final source/census reconciliation must disposition this legacy-root comment before Phase 9 retirement; no invented frozen id, current code edit or approval carry.",
+      "status": "pending Step 7"
+    },
+    {
+      "id": "earlier-shared-test-co-cuts",
+      "sourceReview": "step-05-step7-overlap-list.json",
+      "evidence": "De-duplicate identical pinned test diffs shared by hook/merge and truncation/doctor owners; compose differing changes per test file, preserving every assertion.",
+      "proposedStep7Action": "Deduplicate identical full test diffs, compose differing hunks once per final-pin test file, preserve every owning assertion.",
+      "status": "pending Step 7"
+    },
+    {
+      "id": "earlier-seam5-batch7-deferred-replays",
+      "sourceReview": "step-05-seam5-batch7-deferred-replays.json",
+      "evidence": {
+        "path": "step-05-seam5-batch7-deferred-replays.json",
+        "sha256": "d614fa88fc7f78e39a2f6bbcf11ffdac3a740a78901b2d58b930bc239eb8a7b2",
+        "relevantFields": {}
+      },
+      "proposedStep7Action": "Resolve each deferred current/candidate replay at final composition before its dependent cutover. Current preserved legacy readers do not prove post-retirement parity.",
+      "status": "pending Step 7"
+    },
+    {
+      "id": "earlier-seam67-closure",
+      "sourceReview": "step-05-seam67-closure.json",
+      "evidence": {
+        "path": "step-05-seam67-closure.json",
+        "sha256": "092214ec40e7ee1ebe9799cef53f28fee05ff371409d2241e3981ea5ea214299",
+        "relevantFields": {
+          "missingProofs": [
+            "Dedicated compiler explicit/cwd-root discovery, errors, output path/mode/hash parity",
+            "Runtime verifier ignores --root and targets frontend/docs/ui-spec: no parity inferred",
+            "Candidate citation scan coverage/finding multiplicity after old-root deletion",
+            "DecisionF Phase9 ratchet retirement, no patch/rebaseline authorized"
+          ]
+        }
+      },
+      "proposedStep7Action": "Keep compiler-root and citation/ratchet retirement parity obligations in final assembly; missing current/candidate root-discovery/output and candidate post-delete finding parity remain missing.",
+      "status": "pending Step 7"
+    },
+    {
+      "id": "earlier-seam5-b6-review-closure",
+      "sourceReview": "step-05-seam5-b6-review-closure.json",
+      "evidence": {
+        "path": "step-05-seam5-b6-review-closure.json",
+        "sha256": "e98191ccf63155560d276bff0c815c2dbc1aec14d033da64957df3c060752e9e",
+        "relevantFields": {
+          "ruling": "L12-83",
+          "counts": {
+            "changedRecords": 67,
+            "dispositionChanged": 19,
+            "labelOnly": 48,
+            "newPatchFiles": 6,
+            "retiringCommentOccurrences": 44,
+            "sweepNewPatches": 1,
+            "placeholderReasonsResolved": 17
+          }
+        }
+      },
+      "proposedStep7Action": "Preserve earlier R26 root-retention decisions and live-holder heading assertions when composing retired-corpus tests; no new outcome is authorized by a passing structural checker.",
+      "status": "pending Step 7"
+    }
+  ],
+  "itemCount": 16,
+  "headDrift": "step-05-head-drift.json",
+  "priorOverlapRegistry": "step-05-step7-overlap-list.json",
+  "needsWrites": []
+}

@@ -34,14 +34,14 @@
     "source-pins": 37,
     "passage-outcome": 33,
     "inherited-outcome": 25,
-    "receipts": 420,
+    "receipts": 424,
     "retiring-retained": 149,
     "source-spans": 2166,
-    "parks": 56,
+    "parks": 60,
     "fixture-provenance": 14,
-    "rejections": 1786,
+    "rejections": 1782,
     "pinned-passage": 2017,
-    "dynamic-operand": 241,
+    "dynamic-operand": 245,
     "patches": 37,
     "generated": 37,
     "co-cut-grep": 18,
@@ -52,7 +52,7 @@
     "setup": 1,
     "review": 78,
     "a-passage-agreement": 273,
-    "b-real-blocker": 64,
+    "b-real-blocker": 68,
     "d-own-operand": 2017
   },
   "files": 37,
@@ -3869,8 +3869,8 @@
     {
       "file": "bin/fgos.mjs",
       "record": {
-        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-        "recordLine": 2
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl",
+        "recordLine": 13
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "pinnedHash": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
@@ -3900,7 +3900,7 @@
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "pinnedHash": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
-      "headHash": "7a201ac10c3cc54d91279c2e58051e9bf01111693e154aa3aec904eeb4b6983a",
+      "headHash": "e881c6a33a912cc22a7f6e5cb4c014bdd845c15135a8782552d0066cad1bd7dd",
       "movedSpans": [],
       "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
       "failing": false
@@ -3908,8 +3908,8 @@
     {
       "file": "src/runner/claim-port.mjs",
       "record": {
-        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-        "recordLine": 6
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl",
+        "recordLine": 21
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "pinnedHash": "6e510ae19478f1ba71a2ab900f024d98b0150dd20da9fd255afdd407ae9c50c7",
@@ -3934,8 +3934,8 @@
     {
       "file": "src/runner/merge.mjs",
       "record": {
-        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-        "recordLine": 7
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl",
+        "recordLine": 38
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "pinnedHash": "8ccdb5441f10f806a1753d47394b4c74c655d02c5c7a03f7a1af56ce08024eb4",
@@ -3971,7 +3971,7 @@
     {
       "file": "src/runner/worktree.mjs",
       "record": {
-        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
         "recordLine": 8
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
@@ -3997,8 +3997,8 @@
     {
       "file": "src/state/events-jsonl-truncation-guard.mjs",
       "record": {
-        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-        "recordLine": 9
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
+        "recordLine": 15
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "pinnedHash": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",

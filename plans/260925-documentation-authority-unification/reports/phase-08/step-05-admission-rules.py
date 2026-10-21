@@ -157,6 +157,14 @@ def check(rs,context=None):
    if plans_only(r,e):test('r11-plans-boundary',loc,lambda e=e:e['admission']=='REJECT' and e.get('nonDocumentUse')=='plans-report-artifact')
    if e.get('nonDocumentUse')=='non-census-document-read':
     def noncensus(e=e):
+     if e.get('nonCensusReadProof'):
+      w=e['nonCensusReadProof'];assert w['root'] in ['.','core/','domains/','.claude/'] and w['sourceSha256']==r['sourceSha256']
+      assert not re.search(r"docs/|['\"]docs['\"]",w['operand'])
+      op=e['operationWitness'];assert w['operand']==op['text'] and source_at(r['authorInputCommit'],f).splitlines()[op['line']-1][op['columnStart']-1:op['columnEndExclusive']-1]==w['operand']
+      assert e['admission']=='REJECT' and e['disposition']=='preserve'
+      assert not literal_roots(w['operand'])-({'documents'} if w['root']=='.' and re.search(r'(?:AGENTS|README)\.md',w['operand']) else set())
+      move=json.loads((P/'step-05-cutover-move-set.json').read_text());assert all(x['oldPath'].startswith('docs/') for x in move['paths'])
+      return True
      path=e['realReadPath'];assert not path.startswith('docs/') and path in source_at(r['authorInputCommit'],f)
      move=json.loads((P/'step-05-cutover-move-set.json').read_text());assert all(x['oldPath'].startswith('docs/') for x in move['paths'])
      assert source_at(r['authorInputCommit'],path) and e['disposition']=='preserve' and e['admission']=='REJECT'

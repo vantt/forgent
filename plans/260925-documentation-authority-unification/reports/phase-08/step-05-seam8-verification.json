@@ -536,5 +536,11 @@
     ],
     "sourceState": "Only new permitted runtime/seam8 artifacts; no existing tracked file changed.",
     "gitIndexWrites": false
+  },
+  "subsequentReviewClosure": {
+    "ruling": "L12-87",
+    "currentProof": "step-05-seam8-final-proof.json",
+    "currentTotals": "step-05-closure.json",
+    "note": "This object retains original seam-authoring proof as history; the named frozen-input all-seam proof owns the current corrected record set."
   }
 }

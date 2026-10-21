@@ -384,6 +384,11 @@ if __name__=='__main__':
   s67=ext.check();out.setdefault('extensions',{})['compiler-and-citation-roots']=s67
   for key in ['files','literalReferences','dynamicTuples']:out[key]+=s67[key]
   out['failures']+=s67['failures'];out['failureCount']=len(out['failures']);out['checks'].update(s67['checks']);out['rules'].update(s67['rules']);out['headDrift']+=s67['headDrift']
+ if (P/'step-05-seam8-review-list.json').exists():
+  extsp=importlib.util.spec_from_file_location('seam8check',P/'step-05-seam8-check.py');ext=importlib.util.module_from_spec(extsp);extsp.loader.exec_module(ext)
+  s8=ext.check();s8['headDrift']=head_drift(ext.load());out.setdefault('extensions',{})['runtime-defaults-dynamic']=s8
+  for key in ['files','literalReferences','dynamicTuples']:out[key]+=s8[key]
+  out['failures']+=s8['failures'];out['failureCount']=len(out['failures']);out['checks'].update(s8['checks']);out['headDrift']+=s8['headDrift']
  r26=admission.r26_module().check();out['extensions']['proposed-move-read-units']=r26;out['failures']+=r26['failures'];out['failureCount']=len(out['failures']);out['checks'].update(r26['checks']);out['rules'].update(r26['rules'])
  (P/'step-05-head-drift.json').write_text(json.dumps({'kind':'Non-failing HEAD drift for Step 7 assembly; records remain at their own pins','headCommit':m.git('rev-parse','HEAD').decode().strip(),'entries':out['headDrift']},ensure_ascii=False,indent=2)+'\n')
  (P/args.output).write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(json.dumps(out,ensure_ascii=False));sys.exit(bool(out['failures']))

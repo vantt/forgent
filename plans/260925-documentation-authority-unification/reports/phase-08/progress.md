@@ -1218,3 +1218,18 @@ Read all six independent review windows and the Lead closure brief. Applying L12
 
 ## Seam 6/7 review closure — author handback
 L12-86 addresses all six review windows: 17 files / 1,530 changed items (1 disposition-changing, 16 label-only). R26 regenerated: 43 units / 91 readers over 17 files. Final full checker: 1,030 records / 4,935 references / 31,510 tuples / 0 failures. All 330/330 negative probes reject; root-positive checks 15/15. Runtime verifier broken-default issue is recorded separately for Lead at phase handoff. Lead acceptance, Step7 composition and Phase9 parity remain owed. Records-only scope preserved; no runtime/seam8 edit, git write or fgOS CLI.
+
+
+## L12-87 — Seam 8 and complete Step 5 authoring
+
+Integrated p01–p06 review corrections across every Step5 shard. R29 owns one
+parked native Land tree family; R30 sweep covers 1,481 memberships / 109
+state-path rejection candidates, correcting 43 rejects to state-export parks.
+All inherited Step3/4 questions are evidence-linked in step-05-step7-carry.json.
+The canonical proposed-move manifest has 43 units / 98 readers and outputs;
+the seam-8 supplement is only a pointer. Current global counts and each review
+round/closure ID are in step-05-closure.json. Local-main accounting stays with
+the separate L12-88 turn. Lead acceptance, Step7 composition and Phase9 parity
+remain open. No consumer/runtime changes or git write.
+
+Final frozen-input verification: full checker 1481 memberships / 7223 refs / 39876 tuples / 0 failures; 366/366 negative probes reject and 15/15 root positives pass. Data/checker hashes agree across verification windows; the seam8 output path correction affected only the controller. Step5 authoring and named correction work are complete; Lead acceptance and cutover obligations remain distinct.

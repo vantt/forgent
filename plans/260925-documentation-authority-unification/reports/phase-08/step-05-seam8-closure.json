@@ -1,12 +1,12 @@
 {
   "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-  "status": "authoring-complete; independent review and cutover readiness pending",
+  "status": "L12-87 author corrections complete; Lead acceptance, Step7 composition and Phase9 parity remain pending",
   "totals": {
     "filesOrLocators": 451,
     "physicalFilesRead": 449,
     "references": 2288,
     "tuples": 8366,
-    "supplementalSlots": 8,
+    "supplementalSlots": 15,
     "classes": {
       "external": {
         "files": 2,
@@ -39,26 +39,26 @@
     },
     "inheritedNormalSourceJoins": 286,
     "admissionsExcludingCensusJoins": {
-      "ADMIT": 380,
-      "REJECT": 7231,
+      "ADMIT": 414,
+      "REJECT": 7204,
       "neutral-unlabelled": 1125
     },
     "dispositionsExcludingCensusJoins": {
-      "preserve": 8576,
+      "preserve": 8548,
       "patch": 34,
-      "parked": 113,
+      "parked": 148,
       "render-join": 13
     },
     "newJudgmentAdmissionsExcludingOwnerJoins": {
-      "REJECT": 7226,
-      "ADMIT": 94
+      "REJECT": 7199,
+      "ADMIT": 128
     },
     "newJudgmentDispositionsExcludingOwnerJoins": {
-      "preserve": 7252,
-      "parked": 68
+      "preserve": 7224,
+      "parked": 103
     },
     "externalPopulationParks": 2,
-    "parkDependencyGroups": 43,
+    "parkDependencyGroups": 40,
     "newPhysicalPatchFiles": 0,
     "inheritedOwnerPatchUnits": 19,
     "originalCarries": 25,
@@ -67,9 +67,240 @@
   "countSemantics": "All original census identities are conserved exactly once as owned items or exact censusJoins. Neutral records mint no admissions. Admission/disposition totals exclude censusJoins and include supplemental slots; inherited source joins are distinguished from new judgments. External population parks are locator-level, outside item admission counts.",
   "parkDependencies": [
     {
-      "dependency": "Authorized Work.docsRef / resolved-content-root export for readLockedContext and its intake/runner callers",
-      "itemCount": 3,
+      "dependency": "Authorized Work.acceptance evidence-token population export",
+      "itemCount": 1,
       "items": [
+        {
+          "file": "src/state/work.mjs",
+          "id": "dynamic-015839",
+          "blockedReason": "src/state/work.mjs: Acceptance evidence tokens can resolve docs paths (PATH_LIKE_TOKEN at L856, candidates from clause.evidence at L890); export the Work evidence population before changing document reachability.",
+          "record": {
+            "file": "src/state/work.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 32,
+            "recordSha256": "06ba376a2006ea3bbb8a9d4f0de7e43afcf8dbb9f3ddfa587a6792f61836db2e",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "ae5f1599cf36963602efd1e8b13ee2ac883997ea747cd99877364d0162c05059"
+          },
+          "ownerJoin": null
+        }
+      ]
+    },
+    {
+      "dependency": "Authorized persisted Work.docsRef / content-root / item-context export",
+      "itemCount": 39,
+      "items": [
+        {
+          "file": "bin/fgos.mjs",
+          "id": "dynamic-001357",
+          "blockedReason": "bin/fgos.mjs: The supersession citation scanner constructs the home CONTEXT exclusion from docsRefRaw. Its same-input fixture must prove that only this home document is suppressed when all other widened citations are reported.",
+          "record": {
+            "file": "bin/fgos.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+            "recordLine": 13,
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "dynamic-001367",
+          "blockedReason": "bin/fgos.mjs: The context-render relative CONTEXT name is assembled after docsRef selection. Export the exact trailing-slash docsRef cases so the normalized file name and returned relative path remain coupled.",
+          "record": {
+            "file": "bin/fgos.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+            "recordLine": 13,
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "dynamic-001368",
+          "blockedReason": "bin/fgos.mjs: The context-render relative CONTEXT name is assembled after docsRef selection. Export the exact trailing-slash docsRef cases so the normalized file name and returned relative path remain coupled.",
+          "record": {
+            "file": "bin/fgos.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+            "recordLine": 13,
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "dynamic-001441",
+          "blockedReason": "bin/fgos.mjs: excludeDocsRefResearch exempts only RESEARCH.md under this specific item.docsRef. Export that one item-directory mapping and diff paths so an alias move neither expands the exemption to all docs/history nor loses the intended research-only exemption.",
+          "record": {
+            "file": "bin/fgos.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+            "recordLine": 13,
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "dynamic-001442",
+          "blockedReason": "bin/fgos.mjs: excludeDocsRefResearch exempts only RESEARCH.md under this specific item.docsRef. Export that one item-directory mapping and diff paths so an alias move neither expands the exemption to all docs/history nor loses the intended research-only exemption.",
+          "record": {
+            "file": "bin/fgos.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+            "recordLine": 13,
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/loop.mjs",
+          "id": "dynamic-012848",
+          "blockedReason": "src/runner/loop.mjs: The ready-validation sweep reads planPath from item.docsRef and contentRoot before planVerdictFromPlanMd. Export those item-worktree inputs so a moved plan does not silently remove the inferred caller verdict or mutate Work on a non-READY result.",
+          "record": {
+            "file": "src/runner/loop.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+            "recordLine": 35,
+            "recordSha256": "880d6b5ad8e53557b3c73f25fbe546c648188d92b0b76748e03f99d9e34e32dd",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "e5cde588341c406b73b0c30ffdf3465f89e528db6f4dc8a140d31163dbff74ab"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/loop.mjs",
+          "id": "dynamic-012849",
+          "blockedReason": "src/runner/loop.mjs: The ready-validation sweep reads planPath from item.docsRef and contentRoot before planVerdictFromPlanMd. Export those item-worktree inputs so a moved plan does not silently remove the inferred caller verdict or mutate Work on a non-READY result.",
+          "record": {
+            "file": "src/runner/loop.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+            "recordLine": 35,
+            "recordSha256": "880d6b5ad8e53557b3c73f25fbe546c648188d92b0b76748e03f99d9e34e32dd",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "e5cde588341c406b73b0c30ffdf3465f89e528db6f4dc8a140d31163dbff74ab"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/operation-choice.mjs",
+          "id": "dynamic-013082",
+          "blockedReason": "src/runner/operation-choice.mjs: This later operation branch derives its planPath from the selected docsRef/contentRoot. Supply the claimed-stage work export for this operation so its plan consumption remains tied to the same item, rather than assuming all caller roots agree.",
+          "record": {
+            "file": "src/runner/operation-choice.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+            "recordLine": 39,
+            "recordSha256": "447af3cdda8e838af267ee4c99a0dbcc7b4a66b7d80acc1ef9a29ca64b4570a6",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/operation-choice.mjs",
+          "id": "dynamic-013114",
+          "blockedReason": "src/runner/operation-choice.mjs: The final operation-specific planPath lookup has its own stage input. Bind the actual selected work/stage fixture and plan before rewriting it; it cannot borrow the earlier planner branch witness.",
+          "record": {
+            "file": "src/runner/operation-choice.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+            "recordLine": 39,
+            "recordSha256": "447af3cdda8e838af267ee4c99a0dbcc7b4a66b7d80acc1ef9a29ca64b4570a6",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/operation-choice.mjs",
+          "id": "dynamic-013133",
+          "blockedReason": "src/runner/operation-choice.mjs: The work.docsRef plan file supplies the initial planned-work context at operation selection. Export this persisted value and contentRoot so a phase cut cannot read another worktree plan.",
+          "record": {
+            "file": "src/runner/operation-choice.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+            "recordLine": 39,
+            "recordSha256": "447af3cdda8e838af267ee4c99a0dbcc7b4a66b7d80acc1ef9a29ca64b4570a6",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/operation-choice.mjs",
+          "id": "dynamic-013134",
+          "blockedReason": "src/runner/operation-choice.mjs: The selected plan is also emitted as a repository-relative input reference. Export the relative docsRef identity with its resolved bytes so worker context and the owning absolute reader co-change.",
+          "record": {
+            "file": "src/runner/operation-choice.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+            "recordLine": 39,
+            "recordSha256": "447af3cdda8e838af267ee4c99a0dbcc7b4a66b7d80acc1ef9a29ca64b4570a6",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/operation-choice.mjs",
+          "id": "dynamic-013139",
+          "blockedReason": "src/runner/operation-choice.mjs: The shared plan-mode helper resolves a docsRef plan before operation selection. Bind the actual mode-bearing plan bytes, including missing-file behavior, to the item docsRef export; this is the operation planner input, not a string label.",
+          "record": {
+            "file": "src/runner/operation-choice.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+            "recordLine": 39,
+            "recordSha256": "447af3cdda8e838af267ee4c99a0dbcc7b4a66b7d80acc1ef9a29ca64b4570a6",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/operation-choice.mjs",
+          "id": "dynamic-013171",
+          "blockedReason": "src/runner/operation-choice.mjs: The planning-stage branch resolves its work plan before determining execution readiness. Export planning inputs separately from validation inputs so a missing moved plan cannot advance the stage.",
+          "record": {
+            "file": "src/runner/operation-choice.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+            "recordLine": 39,
+            "recordSha256": "447af3cdda8e838af267ee4c99a0dbcc7b4a66b7d80acc1ef9a29ca64b4570a6",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/operation-choice.mjs",
+          "id": "dynamic-013172",
+          "blockedReason": "src/runner/operation-choice.mjs: The planning-stage relative plan context accompanies that readiness operation. Verify it names the exact plan consumed at the absolute planning read, with the same input-ref bytes delivered to the worker.",
+          "record": {
+            "file": "src/runner/operation-choice.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+            "recordLine": 39,
+            "recordSha256": "447af3cdda8e838af267ee4c99a0dbcc7b4a66b7d80acc1ef9a29ca64b4570a6",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229"
+          },
+          "ownerJoin": null
+        },
         {
           "file": "src/runner/paths.mjs",
           "id": "dynamic-013180",
@@ -78,15 +309,10 @@
             "file": "src/runner/paths.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
             "recordLine": 40,
-            "recordSha256": "a9cc6dc02928ebb9dd36b9641a5dfafff2acede79e475075a4fd382f2a6e74da",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
+            "recordSha256": "c564930f175506f084ddb7011eb3de3af41da3647394381d4e05154400501996",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "bfbb13456f940e02d77b5ad8515b015ec6c1f8a83ee6015086138eeaed96339f",
-            "itemsChanged": true,
-            "referenceCount": 1,
-            "dynamicCount": 27,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "bfbb13456f940e02d77b5ad8515b015ec6c1f8a83ee6015086138eeaed96339f"
           },
           "ownerJoin": null
         },
@@ -98,15 +324,10 @@
             "file": "src/runner/paths.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
             "recordLine": 40,
-            "recordSha256": "a9cc6dc02928ebb9dd36b9641a5dfafff2acede79e475075a4fd382f2a6e74da",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
+            "recordSha256": "c564930f175506f084ddb7011eb3de3af41da3647394381d4e05154400501996",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "bfbb13456f940e02d77b5ad8515b015ec6c1f8a83ee6015086138eeaed96339f",
-            "itemsChanged": true,
-            "referenceCount": 1,
-            "dynamicCount": 27,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "bfbb13456f940e02d77b5ad8515b015ec6c1f8a83ee6015086138eeaed96339f"
           },
           "ownerJoin": null
         },
@@ -118,74 +339,490 @@
             "file": "src/runner/paths.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
             "recordLine": 40,
-            "recordSha256": "a9cc6dc02928ebb9dd36b9641a5dfafff2acede79e475075a4fd382f2a6e74da",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
+            "recordSha256": "c564930f175506f084ddb7011eb3de3af41da3647394381d4e05154400501996",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "bfbb13456f940e02d77b5ad8515b015ec6c1f8a83ee6015086138eeaed96339f",
-            "itemsChanged": true,
-            "referenceCount": 1,
-            "dynamicCount": 27,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "bfbb13456f940e02d77b5ad8515b015ec6c1f8a83ee6015086138eeaed96339f"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/work-compat.mjs",
+          "id": "dynamic-013296",
+          "blockedReason": "src/runner/work-compat.mjs: Worker prompt exposes persisted plan/CONTEXT inputs; export Work.docsRef and content root with the dispatch input-ref unit.",
+          "record": {
+            "file": "src/runner/work-compat.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 5,
+            "recordSha256": "b3e742b8e2359871472f97b52a26a0caaf4723473847fdb9608a3f3548de7f46",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "a804010f1992b05a28e07e11681c06919b1bc4a72fd1ab3e77bd2590bb020d25"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/work-dispatch.mjs",
+          "id": "dynamic-013330",
+          "blockedReason": "src/runner/work-dispatch.mjs: Work dispatch refusal prints invalid persisted docsRef; include rejected values in the item export to preserve diagnostics.",
+          "record": {
+            "file": "src/runner/work-dispatch.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 6,
+            "recordSha256": "5b7a89ca9a3595fa0059082139b0e4d22786387543aa5092443888ee11f60e32",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "7cc4e2cb1c99d5025b435acb3a3c68a9260fcaa4e7bc05415de83e2c0615145f"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/work-dispatch.mjs",
+          "id": "dynamic-013331",
+          "blockedReason": "src/runner/work-dispatch.mjs: Dispatch emits plan.md as an input ref built from the claimed docsRef. Export the plan ref plus content digest so the worker does not receive a stale legacy path after its reader changes.",
+          "record": {
+            "file": "src/runner/work-dispatch.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 6,
+            "recordSha256": "5b7a89ca9a3595fa0059082139b0e4d22786387543aa5092443888ee11f60e32",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "7cc4e2cb1c99d5025b435acb3a3c68a9260fcaa4e7bc05415de83e2c0615145f"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/work-dispatch.mjs",
+          "id": "dynamic-013332",
+          "blockedReason": "src/runner/work-dispatch.mjs: Dispatch emits CONTEXT.md beside the plan ref. Export the locked-decisions context identity and preserve this distinct input even where no plan exists.",
+          "record": {
+            "file": "src/runner/work-dispatch.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 6,
+            "recordSha256": "5b7a89ca9a3595fa0059082139b0e4d22786387543aa5092443888ee11f60e32",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "7cc4e2cb1c99d5025b435acb3a3c68a9260fcaa4e7bc05415de83e2c0615145f"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/work-dispatch.mjs",
+          "id": "dynamic-013333",
+          "blockedReason": "src/runner/work-dispatch.mjs: resolveContentRoot selects the worktree used to pin the plan for an operation Unit at L488-490. This is a separate dispatch pinning operation from paths.mjs readLockedContext; export persisted Work.docsRef with the operation-specific stateRoot/worktree relation and plan presence to preserve pinInputs and read-only worktree selection.",
+          "record": {
+            "file": "src/runner/work-dispatch.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 6,
+            "recordSha256": "5b7a89ca9a3595fa0059082139b0e4d22786387543aa5092443888ee11f60e32",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "7cc4e2cb1c99d5025b435acb3a3c68a9260fcaa4e7bc05415de83e2c0615145f"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/work-dispatch.mjs",
+          "id": "dynamic-013334",
+          "blockedReason": "src/runner/work-dispatch.mjs: Dispatch resolves the physical planPath after choosing contentRoot. Its plan file read must co-change with both the emitted plan ref and the content-root selection in the same claimed-item fixture.",
+          "record": {
+            "file": "src/runner/work-dispatch.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 6,
+            "recordSha256": "5b7a89ca9a3595fa0059082139b0e4d22786387543aa5092443888ee11f60e32",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "7cc4e2cb1c99d5025b435acb3a3c68a9260fcaa4e7bc05415de83e2c0615145f"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/work-dispatch.mjs",
+          "id": "dynamic-013335",
+          "blockedReason": "src/runner/work-dispatch.mjs: Dispatch resolves the physical planPath after choosing contentRoot. Its plan file read must co-change with both the emitted plan ref and the content-root selection in the same claimed-item fixture.",
+          "record": {
+            "file": "src/runner/work-dispatch.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 6,
+            "recordSha256": "5b7a89ca9a3595fa0059082139b0e4d22786387543aa5092443888ee11f60e32",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "7cc4e2cb1c99d5025b435acb3a3c68a9260fcaa4e7bc05415de83e2c0615145f"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015650",
+          "blockedReason": "src/state/retrospective-doors.mjs: The retrospective impact door builds the home CONTEXT citation exclusion for the item. Export docsRef with item-scoped supersession decisions to conserve the wide-citation finding set and home suppression.",
+          "record": {
+            "file": "src/state/retrospective-doors.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 27,
+            "recordSha256": "8695aaf607f82de3bcaf21dfe742bdba9182c4db723e776fcd4d8819a3542d71",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015651",
+          "blockedReason": "src/state/retrospective-doors.mjs: Home CONTEXT bytes are read after docsRef construction; export item docsRef and supersession decisions to preserve citation exclusion.",
+          "record": {
+            "file": "src/state/retrospective-doors.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 27,
+            "recordSha256": "8695aaf607f82de3bcaf21dfe742bdba9182c4db723e776fcd4d8819a3542d71",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015652",
+          "blockedReason": "src/state/retrospective-doors.mjs: The routing door reads the item CONTEXT locked-decision table and compares D identifiers with scoped state.decisions. Export both sides so a moved context cannot become a catch-and-return-empty false negative.",
+          "record": {
+            "file": "src/state/retrospective-doors.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 27,
+            "recordSha256": "8695aaf607f82de3bcaf21dfe742bdba9182c4db723e776fcd4d8819a3542d71",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015653",
+          "blockedReason": "src/state/retrospective-doors.mjs: Routing-door message emits the same persisted docsRef CONTEXT path as its locked-decision-table read; conserve message and missing-decision findings.",
+          "record": {
+            "file": "src/state/retrospective-doors.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 27,
+            "recordSha256": "8695aaf607f82de3bcaf21dfe742bdba9182c4db723e776fcd4d8819a3542d71",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015654",
+          "blockedReason": "src/state/retrospective-doors.mjs: The doc-deferral door enumerates the item docsRef directory. Export its exact Markdown membership and deferred-prose contents; preserve the advisory door and its absent-directory handling.",
+          "record": {
+            "file": "src/state/retrospective-doors.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 27,
+            "recordSha256": "8695aaf607f82de3bcaf21dfe742bdba9182c4db723e776fcd4d8819a3542d71",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015656",
+          "blockedReason": "src/state/retrospective-doors.mjs: Doc-deferral reads each docsRef Markdown member; export exact membership and deferred prose to preserve advisory findings.",
+          "record": {
+            "file": "src/state/retrospective-doors.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 27,
+            "recordSha256": "8695aaf607f82de3bcaf21dfe742bdba9182c4db723e776fcd4d8819a3542d71",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015657",
+          "blockedReason": "src/state/retrospective-doors.mjs: Deferral finding file field emits the same state-derived Markdown path as its byte reader; conserve member and finding locations.",
+          "record": {
+            "file": "src/state/retrospective-doors.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 27,
+            "recordSha256": "8695aaf607f82de3bcaf21dfe742bdba9182c4db723e776fcd4d8819a3542d71",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015658",
+          "blockedReason": "src/state/retrospective-doors.mjs: Deferral message emits a docsRef member and line number; export prose and membership with its file field and reader.",
+          "record": {
+            "file": "src/state/retrospective-doors.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 27,
+            "recordSha256": "8695aaf607f82de3bcaf21dfe742bdba9182c4db723e776fcd4d8819a3542d71",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015660",
+          "blockedReason": "src/state/retrospective-doors.mjs: Candidate existence includes persisted docsRef as well as item.refs; export the item document roots before changing the probe.",
+          "record": {
+            "file": "src/state/retrospective-doors.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 27,
+            "recordSha256": "8695aaf607f82de3bcaf21dfe742bdba9182c4db723e776fcd4d8819a3542d71",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015661",
+          "blockedReason": "src/state/retrospective-doors.mjs: Missing-reference finding path field returns p selected from item.refs or docsRef after candidate existence testing; export both persisted member populations to conserve exact finding locations.",
+          "record": {
+            "file": "src/state/retrospective-doors.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 27,
+            "recordSha256": "8695aaf607f82de3bcaf21dfe742bdba9182c4db723e776fcd4d8819a3542d71",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/retrospective-doors.mjs",
+          "id": "dynamic-015662",
+          "blockedReason": "src/state/retrospective-doors.mjs: Missing-reference message quotes p and explains an unreadable candidate in the retrospective reference door; bound invalid docsRef/item.refs values to preserve diagnostic prose.",
+          "record": {
+            "file": "src/state/retrospective-doors.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 27,
+            "recordSha256": "8695aaf607f82de3bcaf21dfe742bdba9182c4db723e776fcd4d8819a3542d71",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/store.mjs",
+          "id": "dynamic-015753",
+          "blockedReason": "src/state/store.mjs: checkPlanEvidence first probes work.docsRef/plan.md for a heavy delivered transition. Export work.docsRef and the fgw/<id> branch tip so the existing branch-path query and current-tree fallback prove the same presence case.",
+          "record": {
+            "file": "src/state/store.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 30,
+            "recordSha256": "7d6c81e400b2202804edc656e6cfbeb9db4d31bd7ec0da23193426d51efd334c",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/store.mjs",
+          "id": "dynamic-015757",
+          "blockedReason": "src/state/store.mjs: checkPlanEvidence current-tree existsSync consumes the candidates list, including Work.docsRef/plan.md. Export docsRef mapping and local file presence; retained docs/history fallback is independently neutral.",
+          "record": {
+            "file": "src/state/store.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 30,
+            "recordSha256": "7d6c81e400b2202804edc656e6cfbeb9db4d31bd7ec0da23193426d51efd334c",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/store.mjs",
+          "id": "dynamic-015760",
+          "blockedReason": "src/state/store.mjs: checkPlanEvidence heavy-delivery refusal lists all attempted plan candidates and the branch/current-tree location. Export docsRef plus branch availability before composing any path rewrite; preserve the retained history fallback wording.",
+          "record": {
+            "file": "src/state/store.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 30,
+            "recordSha256": "7d6c81e400b2202804edc656e6cfbeb9db4d31bd7ec0da23193426d51efd334c",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/store.mjs",
+          "id": "author-seam8-store-branch-plan-probe",
+          "blockedReason": "src/state/store.mjs: Native Git inspect probes candidate plan paths from Work.docsRef and retained history fallback; export branch-tip membership and docsRef arm before migrating document reachability.",
+          "record": {
+            "file": "src/state/store.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 30,
+            "recordSha256": "7d6c81e400b2202804edc656e6cfbeb9db4d31bd7ec0da23193426d51efd334c",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343"
           },
           "ownerJoin": null
         }
       ]
     },
     {
-      "dependency": "Authorized bounded consumer-edge export through the existing inventory loader; source inventory is the recorded 2.61 GB/125-part population, not a file to load wholesale.",
-      "itemCount": 1,
+      "dependency": "Authorized persisted outcome.docPath / capture evidence export",
+      "itemCount": 4,
       "items": [
         {
-          "file": "plans/260925-documentation-authority-unification/reports/doc-inventory.json",
-          "id": "plans/260925-documentation-authority-unification/reports/doc-inventory.json",
-          "blockedReason": "plans/260925-documentation-authority-unification/reports/doc-inventory.json: Authorized bounded consumer-edge export through the existing inventory loader; source inventory is the recorded 2.61 GB/125-part population, not a file to load wholesale.",
+          "file": "packages/work-state/rust/src/work_source.rs",
+          "id": "dynamic-006213",
+          "blockedReason": "packages/work-state/rust/src/work_source.rs: collect_outcome_entry copies the persisted outcome docPath into OutcomeEntry. Export capture document paths and null/missing cases with the Node item-trace projection; this is state-derived result data, not an in-code argument builder.",
           "record": {
-            "file": "plans/260925-documentation-authority-unification/reports/doc-inventory.json",
-            "recordFile": "step-05-records/runtime-external-parks.jsonl",
-            "recordLine": 2,
-            "recordSha256": "bc296c564506788775874673208cee39cb9148100af515b96e27311354207cbe",
-            "recordFileSha256": "4e208b1b3c88a4bcafe3fa43bc37d48439e2624b22fcaa05f7d0e2ae55f338c8",
+            "file": "packages/work-state/rust/src/work_source.rs",
+            "recordFile": "step-05-records/runtime-judgment-part-25.jsonl",
+            "recordLine": 13,
+            "recordSha256": "88a38b68a6fd8212259b9164b8aac94e018975a27a6e95654cb7aaa0d4bfb2cf",
+            "recordFileSha256": "87fcbd54ab4c31c56ec174f1bffc5669e7cb693cda27a46aad64b47c6fa0d242",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": null,
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 0,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          }
+            "sourceSha256": "0222f9d33ca3db5200588ed6662530218cb9717f0a9ed322a5d58a54536b94dd"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/cleanup-harness.mjs",
+          "id": "dynamic-015349",
+          "blockedReason": "src/state/cleanup-harness.mjs: Retrospective completion probes disk presence for outcome.docPath at L377; require its bounded state export and alias resolution to avoid falsely certifying a missing document.",
+          "record": {
+            "file": "src/state/cleanup-harness.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 9,
+            "recordSha256": "959c17d9937a6d7c0bf1c99198e5d86379749b1ec9af7407c3de0c87f6e3015d",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "95f39a0712c2a921cfc92c83e4dfaf7f3e6e2da074d5ed77dca3bc3a5f3a0e9a"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/cleanup-harness.mjs",
+          "id": "dynamic-015350",
+          "blockedReason": "src/state/cleanup-harness.mjs: Retrospective completion emits a presence/missing finding for outcome.docPath at L378; require its bounded state export and alias resolution to avoid falsely certifying a missing document.",
+          "record": {
+            "file": "src/state/cleanup-harness.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 9,
+            "recordSha256": "959c17d9937a6d7c0bf1c99198e5d86379749b1ec9af7407c3de0c87f6e3015d",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "95f39a0712c2a921cfc92c83e4dfaf7f3e6e2da074d5ed77dca3bc3a5f3a0e9a"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/cleanup-harness.mjs",
+          "id": "dynamic-015353",
+          "blockedReason": "src/state/cleanup-harness.mjs: Retrospective completion emits a presence/missing finding for outcome.docPath at L397; require its bounded state export and alias resolution to avoid falsely certifying a missing document.",
+          "record": {
+            "file": "src/state/cleanup-harness.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 9,
+            "recordSha256": "959c17d9937a6d7c0bf1c99198e5d86379749b1ec9af7407c3de0c87f6e3015d",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "95f39a0712c2a921cfc92c83e4dfaf7f3e6e2da074d5ed77dca3bc3a5f3a0e9a"
+          },
+          "ownerJoin": null
         }
       ]
     },
     {
-      "dependency": "Authorized redacted consumer-edge export of ignored/external instruction files, preserving origin and document-path construction without reading live .fgos state.",
-      "itemCount": 1,
+      "dependency": "Authorized registry docs currentPath / aliases / lifecycle export",
+      "itemCount": 14,
       "items": [
         {
-          "file": ".fgos/**; ignored/external instructions",
-          "id": ".fgos/**; ignored/external instructions",
-          "blockedReason": ".fgos/**; ignored/external instructions: Authorized redacted consumer-edge export of ignored/external instruction files, preserving origin and document-path construction without reading live .fgos state.",
+          "file": "bin/fgos.mjs",
+          "id": "dynamic-001315",
+          "blockedReason": "bin/fgos.mjs: doc promote alias remedy prints targetDoc.currentPath; the registry alias/currentPath export must establish which official destination replaces the supplied alias.",
           "record": {
-            "file": ".fgos/**; ignored/external instructions",
-            "recordFile": "step-05-records/runtime-external-parks.jsonl",
-            "recordLine": 1,
-            "recordSha256": "a6cc91a93727c70f7beb7217d52b346599702ff327261c49ab4ad587d1fe8e2d",
-            "recordFileSha256": "4e208b1b3c88a4bcafe3fa43bc37d48439e2624b22fcaa05f7d0e2ae55f338c8",
+            "file": "bin/fgos.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+            "recordLine": 13,
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": null,
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 0,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          }
-        }
-      ]
-    },
-    {
-      "dependency": "Bounded registry currentPath / committed HEAD export for doc promote",
-      "itemCount": 1,
-      "items": [
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "dynamic-001316",
+          "blockedReason": "bin/fgos.mjs: Registry diagnostic dynamic-001316 emits activeDocs[0].currentPath in async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slice(3)) {; export active/currentPath/alias identities to conserve the exact refusal and remedy.",
+          "record": {
+            "file": "bin/fgos.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+            "recordLine": 13,
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "dynamic-001319",
+          "blockedReason": "bin/fgos.mjs: doc promote HEAD-membership refusal prints the uncommitted targetDoc.currentPath twice; export committed-tree membership with registry identities to conserve that diagnostic.",
+          "record": {
+            "file": "bin/fgos.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+            "recordLine": 13,
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "dynamic-001327",
+          "blockedReason": "bin/fgos.mjs: Registry diagnostic dynamic-001327 emits resolved.currentPath in         const retiredTopics = Object.values(topics).filter((t) => t.status === 'retired').length;; export active/currentPath/alias identities to conserve the exact refusal and remedy.",
+          "record": {
+            "file": "bin/fgos.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+            "recordLine": 13,
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "bin/fgos.mjs",
+          "id": "dynamic-001345",
+          "blockedReason": "bin/fgos.mjs: Registry diagnostic dynamic-001345 emits match.currentPath in         const retiredTopics = Object.values(topics).filter((t) => t.status === 'retired').length;; export active/currentPath/alias identities to conserve the exact refusal and remedy.",
+          "record": {
+            "file": "bin/fgos.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+            "recordLine": 13,
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
+          },
+          "ownerJoin": null
+        },
         {
           "file": "bin/fgos.mjs",
           "id": "author-seam8-bin-head-doc-probe",
@@ -194,15 +831,130 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/cleanup-harness.mjs",
+          "id": "dynamic-015351",
+          "blockedReason": "src/state/cleanup-harness.mjs: Retrospective completion probes disk presence for resolvedDoc.currentPath at L389; require its bounded state export and alias resolution to avoid falsely certifying a missing document.",
+          "record": {
+            "file": "src/state/cleanup-harness.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 9,
+            "recordSha256": "959c17d9937a6d7c0bf1c99198e5d86379749b1ec9af7407c3de0c87f6e3015d",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "95f39a0712c2a921cfc92c83e4dfaf7f3e6e2da074d5ed77dca3bc3a5f3a0e9a"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/cleanup-harness.mjs",
+          "id": "dynamic-015352",
+          "blockedReason": "src/state/cleanup-harness.mjs: Retrospective completion emits a presence/missing finding for resolvedDoc.currentPath at L392; require its bounded state export and alias resolution to avoid falsely certifying a missing document.",
+          "record": {
+            "file": "src/state/cleanup-harness.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 9,
+            "recordSha256": "959c17d9937a6d7c0bf1c99198e5d86379749b1ec9af7407c3de0c87f6e3015d",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "95f39a0712c2a921cfc92c83e4dfaf7f3e6e2da074d5ed77dca3bc3a5f3a0e9a"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/cleanup-harness.mjs",
+          "id": "dynamic-015355",
+          "blockedReason": "src/state/cleanup-harness.mjs: Retrospective completion probes disk presence for attestedDoc.currentPath at L416; require its bounded state export and alias resolution to avoid falsely certifying a missing document.",
+          "record": {
+            "file": "src/state/cleanup-harness.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 9,
+            "recordSha256": "959c17d9937a6d7c0bf1c99198e5d86379749b1ec9af7407c3de0c87f6e3015d",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "95f39a0712c2a921cfc92c83e4dfaf7f3e6e2da074d5ed77dca3bc3a5f3a0e9a"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/cleanup-harness.mjs",
+          "id": "dynamic-015356",
+          "blockedReason": "src/state/cleanup-harness.mjs: Retrospective completion emits a presence/missing finding for attestedDoc.currentPath at L417; require its bounded state export and alias resolution to avoid falsely certifying a missing document.",
+          "record": {
+            "file": "src/state/cleanup-harness.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 9,
+            "recordSha256": "959c17d9937a6d7c0bf1c99198e5d86379749b1ec9af7407c3de0c87f6e3015d",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "95f39a0712c2a921cfc92c83e4dfaf7f3e6e2da074d5ed77dca3bc3a5f3a0e9a"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/cleanup-harness.mjs",
+          "id": "dynamic-015357",
+          "blockedReason": "src/state/cleanup-harness.mjs: Retrospective completion emits a presence/missing finding for attestedDoc.currentPath at L421; require its bounded state export and alias resolution to avoid falsely certifying a missing document.",
+          "record": {
+            "file": "src/state/cleanup-harness.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 9,
+            "recordSha256": "959c17d9937a6d7c0bf1c99198e5d86379749b1ec9af7407c3de0c87f6e3015d",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "95f39a0712c2a921cfc92c83e4dfaf7f3e6e2da074d5ed77dca3bc3a5f3a0e9a"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/knowledge-registry.mjs",
+          "id": "dynamic-015583",
+          "blockedReason": "src/state/knowledge-registry.mjs: Registry diagnostic dynamic-015583 emits existing.currentPath in       const oldDocs = Object.values(view.docs).filter((d) => d.topicId === topicId);; export active/currentPath/alias identities to conserve the exact refusal and remedy.",
+          "record": {
+            "file": "src/state/knowledge-registry.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 22,
+            "recordSha256": "612d3a509b665960fa204b7b0d6655f468e52f4bf462c3de786e00b1d176e666",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/knowledge-registry.mjs",
+          "id": "dynamic-015587",
+          "blockedReason": "src/state/knowledge-registry.mjs: doc register active-slot refusal prints activeDocs[0].currentPath for an already occupied topic/role; export active registry slots to conserve uniqueness remedies.",
+          "record": {
+            "file": "src/state/knowledge-registry.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 22,
+            "recordSha256": "612d3a509b665960fa204b7b0d6655f468e52f4bf462c3de786e00b1d176e666",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/state/knowledge-registry.mjs",
+          "id": "dynamic-015593",
+          "blockedReason": "src/state/knowledge-registry.mjs: doc promote occupied-slot refusal prints the competing activeDocs[0].currentPath while promoting a reserved doc; export lifecycle and active-slot identity to preserve this distinct refusal.",
+          "record": {
+            "file": "src/state/knowledge-registry.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
+            "recordLine": 22,
+            "recordSha256": "612d3a509b665960fa204b7b0d6655f468e52f4bf462c3de786e00b1d176e666",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff"
           },
           "ownerJoin": null
         }
@@ -220,15 +972,10 @@
             "file": "AGENTS.md",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 2,
-            "recordSha256": "178bfb2f7c0b19efb2cbfeb498882e0c027bfe0974b7d784cf1e8c564191aa92",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "887ef3edc3aa8c45aa7408f0b1b82863ba90775f873735a8a12324da9aca4e1e",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
-            "itemsChanged": true,
-            "referenceCount": 37,
-            "dynamicCount": 0,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
@@ -254,7 +1001,7 @@
     },
     {
       "dependency": "Description rewrite: L12-63: Settled-fact writer instruction names docs/specs/<area>.md as the destination. Phase 9 must specify the split area holder and preserve the fact-writing contract; Step 7 reconciles the adjacent A34 decision-writer residual. Own source passage: '   `docs/specs/<area>.md`.'",
-      "itemCount": 1,
+      "itemCount": 2,
       "items": [
         {
           "file": "AGENTS.md",
@@ -264,15 +1011,10 @@
             "file": "AGENTS.md",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 2,
-            "recordSha256": "178bfb2f7c0b19efb2cbfeb498882e0c027bfe0974b7d784cf1e8c564191aa92",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "887ef3edc3aa8c45aa7408f0b1b82863ba90775f873735a8a12324da9aca4e1e",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
-            "itemsChanged": true,
-            "referenceCount": 37,
-            "dynamicCount": 0,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
@@ -293,6 +1035,21 @@
             ],
             "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
           }
+        },
+        {
+          "file": "AGENTS.md",
+          "id": "author-seam8-agents-decision-home-74",
+          "blockedReason": "AGENTS.md: the settled-decision home at L74 still directs new decisions into the retired numbered docs/decisions corpus. Resolve that home alongside the adjacent area-fact destination L75 before rewriting the learning instruction.",
+          "record": {
+            "file": "AGENTS.md",
+            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
+            "recordLine": 2,
+            "recordSha256": "887ef3edc3aa8c45aa7408f0b1b82863ba90775f873735a8a12324da9aca4e1e",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9"
+          },
+          "ownerJoin": null
         }
       ]
     },
@@ -308,15 +1065,10 @@
             "file": "src/state/store.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
             "recordLine": 30,
-            "recordSha256": "9ae10e2e26a6f6f352415412ada38102001b86b2cfbaeda69a86809990e76041",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
+            "recordSha256": "7d6c81e400b2202804edc656e6cfbeb9db4d31bd7ec0da23193426d51efd334c",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343",
-            "itemsChanged": true,
-            "referenceCount": 10,
-            "dynamicCount": 74,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-027.jsonl",
@@ -352,15 +1104,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-010.jsonl",
@@ -391,20 +1138,15 @@
         {
           "file": "AGENTS.md",
           "id": "reference-000123",
-          "blockedReason": "L12-62: A51, L12-30/31/32/58: Description needs rewrite: this complete narrative/index/writer contract assumes one docs/specs/<area>.md layout. Candidate ownership splits specs, decisions and subcomponents; preserve end-user pointers and trace the actual registry/index reader in Step 5 before specifying the whole authority statement. Own source passage: '- docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md\\'s own \"Lịch sử quyết định\" sections (tsk-1lv-4)'",
+          "blockedReason": "AGENTS.md: only the docs/specs/<area>.md narrative-home span at L14 requires a split-area holder rewrite. Export/trace that area narrative mapping before replacing this operand; the adjacent docs/decisions/index.md generated-index operand independently preserves.",
           "record": {
             "file": "AGENTS.md",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 2,
-            "recordSha256": "178bfb2f7c0b19efb2cbfeb498882e0c027bfe0974b7d784cf1e8c564191aa92",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "887ef3edc3aa8c45aa7408f0b1b82863ba90775f873735a8a12324da9aca4e1e",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
-            "itemsChanged": true,
-            "referenceCount": 37,
-            "dynamicCount": 0,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
@@ -441,14 +1183,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 8,
             "recordSha256": "0e3e59b5d5017da306b57cb3b3f3dc21a31ee67a7ff5c74736a48b27e70fad38",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "167d4741830756c229f6b492defa0a2d809e5f1bfc057daee54c5eaf9cf11319",
-            "itemsChanged": true,
-            "referenceCount": 2,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "167d4741830756c229f6b492defa0a2d809e5f1bfc057daee54c5eaf9cf11319"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-012.jsonl",
@@ -490,15 +1227,10 @@
             "file": "AGENTS.md",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 2,
-            "recordSha256": "178bfb2f7c0b19efb2cbfeb498882e0c027bfe0974b7d784cf1e8c564191aa92",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "887ef3edc3aa8c45aa7408f0b1b82863ba90775f873735a8a12324da9aca4e1e",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
-            "itemsChanged": true,
-            "referenceCount": 37,
-            "dynamicCount": 0,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
@@ -534,15 +1266,10 @@
             "file": "AGENTS.md",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 2,
-            "recordSha256": "178bfb2f7c0b19efb2cbfeb498882e0c027bfe0974b7d784cf1e8c564191aa92",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "887ef3edc3aa8c45aa7408f0b1b82863ba90775f873735a8a12324da9aca4e1e",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
-            "itemsChanged": true,
-            "referenceCount": 37,
-            "dynamicCount": 0,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
@@ -578,15 +1305,10 @@
             "file": "AGENTS.md",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 2,
-            "recordSha256": "178bfb2f7c0b19efb2cbfeb498882e0c027bfe0974b7d784cf1e8c564191aa92",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "887ef3edc3aa8c45aa7408f0b1b82863ba90775f873735a8a12324da9aca4e1e",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
-            "itemsChanged": true,
-            "referenceCount": 37,
-            "dynamicCount": 0,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
@@ -622,15 +1344,10 @@
             "file": "AGENTS.md",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 2,
-            "recordSha256": "178bfb2f7c0b19efb2cbfeb498882e0c027bfe0974b7d784cf1e8c564191aa92",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "887ef3edc3aa8c45aa7408f0b1b82863ba90775f873735a8a12324da9aca4e1e",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
-            "itemsChanged": true,
-            "referenceCount": 37,
-            "dynamicCount": 0,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
@@ -666,15 +1383,10 @@
             "file": "packages/distribution/rust/src/init.rs",
             "recordFile": "step-05-records/runtime-judgment-part-23.jsonl",
             "recordLine": 5,
-            "recordSha256": "f48813111f2eb8ba46f2619493b5508d6f23000e686faa641f81a63576bba4ea",
-            "recordFileSha256": "2006394b0637129b15cf2f351ca2993f04841cc35955d607c0b0f47fdf4c3e64",
+            "recordSha256": "34d8002ba8755b060642add6011184057ac5a65aaa0c44b7d8decdd1f36b062f",
+            "recordFileSha256": "30b84c7d491da9b433d37177eb46fc72e06b4c0e87e8a83faaa5163ed14b8678",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "1cfecbbe025a6485495b6e76bf5076d1fa3238ae27a01cf755c83c085a4ebf1c",
-            "itemsChanged": true,
-            "referenceCount": 1,
-            "dynamicCount": 229,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "1cfecbbe025a6485495b6e76bf5076d1fa3238ae27a01cf755c83c085a4ebf1c"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-019.jsonl",
@@ -710,15 +1422,10 @@
             "file": "src/state/knowledge-registry.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
             "recordLine": 22,
-            "recordSha256": "8347826d63c61fd30f3713f225959e28df1bbe57c2a1b577d46ce7a0b28f95d0",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
+            "recordSha256": "612d3a509b665960fa204b7b0d6655f468e52f4bf462c3de786e00b1d176e666",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
-            "itemsChanged": true,
-            "referenceCount": 8,
-            "dynamicCount": 60,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
@@ -760,15 +1467,10 @@
             "file": "src/state/knowledge-registry.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
             "recordLine": 22,
-            "recordSha256": "8347826d63c61fd30f3713f225959e28df1bbe57c2a1b577d46ce7a0b28f95d0",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
+            "recordSha256": "612d3a509b665960fa204b7b0d6655f468e52f4bf462c3de786e00b1d176e666",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
-            "itemsChanged": true,
-            "referenceCount": 8,
-            "dynamicCount": 60,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
@@ -804,15 +1506,10 @@
             "file": "src/state/knowledge-registry.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
             "recordLine": 22,
-            "recordSha256": "8347826d63c61fd30f3713f225959e28df1bbe57c2a1b577d46ce7a0b28f95d0",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
+            "recordSha256": "612d3a509b665960fa204b7b0d6655f468e52f4bf462c3de786e00b1d176e666",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
-            "itemsChanged": true,
-            "referenceCount": 8,
-            "dynamicCount": 60,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
@@ -848,15 +1545,10 @@
             "file": "src/state/knowledge-registry.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
             "recordLine": 22,
-            "recordSha256": "8347826d63c61fd30f3713f225959e28df1bbe57c2a1b577d46ce7a0b28f95d0",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
+            "recordSha256": "612d3a509b665960fa204b7b0d6655f468e52f4bf462c3de786e00b1d176e666",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
-            "itemsChanged": true,
-            "referenceCount": 8,
-            "dynamicCount": 60,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
@@ -892,15 +1584,10 @@
             "file": "src/state/knowledge-registry.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
             "recordLine": 22,
-            "recordSha256": "8347826d63c61fd30f3713f225959e28df1bbe57c2a1b577d46ce7a0b28f95d0",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
+            "recordSha256": "612d3a509b665960fa204b7b0d6655f468e52f4bf462c3de786e00b1d176e666",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
-            "itemsChanged": true,
-            "referenceCount": 8,
-            "dynamicCount": 60,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
@@ -936,15 +1623,10 @@
             "file": "src/state/knowledge-registry.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
             "recordLine": 22,
-            "recordSha256": "8347826d63c61fd30f3713f225959e28df1bbe57c2a1b577d46ce7a0b28f95d0",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
+            "recordSha256": "612d3a509b665960fa204b7b0d6655f468e52f4bf462c3de786e00b1d176e666",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
-            "itemsChanged": true,
-            "referenceCount": 8,
-            "dynamicCount": 60,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
@@ -980,15 +1662,10 @@
             "file": "src/state/knowledge-registry.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
             "recordLine": 22,
-            "recordSha256": "8347826d63c61fd30f3713f225959e28df1bbe57c2a1b577d46ce7a0b28f95d0",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
+            "recordSha256": "612d3a509b665960fa204b7b0d6655f468e52f4bf462c3de786e00b1d176e666",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
-            "itemsChanged": true,
-            "referenceCount": 8,
-            "dynamicCount": 60,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
@@ -1024,15 +1701,10 @@
             "file": "src/state/knowledge-registry.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
             "recordLine": 22,
-            "recordSha256": "8347826d63c61fd30f3713f225959e28df1bbe57c2a1b577d46ce7a0b28f95d0",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
+            "recordSha256": "612d3a509b665960fa204b7b0d6655f468e52f4bf462c3de786e00b1d176e666",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
-            "itemsChanged": true,
-            "referenceCount": 8,
-            "dynamicCount": 60,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
@@ -1069,14 +1741,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-23.jsonl",
             "recordLine": 1,
             "recordSha256": "ee2a19dea952854461f62347b5eb2ca2b830dca1bf7973c57864c8a2ec5bab34",
-            "recordFileSha256": "2006394b0637129b15cf2f351ca2993f04841cc35955d607c0b0f47fdf4c3e64",
+            "recordFileSha256": "30b84c7d491da9b433d37177eb46fc72e06b4c0e87e8a83faaa5163ed14b8678",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "15ea0f48882aa65ed613554dea8a708618d84e94771deb1af2949fedfe682379",
-            "itemsChanged": true,
-            "referenceCount": 1,
-            "dynamicCount": 16,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "15ea0f48882aa65ed613554dea8a708618d84e94771deb1af2949fedfe682379"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-019.jsonl",
@@ -1113,14 +1780,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-23.jsonl",
             "recordLine": 11,
             "recordSha256": "9214a234ea46d82638a1c260ab1fbb38ac77911601917f0cf3d2ad091ac097d0",
-            "recordFileSha256": "2006394b0637129b15cf2f351ca2993f04841cc35955d607c0b0f47fdf4c3e64",
+            "recordFileSha256": "30b84c7d491da9b433d37177eb46fc72e06b4c0e87e8a83faaa5163ed14b8678",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "45abf2dc964ec6fe1687d1cac3bc46654a6b32552ffe8d12d0f1c5753f42b800",
-            "itemsChanged": true,
-            "referenceCount": 1,
-            "dynamicCount": 78,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "45abf2dc964ec6fe1687d1cac3bc46654a6b32552ffe8d12d0f1c5753f42b800"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-019.jsonl",
@@ -1157,14 +1819,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-26.jsonl",
             "recordLine": 44,
             "recordSha256": "8833e773df8be613d99b3f2026726f8e7a578051c60bf7c13f55e1ea39bf15cf",
-            "recordFileSha256": "bba0d39cd84b461ed061c4fa6891f16239abf581c47057a908d2d47e0e7fefcc",
+            "recordFileSha256": "de25139a2e13b7c0728e7c80e8fabddf30e381c7d096075d3485980d560eaf3f",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "932f932d239ccec0ef3debd919576d25ab068c50cb990d1f15afd03ff30f46af",
-            "itemsChanged": true,
-            "referenceCount": 1,
-            "dynamicCount": 64,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "932f932d239ccec0ef3debd919576d25ab068c50cb990d1f15afd03ff30f46af"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
@@ -1200,15 +1857,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-010.jsonl",
@@ -1244,15 +1896,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-010.jsonl",
@@ -1289,14 +1936,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-23.jsonl",
             "recordLine": 12,
             "recordSha256": "4477009a7ff9496b56ea2ee4bfa62c32d708c49878405fd6ca2ee56c3d24bf2e",
-            "recordFileSha256": "2006394b0637129b15cf2f351ca2993f04841cc35955d607c0b0f47fdf4c3e64",
+            "recordFileSha256": "30b84c7d491da9b433d37177eb46fc72e06b4c0e87e8a83faaa5163ed14b8678",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "a1ed550bb846d8a256048134a8a631afa2801f78163ba6f39b73c4ecb19e1f3f",
-            "itemsChanged": true,
-            "referenceCount": 2,
-            "dynamicCount": 14,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "a1ed550bb846d8a256048134a8a631afa2801f78163ba6f39b73c4ecb19e1f3f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-019.jsonl",
@@ -1332,15 +1974,10 @@
             "file": "src/runner/dispatch/mechanism.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-26.jsonl",
             "recordLine": 43,
-            "recordSha256": "b8728630e5f9c381a887d175ae40b29fd768146415262874793d77508d21be8b",
-            "recordFileSha256": "bba0d39cd84b461ed061c4fa6891f16239abf581c47057a908d2d47e0e7fefcc",
+            "recordSha256": "9d3c653499814db3d72295c4561db1276c681dd2a10d4b2facacd2602def10da",
+            "recordFileSha256": "de25139a2e13b7c0728e7c80e8fabddf30e381c7d096075d3485980d560eaf3f",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "964be5b92c651b0e5cd0cfef5e51b6f9e90e1e172b0ccba7c58c19fe42d32709",
-            "itemsChanged": true,
-            "referenceCount": 4,
-            "dynamicCount": 1,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "964be5b92c651b0e5cd0cfef5e51b6f9e90e1e172b0ccba7c58c19fe42d32709"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
@@ -1383,14 +2020,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-26.jsonl",
             "recordLine": 24,
             "recordSha256": "202983591b8838323fe461c3eccb9dfcdeed2b57113d0cce56727637d4881c48",
-            "recordFileSha256": "bba0d39cd84b461ed061c4fa6891f16239abf581c47057a908d2d47e0e7fefcc",
+            "recordFileSha256": "de25139a2e13b7c0728e7c80e8fabddf30e381c7d096075d3485980d560eaf3f",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "c0cff9ec45634a9a8164c10dd9cc944145776cbe51d04ccb0a5676419fdf667a",
-            "itemsChanged": true,
-            "referenceCount": 1,
-            "dynamicCount": 62,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "c0cff9ec45634a9a8164c10dd9cc944145776cbe51d04ccb0a5676419fdf667a"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-022.jsonl",
@@ -1426,15 +2058,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-010.jsonl",
@@ -1459,46 +2086,126 @@
       ]
     },
     {
-      "dependency": "Phase 9 legacy numbered-decision collision output policy and bounded target/source tree fixture export",
-      "itemCount": 2,
+      "dependency": "Phase 9 decision for the legacy decisions-tree writer/reader (native Land)",
+      "itemCount": 8,
       "items": [
         {
           "file": "src/runner/merge.mjs",
-          "id": "author-seam8-native-legacy-decision-writer",
-          "blockedReason": "src/runner/merge.mjs: declareLandFiles constructs a new numbered decision path and puts its renumbered source bytes into the native Land files set. Its target/source refs, colliding IDs and slug set are runtime inputs, while the numbered legacy corpus is retired. Before changing this output, settle legacy-output retention/retirement and provide the same bounded branch-tree fixtures; do not redirect it into the generated decision index or adopt a proposed alias as a writer destination.",
+          "id": "reference-003747",
+          "blockedReason": "src/runner/merge.mjs: Native Land scan of all supplied refs consumes or emits the legacy numbered decisions tree. Settle the reader/writer policy with bounded target/source tree and collision fixtures; preserve quoted filenames and abort/conflict behavior in the atomic cut.",
           "record": {
             "file": "src/runner/merge.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
             "recordLine": 38,
-            "recordSha256": "e2d7b81617e9dc87f9e9154d295266794293ff087dd66420c15f032993be9dd3",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
+            "recordSha256": "60029927819b3be2f5d846cdcb9ce078e104102251dedac1a15d7f834373f51a",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577",
-            "itemsChanged": true,
-            "referenceCount": 23,
-            "dynamicCount": 111,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 2
+            "sourceSha256": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/merge.mjs",
+          "id": "reference-003754",
+          "blockedReason": "src/runner/merge.mjs: DECISION_FILE_RE L419 defines numbered-file classification and slug extraction for both native tree readers and the new numbered output; export conflicting path sets and settle the shared legacy-tree policy.",
+          "record": {
+            "file": "src/runner/merge.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+            "recordLine": 38,
+            "recordSha256": "60029927819b3be2f5d846cdcb9ce078e104102251dedac1a15d7f834373f51a",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/merge.mjs",
+          "id": "reference-003762",
+          "blockedReason": "src/runner/merge.mjs: DECISION_INDEX_PATH L418 names the old hand-authored index consumed by conflict classification and emitted by rebuildDecisionIndex; resolve that exact input/output format with the native Land unit.",
+          "record": {
+            "file": "src/runner/merge.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+            "recordLine": 38,
+            "recordSha256": "60029927819b3be2f5d846cdcb9ce078e104102251dedac1a15d7f834373f51a",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/merge.mjs",
+          "id": "dynamic-012990",
+          "blockedReason": "src/runner/merge.mjs: DECISION_INDEX_PATH L418 names the old hand-authored index consumed by conflict classification and emitted by rebuildDecisionIndex; resolve that exact input/output format with the native Land unit.",
+          "record": {
+            "file": "src/runner/merge.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+            "recordLine": 38,
+            "recordSha256": "60029927819b3be2f5d846cdcb9ce078e104102251dedac1a15d7f834373f51a",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/merge.mjs",
+          "id": "author-seam8-native-legacy-decision-writer",
+          "blockedReason": "src/runner/merge.mjs: Native Land operation author-seam8-native-legacy-decision-writer consumes or emits the legacy numbered decisions tree. Settle the reader/writer policy with bounded target/source tree and collision fixtures; preserve quoted filenames and abort/conflict behavior in the atomic cut.",
+          "record": {
+            "file": "src/runner/merge.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+            "recordLine": 38,
+            "recordSha256": "60029927819b3be2f5d846cdcb9ce078e104102251dedac1a15d7f834373f51a",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577"
           },
           "ownerJoin": null
         },
         {
           "file": "src/runner/merge.mjs",
           "id": "author-seam8-native-legacy-index-writer",
-          "blockedReason": "src/runner/merge.mjs: declareLandFiles also emits the rebuilt old hand-authored 0000 index into the native Land files set. That row/renumber format is not the live state-generated docs/decisions/index.md format. Its output policy must be settled with the numbered-decision writer and bounded conflict fixture before any root/output rewrite, preserving abort/conflict behavior and all quoted filenames.",
+          "blockedReason": "src/runner/merge.mjs: Native Land operation author-seam8-native-legacy-index-writer consumes or emits the legacy numbered decisions tree. Settle the reader/writer policy with bounded target/source tree and collision fixtures; preserve quoted filenames and abort/conflict behavior in the atomic cut.",
           "record": {
             "file": "src/runner/merge.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
             "recordLine": 38,
-            "recordSha256": "e2d7b81617e9dc87f9e9154d295266794293ff087dd66420c15f032993be9dd3",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
+            "recordSha256": "60029927819b3be2f5d846cdcb9ce078e104102251dedac1a15d7f834373f51a",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577",
-            "itemsChanged": true,
-            "referenceCount": 23,
-            "dynamicCount": 111,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 2
+            "sourceSha256": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/merge.mjs",
+          "id": "author-seam8-native-legacy-target-reader",
+          "blockedReason": "src/runner/merge.mjs: Native Land operation author-seam8-native-legacy-target-reader consumes or emits the legacy numbered decisions tree. Settle the reader/writer policy with bounded target/source tree and collision fixtures; preserve quoted filenames and abort/conflict behavior in the atomic cut.",
+          "record": {
+            "file": "src/runner/merge.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+            "recordLine": 38,
+            "recordSha256": "60029927819b3be2f5d846cdcb9ce078e104102251dedac1a15d7f834373f51a",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577"
+          },
+          "ownerJoin": null
+        },
+        {
+          "file": "src/runner/merge.mjs",
+          "id": "author-seam8-native-legacy-source-reader",
+          "blockedReason": "src/runner/merge.mjs: Native Land operation author-seam8-native-legacy-source-reader consumes or emits the legacy numbered decisions tree. Settle the reader/writer policy with bounded target/source tree and collision fixtures; preserve quoted filenames and abort/conflict behavior in the atomic cut.",
+          "record": {
+            "file": "src/runner/merge.mjs",
+            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
+            "recordLine": 38,
+            "recordSha256": "60029927819b3be2f5d846cdcb9ce078e104102251dedac1a15d7f834373f51a",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
+            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+            "sourceSha256": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577"
           },
           "ownerJoin": null
         }
@@ -1516,15 +2223,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -1536,15 +2238,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -1556,15 +2253,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -1576,15 +2268,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -1596,15 +2283,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         }
@@ -1622,15 +2304,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -1642,15 +2319,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         }
@@ -1669,14 +2341,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 24,
             "recordSha256": "e56753b490ed84af48b0e82c2b647378a2e5b1eb7cbffbe22892a72a9fa5bb14",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
@@ -1707,14 +2374,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 24,
             "recordSha256": "e56753b490ed84af48b0e82c2b647378a2e5b1eb7cbffbe22892a72a9fa5bb14",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
@@ -1745,14 +2407,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 24,
             "recordSha256": "e56753b490ed84af48b0e82c2b647378a2e5b1eb7cbffbe22892a72a9fa5bb14",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
@@ -1783,14 +2440,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 24,
             "recordSha256": "e56753b490ed84af48b0e82c2b647378a2e5b1eb7cbffbe22892a72a9fa5bb14",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
@@ -1821,14 +2473,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 24,
             "recordSha256": "e56753b490ed84af48b0e82c2b647378a2e5b1eb7cbffbe22892a72a9fa5bb14",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
@@ -1859,14 +2506,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 24,
             "recordSha256": "e56753b490ed84af48b0e82c2b647378a2e5b1eb7cbffbe22892a72a9fa5bb14",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
@@ -1897,14 +2539,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 24,
             "recordSha256": "e56753b490ed84af48b0e82c2b647378a2e5b1eb7cbffbe22892a72a9fa5bb14",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
@@ -1935,14 +2572,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 24,
             "recordSha256": "e56753b490ed84af48b0e82c2b647378a2e5b1eb7cbffbe22892a72a9fa5bb14",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
@@ -1979,14 +2611,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 15,
             "recordSha256": "915da0a7494d768ba1b2eef64fdfa20e8697d55ada52d431b1bf638d76df36b0",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
@@ -2017,14 +2644,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 15,
             "recordSha256": "915da0a7494d768ba1b2eef64fdfa20e8697d55ada52d431b1bf638d76df36b0",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
@@ -2055,14 +2677,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 15,
             "recordSha256": "915da0a7494d768ba1b2eef64fdfa20e8697d55ada52d431b1bf638d76df36b0",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
@@ -2093,14 +2710,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 15,
             "recordSha256": "915da0a7494d768ba1b2eef64fdfa20e8697d55ada52d431b1bf638d76df36b0",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
@@ -2131,14 +2743,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 15,
             "recordSha256": "915da0a7494d768ba1b2eef64fdfa20e8697d55ada52d431b1bf638d76df36b0",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
@@ -2169,14 +2776,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 15,
             "recordSha256": "915da0a7494d768ba1b2eef64fdfa20e8697d55ada52d431b1bf638d76df36b0",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
@@ -2207,14 +2809,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 15,
             "recordSha256": "915da0a7494d768ba1b2eef64fdfa20e8697d55ada52d431b1bf638d76df36b0",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
@@ -2245,14 +2842,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 15,
             "recordSha256": "915da0a7494d768ba1b2eef64fdfa20e8697d55ada52d431b1bf638d76df36b0",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
@@ -2283,14 +2875,9 @@
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 15,
             "recordSha256": "915da0a7494d768ba1b2eef64fdfa20e8697d55ada52d431b1bf638d76df36b0",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
-            "itemsChanged": true,
-            "referenceCount": 17,
-            "dynamicCount": 2,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
           },
           "ownerJoin": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
@@ -2316,7 +2903,7 @@
     },
     {
       "dependency": "bin/fgos.mjs — CLI item/registry document operations",
-      "itemCount": 26,
+      "itemCount": 21,
       "items": [
         {
           "file": "bin/fgos.mjs",
@@ -2326,15 +2913,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2346,15 +2928,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2366,15 +2943,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2386,15 +2958,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2406,15 +2973,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2426,15 +2988,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2446,15 +3003,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2466,15 +3018,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2486,15 +3033,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2506,15 +3048,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2526,15 +3063,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2546,15 +3078,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2566,35 +3093,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "id": "dynamic-001357",
-          "blockedReason": "bin/fgos.mjs: The supersession citation scanner constructs the home CONTEXT exclusion from docsRefRaw. Its same-input fixture must prove that only this home document is suppressed when all other widened citations are reported.",
-          "record": {
-            "file": "bin/fgos.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
-            "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2606,55 +3108,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "id": "dynamic-001367",
-          "blockedReason": "bin/fgos.mjs: The context-render relative CONTEXT name is assembled after docsRef selection. Export the exact trailing-slash docsRef cases so the normalized file name and returned relative path remain coupled.",
-          "record": {
-            "file": "bin/fgos.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
-            "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "id": "dynamic-001368",
-          "blockedReason": "bin/fgos.mjs: The context-render relative CONTEXT name is assembled after docsRef selection. Export the exact trailing-slash docsRef cases so the normalized file name and returned relative path remain coupled.",
-          "record": {
-            "file": "bin/fgos.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
-            "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2666,15 +3123,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2686,55 +3138,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "id": "dynamic-001441",
-          "blockedReason": "bin/fgos.mjs: excludeDocsRefResearch exempts only RESEARCH.md under this specific item.docsRef. Export that one item-directory mapping and diff paths so an alias move neither expands the exemption to all docs/history nor loses the intended research-only exemption.",
-          "record": {
-            "file": "bin/fgos.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
-            "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "bin/fgos.mjs",
-          "id": "dynamic-001442",
-          "blockedReason": "bin/fgos.mjs: excludeDocsRefResearch exempts only RESEARCH.md under this specific item.docsRef. Export that one item-directory mapping and diff paths so an alias move neither expands the exemption to all docs/history nor loses the intended research-only exemption.",
-          "record": {
-            "file": "bin/fgos.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
-            "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2746,15 +3153,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2766,15 +3168,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2786,15 +3183,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2806,15 +3198,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         },
@@ -2826,61 +3213,10 @@
             "file": "bin/fgos.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-22.jsonl",
             "recordLine": 13,
-            "recordSha256": "f9f98e0242574719990f7c6997b285c3399bdd122836e73a2ce3f6738c8e611e",
-            "recordFileSha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+            "recordSha256": "e80b841e1729b4458fc4035e8e893d0c6084b909bd47b5e39d42052a0b12baa1",
+            "recordFileSha256": "c280e0cc85b82192ff8c9dd31293d91ccf053ab599af811c8df486ab6b7ed154",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
-            "itemsChanged": true,
-            "referenceCount": 51,
-            "dynamicCount": 360,
-            "censusJoinCount": 2,
-            "authorAddedReferences": 5
-          },
-          "ownerJoin": null
-        }
-      ]
-    },
-    {
-      "dependency": "src/runner/loop.mjs — runner assembles item plan context",
-      "itemCount": 2,
-      "items": [
-        {
-          "file": "src/runner/loop.mjs",
-          "id": "dynamic-012848",
-          "blockedReason": "src/runner/loop.mjs: The ready-validation sweep reads planPath from item.docsRef and contentRoot before planVerdictFromPlanMd. Export those item-worktree inputs so a moved plan does not silently remove the inferred caller verdict or mutate Work on a non-READY result.",
-          "record": {
-            "file": "src/runner/loop.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-            "recordLine": 35,
-            "recordSha256": "6c7171fe75244b421dcd29fb58264a366683a12cf805c3b271c0544570d07345",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "e5cde588341c406b73b0c30ffdf3465f89e528db6f4dc8a140d31163dbff74ab",
-            "itemsChanged": true,
-            "referenceCount": 3,
-            "dynamicCount": 108,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/runner/loop.mjs",
-          "id": "dynamic-012849",
-          "blockedReason": "src/runner/loop.mjs: The ready-validation sweep reads planPath from item.docsRef and contentRoot before planVerdictFromPlanMd. Export those item-worktree inputs so a moved plan does not silently remove the inferred caller verdict or mutate Work on a non-READY result.",
-          "record": {
-            "file": "src/runner/loop.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-            "recordLine": 35,
-            "recordSha256": "6c7171fe75244b421dcd29fb58264a366683a12cf805c3b271c0544570d07345",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "e5cde588341c406b73b0c30ffdf3465f89e528db6f4dc8a140d31163dbff74ab",
-            "itemsChanged": true,
-            "referenceCount": 3,
-            "dynamicCount": 108,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b"
           },
           "ownerJoin": null
         }
@@ -2888,7 +3224,7 @@
     },
     {
       "dependency": "src/runner/operation-choice.mjs — operation choice resolves plan and task context",
-      "itemCount": 14,
+      "itemCount": 7,
       "items": [
         {
           "file": "src/runner/operation-choice.mjs",
@@ -2898,35 +3234,10 @@
             "file": "src/runner/operation-choice.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
             "recordLine": 39,
-            "recordSha256": "90b9f2a9e3d55c2e400ea617b7a4142fea96d6be9239f7cc6c070706ca235f5f",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
+            "recordSha256": "447af3cdda8e838af267ee4c99a0dbcc7b4a66b7d80acc1ef9a29ca64b4570a6",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 149,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/runner/operation-choice.mjs",
-          "id": "dynamic-013082",
-          "blockedReason": "src/runner/operation-choice.mjs: This later operation branch derives its planPath from the selected docsRef/contentRoot. Supply the claimed-stage work export for this operation so its plan consumption remains tied to the same item, rather than assuming all caller roots agree.",
-          "record": {
-            "file": "src/runner/operation-choice.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-            "recordLine": 39,
-            "recordSha256": "90b9f2a9e3d55c2e400ea617b7a4142fea96d6be9239f7cc6c070706ca235f5f",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 149,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229"
           },
           "ownerJoin": null
         },
@@ -2938,35 +3249,10 @@
             "file": "src/runner/operation-choice.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
             "recordLine": 39,
-            "recordSha256": "90b9f2a9e3d55c2e400ea617b7a4142fea96d6be9239f7cc6c070706ca235f5f",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
+            "recordSha256": "447af3cdda8e838af267ee4c99a0dbcc7b4a66b7d80acc1ef9a29ca64b4570a6",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 149,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/runner/operation-choice.mjs",
-          "id": "dynamic-013114",
-          "blockedReason": "src/runner/operation-choice.mjs: The final operation-specific planPath lookup has its own stage input. Bind the actual selected work/stage fixture and plan before rewriting it; it cannot borrow the earlier planner branch witness.",
-          "record": {
-            "file": "src/runner/operation-choice.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-            "recordLine": 39,
-            "recordSha256": "90b9f2a9e3d55c2e400ea617b7a4142fea96d6be9239f7cc6c070706ca235f5f",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 149,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229"
           },
           "ownerJoin": null
         },
@@ -2978,75 +3264,10 @@
             "file": "src/runner/operation-choice.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
             "recordLine": 39,
-            "recordSha256": "90b9f2a9e3d55c2e400ea617b7a4142fea96d6be9239f7cc6c070706ca235f5f",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
+            "recordSha256": "447af3cdda8e838af267ee4c99a0dbcc7b4a66b7d80acc1ef9a29ca64b4570a6",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 149,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/runner/operation-choice.mjs",
-          "id": "dynamic-013133",
-          "blockedReason": "src/runner/operation-choice.mjs: The work.docsRef plan file supplies the initial planned-work context at operation selection. Export this persisted value and contentRoot so a phase cut cannot read another worktree plan.",
-          "record": {
-            "file": "src/runner/operation-choice.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-            "recordLine": 39,
-            "recordSha256": "90b9f2a9e3d55c2e400ea617b7a4142fea96d6be9239f7cc6c070706ca235f5f",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 149,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/runner/operation-choice.mjs",
-          "id": "dynamic-013134",
-          "blockedReason": "src/runner/operation-choice.mjs: The selected plan is also emitted as a repository-relative input reference. Export the relative docsRef identity with its resolved bytes so worker context and the owning absolute reader co-change.",
-          "record": {
-            "file": "src/runner/operation-choice.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-            "recordLine": 39,
-            "recordSha256": "90b9f2a9e3d55c2e400ea617b7a4142fea96d6be9239f7cc6c070706ca235f5f",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 149,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/runner/operation-choice.mjs",
-          "id": "dynamic-013139",
-          "blockedReason": "src/runner/operation-choice.mjs: The shared plan-mode helper resolves a docsRef plan before operation selection. Bind the actual mode-bearing plan bytes, including missing-file behavior, to the item docsRef export; this is the operation planner input, not a string label.",
-          "record": {
-            "file": "src/runner/operation-choice.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-            "recordLine": 39,
-            "recordSha256": "90b9f2a9e3d55c2e400ea617b7a4142fea96d6be9239f7cc6c070706ca235f5f",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 149,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229"
           },
           "ownerJoin": null
         },
@@ -3058,15 +3279,10 @@
             "file": "src/runner/operation-choice.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
             "recordLine": 39,
-            "recordSha256": "90b9f2a9e3d55c2e400ea617b7a4142fea96d6be9239f7cc6c070706ca235f5f",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
+            "recordSha256": "447af3cdda8e838af267ee4c99a0dbcc7b4a66b7d80acc1ef9a29ca64b4570a6",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 149,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229"
           },
           "ownerJoin": null
         },
@@ -3078,15 +3294,10 @@
             "file": "src/runner/operation-choice.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
             "recordLine": 39,
-            "recordSha256": "90b9f2a9e3d55c2e400ea617b7a4142fea96d6be9239f7cc6c070706ca235f5f",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
+            "recordSha256": "447af3cdda8e838af267ee4c99a0dbcc7b4a66b7d80acc1ef9a29ca64b4570a6",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 149,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229"
           },
           "ownerJoin": null
         },
@@ -3098,15 +3309,10 @@
             "file": "src/runner/operation-choice.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
             "recordLine": 39,
-            "recordSha256": "90b9f2a9e3d55c2e400ea617b7a4142fea96d6be9239f7cc6c070706ca235f5f",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
+            "recordSha256": "447af3cdda8e838af267ee4c99a0dbcc7b4a66b7d80acc1ef9a29ca64b4570a6",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 149,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229"
           },
           "ownerJoin": null
         },
@@ -3118,161 +3324,10 @@
             "file": "src/runner/operation-choice.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
             "recordLine": 39,
-            "recordSha256": "90b9f2a9e3d55c2e400ea617b7a4142fea96d6be9239f7cc6c070706ca235f5f",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
+            "recordSha256": "447af3cdda8e838af267ee4c99a0dbcc7b4a66b7d80acc1ef9a29ca64b4570a6",
+            "recordFileSha256": "456679d3eb95d7cd3debeccdda78bdd2cbb21e822c072bf846562cbaef1a6316",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 149,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/runner/operation-choice.mjs",
-          "id": "dynamic-013171",
-          "blockedReason": "src/runner/operation-choice.mjs: The planning-stage branch resolves its work plan before determining execution readiness. Export planning inputs separately from validation inputs so a missing moved plan cannot advance the stage.",
-          "record": {
-            "file": "src/runner/operation-choice.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-            "recordLine": 39,
-            "recordSha256": "90b9f2a9e3d55c2e400ea617b7a4142fea96d6be9239f7cc6c070706ca235f5f",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 149,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/runner/operation-choice.mjs",
-          "id": "dynamic-013172",
-          "blockedReason": "src/runner/operation-choice.mjs: The planning-stage relative plan context accompanies that readiness operation. Verify it names the exact plan consumed at the absolute planning read, with the same input-ref bytes delivered to the worker.",
-          "record": {
-            "file": "src/runner/operation-choice.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-27.jsonl",
-            "recordLine": 39,
-            "recordSha256": "90b9f2a9e3d55c2e400ea617b7a4142fea96d6be9239f7cc6c070706ca235f5f",
-            "recordFileSha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 149,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        }
-      ]
-    },
-    {
-      "dependency": "src/runner/work-dispatch.mjs — work dispatch builds plan/CONTEXT input refs",
-      "itemCount": 5,
-      "items": [
-        {
-          "file": "src/runner/work-dispatch.mjs",
-          "id": "dynamic-013331",
-          "blockedReason": "src/runner/work-dispatch.mjs: Dispatch emits plan.md as an input ref built from the claimed docsRef. Export the plan ref plus content digest so the worker does not receive a stale legacy path after its reader changes.",
-          "record": {
-            "file": "src/runner/work-dispatch.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-            "recordLine": 6,
-            "recordSha256": "61a26464a9db2725596c6c40dead79f1244b614e6ddfb483401aa9d3e2271320",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "7cc4e2cb1c99d5025b435acb3a3c68a9260fcaa4e7bc05415de83e2c0615145f",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 40,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/runner/work-dispatch.mjs",
-          "id": "dynamic-013332",
-          "blockedReason": "src/runner/work-dispatch.mjs: Dispatch emits CONTEXT.md beside the plan ref. Export the locked-decisions context identity and preserve this distinct input even where no plan exists.",
-          "record": {
-            "file": "src/runner/work-dispatch.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-            "recordLine": 6,
-            "recordSha256": "61a26464a9db2725596c6c40dead79f1244b614e6ddfb483401aa9d3e2271320",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "7cc4e2cb1c99d5025b435acb3a3c68a9260fcaa4e7bc05415de83e2c0615145f",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 40,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/runner/work-dispatch.mjs",
-          "id": "dynamic-013333",
-          "blockedReason": "src/runner/work-dispatch.mjs: The dispatch contentRoot choice is conditional on docsRef. Export the claimed item and worktree selection so document references resolve against the same branch content, not the shared state root.",
-          "record": {
-            "file": "src/runner/work-dispatch.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-            "recordLine": 6,
-            "recordSha256": "61a26464a9db2725596c6c40dead79f1244b614e6ddfb483401aa9d3e2271320",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "7cc4e2cb1c99d5025b435acb3a3c68a9260fcaa4e7bc05415de83e2c0615145f",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 40,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/runner/work-dispatch.mjs",
-          "id": "dynamic-013334",
-          "blockedReason": "src/runner/work-dispatch.mjs: Dispatch resolves the physical planPath after choosing contentRoot. Its plan file read must co-change with both the emitted plan ref and the content-root selection in the same claimed-item fixture.",
-          "record": {
-            "file": "src/runner/work-dispatch.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-            "recordLine": 6,
-            "recordSha256": "61a26464a9db2725596c6c40dead79f1244b614e6ddfb483401aa9d3e2271320",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "7cc4e2cb1c99d5025b435acb3a3c68a9260fcaa4e7bc05415de83e2c0615145f",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 40,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/runner/work-dispatch.mjs",
-          "id": "dynamic-013335",
-          "blockedReason": "src/runner/work-dispatch.mjs: Dispatch resolves the physical planPath after choosing contentRoot. Its plan file read must co-change with both the emitted plan ref and the content-root selection in the same claimed-item fixture.",
-          "record": {
-            "file": "src/runner/work-dispatch.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-            "recordLine": 6,
-            "recordSha256": "61a26464a9db2725596c6c40dead79f1244b614e6ddfb483401aa9d3e2271320",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "7cc4e2cb1c99d5025b435acb3a3c68a9260fcaa4e7bc05415de83e2c0615145f",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 40,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229"
           },
           "ownerJoin": null
         }
@@ -3280,68 +3335,8 @@
     },
     {
       "dependency": "src/state/retrospective-doors.mjs — retrospective checks persisted source/context evidence",
-      "itemCount": 5,
+      "itemCount": 1,
       "items": [
-        {
-          "file": "src/state/retrospective-doors.mjs",
-          "id": "dynamic-015650",
-          "blockedReason": "src/state/retrospective-doors.mjs: The retrospective impact door builds the home CONTEXT citation exclusion for the item. Export docsRef with item-scoped supersession decisions to conserve the wide-citation finding set and home suppression.",
-          "record": {
-            "file": "src/state/retrospective-doors.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-            "recordLine": 27,
-            "recordSha256": "0c69c434bd931cceb3b0f7a55de5587666d717854d21e05a11929299ffe0f349",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 14,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/state/retrospective-doors.mjs",
-          "id": "dynamic-015652",
-          "blockedReason": "src/state/retrospective-doors.mjs: The routing door reads the item CONTEXT locked-decision table and compares D identifiers with scoped state.decisions. Export both sides so a moved context cannot become a catch-and-return-empty false negative.",
-          "record": {
-            "file": "src/state/retrospective-doors.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-            "recordLine": 27,
-            "recordSha256": "0c69c434bd931cceb3b0f7a55de5587666d717854d21e05a11929299ffe0f349",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 14,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/state/retrospective-doors.mjs",
-          "id": "dynamic-015654",
-          "blockedReason": "src/state/retrospective-doors.mjs: The doc-deferral door enumerates the item docsRef directory. Export its exact Markdown membership and deferred-prose contents; preserve the advisory door and its absent-directory handling.",
-          "record": {
-            "file": "src/state/retrospective-doors.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-            "recordLine": 27,
-            "recordSha256": "0c69c434bd931cceb3b0f7a55de5587666d717854d21e05a11929299ffe0f349",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 14,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
         {
           "file": "src/state/retrospective-doors.mjs",
           "id": "dynamic-015655",
@@ -3350,101 +3345,10 @@
             "file": "src/state/retrospective-doors.mjs",
             "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
             "recordLine": 27,
-            "recordSha256": "0c69c434bd931cceb3b0f7a55de5587666d717854d21e05a11929299ffe0f349",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
+            "recordSha256": "8695aaf607f82de3bcaf21dfe742bdba9182c4db723e776fcd4d8819a3542d71",
+            "recordFileSha256": "d6f1a4787e437306dc1d22b39b2e2759820e98a7d045cf50a045369197953762",
             "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 14,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/state/retrospective-doors.mjs",
-          "id": "dynamic-015657",
-          "blockedReason": "src/state/retrospective-doors.mjs: The doc-deferral finding carries a relative entry path produced from docsRef and the directory member. Export that entry identity with the enumerated reader so reported findings do not retain a stale moved target.",
-          "record": {
-            "file": "src/state/retrospective-doors.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-            "recordLine": 27,
-            "recordSha256": "0c69c434bd931cceb3b0f7a55de5587666d717854d21e05a11929299ffe0f349",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3",
-            "itemsChanged": true,
-            "referenceCount": 0,
-            "dynamicCount": 14,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        }
-      ]
-    },
-    {
-      "dependency": "src/state/store.mjs — heavy delivered transition probes plan evidence",
-      "itemCount": 3,
-      "items": [
-        {
-          "file": "src/state/store.mjs",
-          "id": "reference-003909",
-          "blockedReason": "src/state/store.mjs: checkPlanEvidence separately appends docs/history/<id>/plan.md even when docsRef points elsewhere. Preserve this exact fallback until an authorized item/branch export covers its present/notABlob and missing-plan cases; co-cut approve-6, state-cutover and coding-knowledge fixtures.",
-          "record": {
-            "file": "src/state/store.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-            "recordLine": 30,
-            "recordSha256": "9ae10e2e26a6f6f352415412ada38102001b86b2cfbaeda69a86809990e76041",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343",
-            "itemsChanged": true,
-            "referenceCount": 10,
-            "dynamicCount": 74,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/state/store.mjs",
-          "id": "dynamic-015753",
-          "blockedReason": "src/state/store.mjs: checkPlanEvidence first probes work.docsRef/plan.md for a heavy delivered transition. Export work.docsRef and the fgw/<id> branch tip so the existing branch-path query and current-tree fallback prove the same presence case.",
-          "record": {
-            "file": "src/state/store.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-            "recordLine": 30,
-            "recordSha256": "9ae10e2e26a6f6f352415412ada38102001b86b2cfbaeda69a86809990e76041",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343",
-            "itemsChanged": true,
-            "referenceCount": 10,
-            "dynamicCount": 74,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
-          },
-          "ownerJoin": null
-        },
-        {
-          "file": "src/state/store.mjs",
-          "id": "dynamic-015754",
-          "blockedReason": "src/state/store.mjs: checkPlanEvidence separately appends docs/history/<id>/plan.md even when docsRef points elsewhere. Preserve this exact fallback until an authorized item/branch export covers its present/notABlob and missing-plan cases; co-cut approve-6, state-cutover and coding-knowledge fixtures.",
-          "record": {
-            "file": "src/state/store.mjs",
-            "recordFile": "step-05-records/runtime-judgment-part-28.jsonl",
-            "recordLine": 30,
-            "recordSha256": "9ae10e2e26a6f6f352415412ada38102001b86b2cfbaeda69a86809990e76041",
-            "recordFileSha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
-            "authorInputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
-            "sourceSha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343",
-            "itemsChanged": true,
-            "referenceCount": 10,
-            "dynamicCount": 74,
-            "censusJoinCount": 0,
-            "authorAddedReferences": 0
+            "sourceSha256": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3"
           },
           "ownerJoin": null
         }
@@ -3454,16 +3358,14 @@
   "patchCoCutUnits": [],
   "inheritedPatchOwnerUnits": "step-05-seam8-inherited-patches.json",
   "proposedMoveReadOutputCoChangeUnits": {
-    "path": "step-05-seam8-proposed-move-read-units.json",
+    "path": "step-05-proposed-move-read-units.json",
     "unitCount": 43,
-    "newSlots": {
-      "coChange": 51,
-      "output": 7
-    }
+    "globalReaderOutputMembers": 98,
+    "note": "Seam8 supplement is a pointer; canonical path units include every seam."
   },
   "mandatoryCarries": {
-    "merge": "runtime-judgment-part-27.jsonl: nextFreeDecisionId and separate target/source tree scans; exact canonical record is located by review list",
-    "store": "checkPlanEvidence fallback reader plus approve-6/state-cutover/coding-knowledge proof co-cuts",
+    "merge": "Native Land legacy tree readers, writers and constants are one R29 PARK unit; real L1091/L1092 author slots replace false live-reader pointers to removed census occurrences.",
+    "store": "Retained L615 docs/history fallback preserves; state-backed docsRef arm and mixed candidate probes/messages park. Existing approve-6/state-cutover/coding-knowledge proof co-cuts remain.",
     "bin": "Iron-Law narrow path comparison and doc-registry output constructors; writes retain separate generator-export parks",
     "sharedContextReader": "src/runner/paths.mjs owns readLockedContext once; intake/runner callers join its bounded Work.docsRef export",
     "inventoryGenerator": "step-05-seam8-cross-seam-carries.json joins the seam-4 frozen classifier prefixes and the constitution fixture"
@@ -3829,8 +3731,97 @@
     "Lead performs independent source-window/generated-output review; no approval transfers over changed hashes."
   ],
   "needsWrites": [],
-  "historicalSourceHeadDrift": "step-05-seam8-head-drift.json",
+  "historicalSourceHeadDrift": "step-05-head-drift.json",
   "closureProofs": {
+    "status": "pass",
+    "currentFullChecker": {
+      "failureCount": 0,
+      "files": 1481,
+      "literalReferences": 7223,
+      "dynamicTuples": 39876
+    },
+    "currentRuntimeChecker": {
+      "files": 451,
+      "literalReferences": 2288,
+      "dynamicTuples": 8366,
+      "failureCount": 0
+    },
+    "negativeProbesPassed": 366,
+    "negativeProbesTotal": 366,
+    "recordSetSha256": "db8dd8e91a065e604c1c169f664d87fb6e9b912f86de826bda4c0d746fa6bd2c",
+    "proof": "step-05-seam8-final-proof.json"
+  },
+  "subsequentAllSeamClosure": {
+    "ruling": "L12-87",
+    "currentTotals": "step-05-closure.json",
+    "currentReviewCorrections": "step-05-seam8-review-closure.json",
+    "currentProof": "step-05-seam8-final-proof.json",
+    "note": "Current seam totals/dependencies below are regenerated from canonical records; originalAuthoringTotals and originalAuthoringClosureProofs preserve the prior snapshot."
+  },
+  "originalAuthoringTotals": {
+    "filesOrLocators": 451,
+    "physicalFilesRead": 449,
+    "references": 2288,
+    "tuples": 8366,
+    "supplementalSlots": 8,
+    "classes": {
+      "external": {
+        "files": 2,
+        "references": 0,
+        "tuples": 0,
+        "pinnedBytes": 0
+      },
+      "judgment": {
+        "files": 255,
+        "references": 327,
+        "tuples": 7271,
+        "pinnedBytes": 6455540
+      },
+      "mechanical": {
+        "files": 4,
+        "references": 0,
+        "tuples": 5,
+        "pinnedBytes": 20857
+      },
+      "neutral": {
+        "files": 190,
+        "references": 50,
+        "tuples": 1075,
+        "pinnedBytes": 1673298
+      }
+    },
+    "exactPriorCensusJoins": {
+      "reference": 1911,
+      "dynamic": 15
+    },
+    "inheritedNormalSourceJoins": 286,
+    "admissionsExcludingCensusJoins": {
+      "ADMIT": 380,
+      "REJECT": 7231,
+      "neutral-unlabelled": 1125
+    },
+    "dispositionsExcludingCensusJoins": {
+      "preserve": 8576,
+      "patch": 34,
+      "parked": 113,
+      "render-join": 13
+    },
+    "newJudgmentAdmissionsExcludingOwnerJoins": {
+      "REJECT": 7226,
+      "ADMIT": 94
+    },
+    "newJudgmentDispositionsExcludingOwnerJoins": {
+      "preserve": 7252,
+      "parked": 68
+    },
+    "externalPopulationParks": 2,
+    "parkDependencyGroups": 43,
+    "newPhysicalPatchFiles": 0,
+    "inheritedOwnerPatchUnits": 19,
+    "originalCarries": 25,
+    "remainingFiles": 0
+  },
+  "originalAuthoringClosureProofs": {
     "status": "pass",
     "fullExistingChecker": {
       "files": 995,

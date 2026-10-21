@@ -5161,5 +5161,12 @@
     "pinnedBytes": 3638222
   },
   "task0ReviewClosure": "step-05-seam67-task0-closure.json",
-  "reviewClosure": "L12-86; manifest title joins real readers; canonical park locators refreshed."
+  "reviewClosure": "L12-86; manifest title joins real readers; canonical park locators refreshed.",
+  "subsequentAllSeamClosure": {
+    "ruling": "L12-87",
+    "currentTotals": "step-05-closure.json",
+    "currentReviewCorrections": "step-05-seam8-review-closure.json",
+    "currentProof": "step-05-seam8-final-proof.json",
+    "note": "Counts/proofs above retain their prior closure snapshot; current composed totals and R29/R30 outcomes are in the named all-seam closure."
+  }
 }

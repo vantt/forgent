@@ -1,23 +1,27 @@
-# Seam 8 author handback
+# Seam 8 reviewed author handback
 
-Author input: `97c9694a4b801d152e0deccfa0c58a11213c781f`. Records only; independent semantic review and cutover readiness remain pending.
+L12-87 supersedes the original branch handback. Canonical source remains at
+its own input pins; no consumer file was edited.
 
-The complete queue is accounted for: **451 files/locators, 2,288 original references, 8,366 original tuples, 113 exclusion origins and 25 original carries**, in admission parts 22–29. There are **4 R19 mechanical files, 190 R20/R21 neutral files, 255 judgment files (including one removed source), and two external population parks**. All 449 physical files were read through immutable Git objects. There are zero remaining files for authoring.
+All 451 file/locator memberships are accounted for: 2,288 reference memberships
+and 8,366 tuple memberships, including exact prior census joins. The current
+seam has 15 supplemental source slots. Current counts and dependencies
+are in step-05-seam8-closure.json; complete unique Step5 census totals and
+review-round closure IDs are in step-05-closure.json.
 
-The 1,911 references and 15 tuples already owned by Step 5 are exact `censusJoins`, without a second disposition owner. Normal source references also join exact Step 3/4 owners. The four generated registry/index files remain generator-owned. New judgments have 94 admitted and 7,226 rejected items, including supplemental slots; 68 of those admitted items park their dependent rewrite. Including inherited owner parks gives 113 item parks, plus the two external population parks. Detailed counts distinguish original identities, joins, supplemental slots and neutral rows in `step-05-seam8-closure.json`.
+R29 groups all eight native Land legacy-tree readers, writers and constants
+under one PARK dependency, retaining the quoted-path fixture. L1091/L1092
+have real author slots; census 003770/003748 remain removed/comment rejects.
+R30 is applied across every Step5 seam: 43 former rejects now admit/park on
+their state-source export. Retained docs/history L615 fallback preserves;
+unknown Work.docsRef inputs remain independently parked.
 
-The mandatory merge scans are separately owned: `nextFreeDecisionId` and the target/source branch scans retain their legacy Git-tree corpus identity, with the quoted-path fixture coupled. The post-census native Land numbered-decision and old-index outputs are separate parked writer slots: they need a bounded branch/conflict fixture and a legacy-output policy, rather than a made-up destination in the live generated index. The state-store fallback `docs/history/<id>/plan.md` joins approve-6, state-cutover and coding-knowledge fixtures. `readLockedContext` is owned once in `src/runner/paths.mjs`; intake/runner callers join its Work.docsRef/content-root export instead of duplicating the reader. The plain workflow context digest is an actual reader with an unchanged caller-root/ref construction and explicit unreadable handling.
+One canonical manifest, step-05-proposed-move-read-units.json, owns 43 path
+units and 98 readers/outputs. The seam8 manifest is only a pointer. Sixteen
+Step7 carry items conserve inherited Step3/4 questions and earlier explicit
+composition/replay obligations without reopening those owners here.
 
-Pinned bin bytes show **doc-registry output constructors and writes**, rather than reads at those cited coordinates. The fixed retained output constructors preserve; the Markdown/JSON projection writes retain distinct source-state export dependencies. The narrow Iron-Law evidence-path comparison preserves. Persisted fixed-document rationale joins CLI parity custody; caller-only formatting and scalar pass-throughs reject.
-
-`step-05-seam8-proposed-move-read-units.json` is an additive supplement to the unchanged 43-unit manifest. It adds seven actual fixed output slots and 51 individually pinned comment/header/metadata co-changes. A confirmed move must carry its existing readers/defaults and those outputs/co-changes together. Proposed aliases are not activated. The inventory classifier prefixes already belong to seam 4; `step-05-seam8-cross-seam-carries.json` joins that owner and the constitution fixture without editing either.
-
-The records retain 19 inherited owner-pin diffs. Their complete forward and inverse patches apply in scratch at their own pins; they are not new HEAD patches or passing runtime replays. Step 7 composes them once at the final pin. Current source has no new authored patch. Existing R25 deferred replays remain with their original owners.
-
-Reference spans are verified at their own census origin first; explicitly refreshed coordinates use the L12-66 pin only when its actual token matches. Every original origin/span stays unchanged. Current bindings follow whole-line ancestry or a unique best match within the exact replacement hunk. The YAML library's U+0085 characters are not LF line breaks. Removed occurrences retain their old pin, line hash and full deletion/replacement diff; repeated equal text is not a new binding.
-
-Verification is recorded in `step-05-seam8-verification.json` and `step-05-seam8-probe-results.json`. The full existing checker and every existing probe run through the report-local extension with only output writes redirected to `/tmp/fgos-work/`; checker rules and canonical result files remain unchanged. The extension reuses the existing R19/R20/R21 rules and shared admission invariants, then verifies this seam's conservation, ancestry, owner joins, R27 category and R26/R28 supplement. Semantic review still uses the Lead's bounded source-window packer and includes `authorAddedReferences`.
-
-No code, docs tree, test, skill, baseline, switchboard, existing report, live state or secret file was changed. No fgOS CLI, Git write, build, generator, service, npm suite or cargo suite ran. Python/checker/probe processes and scratch-only patch application are the authorized verification. Markdown preview remains Lead custody under the authoring request's records-only boundary. `needsWrites: []`.
-
-Final verification: existing full Step 5 checker **995 records / 0 failures**; seam-8 extension **451 records / 0 failures**. All **343/343 negative mutations reject**, including the exact existing probe suites and the seam-8 extension. Existing canonical result files were never rewritten. Record-file and row fingerprints in the review list match the final bytes. The non-failing historical-source/locator handoff supplement is `step-05-seam8-head-drift.json`.
+Full checker: 0 failures. Negative probes: 366/366 reject;
+root positives: 15/15. All frozen input hashes remained equal.
+Proof: step-05-seam8-final-proof.json. Lead acceptance, state exports, Step7
+assembly and Phase9 execution/full-suite parity remain separate obligations.

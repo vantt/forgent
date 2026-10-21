@@ -49,6 +49,10 @@ def lineage(oldpin, newpin, file):
 @functools.lru_cache(None)
 def source_diff(oldpin, newpin, file):
     return subprocess.check_output(['git', 'diff', oldpin, newpin, '--', file], cwd=ROOT, text=True)
+def manifest_read():
+    pointer = json.loads((P / 'step-05-seam8-proposed-move-read-units.json').read_text())
+    assert pointer['manifest'] == 'step-05-proposed-move-read-units.json' and 'units' not in pointer
+    return json.loads((P / pointer['manifest']).read_text())
 def load():
     return [record for path in sorted((P / 'step-05-records').glob('runtime-*.jsonl')) for record in rows(path)]
 def check(records=None, check_indexes=True, unit_manifest=None):
@@ -242,17 +246,32 @@ def check(records=None, check_indexes=True, unit_manifest=None):
     checks.update(shared['checks'])
     test('s8-coverage', 'every original reference exactly once, own or exact prior join', lambda: len(ref_ids) == len(set(ref_ids)) == len(refs) and set(ref_ids) == set(refs))
     test('s8-coverage', 'every original tuple exactly once, own or exact prior join', lambda: len(dyn_ids) == len(set(dyn_ids)) == len(dyn) and set(dyn_ids) == set(dyn))
+    # L12-87: the legacy tree family has one policy; state-backed paths
+    # cannot regress into the R5 caller-argument rejection category.
+    merge_record = next((r for r in records if r['file'] == 'src/runner/merge.mjs'), None)
+    if merge_record:
+        mi = {ident(e): e for e in items(merge_record)}
+        unit = merge_record['legacyWriterUnit']
+        expected_legacy = ['reference-003747', 'reference-003754', 'reference-003762', 'dynamic-012990', 'author-seam8-native-legacy-target-reader', 'author-seam8-native-legacy-source-reader', 'author-seam8-native-legacy-decision-writer', 'author-seam8-native-legacy-index-writer']
+        for eid in expected_legacy:
+            test('s8-r29-one-tree', 'src/runner/merge.mjs:' + eid, lambda eid=eid: mi[eid]['admission'] == 'ADMIT' and mi[eid]['disposition'] == 'parked' and mi[eid]['dependency'] == unit['dependency'] == 'Phase 9 decision for the legacy decisions-tree writer/reader (native Land)' and 'test/runner/merge-quoted-paths.test.mjs' in mi[eid]['coCutPaths'])
+        test('s8-r29-reader-owners', 'native Land scans', lambda: unit['readerIds'] == ['reference-003747','author-seam8-native-legacy-target-reader','author-seam8-native-legacy-source-reader'] and all(mi[x]['sourceSpans'][0]['line'] == line for x,line in [('author-seam8-native-legacy-target-reader',1091),('author-seam8-native-legacy-source-reader',1092)]))
+    for r in records:
+        for e in items(r):
+            dep = e.get('stateExportDependency') or ''
+            if dep.startswith('Authorized persisted ') or dep.startswith('Authorized registry docs '):
+                test('s8-r30-state-path', r['file'] + ':' + ident(e), lambda e=e: e['admission'] == 'ADMIT' and e['disposition'] == 'parked' and e.get('nonDocumentUse') is None and e.get('pathOperand') and e['dependency'] == e['stateExportDependency'])
     if check_indexes:
-        manifest = unit_manifest if unit_manifest is not None else json.loads((P / 'step-05-seam8-proposed-move-read-units.json').read_text())
+        manifest = unit_manifest if unit_manifest is not None else manifest_read()
         base = json.loads((P / 'step-05-proposed-move-read-units.json').read_text())
         unitmap = {u['path']: u for u in manifest['units']}
         byfile = {r['file']: r for r in records}
         ownmap = {(r['file'], ident(e)): (r, e) for r in records for e in items(r)}
-        test('s8-r26-population', 'all existing path decisions retained', lambda: set(unitmap) == {u['path'] for u in base['units']} and manifest['unitCount'] == len(unitmap) and manifest['baseManifest']['sha256'] == sha((P / 'step-05-proposed-move-read-units.json').read_bytes()))
+        test('s8-r26-population', 'all existing path decisions retained', lambda: set(unitmap) == {u['path'] for u in base['units']} and manifest['unitCount'] == len(unitmap) and len(manifest['units']) == len(unitmap))
         for original in base['units']:
             if original['path'] not in unitmap: continue
             u = unitmap[original['path']]
-            test('s8-r26-base', u['path'], lambda original=original, u=u: u['readers'][:len(original['readers'])] == original['readers'] and u['coChanges'][:len(original['coChanges'])] == original['coChanges'] and u['decisionDependency'] == original['decisionDependency'] and u['proposalEvidence'] == original['proposalEvidence'] and u['proposedTarget'] == original['proposedTarget'])
+            test('s8-r26-base', u['path'], lambda original=original, u=u: u['readers'] == original['readers'] and u['coChanges'] == original['coChanges'] and u['decisionDependency'] == original['decisionDependency'] and u['proposalEvidence'] == original['proposalEvidence'] and u['proposedTarget'] == original['proposedTarget'])
         # Output coverage is discovered from the fixed producer calls/return
         # statements, independently of the new slot and manifest markers.
         expected_outputs = [
@@ -318,7 +337,7 @@ def probes():
     baseline_records = load()
     baseline = check(baseline_records)
     assert baseline['failureCount'] == 0, baseline['failures']
-    manifest = json.loads((P / 'step-05-seam8-proposed-move-read-units.json').read_text())
+    manifest = manifest_read()
     results = []
     def pick(rs, predicate):
         return next((r, e) for r in rs for e in items(r) if predicate(r, e))
@@ -389,6 +408,9 @@ def probes():
         u['addedThisTurn']=[e for e in u['addedThisTurn'] if not(e['kind']=='coChange' and e['path']==path and e['file']==x['file'] and e['line']==x['line'])]
     run('Comments and fixed metadata remain individually enumerated co-changes', 's8-r28-cochanges', lose_cochange, True)
     run('Old R26 units cannot disappear from the additive supplement', 's8-r26-population', lambda rs,u:u['units'].pop(), True)
+    run('R29 cannot split a native Land reader from its writers', 's8-r29-one-tree', lambda rs,u: pick(rs,lambda r,e:ident(e)=='reference-003747')[1].update(disposition='preserve'))
+    run('R29 live reader cannot reuse a removed census identity', 's8-r29-reader-owners', lambda rs,u: next(r for r in rs if r['file']=='src/runner/merge.mjs')['legacyWriterUnit']['readerIds'].__setitem__(1,'reference-003770'))
+    run('R30 registry probe cannot be scalar pass-through', 's8-r30-state-path', lambda rs,u: pick(rs,lambda r,e:ident(e)=='dynamic-015349')[1].update(admission='REJECT',disposition='preserve',nonDocumentUse='scalar-pass-through',pathOperand=None))
     return {'baselineFailures':0,'passed':sum(x['rejected'] for x in results),'total':len(results),'probes':results,'failures':[x for x in results if not x['rejected']]}
 
 if __name__ == '__main__':

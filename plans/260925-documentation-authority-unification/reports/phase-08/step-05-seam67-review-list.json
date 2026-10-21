@@ -16949,5 +16949,172 @@
       ]
     }
   ],
-  "previousDeferredReplayChanges": []
+  "previousDeferredReplayChanges": [],
+  "L12-87-reviewObligations": [
+    {
+      "file": "src/report/knowledge-projection.mjs",
+      "recordFile": "step-05-records/generators-doc-registry.jsonl",
+      "recordLine": 3,
+      "beforeSha256": "1842369faf14e6ee4358ae21e20541b549ca59c4902d62befde1828d7d59d6b8",
+      "afterSha256": "422a099b42a2cacf9defedd26cc4d9247bb56985ff88d289b64b62ec8a7e2788",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "dynamic-009806",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "beforeAdmission": "REJECT",
+          "afterAdmission": "ADMIT"
+        },
+        {
+          "id": "dynamic-009807",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "beforeAdmission": "REJECT",
+          "afterAdmission": "ADMIT"
+        },
+        {
+          "id": "dynamic-009808",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "beforeAdmission": "REJECT",
+          "afterAdmission": "ADMIT"
+        },
+        {
+          "id": "dynamic-009809",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "beforeAdmission": "REJECT",
+          "afterAdmission": "ADMIT"
+        }
+      ]
+    },
+    {
+      "file": "src/report/item-trace.mjs",
+      "recordFile": "step-05-records/generators-enduser-index.jsonl",
+      "recordLine": 6,
+      "beforeSha256": "015629cf18c820b273eb95aed0a7dea0b295ea045e23dc292731d8909722a308",
+      "afterSha256": "0813e6df84e6c2da437d4f19616bb51ff1cbf2df0aa4c1ac0d17a133b3f4a3a8",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "dynamic-009799",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "beforeAdmission": "REJECT",
+          "afterAdmission": "ADMIT"
+        },
+        {
+          "id": "dynamic-009800",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "beforeAdmission": "REJECT",
+          "afterAdmission": "ADMIT"
+        }
+      ]
+    },
+    {
+      "file": "scripts/knowledge-bootstrap.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "recordLine": 197,
+      "beforeSha256": "73cfaf7d15b9bd3acdde17a0bcc55c93cd41be61385f82048c85206bab37a727",
+      "afterSha256": "1373b1a6ec031ab22d62a7d5e96d04d3f4061337c17112eeae1ae36687c83c3c",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "dynamic-008073",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "beforeAdmission": "REJECT",
+          "afterAdmission": "ADMIT"
+        }
+      ]
+    },
+    {
+      "file": "scripts/knowledge-canary.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "recordLine": 198,
+      "beforeSha256": "9de58642b8ef33108a7f1feaa831d0a91fafd2806d0b3719c6b257e0f4ac6640",
+      "afterSha256": "243172e28aa969c8b2887ddad4ea279bdaed994fee0257ea7645de9afa927e43",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "dynamic-008115",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "beforeAdmission": "REJECT",
+          "afterAdmission": "ADMIT"
+        }
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "recordLine": 200,
+      "beforeSha256": "4347c357b9776aa659f1752a5dd1f55ff40c4f88fdf50cbe1a17e7a17d308239",
+      "afterSha256": "2dd4f7bc0b381697fdfde348d285df33366e0e1d454b2b9ffbc8cf48c2c65100",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "dynamic-008159",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "beforeAdmission": "REJECT",
+          "afterAdmission": "ADMIT"
+        },
+        {
+          "id": "dynamic-008160",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "beforeAdmission": "REJECT",
+          "afterAdmission": "ADMIT"
+        },
+        {
+          "id": "dynamic-008191",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "beforeAdmission": "REJECT",
+          "afterAdmission": "ADMIT"
+        }
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+      "recordLine": 21,
+      "beforeSha256": "554b9de52e049b41edbe1d4cefdb4941bfb9c66a179fa217b7b7989f8a52a771",
+      "afterSha256": "b909a6b219ed1c2f2ead91c4c7f8eb4135a704cc23edc9b4934d40242b373f88",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "dynamic-014387",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "beforeAdmission": "REJECT",
+          "afterAdmission": "ADMIT"
+        },
+        {
+          "id": "dynamic-014425",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "beforeAdmission": "REJECT",
+          "afterAdmission": "ADMIT"
+        },
+        {
+          "id": "dynamic-014426",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "beforeAdmission": "REJECT",
+          "afterAdmission": "ADMIT"
+        },
+        {
+          "id": "dynamic-014427",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "beforeAdmission": "REJECT",
+          "afterAdmission": "ADMIT"
+        }
+      ]
+    }
+  ]
 }
