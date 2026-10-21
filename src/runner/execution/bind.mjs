@@ -555,14 +555,14 @@ export function bind(ask, ctx, { walk = {} } = {}) {
 
 /**
  * The seat a Work operation or a raw dispatch runs, by the same crate call a unit run makes (one headless
- * producer seat; the posture is judged when the assignment launches, not here). A pinned executor, a tier or an effort the caller stated come in as one override. A
+ * producer seat; the posture is judged when the assignment launches, not here, so the ask names no writes). A pinned executor, a tier or an effort the caller stated come in as one override. A
  * refusal throws, named; there is no policy of its own behind it.
  *
  * @param {object} args `{ runnerConfig, unit, role, readOnly, overrides }`; `unit` is `{ id, capability, rigor }`
  */
 export function bindWorkSeat({ runnerConfig, unit, role = 'producer', readOnly = false, overrides = [] }) {
   const bound = bind(
-    { unit: { ...unit, writes: readOnly ? [] : ['scratch/placeholder'] }, seat: 'producer', role, readOnly, overrides, raiseAuthorized: false },
+    { unit: { ...unit, writes: [] }, seat: 'producer', role, readOnly, overrides, raiseAuthorized: false },
     { runnerConfig, session: { headless: true, postureAtLaunch: true } },
   );
   if (bound.refused) throw new RunnerConfigError(`${bound.refused.reason}: ${bound.refused.detail}`, { code: bound.refused.reason });
