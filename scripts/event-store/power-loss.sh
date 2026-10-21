@@ -52,7 +52,9 @@ done
 node=$(command -v node)
 modprobe dm-flakey 2>/dev/null || true
 dmsetup targets | grep -q '^flakey' || die "dm-flakey target unavailable (modprobe dm-flakey)"
-[ -f "$checkout/.fgos/runtime/git-addon/manifest.json" ] || die "build the addon first as yourself: node scripts/git-addon.mjs"
+# The staged addon's manifest, where scripts/git-addon.mjs puts it for this checkout.
+manifest=$(cd "$checkout" && "$node" --input-type=module -e "const [{ gitAddonDirectory }, path] = await Promise.all([import('./scripts/lib/git-addon-stage.mjs'), import('node:path')]); process.stdout.write(path.join(gitAddonDirectory(process.cwd()), 'manifest.json'))") || die "cannot locate the staged addon"
+[ -f "$manifest" ] || die "build the addon first as yourself: node scripts/git-addon.mjs"
 
 as_user() { setpriv --reuid="$SUDO_UID" --regid="$SUDO_GID" --init-groups env HOME="$(getent passwd "$SUDO_UID" | cut -d: -f6)" "$@"; }
 as_user mkdir -p "$image_dir"
