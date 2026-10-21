@@ -1,0 +1,1 @@
+{"counts": {"commentsExamined": 301, "eligibleUniqueDeadPointers": 7}, "pending": [], "compoundRecords": [{"recordFile": "generators-skills-and-support.jsonl", "file": "src/report/knowledge-resolver.mjs; apps/fgos-gateway/web/src/lib/network.ts"}], "coverage": "Every physical Step 5 source record with source spans; compound boundary rows have no separate source blob."}

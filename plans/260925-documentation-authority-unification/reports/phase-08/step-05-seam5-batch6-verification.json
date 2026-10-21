@@ -1,0 +1,295 @@
+{
+  "timestamp": "2026-10-21T00:42:05.841284+00:00",
+  "status": "blocked",
+  "fullChecker": {
+    "exit": 1,
+    "files": 731,
+    "literalReferences": 3622,
+    "dynamicTuples": 20132,
+    "failureCount": 4,
+    "structuralFailureCountExcludingR22": 0,
+    "failures": [
+      {
+        "rule": "j6-r22-replay",
+        "where": "test/runner/merge.test.mjs",
+        "error": "R22 requires actual current/candidate owning test replay; no pending/blocked proof counts as pass"
+      },
+      {
+        "rule": "j6-r22-replay",
+        "where": "test/runner/worktree.test.mjs",
+        "error": "R22 requires actual current/candidate owning test replay; no pending/blocked proof counts as pass"
+      },
+      {
+        "rule": "j6-r22-replay",
+        "where": "test/cli/fgos-merge.test.mjs",
+        "error": "R22 requires actual current/candidate owning test replay; no pending/blocked proof counts as pass"
+      },
+      {
+        "rule": "j6-r22-replay",
+        "where": "test/intake/plan.test.mjs",
+        "error": "R22 requires actual current/candidate owning test replay; no pending/blocked proof counts as pass"
+      }
+    ],
+    "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-final-full-check.json",
+    "resultSha256": "a6a12c0ae866ee7aab350c5fc064549ac8db5673bfc2be35893c33e4d0bea818",
+    "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-final-full-check.log",
+    "logSha256": "1755fa85ef2435786bbd4819607165c14f011e61c8a6fec8664b52bbcc4db9d0"
+  },
+  "probeJobs": [
+    {
+      "label": "pilot",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourceSha256": "a59d36f661d03d96cc8d168ec8dd316b79161904145d04d3e8a50e0b63df7cf5",
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-pilot-probes.log",
+      "logSha256": "ed5a4641a73331a1c84a2cdcfc76a1f7bc1170db25a5ff214213f49b7cd12c57",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
+      "resultSha256": "1c657c27239de46a4712a71565346ea6bf19d8c642900f0867b34eb166ebb63b",
+      "counts": {
+        "passed": 44,
+        "total": 44,
+        "baselineFailures": 0
+      }
+    },
+    {
+      "label": "seam4",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourceSha256": "a19c43384269bb457a4de2ad2f9629d42eab2cec4f849fa0e832056fd0b9c5f5",
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-seam4-probes.log",
+      "logSha256": "be6baada3498e9392aed50f2a1eae7c314e3baf667ac54ad2bbdaec53886bace",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes-result.json",
+      "resultSha256": "079f8336d8931ef7c4b08388fea47808ce35723043191d9f5e0c3cb86e7a3662",
+      "counts": {
+        "passed": 34,
+        "total": 34,
+        "baselineFailures": 0
+      }
+    },
+    {
+      "label": "prompt",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes.py"
+      ],
+      "exit": 1,
+      "resultFresh": false,
+      "sourceSha256": "0daa372358e106547a09b6ab2c59c13d51601552b702a686b3e208571a865928",
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-prompt-probes.log",
+      "logSha256": "4a75bfe91c98092f2028054cd4c58e4dcca9a90abd1d95af79b5baf253f118a5",
+      "resultPath": null,
+      "resultSha256": null,
+      "counts": {}
+    },
+    {
+      "label": "batch2",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourceSha256": "a41e9243dd18de7029d909f8e1a009d626eff4c6dab8ebe4c5b87cd4e7abc79e",
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-batch2-probes.log",
+      "logSha256": "6e23e43fa065043d297532dfacae577b973caee59b1e111131b6d7ca626b1d79",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes-result.json",
+      "resultSha256": "eda386a899c7af10acc888cfb895eebb7386be99c9173f7f6d3f018c0666fc4c",
+      "counts": {
+        "passed": 18,
+        "total": 18,
+        "baselineFailures": 0
+      }
+    },
+    {
+      "label": "batch3",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourceSha256": "eaed7aa4684604d7c5ed16eec9278b6477cd6ef8addabfb9580484bc9b070138",
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-batch3-probes.log",
+      "logSha256": "5d2603d8e219a93aadee79ed6945da5f41a999e014654d78a62902827adae8b1",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes-result.json",
+      "resultSha256": "2e192488be537d058fad959b4e9071ae54268c8fc1aafd089009780026cecac1",
+      "counts": {
+        "passed": 19,
+        "total": 19,
+        "baselineFailures": 0
+      }
+    },
+    {
+      "label": "batch4",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourceSha256": "58fbece70a1dcc940b3f277a50382d018b575d467b5ea5c996bc93bedcfea412",
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-batch4-probes.log",
+      "logSha256": "dccc15d40aa1c7781314fb22c5bfd637bffb36a020d9bcc6b0010bcb28a21e3a",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-probes-result.json",
+      "resultSha256": "0b7f8f5aede3a29acfc58201aaf4c2faf7be5bc2c27d2faccbdf13d2810aac35",
+      "counts": {
+        "passed": 29,
+        "total": 29,
+        "positivePassed": 15,
+        "positiveTotal": 15
+      }
+    },
+    {
+      "label": "batch5",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourceSha256": "26e8efb19b0d1a6e9385cb065cda8295a83c363b6c2a7378ea2115a37542704e",
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-batch5-probes.log",
+      "logSha256": "40d8d7cb16c74ba3a2304a7ceb815bbce588277b71ee8469c6317d170639782d",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes-result.json",
+      "resultSha256": "5f5c20f9961683e282b54bebe0ca74d94fa3b3e5fa8c38c390a7db349a8c763f",
+      "counts": {
+        "passed": 19,
+        "total": 19,
+        "baselineFailures": 0
+      }
+    }
+  ],
+  "executedNegativePassed": 183,
+  "executedNegativeTotal": 183,
+  "promptMutationsNotExecuted": 13,
+  "promptFinalBaseline": "Final integrated checker still has four real R22 failures; intermediate attempt log is retained, not counted as clean baseline.",
+  "newProbeResultSha256": "1df941de548f7b62aacb98095c68f66bc3ae89ec4b5badbe9becdea25c237569",
+  "rootPositivePassed": 15,
+  "rootPositiveTotal": 15,
+  "judgmentFilesAuthored": 100,
+  "newFilesNotRequiringReplay": 99,
+  "pendingNewPatchFiles": 1,
+  "changedOldPatchFilesRequiringReplay": 3,
+  "neutralFilesClosed": 0,
+  "remainingAuthoringFiles": 264,
+  "needsWrites": [],
+  "independentReview": "pending Lead",
+  "phase9FullSuite": "pending",
+  "artifactHashes": {
+    "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md": "a4febbff9d1a697e4ae18c5bcf96e817d2bf0cbfe31c1ef61604db094812c542",
+    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md": "51586e9d986ff7e1419c87cc77c33ca5681d14208856e08808befe7f96e99450",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-admission-rules.py": "d6c29c5ce2365d1bba3e8421e9c22c36d22dcf15fdbbd37d7a2addbd2ac30e6d",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py": "5346a543f4e23d332a8728b61b00c27f68d9f473f10f399bd644fb671ec42b7f",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-author.py": "1c00279a0a68e57f8572e4ffb9a2e43b7cf866babda8795dcf27932b96aab1a8",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-packet.py": "996524c4e3dbdf748a0e99f0c34ccbdd59a0ad85ee50de05f6a3eb69590bce2a",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-step0.py": "b87ef693f8ce722a4817c825ad306188ae48b01be92bb2087cd3a4b50583d0f2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py": "a59d36f661d03d96cc8d168ec8dd316b79161904145d04d3e8a50e0b63df7cf5",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl": "3b0931d75a32dc5e1a73e52356d4dc4aa178261ccd7b3ec1c7223bd03d60e513",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl": "1625ec0891ce1a2f739ca90f6ca24ae72fcf5fbdf3253c89a067b11357038a25",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-decision-index.jsonl": "ed4437898c811c7758585aef8fc6e8d4071bbd8423557700026ba32da6606a35",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-doc-registry.jsonl": "347a36417e8b0ae034b09627ed2932d212c29fc23fad1e6d1df6ea2c85284c57",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl": "0c3fc4c77dea4d2a23c6c05ee8deea6c3e0099296e5296f3005692d90969fe54",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-instructions.jsonl": "7b581f7649fcaeb9d895cf6771a83c006566800191e8a2ae6e2bbf49d8195cb6",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl": "baa49123b6ed375b1776473431a07373d8f5192bb326c74d16fb7eee0065b367",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl": "779d12e1863b6cd693493b3dd9ba3a49ee55099f337e429924373f9d535a53b1",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl": "9f3dbb93e32401ffee73df61fb16c6dc4ad97a0313a875ef0e88121930cfbad4",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl": "4ce77770c9c4ff6a059fa6bbbc3b4bdf33f7d81e60b67c4b9d8de5f2247ec0f3",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl": "2b2bd0e3fff8fdc5a84f94deca16c27b74f552b2fa5ea888c9b8eafa821734a2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl": "3db37e88b5620685dcf7f01262b06c6151c47205a7695a1f22bec59ca19dba8d",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl": "7ece1cb25d2b5a48c70ad1431672d96c415428291f76a01bb1291e3b519e9a92",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-prompt-goldens.jsonl": "6f7aaa44bc6da3619bd9bbb1ba32e6faa9f66691bb04e8fa06738214c78cf423",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file-batch3.jsonl": "56f682625f9cbf357e4edd1a06ea290f461325a7828b00bbfc6477d383d6faf9",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl": "9d78b2e7510226ed7eda231062dfd5ff0bb46a9deca1b692288f6b76c31d6a68",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl": "2706ac0823a05e8e066648ddcc0f736c5b888ddd08f4560777e7750c5c59f3b2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-author.py": "1453dcfa6dfc3ef5d610a53b3d1aca0c47f1c78520c75e461753a163c2f48fee",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-callers.py": "c74bb6c175c46374650f2bad083cf1d1a5011493997db3c68619340204444cd2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check.py": "0835e424675ca7b965f89521242232b06f28e51ff064f31f2653f86699db21cc",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-closure.py": "d6e9613e284fafdfab8eb22eddace334c3aa355befd55394c8aeb845572fb425",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-complete.py": "858bdff36bbd0d521ea020b20008bd33ef8829c0ccec5fd7288bd14e5245ff4d",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-field-roles.py": "698aa84fc6dc824f3735f164c0b294e257397f1545a0ac4f594e4bb5f1aa6cae",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-final-corrections.py": "d9e9a7a7c18e0ae530808e9e9de8bd6e4d2a65e285f502cd8524e1993a2fd041",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-finalize.py": "630edd98983dc704bce579a55b27decf9a30796d66d0bcc219771a287b30a673",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-complete.py": "6cddf7f7e1e476adfec19ee0b020ec5c57d1e910fe226e4655860e8a14dcd7ef",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-handback.py": "b3e5027848fbf2ebb99a63fcbb4354c049c05deba052ba6edd3f9ec511392d48",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-refinements.py": "c64025ebc37b84db575ceb527e79af813ba84cd5f77683df5a89747ac8de2f47",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-specs.py": "f9ab069822227f2ce85d07fd324c0b3f01ffded87df0e605c6bdae893687afe2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2.py": "99ce6877d15e5680a78b21805359d13b9bb75fa7dfb5f0ef82ae85da6fa2b3df",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-handback.py": "53a5dac6a691acdb6c8822edefba7e6f96f9f987b990247135d775dcb51161af",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-input-roles.py": "2c469c6c033c19aae95bbaa63fc654c1e1cce221a4ef5d54b9e945d1e521332b",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-joins.py": "2d329d6132483ce0a0fca5c87bb794acf4b5905c4134a7ac8e7001cc157d7270",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-operand-final.py": "4cba8033d82f2434ab654701f4ad98945a940d532fa3a67188be4972285bdb37",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-operands.py": "61177412731f3162c363bcca8c7d8520147c120be3e720c22c3c381a8cf6dee8",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-packet.py": "efefeaa094f76dee4509cd625c9bd93e076188d35e637ef71d16edf9fcd2f3a4",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-path-operands.py": "18f4f38ae0a29c48e51192ec81e8a3aeadba9badb7143fb86f62fecfa5b8def3",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py": "a19c43384269bb457a4de2ad2f9629d42eab2cec4f849fa0e832056fd0b9c5f5",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-refine.py": "05fb866bec4a2b49cc2dfb4336f430a7d35ff4f4621779a9b8f60e4a2a2f9fd5",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-rulings.py": "fbaedbed8a71f621784844fabff8d4238d67470e526f74613653d9370c6348d7",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-judgment-receipts.json": "1e6ad4b75a68abe2116712505411eb46e0abb7ac1cd603605a000657a02ce266",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes.py": "a41e9243dd18de7029d909f8e1a009d626eff4c6dab8ebe4c5b87cd4e7abc79e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-replay-tests.py": "e913384ab66048e7f2d0d8e808cba30487149b6fc2e5dd6147bc8fbeeda8f037",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-verify.py": "cab3d069c85d926e14f265aeb85c42bbc08b9299e342ac2afe1442eefeb7add0",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-author.py": "2f2eee1634be0b881cb70ddd67b151a59d8b9abc29fd89137bdf41a49a5971e2",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-index.py": "f3f7522c4fea4901586d70b6763b9264d3eafa83daea8d971c9c682822e9cd7e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-judgment-check.py": "31c46cd05ab95fd706b7ac528b776f95f3176647a624829c1635cd0bd98e5895",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes.py": "eaed7aa4684604d7c5ed16eec9278b6477cd6ef8addabfb9580484bc9b070138",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-replay-tests.py": "1241514aa13293a0d677020840389bb4f0964d189d2a798fcbaa33fd2558dce5",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-verify.py": "34d31bc8737288e5c099b1760606bab2e2e082d8e810903b831611261663ae47",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-author-judgment.py": "b5fee8397ff34bf7c2c0363cd075e32420e36977caa9145b08b2ac7f1ac6471c",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-author-neutral.py": "9535d3266d4d21d5db6f337968aa10405027688db944bddcbc1295ba1f933dde",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-index.py": "7a24abedb90abcb6ff631dc7ad93fb112f8a020c3915b28607e8c294061de6fd",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py": "05264e1f8e45f0da3e44f9ef7cb182fd0e141966b19315631c55cc0c17927e08",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-probes.py": "58fbece70a1dcc940b3f277a50382d018b575d467b5ea5c996bc93bedcfea412",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-verify.py": "24650bc90c7fa6401f8f7a59d385b97588466527c42db4cd75d475613c40450e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-author.py": "f6d5e7fda9fad7062f81731a754b0d7de5b7d3529e9a91d3a144632e25385a6b",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-index.py": "ac3a8a6ad2216d3c8c05bea3113a195b7a6b3a69062969df3691603ca7e08554",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py": "9107b861824da18148817912ba6d024d6d9a07d362fd21fdc6cb3a966fd1063a",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-measure.py": "f6970044e7ee8d4a5b631a19c1a6f08fd48b066ab5e04a2b6399c3af85a8ed00",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-parity-receipts.json": "4ccf5052fa3c7b993c662acf353bf104030647d12e2aad42b9d19127f8d9589c",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes.py": "26e8efb19b0d1a6e9385cb065cda8295a83c363b6c2a7378ea2115a37542704e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-replay.py": "b468b6f58660625cf4a8a7817fe27dbf727bcf6744dbac9ed5a9260d33f932de",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-review-closure.py": "311c14e3e27d2f7c7dc3b69e21e94b3837e7e215e46ff2624cfa8d2db7d9f589",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-verify.py": "3ed930f785d47c681e697e2fb955a5468c14544835d644a53f6bcacfbaf98afc",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-all-cocut-audit.json": "6b2c57e773c342131aee97996c902ab93703bb6158f8043f1c655c5407b46e44",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-all-step5-comment-audit.json": "8216c0a0a4b80ad17bd11f802aaf028c8a2c0be96e00732d536ffa8635c216b5",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-author.py": "b909fff02794c6ad6d6e3ac9dfafc5c88f51219d39b758c2a7570d568562bfe0",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-check.py": "ad98bb3405ccb63b914f7bfda1d2efe6d74c5457dacf8b0e8b4e2e59df08c281",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-closure.py": "7c0d4600872fa67f60068dbf45715e614d9d7bcec29bfa1a6438cd3e09a0aacc",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-comment-audit.py": "2ffd42b1a851f08399f0e1293c72fb0c53dea431f1214f6095ff3740ca332c6c",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-cutover-specs.json": "32b42006f2465490b3a6ab0be2f2848b24bea47b7774e89b72b2f9af1b9ed813",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-finalize-records.py": "8e645b2952f222e883bf1af734b39fcb9676ef3928aa47476aa5a68a0899d10a",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-handback.md": "6b8233ed06bb3f4bbab59383ef2bc316be0cccca6c4664eb9faa758cb80d0099",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-index.py": "ff27961b3f718ea0d636546725621c7bdbf9ad1483af2bcd2b75758e29fae570",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-parity-receipts.json": "20d0ee015046c2895d3d023b56f5b6ba15a4d43bca3eb275893da0c6617e2c5f",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-patch-spans.py": "8bd8fb9233c295c706fb336194480110b0a318df947957c07914f38cca9c3770",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-probes.py": "6065aace9078a2a65a9c391bb46837775c8388491016628870da9ee75dac5f56",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-refine.py": "0c95afafa87beeb31cd7d11e83c803a2b23a16e3899b5a23547921a492e9db14",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-replay-blockers.json": "dfc14dfab811d0de15859fd517144dd3d3899a4e62c7cfe606e725dccba446e7",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-review-closure.json": "0f775d2f431f12585cae4f1f88868a2bc564aac2078ee4df5443ffa5ac412f54",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-run-probes.py": "21e417250ea8962e9fe492b8e4dcc189756292abe3869483a28d0d8dc0d88764",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-scope-check.json": "f30ce3b899c4e20ce2eafd6f452102605181de0779aa8efe7431f8287569e3b5",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-title-cocuts.json": "7db4d4254d7d97c8a2a62cdb65f572a637e0694e75d13bf18f3f9ddfef02c04d",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-bulk-rules.py": "b10e106669fb9147fb21e5b90c7ff000511fe18d17b603af32b30343ce93ad04",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-check.py": "449a0671aad715acd74a3576102aa08981cf16bee51e10dae549215e74e1fdc5",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-continuation.json": "b14194feca69dccb394fe75d577c0705efb9ae7fc35b65bf45a16264fca9d078",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-judgment-check.py": "ff3ade91c03d6103209f48b40a5b9d6f60ecf44aedb74cd394edcbeba6f5ae7b",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-neutral-rules.py": "d7c96a9fd7307206fe4098249a29b781d44158beafda88f83113c0fe3f12e5da",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes.py": "0daa372358e106547a09b6ab2c59c13d51601552b702a686b3e208571a865928",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-review-list.json": "79ec7c58f13bc4181587ba125c0c8fad8678a38a2d17c301b5f9d0cd652eced3",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-root-rules.py": "4caf280e5d667bad7b312a5e85bffc27184713b354c9c50f72f1e3b3b18bd8b9"
+  }
+}

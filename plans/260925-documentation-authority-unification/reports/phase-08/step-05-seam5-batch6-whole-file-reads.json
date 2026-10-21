@@ -1,0 +1,702 @@
+[
+  {
+    "file": "test/cli/helpers/fgos-cli-harness.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "82513627745ddfb86343c336b6f58cf283b02a7684e534b46fd91dc9369d6238",
+    "bytes": 61589,
+    "lines": 1263
+  },
+  {
+    "file": "test/fixtures/run-outcome/legacy-derivation.json",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "f1a9e4b8ab383eb405d3baf2be522cc0dfd905f6fe6da5024d7beb7e3a8ba979",
+    "bytes": 138640,
+    "lines": 4356
+  },
+  {
+    "file": "test/fixtures/run-result/real-shapes/03-v1-done-inferred.json",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "06ddfc3a2d2b16b8536a2a5b470618dbc4989b623c6c42abc7675af6c8dcc096",
+    "bytes": 5439,
+    "lines": 142
+  },
+  {
+    "file": "test/fixtures/run-result/real-shapes/05-v1-done-reported.json",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "fc0f3a7f39cb8eaf17b25bca39c7754818885491f3b9d9f15a32abdd982eeab0",
+    "bytes": 9953,
+    "lines": 230
+  },
+  {
+    "file": "test/fixtures/run-result/real-shapes/09-v2-failed-needs-input-provider.json",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "69257ac38a46741f0ea1d1d4153a160ba972a17424b43b88d912f6e8bccd2441",
+    "bytes": 16862,
+    "lines": 685
+  },
+  {
+    "file": "test/fixtures/run-result/real-shapes/10-v2-failed-refuse-provider.json",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "c2a5903cc69d4b43886db433480d86f37611c1e20df42965ea520344ec8fca76",
+    "bytes": 17124,
+    "lines": 696
+  },
+  {
+    "file": "test/fixtures/run-result/real-shapes/14-v2-completed-blocked-reported.json",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "f9864bcd9611b819cb22cda18e0c0c32ab1e6009b8690abfc4f75f277bdf1092",
+    "bytes": 10140,
+    "lines": 277
+  },
+  {
+    "file": "test/fixtures/run-result/real-shapes/15-v2-completed-not-applicable-failed.json",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "00dcd53461cf49a435fb0769835b55224051f9d2229f95636cf203b68b51a5b7",
+    "bytes": 7369,
+    "lines": 282
+  },
+  {
+    "file": "test/fixtures/usage/pi-multiturn-no-agent-end.jsonl",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "0c61f2cf1ec63595fbe42cd70a53e92052859852dc0ceecd13e8a43c525aa723",
+    "bytes": 25476,
+    "lines": 13
+  },
+  {
+    "file": "test/fixtures/usage/pi-multiturn-normal.jsonl",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "ae18f4c33a24ec565f108f6ecfc0e21ac102b4acaf99867990d2d8dd1e6032eb",
+    "bytes": 291195,
+    "lines": 13
+  },
+  {
+    "file": "test/report/helpers/docs-index-state-fixture.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310",
+    "bytes": 2800,
+    "lines": 53
+  },
+  {
+    "file": "test/runner/dispatch-confinement-p04.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "ac66a0d6463bb0327ccbfeb8778f31aeb5352184d98bb88219da7882cbadeb2c",
+    "bytes": 35347,
+    "lines": 1014
+  },
+  {
+    "file": "test/runner/dispatch-confinement-p05.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "12d97830124eb5a0a70e7bc25b53121c815ef3c644c002f2cd5dc8255313d76e",
+    "bytes": 22983,
+    "lines": 696
+  },
+  {
+    "file": "test/runner/dispatch-executor-profile.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "0471818d68f8cac62abbfb9a2aa0997d05c0123c1098c7bb9950ef73213e4e93",
+    "bytes": 21237,
+    "lines": 463
+  },
+  {
+    "file": "test/runner/dispatch-worker-home.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "af466a08f94b3daca86d4fce1e18d47b9973cc20ad10be78e9dea677df91d2e5",
+    "bytes": 12737,
+    "lines": 257
+  },
+  {
+    "file": "test/runner/operation-choice.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "6894dd25825510a9df482f9078f3959c903e40309b733b71275b5fbb33621fa1",
+    "bytes": 248246,
+    "lines": 5951
+  },
+  {
+    "file": "test/runner/spawn-worker.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "84d0f3c59e9340e21f5c65dc1f5df4c2e6b277c32242f3083d5a897563a33bef",
+    "bytes": 22893,
+    "lines": 445
+  },
+  {
+    "file": "test/runner/work-unit-for.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "21014103165835a28461517507175971edb392f51e4aa6dc1156f569ef67f3e4",
+    "bytes": 10768,
+    "lines": 217
+  },
+  {
+    "file": "test/runner/worktree-callsite-wrapper.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "eaf8ce8bb924b5627bbcf6bebc5affc64bf961dbe812efe4d5858786ea8b62cf",
+    "bytes": 8504,
+    "lines": 180
+  },
+  {
+    "file": "test/runner/worktree.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "d9201ace6ecc4367af642dc2c1c438e18dd2a91b9e5f9afd56af64e9b6e92ce7",
+    "bytes": 74108,
+    "lines": 1448
+  },
+  {
+    "file": "test/scripts/check-doc-candidate-status.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "e8a6498e7f68f1e2068e8f0d41741340916d7f6296fb90bf6e34427e7e06a91b",
+    "bytes": 11492,
+    "lines": 193
+  },
+  {
+    "file": "test/scripts/check-doc-conservation.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "bf697f710b586c9e74d5e4a67a17ae4d3de95fdaaaab683efe4a89ea05d00d22",
+    "bytes": 50686,
+    "lines": 716
+  },
+  {
+    "file": "test/scripts/check-doc-constitution.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "8a8ee46f147829962f637dadcd068564548908e6f1d4c09af07e902ee36ddf8f",
+    "bytes": 41309,
+    "lines": 756
+  },
+  {
+    "file": "test/scripts/check-doc-retirement.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "6d85e365ef06eca231ad7dc36fd1f64221d985c325e2b3fb3f4767c1ca11fa87",
+    "bytes": 18504,
+    "lines": 271
+  },
+  {
+    "file": "test/scripts/doc-alias-resolver.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "406db472e6c44e2655141e05eafed5041ba4bf858a29cc757e0de136faaebaaa",
+    "bytes": 15729,
+    "lines": 253
+  },
+  {
+    "file": "test/scripts/doc-candidate-conservation.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "42ae0280845874ab6e9bce0c38d8e442d76a65aa70fe5d26ef7a923aaa6fb21a",
+    "bytes": 24941,
+    "lines": 335
+  },
+  {
+    "file": "test/scripts/doc-review-format.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "f7471d71fe75399f839638a9e770283a02e8e5e62742fa22dda18728ebfb25d5",
+    "bytes": 18831,
+    "lines": 250
+  },
+  {
+    "file": "test/scripts/generate-doc-inventory.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "d2d170906be20e9e0ef2619816c77e9eb1f3fbdd35d6ccfb8bcc9b4c8495b25a",
+    "bytes": 98897,
+    "lines": 1498
+  },
+  {
+    "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+    "bytes": 32220,
+    "lines": 636
+  },
+  {
+    "file": "test/scripts/knowledge-migration.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "648f7404863bb1cb284aa6ecf3215fa234cd1090559a2fa808ed11439f794d99",
+    "bytes": 41735,
+    "lines": 752
+  },
+  {
+    "file": "test/scripts/project-agents.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "632b08c117d16f4bca8cc5c9dfc03488a43407e6ee1ca3a200951fc300a736a4",
+    "bytes": 9124,
+    "lines": 207
+  },
+  {
+    "file": "test/setup/bin-discovery.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "e86a3cc27bb1c060b76c7869725e2c38aaad54c8b6deb90f05ec7e000d45f897",
+    "bytes": 11141,
+    "lines": 251
+  },
+  {
+    "file": "test/setup/capability-catalog-doctrine.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "780b0a0a6aa52a93831691ffb6ec675a5efe4e728050e215e310bf29314b1a0b",
+    "bytes": 12267,
+    "lines": 236
+  },
+  {
+    "file": "test/setup/checks-doctor-config.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "ceeba1aee8eea3cfa1dc92a0e0a90d36ce3654f863a2d63d500bb9c7fad3d3de",
+    "bytes": 59601,
+    "lines": 1163
+  },
+  {
+    "file": "test/setup/checks.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
+    "bytes": 94984,
+    "lines": 1902
+  },
+  {
+    "file": "test/setup/helpers/setup-checks-harness.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "df9919c796c8d0f310bf94fe47ee265d1b30d62346cdac82a477c603d04f819e",
+    "bytes": 6140,
+    "lines": 151
+  },
+  {
+    "file": "test/setup/instruction-registry.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "156110511f8aa5515db4d6dfe98526a1ab91fc51492447d9c1a42eb52e6c31b4",
+    "bytes": 38737,
+    "lines": 1002
+  },
+  {
+    "file": "test/setup/knowledge-doctor.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "1c3ba835550d65da0a8f80690fc14faac7ad36842119f632ebd446422c999096",
+    "bytes": 11690,
+    "lines": 246
+  },
+  {
+    "file": "test/setup/plugin-marketplace-doctor-check.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "9f9ed8197d0452d57cc88c6f064bc4cceb1b4ac8d0c9c7044f2c51434b374dc0",
+    "bytes": 11473,
+    "lines": 267
+  },
+  {
+    "file": "test/setup/registrations.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "a97b98fc8f47cfac63a765b531b4bff31944908a39761835dd4c449ddb707bed",
+    "bytes": 54315,
+    "lines": 1211
+  },
+  {
+    "file": "test/setup/skill-wrappers.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "a1773fd689ba468eac1061727e35d3cd2d10c2da4041944939d87b3b1eb87dcc",
+    "bytes": 176595,
+    "lines": 3682
+  },
+  {
+    "file": "test/skills/fgos-mirror.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "b44dacdc39c52eb31cd741b5da01e470cab14437d62833091255e1a1a6049107",
+    "bytes": 12366,
+    "lines": 235
+  },
+  {
+    "file": "test/state/awaiting.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "2e8184a0fb3bad622e22ed09fbcdf30757a58906a5caa9f480256d000a033f2a",
+    "bytes": 19342,
+    "lines": 371
+  },
+  {
+    "file": "test/state/cleanup-harness.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "3b3bdf0bff743a99642879bf7fbc34512dd9ba6e4ecc048b9fd1f68a2ca71a22",
+    "bytes": 58255,
+    "lines": 1036
+  },
+  {
+    "file": "test/state/decision-relation.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "f01fb129177ecca2aafbb1d2111e6c85a6ad804ff04e1420157a06148872aa65",
+    "bytes": 14727,
+    "lines": 344
+  },
+  {
+    "file": "test/state/events-jsonl-truncation-guard.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "720439fc0a2c07548ac7ddaed5e602b627ba170b8920c9d510d2b8714bc57e17",
+    "bytes": 34790,
+    "lines": 680
+  },
+  {
+    "file": "test/state/frontier.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "4b640fc300465ec8c411bc456534f189d474d59881cd579baeb9198747ddc250",
+    "bytes": 26326,
+    "lines": 590
+  },
+  {
+    "file": "test/state/gate-bypass.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "f3907be480449f98a8cee5308f85c577d763de890a7190d9d251a30edf37caa4",
+    "bytes": 23279,
+    "lines": 466
+  },
+  {
+    "file": "test/state/hot-lock-known-exec-sites.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "023275b39baad678c6b79201059bc73d24b02445b59038ce23e66a5e90e0f528",
+    "bytes": 7485,
+    "lines": 162
+  },
+  {
+    "file": "test/state/knowledge-bootstrap.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "d602ee2a176a905cc7a85e48961e7fa8b8c419bd3f6fde918c65afeec093db81",
+    "bytes": 14269,
+    "lines": 300
+  },
+  {
+    "file": "test/state/knowledge-registry.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "b22f02a1315d12a0d6d9c4c81db367c15e1d52da7c5a6f2ef423e085a5d4dd1a",
+    "bytes": 37606,
+    "lines": 887
+  },
+  {
+    "file": "test/state/porting-store.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "1eb642fb67cfb24622a862cbfffd03a08ef1874aadfd3caf6d25be043c7525e0",
+    "bytes": 14428,
+    "lines": 306
+  },
+  {
+    "file": "test/state/retrospective-doors.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "72a4b066c0a7bbbbefe788a84c1d06cf6dae5f847d1e0e585eb6c76eeb184809",
+    "bytes": 13628,
+    "lines": 279
+  },
+  {
+    "file": "test/state/runtime-coordination.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "dec0108bd4c10fbb6190be4a434a031029e579ba08e2de5ca9227db6da31a3eb",
+    "bytes": 47336,
+    "lines": 842
+  },
+  {
+    "file": "test/state/store.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "6cc78343c4f537034d1ccac8b6e399e3fd0afcb50d1ea940d803451028e1cf22",
+    "bytes": 70773,
+    "lines": 1344
+  },
+  {
+    "file": "test/state/work.test.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "27bd5e4f2510fe92318120324e6fe49dfabde1c7726401dafd60aa8cfba11f86",
+    "bytes": 40753,
+    "lines": 980
+  },
+  {
+    "file": "apps/fgos/tests/cli_tests.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "cc3034cf1b16f674f29cccf2fd28208c0e190e038f3b684830f4b6f6200de055",
+    "bytes": 48441,
+    "lines": 1422
+  },
+  {
+    "file": "apps/fgos/tests/windows_borrow.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "b6a1e16410b69691ee4e33ad594b84720ab4da98936ab476e930d54c42fd974c",
+    "bytes": 13763,
+    "lines": 293
+  },
+  {
+    "file": "apps/fgos/tests/windows_support/mod.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "7ecfe0cc1a463210730966ea0bc2c2b0e2cc9137cef76f035b5e0e62960a46b7",
+    "bytes": 7316,
+    "lines": 201
+  },
+  {
+    "file": "packages/agent-protocol/rust/tests/direct_vectors.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "287adbd0bb43ffed9ec20c81085d33d4b9423266eeda4098ea6ce71548d324ba",
+    "bytes": 4246,
+    "lines": 132
+  },
+  {
+    "file": "packages/agent-protocol/rust/tests/terminal_vectors.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "4ce5222b93e3a657220a83a652d6d51de83bfbd9b6eb2a1a71ecd24a5937a91c",
+    "bytes": 18565,
+    "lines": 537
+  },
+  {
+    "file": "packages/convention/rust/tests/golden.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "e084b8cc30931780a5e05f04f289cd0a95c8f791496a5a788a88162797866027",
+    "bytes": 8636,
+    "lines": 247
+  },
+  {
+    "file": "packages/distribution/rust/tests/activation_lock_multiprocess.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "13b49506f7c45415429a6f1161577b9d33b3c819067777dfa0708332c1c96236",
+    "bytes": 8208,
+    "lines": 224
+  },
+  {
+    "file": "packages/distribution/rust/tests/fetch_download.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "d44e41924790a7bd2cf5829d4948e7046e033fee9fd2e265bdc2b175ff4de858",
+    "bytes": 7915,
+    "lines": 231
+  },
+  {
+    "file": "packages/distribution/rust/tests/install_lock_multiprocess.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "f2a8f086e6da5de67b39ebc9ce56e7ac80f2b467dc1e3a49e0fb441028506d66",
+    "bytes": 6467,
+    "lines": 166
+  },
+  {
+    "file": "packages/distribution/rust/tests/schema_golden.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "4376948b1c76af9f8b899d0705efb6a913ce0d6fe57121d77be7c00bc87e2d62",
+    "bytes": 20303,
+    "lines": 508
+  },
+  {
+    "file": "packages/durable-file/rust/tests/install.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "b6afa024dda90a25b242d6fbf74ccedbe433bcce7c8b713dc690c07389295a98",
+    "bytes": 8901,
+    "lines": 254
+  },
+  {
+    "file": "packages/event-store/rust/tests/append_recovery.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "3885a9356c15bf29ba56273baf15e44bd09623213a9b08f5817dbbb41c1e8964",
+    "bytes": 18454,
+    "lines": 532
+  },
+  {
+    "file": "packages/event-store/rust/tests/common/mod.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "e624f9a261ae17eb1fbcba629523ad971c7124891525e7040e2aedca8efdf9ab",
+    "bytes": 4817,
+    "lines": 154
+  },
+  {
+    "file": "packages/event-store/rust/tests/legacy_reader.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "d6c30655d5e1d7ec4b12dcfb7e8f9daf6af35dae34552601bac2a94d26f6f801",
+    "bytes": 3939,
+    "lines": 129
+  },
+  {
+    "file": "packages/event-store/rust/tests/offline_sync.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "e0de26319f8a93b01a6c2c120e50126859ee12a7ff15778d40bed9001add67d2",
+    "bytes": 2159,
+    "lines": 67
+  },
+  {
+    "file": "packages/event-store/rust/tests/reader_review_regressions.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "0920884230e567d12b45d4ea6f49a1182c7495a93533ac888ea57a2aeba2283c",
+    "bytes": 21114,
+    "lines": 663
+  },
+  {
+    "file": "packages/event-store/rust/tests/reader_seal_stress.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "f721a995073a7d466a35914f58aa06448433e2bce6383809f6abee93bf9fc34e",
+    "bytes": 18631,
+    "lines": 541
+  },
+  {
+    "file": "packages/event-store/rust/tests/reader_support/mod.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "a41def84de7fdb964513c347b4b881625b31688344457f30ae31f3924c6d4e0f",
+    "bytes": 8736,
+    "lines": 307
+  },
+  {
+    "file": "packages/event-store/rust/tests/registry_identity_layout.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "f1e00dee91522804214ac83666c224c05cd682ebb6d1ea2b5e2e268ad4ba8e45",
+    "bytes": 11055,
+    "lines": 328
+  },
+  {
+    "file": "packages/event-store/rust/tests/seal_cas_race.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "ec575e833a1a35a026d46fbb26e46d3088d56ff9a2857cc2f309016c849d814d",
+    "bytes": 3721,
+    "lines": 112
+  },
+  {
+    "file": "packages/event-store/rust/tests/seal_publication.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "8f17ad89117a8f49d73c8c54fec30e401971be0b1f34b56da2d8f8a0767aafba",
+    "bytes": 29333,
+    "lines": 985
+  },
+  {
+    "file": "packages/event-store/rust/tests/setup_identity.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "6c08f71d0cd2942d79088de6cf2a211db2b427f4576a1b3f47a2426d662fa0d6",
+    "bytes": 1310,
+    "lines": 41
+  },
+  {
+    "file": "packages/event-store/rust/tests/sync_review.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "7c754adb6104c2b21fc21f920136fb89ba1261caabc1489a4f9c36d47cd7d715",
+    "bytes": 10649,
+    "lines": 358
+  },
+  {
+    "file": "packages/event-store/rust/tests/sync_support/mod.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "0d81275c28700bed37d9f587f3df0cbbd770632b23724dd9cf0b4a8da9d8ba86",
+    "bytes": 6860,
+    "lines": 218
+  },
+  {
+    "file": "packages/event-store/rust/tests/v_event.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "e3fd04cb6aa92d33095ce5b0b6899b7cf3532b502dded534336bb910b49b9cb4",
+    "bytes": 10597,
+    "lines": 330
+  },
+  {
+    "file": "packages/git/rust/tests/head_tree.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "8d97e1c8768e17ff462df7739aaa089a80a5e99efbc249ae993b48e060ae7d97",
+    "bytes": 5769,
+    "lines": 154
+  },
+  {
+    "file": "packages/git/rust/tests/inspect.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "940332e121e58267b93c290d3b8bb0f6be6730de781924ff0bc390fcb5fa7571",
+    "bytes": 12375,
+    "lines": 309
+  },
+  {
+    "file": "packages/git/rust/tests/publication.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "d57ce44d4ecf31c94a78ee5d5cd405bfebec0ecdf1b0d7db88f4db3983526161",
+    "bytes": 82567,
+    "lines": 2278
+  },
+  {
+    "file": "packages/git/rust/tests/refs_remote.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "4965eaea84acdcfee9d30cefcc46ffc06026c68f47f95f6b9ecd6b5812ce64a5",
+    "bytes": 32747,
+    "lines": 1014
+  },
+  {
+    "file": "packages/git/rust/tests/worktree.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "bc4bf52adef2629d692e9a04f5a670a8fa84784fdc7757430cbe2e79b75223a0",
+    "bytes": 21063,
+    "lines": 642
+  },
+  {
+    "file": "packages/holder-lock/rust/tests/scope_rank.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "ae88fb69b51774c515338db7c856306d97394df657bb3143a19b5db4425670d1",
+    "bytes": 7694,
+    "lines": 205
+  },
+  {
+    "file": "packages/holder-lock/rust/tests/state_root_vectors.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "2d4569ac9a291682a6de94c18250df766a05e070be94823d8a502e3dccb229c6",
+    "bytes": 2131,
+    "lines": 42
+  },
+  {
+    "file": "packages/host-runtime/rust/tests/external_process_router_integration.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "b148036009fcdec18da2fe1dabc95b78783c7e22ef39e68e455e4202e02c5841",
+    "bytes": 15847,
+    "lines": 383
+  },
+  {
+    "file": "packages/host-runtime/rust/tests/external_process_tests.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "81b734850beb225a00f68489ec7c8ca9134dfe493d490c0b8678e197dc7f6be6",
+    "bytes": 28358,
+    "lines": 805
+  },
+  {
+    "file": "packages/host-runtime/rust/tests/external_provider_manifest_and_registry.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "ffa583b9b802ab706ec905a8ac02991108a9de0331db29180b9f6ab765b5c8df",
+    "bytes": 24209,
+    "lines": 611
+  },
+  {
+    "file": "packages/observe/rust/tests/eval_journal_test.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "c3fa4372c1bd292bf356d9185cabef3b7ae35726b550baa97afee3840df0ca12",
+    "bytes": 28771,
+    "lines": 792
+  },
+  {
+    "file": "packages/observe/rust/tests/harness_protocols_test.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "6dbd5029eddedc023ac9862b7cce8fb1da97a85440362f2d8bf35e6641f5dac2",
+    "bytes": 7791,
+    "lines": 200
+  },
+  {
+    "file": "packages/observe/rust/tests/store_lock_multiprocess.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "d6b92d856d2dd22fd3679154f9f517a17a2333e91d3077ffab7d5b872c8c9bdb",
+    "bytes": 7477,
+    "lines": 197
+  },
+  {
+    "file": "packages/process/rust/tests/containment_bwrap.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "b82f52e22171c9f423619e0bc823a9a01c9cb5ebd73e9c6df9a4ab005afb46b1",
+    "bytes": 11201,
+    "lines": 265
+  },
+  {
+    "file": "packages/process/rust/tests/windows_spawn.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "5c8eb632a466203a847a2f6f5a57b401ebda7906509bfc62aece0124fee77e54",
+    "bytes": 6962,
+    "lines": 156
+  },
+  {
+    "file": "packages/run-result/rust/tests/layout_fixture.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "96b4a21bbaae60f8fb72c42811f695fb86207ea091f8e5e0d6a05fd63ed3aa9a",
+    "bytes": 21244,
+    "lines": 644
+  },
+  {
+    "file": "packages/run-result/rust/tests/unit_summary.rs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "c079b8799456e803667b8c4fa64ae698dcef92f9555b440e954a6e74185dc35c",
+    "bytes": 29328,
+    "lines": 760
+  },
+  {
+    "file": "packages/run-supervisor/rust/tests/fixtures/fake-herdr-pane.py",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "27704e6e65d94e6813e16ba7d21c33fe3365563c23fd939f37dd5cf5912eb014",
+    "bytes": 7451,
+    "lines": 198
+  },
+  {
+    "file": "packages/run-supervisor/rust/tests/fixtures/noisy-agent.mjs",
+    "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+    "sha256": "d384bd401ebc75cc0dbdaf2700614f9fea03a1db79567ebd0f0c846f959771ac",
+    "bytes": 2278,
+    "lines": 64
+  }
+]

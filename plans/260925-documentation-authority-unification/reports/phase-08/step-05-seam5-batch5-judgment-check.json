@@ -28,9 +28,9 @@
     "j4-receipts": 40,
     "j4-review": 40,
     "j5-search": 1,
-    "a-passage-agreement": 637,
+    "a-passage-agreement": 638,
     "d-own-operand": 3530,
-    "b-real-blocker": 18,
+    "b-real-blocker": 26,
     "e-retired-successor": 36,
     "j5-successors": 40,
     "j5-uniform-history": 43,
@@ -12916,6 +12916,44 @@
             2937,
             3126,
             3158
+          ]
+        },
+        {
+          "id": "author-s5-b6-loop-split-786",
+          "pinnedSpan": {
+            "line": 786,
+            "columnStart": 67,
+            "columnEndExclusive": 72,
+            "text": "docs/"
+          },
+          "headMatchingLines": [
+            366,
+            511,
+            516,
+            545,
+            563,
+            604,
+            677,
+            788,
+            2086,
+            2794,
+            2937,
+            3126,
+            3158
+          ]
+        },
+        {
+          "id": "author-s5-b6-loop-split-786",
+          "pinnedSpan": {
+            "line": 787,
+            "columnStart": 4,
+            "columnEndExclusive": 44,
+            "text": "architect/doing-coordination-redesign.md"
+          },
+          "headMatchingLines": [
+            366,
+            511,
+            789
           ]
         }
       ],

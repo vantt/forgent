@@ -85,6 +85,9 @@ def binding_roots(pin,file):
    if isinstance(rhs,tuple):
     _,f,n=rhs
     if n.isupper() and f!=file:
+     if subprocess.run(['git','cat-file','-e',pin+':'+f],cwd=ROOT,stderr=subprocess.DEVNULL).returncode:
+      values[name].add('documents') # unresolved import cannot prove plans-only neutrality
+      continue
      values[name].update(literal_roots(' '.join(x for x in path_bindings(pin,f).get(n,[]) if isinstance(x,str))))
      # Imported public constants may themselves depend on local plan roots.
      todo=[n];seen=set()

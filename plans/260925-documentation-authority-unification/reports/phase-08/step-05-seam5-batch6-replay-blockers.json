@@ -1,0 +1,242 @@
+{
+  "blockers": [
+    {
+      "file": "test/runner/merge.test.mjs",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb",
+      "requiredProof": "R22 current/candidate owning test replay",
+      "status": "blocked",
+      "reason": "The records-only brief forbids git writes, fgOS CLI and .fgos access. Full owning tests create disposable git/state fixtures and/or invoke the CLI; this turn does not infer an exemption. No test-only bypass, altered fixture, fake pass or narrower run is used to claim full replay.",
+      "sourceEvidence": [
+        {
+          "line": 43,
+          "text": "  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });"
+        },
+        {
+          "line": 47,
+          "text": "  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });"
+        },
+        {
+          "line": 48,
+          "text": "  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });"
+        },
+        {
+          "line": 63,
+          "text": "  git(repoRoot, ['add', filename]);"
+        },
+        {
+          "line": 64,
+          "text": "  git(repoRoot, ['commit', '-q', '-m', `on ${branch}`]);"
+        },
+        {
+          "line": 137,
+          "text": "  git(repoRoot, ['add', 'proof.txt']);"
+        },
+        {
+          "line": 138,
+          "text": "  git(repoRoot, ['commit', '-q', '-m', 'return commit']);"
+        },
+        {
+          "line": 151,
+          "text": "  git(repoRoot, ['add', 'other.txt']);"
+        },
+        {
+          "line": 152,
+          "text": "  git(repoRoot, ['commit', '-q', '-m', 'interleaved commit from another session']);"
+        },
+        {
+          "line": 154,
+          "text": "  git(repoRoot, ['add', 'proof.txt']);"
+        },
+        {
+          "line": 155,
+          "text": "  git(repoRoot, ['commit', '-q', '-m', 'return commit']);"
+        },
+        {
+          "line": 217,
+          "text": "  git(repoRoot, ['add', '-A']);"
+        }
+      ],
+      "resolution": "Lead must provide an execution contract explicitly permitting disposable test git/state/CLI fixtures, or own the required replay in a separate run."
+    },
+    {
+      "file": "test/runner/worktree.test.mjs",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "sourceSha256": "d9201ace6ecc4367af642dc2c1c438e18dd2a91b9e5f9afd56af64e9b6e92ce7",
+      "requiredProof": "R22 current/candidate owning test replay",
+      "status": "blocked",
+      "reason": "The records-only brief forbids git writes, fgOS CLI and .fgos access. Full owning tests create disposable git/state fixtures and/or invoke the CLI; this turn does not infer an exemption. No test-only bypass, altered fixture, fake pass or narrower run is used to claim full replay.",
+      "sourceEvidence": [
+        {
+          "line": 36,
+          "text": "  execFileSync('git', ['init', '-q'], { cwd: repoRoot });"
+        },
+        {
+          "line": 40,
+          "text": "  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });"
+        },
+        {
+          "line": 41,
+          "text": "  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });"
+        },
+        {
+          "line": 51,
+          "text": "  execFileSync('git', ['add', filename], { cwd: worktreePath });"
+        },
+        {
+          "line": 52,
+          "text": "  execFileSync('git', ['commit', '-q', '-m', `worker: ${filename}`], { cwd: worktreePath });"
+        },
+        {
+          "line": 68,
+          "text": "  execFileSync('git', ['add', filename], { cwd: detachedPath });"
+        },
+        {
+          "line": 69,
+          "text": "  execFileSync('git', ['commit', '-q', '-m', `external advance: ${filename}`], { cwd: detachedPath });"
+        },
+        {
+          "line": 292,
+          "text": "test('reclaimOrphanedCheckout still reclaims normally when the only \"change\" is the .fgos removal createWorktree itself performs', () => {"
+        },
+        {
+          "line": 294,
+          "text": "  fs.mkdirSync(path.join(repoRoot, '.fgos'));"
+        },
+        {
+          "line": 295,
+          "text": "  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '');"
+        },
+        {
+          "line": 296,
+          "text": "  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: repoRoot });"
+        },
+        {
+          "line": 297,
+          "text": "  execFileSync('git', ['commit', '-q', '-m', 'track .fgos'], { cwd: repoRoot });"
+        }
+      ],
+      "resolution": "Lead must provide an execution contract explicitly permitting disposable test git/state/CLI fixtures, or own the required replay in a separate run."
+    },
+    {
+      "file": "test/cli/fgos-merge.test.mjs",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "sourceSha256": "c146fc58884efcf7c83de274beadcb3f65c7c7bb7adac0bd21f1b68bfb2ba4d9",
+      "requiredProof": "R22 current/candidate owning test replay",
+      "status": "blocked",
+      "reason": "The records-only brief forbids git writes, fgOS CLI and .fgos access. Full owning tests create disposable git/state fixtures and/or invoke the CLI; this turn does not infer an exemption. No test-only bypass, altered fixture, fake pass or narrower run is used to claim full replay.",
+      "sourceEvidence": [
+        {
+          "line": 100,
+          "text": "  assert.ok(fs.existsSync(path.join(cwd, '.fgos')), 'fixture must create .fgos/');"
+        },
+        {
+          "line": 105,
+          "text": "  assert.equal(manifest.territory.data, '.fgos/');"
+        },
+        {
+          "line": 107,
+          "text": "  const result = run(cwd, ['list']);"
+        },
+        {
+          "line": 125,
+          "text": "  const result = run(cwd, ['review', 'ghost']);"
+        },
+        {
+          "line": 133,
+          "text": "  const result = run(cwd, ['review', 'not-proposed-review']);"
+        },
+        {
+          "line": 142,
+          "text": "  const result = run(cwd, ['review', 'review-runner-item']);"
+        },
+        {
+          "line": 155,
+          "text": "  run(cwd, ['take', '--id', 'review-pull-item']);"
+        },
+        {
+          "line": 157,
+          "text": "  run(cwd, ['return', 'review-pull-item']);"
+        },
+        {
+          "line": 159,
+          "text": "  const result = run(cwd, ['review', 'review-pull-item']);"
+        },
+        {
+          "line": 171,
+          "text": "  run(cwd, ['move', 'review-legacy-item', '--to', 'doing']);"
+        },
+        {
+          "line": 172,
+          "text": "  run(cwd, ['move', 'review-legacy-item', '--to', 'awaiting-approval', '--skip-return-guard', \"test fixture setup, not exercising return's own guard\"]);"
+        },
+        {
+          "line": 174,
+          "text": "  const result = run(cwd, ['review', 'review-legacy-item']);"
+        }
+      ],
+      "resolution": "Lead must provide an execution contract explicitly permitting disposable test git/state/CLI fixtures, or own the required replay in a separate run."
+    },
+    {
+      "file": "test/intake/plan.test.mjs",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "sourceSha256": "924bc6f16c5ad86a3cb1c8c3f1f8bbd9acc8683651d5f401e1c6681cb8cdfee5",
+      "requiredProof": "R22 current/candidate owning test replay",
+      "status": "blocked",
+      "reason": "The records-only brief forbids git writes, fgOS CLI and .fgos access. Full owning tests create disposable git/state fixtures and/or invoke the CLI; this turn does not infer an exemption. No test-only bypass, altered fixture, fake pass or narrower run is used to claim full replay.",
+      "sourceEvidence": [
+        {
+          "line": 49,
+          "text": "//    `--blast-radius` flag (`bin/fgos.mjs`'s `parseDecomposeCallerVerdict`),"
+        },
+        {
+          "line": 1214,
+          "text": "  const repoRoot = path.basename(storeDir) === '.fgos' ? path.dirname(storeDir) : storeDir;"
+        },
+        {
+          "line": 1222,
+          "text": "  const repoRoot = path.basename(storeDir) === '.fgos' ? path.dirname(storeDir) : storeDir;"
+        },
+        {
+          "line": 1295,
+          "text": "  execFileSync('git', ['init', '-q'], { cwd: repoRoot });"
+        },
+        {
+          "line": 1299,
+          "text": "  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });"
+        },
+        {
+          "line": 1300,
+          "text": "  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });"
+        },
+        {
+          "line": 1301,
+          "text": "  const storeDir = path.join(repoRoot, '.fgos');"
+        },
+        {
+          "line": 1357,
+          "text": "  execFileSync('git', ['add', 'feature'], { cwd: worktreePath });"
+        },
+        {
+          "line": 1358,
+          "text": "  execFileSync('git', ['commit', '-q', '-m', 'plan: item-x'], { cwd: worktreePath });"
+        },
+        {
+          "line": 1381,
+          "text": "  execFileSync('git', ['add', 'feature'], { cwd: worktreePath });"
+        },
+        {
+          "line": 1382,
+          "text": "  execFileSync('git', ['commit', '-q', '-m', 'plan: item-x'], { cwd: worktreePath });"
+        },
+        {
+          "line": 1554,
+          "text": "  fs.writeFileSync(path.join(repoRoot, '.fgos-runner.json'), '{}\\n');"
+        }
+      ],
+      "resolution": "Lead must provide an execution contract explicitly permitting disposable test git/state/CLI fixtures, or own the required replay in a separate run."
+    }
+  ],
+  "testsInvoked": false,
+  "safety": "No product edits, builds, service starts, CLI invocations, git writes, live state or secrets reads."
+}

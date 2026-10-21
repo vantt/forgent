@@ -3,12 +3,15 @@ Semantic actions require independent source-window review.
 """
 import sys
 sys.dont_write_bytecode=True
-import pathlib,json,re,collections,importlib.util,subprocess
+import pathlib,json,re,collections,importlib.util,subprocess,traceback
 P=pathlib.Path(__file__).resolve().parent;ROOT=P.parents[3]
 s=importlib.util.spec_from_file_location('j',P/'step-05-seam5-judgment-check.py');j=importlib.util.module_from_spec(s);s.loader.exec_module(j)
 m=j.m;sha=j.sha
 RULES={'j4-coverage':'All 30 selected files, all original census ids, exact current/historical witnesses and whole-file lexical closure.','j4-pins':'Immutable complete source mode/hash/bytes; no patch claimed for preserve/park.','j4-ownership':'Every declaration and assertion stays pinned; R22 full-suite parity remains pending.','j4-receipts':'One receipt per complete file, exact input metadata and explicit pending full-suite obligation.','j4-search':'Park dependencies retain exact pinned searches, proposed aliases, and P7-DOC-GAP-05.','j4-review':'Every admitted and judgment reject is independently reviewable.'}
 def assert_patch(r,receipt,body):
+ extra=P/'step-05-seam5-batch6-cutover-specs.json'
+ if extra.exists() and any(s['file']==r['file'] for s in json.loads(extra.read_text())['patches']):
+  sp=importlib.util.spec_from_file_location('j6patch',P/'step-05-seam5-batch6-check.py');g=importlib.util.module_from_spec(sp);sp.loader.exec_module(g);return g.assert_patch(r,receipt,body)
  spec=next(s for s in m.read('step-05-seam5-batch5-review-cutover-specs.json')['patches'] if s['file']==r['file'])
  assert all(k in spec for k in m.read('step-05-parity-receipt-template.json')['cutoverPatch'])
  assert spec['inputCommit']==r['authorInputCommit'] and spec['oldText']==body and spec['sourceSha256']==r['sourceSha256'] and spec['mode']==r['sourceMode']
@@ -34,12 +37,12 @@ def assert_patch(r,receipt,body):
 
 def load():return m.rows('step-05-records/tests-judgment-batch4.jsonl')
 def check(rs=None,receipts=None,listing=None,selection=None,batch=4):
- rs=(load() if batch==4 else m.rows('step-05-records/tests-judgment-batch5.jsonl')) if rs is None else rs;receipts=m.read(f'step-05-seam5-batch{batch}-parity-receipts.json')['receipts'] if receipts is None else receipts;listing=m.read('step-05-seam5-review-list.json') if listing is None else listing;selection=m.read(f'step-05-seam5-batch{batch}-selection.json') if selection is None else selection;by={r['file']:r for r in rs};receiptby={r['id']:r for r in receipts};errors=[];counts=collections.Counter()
+ rs=(load() if batch==4 else m.rows(f'step-05-records/tests-judgment-batch{batch}.jsonl')) if rs is None else rs;receipts=m.read(f'step-05-seam5-batch{batch}-parity-receipts.json')['receipts'] if receipts is None else receipts;listing=m.read('step-05-seam5-review-list.json') if listing is None else listing;selection=m.read(f'step-05-seam5-batch{batch}-selection.json') if selection is None else selection;by={r['file']:r for r in rs};receiptby={r['id']:r for r in receipts};errors=[];counts=collections.Counter()
  def test(rule,where,fn):
   counts[rule]+=1
   try:ret=fn();assert ret is None or bool(ret)
-  except Exception as ex:errors.append({'rule':rule,'where':where,'error':str(ex) or 'condition false'})
- test('j4-coverage',f'batch {batch} unique judgment files',lambda:len(rs)==len(by)==(30 if batch==4 else 40) and set(by)==set(selection['files']) and len(receipts)==len(rs) and (batch!=4 or rs[0]['file']=='test/runner/dead-vocabulary-guard.test.mjs' and rs[1]['file']=='test/architecture.test.mjs'))
+  except Exception as ex:errors.append({'rule':rule,'where':where,'error':str(ex) or traceback.format_exc()})
+ test('j4-coverage',f'batch {batch} unique judgment files',lambda:len(rs)==len(by)==(30 if batch==4 else 40 if batch==5 else 100) and set(by)==set(selection['files']) and len(receipts)==len(rs) and (batch!=4 or rs[0]['file']=='test/runner/dead-vocabulary-guard.test.mjs' and rs[1]['file']=='test/architecture.test.mjs'))
  refs=collections.defaultdict(list);dyn=collections.defaultdict(list)
  for e in m.rows('step-05-population-references.jsonl'):refs[e['file']].append(e)
  for e in m.rows('step-05-population-dynamic.jsonl'):dyn[e['file']].append(e)
@@ -71,11 +74,15 @@ def check(rs=None,receipts=None,listing=None,selection=None,batch=4):
    assert len({m.admission.idof(e) for e in m.admission.allitems(r)})==len(m.admission.allitems(r))
   test('j4-coverage',f,coverage)
   def ownership():
-   starts=[i for i,t in enumerate(ls,1) if re.match(r'\s*(?:test|it)\s*(?:\.\w+)?\(',t)];own=r['owningProofs'];assert own and [t['declarationLine'] for t in own]==starts
+   starts=[i for i,t in enumerate(ls,1) if re.match(r'\s*(?:test|it)\s*(?:\.\w+)?\(',t)];own=r['owningProofs'];assert own
+   if not starts and batch==6:
+    starts=[i for i,t in enumerate(ls,1) if re.match(r'\s*(?:pub(?:\([^)]*\))?\s+)?(?:async\s+)?fn\s+',t)] or [1]
+   assert [t['declarationLine'] for t in own]==starts
    for k,t in enumerate(own):
     a=t['declarationLine'];z=starts[k+1]-1 if k+1<len(starts) else len(ls);assert t['declaration']==ls[a-1]
-    assert t['assertions']==[{'line':i,'text':ls[i-1]} for i in range(a,z+1) if re.search(r'\bassert\.\w+\(|\bexpect\(',ls[i-1])]
-   assert any(t['assertions'] for t in own)
+    pattern=r'\bassert(?:_\w+)?!|\bassert\.\w+\(|\bexpect\(' if batch==6 and not re.search(r'\b(?:test|it)\(',t['declaration']) else r'\bassert\.\w+\(|\bexpect\('
+    assert t['assertions']==[{'line':i,'text':ls[i-1]} for i in range(a,z+1) if re.search(pattern,ls[i-1])]
+   assert any(t['assertions'] for t in own) or batch==6 and bool(r.get('importingProofWitness') or r.get('proofOwnerKind'))
    assert receipt['comparison']['assertionOwnership']==own
    for e in m.admission.allitems(r):assert e['disposition'] in ['preserve','parked','patch'] and e['parityObligation'] and e['proofCommand'] and e['receiptId']==receipt['id'] and (e['diffHunk']==r['diff'] if e['disposition']=='patch' else e['diffHunk'] is None)
   test('j4-ownership',f,ownership)
@@ -112,7 +119,7 @@ def check(rs=None,receipts=None,listing=None,selection=None,batch=4):
  if batch==4:test('j4-search','exact park evidence and priority-reader custody',searchcheck)
  else:
   def batch5search():
-   search=m.read('step-05-seam5-batch5-search-evidence.json');assert search['inputCommit']==selection['inputCommit'] and search['roots']==['docs/platform','docs/knowledge','docs/reference','docs/tutorials']
+   search=m.read(f'step-05-seam5-batch{batch}-search-evidence.json');assert search['inputCommit']==selection['inputCommit'] and search['roots']==['docs/platform','docs/knowledge','docs/reference','docs/tutorials']
    for q in search['queries']:
     assert q['command']==['git','grep','-n','-F',q['query'],search['inputCommit'],'--',*search['roots']];proc=subprocess.run(q['command'],cwd=ROOT,text=True,capture_output=True);assert proc.returncode==q['exit'] and proc.stdout.splitlines()==q['matches'] and sha(proc.stdout)==q['stdoutSha256']
    for q in search['aliasLookups']:

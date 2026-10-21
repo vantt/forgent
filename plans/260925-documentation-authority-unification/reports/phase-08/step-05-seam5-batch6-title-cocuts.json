@@ -1,0 +1,635 @@
+{
+  "titles": [
+    {
+      "file": "test/docs/decisions-corpus-retired.test.mjs",
+      "id": "reference-004028",
+      "coCut": {
+        "file": "test/docs/decisions-corpus-retired.test.mjs",
+        "itemIds": [
+          "reference-004033",
+          "reference-004034",
+          "reference-004035",
+          "reference-004037",
+          "reference-004040",
+          "reference-004046",
+          "reference-004047",
+          "reference-004048",
+          "dynamic-018738",
+          "dynamic-018740",
+          "dynamic-018741",
+          "dynamic-018742",
+          "dynamic-018743",
+          "dynamic-018744"
+        ],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "core/skills/fgos-clarifying/SKILL.md",
+        "core/skills/fgos-researching/SKILL.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md"
+      ],
+      "owningTestWhenNoPendingPatch": "test/docs/decisions-corpus-retired.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/docs/decisions-corpus-retired.test.mjs",
+      "id": "reference-004031",
+      "coCut": {
+        "file": "test/docs/decisions-corpus-retired.test.mjs",
+        "itemIds": [
+          "reference-004033",
+          "reference-004034",
+          "reference-004035",
+          "reference-004037",
+          "reference-004040",
+          "reference-004046",
+          "reference-004047",
+          "reference-004048",
+          "dynamic-018738",
+          "dynamic-018740",
+          "dynamic-018741",
+          "dynamic-018742",
+          "dynamic-018743",
+          "dynamic-018744"
+        ],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "core/skills/fgos-clarifying/SKILL.md",
+        "core/skills/fgos-researching/SKILL.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md"
+      ],
+      "owningTestWhenNoPendingPatch": "test/docs/decisions-corpus-retired.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/docs/decisions-corpus-retired.test.mjs",
+      "id": "reference-004032",
+      "coCut": {
+        "file": "test/docs/decisions-corpus-retired.test.mjs",
+        "itemIds": [
+          "reference-004033",
+          "reference-004034",
+          "reference-004035",
+          "reference-004037",
+          "reference-004040",
+          "reference-004046",
+          "reference-004047",
+          "reference-004048",
+          "dynamic-018738",
+          "dynamic-018740",
+          "dynamic-018741",
+          "dynamic-018742",
+          "dynamic-018743",
+          "dynamic-018744"
+        ],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "core/skills/fgos-clarifying/SKILL.md",
+        "core/skills/fgos-researching/SKILL.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md"
+      ],
+      "owningTestWhenNoPendingPatch": "test/docs/decisions-corpus-retired.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/docs/decisions-corpus-retired.test.mjs",
+      "id": "reference-004038",
+      "coCut": {
+        "file": "test/docs/decisions-corpus-retired.test.mjs",
+        "itemIds": [
+          "reference-004033",
+          "reference-004034",
+          "reference-004035",
+          "reference-004037",
+          "reference-004040",
+          "reference-004046",
+          "reference-004047",
+          "reference-004048",
+          "dynamic-018738",
+          "dynamic-018740",
+          "dynamic-018741",
+          "dynamic-018742",
+          "dynamic-018743",
+          "dynamic-018744"
+        ],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "core/skills/fgos-clarifying/SKILL.md",
+        "core/skills/fgos-researching/SKILL.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md"
+      ],
+      "owningTestWhenNoPendingPatch": "test/docs/decisions-corpus-retired.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/docs/decisions-corpus-retired.test.mjs",
+      "id": "reference-004045",
+      "coCut": {
+        "file": "test/docs/decisions-corpus-retired.test.mjs",
+        "itemIds": [
+          "reference-004033",
+          "reference-004034",
+          "reference-004035",
+          "reference-004037",
+          "reference-004040",
+          "reference-004046",
+          "reference-004047",
+          "reference-004048",
+          "dynamic-018738",
+          "dynamic-018740",
+          "dynamic-018741",
+          "dynamic-018742",
+          "dynamic-018743",
+          "dynamic-018744"
+        ],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "core/skills/fgos-clarifying/SKILL.md",
+        "core/skills/fgos-researching/SKILL.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md"
+      ],
+      "owningTestWhenNoPendingPatch": "test/docs/decisions-corpus-retired.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/docs/rul11-anchor-phrase.test.mjs",
+      "id": "reference-004050",
+      "coCut": {
+        "file": "test/docs/rul11-anchor-phrase.test.mjs",
+        "itemIds": [
+          "dynamic-018755"
+        ],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "test/docs/decisions-corpus-retired.test.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/docs/rul11-anchor-phrase.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/runner/dead-vocabulary-guard.test.mjs",
+      "id": "reference-004372",
+      "coCut": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "itemIds": [
+          "reference-004371",
+          "reference-004373",
+          "dynamic-023835",
+          "dynamic-023836",
+          "dynamic-023873",
+          "dynamic-023874",
+          "dynamic-023890",
+          "dynamic-023891",
+          "dynamic-023892",
+          "dynamic-023893",
+          "dynamic-023895",
+          "dynamic-023896",
+          "dynamic-023901",
+          "dynamic-023902",
+          "dynamic-023903"
+        ],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [],
+      "owningTestWhenNoPendingPatch": "test/runner/dead-vocabulary-guard.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004312",
+      "coCut": {
+        "file": "test/report/enduser-index.test.mjs",
+        "itemIds": [
+          "reference-004308",
+          "reference-004311",
+          "reference-004319",
+          "reference-004320",
+          "reference-004330",
+          "reference-004331",
+          "reference-004332",
+          "reference-004343",
+          "reference-004344",
+          "reference-004345",
+          "reference-004347",
+          "reference-004348",
+          "reference-004349",
+          "reference-004351",
+          "dynamic-021513",
+          "dynamic-021542",
+          "dynamic-021543",
+          "dynamic-021544",
+          "dynamic-021545",
+          "dynamic-021547",
+          "dynamic-021548",
+          "dynamic-021549",
+          "dynamic-021550",
+          "dynamic-021551",
+          "dynamic-021552",
+          "author-s5-b5-enduser-index-334-129"
+        ],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "src/cli/command-registry.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/report/enduser-index.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004321",
+      "coCut": {
+        "file": "test/report/enduser-index.test.mjs",
+        "itemIds": [
+          "reference-004308",
+          "reference-004311",
+          "reference-004319",
+          "reference-004320",
+          "reference-004330",
+          "reference-004331",
+          "reference-004332",
+          "reference-004343",
+          "reference-004344",
+          "reference-004345",
+          "reference-004347",
+          "reference-004348",
+          "reference-004349",
+          "reference-004351",
+          "dynamic-021513",
+          "dynamic-021542",
+          "dynamic-021543",
+          "dynamic-021544",
+          "dynamic-021545",
+          "dynamic-021547",
+          "dynamic-021548",
+          "dynamic-021549",
+          "dynamic-021550",
+          "dynamic-021551",
+          "dynamic-021552",
+          "author-s5-b5-enduser-index-334-129"
+        ],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "src/cli/command-registry.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/report/enduser-index.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004346",
+      "coCut": {
+        "file": "test/report/enduser-index.test.mjs",
+        "itemIds": [
+          "reference-004308",
+          "reference-004311",
+          "reference-004319",
+          "reference-004320",
+          "reference-004330",
+          "reference-004331",
+          "reference-004332",
+          "reference-004343",
+          "reference-004344",
+          "reference-004345",
+          "reference-004347",
+          "reference-004348",
+          "reference-004349",
+          "reference-004351",
+          "dynamic-021513",
+          "dynamic-021542",
+          "dynamic-021543",
+          "dynamic-021544",
+          "dynamic-021545",
+          "dynamic-021547",
+          "dynamic-021548",
+          "dynamic-021549",
+          "dynamic-021550",
+          "dynamic-021551",
+          "dynamic-021552",
+          "author-s5-b5-enduser-index-334-129"
+        ],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "src/cli/command-registry.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/report/enduser-index.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "author-s5-b5-enduser-index-447-40",
+      "coCut": {
+        "file": "test/report/enduser-index.test.mjs",
+        "itemIds": [
+          "reference-004308",
+          "reference-004311",
+          "reference-004319",
+          "reference-004320",
+          "reference-004330",
+          "reference-004331",
+          "reference-004332",
+          "reference-004343",
+          "reference-004344",
+          "reference-004345",
+          "reference-004347",
+          "reference-004348",
+          "reference-004349",
+          "reference-004351",
+          "dynamic-021513",
+          "dynamic-021542",
+          "dynamic-021543",
+          "dynamic-021544",
+          "dynamic-021545",
+          "dynamic-021547",
+          "dynamic-021548",
+          "dynamic-021549",
+          "dynamic-021550",
+          "dynamic-021551",
+          "dynamic-021552",
+          "author-s5-b5-enduser-index-334-129"
+        ],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "src/cli/command-registry.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/report/enduser-index.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/report/decision-index.test.mjs",
+      "id": "reference-004302",
+      "coCut": {
+        "file": "test/report/decision-index.test.mjs",
+        "itemIds": [],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [],
+      "owningTestWhenNoPendingPatch": "test/report/decision-index.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/runner/merge.test.mjs",
+      "id": "reference-004419",
+      "coCut": {
+        "file": "test/runner/merge.test.mjs",
+        "itemIds": [
+          "reference-004421",
+          "reference-004449",
+          "reference-004457",
+          "reference-004458",
+          "reference-004460"
+        ],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        ".githooks/pre-commit",
+        "src/runner/merge.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/runner/merge.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/runner/merge.test.mjs",
+      "id": "reference-004420",
+      "coCut": {
+        "file": "test/runner/merge.test.mjs",
+        "itemIds": [
+          "reference-004421",
+          "reference-004449",
+          "reference-004457",
+          "reference-004458",
+          "reference-004460"
+        ],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        ".githooks/pre-commit",
+        "src/runner/merge.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/runner/merge.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/scripts/check-doc-constitution.test.mjs",
+      "id": "author-s5-b6-check-doc-constitution-455-44",
+      "coCut": {
+        "file": "test/scripts/check-doc-constitution.test.mjs",
+        "itemIds": [],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "core/skills/fgos-clarifying/SKILL.md",
+        "core/skills/fgos-indexing/SKILL.md",
+        "core/skills/fgos-researching/SKILL.md",
+        "core/task-specs/fgos-indexing.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "test/docs/decisions-corpus-retired.test.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/scripts/check-doc-constitution.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/scripts/check-doc-constitution.test.mjs",
+      "id": "author-s5-b6-check-doc-constitution-657-37",
+      "coCut": {
+        "file": "test/scripts/check-doc-constitution.test.mjs",
+        "itemIds": [],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "core/skills/fgos-clarifying/SKILL.md",
+        "core/skills/fgos-indexing/SKILL.md",
+        "core/skills/fgos-researching/SKILL.md",
+        "core/task-specs/fgos-indexing.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "test/docs/decisions-corpus-retired.test.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/scripts/check-doc-constitution.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/scripts/doc-alias-resolver.test.mjs",
+      "id": "author-s5-b6-doc-alias-resolver-42-32",
+      "coCut": {
+        "file": "test/scripts/doc-alias-resolver.test.mjs",
+        "itemIds": [],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "core/skills/fgos-clarifying/SKILL.md",
+        "core/skills/fgos-researching/SKILL.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "test/docs/decisions-corpus-retired.test.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/scripts/doc-alias-resolver.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/scripts/generate-doc-inventory.test.mjs",
+      "id": "reference-005005",
+      "coCut": {
+        "file": "test/scripts/generate-doc-inventory.test.mjs",
+        "itemIds": [],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "core/instructions/platform-laws.md",
+        "core/skills/fgos-clarifying/SKILL.md",
+        "core/skills/fgos-researching/SKILL.md",
+        "docs/transitional-switchboard.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "test/docs/decisions-corpus-retired.test.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/scripts/generate-doc-inventory.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/scripts/generate-doc-inventory.test.mjs",
+      "id": "reference-005025",
+      "coCut": {
+        "file": "test/scripts/generate-doc-inventory.test.mjs",
+        "itemIds": [],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "core/instructions/platform-laws.md",
+        "core/skills/fgos-clarifying/SKILL.md",
+        "core/skills/fgos-researching/SKILL.md",
+        "docs/transitional-switchboard.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "test/docs/decisions-corpus-retired.test.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/scripts/generate-doc-inventory.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/scripts/generate-doc-inventory.test.mjs",
+      "id": "reference-005041",
+      "coCut": {
+        "file": "test/scripts/generate-doc-inventory.test.mjs",
+        "itemIds": [],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "core/instructions/platform-laws.md",
+        "core/skills/fgos-clarifying/SKILL.md",
+        "core/skills/fgos-researching/SKILL.md",
+        "docs/transitional-switchboard.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "test/docs/decisions-corpus-retired.test.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/scripts/generate-doc-inventory.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/setup/checks.test.mjs",
+      "id": "reference-005169",
+      "coCut": {
+        "file": "test/setup/checks.test.mjs",
+        "itemIds": [],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "src/setup/registrations.mjs",
+        "src/state/events-jsonl-truncation-guard.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/setup/checks.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/setup/checks.test.mjs",
+      "id": "reference-005173",
+      "coCut": {
+        "file": "test/setup/checks.test.mjs",
+        "itemIds": [],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "src/setup/registrations.mjs",
+        "src/state/events-jsonl-truncation-guard.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/setup/checks.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/setup/checks.test.mjs",
+      "id": "reference-005174",
+      "coCut": {
+        "file": "test/setup/checks.test.mjs",
+        "itemIds": [],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "src/setup/registrations.mjs",
+        "src/state/events-jsonl-truncation-guard.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/setup/checks.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/setup/checks.test.mjs",
+      "id": "author-s5-b6-checks-342-143",
+      "coCut": {
+        "file": "test/setup/checks.test.mjs",
+        "itemIds": [],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "src/setup/registrations.mjs",
+        "src/state/events-jsonl-truncation-guard.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/setup/checks.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/setup/checks.test.mjs",
+      "id": "author-s5-b6-checks-695-51",
+      "coCut": {
+        "file": "test/setup/checks.test.mjs",
+        "itemIds": [],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "src/setup/registrations.mjs",
+        "src/state/events-jsonl-truncation-guard.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/setup/checks.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    },
+    {
+      "file": "test/setup/checks.test.mjs",
+      "id": "author-s5-b6-checks-754-40",
+      "coCut": {
+        "file": "test/setup/checks.test.mjs",
+        "itemIds": [],
+        "rule": "Preserve test title baseline; move this title only with its owning patched/parked test at Step 7/Phase 9."
+      },
+      "sourcePatchCoCuts": [
+        "src/setup/registrations.mjs",
+        "src/state/events-jsonl-truncation-guard.mjs"
+      ],
+      "owningTestWhenNoPendingPatch": "test/setup/checks.test.mjs",
+      "policy": "Preserve baseline title now. If its owning test is patched/parked, compose this title with the exact named local slots and source co-cuts; do not apply an isolated title rewrite."
+    }
+  ],
+  "count": 26
+}

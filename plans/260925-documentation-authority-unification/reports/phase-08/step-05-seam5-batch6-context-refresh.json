@@ -1,0 +1,1700 @@
+[
+  {
+    "file": "test/fixtures/usage/pi-multiturn-normal.jsonl",
+    "before": {
+      "kind": "whole-file superset of enclosing functions",
+      "startLine": 1,
+      "endLine": 13,
+      "sha256": "ae18f4c33a24ec565f108f6ecfc0e21ac102b4acaf99867990d2d8dd1e6032eb",
+      "rootLiteralHits": [
+        {
+          "offset": 724,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 738,
+          "text": "docs/"
+        },
+        {
+          "offset": 807,
+          "text": "docs/"
+        },
+        {
+          "offset": 877,
+          "text": "docs/"
+        },
+        {
+          "offset": 920,
+          "text": "docs/"
+        },
+        {
+          "offset": 1005,
+          "text": "docs/"
+        },
+        {
+          "offset": 2314,
+          "text": "docs/"
+        },
+        {
+          "offset": 2473,
+          "text": "docs/"
+        },
+        {
+          "offset": 2546,
+          "text": "docs/"
+        },
+        {
+          "offset": 7696,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 7710,
+          "text": "docs/"
+        },
+        {
+          "offset": 7779,
+          "text": "docs/"
+        },
+        {
+          "offset": 7849,
+          "text": "docs/"
+        },
+        {
+          "offset": 7892,
+          "text": "docs/"
+        },
+        {
+          "offset": 7977,
+          "text": "docs/"
+        },
+        {
+          "offset": 9286,
+          "text": "docs/"
+        },
+        {
+          "offset": 9445,
+          "text": "docs/"
+        },
+        {
+          "offset": 9518,
+          "text": "docs/"
+        },
+        {
+          "offset": 20908,
+          "text": "CHANGELOG"
+        },
+        {
+          "offset": 20936,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 21987,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 22001,
+          "text": "docs/"
+        },
+        {
+          "offset": 22070,
+          "text": "docs/"
+        },
+        {
+          "offset": 22140,
+          "text": "docs/"
+        },
+        {
+          "offset": 22183,
+          "text": "docs/"
+        },
+        {
+          "offset": 22268,
+          "text": "docs/"
+        },
+        {
+          "offset": 23577,
+          "text": "docs/"
+        },
+        {
+          "offset": 23736,
+          "text": "docs/"
+        },
+        {
+          "offset": 23809,
+          "text": "docs/"
+        },
+        {
+          "offset": 32087,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 32104,
+          "text": "docs/"
+        },
+        {
+          "offset": 32176,
+          "text": "docs/"
+        },
+        {
+          "offset": 32249,
+          "text": "docs/"
+        },
+        {
+          "offset": 32295,
+          "text": "docs/"
+        },
+        {
+          "offset": 32356,
+          "text": "docs/"
+        },
+        {
+          "offset": 37730,
+          "text": "CHANGELOG"
+        },
+        {
+          "offset": 37758,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 39119,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 39309,
+          "text": "docs/"
+        },
+        {
+          "offset": 39390,
+          "text": "docs/"
+        },
+        {
+          "offset": 39585,
+          "text": "CHANGELOG"
+        },
+        {
+          "offset": 39614,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 39629,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 39682,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 39702,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 40707,
+          "text": "docs/"
+        },
+        {
+          "offset": 40761,
+          "text": "docs/"
+        },
+        {
+          "offset": 40832,
+          "text": "docs/"
+        },
+        {
+          "offset": 43578,
+          "text": "AGENTS.md"
+        },
+        {
+          "offset": 44043,
+          "text": "AGENTS.md"
+        },
+        {
+          "offset": 47393,
+          "text": "docs/"
+        },
+        {
+          "offset": 47461,
+          "text": "docs/"
+        },
+        {
+          "offset": 47530,
+          "text": "docs/"
+        },
+        {
+          "offset": 47572,
+          "text": "docs/"
+        },
+        {
+          "offset": 47825,
+          "text": "docs/"
+        },
+        {
+          "offset": 48120,
+          "text": "docs/"
+        },
+        {
+          "offset": 49131,
+          "text": "docs/"
+        },
+        {
+          "offset": 49201,
+          "text": "docs/"
+        },
+        {
+          "offset": 49309,
+          "text": "docs/"
+        },
+        {
+          "offset": 49384,
+          "text": "docs/"
+        },
+        {
+          "offset": 51757,
+          "text": "docs/"
+        },
+        {
+          "offset": 51828,
+          "text": "docs/"
+        },
+        {
+          "offset": 51937,
+          "text": "docs/"
+        },
+        {
+          "offset": 52013,
+          "text": "docs/"
+        },
+        {
+          "offset": 54059,
+          "text": "docs/"
+        },
+        {
+          "offset": 54103,
+          "text": "docs/"
+        },
+        {
+          "offset": 54185,
+          "text": "docs/"
+        },
+        {
+          "offset": 54234,
+          "text": "docs/"
+        },
+        {
+          "offset": 57905,
+          "text": "docs/"
+        },
+        {
+          "offset": 58150,
+          "text": "docs/"
+        },
+        {
+          "offset": 58401,
+          "text": "docs/"
+        },
+        {
+          "offset": 58551,
+          "text": "docs/"
+        },
+        {
+          "offset": 58653,
+          "text": "docs/"
+        },
+        {
+          "offset": 58676,
+          "text": "docs/"
+        },
+        {
+          "offset": 58737,
+          "text": "docs/"
+        },
+        {
+          "offset": 58765,
+          "text": "docs/"
+        },
+        {
+          "offset": 59897,
+          "text": "docs/"
+        },
+        {
+          "offset": 59951,
+          "text": "docs/"
+        },
+        {
+          "offset": 61071,
+          "text": "docs/"
+        },
+        {
+          "offset": 61125,
+          "text": "docs/"
+        },
+        {
+          "offset": 89670,
+          "text": "docs/"
+        },
+        {
+          "offset": 89986,
+          "text": "docs/"
+        },
+        {
+          "offset": 90964,
+          "text": "docs/"
+        },
+        {
+          "offset": 96058,
+          "text": "docs/"
+        },
+        {
+          "offset": 109208,
+          "text": "docs/"
+        },
+        {
+          "offset": 109374,
+          "text": "docs/"
+        },
+        {
+          "offset": 109535,
+          "text": "docs/"
+        },
+        {
+          "offset": 109686,
+          "text": "docs/"
+        },
+        {
+          "offset": 109834,
+          "text": "docs/"
+        },
+        {
+          "offset": 110004,
+          "text": "docs/"
+        },
+        {
+          "offset": 110174,
+          "text": "docs/"
+        },
+        {
+          "offset": 110344,
+          "text": "docs/"
+        },
+        {
+          "offset": 110510,
+          "text": "docs/"
+        },
+        {
+          "offset": 110675,
+          "text": "docs/"
+        },
+        {
+          "offset": 110840,
+          "text": "docs/"
+        },
+        {
+          "offset": 111005,
+          "text": "docs/"
+        },
+        {
+          "offset": 111169,
+          "text": "docs/"
+        },
+        {
+          "offset": 111330,
+          "text": "docs/"
+        },
+        {
+          "offset": 111497,
+          "text": "docs/"
+        },
+        {
+          "offset": 111661,
+          "text": "docs/"
+        },
+        {
+          "offset": 111847,
+          "text": "docs/"
+        },
+        {
+          "offset": 112011,
+          "text": "docs/"
+        },
+        {
+          "offset": 112197,
+          "text": "docs/"
+        },
+        {
+          "offset": 112663,
+          "text": "docs/"
+        },
+        {
+          "offset": 112829,
+          "text": "docs/"
+        },
+        {
+          "offset": 112987,
+          "text": "docs/"
+        },
+        {
+          "offset": 115135,
+          "text": "docs/"
+        },
+        {
+          "offset": 115453,
+          "text": "docs/"
+        },
+        {
+          "offset": 115771,
+          "text": "docs/"
+        },
+        {
+          "offset": 145998,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 146012,
+          "text": "docs/"
+        },
+        {
+          "offset": 146081,
+          "text": "docs/"
+        },
+        {
+          "offset": 146151,
+          "text": "docs/"
+        },
+        {
+          "offset": 146775,
+          "text": "docs/"
+        },
+        {
+          "offset": 146897,
+          "text": "docs/"
+        },
+        {
+          "offset": 147014,
+          "text": "docs/"
+        },
+        {
+          "offset": 147078,
+          "text": "docs/"
+        },
+        {
+          "offset": 147142,
+          "text": "docs/"
+        },
+        {
+          "offset": 147583,
+          "text": "docs/"
+        },
+        {
+          "offset": 147741,
+          "text": "docs/"
+        },
+        {
+          "offset": 147890,
+          "text": "docs/"
+        },
+        {
+          "offset": 148052,
+          "text": "docs/"
+        },
+        {
+          "offset": 148212,
+          "text": "docs/"
+        },
+        {
+          "offset": 148375,
+          "text": "docs/"
+        },
+        {
+          "offset": 148549,
+          "text": "docs/"
+        },
+        {
+          "offset": 148728,
+          "text": "docs/"
+        },
+        {
+          "offset": 148891,
+          "text": "docs/"
+        },
+        {
+          "offset": 149064,
+          "text": "docs/"
+        },
+        {
+          "offset": 149206,
+          "text": "docs/"
+        },
+        {
+          "offset": 149382,
+          "text": "docs/"
+        },
+        {
+          "offset": 149564,
+          "text": "docs/"
+        },
+        {
+          "offset": 149722,
+          "text": "docs/"
+        },
+        {
+          "offset": 149882,
+          "text": "docs/"
+        },
+        {
+          "offset": 150051,
+          "text": "docs/"
+        },
+        {
+          "offset": 150341,
+          "text": "docs/"
+        },
+        {
+          "offset": 150942,
+          "text": "docs/"
+        },
+        {
+          "offset": 151138,
+          "text": "docs/"
+        },
+        {
+          "offset": 151297,
+          "text": "docs/"
+        },
+        {
+          "offset": 151446,
+          "text": "docs/"
+        },
+        {
+          "offset": 151602,
+          "text": "docs/"
+        },
+        {
+          "offset": 151778,
+          "text": "docs/"
+        },
+        {
+          "offset": 151959,
+          "text": "docs/"
+        },
+        {
+          "offset": 152577,
+          "text": "docs/"
+        },
+        {
+          "offset": 152745,
+          "text": "docs/"
+        },
+        {
+          "offset": 153182,
+          "text": "docs/"
+        },
+        {
+          "offset": 153343,
+          "text": "docs/"
+        },
+        {
+          "offset": 153501,
+          "text": "docs/"
+        },
+        {
+          "offset": 154105,
+          "text": "docs/"
+        },
+        {
+          "offset": 154238,
+          "text": "docs/"
+        },
+        {
+          "offset": 154398,
+          "text": "docs/"
+        },
+        {
+          "offset": 154552,
+          "text": "docs/"
+        },
+        {
+          "offset": 154698,
+          "text": "docs/"
+        },
+        {
+          "offset": 154850,
+          "text": "docs/"
+        },
+        {
+          "offset": 155005,
+          "text": "docs/"
+        },
+        {
+          "offset": 155158,
+          "text": "docs/"
+        },
+        {
+          "offset": 155313,
+          "text": "docs/"
+        },
+        {
+          "offset": 155465,
+          "text": "docs/"
+        },
+        {
+          "offset": 155621,
+          "text": "docs/"
+        },
+        {
+          "offset": 155776,
+          "text": "docs/"
+        },
+        {
+          "offset": 155931,
+          "text": "docs/"
+        },
+        {
+          "offset": 156088,
+          "text": "docs/"
+        },
+        {
+          "offset": 156244,
+          "text": "docs/"
+        },
+        {
+          "offset": 156438,
+          "text": "docs/"
+        },
+        {
+          "offset": 156594,
+          "text": "docs/"
+        },
+        {
+          "offset": 156746,
+          "text": "docs/"
+        },
+        {
+          "offset": 156913,
+          "text": "docs/"
+        },
+        {
+          "offset": 157076,
+          "text": "docs/"
+        },
+        {
+          "offset": 172878,
+          "text": "docs/"
+        },
+        {
+          "offset": 174085,
+          "text": "docs/"
+        },
+        {
+          "offset": 182994,
+          "text": "docs/"
+        },
+        {
+          "offset": 183162,
+          "text": "docs/"
+        },
+        {
+          "offset": 202271,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 202285,
+          "text": "docs/"
+        },
+        {
+          "offset": 202354,
+          "text": "docs/"
+        },
+        {
+          "offset": 202424,
+          "text": "docs/"
+        },
+        {
+          "offset": 202467,
+          "text": "docs/"
+        },
+        {
+          "offset": 202552,
+          "text": "docs/"
+        },
+        {
+          "offset": 203867,
+          "text": "docs/"
+        },
+        {
+          "offset": 204026,
+          "text": "docs/"
+        },
+        {
+          "offset": 204099,
+          "text": "docs/"
+        },
+        {
+          "offset": 214462,
+          "text": "docs/"
+        },
+        {
+          "offset": 214713,
+          "text": "docs/"
+        },
+        {
+          "offset": 215001,
+          "text": "docs/"
+        },
+        {
+          "offset": 225901,
+          "text": "docs/"
+        },
+        {
+          "offset": 227264,
+          "text": "docs/"
+        },
+        {
+          "offset": 228025,
+          "text": "docs/"
+        },
+        {
+          "offset": 228272,
+          "text": "docs/"
+        },
+        {
+          "offset": 228420,
+          "text": "docs/"
+        },
+        {
+          "offset": 238320,
+          "text": "CHANGELOG"
+        },
+        {
+          "offset": 238879,
+          "text": "CHANGELOG"
+        },
+        {
+          "offset": 247373,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 249548,
+          "text": "docs/"
+        },
+        {
+          "offset": 249642,
+          "text": "docs/"
+        },
+        {
+          "offset": 256429,
+          "text": "docs/"
+        },
+        {
+          "offset": 256532,
+          "text": "docs/"
+        },
+        {
+          "offset": 256635,
+          "text": "docs/"
+        },
+        {
+          "offset": 256738,
+          "text": "docs/"
+        },
+        {
+          "offset": 256841,
+          "text": "docs/"
+        },
+        {
+          "offset": 256944,
+          "text": "docs/"
+        },
+        {
+          "offset": 257047,
+          "text": "docs/"
+        },
+        {
+          "offset": 264249,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 266567,
+          "text": "docs/"
+        },
+        {
+          "offset": 266621,
+          "text": "docs/"
+        },
+        {
+          "offset": 266692,
+          "text": "docs/"
+        },
+        {
+          "offset": 270353,
+          "text": "docs/"
+        },
+        {
+          "offset": 279374,
+          "text": "docs/"
+        },
+        {
+          "offset": 280871,
+          "text": "docs/"
+        },
+        {
+          "offset": 290448,
+          "text": "docs/"
+        },
+        {
+          "offset": 290698,
+          "text": "CHANGELOG"
+        }
+      ],
+      "tracedCensusConstants": [
+        "UNRESOLVED_IMPORT: mechanical proof refused"
+      ]
+    },
+    "after": {
+      "kind": "whole-file superset of enclosing functions",
+      "startLine": 1,
+      "endLine": 13,
+      "sha256": "ae18f4c33a24ec565f108f6ecfc0e21ac102b4acaf99867990d2d8dd1e6032eb",
+      "rootLiteralHits": [
+        {
+          "offset": 724,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 738,
+          "text": "docs/"
+        },
+        {
+          "offset": 807,
+          "text": "docs/"
+        },
+        {
+          "offset": 877,
+          "text": "docs/"
+        },
+        {
+          "offset": 920,
+          "text": "docs/"
+        },
+        {
+          "offset": 1005,
+          "text": "docs/"
+        },
+        {
+          "offset": 2314,
+          "text": "docs/"
+        },
+        {
+          "offset": 2473,
+          "text": "docs/"
+        },
+        {
+          "offset": 2546,
+          "text": "docs/"
+        },
+        {
+          "offset": 7696,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 7710,
+          "text": "docs/"
+        },
+        {
+          "offset": 7779,
+          "text": "docs/"
+        },
+        {
+          "offset": 7849,
+          "text": "docs/"
+        },
+        {
+          "offset": 7892,
+          "text": "docs/"
+        },
+        {
+          "offset": 7977,
+          "text": "docs/"
+        },
+        {
+          "offset": 9286,
+          "text": "docs/"
+        },
+        {
+          "offset": 9445,
+          "text": "docs/"
+        },
+        {
+          "offset": 9518,
+          "text": "docs/"
+        },
+        {
+          "offset": 20908,
+          "text": "CHANGELOG"
+        },
+        {
+          "offset": 20936,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 21987,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 22001,
+          "text": "docs/"
+        },
+        {
+          "offset": 22070,
+          "text": "docs/"
+        },
+        {
+          "offset": 22140,
+          "text": "docs/"
+        },
+        {
+          "offset": 22183,
+          "text": "docs/"
+        },
+        {
+          "offset": 22268,
+          "text": "docs/"
+        },
+        {
+          "offset": 23577,
+          "text": "docs/"
+        },
+        {
+          "offset": 23736,
+          "text": "docs/"
+        },
+        {
+          "offset": 23809,
+          "text": "docs/"
+        },
+        {
+          "offset": 32087,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 32104,
+          "text": "docs/"
+        },
+        {
+          "offset": 32176,
+          "text": "docs/"
+        },
+        {
+          "offset": 32249,
+          "text": "docs/"
+        },
+        {
+          "offset": 32295,
+          "text": "docs/"
+        },
+        {
+          "offset": 32356,
+          "text": "docs/"
+        },
+        {
+          "offset": 37730,
+          "text": "CHANGELOG"
+        },
+        {
+          "offset": 37758,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 39119,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 39309,
+          "text": "docs/"
+        },
+        {
+          "offset": 39390,
+          "text": "docs/"
+        },
+        {
+          "offset": 39585,
+          "text": "CHANGELOG"
+        },
+        {
+          "offset": 39614,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 39629,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 39682,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 39702,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 40707,
+          "text": "docs/"
+        },
+        {
+          "offset": 40761,
+          "text": "docs/"
+        },
+        {
+          "offset": 40832,
+          "text": "docs/"
+        },
+        {
+          "offset": 43578,
+          "text": "AGENTS.md"
+        },
+        {
+          "offset": 44043,
+          "text": "AGENTS.md"
+        },
+        {
+          "offset": 47393,
+          "text": "docs/"
+        },
+        {
+          "offset": 47461,
+          "text": "docs/"
+        },
+        {
+          "offset": 47530,
+          "text": "docs/"
+        },
+        {
+          "offset": 47572,
+          "text": "docs/"
+        },
+        {
+          "offset": 47825,
+          "text": "docs/"
+        },
+        {
+          "offset": 48120,
+          "text": "docs/"
+        },
+        {
+          "offset": 49131,
+          "text": "docs/"
+        },
+        {
+          "offset": 49201,
+          "text": "docs/"
+        },
+        {
+          "offset": 49309,
+          "text": "docs/"
+        },
+        {
+          "offset": 49384,
+          "text": "docs/"
+        },
+        {
+          "offset": 51757,
+          "text": "docs/"
+        },
+        {
+          "offset": 51828,
+          "text": "docs/"
+        },
+        {
+          "offset": 51937,
+          "text": "docs/"
+        },
+        {
+          "offset": 52013,
+          "text": "docs/"
+        },
+        {
+          "offset": 54059,
+          "text": "docs/"
+        },
+        {
+          "offset": 54103,
+          "text": "docs/"
+        },
+        {
+          "offset": 54185,
+          "text": "docs/"
+        },
+        {
+          "offset": 54234,
+          "text": "docs/"
+        },
+        {
+          "offset": 57905,
+          "text": "docs/"
+        },
+        {
+          "offset": 58150,
+          "text": "docs/"
+        },
+        {
+          "offset": 58401,
+          "text": "docs/"
+        },
+        {
+          "offset": 58551,
+          "text": "docs/"
+        },
+        {
+          "offset": 58653,
+          "text": "docs/"
+        },
+        {
+          "offset": 58676,
+          "text": "docs/"
+        },
+        {
+          "offset": 58737,
+          "text": "docs/"
+        },
+        {
+          "offset": 58765,
+          "text": "docs/"
+        },
+        {
+          "offset": 59897,
+          "text": "docs/"
+        },
+        {
+          "offset": 59951,
+          "text": "docs/"
+        },
+        {
+          "offset": 61071,
+          "text": "docs/"
+        },
+        {
+          "offset": 61125,
+          "text": "docs/"
+        },
+        {
+          "offset": 89670,
+          "text": "docs/"
+        },
+        {
+          "offset": 89986,
+          "text": "docs/"
+        },
+        {
+          "offset": 90964,
+          "text": "docs/"
+        },
+        {
+          "offset": 96058,
+          "text": "docs/"
+        },
+        {
+          "offset": 109208,
+          "text": "docs/"
+        },
+        {
+          "offset": 109374,
+          "text": "docs/"
+        },
+        {
+          "offset": 109535,
+          "text": "docs/"
+        },
+        {
+          "offset": 109686,
+          "text": "docs/"
+        },
+        {
+          "offset": 109834,
+          "text": "docs/"
+        },
+        {
+          "offset": 110004,
+          "text": "docs/"
+        },
+        {
+          "offset": 110174,
+          "text": "docs/"
+        },
+        {
+          "offset": 110344,
+          "text": "docs/"
+        },
+        {
+          "offset": 110510,
+          "text": "docs/"
+        },
+        {
+          "offset": 110675,
+          "text": "docs/"
+        },
+        {
+          "offset": 110840,
+          "text": "docs/"
+        },
+        {
+          "offset": 111005,
+          "text": "docs/"
+        },
+        {
+          "offset": 111169,
+          "text": "docs/"
+        },
+        {
+          "offset": 111330,
+          "text": "docs/"
+        },
+        {
+          "offset": 111497,
+          "text": "docs/"
+        },
+        {
+          "offset": 111661,
+          "text": "docs/"
+        },
+        {
+          "offset": 111847,
+          "text": "docs/"
+        },
+        {
+          "offset": 112011,
+          "text": "docs/"
+        },
+        {
+          "offset": 112197,
+          "text": "docs/"
+        },
+        {
+          "offset": 112663,
+          "text": "docs/"
+        },
+        {
+          "offset": 112829,
+          "text": "docs/"
+        },
+        {
+          "offset": 112987,
+          "text": "docs/"
+        },
+        {
+          "offset": 115135,
+          "text": "docs/"
+        },
+        {
+          "offset": 115453,
+          "text": "docs/"
+        },
+        {
+          "offset": 115771,
+          "text": "docs/"
+        },
+        {
+          "offset": 145998,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 146012,
+          "text": "docs/"
+        },
+        {
+          "offset": 146081,
+          "text": "docs/"
+        },
+        {
+          "offset": 146151,
+          "text": "docs/"
+        },
+        {
+          "offset": 146775,
+          "text": "docs/"
+        },
+        {
+          "offset": 146897,
+          "text": "docs/"
+        },
+        {
+          "offset": 147014,
+          "text": "docs/"
+        },
+        {
+          "offset": 147078,
+          "text": "docs/"
+        },
+        {
+          "offset": 147142,
+          "text": "docs/"
+        },
+        {
+          "offset": 147583,
+          "text": "docs/"
+        },
+        {
+          "offset": 147741,
+          "text": "docs/"
+        },
+        {
+          "offset": 147890,
+          "text": "docs/"
+        },
+        {
+          "offset": 148052,
+          "text": "docs/"
+        },
+        {
+          "offset": 148212,
+          "text": "docs/"
+        },
+        {
+          "offset": 148375,
+          "text": "docs/"
+        },
+        {
+          "offset": 148549,
+          "text": "docs/"
+        },
+        {
+          "offset": 148728,
+          "text": "docs/"
+        },
+        {
+          "offset": 148891,
+          "text": "docs/"
+        },
+        {
+          "offset": 149064,
+          "text": "docs/"
+        },
+        {
+          "offset": 149206,
+          "text": "docs/"
+        },
+        {
+          "offset": 149382,
+          "text": "docs/"
+        },
+        {
+          "offset": 149564,
+          "text": "docs/"
+        },
+        {
+          "offset": 149722,
+          "text": "docs/"
+        },
+        {
+          "offset": 149882,
+          "text": "docs/"
+        },
+        {
+          "offset": 150051,
+          "text": "docs/"
+        },
+        {
+          "offset": 150341,
+          "text": "docs/"
+        },
+        {
+          "offset": 150942,
+          "text": "docs/"
+        },
+        {
+          "offset": 151138,
+          "text": "docs/"
+        },
+        {
+          "offset": 151297,
+          "text": "docs/"
+        },
+        {
+          "offset": 151446,
+          "text": "docs/"
+        },
+        {
+          "offset": 151602,
+          "text": "docs/"
+        },
+        {
+          "offset": 151778,
+          "text": "docs/"
+        },
+        {
+          "offset": 151959,
+          "text": "docs/"
+        },
+        {
+          "offset": 152577,
+          "text": "docs/"
+        },
+        {
+          "offset": 152745,
+          "text": "docs/"
+        },
+        {
+          "offset": 153182,
+          "text": "docs/"
+        },
+        {
+          "offset": 153343,
+          "text": "docs/"
+        },
+        {
+          "offset": 153501,
+          "text": "docs/"
+        },
+        {
+          "offset": 154105,
+          "text": "docs/"
+        },
+        {
+          "offset": 154238,
+          "text": "docs/"
+        },
+        {
+          "offset": 154398,
+          "text": "docs/"
+        },
+        {
+          "offset": 154552,
+          "text": "docs/"
+        },
+        {
+          "offset": 154698,
+          "text": "docs/"
+        },
+        {
+          "offset": 154850,
+          "text": "docs/"
+        },
+        {
+          "offset": 155005,
+          "text": "docs/"
+        },
+        {
+          "offset": 155158,
+          "text": "docs/"
+        },
+        {
+          "offset": 155313,
+          "text": "docs/"
+        },
+        {
+          "offset": 155465,
+          "text": "docs/"
+        },
+        {
+          "offset": 155621,
+          "text": "docs/"
+        },
+        {
+          "offset": 155776,
+          "text": "docs/"
+        },
+        {
+          "offset": 155931,
+          "text": "docs/"
+        },
+        {
+          "offset": 156088,
+          "text": "docs/"
+        },
+        {
+          "offset": 156244,
+          "text": "docs/"
+        },
+        {
+          "offset": 156438,
+          "text": "docs/"
+        },
+        {
+          "offset": 156594,
+          "text": "docs/"
+        },
+        {
+          "offset": 156746,
+          "text": "docs/"
+        },
+        {
+          "offset": 156913,
+          "text": "docs/"
+        },
+        {
+          "offset": 157076,
+          "text": "docs/"
+        },
+        {
+          "offset": 172878,
+          "text": "docs/"
+        },
+        {
+          "offset": 174085,
+          "text": "docs/"
+        },
+        {
+          "offset": 182994,
+          "text": "docs/"
+        },
+        {
+          "offset": 183162,
+          "text": "docs/"
+        },
+        {
+          "offset": 202271,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 202285,
+          "text": "docs/"
+        },
+        {
+          "offset": 202354,
+          "text": "docs/"
+        },
+        {
+          "offset": 202424,
+          "text": "docs/"
+        },
+        {
+          "offset": 202467,
+          "text": "docs/"
+        },
+        {
+          "offset": 202552,
+          "text": "docs/"
+        },
+        {
+          "offset": 203867,
+          "text": "docs/"
+        },
+        {
+          "offset": 204026,
+          "text": "docs/"
+        },
+        {
+          "offset": 204099,
+          "text": "docs/"
+        },
+        {
+          "offset": 214462,
+          "text": "docs/"
+        },
+        {
+          "offset": 214713,
+          "text": "docs/"
+        },
+        {
+          "offset": 215001,
+          "text": "docs/"
+        },
+        {
+          "offset": 225901,
+          "text": "docs/"
+        },
+        {
+          "offset": 227264,
+          "text": "docs/"
+        },
+        {
+          "offset": 228025,
+          "text": "docs/"
+        },
+        {
+          "offset": 228272,
+          "text": "docs/"
+        },
+        {
+          "offset": 228420,
+          "text": "docs/"
+        },
+        {
+          "offset": 238320,
+          "text": "CHANGELOG"
+        },
+        {
+          "offset": 238879,
+          "text": "CHANGELOG"
+        },
+        {
+          "offset": 247373,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 249548,
+          "text": "docs/"
+        },
+        {
+          "offset": 249642,
+          "text": "docs/"
+        },
+        {
+          "offset": 256429,
+          "text": "docs/"
+        },
+        {
+          "offset": 256532,
+          "text": "docs/"
+        },
+        {
+          "offset": 256635,
+          "text": "docs/"
+        },
+        {
+          "offset": 256738,
+          "text": "docs/"
+        },
+        {
+          "offset": 256841,
+          "text": "docs/"
+        },
+        {
+          "offset": 256944,
+          "text": "docs/"
+        },
+        {
+          "offset": 257047,
+          "text": "docs/"
+        },
+        {
+          "offset": 264249,
+          "text": "CHANGELOG.md"
+        },
+        {
+          "offset": 266567,
+          "text": "docs/"
+        },
+        {
+          "offset": 266621,
+          "text": "docs/"
+        },
+        {
+          "offset": 266692,
+          "text": "docs/"
+        },
+        {
+          "offset": 270353,
+          "text": "docs/"
+        },
+        {
+          "offset": 279374,
+          "text": "docs/"
+        },
+        {
+          "offset": 280871,
+          "text": "docs/"
+        },
+        {
+          "offset": 290448,
+          "text": "docs/"
+        },
+        {
+          "offset": 290698,
+          "text": "CHANGELOG"
+        }
+      ],
+      "tracedCensusConstants": [
+        "definition"
+      ]
+    },
+    "reason": "Unresolved import now conservatively marks a document root instead of raising; fixture remains judgment-required."
+  }
+]

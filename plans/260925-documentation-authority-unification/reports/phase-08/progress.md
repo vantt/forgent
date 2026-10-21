@@ -1162,3 +1162,15 @@ L12-80 closes author rework from five reviews: **24 changed old files / 135 chan
 Final integrated checker: **631 records / 2,862 references / 13,582 tuples / zero failures**. **176/176 negative probes reject** (19 new rule-specific); root-positive 15/15, prior positives and HEAD-only drift pass. Source-only worker-session navigation patch replays 8/8 on each side, with exact inverse, co-cut grep, complete import provenance and ten identical holder members. Standalone checks and raw proof hashes are refreshed.
 
 Continuation: **364 files / 760 references / 17,079 tuples**; full original sets and three carries conserved. **75 cumulative judgment / 265 mechanical-neutral closures**; Lead review list separates **24 changed old + 40 added** files. See `step-05-seam5-batch5-handback.md`, `step-05-seam5-batch5-final-proof.json` and `step-05-seam5-batch5-verification.json`. Independent review, Step 7 final assembly/park resolution and Phase 9 full-suite parity remain pending. Records-only scope; no git writes or fgOS CLI; `needsWrites: []`.
+
+## Seam 5 batch 6 — started (2026-10-21)
+
+L12-81 review closure and S1/S2/S3 sweeps in progress, followed by at least 100 judgment-file closures. Records only; pinned source verification; no fgOS CLI or git writes.
+
+## Seam 5 batch 6 — handback blocked on replay (2026-10-21)
+
+L12-81 reconciles six reviews: 13 changed old files (six disposition/new-slot, seven label-only). S1: 80 prior source/test co-cut pairs, three new asserted path lines; S2: five new dead comment-pointer patches, zero remaining eligible dead pointers across the 301-slot audit; S3: 26 title dependencies. Seam 8 owns merge.mjs L536/L638/L640 separately from 003771.
+
+100 next-in-order judgment files are authored: 760 references / 6,550 tuples / 736 supplemental slots / 2,978,583 pinned bytes. Zero new neutral closures. Ninety-nine new files need no replay under R22; one new and three changed old patch files still require it, so this is not a completed 100-file batch. Remaining authoring: 264 files / zero references / 10,529 tuples; replay obligations are separate.
+
+Final checker: 731 records / 3,622 references / 20,132 tuples / **four R22 replay failures**, zero other structural failures; exit 1. Executed negative probes reject 183/183; root-positive 15/15 and HEAD-only drift pass. Thirteen prompt mutations did not start because their zero-failure baseline gate refused this incomplete state; stale old results are not counted. R22 is blocked by the explicit prohibition on git/state/CLI operations required by owning tests. No exemption or test bypass is invented. Scope/conservation/syntax/diff checks pass; product files and live state untouched; runner owns commits; needsWrites []. See batch6 handback, verification and replay-blocker evidence.

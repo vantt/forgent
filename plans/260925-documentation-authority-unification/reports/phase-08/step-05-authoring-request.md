@@ -70,3 +70,8 @@ Next authorized work is Lead review/re-sizing and a separately bounded records-o
 ## L12-66 current input
 
 Use merge pin `fd126f0c853f320e476b648fe50ac9b4e2256d6c`. Queue: **1,447 files/carries, 5,312 references (+1), 227 exclusions, 39,861 dynamic sites, 201 old carries, 29 admission parts**. The changed generated decision index and its new Seat Binding reference require full source-state/generator trace with the other index output; its existing runtime seam is advisory and the owning parity work remains generators/projections. Original census coordinates stay at their recorded pins; relocate actual spans at cutover. No production behavioral source changed in this merge. See `step-05-l12-66-population-delta.json`; prior proof receipts retain their original input, and no current behavior parity or review acceptance is inferred.
+
+
+### Seam 8 carry — L12-81
+
+At pin `5eb9dc609f303fc9d54377f866b5e8caf9a5d129`, own `src/runner/merge.mjs:536` (`nextFreeDecisionId` docs/decisions ls-tree scan) and L638/L640 docs/decisions reads. These were carried since the pilot rr and are distinct from `reference-003771` (`renumberDecisionFile`). Check the quoted-path fixture coupling in `test/runner/merge-quoted-paths.test.mjs:100-108`; keep that fixture and reader together if the scan changes. Do not treat the existing 003771 record as coverage of these three operations.

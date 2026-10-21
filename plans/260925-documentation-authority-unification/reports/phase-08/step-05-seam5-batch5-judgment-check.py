@@ -47,10 +47,11 @@ def sweep(rs=None,listing=None):
   e=by['test/report/enduser-index.test.mjs'];assert e['realReadSetContract']['symlinkFixture']=='test/report/helpers/docs-index-state-fixture.mjs' and e['protectedPins']['test/report/helpers/docs-index-state-fixture.mjs'] and any(x['disposition']=='parked' and x.get('owningGeneratorParks') for x in m.admission.allitems(e))
  test('j5-review-closure','all explicit Lead rulings',closures)
  def delta():
-  closure=m.read('step-05-seam5-batch5-review-closure.json');changed={e['file'] for e in closure['changedRecords']};added={r['file'] for r in m.rows('step-05-records/tests-judgment-batch5.jsonl')};assert len(added)==40 and set(listing['reviewThisTurn'])==changed|added and len(listing['reviewThisTurn'])==len(changed)+len(added)
+  closure=m.read('step-05-seam5-batch5-review-closure.json');latest=m.read('step-05-seam5-batch6-review-closure.json');changed={e['file']:e for e in latest['changedRecords']}
   for e in closure['changedRecords']:
-   r=by[e['file']];assert e['afterSha256']==m.sha(json.dumps(r,ensure_ascii=False,separators=(',',':')))
-  assert {e['file'] for e in listing['changedThisTurn']}==changed and {e['file'] for e in listing['addedThisTurn']}==added
+   r=by[e['file']];expected=changed[e['file']]['beforeSha256'] if e['file'] in changed else m.sha(json.dumps(r,ensure_ascii=False,separators=(',',':')));assert e['afterSha256']==expected
+  assert listing['closedBatch']==6 and len(listing['addedThisTurn'])==100
+  expected={e['file'] for e in latest['changedRecords'] if e['dispositionChanged']}|{e['file'] for e in listing['addedThisTurn']};assert set(listing['reviewThisTurn'])==expected
  test('j5-review-delta','review changed or added sources only',delta)
  return {'files':len(rs),'rules':RULES,'checks':counts,'failureCount':len(errors),'failures':errors,'sourceSweepEvidence':evidence}
 def check(rs=None,receipts=None,listing=None,run_sweep=True):
