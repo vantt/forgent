@@ -367,6 +367,10 @@ pub struct Ask {
     pub independence: Independence,
     #[serde(default)]
     pub required_skills: Vec<String>,
+    /// The unit's own soft preference (`fgos run --provider`): listed ahead of the seat's `prefer`,
+    /// every filter applies to both alike, and a bare executor id covers every entry of that executor.
+    #[serde(default)]
+    pub unit_prefer: Vec<Prefer>,
 }
 
 // ------------------------------------------------------------- machine facts
@@ -419,6 +423,11 @@ pub struct ExecutorFacts {
     /// The invocation the transport picks when nothing pins one; none can carry the posture when absent.
     #[serde(default)]
     pub default_invocation: Option<String>,
+    /// The executor carries the posture without an invocation to name: a native agent, or a CLI
+    /// whose carrying invocation has no id. Without a default invocation and without this, no
+    /// invocation of it can carry the posture.
+    #[serde(default)]
+    pub unnamed_carries: bool,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
@@ -596,6 +605,11 @@ pub struct Skip {
     pub detail: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub config: Option<String>,
+    /// The cell entry the skip is about, when the executor has one at the final tier.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pool: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

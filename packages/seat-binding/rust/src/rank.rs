@@ -71,16 +71,23 @@ pub fn rank(
     now: u64,
 ) -> Ranked {
     let ask = &policy.ask;
-    let prefer_bases: Vec<Base> = policy
-        .prefer
-        .iter()
-        .map(|p| Base {
-            name: p.executor().to_string(),
-            invocation: p.invocation().map(str::to_string),
-            source: policy.prefer_source.clone(),
-            from_override: false,
-        })
-        .collect();
+    // The unit's own preference goes first; a seat `prefer` entry it already names is not listed
+    // twice, and a bare executor id covers every entry of that executor.
+    let mut prefer_bases: Vec<Base> = Vec::new();
+    for p in &ask.unit_prefer {
+        let (name, invocation) = (p.executor(), p.invocation());
+        if !prefer_bases.iter().any(|b| b.name == name && b.invocation.as_deref() == invocation) {
+            prefer_bases.push(Base { name: name.to_string(), invocation: invocation.map(str::to_string), source: "unit-prefer".to_string(), from_override: false });
+        }
+    }
+    let bare: Vec<String> = prefer_bases.iter().filter(|b| b.invocation.is_none()).map(|b| b.name.clone()).collect();
+    for p in &policy.prefer {
+        let (name, invocation) = (p.executor(), p.invocation());
+        if bare.iter().any(|b| b == name) || prefer_bases.iter().any(|b| b.name == name && b.invocation.as_deref() == invocation) {
+            continue;
+        }
+        prefer_bases.push(Base { name: name.to_string(), invocation: invocation.map(str::to_string), source: policy.prefer_source.clone(), from_override: false });
+    }
 
     let override_ = ask.override_.as_ref();
     let override_base = override_.and_then(|o| {
@@ -110,6 +117,8 @@ pub fn rank(
                         reason: why.reason,
                         detail: format!("run-wide override skipped for this seat: {}", why.detail),
                         config: None,
+                        model: None,
+                        pool: None,
                     });
                 }
                 second
@@ -255,6 +264,9 @@ fn run_bases(
                 && keep.invocation.as_ref().is_none_or(|i| c.invocation.as_ref() == Some(i))
                 && keep.effort.is_none_or(|e| c.entry.as_ref().and_then(|x| x.effort) == Some(e) || ask.override_.as_ref().and_then(|o| o.effort) == Some(e))
         });
+        // A candidate that already failed is not tried again: only its account may rotate, and that
+        // is a retry (no `tried`), not a walk step.
+        cands.retain(|c| !walk.tried.iter().any(|t| c.matches(t)));
         if cands.is_empty() {
             refuse(
                 &mut run,
@@ -324,7 +336,10 @@ fn run_bases(
                 if rejection.reason == "independence-unsatisfiable" && natural_first.is_none() && judge(&ctx, cand, true).is_ok() {
                     natural_first = Some(cand.executor.clone());
                 }
-                run.skipped.push(skip(&cand.executor, cand.facts, &rejection.reason, rejection.detail.clone(), rejection.config.clone()));
+                let mut out = skip(&cand.executor, cand.facts, &rejection.reason, rejection.detail.clone(), rejection.config.clone());
+                out.model = cand.model();
+                out.pool = cand.pool();
+                run.skipped.push(out);
                 last_rejection = Some(rejection);
             }
         }
@@ -344,10 +359,12 @@ fn run_bases(
                 match pool_accounts.iter().find(|a| &a.id == account) {
                     None => {
                         let known: Vec<&str> = pool_accounts.iter().map(|a| a.id.as_str()).collect();
-                        refuse(
-                            &mut run,
-                            Refusal::new("account-pin-unknown", format!("account \"{pool}/{account}\" does not exist; the accounts of pool \"{pool}\" are: {}", known.join(", "))),
-                        );
+                        let refusal = if known.is_empty() {
+                            Refusal::new("account-pin-no-inventory", format!("account \"{pool}/{account}\" cannot be pinned: pool \"{pool}\" has no account list (runner.llmAccounts.{pool} in ~/.fgos/config.json), so it leases no account"))
+                        } else {
+                            Refusal::new("account-pin-unknown", format!("account \"{pool}/{account}\" does not exist; the accounts of pool \"{pool}\" are: {}", known.join(", ")))
+                        };
+                        refuse(&mut run, refusal);
                         return run;
                     }
                     Some(a) if a.disabled => {
@@ -367,6 +384,8 @@ fn run_bases(
                 reason: "account-pin-other-pool".to_string(),
                 detail: format!("account \"{pool}/{account}\" cannot be pinned: no usable entry of this seat is served by pool \"{pool}\""),
                 config: None,
+                model: None,
+                pool: None,
             });
         }
     }
@@ -416,7 +435,7 @@ fn run_bases(
 }
 
 fn skip(executor: &str, facts: &ExecutorFacts, reason: &str, detail: String, config: Option<String>) -> Skip {
-    Skip { executor: executor.to_string(), family: facts.family.clone(), reason: reason.to_string(), detail, config }
+    Skip { executor: executor.to_string(), family: facts.family.clone(), reason: reason.to_string(), detail, config, model: None, pool: None }
 }
 
 fn override_pin(ask: &Ask) -> Result<Option<(String, String)>, Refusal> {
@@ -531,6 +550,8 @@ fn judge(ctx: &Ctx, cand: &Cand, ignore_independence: bool) -> Result<Candidate,
             }
         },
         (None, Some(chosen)) => facts.invocations.iter().find(|i| &i.id == chosen),
+        // A native agent (or an invocation with no id) carries the posture without naming one.
+        (None, None) if facts.unnamed_carries => None,
         (None, None) => {
             return Err(rejection("posture-unavailable", format!("executor \"{id}\" has no invocation that can carry this seat's posture")));
         }

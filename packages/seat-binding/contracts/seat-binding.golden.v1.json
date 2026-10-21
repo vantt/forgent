@@ -2926,6 +2926,111 @@
           "reason": "protocol-mismatch"
         }
       }
+    },
+    {
+      "name": "a unit's own preference is listed ahead of the seat's prefer and its source is named",
+      "patch": {
+        "ask": {
+          "unitPrefer": [
+            "openai"
+          ]
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai",
+              "source": "unit-prefer"
+            },
+            {
+              "executor": "claude"
+            }
+          ]
+        }
+      },
+      "executors": [
+        "openai",
+        "claude",
+        "gemini",
+        "xai"
+      ]
+    },
+    {
+      "name": "an executor that declares no invocation binds without naming one",
+      "patch": {
+        "launchView": {
+          "executors": {
+            "claude": {
+              "mechanism": "in-process",
+              "invocations": [],
+              "defaultInvocation": null,
+              "unnamedCarries": true
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "mechanism": "in-process",
+              "invocation": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "a multi-round seat whose kept candidate already failed is refused, never walked to another family",
+      "patch": {
+        "walk": {
+          "continuity": {
+            "executor": "claude",
+            "model": "opus",
+            "pool": "claude",
+            "invocation": "claude-cli-bwrap"
+          },
+          "tried": [
+            {
+              "executor": "claude",
+              "invocation": "claude-cli-bwrap",
+              "pool": "claude",
+              "model": "opus"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "seat-continuity-unavailable"
+        }
+      }
+    },
+    {
+      "name": "an account pin naming a pool with no account list is refused with the config line to add",
+      "patch": {
+        "ask": {
+          "override": {
+            "account": "claude/ghost"
+          }
+        },
+        "accountView": {
+          "pools": {
+            "claude": null
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "account-pin-no-inventory"
+        }
+      }
     }
   ]
 }
