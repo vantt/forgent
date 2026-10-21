@@ -1257,3 +1257,9 @@ the separate L12-88 turn. Lead acceptance, Step7 composition and Phase9 parity
 remain open. No consumer/runtime changes or git write.
 
 Final frozen-input verification: full checker 1481 memberships / 7223 refs / 39876 tuples / 0 failures; 366/366 negative probes reject and 15/15 root positives pass. Data/checker hashes agree across verification windows; the seam8 output path correction affected only the controller. Step5 authoring and named correction work are complete; Lead acceptance and cutover obligations remain distinct.
+
+## L12-98 — local-main merge accounting (2026-10-21)
+
+Accounted `ab3eb83d7`: 87 main commits / 98 imported paths / five changed documentation paths across 27 exact path families. Evidence relocation `--before` passes 867/0 with the 44-row consumer table unchanged; ratchet passes 997 files and its unchanged tests pass 28/28, so no exception digest changed. Both protected extractors agree; eight direct bindings remain content/ancestry exact, with zero rebinds or ledger edits. Step 3/4/5 overlaps are 5/2/20 and remain deferred to Step 7. Fresh Step 5 checker: 1,481 files / 7,223 refs / 39,876 tuples / 0 failures; the 189-entry HEAD drift list is regenerated as non-failing. Exact receipts are `step-00-l12-98-*` and `step-05-l12-98-merge-accounting.json`; separate L12-11 committed-pair accounting follows this written checkpoint.
+
+Pair accounting is complete in both Phase 6 manifests: exact pairs `4be19d6cb/step-06-accounting-brief-ab3eb83d7.md` and carried `aa0df7deb/step-06-pair-accounting-brief-698fd721a.md`, with no other manifest-byte change. Post-append A reports zero unaccounted pairs for each manifest; B/H/I remain green. The working-tree A result is expected to stay non-green until the runner commits this accounting round, whose own new pairs belong to the next accounting checkpoint.

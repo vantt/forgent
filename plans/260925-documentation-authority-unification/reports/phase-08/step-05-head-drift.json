@@ -1,6 +1,6 @@
 {
   "kind": "Non-failing HEAD drift for Step 7 assembly; records remain at their own pins",
-  "headCommit": "e9bf0650e38e68348f900dd54de9d14508bad92c",
+  "headCommit": "4be19d6cb9a7e12e97dfd0a2edee9dbcf03e95b7",
   "entries": [
     {
       "file": ".githooks/pre-commit",
@@ -381,7 +381,7 @@
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "pinnedHash": "3893f566d0b7697cef6dc4af17184faea4c477a5d17c257763db0b4f65f163a0",
-      "headHash": "4e4a70076ed3ccbfdd1c331d376c6c2ef6d5127cfeb1a4f1497ac14a68bdcef1",
+      "headHash": "803ae0bcf0813b055b24b900979a2509f63a010625bff6b4189ceddbe93b47b6",
       "movedSpans": [
         {
           "id": "dynamic-013639",
@@ -2293,7 +2293,7 @@
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "pinnedHash": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "headHash": "eac44ceb1bd5bb132964989720ea5b0fde09137aaa0ef0f6e22a70c53aeacdb5",
+      "headHash": "663a00e2343ba794686afdd6e8d08b15c5f3b6fd0cdfec9e7d6203eb04e6585c",
       "movedSpans": [
         {
           "id": "reference-003801",
@@ -13668,7 +13668,7 @@
       },
       "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "pinnedHash": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
-      "headHash": "c46ddc8847524435df1fc31af5cd3199185d372d7737deb23506e56e2372d667",
+      "headHash": "8b340b4dd01e791454693e83a9c4871fc70b559f14d1145dc206044b3568d96f",
       "movedSpans": [
         {
           "id": "author-s4-19c252476bfb8f58",
@@ -19631,7 +19631,7 @@
       },
       "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "pinnedHash": "85c4db92e0f68a0a2a6a7272b8a4f44f0ab4529ecdf872b78752560df97b9864",
-      "headHash": "709d73239f1e5b0aaa91a2efdb90f695cacc84a8dc317d83f7f615013efbd1be",
+      "headHash": "820f7e847b67f3fcd1c81757cd350ca891e79b1f4f02e39f586622d62ebfbaef",
       "movedSpans": [
         {
           "id": "dynamic-008738",
@@ -19731,9 +19731,7 @@
             "line": 181,
             "text": " * - no inherited NODE_TEST_CONTEXT: an enclosing `node --test` sets it, and a\n *   nested run that inherits it reports to a parent that is not listening\n *   and exits 0 without running a single test;\n * - no inherited FGOS_STATE_ROOT: the host pins it into every payload it\n *   runs, and a suite started under fgOS would otherwise send every fixture\n *   that sets only FGOS_STATE_HOME to the real machine state root;\n * - on darwin, TMPDIR/TMP/TEMP resolved through realpath (/var -> /private/var)."
           },
-          "headMatchingLines": [
-            123
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-008750",
@@ -19741,9 +19739,7 @@
             "line": 187,
             "text": " * - on darwin, TMPDIR/TMP/TEMP resolved through realpath (/var -> /private/var).\n */\nexport function buildTestEnv(env = process.env) {\n  const { NODE_TEST_CONTEXT: _enclosingRunner, FGOS_STATE_ROOT: _pinnedStateRoot, ...rest } = env;\n  const childEnv = { ...rest, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };\n  if (process.platform === 'darwin') {\n    const tempRoot = env.TMPDIR || os.tmpdir();"
           },
-          "headMatchingLines": [
-            129
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-008751",
@@ -19751,9 +19747,7 @@
             "line": 190,
             "text": "  const { NODE_TEST_CONTEXT: _enclosingRunner, FGOS_STATE_ROOT: _pinnedStateRoot, ...rest } = env;\n  const childEnv = { ...rest, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };\n  if (process.platform === 'darwin') {\n    const tempRoot = env.TMPDIR || os.tmpdir();\n    try {\n      const realTempRoot = fs.realpathSync(tempRoot);\n      childEnv.TMPDIR = realTempRoot;"
           },
-          "headMatchingLines": [
-            132
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-008752",
@@ -19761,9 +19755,7 @@
             "line": 190,
             "text": "  const { NODE_TEST_CONTEXT: _enclosingRunner, FGOS_STATE_ROOT: _pinnedStateRoot, ...rest } = env;\n  const childEnv = { ...rest, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };\n  if (process.platform === 'darwin') {\n    const tempRoot = env.TMPDIR || os.tmpdir();\n    try {\n      const realTempRoot = fs.realpathSync(tempRoot);\n      childEnv.TMPDIR = realTempRoot;"
           },
-          "headMatchingLines": [
-            132
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-008753",
@@ -19772,7 +19764,7 @@
             "text": "  if (process.platform === 'darwin') {\n    const tempRoot = env.TMPDIR || os.tmpdir();\n    try {\n      const realTempRoot = fs.realpathSync(tempRoot);\n      childEnv.TMPDIR = realTempRoot;\n      childEnv.TMP = realTempRoot;\n      childEnv.TEMP = realTempRoot;"
           },
           "headMatchingLines": [
-            134
+            139
           ]
         },
         {
@@ -19782,7 +19774,7 @@
             "text": "    const tempRoot = env.TMPDIR || os.tmpdir();\n    try {\n      const realTempRoot = fs.realpathSync(tempRoot);\n      childEnv.TMPDIR = realTempRoot;\n      childEnv.TMP = realTempRoot;\n      childEnv.TEMP = realTempRoot;\n    } catch {"
           },
           "headMatchingLines": [
-            135
+            140
           ]
         },
         {
@@ -19792,7 +19784,7 @@
             "text": "    }\n  } catch (err) {\n    // If cargo is missing or build fails, let tests that require host fail with clear diagnostic\n    console.error(`run-tests: warning: failed to ensure host binary: ${err.message}`);\n  }\n  return childEnv;\n}"
           },
           "headMatchingLines": [
-            149
+            154
           ]
         },
         {
@@ -19802,7 +19794,7 @@
             "text": "// legitimately slower than the default. Empty on purpose: add an entry only\n// with the measured duration that justifies it, never to hide a hang.\nexport const FILE_TIMEOUT_OVERRIDES_MS = {};\nconst WATCHDOG_PATH = fileURLToPath(new URL('./lib/test-file-watchdog.mjs', import.meta.url));\nconst DEFAULT_WATCHDOG_POLL_MS = 5000;\n\n/**"
           },
           "headMatchingLines": [
-            170
+            175
           ]
         },
         {
@@ -19812,7 +19804,7 @@
             "text": "// legitimately slower than the default. Empty on purpose: add an entry only\n// with the measured duration that justifies it, never to hide a hang.\nexport const FILE_TIMEOUT_OVERRIDES_MS = {};\nconst WATCHDOG_PATH = fileURLToPath(new URL('./lib/test-file-watchdog.mjs', import.meta.url));\nconst DEFAULT_WATCHDOG_POLL_MS = 5000;\n\n/**"
           },
           "headMatchingLines": [
-            170
+            175
           ]
         },
         {
@@ -19822,7 +19814,7 @@
             "text": "  for (const file of files) {\n    // Keyed exactly as passed to `node --test`: each file's runner process\n    // carries that same string as its last argv element.\n    limits[file] = FILE_TIMEOUT_OVERRIDES_MS[file.split(path.sep).join('/')] ?? fileTimeoutMs;\n  }\n  const limitsFile = path.join(tempDir, 'file-limits.json');\n  const outFile = path.join(tempDir, 'file-timeouts.jsonl');"
           },
           "headMatchingLines": [
-            188
+            193
           ]
         },
         {
@@ -19832,7 +19824,7 @@
             "text": "    // carries that same string as its last argv element.\n    limits[file] = FILE_TIMEOUT_OVERRIDES_MS[file.split(path.sep).join('/')] ?? fileTimeoutMs;\n  }\n  const limitsFile = path.join(tempDir, 'file-limits.json');\n  const outFile = path.join(tempDir, 'file-timeouts.jsonl');\n  fs.writeFileSync(limitsFile, JSON.stringify(limits));\n  fs.writeFileSync(outFile, '');"
           },
           "headMatchingLines": [
-            190
+            195
           ]
         },
         {
@@ -19842,7 +19834,7 @@
             "text": "    limits[file] = FILE_TIMEOUT_OVERRIDES_MS[file.split(path.sep).join('/')] ?? fileTimeoutMs;\n  }\n  const limitsFile = path.join(tempDir, 'file-limits.json');\n  const outFile = path.join(tempDir, 'file-timeouts.jsonl');\n  fs.writeFileSync(limitsFile, JSON.stringify(limits));\n  fs.writeFileSync(outFile, '');\n  const child = spawnAsync("
           },
           "headMatchingLines": [
-            191
+            196
           ]
         },
         {
@@ -19852,7 +19844,7 @@
             "text": "  fs.writeFileSync(outFile, '');\n  const child = spawnAsync(\n    process.execPath,\n    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],\n    { env, stdio: ['ignore', 'ignore', 'inherit'] },\n  );\n  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));"
           },
           "headMatchingLines": [
-            196
+            201
           ]
         },
         {
@@ -19862,7 +19854,7 @@
             "text": "  fs.writeFileSync(outFile, '');\n  const child = spawnAsync(\n    process.execPath,\n    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],\n    { env, stdio: ['ignore', 'ignore', 'inherit'] },\n  );\n  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));"
           },
           "headMatchingLines": [
-            196
+            201
           ]
         },
         {
@@ -19872,7 +19864,7 @@
             "text": "  fs.writeFileSync(outFile, '');\n  const child = spawnAsync(\n    process.execPath,\n    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],\n    { env, stdio: ['ignore', 'ignore', 'inherit'] },\n  );\n  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));"
           },
           "headMatchingLines": [
-            196
+            201
           ]
         },
         {
@@ -19882,7 +19874,7 @@
             "text": "  fs.writeFileSync(outFile, '');\n  const child = spawnAsync(\n    process.execPath,\n    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],\n    { env, stdio: ['ignore', 'ignore', 'inherit'] },\n  );\n  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));"
           },
           "headMatchingLines": [
-            196
+            201
           ]
         },
         {
@@ -19892,7 +19884,7 @@
             "text": "    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],\n    { env, stdio: ['ignore', 'ignore', 'inherit'] },\n  );\n  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));\n  return {\n    stop() {\n      child.kill('SIGTERM');"
           },
           "headMatchingLines": [
-            199
+            204
           ]
         },
         {
@@ -19902,7 +19894,7 @@
             "text": "}\n/**\n * The identity keys (user.*, author.*, committer.*) the checkout's repository config holds, as\n * `scope: key=value` lines. A fixture that configures an identity in the wrong repository changes\n * exactly this, and every later commit of the checkout's owner then carries the fixture's name.\n * Covers the shared config and a linked worktree's own config.worktree; the machine-wide config is\n * not this checkout's. Empty when `cwd` is not a repository."
           },
           "headMatchingLines": [
-            209
+            214
           ]
         },
         {
@@ -19928,7 +19920,7 @@
             "text": "  const changed = [];\n  for (const [key, line] of a) {\n    if (!b.has(key)) added.push(line);\n    else if (b.get(key) !== line) changed.push(`${b.get(key)} -> ${line}`);\n  }\n  for (const [key, line] of b) if (!a.has(key)) removed.push(line);\n  return { added, removed, changed, leaked: added.length + removed.length + changed.length > 0 };"
           },
           "headMatchingLines": [
-            241
+            246
           ]
         },
         {
@@ -19938,7 +19930,7 @@
             "text": " * temp tree at exit, so anything left here came from a file that skipped that, a killed file, or\n * a child that outlived it.\n */\nexport function leftoverTempPrefixes(root, readdir = fs.readdirSync) {\n  const counts = {};\n  let names = [];\n  try { names = readdir(root); } catch { return counts; }"
           },
           "headMatchingLines": [
-            253
+            258
           ]
         },
         {
@@ -19988,7 +19980,7 @@
             "text": "// shows up as added or changed event, observe and work files, which stay guarded.\nexport const DERIVED_FGOS_FILES = new Set([\n  path.join('cache', 'state.json'),\n  path.join('runtime', 'events-jsonl.truncation-guard.json'),\n]);\n\n/**"
           },
           "headMatchingLines": [
-            273
+            278
           ]
         },
         {
@@ -20014,7 +20006,7 @@
             "text": "    }\n    for (const entry of entries) {\n      if (SENSITIVE_FGOS_FILES.has(entry.name)) continue;\n      const fullPath = path.join(currentDir, entry.name);\n      const relPath = path.relative(fgosDir, fullPath);\n      if (entry.isDirectory()) {\n        walk(fullPath);"
           },
           "headMatchingLines": [
-            295
+            300
           ]
         },
         {
@@ -20024,7 +20016,7 @@
             "text": "    }\n    for (const entry of entries) {\n      if (SENSITIVE_FGOS_FILES.has(entry.name)) continue;\n      const fullPath = path.join(currentDir, entry.name);\n      const relPath = path.relative(fgosDir, fullPath);\n      if (entry.isDirectory()) {\n        walk(fullPath);"
           },
           "headMatchingLines": [
-            295
+            300
           ]
         },
         {
@@ -20034,7 +20026,7 @@
             "text": "    for (const entry of entries) {\n      if (SENSITIVE_FGOS_FILES.has(entry.name)) continue;\n      const fullPath = path.join(currentDir, entry.name);\n      const relPath = path.relative(fgosDir, fullPath);\n      if (entry.isDirectory()) {\n        walk(fullPath);\n      } else if (entry.isFile() || entry.isSymbolicLink()) {"
           },
           "headMatchingLines": [
-            296
+            301
           ]
         },
         {
@@ -20060,7 +20052,7 @@
             "text": "export function runSelectedTests(files, {\n  cwd = REPO_ROOT,\n  forwardedArgs = [],\n  execPath = process.execPath,\n  spawn = spawnSync,\n  env = process.env,\n  stdio = 'inherit',"
           },
           "headMatchingLines": [
-            356
+            361
           ]
         },
         {
@@ -20078,7 +20070,7 @@
             "text": "  const childEnv = buildTestEnv(env);\n  let runTemp = null;\n  try {\n    runTemp = fs.mkdtempSync(path.join(childEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    childEnv.TMPDIR = runTemp;\n    childEnv.TMP = runTemp;\n    childEnv.TEMP = runTemp;"
           },
           "headMatchingLines": [
-            371
+            376
           ]
         },
         {
@@ -20088,7 +20080,7 @@
             "text": "  const childEnv = buildTestEnv(env);\n  let runTemp = null;\n  try {\n    runTemp = fs.mkdtempSync(path.join(childEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    childEnv.TMPDIR = runTemp;\n    childEnv.TMP = runTemp;\n    childEnv.TEMP = runTemp;"
           },
           "headMatchingLines": [
-            371
+            376
           ]
         },
         {
@@ -20098,7 +20090,7 @@
             "text": "  let runTemp = null;\n  try {\n    runTemp = fs.mkdtempSync(path.join(childEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    childEnv.TMPDIR = runTemp;\n    childEnv.TMP = runTemp;\n    childEnv.TEMP = runTemp;\n  } catch {"
           },
           "headMatchingLines": [
-            372
+            377
           ]
         },
         {
@@ -20108,7 +20100,7 @@
             "text": "\n  // Fixtures that confined workers must reach live outside /tmp. A per-run root removed here also\n  // covers a test file the watchdog killed, which never runs its own exit cleanup.\n  let fixtureRoot = null;\n  if (fs.existsSync('/var/tmp') && env[KEEP_TMP_ENV] !== '1') {\n    try {\n      fixtureRoot = fs.mkdtempSync('/var/tmp/fgos-test-fixtures-');"
           },
           "headMatchingLines": [
-            382
+            387
           ]
         },
         {
@@ -20118,7 +20110,7 @@
             "text": "  let fixtureRoot = null;\n  if (fs.existsSync('/var/tmp') && env[KEEP_TMP_ENV] !== '1') {\n    try {\n      fixtureRoot = fs.mkdtempSync('/var/tmp/fgos-test-fixtures-');\n      childEnv.FGOS_TEST_FIXTURE_ROOT = fixtureRoot;\n    } catch {\n      fixtureRoot = null;"
           },
           "headMatchingLines": [
-            385
+            390
           ]
         },
         {
@@ -20128,7 +20120,7 @@
             "text": "  if (fs.existsSync('/var/tmp') && env[KEEP_TMP_ENV] !== '1') {\n    try {\n      fixtureRoot = fs.mkdtempSync('/var/tmp/fgos-test-fixtures-');\n      childEnv.FGOS_TEST_FIXTURE_ROOT = fixtureRoot;\n    } catch {\n      fixtureRoot = null;\n    }"
           },
           "headMatchingLines": [
-            386
+            391
           ]
         },
         {
@@ -20154,7 +20146,7 @@
             "text": "    }\n    if (runTemp) {\n      if (env[KEEP_TMP_ENV] === '1') {\n        log(`run-tests: kept this run's temp dir (${KEEP_TMP_ENV}=1): ${runTemp}`);\n      } else {\n        try {\n          fs.rmSync(runTemp, { recursive: true, force: true, maxRetries: 3 });"
           },
           "headMatchingLines": [
-            424
+            429
           ]
         },
         {
@@ -20172,7 +20164,7 @@
             "text": "  if (timedOut.length) {\n    log('run-tests: ERROR: test file(s) exceeded the per-file time limit and were killed (process tree):');\n    for (const { file, elapsedMs, limitMs } of timedOut) {\n      log(`  ${file}: timed out after ${Math.round(elapsedMs / 1000)}s (limit ${Math.round(limitMs / 1000)}s)`);\n    }\n    result.status = result.status !== 0 ? result.status : 1;\n  }"
           },
           "headMatchingLines": [
-            439
+            444
           ]
         },
         {
@@ -20182,7 +20174,7 @@
             "text": "  result.tempLeftovers = tempLeftovers;\n  if (Object.keys(tempLeftovers).length) {\n    log('run-tests: ERROR: test suite left temporary directories behind (name prefix: count):');\n    for (const [prefix, count] of Object.entries(tempLeftovers).sort()) log(`  ${prefix}*: ${count}`);\n    log('  A test file must import test/helpers/process-tmp-root.mjs first; a killed file leaves its own tree.');\n    result.status = result.status !== 0 ? result.status : 1;\n  }"
           },
           "headMatchingLines": [
-            447
+            452
           ]
         },
         {
@@ -20192,7 +20184,7 @@
             "text": "  if (fgosDiff.leaked) {\n    log('run-tests: ERROR: test suite leaked unexpected files or modifications into .fgos store:');\n    if (fgosDiff.added.length) {\n      log(`  Added (${fgosDiff.added.length}):`);\n      for (const f of fgosDiff.added) log(`    + .fgos/${f}`);\n    }\n    if (fgosDiff.modified.length) {"
           },
           "headMatchingLines": [
-            472
+            477
           ]
         },
         {
@@ -20202,7 +20194,7 @@
             "text": "    log('run-tests: ERROR: test suite leaked unexpected files or modifications into .fgos store:');\n    if (fgosDiff.added.length) {\n      log(`  Added (${fgosDiff.added.length}):`);\n      for (const f of fgosDiff.added) log(`    + .fgos/${f}`);\n    }\n    if (fgosDiff.modified.length) {\n      log(`  Modified (${fgosDiff.modified.length}):`);"
           },
           "headMatchingLines": [
-            473
+            478
           ]
         },
         {
@@ -20212,7 +20204,7 @@
             "text": "      for (const f of fgosDiff.added) log(`    + .fgos/${f}`);\n    }\n    if (fgosDiff.modified.length) {\n      log(`  Modified (${fgosDiff.modified.length}):`);\n      for (const f of fgosDiff.modified) log(`    * .fgos/${f}`);\n    }\n    if (fgosDiff.deleted.length) {"
           },
           "headMatchingLines": [
-            476
+            481
           ]
         },
         {
@@ -20222,7 +20214,7 @@
             "text": "    }\n    if (fgosDiff.modified.length) {\n      log(`  Modified (${fgosDiff.modified.length}):`);\n      for (const f of fgosDiff.modified) log(`    * .fgos/${f}`);\n    }\n    if (fgosDiff.deleted.length) {\n      log(`  Deleted (${fgosDiff.deleted.length}):`);"
           },
           "headMatchingLines": [
-            477
+            482
           ]
         },
         {
@@ -20232,7 +20224,7 @@
             "text": "      for (const f of fgosDiff.modified) log(`    * .fgos/${f}`);\n    }\n    if (fgosDiff.deleted.length) {\n      log(`  Deleted (${fgosDiff.deleted.length}):`);\n      for (const f of fgosDiff.deleted) log(`    - .fgos/${f}`);\n    }\n    result.status = result.status !== 0 ? result.status : 1;"
           },
           "headMatchingLines": [
-            480
+            485
           ]
         },
         {
@@ -20242,7 +20234,7 @@
             "text": "    }\n    if (fgosDiff.deleted.length) {\n      log(`  Deleted (${fgosDiff.deleted.length}):`);\n      for (const f of fgosDiff.deleted) log(`    - .fgos/${f}`);\n    }\n    result.status = result.status !== 0 ? result.status : 1;\n  }"
           },
           "headMatchingLines": [
-            481
+            486
           ]
         },
         {
@@ -20252,7 +20244,7 @@
             "text": "  result.gitIdentityDiff = identityDiff;\n  if (identityDiff.leaked) {\n    log('run-tests: ERROR: test suite changed the git identity held by this checkout\\'s own repository config:');\n    for (const line of identityDiff.added) log(`  + ${line}`);\n    for (const line of identityDiff.removed) log(`  - ${line}`);\n    for (const line of identityDiff.changed) log(`  * ${line}`);\n    log('  A fixture ran `git config user.*` outside its own temporary repository; restore the keys above with `git config --local`.');"
           },
           "headMatchingLines": [
-            490
+            495
           ]
         },
         {
@@ -20286,7 +20278,7 @@
             "text": "  if (identityDiff.leaked) {\n    log('run-tests: ERROR: test suite changed the git identity held by this checkout\\'s own repository config:');\n    for (const line of identityDiff.added) log(`  + ${line}`);\n    for (const line of identityDiff.removed) log(`  - ${line}`);\n    for (const line of identityDiff.changed) log(`  * ${line}`);\n    log('  A fixture ran `git config user.*` outside its own temporary repository; restore the keys above with `git config --local`.');\n    result.status = result.status !== 0 ? result.status : 1;"
           },
           "headMatchingLines": [
-            491
+            496
           ]
         },
         {
@@ -20296,7 +20288,7 @@
             "text": "    log('run-tests: ERROR: test suite changed the git identity held by this checkout\\'s own repository config:');\n    for (const line of identityDiff.added) log(`  + ${line}`);\n    for (const line of identityDiff.removed) log(`  - ${line}`);\n    for (const line of identityDiff.changed) log(`  * ${line}`);\n    log('  A fixture ran `git config user.*` outside its own temporary repository; restore the keys above with `git config --local`.');\n    result.status = result.status !== 0 ? result.status : 1;\n  }"
           },
           "headMatchingLines": [
-            492
+            497
           ]
         },
         {
@@ -20314,7 +20306,7 @@
             "text": " * replaces.\n */\nexport function runTests({\n  root = DEFAULT_TEST_ROOT,\n  forwardedArgs = [],\n  execPath = process.execPath,\n  spawn = spawnSync,"
           },
           "headMatchingLines": [
-            509
+            514
           ]
         },
         {
@@ -20324,7 +20316,7 @@
             "text": "export function runTests({\n  root = DEFAULT_TEST_ROOT,\n  forwardedArgs = [],\n  execPath = process.execPath,\n  spawn = spawnSync,\n  env = process.env,\n  cwd = REPO_ROOT,"
           },
           "headMatchingLines": [
-            511
+            516
           ]
         },
         {
@@ -20374,7 +20366,7 @@
             "text": "      const hostBin = ensure(process.env, REPO_ROOT);\n      if (hostBin) process.env.FGOS_HOST_BIN = hostBin;\n    } catch (err) {\n      log(`run-tests: warning: failed to ensure host binary: ${err.message}`);\n    }\n  }\n  return queue(options);"
           },
           "headMatchingLines": [
-            566
+            571
           ]
         },
         {
@@ -20617,17 +20609,187 @@
       },
       "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "pinnedHash": "44b222ef7b565cbaf6c1caf0ca683a2dec793eb5b8f34376c60f0e1a0a9a65f7",
-      "headHash": "cbd3324b5fc76b680253283001e9d310bdd782e64148e2f03234b5a75e05904f",
+      "headHash": "61a54de2d57888dadb31138db836c569d5663046f4f835bf63061b43cbb77a35",
       "movedSpans": [
+        {
+          "id": "reference-003634",
+          "pinnedSpan": {
+            "line": 166,
+            "columnStart": 62,
+            "columnEndExclusive": 72,
+            "text": "docs/specs"
+          },
+          "headMatchingLines": [
+            168
+          ]
+        },
+        {
+          "id": "dynamic-008855",
+          "pinnedSpan": {
+            "line": 116,
+            "text": "    return {\n      primaryResponsibility: 'process-contract',\n      disposition: 'retain',\n      reason: `cwd built via ${site.cwdConstructor}(); fgos init's own cwd/subdir resolution is the fixture location under test (P06 precedent: over-broad fast-fixture replacement broke subdir cases)`,\n    };\n  }\n  return {"
+          },
+          "headMatchingLines": [
+            118
+          ]
+        },
+        {
+          "id": "dynamic-008856",
+          "pinnedSpan": {
+            "line": 126,
+            "text": "  };\n}\n\nexport function inventoryRunInitSites(files, { readFile = (f) => fs.readFileSync(f, 'utf8'), repoRoot = REPO_ROOT } = {}) {\n  const entries = [];\n  for (const relFile of files) {\n    const abs = path.join(repoRoot, relFile);"
+          },
+          "headMatchingLines": [
+            128
+          ]
+        },
+        {
+          "id": "dynamic-008857",
+          "pinnedSpan": {
+            "line": 129,
+            "text": "export function inventoryRunInitSites(files, { readFile = (f) => fs.readFileSync(f, 'utf8'), repoRoot = REPO_ROOT } = {}) {\n  const entries = [];\n  for (const relFile of files) {\n    const abs = path.join(repoRoot, relFile);\n    let content;\n    try {\n      content = readFile(abs);"
+          },
+          "headMatchingLines": [
+            131
+          ]
+        },
+        {
+          "id": "dynamic-008858",
+          "pinnedSpan": {
+            "line": 139,
+            "text": "    for (const site of scanRunInitSites(content, relFile)) {\n      const cls = classifyRunInitSite(site);\n      entries.push({\n        testId: `${relFile}::run-init@L${site.line}`,\n        file: relFile,\n        durationSeconds: null,\n        primaryResponsibility: cls.primaryResponsibility,"
+          },
+          "headMatchingLines": [
+            141
+          ]
+        },
+        {
+          "id": "dynamic-008859",
+          "pinnedSpan": {
+            "line": 161,
+            "text": "\n// -- 2. profile-driven top-N test/file classification --\n\nconst DIR_RULES = [\n  // Strong, structural signal only: rust-host tests genuinely cross the\n  // Rust/Node package boundary by directory convention (see docs/specs\n  // and P00's baseline report), not a content guess."
+          },
+          "headMatchingLines": [
+            163
+          ]
+        },
+        {
+          "id": "dynamic-008860",
+          "pinnedSpan": {
+            "line": 165,
+            "text": "  // Strong, structural signal only: rust-host tests genuinely cross the\n  // Rust/Node package boundary by directory convention (see docs/specs\n  // and P00's baseline report), not a content guess.\n  { test: (dir) => dir === 'rust-host', responsibility: 'cross-language-packaging', reason: 'test/rust-host/** exercises the real Rust binary across the package boundary' },\n];\n\nconst NAME_KEYWORD_RULES = ["
+          },
+          "headMatchingLines": [
+            167
+          ]
+        },
+        {
+          "id": "dynamic-008861",
+          "pinnedSpan": {
+            "line": 174,
+            "text": "];\n\nfunction dirBucket(absFile, repoRoot) {\n  const rel = path.relative(path.join(repoRoot, 'test'), absFile);\n  const parts = rel.split(path.sep);\n  return parts.length > 1 ? parts[0] : '(test root)';\n}"
+          },
+          "headMatchingLines": [
+            176
+          ]
+        },
+        {
+          "id": "dynamic-008862",
+          "pinnedSpan": {
+            "line": 179,
+            "text": "  return parts.length > 1 ? parts[0] : '(test root)';\n}\n\nexport function classifyProfiledTest({ name, file }, { repoRoot = REPO_ROOT } = {}) {\n  for (const rule of NAME_KEYWORD_RULES) {\n    if (rule.test(name)) return { primaryResponsibility: rule.responsibility, reason: rule.reason };\n  }"
+          },
+          "headMatchingLines": [
+            181
+          ]
+        },
+        {
+          "id": "dynamic-008863",
+          "pinnedSpan": {
+            "line": 183,
+            "text": "  for (const rule of NAME_KEYWORD_RULES) {\n    if (rule.test(name)) return { primaryResponsibility: rule.responsibility, reason: rule.reason };\n  }\n  const dir = dirBucket(file, repoRoot);\n  for (const rule of DIR_RULES) {\n    if (rule.test(dir)) return { primaryResponsibility: rule.responsibility, reason: rule.reason };\n  }"
+          },
+          "headMatchingLines": [
+            185
+          ]
+        },
+        {
+          "id": "dynamic-008864",
+          "pinnedSpan": {
+            "line": 190,
+            "text": "  return { primaryResponsibility: 'unknown', reason: 'no mechanical directory/keyword signal; needs a manual read, not guessed' };\n}\n\nexport function inventoryProfiledTests(topTests, { repoRoot = REPO_ROOT } = {}) {\n  return topTests.map((t) => {\n    const cls = classifyProfiledTest(t, { repoRoot });\n    const relFile = path.relative(repoRoot, t.file).replaceAll('\\\\', '/');"
+          },
+          "headMatchingLines": [
+            192
+          ]
+        },
+        {
+          "id": "dynamic-008865",
+          "pinnedSpan": {
+            "line": 195,
+            "text": "    const cls = classifyProfiledTest(t, { repoRoot });\n    const relFile = path.relative(repoRoot, t.file).replaceAll('\\\\', '/');\n    return {\n      testId: `${relFile}::${t.name}`,\n      file: relFile,\n      durationSeconds: t.time,\n      primaryResponsibility: cls.primaryResponsibility,"
+          },
+          "headMatchingLines": [
+            197
+          ]
+        },
+        {
+          "id": "dynamic-008866",
+          "pinnedSpan": {
+            "line": 220,
+            "text": " * individual tests within it may be classified elsewhere (e.g. via\n * inventoryRunInitSites for the P02 nine files).\n */\nexport function inventoryProfiledFiles(topFiles, { repoRoot = REPO_ROOT } = {}) {\n  return topFiles.map((f) => {\n    const relFile = path.relative(repoRoot, f.file).replaceAll('\\\\', '/');\n    const dir = dirBucket(f.file, repoRoot);"
+          },
+          "headMatchingLines": [
+            222
+          ]
+        },
+        {
+          "id": "dynamic-008867",
+          "pinnedSpan": {
+            "line": 223,
+            "text": "export function inventoryProfiledFiles(topFiles, { repoRoot = REPO_ROOT } = {}) {\n  return topFiles.map((f) => {\n    const relFile = path.relative(repoRoot, f.file).replaceAll('\\\\', '/');\n    const dir = dirBucket(f.file, repoRoot);\n    const rule = DIR_RULES.find((r) => r.test(dir));\n    return {\n      testId: `${relFile}::(file-rollup)`,"
+          },
+          "headMatchingLines": [
+            225
+          ]
+        },
+        {
+          "id": "dynamic-008868",
+          "pinnedSpan": {
+            "line": 226,
+            "text": "    const dir = dirBucket(f.file, repoRoot);\n    const rule = DIR_RULES.find((r) => r.test(dir));\n    return {\n      testId: `${relFile}::(file-rollup)`,\n      file: relFile,\n      durationSeconds: f.totalSeconds,\n      testCount: f.count,"
+          },
+          "headMatchingLines": [
+            228
+          ]
+        },
+        {
+          "id": "dynamic-008869",
+          "pinnedSpan": {
+            "line": 270,
+            "text": " * callers decide whether a violation is fatal.\n */\nexport function checkAdmission(changedLines, baseline = []) {\n  const baselineKeys = new Set(baseline.map((b) => `${b.ruleId}::${b.file}::${b.line}`));\n  const violations = [];\n  for (const { file, line, text, prevText } of changedLines) {\n    for (const rule of ADMISSION_RULES) {"
+          },
+          "headMatchingLines": [
+            289
+          ]
+        },
+        {
+          "id": "dynamic-008870",
+          "pinnedSpan": {
+            "line": 275,
+            "text": "  for (const { file, line, text, prevText } of changedLines) {\n    for (const rule of ADMISSION_RULES) {\n      if (!rule.test(text, prevText)) continue;\n      const key = `${rule.id}::${file}::${line}`;\n      if (baselineKeys.has(key)) continue;\n      violations.push({ ruleId: rule.id, file, line, message: rule.message });\n    }"
+          },
+          "headMatchingLines": [
+            294
+          ]
+        },
         {
           "id": "dynamic-008871",
           "pinnedSpan": {
             "line": 543,
             "text": "    }\n    for (const { title, files } of report.shared) console.log(`title ${title}: ${files.join(', ')}`);\n  } else if (args[0] === '--check') {\n    const scopeIdx = args.indexOf('--scope');\n    const scopeFiles = scopeIdx === -1 ? [] : args[scopeIdx + 1].split(',');\n    const baselineIdx = args.indexOf('--baseline');\n    const baselinePath = baselineIdx === -1 ? null : args[baselineIdx + 1];"
           },
-          "headMatchingLines": [
-            552
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-008872",
@@ -20635,9 +20797,7 @@
             "line": 544,
             "text": "    for (const { title, files } of report.shared) console.log(`title ${title}: ${files.join(', ')}`);\n  } else if (args[0] === '--check') {\n    const scopeIdx = args.indexOf('--scope');\n    const scopeFiles = scopeIdx === -1 ? [] : args[scopeIdx + 1].split(',');\n    const baselineIdx = args.indexOf('--baseline');\n    const baselinePath = baselineIdx === -1 ? null : args[baselineIdx + 1];\n    const baseline = baselinePath && fs.existsSync(baselinePath) ? JSON.parse(fs.readFileSync(baselinePath, 'utf8')) : [];"
           },
-          "headMatchingLines": [
-            553
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-008873",
@@ -20645,9 +20805,7 @@
             "line": 544,
             "text": "    for (const { title, files } of report.shared) console.log(`title ${title}: ${files.join(', ')}`);\n  } else if (args[0] === '--check') {\n    const scopeIdx = args.indexOf('--scope');\n    const scopeFiles = scopeIdx === -1 ? [] : args[scopeIdx + 1].split(',');\n    const baselineIdx = args.indexOf('--baseline');\n    const baselinePath = baselineIdx === -1 ? null : args[baselineIdx + 1];\n    const baseline = baselinePath && fs.existsSync(baselinePath) ? JSON.parse(fs.readFileSync(baselinePath, 'utf8')) : [];"
           },
-          "headMatchingLines": [
-            553
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-008874",
@@ -20656,7 +20814,7 @@
             "text": "    const scopeIdx = args.indexOf('--scope');\n    const scopeFiles = scopeIdx === -1 ? [] : args[scopeIdx + 1].split(',');\n    const baselineIdx = args.indexOf('--baseline');\n    const baselinePath = baselineIdx === -1 ? null : args[baselineIdx + 1];\n    const baseline = baselinePath && fs.existsSync(baselinePath) ? JSON.parse(fs.readFileSync(baselinePath, 'utf8')) : [];\n    const changed = addedLinesFromGitDiff(scopeFiles);\n    const violations = checkAdmission(changed, baseline);"
           },
           "headMatchingLines": [
-            555
+            620
           ]
         },
         {
@@ -20666,7 +20824,7 @@
             "text": "    const changed = addedLinesFromGitDiff(scopeFiles);\n    const violations = checkAdmission(changed, baseline);\n    if (violations.length > 0) {\n      console.log(`WARNING: ${violations.length} new admission-check violation(s):`);\n      for (const v of violations) console.log(`  ${v.file}:${v.line} [${v.ruleId}] ${v.message}`);\n    } else {\n      console.log('No new admission-check violations.');"
           },
           "headMatchingLines": [
-            560
+            625
           ]
         },
         {
@@ -20676,7 +20834,305 @@
             "text": "    const violations = checkAdmission(changed, baseline);\n    if (violations.length > 0) {\n      console.log(`WARNING: ${violations.length} new admission-check violation(s):`);\n      for (const v of violations) console.log(`  ${v.file}:${v.line} [${v.ruleId}] ${v.message}`);\n    } else {\n      console.log('No new admission-check violations.');\n    }"
           },
           "headMatchingLines": [
-            561
+            626
+          ]
+        },
+        {
+          "id": "dynamic-008877",
+          "pinnedSpan": {
+            "line": 46,
+            "text": "\nconst RUN_INIT_RE = /\\brun\\(\\s*([A-Za-z_$][\\w$]*)\\s*,\\s*\\[\\s*'init'\\s*\\]\\s*\\)/;\nconst CWD_CTOR_RE = (varName) =>\n  new RegExp(`\\\\b(?:const|let)\\\\s+(?:\\\\{[^}]*\\\\b${varName}\\\\b[^}]*\\\\}|${varName})\\\\s*=\\\\s*([A-Za-z_$][\\\\w$]*)\\\\s*\\\\(`);\n\n/**\n * Scans one file's source text for bare `run(cwdVar, ['init'])` call sites."
+          },
+          "headMatchingLines": [
+            48
+          ]
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "scripts/test-select-coverage-map.mjs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 226
+      },
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "pinnedHash": "8e4fbb903bb3c9e3680c946cbaeb8f5116a474c2bb873e96589bee1b4c56a431",
+      "headHash": "b313d02cce6c8fa7f03dae8acdfd14a37b8f3a04b330ae9b2c144d0287b08e85",
+      "movedSpans": [
+        {
+          "id": "dynamic-008895",
+          "pinnedSpan": {
+            "line": 105,
+            "text": "\n  // If NODE_V8_COVERAGE is set, use it (assumed to be populated by per-process runs),\n  // otherwise run the tests ourselves one file per process to get accurate per-test coverage.\n  let covDirToProcess = process.env.NODE_V8_COVERAGE;\n  let selfGenerated = false;\n  let collection = null;\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008896",
+          "pinnedSpan": {
+            "line": 110,
+            "text": "  let collection = null;\n\n  if (!covDirToProcess) {\n    console.log(`NODE_V8_COVERAGE not set. Collecting coverage for ${suiteFiles.length} test files (concurrency ${COVERAGE_CONCURRENCY}, ${COVERAGE_FILE_TIMEOUT_MS / 1000}s per file)...`);\n    covDirToProcess = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coverage-'));\n    selfGenerated = true;\n    collection = await collectPerFileCoverage(suiteFiles, {"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008897",
+          "pinnedSpan": {
+            "line": 111,
+            "text": "\n  if (!covDirToProcess) {\n    console.log(`NODE_V8_COVERAGE not set. Collecting coverage for ${suiteFiles.length} test files (concurrency ${COVERAGE_CONCURRENCY}, ${COVERAGE_FILE_TIMEOUT_MS / 1000}s per file)...`);\n    covDirToProcess = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coverage-'));\n    selfGenerated = true;\n    collection = await collectPerFileCoverage(suiteFiles, {\n      repoRoot,"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008898",
+          "pinnedSpan": {
+            "line": 111,
+            "text": "\n  if (!covDirToProcess) {\n    console.log(`NODE_V8_COVERAGE not set. Collecting coverage for ${suiteFiles.length} test files (concurrency ${COVERAGE_CONCURRENCY}, ${COVERAGE_FILE_TIMEOUT_MS / 1000}s per file)...`);\n    covDirToProcess = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coverage-'));\n    selfGenerated = true;\n    collection = await collectPerFileCoverage(suiteFiles, {\n      repoRoot,"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008899",
+          "pinnedSpan": {
+            "line": 115,
+            "text": "    selfGenerated = true;\n    collection = await collectPerFileCoverage(suiteFiles, {\n      repoRoot,\n      covRoot: covDirToProcess,\n      onResult: (r, done, total) => console.log(`[${done}/${total}] ${r.outcome} ${(r.durationMs / 1000).toFixed(1)}s ${r.file}`),\n    });\n    for (const r of collection.results) {"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008900",
+          "pinnedSpan": {
+            "line": 116,
+            "text": "    collection = await collectPerFileCoverage(suiteFiles, {\n      repoRoot,\n      covRoot: covDirToProcess,\n      onResult: (r, done, total) => console.log(`[${done}/${total}] ${r.outcome} ${(r.durationMs / 1000).toFixed(1)}s ${r.file}`),\n    });\n    for (const r of collection.results) {\n      for (const srcRel of coveredSourceFiles(r.covDir, repoRoot)) {"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008901",
+          "pinnedSpan": {
+            "line": 126,
+            "text": "    }\n    fs.rmSync(covDirToProcess, { recursive: true, force: true });\n    const timedOut = collection.results.filter((r) => r.outcome === 'coverage-collection-timeout');\n    console.log(`Coverage collection finished in ${(collection.durationMs / 60000).toFixed(1)} min; ${timedOut.length} file(s) timed out${timedOut.length ? `: ${timedOut.map((r) => r.file).join(', ')}` : ''}.`);\n  }\n\n  if (covDirToProcess && !selfGenerated && fs.existsSync(covDirToProcess)) {"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008902",
+          "pinnedSpan": {
+            "line": 126,
+            "text": "    }\n    fs.rmSync(covDirToProcess, { recursive: true, force: true });\n    const timedOut = collection.results.filter((r) => r.outcome === 'coverage-collection-timeout');\n    console.log(`Coverage collection finished in ${(collection.durationMs / 60000).toFixed(1)} min; ${timedOut.length} file(s) timed out${timedOut.length ? `: ${timedOut.map((r) => r.file).join(', ')}` : ''}.`);\n  }\n\n  if (covDirToProcess && !selfGenerated && fs.existsSync(covDirToProcess)) {"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008903",
+          "pinnedSpan": {
+            "line": 133,
+            "text": "    console.log(\"Merging NODE_V8_COVERAGE data...\");\n    const covFiles = fs.readdirSync(covDirToProcess).filter(f => f.endsWith('.json'));\n    for (const file of covFiles) {\n      const covPath = path.join(covDirToProcess, file);\n      try {\n        const data = JSON.parse(fs.readFileSync(covPath, 'utf8'));\n        // Find the test file in this coverage profile"
+          },
+          "headMatchingLines": [
+            137
+          ]
+        },
+        {
+          "id": "dynamic-008904",
+          "pinnedSpan": {
+            "line": 133,
+            "text": "    console.log(\"Merging NODE_V8_COVERAGE data...\");\n    const covFiles = fs.readdirSync(covDirToProcess).filter(f => f.endsWith('.json'));\n    for (const file of covFiles) {\n      const covPath = path.join(covDirToProcess, file);\n      try {\n        const data = JSON.parse(fs.readFileSync(covPath, 'utf8'));\n        // Find the test file in this coverage profile"
+          },
+          "headMatchingLines": [
+            137
+          ]
+        },
+        {
+          "id": "dynamic-008905",
+          "pinnedSpan": {
+            "line": 140,
+            "text": "        let testScript = null;\n        for (const res of data.result || []) {\n          if (res.url.includes('/test/') && (res.url.endsWith('.test.mjs') || res.url.endsWith('.mjs'))) {\n            const urlObj = new URL(res.url);\n            testScript = path.relative(repoRoot, urlObj.pathname).replace(/\\\\/g, '/');\n            break;\n          }"
+          },
+          "headMatchingLines": [
+            144
+          ]
+        },
+        {
+          "id": "dynamic-008906",
+          "pinnedSpan": {
+            "line": 149,
+            "text": "        if (testScript) {\n          for (const res of data.result || []) {\n            if (res.url.includes('/src/') || res.url.includes('/bin/')) {\n              const urlObj = new URL(res.url);\n              const srcRel = path.relative(repoRoot, urlObj.pathname).replace(/\\\\/g, '/');\n              if (srcRel.startsWith('src/') || srcRel.startsWith('bin/')) {\n                if (!mapping[srcRel]) mapping[srcRel] = new Set();"
+          },
+          "headMatchingLines": [
+            153
+          ]
+        },
+        {
+          "id": "dynamic-008907",
+          "pinnedSpan": {
+            "line": 170,
+            "text": "    finalMapping[src] = Array.from(tests).sort();\n  }\n\n  const outDir = 'plans/260922-test-suite-optimization/reports';\n  if (!fs.existsSync(outDir)) {\n    fs.mkdirSync(outDir, { recursive: true });\n  }"
+          },
+          "headMatchingLines": [
+            174
+          ]
+        },
+        {
+          "id": "dynamic-008908",
+          "pinnedSpan": {
+            "line": 176,
+            "text": "  }\n\n  const date = new Date().toISOString().split('T')[0];\n  fs.writeFileSync(path.join(outDir, `coverage-map-${date}.json`), JSON.stringify({\n    version: 1,\n    generatedAt: new Date().toISOString(),\n    mapping: finalMapping,"
+          },
+          "headMatchingLines": [
+            180
+          ]
+        },
+        {
+          "id": "dynamic-008909",
+          "pinnedSpan": {
+            "line": 176,
+            "text": "  }\n\n  const date = new Date().toISOString().split('T')[0];\n  fs.writeFileSync(path.join(outDir, `coverage-map-${date}.json`), JSON.stringify({\n    version: 1,\n    generatedAt: new Date().toISOString(),\n    mapping: finalMapping,"
+          },
+          "headMatchingLines": [
+            180
+          ]
+        },
+        {
+          "id": "dynamic-008910",
+          "pinnedSpan": {
+            "line": 194,
+            "text": "  let md = `# Coverage Suggestion Diff\\n\\n`;\n  for (const src of Object.keys(finalMapping).sort()) {\n    if (src.startsWith('src/verbs/state/')) {\n      md += `\\n### \\`${src}\\`\\n`;\n      for (const t of finalMapping[src]) {\n        md += `- ${t}\\n`;\n      }"
+          },
+          "headMatchingLines": [
+            198
+          ]
+        },
+        {
+          "id": "dynamic-008911",
+          "pinnedSpan": {
+            "line": 196,
+            "text": "    if (src.startsWith('src/verbs/state/')) {\n      md += `\\n### \\`${src}\\`\\n`;\n      for (const t of finalMapping[src]) {\n        md += `- ${t}\\n`;\n      }\n    }\n  }"
+          },
+          "headMatchingLines": [
+            200
+          ]
+        },
+        {
+          "id": "dynamic-008912",
+          "pinnedSpan": {
+            "line": 200,
+            "text": "      }\n    }\n  }\n  fs.writeFileSync(path.join(outDir, `coverage-suggestion-${date}.md`), md);\n  \n  console.log(\"Coverage map generated.\");\n}"
+          },
+          "headMatchingLines": [
+            204
+          ]
+        },
+        {
+          "id": "dynamic-008913",
+          "pinnedSpan": {
+            "line": 200,
+            "text": "      }\n    }\n  }\n  fs.writeFileSync(path.join(outDir, `coverage-suggestion-${date}.md`), md);\n  \n  console.log(\"Coverage map generated.\");\n}"
+          },
+          "headMatchingLines": [
+            204
+          ]
+        },
+        {
+          "id": "dynamic-008915",
+          "pinnedSpan": {
+            "line": 211,
+            "text": "  if (!fs.existsSync(covDir)) return found;\n  for (const file of fs.readdirSync(covDir).filter((f) => f.endsWith('.json'))) {\n    try {\n      const data = JSON.parse(fs.readFileSync(path.join(covDir, file), 'utf8'));\n      for (const res of data.result || []) {\n        if (!res.url.startsWith('file:')) continue;\n        const srcRel = path.relative(repoRoot, new URL(res.url).pathname).replace(/\\\\/g, '/');"
+          },
+          "headMatchingLines": [
+            215
+          ]
+        },
+        {
+          "id": "dynamic-008916",
+          "pinnedSpan": {
+            "line": 214,
+            "text": "      const data = JSON.parse(fs.readFileSync(path.join(covDir, file), 'utf8'));\n      for (const res of data.result || []) {\n        if (!res.url.startsWith('file:')) continue;\n        const srcRel = path.relative(repoRoot, new URL(res.url).pathname).replace(/\\\\/g, '/');\n        if (srcRel.startsWith('src/') || srcRel.startsWith('bin/')) found.add(srcRel);\n      }\n    } catch {"
+          },
+          "headMatchingLines": [
+            218
+          ]
+        },
+        {
+          "id": "dynamic-008917",
+          "pinnedSpan": {
+            "line": 237,
+            "text": "  covRoot,\n  timeoutMs = COVERAGE_FILE_TIMEOUT_MS,\n  concurrency = COVERAGE_CONCURRENCY,\n  execPath = process.execPath,\n  env = process.env,\n  onResult = () => {},\n} = {}) {"
+          },
+          "headMatchingLines": [
+            241
+          ]
+        },
+        {
+          "id": "dynamic-008918",
+          "pinnedSpan": {
+            "line": 247,
+            "text": "\n  const runOne = (absFile) => new Promise((resolve) => {\n    const file = path.relative(repoRoot, absFile).replace(/\\\\/g, '/');\n    const covDir = path.join(covRoot, encodeURIComponent(file));\n    fs.mkdirSync(covDir, { recursive: true });\n    const t0 = Date.now();\n    // Same per-run temp root as run-tests.mjs: whatever fixtures this file"
+          },
+          "headMatchingLines": [
+            251
+          ]
+        },
+        {
+          "id": "dynamic-008919",
+          "pinnedSpan": {
+            "line": 247,
+            "text": "\n  const runOne = (absFile) => new Promise((resolve) => {\n    const file = path.relative(repoRoot, absFile).replace(/\\\\/g, '/');\n    const covDir = path.join(covRoot, encodeURIComponent(file));\n    fs.mkdirSync(covDir, { recursive: true });\n    const t0 = Date.now();\n    // Same per-run temp root as run-tests.mjs: whatever fixtures this file"
+          },
+          "headMatchingLines": [
+            251
+          ]
+        },
+        {
+          "id": "dynamic-008920",
+          "pinnedSpan": {
+            "line": 254,
+            "text": "    // leaves behind are removed with it instead of piling up in the shared\n    // temp dir across the nightly's hundreds of per-file runs.\n    const baseEnv = buildTestEnv(env);\n    const tmpRoot = fs.mkdtempSync(path.join(baseEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    const child = spawn(execPath, ['--test', absFile], {\n      cwd: repoRoot,\n      env: { ...baseEnv, TMPDIR: tmpRoot, TMP: tmpRoot, TEMP: tmpRoot, NODE_V8_COVERAGE: covDir },"
+          },
+          "headMatchingLines": [
+            258
+          ]
+        },
+        {
+          "id": "dynamic-008921",
+          "pinnedSpan": {
+            "line": 254,
+            "text": "    // leaves behind are removed with it instead of piling up in the shared\n    // temp dir across the nightly's hundreds of per-file runs.\n    const baseEnv = buildTestEnv(env);\n    const tmpRoot = fs.mkdtempSync(path.join(baseEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    const child = spawn(execPath, ['--test', absFile], {\n      cwd: repoRoot,\n      env: { ...baseEnv, TMPDIR: tmpRoot, TMP: tmpRoot, TEMP: tmpRoot, NODE_V8_COVERAGE: covDir },"
+          },
+          "headMatchingLines": [
+            258
+          ]
+        },
+        {
+          "id": "dynamic-008922",
+          "pinnedSpan": {
+            "line": 254,
+            "text": "    // leaves behind are removed with it instead of piling up in the shared\n    // temp dir across the nightly's hundreds of per-file runs.\n    const baseEnv = buildTestEnv(env);\n    const tmpRoot = fs.mkdtempSync(path.join(baseEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    const child = spawn(execPath, ['--test', absFile], {\n      cwd: repoRoot,\n      env: { ...baseEnv, TMPDIR: tmpRoot, TMP: tmpRoot, TEMP: tmpRoot, NODE_V8_COVERAGE: covDir },"
+          },
+          "headMatchingLines": [
+            258
+          ]
+        },
+        {
+          "id": "dynamic-008923",
+          "pinnedSpan": {
+            "line": 257,
+            "text": "    const tmpRoot = fs.mkdtempSync(path.join(baseEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    const child = spawn(execPath, ['--test', absFile], {\n      cwd: repoRoot,\n      env: { ...baseEnv, TMPDIR: tmpRoot, TMP: tmpRoot, TEMP: tmpRoot, NODE_V8_COVERAGE: covDir },\n      stdio: 'ignore',\n      detached: process.platform !== 'win32',\n    });"
+          },
+          "headMatchingLines": [
+            261
+          ]
+        },
+        {
+          "id": "dynamic-008924",
+          "pinnedSpan": {
+            "line": 274,
+            "text": "    const finish = (outcome) => {\n      clearTimeout(timer);\n      try { fs.rmSync(tmpRoot, { recursive: true, force: true, maxRetries: 3 }); } catch {}\n      resolve({ file, covDir, outcome, durationMs: Date.now() - t0 });\n    };\n    child.on('error', () => finish('spawn-failed'));\n    child.on('exit', (code) => finish(timedOut ? 'coverage-collection-timeout' : code === 0 ? 'ok' : 'test-failed'));"
+          },
+          "headMatchingLines": [
+            278
           ]
         }
       ],
@@ -22255,6 +22711,19 @@
       "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
       "pinnedHash": "e68c257afc35057401aa0d5c140e59636916d63a83a4908b948a349b55f57c2f",
       "headHash": "faf93fbb79706eec91b88d4659d5ca23141fee145fbd8f9fab95e018d2f21c5a",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "test/run-supervisor/contracts-unit-state.test.mjs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+        "recordLine": 17
+      },
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "pinnedHash": "c1223f01fa408b77fb3213ed338d269efff1d7aa73c3b1c0b67758aa60c4dc74",
+      "headHash": "58521fe4f250f06b8d715f3ad544e02edc08c75dd3147ace42675abde60f889e",
       "movedSpans": [],
       "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
       "failing": false
@@ -48303,6 +48772,588 @@
       "failing": false
     },
     {
+      "file": "test/run-supervisor/adopt-client.test.mjs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 86
+      },
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "pinnedHash": "81836c8a1f175a4a9a21aac84c36965d1be7246a678f1e63f351bf4b4659b4fe",
+      "headHash": "bdb9fa643f3853e411a4e19a01a634613b2c43d0ed9c14c5e93a6a558c9f1a1c",
+      "movedSpans": [
+        {
+          "id": "dynamic-021616",
+          "pinnedSpan": {
+            "line": 98,
+            "text": "  }\n});\n\ntest('a route that fails is a named error, not a verdict', { skip: NEEDS_HOST }, () => {\n  const root = tmp('fail');\n  try {\n    const script = path.join(root, 'bad-host.sh');\n    fs.writeFileSync(script, '#!/bin/sh\\necho \"not json\"\\nexit 7\\n', { mode: 0o755 });\n    assert.throws(() => adoptRun(root, { hostBin: script }), (err) => err instanceof RunSupervisorError && err.code === 'adopt-route-failed' && err.status === 7);"
+          },
+          "headMatchingLines": [
+            84
+          ]
+        },
+        {
+          "id": "dynamic-021617",
+          "pinnedSpan": {
+            "line": 100,
+            "text": "\ntest('a route that fails is a named error, not a verdict', { skip: NEEDS_HOST }, () => {\n  const root = tmp('fail');\n  try {\n    const script = path.join(root, 'bad-host.sh');\n    fs.writeFileSync(script, '#!/bin/sh\\necho \"not json\"\\nexit 7\\n', { mode: 0o755 });\n    assert.throws(() => adoptRun(root, { hostBin: script }), (err) => err instanceof RunSupervisorError && err.code === 'adopt-route-failed' && err.status === 7);\n    const old = path.join(root, 'old-host.sh');\n    fs.writeFileSync(old, '#!/bin/sh\\necho \\'{\"v\":1,\"protocol\":1,\"result\":\"error\",\"code\":\"host-version-mismatch\"}\\'\\nexit 3\\n', { mode: 0o755 });"
+          },
+          "headMatchingLines": [
+            86
+          ]
+        },
+        {
+          "id": "dynamic-021618",
+          "pinnedSpan": {
+            "line": 103,
+            "text": "  try {\n    const script = path.join(root, 'bad-host.sh');\n    fs.writeFileSync(script, '#!/bin/sh\\necho \"not json\"\\nexit 7\\n', { mode: 0o755 });\n    assert.throws(() => adoptRun(root, { hostBin: script }), (err) => err instanceof RunSupervisorError && err.code === 'adopt-route-failed' && err.status === 7);\n    const old = path.join(root, 'old-host.sh');\n    fs.writeFileSync(old, '#!/bin/sh\\necho \\'{\"v\":1,\"protocol\":1,\"result\":\"error\",\"code\":\"host-version-mismatch\"}\\'\\nexit 3\\n', { mode: 0o755 });\n    assert.throws(() => adoptRun(root, { hostBin: old }), (err) => err.code === 'host-version-mismatch');\n  } finally {\n    fs.rmSync(root, { recursive: true, force: true });"
+          },
+          "headMatchingLines": [
+            89
+          ]
+        },
+        {
+          "id": "dynamic-021634",
+          "pinnedSpan": {
+            "line": 39,
+            "text": "    agentProtocol: { cli: 'claude', mode: 'direct' },\n    steps,\n  };\n  envelope.digest = computeSha256Digest(envelope);\n  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify(envelope));\n  fs.writeFileSync(path.join(dir, 'attempt.lock'), '');\n  return dir;\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-021640",
+          "pinnedSpan": {
+            "line": 61,
+            "text": "  }\n});\n\ntest('adoptRun with probeOnly changes nothing and a foreign run dir is legacy-run', { skip: NEEDS_HOST }, () => {\n  const root = tmp('probe');\n  try {\n    const dir = attemptDir(root, 'a1');\n    assert.equal(adoptRun(dir, { probeOnly: true }).state, 'needs-adopt');\n    assert.deepEqual(fs.readdirSync(dir).sort(), ['attempt.lock', 'envelope.json']);"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-021641",
+          "pinnedSpan": {
+            "line": 63,
+            "text": "\ntest('adoptRun with probeOnly changes nothing and a foreign run dir is legacy-run', { skip: NEEDS_HOST }, () => {\n  const root = tmp('probe');\n  try {\n    const dir = attemptDir(root, 'a1');\n    assert.equal(adoptRun(dir, { probeOnly: true }).state, 'needs-adopt');\n    assert.deepEqual(fs.readdirSync(dir).sort(), ['attempt.lock', 'envelope.json']);\n    const foreign = path.join(root, 'old');\n    fs.mkdirSync(foreign);"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-021642",
+          "pinnedSpan": {
+            "line": 66,
+            "text": "  try {\n    const dir = attemptDir(root, 'a1');\n    assert.equal(adoptRun(dir, { probeOnly: true }).state, 'needs-adopt');\n    assert.deepEqual(fs.readdirSync(dir).sort(), ['attempt.lock', 'envelope.json']);\n    const foreign = path.join(root, 'old');\n    fs.mkdirSync(foreign);\n    assert.equal(adoptRun(foreign).state, 'legacy-run');\n  } finally {\n    fs.rmSync(root, { recursive: true, force: true });"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-021643",
+          "pinnedSpan": {
+            "line": 75,
+            "text": "  }\n});\n\ntest('adoptScan lists open attempts under runs/, skips closed ones and answers in listing order', { skip: NEEDS_HOST }, () => {\n  const root = tmp('scan');\n  try {\n    const open = [\n      attemptDir(path.join(root, 'u1', 'runs'), '01'),\n      attemptDir(path.join(root, 'u2', 'nested', 'runs'), '01'),"
+          },
+          "headMatchingLines": [
+            61
+          ]
+        },
+        {
+          "id": "dynamic-021644",
+          "pinnedSpan": {
+            "line": 78,
+            "text": "test('adoptScan lists open attempts under runs/, skips closed ones and answers in listing order', { skip: NEEDS_HOST }, () => {\n  const root = tmp('scan');\n  try {\n    const open = [\n      attemptDir(path.join(root, 'u1', 'runs'), '01'),\n      attemptDir(path.join(root, 'u2', 'nested', 'runs'), '01'),\n    ];\n    const closed = attemptDir(path.join(root, 'u1', 'runs'), '00');\n    fs.writeFileSync(path.join(closed, 'closed.json'), '{}');"
+          },
+          "headMatchingLines": [
+            64
+          ]
+        },
+        {
+          "id": "dynamic-021645",
+          "pinnedSpan": {
+            "line": 79,
+            "text": "  const root = tmp('scan');\n  try {\n    const open = [\n      attemptDir(path.join(root, 'u1', 'runs'), '01'),\n      attemptDir(path.join(root, 'u2', 'nested', 'runs'), '01'),\n    ];\n    const closed = attemptDir(path.join(root, 'u1', 'runs'), '00');\n    fs.writeFileSync(path.join(closed, 'closed.json'), '{}');\n    fs.mkdirSync(path.join(root, 'u3', 'not-runs', '01'), { recursive: true });"
+          },
+          "headMatchingLines": [
+            65
+          ]
+        },
+        {
+          "id": "dynamic-021646",
+          "pinnedSpan": {
+            "line": 81,
+            "text": "    const open = [\n      attemptDir(path.join(root, 'u1', 'runs'), '01'),\n      attemptDir(path.join(root, 'u2', 'nested', 'runs'), '01'),\n    ];\n    const closed = attemptDir(path.join(root, 'u1', 'runs'), '00');\n    fs.writeFileSync(path.join(closed, 'closed.json'), '{}');\n    fs.mkdirSync(path.join(root, 'u3', 'not-runs', '01'), { recursive: true });\n    assert.deepEqual(listOpenAttemptDirs(root), [...open].sort());\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-021647",
+          "pinnedSpan": {
+            "line": 82,
+            "text": "      attemptDir(path.join(root, 'u1', 'runs'), '01'),\n      attemptDir(path.join(root, 'u2', 'nested', 'runs'), '01'),\n    ];\n    const closed = attemptDir(path.join(root, 'u1', 'runs'), '00');\n    fs.writeFileSync(path.join(closed, 'closed.json'), '{}');\n    fs.mkdirSync(path.join(root, 'u3', 'not-runs', '01'), { recursive: true });\n    assert.deepEqual(listOpenAttemptDirs(root), [...open].sort());\n\n    const probed = adoptScan({ assignmentsRoot: root, probeOnly: true });"
+          },
+          "headMatchingLines": [
+            68
+          ]
+        },
+        {
+          "id": "dynamic-021648",
+          "pinnedSpan": {
+            "line": 83,
+            "text": "      attemptDir(path.join(root, 'u2', 'nested', 'runs'), '01'),\n    ];\n    const closed = attemptDir(path.join(root, 'u1', 'runs'), '00');\n    fs.writeFileSync(path.join(closed, 'closed.json'), '{}');\n    fs.mkdirSync(path.join(root, 'u3', 'not-runs', '01'), { recursive: true });\n    assert.deepEqual(listOpenAttemptDirs(root), [...open].sort());\n\n    const probed = adoptScan({ assignmentsRoot: root, probeOnly: true });\n    assert.deepEqual(probed.map((l) => l.state), ['needs-adopt', 'needs-adopt']);"
+          },
+          "headMatchingLines": [
+            69
+          ]
+        },
+        {
+          "id": "dynamic-021649",
+          "pinnedSpan": {
+            "line": 86,
+            "text": "    fs.writeFileSync(path.join(closed, 'closed.json'), '{}');\n    fs.mkdirSync(path.join(root, 'u3', 'not-runs', '01'), { recursive: true });\n    assert.deepEqual(listOpenAttemptDirs(root), [...open].sort());\n\n    const probed = adoptScan({ assignmentsRoot: root, probeOnly: true });\n    assert.deepEqual(probed.map((l) => l.state), ['needs-adopt', 'needs-adopt']);\n    const adopted = adoptScan({ assignmentsRoot: root });\n    assert.deepEqual(adopted.map((l) => l.attemptDir), [...open].sort());\n    assert.deepEqual(adopted.map((l) => l.state), ['adopted', 'adopted']);"
+          },
+          "headMatchingLines": [
+            72
+          ]
+        },
+        {
+          "id": "dynamic-021650",
+          "pinnedSpan": {
+            "line": 88,
+            "text": "    assert.deepEqual(listOpenAttemptDirs(root), [...open].sort());\n\n    const probed = adoptScan({ assignmentsRoot: root, probeOnly: true });\n    assert.deepEqual(probed.map((l) => l.state), ['needs-adopt', 'needs-adopt']);\n    const adopted = adoptScan({ assignmentsRoot: root });\n    assert.deepEqual(adopted.map((l) => l.attemptDir), [...open].sort());\n    assert.deepEqual(adopted.map((l) => l.state), ['adopted', 'adopted']);\n    assert.deepEqual(adoptScan({ assignmentsRoot: root }), [], 'nothing open is left');\n  } finally {"
+          },
+          "headMatchingLines": [
+            74
+          ]
+        },
+        {
+          "id": "dynamic-021651",
+          "pinnedSpan": {
+            "line": 91,
+            "text": "    assert.deepEqual(probed.map((l) => l.state), ['needs-adopt', 'needs-adopt']);\n    const adopted = adoptScan({ assignmentsRoot: root });\n    assert.deepEqual(adopted.map((l) => l.attemptDir), [...open].sort());\n    assert.deepEqual(adopted.map((l) => l.state), ['adopted', 'adopted']);\n    assert.deepEqual(adoptScan({ assignmentsRoot: root }), [], 'nothing open is left');\n  } finally {\n    fs.rmSync(root, { recursive: true, force: true });\n  }\n});"
+          },
+          "headMatchingLines": [
+            77
+          ]
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "test/run-supervisor/contracts-terminal.test.mjs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 90
+      },
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "pinnedHash": "d07d8b85c645c2699668529b4501a5bbc22837df9decf9240d059cd22375d781",
+      "headHash": "4c24eb0510e312d0d36f6bf2bc1010524b65d7ea5e57396f5118b653661c530d",
+      "movedSpans": [
+        {
+          "id": "dynamic-021773",
+          "pinnedSpan": {
+            "line": 104,
+            "text": "  const t = gateGo.terminal;\n  assert.match(t.peerCheck.rule, /SO_PEERCRED/);\n  assert.match(t.peerCheck.rule, /Pids are never compared/);\n  assert.deepEqual(Object.keys(t.fdOrder).filter((k) => /^\\d$/.test(k)), ['0', '1']);\n  assert.match(t.sequence.join(' '), /MSG_CMSG_CLOEXEC/);\n  assert.deepEqual(Object.keys(t.orphan.reasons).sort(), ['abandoned-before-brief', 'orphan-result']);\n  assert.ok('BRIEF_DELIVERED' in gateGo.frames);\n  assert.equal(gateGo.frames.BRIEF_DELIVERED.direction, 'supervisor -> gate');\n});"
+          },
+          "headMatchingLines": [
+            91
+          ]
+        },
+        {
+          "id": "dynamic-021775",
+          "pinnedSpan": {
+            "line": 113,
+            "text": "\ntest('orphan reasons agree between gate-go, gate-exit and the receipt', () => {\n  const reasons = Object.keys(gateGo.terminal.orphan.reasons);\n  assert.ok(gateExit.fields.stoppedBy.enum.includes('orphan'));\n  for (const reason of reasons) assert.match(gateExit.fields.cause, new RegExp(reason), `gate-exit names ${reason}`);\n  assert.ok(receipt.fields.outcome.enum.includes('carrier-lost'));\n  assert.ok(receipt.fields.outcome.enum.includes('abandoned-before-brief'));\n  assert.ok(receipt.outcomeRule.some((rule) => /abandoned-before-brief/.test(rule)));\n});"
+          },
+          "headMatchingLines": [
+            100
+          ]
+        },
+        {
+          "id": "dynamic-021776",
+          "pinnedSpan": {
+            "line": 121,
+            "text": "});\n\ntest('terminal outcomes are the interactive subset of the agent protocol results', () => {\n  assert.deepEqual(Object.keys(outcomes.outcomes), ['ready', 'blocked', 'delivered', 'delivery-unknown', 'completed', 'needs-human']);\n  for (const name of Object.keys(outcomes.outcomes)) assert.ok(name in agentProtocol.results, `${name} is an agent-protocol result`);\n  assert.deepEqual(outcomes.outcomes.blocked.fields.reason.enum, ['trust-dialog', 'login']);\n  for (const reason of outcomes.outcomes.blocked.fields.reason.enum) assert.ok(agentProtocol.results.blocked.reason.enum.includes(reason));\n  assert.ok('resultPath' in outcomes.outcomes.completed.fields);\n});"
+          },
+          "headMatchingLines": [
+            108
+          ]
+        },
+        {
+          "id": "dynamic-021780",
+          "pinnedSpan": {
+            "line": 58,
+            "text": "  assert.equal(last.builtin, true);\n  assert.deepEqual(Object.keys(last).sort(), Object.keys(envelopeContract.fields.steps.builtinItem).sort());\n  assert.deepEqual(last.disposition, { onSuccess: 'close', onFailure: 'retain' });\n  for (const step of terminalEnvelope.steps.slice(0, -1)) {\n    for (const field of Object.keys(envelopeContract.fields.steps.item).filter((f) => f !== 'note')) assert.ok(field in step, `process step ${step.stepId}.${field}`);\n  }\n  assert.deepEqual(envelopeContract.fields.steps.item.stepId.enum, ['settle-attempt', 'finalize-home', 'cleanup-trust']);\n});\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-021781",
+          "pinnedSpan": {
+            "line": 78,
+            "text": "    const attemptId = c.expand ? c.expand.char.repeat(c.expand.count) : c.attemptId;\n    if (c.error) {\n      assert.throws(() => mintAttemptWriterId(attemptId), { code: c.error }, c.name);\n    } else {\n      const expected = c.expand ? `att-${attemptId}` : c.writerId;\n      assert.equal(mintAttemptWriterId(attemptId), expected, c.name);\n    }\n  }\n});"
+          },
+          "headMatchingLines": []
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "test/run-supervisor/inspect-recover-adopt.test.mjs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 98
+      },
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "pinnedHash": "a4f5c22b1f5e2ed886d347a3e7cdc286317823e76a4ff6cb7bd2c467bc350211",
+      "headHash": "2c56f9837acab5c021057419ec11ec1ac6ca97b001f3cff5549d39422b1b81b5",
+      "movedSpans": [
+        {
+          "id": "dynamic-021981",
+          "pinnedSpan": {
+            "line": 100,
+            "text": "    runId: 'run-1', action: rec.action, expectedSnapshot: rec.snapshotHash, expectedControlEpoch: rec.expectedControlEpoch,\n    expectedExpiresAt: rec.expiresAt, actionKey: rec.actionKey,\n  });\n  assert.equal(applied.outcome, 'plan-stale');\n  assert.equal(fs.existsSync(path.join(p.dir, 'closed.json')), false);\n});\n\ntest('inspect and show-run: a unit with a closed attempt, no summary and no controller awaits resume and names the command', { skip }, () => {\n  const p = project();"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-021982",
+          "pinnedSpan": {
+            "line": 120,
+            "text": "});\n\ntest('a unit whose attempt is not closed stays running, and one with a summary reads its verdict', { skip }, () => {\n  const p = project();\n  const unitDir = unitOf(p);\n  assert.equal(showRunUseCase(p.ctx, { runId: 'run-1' }).unitState, 'running');\n  write(path.join(unitDir, 'unit-summary.json'), { outcome: 'pass' });\n  assert.equal(showRunUseCase(p.ctx, { runId: 'run-1' }).unitState, 'completed');\n  write(path.join(unitDir, 'unit-summary.json'), { outcome: 'fail' });"
+          },
+          "headMatchingLines": [
+            129
+          ]
+        },
+        {
+          "id": "dynamic-021983",
+          "pinnedSpan": {
+            "line": 122,
+            "text": "test('a unit whose attempt is not closed stays running, and one with a summary reads its verdict', { skip }, () => {\n  const p = project();\n  const unitDir = unitOf(p);\n  assert.equal(showRunUseCase(p.ctx, { runId: 'run-1' }).unitState, 'running');\n  write(path.join(unitDir, 'unit-summary.json'), { outcome: 'pass' });\n  assert.equal(showRunUseCase(p.ctx, { runId: 'run-1' }).unitState, 'completed');\n  write(path.join(unitDir, 'unit-summary.json'), { outcome: 'fail' });\n  assert.equal(showRunUseCase(p.ctx, { runId: 'run-1' }).unitState, 'failed');\n});"
+          },
+          "headMatchingLines": [
+            131
+          ]
+        },
+        {
+          "id": "dynamic-021984",
+          "pinnedSpan": {
+            "line": 124,
+            "text": "  const unitDir = unitOf(p);\n  assert.equal(showRunUseCase(p.ctx, { runId: 'run-1' }).unitState, 'running');\n  write(path.join(unitDir, 'unit-summary.json'), { outcome: 'pass' });\n  assert.equal(showRunUseCase(p.ctx, { runId: 'run-1' }).unitState, 'completed');\n  write(path.join(unitDir, 'unit-summary.json'), { outcome: 'fail' });\n  assert.equal(showRunUseCase(p.ctx, { runId: 'run-1' }).unitState, 'failed');\n});\n\ntest('a closed attempt a later resume replaced reads superseded', { skip }, () => {"
+          },
+          "headMatchingLines": [
+            133
+          ]
+        },
+        {
+          "id": "dynamic-021985",
+          "pinnedSpan": {
+            "line": 130,
+            "text": "});\n\ntest('a closed attempt a later resume replaced reads superseded', { skip }, () => {\n  const p = project();\n  write(path.join(p.dir, 'closed.json'), { v: 1, closedBy: 'supervisor' });\n  write(path.join(p.dir, 'receipt.json'), { outcome: 'cancelled' });\n  const second = path.join(p.assignments, 'unit-run-1/producer/1', 'runs', '02');\n  write(path.join(second, 'run.json'), { runId: 'run-2', assignmentId: 'unit-run-1/producer/1', status: 'running', supersedesRunId: 'run-1' });\n  const view = showRunUseCase(p.ctx, { runId: 'run-1' });"
+          },
+          "headMatchingLines": [
+            139
+          ]
+        },
+        {
+          "id": "dynamic-021986",
+          "pinnedSpan": {
+            "line": 131,
+            "text": "\ntest('a closed attempt a later resume replaced reads superseded', { skip }, () => {\n  const p = project();\n  write(path.join(p.dir, 'closed.json'), { v: 1, closedBy: 'supervisor' });\n  write(path.join(p.dir, 'receipt.json'), { outcome: 'cancelled' });\n  const second = path.join(p.assignments, 'unit-run-1/producer/1', 'runs', '02');\n  write(path.join(second, 'run.json'), { runId: 'run-2', assignmentId: 'unit-run-1/producer/1', status: 'running', supersedesRunId: 'run-1' });\n  const view = showRunUseCase(p.ctx, { runId: 'run-1' });\n  assert.equal(view.attemptState, 'superseded');"
+          },
+          "headMatchingLines": [
+            140
+          ]
+        },
+        {
+          "id": "dynamic-021987",
+          "pinnedSpan": {
+            "line": 132,
+            "text": "test('a closed attempt a later resume replaced reads superseded', { skip }, () => {\n  const p = project();\n  write(path.join(p.dir, 'closed.json'), { v: 1, closedBy: 'supervisor' });\n  write(path.join(p.dir, 'receipt.json'), { outcome: 'cancelled' });\n  const second = path.join(p.assignments, 'unit-run-1/producer/1', 'runs', '02');\n  write(path.join(second, 'run.json'), { runId: 'run-2', assignmentId: 'unit-run-1/producer/1', status: 'running', supersedesRunId: 'run-1' });\n  const view = showRunUseCase(p.ctx, { runId: 'run-1' });\n  assert.equal(view.attemptState, 'superseded');\n  assert.equal(view.supersededBy, 'run-2');"
+          },
+          "headMatchingLines": [
+            141
+          ]
+        },
+        {
+          "id": "dynamic-021988",
+          "pinnedSpan": {
+            "line": 133,
+            "text": "  const p = project();\n  write(path.join(p.dir, 'closed.json'), { v: 1, closedBy: 'supervisor' });\n  write(path.join(p.dir, 'receipt.json'), { outcome: 'cancelled' });\n  const second = path.join(p.assignments, 'unit-run-1/producer/1', 'runs', '02');\n  write(path.join(second, 'run.json'), { runId: 'run-2', assignmentId: 'unit-run-1/producer/1', status: 'running', supersedesRunId: 'run-1' });\n  const view = showRunUseCase(p.ctx, { runId: 'run-1' });\n  assert.equal(view.attemptState, 'superseded');\n  assert.equal(view.supersededBy, 'run-2');\n  assert.equal(view.attemptOutcome, 'closed');"
+          },
+          "headMatchingLines": [
+            142
+          ]
+        },
+        {
+          "id": "dynamic-021989",
+          "pinnedSpan": {
+            "line": 172,
+            "text": "});\n\ntest('abandon-legacy settles a legacy run whose worker result nobody read, and the other intents still treat it as settled', { skip }, () => {\n  const p = project({ supervised: false });\n  write(path.join(p.dir, 'outbox', 'result-1.json'), { claim: 'done' });\n  const dead = { ...p.ctx, judgeLegacyHolders: () => ({ allDead: true }) };\n  const rec = recoverObserveUseCase(dead, { runId: 'run-1', intent: 'abandon-legacy' });\n  assert.equal(rec.kind, 'recommendation', rec.reason);\n  assert.deepEqual(rec.action, { type: 'abandon-legacy' });"
+          },
+          "headMatchingLines": [
+            181
+          ]
+        },
+        {
+          "id": "dynamic-021990",
+          "pinnedSpan": {
+            "line": 184,
+            "text": "  });\n  assert.equal(applied.outcome, 'applied', applied.reason);\n  assert.equal(showRunUseCase(p.ctx, { runId: 'run-1' }).attemptState, 'abandoned-legacy');\n  const other = project({ supervised: false, runId: 'run-2', assignmentId: 'unit-run-2/producer/1' });\n  write(path.join(other.dir, 'outbox', 'result-1.json'), { claim: 'done' });\n  const resume = recoverObserveUseCase(other.ctx, { runId: 'run-2' });\n  assert.equal(resume.kind, 'park');\n  assert.match(resume.reason, /already settled/);\n});"
+          },
+          "headMatchingLines": [
+            193
+          ]
+        },
+        {
+          "id": "dynamic-021991",
+          "pinnedSpan": {
+            "line": 25,
+            "text": "};\n\n/** A project root holding one attempt of `assignmentId`; `supervised: false` leaves it as a run from before the supervisor. */\nfunction project({ assignmentId = 'unit-run-1/producer/1', runId = 'run-1', supervised = true, attempt = '01', extraRun = {} } = {}) {\n  const root = makeFixtureDir('inspect-recover-');\n  const assignments = path.join(root, '.fgos', 'assignments');\n  const dir = path.join(assignments, assignmentId, 'runs', attempt);\n  write(path.join(dir, 'run.json'), { runId, assignmentId, status: 'running', cwd: root, ...extraRun });\n  if (supervised) {"
+          },
+          "headMatchingLines": [
+            26
+          ]
+        },
+        {
+          "id": "dynamic-021992",
+          "pinnedSpan": {
+            "line": 26,
+            "text": "\n/** A project root holding one attempt of `assignmentId`; `supervised: false` leaves it as a run from before the supervisor. */\nfunction project({ assignmentId = 'unit-run-1/producer/1', runId = 'run-1', supervised = true, attempt = '01', extraRun = {} } = {}) {\n  const root = makeFixtureDir('inspect-recover-');\n  const assignments = path.join(root, '.fgos', 'assignments');\n  const dir = path.join(assignments, assignmentId, 'runs', attempt);\n  write(path.join(dir, 'run.json'), { runId, assignmentId, status: 'running', cwd: root, ...extraRun });\n  if (supervised) {\n    const envelope = {"
+          },
+          "headMatchingLines": [
+            27
+          ]
+        },
+        {
+          "id": "dynamic-021993",
+          "pinnedSpan": {
+            "line": 27,
+            "text": "/** A project root holding one attempt of `assignmentId`; `supervised: false` leaves it as a run from before the supervisor. */\nfunction project({ assignmentId = 'unit-run-1/producer/1', runId = 'run-1', supervised = true, attempt = '01', extraRun = {} } = {}) {\n  const root = makeFixtureDir('inspect-recover-');\n  const assignments = path.join(root, '.fgos', 'assignments');\n  const dir = path.join(assignments, assignmentId, 'runs', attempt);\n  write(path.join(dir, 'run.json'), { runId, assignmentId, status: 'running', cwd: root, ...extraRun });\n  if (supervised) {\n    const envelope = {\n      v: 3, attemptId: `att-${runId}`, unitRunId: 'unit-run-1', runDir: dir, mode: 'direct', protocolId: 1,"
+          },
+          "headMatchingLines": [
+            28
+          ]
+        },
+        {
+          "id": "dynamic-021994",
+          "pinnedSpan": {
+            "line": 27,
+            "text": "/** A project root holding one attempt of `assignmentId`; `supervised: false` leaves it as a run from before the supervisor. */\nfunction project({ assignmentId = 'unit-run-1/producer/1', runId = 'run-1', supervised = true, attempt = '01', extraRun = {} } = {}) {\n  const root = makeFixtureDir('inspect-recover-');\n  const assignments = path.join(root, '.fgos', 'assignments');\n  const dir = path.join(assignments, assignmentId, 'runs', attempt);\n  write(path.join(dir, 'run.json'), { runId, assignmentId, status: 'running', cwd: root, ...extraRun });\n  if (supervised) {\n    const envelope = {\n      v: 3, attemptId: `att-${runId}`, unitRunId: 'unit-run-1', runDir: dir, mode: 'direct', protocolId: 1,"
+          },
+          "headMatchingLines": [
+            28
+          ]
+        },
+        {
+          "id": "dynamic-021995",
+          "pinnedSpan": {
+            "line": 28,
+            "text": "function project({ assignmentId = 'unit-run-1/producer/1', runId = 'run-1', supervised = true, attempt = '01', extraRun = {} } = {}) {\n  const root = makeFixtureDir('inspect-recover-');\n  const assignments = path.join(root, '.fgos', 'assignments');\n  const dir = path.join(assignments, assignmentId, 'runs', attempt);\n  write(path.join(dir, 'run.json'), { runId, assignmentId, status: 'running', cwd: root, ...extraRun });\n  if (supervised) {\n    const envelope = {\n      v: 3, attemptId: `att-${runId}`, unitRunId: 'unit-run-1', runDir: dir, mode: 'direct', protocolId: 1,\n      hostBin: HOST ?? '/bin/false', payloadRoot: '/', cwd: dir, mutation: 'read-only',"
+          },
+          "headMatchingLines": [
+            29
+          ]
+        },
+        {
+          "id": "dynamic-021996",
+          "pinnedSpan": {
+            "line": 31,
+            "text": "  const dir = path.join(assignments, assignmentId, 'runs', attempt);\n  write(path.join(dir, 'run.json'), { runId, assignmentId, status: 'running', cwd: root, ...extraRun });\n  if (supervised) {\n    const envelope = {\n      v: 3, attemptId: `att-${runId}`, unitRunId: 'unit-run-1', runDir: dir, mode: 'direct', protocolId: 1,\n      hostBin: HOST ?? '/bin/false', payloadRoot: '/', cwd: dir, mutation: 'read-only',\n      launch: { command: '/bin/true', args: [], env: {}, stdinPolicy: 'null', briefPath: null, outboxDir: path.join(dir, 'outbox'), capture: { stdout: path.join(dir, 'o.log'), stderr: path.join(dir, 'e.log') } },\n      containment: { preferred: 'linux-gate' },\n      deadlines: { softAt: null, idleMs: null, hardCeiling: null, gateKillGraceMs: 1000 },"
+          },
+          "headMatchingLines": [
+            32
+          ]
+        },
+        {
+          "id": "dynamic-021997",
+          "pinnedSpan": {
+            "line": 31,
+            "text": "  const dir = path.join(assignments, assignmentId, 'runs', attempt);\n  write(path.join(dir, 'run.json'), { runId, assignmentId, status: 'running', cwd: root, ...extraRun });\n  if (supervised) {\n    const envelope = {\n      v: 3, attemptId: `att-${runId}`, unitRunId: 'unit-run-1', runDir: dir, mode: 'direct', protocolId: 1,\n      hostBin: HOST ?? '/bin/false', payloadRoot: '/', cwd: dir, mutation: 'read-only',\n      launch: { command: '/bin/true', args: [], env: {}, stdinPolicy: 'null', briefPath: null, outboxDir: path.join(dir, 'outbox'), capture: { stdout: path.join(dir, 'o.log'), stderr: path.join(dir, 'e.log') } },\n      containment: { preferred: 'linux-gate' },\n      deadlines: { softAt: null, idleMs: null, hardCeiling: null, gateKillGraceMs: 1000 },"
+          },
+          "headMatchingLines": [
+            32
+          ]
+        },
+        {
+          "id": "dynamic-021998",
+          "pinnedSpan": {
+            "line": 32,
+            "text": "  write(path.join(dir, 'run.json'), { runId, assignmentId, status: 'running', cwd: root, ...extraRun });\n  if (supervised) {\n    const envelope = {\n      v: 3, attemptId: `att-${runId}`, unitRunId: 'unit-run-1', runDir: dir, mode: 'direct', protocolId: 1,\n      hostBin: HOST ?? '/bin/false', payloadRoot: '/', cwd: dir, mutation: 'read-only',\n      launch: { command: '/bin/true', args: [], env: {}, stdinPolicy: 'null', briefPath: null, outboxDir: path.join(dir, 'outbox'), capture: { stdout: path.join(dir, 'o.log'), stderr: path.join(dir, 'e.log') } },\n      containment: { preferred: 'linux-gate' },\n      deadlines: { softAt: null, idleMs: null, hardCeiling: null, gateKillGraceMs: 1000 },\n      agentProtocol: { cli: 'claude', mode: 'direct' },"
+          },
+          "headMatchingLines": [
+            33
+          ]
+        },
+        {
+          "id": "dynamic-021999",
+          "pinnedSpan": {
+            "line": 33,
+            "text": "  if (supervised) {\n    const envelope = {\n      v: 3, attemptId: `att-${runId}`, unitRunId: 'unit-run-1', runDir: dir, mode: 'direct', protocolId: 1,\n      hostBin: HOST ?? '/bin/false', payloadRoot: '/', cwd: dir, mutation: 'read-only',\n      launch: { command: '/bin/true', args: [], env: {}, stdinPolicy: 'null', briefPath: null, outboxDir: path.join(dir, 'outbox'), capture: { stdout: path.join(dir, 'o.log'), stderr: path.join(dir, 'e.log') } },\n      containment: { preferred: 'linux-gate' },\n      deadlines: { softAt: null, idleMs: null, hardCeiling: null, gateKillGraceMs: 1000 },\n      agentProtocol: { cli: 'claude', mode: 'direct' },\n      steps: [],"
+          },
+          "headMatchingLines": [
+            34
+          ]
+        },
+        {
+          "id": "dynamic-022000",
+          "pinnedSpan": {
+            "line": 33,
+            "text": "  if (supervised) {\n    const envelope = {\n      v: 3, attemptId: `att-${runId}`, unitRunId: 'unit-run-1', runDir: dir, mode: 'direct', protocolId: 1,\n      hostBin: HOST ?? '/bin/false', payloadRoot: '/', cwd: dir, mutation: 'read-only',\n      launch: { command: '/bin/true', args: [], env: {}, stdinPolicy: 'null', briefPath: null, outboxDir: path.join(dir, 'outbox'), capture: { stdout: path.join(dir, 'o.log'), stderr: path.join(dir, 'e.log') } },\n      containment: { preferred: 'linux-gate' },\n      deadlines: { softAt: null, idleMs: null, hardCeiling: null, gateKillGraceMs: 1000 },\n      agentProtocol: { cli: 'claude', mode: 'direct' },\n      steps: [],"
+          },
+          "headMatchingLines": [
+            34
+          ]
+        },
+        {
+          "id": "dynamic-022001",
+          "pinnedSpan": {
+            "line": 33,
+            "text": "  if (supervised) {\n    const envelope = {\n      v: 3, attemptId: `att-${runId}`, unitRunId: 'unit-run-1', runDir: dir, mode: 'direct', protocolId: 1,\n      hostBin: HOST ?? '/bin/false', payloadRoot: '/', cwd: dir, mutation: 'read-only',\n      launch: { command: '/bin/true', args: [], env: {}, stdinPolicy: 'null', briefPath: null, outboxDir: path.join(dir, 'outbox'), capture: { stdout: path.join(dir, 'o.log'), stderr: path.join(dir, 'e.log') } },\n      containment: { preferred: 'linux-gate' },\n      deadlines: { softAt: null, idleMs: null, hardCeiling: null, gateKillGraceMs: 1000 },\n      agentProtocol: { cli: 'claude', mode: 'direct' },\n      steps: [],"
+          },
+          "headMatchingLines": [
+            34
+          ]
+        },
+        {
+          "id": "dynamic-022002",
+          "pinnedSpan": {
+            "line": 33,
+            "text": "  if (supervised) {\n    const envelope = {\n      v: 3, attemptId: `att-${runId}`, unitRunId: 'unit-run-1', runDir: dir, mode: 'direct', protocolId: 1,\n      hostBin: HOST ?? '/bin/false', payloadRoot: '/', cwd: dir, mutation: 'read-only',\n      launch: { command: '/bin/true', args: [], env: {}, stdinPolicy: 'null', briefPath: null, outboxDir: path.join(dir, 'outbox'), capture: { stdout: path.join(dir, 'o.log'), stderr: path.join(dir, 'e.log') } },\n      containment: { preferred: 'linux-gate' },\n      deadlines: { softAt: null, idleMs: null, hardCeiling: null, gateKillGraceMs: 1000 },\n      agentProtocol: { cli: 'claude', mode: 'direct' },\n      steps: [],"
+          },
+          "headMatchingLines": [
+            34
+          ]
+        },
+        {
+          "id": "dynamic-022003",
+          "pinnedSpan": {
+            "line": 33,
+            "text": "  if (supervised) {\n    const envelope = {\n      v: 3, attemptId: `att-${runId}`, unitRunId: 'unit-run-1', runDir: dir, mode: 'direct', protocolId: 1,\n      hostBin: HOST ?? '/bin/false', payloadRoot: '/', cwd: dir, mutation: 'read-only',\n      launch: { command: '/bin/true', args: [], env: {}, stdinPolicy: 'null', briefPath: null, outboxDir: path.join(dir, 'outbox'), capture: { stdout: path.join(dir, 'o.log'), stderr: path.join(dir, 'e.log') } },\n      containment: { preferred: 'linux-gate' },\n      deadlines: { softAt: null, idleMs: null, hardCeiling: null, gateKillGraceMs: 1000 },\n      agentProtocol: { cli: 'claude', mode: 'direct' },\n      steps: [],"
+          },
+          "headMatchingLines": [
+            34
+          ]
+        },
+        {
+          "id": "dynamic-022004",
+          "pinnedSpan": {
+            "line": 40,
+            "text": "      agentProtocol: { cli: 'claude', mode: 'direct' },\n      steps: [],\n    };\n    envelope.digest = computeSha256Digest(envelope);\n    write(path.join(dir, 'envelope.json'), envelope);\n    write(path.join(dir, 'attempt.lock'), '');\n  }\n  write(path.join(assignments, assignmentId, 'admission', 'generations', '0000000001.json'), { runId, attempt: Number(attempt), attemptStr: attempt });\n  return { root, assignments, dir, ctx: { cwd: root, repoRoot: root } };"
+          },
+          "headMatchingLines": [
+            41
+          ]
+        },
+        {
+          "id": "dynamic-022005",
+          "pinnedSpan": {
+            "line": 41,
+            "text": "      steps: [],\n    };\n    envelope.digest = computeSha256Digest(envelope);\n    write(path.join(dir, 'envelope.json'), envelope);\n    write(path.join(dir, 'attempt.lock'), '');\n  }\n  write(path.join(assignments, assignmentId, 'admission', 'generations', '0000000001.json'), { runId, attempt: Number(attempt), attemptStr: attempt });\n  return { root, assignments, dir, ctx: { cwd: root, repoRoot: root } };\n}"
+          },
+          "headMatchingLines": [
+            42
+          ]
+        },
+        {
+          "id": "dynamic-022006",
+          "pinnedSpan": {
+            "line": 43,
+            "text": "    envelope.digest = computeSha256Digest(envelope);\n    write(path.join(dir, 'envelope.json'), envelope);\n    write(path.join(dir, 'attempt.lock'), '');\n  }\n  write(path.join(assignments, assignmentId, 'admission', 'generations', '0000000001.json'), { runId, attempt: Number(attempt), attemptStr: attempt });\n  return { root, assignments, dir, ctx: { cwd: root, repoRoot: root } };\n}\n\n/** A unit run directory that recorded `assignmentId` as the attempt of its only seat. */"
+          },
+          "headMatchingLines": [
+            44
+          ]
+        },
+        {
+          "id": "dynamic-022007",
+          "pinnedSpan": {
+            "line": 44,
+            "text": "    write(path.join(dir, 'envelope.json'), envelope);\n    write(path.join(dir, 'attempt.lock'), '');\n  }\n  write(path.join(assignments, assignmentId, 'admission', 'generations', '0000000001.json'), { runId, attempt: Number(attempt), attemptStr: attempt });\n  return { root, assignments, dir, ctx: { cwd: root, repoRoot: root } };\n}\n\n/** A unit run directory that recorded `assignmentId` as the attempt of its only seat. */\nfunction unitOf(p, assignmentId = 'unit-run-1/producer/1', unitRunId = 'unit-run-1') {"
+          },
+          "headMatchingLines": [
+            45
+          ]
+        },
+        {
+          "id": "dynamic-022008",
+          "pinnedSpan": {
+            "line": 49,
+            "text": "}\n\n/** A unit run directory that recorded `assignmentId` as the attempt of its only seat. */\nfunction unitOf(p, assignmentId = 'unit-run-1/producer/1', unitRunId = 'unit-run-1') {\n  const unitDir = path.join(p.assignments, unitRunId);\n  write(path.join(unitDir, 'unit.json'), { execution: { status: 'running' }, bindings: { 'producer/1': [{ role: 'producer', assignmentId }] } });\n  return unitDir;\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-022009",
+          "pinnedSpan": {
+            "line": 49,
+            "text": "}\n\n/** A unit run directory that recorded `assignmentId` as the attempt of its only seat. */\nfunction unitOf(p, assignmentId = 'unit-run-1/producer/1', unitRunId = 'unit-run-1') {\n  const unitDir = path.join(p.assignments, unitRunId);\n  write(path.join(unitDir, 'unit.json'), { execution: { status: 'running' }, bindings: { 'producer/1': [{ role: 'producer', assignmentId }] } });\n  return unitDir;\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-022010",
+          "pinnedSpan": {
+            "line": 50,
+            "text": "\n/** A unit run directory that recorded `assignmentId` as the attempt of its only seat. */\nfunction unitOf(p, assignmentId = 'unit-run-1/producer/1', unitRunId = 'unit-run-1') {\n  const unitDir = path.join(p.assignments, unitRunId);\n  write(path.join(unitDir, 'unit.json'), { execution: { status: 'running' }, bindings: { 'producer/1': [{ role: 'producer', assignmentId }] } });\n  return unitDir;\n}\n\nconst adoptable = (p, outcome) => {"
+          },
+          "headMatchingLines": [
+            51
+          ]
+        },
+        {
+          "id": "dynamic-022011",
+          "pinnedSpan": {
+            "line": 55,
+            "text": "  return unitDir;\n}\n\nconst adoptable = (p, outcome) => {\n  write(path.join(p.dir, 'outbox', 'result-1.json'), { claim: outcome ?? 'done' });\n  return p;\n};\n\ntest('an orphaned attempt with an outbox result recovers as adopt, and applying it closes the attempt', { skip }, () => {"
+          },
+          "headMatchingLines": [
+            56
+          ]
+        },
+        {
+          "id": "dynamic-022012",
+          "pinnedSpan": {
+            "line": 71,
+            "text": "    runId: 'run-1', action: rec.action, expectedSnapshot: rec.snapshotHash, expectedControlEpoch: rec.expectedControlEpoch,\n    expectedExpiresAt: rec.expiresAt, actionKey: rec.actionKey,\n  });\n  assert.equal(applied.outcome, 'applied', applied.reason);\n  assert.ok(fs.existsSync(path.join(p.dir, 'closed.json')));\n  assert.equal(JSON.parse(fs.readFileSync(path.join(p.dir, 'recovery-commands.jsonl'), 'utf8').trim()).action.type, 'adopt');\n\n  const again = recoverObserveUseCase(p.ctx, { runId: 'run-1' });\n  assert.equal(again.kind, 'park');"
+          },
+          "headMatchingLines": [
+            72
+          ]
+        },
+        {
+          "id": "dynamic-022013",
+          "pinnedSpan": {
+            "line": 72,
+            "text": "    expectedExpiresAt: rec.expiresAt, actionKey: rec.actionKey,\n  });\n  assert.equal(applied.outcome, 'applied', applied.reason);\n  assert.ok(fs.existsSync(path.join(p.dir, 'closed.json')));\n  assert.equal(JSON.parse(fs.readFileSync(path.join(p.dir, 'recovery-commands.jsonl'), 'utf8').trim()).action.type, 'adopt');\n\n  const again = recoverObserveUseCase(p.ctx, { runId: 'run-1' });\n  assert.equal(again.kind, 'park');\n  assert.match(again.reason, /closed/);"
+          },
+          "headMatchingLines": [
+            73
+          ]
+        },
+        {
+          "id": "dynamic-022014",
+          "pinnedSpan": {
+            "line": 81,
+            "text": "});\n\ntest('an attempt whose lock is held offers no action and reads running', { skip }, async () => {\n  const p = adoptable(project());\n  const holder = spawn('flock', ['-x', path.join(p.dir, 'attempt.lock'), 'sleep', '60'], { stdio: 'ignore' });\n  holders.push(holder);\n  await new Promise((resolve) => setTimeout(resolve, 300));\n  const rec = recoverObserveUseCase(p.ctx, { runId: 'run-1' });\n  assert.equal(rec.kind, 'park');"
+          },
+          "headMatchingLines": [
+            82
+          ]
+        },
+        {
+          "id": "dynamic-022015",
+          "pinnedSpan": {
+            "line": 94,
+            "text": "\ntest('a recommendation goes stale when the run changes between observe and apply', { skip }, () => {\n  const p = adoptable(project());\n  const rec = recoverObserveUseCase(p.ctx, { runId: 'run-1' });\n  write(path.join(p.dir, 'outbox', 'result-2.json'), {});\n  const applied = recoverApplyUseCase(p.ctx, {\n    runId: 'run-1', action: rec.action, expectedSnapshot: rec.snapshotHash, expectedControlEpoch: rec.expectedControlEpoch,\n    expectedExpiresAt: rec.expiresAt, actionKey: rec.actionKey,\n  });"
+          },
+          "headMatchingLines": [
+            95
+          ]
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
       "file": "test/run-supervisor/support/direct-harness.mjs",
       "record": {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -63953,6 +65004,260 @@
       "failing": false
     },
     {
+      "file": "test/rust-host/help-routes.test.mjs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+        "recordLine": 187
+      },
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "pinnedHash": "914397d83e368980e1c79a2ba0d7419b60522eb0bd7e4ade1ec3b90c0442c1c4",
+      "headHash": "264585ee799485fe6c3efa025789f729c6fc14bf0f54c0e8631d151ea8afdc6f",
+      "movedSpans": [
+        {
+          "id": "dynamic-031452",
+          "pinnedSpan": {
+            "line": 104,
+            "text": "  assert.equal(madeUp.status, 4, madeUp.stdout);\n  assert.match(madeUp.stderr, /unknown verb \"--made-up\"/);\n  for (const args of [['-h', 'foo'], ['--help', '--bogus'], ['--help', 'dispatch', 'bogus', '--json']]) {\n    const result = host(args, cwd);\n    assert.equal(result.status, 4, `${args.join(' ')}: ${result.stdout}`);\n    assert.equal(result.stdout, '', args.join(' '));\n  }\n});\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-031453",
+          "pinnedSpan": {
+            "line": 105,
+            "text": "  assert.match(madeUp.stderr, /unknown verb \"--made-up\"/);\n  for (const args of [['-h', 'foo'], ['--help', '--bogus'], ['--help', 'dispatch', 'bogus', '--json']]) {\n    const result = host(args, cwd);\n    assert.equal(result.status, 4, `${args.join(' ')}: ${result.stdout}`);\n    assert.equal(result.stdout, '', args.join(' '));\n  }\n});\n\ntest('fgos <verb> --help --json through the host returns the manifest entry for every route kind, without running the verb', () => {"
+          },
+          "headMatchingLines": [
+            118
+          ]
+        },
+        {
+          "id": "dynamic-031454",
+          "pinnedSpan": {
+            "line": 114,
+            "text": "  const cwd = emptyCwd('per-verb');\n  const manifest = JSON.parse(node(['--help', '--json'], cwd).stdout);\n  const entryOf = (name) => manifest.commands.find((c) => c.name === name);\n  const native = Object.values(ROUTES).filter((r) => r.route_kind === 'native').map((r) => r.selector);\n  assert.ok(native.length >= 5, `expected the native routes, got ${native}`);\n  const cases = [\n    ...native.map((name) => ({ args: [name, '--help', '--json'], expected: entryOf(name) })),\n    ...native.map((name) => ({ args: [name, '-h', '--json'], expected: entryOf(name) })),\n    { args: ['metrics', 'runs', '--help', '--json'], expected: { ...entryOf('metrics'), subcommands: { runs: entryOf('metrics').subcommands.runs } } },"
+          },
+          "headMatchingLines": [
+            127
+          ]
+        },
+        {
+          "id": "dynamic-031455",
+          "pinnedSpan": {
+            "line": 127,
+            "text": "    { args: ['dispatch', 'decide', '--help', '--json'], expected: { ...entryOf('dispatch'), subcommands: { decide: entryOf('dispatch').subcommands.decide } } },\n    { args: ['workflow', 'start', '--help', '--json'], expected: { ...entryOf('workflow'), subcommands: { start: entryOf('workflow').subcommands.start } } },\n  ];\n  for (const { args, expected } of cases) {\n    assert.ok(expected, `no manifest entry for ${args[0]}`);\n    const result = host(args, cwd);\n    assert.equal(result.status, 0, `${args.join(' ')}: ${result.stderr}`);\n    assert.deepEqual(JSON.parse(result.stdout), expected, args.join(' '));\n  }"
+          },
+          "headMatchingLines": [
+            140
+          ]
+        },
+        {
+          "id": "dynamic-031456",
+          "pinnedSpan": {
+            "line": 129,
+            "text": "  ];\n  for (const { args, expected } of cases) {\n    assert.ok(expected, `no manifest entry for ${args[0]}`);\n    const result = host(args, cwd);\n    assert.equal(result.status, 0, `${args.join(' ')}: ${result.stderr}`);\n    assert.deepEqual(JSON.parse(result.stdout), expected, args.join(' '));\n  }\n  assert.deepEqual(fs.readdirSync(cwd), [], 'help wrote into the working directory');\n});"
+          },
+          "headMatchingLines": [
+            142
+          ]
+        },
+        {
+          "id": "dynamic-031457",
+          "pinnedSpan": {
+            "line": 130,
+            "text": "  for (const { args, expected } of cases) {\n    assert.ok(expected, `no manifest entry for ${args[0]}`);\n    const result = host(args, cwd);\n    assert.equal(result.status, 0, `${args.join(' ')}: ${result.stderr}`);\n    assert.deepEqual(JSON.parse(result.stdout), expected, args.join(' '));\n  }\n  assert.deepEqual(fs.readdirSync(cwd), [], 'help wrote into the working directory');\n});\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-031458",
+          "pinnedSpan": {
+            "line": 17,
+            "text": "import { HELP_SELECTORS } from '../../src/cli/command-registry.mjs';\nimport { nativeAddonLibraryName } from '../../scripts/build-rust-distribution.mjs';\nimport { ensureGitAddon } from '../helpers/git-addon.mjs';\n\nconst REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');\nconst ROUTES = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'packages/host-runtime/contracts/command-routes.json'), 'utf8'));\nconst BINARY_NAME = process.platform === 'win32' ? 'fgos.exe' : 'fgos';\nconst HOST_BIN = process.env.FGOS_HOST_BIN;\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-031459",
+          "pinnedSpan": {
+            "line": 17,
+            "text": "import { HELP_SELECTORS } from '../../src/cli/command-registry.mjs';\nimport { nativeAddonLibraryName } from '../../scripts/build-rust-distribution.mjs';\nimport { ensureGitAddon } from '../helpers/git-addon.mjs';\n\nconst REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');\nconst ROUTES = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'packages/host-runtime/contracts/command-routes.json'), 'utf8'));\nconst BINARY_NAME = process.platform === 'win32' ? 'fgos.exe' : 'fgos';\nconst HOST_BIN = process.env.FGOS_HOST_BIN;\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-031460",
+          "pinnedSpan": {
+            "line": 18,
+            "text": "import { nativeAddonLibraryName } from '../../scripts/build-rust-distribution.mjs';\nimport { ensureGitAddon } from '../helpers/git-addon.mjs';\n\nconst REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');\nconst ROUTES = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'packages/host-runtime/contracts/command-routes.json'), 'utf8'));\nconst BINARY_NAME = process.platform === 'win32' ? 'fgos.exe' : 'fgos';\nconst HOST_BIN = process.env.FGOS_HOST_BIN;\n\nconst scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-help-routes-'));"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-031461",
+          "pinnedSpan": {
+            "line": 22,
+            "text": "const ROUTES = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'packages/host-runtime/contracts/command-routes.json'), 'utf8'));\nconst BINARY_NAME = process.platform === 'win32' ? 'fgos.exe' : 'fgos';\nconst HOST_BIN = process.env.FGOS_HOST_BIN;\n\nconst scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-help-routes-'));\nafter(() => fs.rmSync(scratch, { recursive: true, force: true }));\n\nfunction stubCargo() {\n  const dir = path.join(scratch, 'cargo-stub');"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-031462",
+          "pinnedSpan": {
+            "line": 26,
+            "text": "const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-help-routes-'));\nafter(() => fs.rmSync(scratch, { recursive: true, force: true }));\n\nfunction stubCargo() {\n  const dir = path.join(scratch, 'cargo-stub');\n  if (!fs.existsSync(dir)) {\n    fs.mkdirSync(dir);\n    fs.writeFileSync(path.join(dir, 'package.json'), '{\"type\":\"module\"}\\n');\n    fs.writeFileSync("
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-031463",
+          "pinnedSpan": {
+            "line": 26,
+            "text": "const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-help-routes-'));\nafter(() => fs.rmSync(scratch, { recursive: true, force: true }));\n\nfunction stubCargo() {\n  const dir = path.join(scratch, 'cargo-stub');\n  if (!fs.existsSync(dir)) {\n    fs.mkdirSync(dir);\n    fs.writeFileSync(path.join(dir, 'package.json'), '{\"type\":\"module\"}\\n');\n    fs.writeFileSync("
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-031464",
+          "pinnedSpan": {
+            "line": 29,
+            "text": "function stubCargo() {\n  const dir = path.join(scratch, 'cargo-stub');\n  if (!fs.existsSync(dir)) {\n    fs.mkdirSync(dir);\n    fs.writeFileSync(path.join(dir, 'package.json'), '{\"type\":\"module\"}\\n');\n    fs.writeFileSync(\n      path.join(dir, 'cargo'),\n      `#!${process.execPath}\\nimport fs from 'node:fs';\\nimport path from 'node:path';\\nconst out = path.join(process.env.CARGO_TARGET_DIR, 'debug');\\nfs.mkdirSync(out, { recursive: true });\\nfs.copyFileSync(process.env.HELP_TEST_HOST_BIN, path.join(out, ${JSON.stringify(BINARY_NAME)}));\\nfs.chmodSync(path.join(out, ${JSON.stringify(BINARY_NAME)}), 0o755);\\nfs.copyFileSync(process.env.HELP_TEST_NATIVE_ADDON, path.join(out, ${JSON.stringify(nativeAddonLibraryName())}));\\n`,\n      { mode: 0o755 },"
+          },
+          "headMatchingLines": [
+            34
+          ]
+        },
+        {
+          "id": "dynamic-031465",
+          "pinnedSpan": {
+            "line": 31,
+            "text": "  if (!fs.existsSync(dir)) {\n    fs.mkdirSync(dir);\n    fs.writeFileSync(path.join(dir, 'package.json'), '{\"type\":\"module\"}\\n');\n    fs.writeFileSync(\n      path.join(dir, 'cargo'),\n      `#!${process.execPath}\\nimport fs from 'node:fs';\\nimport path from 'node:path';\\nconst out = path.join(process.env.CARGO_TARGET_DIR, 'debug');\\nfs.mkdirSync(out, { recursive: true });\\nfs.copyFileSync(process.env.HELP_TEST_HOST_BIN, path.join(out, ${JSON.stringify(BINARY_NAME)}));\\nfs.chmodSync(path.join(out, ${JSON.stringify(BINARY_NAME)}), 0o755);\\nfs.copyFileSync(process.env.HELP_TEST_NATIVE_ADDON, path.join(out, ${JSON.stringify(nativeAddonLibraryName())}));\\n`,\n      { mode: 0o755 },\n    );\n  }"
+          },
+          "headMatchingLines": [
+            36
+          ]
+        },
+        {
+          "id": "dynamic-031466",
+          "pinnedSpan": {
+            "line": 32,
+            "text": "    fs.mkdirSync(dir);\n    fs.writeFileSync(path.join(dir, 'package.json'), '{\"type\":\"module\"}\\n');\n    fs.writeFileSync(\n      path.join(dir, 'cargo'),\n      `#!${process.execPath}\\nimport fs from 'node:fs';\\nimport path from 'node:path';\\nconst out = path.join(process.env.CARGO_TARGET_DIR, 'debug');\\nfs.mkdirSync(out, { recursive: true });\\nfs.copyFileSync(process.env.HELP_TEST_HOST_BIN, path.join(out, ${JSON.stringify(BINARY_NAME)}));\\nfs.chmodSync(path.join(out, ${JSON.stringify(BINARY_NAME)}), 0o755);\\nfs.copyFileSync(process.env.HELP_TEST_NATIVE_ADDON, path.join(out, ${JSON.stringify(nativeAddonLibraryName())}));\\n`,\n      { mode: 0o755 },\n    );\n  }\n  return dir;"
+          },
+          "headMatchingLines": [
+            37
+          ]
+        },
+        {
+          "id": "dynamic-031467",
+          "pinnedSpan": {
+            "line": 43,
+            "text": "let builtAddon;\nconst nativeAddon = () => (builtAddon ??= ensureGitAddon().addon);\n\nfunction host(args, cwd) {\n  assert.ok(HOST_BIN && fs.existsSync(HOST_BIN), `set FGOS_HOST_BIN to a host built from this checkout (npm test does): ${HOST_BIN}`);\n  const env = { ...process.env };\n  for (const key of ['CLAUDE_CODE_SESSION_ID', 'FGOS_ACTIVE_RELEASE_PATH', 'FGOS_ACTIVE_MANIFEST_PATH', 'FGOS_RUST_HOST_RECURSION_GUARD']) delete env[key];\n  return spawnSync(process.execPath, [path.join(REPO_ROOT, 'scripts/run-rust-dev-host.mjs'), ...args], {\n    cwd,"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-031468",
+          "pinnedSpan": {
+            "line": 46,
+            "text": "function host(args, cwd) {\n  assert.ok(HOST_BIN && fs.existsSync(HOST_BIN), `set FGOS_HOST_BIN to a host built from this checkout (npm test does): ${HOST_BIN}`);\n  const env = { ...process.env };\n  for (const key of ['CLAUDE_CODE_SESSION_ID', 'FGOS_ACTIVE_RELEASE_PATH', 'FGOS_ACTIVE_MANIFEST_PATH', 'FGOS_RUST_HOST_RECURSION_GUARD']) delete env[key];\n  return spawnSync(process.execPath, [path.join(REPO_ROOT, 'scripts/run-rust-dev-host.mjs'), ...args], {\n    cwd,\n    encoding: 'utf8',\n    maxBuffer: 64 * 1024 * 1024,\n    timeout: 60000,"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-031469",
+          "pinnedSpan": {
+            "line": 54,
+            "text": "    timeout: 60000,\n    env: {\n      ...env,\n      INIT_CWD: cwd,\n      PATH: `${stubCargo()}${path.delimiter}${process.env.PATH}`,\n      CARGO_TARGET_DIR: path.join(scratch, 'cargo-out'),\n      HELP_TEST_HOST_BIN: HOST_BIN,\n      HELP_TEST_NATIVE_ADDON: nativeAddon(),\n    },"
+          },
+          "headMatchingLines": [
+            67
+          ]
+        },
+        {
+          "id": "dynamic-031470",
+          "pinnedSpan": {
+            "line": 54,
+            "text": "    timeout: 60000,\n    env: {\n      ...env,\n      INIT_CWD: cwd,\n      PATH: `${stubCargo()}${path.delimiter}${process.env.PATH}`,\n      CARGO_TARGET_DIR: path.join(scratch, 'cargo-out'),\n      HELP_TEST_HOST_BIN: HOST_BIN,\n      HELP_TEST_NATIVE_ADDON: nativeAddon(),\n    },"
+          },
+          "headMatchingLines": [
+            67
+          ]
+        },
+        {
+          "id": "dynamic-031471",
+          "pinnedSpan": {
+            "line": 55,
+            "text": "    env: {\n      ...env,\n      INIT_CWD: cwd,\n      PATH: `${stubCargo()}${path.delimiter}${process.env.PATH}`,\n      CARGO_TARGET_DIR: path.join(scratch, 'cargo-out'),\n      HELP_TEST_HOST_BIN: HOST_BIN,\n      HELP_TEST_NATIVE_ADDON: nativeAddon(),\n    },\n  });"
+          },
+          "headMatchingLines": [
+            68
+          ]
+        },
+        {
+          "id": "dynamic-031472",
+          "pinnedSpan": {
+            "line": 55,
+            "text": "    env: {\n      ...env,\n      INIT_CWD: cwd,\n      PATH: `${stubCargo()}${path.delimiter}${process.env.PATH}`,\n      CARGO_TARGET_DIR: path.join(scratch, 'cargo-out'),\n      HELP_TEST_HOST_BIN: HOST_BIN,\n      HELP_TEST_NATIVE_ADDON: nativeAddon(),\n    },\n  });"
+          },
+          "headMatchingLines": [
+            68
+          ]
+        },
+        {
+          "id": "dynamic-031473",
+          "pinnedSpan": {
+            "line": 65,
+            "text": "\nfunction node(args, cwd) {\n  const env = { ...process.env };\n  delete env.CLAUDE_CODE_SESSION_ID;\n  return spawnSync(process.execPath, [path.join(REPO_ROOT, 'bin/fgos.mjs'), ...args], { cwd, encoding: 'utf8', env, maxBuffer: 64 * 1024 * 1024 });\n}\n\nfunction emptyCwd(name) {\n  const dir = path.join(scratch, name);"
+          },
+          "headMatchingLines": [
+            78
+          ]
+        },
+        {
+          "id": "dynamic-031474",
+          "pinnedSpan": {
+            "line": 69,
+            "text": "  return spawnSync(process.execPath, [path.join(REPO_ROOT, 'bin/fgos.mjs'), ...args], { cwd, encoding: 'utf8', env, maxBuffer: 64 * 1024 * 1024 });\n}\n\nfunction emptyCwd(name) {\n  const dir = path.join(scratch, name);\n  fs.mkdirSync(dir);\n  return dir;\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-031475",
+          "pinnedSpan": {
+            "line": 69,
+            "text": "  return spawnSync(process.execPath, [path.join(REPO_ROOT, 'bin/fgos.mjs'), ...args], { cwd, encoding: 'utf8', env, maxBuffer: 64 * 1024 * 1024 });\n}\n\nfunction emptyCwd(name) {\n  const dir = path.join(scratch, name);\n  fs.mkdirSync(dir);\n  return dir;\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-031476",
+          "pinnedSpan": {
+            "line": 84,
+            "text": "\ntest('fgos --help --json through the host is the whole manifest, byte-identical to the Node payload', () => {\n  const cwd = emptyCwd('top-level');\n  const expected = node(['--help', '--json'], cwd).stdout;\n  assert.ok(expected.length > 64 * 1024, `manifest unexpectedly small (${expected.length} bytes): the truncation check needs a large one`);\n  for (const door of ['--help', '-h']) {\n    const result = host([door, '--json'], cwd);\n    assert.equal(result.status, 0, `${door}: ${result.stderr}`);\n    assert.equal(result.stdout, expected, `${door} --json through the host differs from the Node payload (${result.stdout.length} vs ${expected.length} bytes)`);"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-031477",
+          "pinnedSpan": {
+            "line": 87,
+            "text": "  const expected = node(['--help', '--json'], cwd).stdout;\n  assert.ok(expected.length > 64 * 1024, `manifest unexpectedly small (${expected.length} bytes): the truncation check needs a large one`);\n  for (const door of ['--help', '-h']) {\n    const result = host([door, '--json'], cwd);\n    assert.equal(result.status, 0, `${door}: ${result.stderr}`);\n    assert.equal(result.stdout, expected, `${door} --json through the host differs from the Node payload (${result.stdout.length} vs ${expected.length} bytes)`);\n    assert.ok(JSON.parse(result.stdout).commands.length > 0);\n  }\n  const text = host(['--help'], cwd);"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-031478",
+          "pinnedSpan": {
+            "line": 88,
+            "text": "  assert.ok(expected.length > 64 * 1024, `manifest unexpectedly small (${expected.length} bytes): the truncation check needs a large one`);\n  for (const door of ['--help', '-h']) {\n    const result = host([door, '--json'], cwd);\n    assert.equal(result.status, 0, `${door}: ${result.stderr}`);\n    assert.equal(result.stdout, expected, `${door} --json through the host differs from the Node payload (${result.stdout.length} vs ${expected.length} bytes)`);\n    assert.ok(JSON.parse(result.stdout).commands.length > 0);\n  }\n  const text = host(['--help'], cwd);\n  assert.equal(text.status, 0, text.stderr);"
+          },
+          "headMatchingLines": []
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
       "file": "test/rust-host/release-tree.test.mjs",
       "record": {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
@@ -66084,7 +67389,7 @@
       },
       "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
       "pinnedHash": "8f340407e83ba0e3b8b5fe105ba99dffd182d1eef0d2900ebe46a9f0e5c782b0",
-      "headHash": "90f3c097c32ab0a38cd8e2024e4054ac87a541788f9010cb330e2f693392186e",
+      "headHash": "380d4372171a6ec235cf58d35d11d9ee72ff5cb16a408c77a252338dad3b37ed",
       "movedSpans": [
         {
           "id": "dynamic-033820",
@@ -66573,7 +67878,7 @@
             "text": "  assert.equal('FGOS_STATE_ROOT' in env, false);\n  assert.equal(env.FGOS_STATE_HOME, '/fixture/state');\n});\n\n// --- per-run temp dir: every fixture the suite mkdtemps lands under one\n// directory that is removed when the run ends, so leaked fixtures can never\n// pile up in the OS temp dir across runs.\n\nfunction tempBase() {"
           },
           "headMatchingLines": [
-            334
+            339
           ]
         },
         {
@@ -66583,7 +67888,7 @@
             "text": "// directory that is removed when the run ends, so leaked fixtures can never\n// pile up in the OS temp dir across runs.\n\nfunction tempBase() {\n  return fs.mkdtempSync(path.join(os.tmpdir(), 'run-tests-tmpbase-'));\n}\n\ntest('runSelectedTests points the child at a fresh per-run temp dir and removes it when the run ends', () => {\n  const base = tempBase();"
           },
           "headMatchingLines": [
-            339
+            344
           ]
         },
         {
@@ -66593,7 +67898,7 @@
             "text": "  const base = tempBase();\n  let seen;\n  const result = runSelectedTests(['a.test.mjs'], {\n    cwd: base,\n    env: { TMPDIR: base },\n    spawn: (_exec, _argv, opts) => {\n      seen = opts.env;\n      fs.writeFileSync(path.join(opts.env.TMPDIR, 'leaked-fixture'), 'x'); // a test that never cleans up\n      return { status: 0 };"
           },
           "headMatchingLines": [
-            347
+            352
           ]
         },
         {
@@ -66603,7 +67908,7 @@
             "text": "    cwd: base,\n    env: { TMPDIR: base },\n    spawn: (_exec, _argv, opts) => {\n      seen = opts.env;\n      fs.writeFileSync(path.join(opts.env.TMPDIR, 'leaked-fixture'), 'x'); // a test that never cleans up\n      return { status: 0 };\n    },\n  });\n  assert.equal(result.status, 0);"
           },
           "headMatchingLines": [
-            350
+            355
           ]
         },
         {
@@ -66613,7 +67918,7 @@
             "text": "  const base = tempBase();\n  const logs = [];\n  const result = runSelectedTests(['a.test.mjs'], {\n    cwd: base,\n    env: { TMPDIR: base, [KEEP_TMP_ENV]: '1' },\n    spawn: () => ({ status: 0 }),\n    log: (msg) => logs.push(msg),\n  });\n  assert.equal(fs.existsSync(result.runTemp), true);"
           },
           "headMatchingLines": [
-            368
+            373
           ]
         },
         {
@@ -66623,7 +67928,7 @@
             "text": "    spawn: () => ({ status: 0 }),\n    log: (msg) => logs.push(msg),\n  });\n  assert.equal(fs.existsSync(result.runTemp), true);\n  assert.match(logs.join('\\n'), new RegExp(result.runTemp.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')));\n  fs.rmSync(base, { recursive: true, force: true });\n});\n\ntest('runSelectedTests fails a run that leaves fgos-* temp dirs behind and names their prefixes', () => {"
           },
           "headMatchingLines": [
-            373
+            378
           ]
         },
         {
@@ -66633,7 +67938,7 @@
             "text": "  const base = tempBase();\n  const logs = [];\n  const result = runSelectedTests(['a.test.mjs'], {\n    cwd: base,\n    env: { TMPDIR: base },\n    spawn: (_exec, _argv, opts) => {\n      for (const name of ['fgos-leaky-test-Ab12Cd', 'fgos-leaky-test-Zy98Xw', 'fgos-other-q1w2e3', 'unrelated-dir']) fs.mkdirSync(path.join(opts.env.TMPDIR, name));\n      return { status: 0 };\n    },"
           },
           "headMatchingLines": [
-            382
+            387
           ]
         },
         {
@@ -66643,7 +67948,7 @@
             "text": "  const result = runSelectedTests(['a.test.mjs'], {\n    cwd: base,\n    env: { TMPDIR: base },\n    spawn: (_exec, _argv, opts) => {\n      for (const name of ['fgos-leaky-test-Ab12Cd', 'fgos-leaky-test-Zy98Xw', 'fgos-other-q1w2e3', 'unrelated-dir']) fs.mkdirSync(path.join(opts.env.TMPDIR, name));\n      return { status: 0 };\n    },\n    log: (msg) => logs.push(msg),\n  });"
           },
           "headMatchingLines": [
-            384
+            389
           ]
         },
         {
@@ -66661,7 +67966,7 @@
             "text": "});\n\ntest('runSelectedTests passes a run whose temp root holds no fgos-* leftovers', () => {\n  const base = tempBase();\n  const result = runSelectedTests(['a.test.mjs'], { cwd: base, env: { TMPDIR: base }, spawn: () => ({ status: 0 }) });\n  assert.equal(result.status, 0);\n  assert.deepEqual(result.tempLeftovers, {});\n  fs.rmSync(base, { recursive: true, force: true });\n});"
           },
           "headMatchingLines": [
-            398
+            403
           ]
         },
         {
@@ -66671,7 +67976,7 @@
             "text": "  assert.deepEqual(leftoverTempPrefixes('/nope', () => { throw new Error('ENOENT'); }), {});\n});\n\ntest('a test process that imports process-tmp-root.mjs keeps its temp files in a private dir and removes it at exit', () => {\n  const helper = fileURLToPath(new URL('../helpers/process-tmp-root.mjs', import.meta.url));\n  const script = `import { PROCESS_TEMP_ROOT } from ${JSON.stringify(helper)};\nimport fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';\nfs.mkdtempSync(path.join(os.tmpdir(), 'fgos-never-cleaned-'));\nconsole.log(JSON.stringify({ root: PROCESS_TEMP_ROOT, tmpdir: os.tmpdir() }));`;"
           },
           "headMatchingLines": [
-            410
+            415
           ]
         },
         {
@@ -66681,7 +67986,7 @@
             "text": "test('a test process that imports process-tmp-root.mjs keeps its temp files in a private dir and removes it at exit', () => {\n  const helper = fileURLToPath(new URL('../helpers/process-tmp-root.mjs', import.meta.url));\n  const script = `import { PROCESS_TEMP_ROOT } from ${JSON.stringify(helper)};\nimport fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';\nfs.mkdtempSync(path.join(os.tmpdir(), 'fgos-never-cleaned-'));\nconsole.log(JSON.stringify({ root: PROCESS_TEMP_ROOT, tmpdir: os.tmpdir() }));`;\n  const base = tempBase();\n  const run = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8', env: { ...process.env, TMPDIR: base, FGOS_KEEP_TEST_FIXTURES: '' } });\n  assert.equal(run.status, 0, run.stderr);"
           },
           "headMatchingLines": [
-            413
+            418
           ]
         },
         {
@@ -66691,7 +67996,7 @@
             "text": "  const helper = fileURLToPath(new URL('../helpers/process-tmp-root.mjs', import.meta.url));\n  const script = `import { PROCESS_TEMP_ROOT } from ${JSON.stringify(helper)};\nimport fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';\nfs.mkdtempSync(path.join(os.tmpdir(), 'fgos-never-cleaned-'));\nconsole.log(JSON.stringify({ root: PROCESS_TEMP_ROOT, tmpdir: os.tmpdir() }));`;\n  const base = tempBase();\n  const run = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8', env: { ...process.env, TMPDIR: base, FGOS_KEEP_TEST_FIXTURES: '' } });\n  assert.equal(run.status, 0, run.stderr);\n  const { root, tmpdir } = JSON.parse(run.stdout);"
           },
           "headMatchingLines": [
-            414
+            419
           ]
         },
         {
@@ -66701,7 +68006,7 @@
             "text": "  const helper = fileURLToPath(new URL('../helpers/process-tmp-root.mjs', import.meta.url));\n  const script = `import { PROCESS_TEMP_ROOT } from ${JSON.stringify(helper)};\nimport fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';\nfs.mkdtempSync(path.join(os.tmpdir(), 'fgos-never-cleaned-'));\nconsole.log(JSON.stringify({ root: PROCESS_TEMP_ROOT, tmpdir: os.tmpdir() }));`;\n  const base = tempBase();\n  const run = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8', env: { ...process.env, TMPDIR: base, FGOS_KEEP_TEST_FIXTURES: '' } });\n  assert.equal(run.status, 0, run.stderr);\n  const { root, tmpdir } = JSON.parse(run.stdout);"
           },
           "headMatchingLines": [
-            414
+            419
           ]
         },
         {
@@ -66711,7 +68016,7 @@
             "text": "import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';\nfs.mkdtempSync(path.join(os.tmpdir(), 'fgos-never-cleaned-'));\nconsole.log(JSON.stringify({ root: PROCESS_TEMP_ROOT, tmpdir: os.tmpdir() }));`;\n  const base = tempBase();\n  const run = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8', env: { ...process.env, TMPDIR: base, FGOS_KEEP_TEST_FIXTURES: '' } });\n  assert.equal(run.status, 0, run.stderr);\n  const { root, tmpdir } = JSON.parse(run.stdout);\n  assert.equal(tmpdir, root);\n  assert.equal(path.dirname(root), fs.realpathSync(base));"
           },
           "headMatchingLines": [
-            416
+            421
           ]
         },
         {
@@ -66721,7 +68026,7 @@
             "text": "  fs.rmSync(base, { recursive: true, force: true });\n});\n\ntest('a test process ended by SIGTERM still removes its private temp dir', async () => {\n  const helper = fileURLToPath(new URL('../helpers/process-tmp-root.mjs', import.meta.url));\n  const script = `import ${JSON.stringify(helper)};\nimport fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';\nfs.mkdtempSync(path.join(os.tmpdir(), 'fgos-never-cleaned-'));\nconsole.log('ready'); setInterval(() => {}, 1000);`;"
           },
           "headMatchingLines": [
-            426
+            431
           ]
         },
         {
@@ -66731,7 +68036,7 @@
             "text": "test('a test process ended by SIGTERM still removes its private temp dir', async () => {\n  const helper = fileURLToPath(new URL('../helpers/process-tmp-root.mjs', import.meta.url));\n  const script = `import ${JSON.stringify(helper)};\nimport fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';\nfs.mkdtempSync(path.join(os.tmpdir(), 'fgos-never-cleaned-'));\nconsole.log('ready'); setInterval(() => {}, 1000);`;\n  const base = tempBase();\n  const child = spawn(process.execPath, ['--input-type=module', '-e', script], { env: { ...process.env, TMPDIR: base, FGOS_KEEP_TEST_FIXTURES: '' }, stdio: ['ignore', 'pipe', 'inherit'] });\n  await new Promise((resolve) => child.stdout.once('data', resolve));"
           },
           "headMatchingLines": [
-            429
+            434
           ]
         },
         {
@@ -66741,7 +68046,7 @@
             "text": "import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';\nfs.mkdtempSync(path.join(os.tmpdir(), 'fgos-never-cleaned-'));\nconsole.log('ready'); setInterval(() => {}, 1000);`;\n  const base = tempBase();\n  const child = spawn(process.execPath, ['--input-type=module', '-e', script], { env: { ...process.env, TMPDIR: base, FGOS_KEEP_TEST_FIXTURES: '' }, stdio: ['ignore', 'pipe', 'inherit'] });\n  await new Promise((resolve) => child.stdout.once('data', resolve));\n  const closed = new Promise((resolve) => child.once('close', resolve));\n  child.kill('SIGTERM');\n  await closed;"
           },
           "headMatchingLines": [
-            432
+            437
           ]
         },
         {
@@ -66751,7 +68056,7 @@
             "text": "  const base = tempBase();\n  let runTemp;\n  assert.throws(() => runSelectedTests(['a.test.mjs'], {\n    cwd: base,\n    env: { TMPDIR: base },\n    spawn: (_exec, _argv, opts) => { runTemp = opts.env.TMPDIR; throw new Error('spawn blew up'); },\n  }), /spawn blew up/);\n  assert.equal(fs.existsSync(runTemp), false);\n  fs.rmSync(base, { recursive: true, force: true });"
           },
           "headMatchingLines": [
-            475
+            480
           ]
         },
         {
@@ -66761,7 +68066,7 @@
             "text": "  const base = tempBase();\n  let fixtureRoot;\n  runSelectedTests(['a.test.mjs'], {\n    cwd: base,\n    env: { TMPDIR: base },\n    spawn: (_exec, _argv, opts) => {\n      fixtureRoot = opts.env.FGOS_TEST_FIXTURE_ROOT;\n      fs.mkdirSync(path.join(fixtureRoot, 'left-by-a-killed-file'));\n      return { status: 0 };"
           },
           "headMatchingLines": [
-            487
+            492
           ]
         },
         {
@@ -66771,7 +68076,7 @@
             "text": "  runSelectedTests(['a.test.mjs'], {\n    cwd: base,\n    env: { TMPDIR: base },\n    spawn: (_exec, _argv, opts) => {\n      fixtureRoot = opts.env.FGOS_TEST_FIXTURE_ROOT;\n      fs.mkdirSync(path.join(fixtureRoot, 'left-by-a-killed-file'));\n      return { status: 0 };\n    },\n  });"
           },
           "headMatchingLines": [
-            489
+            494
           ]
         },
         {
@@ -66781,7 +68086,7 @@
             "text": "    cwd: base,\n    env: { TMPDIR: base },\n    spawn: (_exec, _argv, opts) => {\n      fixtureRoot = opts.env.FGOS_TEST_FIXTURE_ROOT;\n      fs.mkdirSync(path.join(fixtureRoot, 'left-by-a-killed-file'));\n      return { status: 0 };\n    },\n  });\n  assert.ok(fixtureRoot, 'the suite is told where to put its fixtures');"
           },
           "headMatchingLines": [
-            490
+            495
           ]
         },
         {
@@ -66791,7 +68096,7 @@
             "text": "// ─── .fgos Store Leak Guardrail Tests ─────────────────────────────────────────\n\ntest('snapshotFgos captures files in .fgos including observe/, excluding secrets', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });\n  fs.mkdirSync(path.join(fgosDir, 'coordination'), { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{\"runner\":{}}');\n  fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'data.json'), '{\"friction\":1}');"
           },
           "headMatchingLines": [
-            503
+            508
           ]
         },
         {
@@ -66801,7 +68106,7 @@
             "text": "// ─── .fgos Store Leak Guardrail Tests ─────────────────────────────────────────\n\ntest('snapshotFgos captures files in .fgos including observe/, excluding secrets', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });\n  fs.mkdirSync(path.join(fgosDir, 'coordination'), { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{\"runner\":{}}');\n  fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'data.json'), '{\"friction\":1}');"
           },
           "headMatchingLines": [
-            503
+            508
           ]
         },
         {
@@ -66811,7 +68116,7 @@
             "text": "\ntest('snapshotFgos captures files in .fgos including observe/, excluding secrets', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });\n  fs.mkdirSync(path.join(fgosDir, 'coordination'), { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{\"runner\":{}}');\n  fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'data.json'), '{\"friction\":1}');\n  fs.writeFileSync(path.join(fgosDir, 'secrets.local.env'), 'SECRET_TOKEN=abc');"
           },
           "headMatchingLines": [
-            504
+            509
           ]
         },
         {
@@ -66821,7 +68126,7 @@
             "text": "test('snapshotFgos captures files in .fgos including observe/, excluding secrets', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });\n  fs.mkdirSync(path.join(fgosDir, 'coordination'), { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{\"runner\":{}}');\n  fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'data.json'), '{\"friction\":1}');\n  fs.writeFileSync(path.join(fgosDir, 'secrets.local.env'), 'SECRET_TOKEN=abc');\n  fs.writeFileSync(path.join(fgosDir, 'secrets.env'), 'SECRET_KEY=xyz');"
           },
           "headMatchingLines": [
-            505
+            510
           ]
         },
         {
@@ -66839,7 +68144,7 @@
             "text": "  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });\n  fs.mkdirSync(path.join(fgosDir, 'coordination'), { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{\"runner\":{}}');\n  fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'data.json'), '{\"friction\":1}');\n  fs.writeFileSync(path.join(fgosDir, 'secrets.local.env'), 'SECRET_TOKEN=abc');\n  fs.writeFileSync(path.join(fgosDir, 'secrets.env'), 'SECRET_KEY=xyz');\n\n  const snap = snapshotFgos(base);"
           },
           "headMatchingLines": [
-            507
+            512
           ]
         },
         {
@@ -66849,7 +68154,7 @@
             "text": "  fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });\n  fs.mkdirSync(path.join(fgosDir, 'coordination'), { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{\"runner\":{}}');\n  fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'data.json'), '{\"friction\":1}');\n  fs.writeFileSync(path.join(fgosDir, 'secrets.local.env'), 'SECRET_TOKEN=abc');\n  fs.writeFileSync(path.join(fgosDir, 'secrets.env'), 'SECRET_KEY=xyz');\n\n  const snap = snapshotFgos(base);\n  assert.equal(snap.has('config.json'), true);"
           },
           "headMatchingLines": [
-            508
+            513
           ]
         },
         {
@@ -66859,7 +68164,7 @@
             "text": "  fs.mkdirSync(path.join(fgosDir, 'coordination'), { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{\"runner\":{}}');\n  fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'data.json'), '{\"friction\":1}');\n  fs.writeFileSync(path.join(fgosDir, 'secrets.local.env'), 'SECRET_TOKEN=abc');\n  fs.writeFileSync(path.join(fgosDir, 'secrets.env'), 'SECRET_KEY=xyz');\n\n  const snap = snapshotFgos(base);\n  assert.equal(snap.has('config.json'), true);\n  assert.equal(snap.has(path.join('observe', 'friction', 'data.json')), true);"
           },
           "headMatchingLines": [
-            509
+            514
           ]
         },
         {
@@ -66877,7 +68182,7 @@
             "text": "});\n\ntest('runSelectedTests passes cleanly with status 0 when no .fgos store leak occurs', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(fgosDir, { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{\"runner\":{}}');\n\n  const result = runSelectedTests(['a.test.mjs'], {"
           },
           "headMatchingLines": [
-            545
+            550
           ]
         },
         {
@@ -66887,7 +68192,7 @@
             "text": "});\n\ntest('runSelectedTests passes cleanly with status 0 when no .fgos store leak occurs', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(fgosDir, { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{\"runner\":{}}');\n\n  const result = runSelectedTests(['a.test.mjs'], {"
           },
           "headMatchingLines": [
-            545
+            550
           ]
         },
         {
@@ -66897,7 +68202,7 @@
             "text": "test('runSelectedTests passes cleanly with status 0 when no .fgos store leak occurs', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(fgosDir, { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{\"runner\":{}}');\n\n  const result = runSelectedTests(['a.test.mjs'], {\n    cwd: base,\n    spawn: () => ({ status: 0 }),"
           },
           "headMatchingLines": [
-            547
+            552
           ]
         },
         {
@@ -66907,7 +68212,7 @@
             "text": "});\n\ntest('runSelectedTests fails with exit 1 and reports error when test suite leaks a file into .fgos', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(fgosDir, { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{\"runner\":{}}');\n\n  const logs = [];"
           },
           "headMatchingLines": [
-            564
+            569
           ]
         },
         {
@@ -66917,7 +68222,7 @@
             "text": "});\n\ntest('runSelectedTests fails with exit 1 and reports error when test suite leaks a file into .fgos', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(fgosDir, { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{\"runner\":{}}');\n\n  const logs = [];"
           },
           "headMatchingLines": [
-            564
+            569
           ]
         },
         {
@@ -66927,7 +68232,7 @@
             "text": "test('runSelectedTests fails with exit 1 and reports error when test suite leaks a file into .fgos', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(fgosDir, { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{\"runner\":{}}');\n\n  const logs = [];\n  const result = runSelectedTests(['a.test.mjs'], {\n    cwd: base,"
           },
           "headMatchingLines": [
-            566
+            571
           ]
         },
         {
@@ -66937,7 +68242,7 @@
             "text": "  const result = runSelectedTests(['a.test.mjs'], {\n    cwd: base,\n    spawn: () => {\n      // Simulate a test leaking a file into .fgos/dispatch-runs/claude/123/run.json\n      const leakDir = path.join(fgosDir, 'dispatch-runs', 'claude', '123');\n      fs.mkdirSync(leakDir, { recursive: true });\n      fs.writeFileSync(path.join(leakDir, 'run.json'), '{\"leaked\":true}');\n      return { status: 0 }; // test claimed it passed\n    },"
           },
           "headMatchingLines": [
-            573
+            578
           ]
         },
         {
@@ -66947,7 +68252,7 @@
             "text": "  const result = runSelectedTests(['a.test.mjs'], {\n    cwd: base,\n    spawn: () => {\n      // Simulate a test leaking a file into .fgos/dispatch-runs/claude/123/run.json\n      const leakDir = path.join(fgosDir, 'dispatch-runs', 'claude', '123');\n      fs.mkdirSync(leakDir, { recursive: true });\n      fs.writeFileSync(path.join(leakDir, 'run.json'), '{\"leaked\":true}');\n      return { status: 0 }; // test claimed it passed\n    },"
           },
           "headMatchingLines": [
-            573
+            578
           ]
         },
         {
@@ -66957,7 +68262,7 @@
             "text": "    spawn: () => {\n      // Simulate a test leaking a file into .fgos/dispatch-runs/claude/123/run.json\n      const leakDir = path.join(fgosDir, 'dispatch-runs', 'claude', '123');\n      fs.mkdirSync(leakDir, { recursive: true });\n      fs.writeFileSync(path.join(leakDir, 'run.json'), '{\"leaked\":true}');\n      return { status: 0 }; // test claimed it passed\n    },\n    log: (msg) => logs.push(msg),\n  });"
           },
           "headMatchingLines": [
-            575
+            580
           ]
         },
         {
@@ -66967,7 +68272,7 @@
             "text": "  });\n\n  assert.equal(result.status, 1, 'suite MUST fail if test leaked into .fgos');\n  assert.equal(result.fgosDiff.leaked, true);\n  assert.equal(result.fgosDiff.added.includes(path.join('dispatch-runs', 'claude', '123', 'run.json')), true);\n  assert.match(logs.join('\\n'), /leaked unexpected files/);\n  assert.match(logs.join('\\n'), /dispatch-runs.*run\\.json/);\n\n  fs.rmSync(base, { recursive: true, force: true });"
           },
           "headMatchingLines": [
-            583
+            588
           ]
         },
         {
@@ -66977,7 +68282,7 @@
             "text": "\n  assert.equal(result.status, 1, 'suite MUST fail if test leaked into .fgos');\n  assert.equal(result.fgosDiff.leaked, true);\n  assert.equal(result.fgosDiff.added.includes(path.join('dispatch-runs', 'claude', '123', 'run.json')), true);\n  assert.match(logs.join('\\n'), /leaked unexpected files/);\n  assert.match(logs.join('\\n'), /dispatch-runs.*run\\.json/);\n\n  fs.rmSync(base, { recursive: true, force: true });\n});"
           },
           "headMatchingLines": [
-            584
+            589
           ]
         },
         {
@@ -66995,7 +68300,7 @@
             "text": "});\n\ntest('runSelectedTests fails when a test leaks into .fgos/observe/ store', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });\n\n  const logs = [];\n  const result = runSelectedTests(['observe.test.mjs'], {"
           },
           "headMatchingLines": [
-            592
+            597
           ]
         },
         {
@@ -67005,7 +68310,7 @@
             "text": "});\n\ntest('runSelectedTests fails when a test leaks into .fgos/observe/ store', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });\n\n  const logs = [];\n  const result = runSelectedTests(['observe.test.mjs'], {"
           },
           "headMatchingLines": [
-            592
+            597
           ]
         },
         {
@@ -67015,7 +68320,7 @@
             "text": "\ntest('runSelectedTests fails when a test leaks into .fgos/observe/ store', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });\n\n  const logs = [];\n  const result = runSelectedTests(['observe.test.mjs'], {\n    cwd: base,"
           },
           "headMatchingLines": [
-            593
+            598
           ]
         },
         {
@@ -67025,7 +68330,7 @@
             "text": "  const result = runSelectedTests(['observe.test.mjs'], {\n    cwd: base,\n    spawn: () => {\n      // Simulate leaking into .fgos/observe/friction/leak.json\n      fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'leak.json'), '{\"bad\":true}');\n      return { status: 0 };\n    },\n    log: (msg) => logs.push(msg),\n  });"
           },
           "headMatchingLines": [
-            600
+            605
           ]
         },
         {
@@ -67035,7 +68340,7 @@
             "text": "  });\n\n  assert.equal(result.status, 1, 'suite MUST fail if test leaked into .fgos/observe/');\n  assert.equal(result.fgosDiff.leaked, true);\n  assert.equal(result.fgosDiff.added.includes(path.join('observe', 'friction', 'leak.json')), true);\n  assert.match(logs.join('\\n'), /observe.*leak\\.json/);\n\n  fs.rmSync(base, { recursive: true, force: true });\n});"
           },
           "headMatchingLines": [
-            608
+            613
           ]
         },
         {
@@ -67053,7 +68358,7 @@
             "text": "});\n\ntest('runSelectedTests permits allowed mutations without failing the suite', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(fgosDir, { recursive: true });\n\n  const allowed = new Set(['allowed.log']);\n  const result = runSelectedTests(['a.test.mjs'], {"
           },
           "headMatchingLines": [
-            616
+            621
           ]
         },
         {
@@ -67063,7 +68368,7 @@
             "text": "});\n\ntest('runSelectedTests permits allowed mutations without failing the suite', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(fgosDir, { recursive: true });\n\n  const allowed = new Set(['allowed.log']);\n  const result = runSelectedTests(['a.test.mjs'], {"
           },
           "headMatchingLines": [
-            616
+            621
           ]
         },
         {
@@ -67081,7 +68386,7 @@
             "text": "});\n\ntest('runSelectedTests tolerates a rewrite of the derived state view but still fails other cache changes', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(path.join(fgosDir, 'cache'), { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'cache', 'state.json'), '{}');\n\n  const refreshed = runSelectedTests(['a.test.mjs'], {"
           },
           "headMatchingLines": [
-            636
+            641
           ]
         },
         {
@@ -67091,7 +68396,7 @@
             "text": "});\n\ntest('runSelectedTests tolerates a rewrite of the derived state view but still fails other cache changes', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(path.join(fgosDir, 'cache'), { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'cache', 'state.json'), '{}');\n\n  const refreshed = runSelectedTests(['a.test.mjs'], {"
           },
           "headMatchingLines": [
-            636
+            641
           ]
         },
         {
@@ -67101,7 +68406,7 @@
             "text": "\ntest('runSelectedTests tolerates a rewrite of the derived state view but still fails other cache changes', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(path.join(fgosDir, 'cache'), { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'cache', 'state.json'), '{}');\n\n  const refreshed = runSelectedTests(['a.test.mjs'], {\n    cwd: base,"
           },
           "headMatchingLines": [
-            637
+            642
           ]
         },
         {
@@ -67111,7 +68416,7 @@
             "text": "test('runSelectedTests tolerates a rewrite of the derived state view but still fails other cache changes', () => {\n  const base = tempBase();\n  const fgosDir = path.join(base, '.fgos');\n  fs.mkdirSync(path.join(fgosDir, 'cache'), { recursive: true });\n  fs.writeFileSync(path.join(fgosDir, 'cache', 'state.json'), '{}');\n\n  const refreshed = runSelectedTests(['a.test.mjs'], {\n    cwd: base,\n    spawn: () => {"
           },
           "headMatchingLines": [
-            638
+            643
           ]
         },
         {
@@ -67121,7 +68426,7 @@
             "text": "\n  const refreshed = runSelectedTests(['a.test.mjs'], {\n    cwd: base,\n    spawn: () => {\n      fs.writeFileSync(path.join(fgosDir, 'cache', 'state.json'), '{\"refreshed\":true}');\n      return { status: 0 };\n    },\n  });\n  assert.equal(refreshed.status, 0);"
           },
           "headMatchingLines": [
-            643
+            648
           ]
         },
         {
@@ -67131,7 +68436,7 @@
             "text": "  const leaked = runSelectedTests(['a.test.mjs'], {\n    cwd: base,\n    log: () => {},\n    spawn: () => {\n      fs.writeFileSync(path.join(fgosDir, 'cache', 'other.json'), '{}');\n      return { status: 0 };\n    },\n  });\n  assert.equal(leaked.status, 1);"
           },
           "headMatchingLines": [
-            654
+            659
           ]
         },
         {
@@ -67141,7 +68446,7 @@
             "text": "      return { status: 0 };\n    },\n  });\n  assert.equal(leaked.status, 1);\n  assert.deepEqual(leaked.fgosDiff.added, [path.join('cache', 'other.json')]);\n  fs.rmSync(base, { recursive: true, force: true });\n});\n\n// --- Per-file time limit ----------------------------------------------------"
           },
           "headMatchingLines": [
-            659
+            664
           ]
         },
         {
@@ -67151,7 +68456,7 @@
             "text": "    '  300   200    09:00 /usr/bin/node test/a.test.mjs',\n    '  400   300    08:59 sleep 99999',\n    '  500   200    00:05 /usr/bin/node test/b.test.mjs',\n    '  600     1    99:00 /usr/bin/node test/a.test.mjs',\n  ].join('\\n'));\n  const limits = { 'test/a.test.mjs': 60_000, 'test/b.test.mjs': 60_000 };\n  const overdue = findOverdue(procs, 100, limits);\n  assert.deepEqual(overdue.map((o) => [o.pid, o.file]), [[300, 'test/a.test.mjs']]);\n  assert.deepEqual(treeOf(procs, 300), [400, 300]);"
           },
           "headMatchingLines": [
-            681
+            686
           ]
         },
         {
@@ -67161,7 +68466,7 @@
             "text": "    '  100     1    10:00 node run-tests.mjs',\n    '  200   100    10:00 node --test test/a.test.mjs',\n    '  300   200 441077234-00:18:40 /usr/bin/node test/a.test.mjs',\n    '  310   200    09:00 /usr/bin/node test/b.test.mjs',\n  ].join('\\n'));\n  const limits = { 'test/a.test.mjs': 600_000, 'test/b.test.mjs': 60_000 };\n  assert.deepEqual(findOverdue(procs, 100, limits).map((o) => o.pid), [310]);\n  // Without the root's own elapsed time the absolute ceiling still applies.\n  const noRoot = parsePs('  300   100 441077234-00:18:40 /usr/bin/node test/a.test.mjs');"
           },
           "headMatchingLines": [
-            696
+            701
           ]
         },
         {
@@ -67171,7 +68476,7 @@
             "text": "  ].join('\\n'));\n  const limits = { 'test/a.test.mjs': 600_000, 'test/b.test.mjs': 60_000 };\n  assert.deepEqual(findOverdue(procs, 100, limits).map((o) => o.pid), [310]);\n  // Without the root's own elapsed time the absolute ceiling still applies.\n  const noRoot = parsePs('  300   100 441077234-00:18:40 /usr/bin/node test/a.test.mjs');\n  assert.deepEqual(findOverdue(noRoot, 100, limits), []);\n});\n\nfor (const pauseAfterKill of [false, true]) {"
           },
           "headMatchingLines": [
-            700
+            705
           ]
         },
         {
@@ -67181,7 +68486,7 @@
             "text": "for (const pauseAfterKill of [false, true]) {\n  test(pauseAfterKill\n    ? 'timeout evidence survives the nested runner finishing while the watchdog is paused after killing a file'\n    : 'a hung test file is killed with its whole process tree, named, and the rest of the suite still runs', async (t) => {\n    const root = tmpFixtureRoot();\n    const runnerPidFile = path.join(root, 'runner.pid');\n    const grandchildPidFile = path.join(root, 'grandchild.pid');\n    const okMarker = path.join(root, 'ok.ran');\n    const acknowledged = path.join(root, 'parent-read');"
           },
           "headMatchingLines": [
-            708
+            713
           ]
         },
         {
@@ -67191,7 +68496,7 @@
             "text": "  test(pauseAfterKill\n    ? 'timeout evidence survives the nested runner finishing while the watchdog is paused after killing a file'\n    : 'a hung test file is killed with its whole process tree, named, and the rest of the suite still runs', async (t) => {\n    const root = tmpFixtureRoot();\n    const runnerPidFile = path.join(root, 'runner.pid');\n    const grandchildPidFile = path.join(root, 'grandchild.pid');\n    const okMarker = path.join(root, 'ok.ran');\n    const acknowledged = path.join(root, 'parent-read');\n    const killGapMarker = path.join(root, 'kill-gap');"
           },
           "headMatchingLines": [
-            709
+            714
           ]
         },
         {
@@ -67201,7 +68506,7 @@
             "text": "    ? 'timeout evidence survives the nested runner finishing while the watchdog is paused after killing a file'\n    : 'a hung test file is killed with its whole process tree, named, and the rest of the suite still runs', async (t) => {\n    const root = tmpFixtureRoot();\n    const runnerPidFile = path.join(root, 'runner.pid');\n    const grandchildPidFile = path.join(root, 'grandchild.pid');\n    const okMarker = path.join(root, 'ok.ran');\n    const acknowledged = path.join(root, 'parent-read');\n    const killGapMarker = path.join(root, 'kill-gap');\n    const supervisorPidFile = path.join(root, 'supervisor.pid');"
           },
           "headMatchingLines": [
-            710
+            715
           ]
         },
         {
@@ -67211,7 +68516,7 @@
             "text": "    : 'a hung test file is killed with its whole process tree, named, and the rest of the suite still runs', async (t) => {\n    const root = tmpFixtureRoot();\n    const runnerPidFile = path.join(root, 'runner.pid');\n    const grandchildPidFile = path.join(root, 'grandchild.pid');\n    const okMarker = path.join(root, 'ok.ran');\n    const acknowledged = path.join(root, 'parent-read');\n    const killGapMarker = path.join(root, 'kill-gap');\n    const supervisorPidFile = path.join(root, 'supervisor.pid');\n    const supervisorExited = path.join(root, 'supervisor.exited');"
           },
           "headMatchingLines": [
-            711
+            716
           ]
         },
         {
@@ -67221,7 +68526,7 @@
             "text": "    const root = tmpFixtureRoot();\n    const runnerPidFile = path.join(root, 'runner.pid');\n    const grandchildPidFile = path.join(root, 'grandchild.pid');\n    const okMarker = path.join(root, 'ok.ran');\n    const acknowledged = path.join(root, 'parent-read');\n    const killGapMarker = path.join(root, 'kill-gap');\n    const supervisorPidFile = path.join(root, 'supervisor.pid');\n    const supervisorExited = path.join(root, 'supervisor.exited');\n    const env = { ...process.env };"
           },
           "headMatchingLines": [
-            712
+            717
           ]
         },
         {
@@ -67231,7 +68536,7 @@
             "text": "    const runnerPidFile = path.join(root, 'runner.pid');\n    const grandchildPidFile = path.join(root, 'grandchild.pid');\n    const okMarker = path.join(root, 'ok.ran');\n    const acknowledged = path.join(root, 'parent-read');\n    const killGapMarker = path.join(root, 'kill-gap');\n    const supervisorPidFile = path.join(root, 'supervisor.pid');\n    const supervisorExited = path.join(root, 'supervisor.exited');\n    const env = { ...process.env };\n    t.after(async () => {"
           },
           "headMatchingLines": [
-            713
+            718
           ]
         },
         {
@@ -67241,7 +68546,7 @@
             "text": "    const grandchildPidFile = path.join(root, 'grandchild.pid');\n    const okMarker = path.join(root, 'ok.ran');\n    const acknowledged = path.join(root, 'parent-read');\n    const killGapMarker = path.join(root, 'kill-gap');\n    const supervisorPidFile = path.join(root, 'supervisor.pid');\n    const supervisorExited = path.join(root, 'supervisor.exited');\n    const env = { ...process.env };\n    t.after(async () => {\n      try {"
           },
           "headMatchingLines": [
-            714
+            719
           ]
         },
         {
@@ -67251,7 +68556,7 @@
             "text": "    const okMarker = path.join(root, 'ok.ran');\n    const acknowledged = path.join(root, 'parent-read');\n    const killGapMarker = path.join(root, 'kill-gap');\n    const supervisorPidFile = path.join(root, 'supervisor.pid');\n    const supervisorExited = path.join(root, 'supervisor.exited');\n    const env = { ...process.env };\n    t.after(async () => {\n      try {\n        // Release the real supervisor even if an assertion or spawn failed."
           },
           "headMatchingLines": [
-            715
+            720
           ]
         },
         {
@@ -67269,7 +68574,7 @@
             "text": "    if (pauseAfterKill) {\n      // Hold the real SIGKILL boundary until runTests has read the journal.\n      // No fake process table, source pin, or production-only testing seam:\n      // the nested runner, supervisor, and detached child all run for real.\n      const watchdogPath = fileURLToPath(new URL('../../scripts/lib/test-file-watchdog.mjs', import.meta.url));\n      const preload = write(root, 'pause-watchdog.mjs', `\nimport fs from 'node:fs';\nif (process.argv[1] === ${JSON.stringify(watchdogPath)}) {\n  fs.writeFileSync(${JSON.stringify(supervisorPidFile)}, String(process.pid));"
           },
           "headMatchingLines": [
-            749
+            754
           ]
         },
         {
@@ -67279,7 +68584,7 @@
             "text": "    if (pauseAfterKill) {\n      // Hold the real SIGKILL boundary until runTests has read the journal.\n      // No fake process table, source pin, or production-only testing seam:\n      // the nested runner, supervisor, and detached child all run for real.\n      const watchdogPath = fileURLToPath(new URL('../../scripts/lib/test-file-watchdog.mjs', import.meta.url));\n      const preload = write(root, 'pause-watchdog.mjs', `\nimport fs from 'node:fs';\nif (process.argv[1] === ${JSON.stringify(watchdogPath)}) {\n  fs.writeFileSync(${JSON.stringify(supervisorPidFile)}, String(process.pid));"
           },
           "headMatchingLines": [
-            749
+            754
           ]
         },
         {
@@ -67289,7 +68594,7 @@
             "text": "    return result;\n  };\n}\n`);\n      env.NODE_OPTIONS = `${env.NODE_OPTIONS || ''} --import=${JSON.stringify(pathToFileURL(preload).href)}`.trim();\n    }\n    write(\n      root,\n      'a-hang.test.mjs',"
           },
           "headMatchingLines": [
-            773
+            778
           ]
         },
         {
@@ -67299,7 +68604,7 @@
             "text": "    write(\n      root,\n      'a-hang.test.mjs',\n      \"import { test } from 'node:test';\\nimport { spawn } from 'node:child_process';\\nimport fs from 'node:fs';\\n\" +\n        `fs.writeFileSync(${JSON.stringify(runnerPidFile)}, String(process.pid));\\n` +\n        \"const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { detached: true, stdio: 'ignore' });\\n\" +\n        `fs.writeFileSync(${JSON.stringify(grandchildPidFile)}, String(child.pid));\\n` +\n        \"test('passes, then the process never exits', () => {});\\nsetInterval(() => {}, 1000);\\n\",\n    );"
           },
           "headMatchingLines": [
-            779
+            784
           ]
         },
         {
@@ -67309,7 +68614,7 @@
             "text": "      'a-hang.test.mjs',\n      \"import { test } from 'node:test';\\nimport { spawn } from 'node:child_process';\\nimport fs from 'node:fs';\\n\" +\n        `fs.writeFileSync(${JSON.stringify(runnerPidFile)}, String(process.pid));\\n` +\n        \"const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { detached: true, stdio: 'ignore' });\\n\" +\n        `fs.writeFileSync(${JSON.stringify(grandchildPidFile)}, String(child.pid));\\n` +\n        \"test('passes, then the process never exits', () => {});\\nsetInterval(() => {}, 1000);\\n\",\n    );\n    write(\n      root,"
           },
           "headMatchingLines": [
-            781
+            786
           ]
         },
         {
@@ -67319,7 +68624,7 @@
             "text": "    );\n    write(\n      root,\n      'b-ok.test.mjs',\n      `import { test } from 'node:test';\\nimport fs from 'node:fs';\\ntest('ok', () => fs.writeFileSync(${JSON.stringify(okMarker)}, '1'));\\n`,\n    );\n    const logs = [];\n    const started = Date.now();\n    let nested;"
           },
           "headMatchingLines": [
-            787
+            792
           ]
         },
         {
@@ -67329,7 +68634,7 @@
             "text": "      assert.equal(nested.signal, null, 'the nested runner itself must not be killed');\n      assert.notEqual(result.status, 0);\n      assert.ok(Date.now() - started < 60_000, 'a hung file must not hold the run');\n      assert.deepEqual(result.timedOut.map((hit) => hit.file), ['a-hang.test.mjs']);\n      assert.match(logs.join('\\n'), /a-hang\\.test\\.mjs: timed out/);\n      assert.ok(fs.existsSync(okMarker), 'the other file still ran');\n      const grandchildPid = Number(fs.readFileSync(grandchildPidFile, 'utf8'));\n      assert.throws(() => process.kill(grandchildPid, 0), { code: 'ESRCH' }, 'the detached grandchild was killed too');\n      if (pauseAfterKill) assert.ok(fs.existsSync(killGapMarker), 'the post-kill scheduling gap was exercised');"
           },
           "headMatchingLines": [
-            823
+            828
           ]
         },
         {
@@ -67339,7 +68644,7 @@
             "text": "        invocation, status: nested?.status, signal: nested?.signal, pid: nested?.pid,\n        error: nested?.error && { message: nested.error.message, code: nested.error.code, syscall: nested.error.syscall },\n        timedOut: result?.timedOut, logs, otherFileRan: fs.existsSync(okMarker),\n      }));\n      t.diagnostic(`nested stdout:\\n${nested?.stdout ?? '(not captured)'}`);\n      t.diagnostic(`nested stderr:\\n${nested?.stderr ?? '(not captured)'}`);\n      throw err;\n    }\n  });"
           },
           "headMatchingLines": [
-            837
+            842
           ]
         },
         {
@@ -67349,7 +68654,7 @@
             "text": "        error: nested?.error && { message: nested.error.message, code: nested.error.code, syscall: nested.error.syscall },\n        timedOut: result?.timedOut, logs, otherFileRan: fs.existsSync(okMarker),\n      }));\n      t.diagnostic(`nested stdout:\\n${nested?.stdout ?? '(not captured)'}`);\n      t.diagnostic(`nested stderr:\\n${nested?.stderr ?? '(not captured)'}`);\n      throw err;\n    }\n  });\n}"
           },
           "headMatchingLines": [
-            838
+            843
           ]
         },
         {
@@ -67359,7 +68664,7 @@
             "text": "    },\n  });\n  assert.equal(result.status, 1, 'a suite that rewrote the identity must not pass');\n  assert.equal(result.gitIdentityDiff.leaked, true);\n  assert.match(logs.join('\\n'), /changed the git identity/);\n  assert.match(logs.join('\\n'), /\\+ local: user\\.email test@example\\.com/);\n  assert.match(logs.join('\\n'), /\\* local: user\\.name Owner Name -> local: user\\.name Test/);\n  fs.rmSync(base, { recursive: true, force: true });\n});"
           },
           "headMatchingLines": [
-            890
+            895
           ]
         },
         {
@@ -67377,7 +68682,7 @@
             "text": "  assert.equal(result.status, 1, 'a suite that rewrote the identity must not pass');\n  assert.equal(result.gitIdentityDiff.leaked, true);\n  assert.match(logs.join('\\n'), /changed the git identity/);\n  assert.match(logs.join('\\n'), /\\+ local: user\\.email test@example\\.com/);\n  assert.match(logs.join('\\n'), /\\* local: user\\.name Owner Name -> local: user\\.name Test/);\n  fs.rmSync(base, { recursive: true, force: true });\n});\n\ntest('runSelectedTests leaves the run green when the identity keys are untouched', () => {"
           },
           "headMatchingLines": [
-            892
+            897
           ]
         }
       ],
@@ -75047,7 +76352,7 @@
       },
       "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
       "pinnedHash": "24ca8891ee89b39e7951d6cf9477a26c65ac185ecfa61600a2bed56033f8b003",
-      "headHash": "7e0d0d672b8b0b0777a5a93e47bd5c16c59da4370783721413f6ef2de1e7f4a1",
+      "headHash": "03ce804e03e245e62d01a4b43c41cc43e071f83f89615564841da2008072e730",
       "movedSpans": [],
       "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
       "failing": false
@@ -75138,7 +76443,7 @@
       },
       "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
       "pinnedHash": "1d72de1295e183d52d88e6fc68172b53966b613a5b44e9dd09870287ca3dc4e7",
-      "headHash": "903d31d46e772149154d9522b7c892fd150fd4b77f928011dce2c16e093f48ac",
+      "headHash": "63b9b03b4e7d89bce09b820cb2083f1a9771a4d6b269517849e7588c1c5e3dd5",
       "movedSpans": [],
       "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
       "failing": false
@@ -75894,7 +77199,7 @@
       },
       "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
       "pinnedHash": "880dbd8cec7d5ece0a8699c571f441c6fa5d428b7e3fc9270e516b1c3126362a",
-      "headHash": "d6cd0d47556378df4deb3a5285863663a5915783a7e1e302daecee8b8ec07197",
+      "headHash": "c6770e7aba51fc241dba13db524ea38fdef934d5454b5c1544dec9a1032ff239",
       "movedSpans": [
         {
           "id": "dynamic-003610",
@@ -75903,7 +77208,7 @@
             "text": "/// Fsync a ref's directory chain (see `ref_dirs`), concurrently. A\n/// directory that a concurrent ref deletion pruned in the meantime has no\n/// entry left to make durable, and its removal is made durable by its parent,\n/// which is in the chain: it is skipped, never an error.\nfn sync_ref_chain(dirs: &[PathBuf]) -> std::io::Result<()> {\n    let paths: Vec<&Path> = dirs.iter().map(PathBuf::as_path).collect();\n    let synced = match fgos_durable_file::sync_directories(&paths) {\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => paths.iter().try_for_each(|dir| {\n            match fgos_durable_file::sync_directory(dir) {"
           },
           "headMatchingLines": [
-            1104
+            1076
           ]
         },
         {
@@ -75913,7 +77218,7 @@
             "text": "/// directory that a concurrent ref deletion pruned in the meantime has no\n/// entry left to make durable, and its removal is made durable by its parent,\n/// which is in the chain: it is skipped, never an error.\nfn sync_ref_chain(dirs: &[PathBuf]) -> std::io::Result<()> {\n    let paths: Vec<&Path> = dirs.iter().map(PathBuf::as_path).collect();\n    let synced = match fgos_durable_file::sync_directories(&paths) {\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => paths.iter().try_for_each(|dir| {\n            match fgos_durable_file::sync_directory(dir) {\n                Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),"
           },
           "headMatchingLines": [
-            1105
+            1077
           ]
         },
         {
@@ -75923,7 +77228,7 @@
             "text": "/// directory that a concurrent ref deletion pruned in the meantime has no\n/// entry left to make durable, and its removal is made durable by its parent,\n/// which is in the chain: it is skipped, never an error.\nfn sync_ref_chain(dirs: &[PathBuf]) -> std::io::Result<()> {\n    let paths: Vec<&Path> = dirs.iter().map(PathBuf::as_path).collect();\n    let synced = match fgos_durable_file::sync_directories(&paths) {\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => paths.iter().try_for_each(|dir| {\n            match fgos_durable_file::sync_directory(dir) {\n                Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),"
           },
           "headMatchingLines": [
-            1105
+            1077
           ]
         },
         {
@@ -75932,9 +77237,7 @@
             "line": 1119,
             "text": "/// Bounded in size and age.\nmod durable_objects {\n    use crate::{Oid, RepoHandle};\n    use std::collections::HashMap;\n    use std::path::PathBuf;\n    use std::sync::Mutex;\n    use std::time::{Duration, Instant};\n    const KEEP: Duration = Duration::from_secs(600);\n    const BOUND: usize = 4096;"
           },
-          "headMatchingLines": [
-            1126
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-003614",
@@ -75942,9 +77245,7 @@
             "line": 1131,
             "text": "    static SEEN: Mutex<Option<Seen>> = Mutex::new(None);\n    #[cfg(unix)]\n    fn loose(repo: &RepoHandle, oid: &Oid) -> Option<(u64, u64, u128)> {\n        let s = oid.as_str();\n        let m = std::fs::symlink_metadata(repo.common_dir().join(\"objects\").join(&s[..2]).join(&s[2..])).ok()?;\n        m.is_file().then(|| crate::wal::durable_identity(&m)).flatten()\n    }\n    #[cfg(not(unix))]\n    fn loose(_: &RepoHandle, _: &Oid) -> Option<(u64, u64, u128)> {"
           },
-          "headMatchingLines": [
-            1138
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-003615",
@@ -75952,9 +77253,7 @@
             "line": 1131,
             "text": "    static SEEN: Mutex<Option<Seen>> = Mutex::new(None);\n    #[cfg(unix)]\n    fn loose(repo: &RepoHandle, oid: &Oid) -> Option<(u64, u64, u128)> {\n        let s = oid.as_str();\n        let m = std::fs::symlink_metadata(repo.common_dir().join(\"objects\").join(&s[..2]).join(&s[2..])).ok()?;\n        m.is_file().then(|| crate::wal::durable_identity(&m)).flatten()\n    }\n    #[cfg(not(unix))]\n    fn loose(_: &RepoHandle, _: &Oid) -> Option<(u64, u64, u128)> {"
           },
-          "headMatchingLines": [
-            1138
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-003616",
@@ -75962,9 +77261,7 @@
             "line": 1131,
             "text": "    static SEEN: Mutex<Option<Seen>> = Mutex::new(None);\n    #[cfg(unix)]\n    fn loose(repo: &RepoHandle, oid: &Oid) -> Option<(u64, u64, u128)> {\n        let s = oid.as_str();\n        let m = std::fs::symlink_metadata(repo.common_dir().join(\"objects\").join(&s[..2]).join(&s[2..])).ok()?;\n        m.is_file().then(|| crate::wal::durable_identity(&m)).flatten()\n    }\n    #[cfg(not(unix))]\n    fn loose(_: &RepoHandle, _: &Oid) -> Option<(u64, u64, u128)> {"
           },
-          "headMatchingLines": [
-            1138
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-003618",
@@ -75973,7 +77270,7 @@
             "text": "    }\n    fn sync_all_objects(&self, repo: &RepoHandle) -> Result<()> {\n        // Includes loose fanouts and pack indexes after fetch. Never traverse\n        // a symlink. The file fsync profile comes from core.fsync=all.\n        let objects = repo.common_dir().join(\"objects\");\n        for e in fs::read_dir(&objects).map_err(|e| err(e.to_string()))? {\n            let e = e.map_err(|e| err(e.to_string()))?;\n            if e.file_type().map_err(|e| err(e.to_string()))?.is_symlink() {\n                return Err(err(\"untrusted-object-directory\"));"
           },
           "headMatchingLines": [
-            1611
+            1533
           ]
         },
         {
@@ -75983,7 +77280,7 @@
             "text": "    fn read_paths_at(\n        &self,\n        repo: &RepoHandle,\n        revision: &Oid,\n        paths: &[Vec<u8>],\n        max_blob_bytes: usize,\n    ) -> Result<Vec<PathRead>> {\n        Inspect::read_paths_at(self.driver, repo, revision, paths, max_blob_bytes)\n    }"
           },
           "headMatchingLines": [
-            1966
+            1888
           ]
         },
         {
@@ -75993,7 +77290,135 @@
             "text": "        remote: &str,\n    ) -> Result<Option<FetchMappingProvenance>> {\n        Inspect::fetch_mapping_provenance(self.driver, r, remote)\n    }\n    fn resolve_repo(&self, path: &Path) -> Result<ResolveRepo> {\n        Inspect::resolve_repo(self.driver, path)\n    }\n}"
           },
           "headMatchingLines": [
-            2004
+            1926
+          ]
+        },
+        {
+          "id": "dynamic-003622",
+          "pinnedSpan": {
+            "line": 353,
+            "text": "    }\n    /// Fsync `dirs` together (one fsync each, issued concurrently so the\n    /// filesystem can serve them with one journal commit). Each must be a\n    /// real directory, never a symlink.\n    fn sync_dirs(&self, dirs: &[PathBuf]) -> Result<()> {\n        for path in dirs {\n            let meta = fs::symlink_metadata(path).map_err(|e| err(e.to_string()))?;\n            if !meta.is_dir() || meta.file_type().is_symlink() {\n                return Err(err(\"untrusted-publication-directory\"));"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-003623",
+          "pinnedSpan": {
+            "line": 360,
+            "text": "            if !meta.is_dir() || meta.file_type().is_symlink() {\n                return Err(err(\"untrusted-publication-directory\"));\n            }\n        }\n        let paths: Vec<&Path> = dirs.iter().map(PathBuf::as_path).collect();\n        fgos_durable_file::sync_directories(&paths)\n            .map_err(|e| err(format!(\"directory-fsync: {e}\")))?;\n        for _ in dirs {\n            self.point(\"publication-directory-fsync\")?;"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-003624",
+          "pinnedSpan": {
+            "line": 360,
+            "text": "            if !meta.is_dir() || meta.file_type().is_symlink() {\n                return Err(err(\"untrusted-publication-directory\"));\n            }\n        }\n        let paths: Vec<&Path> = dirs.iter().map(PathBuf::as_path).collect();\n        fgos_durable_file::sync_directories(&paths)\n            .map_err(|e| err(format!(\"directory-fsync: {e}\")))?;\n        for _ in dirs {\n            self.point(\"publication-directory-fsync\")?;"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-003625",
+          "pinnedSpan": {
+            "line": 370,
+            "text": "        Ok(())\n    }\n    /// The loose-object fan-out directory (when present) and `objects/`.\n    fn object_dirs(repo: &RepoHandle, oid: &Oid) -> Vec<PathBuf> {\n        let objects = repo.common_dir().join(\"objects\");\n        let fanout = objects.join(&oid.as_str()[..2]);\n        let mut dirs = Vec::new();\n        if fanout.exists() {\n            dirs.push(fanout);"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-003626",
+          "pinnedSpan": {
+            "line": 371,
+            "text": "    }\n    /// The loose-object fan-out directory (when present) and `objects/`.\n    fn object_dirs(repo: &RepoHandle, oid: &Oid) -> Vec<PathBuf> {\n        let objects = repo.common_dir().join(\"objects\");\n        let fanout = objects.join(&oid.as_str()[..2]);\n        let mut dirs = Vec::new();\n        if fanout.exists() {\n            dirs.push(fanout);\n        }"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-003627",
+          "pinnedSpan": {
+            "line": 372,
+            "text": "    /// The loose-object fan-out directory (when present) and `objects/`.\n    fn object_dirs(repo: &RepoHandle, oid: &Oid) -> Vec<PathBuf> {\n        let objects = repo.common_dir().join(\"objects\");\n        let fanout = objects.join(&oid.as_str()[..2]);\n        let mut dirs = Vec::new();\n        if fanout.exists() {\n            dirs.push(fanout);\n        }\n        dirs.push(objects);"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-003628",
+          "pinnedSpan": {
+            "line": 392,
+            "text": "    /// Every existing directory from the ref's parent up to the common dir\n    /// (and `reftable/` for that backend): the directory chain of a ref\n    /// created, changed or deleted.\n    fn ref_dirs(&self, repo: &RepoHandle, reference: &str) -> Result<Vec<PathBuf>> {\n        let mut dirs = Vec::new();\n        let mut path = repo\n            .common_dir()\n            .join(reference)\n            .parent()"
+          },
+          "headMatchingLines": [
+            364
+          ]
+        },
+        {
+          "id": "dynamic-003629",
+          "pinnedSpan": {
+            "line": 393,
+            "text": "    /// (and `reftable/` for that backend): the directory chain of a ref\n    /// created, changed or deleted.\n    fn ref_dirs(&self, repo: &RepoHandle, reference: &str) -> Result<Vec<PathBuf>> {\n        let mut dirs = Vec::new();\n        let mut path = repo\n            .common_dir()\n            .join(reference)\n            .parent()\n            .unwrap()"
+          },
+          "headMatchingLines": [
+            365
+          ]
+        },
+        {
+          "id": "dynamic-003630",
+          "pinnedSpan": {
+            "line": 395,
+            "text": "    fn ref_dirs(&self, repo: &RepoHandle, reference: &str) -> Result<Vec<PathBuf>> {\n        let mut dirs = Vec::new();\n        let mut path = repo\n            .common_dir()\n            .join(reference)\n            .parent()\n            .unwrap()\n            .to_path_buf();\n        loop {"
+          },
+          "headMatchingLines": [
+            367
+          ]
+        },
+        {
+          "id": "dynamic-003631",
+          "pinnedSpan": {
+            "line": 406,
+            "text": "                Ok(_) => return Err(err(\"untrusted-publication-directory\")),\n                Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),\n                Err(e) => return Err(err(e.to_string())),\n            }\n            if path == repo.common_dir() {\n                break;\n            }\n            path = path\n                .parent()"
+          },
+          "headMatchingLines": [
+            378
+          ]
+        },
+        {
+          "id": "dynamic-003632",
+          "pinnedSpan": {
+            "line": 409,
+            "text": "            }\n            if path == repo.common_dir() {\n                break;\n            }\n            path = path\n                .parent()\n                .ok_or_else(|| err(\"ref-directory-outside-repository\"))?\n                .into();\n        }"
+          },
+          "headMatchingLines": [
+            381
+          ]
+        },
+        {
+          "id": "dynamic-003633",
+          "pinnedSpan": {
+            "line": 415,
+            "text": "                .ok_or_else(|| err(\"ref-directory-outside-repository\"))?\n                .into();\n        }\n        if repo.layout.refs == RefStorage::Reftable {\n            dirs.push(repo.common_dir().join(\"reftable\"));\n        }\n        Ok(dirs)\n    }\n    /// One existence probe first (`show-ref --exists` reads the ref itself,"
+          },
+          "headMatchingLines": [
+            387
+          ]
+        },
+        {
+          "id": "dynamic-003634",
+          "pinnedSpan": {
+            "line": 437,
+            "text": "            _ => Err(exists.error(\"read-ref-failed\")),\n        }\n    }\n    fn sync_refs(&self, repo: &RepoHandle, reference: &str) -> Result<()> {\n        let dirs = self.ref_dirs(repo, reference)?;\n        sync_ref_chain(&dirs).map_err(|e| err(e.to_string()))?;\n        for _ in &dirs {\n            self.point(\"publication-directory-fsync\")?;\n        }"
+          },
+          "headMatchingLines": [
+            409
+          ]
+        },
+        {
+          "id": "dynamic-003635",
+          "pinnedSpan": {
+            "line": 457,
+            "text": "        chain: &wal::Chain,\n        phase: Phase,\n        reference: &str,\n    ) -> Result<wal::Chain> {\n        let dirs = self.ref_dirs(repo, reference)?;\n        let sync = || sync_ref_chain(&dirs);\n        let mut refused: Option<OperationError> = None;\n        let mut points = || -> std::io::Result<()> {\n            let mut done = Ok(());"
+          },
+          "headMatchingLines": [
+            429
           ]
         }
       ],
@@ -76973,6 +78398,90 @@
       "failing": false
     },
     {
+      "file": "src/event-store/native.mjs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl",
+        "recordLine": 15
+      },
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "pinnedHash": "43899fbb698c2b6d698efe018cfbbeb1fe34e67d623243f96d44dcd2d81b10f8",
+      "headHash": "1f5d92d553b9d66babb0a2e2683d178dbbc1eff76146804ba69ac64d89c1e718",
+      "movedSpans": [
+        {
+          "id": "dynamic-009355",
+          "pinnedSpan": {
+            "line": 150,
+            "text": "\n/** Read facts without requiring a machine id or creating a store. */\nexport function eventStoreFacts(cwd, { stateRoot, trustedMain = cwd, remote = 'origin', loaderOptions } = {}) {\n  outsideGate([]);\n  return call(() => loadNativeAddon(loaderOptions).eventStoreFacts(cwd, stateRoot ?? resolveStateRoot().stateRoot, trustedMain, remote));\n}\nexport function ensureEventStoreRefspecs(cwd, { stateRoot, trustedMain = cwd, remote = 'origin', loaderOptions } = {}) {\n  outsideGate([]);\n  return call(() => loadNativeAddon(loaderOptions).ensureEventStoreRefspecs(cwd, stateRoot ?? resolveStateRoot().stateRoot, trustedMain, remote));"
+          },
+          "headMatchingLines": [
+            149
+          ]
+        },
+        {
+          "id": "dynamic-009356",
+          "pinnedSpan": {
+            "line": 154,
+            "text": "  return call(() => loadNativeAddon(loaderOptions).eventStoreFacts(cwd, stateRoot ?? resolveStateRoot().stateRoot, trustedMain, remote));\n}\nexport function ensureEventStoreRefspecs(cwd, { stateRoot, trustedMain = cwd, remote = 'origin', loaderOptions } = {}) {\n  outsideGate([]);\n  return call(() => loadNativeAddon(loaderOptions).ensureEventStoreRefspecs(cwd, stateRoot ?? resolveStateRoot().stateRoot, trustedMain, remote));\n}\nexport function eventStoreAddonAvailable(loaderOptions) {\n  outsideGate([]);\n  const native = call(() => loadNativeAddon(loaderOptions));"
+          },
+          "headMatchingLines": [
+            153
+          ]
+        },
+        {
+          "id": "dynamic-009357",
+          "pinnedSpan": {
+            "line": 51,
+            "text": "  available();\n  const settings = eventStoreConfig(config);\n  if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');\n  if (typeof trustedMain !== 'string' || !trustedMain) throw refusal('event-store-trusted-main-required');\n  const root = path.resolve(cwd);\n  const trusted = path.resolve(trustedMain);\n  const state = stateRoot ?? resolveStateRoot().stateRoot;\n  const native = loadNativeAddon(loaderOptions);\n  const key = JSON.stringify([root, trusted, state, loaderOptions ?? null, settings.remote]);"
+          },
+          "headMatchingLines": [
+            50
+          ]
+        },
+        {
+          "id": "dynamic-009358",
+          "pinnedSpan": {
+            "line": 51,
+            "text": "  available();\n  const settings = eventStoreConfig(config);\n  if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');\n  if (typeof trustedMain !== 'string' || !trustedMain) throw refusal('event-store-trusted-main-required');\n  const root = path.resolve(cwd);\n  const trusted = path.resolve(trustedMain);\n  const state = stateRoot ?? resolveStateRoot().stateRoot;\n  const native = loadNativeAddon(loaderOptions);\n  const key = JSON.stringify([root, trusted, state, loaderOptions ?? null, settings.remote]);"
+          },
+          "headMatchingLines": [
+            50
+          ]
+        },
+        {
+          "id": "dynamic-009359",
+          "pinnedSpan": {
+            "line": 52,
+            "text": "  const settings = eventStoreConfig(config);\n  if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');\n  if (typeof trustedMain !== 'string' || !trustedMain) throw refusal('event-store-trusted-main-required');\n  const root = path.resolve(cwd);\n  const trusted = path.resolve(trustedMain);\n  const state = stateRoot ?? resolveStateRoot().stateRoot;\n  const native = loadNativeAddon(loaderOptions);\n  const key = JSON.stringify([root, trusted, state, loaderOptions ?? null, settings.remote]);\n  if (prepared.has(key)) return prepared.get(key);"
+          },
+          "headMatchingLines": [
+            51
+          ]
+        },
+        {
+          "id": "dynamic-009360",
+          "pinnedSpan": {
+            "line": 53,
+            "text": "  if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');\n  if (typeof trustedMain !== 'string' || !trustedMain) throw refusal('event-store-trusted-main-required');\n  const root = path.resolve(cwd);\n  const trusted = path.resolve(trustedMain);\n  const state = stateRoot ?? resolveStateRoot().stateRoot;\n  const native = loadNativeAddon(loaderOptions);\n  const key = JSON.stringify([root, trusted, state, loaderOptions ?? null, settings.remote]);\n  if (prepared.has(key)) return prepared.get(key);\n  const resolved = call(() => native.resolveEventStore(root, state, trusted));"
+          },
+          "headMatchingLines": [
+            52
+          ]
+        },
+        {
+          "id": "dynamic-009361",
+          "pinnedSpan": {
+            "line": 70,
+            "text": "  if (hotLockDepth() > 0) throw refusal('event-store-seal-under-state');\n  const native = call(() => loadNativeAddon(loaderOptions).openStore(resolvedRoot, machineId, files, remote));\n  const views = new WeakMap();\n  const facade = {\n    commonDir: resolvedRoot.commonDir,\n    machineId,\n    // null means this clone has no local store identity yet (no append).\n    get ownOrigin() { return call(() => native.ownOrigin); },\n    append(stream, events, cursor, writer, heldRanks) {"
+          },
+          "headMatchingLines": [
+            69
+          ]
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
       "file": "packages/terminal-control/rust/src/port.rs",
       "record": {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r19.jsonl",
@@ -76994,6 +78503,19 @@
       "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
       "pinnedHash": "427a4ba1dcb473f293b242cecf4fbaad794cc2deec5b8a76bbf6027f29fa5b74",
       "headHash": "6751316ae2fb864008d4ef10419c3ed83b9cd3e56f8591606c91406638ee46c4",
+      "movedSpans": [],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "packages/git/rust/src/lib.rs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+        "recordLine": 66
+      },
+      "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "pinnedHash": "b311d1d392a1c795aa2ee791ffe076bb1becbc5077d6c2f7015695112a6eaf84",
+      "headHash": "05fd3a939365b517860eb781c28db2c5c70a7101225740fb3f2cd1e0107788ae",
       "movedSpans": [],
       "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
       "failing": false

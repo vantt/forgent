@@ -23,7 +23,9 @@
     "c-render-owner": "Every generated source-copy reference/tuple derives its disposition from the exact source owner; a park cites an actually parked source owner.",
     "d-own-operand": "Each admitted dynamic tuple has its exact document-yielding sub-expression pathOperand in its pinned passage; every rejection names a closed R5 nonDocumentUse category.",
     "e-retired-successor": "Preserved retired decision citations carry a live successorNote with a real heading anchor.",
-    "r11-plans-boundary": "R11: an operation rooted only in plans/** is rejected as plans-report-artifact; trace pinned declarations and imported constants, not adjacent context."
+    "r11-plans-boundary": "R11: an operation rooted only in plans/** is rejected as plans-report-artifact; trace pinned declarations and imported constants, not adjacent context.",
+    "r30-state-operand": "R30/R31: independently swept real-project state/registry document operands, including messages, exclusions and outputs, cannot be rejected as scalar pass-through; sandbox literals retain their construction owner.",
+    "park-index": "Every parked owning item is explicitly listed in its record parked index."
   },
   "checks": {
     "s4-coverage": 5910,
@@ -31,7 +33,7 @@
     "s4-spans": 5907,
     "s4-retiring-retained": 2330,
     "s4-inheritance": 2271,
-    "s4-parks": 1947,
+    "s4-parks": 1967,
     "s4-operand": 3637,
     "s4-outputs": 255,
     "s4-receipts": 259,
@@ -40,8 +42,10 @@
     "s4-carries": 1,
     "s4-lexical": 2275,
     "s4-review": 435,
-    "b-real-blocker": 1949,
+    "park-index": 1969,
+    "b-real-blocker": 1969,
     "d-own-operand": 3637,
+    "r30-state-operand": 37,
     "a-passage-agreement": 410,
     "c-render-owner": 522,
     "e-retired-successor": 10,
@@ -4986,7 +4990,7 @@
       },
       "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "pinnedHash": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
-      "headHash": "c46ddc8847524435df1fc31af5cd3199185d372d7737deb23506e56e2372d667",
+      "headHash": "8b340b4dd01e791454693e83a9c4871fc70b559f14d1145dc206044b3568d96f",
       "movedSpans": [
         {
           "id": "author-s4-19c252476bfb8f58",
@@ -10949,7 +10953,7 @@
       },
       "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "pinnedHash": "85c4db92e0f68a0a2a6a7272b8a4f44f0ab4529ecdf872b78752560df97b9864",
-      "headHash": "709d73239f1e5b0aaa91a2efdb90f695cacc84a8dc317d83f7f615013efbd1be",
+      "headHash": "820f7e847b67f3fcd1c81757cd350ca891e79b1f4f02e39f586622d62ebfbaef",
       "movedSpans": [
         {
           "id": "dynamic-008738",
@@ -11049,9 +11053,7 @@
             "line": 181,
             "text": " * - no inherited NODE_TEST_CONTEXT: an enclosing `node --test` sets it, and a\n *   nested run that inherits it reports to a parent that is not listening\n *   and exits 0 without running a single test;\n * - no inherited FGOS_STATE_ROOT: the host pins it into every payload it\n *   runs, and a suite started under fgOS would otherwise send every fixture\n *   that sets only FGOS_STATE_HOME to the real machine state root;\n * - on darwin, TMPDIR/TMP/TEMP resolved through realpath (/var -> /private/var)."
           },
-          "headMatchingLines": [
-            123
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-008750",
@@ -11059,9 +11061,7 @@
             "line": 187,
             "text": " * - on darwin, TMPDIR/TMP/TEMP resolved through realpath (/var -> /private/var).\n */\nexport function buildTestEnv(env = process.env) {\n  const { NODE_TEST_CONTEXT: _enclosingRunner, FGOS_STATE_ROOT: _pinnedStateRoot, ...rest } = env;\n  const childEnv = { ...rest, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };\n  if (process.platform === 'darwin') {\n    const tempRoot = env.TMPDIR || os.tmpdir();"
           },
-          "headMatchingLines": [
-            129
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-008751",
@@ -11069,9 +11069,7 @@
             "line": 190,
             "text": "  const { NODE_TEST_CONTEXT: _enclosingRunner, FGOS_STATE_ROOT: _pinnedStateRoot, ...rest } = env;\n  const childEnv = { ...rest, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };\n  if (process.platform === 'darwin') {\n    const tempRoot = env.TMPDIR || os.tmpdir();\n    try {\n      const realTempRoot = fs.realpathSync(tempRoot);\n      childEnv.TMPDIR = realTempRoot;"
           },
-          "headMatchingLines": [
-            132
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-008752",
@@ -11079,9 +11077,7 @@
             "line": 190,
             "text": "  const { NODE_TEST_CONTEXT: _enclosingRunner, FGOS_STATE_ROOT: _pinnedStateRoot, ...rest } = env;\n  const childEnv = { ...rest, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };\n  if (process.platform === 'darwin') {\n    const tempRoot = env.TMPDIR || os.tmpdir();\n    try {\n      const realTempRoot = fs.realpathSync(tempRoot);\n      childEnv.TMPDIR = realTempRoot;"
           },
-          "headMatchingLines": [
-            132
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-008753",
@@ -11090,7 +11086,7 @@
             "text": "  if (process.platform === 'darwin') {\n    const tempRoot = env.TMPDIR || os.tmpdir();\n    try {\n      const realTempRoot = fs.realpathSync(tempRoot);\n      childEnv.TMPDIR = realTempRoot;\n      childEnv.TMP = realTempRoot;\n      childEnv.TEMP = realTempRoot;"
           },
           "headMatchingLines": [
-            134
+            139
           ]
         },
         {
@@ -11100,7 +11096,7 @@
             "text": "    const tempRoot = env.TMPDIR || os.tmpdir();\n    try {\n      const realTempRoot = fs.realpathSync(tempRoot);\n      childEnv.TMPDIR = realTempRoot;\n      childEnv.TMP = realTempRoot;\n      childEnv.TEMP = realTempRoot;\n    } catch {"
           },
           "headMatchingLines": [
-            135
+            140
           ]
         },
         {
@@ -11110,7 +11106,7 @@
             "text": "    }\n  } catch (err) {\n    // If cargo is missing or build fails, let tests that require host fail with clear diagnostic\n    console.error(`run-tests: warning: failed to ensure host binary: ${err.message}`);\n  }\n  return childEnv;\n}"
           },
           "headMatchingLines": [
-            149
+            154
           ]
         },
         {
@@ -11120,7 +11116,7 @@
             "text": "// legitimately slower than the default. Empty on purpose: add an entry only\n// with the measured duration that justifies it, never to hide a hang.\nexport const FILE_TIMEOUT_OVERRIDES_MS = {};\nconst WATCHDOG_PATH = fileURLToPath(new URL('./lib/test-file-watchdog.mjs', import.meta.url));\nconst DEFAULT_WATCHDOG_POLL_MS = 5000;\n\n/**"
           },
           "headMatchingLines": [
-            170
+            175
           ]
         },
         {
@@ -11130,7 +11126,7 @@
             "text": "// legitimately slower than the default. Empty on purpose: add an entry only\n// with the measured duration that justifies it, never to hide a hang.\nexport const FILE_TIMEOUT_OVERRIDES_MS = {};\nconst WATCHDOG_PATH = fileURLToPath(new URL('./lib/test-file-watchdog.mjs', import.meta.url));\nconst DEFAULT_WATCHDOG_POLL_MS = 5000;\n\n/**"
           },
           "headMatchingLines": [
-            170
+            175
           ]
         },
         {
@@ -11140,7 +11136,7 @@
             "text": "  for (const file of files) {\n    // Keyed exactly as passed to `node --test`: each file's runner process\n    // carries that same string as its last argv element.\n    limits[file] = FILE_TIMEOUT_OVERRIDES_MS[file.split(path.sep).join('/')] ?? fileTimeoutMs;\n  }\n  const limitsFile = path.join(tempDir, 'file-limits.json');\n  const outFile = path.join(tempDir, 'file-timeouts.jsonl');"
           },
           "headMatchingLines": [
-            188
+            193
           ]
         },
         {
@@ -11150,7 +11146,7 @@
             "text": "    // carries that same string as its last argv element.\n    limits[file] = FILE_TIMEOUT_OVERRIDES_MS[file.split(path.sep).join('/')] ?? fileTimeoutMs;\n  }\n  const limitsFile = path.join(tempDir, 'file-limits.json');\n  const outFile = path.join(tempDir, 'file-timeouts.jsonl');\n  fs.writeFileSync(limitsFile, JSON.stringify(limits));\n  fs.writeFileSync(outFile, '');"
           },
           "headMatchingLines": [
-            190
+            195
           ]
         },
         {
@@ -11160,7 +11156,7 @@
             "text": "    limits[file] = FILE_TIMEOUT_OVERRIDES_MS[file.split(path.sep).join('/')] ?? fileTimeoutMs;\n  }\n  const limitsFile = path.join(tempDir, 'file-limits.json');\n  const outFile = path.join(tempDir, 'file-timeouts.jsonl');\n  fs.writeFileSync(limitsFile, JSON.stringify(limits));\n  fs.writeFileSync(outFile, '');\n  const child = spawnAsync("
           },
           "headMatchingLines": [
-            191
+            196
           ]
         },
         {
@@ -11170,7 +11166,7 @@
             "text": "  fs.writeFileSync(outFile, '');\n  const child = spawnAsync(\n    process.execPath,\n    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],\n    { env, stdio: ['ignore', 'ignore', 'inherit'] },\n  );\n  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));"
           },
           "headMatchingLines": [
-            196
+            201
           ]
         },
         {
@@ -11180,7 +11176,7 @@
             "text": "  fs.writeFileSync(outFile, '');\n  const child = spawnAsync(\n    process.execPath,\n    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],\n    { env, stdio: ['ignore', 'ignore', 'inherit'] },\n  );\n  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));"
           },
           "headMatchingLines": [
-            196
+            201
           ]
         },
         {
@@ -11190,7 +11186,7 @@
             "text": "  fs.writeFileSync(outFile, '');\n  const child = spawnAsync(\n    process.execPath,\n    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],\n    { env, stdio: ['ignore', 'ignore', 'inherit'] },\n  );\n  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));"
           },
           "headMatchingLines": [
-            196
+            201
           ]
         },
         {
@@ -11200,7 +11196,7 @@
             "text": "  fs.writeFileSync(outFile, '');\n  const child = spawnAsync(\n    process.execPath,\n    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],\n    { env, stdio: ['ignore', 'ignore', 'inherit'] },\n  );\n  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));"
           },
           "headMatchingLines": [
-            196
+            201
           ]
         },
         {
@@ -11210,7 +11206,7 @@
             "text": "    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],\n    { env, stdio: ['ignore', 'ignore', 'inherit'] },\n  );\n  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));\n  return {\n    stop() {\n      child.kill('SIGTERM');"
           },
           "headMatchingLines": [
-            199
+            204
           ]
         },
         {
@@ -11220,7 +11216,7 @@
             "text": "}\n/**\n * The identity keys (user.*, author.*, committer.*) the checkout's repository config holds, as\n * `scope: key=value` lines. A fixture that configures an identity in the wrong repository changes\n * exactly this, and every later commit of the checkout's owner then carries the fixture's name.\n * Covers the shared config and a linked worktree's own config.worktree; the machine-wide config is\n * not this checkout's. Empty when `cwd` is not a repository."
           },
           "headMatchingLines": [
-            209
+            214
           ]
         },
         {
@@ -11246,7 +11242,7 @@
             "text": "  const changed = [];\n  for (const [key, line] of a) {\n    if (!b.has(key)) added.push(line);\n    else if (b.get(key) !== line) changed.push(`${b.get(key)} -> ${line}`);\n  }\n  for (const [key, line] of b) if (!a.has(key)) removed.push(line);\n  return { added, removed, changed, leaked: added.length + removed.length + changed.length > 0 };"
           },
           "headMatchingLines": [
-            241
+            246
           ]
         },
         {
@@ -11256,7 +11252,7 @@
             "text": " * temp tree at exit, so anything left here came from a file that skipped that, a killed file, or\n * a child that outlived it.\n */\nexport function leftoverTempPrefixes(root, readdir = fs.readdirSync) {\n  const counts = {};\n  let names = [];\n  try { names = readdir(root); } catch { return counts; }"
           },
           "headMatchingLines": [
-            253
+            258
           ]
         },
         {
@@ -11306,7 +11302,7 @@
             "text": "// shows up as added or changed event, observe and work files, which stay guarded.\nexport const DERIVED_FGOS_FILES = new Set([\n  path.join('cache', 'state.json'),\n  path.join('runtime', 'events-jsonl.truncation-guard.json'),\n]);\n\n/**"
           },
           "headMatchingLines": [
-            273
+            278
           ]
         },
         {
@@ -11332,7 +11328,7 @@
             "text": "    }\n    for (const entry of entries) {\n      if (SENSITIVE_FGOS_FILES.has(entry.name)) continue;\n      const fullPath = path.join(currentDir, entry.name);\n      const relPath = path.relative(fgosDir, fullPath);\n      if (entry.isDirectory()) {\n        walk(fullPath);"
           },
           "headMatchingLines": [
-            295
+            300
           ]
         },
         {
@@ -11342,7 +11338,7 @@
             "text": "    }\n    for (const entry of entries) {\n      if (SENSITIVE_FGOS_FILES.has(entry.name)) continue;\n      const fullPath = path.join(currentDir, entry.name);\n      const relPath = path.relative(fgosDir, fullPath);\n      if (entry.isDirectory()) {\n        walk(fullPath);"
           },
           "headMatchingLines": [
-            295
+            300
           ]
         },
         {
@@ -11352,7 +11348,7 @@
             "text": "    for (const entry of entries) {\n      if (SENSITIVE_FGOS_FILES.has(entry.name)) continue;\n      const fullPath = path.join(currentDir, entry.name);\n      const relPath = path.relative(fgosDir, fullPath);\n      if (entry.isDirectory()) {\n        walk(fullPath);\n      } else if (entry.isFile() || entry.isSymbolicLink()) {"
           },
           "headMatchingLines": [
-            296
+            301
           ]
         },
         {
@@ -11378,7 +11374,7 @@
             "text": "export function runSelectedTests(files, {\n  cwd = REPO_ROOT,\n  forwardedArgs = [],\n  execPath = process.execPath,\n  spawn = spawnSync,\n  env = process.env,\n  stdio = 'inherit',"
           },
           "headMatchingLines": [
-            356
+            361
           ]
         },
         {
@@ -11396,7 +11392,7 @@
             "text": "  const childEnv = buildTestEnv(env);\n  let runTemp = null;\n  try {\n    runTemp = fs.mkdtempSync(path.join(childEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    childEnv.TMPDIR = runTemp;\n    childEnv.TMP = runTemp;\n    childEnv.TEMP = runTemp;"
           },
           "headMatchingLines": [
-            371
+            376
           ]
         },
         {
@@ -11406,7 +11402,7 @@
             "text": "  const childEnv = buildTestEnv(env);\n  let runTemp = null;\n  try {\n    runTemp = fs.mkdtempSync(path.join(childEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    childEnv.TMPDIR = runTemp;\n    childEnv.TMP = runTemp;\n    childEnv.TEMP = runTemp;"
           },
           "headMatchingLines": [
-            371
+            376
           ]
         },
         {
@@ -11416,7 +11412,7 @@
             "text": "  let runTemp = null;\n  try {\n    runTemp = fs.mkdtempSync(path.join(childEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    childEnv.TMPDIR = runTemp;\n    childEnv.TMP = runTemp;\n    childEnv.TEMP = runTemp;\n  } catch {"
           },
           "headMatchingLines": [
-            372
+            377
           ]
         },
         {
@@ -11426,7 +11422,7 @@
             "text": "\n  // Fixtures that confined workers must reach live outside /tmp. A per-run root removed here also\n  // covers a test file the watchdog killed, which never runs its own exit cleanup.\n  let fixtureRoot = null;\n  if (fs.existsSync('/var/tmp') && env[KEEP_TMP_ENV] !== '1') {\n    try {\n      fixtureRoot = fs.mkdtempSync('/var/tmp/fgos-test-fixtures-');"
           },
           "headMatchingLines": [
-            382
+            387
           ]
         },
         {
@@ -11436,7 +11432,7 @@
             "text": "  let fixtureRoot = null;\n  if (fs.existsSync('/var/tmp') && env[KEEP_TMP_ENV] !== '1') {\n    try {\n      fixtureRoot = fs.mkdtempSync('/var/tmp/fgos-test-fixtures-');\n      childEnv.FGOS_TEST_FIXTURE_ROOT = fixtureRoot;\n    } catch {\n      fixtureRoot = null;"
           },
           "headMatchingLines": [
-            385
+            390
           ]
         },
         {
@@ -11446,7 +11442,7 @@
             "text": "  if (fs.existsSync('/var/tmp') && env[KEEP_TMP_ENV] !== '1') {\n    try {\n      fixtureRoot = fs.mkdtempSync('/var/tmp/fgos-test-fixtures-');\n      childEnv.FGOS_TEST_FIXTURE_ROOT = fixtureRoot;\n    } catch {\n      fixtureRoot = null;\n    }"
           },
           "headMatchingLines": [
-            386
+            391
           ]
         },
         {
@@ -11472,7 +11468,7 @@
             "text": "    }\n    if (runTemp) {\n      if (env[KEEP_TMP_ENV] === '1') {\n        log(`run-tests: kept this run's temp dir (${KEEP_TMP_ENV}=1): ${runTemp}`);\n      } else {\n        try {\n          fs.rmSync(runTemp, { recursive: true, force: true, maxRetries: 3 });"
           },
           "headMatchingLines": [
-            424
+            429
           ]
         },
         {
@@ -11490,7 +11486,7 @@
             "text": "  if (timedOut.length) {\n    log('run-tests: ERROR: test file(s) exceeded the per-file time limit and were killed (process tree):');\n    for (const { file, elapsedMs, limitMs } of timedOut) {\n      log(`  ${file}: timed out after ${Math.round(elapsedMs / 1000)}s (limit ${Math.round(limitMs / 1000)}s)`);\n    }\n    result.status = result.status !== 0 ? result.status : 1;\n  }"
           },
           "headMatchingLines": [
-            439
+            444
           ]
         },
         {
@@ -11500,7 +11496,7 @@
             "text": "  result.tempLeftovers = tempLeftovers;\n  if (Object.keys(tempLeftovers).length) {\n    log('run-tests: ERROR: test suite left temporary directories behind (name prefix: count):');\n    for (const [prefix, count] of Object.entries(tempLeftovers).sort()) log(`  ${prefix}*: ${count}`);\n    log('  A test file must import test/helpers/process-tmp-root.mjs first; a killed file leaves its own tree.');\n    result.status = result.status !== 0 ? result.status : 1;\n  }"
           },
           "headMatchingLines": [
-            447
+            452
           ]
         },
         {
@@ -11510,7 +11506,7 @@
             "text": "  if (fgosDiff.leaked) {\n    log('run-tests: ERROR: test suite leaked unexpected files or modifications into .fgos store:');\n    if (fgosDiff.added.length) {\n      log(`  Added (${fgosDiff.added.length}):`);\n      for (const f of fgosDiff.added) log(`    + .fgos/${f}`);\n    }\n    if (fgosDiff.modified.length) {"
           },
           "headMatchingLines": [
-            472
+            477
           ]
         },
         {
@@ -11520,7 +11516,7 @@
             "text": "    log('run-tests: ERROR: test suite leaked unexpected files or modifications into .fgos store:');\n    if (fgosDiff.added.length) {\n      log(`  Added (${fgosDiff.added.length}):`);\n      for (const f of fgosDiff.added) log(`    + .fgos/${f}`);\n    }\n    if (fgosDiff.modified.length) {\n      log(`  Modified (${fgosDiff.modified.length}):`);"
           },
           "headMatchingLines": [
-            473
+            478
           ]
         },
         {
@@ -11530,7 +11526,7 @@
             "text": "      for (const f of fgosDiff.added) log(`    + .fgos/${f}`);\n    }\n    if (fgosDiff.modified.length) {\n      log(`  Modified (${fgosDiff.modified.length}):`);\n      for (const f of fgosDiff.modified) log(`    * .fgos/${f}`);\n    }\n    if (fgosDiff.deleted.length) {"
           },
           "headMatchingLines": [
-            476
+            481
           ]
         },
         {
@@ -11540,7 +11536,7 @@
             "text": "    }\n    if (fgosDiff.modified.length) {\n      log(`  Modified (${fgosDiff.modified.length}):`);\n      for (const f of fgosDiff.modified) log(`    * .fgos/${f}`);\n    }\n    if (fgosDiff.deleted.length) {\n      log(`  Deleted (${fgosDiff.deleted.length}):`);"
           },
           "headMatchingLines": [
-            477
+            482
           ]
         },
         {
@@ -11550,7 +11546,7 @@
             "text": "      for (const f of fgosDiff.modified) log(`    * .fgos/${f}`);\n    }\n    if (fgosDiff.deleted.length) {\n      log(`  Deleted (${fgosDiff.deleted.length}):`);\n      for (const f of fgosDiff.deleted) log(`    - .fgos/${f}`);\n    }\n    result.status = result.status !== 0 ? result.status : 1;"
           },
           "headMatchingLines": [
-            480
+            485
           ]
         },
         {
@@ -11560,7 +11556,7 @@
             "text": "    }\n    if (fgosDiff.deleted.length) {\n      log(`  Deleted (${fgosDiff.deleted.length}):`);\n      for (const f of fgosDiff.deleted) log(`    - .fgos/${f}`);\n    }\n    result.status = result.status !== 0 ? result.status : 1;\n  }"
           },
           "headMatchingLines": [
-            481
+            486
           ]
         },
         {
@@ -11570,7 +11566,7 @@
             "text": "  result.gitIdentityDiff = identityDiff;\n  if (identityDiff.leaked) {\n    log('run-tests: ERROR: test suite changed the git identity held by this checkout\\'s own repository config:');\n    for (const line of identityDiff.added) log(`  + ${line}`);\n    for (const line of identityDiff.removed) log(`  - ${line}`);\n    for (const line of identityDiff.changed) log(`  * ${line}`);\n    log('  A fixture ran `git config user.*` outside its own temporary repository; restore the keys above with `git config --local`.');"
           },
           "headMatchingLines": [
-            490
+            495
           ]
         },
         {
@@ -11604,7 +11600,7 @@
             "text": "  if (identityDiff.leaked) {\n    log('run-tests: ERROR: test suite changed the git identity held by this checkout\\'s own repository config:');\n    for (const line of identityDiff.added) log(`  + ${line}`);\n    for (const line of identityDiff.removed) log(`  - ${line}`);\n    for (const line of identityDiff.changed) log(`  * ${line}`);\n    log('  A fixture ran `git config user.*` outside its own temporary repository; restore the keys above with `git config --local`.');\n    result.status = result.status !== 0 ? result.status : 1;"
           },
           "headMatchingLines": [
-            491
+            496
           ]
         },
         {
@@ -11614,7 +11610,7 @@
             "text": "    log('run-tests: ERROR: test suite changed the git identity held by this checkout\\'s own repository config:');\n    for (const line of identityDiff.added) log(`  + ${line}`);\n    for (const line of identityDiff.removed) log(`  - ${line}`);\n    for (const line of identityDiff.changed) log(`  * ${line}`);\n    log('  A fixture ran `git config user.*` outside its own temporary repository; restore the keys above with `git config --local`.');\n    result.status = result.status !== 0 ? result.status : 1;\n  }"
           },
           "headMatchingLines": [
-            492
+            497
           ]
         },
         {
@@ -11632,7 +11628,7 @@
             "text": " * replaces.\n */\nexport function runTests({\n  root = DEFAULT_TEST_ROOT,\n  forwardedArgs = [],\n  execPath = process.execPath,\n  spawn = spawnSync,"
           },
           "headMatchingLines": [
-            509
+            514
           ]
         },
         {
@@ -11642,7 +11638,7 @@
             "text": "export function runTests({\n  root = DEFAULT_TEST_ROOT,\n  forwardedArgs = [],\n  execPath = process.execPath,\n  spawn = spawnSync,\n  env = process.env,\n  cwd = REPO_ROOT,"
           },
           "headMatchingLines": [
-            511
+            516
           ]
         },
         {
@@ -11692,7 +11688,7 @@
             "text": "      const hostBin = ensure(process.env, REPO_ROOT);\n      if (hostBin) process.env.FGOS_HOST_BIN = hostBin;\n    } catch (err) {\n      log(`run-tests: warning: failed to ensure host binary: ${err.message}`);\n    }\n  }\n  return queue(options);"
           },
           "headMatchingLines": [
-            566
+            571
           ]
         },
         {
@@ -11935,17 +11931,187 @@
       },
       "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "pinnedHash": "44b222ef7b565cbaf6c1caf0ca683a2dec793eb5b8f34376c60f0e1a0a9a65f7",
-      "headHash": "cbd3324b5fc76b680253283001e9d310bdd782e64148e2f03234b5a75e05904f",
+      "headHash": "61a54de2d57888dadb31138db836c569d5663046f4f835bf63061b43cbb77a35",
       "movedSpans": [
+        {
+          "id": "reference-003634",
+          "pinnedSpan": {
+            "line": 166,
+            "columnStart": 62,
+            "columnEndExclusive": 72,
+            "text": "docs/specs"
+          },
+          "headMatchingLines": [
+            168
+          ]
+        },
+        {
+          "id": "dynamic-008855",
+          "pinnedSpan": {
+            "line": 116,
+            "text": "    return {\n      primaryResponsibility: 'process-contract',\n      disposition: 'retain',\n      reason: `cwd built via ${site.cwdConstructor}(); fgos init's own cwd/subdir resolution is the fixture location under test (P06 precedent: over-broad fast-fixture replacement broke subdir cases)`,\n    };\n  }\n  return {"
+          },
+          "headMatchingLines": [
+            118
+          ]
+        },
+        {
+          "id": "dynamic-008856",
+          "pinnedSpan": {
+            "line": 126,
+            "text": "  };\n}\n\nexport function inventoryRunInitSites(files, { readFile = (f) => fs.readFileSync(f, 'utf8'), repoRoot = REPO_ROOT } = {}) {\n  const entries = [];\n  for (const relFile of files) {\n    const abs = path.join(repoRoot, relFile);"
+          },
+          "headMatchingLines": [
+            128
+          ]
+        },
+        {
+          "id": "dynamic-008857",
+          "pinnedSpan": {
+            "line": 129,
+            "text": "export function inventoryRunInitSites(files, { readFile = (f) => fs.readFileSync(f, 'utf8'), repoRoot = REPO_ROOT } = {}) {\n  const entries = [];\n  for (const relFile of files) {\n    const abs = path.join(repoRoot, relFile);\n    let content;\n    try {\n      content = readFile(abs);"
+          },
+          "headMatchingLines": [
+            131
+          ]
+        },
+        {
+          "id": "dynamic-008858",
+          "pinnedSpan": {
+            "line": 139,
+            "text": "    for (const site of scanRunInitSites(content, relFile)) {\n      const cls = classifyRunInitSite(site);\n      entries.push({\n        testId: `${relFile}::run-init@L${site.line}`,\n        file: relFile,\n        durationSeconds: null,\n        primaryResponsibility: cls.primaryResponsibility,"
+          },
+          "headMatchingLines": [
+            141
+          ]
+        },
+        {
+          "id": "dynamic-008859",
+          "pinnedSpan": {
+            "line": 161,
+            "text": "\n// -- 2. profile-driven top-N test/file classification --\n\nconst DIR_RULES = [\n  // Strong, structural signal only: rust-host tests genuinely cross the\n  // Rust/Node package boundary by directory convention (see docs/specs\n  // and P00's baseline report), not a content guess."
+          },
+          "headMatchingLines": [
+            163
+          ]
+        },
+        {
+          "id": "dynamic-008860",
+          "pinnedSpan": {
+            "line": 165,
+            "text": "  // Strong, structural signal only: rust-host tests genuinely cross the\n  // Rust/Node package boundary by directory convention (see docs/specs\n  // and P00's baseline report), not a content guess.\n  { test: (dir) => dir === 'rust-host', responsibility: 'cross-language-packaging', reason: 'test/rust-host/** exercises the real Rust binary across the package boundary' },\n];\n\nconst NAME_KEYWORD_RULES = ["
+          },
+          "headMatchingLines": [
+            167
+          ]
+        },
+        {
+          "id": "dynamic-008861",
+          "pinnedSpan": {
+            "line": 174,
+            "text": "];\n\nfunction dirBucket(absFile, repoRoot) {\n  const rel = path.relative(path.join(repoRoot, 'test'), absFile);\n  const parts = rel.split(path.sep);\n  return parts.length > 1 ? parts[0] : '(test root)';\n}"
+          },
+          "headMatchingLines": [
+            176
+          ]
+        },
+        {
+          "id": "dynamic-008862",
+          "pinnedSpan": {
+            "line": 179,
+            "text": "  return parts.length > 1 ? parts[0] : '(test root)';\n}\n\nexport function classifyProfiledTest({ name, file }, { repoRoot = REPO_ROOT } = {}) {\n  for (const rule of NAME_KEYWORD_RULES) {\n    if (rule.test(name)) return { primaryResponsibility: rule.responsibility, reason: rule.reason };\n  }"
+          },
+          "headMatchingLines": [
+            181
+          ]
+        },
+        {
+          "id": "dynamic-008863",
+          "pinnedSpan": {
+            "line": 183,
+            "text": "  for (const rule of NAME_KEYWORD_RULES) {\n    if (rule.test(name)) return { primaryResponsibility: rule.responsibility, reason: rule.reason };\n  }\n  const dir = dirBucket(file, repoRoot);\n  for (const rule of DIR_RULES) {\n    if (rule.test(dir)) return { primaryResponsibility: rule.responsibility, reason: rule.reason };\n  }"
+          },
+          "headMatchingLines": [
+            185
+          ]
+        },
+        {
+          "id": "dynamic-008864",
+          "pinnedSpan": {
+            "line": 190,
+            "text": "  return { primaryResponsibility: 'unknown', reason: 'no mechanical directory/keyword signal; needs a manual read, not guessed' };\n}\n\nexport function inventoryProfiledTests(topTests, { repoRoot = REPO_ROOT } = {}) {\n  return topTests.map((t) => {\n    const cls = classifyProfiledTest(t, { repoRoot });\n    const relFile = path.relative(repoRoot, t.file).replaceAll('\\\\', '/');"
+          },
+          "headMatchingLines": [
+            192
+          ]
+        },
+        {
+          "id": "dynamic-008865",
+          "pinnedSpan": {
+            "line": 195,
+            "text": "    const cls = classifyProfiledTest(t, { repoRoot });\n    const relFile = path.relative(repoRoot, t.file).replaceAll('\\\\', '/');\n    return {\n      testId: `${relFile}::${t.name}`,\n      file: relFile,\n      durationSeconds: t.time,\n      primaryResponsibility: cls.primaryResponsibility,"
+          },
+          "headMatchingLines": [
+            197
+          ]
+        },
+        {
+          "id": "dynamic-008866",
+          "pinnedSpan": {
+            "line": 220,
+            "text": " * individual tests within it may be classified elsewhere (e.g. via\n * inventoryRunInitSites for the P02 nine files).\n */\nexport function inventoryProfiledFiles(topFiles, { repoRoot = REPO_ROOT } = {}) {\n  return topFiles.map((f) => {\n    const relFile = path.relative(repoRoot, f.file).replaceAll('\\\\', '/');\n    const dir = dirBucket(f.file, repoRoot);"
+          },
+          "headMatchingLines": [
+            222
+          ]
+        },
+        {
+          "id": "dynamic-008867",
+          "pinnedSpan": {
+            "line": 223,
+            "text": "export function inventoryProfiledFiles(topFiles, { repoRoot = REPO_ROOT } = {}) {\n  return topFiles.map((f) => {\n    const relFile = path.relative(repoRoot, f.file).replaceAll('\\\\', '/');\n    const dir = dirBucket(f.file, repoRoot);\n    const rule = DIR_RULES.find((r) => r.test(dir));\n    return {\n      testId: `${relFile}::(file-rollup)`,"
+          },
+          "headMatchingLines": [
+            225
+          ]
+        },
+        {
+          "id": "dynamic-008868",
+          "pinnedSpan": {
+            "line": 226,
+            "text": "    const dir = dirBucket(f.file, repoRoot);\n    const rule = DIR_RULES.find((r) => r.test(dir));\n    return {\n      testId: `${relFile}::(file-rollup)`,\n      file: relFile,\n      durationSeconds: f.totalSeconds,\n      testCount: f.count,"
+          },
+          "headMatchingLines": [
+            228
+          ]
+        },
+        {
+          "id": "dynamic-008869",
+          "pinnedSpan": {
+            "line": 270,
+            "text": " * callers decide whether a violation is fatal.\n */\nexport function checkAdmission(changedLines, baseline = []) {\n  const baselineKeys = new Set(baseline.map((b) => `${b.ruleId}::${b.file}::${b.line}`));\n  const violations = [];\n  for (const { file, line, text, prevText } of changedLines) {\n    for (const rule of ADMISSION_RULES) {"
+          },
+          "headMatchingLines": [
+            289
+          ]
+        },
+        {
+          "id": "dynamic-008870",
+          "pinnedSpan": {
+            "line": 275,
+            "text": "  for (const { file, line, text, prevText } of changedLines) {\n    for (const rule of ADMISSION_RULES) {\n      if (!rule.test(text, prevText)) continue;\n      const key = `${rule.id}::${file}::${line}`;\n      if (baselineKeys.has(key)) continue;\n      violations.push({ ruleId: rule.id, file, line, message: rule.message });\n    }"
+          },
+          "headMatchingLines": [
+            294
+          ]
+        },
         {
           "id": "dynamic-008871",
           "pinnedSpan": {
             "line": 543,
             "text": "    }\n    for (const { title, files } of report.shared) console.log(`title ${title}: ${files.join(', ')}`);\n  } else if (args[0] === '--check') {\n    const scopeIdx = args.indexOf('--scope');\n    const scopeFiles = scopeIdx === -1 ? [] : args[scopeIdx + 1].split(',');\n    const baselineIdx = args.indexOf('--baseline');\n    const baselinePath = baselineIdx === -1 ? null : args[baselineIdx + 1];"
           },
-          "headMatchingLines": [
-            552
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-008872",
@@ -11953,9 +12119,7 @@
             "line": 544,
             "text": "    for (const { title, files } of report.shared) console.log(`title ${title}: ${files.join(', ')}`);\n  } else if (args[0] === '--check') {\n    const scopeIdx = args.indexOf('--scope');\n    const scopeFiles = scopeIdx === -1 ? [] : args[scopeIdx + 1].split(',');\n    const baselineIdx = args.indexOf('--baseline');\n    const baselinePath = baselineIdx === -1 ? null : args[baselineIdx + 1];\n    const baseline = baselinePath && fs.existsSync(baselinePath) ? JSON.parse(fs.readFileSync(baselinePath, 'utf8')) : [];"
           },
-          "headMatchingLines": [
-            553
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-008873",
@@ -11963,9 +12127,7 @@
             "line": 544,
             "text": "    for (const { title, files } of report.shared) console.log(`title ${title}: ${files.join(', ')}`);\n  } else if (args[0] === '--check') {\n    const scopeIdx = args.indexOf('--scope');\n    const scopeFiles = scopeIdx === -1 ? [] : args[scopeIdx + 1].split(',');\n    const baselineIdx = args.indexOf('--baseline');\n    const baselinePath = baselineIdx === -1 ? null : args[baselineIdx + 1];\n    const baseline = baselinePath && fs.existsSync(baselinePath) ? JSON.parse(fs.readFileSync(baselinePath, 'utf8')) : [];"
           },
-          "headMatchingLines": [
-            553
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-008874",
@@ -11974,7 +12136,7 @@
             "text": "    const scopeIdx = args.indexOf('--scope');\n    const scopeFiles = scopeIdx === -1 ? [] : args[scopeIdx + 1].split(',');\n    const baselineIdx = args.indexOf('--baseline');\n    const baselinePath = baselineIdx === -1 ? null : args[baselineIdx + 1];\n    const baseline = baselinePath && fs.existsSync(baselinePath) ? JSON.parse(fs.readFileSync(baselinePath, 'utf8')) : [];\n    const changed = addedLinesFromGitDiff(scopeFiles);\n    const violations = checkAdmission(changed, baseline);"
           },
           "headMatchingLines": [
-            555
+            620
           ]
         },
         {
@@ -11984,7 +12146,7 @@
             "text": "    const changed = addedLinesFromGitDiff(scopeFiles);\n    const violations = checkAdmission(changed, baseline);\n    if (violations.length > 0) {\n      console.log(`WARNING: ${violations.length} new admission-check violation(s):`);\n      for (const v of violations) console.log(`  ${v.file}:${v.line} [${v.ruleId}] ${v.message}`);\n    } else {\n      console.log('No new admission-check violations.');"
           },
           "headMatchingLines": [
-            560
+            625
           ]
         },
         {
@@ -11994,7 +12156,305 @@
             "text": "    const violations = checkAdmission(changed, baseline);\n    if (violations.length > 0) {\n      console.log(`WARNING: ${violations.length} new admission-check violation(s):`);\n      for (const v of violations) console.log(`  ${v.file}:${v.line} [${v.ruleId}] ${v.message}`);\n    } else {\n      console.log('No new admission-check violations.');\n    }"
           },
           "headMatchingLines": [
-            561
+            626
+          ]
+        },
+        {
+          "id": "dynamic-008877",
+          "pinnedSpan": {
+            "line": 46,
+            "text": "\nconst RUN_INIT_RE = /\\brun\\(\\s*([A-Za-z_$][\\w$]*)\\s*,\\s*\\[\\s*'init'\\s*\\]\\s*\\)/;\nconst CWD_CTOR_RE = (varName) =>\n  new RegExp(`\\\\b(?:const|let)\\\\s+(?:\\\\{[^}]*\\\\b${varName}\\\\b[^}]*\\\\}|${varName})\\\\s*=\\\\s*([A-Za-z_$][\\\\w$]*)\\\\s*\\\\(`);\n\n/**\n * Scans one file's source text for bare `run(cwdVar, ['init'])` call sites."
+          },
+          "headMatchingLines": [
+            48
+          ]
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "scripts/test-select-coverage-map.mjs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 226
+      },
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "pinnedHash": "8e4fbb903bb3c9e3680c946cbaeb8f5116a474c2bb873e96589bee1b4c56a431",
+      "headHash": "b313d02cce6c8fa7f03dae8acdfd14a37b8f3a04b330ae9b2c144d0287b08e85",
+      "movedSpans": [
+        {
+          "id": "dynamic-008895",
+          "pinnedSpan": {
+            "line": 105,
+            "text": "\n  // If NODE_V8_COVERAGE is set, use it (assumed to be populated by per-process runs),\n  // otherwise run the tests ourselves one file per process to get accurate per-test coverage.\n  let covDirToProcess = process.env.NODE_V8_COVERAGE;\n  let selfGenerated = false;\n  let collection = null;\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008896",
+          "pinnedSpan": {
+            "line": 110,
+            "text": "  let collection = null;\n\n  if (!covDirToProcess) {\n    console.log(`NODE_V8_COVERAGE not set. Collecting coverage for ${suiteFiles.length} test files (concurrency ${COVERAGE_CONCURRENCY}, ${COVERAGE_FILE_TIMEOUT_MS / 1000}s per file)...`);\n    covDirToProcess = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coverage-'));\n    selfGenerated = true;\n    collection = await collectPerFileCoverage(suiteFiles, {"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008897",
+          "pinnedSpan": {
+            "line": 111,
+            "text": "\n  if (!covDirToProcess) {\n    console.log(`NODE_V8_COVERAGE not set. Collecting coverage for ${suiteFiles.length} test files (concurrency ${COVERAGE_CONCURRENCY}, ${COVERAGE_FILE_TIMEOUT_MS / 1000}s per file)...`);\n    covDirToProcess = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coverage-'));\n    selfGenerated = true;\n    collection = await collectPerFileCoverage(suiteFiles, {\n      repoRoot,"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008898",
+          "pinnedSpan": {
+            "line": 111,
+            "text": "\n  if (!covDirToProcess) {\n    console.log(`NODE_V8_COVERAGE not set. Collecting coverage for ${suiteFiles.length} test files (concurrency ${COVERAGE_CONCURRENCY}, ${COVERAGE_FILE_TIMEOUT_MS / 1000}s per file)...`);\n    covDirToProcess = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coverage-'));\n    selfGenerated = true;\n    collection = await collectPerFileCoverage(suiteFiles, {\n      repoRoot,"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008899",
+          "pinnedSpan": {
+            "line": 115,
+            "text": "    selfGenerated = true;\n    collection = await collectPerFileCoverage(suiteFiles, {\n      repoRoot,\n      covRoot: covDirToProcess,\n      onResult: (r, done, total) => console.log(`[${done}/${total}] ${r.outcome} ${(r.durationMs / 1000).toFixed(1)}s ${r.file}`),\n    });\n    for (const r of collection.results) {"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008900",
+          "pinnedSpan": {
+            "line": 116,
+            "text": "    collection = await collectPerFileCoverage(suiteFiles, {\n      repoRoot,\n      covRoot: covDirToProcess,\n      onResult: (r, done, total) => console.log(`[${done}/${total}] ${r.outcome} ${(r.durationMs / 1000).toFixed(1)}s ${r.file}`),\n    });\n    for (const r of collection.results) {\n      for (const srcRel of coveredSourceFiles(r.covDir, repoRoot)) {"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008901",
+          "pinnedSpan": {
+            "line": 126,
+            "text": "    }\n    fs.rmSync(covDirToProcess, { recursive: true, force: true });\n    const timedOut = collection.results.filter((r) => r.outcome === 'coverage-collection-timeout');\n    console.log(`Coverage collection finished in ${(collection.durationMs / 60000).toFixed(1)} min; ${timedOut.length} file(s) timed out${timedOut.length ? `: ${timedOut.map((r) => r.file).join(', ')}` : ''}.`);\n  }\n\n  if (covDirToProcess && !selfGenerated && fs.existsSync(covDirToProcess)) {"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008902",
+          "pinnedSpan": {
+            "line": 126,
+            "text": "    }\n    fs.rmSync(covDirToProcess, { recursive: true, force: true });\n    const timedOut = collection.results.filter((r) => r.outcome === 'coverage-collection-timeout');\n    console.log(`Coverage collection finished in ${(collection.durationMs / 60000).toFixed(1)} min; ${timedOut.length} file(s) timed out${timedOut.length ? `: ${timedOut.map((r) => r.file).join(', ')}` : ''}.`);\n  }\n\n  if (covDirToProcess && !selfGenerated && fs.existsSync(covDirToProcess)) {"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008903",
+          "pinnedSpan": {
+            "line": 133,
+            "text": "    console.log(\"Merging NODE_V8_COVERAGE data...\");\n    const covFiles = fs.readdirSync(covDirToProcess).filter(f => f.endsWith('.json'));\n    for (const file of covFiles) {\n      const covPath = path.join(covDirToProcess, file);\n      try {\n        const data = JSON.parse(fs.readFileSync(covPath, 'utf8'));\n        // Find the test file in this coverage profile"
+          },
+          "headMatchingLines": [
+            137
+          ]
+        },
+        {
+          "id": "dynamic-008904",
+          "pinnedSpan": {
+            "line": 133,
+            "text": "    console.log(\"Merging NODE_V8_COVERAGE data...\");\n    const covFiles = fs.readdirSync(covDirToProcess).filter(f => f.endsWith('.json'));\n    for (const file of covFiles) {\n      const covPath = path.join(covDirToProcess, file);\n      try {\n        const data = JSON.parse(fs.readFileSync(covPath, 'utf8'));\n        // Find the test file in this coverage profile"
+          },
+          "headMatchingLines": [
+            137
+          ]
+        },
+        {
+          "id": "dynamic-008905",
+          "pinnedSpan": {
+            "line": 140,
+            "text": "        let testScript = null;\n        for (const res of data.result || []) {\n          if (res.url.includes('/test/') && (res.url.endsWith('.test.mjs') || res.url.endsWith('.mjs'))) {\n            const urlObj = new URL(res.url);\n            testScript = path.relative(repoRoot, urlObj.pathname).replace(/\\\\/g, '/');\n            break;\n          }"
+          },
+          "headMatchingLines": [
+            144
+          ]
+        },
+        {
+          "id": "dynamic-008906",
+          "pinnedSpan": {
+            "line": 149,
+            "text": "        if (testScript) {\n          for (const res of data.result || []) {\n            if (res.url.includes('/src/') || res.url.includes('/bin/')) {\n              const urlObj = new URL(res.url);\n              const srcRel = path.relative(repoRoot, urlObj.pathname).replace(/\\\\/g, '/');\n              if (srcRel.startsWith('src/') || srcRel.startsWith('bin/')) {\n                if (!mapping[srcRel]) mapping[srcRel] = new Set();"
+          },
+          "headMatchingLines": [
+            153
+          ]
+        },
+        {
+          "id": "dynamic-008907",
+          "pinnedSpan": {
+            "line": 170,
+            "text": "    finalMapping[src] = Array.from(tests).sort();\n  }\n\n  const outDir = 'plans/260922-test-suite-optimization/reports';\n  if (!fs.existsSync(outDir)) {\n    fs.mkdirSync(outDir, { recursive: true });\n  }"
+          },
+          "headMatchingLines": [
+            174
+          ]
+        },
+        {
+          "id": "dynamic-008908",
+          "pinnedSpan": {
+            "line": 176,
+            "text": "  }\n\n  const date = new Date().toISOString().split('T')[0];\n  fs.writeFileSync(path.join(outDir, `coverage-map-${date}.json`), JSON.stringify({\n    version: 1,\n    generatedAt: new Date().toISOString(),\n    mapping: finalMapping,"
+          },
+          "headMatchingLines": [
+            180
+          ]
+        },
+        {
+          "id": "dynamic-008909",
+          "pinnedSpan": {
+            "line": 176,
+            "text": "  }\n\n  const date = new Date().toISOString().split('T')[0];\n  fs.writeFileSync(path.join(outDir, `coverage-map-${date}.json`), JSON.stringify({\n    version: 1,\n    generatedAt: new Date().toISOString(),\n    mapping: finalMapping,"
+          },
+          "headMatchingLines": [
+            180
+          ]
+        },
+        {
+          "id": "dynamic-008910",
+          "pinnedSpan": {
+            "line": 194,
+            "text": "  let md = `# Coverage Suggestion Diff\\n\\n`;\n  for (const src of Object.keys(finalMapping).sort()) {\n    if (src.startsWith('src/verbs/state/')) {\n      md += `\\n### \\`${src}\\`\\n`;\n      for (const t of finalMapping[src]) {\n        md += `- ${t}\\n`;\n      }"
+          },
+          "headMatchingLines": [
+            198
+          ]
+        },
+        {
+          "id": "dynamic-008911",
+          "pinnedSpan": {
+            "line": 196,
+            "text": "    if (src.startsWith('src/verbs/state/')) {\n      md += `\\n### \\`${src}\\`\\n`;\n      for (const t of finalMapping[src]) {\n        md += `- ${t}\\n`;\n      }\n    }\n  }"
+          },
+          "headMatchingLines": [
+            200
+          ]
+        },
+        {
+          "id": "dynamic-008912",
+          "pinnedSpan": {
+            "line": 200,
+            "text": "      }\n    }\n  }\n  fs.writeFileSync(path.join(outDir, `coverage-suggestion-${date}.md`), md);\n  \n  console.log(\"Coverage map generated.\");\n}"
+          },
+          "headMatchingLines": [
+            204
+          ]
+        },
+        {
+          "id": "dynamic-008913",
+          "pinnedSpan": {
+            "line": 200,
+            "text": "      }\n    }\n  }\n  fs.writeFileSync(path.join(outDir, `coverage-suggestion-${date}.md`), md);\n  \n  console.log(\"Coverage map generated.\");\n}"
+          },
+          "headMatchingLines": [
+            204
+          ]
+        },
+        {
+          "id": "dynamic-008915",
+          "pinnedSpan": {
+            "line": 211,
+            "text": "  if (!fs.existsSync(covDir)) return found;\n  for (const file of fs.readdirSync(covDir).filter((f) => f.endsWith('.json'))) {\n    try {\n      const data = JSON.parse(fs.readFileSync(path.join(covDir, file), 'utf8'));\n      for (const res of data.result || []) {\n        if (!res.url.startsWith('file:')) continue;\n        const srcRel = path.relative(repoRoot, new URL(res.url).pathname).replace(/\\\\/g, '/');"
+          },
+          "headMatchingLines": [
+            215
+          ]
+        },
+        {
+          "id": "dynamic-008916",
+          "pinnedSpan": {
+            "line": 214,
+            "text": "      const data = JSON.parse(fs.readFileSync(path.join(covDir, file), 'utf8'));\n      for (const res of data.result || []) {\n        if (!res.url.startsWith('file:')) continue;\n        const srcRel = path.relative(repoRoot, new URL(res.url).pathname).replace(/\\\\/g, '/');\n        if (srcRel.startsWith('src/') || srcRel.startsWith('bin/')) found.add(srcRel);\n      }\n    } catch {"
+          },
+          "headMatchingLines": [
+            218
+          ]
+        },
+        {
+          "id": "dynamic-008917",
+          "pinnedSpan": {
+            "line": 237,
+            "text": "  covRoot,\n  timeoutMs = COVERAGE_FILE_TIMEOUT_MS,\n  concurrency = COVERAGE_CONCURRENCY,\n  execPath = process.execPath,\n  env = process.env,\n  onResult = () => {},\n} = {}) {"
+          },
+          "headMatchingLines": [
+            241
+          ]
+        },
+        {
+          "id": "dynamic-008918",
+          "pinnedSpan": {
+            "line": 247,
+            "text": "\n  const runOne = (absFile) => new Promise((resolve) => {\n    const file = path.relative(repoRoot, absFile).replace(/\\\\/g, '/');\n    const covDir = path.join(covRoot, encodeURIComponent(file));\n    fs.mkdirSync(covDir, { recursive: true });\n    const t0 = Date.now();\n    // Same per-run temp root as run-tests.mjs: whatever fixtures this file"
+          },
+          "headMatchingLines": [
+            251
+          ]
+        },
+        {
+          "id": "dynamic-008919",
+          "pinnedSpan": {
+            "line": 247,
+            "text": "\n  const runOne = (absFile) => new Promise((resolve) => {\n    const file = path.relative(repoRoot, absFile).replace(/\\\\/g, '/');\n    const covDir = path.join(covRoot, encodeURIComponent(file));\n    fs.mkdirSync(covDir, { recursive: true });\n    const t0 = Date.now();\n    // Same per-run temp root as run-tests.mjs: whatever fixtures this file"
+          },
+          "headMatchingLines": [
+            251
+          ]
+        },
+        {
+          "id": "dynamic-008920",
+          "pinnedSpan": {
+            "line": 254,
+            "text": "    // leaves behind are removed with it instead of piling up in the shared\n    // temp dir across the nightly's hundreds of per-file runs.\n    const baseEnv = buildTestEnv(env);\n    const tmpRoot = fs.mkdtempSync(path.join(baseEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    const child = spawn(execPath, ['--test', absFile], {\n      cwd: repoRoot,\n      env: { ...baseEnv, TMPDIR: tmpRoot, TMP: tmpRoot, TEMP: tmpRoot, NODE_V8_COVERAGE: covDir },"
+          },
+          "headMatchingLines": [
+            258
+          ]
+        },
+        {
+          "id": "dynamic-008921",
+          "pinnedSpan": {
+            "line": 254,
+            "text": "    // leaves behind are removed with it instead of piling up in the shared\n    // temp dir across the nightly's hundreds of per-file runs.\n    const baseEnv = buildTestEnv(env);\n    const tmpRoot = fs.mkdtempSync(path.join(baseEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    const child = spawn(execPath, ['--test', absFile], {\n      cwd: repoRoot,\n      env: { ...baseEnv, TMPDIR: tmpRoot, TMP: tmpRoot, TEMP: tmpRoot, NODE_V8_COVERAGE: covDir },"
+          },
+          "headMatchingLines": [
+            258
+          ]
+        },
+        {
+          "id": "dynamic-008922",
+          "pinnedSpan": {
+            "line": 254,
+            "text": "    // leaves behind are removed with it instead of piling up in the shared\n    // temp dir across the nightly's hundreds of per-file runs.\n    const baseEnv = buildTestEnv(env);\n    const tmpRoot = fs.mkdtempSync(path.join(baseEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    const child = spawn(execPath, ['--test', absFile], {\n      cwd: repoRoot,\n      env: { ...baseEnv, TMPDIR: tmpRoot, TMP: tmpRoot, TEMP: tmpRoot, NODE_V8_COVERAGE: covDir },"
+          },
+          "headMatchingLines": [
+            258
+          ]
+        },
+        {
+          "id": "dynamic-008923",
+          "pinnedSpan": {
+            "line": 257,
+            "text": "    const tmpRoot = fs.mkdtempSync(path.join(baseEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    const child = spawn(execPath, ['--test', absFile], {\n      cwd: repoRoot,\n      env: { ...baseEnv, TMPDIR: tmpRoot, TMP: tmpRoot, TEMP: tmpRoot, NODE_V8_COVERAGE: covDir },\n      stdio: 'ignore',\n      detached: process.platform !== 'win32',\n    });"
+          },
+          "headMatchingLines": [
+            261
+          ]
+        },
+        {
+          "id": "dynamic-008924",
+          "pinnedSpan": {
+            "line": 274,
+            "text": "    const finish = (outcome) => {\n      clearTimeout(timer);\n      try { fs.rmSync(tmpRoot, { recursive: true, force: true, maxRetries: 3 }); } catch {}\n      resolve({ file, covDir, outcome, durationMs: Date.now() - t0 });\n    };\n    child.on('error', () => finish('spawn-failed'));\n    child.on('exit', (code) => finish(timedOut ? 'coverage-collection-timeout' : code === 0 ? 'ok' : 'test-failed'));"
+          },
+          "headMatchingLines": [
+            278
           ]
         }
       ],

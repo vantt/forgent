@@ -1,0 +1,1309 @@
+{
+  "inputHEAD": "4be19d6cb9a7e12e97dfd0a2edee9dbcf03e95b7",
+  "prior": "ae1f37190fcddeefe169c057af6dd9a29030087d",
+  "merge": "ab3eb83d7c1f1f298bcca13813150f56e66caf0f",
+  "main": "60eaad9d0622fd3423e35cf92ef15621778fba39",
+  "base": "5a4b7353300f139907611b170de650314aafbe80",
+  "accountedMerges": [
+    {
+      "merge": "ab3eb83d7c1f1f298bcca13813150f56e66caf0f",
+      "firstParent": "ae1f37190fcddeefe169c057af6dd9a29030087d",
+      "secondParent": "60eaad9d0622fd3423e35cf92ef15621778fba39",
+      "base": "5a4b7353300f139907611b170de650314aafbe80",
+      "mainCommits": 87,
+      "changedPaths": [
+        ".agents/skills/fgos-run/SKILL.md",
+        "CHANGELOG.md",
+        "core/skills/fgos-run/SKILL.md",
+        "docs/backlog.md",
+        "docs/platform/git/spec.md",
+        "docs/platform/holder-lock/spec.md",
+        "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "docs/platform/proposals/documentation-system-unification.md",
+        "packages/event-store/rust/tests/legacy_import.rs",
+        "packages/event-store/rust/tests/offline_sync.rs",
+        "packages/git/contracts/mutation-census.v1.json",
+        "packages/git/node-addon/src/git/recovery.rs",
+        "packages/git/rust/src/lib.rs",
+        "packages/git/rust/src/objects.rs",
+        "packages/git/rust/src/publication.rs",
+        "packages/git/rust/src/recovery.rs",
+        "packages/git/rust/src/scoped_commit.rs",
+        "packages/git/rust/tests/land.rs",
+        "packages/git/rust/tests/scoped_commit_sync.rs",
+        "plans/261017-1313-fgos-platform-program-board/log.md",
+        "plans/261017-1313-fgos-platform-program-board/plan.md",
+        "plans/261018-0914-git-component-fgos-git/e3-budgets.md",
+        "plans/261020-1757-test-governance-port-inventory-and-slow-file-extraction/plan.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-07-closing-and-handoff.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/plan.md",
+        "plans/261021-1513-rule-management-group-1a/plan.md",
+        "plans/261021-1547-harden-t0-process-facts-door/phase-01-red-tests.md",
+        "plans/261021-1547-harden-t0-process-facts-door/phase-02-the-door.md",
+        "plans/261021-1547-harden-t0-process-facts-door/phase-03-process-sites.md",
+        "plans/261021-1547-harden-t0-process-facts-door/phase-04-containment-and-crate-fixes.md",
+        "plans/261021-1547-harden-t0-process-facts-door/phase-05-durable-and-canonical-sites.md",
+        "plans/261021-1547-harden-t0-process-facts-door/phase-06-deletions-and-specs.md",
+        "plans/261021-1547-harden-t0-process-facts-door/phase-07-post-seat-carry-list.md",
+        "plans/261021-1547-harden-t0-process-facts-door/phase-08-close-verify-land.md",
+        "plans/261021-1547-harden-t0-process-facts-door/plan.md",
+        "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-assume.md",
+        "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-failure.md",
+        "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-scope.md",
+        "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-security.md",
+        "plans/261021-1656-convention-second-wave/phase-00-reinvestigate-and-pin.md",
+        "plans/261021-1656-convention-second-wave/phase-01-root-allowlist-and-scratch.md",
+        "plans/261021-1656-convention-second-wave/phase-02-render-targets-and-skill-layout.md",
+        "plans/261021-1656-convention-second-wave/phase-03-contracts-naming.md",
+        "plans/261021-1656-convention-second-wave/phase-04-domains-and-decisions.md",
+        "plans/261021-1656-convention-second-wave/phase-05-plan-and-knowledge-families.md",
+        "plans/261021-1656-convention-second-wave/phase-06-flip-to-block.md",
+        "plans/261021-1656-convention-second-wave/plan.md",
+        "plans/reports/council-261021-1324-harden-t0-seat-correctness.md",
+        "plans/reports/council-261021-1324-harden-t0-seat-redteam.md",
+        "plans/reports/council-261021-1324-harden-t0-seat-simplicity.md",
+        "plans/reports/council-261021-1324-harden-t0-seat-speed.md",
+        "plans/reports/council-261021-1507-harden-t0-arbitration.md",
+        "plans/reports/debug-261021-1329-scoped-commit-e3-breakdown.md",
+        "plans/reports/debug-261021-1639-scoped-commit-object-dir-durability.md",
+        "plans/reports/design-261020-1035-operation-scoped-containment.md",
+        "plans/reports/handoff-261021-1021-rule-management-tight-no-conflict-right-place.md",
+        "plans/reports/handoff-261021-1446-rule-management-execution-and-decisions.md",
+        "plans/reports/handoff-261021-1519-test-lane-governance.md",
+        "plans/reports/kongming-261021-1325-rule-engine-component-boundary.md",
+        "plans/reports/phase-lead-261021-1129-test-governance-p2-ported-areas.md",
+        "plans/reports/phase-lead-261021-1553-git-scoped-commit-speedups.md",
+        "plans/reports/phase-lead-261021-1713-git-scoped-commit-object-durability.md",
+        "plans/reports/phase-lead-261021-1730-git-scoped-commit-precommit-durability.md",
+        "plans/reports/phase-lead-261021-1740-git-land-retained-candidates-doctor.md",
+        "plans/reports/phase-lead-261021-1759-test-governance-guards-claude-and-help-routes.md",
+        "plans/reports/research-261021-1054-rules-instruction-optimization-references.md",
+        "plans/reports/research-261021-1643-canonical-decision-projection-component.md",
+        "plans/reports/research-261021-1707-doc-plan-dedup-components.md",
+        "plans/reports/research-261021-1752-knowledge-registry-overlap-history-journals.md",
+        "plans/reports/research-261021-1752-knowledge-registry-overlap-plans-reports.md",
+        "plans/reports/research-261021-1752-knowledge-registry-overlap-work-items-code-specs.md",
+        "plans/reports/research-261021-1759-knowledge-registry-vs-knowledge-doc-engine-synthesis.md",
+        "plans/reports/review-261021-1726-seat-wave-growth.md",
+        "plugins/fgOS/skills/fgos-run/SKILL.md",
+        "scripts/git/e1-power-cut.mjs",
+        "scripts/git/e1-power-cut.sh",
+        "scripts/git/p-space-resource.mjs",
+        "scripts/git/p-space.sh",
+        "scripts/run-tests.mjs",
+        "scripts/test-proof-inventory.mjs",
+        "scripts/test-select-coverage-map.mjs",
+        "src/event-store/native.mjs",
+        "src/git/recovery.mjs",
+        "src/setup/git-checks.mjs",
+        "src/setup/registrations.mjs",
+        "test/git/recovery.test.mjs",
+        "test/git/scoped-commit.test.mjs",
+        "test/run-supervisor/adopt-client.test.mjs",
+        "test/run-supervisor/contracts-terminal.test.mjs",
+        "test/run-supervisor/contracts-unit-state.test.mjs",
+        "test/run-supervisor/inspect-recover-adopt.test.mjs",
+        "test/rust-host/help-routes.test.mjs",
+        "test/scripts/run-tests.test.mjs",
+        "test/scripts/test-proof-inventory.test.mjs",
+        "test/setup/checks-doctor-config.test.mjs",
+        "test/setup/checks.test.mjs",
+        "test/suite-baseline.json",
+        "test/terminal-control/client-route.test.mjs"
+      ]
+    }
+  ],
+  "mainCommits": 87,
+  "changedPaths": [
+    ".agents/skills/fgos-run/SKILL.md",
+    "CHANGELOG.md",
+    "core/skills/fgos-run/SKILL.md",
+    "docs/backlog.md",
+    "docs/platform/git/spec.md",
+    "docs/platform/holder-lock/spec.md",
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+    "docs/platform/proposals/documentation-system-unification.md",
+    "packages/event-store/rust/tests/legacy_import.rs",
+    "packages/event-store/rust/tests/offline_sync.rs",
+    "packages/git/contracts/mutation-census.v1.json",
+    "packages/git/node-addon/src/git/recovery.rs",
+    "packages/git/rust/src/lib.rs",
+    "packages/git/rust/src/objects.rs",
+    "packages/git/rust/src/publication.rs",
+    "packages/git/rust/src/recovery.rs",
+    "packages/git/rust/src/scoped_commit.rs",
+    "packages/git/rust/tests/land.rs",
+    "packages/git/rust/tests/scoped_commit_sync.rs",
+    "plans/261017-1313-fgos-platform-program-board/log.md",
+    "plans/261017-1313-fgos-platform-program-board/plan.md",
+    "plans/261018-0914-git-component-fgos-git/e3-budgets.md",
+    "plans/261020-1757-test-governance-port-inventory-and-slow-file-extraction/plan.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-07-closing-and-handoff.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/plan.md",
+    "plans/261021-1513-rule-management-group-1a/plan.md",
+    "plans/261021-1547-harden-t0-process-facts-door/phase-01-red-tests.md",
+    "plans/261021-1547-harden-t0-process-facts-door/phase-02-the-door.md",
+    "plans/261021-1547-harden-t0-process-facts-door/phase-03-process-sites.md",
+    "plans/261021-1547-harden-t0-process-facts-door/phase-04-containment-and-crate-fixes.md",
+    "plans/261021-1547-harden-t0-process-facts-door/phase-05-durable-and-canonical-sites.md",
+    "plans/261021-1547-harden-t0-process-facts-door/phase-06-deletions-and-specs.md",
+    "plans/261021-1547-harden-t0-process-facts-door/phase-07-post-seat-carry-list.md",
+    "plans/261021-1547-harden-t0-process-facts-door/phase-08-close-verify-land.md",
+    "plans/261021-1547-harden-t0-process-facts-door/plan.md",
+    "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-assume.md",
+    "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-failure.md",
+    "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-scope.md",
+    "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-security.md",
+    "plans/261021-1656-convention-second-wave/phase-00-reinvestigate-and-pin.md",
+    "plans/261021-1656-convention-second-wave/phase-01-root-allowlist-and-scratch.md",
+    "plans/261021-1656-convention-second-wave/phase-02-render-targets-and-skill-layout.md",
+    "plans/261021-1656-convention-second-wave/phase-03-contracts-naming.md",
+    "plans/261021-1656-convention-second-wave/phase-04-domains-and-decisions.md",
+    "plans/261021-1656-convention-second-wave/phase-05-plan-and-knowledge-families.md",
+    "plans/261021-1656-convention-second-wave/phase-06-flip-to-block.md",
+    "plans/261021-1656-convention-second-wave/plan.md",
+    "plans/reports/council-261021-1324-harden-t0-seat-correctness.md",
+    "plans/reports/council-261021-1324-harden-t0-seat-redteam.md",
+    "plans/reports/council-261021-1324-harden-t0-seat-simplicity.md",
+    "plans/reports/council-261021-1324-harden-t0-seat-speed.md",
+    "plans/reports/council-261021-1507-harden-t0-arbitration.md",
+    "plans/reports/debug-261021-1329-scoped-commit-e3-breakdown.md",
+    "plans/reports/debug-261021-1639-scoped-commit-object-dir-durability.md",
+    "plans/reports/design-261020-1035-operation-scoped-containment.md",
+    "plans/reports/handoff-261021-1021-rule-management-tight-no-conflict-right-place.md",
+    "plans/reports/handoff-261021-1446-rule-management-execution-and-decisions.md",
+    "plans/reports/handoff-261021-1519-test-lane-governance.md",
+    "plans/reports/kongming-261021-1325-rule-engine-component-boundary.md",
+    "plans/reports/phase-lead-261021-1129-test-governance-p2-ported-areas.md",
+    "plans/reports/phase-lead-261021-1553-git-scoped-commit-speedups.md",
+    "plans/reports/phase-lead-261021-1713-git-scoped-commit-object-durability.md",
+    "plans/reports/phase-lead-261021-1730-git-scoped-commit-precommit-durability.md",
+    "plans/reports/phase-lead-261021-1740-git-land-retained-candidates-doctor.md",
+    "plans/reports/phase-lead-261021-1759-test-governance-guards-claude-and-help-routes.md",
+    "plans/reports/research-261021-1054-rules-instruction-optimization-references.md",
+    "plans/reports/research-261021-1643-canonical-decision-projection-component.md",
+    "plans/reports/research-261021-1707-doc-plan-dedup-components.md",
+    "plans/reports/research-261021-1752-knowledge-registry-overlap-history-journals.md",
+    "plans/reports/research-261021-1752-knowledge-registry-overlap-plans-reports.md",
+    "plans/reports/research-261021-1752-knowledge-registry-overlap-work-items-code-specs.md",
+    "plans/reports/research-261021-1759-knowledge-registry-vs-knowledge-doc-engine-synthesis.md",
+    "plans/reports/review-261021-1726-seat-wave-growth.md",
+    "plugins/fgOS/skills/fgos-run/SKILL.md",
+    "scripts/git/e1-power-cut.mjs",
+    "scripts/git/e1-power-cut.sh",
+    "scripts/git/p-space-resource.mjs",
+    "scripts/git/p-space.sh",
+    "scripts/run-tests.mjs",
+    "scripts/test-proof-inventory.mjs",
+    "scripts/test-select-coverage-map.mjs",
+    "src/event-store/native.mjs",
+    "src/git/recovery.mjs",
+    "src/setup/git-checks.mjs",
+    "src/setup/registrations.mjs",
+    "test/git/recovery.test.mjs",
+    "test/git/scoped-commit.test.mjs",
+    "test/run-supervisor/adopt-client.test.mjs",
+    "test/run-supervisor/contracts-terminal.test.mjs",
+    "test/run-supervisor/contracts-unit-state.test.mjs",
+    "test/run-supervisor/inspect-recover-adopt.test.mjs",
+    "test/rust-host/help-routes.test.mjs",
+    "test/scripts/run-tests.test.mjs",
+    "test/scripts/test-proof-inventory.test.mjs",
+    "test/setup/checks-doctor-config.test.mjs",
+    "test/setup/checks.test.mjs",
+    "test/suite-baseline.json",
+    "test/terminal-control/client-route.test.mjs"
+  ],
+  "changedCandidateFiles": [
+    "docs/platform/git/spec.md",
+    "docs/platform/holder-lock/spec.md",
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+    "docs/platform/proposals/documentation-system-unification.md"
+  ],
+  "changedDocs": [
+    "docs/backlog.md",
+    "docs/platform/git/spec.md",
+    "docs/platform/holder-lock/spec.md",
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+    "docs/platform/proposals/documentation-system-unification.md"
+  ],
+  "pathFamilies": [
+    {
+      "family": ".agents/fgos-run-skill",
+      "count": 1,
+      "paths": [
+        ".agents/skills/fgos-run/SKILL.md"
+      ]
+    },
+    {
+      "family": "CHANGELOG.md",
+      "count": 1,
+      "paths": [
+        "CHANGELOG.md"
+      ]
+    },
+    {
+      "family": "core/fgos-run-skill",
+      "count": 1,
+      "paths": [
+        "core/skills/fgos-run/SKILL.md"
+      ]
+    },
+    {
+      "family": "docs/accounted-documents",
+      "count": 5,
+      "paths": [
+        "docs/backlog.md",
+        "docs/platform/git/spec.md",
+        "docs/platform/holder-lock/spec.md",
+        "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "docs/platform/proposals/documentation-system-unification.md"
+      ]
+    },
+    {
+      "family": "packages/event-store",
+      "count": 2,
+      "paths": [
+        "packages/event-store/rust/tests/legacy_import.rs",
+        "packages/event-store/rust/tests/offline_sync.rs"
+      ]
+    },
+    {
+      "family": "packages/git",
+      "count": 9,
+      "paths": [
+        "packages/git/contracts/mutation-census.v1.json",
+        "packages/git/node-addon/src/git/recovery.rs",
+        "packages/git/rust/src/lib.rs",
+        "packages/git/rust/src/objects.rs",
+        "packages/git/rust/src/publication.rs",
+        "packages/git/rust/src/recovery.rs",
+        "packages/git/rust/src/scoped_commit.rs",
+        "packages/git/rust/tests/land.rs",
+        "packages/git/rust/tests/scoped_commit_sync.rs"
+      ]
+    },
+    {
+      "family": "plans/261017-1313-fgos-platform-program-board",
+      "count": 2,
+      "paths": [
+        "plans/261017-1313-fgos-platform-program-board/log.md",
+        "plans/261017-1313-fgos-platform-program-board/plan.md"
+      ]
+    },
+    {
+      "family": "plans/261018-0914-git-component-fgos-git",
+      "count": 1,
+      "paths": [
+        "plans/261018-0914-git-component-fgos-git/e3-budgets.md"
+      ]
+    },
+    {
+      "family": "plans/261020-1757-test-governance-port-inventory-and-slow-file-extraction",
+      "count": 1,
+      "paths": [
+        "plans/261020-1757-test-governance-port-inventory-and-slow-file-extraction/plan.md"
+      ]
+    },
+    {
+      "family": "plans/261021-1118-harden-low-layers-bottom-up",
+      "count": 2,
+      "paths": [
+        "plans/261021-1118-harden-low-layers-bottom-up/phase-07-closing-and-handoff.md",
+        "plans/261021-1118-harden-low-layers-bottom-up/plan.md"
+      ]
+    },
+    {
+      "family": "plans/261021-1513-rule-management-group-1a",
+      "count": 1,
+      "paths": [
+        "plans/261021-1513-rule-management-group-1a/plan.md"
+      ]
+    },
+    {
+      "family": "plans/261021-1547-harden-t0-process-facts-door",
+      "count": 13,
+      "paths": [
+        "plans/261021-1547-harden-t0-process-facts-door/phase-01-red-tests.md",
+        "plans/261021-1547-harden-t0-process-facts-door/phase-02-the-door.md",
+        "plans/261021-1547-harden-t0-process-facts-door/phase-03-process-sites.md",
+        "plans/261021-1547-harden-t0-process-facts-door/phase-04-containment-and-crate-fixes.md",
+        "plans/261021-1547-harden-t0-process-facts-door/phase-05-durable-and-canonical-sites.md",
+        "plans/261021-1547-harden-t0-process-facts-door/phase-06-deletions-and-specs.md",
+        "plans/261021-1547-harden-t0-process-facts-door/phase-07-post-seat-carry-list.md",
+        "plans/261021-1547-harden-t0-process-facts-door/phase-08-close-verify-land.md",
+        "plans/261021-1547-harden-t0-process-facts-door/plan.md",
+        "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-assume.md",
+        "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-failure.md",
+        "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-scope.md",
+        "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-security.md"
+      ]
+    },
+    {
+      "family": "plans/261021-1656-convention-second-wave",
+      "count": 8,
+      "paths": [
+        "plans/261021-1656-convention-second-wave/phase-00-reinvestigate-and-pin.md",
+        "plans/261021-1656-convention-second-wave/phase-01-root-allowlist-and-scratch.md",
+        "plans/261021-1656-convention-second-wave/phase-02-render-targets-and-skill-layout.md",
+        "plans/261021-1656-convention-second-wave/phase-03-contracts-naming.md",
+        "plans/261021-1656-convention-second-wave/phase-04-domains-and-decisions.md",
+        "plans/261021-1656-convention-second-wave/phase-05-plan-and-knowledge-families.md",
+        "plans/261021-1656-convention-second-wave/phase-06-flip-to-block.md",
+        "plans/261021-1656-convention-second-wave/plan.md"
+      ]
+    },
+    {
+      "family": "plans/reports",
+      "count": 26,
+      "paths": [
+        "plans/reports/council-261021-1324-harden-t0-seat-correctness.md",
+        "plans/reports/council-261021-1324-harden-t0-seat-redteam.md",
+        "plans/reports/council-261021-1324-harden-t0-seat-simplicity.md",
+        "plans/reports/council-261021-1324-harden-t0-seat-speed.md",
+        "plans/reports/council-261021-1507-harden-t0-arbitration.md",
+        "plans/reports/debug-261021-1329-scoped-commit-e3-breakdown.md",
+        "plans/reports/debug-261021-1639-scoped-commit-object-dir-durability.md",
+        "plans/reports/design-261020-1035-operation-scoped-containment.md",
+        "plans/reports/handoff-261021-1021-rule-management-tight-no-conflict-right-place.md",
+        "plans/reports/handoff-261021-1446-rule-management-execution-and-decisions.md",
+        "plans/reports/handoff-261021-1519-test-lane-governance.md",
+        "plans/reports/kongming-261021-1325-rule-engine-component-boundary.md",
+        "plans/reports/phase-lead-261021-1129-test-governance-p2-ported-areas.md",
+        "plans/reports/phase-lead-261021-1553-git-scoped-commit-speedups.md",
+        "plans/reports/phase-lead-261021-1713-git-scoped-commit-object-durability.md",
+        "plans/reports/phase-lead-261021-1730-git-scoped-commit-precommit-durability.md",
+        "plans/reports/phase-lead-261021-1740-git-land-retained-candidates-doctor.md",
+        "plans/reports/phase-lead-261021-1759-test-governance-guards-claude-and-help-routes.md",
+        "plans/reports/research-261021-1054-rules-instruction-optimization-references.md",
+        "plans/reports/research-261021-1643-canonical-decision-projection-component.md",
+        "plans/reports/research-261021-1707-doc-plan-dedup-components.md",
+        "plans/reports/research-261021-1752-knowledge-registry-overlap-history-journals.md",
+        "plans/reports/research-261021-1752-knowledge-registry-overlap-plans-reports.md",
+        "plans/reports/research-261021-1752-knowledge-registry-overlap-work-items-code-specs.md",
+        "plans/reports/research-261021-1759-knowledge-registry-vs-knowledge-doc-engine-synthesis.md",
+        "plans/reports/review-261021-1726-seat-wave-growth.md"
+      ]
+    },
+    {
+      "family": "plugins/fgos-run-skill",
+      "count": 1,
+      "paths": [
+        "plugins/fgOS/skills/fgos-run/SKILL.md"
+      ]
+    },
+    {
+      "family": "scripts/git",
+      "count": 4,
+      "paths": [
+        "scripts/git/e1-power-cut.mjs",
+        "scripts/git/e1-power-cut.sh",
+        "scripts/git/p-space-resource.mjs",
+        "scripts/git/p-space.sh"
+      ]
+    },
+    {
+      "family": "scripts/root",
+      "count": 3,
+      "paths": [
+        "scripts/run-tests.mjs",
+        "scripts/test-proof-inventory.mjs",
+        "scripts/test-select-coverage-map.mjs"
+      ]
+    },
+    {
+      "family": "src/event-store",
+      "count": 1,
+      "paths": [
+        "src/event-store/native.mjs"
+      ]
+    },
+    {
+      "family": "src/git",
+      "count": 1,
+      "paths": [
+        "src/git/recovery.mjs"
+      ]
+    },
+    {
+      "family": "src/setup",
+      "count": 2,
+      "paths": [
+        "src/setup/git-checks.mjs",
+        "src/setup/registrations.mjs"
+      ]
+    },
+    {
+      "family": "test/git",
+      "count": 2,
+      "paths": [
+        "test/git/recovery.test.mjs",
+        "test/git/scoped-commit.test.mjs"
+      ]
+    },
+    {
+      "family": "test/run-supervisor",
+      "count": 4,
+      "paths": [
+        "test/run-supervisor/adopt-client.test.mjs",
+        "test/run-supervisor/contracts-terminal.test.mjs",
+        "test/run-supervisor/contracts-unit-state.test.mjs",
+        "test/run-supervisor/inspect-recover-adopt.test.mjs"
+      ]
+    },
+    {
+      "family": "test/rust-host",
+      "count": 1,
+      "paths": [
+        "test/rust-host/help-routes.test.mjs"
+      ]
+    },
+    {
+      "family": "test/scripts",
+      "count": 2,
+      "paths": [
+        "test/scripts/run-tests.test.mjs",
+        "test/scripts/test-proof-inventory.test.mjs"
+      ]
+    },
+    {
+      "family": "test/setup",
+      "count": 2,
+      "paths": [
+        "test/setup/checks-doctor-config.test.mjs",
+        "test/setup/checks.test.mjs"
+      ]
+    },
+    {
+      "family": "test/suite-baseline.json",
+      "count": 1,
+      "paths": [
+        "test/suite-baseline.json"
+      ]
+    },
+    {
+      "family": "test/terminal-control",
+      "count": 1,
+      "paths": [
+        "test/terminal-control/client-route.test.mjs"
+      ]
+    }
+  ],
+  "mainPathCommits": {
+    ".agents/skills/fgos-run/SKILL.md": [
+      "47792b279eee87a9e29e7e3a462688fe135533f1 docs(fgos-run): reviewers check what a change costs the suite"
+    ],
+    "CHANGELOG.md": [
+      "70be7bdd685f9b00536575f2b30b704f381eff90 fix(git): report the Land pins actually present and skip chains holding nothing",
+      "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates",
+      "69eb11fa8e6a3e22201894ae67e62b776d70d2ce fix(git): make a scoped commit's staged blobs and trees durable before git commit",
+      "800ef44d881f7008175fc721a2a98c18503d7474 fix(git): make a scoped commit's new objects durable before its receipt"
+    ],
+    "core/skills/fgos-run/SKILL.md": [
+      "47792b279eee87a9e29e7e3a462688fe135533f1 docs(fgos-run): reviewers check what a change costs the suite"
+    ],
+    "docs/backlog.md": [
+      "4b8e3334aadc7966ee9cf8818f73ea22d78823f7 docs(backlog): record the herdr brief recurrence on the release before the fix"
+    ],
+    "docs/platform/git/spec.md": [
+      "70be7bdd685f9b00536575f2b30b704f381eff90 fix(git): report the Land pins actually present and skip chains holding nothing",
+      "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates",
+      "69eb11fa8e6a3e22201894ae67e62b776d70d2ce fix(git): make a scoped commit's staged blobs and trees durable before git commit",
+      "800ef44d881f7008175fc721a2a98c18503d7474 fix(git): make a scoped commit's new objects durable before its receipt",
+      "d30754ab616900511fc64e986d5e678ba3bf2504 docs(git): record P-SPACE on real small filesystems"
+    ],
+    "docs/platform/holder-lock/spec.md": [
+      "9d33e7869ae573670aa00c5256088848d3fe88f8 docs(holder-lock): note that an old payload's quiescence scan misses linked worktrees"
+    ],
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md": [
+      "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+    ],
+    "docs/platform/proposals/documentation-system-unification.md": [
+      "23359f84342afe7d57da41428b2df21444fc3558 docs(platform): note that the documentation engine starts from the running knowledge registry and the decision projection"
+    ],
+    "packages/event-store/rust/tests/legacy_import.rs": [
+      "5a9652625693ceeab4a2292fcdea0744b116ce65 test: guard sync --no-push, the root porting log and a live unit controller"
+    ],
+    "packages/event-store/rust/tests/offline_sync.rs": [
+      "5a9652625693ceeab4a2292fcdea0744b116ce65 test: guard sync --no-push, the root porting log and a live unit controller"
+    ],
+    "packages/git/contracts/mutation-census.v1.json": [
+      "31cb41470fe9f0a03f5391839720e561c8177446 chore(git): regenerate the mutation census for the TEST batch",
+      "8b24e4310b89db82df201561dc274f7507b77374 test(git): prove the retained Land listing skips chains that hold nothing",
+      "70be7bdd685f9b00536575f2b30b704f381eff90 fix(git): report the Land pins actually present and skip chains holding nothing",
+      "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates",
+      "69eb11fa8e6a3e22201894ae67e62b776d70d2ce fix(git): make a scoped commit's staged blobs and trees durable before git commit",
+      "800ef44d881f7008175fc721a2a98c18503d7474 fix(git): make a scoped commit's new objects durable before its receipt",
+      "2b5cc7535f5af08b79b36b90e43d59038d6c4716 perf(git): overlap the ref directory fsync with the commit receipt and fuse the post-commit reads"
+    ],
+    "packages/git/node-addon/src/git/recovery.rs": [
+      "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+    ],
+    "packages/git/rust/src/lib.rs": [
+      "800ef44d881f7008175fc721a2a98c18503d7474 fix(git): make a scoped commit's new objects durable before its receipt"
+    ],
+    "packages/git/rust/src/objects.rs": [
+      "800ef44d881f7008175fc721a2a98c18503d7474 fix(git): make a scoped commit's new objects durable before its receipt"
+    ],
+    "packages/git/rust/src/publication.rs": [
+      "800ef44d881f7008175fc721a2a98c18503d7474 fix(git): make a scoped commit's new objects durable before its receipt"
+    ],
+    "packages/git/rust/src/recovery.rs": [
+      "70be7bdd685f9b00536575f2b30b704f381eff90 fix(git): report the Land pins actually present and skip chains holding nothing",
+      "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+    ],
+    "packages/git/rust/src/scoped_commit.rs": [
+      "69eb11fa8e6a3e22201894ae67e62b776d70d2ce fix(git): make a scoped commit's staged blobs and trees durable before git commit",
+      "800ef44d881f7008175fc721a2a98c18503d7474 fix(git): make a scoped commit's new objects durable before its receipt",
+      "2b5cc7535f5af08b79b36b90e43d59038d6c4716 perf(git): overlap the ref directory fsync with the commit receipt and fuse the post-commit reads"
+    ],
+    "packages/git/rust/tests/land.rs": [
+      "8b24e4310b89db82df201561dc274f7507b77374 test(git): prove the retained Land listing skips chains that hold nothing",
+      "70be7bdd685f9b00536575f2b30b704f381eff90 fix(git): report the Land pins actually present and skip chains holding nothing",
+      "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+    ],
+    "packages/git/rust/tests/scoped_commit_sync.rs": [
+      "69eb11fa8e6a3e22201894ae67e62b776d70d2ce fix(git): make a scoped commit's staged blobs and trees durable before git commit",
+      "800ef44d881f7008175fc721a2a98c18503d7474 fix(git): make a scoped commit's new objects durable before its receipt"
+    ],
+    "plans/261017-1313-fgos-platform-program-board/log.md": [
+      "8e4e4bf853deacd3609835a7df580c03c69f408e docs(board): log the two TEST batches on main",
+      "61e14d2fe52c6bdc9926f44ee79efeb50c1a43fb docs(board): record the T0 phases merged into the integration branch",
+      "61ba37e8365dfcc6af7e949a5be2a3923cebf632 docs(board): keep the pre-seat run records readable as they are",
+      "37d174d1f84a8ee2b0ce118a9a1b27beca8f1b37 docs(board): record the retained Land candidate doctor row",
+      "8b59569e9257585e3e5c1c84c958db7d31837532 docs(board): claim the rule-management lane and record the decision-projection and knowledge-registry findings",
+      "39c999d5ffcc8a3934a14521561e152c125fcb41 docs(board): record the start of the T0 implementation",
+      "d2b9781dcff9554f806d344817ded7fbe66f8c5d docs(board): record the M3 change and the T0 phase 2 review",
+      "b43c502651d599e149af6cc6ab988f9f7245c67b docs(harden): settle the npm channel and addon verification questions for T0",
+      "10c75f35ffe90761d0b97e32c33941d67bfffe6c docs(board): record the scoped commit pre-commit durability fix",
+      "f13f36b68845b8a037f29bfad4e02c1fe9279c2c docs(seat-binding): record the wave growth review and the trim lane",
+      "b410c92b08e5ce87eafd4f49dc58bea554555648 docs(board): ask the hardening lane about the doc cutover lock row",
+      "9bf8ae1dfa50d655a3883df4b0fd1f460589dc67 Merge branch 'main' of https://github.com/vantt/forgent",
+      "d6ab1b0a96ba59c13de4b90d8f53fcf15c2fa84d docs(board): record P-SPACE, the ScopedCommit budget and the object durability gap",
+      "ea5ebb043eab4c677341b72446806681a914bc9b docs(board): link the documentation system proposal and its later stages",
+      "10c412c901c4d6759a228a4859678aa5269b3081 docs(board): add the rule-management lane and its ordering after the doc cutover",
+      "030935a51603a776e7ab1731d19eb8d1328458f0 docs(board): seat ranking and lease phases on the track, last phases opened",
+      "6b518a364734ee3332b91ab40c5da8d25f03d2e0 docs(harden): record the owner's T0 answers and the hand-off ledger",
+      "5ff44dd5441fd4d9c337cbc5718470172397ee7d docs(board): record the new TEST lane owner",
+      "f132c8c7e7e35ca2dd475b4df51fac2bbdeb22c1 docs(board): hand the TEST lane to a new owner",
+      "265e5daad14bf7a1e8c5431448b512a7e1ea3390 docs(board): record the T0 council arbitration"
+    ],
+    "plans/261017-1313-fgos-platform-program-board/plan.md": [
+      "4ebf607483783b72e4662797a9b67b9bb451f64c docs(test): close D1, H1, H4 and H5 on the plan and the board",
+      "61ba37e8365dfcc6af7e949a5be2a3923cebf632 docs(board): keep the pre-seat run records readable as they are",
+      "37d174d1f84a8ee2b0ce118a9a1b27beca8f1b37 docs(board): record the retained Land candidate doctor row",
+      "8b59569e9257585e3e5c1c84c958db7d31837532 docs(board): claim the rule-management lane and record the decision-projection and knowledge-registry findings",
+      "d2b9781dcff9554f806d344817ded7fbe66f8c5d docs(board): record the M3 change and the T0 phase 2 review",
+      "b71005d556bea02f777c11f0abf49b1c005f0195 docs(test): move the release-staging trigger to H13, park longest-first ordering, close the run-supervisor batch",
+      "10c75f35ffe90761d0b97e32c33941d67bfffe6c docs(board): record the scoped commit pre-commit durability fix",
+      "f13f36b68845b8a037f29bfad4e02c1fe9279c2c docs(seat-binding): record the wave growth review and the trim lane",
+      "5b98d30bc39a53fe740342561a3e740223660ea4 docs(board): add the convention second-wave draft",
+      "b410c92b08e5ce87eafd4f49dc58bea554555648 docs(board): ask the hardening lane about the doc cutover lock row",
+      "ea5ebb043eab4c677341b72446806681a914bc9b docs(board): link the documentation system proposal and its later stages",
+      "10c412c901c4d6759a228a4859678aa5269b3081 docs(board): add the rule-management lane and its ordering after the doc cutover",
+      "85862584496010f86879d39fffd2a6d0ea0b7c19 docs(board): close P-SPACE in the Git row",
+      "fb1a74790fb5c663e3b63d7f02e05e50b04c5173 docs(board): close the L3 decision",
+      "c8363a1e8e49e826f681a88ed897a1b6ea641a2a docs(board): record the M3 decision and the quiet-window rule",
+      "f3890986256c9e832ae68d4775284699a842c252 docs(board): record the ScopedCommit budget choice and the deferred spec-text option",
+      "3b788f78eb9ab98a2080c32039b3905224611a3b docs(test): name HARDEN T0 as the layer that removes the per-process addon hash",
+      "7ed88b85f8a7b7d7e337b912c8a1505585c24e65 docs(test): record the items the TEST lane took on and the owner's answers",
+      "2ac24696abcce1b21916d026c7bb2fbb615f0560 docs(board): list the Git lane's open items and the work moved to HARDEN",
+      "6b518a364734ee3332b91ab40c5da8d25f03d2e0 docs(harden): record the owner's T0 answers and the hand-off ledger",
+      "5ff44dd5441fd4d9c337cbc5718470172397ee7d docs(board): record the new TEST lane owner",
+      "265e5daad14bf7a1e8c5431448b512a7e1ea3390 docs(board): record the T0 council arbitration"
+    ],
+    "plans/261018-0914-git-component-fgos-git/e3-budgets.md": [
+      "8b960030e62d7aa9b231c044779ee09c1f36e6b5 docs(git): give ScopedCommit an absolute E3 budget, as the owner chose"
+    ],
+    "plans/261020-1757-test-governance-port-inventory-and-slow-file-extraction/plan.md": [
+      "4ebf607483783b72e4662797a9b67b9bb451f64c docs(test): close D1, H1, H4 and H5 on the plan and the board",
+      "b71005d556bea02f777c11f0abf49b1c005f0195 docs(test): move the release-staging trigger to H13, park longest-first ordering, close the run-supervisor batch",
+      "3b788f78eb9ab98a2080c32039b3905224611a3b docs(test): name HARDEN T0 as the layer that removes the per-process addon hash",
+      "7ed88b85f8a7b7d7e337b912c8a1505585c24e65 docs(test): record the items the TEST lane took on and the owner's answers"
+    ],
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-07-closing-and-handoff.md": [
+      "b43c502651d599e149af6cc6ab988f9f7245c67b docs(harden): settle the npm channel and addon verification questions for T0",
+      "6b518a364734ee3332b91ab40c5da8d25f03d2e0 docs(harden): record the owner's T0 answers and the hand-off ledger"
+    ],
+    "plans/261021-1118-harden-low-layers-bottom-up/plan.md": [
+      "bf24f3ad6344609eaae98dd2107ff7404aa8d737 docs(harden): close the test-cost rule hand-off",
+      "ce40fce80df9e797b09c35a5036fc1a744bcb3a3 docs(harden): close the TEST hand-offs that landed on main",
+      "7d55ddf365afcd8661e1b2b2ee9ec45848d29fc5 docs(harden): record the TEST lane's status on its hand-offs",
+      "8af4c41eab5cf17813468a311595c32008504d7a docs(harden): move the TEST ping to the release verification hand-off",
+      "b43c502651d599e149af6cc6ab988f9f7245c67b docs(harden): settle the npm channel and addon verification questions for T0",
+      "d95e0783f2b757cd573f615caeffa08e80a49908 docs(harden): record the TEST lane's confirmation of its hand-offs",
+      "8cef699876cbc6d7d4232e850c11f34e4014b1c0 docs(harden): close the GIT rows of the hand-off ledger",
+      "6b518a364734ee3332b91ab40c5da8d25f03d2e0 docs(harden): record the owner's T0 answers and the hand-off ledger"
+    ],
+    "plans/261021-1513-rule-management-group-1a/plan.md": [
+      "537cb083afffab288c5fde95db11f0c299329de6 docs(plans): plan the rule-management group 1A fixes and record the decision-projection and knowledge-registry research"
+    ],
+    "plans/261021-1547-harden-t0-process-facts-door/phase-01-red-tests.md": [
+      "71ac9281df1a2d81c2a33bb39f94e3c7be277e49 docs(harden): apply the red-team review to the T0 plan",
+      "ce9720c19c1746493b92e22d448f07ab9d5a3489 docs(harden): plan the T0 process facts door and its fixes"
+    ],
+    "plans/261021-1547-harden-t0-process-facts-door/phase-02-the-door.md": [
+      "7bbc8fc14d209f8d54b55e22acd86933305ee82b docs(harden): add the Git lane's review conditions to the door phase",
+      "b43c502651d599e149af6cc6ab988f9f7245c67b docs(harden): settle the npm channel and addon verification questions for T0",
+      "71ac9281df1a2d81c2a33bb39f94e3c7be277e49 docs(harden): apply the red-team review to the T0 plan",
+      "4ff7e43289efa4a32f37bb2a3c64f9002ef541da docs(harden): add the Git lane's activation identity criteria to the door phase",
+      "55bdb81d2976d2f770e08f28ef17040640126755 docs(harden): record the owner's answer to the addon verification question",
+      "ce9720c19c1746493b92e22d448f07ab9d5a3489 docs(harden): plan the T0 process facts door and its fixes"
+    ],
+    "plans/261021-1547-harden-t0-process-facts-door/phase-03-process-sites.md": [
+      "d0be1e7ec10c0a4fad4e1bc2416fcd65b1b4d865 docs(harden): carry the lock fence proof note into the process sites phase",
+      "71ac9281df1a2d81c2a33bb39f94e3c7be277e49 docs(harden): apply the red-team review to the T0 plan",
+      "ce9720c19c1746493b92e22d448f07ab9d5a3489 docs(harden): plan the T0 process facts door and its fixes"
+    ],
+    "plans/261021-1547-harden-t0-process-facts-door/phase-04-containment-and-crate-fixes.md": [
+      "71ac9281df1a2d81c2a33bb39f94e3c7be277e49 docs(harden): apply the red-team review to the T0 plan",
+      "ce9720c19c1746493b92e22d448f07ab9d5a3489 docs(harden): plan the T0 process facts door and its fixes"
+    ],
+    "plans/261021-1547-harden-t0-process-facts-door/phase-05-durable-and-canonical-sites.md": [
+      "71ac9281df1a2d81c2a33bb39f94e3c7be277e49 docs(harden): apply the red-team review to the T0 plan",
+      "ce9720c19c1746493b92e22d448f07ab9d5a3489 docs(harden): plan the T0 process facts door and its fixes"
+    ],
+    "plans/261021-1547-harden-t0-process-facts-door/phase-06-deletions-and-specs.md": [
+      "71ac9281df1a2d81c2a33bb39f94e3c7be277e49 docs(harden): apply the red-team review to the T0 plan",
+      "ce9720c19c1746493b92e22d448f07ab9d5a3489 docs(harden): plan the T0 process facts door and its fixes"
+    ],
+    "plans/261021-1547-harden-t0-process-facts-door/phase-07-post-seat-carry-list.md": [
+      "71ac9281df1a2d81c2a33bb39f94e3c7be277e49 docs(harden): apply the red-team review to the T0 plan",
+      "ce9720c19c1746493b92e22d448f07ab9d5a3489 docs(harden): plan the T0 process facts door and its fixes"
+    ],
+    "plans/261021-1547-harden-t0-process-facts-door/phase-08-close-verify-land.md": [
+      "71ac9281df1a2d81c2a33bb39f94e3c7be277e49 docs(harden): apply the red-team review to the T0 plan",
+      "ce9720c19c1746493b92e22d448f07ab9d5a3489 docs(harden): plan the T0 process facts door and its fixes"
+    ],
+    "plans/261021-1547-harden-t0-process-facts-door/plan.md": [
+      "b43c502651d599e149af6cc6ab988f9f7245c67b docs(harden): settle the npm channel and addon verification questions for T0",
+      "71ac9281df1a2d81c2a33bb39f94e3c7be277e49 docs(harden): apply the red-team review to the T0 plan",
+      "55bdb81d2976d2f770e08f28ef17040640126755 docs(harden): record the owner's answer to the addon verification question",
+      "ce9720c19c1746493b92e22d448f07ab9d5a3489 docs(harden): plan the T0 process facts door and its fixes"
+    ],
+    "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-assume.md": [
+      "71ac9281df1a2d81c2a33bb39f94e3c7be277e49 docs(harden): apply the red-team review to the T0 plan"
+    ],
+    "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-failure.md": [
+      "71ac9281df1a2d81c2a33bb39f94e3c7be277e49 docs(harden): apply the red-team review to the T0 plan"
+    ],
+    "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-scope.md": [
+      "71ac9281df1a2d81c2a33bb39f94e3c7be277e49 docs(harden): apply the red-team review to the T0 plan"
+    ],
+    "plans/261021-1547-harden-t0-process-facts-door/reports/red-team-261021-1642-security.md": [
+      "71ac9281df1a2d81c2a33bb39f94e3c7be277e49 docs(harden): apply the red-team review to the T0 plan"
+    ],
+    "plans/261021-1656-convention-second-wave/phase-00-reinvestigate-and-pin.md": [
+      "b2763b5e48a9f2866e87e18dc18810b62bd3dc28 docs(plans): draft the second wave of convention rules"
+    ],
+    "plans/261021-1656-convention-second-wave/phase-01-root-allowlist-and-scratch.md": [
+      "b2763b5e48a9f2866e87e18dc18810b62bd3dc28 docs(plans): draft the second wave of convention rules"
+    ],
+    "plans/261021-1656-convention-second-wave/phase-02-render-targets-and-skill-layout.md": [
+      "b2763b5e48a9f2866e87e18dc18810b62bd3dc28 docs(plans): draft the second wave of convention rules"
+    ],
+    "plans/261021-1656-convention-second-wave/phase-03-contracts-naming.md": [
+      "b2763b5e48a9f2866e87e18dc18810b62bd3dc28 docs(plans): draft the second wave of convention rules"
+    ],
+    "plans/261021-1656-convention-second-wave/phase-04-domains-and-decisions.md": [
+      "b2763b5e48a9f2866e87e18dc18810b62bd3dc28 docs(plans): draft the second wave of convention rules"
+    ],
+    "plans/261021-1656-convention-second-wave/phase-05-plan-and-knowledge-families.md": [
+      "b2763b5e48a9f2866e87e18dc18810b62bd3dc28 docs(plans): draft the second wave of convention rules"
+    ],
+    "plans/261021-1656-convention-second-wave/phase-06-flip-to-block.md": [
+      "b2763b5e48a9f2866e87e18dc18810b62bd3dc28 docs(plans): draft the second wave of convention rules"
+    ],
+    "plans/261021-1656-convention-second-wave/plan.md": [
+      "b2763b5e48a9f2866e87e18dc18810b62bd3dc28 docs(plans): draft the second wave of convention rules"
+    ],
+    "plans/reports/council-261021-1324-harden-t0-seat-correctness.md": [
+      "1477ff770ed92563a6f961af1e203445415f762d docs(harden): record the three T0 council seat reports"
+    ],
+    "plans/reports/council-261021-1324-harden-t0-seat-redteam.md": [
+      "d0432d53f734d5e50ba1cd43c08ed42a6beeb4ba docs(harden): arbitrate the T0 council and record the red-team report"
+    ],
+    "plans/reports/council-261021-1324-harden-t0-seat-simplicity.md": [
+      "1477ff770ed92563a6f961af1e203445415f762d docs(harden): record the three T0 council seat reports"
+    ],
+    "plans/reports/council-261021-1324-harden-t0-seat-speed.md": [
+      "1477ff770ed92563a6f961af1e203445415f762d docs(harden): record the three T0 council seat reports"
+    ],
+    "plans/reports/council-261021-1507-harden-t0-arbitration.md": [
+      "6b518a364734ee3332b91ab40c5da8d25f03d2e0 docs(harden): record the owner's T0 answers and the hand-off ledger",
+      "d0432d53f734d5e50ba1cd43c08ed42a6beeb4ba docs(harden): arbitrate the T0 council and record the red-team report"
+    ],
+    "plans/reports/debug-261021-1329-scoped-commit-e3-breakdown.md": [
+      "5139c7c666fdc683199144efda5cc01026ce93b8 docs(git): record where ScopedCommit spends its time against the legacy commit"
+    ],
+    "plans/reports/debug-261021-1639-scoped-commit-object-dir-durability.md": [
+      "39c6362db6abd054faadd8c450739b3af3f715d2 docs(git): record the ScopedCommit object durability gap"
+    ],
+    "plans/reports/design-261020-1035-operation-scoped-containment.md": [
+      "23b23528e1f0ce0b2be686afc9419e391d26421d docs(git): add the T0 containment numbers and today's E3 to the containment design inputs"
+    ],
+    "plans/reports/handoff-261021-1021-rule-management-tight-no-conflict-right-place.md": [
+      "10c412c901c4d6759a228a4859678aa5269b3081 docs(board): add the rule-management lane and its ordering after the doc cutover",
+      "8666ea057375830ee9187932e7bef09d2899d130 docs(reports): record the rule-engine boundary review, the domain and task criterion, and the handoff for the execution chat"
+    ],
+    "plans/reports/handoff-261021-1446-rule-management-execution-and-decisions.md": [
+      "8666ea057375830ee9187932e7bef09d2899d130 docs(reports): record the rule-engine boundary review, the domain and task criterion, and the handoff for the execution chat"
+    ],
+    "plans/reports/handoff-261021-1519-test-lane-governance.md": [
+      "f132c8c7e7e35ca2dd475b4df51fac2bbdeb22c1 docs(board): hand the TEST lane to a new owner"
+    ],
+    "plans/reports/kongming-261021-1325-rule-engine-component-boundary.md": [
+      "8666ea057375830ee9187932e7bef09d2899d130 docs(reports): record the rule-engine boundary review, the domain and task criterion, and the handoff for the execution chat"
+    ],
+    "plans/reports/phase-lead-261021-1129-test-governance-p2-ported-areas.md": [
+      "c453cd99b750bda4a6890d659fc84609ae70f7b7 docs(reports): record the test governance inventory for event-store, run-supervisor and terminal-control"
+    ],
+    "plans/reports/phase-lead-261021-1553-git-scoped-commit-speedups.md": [
+      "58ccce8e8f9044b28939a30a3a09109d6f74304a docs(git): record the scoped commit speedup measurements"
+    ],
+    "plans/reports/phase-lead-261021-1713-git-scoped-commit-object-durability.md": [
+      "e9f5cafcb8654507d7292037e45aec0df5570cf3 test(git): add a scoped-commit kind to the E1 power-cut experiment"
+    ],
+    "plans/reports/phase-lead-261021-1730-git-scoped-commit-precommit-durability.md": [
+      "69eb11fa8e6a3e22201894ae67e62b776d70d2ce fix(git): make a scoped commit's staged blobs and trees durable before git commit"
+    ],
+    "plans/reports/phase-lead-261021-1740-git-land-retained-candidates-doctor.md": [
+      "8b24e4310b89db82df201561dc274f7507b77374 test(git): prove the retained Land listing skips chains that hold nothing",
+      "70be7bdd685f9b00536575f2b30b704f381eff90 fix(git): report the Land pins actually present and skip chains holding nothing",
+      "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates",
+      "bad4b3e654a89a1186059e498dfaf2fd8babea5f docs(git): record why retained Land candidates cannot be reported with a release command yet"
+    ],
+    "plans/reports/phase-lead-261021-1759-test-governance-guards-claude-and-help-routes.md": [
+      "593aadc19647a5144b300d2ca942a508c3b0f7cc docs(reports): record the TEST batch that guards claude, speeds help-routes and reports suite cost"
+    ],
+    "plans/reports/research-261021-1054-rules-instruction-optimization-references.md": [
+      "8666ea057375830ee9187932e7bef09d2899d130 docs(reports): record the rule-engine boundary review, the domain and task criterion, and the handoff for the execution chat"
+    ],
+    "plans/reports/research-261021-1643-canonical-decision-projection-component.md": [
+      "537cb083afffab288c5fde95db11f0c299329de6 docs(plans): plan the rule-management group 1A fixes and record the decision-projection and knowledge-registry research"
+    ],
+    "plans/reports/research-261021-1707-doc-plan-dedup-components.md": [
+      "537cb083afffab288c5fde95db11f0c299329de6 docs(plans): plan the rule-management group 1A fixes and record the decision-projection and knowledge-registry research"
+    ],
+    "plans/reports/research-261021-1752-knowledge-registry-overlap-history-journals.md": [
+      "537cb083afffab288c5fde95db11f0c299329de6 docs(plans): plan the rule-management group 1A fixes and record the decision-projection and knowledge-registry research"
+    ],
+    "plans/reports/research-261021-1752-knowledge-registry-overlap-plans-reports.md": [
+      "537cb083afffab288c5fde95db11f0c299329de6 docs(plans): plan the rule-management group 1A fixes and record the decision-projection and knowledge-registry research"
+    ],
+    "plans/reports/research-261021-1752-knowledge-registry-overlap-work-items-code-specs.md": [
+      "537cb083afffab288c5fde95db11f0c299329de6 docs(plans): plan the rule-management group 1A fixes and record the decision-projection and knowledge-registry research"
+    ],
+    "plans/reports/research-261021-1759-knowledge-registry-vs-knowledge-doc-engine-synthesis.md": [
+      "537cb083afffab288c5fde95db11f0c299329de6 docs(plans): plan the rule-management group 1A fixes and record the decision-projection and knowledge-registry research"
+    ],
+    "plans/reports/review-261021-1726-seat-wave-growth.md": [
+      "f13f36b68845b8a037f29bfad4e02c1fe9279c2c docs(seat-binding): record the wave growth review and the trim lane"
+    ],
+    "plugins/fgOS/skills/fgos-run/SKILL.md": [
+      "47792b279eee87a9e29e7e3a462688fe135533f1 docs(fgos-run): reviewers check what a change costs the suite"
+    ],
+    "scripts/git/e1-power-cut.mjs": [
+      "53f39c272006cd273298f8e84c038d1793aa548b test(git): carry the staged host binary in the E1 addon descriptor",
+      "69eb11fa8e6a3e22201894ae67e62b776d70d2ce fix(git): make a scoped commit's staged blobs and trees durable before git commit",
+      "e9f5cafcb8654507d7292037e45aec0df5570cf3 test(git): add a scoped-commit kind to the E1 power-cut experiment"
+    ],
+    "scripts/git/e1-power-cut.sh": [
+      "60eaad9d0622fd3423e35cf92ef15621778fba39 test(git): retry the E1 snapshot unmount and record what held it",
+      "e9f5cafcb8654507d7292037e45aec0df5570cf3 test(git): add a scoped-commit kind to the E1 power-cut experiment"
+    ],
+    "scripts/git/p-space-resource.mjs": [
+      "6dc5b672198aaeb6d57eee3da983b9150db6069b fix(git): make the space and EIO experiment actually reach ENOSPC and survive its table switch"
+    ],
+    "scripts/git/p-space.sh": [
+      "6dc5b672198aaeb6d57eee3da983b9150db6069b fix(git): make the space and EIO experiment actually reach ENOSPC and survive its table switch"
+    ],
+    "scripts/run-tests.mjs": [
+      "7888c6632b134f6b95791ce83e27d2a721d80e3b test: keep every test process off the real claude CLI from the suite door"
+    ],
+    "scripts/test-proof-inventory.mjs": [
+      "060caa637a7794b4b2fac52d83287a2e15d54011 test(suite): report what a change does to the suite and what one CLI call costs"
+    ],
+    "scripts/test-select-coverage-map.mjs": [
+      "20bbe1f729aef57a9b6ce7a4ac9e8748a4f38268 fix(test): the coverage map removes its raw profiles when a run fails"
+    ],
+    "src/event-store/native.mjs": [
+      "5a9652625693ceeab4a2292fcdea0744b116ce65 test: guard sync --no-push, the root porting log and a live unit controller"
+    ],
+    "src/git/recovery.mjs": [
+      "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+    ],
+    "src/setup/git-checks.mjs": [
+      "70be7bdd685f9b00536575f2b30b704f381eff90 fix(git): report the Land pins actually present and skip chains holding nothing",
+      "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+    ],
+    "src/setup/registrations.mjs": [
+      "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+    ],
+    "test/git/recovery.test.mjs": [
+      "70be7bdd685f9b00536575f2b30b704f381eff90 fix(git): report the Land pins actually present and skip chains holding nothing",
+      "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+    ],
+    "test/git/scoped-commit.test.mjs": [
+      "2b5cc7535f5af08b79b36b90e43d59038d6c4716 perf(git): overlap the ref directory fsync with the commit receipt and fuse the post-commit reads"
+    ],
+    "test/run-supervisor/adopt-client.test.mjs": [
+      "4bb8058dc38585c191be637ff6ad526c72ee71b0 test(run-supervisor): retire five Node tests other proofs own"
+    ],
+    "test/run-supervisor/contracts-terminal.test.mjs": [
+      "4bb8058dc38585c191be637ff6ad526c72ee71b0 test(run-supervisor): retire five Node tests other proofs own"
+    ],
+    "test/run-supervisor/contracts-unit-state.test.mjs": [
+      "4bb8058dc38585c191be637ff6ad526c72ee71b0 test(run-supervisor): retire five Node tests other proofs own"
+    ],
+    "test/run-supervisor/inspect-recover-adopt.test.mjs": [
+      "5a9652625693ceeab4a2292fcdea0744b116ce65 test: guard sync --no-push, the root porting log and a live unit controller"
+    ],
+    "test/rust-host/help-routes.test.mjs": [
+      "0c0548f97183924de28b58035612eb26866b2799 test(rust-host): run the help-route cases through one staged release"
+    ],
+    "test/scripts/run-tests.test.mjs": [
+      "7888c6632b134f6b95791ce83e27d2a721d80e3b test: keep every test process off the real claude CLI from the suite door"
+    ],
+    "test/scripts/test-proof-inventory.test.mjs": [
+      "7888c6632b134f6b95791ce83e27d2a721d80e3b test: keep every test process off the real claude CLI from the suite door",
+      "060caa637a7794b4b2fac52d83287a2e15d54011 test(suite): report what a change does to the suite and what one CLI call costs"
+    ],
+    "test/setup/checks-doctor-config.test.mjs": [
+      "7888c6632b134f6b95791ce83e27d2a721d80e3b test: keep every test process off the real claude CLI from the suite door"
+    ],
+    "test/setup/checks.test.mjs": [
+      "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+    ],
+    "test/suite-baseline.json": [
+      "4bb8058dc38585c191be637ff6ad526c72ee71b0 test(run-supervisor): retire five Node tests other proofs own",
+      "1887a7041a802ed4a2f111a1fc12f802d06532c4 test(terminal-control): retire three Node copies of cases the crate owns"
+    ],
+    "test/terminal-control/client-route.test.mjs": [
+      "a7689dd37d4fdf185b7651dba0c52d9c494cf755 Merge remote-tracking branch 'origin/main' into chore/test-governance-p2-p3",
+      "1887a7041a802ed4a2f111a1fc12f802d06532c4 test(terminal-control): retire three Node copies of cases the crate owns"
+    ]
+  },
+  "extractorsAgree": true,
+  "checkedBindings": [
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        10
+      ],
+      "claimId": "claim_ac8cc5d1152e7a057ffbef1e804079aa",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "oldPassage": {
+        "unitKind": "heading",
+        "level": 5,
+        "title": "Contributor hooks setup",
+        "anchor": "contributor-hooks-setup",
+        "githubAnchor": "contributor-hooks-setup",
+        "stableAnchor": "h-d6329adac9c0",
+        "startLine": 153,
+        "endLine": 153,
+        "textDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+        "sample": "Contributor hooks setup",
+        "sectionPayloadDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+        "followingBlockDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+        "identityFingerprint": "c4d5b89fd8ed99a07024c496386969022c40c075bf0bc95629b02860c583d086",
+        "ancestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail"
+        ],
+        "text": "##### Contributor hooks setup",
+        "sectionText": "##### Contributor hooks setup\n\n- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+      },
+      "currentPassage": {
+        "unitKind": "heading",
+        "level": 5,
+        "title": "Contributor hooks setup",
+        "anchor": "contributor-hooks-setup",
+        "githubAnchor": "contributor-hooks-setup",
+        "stableAnchor": "h-d6329adac9c0",
+        "startLine": 153,
+        "endLine": 153,
+        "textDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+        "sample": "Contributor hooks setup",
+        "sectionPayloadDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+        "followingBlockDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+        "identityFingerprint": "c4d5b89fd8ed99a07024c496386969022c40c075bf0bc95629b02860c583d086",
+        "ancestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail"
+        ],
+        "text": "##### Contributor hooks setup",
+        "sectionText": "##### Contributor hooks setup\n\n- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+      },
+      "drift": false,
+      "mainPathCommits": [
+        "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+      ]
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        11
+      ],
+      "claimId": "claim_5c58459a3d4fb3c94d3d177ae5ff71ad",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "oldPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-27",
+        "githubAnchor": "unheaded-block-27",
+        "stableAnchor": "unheaded-block-27",
+        "title": "Unheaded block 27",
+        "startLine": 155,
+        "endLine": 178,
+        "textDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+        "sample": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this re",
+        "identityFingerprint": "84d5b75480549a2ee4a9c52b20563ba7cc5eaff063b44f522cc44e5511acd3b5",
+        "ancestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Contributor hooks setup"
+        ],
+        "text": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+      },
+      "currentPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-27",
+        "githubAnchor": "unheaded-block-27",
+        "stableAnchor": "unheaded-block-27",
+        "title": "Unheaded block 27",
+        "startLine": 155,
+        "endLine": 178,
+        "textDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+        "sample": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this re",
+        "identityFingerprint": "84d5b75480549a2ee4a9c52b20563ba7cc5eaff063b44f522cc44e5511acd3b5",
+        "ancestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Contributor hooks setup"
+        ],
+        "text": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+      },
+      "drift": false,
+      "mainPathCommits": [
+        "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+      ]
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        12
+      ],
+      "claimId": "claim_2cca265eea57df2daf94c3b3876393f3",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "oldPassage": {
+        "unitKind": "heading",
+        "level": 5,
+        "title": "Setup",
+        "anchor": "setup",
+        "githubAnchor": "setup",
+        "stableAnchor": "h-8b25d66670bc",
+        "startLine": 180,
+        "endLine": 180,
+        "textDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+        "sample": "Setup",
+        "sectionPayloadDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+        "followingBlockDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+        "identityFingerprint": "451b3f0ee715b54c4437416eedc7d469d868d68b927ce27e9ace4b614d285d75",
+        "ancestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail"
+        ],
+        "text": "##### Setup",
+        "sectionText": "##### Setup\n\n- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+      },
+      "currentPassage": {
+        "unitKind": "heading",
+        "level": 5,
+        "title": "Setup",
+        "anchor": "setup",
+        "githubAnchor": "setup",
+        "stableAnchor": "h-8b25d66670bc",
+        "startLine": 180,
+        "endLine": 180,
+        "textDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+        "sample": "Setup",
+        "sectionPayloadDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+        "followingBlockDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+        "identityFingerprint": "451b3f0ee715b54c4437416eedc7d469d868d68b927ce27e9ace4b614d285d75",
+        "ancestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail"
+        ],
+        "text": "##### Setup",
+        "sectionText": "##### Setup\n\n- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+      },
+      "drift": false,
+      "mainPathCommits": [
+        "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+      ]
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        13
+      ],
+      "claimId": "claim_40d8d8f06aaedbc16cdcc4f8603e6d09",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "oldPassage": {
+        "unitKind": "heading",
+        "level": 5,
+        "title": "Doctor",
+        "anchor": "doctor",
+        "githubAnchor": "doctor",
+        "stableAnchor": "h-1d14ad78a4ae",
+        "startLine": 216,
+        "endLine": 216,
+        "textDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+        "sample": "Doctor",
+        "sectionPayloadDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+        "followingBlockDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+        "identityFingerprint": "a694327a97e6bc17eb43b0e007434c507ed05c3ed2f9f453246af7adb4cae615",
+        "ancestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail"
+        ],
+        "text": "##### Doctor",
+        "sectionText": "##### Doctor\n\n- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+      },
+      "currentPassage": {
+        "unitKind": "heading",
+        "level": 5,
+        "title": "Doctor",
+        "anchor": "doctor",
+        "githubAnchor": "doctor",
+        "stableAnchor": "h-1d14ad78a4ae",
+        "startLine": 216,
+        "endLine": 216,
+        "textDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+        "sample": "Doctor",
+        "sectionPayloadDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+        "followingBlockDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+        "identityFingerprint": "a694327a97e6bc17eb43b0e007434c507ed05c3ed2f9f453246af7adb4cae615",
+        "ancestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail"
+        ],
+        "text": "##### Doctor",
+        "sectionText": "##### Doctor\n\n- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+      },
+      "drift": false,
+      "mainPathCommits": [
+        "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+      ]
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        14
+      ],
+      "claimId": "claim_1b418e3e2ee62a83adc1420a4967de62",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "oldPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-29",
+        "githubAnchor": "unheaded-block-29",
+        "stableAnchor": "unheaded-block-29",
+        "title": "Unheaded block 29",
+        "startLine": 218,
+        "endLine": 232,
+        "textDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+        "sample": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not",
+        "identityFingerprint": "9dea4519717d2a2949595589e0a3cac9e1775ab91fe80629f3382c8e19176800",
+        "ancestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Doctor"
+        ],
+        "text": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+      },
+      "currentPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-29",
+        "githubAnchor": "unheaded-block-29",
+        "stableAnchor": "unheaded-block-29",
+        "title": "Unheaded block 29",
+        "startLine": 218,
+        "endLine": 232,
+        "textDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+        "sample": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not",
+        "identityFingerprint": "9dea4519717d2a2949595589e0a3cac9e1775ab91fe80629f3382c8e19176800",
+        "ancestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Doctor"
+        ],
+        "text": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+      },
+      "drift": false,
+      "mainPathCommits": [
+        "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+      ]
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "registryGaps",
+        5
+      ],
+      "claimId": "claim_891db485a75cdb558cf725c3315f3857",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "oldPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-28",
+        "githubAnchor": "unheaded-block-28",
+        "stableAnchor": "unheaded-block-28",
+        "title": "Unheaded block 28",
+        "startLine": 182,
+        "endLine": 214,
+        "textDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+        "sample": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for ev",
+        "identityFingerprint": "48447621ee00b66d1bf54560f32c99d5392879efb1c1bfe602dfffdd88856907",
+        "ancestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Setup"
+        ],
+        "text": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+      },
+      "currentPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-28",
+        "githubAnchor": "unheaded-block-28",
+        "stableAnchor": "unheaded-block-28",
+        "title": "Unheaded block 28",
+        "startLine": 182,
+        "endLine": 214,
+        "textDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+        "sample": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for ev",
+        "identityFingerprint": "48447621ee00b66d1bf54560f32c99d5392879efb1c1bfe602dfffdd88856907",
+        "ancestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Setup"
+        ],
+        "text": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+      },
+      "drift": false,
+      "mainPathCommits": [
+        "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+      ]
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "keys": [
+        "registryGaps",
+        12
+      ],
+      "claimId": "claim_acd9a23bb5fe3a5dda7169c04a12b409",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "oldPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 26,
+        "textDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
+        "sample": "```txt\nDocument type: Contract\nAudience: Maintainer, implementation agent, reviewer\nPurpose: Define the doctor/fix registry contract and legacy setup compatibility used by packagin",
+        "identityFingerprint": "f35630a577a3a4ffe9cde926613961474ed4cf79e29bfabf3d1df18722d0892d",
+        "ancestry": [
+          "Contract: Setup Doctor Registry"
+        ],
+        "text": "```txt\nDocument type: Contract\nAudience: Maintainer, implementation agent, reviewer\nPurpose: Define the doctor/fix registry contract and legacy setup compatibility used by packaging-distribution\nDesign status: Draft\nImplementation status: Implemented\nCanonical: Yes, after review\nOwner: Platform documentation\nSource type: Promoted from docs/specs/distribution.md and src/setup/**\nLast reviewed: 2026-09-13\nRelated:\n- src/setup/checks.mjs\n- src/setup/registrations.mjs\n- bin/fgos.mjs\n- test/setup/registrations.test.mjs\nImplementation: Original section-specific implementation statements retained; carriage is pending independent review\nProvenance: Existing area document plus source-detail carriage at 77830ba77eb05991d95b005919776ee6254e833b\nWriter type: Human + agent coauthor\nCanonical for: The topic stated by this document, subject to the unchanged switchboard route and independent review\nUse this when: Reading this area topic and its retained design details\nDo not use this for: Claiming a truth review or an authority cutover from carriage alone\nSupersedes: No authority transition in this carriage pass\nSuperseded by: None recorded\n```"
+      },
+      "currentPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 26,
+        "textDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
+        "sample": "```txt\nDocument type: Contract\nAudience: Maintainer, implementation agent, reviewer\nPurpose: Define the doctor/fix registry contract and legacy setup compatibility used by packagin",
+        "identityFingerprint": "f35630a577a3a4ffe9cde926613961474ed4cf79e29bfabf3d1df18722d0892d",
+        "ancestry": [
+          "Contract: Setup Doctor Registry"
+        ],
+        "text": "```txt\nDocument type: Contract\nAudience: Maintainer, implementation agent, reviewer\nPurpose: Define the doctor/fix registry contract and legacy setup compatibility used by packaging-distribution\nDesign status: Draft\nImplementation status: Implemented\nCanonical: Yes, after review\nOwner: Platform documentation\nSource type: Promoted from docs/specs/distribution.md and src/setup/**\nLast reviewed: 2026-09-13\nRelated:\n- src/setup/checks.mjs\n- src/setup/registrations.mjs\n- bin/fgos.mjs\n- test/setup/registrations.test.mjs\nImplementation: Original section-specific implementation statements retained; carriage is pending independent review\nProvenance: Existing area document plus source-detail carriage at 77830ba77eb05991d95b005919776ee6254e833b\nWriter type: Human + agent coauthor\nCanonical for: The topic stated by this document, subject to the unchanged switchboard route and independent review\nUse this when: Reading this area topic and its retained design details\nDo not use this for: Claiming a truth review or an authority cutover from carriage alone\nSupersedes: No authority transition in this carriage pass\nSuperseded by: None recorded\n```"
+      },
+      "drift": false,
+      "mainPathCommits": [
+        "4cd418c6a76e86d3e39a3b5d9536a5abefc2e68f feat(git): doctor reports retained Land candidates"
+      ]
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-holder-lock-predecessor.json",
+      "keys": [
+        "registryGaps",
+        0
+      ],
+      "claimId": "claim_7cfb055e3f10b99944ffec46ce877653",
+      "targetOwner": "docs/platform/holder-lock/spec.md",
+      "oldPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 23,
+        "textDigest": "5eee8f4b7712d514006c2e0340d8adc366bcae5c04e81b21e6a2b4dd12845d92",
+        "sample": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel l",
+        "identityFingerprint": "fd0a9eefc497a5dd9dcd4f3a0e38bf035576d840c4f245f93fcff15404290228",
+        "ancestry": [
+          "Holder-lock Component Specification"
+        ],
+        "text": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port\nDesign status: Accepted\nImplementation status: In progress (contracts and registry landed; crate, routes, Node facade, fences, fgctl gate and the cutover of ten locks land in parallel phases; the main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17 and land with the main-door track; the hot state mutex stays with the state store pending implementation of the signed Event Store decision D-ADR0055, section 15)\nCanonical: Yes\nOwner: Holder-lock component\nSource: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)\nContracts: packages/holder-lock/contracts/\nLast reviewed: 2026-10-17\nRelated:\n- docs/platform/process/spec.md\n- docs/platform/component-boundary.md\n- docs/platform/session-identity/spec.md\n- docs/specs/distribution.md\n- docs/specs/runner.md\n- plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md\n- plans/261016-1306-main-checkout-single-door-hot-lock/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+      },
+      "currentPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 23,
+        "textDigest": "5eee8f4b7712d514006c2e0340d8adc366bcae5c04e81b21e6a2b4dd12845d92",
+        "sample": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel l",
+        "identityFingerprint": "fd0a9eefc497a5dd9dcd4f3a0e38bf035576d840c4f245f93fcff15404290228",
+        "ancestry": [
+          "Holder-lock Component Specification"
+        ],
+        "text": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port\nDesign status: Accepted\nImplementation status: In progress (contracts and registry landed; crate, routes, Node facade, fences, fgctl gate and the cutover of ten locks land in parallel phases; the main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17 and land with the main-door track; the hot state mutex stays with the state store pending implementation of the signed Event Store decision D-ADR0055, section 15)\nCanonical: Yes\nOwner: Holder-lock component\nSource: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)\nContracts: packages/holder-lock/contracts/\nLast reviewed: 2026-10-17\nRelated:\n- docs/platform/process/spec.md\n- docs/platform/component-boundary.md\n- docs/platform/session-identity/spec.md\n- docs/specs/distribution.md\n- docs/specs/runner.md\n- plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md\n- plans/261016-1306-main-checkout-single-door-hot-lock/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+      },
+      "drift": false,
+      "mainPathCommits": [
+        "9d33e7869ae573670aa00c5256088848d3fe88f8 docs(holder-lock): note that an old payload's quiescence scan misses linked worktrees"
+      ]
+    }
+  ],
+  "successorGroupMemberChecks": [],
+  "entries": [],
+  "parked": [],
+  "needsWrites": [],
+  "counts": {
+    "directChecked": 8,
+    "groupMembersChecked": 0,
+    "changedBindings": 0,
+    "pendingReview": 0
+  },
+  "phase9ConservationUnionAdditions": [
+    "docs/platform/git/spec.md",
+    "docs/platform/holder-lock/spec.md",
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+    "docs/platform/proposals/documentation-system-unification.md"
+  ],
+  "acceptance": "Author binding verification only; final Step 7 composition, independent review and real runner commit L12-11 accounting remain owed."
+}

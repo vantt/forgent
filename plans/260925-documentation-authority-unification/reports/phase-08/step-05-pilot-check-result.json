@@ -27,21 +27,23 @@
     "c-render-owner": "Every generated source-copy reference/tuple derives its disposition from the exact source owner; a park cites an actually parked source owner.",
     "d-own-operand": "Each admitted dynamic tuple has its exact document-yielding sub-expression pathOperand in its pinned passage; every rejection names a closed R5 nonDocumentUse category.",
     "e-retired-successor": "Preserved retired decision citations carry a live successorNote with a real heading anchor.",
-    "r11-plans-boundary": "R11: an operation rooted only in plans/** is rejected as plans-report-artifact; trace pinned declarations and imported constants, not adjacent context."
+    "r11-plans-boundary": "R11: an operation rooted only in plans/** is rejected as plans-report-artifact; trace pinned declarations and imported constants, not adjacent context.",
+    "r30-state-operand": "R30/R31: independently swept real-project state/registry document operands, including messages, exclusions and outputs, cannot be rejected as scalar pass-through; sandbox literals retain their construction owner.",
+    "park-index": "Every parked owning item is explicitly listed in its record parked index."
   },
   "checks": {
     "coverage": 2206,
     "source-pins": 37,
     "passage-outcome": 33,
     "inherited-outcome": 25,
-    "receipts": 424,
+    "receipts": 430,
     "retiring-retained": 149,
     "source-spans": 2166,
-    "parks": 60,
+    "parks": 66,
     "fixture-provenance": 14,
-    "rejections": 1782,
+    "rejections": 1776,
     "pinned-passage": 2017,
-    "dynamic-operand": 245,
+    "dynamic-operand": 251,
     "patches": 37,
     "generated": 37,
     "co-cut-grep": 18,
@@ -52,8 +54,10 @@
     "setup": 1,
     "review": 78,
     "a-passage-agreement": 273,
-    "b-real-blocker": 68,
-    "d-own-operand": 2017
+    "park-index": 74,
+    "b-real-blocker": 74,
+    "d-own-operand": 2017,
+    "r30-state-operand": 13
   },
   "files": 37,
   "literalReferences": 149,
@@ -4015,7 +4019,7 @@
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "pinnedHash": "3893f566d0b7697cef6dc4af17184faea4c477a5d17c257763db0b4f65f163a0",
-      "headHash": "4e4a70076ed3ccbfdd1c331d376c6c2ef6d5127cfeb1a4f1497ac14a68bdcef1",
+      "headHash": "803ae0bcf0813b055b24b900979a2509f63a010625bff6b4189ceddbe93b47b6",
       "movedSpans": [
         {
           "id": "dynamic-013639",
@@ -5927,7 +5931,7 @@
       },
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "pinnedHash": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "headHash": "eac44ceb1bd5bb132964989720ea5b0fde09137aaa0ef0f6e22a70c53aeacdb5",
+      "headHash": "663a00e2343ba794686afdd6e8d08b15c5f3b6fd0cdfec9e7d6203eb04e6585c",
       "movedSpans": [
         {
           "id": "reference-003801",
