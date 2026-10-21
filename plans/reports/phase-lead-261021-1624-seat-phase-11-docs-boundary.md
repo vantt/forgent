@@ -86,4 +86,4 @@ By commit: D1 src +31/-35 tests +40; trims src +2/-7 tests +4/-781; Work path sr
 
 ### Verification
 
-393 test files (runner, runner/execution, cli, e2e, direct, verbs, workflow, setup, seat-binding, parity, intake, scripts, docs, architecture) each run alone: all pass except `active-release-drift-check` (needs a release build; red on the base). `test/run-supervisor/terminal-cutover` and `terminal-crash-matrix` fail the same way on the track checkout without these changes (they need a real release host and a fake herdr). `npm test` and cargo not run.
+393 test files (runner, runner/execution, cli, e2e, direct, verbs, workflow, setup, seat-binding, parity, intake, scripts, docs, architecture) each run alone: all pass except `active-release-drift-check` (needs a release build; red on the base). `test/run-supervisor/terminal-cutover` fails the same way on the track checkout without these changes (checked), and `terminal-crash-matrix` uses the same harness (not checked); both need a real release host and a fake herdr. `npm test` and cargo not run.
