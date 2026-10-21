@@ -296,15 +296,18 @@ test('finalize-home refuses a home whose marker is another attempt or version 1,
   }
 });
 
+// A step runs with the FGOS_* variables of its runner (attemptStepEnv), which is how the entry finds the native door.
+const doorEnv = () => Object.fromEntries(Object.entries(process.env).filter(([name]) => name.startsWith('FGOS_') && name !== 'FGOS_STATE_ROOT'));
+
 test('the entry reports a missing step variable and a payload the envelope does not name', async () => {
   const w = workspace();
   try {
     const { runDir, envelope } = attempt(w, { receipt: { outcome: 'exited', gateExit: gateExit() } });
-    const noHome = spawnSync(process.execPath, [ENTRY, 'finalize-home', '--run-dir', runDir], { env: { PATH: process.env.PATH, FGOS_STATE_ROOT: w.stateRoot }, encoding: 'utf8' });
+    const noHome = spawnSync(process.execPath, [ENTRY, 'finalize-home', '--run-dir', runDir], { env: { PATH: process.env.PATH, ...doorEnv(), FGOS_STATE_ROOT: w.stateRoot }, encoding: 'utf8' });
     assert.equal(noHome.status, 65);
     assert.match(JSON.parse(noHome.stdout).message, /lacks HOME/);
 
-    const ok = spawnSync(process.execPath, [ENTRY, 'finalize-home', '--run-dir', runDir], { env: { PATH: process.env.PATH, ...w.env }, encoding: 'utf8' });
+    const ok = spawnSync(process.execPath, [ENTRY, 'finalize-home', '--run-dir', runDir], { env: { PATH: process.env.PATH, ...doorEnv(), ...w.env }, encoding: 'utf8' });
     assert.equal(ok.status, 0, ok.stdout + ok.stderr);
     assert.equal(JSON.parse(ok.stdout).result, 'done');
 

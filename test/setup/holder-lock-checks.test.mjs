@@ -30,7 +30,7 @@ const {
 } = await import('../../src/setup/holder-lock-checks.mjs');
 const { fenceStatus, placeFences } = await import('../../src/holder-lock/fences.mjs');
 const { descriptionHolders } = await import('../../src/holder-lock/driver.mjs');
-const { getBootId, getPidNs, getProcessStartTime } = await import('../../src/runner/dispatch/process-identity.mjs');
+const { observe } = await import('../../src/runner/dispatch/process-identity.mjs');
 
 const HOST_BIN = process.env.FGOS_HOST_BIN;
 const STATE_ROOT = process.env.FGOS_STATE_ROOT;
@@ -299,7 +299,7 @@ test('lock-holders: a predecessor domain that is still running warns with the do
   const gate = spawn('sleep', ['30'], { stdio: 'ignore' });
   children.add(gate);
   await new Promise((resolve) => { gate.once('spawn', resolve); });
-  const domainId = { host: os.hostname(), bootId: getBootId(), pidNs: getPidNs(), pid: gate.pid, startTime: getProcessStartTime(gate.pid) };
+  const { kind: _kind, ...domainId } = observe(gate.pid);
   fs.writeFileSync(`${lockFile}.predecessor.json`, JSON.stringify({ v: 1, domainKind: 'linux-gate', domainId }));
   const live = checkLockHolders(root);
   assert.match(live.message, /^warning: runner: .*runner\.lock\.predecessor\.json: linux-gate domain .* is not empty \(alive\)/);

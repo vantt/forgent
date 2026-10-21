@@ -14,20 +14,13 @@ import { dispatchCwdHolder } from '../runner/dispatch/cwd-lock.mjs';
 import { gateAnswerFile } from '../runner/execution/handoff-refs.mjs';
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 import { unbindWorktree } from './case-bindings.mjs';
+import { installOnce, replaceDurably } from '../native/door.mjs';
 
 const caseDir = (mainRoot, caseId) => path.join(mainRoot, '.fgos', 'workflow-runs', caseId);
 
 function writeJsonAtomic(file, value) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  const tmp = `${file}.${process.pid}.tmp`;
-  const fd = fs.openSync(tmp, 'w');
-  try {
-    fs.writeSync(fd, JSON.stringify(value));
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
-  }
-  fs.renameSync(tmp, file);
+  replaceDurably(path.dirname(file), path.basename(file), JSON.stringify(value), 0o644);
 }
 
 const readJson = (file) => {
@@ -193,18 +186,8 @@ export function recordGateAnswerRound({ mainRoot, caseId, events, stepId, answer
   const record = { stepId, occurrence, round, answer: String(answer), approved: approved === true, settles: settlesNow, mode, question, subjectDigest, answeredAt };
   fs.mkdirSync(dir, { recursive: true });
   const target = path.join(dir, `${occurrence}-${round}.json`);
-  let fd;
-  try {
-    fd = fs.openSync(target, 'wx');
-  } catch (err) {
-    if (err.code === 'EEXIST') throw new RunnerConfigError(`gate "${stepId}" was answered at the same moment by another process`, { code: 'gate-already-answered' });
-    throw err;
-  }
-  try {
-    fs.writeSync(fd, JSON.stringify(record));
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
+  if (installOnce(dir, path.basename(target), JSON.stringify(record), 0o644) === 'already-exists') {
+    throw new RunnerConfigError(`gate "${stepId}" was answered at the same moment by another process`, { code: 'gate-already-answered' });
   }
   renderGateAnswerFile(mainRoot, caseId, stepId);
   return { stepId, occurrence, round, settles: settlesNow };

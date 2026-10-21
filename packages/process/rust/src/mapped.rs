@@ -234,8 +234,13 @@ mod posix {
             .map(|(_, v)| v.clone())
             .or_else(|| if request.clear_env { None } else { std::env::var_os("PATH") })
             .unwrap_or_else(|| OsString::from("/usr/bin:/bin"));
-        let cwd = std::env::current_dir()?;
-        let cwd = request.cwd.as_ref().map_or(cwd.clone(), |p| cwd.join(p));
+        let cwd = match &request.cwd {
+            Some(p) if p.is_absolute() => p.clone(),
+            other => {
+                let here = std::env::current_dir()?;
+                other.as_ref().map_or(here.clone(), |p| here.join(p))
+            }
+        };
         let mut denied = false;
         for dir in std::env::split_paths(&path) {
             let candidate = cwd.join(dir).join(name);

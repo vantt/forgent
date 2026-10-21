@@ -5,7 +5,7 @@ import { EventEmitter } from 'node:events';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
 import { pathToFileURL } from 'node:url';
 
@@ -1377,18 +1377,14 @@ test('failures closer together than the minimum interval are counted once, and t
   } finally { process.stderr.write = realWrite; w.cleanup(); }
 });
 
-test('the marker is rewritten through a rename, and a marker that cannot be read stops the removal', () => {
+test('the marker is rewritten whole, and a marker that cannot be read stops the removal', () => {
   const w = workspace();
   try {
     const dir = privateHomeWithRenewedLogin(w);
     const marker = path.join(dir, OWNERSHIP_MARKER_FILE);
-    const renamed = [];
-    const realRename = fs.renameSync;
-    fs.renameSync = (from, to) => { renamed.push(to); return realRename(from, to); };
-    try { extendOwnershipMarker(dir, { credentialKept: { attempts: 1 } }); } finally { fs.renameSync = realRename; }
-    assert.deepEqual(renamed, [marker], 'written to a temp file and renamed over the marker');
+    extendOwnershipMarker(dir, { credentialKept: { attempts: 1 } });
     assert.equal(markerOf(dir).credentialKept.attempts, 1);
-    assert.deepEqual(fs.readdirSync(dir).filter((n) => /\.fgos-\d+-/.test(n)), [], 'no temp file is left behind');
+    assert.deepEqual(fs.readdirSync(dir).filter((n) => /\.tmp$/.test(n)), [], 'no temp file is left behind');
 
     // A torn marker (a writer died half-way) does not prove the home holds no login.
     fs.writeFileSync(marker, '{"contract": "');
@@ -2024,6 +2020,49 @@ test('an interrupted staging is reported once its writer is gone and it has sat 
     w.put(`.tmp-${process.pid}-bbbb`, { 'auth.json': 'LIVE' });
     const found = inspectRetainedCredentialCopies({ runtimeDir: w.runtimeDir, now: Date.now() });
     assert.deepEqual(found.map((c) => [c.provider, c.accountId, c.kind]), [['xai', 'acct', 'staging']]);
+  } finally { w.cleanup(); }
+});
+
+test('a staging whose writer is a zombie is reported: a writer that has exited is gone even before its parent reaps it', () => {
+  if (process.platform !== 'linux') return;
+  const w = interruptedStagingWorkspace();
+  const files = path.join(w.runtimeDir, 'zombie-fixture');
+  fs.mkdirSync(files, { recursive: true });
+  const zombieFile = path.join(files, 'zombie.pid');
+  const parentFile = path.join(files, 'parent.pid');
+  // `sleep` never reaps: it is the parent of a child that exited at once, which stays a zombie.
+  execFileSync('sh', ['-c', `setsid sh -c 'sh -c "exit 0" & echo $! > "$0"; echo $$ > "$1"; exec sleep 300' "$0" "$1" </dev/null >/dev/null 2>&1 &`, zombieFile, parentFile]);
+  let parentPid = null;
+  try {
+    const deadline = Date.now() + 5000;
+    let zombiePid;
+    for (;;) {
+      try {
+        zombiePid = Number(fs.readFileSync(zombieFile, 'utf8').trim());
+        parentPid = Number(fs.readFileSync(parentFile, 'utf8').trim());
+        const stat = fs.readFileSync(`/proc/${zombiePid}/stat`, 'utf8');
+        if (stat.slice(stat.lastIndexOf(')') + 2, stat.lastIndexOf(')') + 3) === 'Z') break;
+      } catch { /* not written yet */ }
+      assert.ok(Date.now() < deadline, 'the fixture never produced a zombie');
+      execFileSync('sleep', ['0.05']);
+    }
+    w.put(`.tmp-${zombiePid}-zzzz`, { 'auth.json': 'PART' });
+    const found = inspectRetainedCredentialCopies({ runtimeDir: w.runtimeDir, now: Date.now() });
+    assert.deepEqual(found.map((c) => c.kind), ['staging']);
+  } finally {
+    if (parentPid) { try { process.kill(parentPid, 'SIGKILL'); } catch { /* gone */ } }
+    w.cleanup();
+  }
+});
+
+test('a staging that holds a leftover durable-file temporary still digests equal to its kept twin and is reaped', () => {
+  const w = interruptedStagingWorkspace();
+  try {
+    const dead = deadPid();
+    w.put('000000000001000-aaaa', { 'auth.json': 'KEPT' });
+    const leftover = w.put(`.tmp-${dead}-leftover`, { 'auth.json': 'KEPT', [`.durable-file-${dead}-3.tmp`]: 'KEPT' });
+    assert.deepEqual(sweepInterruptedStagings({ runtimeDir: w.runtimeDir }), { removed: 1, kept: 0 });
+    assert.equal(fs.existsSync(leftover), false);
   } finally { w.cleanup(); }
 });
 

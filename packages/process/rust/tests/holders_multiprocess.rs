@@ -92,7 +92,7 @@ fn a_child_holding_flock_is_listed_and_disappears_when_it_dies() {
     assert_eq!(pids, vec![child.id()], "exactly the child holds the lock: {listed:?}");
     if let Holders::List(holders) = &listed {
         let tuple = &holders[0];
-        assert_eq!(Some(tuple.start_time.clone()), facts::start_time(ProcId(child.id())));
+        assert_eq!(Some(tuple.start_time.clone()), facts::identity_of(ProcId(child.id())).map(|t| t.start_time));
         assert_eq!(tuple.host, facts::host());
     }
 
@@ -137,7 +137,7 @@ fn scan_sees_a_child_by_its_environment_and_names_what_it_cannot_read() {
     };
     let view = views.iter().find(|v| v.pid.0 == child.id()).expect("the child is in the scan");
     assert_eq!(view.tuple.as_ref().map(|t| t.pid), Some(view.pid), "our own child is identified");
-    assert_eq!(view.tuple.as_ref().and_then(|t| facts::start_time(t.pid)), view.tuple.as_ref().map(|t| t.start_time.clone()));
+    assert_eq!(view.tuple.as_ref().and_then(|t| facts::identity_of(t.pid)).map(|t| t.start_time), view.tuple.as_ref().map(|t| t.start_time.clone()));
     assert_eq!(view.env_subset.get("FGOS_STATE_ROOT"), Some(&state_root.to_string_lossy().into_owned()));
     assert_eq!(view.cmdline.as_ref().and_then(|c| c.first()).map(String::as_str), Some("sleep"));
     assert_eq!(view.cwd.as_deref(), Some(std::env::current_dir().unwrap().as_path()));

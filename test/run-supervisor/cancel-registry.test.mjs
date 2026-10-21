@@ -69,6 +69,17 @@ test('a request names who asked and stands once written', () => {
   assert.match(file.requestedBy, /controller pid/);
 });
 
+// The supervisor compares the requester's pidNs with its own, which it reads in the namespace
+// form (`pid:[N]` on Linux, `none` where there are none); a bare inode number never matches it.
+test("the cancel request's self tuple uses the pidNs form the supervisor compares (pid:[N] on Linux, none elsewhere)", () => {
+  const dir = makeFixtureDir('cancel-request-pidns-');
+  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ attemptId: 'att-1', unitRunId: 'unit-1' }));
+  assert.equal(requestCancel(dir, 'SIGINT'), true);
+  const { requester } = readJson(path.join(dir, 'cancel-requested.json'));
+  const expected = process.platform === 'linux' ? fs.readlinkSync('/proc/self/ns/pid') : 'none';
+  assert.equal(requester.pidNs, expected);
+});
+
 test('1. SIGINT after the binding: cancel request, receipt cancelled, the resume line, exit 130 within the wait', { skip, timeout: 240_000 }, async () => {
   const project = createProject({ agent: { runMs: 120_000 }, timeoutMs: 180_000, dispatch: { gateKillGraceMs: 1000 } });
   const run = startController(project, project.unitFile('cancel-sigint'));

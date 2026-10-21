@@ -36,6 +36,7 @@ const SECRET_KEY_PATTERN = /token|secret|password|credential|apiKey|privateKey|a
  * @param {unknown} value
  * @returns {string}
  */
+// Not the door's canonicalJson: the persisted hashes cover live inputs whose members can be `undefined`, which this form writes and the door drops, so moving it changes stored provenance (a separate decision).
 export function canonicalJson(value) {
   if (value === null || typeof value !== 'object') {
     return JSON.stringify(value);

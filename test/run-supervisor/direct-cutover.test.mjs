@@ -93,6 +93,27 @@ test('the step environment carries the state root and PATH and never a lock desc
   for (const name of ['FGOS_LOCK_FD', 'FGOS_LOCK_JOB', 'FGOS_RUST_HOST_RECURSION_GUARD', 'SECRET_API_KEY']) assert.equal(name in env, false, name);
 });
 
+// A pin on every platform: where there is no boot id to read, the envelope still carries a string, so the
+// supervisor's boot comparison never meets a missing field.
+test('every envelope deadline carries a string bootId on every platform', (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-envelope-boot-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const runDir = path.join(dir, 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  prepareAttemptFiles(runDir, 'att-1');
+  const body = buildEnvelope({
+    attemptId: 'att-1', unitRunId: 'unit-1', runDir, host: { hostBin: '/h/fgos', payloadRoot: '/h/payload' }, cwd: dir, mutating: false,
+    attempt: { command: '/bin/agent', args: [], env: { PATH: '/bin' }, bwrapPrefix: ['--unshare-pid', '--'], bwrapExecutable: '/usr/bin/bwrap' },
+    timeoutMs: 60_000, idleTimeoutMs: null, cli: 'claude', stepEnv: { PATH: '/bin', FGOS_STATE_ROOT: '/state', HOME: '/h' },
+    gateKillGraceMs: 1000, killWaitMs: 1000,
+  });
+  const envelope = writeAttemptFiles({ runDir, body, secretEnv: { PATH: '/bin' }, controlEpoch: 1, controlToken: 't' });
+  for (const [name, at] of [['createdAt', envelope.createdAt], ['softAt', envelope.deadlines.softAt], ['hardCeiling', envelope.deadlines.hardCeiling]]) {
+    assert.equal(typeof at.bootId, 'string', `${name}.bootId`);
+    assert.notEqual(at.bootId, '', `${name}.bootId`);
+  }
+});
+
 test('the envelope is immutable, digest-checked and secret-free; the side file is 0600 and holds the secrets and the control token', (t) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-envelope-'));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));

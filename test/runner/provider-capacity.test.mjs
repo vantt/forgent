@@ -26,7 +26,7 @@ import {
   validateProviderAccountInventory,
 } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { reconcileProviderCapacityQuarantineUseCase } from '../../src/verbs/dispatch/reconcile.mjs';
-import { getProcessStartTime } from '../../src/runner/dispatch/process-identity.mjs';
+import { selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
 import { lockHolders, resolveLockRoot } from '../../src/holder-lock/index.mjs';
 
 // Every lock here is machine-scoped under the state root: a private root keeps this file's locks off
@@ -39,7 +39,7 @@ const PROVIDER_CAPACITY_MJS = path.resolve(fileURLToPath(import.meta.url), '../.
 // Linux -- elsewhere resolveHolderLiveness has nothing to cross-check
 // against and fails closed to 'held' by contract (process-identity.mjs's
 // own documented decision table).
-const HAS_PROC_START_TIME = getProcessStartTime(process.pid) !== null;
+const HAS_PROC_START_TIME = typeof selfRecord().startTime === 'string';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-capacity-test-'));

@@ -14,7 +14,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { hotPaths, readHotRecord, withStateTx } from '../../src/state/hot-lock.mjs';
+import { hotPaths, judgeHotRecord, readHotRecord, withStateTx } from '../../src/state/hot-lock.mjs';
+import { observe } from '../../src/runner/dispatch/process-identity.mjs';
 import { resolveWriterIdentity, IDENTITY_ENV_KEYS } from '../../src/util/session-identity.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
@@ -291,5 +292,23 @@ test('fast path: uncontended acquire and release is not more than 10% slower tha
     assert.ok(ratio <= 1.1, `fast path ratio ${ratio.toFixed(3)} exceeds 1.10`);
   } finally {
     f.cleanup();
+  }
+});
+
+// The hot lock judges a holder's record through the process door, the same on every platform.
+test('judgeHotRecord: a live holder with its recorded start time is alive, another start time is a reused pid, a killed holder is dead, a live holder without a start time stays unknown', async () => {
+  const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
+  const exited = new Promise((resolve) => child.on('exit', resolve));
+  try {
+    const { pid, startTime, bootId, pidNs } = observe(child.pid);
+    const record = { v: 1, pid, startTime, bootId, pidNs };
+    assert.equal(judgeHotRecord(record), 'alive');
+    assert.equal(judgeHotRecord({ ...record, startTime: `${startTime}0` }), 'dead');
+    assert.equal(judgeHotRecord({ v: 1, pid }), 'unknown');
+    child.kill('SIGKILL');
+    await exited;
+    assert.equal(judgeHotRecord(record), 'dead');
+  } finally {
+    child.kill('SIGKILL');
   }
 });

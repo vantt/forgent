@@ -16,13 +16,13 @@ import { inspectDispatchRuntime, clearAllRunsCache, withRunsCache } from './runt
 // test/runner/dispatch-reconciliation-import-graph.test.mjs).
 import { RUN_STATUSES } from './visibility-session.mjs';
 import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
+import { canonicalJson } from '../../native/door.mjs';
 // The lock door: reconcile's own apply mutex and the per-cwd dispatch lock it
 // reports on are kernel locks (the import-graph test pins the door's files).
 import { acquireSync, createLockScope } from '../../holder-lock/index.mjs';
 import { dispatchCwdHolder } from './cwd-lock.mjs';
 
-const stable = (v) => v && typeof v === 'object' ? (Array.isArray(v) ? `[${v.map(stable).join(',')}]` : `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}:${stable(v[k])}`).join(',')}}`) : JSON.stringify(v);
-const digest = (v) => `sha256:${createHash('sha256').update(stable(v)).digest('hex')}`;
+const digest = (v) => `sha256:${createHash('sha256').update(canonicalJson(v)).digest('hex')}`;
 const json = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return undefined; } };
 // The Run's REAL control epoch, off run-lock.mjs's own generation ledger
 // (`control/generations/`) -- never a `controlEpoch` field copied onto some
@@ -59,7 +59,7 @@ const expires = (now, ttlMs) => new Date(Date.parse(now) + ttlMs).toISOString();
 // per-call check, against that vocabulary ever dropping 'settled'.
 const SETTLED_STATUS = 'settled';
 if (!RUN_STATUSES.includes(SETTLED_STATUS)) throw new Error('reconciliation-planner: repair-projection target status must be a member of visibility-session.mjs RUN_STATUSES');
-const actionKey = (snapshot, action, expiresAt) => `reconcile_${createHash('sha256').update(stable({ snapshot, action, expiresAt })).digest('hex')}`;
+const actionKey = (snapshot, action, expiresAt) => `reconcile_${createHash('sha256').update(canonicalJson({ snapshot, action, expiresAt })).digest('hex')}`;
 
 function actionLog(root) { return path.join(root, '.fgos', 'dispatch', 'reconciliation-actions.jsonl'); }
 function resultFile(runDir) { return path.join(runDir, 'result.json'); }
@@ -237,7 +237,7 @@ function applyCollectResult(root, plan, { now }) {
     // proposedAction.path is never trusted as the mutation target until it is
     // proven identical to what a fresh, from-scratch plan computes right now.
     const fresh = planCollectResult(root, { runId, now, ttlMs: Math.max(0, Date.parse(plan.snapshot.expiresAt) - Date.parse(now)) });
-    if (fresh.outcome !== 'planned' || stable(fresh.proposedAction) !== stable(plan.proposedAction) || stable(fresh.snapshot) !== stable(plan.snapshot)) {
+    if (fresh.outcome !== 'planned' || canonicalJson(fresh.proposedAction) !== canonicalJson(plan.proposedAction) || canonicalJson(fresh.snapshot) !== canonicalJson(plan.snapshot)) {
       return { outcome: fresh.outcome === 'blocked' ? 'blocked' : 'plan-stale', reason: fresh.reason ?? 'run facts changed since planning' };
     }
     const expectedActionKey = actionKey(fresh.snapshot, fresh.proposedAction, fresh.snapshot.expiresAt);
@@ -301,7 +301,7 @@ function applyRepairProjection(root, plan, { now }) {
     // proposedAction.path is never trusted as the mutation target until it is
     // proven identical to what a fresh, from-scratch plan computes right now.
     const fresh = planRepairProjection(root, { runId, now, ttlMs: Math.max(0, Date.parse(plan.snapshot.expiresAt) - Date.parse(now)) });
-    if (fresh.outcome !== 'planned' || stable(fresh.proposedAction) !== stable(plan.proposedAction) || stable(fresh.snapshot) !== stable(plan.snapshot)) {
+    if (fresh.outcome !== 'planned' || canonicalJson(fresh.proposedAction) !== canonicalJson(plan.proposedAction) || canonicalJson(fresh.snapshot) !== canonicalJson(plan.snapshot)) {
       return { outcome: fresh.outcome === 'blocked' ? 'blocked' : 'plan-stale', reason: fresh.reason ?? 'projection facts changed since planning' };
     }
     const expectedActionKey = actionKey(fresh.snapshot, fresh.proposedAction, fresh.snapshot.expiresAt);
@@ -341,7 +341,7 @@ export function applyReconciliation(root, plan, { now = new Date().toISOString()
     if (plan?.proposedAction?.kind === 'repair-projection') return applyRepairProjection(root, plan, { now });
     const canonical = canonicalAction(plan?.proposedAction?.kind, plan?.proposedAction?.cwd);
     if (!plan?.actionKey || !plan?.snapshot || !canonical) return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };
-    if (stable(plan.proposedAction) !== stable(canonical)) return { outcome: 'plan-stale', reason: 'reconcile action target is not the canonical guard target' };
+    if (canonicalJson(plan.proposedAction) !== canonicalJson(canonical)) return { outcome: 'plan-stale', reason: 'reconcile action target is not the canonical guard target' };
     // clear-cwd-lock never plans a mutation (a kernel lock has no dead
     // holder's file to clear), so applying one only reports today's facts.
     const fresh = planReconciliation(root, { action: canonical.kind, cwd: canonical.cwd, now });

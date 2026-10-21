@@ -1,4 +1,4 @@
-use fgos_durable_file::{install_once, Installed};
+use fgos_durable_file::{install_once, install_with, FileSystem, Installed};
 use std::{
     fs,
     path::PathBuf,
@@ -67,6 +67,20 @@ fn concurrent_writers_have_exactly_one_winner() {
         vec![winners[0].0; 8192]
     );
     assert_eq!(fs::read_dir(&dir.0).unwrap().count(), 1);
+    // A loser installed nothing, so it makes no directory durable.
+    struct Steps(std::sync::Mutex<Vec<&'static str>>);
+    impl FileSystem for Steps {
+        fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+            self.0.lock().unwrap().push(step);
+            Ok(())
+        }
+    }
+    let steps = Steps(Default::default());
+    assert_eq!(
+        install_with(&dir.0, "record", b"late", &steps).unwrap(),
+        Installed::AlreadyExists
+    );
+    assert_eq!(steps.0.lock().unwrap().last(), Some(&"temp-removed"));
 }
 #[test]
 fn rejects_non_literal_names_without_writes() {
@@ -182,6 +196,14 @@ fn replacement_errors_report_effect_at_real_boundaries() {
         })
         .unwrap_err();
         assert_eq!(err.installed.is_some(), after_rename);
+        let (step, effect) = if after_rename {
+            ("name-installed", "installed: created")
+        } else {
+            ("file-fsync", "installed: none")
+        };
+        assert_eq!(err.step, step);
+        let text = err.to_string();
+        assert!(text.contains(step) && text.contains(effect), "{text}");
         assert_eq!(
             fs::read(dir.0.join("hint")).unwrap(),
             if after_rename { b"new" } else { b"old" }
@@ -239,8 +261,20 @@ fn ordered_install_waits_for_its_barrier_before_the_name_exists() {
             name,
             b"bytes",
             &steps,
-            Some(&|| if alongside_fails { Err(std::io::Error::other("alongside refused")) } else { Ok(()) }),
-            &mut || if alongside_fails { Ok(()) } else { Err(std::io::Error::other("barrier refused")) },
+            Some(&|| {
+                if alongside_fails {
+                    Err(std::io::Error::other("alongside refused"))
+                } else {
+                    Ok(())
+                }
+            }),
+            &mut || {
+                if alongside_fails {
+                    Ok(())
+                } else {
+                    Err(std::io::Error::other("barrier refused"))
+                }
+            },
             &[],
         )
         .unwrap_err();

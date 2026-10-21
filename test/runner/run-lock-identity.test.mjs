@@ -12,9 +12,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
-import { acquireRunControl, buildRunControlHolder, resolveHolderLiveness } from '../../src/runner/dispatch/run-lock.mjs';
-import { getBootId, getProcessStartTime } from '../../src/runner/dispatch/process-identity.mjs';
+import { spawn, spawnSync } from 'node:child_process';
+import { acquireRunControl, buildRunControlHolder, listGenerations, publishMarkerOnce, publishNextGeneration } from '../../src/runner/dispatch/run-lock.mjs';
+import { selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
 
 function mkRunDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-lock-identity-'));
@@ -24,54 +24,13 @@ function mkRunDir() {
 // reused or the host rebooted. Elsewhere resolveHolderLiveness has nothing to
 // cross-check and fails closed to 'held' by contract; the tests below assert
 // whichever of the two behaviors this platform is supposed to have.
-const HAS_PROC_START_TIME = getProcessStartTime(process.pid) !== null;
-const HAS_BOOT_ID = getBootId() !== 'unknown-boot';
+const HAS_PROC_START_TIME = selfRecord().startTime !== undefined;
 
 // A definitely-dead PID: spawn a real child, let it exit, then reuse its pid.
 function deadPid() {
   const result = spawnSync(process.execPath, ['-e', 'process.exit(0)']);
   return result.pid;
 }
-
-test('buildRunControlHolder: current process identity is self-consistent with process-identity.mjs', () => {
-  const holder = buildRunControlHolder('test-id');
-  assert.equal(holder.id, 'test-id');
-  assert.equal(holder.pid, process.pid);
-  assert.equal(holder.bootId, getBootId());
-  assert.equal(holder.processStartTime, getProcessStartTime(process.pid));
-  assert.equal(holder.host, os.hostname());
-});
-
-test('resolveHolderLiveness: alive pid + matching processStartTime -> held', () => {
-  const holder = buildRunControlHolder('self');
-  assert.equal(resolveHolderLiveness(holder), 'held');
-});
-
-test('resolveHolderLiveness: alive pid but a DIFFERENT recorded processStartTime (pid reused by an unrelated process) -> dead', () => {
-  const holder = { id: 'stale', pid: process.pid, bootId: getBootId(), processStartTime: 'not-the-real-starttime', host: os.hostname() };
-  assert.equal(resolveHolderLiveness(holder), HAS_PROC_START_TIME ? 'dead' : 'held');
-});
-
-test('resolveHolderLiveness: a genuinely dead pid (ESRCH) -> dead, regardless of recorded processStartTime', () => {
-  const pid = deadPid();
-  const holder = { id: 'gone', pid, bootId: getBootId(), processStartTime: '12345', host: os.hostname() };
-  assert.equal(resolveHolderLiveness(holder), 'dead');
-});
-
-test('resolveHolderLiveness: alive pid with NO recorded processStartTime (pre-H1 legacy holder) -> held (nothing to cross-check, stay conservative)', () => {
-  const holder = { id: 'legacy', pid: process.pid };
-  assert.equal(resolveHolderLiveness(holder), 'held');
-});
-
-test('resolveHolderLiveness: bootId recorded and different from the current boot -> dead, even with a coincidentally live pid', () => {
-  const holder = { id: 'pre-reboot', pid: process.pid, bootId: 'a-different-boot-id-entirely', processStartTime: getProcessStartTime(process.pid), host: os.hostname() };
-  assert.equal(resolveHolderLiveness(holder), HAS_BOOT_ID ? 'dead' : 'held');
-});
-
-test('resolveHolderLiveness: no pid at all -> held (a record that cannot be disproven is never reclaimed)', () => {
-  assert.equal(resolveHolderLiveness({ id: 'no-pid' }), 'held');
-  assert.equal(resolveHolderLiveness(null), 'held');
-});
 
 test('acquireRunControl: a live holder (real process, matching processStartTime) is never reclaimed by a contender, even with no ttlMs (always-attempt path)', () => {
   const runDir = mkRunDir();
@@ -85,7 +44,7 @@ test('acquireRunControl: a live holder (real process, matching processStartTime)
 
 test('acquireRunControl: a holder record whose pid was reused by an unrelated process (processStartTime mismatch) IS reclaimed', () => {
   const runDir = mkRunDir();
-  const staleHolder = { id: 'stale-holder', pid: process.pid, bootId: getBootId(), processStartTime: 'not-the-real-starttime', host: os.hostname() };
+  const staleHolder = { id: 'stale-holder', pid: process.pid, bootId: selfRecord().bootId ?? 'unknown-boot', processStartTime: 'not-the-real-starttime', host: os.hostname() };
   const first = acquireRunControl(runDir, { holder: staleHolder });
   assert.equal(first.status, 'acquired');
 
@@ -101,10 +60,37 @@ test('acquireRunControl: a holder record whose pid was reused by an unrelated pr
 test('acquireRunControl: a holder whose pid is genuinely dead IS reclaimed', () => {
   const runDir = mkRunDir();
   const pid = deadPid();
-  const deadHolder = { id: 'dead-holder', pid, bootId: getBootId(), processStartTime: '12345', host: os.hostname() };
+  const deadHolder = { id: 'dead-holder', pid, bootId: selfRecord().bootId ?? 'unknown-boot', processStartTime: '12345', host: os.hostname() };
   const first = acquireRunControl(runDir, { holder: deadHolder });
   assert.equal(first.status, 'acquired');
 
   const contender = acquireRunControl(runDir, { holder: buildRunControlHolder('contender') });
   assert.equal(contender.status, 'acquired');
+});
+
+// Publication is create-only through the durable-file door: of any number of separate processes racing for
+// one name, exactly one installs it, and no temporary is left behind.
+test('racing processes publish one marker and one next generation, never a replace', async () => {
+  const dir = mkRunDir();
+  const lock = new URL('../../src/runner/dispatch/run-lock.mjs', import.meta.url).href;
+  const race = (code) => Promise.all([1, 2, 3, 4].map((n) => new Promise((resolve) => {
+    const child = spawn(process.execPath, ['--input-type=module', '-e', code(n)], { stdio: ['ignore', 'pipe', 'inherit'] });
+    let out = '';
+    child.stdout.on('data', (chunk) => { out += chunk; });
+    child.once('exit', () => resolve(JSON.parse(out)));
+  })));
+  const marker = path.join(dir, 'releases', '0000000001.json.release');
+  const markers = await race((n) => `import { publishMarkerOnce } from ${JSON.stringify(lock)};
+    console.log(JSON.stringify(publishMarkerOnce(${JSON.stringify(marker)}, { winner: ${n} })));`);
+  assert.equal(markers.filter((r) => r.published).length, 1);
+  const generations = path.join(dir, 'generations');
+  fs.mkdirSync(generations, { recursive: true });
+  const published = await race((n) => `import { publishNextGeneration } from ${JSON.stringify(lock)};
+    const r = publishNextGeneration(${JSON.stringify(generations)}, ({ nextEpoch }) => nextEpoch > 1 ? { stop: true } : { record: { winner: ${n} } });
+    console.log(JSON.stringify({ published: r.published }));`);
+  assert.equal(published.filter((r) => r.published).length, 1);
+  assert.equal(listGenerations(generations).length, 1);
+  for (const sub of [path.dirname(marker), generations]) assert.deepEqual(fs.readdirSync(sub).filter((f) => f.endsWith('.tmp')), []);
+  assert.deepEqual(publishMarkerOnce(marker, { winner: 'late' }), { published: false });
+  assert.equal(publishNextGeneration(generations, () => ({ stop: true })).published, false);
 });
