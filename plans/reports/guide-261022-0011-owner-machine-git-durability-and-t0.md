@@ -22,6 +22,8 @@ Máy owner có thể vẫn chạy `653affd6…` (Git 07–08), vì bản [12:36]
 - Route `process-observe` và row `coordination-abandoned-claims` bị xoá.
 - `gateway.json` có thêm tuple danh tính.
 
+**Terminal-control:** pane có tiến trình zombie không còn làm runner dừng nhầm agent (`terminal:foreground-not-agent`). Bản sửa là `359274c62` của HARDEN, sẽ có trong release khi build từ main mới.
+
 Lock protocol vẫn là 2. Activate thì vẫn dừng toàn bộ như mọi lần, theo yêu cầu của T0.
 
 ## Các bước
