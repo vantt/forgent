@@ -115,8 +115,34 @@ async function check(args) {
     if (acked > 0) violations.push(`repository missing or unreadable after acknowledged operations: ${String(opened.out).trim().slice(0, 300)}`);
     return finish({ acked, violations });
   }
+  // A pin delete interrupted by the cut leaves the chain at pin-release-attempt. The next release
+  // re-issues the same exact-old delete, so such a chain is resumable while its pin still holds
+  // the recorded candidate (or is already gone); any other pin value is evidence and a violation.
+  const releaseChains = new Map();
+  const opsDir = path.join(repo, 'fgos', 'git', 'operations');
+  for (const id of fs.existsSync(opsDir) ? fs.readdirSync(opsDir) : []) {
+    const last = fs.readdirSync(path.join(opsDir, id)).filter((f) => /^\d+\.json$/.test(f)).sort().at(-1);
+    let record;
+    try { record = last && JSON.parse(fs.readFileSync(path.join(opsDir, id, last), 'utf8')); } catch { continue; }
+    if (record?.phase?.phase !== 'pin-release-attempt') continue;
+    const pin = `refs/fgos/git-operations/${id}/candidate`;
+    const shown = run(['--git-dir', repo, 'rev-parse', '--verify', '-q', pin]);
+    const held = shown.ok ? String(shown.out).trim() : null;
+    const candidate = record.phase.data?.expected?.oid;
+    if (held !== null && held !== candidate) violations.push(`${id}: pin release not resumable, ${pin} holds ${held}, recorded ${candidate}`);
+    else releaseChains.set(pin, id);
+  }
+  // Git leaves a zero-byte `<pin>.lock` when the cut lands inside that delete: legal crash residue
+  // that the resumed release clears, so only badRefContent on such a lock is excused.
   const fsck = run(['--git-dir', repo, 'fsck', '--full', '--no-dangling']);
-  if (!fsck.ok) violations.push(`git fsck: ${String(fsck.out).trim().slice(0, 400)}`);
+  if (!fsck.ok) {
+    const residue = (line) => {
+      const m = /^error: (refs\/fgos\/git-operations\/[^/]+\/candidate)\.lock: badRefContent\b/.exec(line);
+      return Boolean(m && releaseChains.has(m[1]));
+    };
+    const rest = String(fsck.out).split('\n').filter((l) => l.trim() && !residue(l));
+    if (rest.length) violations.push(`git fsck: ${rest.join('\n').trim().slice(0, 400)}`);
+  }
   for (const ref of REFS) {
     const ops = plan.filter((p) => p.kind === 'intent' && p.ref === ref);
     const lastAck = plan.filter((p) => p.kind === 'ack' && p.ref === ref && p.i < acked).at(-1);
