@@ -35,6 +35,14 @@ const seenBy = (tmp, unitRunId) => {
   return JSON.parse(/case variables: (\{.*?\})\./.exec(fs.readFileSync(report, 'utf8'))[1]);
 };
 
+test('a worker starts with none of its controller\'s lock descriptions: the lock fd, lock job and main-lock holder pid are dropped', () => {
+  const env = workerBaseEnv({ PATH: '/usr/bin', FGOS_LOCK_FD: 'main-checkout:3', FGOS_LOCK_JOB: 'job-1', FGOS_MAIN_LOCK_HOLDER_PID: '4242' });
+  assert.equal(env.FGOS_LOCK_FD, undefined);
+  assert.equal(env.FGOS_LOCK_JOB, undefined);
+  assert.equal(env.FGOS_MAIN_LOCK_HOLDER_PID, undefined);
+  assert.equal(env.PATH, '/usr/bin');
+});
+
 test('a worker starts with neither case variable of its controller: both are dropped like the session ids', () => {
   const env = workerBaseEnv({ PATH: '/usr/bin', [CASE_ID_ENV]: 'wf-a', [CASE_RESERVATION_ENV]: 'rsv-a', FGOS_SESSION_ID: 's' });
   assert.equal(env[CASE_ID_ENV], undefined);
