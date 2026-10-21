@@ -55,8 +55,8 @@ export function hotPaths(fgosDir, resource = 'state') {
  * that does not exist is absent without asking. A host that cannot be run or
  * answers badly is `unreadable`, never absent: the record stays unjudged. */
 export function observeViaHost(pid, { fgosDir } = {}) {
-  if (!pidExists(pid)) return { kind: 'absent' };
   try {
+    if (!pidExists(pid)) return { kind: 'absent' };
     const line = runProcessObserveRoute({ fgosDir, pid });
     if (line.state === 'live') return { kind: 'live', startTime: line.startTime };
     if (line.state === 'zombie') return { kind: 'zombie' };

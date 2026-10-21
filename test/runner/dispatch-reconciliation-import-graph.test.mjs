@@ -105,7 +105,8 @@ for (const banned of BANNED_FILES) {
 
 // Builtins the closure may load. Process creation (child_process, cluster)
 // and anything else is refused, whichever way it is spelled.
-const ALLOWED_BUILTINS = new Set(['fs', 'path', 'crypto', 'os', 'async_hooks', 'worker_threads', 'url', 'util']);
+const ALLOWED_BUILTINS = new Set(['fs', 'path', 'crypto', 'os', 'async_hooks', 'worker_threads', 'url', 'util', 'module']);
+// `module` is the door's `createRequire`: the leaf loads the native addon in-process, lazily, on its first call.
 const builtinName = (specifier) => specifier.replace(/^node:/, '').split('/')[0];
 
 // The lock door (src/holder-lock): the provider-capacity state that reconcile's
@@ -219,9 +220,13 @@ const EXPECTED_CLOSURE = [
   // ... the auth-failure wording table, a leaf with no imports, kept apart
   // so provider-capacity never imports a process-control module for it ...
   'src/runner/dispatch/provider-auth-failure.mjs',
-  // ... and /proc boot-id/start-time reads that decide lease holder
-  // identity (node:fs only; no signals, no spawn).
+  // ... and the thin client of process facts that decides lease holder
+  // identity through the native door (no signals, no spawn, no /proc read).
   'src/runner/dispatch/process-identity.mjs',
+  // The door loads the addon lazily through node:module (never at import time);
+  // payload-root.mjs locates the release it belongs to (node:fs/node:path only).
+  'src/native/door.mjs',
+  'src/run-supervisor/payload-root.mjs',
   // ... and the lock door guarding the provider-capacity state file
   // (see LOCK_DOOR_FILES), with the host-binary lookup its driver needs.
   'src/holder-lock/index.mjs',

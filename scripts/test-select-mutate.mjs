@@ -6,6 +6,7 @@ import { spawnSync } from 'node:child_process';
 import { MANIFEST } from '../test/test-ownership.mjs';
 import { mutants } from '../test/test-ownership-mutants.mjs';
 import { REPO_ROOT, buildTestArgv, buildTestEnv } from './run-tests.mjs';
+import { ensureGitAddon, gitAddonDirectory } from './lib/git-addon-stage.mjs';
 import { getFailedTestsFromJunit } from './test-select-compare.mjs';
 import { createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
 import { ensureScriptAddon } from './lib/git-ports.mjs';
@@ -41,6 +42,11 @@ export function unlinkSharedDirs(worktreePath) {
   for (const name of ['node_modules', 'target']) {
     const link = path.join(worktreePath, name);
     try { if (fs.lstatSync(link).isSymbolicLink()) fs.unlinkSync(link); } catch {}
+  }
+  // The release `runRelatedCaptured` staged for the checkout's own native door, and the empty directories above it.
+  try { fs.rmSync(gitAddonDirectory(worktreePath), { recursive: true, force: true }); } catch {}
+  for (const dir of ['.fgos/runtime/git-addon', '.fgos/runtime', '.fgos']) {
+    try { fs.rmdirSync(path.join(worktreePath, dir)); } catch {}
   }
 }
 
@@ -155,10 +161,15 @@ export function runFullSuite({ cwd, spawn = spawnSync, timeoutMs = FULL_SUITE_TI
  */
 export function runRelatedCaptured(files, { cwd, spawn = spawnSync } = {}) {
   const relFiles = files.map((f) => path.relative(cwd, f));
+  const env = buildTestEnv();
+  // The native door loads only the release its own payload belongs to, so the checkout under test stages its own
+  // (built into this checkout's shared Cargo target, never a cold target of the throwaway worktree).
+  env.CARGO_TARGET_DIR ||= path.join(REPO_ROOT, 'target');
+  ensureGitAddon(env, cwd);
   const result = spawn(process.execPath, buildTestArgv(relFiles, []), {
     cwd,
     encoding: 'utf8',
-    env: buildTestEnv(),
+    env,
   });
   return {
     status: result.status ?? 1,

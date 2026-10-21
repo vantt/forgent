@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "caa04d81efe2445053ecfb050dd4de3a91158508c08d3d78118a7dc87944c163",
+  "payloadDigest": "951d542c8f7ac98bd74476b347589d2760013ba70c178511e705304e471b5a74",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -276,6 +276,8 @@
     "packages/event-store/rust/tests/walk_certified.rs": "0ae2d9f7f3fc96b748167c0a3f9b5de4d3ad7a3e57d6a65ced896f93b9a2db55",
     "packages/git/node-addon/build.rs": "fcbd1ff3f627a7553fa1704dc6f558998daff8bc256015c37aace62cc49ce584",
     "packages/git/node-addon/examples/e3_fixture.rs": "f3a98f5c8de968be2109b9958a5a7d0efeca7fa5000493278277d7bba035a75a",
+    "packages/git/node-addon/src/canonical_json.rs": "6837d46ba14f53228b7d9ccc6e4fdba8bf42210f46cadeee48ce32c8d4a03fd8",
+    "packages/git/node-addon/src/durable_file.rs": "cf88bbf1b1e1ec33987199f532de8159a5b1fbceb7b303e8738bca5bca9e2408",
     "packages/git/node-addon/src/event_store.rs": "4db4794487da76c656b1812924e1b499bf8dbe6c807d8b3a3ea18857cfed60da",
     "packages/git/node-addon/src/git.rs": "52bac5c46534cad262f2b760a88b5f8e5fe3d2d8fb456575a1414949110a9787",
     "packages/git/node-addon/src/git/config.rs": "521afa249294ebd96b038d99d60b5f4ff6119c7d6d6bb930ae41ea709f72515d",
@@ -291,7 +293,8 @@
     "packages/git/node-addon/src/git/sync.rs": "a541edc814725b495011e78e0647062bf7567669d0247a12c05d6f265a38f05a",
     "packages/git/node-addon/src/git/worktree.rs": "4d15190574dcba294db6214c818039ef754fce829a415ba204a43acf10678c30",
     "packages/git/node-addon/src/git/write_scope.rs": "657f168ae337fac9315cd39fc8681bc069c16b5ff7ce2dd607dfef39dc9ce5ee",
-    "packages/git/node-addon/src/lib.rs": "af997302edde095dfe15244213cfcb0d76dcdfc48f29c6ac8699b5ac394d2e57",
+    "packages/git/node-addon/src/lib.rs": "3facd144a66f0a0cba95acbc2d92c8d6bb0da914cf1c6ffe857ce92b3c70feff",
+    "packages/git/node-addon/src/process.rs": "34662e53ebd098088e58bbbea03e34b9347326ff2c761e05453b502ea4e2e713",
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
     "packages/git/rust/src/driver.rs": "65606ab90c38d31fca240a9e813eab363de27b23de2bd8894645efd018324b75",
     "packages/git/rust/src/grant.rs": "d4f47e49d85994778dc093098b47584e3f73c3cec5f501af82a1c5cd787446f2",
@@ -598,13 +601,13 @@
     "scripts/regenerate-observe-fixtures.mjs": "07c5b42795e22c36d75363e2265cf59b6f6244d63f7413d9dacf9fe0e3071631",
     "scripts/run-rust-dev-host.mjs": "bae6761acce9ccc479b9d30134a76ea8fd20993937e8d2b78d1c69a87a0f3741",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "709d73239f1e5b0aaa91a2efdb90f695cacc84a8dc317d83f7f615013efbd1be",
+    "scripts/run-tests.mjs": "23a60b3a7d2057764270e40eeb5d981a24df8bc62e5a333fd550aab02bbfbab7",
     "scripts/stress-test-files.mjs": "c3ccd385982e8e1865b54e02abef044ae3e85a4547f34c9efd2fcbcc66d37240",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
     "scripts/test-proof-inventory.mjs": "cbd3324b5fc76b680253283001e9d310bdd782e64148e2f03234b5a75e05904f",
     "scripts/test-select-compare.mjs": "45ec5c8f1b192430431127a06133376cd5e5d2a50f8e6865472c1ae341ae1329",
     "scripts/test-select-coverage-map.mjs": "8e4fbb903bb3c9e3680c946cbaeb8f5116a474c2bb873e96589bee1b4c56a431",
-    "scripts/test-select-mutate.mjs": "72a8338aa3fdce409f7d531f2c010208b19a90907b86b59e4ec6360922232822",
+    "scripts/test-select-mutate.mjs": "49cb3f6157c175d56539cf2c4f3f637a8225395c30750627bb80dbfa736d21ec",
     "scripts/test-select-promote-report.mjs": "d5bb99bbe7a6c02ccafe29b2fa632471a424eeef454e17003631021445c81bd0",
     "scripts/test-select-promote.mjs": "a0da23143e4dfb674a89f419b87a70b84af33f874507e635467f2bc5dbc6b2fe",
     "scripts/test-select-run-plan.mjs": "94789b3167a55ee33a18ea3a3abd4ac87fa1c06601356d6ae0fe9f864fa49984",
@@ -632,7 +635,7 @@
     "src/git/inspect.mjs": "57d08738f1e1710a389f8897ddad233f1af4d29c80540244d4b91cd34fb7f25f",
     "src/git/land.mjs": "0c8a1c878a46ac19343040b6c85fc11dd0e59ac6d18b7a1490b85a06940524da",
     "src/git/native-lock.mjs": "b75f10cf57a5bc07f916b45c2ef241ab62eff89f1cf6f67505a3cb3a7ad6d515",
-    "src/git/native.mjs": "5ee8484514af1658682894a487c87896c94714d9790578447e5eac25fb25e280",
+    "src/git/native.mjs": "6b6a0e898a3244d5f9cc5a0a62e1c6f1732880ef9e060f408691ed5bd503ace2",
     "src/git/recovery.mjs": "9b0baba9cc59665d700d1269c5f35dd5f7750b918d1dbf0273a8c651e03e4941",
     "src/git/refs.mjs": "eb8dfa75531652a19f0c524357d8e1c57d54bf281548f3d0e3a7657a4ee18502",
     "src/git/remote.mjs": "58aafc6f9ff17488427f515268cba52271696f1005ff44e6863977c9859ece4e",
@@ -657,6 +660,7 @@
     "src/intake/plan.mjs": "c3c72be35468420d9f42bcf23a0bdec9e48a11c1f4d8dd6bb4b9be09f4c60dc6",
     "src/intake/risk-keywords.mjs": "b71f9c07e58ad759538ac3a287027273d08b9a65a397be2f39b2716595f14445",
     "src/intake/verify-pattern-check.mjs": "1cfe3feb6375b999c4b851f6e9ef8fce7b1fb1209a81c29dd0a043939cb69e0c",
+    "src/native/door.mjs": "054de88bc06dd1b03ea71377eb70bc6dca88f9cafa5e459726863ed6bed342b1",
     "src/observe/friction-client.mjs": "fa010f78de11c002da7ed01141a38ef5e65c072e937a1589642f0ed3ced8229d",
     "src/report/authoritative-match.mjs": "385fd87aaaab0441c290d0203f5903a9b1edc614e7bead7e0970dc6aabd6b596",
     "src/report/capability-plan-lint.mjs": "7dab2f9aaa2d97fcb33ed9d0ddc378aec9ee314f2f4e960808514ce96797c212",
@@ -724,7 +728,7 @@
     "src/runner/dispatch/operation-prompt-templates.mjs": "932f932d239ccec0ef3debd919576d25ab068c50cb990d1f15afd03ff30f46af",
     "src/runner/dispatch/plan.mjs": "bc57319f904c8856b070a01bdfe76506a17166e4ace244d5f2b917bf5a406598",
     "src/runner/dispatch/prepare.mjs": "d2bc4e5bccce5db31c8a56a364d06d88916b4c108cb0191957e8989b44ff90ce",
-    "src/runner/dispatch/process-identity.mjs": "1ad61ab28aaebe81701c27792f849207b610ccb72f900c9e4e37babf9347e08a",
+    "src/runner/dispatch/process-identity.mjs": "6b4391dd987435661b3648618b18e19041017df4c308aa936d2626d15e45b8fb",
     "src/runner/dispatch/proof-helpers.mjs": "3a55905afa70300caa94eae077d46399b65ea2a172544c9fd96c80d4011c66fc",
     "src/runner/dispatch/provider-account-probe.mjs": "377886cac36ec401c2804b8e288883b3b7e3b6a24514d4bfe8c8a1286980d27c",
     "src/runner/dispatch/provider-adapter.mjs": "2e768fc4af7a4f33348f8d5ff21558adfa0591466c793d796bd06ad7d1755288",
@@ -858,7 +862,7 @@
     "src/state/graph-harness.mjs": "6d93e939f7d13ec8f24957eca8b02bc66aad00573c4369175bcb426915ac789b",
     "src/state/graph-metrics.mjs": "ce0c9112f0a22ae408a442773fc91628eb225ef103bc9024a16ce926c1f0f167",
     "src/state/handoff.mjs": "352dbce5f607f2ad478bf0119fbf875bf640142f3438a745ebcead4804dd4d38",
-    "src/state/hot-lock.mjs": "2eff81fce147f31b637e2d4491640ccb0405713439f7e8648a89e0d351c6a14d",
+    "src/state/hot-lock.mjs": "365a487c2f0c97e5347e64b38781e817f848efb54409c2335aa11338c9f17e9b",
     "src/state/impact.mjs": "5baf4a1efb7cb4e7b7b8c307e16a9671b925efe103246515b49f29710a8ddb4c",
     "src/state/knowledge-registry.mjs": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
     "src/state/legacy-event-git-adapter.mjs": "8b65b55aacf9a3b321e51847e4c5f8c4829c0d2fd6f5de2ad52046c0ac1bf7e9",
@@ -2214,7 +2218,7 @@
     {
       "path": "scripts/event-store/power-loss-driver.mjs",
       "line": 25,
-      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
@@ -2228,7 +2232,7 @@
     {
       "path": "scripts/event-store/store-increment-worker.mjs",
       "line": 12,
-      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
@@ -2242,7 +2246,7 @@
     {
       "path": "scripts/git-addon.mjs",
       "line": 16,
-      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
@@ -2277,7 +2281,7 @@
     {
       "path": "scripts/git/e3-bench.mjs",
       "line": 104,
-      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
@@ -2354,14 +2358,14 @@
     {
       "path": "scripts/git/e3-bench.mjs",
       "line": 666,
-      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
       "line": 679,
-      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
@@ -2442,15 +2446,15 @@
     },
     {
       "path": "scripts/run-tests.mjs",
-      "line": 564,
-      "spawn": "hostSpeaksLockProtocol -> scripts/run-tests.mjs:577",
+      "line": 577,
+      "spawn": "hostSpeaksLockProtocol -> scripts/run-tests.mjs:590",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/event-store/native.mjs",
       "line": 176,
-      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "param loaderOptions",
       "class": "uncalled-wrapper",
       "function": "decodeLegacyFiles"
@@ -2458,7 +2462,7 @@
     {
       "path": "src/event-store/native.mjs",
       "line": 182,
-      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "param loaderOptions",
       "class": "uncalled-wrapper",
       "function": "branchKey"
@@ -2473,7 +2477,7 @@
     {
       "path": "src/git/index.mjs",
       "line": 17,
-      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "param loaderOptions",
       "class": "uncalled-wrapper",
       "function": "versions"
@@ -2481,7 +2485,7 @@
     {
       "path": "src/git/native-lock.mjs",
       "line": 7,
-      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "param loaderOptions",
       "class": "uncalled-wrapper",
       "function": "createGitNativeLockRepair"

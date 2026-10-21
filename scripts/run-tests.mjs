@@ -18,7 +18,7 @@
 // invocation works unchanged on every OS's default shell.
 
 import fs from 'node:fs';
-import { REPO_ROOT, ensureGitAddon, ensureHostBin } from './lib/git-addon-stage.mjs';
+import { REPO_ROOT, ensureGitAddon, ensureHostBin, gitAddonDirectory } from './lib/git-addon-stage.mjs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn as spawnAsync, spawnSync, execFileSync } from 'node:child_process';
@@ -116,6 +116,18 @@ export function readGitSpawnLog(file) {
   return [...sites.values()];
 }
 
+// The staged release manifest the in-process door needs (`target/debug/fgos` alone has none). Staged once per
+// process, and not at all when the caller's env already names this checkout's staged manifest, as the host
+// binary is reused when FGOS_HOST_BIN already runs.
+let stagedDoor = null;
+function stageDoorManifest(childEnv) {
+  const manifest = path.join(gitAddonDirectory(REPO_ROOT), 'manifest.json');
+  if (childEnv.FGOS_ACTIVE_MANIFEST_PATH !== manifest || !fs.existsSync(manifest)) {
+    stagedDoor ??= (() => { const staged = { ...childEnv }; ensureGitAddon(staged, REPO_ROOT); return staged; })();
+    Object.assign(childEnv, { FGOS_HOST_BIN: stagedDoor.FGOS_HOST_BIN, FGOS_ACTIVE_RELEASE_PATH: stagedDoor.FGOS_ACTIVE_RELEASE_PATH, FGOS_ACTIVE_MANIFEST_PATH: stagedDoor.FGOS_ACTIVE_MANIFEST_PATH });
+  }
+}
+
 /**
  * The env every spawned `node --test` run gets, whoever spawns it (the full
  * suite, the canary, the selector's related run, mutation and coverage runs):
@@ -147,6 +159,7 @@ export function buildTestEnv(env = process.env) {
     if (hostBin) {
       childEnv.FGOS_HOST_BIN = hostBin;
     }
+    stageDoorManifest(childEnv);
   } catch (err) {
     // If cargo is missing or build fails, let tests that require host fail with clear diagnostic
     console.error(`run-tests: warning: failed to ensure host binary: ${err.message}`);
