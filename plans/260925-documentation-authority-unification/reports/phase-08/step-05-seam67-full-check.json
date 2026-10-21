@@ -215,7 +215,7 @@
     "s67-review": 1,
     "r26-unit": 43,
     "r26-real-read": 29,
-    "r26-membership": 90,
+    "r26-membership": 91,
     "r26-coverage": 1
   },
   "files": 1030,
@@ -92721,7 +92721,7 @@
         "j-search": 1,
         "j-review": 1,
         "a-passage-agreement": 3467,
-        "b-real-blocker": 81,
+        "b-real-blocker": 82,
         "e-retired-successor": 41,
         "r20-move-set": 1,
         "r20-coverage": 3,
@@ -93452,7 +93452,7 @@
           "j5-search": 1,
           "a-passage-agreement": 638,
           "d-own-operand": 3530,
-          "b-real-blocker": 34,
+          "b-real-blocker": 35,
           "e-retired-successor": 36,
           "j5-successors": 40,
           "j5-uniform-history": 43,
@@ -218697,7 +218697,7 @@
       "checks": {
         "r26-unit": 43,
         "r26-real-read": 29,
-        "r26-membership": 90,
+        "r26-membership": 91,
         "r26-coverage": 1
       },
       "failureCount": 0,

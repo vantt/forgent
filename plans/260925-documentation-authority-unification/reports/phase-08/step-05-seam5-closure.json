@@ -22,12 +22,12 @@
         "tuples": 3787
       }
     },
-    "admitted": 423,
-    "rejected": 23067,
+    "admitted": 424,
+    "rejected": 23066,
     "neutralUnlabelled": 3839,
-    "parks": 81,
+    "parks": 82,
     "patches": 23,
-    "preserves": 27225,
+    "preserves": 27224,
     "patchFiles": 11,
     "deferredReplays": 6
   },
@@ -222,7 +222,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
+            "recordSha256": "500b796351b7a697741ccf8c18dcf58e6f21545fac0559577cfb6fca89f46071"
           }
         }
       ]
@@ -380,7 +380,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
+            "recordSha256": "500b796351b7a697741ccf8c18dcf58e6f21545fac0559577cfb6fca89f46071"
           }
         },
         {
@@ -532,7 +532,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
+            "recordSha256": "500b796351b7a697741ccf8c18dcf58e6f21545fac0559577cfb6fca89f46071"
           }
         },
         {
@@ -555,7 +555,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
@@ -578,7 +578,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
@@ -615,7 +615,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
@@ -638,7 +638,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
@@ -675,7 +675,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
@@ -712,7 +712,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
@@ -735,7 +735,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
@@ -772,7 +772,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
@@ -809,7 +809,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
@@ -846,7 +846,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
@@ -883,7 +883,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
@@ -920,7 +920,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
@@ -957,7 +957,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         }
       ]
@@ -986,7 +986,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
             "recordLine": 21,
-            "recordSha256": "8941457165965925f4a55973b70f5f04d34f3858fe37fe23749810c998a5f141"
+            "recordSha256": "58c9e77a2f7c5263f1c6523c5627ffc63efe14019d839c32658de8d3c05cab8e"
           }
         },
         {
@@ -1009,7 +1009,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
             "recordLine": 21,
-            "recordSha256": "8941457165965925f4a55973b70f5f04d34f3858fe37fe23749810c998a5f141"
+            "recordSha256": "58c9e77a2f7c5263f1c6523c5627ffc63efe14019d839c32658de8d3c05cab8e"
           }
         },
         {
@@ -1032,7 +1032,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
             "recordLine": 21,
-            "recordSha256": "8941457165965925f4a55973b70f5f04d34f3858fe37fe23749810c998a5f141"
+            "recordSha256": "58c9e77a2f7c5263f1c6523c5627ffc63efe14019d839c32658de8d3c05cab8e"
           }
         },
         {
@@ -1055,7 +1055,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
             "recordLine": 21,
-            "recordSha256": "8941457165965925f4a55973b70f5f04d34f3858fe37fe23749810c998a5f141"
+            "recordSha256": "58c9e77a2f7c5263f1c6523c5627ffc63efe14019d839c32658de8d3c05cab8e"
           }
         },
         {
@@ -1078,7 +1078,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
             "recordLine": 21,
-            "recordSha256": "8941457165965925f4a55973b70f5f04d34f3858fe37fe23749810c998a5f141"
+            "recordSha256": "58c9e77a2f7c5263f1c6523c5627ffc63efe14019d839c32658de8d3c05cab8e"
           }
         },
         {
@@ -1101,7 +1101,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
             "recordLine": 21,
-            "recordSha256": "8941457165965925f4a55973b70f5f04d34f3858fe37fe23749810c998a5f141"
+            "recordSha256": "58c9e77a2f7c5263f1c6523c5627ffc63efe14019d839c32658de8d3c05cab8e"
           }
         },
         {
@@ -1200,7 +1200,7 @@
     },
     {
       "dependency": "Phase 9 retention-or-move decision for docs/enduser-docs-index.json",
-      "itemCount": 9,
+      "itemCount": 23,
       "items": [
         {
           "file": "test/report/enduser-index.test.mjs",
@@ -1222,7 +1222,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
@@ -1245,7 +1245,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
@@ -1408,18 +1408,35 @@
             "recordLine": 1,
             "recordSha256": "6a60096b7aa095e04689580a85f5c626711016eec1d8f9e50d82a0328a4a01bb"
           }
-        }
-      ]
-    },
-    {
-      "dependency": "alias-filter",
-      "itemCount": 2,
-      "items": [
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "author-s5-b5-enduser-index-154-35",
+          "blockedReason": "test/report/enduser-index.test.mjs: L154 integration title names the real manifest read by dynamic-021514/021515 after runDocsIndex(); change this title only with the complete manifest retention-or-move unit, retaining all assertions.",
+          "dependencyCategory": "phase9-retention-or-move",
+          "searchWitness": {
+            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+            "roots": [
+              "docs/platform",
+              "docs/knowledge",
+              "docs/reference",
+              "docs/tutorials"
+            ],
+            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
+            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
+            "assessment": "test/report/enduser-index.test.mjs: L154 integration title names the real manifest read by dynamic-021514/021515 after runDocsIndex(); change this title only with the complete manifest retention-or-move unit, retaining all assertions."
+          },
+          "record": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+            "recordLine": 2,
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
+          }
+        },
         {
           "file": "test/report/enduser-index.test.mjs",
           "id": "reference-004320",
           "blockedReason": "test/report/enduser-index.test.mjs: The legacyExplanationEntries filter fixes the decisions/explanation subset of the real generated manifest. Settle explanation alias membership with generator dynamic-009788 and quadrant dynamic-009791; retain one entry per actual source file.",
-          "dependencyCategory": "step5-parity",
+          "dependencyCategory": "phase9-retention-or-move",
           "searchWitness": {
             "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
             "roots": [
@@ -1449,14 +1466,14 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
           "file": "test/report/enduser-index.test.mjs",
           "id": "reference-004347",
           "blockedReason": "test/report/enduser-index.test.mjs: The legacyExplanationEntries filter fixes the decisions/explanation subset of the real generated manifest. Settle explanation alias membership with generator dynamic-009788 and quadrant dynamic-009791; retain one entry per actual source file.",
-          "dependencyCategory": "step5-parity",
+          "dependencyCategory": "phase9-retention-or-move",
           "searchWitness": {
             "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
             "roots": [
@@ -1486,20 +1503,14 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
-        }
-      ]
-    },
-    {
-      "dependency": "alias-membership",
-      "itemCount": 3,
-      "items": [
+        },
         {
           "file": "test/report/enduser-index.test.mjs",
           "id": "reference-004319",
           "blockedReason": "test/report/enduser-index.test.mjs: The per-entry allowed-directory predicate constrains every explanation output to decisions, explanation or knowledge. Its old prefixes must be composed with parked QUADRANT_DIR_ALIASES dynamic-009791 and source enumerator dynamic-009788, never simply removed.",
-          "dependencyCategory": "step5-parity",
+          "dependencyCategory": "phase9-retention-or-move",
           "searchWitness": {
             "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
             "roots": [
@@ -1529,14 +1540,14 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
           "file": "test/report/enduser-index.test.mjs",
           "id": "reference-004351",
           "blockedReason": "test/report/enduser-index.test.mjs: The per-entry allowed-directory predicate constrains every explanation output to decisions, explanation or knowledge. Its old prefixes must be composed with parked QUADRANT_DIR_ALIASES dynamic-009791 and source enumerator dynamic-009788, never simply removed.",
-          "dependencyCategory": "step5-parity",
+          "dependencyCategory": "phase9-retention-or-move",
           "searchWitness": {
             "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
             "roots": [
@@ -1566,14 +1577,14 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
           "file": "test/report/enduser-index.test.mjs",
           "id": "author-s5-b5-enduser-index-334-129",
           "blockedReason": "test/report/enduser-index.test.mjs: The per-entry allowed-directory predicate constrains every explanation output to decisions, explanation or knowledge. Its old prefixes must be composed with parked QUADRANT_DIR_ALIASES dynamic-009791 and source enumerator dynamic-009788, never simply removed.",
-          "dependencyCategory": "step5-parity",
+          "dependencyCategory": "phase9-retention-or-move",
           "searchWitness": {
             "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
             "roots": [
@@ -1603,20 +1614,14 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
-        }
-      ]
-    },
-    {
-      "dependency": "alias-primary-find",
-      "itemCount": 2,
-      "items": [
+        },
         {
           "file": "test/report/enduser-index.test.mjs",
           "id": "reference-004332",
           "blockedReason": "test/report/enduser-index.test.mjs: L12-81: The primaryDoc existence assertion names the first backfilled explanation document in the generated manifest. Resolve the primary explanation membership with generator dynamic-009788/dynamic-009791 and preserve the assertion that a primary-directory entry actually appears, jointly with reference-004345.",
-          "dependencyCategory": "step5-parity",
+          "dependencyCategory": "phase9-retention-or-move",
           "searchWitness": {
             "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
             "roots": [
@@ -1646,14 +1651,14 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
           "file": "test/report/enduser-index.test.mjs",
           "id": "reference-004345",
           "blockedReason": "test/report/enduser-index.test.mjs: The primaryDoc selection requires at least one backfilled explanation document after registry migration. Verify at final composition that the primary directory still contributes an entry, preserving the independent primary-vs-alias check.",
-          "dependencyCategory": "step5-parity",
+          "dependencyCategory": "phase9-retention-or-move",
           "searchWitness": {
             "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
             "roots": [
@@ -1683,20 +1688,14 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
-        }
-      ]
-    },
-    {
-      "dependency": "alias-total",
-      "itemCount": 2,
-      "items": [
+        },
         {
           "file": "test/report/enduser-index.test.mjs",
           "id": "reference-004311",
           "blockedReason": "test/report/enduser-index.test.mjs: The explanatory assertion compares the counted retained decisions alias plus primary explanation files to exactly that output subset. Resolve the two generator parks and preserve this cardinality equality after final layout composition.",
-          "dependencyCategory": "step5-parity",
+          "dependencyCategory": "phase9-retention-or-move",
           "searchWitness": {
             "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
             "roots": [
@@ -1726,14 +1725,14 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         },
         {
           "file": "test/report/enduser-index.test.mjs",
           "id": "reference-004348",
           "blockedReason": "test/report/enduser-index.test.mjs: The explanatory assertion compares the counted retained decisions alias plus primary explanation files to exactly that output subset. Resolve the two generator parks and preserve this cardinality equality after final layout composition.",
-          "dependencyCategory": "step5-parity",
+          "dependencyCategory": "phase9-retention-or-move",
           "searchWitness": {
             "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
             "roots": [
@@ -1763,7 +1762,155 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
             "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
+          }
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004330",
+          "blockedReason": "test/report/enduser-index.test.mjs: The asserted demo.docPath must agree with the seeded capture and fixture constant after rollup-doc relocation; preserve sourceCaptureId doc-fgos-rollup-howto and the exact demo title while composing its generated manifest mapping.",
+          "dependencyCategory": "phase9-retention-or-move",
+          "searchWitness": {
+            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+            "roots": [
+              "docs/platform",
+              "docs/knowledge",
+              "docs/reference",
+              "docs/tutorials"
+            ],
+            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
+            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
+            "assessment": "test/report/enduser-index.test.mjs: The asserted demo.docPath must agree with the seeded capture and fixture constant after rollup-doc relocation; preserve sourceCaptureId doc-fgos-rollup-howto and the exact demo title while composing its generated manifest mapping.",
+            "queries": [
+              "check-rollup-progress",
+              "QUADRANT_DIR_ALIASES",
+              "docs/decisions",
+              "### 0010",
+              "### 0015",
+              "### 0017",
+              "Product Gates"
+            ],
+            "aliasLookupSources": [
+              "plans/260925-documentation-authority-unification/alias-table.json",
+              "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
+              "docs/doc-registry.json"
+            ]
+          },
+          "record": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+            "recordLine": 2,
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
+          }
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004344",
+          "blockedReason": "test/report/enduser-index.test.mjs: The generated manifest find predicate requires the seeded real rollup demo at its old how-to path. Registry proposes the knowledge holder; co-cut REAL_DEMO_DOC_PATH in test/report/helpers/docs-index-state-fixture.mjs and real generator output before changing this predicate.",
+          "dependencyCategory": "phase9-retention-or-move",
+          "searchWitness": {
+            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+            "roots": [
+              "docs/platform",
+              "docs/knowledge",
+              "docs/reference",
+              "docs/tutorials"
+            ],
+            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
+            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
+            "assessment": "test/report/enduser-index.test.mjs: The generated manifest find predicate requires the seeded real rollup demo at its old how-to path. Registry proposes the knowledge holder; co-cut REAL_DEMO_DOC_PATH in test/report/helpers/docs-index-state-fixture.mjs and real generator output before changing this predicate.",
+            "queries": [
+              "check-rollup-progress",
+              "QUADRANT_DIR_ALIASES",
+              "docs/decisions",
+              "### 0010",
+              "### 0015",
+              "### 0017",
+              "Product Gates"
+            ],
+            "aliasLookupSources": [
+              "plans/260925-documentation-authority-unification/alias-table.json",
+              "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
+              "docs/doc-registry.json"
+            ]
+          },
+          "record": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+            "recordLine": 2,
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
+          }
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "dynamic-021513",
+          "blockedReason": "test/report/enduser-index.test.mjs: The generated manifest find predicate requires the seeded real rollup demo at its old how-to path. Registry proposes the knowledge holder; co-cut REAL_DEMO_DOC_PATH in test/report/helpers/docs-index-state-fixture.mjs and real generator output before changing this predicate.",
+          "dependencyCategory": "phase9-retention-or-move",
+          "searchWitness": {
+            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+            "roots": [
+              "docs/platform",
+              "docs/knowledge",
+              "docs/reference",
+              "docs/tutorials"
+            ],
+            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
+            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
+            "assessment": "test/report/enduser-index.test.mjs: The generated manifest find predicate requires the seeded real rollup demo at its old how-to path. Registry proposes the knowledge holder; co-cut REAL_DEMO_DOC_PATH in test/report/helpers/docs-index-state-fixture.mjs and real generator output before changing this predicate.",
+            "queries": [
+              "check-rollup-progress",
+              "QUADRANT_DIR_ALIASES",
+              "docs/decisions",
+              "### 0010",
+              "### 0015",
+              "### 0017",
+              "Product Gates"
+            ],
+            "aliasLookupSources": [
+              "plans/260925-documentation-authority-unification/alias-table.json",
+              "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
+              "docs/doc-registry.json"
+            ]
+          },
+          "record": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+            "recordLine": 2,
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
+          }
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "dynamic-021543",
+          "blockedReason": "test/report/enduser-index.test.mjs: The primaryExplanationCount enumerates real explanation Markdown while registry proposals move some entries into knowledge. Compose its counted legacy subset against the promoted output without replacing the count assertion with a weaker existence test.",
+          "dependencyCategory": "phase9-retention-or-move",
+          "searchWitness": {
+            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+            "roots": [
+              "docs/platform",
+              "docs/knowledge",
+              "docs/reference",
+              "docs/tutorials"
+            ],
+            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
+            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
+            "assessment": "test/report/enduser-index.test.mjs: The primaryExplanationCount enumerates real explanation Markdown while registry proposals move some entries into knowledge. Compose its counted legacy subset against the promoted output without replacing the count assertion with a weaker existence test.",
+            "queries": [
+              "check-rollup-progress",
+              "QUADRANT_DIR_ALIASES",
+              "docs/decisions",
+              "### 0010",
+              "### 0015",
+              "### 0017",
+              "Product Gates"
+            ],
+            "aliasLookupSources": [
+              "plans/260925-documentation-authority-unification/alias-table.json",
+              "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
+              "docs/doc-registry.json"
+            ]
+          },
+          "record": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+            "recordLine": 2,
+            "recordSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21"
           }
         }
       ]
@@ -1921,7 +2068,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
+            "recordSha256": "500b796351b7a697741ccf8c18dcf58e6f21545fac0559577cfb6fca89f46071"
           }
         }
       ]
@@ -2047,129 +2194,6 @@
       ]
     },
     {
-      "dependency": "demo-equality",
-      "itemCount": 1,
-      "items": [
-        {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "reference-004330",
-          "blockedReason": "test/report/enduser-index.test.mjs: The asserted demo.docPath must agree with the seeded capture and fixture constant after rollup-doc relocation; preserve sourceCaptureId doc-fgos-rollup-howto and the exact demo title while composing its generated manifest mapping.",
-          "dependencyCategory": "step5-parity",
-          "searchWitness": {
-            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-            "roots": [
-              "docs/platform",
-              "docs/knowledge",
-              "docs/reference",
-              "docs/tutorials"
-            ],
-            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
-            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
-            "assessment": "test/report/enduser-index.test.mjs: The asserted demo.docPath must agree with the seeded capture and fixture constant after rollup-doc relocation; preserve sourceCaptureId doc-fgos-rollup-howto and the exact demo title while composing its generated manifest mapping.",
-            "queries": [
-              "check-rollup-progress",
-              "QUADRANT_DIR_ALIASES",
-              "docs/decisions",
-              "### 0010",
-              "### 0015",
-              "### 0017",
-              "Product Gates"
-            ],
-            "aliasLookupSources": [
-              "plans/260925-documentation-authority-unification/alias-table.json",
-              "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
-              "docs/doc-registry.json"
-            ]
-          },
-          "record": {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
-            "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
-          }
-        }
-      ]
-    },
-    {
-      "dependency": "demo-find",
-      "itemCount": 2,
-      "items": [
-        {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "reference-004344",
-          "blockedReason": "test/report/enduser-index.test.mjs: The generated manifest find predicate requires the seeded real rollup demo at its old how-to path. Registry proposes the knowledge holder; co-cut REAL_DEMO_DOC_PATH in test/report/helpers/docs-index-state-fixture.mjs and real generator output before changing this predicate.",
-          "dependencyCategory": "step5-parity",
-          "searchWitness": {
-            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-            "roots": [
-              "docs/platform",
-              "docs/knowledge",
-              "docs/reference",
-              "docs/tutorials"
-            ],
-            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
-            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
-            "assessment": "test/report/enduser-index.test.mjs: The generated manifest find predicate requires the seeded real rollup demo at its old how-to path. Registry proposes the knowledge holder; co-cut REAL_DEMO_DOC_PATH in test/report/helpers/docs-index-state-fixture.mjs and real generator output before changing this predicate.",
-            "queries": [
-              "check-rollup-progress",
-              "QUADRANT_DIR_ALIASES",
-              "docs/decisions",
-              "### 0010",
-              "### 0015",
-              "### 0017",
-              "Product Gates"
-            ],
-            "aliasLookupSources": [
-              "plans/260925-documentation-authority-unification/alias-table.json",
-              "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
-              "docs/doc-registry.json"
-            ]
-          },
-          "record": {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
-            "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
-          }
-        },
-        {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "dynamic-021513",
-          "blockedReason": "test/report/enduser-index.test.mjs: The generated manifest find predicate requires the seeded real rollup demo at its old how-to path. Registry proposes the knowledge holder; co-cut REAL_DEMO_DOC_PATH in test/report/helpers/docs-index-state-fixture.mjs and real generator output before changing this predicate.",
-          "dependencyCategory": "step5-parity",
-          "searchWitness": {
-            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-            "roots": [
-              "docs/platform",
-              "docs/knowledge",
-              "docs/reference",
-              "docs/tutorials"
-            ],
-            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
-            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
-            "assessment": "test/report/enduser-index.test.mjs: The generated manifest find predicate requires the seeded real rollup demo at its old how-to path. Registry proposes the knowledge holder; co-cut REAL_DEMO_DOC_PATH in test/report/helpers/docs-index-state-fixture.mjs and real generator output before changing this predicate.",
-            "queries": [
-              "check-rollup-progress",
-              "QUADRANT_DIR_ALIASES",
-              "docs/decisions",
-              "### 0010",
-              "### 0015",
-              "### 0017",
-              "Product Gates"
-            ],
-            "aliasLookupSources": [
-              "plans/260925-documentation-authority-unification/alias-table.json",
-              "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
-              "docs/doc-registry.json"
-            ]
-          },
-          "record": {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
-            "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
-          }
-        }
-      ]
-    },
-    {
       "dependency": "doc-array",
       "itemCount": 1,
       "items": [
@@ -2207,49 +2231,6 @@
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
             "recordLine": 1,
             "recordSha256": "78d94901dba8de1244bb24cb16d90800f80707049f900a7f8c1a363fd7f4aa53"
-          }
-        }
-      ]
-    },
-    {
-      "dependency": "enduser-index-alias-membership-and-explanation-move",
-      "itemCount": 1,
-      "items": [
-        {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "dynamic-021543",
-          "blockedReason": "test/report/enduser-index.test.mjs: The primaryExplanationCount enumerates real explanation Markdown while registry proposals move some entries into knowledge. Compose its counted legacy subset against the promoted output without replacing the count assertion with a weaker existence test.",
-          "dependencyCategory": "generator-cutover",
-          "searchWitness": {
-            "pin": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-            "roots": [
-              "docs/platform",
-              "docs/knowledge",
-              "docs/reference",
-              "docs/tutorials"
-            ],
-            "evidenceFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-search-evidence.json",
-            "evidenceSha256": "f7902cb7849ca7d9a6258231069a4c85b76bf5d39c1c2d2798f9e1cd65f413ac",
-            "assessment": "test/report/enduser-index.test.mjs: The primaryExplanationCount enumerates real explanation Markdown while registry proposals move some entries into knowledge. Compose its counted legacy subset against the promoted output without replacing the count assertion with a weaker existence test.",
-            "queries": [
-              "check-rollup-progress",
-              "QUADRANT_DIR_ALIASES",
-              "docs/decisions",
-              "### 0010",
-              "### 0015",
-              "### 0017",
-              "Product Gates"
-            ],
-            "aliasLookupSources": [
-              "plans/260925-documentation-authority-unification/alias-table.json",
-              "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json",
-              "docs/doc-registry.json"
-            ]
-          },
-          "record": {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
-            "recordLine": 2,
-            "recordSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b"
           }
         }
       ]
@@ -2407,7 +2388,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
+            "recordSha256": "500b796351b7a697741ccf8c18dcf58e6f21545fac0559577cfb6fca89f46071"
           }
         }
       ]
@@ -2859,7 +2840,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
+            "recordSha256": "500b796351b7a697741ccf8c18dcf58e6f21545fac0559577cfb6fca89f46071"
           }
         }
       ]
@@ -3017,7 +2998,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
+            "recordSha256": "500b796351b7a697741ccf8c18dcf58e6f21545fac0559577cfb6fca89f46071"
           }
         }
       ]
@@ -3764,7 +3745,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
+            "recordSha256": "500b796351b7a697741ccf8c18dcf58e6f21545fac0559577cfb6fca89f46071"
           }
         },
         {
@@ -3916,7 +3897,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
+            "recordSha256": "500b796351b7a697741ccf8c18dcf58e6f21545fac0559577cfb6fca89f46071"
           }
         }
       ]
@@ -4074,7 +4055,7 @@
           "record": {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
             "recordLine": 1,
-            "recordSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19"
+            "recordSha256": "500b796351b7a697741ccf8c18dcf58e6f21545fac0559577cfb6fca89f46071"
           }
         }
       ]
@@ -5179,5 +5160,6 @@
     },
     "pinnedBytes": 3638222
   },
-  "task0ReviewClosure": "step-05-seam67-task0-closure.json"
+  "task0ReviewClosure": "step-05-seam67-task0-closure.json",
+  "reviewClosure": "L12-86; manifest title joins real readers; canonical park locators refreshed."
 }

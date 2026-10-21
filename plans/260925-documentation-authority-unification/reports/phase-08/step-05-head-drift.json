@@ -1,6 +1,6 @@
 {
   "kind": "Non-failing HEAD drift for Step 7 assembly; records remain at their own pins",
-  "headCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+  "headCommit": "198372e1a96e7c1784917342e83a1866fc67f65a",
   "entries": [
     {
       "file": ".githooks/pre-commit",

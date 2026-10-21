@@ -140,7 +140,8 @@
       "scripts/check-legacy-docs-ratchet.baseline.json": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8",
       "scripts/check-legacy-docs-ratchet.exceptions.json": "3d765b091e2e3c620f557dd162ea7c4c6fed207ec33a2795b22c8a8b60298750",
       "scripts/generate-shipped-path-inventory.mjs": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284"
-    }
+    },
+    "wholeUnitWitness": "Decision F: script, frozen baseline and exceptions form ONE retirement unit. Step 7 must compose the whole set as the Phase 9 Decision F retirement obligation; preserve means no byte change now, not survival after the cut. No rebaseline or new exception kind."
   },
   "readiness": "pending independent review and Phase9 composed parity"
 }

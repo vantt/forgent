@@ -1212,3 +1212,9 @@ Task0: 31 changed old files / 167 items, including direct and transitive governa
 
 ## Seam 6/7 author handback
 Task0 review closure and both complete seams are authored. Final checker: 1,030 records / 4,935 references / 31,510 tuples / 0 failures. Negative probes: 330/330 reject; current citation/ratchet suites 59/59; exact retired-corpus/RUL11 scratch replay passes on both sides. Independent review, 36 new-seam parks, Step7 composition and Phase9 parity remain open. No product/code/docs/tests/skills/baseline or runtime-* record edit; no git write, fgOS CLI, build, cargo, service or live-state/secrets access.
+
+## Seam 6/7 review closure — in progress
+Read all six independent review windows and the Lead closure brief. Applying L12-86 records-only corrections: proposed-move pointer membership, real manifest integration title, Decision F whole-unit witness, caller-root labels, and residual record text. Existing physical-home parks require source-bound search evidence; lifetime-shape prose alone does not establish a replacement operand. Full checker and all negative probe families will be rerun after canonical indexes are refreshed. No runtime-* or seam8 artifact is edited.
+
+## Seam 6/7 review closure — author handback
+L12-86 addresses all six review windows: 17 files / 1,530 changed items (1 disposition-changing, 16 label-only). R26 regenerated: 43 units / 91 readers over 17 files. Final full checker: 1,030 records / 4,935 references / 31,510 tuples / 0 failures. All 330/330 negative probes reject; root-positive checks 15/15. Runtime verifier broken-default issue is recorded separately for Lead at phase handoff. Lead acceptance, Step7 composition and Phase9 parity remain owed. Records-only scope preserved; no runtime/seam8 edit, git write or fgOS CLI.

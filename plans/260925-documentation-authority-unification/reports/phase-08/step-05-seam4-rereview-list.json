@@ -3371,7 +3371,7 @@
       "file": "src/setup/instruction-registry.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "b2e7b26ff127f8846ea5820b23df1d0238645b2b196f03d4b28219339c5e8726",
+      "recordSha256": "0db0c06d48f3835ac31f6c913db7c1251545ccffcf3a1875712c95e5a2267308",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697"
     },
@@ -3403,7 +3403,7 @@
       "file": "src/setup/registrations.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "815e0b5c3db36a472cdea755f1a0a3198bc8c1769fe3e3822b69ef0c502f42b5",
+      "recordSha256": "554b9de52e049b41edbe1d4cefdb4941bfb9c66a179fa217b7b7989f8a52a771",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518"
     },

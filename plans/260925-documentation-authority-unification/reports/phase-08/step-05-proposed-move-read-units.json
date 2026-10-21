@@ -1,5 +1,5 @@
 {
-  "ruling": "L12-85/R26/R27/R28",
+  "ruling": "L12-86/R26/R27/R28",
   "moveSetPath": "step-05-cutover-move-set.json",
   "moveSetSha256": "3b8f1999d1e2b4b32e5219185ab61493569b8ade135ebebd784ceef5ab2cf5db",
   "units": [
@@ -2234,6 +2234,19 @@
       ],
       "coChanges": [
         {
+          "file": "scripts/check-decision-citation-drift.mjs",
+          "id": "reference-002470",
+          "recordFile": "step-05-records/citation-ratchet-roots.jsonl",
+          "line": 18,
+          "role": "comment-provenance",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+          "operation": "docs/decisions/index.md",
+          "sourceLine": "//     convention, superseded by docs/decisions/index.md (generated,"
+        },
+        {
           "file": "src/report/decision-index.mjs",
           "id": "reference-003693",
           "recordFile": "step-05-records/generators-decision-index.jsonl",
@@ -2817,6 +2830,19 @@
           "sourceSha256": "156110511f8aa5515db4d6dfe98526a1ab91fc51492447d9c1a42eb52e6c31b4",
           "operation": "path.join(tmp, 'docs', 'decisions', 'index.md')",
           "sourceLine": "    path.join(tmp, 'docs', 'decisions', 'index.md'),"
+        },
+        {
+          "file": "test/docs/decisions-corpus-retired.test.mjs",
+          "id": "reference-004030",
+          "recordFile": "step-05-records/tests-real-file.jsonl",
+          "line": 8,
+          "role": "dated-provenance",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "fd8b2e38773f33f71a6507876a7f5d2cc4bd1b61f9bbd8a4246e7f56a29b18b2",
+          "operation": "docs/decisions/",
+          "sourceLine": "// docs/decisions/\" section."
         },
         {
           "file": "test/docs/decisions-corpus-retired.test.mjs",
@@ -3480,6 +3506,32 @@
       "readers": [],
       "coChanges": [
         {
+          "file": "core/skills/_shared/citation-format.md",
+          "id": "author-s67-citation-core-51-3",
+          "recordFile": "step-05-records/citation-ratchet-roots.jsonl",
+          "line": 51,
+          "role": "citation-convention",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+          "operation": "docs/id-systems-audit.md",
+          "sourceLine": "(`docs/id-systems-audit.md` §5), already locked, previously unenforced."
+        },
+        {
+          "file": "core/skills/_shared/citation-format.md",
+          "id": "author-s67-citation-core-34-30",
+          "recordFile": "step-05-records/citation-ratchet-roots.jsonl",
+          "line": 34,
+          "role": "citation-convention",
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "inputCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+          "sourceSha256": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+          "operation": "docs/id-systems-audit.md",
+          "sourceLine": "                            (docs/id-systems-audit.md) but not this"
+        },
+        {
           "file": "scripts/generate-shipped-path-inventory.mjs",
           "id": "reference-003592",
           "recordFile": "step-05-records/generators-skills-and-support.jsonl",
@@ -3521,6 +3573,7 @@
       ],
       "readerRecordIds": [],
       "coCutPaths": [
+        "core/skills/_shared/citation-format.md",
         "scripts/generate-shipped-path-inventory.mjs",
         "scripts/next-doc-id.mjs",
         "scripts/propose-doc-decisions.mjs"
@@ -6814,6 +6867,19 @@
           "sourceLine": "const MANIFEST_PATH = path.join(REPO_ROOT, 'docs', 'enduser-docs-index.json');"
         },
         {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "author-s5-b5-enduser-index-154-35",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 154,
+          "role": "test-title",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/enduser-docs-index.json",
+          "sourceLine": "test('fgos docs-index writes repo/docs/enduser-docs-index.json with the real how-to demo entry', () => {"
+        },
+        {
           "file": "test/cli/fgos-post-merge.test.mjs",
           "id": "author-s5-b6-closure-manifest-reader-187",
           "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
@@ -6998,19 +7064,6 @@
           "sourceLine": "  const manifestPath = path.join(cwd, 'docs', 'enduser-docs-index.json');"
         },
         {
-          "file": "test/report/enduser-index.test.mjs",
-          "id": "author-s5-b5-enduser-index-154-35",
-          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
-          "line": 154,
-          "role": "non-document-operation",
-          "admission": "REJECT",
-          "disposition": "preserve",
-          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
-          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
-          "operation": "docs/enduser-docs-index.json",
-          "sourceLine": "test('fgos docs-index writes repo/docs/enduser-docs-index.json with the real how-to demo entry', () => {"
-        },
-        {
           "file": "test/fixtures/run-outcome/legacy-derivation.json",
           "id": "author-s5-b6-legacy-derivation.json-4246-12",
           "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
@@ -7113,6 +7166,175 @@
           "sourceSha256": "df9919c796c8d0f310bf94fe47ee265d1b30d62346cdac82a477c603d04f819e",
           "operation": "path.join(tmp, 'docs', 'enduser-docs-index.json')",
           "sourceLine": "  fs.writeFileSync(path.join(tmp, 'docs', 'enduser-docs-index.json'), `${JSON.stringify(entries, null, 2)}\\n`);"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004311",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 330,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/decisions/",
+          "sourceLine": "    'every .md file under docs/decisions/ (alias) plus every .md file under docs/explanation/ (primary dir) must appear as one explanation-quadrant entry each',"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004319",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 334,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/decisions/",
+          "sourceLine": "      entry.docPath.startsWith('docs/decisions/') || entry.docPath.startsWith('docs/explanation/') || entry.docPath.startsWith('docs/knowledge/'),"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004320",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 325,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/decisions/",
+          "sourceLine": "    (e) => e.docPath.startsWith('docs/decisions/') || e.docPath.startsWith('docs/explanation/'),"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004330",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 167,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/how-to/check-rollup-progress.md",
+          "sourceLine": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004332",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 348,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/explanation/",
+          "sourceLine": "  assert.ok(primaryDoc, 'at least one backfilled docs/explanation/ doc must appear via the primary dir');"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004344",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 162,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/how-to/check-rollup-progress.md",
+          "sourceLine": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004345",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 347,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/explanation/",
+          "sourceLine": "  const primaryDoc = explanationEntries.find((e) => e.docPath.startsWith('docs/explanation/'));"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004347",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 325,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/explanation/",
+          "sourceLine": "    (e) => e.docPath.startsWith('docs/decisions/') || e.docPath.startsWith('docs/explanation/'),"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004348",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 330,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/explanation/",
+          "sourceLine": "    'every .md file under docs/decisions/ (alias) plus every .md file under docs/explanation/ (primary dir) must appear as one explanation-quadrant entry each',"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "reference-004351",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 334,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/explanation/",
+          "sourceLine": "      entry.docPath.startsWith('docs/decisions/') || entry.docPath.startsWith('docs/explanation/') || entry.docPath.startsWith('docs/knowledge/'),"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "dynamic-021513",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 162,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docPath === 'docs/how-to/check-rollup-progress.md')",
+          "sourceLine": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "dynamic-021543",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 323,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "path.join(REPO_ROOT, 'docs', 'explanation')",
+          "sourceLine": "  const primaryExplanationCount = fs.readdirSync(path.join(REPO_ROOT, 'docs', 'explanation')).filter((f) => f.endsWith('.md')).length;"
+        },
+        {
+          "file": "test/report/enduser-index.test.mjs",
+          "id": "author-s5-b5-enduser-index-334-129",
+          "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+          "line": 334,
+          "role": "real-document-reader",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+          "operation": "docs/knowledge/",
+          "sourceLine": "      entry.docPath.startsWith('docs/decisions/') || entry.docPath.startsWith('docs/explanation/') || entry.docPath.startsWith('docs/knowledge/'),"
         }
       ],
       "readerRecordIds": [
@@ -7129,6 +7351,7 @@
         "author-s4-fix2-a8e9503a9eafcad1",
         "dynamic-021514",
         "dynamic-021515",
+        "author-s5-b5-enduser-index-154-35",
         "author-s5-b6-closure-manifest-reader-187",
         "author-s5-b6-closure-manifest-reader-188",
         "author-s5-b6-closure-manifest-reader-198",
@@ -7155,13 +7378,13 @@
         "test/setup/checks.test.mjs",
         "test/setup/helpers/setup-checks-harness.mjs"
       ],
-      "readerCount": 20,
+      "readerCount": 21,
       "status": "decision-open"
     }
   ],
   "unitCount": 43,
   "unitsWithReaders": 6,
-  "readerCount": 90,
+  "readerCount": 91,
   "readerFiles": 17,
   "scope": "All canonical authored Step5 shards, including seams6/7; every declared reader/output and comment/fixture co-change is individually pin-bound. No runtime-* shard edited."
 }

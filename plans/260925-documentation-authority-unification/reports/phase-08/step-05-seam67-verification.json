@@ -1,6 +1,13 @@
 {
   "ok": true,
-  "verifiedAtNs": 1792566091098824179,
+  "ruling": "L12-86",
+  "verifiedAt": "2026-10-21T07:47:26.006497+00:00",
+  "reviewDelta": {
+    "files": 17,
+    "items": 1530,
+    "dispositionChangedFiles": 1,
+    "labelOnlyFiles": 16
+  },
   "fullChecker": {
     "files": 1030,
     "literalReferences": 4935,
@@ -9,7 +16,8 @@
   },
   "negativeProbesPassed": 330,
   "negativeProbesTotal": 330,
-  "currentTests": 59,
+  "positivePassed": 15,
+  "positiveTotal": 15,
   "seam67Totals": {
     "files": 35,
     "references": 1313,
@@ -18,19 +26,17 @@
     "mechanicalFiles": 0,
     "neutralFiles": 0,
     "judgmentFiles": 35,
-    "admitted": 1222,
-    "rejected": 957,
+    "admitted": 1215,
+    "rejected": 964,
     "parks": 36,
     "patches": 2,
     "preserves": 2116,
     "renderJoins": 25,
     "patchFiles": 2
   },
-  "task0": {
-    "files": 32,
-    "items": 168,
-    "dispositionChangedFiles": 8,
-    "labelOnlyFiles": 24
+  "r26": {
+    "units": 43,
+    "readers": 91
   },
   "scope": {
     "allChangesInsideAuthorizedReportDirectory": true,
@@ -39,224 +45,227 @@
     "diffCheckPass": true,
     "needsWrites": []
   },
-  "checkerSources": [
+  "canonicalInputsFrozenBeforeFinalChecker": [
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-admission-rules.py",
-      "sha256": "443fca4119b5e751035c3820a92ccd1f884bdaa25d7452622364c15e29090618"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-read-units.json",
+      "sha256": "3425c756255d969db17a2bf71d29b176a158e705443a54404f9af5c8247cfbea"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
-      "sha256": "132fc350563cc76f8a9c84b221790fe8421acf8305f56e95c844af328992c6d1"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/citation-ratchet-roots.jsonl",
+      "sha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
-      "sha256": "a59d36f661d03d96cc8d168ec8dd316b79161904145d04d3e8a50e0b63df7cf5"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sha256": "e87cdf03429074018e7cb4dd971cb71502dc87b28e17744d3d2c02d0d942ab67"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-probes.py",
-      "sha256": "354891b56926139bedbb7bb0df4d8f916ea8a519e8ea06d4d0b0f5e0e028c950"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+      "sha256": "17b7c1b7dcdcb7232f6d0f6b70bd3fb8cab7dc4bd0555125cd114b5a64f1368c"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-rules.py",
-      "sha256": "2c50a2cfec0c31ea1ad40b2acc0aa3207cbf089b9c7b779bb67449beec1c4106"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-decision-index.jsonl",
+      "sha256": "85637d71877e6216e23382a843873d7cddf2db7cf6d5652092b96b5db6858a43"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-callers.py",
-      "sha256": "c74bb6c175c46374650f2bad083cf1d1a5011493997db3c68619340204444cd2"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-doc-registry.jsonl",
+      "sha256": "2e4bb12660f2e26482ce8ac6de652930a09458676dc7af58412179a987d7d1e4"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check.py",
-      "sha256": "50d9337f7e921017b2f72b66b7010b6f1a6fb49b6b20ea7988fddfbb59d0fecb"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+      "sha256": "cbde89019894d01cc46ce8e09575127c5f82d8208203672b1e93126606fd3f2b"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py",
-      "sha256": "a19c43384269bb457a4de2ad2f9629d42eab2cec4f849fa0e832056fd0b9c5f5"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-instructions.jsonl",
+      "sha256": "7b581f7649fcaeb9d895cf6771a83c006566800191e8a2ae6e2bbf49d8195cb6"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes.py",
-      "sha256": "a41e9243dd18de7029d909f8e1a009d626eff4c6dab8ebe4c5b87cd4e7abc79e"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+      "sha256": "6f7bbf873c2fe170ff943cd2078bec4b51245cc8b82267f5aaef3bca39554dfe"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-judgment-check.py",
-      "sha256": "31c46cd05ab95fd706b7ac528b776f95f3176647a624829c1635cd0bd98e5895"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sha256": "52de0864d769d7b44184c90240420a2be823658ac61a7862c042412e4cd345a1"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes.py",
-      "sha256": "eaed7aa4684604d7c5ed16eec9278b6477cd6ef8addabfb9580484bc9b070138"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "sha256": "9f3dbb93e32401ffee73df61fb16c6dc4ad97a0313a875ef0e88121930cfbad4"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py",
-      "sha256": "ec07e5925fd8a62d2d914101bb999e4f50c4a65d336f475fb07e2d648d218936"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
+      "sha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-probes.py",
-      "sha256": "58fbece70a1dcc940b3f277a50382d018b575d467b5ea5c996bc93bedcfea412"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+      "sha256": "01ba28d87fe615a3529ab145faa4c3d73c474cff2b356b04ee1b321ee39e701d"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py",
-      "sha256": "70112e78d4bff0a102ab4e40fdb2a07f603c12beb647be611801d583b084885c"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+      "sha256": "5cd70b50ea657c6b1038f2e1b4b856845d6d020100025dcbca4731a15706083d"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes.py",
-      "sha256": "26e8efb19b0d1a6e9385cb065cda8295a83c363b6c2a7378ea2115a37542704e"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+      "sha256": "1d79a8e3ba873e6294c4838537ff938d951ebedd4931cb428b86a22c9023ce46"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-check.py",
-      "sha256": "084e41e416ba98297bc8bf82590743b84343bb935e66353a77dc584bf9e182b1"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "sha256": "7ece1cb25d2b5a48c70ad1431672d96c415428291f76a01bb1291e3b519e9a92"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-probes.py",
-      "sha256": "6065aace9078a2a65a9c391bb46837775c8388491016628870da9ee75dac5f56"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-prompt-goldens.jsonl",
+      "sha256": "6f7aaa44bc6da3619bd9bbb1ba32e6faa9f66691bb04e8fa06738214c78cf423"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-run-probes.py",
-      "sha256": "21e417250ea8962e9fe492b8e4dcc189756292abe3869483a28d0d8dc0d88764"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file-batch3.jsonl",
+      "sha256": "56f682625f9cbf357e4edd1a06ea290f461325a7828b00bbfc6477d383d6faf9"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-check.py",
-      "sha256": "9d7a13e482987a6ee50bf968c7e1937b613fb87533941a89eb0ff448b33d7c57"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
+      "sha256": "7b927019c9136d3199ffcfd95f371ba4e12a1ddb7deaa902883040e61514b38e"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-probes.py",
-      "sha256": "77d42fa47e5728d143e3b079301ced642fc5bc3691ac72066aa64f40def5c5e8"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+      "sha256": "2706ac0823a05e8e066648ddcc0f736c5b888ddd08f4560777e7750c5c59f3b2"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-bulk-rules.py",
-      "sha256": "b10e106669fb9147fb21e5b90c7ff000511fe18d17b603af32b30343ce93ad04"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/ui-spec-compiler.jsonl",
+      "sha256": "26a1696b517677964d62c387a54b503c8ecf2f2f4a6ec809d25fad60c8c8d6c7"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-check.py",
-      "sha256": "7bf82a23b82e0e513f0632dcf18e6dcbe6d18f5407adb8a2eb2c10962b7e8c88"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-rereview-list.json",
+      "sha256": "61c361c509eefe90c9ec8aaed4850f6a0f60241ceb6c950850b85d5d0fc1fa27"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-judgment-check.py",
-      "sha256": "ff3ade91c03d6103209f48b40a5b9d6f60ecf44aedb74cd394edcbeba6f5ae7b"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-parity-receipts.json",
+      "sha256": "d2d19099915daa8c0c31420dc99097c76c39063a60f95f248bd0b62704a033a0"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-neutral-rules.py",
-      "sha256": "d7c96a9fd7307206fe4098249a29b781d44158beafda88f83113c0fe3f12e5da"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-review-list.json",
+      "sha256": "4dfd2f7100f82ca067c22662eeee6896c49258554e7ab4a926ed47f9acb71549"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes.py",
-      "sha256": "cf5e6fa04562cb2aa35aef2eac7890def60e4790bba7b0a0ef62d864fa4bfc61"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-cutover-specs.json",
+      "sha256": "71e54d26fd7a7f3059a17c122f7aaa59f9065ab8510703528d97a02a3c427845"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-root-rules.py",
-      "sha256": "4caf280e5d667bad7b312a5e85bffc27184713b354c9c50f72f1e3b3b18bd8b9"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-parity-receipts.json",
+      "sha256": "c896ea33acb0e7ac0a370a4e71a499354a6103248e1c8fa0fcd8191edfe53543"
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-callers.py",
-      "sha256": "ff12815222b6e6c4173759a51e9c3f776b41929c6650066f79fd036936496611"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-check.py",
-      "sha256": "387fa351c6126265446803bd7584f97ed95f3a8cd571e03e6b1e0f9d3cfa4464"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-probes.py",
-      "sha256": "f9d236fb7606558049b49a809e2e51795bb68c5cffe07db9cca59d9ab71af2d8"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-task0-rules.py",
-      "sha256": "c4eb5e9374a591f7e5ad34a374fa507847737c345fd8f0b4edfc57f6b2cce2b6"
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-review-list.json",
+      "sha256": "266621e0665b001f1d54e710bdfcf8b4f85b0078bfd074a531a033f07e53847f"
     }
   ],
   "artifacts": [
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/ui-spec-compiler.jsonl",
-      "sha256": "a6492f02d7d1c341f9beb7600c7ae99aae9dd7644a7a8c5c3be4d1f47599a0b0",
-      "bytes": 66030168
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "sha256": "aa8e4316bb065d79c0931505acb4847c584aa4a3b89a84bb0ace484091e08d9c",
+      "bytes": 305431
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/citation-ratchet-roots.jsonl",
-      "sha256": "4ca70717c2f9b1829d584fbe8c928ebf37682520356d1de5452c8f0154b548c1",
-      "bytes": 5300075
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "sha256": "345c705e985a6819ab7eff2f6c326b9d2ec094a179cd8a26cfdf18b2944fea58",
+      "bytes": 271635
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-review-list.json",
-      "sha256": "8ff0ec006731134e3b9f2a08d7b2c88a4977dbd229bcef16db234feccf232a4d",
-      "bytes": 267878
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-task0-closure.json",
-      "sha256": "b12845d9ffa7d0471d50a0dcddd432eb661bbb001cfcf6a5505199ddadd6bf16",
-      "bytes": 44057
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-closure.json",
-      "sha256": "aa7a29730ffbaeaa79ea7f1457d6a9e1d1e8b813a34a0d91b727de466c024069",
-      "bytes": 28653
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-cutover-specs.json",
-      "sha256": "b5e45f7210bfdf2f0a7fc0021e2fadacfedff3d34beeb6961b59cccfdc4a0700",
-      "bytes": 10072
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-parity-receipts.json",
-      "sha256": "5b587bfb462f4d549f962f85a2af4946ca63469f4a33b54ff55a23953c5e5d09",
-      "bytes": 59335
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-source-traces.json",
-      "sha256": "54baa7eddc46c7303d03dc230b5eb64acf6604144e5e7bf73ec9031487e084cf",
-      "bytes": 20310
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-caller-corrections.json",
-      "sha256": "357c42b7de52aac49f7674f451a13c2e8be7d31d0dc63a0a40ce383900a560ce",
-      "bytes": 363767
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-whole-file-reads.json",
-      "sha256": "9a6606ac20ab7bd2e465dfe4319dce4bfbb3c5f426677342a78fcc8e4f064224",
-      "bytes": 14504
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-inventory-owner-confirmation.json",
-      "sha256": "76dc4fa25bc6989cb2c75da780111d694aa96726e7e8556c8bfcc8768306f8a1",
-      "bytes": 708
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-documented-commands.json",
-      "sha256": "ff7e6d1ed303a6fe59a1a3c3c88cedc67a9a7e1030ccbca90f35102992cc66e0",
-      "bytes": 121359
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+      "sha256": "38ce24a7943738fbb0382098c3f9de91d57a3cb7a1285905dee1ad35d4a43aec",
+      "bytes": 4968638
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-read-units.json",
-      "sha256": "24dc886a79f67b22258c9053e111fc8bb184387fa405f00ce738f0a8fc14ac8c",
-      "bytes": 350783
+      "sha256": "3425c756255d969db17a2bf71d29b176a158e705443a54404f9af5c8247cfbea",
+      "bytes": 362147
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-review-list.json",
-      "sha256": "43905b35fa4098a6826b6e02c10d8727d9a4dc75999ff1934dabd46d5347100c",
-      "bytes": 2765775
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/citation-ratchet-roots.jsonl",
+      "sha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+      "bytes": 5841902
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sha256": "52de0864d769d7b44184c90240420a2be823658ac61a7862c042412e4cd345a1",
+      "bytes": 4043282
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+      "sha256": "01ba28d87fe615a3529ab145faa4c3d73c474cff2b356b04ee1b321ee39e701d",
+      "bytes": 9259988
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+      "sha256": "5cd70b50ea657c6b1038f2e1b4b856845d6d020100025dcbca4731a15706083d",
+      "bytes": 103868686
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
+      "sha256": "7b927019c9136d3199ffcfd95f371ba4e12a1ddb7deaa902883040e61514b38e",
+      "bytes": 173825
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/ui-spec-compiler.jsonl",
+      "sha256": "26a1696b517677964d62c387a54b503c8ecf2f2f4a6ec809d25fad60c8c8d6c7",
+      "bytes": 66028148
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-rereview-list.json",
+      "sha256": "61c361c509eefe90c9ec8aaed4850f6a0f60241ceb6c950850b85d5d0fc1fa27",
+      "bytes": 3255488
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-parity-receipts.json",
+      "sha256": "d2d19099915daa8c0c31420dc99097c76c39063a60f95f248bd0b62704a033a0",
+      "bytes": 2312795
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-closure.json",
-      "sha256": "86a9c7509290c33bcf6f163b26789dd3950059c55c85369c11f7702328e20373",
-      "bytes": 309661
+      "sha256": "d0472355e8a5727a827fdbf822b6e90359d2d647e03d217ab05b5cee08c6ff4d",
+      "bytes": 310723
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-review-list.json",
+      "sha256": "4dfd2f7100f82ca067c22662eeee6896c49258554e7ab4a926ed47f9acb71549",
+      "bytes": 2765730
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-closure.json",
+      "sha256": "e951009077ddcc90b30ee108849b3128d73e0e3cc77ac252d7c11b4ee2242553",
+      "bytes": 329347
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-cutover-specs.json",
+      "sha256": "71e54d26fd7a7f3059a17c122f7aaa59f9065ab8510703528d97a02a3c427845",
+      "bytes": 10359
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-final-proof.json",
-      "sha256": "36491feca3c95e0fdeb80e9222af9a35febd5fab4aa4c1c9e8af91d09e854d78",
-      "bytes": 14113
+      "sha256": "e0605c023a259c46aee0bfd8da91f1ca78635631d1e1f488c7cacedcdc618728",
+      "bytes": 13976
     },
     {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-current-proof.json",
-      "sha256": "b344dfac042449803ef6fef545649034f24bad36df11916204a19b9f290e09a8",
-      "bytes": 2360
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-r22-patch-replay.json",
-      "sha256": "c2f493ceba3d16c1e7a5b91c44fba96c95bbf83947abc8e74947bff2f120091c",
-      "bytes": 4019
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-full-check.json",
+      "sha256": "1087fba829ff4652df7277b68ec01eb54a13dc3382b69358504c885781e828a2",
+      "bytes": 15120631
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-handback.md",
-      "sha256": "fe289e065ed780ce4b6dfcd29a6e05f14df2d4b5849a1eacca83fba3ac907466",
-      "bytes": 3072
+      "sha256": "93077c424688ba3b4d2150cf08725da3edd53bc8cb91a7605f297e65f6fe2afa",
+      "bytes": 3839
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-parity-receipts.json",
+      "sha256": "c896ea33acb0e7ac0a370a4e71a499354a6103248e1c8fa0fcd8191edfe53543",
+      "bytes": 60955
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-review-list.json",
+      "sha256": "266621e0665b001f1d54e710bdfcf8b4f85b0078bfd074a531a033f07e53847f",
+      "bytes": 529841
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-task0-closure.json",
+      "sha256": "85babfaf310618f9a525f3d3081594e80b5bc54c3e9b833e058ec6f45a9d52ed",
+      "bytes": 44172
     }
   ],
-  "limits": "Author structural verification only; independent review, retention/move decisions, Step7 composition, UI/candidate scan parity and Phase9 full-suite proof remain owed."
+  "limits": "Author review closure only. Lead validation, retention/move decisions, Step7 composition and Phase9 executed parity remain owed; separate runtime-verifier item recorded for phase handoff."
 }

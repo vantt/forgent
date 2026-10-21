@@ -286,7 +286,7 @@
       "file": "src/setup/instruction-registry.mjs",
       "recordFile": "step-05-records/setup-doctor-roots.jsonl",
       "beforeSha256": "919c0817ce4126988a7b5462a519d35e9260e7df71c88fe737c4616e566c7a61",
-      "afterSha256": "b2e7b26ff127f8846ea5820b23df1d0238645b2b196f03d4b28219339c5e8726",
+      "afterSha256": "0db0c06d48f3835ac31f6c913db7c1251545ccffcf3a1875712c95e5a2267308",
       "dispositionChanged": true,
       "changes": [
         {
@@ -325,7 +325,7 @@
       "file": "src/setup/registrations.mjs",
       "recordFile": "step-05-records/setup-doctor-roots.jsonl",
       "beforeSha256": "f17ef1f8352dc3071b217ca93e6d2d49b009789d7424e6fcf364bd6914aa3f7a",
-      "afterSha256": "815e0b5c3db36a472cdea755f1a0a3198bc8c1769fe3e3822b69ef0c502f42b5",
+      "afterSha256": "554b9de52e049b41edbe1d4cefdb4941bfb9c66a179fa217b7b7989f8a52a771",
       "dispositionChanged": true,
       "changes": [
         {
@@ -499,7 +499,7 @@
       "file": "test/report/enduser-index.test.mjs",
       "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
       "beforeSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a",
-      "afterSha256": "94994f0047fc6b03ab7f5e8676d8388c5ff747662594a4f90e5f1efe118ac79b",
+      "afterSha256": "a7b2bc6820ed5ddf0115d51dcc6639c267c0fee114ac3fd624e5ec37966d1d21",
       "dispositionChanged": true,
       "changes": [
         {
@@ -583,7 +583,7 @@
       "file": "test/scripts/check-doc-candidate-status.test.mjs",
       "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
       "beforeSha256": "bf697242fa0b27d98373e4add958f4d01f6d28903ae76255ca28b7ae9a3fc7ad",
-      "afterSha256": "8941457165965925f4a55973b70f5f04d34f3858fe37fe23749810c998a5f141",
+      "afterSha256": "58c9e77a2f7c5263f1c6523c5627ffc63efe14019d839c32658de8d3c05cab8e",
       "dispositionChanged": true,
       "changes": [
         {
@@ -1270,7 +1270,7 @@
       "file": "test/docs/decisions-corpus-retired.test.mjs",
       "recordFile": "step-05-records/tests-real-file.jsonl",
       "beforeSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f",
-      "afterSha256": "f963ffba87caf59ab599d8f8f5a8882ba1c9609b59d64b1a94d94d9542a1ea19",
+      "afterSha256": "500b796351b7a697741ccf8c18dcf58e6f21545fac0559577cfb6fca89f46071",
       "dispositionChanged": true,
       "changes": [
         {
@@ -1336,5 +1336,6 @@
       "obligation": "Seam 8 confirm existing seam 4 ownership and atomic fixture co-change."
     }
   ],
-  "independentReview": "pending Lead"
+  "independentReview": "pending Lead",
+  "subsequentReviewClosure": "L12-86; historical Task0 classifications retained; current after-hashes refreshed."
 }

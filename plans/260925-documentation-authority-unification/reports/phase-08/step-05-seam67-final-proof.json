@@ -4,114 +4,51 @@
     {
       "label": "full-check",
       "command": [
-        "/usr/bin/python3",
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "python3",
         "-B",
-        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
         "--output",
         "step-05-seam67-full-check.json"
       ],
-      "startedAtNs": 1792565506734959153,
+      "startedAtNs": 1792567618171544768,
+      "finishedAtNs": 1792568843593093519,
       "exit": 0,
       "resultFresh": true,
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
       "sourceSha256": "132fc350563cc76f8a9c84b221790fe8421acf8305f56e95c844af328992c6d1",
-      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-full-check.log",
-      "logSha256": "c820052d0ec4e803d5ed41d79174f68fd2b8afd1f81ed2ebc702b0d641c5db4d",
       "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-full-check.json",
-      "resultSha256": "ed7de8d96dadae59d21eec882276243a9a001a0c5507a1f371ec01e910bc6595",
+      "resultSha256": "1087fba829ff4652df7277b68ec01eb54a13dc3382b69358504c885781e828a2",
+      "scratchLogPath": "/tmp/fgos-work/seam67-final-check.log",
+      "scratchLogSha256": "b32bcd2de226389f44c3929936a968c287e90313696dd56a55e9d0ebe3d76641",
       "counts": {
-        "failureCount": 0,
         "files": 1030,
         "literalReferences": 4935,
-        "dynamicTuples": 31510
-      },
-      "ok": true
-    },
-    {
-      "label": "pilot",
-      "command": [
-        "/usr/bin/python3",
-        "-B",
-        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py"
-      ],
-      "startedAtNs": 1792562720953036549,
-      "exit": 0,
-      "resultFresh": true,
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
-      "sourceSha256": "a59d36f661d03d96cc8d168ec8dd316b79161904145d04d3e8a50e0b63df7cf5",
-      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-pilot.log",
-      "logSha256": "ed5a4641a73331a1c84a2cdcfc76a1f7bc1170db25a5ff214213f49b7cd12c57",
-      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
-      "resultSha256": "b2335caa41137e75baba492b2771e64443c542f728a82798d18d684a54d01500",
-      "counts": {
-        "passed": 44,
-        "total": 44,
-        "baselineFailures": 0
-      },
-      "ok": true
-    },
-    {
-      "label": "seam4",
-      "command": [
-        "/usr/bin/python3",
-        "-B",
-        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py"
-      ],
-      "startedAtNs": 1792562941575939548,
-      "exit": 0,
-      "resultFresh": true,
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py",
-      "sourceSha256": "a19c43384269bb457a4de2ad2f9629d42eab2cec4f849fa0e832056fd0b9c5f5",
-      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-seam4.log",
-      "logSha256": "be6baada3498e9392aed50f2a1eae7c314e3baf667ac54ad2bbdaec53886bace",
-      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes-result.json",
-      "resultSha256": "079f8336d8931ef7c4b08388fea47808ce35723043191d9f5e0c3cb86e7a3662",
-      "counts": {
-        "passed": 34,
-        "total": 34,
-        "baselineFailures": 0
-      },
-      "ok": true
-    },
-    {
-      "label": "prompt",
-      "command": [
-        "/usr/bin/python3",
-        "-B",
-        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes.py"
-      ],
-      "startedAtNs": 1792563631567778456,
-      "exit": 0,
-      "resultFresh": true,
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes.py",
-      "sourceSha256": "cf5e6fa04562cb2aa35aef2eac7890def60e4790bba7b0a0ef62d864fa4bfc61",
-      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-prompt.log",
-      "logSha256": "00ea355b1902af878116cadc730b7776679c1712caebb92ab938cfb8d78b7f5c",
-      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes-result.json",
-      "resultSha256": "45d235bb0e28a8b776f3503d418347d6a182e629b6d10bc32dda821fc44c68e8",
-      "counts": {
-        "passed": 13,
-        "total": 13,
-        "baselineFailures": 0
+        "dynamicTuples": 31510,
+        "failureCount": 0
       },
       "ok": true
     },
     {
       "label": "batch2",
       "command": [
-        "/usr/bin/python3",
+        "python3",
         "-B",
         "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes.py"
       ],
-      "startedAtNs": 1792564419296940391,
+      "startedAtNs": 1792568088845902231,
+      "finishedAtNs": 1792568216949472742,
       "exit": 0,
       "resultFresh": true,
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes.py",
       "sourceSha256": "a41e9243dd18de7029d909f8e1a009d626eff4c6dab8ebe4c5b87cd4e7abc79e",
-      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch2.log",
-      "logSha256": "6e23e43fa065043d297532dfacae577b973caee59b1e111131b6d7ca626b1d79",
       "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes-result.json",
       "resultSha256": "eda386a899c7af10acc888cfb895eebb7386be99c9173f7f6d3f018c0666fc4c",
+      "scratchLogPath": "/tmp/fgos-work/closure-batch2.log",
+      "scratchLogSha256": "6e23e43fa065043d297532dfacae577b973caee59b1e111131b6d7ca626b1d79",
       "counts": {
         "passed": 18,
         "total": 18,
@@ -122,19 +59,20 @@
     {
       "label": "batch3",
       "command": [
-        "/usr/bin/python3",
+        "python3",
         "-B",
         "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes.py"
       ],
-      "startedAtNs": 1792564474222404161,
+      "startedAtNs": 1792567870519455376,
+      "finishedAtNs": 1792568088844920379,
       "exit": 0,
       "resultFresh": true,
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes.py",
       "sourceSha256": "eaed7aa4684604d7c5ed16eec9278b6477cd6ef8addabfb9580484bc9b070138",
-      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch3.log",
-      "logSha256": "5d2603d8e219a93aadee79ed6945da5f41a999e014654d78a62902827adae8b1",
       "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes-result.json",
       "resultSha256": "2e192488be537d058fad959b4e9071ae54268c8fc1aafd089009780026cecac1",
+      "scratchLogPath": "/tmp/fgos-work/closure-batch3.log",
+      "scratchLogSha256": "5d2603d8e219a93aadee79ed6945da5f41a999e014654d78a62902827adae8b1",
       "counts": {
         "passed": 19,
         "total": 19,
@@ -145,19 +83,20 @@
     {
       "label": "batch4",
       "command": [
-        "/usr/bin/python3",
+        "python3",
         "-B",
         "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-probes.py"
       ],
-      "startedAtNs": 1792564572155380641,
+      "startedAtNs": 1792567477166865468,
+      "finishedAtNs": 1792567710823227719,
       "exit": 0,
       "resultFresh": true,
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-probes.py",
       "sourceSha256": "58fbece70a1dcc940b3f277a50382d018b575d467b5ea5c996bc93bedcfea412",
-      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch4.log",
-      "logSha256": "dccc15d40aa1c7781314fb22c5bfd637bffb36a020d9bcc6b0010bcb28a21e3a",
       "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-probes-result.json",
       "resultSha256": "0b7f8f5aede3a29acfc58201aaf4c2faf7be5bc2c27d2faccbdf13d2810aac35",
+      "scratchLogPath": "/tmp/fgos-work/closure-batch4.log",
+      "scratchLogSha256": "dccc15d40aa1c7781314fb22c5bfd637bffb36a020d9bcc6b0010bcb28a21e3a",
       "counts": {
         "passed": 29,
         "total": 29,
@@ -169,19 +108,20 @@
     {
       "label": "batch5",
       "command": [
-        "/usr/bin/python3",
+        "python3",
         "-B",
         "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes.py"
       ],
-      "startedAtNs": 1792564909343896142,
+      "startedAtNs": 1792567710823401892,
+      "finishedAtNs": 1792567870519101608,
       "exit": 0,
       "resultFresh": true,
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes.py",
       "sourceSha256": "26e8efb19b0d1a6e9385cb065cda8295a83c363b6c2a7378ea2115a37542704e",
-      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch5.log",
-      "logSha256": "c63821897ed9a5fae8a0d1f7511c6d5f0d1fa4bd917f2f15036d31e92ac3be77",
       "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes-result.json",
       "resultSha256": "a9e5ad8f9a24816d60081ab678ee54e7ffdaefec5dc2aecbcba132d90c321eba",
+      "scratchLogPath": "/tmp/fgos-work/closure-batch5.log",
+      "scratchLogSha256": "c63821897ed9a5fae8a0d1f7511c6d5f0d1fa4bd917f2f15036d31e92ac3be77",
       "counts": {
         "passed": 19,
         "total": 19,
@@ -192,19 +132,20 @@
     {
       "label": "batch6",
       "command": [
-        "/usr/bin/python3",
+        "python3",
         "-B",
         "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-probes.py"
       ],
-      "startedAtNs": 1792565246339739667,
+      "startedAtNs": 1792567472729948587,
+      "finishedAtNs": 1792567477166625232,
       "exit": 0,
       "resultFresh": true,
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-probes.py",
       "sourceSha256": "6065aace9078a2a65a9c391bb46837775c8388491016628870da9ee75dac5f56",
-      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch6.log",
-      "logSha256": "5b58b4b19fd6c7386adb4584b0f441f2b9322ac6bd6af3490452c16d0211a731",
       "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-probes-result.json",
       "resultSha256": "1df941de548f7b62aacb98095c68f66bc3ae89ec4b5badbe9becdea25c237569",
+      "scratchLogPath": "/tmp/fgos-work/closure-batch6.log",
+      "scratchLogSha256": "5b58b4b19fd6c7386adb4584b0f441f2b9322ac6bd6af3490452c16d0211a731",
       "counts": {
         "passed": 20,
         "total": 20
@@ -214,19 +155,20 @@
     {
       "label": "batch7",
       "command": [
-        "/usr/bin/python3",
+        "python3",
         "-B",
         "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-probes.py"
       ],
-      "startedAtNs": 1792565978728703526,
+      "startedAtNs": 1792568216949829321,
+      "finishedAtNs": 1792568239005037687,
       "exit": 0,
       "resultFresh": true,
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-probes.py",
       "sourceSha256": "77d42fa47e5728d143e3b079301ced642fc5bc3691ac72066aa64f40def5c5e8",
-      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-batch7.log",
-      "logSha256": "2edc66b2540980ad5fa90923222e42786f087105d41ae0d47c88708c8a645770",
       "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-probes-result.json",
       "resultSha256": "670c424a00d04dc47cb591f92c051fdcc44c7fa19768274447a878eacaff3592",
+      "scratchLogPath": "/tmp/fgos-work/closure-batch7.log",
+      "scratchLogSha256": "2edc66b2540980ad5fa90923222e42786f087105d41ae0d47c88708c8a645770",
       "counts": {
         "passed": 106,
         "total": 106
@@ -234,21 +176,71 @@
       "ok": true
     },
     {
+      "label": "pilot",
+      "command": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py"
+      ],
+      "finishedAtNs": 1792568321523382635,
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
+      "sourceSha256": "a59d36f661d03d96cc8d168ec8dd316b79161904145d04d3e8a50e0b63df7cf5",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
+      "resultSha256": "b2335caa41137e75baba492b2771e64443c542f728a82798d18d684a54d01500",
+      "scratchLogPath": "/tmp/fgos-work/closure-pilot.log",
+      "scratchLogSha256": "ed5a4641a73331a1c84a2cdcfc76a1f7bc1170db25a5ff214213f49b7cd12c57",
+      "counts": {
+        "passed": 44,
+        "total": 44,
+        "baselineFailures": 0
+      },
+      "ok": true,
+      "freshnessLowerBoundNs": 1792567231000000000,
+      "freshnessMethod": "Original invocation scratch-log creation time, second-resolution conservative lower bound; original pilot completed before parallel controller collected its result."
+    },
+    {
+      "label": "prompt",
+      "command": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes.py"
+      ],
+      "startedAtNs": 1792567472729719291,
+      "finishedAtNs": 1792568833190808227,
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes.py",
+      "sourceSha256": "cf5e6fa04562cb2aa35aef2eac7890def60e4790bba7b0a0ef62d864fa4bfc61",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes-result.json",
+      "resultSha256": "45d235bb0e28a8b776f3503d418347d6a182e629b6d10bc32dda821fc44c68e8",
+      "scratchLogPath": "/tmp/fgos-work/closure-prompt.log",
+      "scratchLogSha256": "00ea355b1902af878116cadc730b7776679c1712caebb92ab938cfb8d78b7f5c",
+      "counts": {
+        "passed": 13,
+        "total": 13,
+        "baselineFailures": 0
+      },
+      "ok": true
+    },
+    {
       "label": "r26",
       "command": [
-        "/usr/bin/python3",
+        "python3",
         "-B",
         "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-probes.py"
       ],
-      "startedAtNs": 1792565279591158495,
+      "startedAtNs": 1792568316836195535,
+      "finishedAtNs": 1792568321521897649,
       "exit": 0,
       "resultFresh": true,
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-probes.py",
       "sourceSha256": "354891b56926139bedbb7bb0df4d8f916ea8a519e8ea06d4d0b0f5e0e028c950",
-      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-r26.log",
-      "logSha256": "947d722a86c1084e7e508e793bed22b0f6f5c7022dd013690e6b1ade1c485ae2",
       "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-probes-result.json",
       "resultSha256": "1d7b0985a939b5bfd7789a5673166e9a18fd6eae4e950ced11f26ac2df094ac3",
+      "scratchLogPath": "/tmp/fgos-work/closure-r26.log",
+      "scratchLogSha256": "947d722a86c1084e7e508e793bed22b0f6f5c7022dd013690e6b1ade1c485ae2",
       "counts": {
         "passed": 8,
         "total": 8,
@@ -257,21 +249,46 @@
       "ok": true
     },
     {
+      "label": "seam4",
+      "command": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py"
+      ],
+      "startedAtNs": 1792567472729505523,
+      "finishedAtNs": 1792568578862165938,
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py",
+      "sourceSha256": "a19c43384269bb457a4de2ad2f9629d42eab2cec4f849fa0e832056fd0b9c5f5",
+      "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes-result.json",
+      "resultSha256": "079f8336d8931ef7c4b08388fea47808ce35723043191d9f5e0c3cb86e7a3662",
+      "scratchLogPath": "/tmp/fgos-work/closure-seam4.log",
+      "scratchLogSha256": "be6baada3498e9392aed50f2a1eae7c314e3baf667ac54ad2bbdaec53886bace",
+      "counts": {
+        "passed": 34,
+        "total": 34,
+        "baselineFailures": 0
+      },
+      "ok": true
+    },
+    {
       "label": "seam67",
       "command": [
-        "/usr/bin/python3",
+        "python3",
         "-B",
         "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-probes.py"
       ],
-      "startedAtNs": 1792565283250147555,
+      "startedAtNs": 1792568239005405223,
+      "finishedAtNs": 1792568316835194092,
       "exit": 0,
       "resultFresh": true,
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-probes.py",
       "sourceSha256": "f9d236fb7606558049b49a809e2e51795bb68c5cffe07db9cca59d9ab71af2d8",
-      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-proof-seam67.log",
-      "logSha256": "381a6c459f9842c0d63d71c8e6a7703259bdca6dde4f7c648bad3dc2d72751dc",
       "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam67-probes-result.json",
       "resultSha256": "46aea48b1a344b0b48ba98a82b3e78246212378d3e1f345ee30551dd9148c9d0",
+      "scratchLogPath": "/tmp/fgos-work/closure-seam67.log",
+      "scratchLogSha256": "381a6c459f9842c0d63d71c8e6a7703259bdca6dde4f7c648bad3dc2d72751dc",
       "counts": {
         "passed": 20,
         "total": 20,
@@ -282,14 +299,9 @@
   ],
   "negativeProbesPassed": 330,
   "negativeProbesTotal": 330,
+  "ruling": "L12-86",
   "failures": [],
-  "scope": "Author structural verification and mutations only; independent semantic review and Phase9 parity remain pending.",
-  "metadataRevalidation": {
-    "reason": "Final p05 scalar-object reason and matching canonical review hashes only; no source pin, operand, admission or disposition change. Full checker and affected batch7 probes rerun. Other probe families retain their actual completed evidence.",
-    "revalidated": [
-      "full-check",
-      "batch7"
-    ],
-    "previousProof": "step-05-seam67-before-last-note-proof.json"
-  }
+  "positivePassed": 15,
+  "positiveTotal": 15,
+  "scope": "Fresh full Step 5 structural checker and every existing negative probe family on the corrected records. Logs are scratch only; committed per-family result files and source/result hashes carry durable evidence. Independent Lead acceptance, Step7 composition and Phase9 parity remain owed."
 }
