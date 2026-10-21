@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "aaf3d0f91d460da351d53b55edc48bdc4b91632de16f018c37575fc7b9bebb59",
+  "payloadDigest": "ad37f44ecfe6b2e0f021a0c9e613a41d419259d181c7aa8d7bcbf73de69e3c2e",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -514,7 +514,7 @@
     "packages/session-identity/rust/tests/attempt_writer_id.rs": "1a5d81d68a072e29f3751f969815ed7d49489e87144de8a7e8821335005616c8",
     "packages/session-identity/rust/tests/golden.rs": "e10691f2741b7e0bdc60569269dae2a060b07b6c389f7ec3c90f5068ddaa8302",
     "packages/terminal-control/rust/src/core.rs": "d684bf3d1d094b9c7652b8dbfc61e78121c6a2c6f5460cb3b7b452a27cfccda6",
-    "packages/terminal-control/rust/src/driver/herdr.rs": "d6ab429d90d281c2371c45a0d96ea886378158eb0db31cd8134ca357e437d598",
+    "packages/terminal-control/rust/src/driver/herdr.rs": "1fc61503c034f9e92710ccaffc40e339d1649a98d57192e2592deddd7a066738",
     "packages/terminal-control/rust/src/driver/mod.rs": "b91485514211ef7863daab5fead7d4b3d79556351098eca1a4a1d3df57e61956",
     "packages/terminal-control/rust/src/identity.rs": "ff668e3b7070fadc567a2d2331dc0316fa759471f060e5901c594a67a3e2b090",
     "packages/terminal-control/rust/src/lib.rs": "f420d65492eb50bf458a3ab331d5483707ee4326db490ab440a6aab0fb9ba263",
@@ -529,7 +529,7 @@
     "packages/terminal-control/rust/tests/core_rules.rs": "d6a67efee12ea914ed47b52168e14710d2e613081120af182e8803edf1e1fce4",
     "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh": "04375ca1650b15a8578b4067cb2ae04de457b0f7838dac99fe953b59e5da2c0e",
     "packages/terminal-control/rust/tests/herdr_driver_fake.rs": "da8192017463f49681d54799d467b490d86485441436cc7e02c2a7ac2d6d0686",
-    "packages/terminal-control/rust/tests/herdr_driver_fixtures.rs": "833c56ae001bf3b5fd99a11c75ac3b73e8383467c32a6adf3047b36403c5b94e",
+    "packages/terminal-control/rust/tests/herdr_driver_fixtures.rs": "56eccda3c585f0a4c903691cd9666472ac8f2dc04cd03993b4bc976bea1906d9",
     "packages/terminal-control/rust/tests/herdr_driver_live.rs": "3d2f2bc0b66db1fb4cccab5098256835782985ed7b901822f85cc6f459503534",
     "packages/terminal-control/rust/tests/policy_fixtures.rs": "88909d80eca0f638b71a33c02d9b8c6f0346c378776a2885afcc9fd2e26c2f9f",
     "packages/terminal-control/rust/tests/store_publish.rs": "7ba66079f7e59ccbc86582b96b5cecd05a0bbc6569ab99f8eaee2faa31e0de87",
@@ -565,7 +565,7 @@
     "scripts/git-addon.mjs": "67532c2006d74a97cbc40814e82882da1de5d48b5d072670444489e2ed963d71",
     "scripts/git/e1-power-cut.mjs": "58e093cefe327fc2d7c2dd791185a02c68ee596925d0adb3b9a544abe5d18458",
     "scripts/git/e1-power-cut.sh": "be0500b7f99580694cf1ca7418c17ddf6bd70583f3a06686aaab923118e2d1fa",
-    "scripts/git/e3-bench.mjs": "324b205b6ac185b7d1f1d5e1c10070de9d6261714bb5c4ae334a35307d68e003",
+    "scripts/git/e3-bench.mjs": "c1fc958e747bf67fa4004936aa1c2a7ecc12651459d8d19e4fc39a7bd45446a2",
     "scripts/git/p-release-checks.sh": "08bb9b3c32e7915b27f645f7aa68d42cba0dbddd2a7dc9adc45d43a75b4d0056",
     "scripts/git/p-space-resource.mjs": "31e12327e2782a769a341cb6819f7e1e24d63e78de732c1ad210e430433aad06",
     "scripts/git/p-space.sh": "ab11ec0d8fc8c5a0c32f0dcc1aa08d26c39356db710a4e395513f87af78decd3",
@@ -2140,7 +2140,7 @@
     {
       "path": "packages/run-supervisor/rust/src/terminal_slot.rs",
       "line": 49,
-      "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:227",
+      "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:230",
       "binary": "(env *)",
       "class": "configured-binary"
     },
@@ -2202,7 +2202,7 @@
     },
     {
       "path": "packages/terminal-control/rust/src/driver/herdr.rs",
-      "line": 227,
+      "line": 230,
       "spawn": "Command::new",
       "binary": "herdr",
       "class": "argv-runner",
@@ -2211,7 +2211,7 @@
     {
       "path": "packages/terminal-control/rust/src/route.rs",
       "line": 149,
-      "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:227",
+      "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:230",
       "binary": "(parsed configuration (match envelope.get(\"herdrBin\") { None | Some(Value::Null) =>))",
       "class": "configured-binary"
     },
@@ -2315,85 +2315,92 @@
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 461,
+      "line": 491,
       "spawn": "checkoutInspect -> scripts/git/e3-bench.mjs:48",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 463,
+      "line": 493,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 465,
+      "line": 495,
       "spawn": "typedOperationRows -> scripts/git/e3-bench.mjs:298",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 479,
+      "line": 509,
       "spawn": "createGitPublication -> src/git/index.mjs:9",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 496,
+      "line": 526,
       "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 600,
+      "line": 630,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 666,
+      "line": 669,
       "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 679,
+      "line": 682,
       "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 697,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:770",
+      "line": 700,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:773",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 697,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:740",
+      "line": 700,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:743",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 795,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:770",
+      "line": 798,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:773",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 803,
-      "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:795",
+      "line": 813,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 828,
+      "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:798",
       "binary": "(command-line arguments)",
       "class": "configured-binary"
     },
@@ -2440,7 +2447,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        "scripts/git/e3-bench.mjs:442"
+        "scripts/git/e3-bench.mjs:443"
       ],
       "class": "sandbox-door"
     },

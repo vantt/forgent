@@ -44,7 +44,7 @@ One-door jobs owned here (plan.md success criteria): lock, identity, and `.fgos`
 
 - **SEAT collision:** SEAT changes `src/util/session-identity.mjs`, `src/convention/*` (adds `definition-names.mjs`, `seat-id.mjs`) and `packages/convention/*`. The T1 council may run; edits to those files wait until SEAT lands (or the later lander rebases, board rule).
 - **Hot mutex (`src/state/hot-lock.mjs`) — no lane gap.** Its liveness judging moved at T0. T1 reviews the mutex itself (users: the state store, `src/runner/lock-fence.mjs:16`, the `src/git/*` guards via `hotLockDepth`, `src/holder-lock/hot-guard.mjs`). Either it moves under holder-lock in Rust here, or the owner accepts it as a named Node exception until WORK replaces the store (T1 ask 1). The state store's writes stay WORK-owned.
-- R4 compatibility policy unanswered ⇒ keep existing fences, add none.
+- Compatibility (review R4) is answered: owner decision 1 in [plan.md](plan.md#owner-decisions). Fences and drains live one release, then go, so T1 may delete `src/holder-lock/fences.mjs` and the legacy readers once their release has passed. Add no new fence.
 
 ## Files
 

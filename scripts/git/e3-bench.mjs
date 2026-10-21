@@ -383,11 +383,12 @@ async function typedOperationRows(root, state, index, loader, samples, observer 
     if (fs.readFileSync(path.join(main,'payload'),'utf8') !== 'producer\n') throw new Error('land checkout mismatch');
     land[mode].push(elapsed);
   }
-  const row = (runs, multiplier) => {
+  // The budgets are absolute (e3-budgets.md); the ratio to the legacy path is reported, not budgeted.
+  const row = (runs, budgetMs) => {
     const legacy = stats(runs.legacy), port = stats(runs.port);
-    return {legacy,port,multiplier,p95Ratio:port.p95 / legacy.p95,passed:port.p95 <= multiplier * legacy.p95,fixture:'one tracked payload; fresh linked producer / source descendant; same filesystem',verifyExcluded:true};
+    return {legacy,port,budgetP95Ms:budgetMs,p95Ratio:port.p95 / legacy.p95,passed:port.p95 <= budgetMs,fixture:'one tracked payload; fresh linked producer / source descendant; same filesystem',verifyExcluded:true};
   };
-  return {scopedCommit:row(scoped,1.5),land:{...row(land,1.2),prepare:stats(prepare),publish:stats(publish)}};
+  return {scopedCommit:row(scoped,250),land:{...row(land,1600),prepare:stats(prepare),publish:stats(publish)}};
 }
 
 // ---- the experiment ------------------------------------------------------------
@@ -442,6 +443,35 @@ function environment(root, inspect) {
     git: gitVersion(root), node: process.version, rustc: execFileSync('rustc', ['--version'], { encoding: 'utf8' }).trim(),
     loadavg: os.loadavg(), checkoutHead: inspect.resolveCommit({ name: 'HEAD' }), at: new Date().toISOString(),
   };
+}
+
+/** Local transport push of one ref, with and without new objects, on fresh repositories under root. */
+function pushRow(root, open, samples) {
+  const local = bareRepo(path.join(root, 'push-local.git'));
+  const remote = bareRepo(path.join(root, 'push-remote.git'));
+  git(['--git-dir', local, 'remote', 'add', 'origin', remote]);
+  const reference = 'refs/fgos/events/e3-push';
+  const port = open(local, reference);
+  const grant = { name: 'origin', pinnedUrl: remote };
+  let tip = null, n = 0;
+  const advance = (seed) => {
+    const next = commitFor(port, `push ${n} ${crypto.randomUUID()}`, tip ? [tip] : []);
+    if (seed) git(['--git-dir', local, 'push', '-q', remote, `${next}:refs/seed/${n}`]);
+    port.compareAndSwap({ expected: tip, next, operationId: `push-cas-${n++}` });
+    tip = next;
+  };
+  const push = (seed) => {
+    advance(seed);
+    const [ms, result] = time(() => port.pushRefs({ remote: 'origin', refs: [[reference, reference]], remoteGrant: grant }));
+    if (result.refs[0].outcome.kind !== 'accepted') throw new Error(`push not accepted: ${JSON.stringify(result)}`);
+    return ms;
+  };
+  for (let i = 0; i < 10; i++) { push(false); push(true); }
+  const withObjects = [], withoutObjects = [];
+  for (let i = 0; i < samples; i++) { withObjects.push(push(false)); withoutObjects.push(push(true)); }
+  if (git(['--git-dir', remote, 'rev-parse', reference]) !== tip) throw new Error('remote tip differs');
+  port.close();
+  return { withObjects: stats(withObjects), withoutObjects: stats(withoutObjects) };
 }
 
 async function run(args) {
@@ -605,34 +635,7 @@ async function run(args) {
   }
 
   // Local transport push of one ref, with and without new objects.
-  {
-    const local = bareRepo(path.join(root, 'push-local.git'));
-    const remote = bareRepo(path.join(root, 'push-remote.git'));
-    git(['--git-dir', local, 'remote', 'add', 'origin', remote]);
-    const reference = 'refs/fgos/events/e3-push';
-    const port = open(local, reference);
-    const grant = { name: 'origin', pinnedUrl: remote };
-    let tip = null, n = 0;
-    const advance = (seed) => {
-      const next = commitFor(port, `push ${n} ${crypto.randomUUID()}`, tip ? [tip] : []);
-      if (seed) git(['--git-dir', local, 'push', '-q', remote, `${next}:refs/seed/${n}`]);
-      port.compareAndSwap({ expected: tip, next, operationId: `push-cas-${n++}` });
-      tip = next;
-    };
-    const push = (seed) => {
-      advance(seed);
-      const [ms, result] = time(() => port.pushRefs({ remote: 'origin', refs: [[reference, reference]], remoteGrant: grant }));
-      if (result.refs[0].outcome.kind !== 'accepted') throw new Error(`push not accepted: ${JSON.stringify(result)}`);
-      return ms;
-    };
-    for (let i = 0; i < 10; i++) { push(false); push(true); }
-    const pushes = Number(args.pushSamples ?? 100);
-    const withObjects = [], withoutObjects = [];
-    for (let i = 0; i < pushes; i++) { withObjects.push(push(false)); withoutObjects.push(push(true)); }
-    if (git(['--git-dir', remote, 'rev-parse', reference]) !== tip) throw new Error('remote tip differs');
-    port.close();
-    say('push', { withObjects: stats(withObjects), withoutObjects: stats(withoutObjects) });
-  }
+  say('push', pushRow(root, open, Number(args.pushSamples ?? 100)));
 
   // Git subprocess count per operation (strace census in a separate process).
   {
@@ -797,7 +800,29 @@ async function rollbackOnly(args) {
   // The owner budget: refused by the C5 door or completed, with no record lost or corrupt.
   if (row.error || row.lostOrMismatchedReceipts !== 0 || !row.tipMatchesLastReceipt) process.exitCode = 1;
 }
-const modes = { run, rollback: rollbackOnly, 'load-probe': loadProbe, writer, idle, census, 'scoped-census': scopedCensus, 'scoped-census-worker': scopedCensusWorker };
+/** The push row alone, repeated: --root <fresh dir> --addon <.node> --host <fgos> [--rounds N] [--pushSamples N]. */
+async function pushOnly(args) {
+  const root = path.resolve(args.root);
+  if (fs.existsSync(root)) throw new Error(`root must be fresh: ${root}`);
+  bindSandbox(privateDir(root));
+  const host = fs.realpathSync(args.host ?? process.env.FGOS_HOST_BIN);
+  process.env.FGOS_HOST_BIN = host;
+  const descriptor = await stageAddon(root, fs.realpathSync(args.addon), host);
+  const { index, loader } = await loaders(descriptor);
+  const state = privateDir(path.join(root, 'state'));
+  const open = (repo, reference) => index.createGitPublication({ stateRoot: state, repoPath: repo, trustedMain: repo, reference, writer: WRITER }, loader);
+  for (let round = 0; round < Number(args.rounds ?? 1); round++) {
+    const dir = path.join(root, `round-${round}`);
+    const mhz = () => { const f = os.cpus().map(c => c.speed); return Math.round(f.reduce((a, b) => a + b, 0) / f.length); };
+    const before = { loadavg: os.loadavg(), mhz: mhz() };
+    const row = pushRow(dir, open, Number(args.pushSamples ?? 100));
+    const remote = path.join(dir, 'push-remote.git');
+    const count = (sub, re) => { try { return fs.readdirSync(path.join(remote, sub)).filter(f => re.test(f)).length; } catch { return 0; } };
+    const state = { ...footprint(remote), packs: count('objects/pack', /\.pack$/), looseRefs: footprint(path.join(remote, 'refs')).inodes };
+    console.log(JSON.stringify({ round, before, after: { loadavg: os.loadavg(), mhz: mhz() }, remote: state, ...row }));
+  }
+}
+const modes = { run, 'push-only': pushOnly, rollback: rollbackOnly, 'load-probe': loadProbe, writer, idle, census, 'scoped-census': scopedCensus, 'scoped-census-worker': scopedCensusWorker };
 if (at >= 0) {
 if (!modes[mode]) { console.error(`usage: e3-bench.mjs ${Object.keys(modes).join('|')} [options]`); process.exit(2); }
 await modes[mode](args);
