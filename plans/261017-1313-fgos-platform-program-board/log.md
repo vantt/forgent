@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-21 23:40 (GIT/ES điều phối, nhận từ HARDEN, owner 23:37): máy owner land T0 cùng lần land GIT tới (H15, chủ GIT); hướng dẫn GIT gộp bước 6 kiểm corpus canonical-JSON của T0.
+
 - 2026-10-21 23:36 (GIT/ES điều phối, owner chạy sudo): **E1 held cả hai loại** trên main ed45bb84c — Publication 1040 điểm, ScopedCommit 554 điểm, 0 lỗi, trace thứ tự 0 vi phạm ([kiểm chứng](../reports/verification-261021-2336-git-e1-publication-and-scoped-commit.md)). Tiếp: E3 sạch (xin TEST + HARDEN), rồi land kèm T0.
 
 - 2026-10-21 23:40 (phiên `f2c6f8ce`): **MAIL V1 có plan và bắt đầu triển khai.** [Plan](../261021-2255-mailbox-v1-core-crate/plan.md) có 8 phase, đã validate và red-team (25 phát hiện: nhận đủ 23, nhận một phần 2). Kiểm hiện trạng tiền đề: hàm tìm `.fgos` của main checkout **đã có** (`GitDriver::open_at`, `resolve_workspace_root`), dù spec ghi là chưa có; `durable-file` và phán quyết liveness của `fgos_process` cũng đã có. Còn thiếu: hàng `mailbox` trong lock registry (V2), route `hook` native (V5), `is_attempt_writer_id`, gốc ẩn trong confinement (V4). Ba câu hỏi cho owner (Q1–Q3) đang chạy với mặc định tạm. Mã nằm trên nhánh `mailbox/v1-v3`, không merge main.
