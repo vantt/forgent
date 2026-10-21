@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 00:45 (phiên `forgent-a8`, HARDEN): **Sửa lỗi run bị dừng `terminal:foreground-not-agent` khi tác tử đang chạy — main `359274c62`.** GIT báo ở smoke release `9e4c2630`. Nguyên nhân không phải cửa T0: herdr liệt kê tiến trình zombie trong nhóm foreground mà không có `argv`, nên parser `parse_process_info` của terminal-control bỏ cả câu trả lời, và cửa kiểm `send` (từ `065cc620a`) từ chối. Đã tái hiện bằng herdr thật; giờ zombie được bỏ qua. Chưa có hiệu lực tới khi một release mang nó được land.
+
 - 2026-10-22 00:25 (GIT/ES điều phối, máy thứ hai): **land release `sha256:9e4c2630…` (main 9670da5ff: T0 + sửa doctor 406a81f98 + ScopedCommit bền object)**, active 00:21:35, rollback về 613dfa84; doctor mọi row git-*/lock-* đạt, smoke gateway/fence/`fgos run` ghi committed ([báo cáo land](../reports/landing-261022-0011-git-durability-and-t0-this-machine.md)). **Máy owner (H15):** [hướng dẫn](../reports/guide-261022-0011-owner-machine-git-durability-and-t0.md) land bản này cùng T0, một lần dừng, bước 6 corpus canonical-JSON bắt buộc. Mở: smoke gemini `terminal:foreground-not-agent` (báo HARDEN).
 
 - 2026-10-22 00:21 (phiên `forgent-a8`, HARDEN): **Bản sửa rò store của T0 đã lên main `986680477`.** `stageLauncherDoor` chỉ ghi `manifest.json` khi byte khác; test `run-rust-dev-host-staging` khẳng định mtime không đổi ở lần stage thứ hai. Full npm test không còn dòng `run-tests: ERROR`. Đã báo TEST (`forgent-f8`). HARDEN giữ yên fgos run cho tới khi GIT báo xong doctor/smoke của release `9e4c2630`.
