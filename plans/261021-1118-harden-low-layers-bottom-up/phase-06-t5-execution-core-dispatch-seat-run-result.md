@@ -14,6 +14,10 @@ Template layer: follow the loop in [plan.md](plan.md#the-per-layer-loop). From T
 
 [runner spec](../../docs/specs/runner.md), [confinement-authority](../../docs/specs/confinement-authority.md), [seat-binding spec](../../docs/specs/seat-binding.md) (after SEAT lands), [component-boundary](../../docs/platform/component-boundary.md); [audit 09-28](../reports/audit-260928-2318-dispatch-engine-stability-speed-simplicity-report.md) C1 (five shadow binders), C3, C4; SEAT plan [`plans/261020-2132-seat-binding-component/`](../261020-2132-seat-binding-component/plan.md) and its landing report.
 
+## Received from other lanes (record here, never lose)
+
+- **H20 (HARDEN T1 arbitration, 2026-10-22):** `src/runner/lock-wait.mjs:22-24` is one default behind a module; callers `bin/fgos.mjs:3217,3291`; `test/runner/lock-wait.test.mjs` (53 lines) proves a function is called once. Inline the default at the CLI flag parsing and retire the module and test. Evidence: [T1 simplicity seat](../reports/council-261021-2338-harden-t1-seat-simplicity.md) S-E8.
+
 ## Components, crates, Node
 
 | Component | Rust | Node around it |

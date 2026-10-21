@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 03:05 (phiên `forgent-a8`, HARDEN): **Hội đồng T1 xong, phân xử ở [council-261022-0245-harden-t1-arbitration](../reports/council-261022-0245-harden-t1-arbitration.md).** Cửa holder-lock in-process cho Linux/macOS (giữ helper `lock-hold` trên Windows), xoá fence cutover, bỏ quét `/proc` và probe Node, gom doctor 9→5; dự kiến Node −1 100..−1 350. Giao: H16 GIT (`git-fence-missing` cần row Git trước khi xoá `checkLockFences`), H17 T9, H18 ES (`events/migrate.mjs` nhận `checkStopped`), H19 SEAT, H20 T5. Chờ owner ask 1 (Q1–Q5).
+
 - 2026-10-22 01:45 (phiên `forgent-a8`, HARDEN): **Mở hội đồng T1** (holder-lock, session identity, convention, cửa state-root, review hot mutex). Ba seat chạy song song: correctness (codex), speed và simplicity (Claude Fable); red-team gemini chạy sau. [Baseline](../reports/research-261022-0138-harden-t1-baseline.md): `acquireSync` holder-lock tốn 1,36 ms mỗi lần vì spawn route host; `withStateTx` 19,6 µs; fsync trơn 5,2 ms.
 
 - 2026-10-22 01:37 (phiên `forgent-a8`, HARDEN, tự land theo quyền đứng của owner): **Máy thứ hai chạy release `79d2eed3` (main `e679a2d4e`) từ 01:32.** Mang bản sửa zombie foreground `359274c62`; hai run gemini smoke qua (`OK`), doctor 11 row không đạt giống hệt lần land của GIT, mọi row git/lock/terminal/containment đạt. Rollback về `9e4c2630`. [Báo cáo](../reports/landing-261022-0137-harden-terminal-zombie-foreground-this-machine.md).
