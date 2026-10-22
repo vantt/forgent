@@ -9,7 +9,7 @@ import { execSync, execFileSync, execFile, spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { executeAssignment as executeAssignmentRaw, commitRunSettlement, settleRunOutcome, resolveWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { bindable, bindableExecute } from '../helpers/work-seat-config.mjs';
+import { bindable, bindableExecute, bindableFile } from '../helpers/work-seat-config.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { RunnerConfigError, FRESH_PROJECT_RUNNER_CONFIG } from '../../src/runner/dispatch/config.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
@@ -303,7 +303,7 @@ test('decideExecutorCli resolves dispatch plan for an assignment', async () => {
   // a machine without one (a CI runner) cannot satisfy.
   fs.writeFileSync(
     path.join(tempDir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: bindable(structuredClone(FRESH_PROJECT_RUNNER_CONFIG)) }, null, 2),
+    JSON.stringify({ runner: bindableFile(structuredClone(FRESH_PROJECT_RUNNER_CONFIG)) }, null, 2),
   );
 
   const decided = await decideExecutorCli(undefined, {
