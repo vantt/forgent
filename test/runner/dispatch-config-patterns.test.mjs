@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { projectConfigPath, writeProjectConfig } from '../helpers/config-fixture.mjs';
 import {
   loadRunnerConfig,
   RunnerConfigError,
@@ -13,8 +14,8 @@ import {
 
 function mkTempConfig(runnerObj) {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dispatch-config-test-'));
-  const configPath = path.join(tmpDir, 'config.json');
-  fs.writeFileSync(configPath, JSON.stringify(runnerObj, null, 2), 'utf8');
+  const configPath = projectConfigPath(tmpDir);
+  writeProjectConfig(tmpDir, runnerObj);
   return { tmpDir, configPath };
 }
 

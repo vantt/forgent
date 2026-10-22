@@ -24,6 +24,7 @@ import { establishConfinement } from "../../src/runner/dispatch/herdr-round.mjs"
 import { evaluateBypassPairing } from "../../src/runner/dispatch/confinement/bypass-pairing.mjs";
 import { checkConfinementHerdrMaturity } from "../../src/setup/registrations.mjs";
 import { DispatchError } from "../../src/runner/dispatch/transport.mjs";
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 function mkTemp(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -611,9 +612,7 @@ test("Doctor check: confinement-herdr-maturity reports partial maturity for herd
   const tmpDir = mkTemp("p05-doctor-");
   const cfgDir = path.join(tmpDir, ".fgos");
   fs.mkdirSync(cfgDir, { recursive: true });
-  fs.writeFileSync(
-    path.join(cfgDir, "config.json"),
-    JSON.stringify({
+  writeProjectConfig(tmpDir, {
       runner: {
         executors: {
           "herdr-agent": {
@@ -628,8 +627,7 @@ test("Doctor check: confinement-herdr-maturity reports partial maturity for herd
           },
         },
       },
-    }),
-  );
+    });
 
   const res = checkConfinementHerdrMaturity(tmpDir);
   assert.equal(res.passed, true);
@@ -643,9 +641,7 @@ test("Doctor check: confinement-herdr-maturity fails if bypass is missing full c
   const tmpDir = mkTemp("p05-doctor-bypass-bad-");
   const cfgDir = path.join(tmpDir, ".fgos");
   fs.mkdirSync(cfgDir, { recursive: true });
-  fs.writeFileSync(
-    path.join(cfgDir, "config.json"),
-    JSON.stringify({
+  writeProjectConfig(tmpDir, {
       runner: {
         executors: {
           "herdr-agent": {
@@ -659,8 +655,7 @@ test("Doctor check: confinement-herdr-maturity fails if bypass is missing full c
           },
         },
       },
-    }),
-  );
+    });
 
   const res = checkConfinementHerdrMaturity(tmpDir);
   assert.equal(res.passed, false);
@@ -674,9 +669,7 @@ test("Doctor check: confinement-herdr-maturity reports not-applicable when no he
   const tmpDir = mkTemp("p05-doctor-none-");
   const cfgDir = path.join(tmpDir, ".fgos");
   fs.mkdirSync(cfgDir, { recursive: true });
-  fs.writeFileSync(
-    path.join(cfgDir, "config.json"),
-    JSON.stringify({
+  writeProjectConfig(tmpDir, {
       runner: {
         executors: {
           "cli-agent": {
@@ -685,8 +678,7 @@ test("Doctor check: confinement-herdr-maturity reports not-applicable when no he
           },
         },
       },
-    }),
-  );
+    });
 
   const res = checkConfinementHerdrMaturity(tmpDir);
   assert.equal(res.passed, true);

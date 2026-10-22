@@ -11,6 +11,7 @@ import { withMainCheckout } from '../../src/runner/repo-locks.mjs';
 import { checkpointMainFgos } from '../../src/runner/main-fgos-checkpoint.mjs';
 import { createLockScope, probe } from '../../src/holder-lock/index.mjs';
 import { git, mkTempDir, initRepo, installHook, sessionEnv, commitCount, HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // The land step of a root-into-main merge and everything that can touch the
 // main checkout around it, on real git in disposable repos. Every test here
@@ -67,7 +68,7 @@ test('a checkpoint that holds main while a land waits for it finishes first; the
   addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
   const fgosDir = path.join(repoRoot, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ checkpoint: { fallbackIntervalSec: 0 } }));
+  writeProjectConfig(repoRoot, { checkpoint: { fallbackIntervalSec: 0 } });
   fs.writeFileSync(path.join(fgosDir, 'events.jsonl'), '{"seq":1}\n{"seq":2}\n');
   activateGitFixture(repoRoot);
   const tipBefore = mainTip(repoRoot);

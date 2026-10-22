@@ -19,6 +19,7 @@ import { validateUnit } from '../../../src/runner/execution/unit.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
+import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -58,7 +59,7 @@ function setup({ mainFiles = { 'base.txt': 'from main\n' }, branchFiles = { 'min
   const command = path.join(repoRoot, 'alpha-bin');
   fs.symlinkSync(process.execPath, command);
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({
+  writeProjectConfig(repoRoot, {
     runner: {
       defaultExecutor: 'alpha',
       defaults: { tier: 'standard' },
@@ -72,7 +73,7 @@ function setup({ mainFiles = { 'base.txt': 'from main\n' }, branchFiles = { 'min
       capabilities: { 'docs:write': { prefer: [{ executor: 'alpha' }], rigor: 'standard' } },
       patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' } },
     },
-  }, null, 2));
+  });
   prepareActivatedGitFixture(repoRoot);
   return { repoRoot, worktree, script };
 }
