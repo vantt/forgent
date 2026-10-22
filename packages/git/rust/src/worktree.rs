@@ -1,7 +1,7 @@
 //! Worktree administration. One rank-40 hold spans inspection and mutation.
 use crate::{
     driver::Policy,
-    refs::{admission, compact_finished, failure, install_pin, pending, recovery, release_pin, Authority},
+    refs::{admission, failure, install_pin, pending, recovery, release_pin, Authority},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
 };
@@ -531,21 +531,7 @@ impl GitDriver {
             scope.handle("worktree-admin").expect("acquired"),
             wal,
             &terminal,
-        )?;
-        // A compaction that cannot finish leaves its chain retained for the next pass; the
-        // operation that already succeeded does not fail for it. A create chain is the only
-        // proof that a checkout was made here (guarded prune reads its path and registration),
-        // so it is kept while the registration or the checkout exists.
-        let admin = repo.common_dir().join("worktrees");
-        let _deferred = compact_finished(self, repo, scope, wal, |chain| match &chain.intent().kind {
-            OperationKind::WorktreeCreate { path, registration, .. } => {
-                missing(&admin.join(registration.as_ref())).unwrap_or(false)
-                    && missing(Path::new(path.as_ref())).unwrap_or(false)
-            }
-            OperationKind::WorktreeMove { .. } | OperationKind::WorktreeRemove { .. } => true,
-            _ => false,
-        });
-        Ok(())
+        )
     }
     /// A caller supplies a full immutable base; provisioning happens after return.
     pub fn create_worktree(
@@ -696,33 +682,6 @@ impl GitDriver {
             }
             return Ok(handle);
         }
-        let name = path
-            .file_name()
-            .and_then(|n| n.to_str())
-            .ok_or_else(|| failure("worktree-path-not-utf8"))?
-            .to_owned();
-        let kind = OperationKind::WorktreeCreate {
-            path: text(&path)?.into(),
-            registration: name.clone().into(),
-            branch: input.branch.as_ref().map(|r| r.as_str().into()),
-            session_id: input.session_id.clone().map(String::into_boxed_str),
-        };
-        let request = wal::canonical_digest(&(
-            &kind,
-            &Tip::Absent,
-            &Tip::Oid(input.base.as_str().into()),
-            writer,
-        ))
-        .map_err(failure)?;
-        if let Some(outcome) = compacted_replay(&wal, id, |c| c.request == request)? {
-            // The ledger keeps no path or registration, so no handle is rebuilt: the answer is
-            // the recorded outcome.
-            return Err(match outcome {
-                Outcome::Worktree { completed: true, .. } => failure("worktree-operation-already-completed"),
-                Outcome::Worktree { completed: false, .. } => failure("worktree-operation-not-completed"),
-                _ => recovery("operation-recovery-required"),
-            });
-        }
         // One admin-held Git inventory supplies nesting and branch-use facts.
         // Git worktree add checks branch occupancy again at the actual effect.
         let rows = self.worktree_rows(repo)?;
@@ -766,9 +725,20 @@ impl GitDriver {
                 _ => return Err(failure("worktree-branch-tip-stale")),
             }
         }
+        let name = path
+            .file_name()
+            .and_then(|n| n.to_str())
+            .ok_or_else(|| failure("worktree-path-not-utf8"))?
+            .to_owned();
         if !missing(&repo.common_dir().join("worktrees").join(&name))? {
             return Err(recovery("worktree-admin-name-in-use"));
         }
+        let kind = OperationKind::WorktreeCreate {
+            path: text(&path)?.into(),
+            registration: name.into(),
+            branch: input.branch.as_ref().map(|r| r.as_str().into()),
+            session_id: input.session_id.clone().map(String::into_boxed_str),
+        };
         let chain = self.begin_worktree(
             repo,
             scope,
@@ -944,15 +914,6 @@ impl GitDriver {
                 &chain,
             );
         }
-        if let Some(outcome) = compacted_replay(&wal, id, |c| {
-            c.expected == proof.expected_tip.as_str() && c.next == "-"
-        })? {
-            return match outcome {
-                Outcome::Worktree { completed: true, .. } => Ok(()),
-                Outcome::Worktree { completed: false, .. } => Err(failure("worktree-operation-not-completed")),
-                _ => Err(recovery("operation-recovery-required")),
-            };
-        }
         let path = path.canonicalize().map_err(failure)?;
         if path.parent().is_none() {
             return Err(failure("worktree-root-refused"));
@@ -1120,15 +1081,6 @@ impl GitDriver {
                 &chain,
             )?;
             return self.worktree_handle(repo, &destination);
-        }
-        if let Some(outcome) = compacted_replay(&wal, id, |c| {
-            c.expected == expected.as_str() && c.next == c.expected
-        })? {
-            return Err(match outcome {
-                Outcome::Worktree { completed: true, .. } => failure("worktree-operation-already-completed"),
-                Outcome::Worktree { completed: false, .. } => failure("worktree-operation-not-completed"),
-                _ => recovery("operation-recovery-required"),
-            });
         }
         let source = source.canonicalize().map_err(failure)?;
         self.exclude_nested(repo, &destination, &self.worktree_rows(repo)?)?;
@@ -1676,22 +1628,6 @@ fn admin_identity(path: &Path) -> Result<String> {
     {
         Err(failure("git-lockscope-unavailable-windows"))
     }
-}
-
-/// The terminal outcome of an id whose chain was compacted, when the request still matches what
-/// the ledger kept (`matches`). Reads the ledger only, never disk state.
-fn compacted_replay<F: wal::FileSystem>(
-    wal: &Wal<F>,
-    id: &str,
-    matches: impl Fn(&wal::CompactReceipt) -> bool,
-) -> Result<Option<Outcome>> {
-    let Some(compacted) = wal.compacted(id).map_err(failure)? else {
-        return Ok(None);
-    };
-    if !matches(&compacted) {
-        return Err(failure("operation-id-conflict"));
-    }
-    compacted.outcome().map(Some).map_err(failure)
 }
 
 fn existing<F: wal::FileSystem>(wal: &Wal<F>, id: &str) -> Result<Option<wal::Chain>> {

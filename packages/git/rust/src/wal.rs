@@ -1781,16 +1781,6 @@ impl<F: FileSystem> Wal<F> {
     }
 }
 
-/// Terminal chains of one operation family kept whole by compaction, so a
-/// just-finished id still replays with its full receipt.
-pub const RECENT_TERMINAL: usize = 4;
-
-/// Finished chains one compaction pass finishes, oldest first, so the first
-/// operation after an upgrade pays about 0.4 s instead of the whole backlog.
-/// A pass makes at most twice as many attempts, so chains that cannot finish
-/// delay it by a bounded amount and never block the ones behind them.
-pub const COMPACT_PER_PASS: usize = 8;
-
 /// Compact terminal receipt. Keys are short to maintain the ≤512-byte bound
 /// even for SHA-256 refs. Request/resource/authority bindings remain immutable.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -2321,15 +2311,6 @@ impl<F: FileSystem> Wal<F> {
     /// installed). Scheduling only: it never decides a protocol outcome.
     pub(crate) fn last_change(&self, id: &str) -> Option<std::time::SystemTime> {
         fs::metadata(self.root.path().join(id))
-            .ok()?
-            .modified()
-            .ok()
-    }
-    /// When the operation's first record was installed. Unlike the directory's
-    /// change time it never moves when later records or the pin release append,
-    /// so it orders chains stably. Scheduling only.
-    pub(crate) fn first_change(&self, id: &str) -> Option<std::time::SystemTime> {
-        fs::metadata(self.root.path().join(id).join(record_name(0)))
             .ok()?
             .modified()
             .ok()
