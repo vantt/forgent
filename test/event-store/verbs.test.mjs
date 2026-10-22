@@ -54,7 +54,7 @@ test('config merges project over global and validates integer boundaries; the Wo
   assert.throws(() => readEventStoreConfig(f.repo, f.ctx.globalConfigPath), /event-store-config/);
   fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), '{}');
   for (const eventStore of [{ seal: { intervalSec: 0 } }, { sync: { intervalSec: -1 } }, { rebuild: { maxAttempts: 1.5 } }, { remote: '../bad' }]) assert.throws(() => eventStoreConfig({ eventStore }), /event-store-config/);
-  assert.deepEqual(await rebuildStoreUseCase(f.ctx), { rebuilt: [{ consumer: 'work', result: { work: {}, decisions: [] } }] });
+  assert.deepEqual(await rebuildStoreUseCase(f.ctx), { rebuilt: [{ consumer: 'work', result: { work: {}, decisions: [] } }, { consumer: 'porting', result: { porting: {} } }] });
   const cache = JSON.parse(fs.readFileSync(path.join(f.repo, '.fgos/cache/state.json')));
   assert.deepEqual(cache.work, {});
   assert.equal(typeof cache.revision, 'string');

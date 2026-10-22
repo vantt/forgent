@@ -9,7 +9,8 @@ import { checkStopped } from '../../holder-lock/fences.mjs';
 import { workspaceListing } from '../../setup/holder-lock-checks.mjs';
 import { fixEventStoreLockDirs, fixEventStoreMachineId, fixEventStoreRefspec } from '../../setup/event-store-fixes.mjs';
 import { foldEvents, readAllEventsFromDir, buildSnapshotFromDir, serializeView } from '../../state/replay.mjs';
-import { listPorting } from '../../state/porting-store.mjs';
+import { parseEventLines } from '../../state/event-log.mjs';
+import { foldPortingEvents } from '../../state/porting-store.mjs';
 import { eventsContext } from './context.mjs';
 import { resolveStateRoot } from '../../holder-lock/state-root.mjs';
 import { entityDifferences } from './parity.mjs';
@@ -50,11 +51,8 @@ export function migrationParity({ inventory, events }, { baseline, cache } = {})
     const porting = events.filter(e => e.provenance.file.startsWith('porting/'));
     let portingCount = 0;
     if (inventory.portingLog) {
-      const original = path.join(scratch, 'original');
-      const modern = path.join(scratch, 'modern');
-      put(original, 'porting/events.jsonl', Buffer.from(inventory.files[inventory.portingLog]));
-      put(modern, 'porting/events.jsonl', porting.map(e => e.raw + '\n').join(''));
-      const left = listPorting(original).porting, right = listPorting(modern).porting;
+      const left = foldPortingEvents(parseEventLines(Buffer.from(inventory.files[inventory.portingLog]).toString('utf8'), inventory.portingLog)).porting;
+      const right = foldPortingEvents(porting.map(e => JSON.parse(e.raw))).porting;
       portingCount = Object.keys(right).length;
       differences.push(...entityDifferences({ porting: left }, { porting: right }).map(d => ({ source: 'porting-fold', ...d })));
     }
