@@ -67,6 +67,7 @@ test('project id row warns while the repository has none, passes after the expli
   assert.equal(absent.passed, true);
   assert.match(absent.message, /^warning: no project id yet; run `fgos identity project --init` once on one machine, commit, pull elsewhere/);
 
+  // boundary: the row reads what the host prints, so the mint it reads must come from the host's own verb (the crate tests own the mint rules)
   const minted = JSON.parse(execFileSync(HOST, ['identity', 'project', '--init', '--json'], { cwd: repo, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })).data;
   const present = checkIdentityProjectId(repo, { hostBin: HOST });
   assert.equal(present.passed, true);
