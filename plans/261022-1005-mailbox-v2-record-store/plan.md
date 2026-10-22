@@ -146,6 +146,10 @@ Phase 8 records these in the branch spec §17, attributed to the planning lead (
 
 ## Câu hỏi cho owner
 
+**Owner answered Q1 2026-10-22 12:16: option B** — the default of `mailbox.record.bodyRetentionSec` becomes 86400 (the `record.ttlSec` value), so settled headers live about one day instead of seven; measured reason: a steady week of headers made the no-mail hook 30–58 ms p50 before host overhead.
+
+**Owner answered 2026-10-22 11:10:** Q2 → option **(b)**: name resolution ignores a binding the store judged `Dead` (the store passes the dead keys into `send`). Q1 stays on its provisional default (a), measure first, and returns to the owner only if phase 7 exceeds 50 ms. In the same answer the owner also decided two core items from the V1 final review: **M2 → A** (a message offered more than `loop.windowSec` ago no longer counts as a derived parent), and **self-send → B** (a head sending to its own key is refused with reason `self`).
+
 Both questions let the plan continue on the provisional default; only the owner's answer changes it.
 
 ### Q1. If a week of headers makes the no-mail hook slower than 50 ms, which lever?

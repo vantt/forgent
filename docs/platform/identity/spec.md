@@ -4,11 +4,11 @@
 Document type: BA-grade area specification (draft)
 Audience: Owner, maintainer, implementation agent
 Purpose: One authority that mints and resolves the identities of machines, projects, clones and agent sessions, globally unique across machines and independent of any one project
-Design status: Draft, opened 2026-10-22 by the owner; nothing here is signed
+Design status: G0 signed 2026-10-22 for rungs I1-I4; I5 (authenticity mechanism) open
 Implementation status: Not started
-Canonical: Not yet (becomes canonical when the owner signs gate G0 below)
+Canonical: Yes for rungs I1-I4 (G0 signed 2026-10-22, section 10)
 Owner: Identity component (proposed)
-Source (planned): packages/identity/rust (proposed; see open question 1)
+Source: packages/session-identity/rust today (the one identity crate); renamed to packages/identity/rust after HARDEN T1 phase 6 lands
 Related:
 - docs/platform/session-identity/spec.md (writer id of a process; attribution, not authentication)
 - docs/platform/event-store/spec.md section 5 (machine id, store id) and section 14 (sharing through git)
@@ -29,6 +29,17 @@ This component answers four questions with one authority. Every answer is global
 4. **How does one agent address another**, on the same machine or on another one, so that the address resolves to exactly one live session or to a clear "not found"?
 
 A fifth question, **is this message really from who it claims**, is in scope as a later rung (section 7). The first rungs give attribution only, like Session Identity today.
+
+It also answers a sixth question for every other owner: **which id does this new record get**, so that work items, decisions, backlog rows, run and claim ids never collide across machines (section 4a). The record stays with its owner; only the id comes from here.
+
+**Not this component.** The word "identity" has other owners in fgOS, and they keep them:
+
+| Term | Owner |
+|---|---|
+| Process identity (pid, boot id, start time, liveness) | Process (`fgos_process::facts`) |
+| Git author and committer identity (`user.name`, `user.email`) | Git |
+| Event Store store identity (`store.json`) | Event Store; the store id itself is minted here |
+| Release and activation identity (hashes) | Distribution |
 
 ## 2. Problem, with evidence (2026-10-22)
 
@@ -74,12 +85,24 @@ Rules:
 4. **Short handles are resolved, never trusted.** A handle resolves through the directory to exactly one full id, or the call fails with "ambiguous" or "not found" and lists the candidates.
 5. **Formats are Convention kinds.** The textual shapes (id syntax, handle syntax) are registered with Convention so that every caller checks them the same way.
 
+## 4a. Minting ids for every owner (settled 2026-10-22)
+
+Three rules, no daemon, no server of its own, almost no garbage:
+
+1. **Random ids** (work items, backlog rows, project id, run, claim and reservation ids): `<prefix>-<10 lowercase base32 characters>`, 50 random bits, no state and no coordination. A kind that must sort by time puts a time part before the random part. An id is never derived from a title or another content field, because two machines with the same content would get the same id.
+2. **Machine-scoped ids** (machine-local things such as sessions): `<machine-id>/<local id>`, unique by construction once machine ids are.
+3. **Sequential ids** (`D-ADR####`, decision file numbers): the format is not changed, no temporary id, no suffix, no renumbering. Each sequence kind has one counter ref on the project's remote, `refs/fgos/seq/<kind>`, pointing at one commit with no parent whose message is the last number claimed. To claim, read the ref, add one, create a new parentless commit and push it with `--force-with-lease=<ref>:<old sha>` (`<ref>:` when the ref does not exist yet); the forge accepts it only if nobody claimed in between, and a refused claimer fetches and tries the next number. A number is claimed right before the commit that uses it; if that commit fails and nobody claimed after, the ref is pushed back with the same lease. Without a network the claim fails and the writer retries; the format is never changed to work around it. A repository with no remote claims against its local ref.
+
+Garbage: one ref and one commit of about 200 bytes per sequence kind on the remote; each claim replaces the previous commit. Evidence: probe on `github.com/vantt/forgent` (`plans/reports/research-261022-1217-identity-sequence-counter-ref-github-probe.md`): a race of two claims accepted exactly one, the loser's retry got the next number, a stale lease was refused, one claim costs about 2.5-3 s. When GitHub removes replaced commits is not observable.
+
+Pushes and ref writes go through the Git component, like every other git mutation.
+
 ## 5. Directory and resolution across machines
 
 - **Local directory.** Each machine keeps the sessions registered on it: full id, short handle, CLI, project id, clone, start time, liveness (from process facts), role aliases.
 - **Shared directory.** A machine publishes the entries of its projects through the Event Store, on its own `refs/fgos/events/<machine-id>`, as a registered identity event type. Another machine sees them after its next fetch. This reuses Event Store transport (its section 14); it adds no server and no daemon.
 - **Freshness.** A remote entry is as fresh as the last fetch (Event Store sync interval). The resolver reports the age of what it read. It never claims that a remote session is alive.
-- **Verbs (proposed).** `fgos identity` keeps its current answer and adds the machine id, project id and session full id. New: `fgos identity resolve <handle>` and `fgos identity list [--project] [--machine]`.
+- **Verbs (owner-approved 2026-10-22).** Each identity has its own read: `fgos identity machine`, `fgos identity project`, `fgos identity session`, each with `--json`, returning the full id, the handle, the source the id was read from, and aliases. The crate exports the same reads (`machine()`, `project(repo)`, `session()`) so Node, through the addon, and Rust call them in process. Bare `fgos identity` keeps its current answer (the writer id) and adds the three ids, so doctor, the pre-commit hook and people change nothing. Resolution: `fgos identity resolve <handle>` returns exactly one full id or fails with "ambiguous" or "not found" and the candidates; `fgos identity list [--project] [--machine]` lists what the directory knows, with the age of remote entries.
 
 ## 6. Consumers
 
@@ -105,7 +128,7 @@ Rules:
 - Lock authority. As with Session Identity, an identity never grants a lock.
 - Real-time presence across machines.
 
-## 9. Open questions for the owner (each to be asked in the decision-question template before G0)
+## 9. Open questions for the owner (asked at G0 on 2026-10-22; answers in section 10)
 
 1. **One component or two?** Fold Session Identity into this component (one authority for every identity), or keep it separate as the local resolver this component calls. Draft recommendation: fold it in, keeping its crate as the resolver module.
 2. **Where does the project id live?** A tracked file at the repository root's `.fgos/`, or git config, or a commit-addressed value (for example the root commit hash). Draft recommendation: a tracked file, because a root commit is shared by forks.
@@ -118,3 +141,15 @@ Rules:
 
 - 2026-10-22 — Owner opens lane IDENT: "identity càng sớm càng tốt", to cover cross-machine identity minting independent of any project, because lanes on different machines already talk through Git and address each other loosely and inaccurately. Draft written by session `f2c6f8ce` (lane MAIL lead) from the inventory in section 3; the owner will assign another agent on another machine to take the lane.
 - 2026-10-22 11:05 — Lane taken by session `b8f192bf` on the owner machine `fg-server`, handed over by HARDEN `forgent-a8`. Added the path-derived workspace id to section 3. G0 questions sent to the owner.
+- 2026-10-22 — **G0 signed for rungs I1-I4.** The six questions of section 9 were sent as one batch in the decision-question template; the owner chose the recommendation on questions 3 and 4 and raised no objection to the lead's decisions on 1, 2, 5 and 6.
+  1. One authority for every identity. The `fgos-session-identity` crate stays where it is as this component's local-session resolver; no rename or package move until HARDEN T1 phase 6 lands. Reverse if one authority forces two copies of the resolver rule.
+  2. The project id lives in a tracked file under the repository's `.fgos/`, because git config does not travel with a clone and a root commit is shared by forks and absent in an empty repository. The plan must show that the file passes the frozen `.fgos` strip rules (barrier F10) without changing them.
+  3. A fork or copy keeps the project id; splitting is an explicit verb (`fgos identity project --new`). Doctor warns when two different remotes publish one project id. Automatic fork detection by remote URL was rejected: a remote change or a mirror would read as a fork.
+  4. A session handle is `<cli>-<chars>@<machine-handle>`; the machine handle is generated from the machine id and can carry a human alias; role aliases such as `lead:IDENT` resolve to the session holding the role. Both shapes are Convention kinds.
+  5. The I5 authenticity mechanism is decided at the close of I4, with evidence of which signing keys the machines really have; G0 does not cover I5.
+  6. From the landing of I3, new board rows and log lines name agents and machines by handle; old log lines stay as history; the IDENT lead rewrites the "ai làm" column of live rows once when I3 lands.
+- 2026-10-22 — Owner approves the read surface of section 5: one read per identity (machine, project, session) plus `resolve` and `list`; bare `fgos identity` keeps its answer.
+- 2026-10-22 — **Decision 1 sharpened by the owner: one component, one authority, one crate** ("1 component thôi, đã cấp phát ở mọi mức độ rồi thì không cần 2 authority"). Identity grows inside the existing crate `packages/session-identity/rust`; no second crate is created. The writer-id rule becomes the local part of the session identity. Package, crate and spec are renamed to Identity in one change after HARDEN T1 phase 6 lands; until then the name stays to avoid colliding with T1. Reverse if the rename turns out to need an alias crate (it must not; L10).
+- 2026-10-22 11:32 — **Owner chooses option A: Identity mints every kind of id**, participants (machine, project, clone, session) and artifacts (work items, decisions, backlog rows, run and claim ids), through one mint door; record owners keep their records and call the door. The component, crate and spec are renamed to Identity; the verb stays `fgos identity`. **Nothing is built until a cheap mechanism against cross-machine collisions is settled** (owner: "sẽ không làm cho tới khi xác định được cơ chế rẻ tiền để chống trùng xuyên máy"). The plan of 2026-10-22 is held until then.
+- 2026-10-22 13:08 — **Owner settles the anti-collision mechanism** (section 4a): random ids of 50 bits, machine-scoped ids, and one counter ref per sequence kind claimed by compare-and-swap push. The owner ruled that sequential ids keep their exact format (no temporary ids, suffixes or renumbering) and that garbage must stay minimal; per-number claim refs were rejected for leaving one ref per claim. The lane leaves `held`. Rename to Identity runs first, because no branch has edited the crate yet (checked 13:08 on every `origin/harden/*` branch). Reverse rule 3 if the forge ever accepts a stale lease.
+- 2026-10-22 13:40 — Owner answers the two questions of the mint rung: new Work item ids are `tsk-` plus 10 base32 characters (existing ids unchanged); one rule line in `core/instructions/` tells every agent to take ids that travel between machines from `fgos identity mint <kind>`.

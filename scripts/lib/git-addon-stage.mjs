@@ -70,20 +70,37 @@ export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true
   return { addon, manifest, hostBin, cargoEnv };
 }
 
+// Answers this process already proved, so a caller that prepares two runs (the canary, the suite)
+// starts one check, not two. A named host is keyed by its file identity, so a rebuilt binary is
+// checked again; a build by checkout and target directory.
+const provenHosts = new Map();
+const fileIdentity = (file) => { const st = fs.statSync(file); return `${file}:${st.size}:${st.mtimeMs}`; };
+
 /**
  * Ensures FGOS_HOST_BIN is available and points to a runnable host binary.
  * If FGOS_HOST_BIN is already set and runnable, returns it without building.
  * Otherwise, builds fgos with cargo (debug incremental) using checkout's CARGO_TARGET_DIR.
+ * Each answer is proved once per process.
  */
 export function ensureHostBin(env = process.env, cwd = REPO_ROOT) {
   if (env.FGOS_HOST_BIN) {
     try {
       if (fs.existsSync(env.FGOS_HOST_BIN)) {
-        execFileSync(env.FGOS_HOST_BIN, ['version'], { stdio: 'ignore' });
+        const key = `named:${fileIdentity(env.FGOS_HOST_BIN)}`;
+        if (!provenHosts.has(key)) {
+          execFileSync(env.FGOS_HOST_BIN, ['version'], { stdio: 'ignore' });
+          provenHosts.set(key, env.FGOS_HOST_BIN);
+        }
         return env.FGOS_HOST_BIN;
       }
     } catch {}
   }
+
+  const targetDir = env.CARGO_TARGET_DIR || path.join(cwd, 'target');
+  const binName = process.platform === 'win32' ? 'fgos.exe' : 'fgos';
+  const binPath = path.join(targetDir, 'debug', binName);
+  const key = `built:${cwd}:${targetDir}`;
+  if (provenHosts.has(key)) return provenHosts.get(key);
 
   try {
     execFileSync('cargo', ['--version'], { stdio: 'ignore' });
@@ -91,15 +108,12 @@ export function ensureHostBin(env = process.env, cwd = REPO_ROOT) {
     throw new Error('cargo is required to build fgos host binary for testing, but was not found on PATH');
   }
 
-  const targetDir = env.CARGO_TARGET_DIR || path.join(cwd, 'target');
-  const binName = process.platform === 'win32' ? 'fgos.exe' : 'fgos';
-  const binPath = path.join(targetDir, 'debug', binName);
-
   execFileSync('cargo', ['build', '-p', 'fgos'], {
     cwd,
     env: { ...env, CARGO_TARGET_DIR: targetDir },
     stdio: 'inherit',
   });
 
+  provenHosts.set(key, binPath);
   return binPath;
 }
