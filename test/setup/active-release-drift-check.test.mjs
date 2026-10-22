@@ -336,6 +336,11 @@ test('real builder selection and staged production dependency payload agree with
   put(f.source, `target/release/${nativeAddonLibraryName()}`, 'native addon fixture\n');
   fs.copyFileSync(path.join(REPO_ROOT, 'Cargo.lock'), path.join(f.source, 'Cargo.lock'));
   const built = path.join(f.temp, 'built');
+  // The host pins the state root for every payload it starts; the checkout reader the builder spawns only
+  // asks the addon when nothing is pinned, and this fixture's addon is a placeholder file.
+  const unpinned = process.env.FGOS_STATE_ROOT;
+  process.env.FGOS_STATE_ROOT = path.join(f.temp, 'state');
+  t.after(() => { if (unpinned === undefined) delete process.env.FGOS_STATE_ROOT; else process.env.FGOS_STATE_ROOT = unpinned; });
   const result = buildRustDistribution({ outDir: built, repoRoot: f.source });
   const manifest = JSON.parse(fs.readFileSync(result.manifestPath, 'utf8'));
   assert.ok(manifest.files.some((entry) => entry.path === 'libexec/legacy-node/node_modules/dep/index.mjs'));
