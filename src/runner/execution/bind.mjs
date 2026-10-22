@@ -244,6 +244,13 @@ function crateOverrideOf(override) {
   return Object.keys(out).length > 0 ? out : undefined;
 }
 
+/** The session lead that may run a seat inline: a lead is in the session and the seat's posture allows it. */
+function inlineLeadOf(seatPosture, session, runnerConfig) {
+  if (!seatPosture.inlineAllowed || session.headless || !(session.hasNativeAgent || session.provider)) return undefined;
+  const executor = session.provider ?? 'lead';
+  return { executor, family: getProviderFamily(runnerConfig, executor) };
+}
+
 /**
  * Everything the crate is asked for one seat. Throws RunnerConfigError for an override no seat could take
  * (an unknown tier or effort name); returns `{ refused }` for a persona conflict.
@@ -300,6 +307,7 @@ function requestOf(ask, ctx, walk) {
     const at = peers.findIndex((known) => known.seat === entry.seat);
     if (at >= 0) peers[at] = entry; else peers.push(entry);
   }
+  const inlineLead = inlineLeadOf(seatPosture, session, runnerConfig);
   const crateAsk = {
     // A door that names the capability changes it: the ask carries what the door would have run without it.
     capability: selectors.capability ? DEFAULT_RUN_CAPABILITY : unit?.capability,
@@ -316,10 +324,11 @@ function requestOf(ask, ctx, walk) {
     independence: { hard, hardCheckers: [], soft: peers.map((peer) => peer.seat) },
     requiredSkills,
     unitPrefer: unitPreferOf(unit?.prefer),
+    ...(inlineLead ? { inlineLead } : {}),
   };
   const launchView = launchViewOf(runnerConfig, session);
   return {
-    persona, matchingOverride, posture, isReadOnlyPosture, requiredSkills, launchView,
+    persona, matchingOverride, posture, isReadOnlyPosture, launchView,
     request: {
       ask: crateAsk,
       runnerConfig,
@@ -392,40 +401,18 @@ function fallbackFrom(previous, binding, { reason, rotation, detail, runnerConfi
 }
 
 function bindingOf({ out, prep, ask, ctx, walk }) {
-  const { unit, seat = 'producer', posture: seatPosture = PRODUCER_POSTURE, blind = false } = ask ?? {};
+  const { unit, seat = 'producer', posture: seatPosture = PRODUCER_POSTURE } = ask ?? {};
   const { runnerConfig = {}, session = {} } = ctx ?? {};
-  const { persona: personaChoice, matchingOverride, posture, isReadOnlyPosture, requiredSkills, launchView } = prep;
+  const { persona: personaChoice, matchingOverride, posture, isReadOnlyPosture, launchView } = prep;
   const executors = executorsOf(runnerConfig);
   const { policy, ranked } = out;
   // Stage 1 refused (a tier no cell serves, a raise no door may make): there is nothing to rank.
   if (!ranked) return { refused: refusalOf(out.refusal, { session, unit }) };
 
-  let cand = ranked.candidates[0];
-  let inlineFallback = false;
-  if (!cand) {
-    // The session lead runs a seat that may run inline only when the unit configured no candidate at all.
-    const unconfigured = out.refusal?.reason === 'no-candidate' && (out.refusal.configured ?? 0) === 0;
-    const isLeadPresent = !session.headless && (session.hasNativeAgent || session.provider);
-    if (unconfigured && seatPosture.inlineAllowed && isLeadPresent && !blind && requiredSkills.length === 0) {
-      inlineFallback = true;
-      const leadId = session.provider ?? 'lead';
-      cand = {
-        executor: leadId,
-        family: getProviderFamily(runnerConfig, leadId),
-        invocation: null,
-        model: null,
-        modelSource: 'no-model-needed',
-        effort: null,
-        effortSource: 'invocation-default',
-        pool: null,
-        mechanism: 'inline',
-        source: 'session-lead-inline',
-        pinned: false,
-      };
-    } else {
-      return { refused: refusalOf(out.refusal ?? { reason: 'no-candidate', detail: 'no candidate' }, { session, unit }) };
-    }
-  }
+  const cand = ranked.candidates[0];
+  if (!cand) return { refused: refusalOf(out.refusal ?? { reason: 'no-candidate', detail: 'no candidate' }, { session, unit }) };
+  // The crate seats the session lead inline when the seat has no candidate configured; nothing launches then.
+  const inlineFallback = cand.mechanism === 'inline';
 
   let timeout;
   try {
