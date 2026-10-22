@@ -1,6 +1,12 @@
 # Seat trim: convention rule evaluation behind the native door
 
-Status: BLOCKED at the pre-check; no source changed.
+Status: DONE with decision B. The native-door move closes as "JS evaluation stays; reason: compat-channel reads have no addon; reverse
+when compat channels ship the native addon or are retired". Instead the duplicate JS check is merged: new leaf
+`src/convention/identifier-rules.mjs` (one lazy contract reader, `identifierRule`, `identifierProblem`); `seat-id.mjs` and
+`definition-names.mjs` keep their public APIs and messages and call it. Manifest row added (domain). Node golden loops kept.
+Verified: `node --test test/convention/seat-id.test.mjs test/convention/definition-files.test.mjs test/architecture.test.mjs` green.
+
+The rest of this file is the original pre-check record.
 
 ## Pre-check findings
 
