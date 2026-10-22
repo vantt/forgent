@@ -843,7 +843,7 @@ export async function decideExecutorCli(
       }
     } catch {}
   }
-  const cfg = ensureRunnerConfigForDir(configRoot);
+  const cfg = withDefaultExecutor(ensureRunnerConfigForDir(configRoot));
 
   let workHint;
   if (!executorIdArg && workIdArg) {
