@@ -13,7 +13,7 @@
     },
     "optional": [
       { "flag": "--predecessor-kinds <kind,kind>", "meaning": "reject other recorded kinds under the kernel lock before ordinary cleanup" },
-      { "flag": "--kill-wait-ms K", "default": 2000, "meaning": "predecessor kill wait and the bound for emptying a borrow job on parent death; source lock.predecessorKillWaitMs" }
+      { "flag": "--kill-wait-ms K", "default": 2000, "meaning": "predecessor kill wait and the bound for emptying a borrow job on parent death" }
     ],
     "unknownFlag": "usage error, exit 2"
   },

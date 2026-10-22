@@ -4,6 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
 import { createGitInspect, gitWriter } from '../../git/inspect.mjs';
 
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
@@ -55,7 +56,7 @@ import { defaultConfinementTempRoots } from '../dispatch/confinement/backend-reg
 
 /** Write `file` atomically so a reader never sees half a record. */
 function writeJsonAtomic(file, value) {
-  const tmp = `${file}.${process.pid}.${crypto.randomBytes(4).toString('hex')}.tmp`;
+  const tmp = `${file}.${uniqueTmpTag()}.tmp`;
   try {
     fs.writeFileSync(tmp, JSON.stringify(value, null, 2));
     fs.renameSync(tmp, file);
@@ -119,7 +120,7 @@ export function detectHerdrPresent(env = process.env) {
  */
 export function resolveGitRoots(cwd = process.cwd(), { allowNoRepository = false } = {}) {
   try {
-    const result = createGitInspect({stateRoot:resolveStateRoot({fgosDir:path.join(cwd,'.fgos')}).stateRoot,
+    const result = createGitInspect({stateRoot:resolveStateRoot().stateRoot,
       repoPath:cwd,trustedMain:cwd}).resolveRepo();
     // A read-only caller may work in a directory that is no repository: Inspect's typed answer is
     // `notARepository`, and the directory is its own project root.
@@ -402,19 +403,16 @@ function requireFreeWorktree(port, worktree) {
   throw new CaseAdmissionRefusedError({ code: answer, condition: binding?.condition ?? `worktree ${worktree} is not free for a run that names no case: ${answer}${owner}` });
 }
 
-const hasSelectors = (selectors) => selectors !== null && typeof selectors === 'object' && Object.values(selectors).some((v) => v !== undefined && v !== null);
-
 /**
- * What a seat's bind ask carries beyond the seat itself: the tier its workflow recommended, what the
- * calling door chose, and whether that door may raise. The recommendation and the selectors come from
- * the unit record, so a resume and a replay ask what the run asked; `raiseAuthorized` is never
+ * What a seat's bind ask carries beyond the seat itself: the tier its workflow recommended and whether
+ * the calling door may raise. The recommendation comes from the unit record, so a resume and a replay
+ * ask what the run asked; `raiseAuthorized` is never
  * persisted, so a replay can only ever be the unauthorized one.
  */
 function bindContextOf(unitRecord, seatUnit, seat, options = {}) {
   const workflowTier = workflowTierOf(seat, seatUnit, unitRecord.workflowId);
   return {
     ...(workflowTier ? { workflowTier } : {}),
-    ...(hasSelectors(unitRecord.selectors) ? { selectors: unitRecord.selectors } : {}),
     raiseAuthorized: options.raiseAuthorized === true,
   };
 }
@@ -424,7 +422,7 @@ function bindContextOf(unitRecord, seatUnit, seat, options = {}) {
  * run exists.
  *
  * - An override that accepts a dependence, and a tier above the one a seat resolves to (an override's, or
- *   one a door's chosen persona or capability resolves to), are raises. No door is authorized yet, so they
+ *   its persona's), are raises. No door is authorized yet, so they
  *   are refused by name: `dependence-acceptance-unauthorized`, `tier-escalation-unauthorized`.
  * - Each seat an `account` override applies to (bound the way the run would bind it) must take that
  *   account, at least one seat must, and the account must not be quarantined now.
@@ -439,7 +437,7 @@ async function assertDoorChoicesBeforeRun(unit, runnerConfig, options) {
     );
   }
   const pinsAccount = objects.some((o) => o.account !== undefined);
-  const mayRaise = objects.some((o) => o.tier !== undefined) || hasSelectors(options.selectors) || objects.some((o) => o.persona !== undefined);
+  const mayRaise = objects.some((o) => o.tier !== undefined) || objects.some((o) => o.persona !== undefined);
   if (!pinsAccount && !mayRaise) return;
   const { seats } = await simulateUnitBindings(
     { ...unit, pattern: chosenPattern(options, unit) },
@@ -447,7 +445,6 @@ async function assertDoorChoicesBeforeRun(unit, runnerConfig, options) {
     {
       session: { herdrPresent: options.session?.herdrPresent ?? detectHerdrPresent(), ...(options.session ?? {}) },
       overrides,
-      selectors: options.selectors,
       raiseAuthorized: options.raiseAuthorized === true,
       workflowId: options.workflowId,
     },
@@ -474,9 +471,6 @@ async function assertDoorChoicesBeforeRun(unit, runnerConfig, options) {
  * @param {object} [options.unitData] Raw unit object (in-memory)
  * @param {string} [options.pattern] Pattern name or preset
  * @param {Array} [options.overrides] Array of overrides [{scope, origin, executor, invocation, tier, persona, reasoningEffort, account, timeoutMs}]
- * @param {{persona?: string, seat?: string, capability?: string}} [options.selectors] What the calling door chose
- *   (a persona or capability a person typed): a choice that lifts a seat's tier above what the seat resolves
- *   to without it is a raise, refused unless the door is authorized
  * @param {boolean} [options.raiseAuthorized] Whether the calling door may raise a tier or accept a dependence.
  *   No door is authorized yet: every caller passes false (the default)
  * @param {string} [options.workflowId] The workflow this unit belongs to, to name where a seat's recommended tier was declared
@@ -804,7 +798,6 @@ async function runUnitBody(options, scope) {
       unit,
       seatSchema: 1,
       seats,
-      ...(hasSelectors(options.selectors) ? { selectors: Object.fromEntries(Object.entries(options.selectors).filter(([, v]) => v !== undefined && v !== null)) } : {}),
       ...(typeof options.workflowId === 'string' && options.workflowId ? { workflowId: options.workflowId } : {}),
       workflow: scope.admission ? normalizeWorkflowLink({ caseId: scope.admission.caseId, activity: caseRef.activity, reservationId: scope.admission.reservationId }) : null,
       ...(admittedCeiling !== null ? { seatLaunchCeiling: admittedCeiling } : {}),

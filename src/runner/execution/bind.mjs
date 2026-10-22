@@ -18,7 +18,7 @@ import { MODEL_POLICY_TIERS, RunnerConfigError, assertReasoningEffort, assertRun
 import { credentialSourceForCli, credentialStoreOf, providerAccountInventory, readAccountStates } from '../dispatch/provider-capacity.mjs';
 import { parseTierCell } from '../dispatch/tier-cell.mjs';
 import { legacyStateKey } from '../dispatch/llm-accounts.mjs';
-import { DEFAULT_RUN_CAPABILITY, PRODUCER_POSTURE, capabilityEntriesOf, effectiveRigorOf } from './seat-resolver.mjs';
+import { PRODUCER_POSTURE, capabilityEntriesOf, effectiveRigorOf } from './seat-resolver.mjs';
 import { seatBinding } from './seat-policy.mjs';
 
 export const BIND_CONTRACT_VERSION = 'v1alpha1';
@@ -68,8 +68,8 @@ export function getProviderFamily(runnerConfig, executorId) {
 /**
  * The persona that sits a seat, and where it came from: an override's, else the seat's own, the
  * unit's, the locked one, the capability's default (its exact entry, then its prefix entry).
- * `base` is the same chain without the persona a door selected, which is what the tier is judged
- * against before the selection (a persona a door picks that lifts the tier is a raise).
+ * `base` is the same chain without the persona an override named, which is what the tier is judged
+ * against before the selection (an override persona that lifts the tier is a raise).
  */
 function resolvePersona({ ask, unit, matchingOverride, capEntries }) {
   const { persona: seatPersona = null, lockedPersona = null } = ask ?? {};
@@ -88,7 +88,7 @@ function resolvePersona({ ask, unit, matchingOverride, capEntries }) {
     if (capDefault) return { persona: capDefault.entry.persona, source: `capability:${capDefault.key}` };
     return { persona: null, source: 'none' };
   };
-  const selected = ask?.selectors?.persona ?? matchingOverride?.persona ?? null;
+  const selected = matchingOverride?.persona ?? null;
   const chosen = matchingOverride?.persona
     ? { persona: matchingOverride.persona, source: overrideSource(matchingOverride) }
     : chain(null);
@@ -289,12 +289,7 @@ function requestOf(ask, ctx, walk) {
   const persona = resolvePersona({ ask, unit, matchingOverride, capEntries: capabilityEntriesOf(runnerConfig, unit?.capability) });
   if (persona.refused) return { refused: persona.refused };
 
-  const doorSelectors = ask?.selectors ?? {};
-  const selectors = {
-    ...(persona.selected ? { persona: persona.selected } : {}),
-    ...(doorSelectors.seat ? { seat: doorSelectors.seat } : {}),
-    ...(doorSelectors.capability ? { capability: doorSelectors.capability } : {}),
-  };
+  const selectors = persona.selected ? { persona: persona.selected } : {};
   // Only roles that do the unit's work are asked for its skills; a checker or panel seat reads the result.
   const requiredSkills = !seatPosture.forceOutOfProcess && Array.isArray(unit?.skills) ? unit.skills : [];
   // A hard `independentOf` names executors (or seats not bound yet): the crate compares provider families.
@@ -309,8 +304,7 @@ function requestOf(ask, ctx, walk) {
   }
   const inlineLead = inlineLeadOf(seatPosture, session, runnerConfig);
   const crateAsk = {
-    // A door that names the capability changes it: the ask carries what the door would have run without it.
-    capability: selectors.capability ? DEFAULT_RUN_CAPABILITY : unit?.capability,
+    capability: unit?.capability,
     seat,
     role,
     ...(persona.base ? { persona: persona.base } : {}),
@@ -520,8 +514,8 @@ function decide(ask, ctx, walk) {
  *
  * @param {object} ask unit, seat, role, posture, persona, overrides, independentOf (executors or seats the
  *   seat must differ from), preferIndependentOf ([{ seat, executor }] it should differ from), blind,
- *   workflowTier, selectors, raiseAuthorized
- * @param {object} ctx { runnerConfig, session, accounts? }
+ *   workflowTier, raiseAuthorized
+ * @param {object} ctx { runnerConfig, session }
  *   Execution admission belongs to the calling door, not seat choice or replay.
  * @param {object} [options]
  * @param {object} [options.walk] where the seat stands after a failure

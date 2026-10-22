@@ -3,14 +3,11 @@
 // with a 401, and GLM loops on one tool call in a pane). What must be true of them is pinned here.
 
 import '../helpers/process-tmp-root.mjs';
+import { committedRunnerConfig } from '../helpers/committed-config.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const runner = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'config.json'), 'utf8')).runner;
+const runner = committedRunnerConfig();
 const invocation = (executor) => runner.executors[executor].invocations.find((inv) => inv.adapter === 'herdr-spawn');
 
 test('claude runs a claude REPL in a pane under the bwrap posture', () => {

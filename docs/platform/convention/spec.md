@@ -172,7 +172,7 @@ This operation classifies only `placement-glob` rules; `name-template` kinds are
 
 An explicit `--at` must be RFC3339 with an offset. Its civil date and time are formatted in that supplied offset; equivalent instants with different offsets may therefore produce different names intentionally.
 
-Without `--at`, the provider uses the process-local civil time and returns its numeric offset. Unix obtains the offset through the one shared host-runtime civil-time implementation; unsupported platforms fall back to UTC and return `+00:00`. Callers and tests inject time/offset into pure operations.
+Without `--at`, the provider uses the process-local civil time and returns its numeric offset. Unix obtains the local offset with `localtime_r` in the Convention provider; the RFC 3339 offset parsing and formatting are the shared host-runtime civil-time functions; unsupported platforms fall back to UTC and return `+00:00`. Callers and tests inject time/offset into pure operations.
 
 Timestamp fields are calendar-validated, including month/day/leap-year and hour/minute bounds. A shape match with an impossible timestamp is `invalid-timestamp`, not merely `pattern-mismatch`.
 

@@ -3,16 +3,8 @@
 // named errors the Node facade raises. Every other module of this component
 // imports its constants from here, so a protocol bump is one edit.
 //
-// `lock.predecessorKillWaitMs` is read through the same project-over-global
-// config reader `fgos setup` uses (readSharedConfigOrEmpty + mergeWithGlobalConfig):
-// the facade never installs the predecessor rule, it only forwards the bound
-// to the route as `--kill-wait-ms`.
-
-import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
-import { mergeWithGlobalConfig } from '../config/global-config.mjs';
-
 // 2 refuses a payload of the first release (`--protocol 1`) on every lock route; `quiesce-scan` keeps its own
-// protocol (SCAN_PROTOCOL in fences.mjs) because its callers pin it separately from this facade.
+// protocol (SCAN_PROTOCOL in src/verbs/events/migrate.mjs) because its caller pins it separately from this facade.
 export const PROTOCOL = 2;
 
 /** The stdio slot a borrowed description is handed to, and the env variable
@@ -22,9 +14,8 @@ export const LOCK_FD_ENV = 'FGOS_LOCK_FD';
 /** Names a borrow job on the hold transport: `<lock name>:<job name>`. */
 export const LOCK_JOB_ENV = 'FGOS_LOCK_JOB';
 
+/** How long a dead predecessor's domain is waited on after it is killed; the one bound every caller uses. */
 export const DEFAULT_KILL_WAIT_MS = 2000;
-export const MAX_KILL_WAIT_MS = 60_000;
-export const KILL_WAIT_CONFIG_KEY = 'lock.predecessorKillWaitMs';
 
 /** Raised for every failure the facade names. `code` is the stable key a
  * caller branches on; `category` follows the CLI-facing vocabulary other
@@ -58,31 +49,4 @@ export function parseRouteLine(stdout, bin) {
     throw new HolderLockError('lock-route-bad-output', `${bin} answered with protocol ${parsed?.protocol ?? '?'}, expected ${PROTOCOL}: ${line.slice(0, 200)}`);
   }
   return parsed;
-}
-
-/**
- * `lock.predecessorKillWaitMs` for the project rooted at `projectRoot`
- * (the directory holding `.fgos/config.json`; omit it for a machine-scope
- * lock, which only sees the global config). Absent -> the default. Present
- * but not a positive integer -> an error: a bound that cannot be forwarded
- * to the route is a misconfiguration, never something to guess around.
- */
-export function readPredecessorKillWaitMs({ projectRoot } = {}) {
-  let merged;
-  try {
-    merged = mergeWithGlobalConfig(projectRoot ? readSharedConfigOrEmpty(projectRoot) : {});
-  } catch {
-    // The optional-setting discipline of readSharedConfigOrEmpty, extended to
-    // the global file: a half-typed config is an ordinary state and reads as
-    // "nothing configured"; doctor is the one that reports the parse failure.
-    merged = {};
-  }
-  const section = merged.lock;
-  if (!section || typeof section !== 'object' || Array.isArray(section)) return DEFAULT_KILL_WAIT_MS;
-  const value = section.predecessorKillWaitMs;
-  if (value === undefined) return DEFAULT_KILL_WAIT_MS;
-  if (!Number.isInteger(value) || value < 1 || value > MAX_KILL_WAIT_MS) {
-    throw new HolderLockError('lock-config-invalid', `${KILL_WAIT_CONFIG_KEY} must be an integer from 1 to ${MAX_KILL_WAIT_MS}, got ${JSON.stringify(value)}`, { key: KILL_WAIT_CONFIG_KEY, value });
-  }
-  return value;
 }

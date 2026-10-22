@@ -1,7 +1,8 @@
-// Real processes, real kernel locks, the real `fgos internal lock-fd` route:
-// a lock taken through the facade stays held after the helper exits, a
-// bounded wait ends as `timeout` with nothing held, and the predecessor rule
-// runs through the facade (named error, configured bound). The kernel cases
+// Real processes, real kernel locks, the real in-process `holderLock` door:
+// a lock taken through the facade excludes another process and starts no
+// process of its own, a bounded wait ends as `timeout` with nothing held, and
+// the predecessor rule runs through the facade (named error, the 2000 ms
+// bound). The kernel cases
 // the facade only passes through (two descriptions exclude each other, a
 // SIGKILLed holder frees the lock, a live predecessor is killed at once) are
 // owned by packages/holder-lock/rust/tests/multiprocess.rs.
@@ -14,12 +15,14 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
-import { acquire, acquireSync, probe, createLockScope, HolderLockError } from '../../src/holder-lock/index.mjs';
+import { acquire, acquireSync, probe, createLockScope, spawnWithLocks, HolderLockError } from '../../src/holder-lock/index.mjs';
+import { observe, signalByIdentity } from '../../src/runner/dispatch/process-identity.mjs';
+import { enterHotLock } from '../../src/holder-lock/hot-guard.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const FACADE_URL = pathToFileURL(path.join(root, 'src', 'holder-lock', 'index.mjs')).href;
 const { bin: HOST_BIN } = resolveActiveHostBin({ fgosDir: path.join(root, '.fgos') });
-const NEEDS_HOST = HOST_BIN ? false : 'no fgos host binary: set FGOS_HOST_BIN to a host built with the internal lock-fd route';
+const NEEDS_HOST = HOST_BIN ? false : 'no fgos host binary: set FGOS_HOST_BIN to a host whose release carries the addon';
 const LINUX_ONLY = process.platform === 'linux' ? false : 'reads /proc';
 const LOCK = 'main-checkout';
 
@@ -63,22 +66,34 @@ function openFdCount() {
   return fs.readdirSync('/proc/self/fd').length;
 }
 
-test('a lock acquired through the facade stays held after the helper exits and excludes another process', { skip: NEEDS_HOST }, () => {
+test('a lock acquired through the door is held with no child process and excludes another process', { skip: NEEDS_HOST }, () => {
   const { dir, fgosDir } = makeProject();
   try {
     const scope = createLockScope('owner');
-    const taken = acquireSync(scope, LOCK, { fgosDir });
-    assert.equal(taken.result, 'acquired');
+    // Inside a hot critical section any process start is refused by name: acquire, probe and release start none.
+    const leave = enterHotLock();
+    let taken;
+    try {
+      taken = acquireSync(scope, LOCK, { fgosDir });
+      assert.equal(taken.result, 'acquired');
+      assert.deepEqual(probe(LOCK, { fgosDir }), { result: 'held' });
+    } finally {
+      leave();
+    }
     assert.ok(fs.existsSync(path.join(fgosDir, 'locks', 'main-checkout.lock')));
     assert.equal(taken.handle.name, LOCK);
     assert.equal(taken.handle.rank, 50);
     assert.deepEqual(Object.keys(taken.handle).filter((key) => /fd/i.test(key)), [], 'the handle carries no descriptor');
 
     assert.deepEqual(tryFromAnotherProcess(dir, fgosDir), { result: 'held', reason: 'kernel-lock-held' });
-    assert.deepEqual(probe(LOCK, { fgosDir }), { result: 'held' });
 
-    assert.equal(taken.handle.release(), true);
-    assert.equal(taken.handle.release(), false, 'release is idempotent');
+    const leaveAgain = enterHotLock();
+    try {
+      assert.deepEqual(taken.handle.release(), { settled: 'released', killed: 0, pids: [] });
+    } finally {
+      leaveAgain();
+    }
+    assert.deepEqual(taken.handle.release(), { settled: 'closed', killed: 0, pids: [] }, 'release is idempotent');
     assert.equal(taken.handle.released, true);
     assert.deepEqual(scope.holding(), []);
 
@@ -87,6 +102,43 @@ test('a lock acquired through the facade stays held after the helper exits and e
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
+});
+
+// boundary: process-level lock handover. The grandchild is the only process that
+// can prove the handed-over description outlives the parent's release.
+const HANDOVER_CHILD = `
+const { spawn } = require('node:child_process');
+const grandchild = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: ['ignore', 'ignore', 'ignore', 3] });
+require('node:fs').writeFileSync(process.argv[1], String(grandchild.pid));
+setInterval(() => {}, 1000);
+`;
+
+test('a lock handed to a spawned child stays held through the parent release while the child tree lives', { skip: NEEDS_HOST || LINUX_ONLY }, async (t) => {
+  const { dir, fgosDir } = makeProject();
+  fs.mkdirSync(dir, { recursive: true });
+  const pidFile = path.join(dir, 'grandchild.pid');
+  const tuples = [];
+  t.after(async () => {
+    for (const tuple of tuples) signalByIdentity(tuple, 'kill');
+    for (let i = 0; i < 100 && tuples.some((tuple) => observe(tuple.pid).kind === 'live'); i += 1) await new Promise((r) => setTimeout(r, 50));
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+  const taken = acquireSync(createLockScope('owner'), LOCK, { fgosDir });
+  assert.equal(taken.result, 'acquired');
+  const child = spawnWithLocks([taken.handle], { command: process.execPath, args: ['-e', HANDOVER_CHILD, pidFile], env: childEnv({}) });
+  tuples.push(observe(child.pid));
+  for (let i = 0; i < 200 && !fs.existsSync(pidFile); i += 1) await new Promise((r) => setTimeout(r, 25));
+  assert.ok(fs.existsSync(pidFile), 'the child started its grandchild');
+  const grandchildPid = Number(fs.readFileSync(pidFile, 'utf8'));
+  tuples.push(observe(grandchildPid));
+  assert.equal(tuples[1].kind, 'live');
+
+  // The description lives on in the child tree: the release closes this process's copy and settles nothing.
+  assert.deepEqual(taken.handle.release(), { settled: 'closed', killed: 0, pids: [] });
+  await new Promise((r) => setTimeout(r, 300));
+
+  assert.equal(observe(grandchildPid).kind, 'live', 'the grandchild outlives the parent release');
+  assert.deepEqual(probe(LOCK, { fgosDir }), { result: 'held' });
 });
 
 test('a bounded wait on a held lock ends as timeout, closes its description and holds nothing', { skip: NEEDS_HOST || LINUX_ONLY }, () => {
@@ -147,11 +199,9 @@ function writePredecessor(fgosDir, tuple) {
   return record;
 }
 
-test('a predecessor domain that cannot be killed fails by name within lock.predecessorKillWaitMs and leaves the lock free', { skip: NEEDS_HOST || LINUX_ONLY || (process.getuid?.() === 0 ? 'root can kill pid 1' : false) }, () => {
+test('a predecessor domain that cannot be killed fails by name within the 2000 ms kill wait and leaves the lock free', { skip: NEEDS_HOST || LINUX_ONLY || (process.getuid?.() === 0 ? 'root can kill pid 1' : false) }, () => {
   const { dir, fgosDir } = makeProject();
   try {
-    fs.mkdirSync(fgosDir, { recursive: true });
-    fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ lock: { predecessorKillWaitMs: 200 } }));
     writePredecessor(fgosDir, processTuple(1));
     const started = Date.now();
     assert.throws(
@@ -161,30 +211,15 @@ test('a predecessor domain that cannot be killed fails by name within lock.prede
         assert.equal(err.code, 'lock-predecessor-domain-not-empty');
         assert.equal(err.domain?.domainKind, 'linux-gate');
         assert.equal(err.domain?.domainId?.pid, 1);
-        assert.equal(err.killWaitMs, 200, 'the configured bound is the one sent to the route');
+        assert.equal(err.killWaitMs, 2000, 'the one kill wait every caller uses');
         return true;
       },
     );
     const elapsed = Date.now() - started;
-    // pid 1 refuses the kill (EPERM), and the route answers a refused kill at
-    // once instead of waiting the bound out; it never takes longer than it.
-    assert.ok(elapsed < 1500, `took ${elapsed} ms: the configured 200 ms bound was not applied`);
+    // pid 1 refuses the kill (EPERM), and a refused kill is answered at once
+    // instead of waiting the bound out; it never takes longer than it.
+    assert.ok(elapsed < 2500, `took ${elapsed} ms: the 2000 ms bound was not applied`);
     assert.deepEqual(probe(LOCK, { fgosDir }), { result: 'free' }, 'the successor released the kernel lock before reporting');
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('a malformed lock.predecessorKillWaitMs is refused, never guessed around', () => {
-  const { dir, fgosDir } = makeProject();
-  try {
-    fs.mkdirSync(fgosDir, { recursive: true });
-    // The same range doctor's lock-predecessor-kill-wait check enforces.
-    for (const value of ['2s', 0, 60_001]) {
-      fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ lock: { predecessorKillWaitMs: value } }));
-      assert.throws(() => acquireSync(createLockScope('x'), LOCK, { fgosDir }), (err) => err.code === 'lock-config-invalid' && err.key === 'lock.predecessorKillWaitMs', `value ${JSON.stringify(value)}`);
-      assert.equal(fs.existsSync(path.join(fgosDir, 'locks')), false, 'refused before any lock file was touched');
-    }
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

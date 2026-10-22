@@ -1,6 +1,6 @@
 use fgos_event_store::{
     envelope::Scope,
-    identity::{machine_id, valid_machine_id, StoreIdentity},
+    identity::{machine_id, StoreIdentity},
     layout::{Layout, StreamId},
     registry::{ConsumerContract, Registry},
 };
@@ -132,11 +132,6 @@ fn machine_identity_precedence_and_validation() {
     assert_eq!(machine_id(None, &repo.0).unwrap(), "home-abc123");
     assert_eq!(machine_id(Some("clone-123"), &repo.0).unwrap(), "clone-123");
     assert!(machine_id(Some("INVALID"), &repo.0).is_err());
-    for bad in ["", "a", "-ab", "Ab", "a/b", "a b"] {
-        assert!(!valid_machine_id(bad));
-    }
-    assert!(valid_machine_id(&"a".repeat(63)));
-    assert!(!valid_machine_id(&"a".repeat(64)));
 }
 #[test]
 fn identity_is_stable_and_copies_moves_and_machine_changes_refuse() {

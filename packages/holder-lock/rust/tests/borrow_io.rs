@@ -841,3 +841,41 @@ fn watched_borrow_reports_a_setsid_child_that_dropped_the_borrowed_descriptor() 
     let clean = run_borrowed_io_watched(&handle, &shell("true", &dir), &bounds(Vec::new())).unwrap();
     assert!(clean.escaped.is_empty(), "a run that leaves nothing behind reports nothing");
 }
+
+/// A lock released while a sibling thread forks children is free to an
+/// immediate exclusive try: a child forked in the release window must not
+/// inherit anything that still holds the lock.
+#[cfg(target_os = "linux")]
+#[test]
+fn released_lock_is_free_while_a_sibling_thread_forks_children() {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    let _serial = serial();
+    let dir = temp_dir("release-while-forking");
+    let res = resource(&dir, "fork");
+    let stop = std::sync::Arc::new(AtomicBool::new(false));
+    let forker = {
+        let stop = stop.clone();
+        std::thread::spawn(move || {
+            while !stop.load(Ordering::Relaxed) {
+                let _ = Command::new("true").status();
+            }
+        })
+    };
+    let deadline = Instant::now() + Duration::from_secs(20);
+    let mut held_after_release = 0;
+    for _ in 0..300 {
+        if Instant::now() > deadline { break; }
+        for _ in 0..2 {
+            match acquire(&res, Mode::Ex, Wait::Try, 2000) {
+                Acquire::Acquired(handle) => {
+                    assert!(matches!(release(handle), Release::Released { .. }));
+                }
+                Acquire::Held { .. } => { held_after_release += 1; }
+                other => panic!("{other:?}"),
+            }
+        }
+    }
+    stop.store(true, Ordering::Relaxed);
+    forker.join().unwrap();
+    assert_eq!(held_after_release, 0, "an Ex try right after a release answered Held");
+}

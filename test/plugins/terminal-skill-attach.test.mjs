@@ -23,6 +23,7 @@ let scratch;
 let fake;
 let binDir;
 let allocationsDir;
+let renameArgs;
 
 // The fake reports shell_pid 100 for every pane; the ownership guard needs the pane's
 // shell to be an ancestor of the script, so the wrapper reports this process instead,
@@ -52,6 +53,12 @@ before(async () => {
   scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-terminal-skill-'));
   fake = createFakeHerdr(path.join(scratch, 'herdr'));
   installShims();
+  // A project root whose capability query reports a pane-labeling provider, so the script never
+  // reads this checkout's own .fgos/ (a worker worktree has none) or bootstraps a config into it.
+  const projectRoot = path.join(scratch, 'project');
+  fs.mkdirSync(path.join(projectRoot, 'bin'), { recursive: true });
+  fs.writeFileSync(path.join(projectRoot, 'bin', 'fgos.mjs'), 'console.log(JSON.stringify({ capability: "pane-labeling" }, null, 1));\n');
+  renameArgs = ['tsk-x', projectRoot];
   allocationsDir = () => {
     const root = path.join(harness.stateRoot, 'terminal', 'herdr');
     const [incarnation] = fs.existsSync(root) ? fs.readdirSync(root) : [];
@@ -86,7 +93,6 @@ function run(script, args, env = {}) {
   });
 }
 
-const renameArgs = ['tsk-x', repo];
 const records = () => {
   const dir = allocationsDir();
   return dir && fs.existsSync(dir)

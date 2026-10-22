@@ -86,6 +86,14 @@ pub fn project_cli_invocation(
             ContractRef::from_static("identity.writer.request", "1.0.0"),
             Box::new(project_identity_request(args)?),
         ),
+        "identity.read" => (
+            ContractRef::from_static("identity.read.request", "1.0.0"),
+            Box::new(project_identity_request(args)?),
+        ),
+        "identity.write" => (
+            ContractRef::from_static("identity.write.request", "1.0.0"),
+            Box::new(project_identity_request(args)?),
+        ),
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",
@@ -99,17 +107,86 @@ pub fn project_cli_invocation(
     Ok((invocation, request))
 }
 
-/// `fgos identity [--pid <n>] [--fgos-dir <dir>] [--json]`. `--dir` is accepted
-/// and ignored, like every verb, because the shell integration appends it.
+/// The operation a native route runs for these arguments. A route names one
+/// operation; `identity` fans out over three (`identity.writer` bare,
+/// `identity.read`, `identity.write`) and the arguments decide which.
+pub fn native_operation_id(route_operation: &str, args: &[OsString]) -> Result<String, String> {
+    if route_operation == fgos_identity::IDENTITY_OPERATION_ID {
+        return Ok(project_identity_request(args)?.operation_id().to_string());
+    }
+    Ok(route_operation.to_string())
+}
+
+/// `fgos identity [--pid <n>] [--fgos-dir <dir>] [--json]`, `fgos identity
+/// machine [--alias <name>] [--json]`, `fgos identity project [--init|--new]
+/// [--handle <name>] [--json]`, `fgos identity mint <kind> [--release <number>]
+/// [--json]`. `--dir` is accepted and ignored on
+/// every verb, because the shell integration appends it.
 fn project_identity_request(
     args: &[OsString],
 ) -> Result<fgos_identity::IdentityRequest, String> {
-    let mut request = fgos_identity::IdentityRequest::default();
-    let mut index = 1;
+    let subcommand = args
+        .get(1)
+        .map(|value| value.to_string_lossy().into_owned())
+        .filter(|value| !value.starts_with('-'));
+    let mut index = if subcommand.is_some() { 2 } else { 1 };
+    let (verb, allowed): (fgos_identity::Verb, &[&str]) = match subcommand.as_deref() {
+        None | Some("writer") => (fgos_identity::Verb::Writer, &["--pid", "--fgos-dir", "--dir"]),
+        Some("machine") => (
+            fgos_identity::Verb::Machine { alias: None },
+            &["--alias", "--dir"],
+        ),
+        Some("session") => (
+            fgos_identity::Verb::Session,
+            &["--pid", "--fgos-dir", "--dir"],
+        ),
+        Some("project") => (
+            fgos_identity::Verb::Project(fgos_identity::ProjectAction::Read),
+            &["--init", "--new", "--handle", "--dir"],
+        ),
+        Some("mint") => (
+            fgos_identity::Verb::Mint { kind: String::new(), release: None },
+            &["--release", "--dir"],
+        ),
+        Some(other) => {
+            return Err(format!(
+                "unknown identity subcommand '{other}'. Available: {}",
+                fgos_identity::AVAILABLE_SUBCOMMANDS.join(", ")
+            ))
+        }
+    };
+    let mut request = fgos_identity::IdentityRequest {
+        verb,
+        ..Default::default()
+    };
+    // `mint <kind>`: the kind is the one positional argument.
+    if let fgos_identity::Verb::Mint { kind, .. } = &mut request.verb {
+        let name = args
+            .get(index)
+            .map(|value| value.to_string_lossy().into_owned())
+            .filter(|value| !value.starts_with('-'))
+            .ok_or_else(|| {
+                format!("mint requires an id kind. Available: {}", fgos_identity::KIND_NAMES.join(", "))
+            })?;
+        index += 1;
+        *kind = name;
+    }
+    // `Some(fork)` once `--init` (false) or `--new` (true) was given.
+    let mut mint: Option<bool> = None;
+    let mut handle: Option<String> = None;
     while index < args.len() {
         let value = args[index].to_string_lossy().into_owned();
         index += 1;
         if value == "--json" {
+            continue;
+        }
+        if value == "--init" || value == "--new" {
+            if !allowed.contains(&value.as_str()) {
+                return Err(format!("unknown identity option '{value}'"));
+            }
+            if mint.replace(value == "--new").is_some() {
+                return Err("--init and --new are exclusive and each given once".into());
+            }
             continue;
         }
         let (flag, inline_value) = value
@@ -117,7 +194,7 @@ fn project_identity_request(
             .map_or((value.as_str(), None), |(flag, value)| {
                 (flag, Some(value.to_owned()))
             });
-        if !matches!(flag, "--pid" | "--fgos-dir" | "--dir") {
+        if !allowed.contains(&flag) {
             return Err(format!("unknown identity option '{value}'"));
         }
         let flag_value = match inline_value {
@@ -131,22 +208,55 @@ fn project_identity_request(
                 next
             }
         };
-        if flag == "--dir" {
-            continue;
-        }
-        if flag == "--pid" {
-            let pid = flag_value
-                .parse::<u32>()
-                .ok()
-                .filter(|pid| *pid > 0)
-                .ok_or_else(|| format!("--pid must be a positive integer, got '{flag_value}'"))?;
-            request.pid = Some(pid);
-        } else {
-            if flag_value.is_empty() {
-                return Err("--fgos-dir requires a value".into());
+        match flag {
+            "--dir" => {}
+            "--pid" => {
+                let pid = flag_value
+                    .parse::<u32>()
+                    .ok()
+                    .filter(|pid| *pid > 0)
+                    .ok_or_else(|| format!("--pid must be a positive integer, got '{flag_value}'"))?;
+                request.pid = Some(pid);
             }
-            request.fgos_dir = Some(std::path::PathBuf::from(flag_value));
+            "--release" => {
+                let number = flag_value
+                    .parse::<u64>()
+                    .ok()
+                    .filter(|number| *number > 0)
+                    .ok_or_else(|| format!("--release must be a positive number, got '{flag_value}'"))?;
+                if let fgos_identity::Verb::Mint { release, .. } = &mut request.verb {
+                    *release = Some(number);
+                }
+            }
+            "--handle" => {
+                if flag_value.is_empty() {
+                    return Err("--handle requires a value".into());
+                }
+                handle = Some(flag_value);
+            }
+            "--alias" => {
+                if flag_value.is_empty() {
+                    return Err("--alias requires a value".into());
+                }
+                request.verb = fgos_identity::Verb::Machine {
+                    alias: Some(flag_value),
+                };
+            }
+            _ => {
+                if flag_value.is_empty() {
+                    return Err("--fgos-dir requires a value".into());
+                }
+                request.fgos_dir = Some(std::path::PathBuf::from(flag_value));
+            }
         }
+    }
+    if matches!(request.verb, fgos_identity::Verb::Project(_)) {
+        request.verb = fgos_identity::Verb::Project(match (mint, handle) {
+            (None, None) => fgos_identity::ProjectAction::Read,
+            (None, Some(_)) => return Err("--handle needs --init or --new".into()),
+            (Some(false), handle) => fgos_identity::ProjectAction::Init { handle },
+            (Some(true), handle) => fgos_identity::ProjectAction::New { handle },
+        });
     }
     Ok(request)
 }
@@ -277,6 +387,51 @@ mod tests {
         let request = project_identity_request(&args).unwrap();
         assert_eq!(request.pid, Some(42));
         assert_eq!(request.fgos_dir, None);
+    }
+
+    #[test]
+    fn identity_arguments_pick_the_operation_that_matches_their_effect() {
+        let operation = |args: &[&str]| {
+            let args: Vec<OsString> = args.iter().map(OsString::from).collect();
+            native_operation_id("identity.writer", &args).unwrap()
+        };
+        assert_eq!(operation(&["identity", "--json"]), "identity.writer");
+        assert_eq!(operation(&["identity", "writer", "--pid", "7"]), "identity.writer");
+        assert_eq!(operation(&["identity", "machine", "--json"]), "identity.read");
+        assert_eq!(operation(&["identity", "session", "--pid", "7"]), "identity.read");
+        assert_eq!(
+            operation(&["identity", "machine", "--alias", "lab"]),
+            "identity.write"
+        );
+        let args: Vec<OsString> = ["identity", "machine", "--pid", "7"]
+            .iter()
+            .map(OsString::from)
+            .collect();
+        assert!(native_operation_id("identity.writer", &args).is_err());
+        assert_eq!(operation(&["identity", "project", "--json"]), "identity.read");
+        assert_eq!(operation(&["identity", "project", "--init"]), "identity.write");
+        assert_eq!(
+            operation(&["identity", "project", "--handle", "app", "--new"]),
+            "identity.write"
+        );
+        assert_eq!(operation(&["identity", "mint", "work", "--json"]), "identity.write");
+    }
+
+    #[test]
+    fn identity_mint_takes_a_kind_and_an_optional_release_number() {
+        let request = |args: &[&str]| {
+            let args: Vec<OsString> = args.iter().map(OsString::from).collect();
+            project_identity_request(&args)
+        };
+        let minted = request(&["identity", "mint", "d-adr", "--release", "73", "--json"]).unwrap();
+        assert_eq!(
+            minted.verb,
+            fgos_identity::Verb::Mint { kind: "d-adr".into(), release: Some(73) }
+        );
+        let message = request(&["identity", "mint", "--json"]).unwrap_err();
+        assert!(message.contains("requires an id kind") && message.contains("d-adr"), "{message}");
+        assert!(request(&["identity", "mint", "d-adr", "--release", "0"]).is_err());
+        assert!(request(&["identity", "machine", "--release", "3"]).is_err());
     }
 
     #[test]

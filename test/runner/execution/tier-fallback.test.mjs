@@ -4,11 +4,9 @@
 // skipped and recorded; a pool no account can serve gives no candidate.
 
 import '../../helpers/process-tmp-root.mjs';
+import { committedRunnerConfig } from '../../helpers/committed-config.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { bind, bindingIdentity, explainSeat } from '../../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -147,8 +145,7 @@ test('the walk state is the earlier bindings: binding N+1 from the recorded ones
 });
 
 test('a committed-config walk stays in its tier and keeps each family to its own tier cell', () => {
-  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-  const committed = JSON.parse(fs.readFileSync(path.join(root, '.fgos', 'config.json'), 'utf8')).runner;
+  const committed = committedRunnerConfig();
   const DOER = ['gemini', 'deepseek', 'z-ai', 'claude', 'openai'];
   const PREMIUM = ['claude', 'openai', 'gemini', 'xai'];
   const withTier = (tier) => ({

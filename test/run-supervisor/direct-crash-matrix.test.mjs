@@ -288,7 +288,8 @@ test('9. read-only attempts on one cwd share it without a lease; a writing attem
   const { supervisor, gate } = readJson(here(dir, 'supervisor-binding.json'));
   const holders = await waitUntil(() => {
     const listed = lockHolders('dispatch-cwd', { fgosDir: writerFgos, cwd: worktree });
-    return listed.kind === 'list' && listed.pids.includes(run.child.pid) && listed.pids.length > 1 ? listed.pids : null;
+    const pids = listed.kind === 'list' ? listed.holders.map((h) => h.pid) : [];
+    return pids.includes(run.child.pid) && pids.length > 1 ? pids : null;
   }, { timeoutMs: 10_000, what: 'the controller and attempt to hold the cwd lease together' });
   for (const pid of holders.filter((pid) => pid !== run.child.pid)) {
     assert.ok(ancestry(pid).some((p) => p === supervisor.pid || p === gate.pid), `lease holder ${pid} is not part of the attempt of supervisor ${supervisor.pid}`);

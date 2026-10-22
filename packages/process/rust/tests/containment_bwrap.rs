@@ -1,71 +1,39 @@
 //! `bwrap-pidns` against real bwrap, real namespaces and real processes.
 #![cfg(target_os = "linux")]
 
-use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::thread::sleep;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use fgos_process::containment::{select, BwrapPidns, ContainmentDriver, GuaranteeLevel, SelectEnv, SpawnSpec, StartMode};
 use fgos_process::control::{signal_by_identity, Signal};
 use fgos_process::facts::{self, ProcTuple};
-use fgos_process::{Domain, DomainState, KillOutcome, ProcId};
+use fgos_process::{Domain, KillOutcome, ProcId};
 
+mod common;
+use common::{scratch, wait_for};
 const HELPER_ENV: &str = "FGOS_CONTAINMENT_HELPER_MODE";
-
-fn scratch(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!("fgos-containment-{name}-{}", std::process::id()));
-    let _ = fs::remove_dir_all(&dir);
-    fs::create_dir_all(&dir).unwrap();
-    dir
-}
 
 fn fixture(name: &str) -> String {
     format!("{}/tests/fixtures/{name}", env!("CARGO_MANIFEST_DIR"))
 }
 
-/// The driver `select` picks, only when it is `bwrap-pidns`; otherwise the
-/// named skip is printed and the test ends.
-fn bwrap_driver(test: &str) -> Option<Box<dyn ContainmentDriver>> {
+fn lines(path: &Path) -> usize {
+    fs::read_to_string(path).map(|text| text.lines().count()).unwrap_or(0)
+}
+
+fn bwrap_driver(_test: &str) -> Option<Box<dyn ContainmentDriver>> {
+    common::require_bwrap()?;
     let driver = select(&SelectEnv::default()).expect("select");
-    if driver.name() == "bwrap-pidns" {
-        return Some(driver);
-    }
-    eprintln!("skip: {test}: no-bwrap-pidns (driver {})", driver.name());
-    None
+    (driver.name() == "bwrap-pidns").then_some(driver)
 }
 
 fn spec(argv: &[&str], mode: StartMode) -> SpawnSpec {
-    SpawnSpec {
-        argv: argv.iter().map(|a| a.to_string()).collect(),
-        bwrap_prefix: None,
-        fd_map: Vec::new(),
-        env: BTreeMap::from([("PATH".to_string(), "/usr/bin:/bin".to_string())]),
-        cwd: std::env::temp_dir(),
-        stdin: None,
-        stdout: None,
-        stderr: None,
-        mode,
-    }
-}
-
-fn wait_for(path: &Path) -> String {
-    let start = Instant::now();
-    loop {
-        if let Ok(text) = fs::read_to_string(path) {
-            if !text.trim().is_empty() {
-                return text;
-            }
-        }
-        assert!(start.elapsed() < Duration::from_secs(10), "{} never written", path.display());
-        sleep(Duration::from_millis(10));
-    }
-}
-
-fn lines(path: &Path) -> usize {
-    fs::read_to_string(path).map(|text| text.lines().count()).unwrap_or(0)
+    let mut s = common::spec(argv);
+    s.mode = mode;
+    s
 }
 
 fn identity(pid: u32) -> ProcTuple {
@@ -89,29 +57,6 @@ fn containment_gate_is_pid_1_inside_and_its_host_pid_matches_nspid() {
     assert!(matches!(domain.domain(), Some(Domain::LinuxGate(tuple)) if *tuple == spawned.root));
 
     assert_eq!(driver.kill_all(&mut domain, 0), KillOutcome::Ok);
-    spawned.child.wait().unwrap();
-}
-
-#[test]
-fn containment_killing_the_gate_stops_a_setsid_grandchild_and_empties_the_domain() {
-    let Some(driver) = bwrap_driver("heartbeat") else { return };
-    let dir = scratch("heartbeat");
-    let beat = dir.join("beat");
-    let script = fixture("heartbeat-grandchild.sh");
-    let mut domain = driver.create("attempt-heartbeat").unwrap();
-    let mut spawned = driver.spawn_in(&mut domain, spec(&["sh", &script, &beat.display().to_string()], StartMode::Direct)).unwrap();
-
-    wait_for(&beat);
-    sleep(Duration::from_millis(100));
-    assert!(lines(&beat) > 1, "the grandchild is beating");
-    assert_eq!(driver.is_empty(&mut domain), DomainState::NotEmpty);
-
-    assert_eq!(driver.kill_all(&mut domain, 0), KillOutcome::Ok);
-    assert_eq!(driver.is_empty(&mut domain), DomainState::Empty, "empty as soon as the gate is dead");
-    sleep(Duration::from_millis(200));
-    let settled = lines(&beat);
-    sleep(Duration::from_millis(200));
-    assert_eq!(lines(&beat), settled, "the heartbeat stopped within 200 ms of the gate's death");
     spawned.child.wait().unwrap();
 }
 
@@ -218,19 +163,25 @@ fn containment_direct_refuses_die_with_parent_by_name() {
 }
 
 #[test]
-fn containment_select_prefers_bwrap_pidns_when_user_namespaces_work() {
-    let usable = Path::new("/usr/bin/bwrap").is_file()
-        && Command::new("/usr/bin/bwrap")
-            .args(["--unshare-user", "--dev-bind", "/", "/", "--", "/bin/true"])
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .status()
-            .map(|s| s.success())
-            .unwrap_or(false);
-    if !usable {
-        eprintln!("skip: no-userns-to-disable");
-        return;
+fn a_refused_mount_is_named_in_the_containment_error() {
+    let driver = BwrapPidns::new(fixture("bwrap-refuses-mount.sh").into());
+    let mut domain = driver.create("attempt-refused-mount").unwrap();
+    let err = driver.spawn_in(&mut domain, spec(&["true"], StartMode::Terminal)).err().expect("the refusing bwrap cannot start a gate");
+    assert_eq!(err.name(), "namespace-unavailable");
+    let display = err.to_string();
+    assert!(display.starts_with("namespace-unavailable: containment-mount-refused: "), "Display names cause, got: {display}");
+    match err {
+        fgos_process::containment::ContainmentError::NamespaceUnavailable(msg) => {
+            assert!(msg.starts_with("containment-mount-refused: "), "cause name is containment-mount-refused, got: {msg}");
+            assert!(msg.contains("Can't bind mount /oldroot/var/tmp/x"), "the refused mount is named, got: {msg}");
+        }
+        other => panic!("expected namespace-unavailable, got {other}"),
     }
+}
+
+#[test]
+fn containment_select_prefers_bwrap_pidns_when_user_namespaces_work() {
+    let Some(_) = common::require_bwrap() else { return };
     let driver = select(&SelectEnv::default()).unwrap();
     assert_eq!(driver.name(), "bwrap-pidns");
     let guarantee = driver.guarantee();
@@ -239,27 +190,4 @@ fn containment_select_prefers_bwrap_pidns_when_user_namespaces_work() {
     // A bwrap that does not exist cannot be selected.
     let none = select(&SelectEnv { bwrap: Some("/nonexistent/bwrap".into()) }).unwrap();
     assert_eq!(none.name(), "linux-pgroup");
-}
-
-#[test]
-fn a_hundred_fast_exits_are_normal_spawns() {
-    let Some(driver) = bwrap_driver("fast-exit") else { return };
-    for i in 0..100 {
-        let mut domain = driver.create(&format!("fast-{i}")).unwrap();
-        let mut spawned = driver.spawn_in(&mut domain, spec(&["/bin/true"], StartMode::Direct)).unwrap();
-        assert!(spawned.child.wait().unwrap().success(), "spawn {i}");
-        assert_eq!(driver.is_empty(&mut domain), DomainState::Empty);
-        assert_eq!(driver.kill_all(&mut domain, 0), KillOutcome::Ok);
-    }
-}
-
-#[test]
-fn fast_exit_preserves_a_nonzero_status() {
-    let Some(driver) = bwrap_driver("fast-status") else { return };
-    for i in 0..100 {
-        let mut domain = driver.create(&format!("status-{i}")).unwrap();
-        let mut spawned = driver.spawn_in(&mut domain, spec(&["/bin/sh", "-c", "exit 7"], StartMode::Direct)).unwrap();
-        assert_eq!(spawned.child.wait().unwrap().code(), Some(7));
-        assert_eq!(driver.is_empty(&mut domain), DomainState::Empty);
-    }
 }

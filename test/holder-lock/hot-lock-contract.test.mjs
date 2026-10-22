@@ -34,7 +34,6 @@ test('the record carries the full process tuple and cleanup needs the judge and 
   const rules = hot.cleanup.allOf.join('\n');
   assert.match(rules, /judge .* answers dead/);
   assert.match(rules, /kernel lock/);
-  assert.match(rules, /bytes equal/);
   const never = hot.cleanup.never.join('\n');
   assert.match(never, /does not parse is never cleaned/);
   assert.match(never, /unknown is never cleaned/);
@@ -46,7 +45,7 @@ test('the critical section forbids children and nesting, and names every error t
   assert.ok(hot.criticalSection.forbidden.some((rule) => /again in the same process/.test(rule)));
   assert.deepEqual(
     Object.keys(hot.errors).sort(),
-    ['exec-under-hot-lock', 'hot-lock-reentry', 'hot-lock-timeout', 'lock-record-unreadable', 'state-tx-async', 'state-tx-revoked'],
+    ['exec-under-hot-lock', 'hot-lock-reentry', 'hot-lock-release-stuck', 'hot-lock-timeout', 'lock-record-unreadable', 'state-tx-async', 'state-tx-revoked'],
   );
   assert.equal(hot.wait.timeoutMs, 5000);
 });

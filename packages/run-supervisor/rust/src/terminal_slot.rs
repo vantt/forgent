@@ -15,7 +15,7 @@ use fgos_terminal_control::core::{Core, CoreConfig};
 use fgos_terminal_control::driver::herdr::{HerdrConfig, HerdrDriver};
 use fgos_terminal_control::policy::{policy_by_name, PlacementPolicy};
 use fgos_terminal_control::port::{Disposition, ReleaseOutcome};
-use fgos_terminal_control::route::{DEFAULT_ALLOCATION_GRACE_MS, DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS, DEFAULT_LIMITS};
+use fgos_terminal_control::route::{DEFAULT_ALLOCATION_GRACE_MS, DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS, DEFAULT_SHELL_READY_TIMEOUT_MS, DEFAULT_LIMITS};
 use fgos_terminal_control::store::default_state_root;
 use serde_json::Value;
 
@@ -54,6 +54,7 @@ impl Backend {
             limits: DEFAULT_LIMITS,
             allocation_grace_ms: DEFAULT_ALLOCATION_GRACE_MS,
             launch_identify_timeout_ms: DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS,
+            shell_ready_timeout_ms: DEFAULT_SHELL_READY_TIMEOUT_MS,
         };
         Backend {
             driver: HerdrDriver::new(herdr),

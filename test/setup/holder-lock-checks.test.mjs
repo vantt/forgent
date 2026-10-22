@@ -1,7 +1,6 @@
-// The holder-lock doctor checks and setup fixes, run for real: the host
-// route answers the guarantee, the probe hands a real description to a real
-// child, `flock(1)` of util-linux plays a foreign holder, and the fence fix
-// goes through the host's quiesce scan.
+// The holder-lock doctor checks and setup fixes, run for real: the in-process
+// door answers the guarantee and the two-process probe, `flock(1)` of
+// util-linux plays a foreign holder.
 import '../helpers/process-tmp-root.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
@@ -18,19 +17,12 @@ const {
   checkLockBorrowVectors,
   guaranteeRefusal,
   checkLockHolders,
-  checkLockFences,
-  fixLockFences,
-  checkLockPredecessorKillWait,
-  checkStateRoot,
+  UNKNOWN_JUDGE_GRACE_MS,
   fixLockDirs,
-  twoProcessProbe,
-  activatedHolderLockRelease,
-  workspaceListing,
-  MAX_KILL_WAIT_MS,
+  cutOverLockFiles,
 } = await import('../../src/setup/holder-lock-checks.mjs');
-const { fenceStatus, placeFences } = await import('../../src/holder-lock/fences.mjs');
-const { descriptionHolders } = await import('../../src/holder-lock/driver.mjs');
-const { observe } = await import('../../src/runner/dispatch/process-identity.mjs');
+const { fileHolders } = await import('../../src/holder-lock/index.mjs');
+const { observe, selfRecord } = await import('../../src/runner/dispatch/process-identity.mjs');
 
 const HOST_BIN = process.env.FGOS_HOST_BIN;
 const STATE_ROOT = process.env.FGOS_STATE_ROOT;
@@ -57,11 +49,6 @@ function workspace(name) {
   return root;
 }
 
-function writeConfig(file, config) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, `${JSON.stringify(config)}\n`);
-}
-
 async function stop(child) {
   children.delete(child);
   if (child.exitCode === null && child.signalCode === null) {
@@ -83,47 +70,12 @@ async function holdWithFlock(file, env) {
   children.add(child);
   const deadline = Date.now() + 5000;
   for (;;) {
-    const holders = descriptionHolders(file);
-    if (holders.kind === 'list' && holders.pids.includes(child.pid)) return child;
+    const holders = fileHolders('gateway', file);
+    if (holders.kind === 'list' && holders.holders.some((h) => h.pid === child.pid)) return child;
     if (Date.now() > deadline) throw new Error('flock did not take the lock');
     await new Promise((resolve) => { setTimeout(resolve, 20); });
   }
 }
-
-// ─── lock-predecessor-kill-wait ─────────────────────────────────────────
-
-test('lock-predecessor-kill-wait: absent passes with the default, valid values name their source', () => {
-  const root = workspace('kill-wait');
-  const globalConfigPath = path.join(scratch, 'kill-wait-home', '.fgos', 'config.json');
-  let res = checkLockPredecessorKillWait(root, { globalConfigPath });
-  assert.deepEqual(res, { passed: true, message: 'lock.predecessorKillWaitMs = 2000 (default)' });
-
-  writeConfig(globalConfigPath, { lock: { predecessorKillWaitMs: 750 } });
-  res = checkLockPredecessorKillWait(root, { globalConfigPath });
-  assert.deepEqual(res, { passed: true, message: 'lock.predecessorKillWaitMs = 750 (global)' });
-
-  writeConfig(path.join(root, '.fgos', 'config.json'), { lock: { predecessorKillWaitMs: 500 } });
-  res = checkLockPredecessorKillWait(root, { globalConfigPath });
-  assert.deepEqual(res, { passed: true, message: 'lock.predecessorKillWaitMs = 500 (project)' }, 'project overrides global');
-
-  writeConfig(path.join(root, '.fgos', 'config.json'), { lock: { predecessorKillWaitMs: MAX_KILL_WAIT_MS } });
-  assert.equal(checkLockPredecessorKillWait(root, { globalConfigPath }).passed, true, 'the upper bound itself is accepted');
-});
-
-test('lock-predecessor-kill-wait: negative, string, fractional and over-the-bound values fail by name', () => {
-  const root = workspace('kill-wait-bad');
-  const globalConfigPath = path.join(scratch, 'kill-wait-bad-home', '.fgos', 'config.json');
-  for (const value of [-5, 0, '2000', 1.5, MAX_KILL_WAIT_MS + 1]) {
-    writeConfig(path.join(root, '.fgos', 'config.json'), { lock: { predecessorKillWaitMs: value } });
-    const res = checkLockPredecessorKillWait(root, { globalConfigPath });
-    assert.equal(res.passed, false, `value ${JSON.stringify(value)}`);
-    assert.match(res.message, /^lock\.predecessorKillWaitMs = .* \(project\) must be an integer from 1 to 60000$/);
-  }
-  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), '{ not json');
-  const res = checkLockPredecessorKillWait(root, { globalConfigPath });
-  assert.equal(res.passed, false);
-  assert.match(res.message, /unreadable: cannot parse shared config/);
-});
 
 // ─── lock-dirs fix + lock-kernel-semantics ──────────────────────────────
 
@@ -156,30 +108,9 @@ test('lock-kernel-semantics warns for a missing lock directory, then passes on t
   assert.equal(res.passed, true, res.message);
   assert.doesNotMatch(res.message, /^warning:/);
   assert.match(res.message, /workspace .*"driver":"flock","exclusion":"kernel","borrow":"kernel","holders":"kernel"}, two-process probe green/);
-  assert.match(res.message, /machine .*, two-process probe green$/);
+  assert.match(res.message, /machine .*, two-process probe green/);
+  assert.ok(res.message.endsWith(`; stateRoot ${STATE_ROOT} (pinned); killWaitMs 2000 (fixed)`), res.message);
   assert.deepEqual(fs.readdirSync(path.join(root, '.fgos', 'locks')), [], 'the probe file is removed');
-});
-
-test('the two-process probe passes on tmpfs as well', { skip: !fs.existsSync('/dev/shm') && 'no /dev/shm' }, async () => {
-  const dir = fs.mkdtempSync(path.join('/dev/shm', 'fgos-semantics-probe-'));
-  try {
-    const ms = await twoProcessProbe(dir, HOST_BIN);
-    assert.ok(ms < 2000, `probe took ${ms} ms`);
-    assert.deepEqual(fs.readdirSync(dir), []);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('the probe refuses a probe file another process already holds', async () => {
-  const dir = path.join(scratch, 'probe-leak');
-  fs.mkdirSync(dir);
-  // A foreign process already holds the very file the probe will lock: the fresh probe file is not fresh.
-  const file = path.join(dir, `.semantics-probe-${process.pid}.lock`);
-  fs.writeFileSync(file, '');
-  const holder = await holdWithFlock(file, foreignEnv());
-  await assert.rejects(twoProcessProbe(dir, HOST_BIN), /a fresh probe file answered held/);
-  await stop(holder);
 });
 
 test('a guarantee of unsupported fails by name, a network filesystem too, a kernel one passes', () => {
@@ -201,12 +132,14 @@ test('lock-borrow-vectors passes with the real host and real git', () => {
 
 // ─── lock-holders ───────────────────────────────────────────────────────
 
-test('lock-holders: a foreign flock holder warns with pid and cmdline; a borrowed child does not', { skip: !HAS_FLOCK && 'util-linux flock missing' }, async () => {
+// The classification itself is owned by the pure test in packages/holder-lock/rust/src/origin.rs; this is the wiring: the
+// doctor row lists real holders through the door and warns only for the origin Rust calls foreign.
+test('lock-holders: a foreign flock holder warns with pid and cmdline; a borrowed child and an attempt member do not', { skip: !HAS_FLOCK && 'util-linux flock missing' }, async () => {
   const root = workspace('holders');
   fixLockDirs(root);
   const gateway = path.join(root, '.fgos', 'locks', 'gateway.lock');
   fs.writeFileSync(gateway, '');
-  assert.match(checkLockHolders(root).message, /^\d+ lock file\(s\) of 18 locks, 0 held, every holder a fgOS process or a borrowed child$/);
+  assert.match(checkLockHolders(root).message, /^\d+ lock file\(s\) of 19 locks, 0 held, every holder a fgOS process or a borrowed child$/);
 
   const foreign = await holdWithFlock(gateway, foreignEnv());
   const warned = checkLockHolders(root);
@@ -216,38 +149,10 @@ test('lock-holders: a foreign flock holder warns with pid and cmdline; a borrowe
 
   const borrowed = await holdWithFlock(gateway, foreignEnv({ FGOS_LOCK_FD: 'gateway:3' }));
   const clean = checkLockHolders(root);
-  assert.match(clean.message, /^\d+ lock file\(s\) of 18 locks, 1 held, every holder a fgOS process or a borrowed child$/, clean.message);
+  assert.match(clean.message, /^\d+ lock file\(s\) of 19 locks, 1 held, every holder a fgOS process or a borrowed child$/, clean.message);
   await stop(borrowed);
-});
 
-test('lock-holders covers the main checkout, merge slot and worktree-admin files: a foreign holder warns, a borrowed child does not', { skip: !HAS_FLOCK && 'util-linux flock missing' }, async () => {
-  const root = workspace('holders-main-door');
-  fixLockDirs(root);
-  const locks = path.join(root, '.fgos', 'locks');
-  const mainLock = path.join(locks, 'main-checkout.lock');
-  const slot = path.join(locks, 'merge-slot--main.lock');
-  const admin = path.join(locks, 'worktree-admin.lock');
-  for (const file of [mainLock, slot, admin]) fs.writeFileSync(file, '');
-  assert.match(checkLockHolders(root).message, /^3 lock file\(s\) of 18 locks, 0 held, every holder a fgOS process or a borrowed child$/);
-
-  const foreign = await holdWithFlock(mainLock, foreignEnv());
-  const warned = checkLockHolders(root);
-  assert.equal(warned.passed, true);
-  assert.match(warned.message, new RegExp(`^warning: main-checkout .*main-checkout\\.lock held by pid ${foreign.pid} .*not a fgOS process nor a borrowed child`));
-  await stop(foreign);
-
-  const borrowed = await holdWithFlock(mainLock, foreignEnv({ FGOS_LOCK_FD: 'main-checkout:3' }));
-  const heldSlot = await holdWithFlock(slot, foreignEnv());
-  const mixed = checkLockHolders(root);
-  assert.match(mixed.message, new RegExp(`^warning: merge-slot .*merge-slot--main\\.lock held by pid ${heldSlot.pid} `));
-  assert.ok(!mixed.message.includes('main-checkout.lock held'), 'a borrowed git child of the main checkout lock is a member');
-  await stop(borrowed);
-  await stop(heldSlot);
-});
-
-test('lock-holders: a monitor whose parent is the supervisor of the attempt is a member; once the parent is gone it is named', { skip: !HAS_FLOCK && 'util-linux flock missing' }, async () => {
-  const root = workspace('holders-attempt');
-  fixLockDirs(root);
+  // An attempt's monitor whose parent is the supervisor is a member; once the parent is gone it is named.
   const dir = path.join(root, '.fgos', 'assignments', 'asgn-1', 'runs', '01');
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-holders' }));
@@ -266,9 +171,9 @@ test('lock-holders: a monitor whose parent is the supervisor of the attempt is a
   let monitorPid;
   const deadline = Date.now() + 5000;
   for (;;) {
-    const holders = descriptionHolders(lock);
-    if (holders.kind === 'list' && holders.pids.length === 2 && holders.pids.includes(supervisor.pid)) {
-      monitorPid = holders.pids.find((pid) => pid !== supervisor.pid);
+    const holders = fileHolders('attempt', lock);
+    if (holders.kind === 'list' && holders.holders.length === 2 && holders.holders.some((h) => h.pid === supervisor.pid)) {
+      monitorPid = holders.holders.find((h) => h.pid !== supervisor.pid).pid;
       break;
     }
     assert.ok(Date.now() < deadline, 'supervisor and monitor did not both hold the lock');
@@ -276,7 +181,7 @@ test('lock-holders: a monitor whose parent is the supervisor of the attempt is a
   }
   const monitorCmdline = fs.readFileSync(`/proc/${monitorPid}/cmdline`, 'utf8').split('\0').filter(Boolean).join(' ');
   const member = checkLockHolders(root);
-  assert.match(member.message, /^1 lock file\(s\) of 18 locks, 1 held, every holder a fgOS process or a borrowed child$/, member.message);
+  assert.match(member.message, /^\d+ lock file\(s\) of 19 locks, 1 held, every holder a fgOS process or a borrowed child$/, member.message);
 
   process.kill(supervisor.pid, 'SIGKILL');
   const named = await (async () => {
@@ -328,123 +233,64 @@ test('lock-holders: a windows-job record the host cannot judge here warns with t
   assert.match(checkLockHolders(root).message, /^warning: runner: .*is unknown \(record-unknown-shape\)/);
 });
 
-// ─── lock-fences ────────────────────────────────────────────────────────
+test('lock-holders scans every registry row that has a lock file, repo-config included, and skips rows with none', () => {
+  const root = workspace('scanned-rows');
+  fixLockDirs(root);
+  const repoConfig = path.join(root, '.fgos', 'locks', 'repo-config.lock');
+  fs.writeFileSync(repoConfig, '');
+  const rows = cutOverLockFiles({ fgosDir: path.join(root, '.fgos'), lockRoot: undefined });
+  assert.deepEqual(rows.find((row) => row.lock === 'repo-config').files, [repoConfig]);
+  assert.deepEqual(rows.map((row) => row.lock).filter((name) => ['attempt', 'event-seal', 'event-append'].includes(name)), []);
+});
 
-/** A ready activation of a release whose payload ships the lock registry (or not). */
-function activate(root, { withRegistry }) {
-  const release = path.join(scratch, `release-${path.basename(root)}-${withRegistry ? 'v3' : 'v1'}`);
-  const payload = path.join(release, 'libexec', 'legacy-node');
-  fs.mkdirSync(payload, { recursive: true });
-  writeConfig(path.join(release, 'manifest.json'), { schemaVersion: 1, components: { legacyNode: { root: 'libexec/legacy-node', entry: 'bin/fgos.mjs' } } });
-  if (withRegistry) {
-    const registry = path.join(payload, 'packages', 'holder-lock', 'contracts', 'lock-registry.v1.json');
-    fs.mkdirSync(path.dirname(registry), { recursive: true });
-    fs.copyFileSync(new URL('../../packages/holder-lock/contracts/lock-registry.v1.json', import.meta.url), registry);
-  }
-  writeConfig(path.join(root, '.fgos', 'installation', 'activation.json'), { schemaVersion: 1, status: 'ready', releasePath: release });
+// ─── hot records, judged by lock-holders ────────────────────────────────
+
+const hotRecord = (root, resource) => path.join(root, '.fgos', 'locks', `${resource}.hot`);
+
+function hotWorkspace(name) {
+  const root = workspace(name);
+  fs.mkdirSync(path.join(root, '.fgos', 'locks'), { recursive: true });
+  return root;
 }
 
-/**
- * The production fence fix scans the whole machine (a stop-everything cutover),
- * so what other sessions run at this moment would decide these tests. The
- * fixture gives the fix the host's own workspace-scoped scan (`--workspace-only`,
- * the mode the Git gate uses): only processes working in the fixture workspace
- * count, and every other route passes through to the real host untouched.
- */
-function workspaceScopedHost() {
-  const shim = path.join(scratch, 'workspace-scoped-host.sh');
-  if (!fs.existsSync(shim)) {
-    fs.writeFileSync(shim, `#!/bin/sh
-if [ "$2" = "quiesce-scan" ]; then exec "${HOST_BIN}" "$@" --workspace-only; fi
-exec "${HOST_BIN}" "$@"
-`, { mode: 0o755 });
-  }
-  return shim;
-}
-
-test('lock-fences sees the missing fences, and the fix places them only under an activated holder-lock release', () => {
-  const root = workspace('fences');
-  const providerRuntimeDir = path.join(scratch, 'fences-provider-capacity');
-  const before = checkLockFences(root, { providerRuntimeDir });
-  assert.equal(before.passed, true);
-  assert.match(before.message, /^warning: 13 of 13 legacy lock path\(s\) not fenced: .*gateway\.lock.* -- the fix waits for this release to be activated here \(no readable activation at .*\)$/);
-
-  const noActivation = fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN });
-  assert.equal(noActivation.changed, false);
-  assert.match(noActivation.message, /^fences not placed: no readable activation at /);
-
-  activate(root, { withRegistry: false });
-  assert.match(activatedHolderLockRelease(root).reason, /still runs the old lock code/);
-  assert.match(fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN }).message, /^fences not placed: the activated release .* still runs the old lock code/);
-  assert.equal(fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, ...workspaceListing(root), providerRuntimeDir }).complete, false, 'nothing was written');
-
-  activate(root, { withRegistry: true });
-  assert.match(checkLockFences(root, { providerRuntimeDir }).message, / -- stop every fgOS process of this workspace, then run fgos doctor --fix$/);
-  const fixed = fixLockFences(root, { providerRuntimeDir, hostBin: workspaceScopedHost() });
-  assert.equal(fixed.changed, true, fixed.message);
-  assert.match(fixed.message, /^placed 13 fence\(s\)/);
-  assert.equal(checkLockFences(root, { providerRuntimeDir }).passed, false);
-  assert.match(checkLockFences(root, { providerRuntimeDir }).message, /^git-fence-missing:/);
-  assert.equal(fs.existsSync(path.join(root, '.fgos/locks/activation.lock')), false, 'doctor never places the controller fence');
-  assert.match(fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN }).message, /only the new fgctl/);
+test('lock-holders: no hot record passes', () => {
+  const result = checkLockHolders(hotWorkspace('hot-none'));
+  assert.equal(result.passed, true);
+  assert.doesNotMatch(result.message, /^warning:/);
 });
 
-test('a payload registry without the Rust callers\' locks fences only the locks it owns, leaving the paths an older fgctl still uses', () => {
-  const root = workspace('fences-owners');
-  // Establish the machine-wide fence independently of earlier tests.
-  const preconditionRoot = workspace('fences-owners-precondition');
-  assert.equal(placeFences({ fgosDir: path.join(preconditionRoot, '.fgos'), workspaceRoot: preconditionRoot, ...workspaceListing(preconditionRoot),
-    providerRuntimeDir: path.join(scratch, 'fences-owners-precondition'), owners: ['4.4'] }).ok, true);
-  const providerRuntimeDir = path.join(scratch, 'fences-owners-provider-capacity');
-  activate(root, { withRegistry: true });
-  const activation = JSON.parse(fs.readFileSync(path.join(root, '.fgos', 'installation', 'activation.json'), 'utf8'));
-  const registryPath = path.join(activation.releasePath, 'libexec', 'legacy-node', 'packages', 'holder-lock', 'contracts', 'lock-registry.v1.json');
-  const registry = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
-  registry.locks = registry.locks.filter((lock) => lock.owner !== '4.4');
-  writeConfig(registryPath, registry);
-  const owners = activatedHolderLockRelease(root).owners;
-  assert.ok(owners.includes('4.2') && !owners.includes('4.4'), owners.join(','));
-  const fixed = fixLockFences(root, { providerRuntimeDir, hostBin: workspaceScopedHost() });
-  assert.equal(fixed.changed, true, fixed.message);
-  assert.match(fixed.message, /^placed 10 fence\(s\)/);
-  const status = fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, ...workspaceListing(root), providerRuntimeDir });
-  // The explicit precondition above placed the machine-wide install tombstone.
-  assert.deepEqual(status.missing.map((file) => path.relative(path.join(root, '.fgos'), file)).sort(), [path.join('installation', 'activation.lock'), path.join('observe', '.lock')]);
-  assert.deepEqual(status.controllerMissing.map((file) => path.relative(path.join(root, '.fgos'), file)), [path.join('locks', 'activation.lock')], 'the controller fence stays with fgctl');
-  assert.deepEqual(fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN }), {
-    changed: false,
-    message: 'fences not placed: the activated release does not yet take the locks still missing a fence; activate the release that ships them first',
-  });
-  assert.match(checkLockFences(root, { providerRuntimeDir }).message, /^warning: 2 of 13 legacy lock path\(s\) not fenced: .* -- the fix waits for this release to be activated here/);
+test('lock-holders: a hot record of a live process with its full tuple passes', () => {
+  const root = hotWorkspace('hot-live');
+  const me = selfRecord();
+  fs.writeFileSync(hotRecord(root, 'state'), JSON.stringify({ v: 1, pid: process.pid, startTime: me.startTime, bootId: me.bootId, pidNs: me.pidNs }));
+  assert.doesNotMatch(checkLockHolders(root).message, /^warning:/);
 });
 
-test('the fence fix refuses while an fgOS payload of the workspace runs, and names it', async () => {
-  const root = workspace('fences-blocked');
-  activate(root, { withRegistry: true });
-  fs.mkdirSync(path.join(root, 'bin'));
-  fs.writeFileSync(path.join(root, 'bin', 'fgos.mjs'), 'setInterval(() => {}, 1000);\n');
-  const payload = spawn(process.execPath, ['bin/fgos.mjs'], { cwd: root, stdio: 'ignore' });
-  children.add(payload);
-  await new Promise((resolve) => { payload.once('spawn', resolve); });
-  const providerRuntimeDir = path.join(scratch, 'fences-blocked-provider-capacity');
-  const res = fixLockFences(root, { providerRuntimeDir, hostBin: workspaceScopedHost() });
-  assert.equal(res.changed, false);
-  assert.match(res.message, new RegExp(`^fences not placed: fgOS processes still running, stop them first: .*pid ${payload.pid} `));
-  assert.equal(fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, ...workspaceListing(root), providerRuntimeDir }).complete, false);
-  await stop(payload);
+test('lock-holders: a hot record that does not parse warns with its path and the fence command, for the right resource only', () => {
+  const root = hotWorkspace('hot-garbage');
+  fs.writeFileSync(hotRecord(root, 'porting-events'), '{"v":1,"pid":');
+  const result = checkLockHolders(root);
+  assert.equal(result.passed, true);
+  assert.match(result.message, /^warning: /);
+  assert.ok(result.message.includes(hotRecord(root, 'porting-events')), result.message);
+  assert.match(result.message, /fgos lock fence porting-events/);
+  assert.doesNotMatch(result.message, /fgos lock fence state/);
 });
 
-// ─── state-root ─────────────────────────────────────────────────────────
+test('lock-holders: a hot record without a pid is unreadable', () => {
+  const root = hotWorkspace('hot-no-pid');
+  fs.writeFileSync(hotRecord(root, 'state'), JSON.stringify({ v: 1 }));
+  assert.match(checkLockHolders(root).message, /fgos lock fence state/);
+});
 
-test('state-root: Node and the host agree; a pinned root also shows the unpinned answer', () => {
-  const root = workspace('state-root');
-  const pinned = checkStateRoot(root);
-  assert.equal(pinned.passed, true, pinned.message);
-  assert.ok(pinned.message.startsWith(`stateRoot ${STATE_ROOT}, lockRoot ${path.join(STATE_ROOT, 'locks')} (pinned); without the pin the host resolves stateRoot `), pinned.message);
-
-  const home = path.join(scratch, 'state-root-home');
-  const { FGOS_STATE_ROOT: _pin, FGOS_STATE_HOME: _home, XDG_STATE_HOME: _xdg, ...rest } = process.env;
-  const unpinned = checkStateRoot(root, { env: { ...rest, HOME: home } });
-  // Node asks the route once per process and keeps the answer; the host answers the same environment.
-  assert.equal(unpinned.passed, true, unpinned.message);
+test('lock-holders: a hot record naming a live pid in a foreign namespace warns only after the grace', () => {
+  const root = hotWorkspace('hot-foreign-ns');
+  const me = selfRecord();
+  // The recorded namespace differs from ours, so the judge cannot place the live pid.
+  fs.writeFileSync(hotRecord(root, 'state'), JSON.stringify({ v: 1, pid: process.pid, startTime: me.startTime, bootId: me.bootId, pidNs: 'pid:[0]' }));
+  const young = checkLockHolders(root);
+  const old = checkLockHolders(root, { now: Date.now() + UNKNOWN_JUDGE_GRACE_MS + 60_000 });
+  assert.doesNotMatch(young.message, /^warning:/);
+  assert.match(old.message, /cannot be judged here/);
+  assert.match(old.message, /fgos lock fence state/);
 });

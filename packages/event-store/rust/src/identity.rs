@@ -1,4 +1,4 @@
-//! Event Store owns machine and clone identities; setup owns machine-id minting.
+//! Event Store owns clone identities; the machine id is the Identity component's.
 use crate::errors::invalid;
 use crate::{
     envelope::{line, valid_timestamp},
@@ -6,38 +6,24 @@ use crate::{
     layout::Layout,
 };
 use crate::{errors::io, validation::valid_store_id};
+use fgos_identity::machine::valid_machine_id;
 use serde::{Deserialize, Serialize};
 use std::{
     fs::{self, File},
-    io::Read,
     path::Path,
 };
 fn moved(detail: impl Into<String>) -> Error {
     Error::new(ErrorCode::EventStoreStoreMoved, detail)
 }
-pub fn valid_machine_id(value: &str) -> bool {
-    (2..=63).contains(&value.len())
-        && value.as_bytes()[0].is_ascii_alphanumeric()
-        && value
-            .bytes()
-            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'-')
-}
+/// The machine id Event Store names refs with: the git-config override when
+/// set, else the one the Identity component minted under the state root.
 pub fn machine_id(config_value: Option<&str>, state_root: &Path) -> Result<String, Error> {
     let value = match config_value {
         Some(value) => value.to_owned(),
-        None => fs::read_to_string(state_root.join("machine-id"))
-            .map_err(|e| {
-                if e.kind() == std::io::ErrorKind::NotFound {
-                    Error::new(
-                        ErrorCode::EventStoreMachineId,
-                        format!("machine id missing: {e}"),
-                    )
-                } else {
-                    io(e)
-                }
-            })?
-            .trim_end_matches(['\r', '\n'])
-            .to_owned(),
+        None => fgos_identity::machine::read(state_root).map_err(|e| match e {
+            fgos_identity::Error::Io(e) => io(e),
+            e => Error::new(ErrorCode::EventStoreMachineId, e.to_string()),
+        })?,
     };
     if !valid_machine_id(&value) {
         return Err(Error::new(
@@ -70,20 +56,14 @@ fn dev_ino(_: &Path) -> Result<String, Error> {
         "store identity requires a native file identity driver",
     ))
 }
-#[cfg(target_os = "linux")]
 pub(crate) fn random_id() -> Result<String, Error> {
-    let mut bytes = [0u8; 16];
-    File::open("/dev/urandom")
-        .and_then(|mut f| f.read_exact(&mut bytes))
-        .map_err(io)?;
-    Ok(bytes.iter().map(|b| format!("{b:02x}")).collect())
-}
-#[cfg(not(target_os = "linux"))]
-pub(crate) fn random_id() -> Result<String, Error> {
-    Err(Error::new(
-        ErrorCode::EventStoreUnsupportedPlatform,
-        "native random identity driver unavailable",
-    ))
+    fgos_identity::text::random_hex128().map_err(|e| {
+        if e.kind() == std::io::ErrorKind::Unsupported {
+            Error::new(ErrorCode::EventStoreUnsupportedPlatform, e.to_string())
+        } else {
+            io(e)
+        }
+    })
 }
 impl StoreIdentity {
     /// Recovery only: caller must hold event-append and exclude live initializers.
@@ -183,31 +163,11 @@ impl StoreIdentity {
     }
 }
 
-/// Setup-only atomic mint. Readers can never observe a partially written id.
+/// Setup-only atomic mint, owned by the Identity component.
 pub fn mint_machine_id(state_root: &Path, hostname: &str) -> Result<(bool, String), Error> {
-    let mut slug = crate::layout::branch_key(hostname)?;
-    slug.truncate(56);
-    let slug = slug.trim_end_matches('-');
-    let random = random_id()?;
-    let mut suffix = String::new();
-    for offset in (0..12).step_by(2) {
-        let byte = u8::from_str_radix(&random[offset..offset + 2], 16)
-            .map_err(|e| invalid(e.to_string()))?;
-        suffix.push(b"abcdefghijklmnopqrstuvwxyz234567"[(byte & 31) as usize] as char);
-    }
-    let value = format!("{slug}-{suffix}\n");
-    let result = fgos_durable_file::install_once_with_mode(
-        state_root,
-        "machine-id",
-        value.as_bytes(),
-        0o600,
-    )
-    .map_err(Error::from_install_error)?;
-    let meta = fs::symlink_metadata(state_root.join("machine-id")).map_err(io)?;
-    if !meta.is_file() || meta.file_type().is_symlink() {
-        return Err(invalid("existing identity is invalid"));
-    }
-    let id = machine_id(None, state_root)
-        .map_err(|e| invalid(format!("existing identity is invalid: {e}")))?;
-    Ok((result == fgos_durable_file::Installed::Created, id))
+    fgos_identity::machine::mint(state_root, hostname).map_err(|e| match e {
+        fgos_identity::Error::Install(e) => Error::from_install_error(e),
+        fgos_identity::Error::Io(e) => io(e),
+        e => invalid(e.to_string()),
+    })
 }

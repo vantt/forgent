@@ -21,18 +21,18 @@ function attemptIdOf(c) {
 
 const needsHost = { skip: HOST_BIN ? false : 'FGOS_HOST_BIN is not set' };
 
-test('every shared vector mints to the same writer id through the Rust route', needsHost, () => {
+test('every shared vector mints to the same writer id through the door', needsHost, () => {
   for (const c of vectors.cases) {
     const attemptId = attemptIdOf(c);
     if (c.error) {
       assert.throws(
-        () => mintAttemptWriterId(attemptId, { bin: HOST_BIN }),
+        () => mintAttemptWriterId(attemptId),
         (err) => err instanceof WriterIdentityError && err.code === c.error,
         c.name,
       );
     } else {
       const expected = c.expand ? `att-${attemptId}` : c.writerId;
-      assert.equal(mintAttemptWriterId(attemptId, { bin: HOST_BIN }), expected, c.name);
+      assert.equal(mintAttemptWriterId(attemptId), expected, c.name);
     }
   }
 });
@@ -57,7 +57,7 @@ test('workerBaseEnv drops an empty session id too, so it cannot shadow the minte
 
 test('resuming the same attempt gives the same writer id and the same env digest', needsHost, () => {
   const build = () => {
-    const writerId = mintAttemptWriterId('att_asgn-demo_01_7f3a', { bin: HOST_BIN });
+    const writerId = mintAttemptWriterId('att_asgn-demo_01_7f3a');
     return { writerId, envDigest: computeSha256Digest({ ...workerBaseEnv({ PATH: '/usr/bin' }), FGOS_SESSION_ID: writerId }) };
   };
   const first = build();

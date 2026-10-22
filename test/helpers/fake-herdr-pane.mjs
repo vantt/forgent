@@ -29,7 +29,7 @@ import path from 'node:path';
 const MOCK = String.raw`
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, execSync } from 'node:child_process';
 
 const dir = process.env.FAKE_HERDR_DIR;
 const statePath = path.join(dir, 'state.json');
@@ -146,6 +146,17 @@ if (group === 'pane' && action === 'run') {
   if (!pane) fail('pane_not_found');
   if (scenario.runError) fail(scenario.runError, 'pane run failed');
   const command = args.slice(3).join(' ');
+  if (command.startsWith("printf '%s%s\\n' fgos-ok-")) {
+    let out = '';
+    try {
+      out = execSync(command, { encoding: 'utf8' });
+    } catch (e) {
+      out = e.stdout ? e.stdout.toString('utf8') : '';
+    }
+    pane.probeOutput = (pane.probeOutput ?? '') + out;
+    writeState(state);
+    ok({ type: 'ok' });
+  }
   const child = spawn('bash', ['-c', command], {
     cwd: pane.cwd,
     env: { ...process.env, ...pane.env, FAKE_HERDR_DIR: undefined },
@@ -219,7 +230,9 @@ if (group === 'pane' && action === 'read' || group === 'agent' && action === 're
   const pane = openPane(id);
   if (!pane) fail('pane_not_found', 'pane not found');
   const blockedText = scripted(id).blockedAfterBrief && pane.delivered ? (scenario.blockScreen ?? '') : '';
-  console.log(scripted(id).limit ? (scenario.limitScreen ?? '') : blockedText);
+  const base = scripted(id).limit ? (scenario.limitScreen ?? '') : blockedText;
+  const probe = pane.probeOutput ?? '';
+  console.log(base ? (probe ? base + '\n' + probe : base) : probe);
   process.exit(0);
 }
 

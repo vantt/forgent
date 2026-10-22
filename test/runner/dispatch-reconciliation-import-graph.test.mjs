@@ -232,8 +232,6 @@ const EXPECTED_CLOSURE = [
   'src/holder-lock/lock-scope.mjs',
   'src/holder-lock/state-root.mjs',
   'src/util/host-bin-path.mjs',
-  // Whether a state lock is held (a counter, no imports): the provider state lock notes it.
-  'src/util/state-lock-held.mjs',
   // The per-cwd dispatch lock the planner reports on (holder list or probe
   // through the door; no process control of its own) and the leaf error type
   // its acquire raises.

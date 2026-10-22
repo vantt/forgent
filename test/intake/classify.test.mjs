@@ -1,12 +1,9 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { deriveTitle, classify, generateId } from '../../src/intake/classify.mjs';
+import { deriveTitle, classify } from '../../src/intake/classify.mjs';
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 import { DOMAINS, classificationVocabulary } from '../../src/state/domain-registry.mjs';
-
-// Mirrors work.mjs's (unexported) ID_PATTERN: kebab-case, letter-start.
-const ID_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 
 test('deriveTitle cuts at the first sentence boundary', () => {
   assert.equal(deriveTitle('Login is broken. Users cannot sign in.'), 'Login is broken');
@@ -146,40 +143,4 @@ test('every kind/risk classify() can emit is inside coding\'s declared vocabular
     assert.ok(kinds.includes(kind), `kind ${JSON.stringify(kind)} from ${JSON.stringify(text)} must be declared`);
     assert.ok(risks.includes(risk), `risk ${JSON.stringify(risk)} from ${JSON.stringify(text)} must be declared`);
   }
-});
-
-test('generateId always returns an id matching ID_PATTERN', () => {
-  assert.match(generateId('Fix login bug', []), ID_PATTERN);
-  assert.match(generateId('123 numeric start', []), ID_PATTERN);
-  assert.match(generateId('', []), ID_PATTERN);
-  assert.match(generateId('!!!', []), ID_PATTERN);
-});
-
-test('generateId returns a fixed tsk- prefixed id, independent of title content', () => {
-  for (const title of ['Fix login bug', '123 numeric start', '', '!!!', 'a'.repeat(200)]) {
-    const id = generateId(title, []);
-    assert.match(id, /^tsk-[a-z0-9]{3,8}$/);
-  }
-});
-
-test('generateId satisfies ID_PATTERN even when the hash digest starts with a digit', () => {
-  // "title-0" is a fixed, deterministic input whose sha256->base36 digest
-  // starts with a digit (verified directly) -- the exact case the bare-hash
-  // approach violated on ~89% of inputs (id-systems-audit.md #1).
-  const id = generateId('title-0', []);
-  assert.match(id, ID_PATTERN);
-  assert.match(id, /^tsk-/);
-});
-
-test('generateId retries with a longer suffix on collision, returning a different id', () => {
-  const first = generateId('Duplicate title example', []);
-  const second = generateId('Duplicate title example', new Set([first]));
-  assert.notEqual(second, first);
-  assert.match(second, ID_PATTERN);
-});
-
-test('generateId is stable for the same title and empty existingIds', () => {
-  const a = generateId('Stable title', []);
-  const b = generateId('Stable title', []);
-  assert.equal(a, b);
 });
