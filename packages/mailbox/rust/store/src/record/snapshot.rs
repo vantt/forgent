@@ -1,11 +1,9 @@
 //! Reading and installing `snapshot.json`; called only by a holder of the
 //! mailbox lock.
-use super::{Paths, RecordError, Step, Warning};
+use super::{open_regular, Paths, RecordError, Step, Warning};
 use fgos_durable_file::{replace_durably_observed, ReplacePoint};
 use fgos_mailbox_core::{MailboxState, SnapshotVersion};
-use std::fs::OpenOptions;
 use std::io::{self, Read};
-use std::os::unix::fs::OpenOptionsExt;
 
 /// The installed snapshot's bytes and state. A missing snapshot reads as
 /// the empty state, with the bytes that state encodes to, so a hold that
@@ -16,11 +14,7 @@ use std::os::unix::fs::OpenOptionsExt;
 /// FIFO is refused, never followed and never waited on.
 pub(super) fn read(paths: &Paths) -> Result<(Vec<u8>, MailboxState), RecordError> {
     let unreadable = |detail: String| RecordError::SnapshotUnreadable { detail };
-    let file = OpenOptions::new()
-        .read(true)
-        .custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK)
-        .open(paths.snapshot());
-    let mut file = match file {
+    let mut file = match open_regular(&paths.snapshot()) {
         Ok(file) => file,
         Err(e) if e.kind() == io::ErrorKind::NotFound => {
             let state = MailboxState::new();
@@ -28,10 +22,6 @@ pub(super) fn read(paths: &Paths) -> Result<(Vec<u8>, MailboxState), RecordError
         }
         Err(e) => return Err(unreadable(e.to_string())),
     };
-    let meta = file.metadata().map_err(|e| unreadable(e.to_string()))?;
-    if !meta.file_type().is_file() {
-        return Err(unreadable("not a regular file".to_string()));
-    }
     let mut bytes = Vec::new();
     file.read_to_end(&mut bytes)
         .map_err(|e| unreadable(e.to_string()))?;

@@ -318,7 +318,6 @@ fn the_frozen_version_1_snapshot_still_reads() {
 
 #[test]
 fn ids_drawn_by_two_processes_do_not_collide() {
-    let _serial = rec::serial();
     let fgos = TempFgos::new("ids");
     let mut children: Vec<_> = ["one", "two"]
         .iter()

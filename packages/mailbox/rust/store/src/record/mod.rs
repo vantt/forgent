@@ -9,8 +9,12 @@
 //! `wrote: true`, because the new snapshot is live and a caller that retried
 //! would apply its change twice.
 //!
+//! Only a holder of the lock writes `record/`: that invariant is what lets
+//! the record delete every file there that no snapshot names.
+//!
 //! It runs inside the hook, which must never panic.
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+pub mod bodies;
 mod os_ids;
 mod paths;
 mod snapshot;
@@ -22,10 +26,14 @@ pub use paths::Paths;
 
 use fgos_durable_file::sync_directory;
 use fgos_holder_lock::{Acquire, LockScope, ScopeError};
-use fgos_mailbox_core::{IdSource, MailboxState, SnapshotVersionError};
+use fgos_mailbox_core::{
+    IdSource, Limits, MailboxState, MessageId, Refusal, SendOutcome, SendRequest,
+    SnapshotVersionError, Timestamp,
+};
 use std::fmt;
-use std::io;
-use std::os::unix::fs::{DirBuilderExt, MetadataExt};
+use std::fs::{File, OpenOptions};
+use std::io::{self, Read};
+use std::os::unix::fs::{DirBuilderExt, MetadataExt, OpenOptionsExt};
 use std::path::{Path, PathBuf};
 
 /// The boundaries of one hold, in order. An observer passed to
@@ -67,6 +75,16 @@ pub struct Held<R> {
     /// Whether a new snapshot was installed.
     pub wrote: bool,
     pub warning: Option<Warning>,
+    /// What the deletions after the install did.
+    pub collected: Collected,
+}
+
+/// Body files and temporaries the hold deleted after its install. A failed
+/// deletion is not an error: the next send's sweep tries again.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct Collected {
+    pub deleted: u32,
+    pub failed: u32,
 }
 
 /// Why a hold changed nothing.
@@ -96,6 +114,10 @@ pub enum RecordError {
     },
     /// The random device failed.
     Ids,
+    /// A body file of this id exists already; bodies are never overwritten.
+    BodyExists {
+        id: MessageId,
+    },
     /// A record directory is not a real directory of this user.
     RecordDirUntrusted {
         path: PathBuf,
@@ -122,6 +144,7 @@ impl RecordError {
             Self::SnapshotVersion(e) => e.code(),
             Self::SnapshotUnreadable { .. } => "snapshot-unreadable",
             Self::Ids => "ids-unavailable",
+            Self::BodyExists { .. } => "body-exists",
             Self::RecordDirUntrusted { .. } => "record-dir-untrusted",
             Self::Observer { .. } => "observer",
             Self::Io { .. } => "io",
@@ -166,6 +189,7 @@ impl fmt::Display for RecordError {
             | Self::LockRegistry { detail }
             | Self::SnapshotUnreadable { detail } => write!(f, ": {detail}"),
             Self::SnapshotVersion(e) => write!(f, ": {e}"),
+            Self::BodyExists { id } => write!(f, ": {id}"),
             Self::RecordDirUntrusted { path, detail } => {
                 write!(f, ": {}: {detail}", path.display())
             }
@@ -214,8 +238,81 @@ impl Record {
     pub fn hold_observed<R>(
         &self,
         wait: Wait,
-        mut observe: impl FnMut(Step) -> io::Result<()>,
+        observe: impl FnMut(Step) -> io::Result<()>,
         mutate: impl FnOnce(&mut MailboxState, &mut dyn IdSource) -> R,
+    ) -> Result<Held<R>, RecordError> {
+        self.run(
+            wait,
+            observe,
+            |state, ids| (mutate(state, ids), None),
+            Sweep::No,
+        )
+    }
+
+    /// One hold that sends: the core decides; an accepted message's body is
+    /// installed before the snapshot that names it; a refusal is saved too,
+    /// because it changed the budget and the counters (spec §5.3).
+    pub fn send(
+        &self,
+        req: SendRequest<'_>,
+        wait: Wait,
+        now: Timestamp,
+        limits: &Limits,
+    ) -> Result<Held<Result<SendOutcome, Refusal>>, RecordError> {
+        self.send_observed(req, wait, now, limits, |_| Ok(()))
+    }
+
+    /// [`Record::send`] with an observer, as [`Record::hold_observed`].
+    pub fn send_observed(
+        &self,
+        req: SendRequest<'_>,
+        wait: Wait,
+        now: Timestamp,
+        limits: &Limits,
+        observe: impl FnMut(Step) -> io::Result<()>,
+    ) -> Result<Held<Result<SendOutcome, Refusal>>, RecordError> {
+        let body = req.body;
+        self.run(
+            wait,
+            observe,
+            |state, ids| {
+                let sent = state.send(req, now, limits, ids);
+                let install = sent.as_ref().ok().map(|outcome| (outcome.id.clone(), body));
+                (sent, install)
+            },
+            Sweep::Yes,
+        )
+    }
+
+    /// The body of `id`, read without the lock: only a regular file, not
+    /// followed through a symlink, never waited on, of exactly
+    /// `expected_bytes` (its header's size, read in the same hold that
+    /// claimed it) and at most `mailbox.maxBodyBytes`, valid UTF-8.
+    /// Anything else is `None`, which the frame shows as a missing body.
+    pub fn body(&self, id: &MessageId, expected_bytes: u64, limits: &Limits) -> Option<String> {
+        if expected_bytes > limits.max_body_bytes {
+            return None;
+        }
+        self.check_dirs().ok()?;
+        let file = open_regular(&self.paths.body(id)?).ok()?;
+        let mut bytes = Vec::new();
+        file.take(expected_bytes.saturating_add(1))
+            .read_to_end(&mut bytes)
+            .ok()?;
+        if bytes.len() as u64 != expected_bytes {
+            return None;
+        }
+        String::from_utf8(bytes).ok()
+    }
+
+    /// The one write path of every hold. `mutate` returns its value and,
+    /// for an accepted send, the body to install before the snapshot.
+    fn run<'b, R>(
+        &self,
+        wait: Wait,
+        mut observe: impl FnMut(Step) -> io::Result<()>,
+        mutate: impl FnOnce(&mut MailboxState, &mut dyn IdSource) -> (R, Option<(MessageId, &'b str)>),
+        sweep: Sweep,
     ) -> Result<Held<R>, RecordError> {
         let params = self
             .paths
@@ -228,11 +325,12 @@ impl Record {
             .acquire(Paths::lock_name(), &params, wait)
             .map_err(RecordError::from_scope)?;
         before_commit(&mut observe, Step::Locked)?;
-        self.check_dirs()?;
+        let dirs = self.check_dirs()?;
         let (old, mut state) = snapshot::read(&self.paths)?;
         before_commit(&mut observe, Step::Read)?;
+        let kept_before = bodies::referenced(&state);
         let mut ids = OsIds::open().map_err(|_| RecordError::Ids)?;
-        let value = mutate(&mut state, &mut ids);
+        let (value, body) = mutate(&mut state, &mut ids);
         if ids.failed() {
             return Err(RecordError::Ids);
         }
@@ -242,25 +340,48 @@ impl Record {
                 value,
                 wrote: false,
                 warning: None,
+                collected: Collected::default(),
             });
         }
         before_commit(&mut observe, Step::Mutated)?;
+        if let Some((id, text)) = body {
+            bodies::install(&self.paths, &id, text.as_bytes())?;
+            before_commit(&mut observe, Step::BodyInstalled)?;
+        }
         let mut warning = snapshot::install(&self.paths, &new, &mut observe)?;
+        let mut collected = Collected::default();
         if warning.is_none() {
-            warning = after_commit(&mut observe, Step::Collected);
+            let kept_after = bodies::referenced(&state);
+            let dropped = kept_before.difference(&kept_after).cloned().collect();
+            warning = bodies::collect(
+                &self.paths,
+                &dirs,
+                &dropped,
+                sweep,
+                &kept_after,
+                &mut collected,
+            )
+            .err()
+            .map(|detail| Warning {
+                step: Step::Collected,
+                detail,
+            })
+            .or_else(|| after_commit(&mut observe, Step::Collected));
         }
         Ok(Held {
             value,
             wrote: true,
             warning,
+            collected,
         })
     }
 
     /// The record directories must be real directories of this user, not
     /// symlinks: a worker that can write `runtime/` must not steer the
-    /// record's reads, writes or deletions elsewhere.
-    fn check_dirs(&self) -> Result<(), RecordError> {
-        for dir in [self.paths.record_dir(), self.paths.bodies_dir()] {
+    /// record's reads, writes or deletions elsewhere. Returns their
+    /// identities, which a deletion checks again on the descriptor it uses.
+    fn check_dirs(&self) -> Result<TrustedDirs, RecordError> {
+        let check = |dir: PathBuf| {
             let untrusted = |detail: String| RecordError::RecordDirUntrusted {
                 path: dir.clone(),
                 detail,
@@ -276,9 +397,53 @@ impl Record {
                     sys::current_uid()
                 )));
             }
-        }
-        Ok(())
+            Ok(DirId {
+                dev: meta.dev(),
+                ino: meta.ino(),
+            })
+        };
+        Ok(TrustedDirs {
+            record: check(self.paths.record_dir())?,
+            bodies: check(self.paths.bodies_dir())?,
+        })
     }
+}
+
+/// Whether a writing hold also lists the record directories for files no
+/// snapshot names. Only a send does, so the hook path never lists.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Sweep {
+    No,
+    Yes,
+}
+
+/// A directory's identity when the hold checked it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct DirId {
+    dev: u64,
+    ino: u64,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct TrustedDirs {
+    record: DirId,
+    bodies: DirId,
+}
+
+/// Opens `path` without following a symlink and without blocking, and
+/// refuses anything but a regular file before a byte is read.
+fn open_regular(path: &Path) -> io::Result<File> {
+    let file = OpenOptions::new()
+        .read(true)
+        .custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK)
+        .open(path)?;
+    if !file.metadata()?.file_type().is_file() {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "not a regular file",
+        ));
+    }
+    Ok(file)
 }
 
 /// Creates each missing directory from `base` down to `dir`, mode 0700,

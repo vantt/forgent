@@ -12,8 +12,13 @@ use std::time::{Duration, Instant};
 
 /// A temporary directory holding the `.fgos` directory the store is given
 /// and a scratch directory beside it, outside the record. Removed on drop.
+///
+/// One at a time per test binary: a fork (a child process of another test)
+/// copies every description open in the process until the child execs, so
+/// a hold running beside it would find its own lock still held.
 pub struct TempFgos {
     root: PathBuf,
+    _one_at_a_time: std::sync::MutexGuard<'static, ()>,
 }
 
 impl TempFgos {
@@ -24,7 +29,14 @@ impl TempFgos {
             .as_nanos();
         let root =
             std::env::temp_dir().join(format!("fgos-mailbox-{tag}-{}-{nanos}", std::process::id()));
-        let fgos = Self { root };
+        static ONE_AT_A_TIME: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let guard = ONE_AT_A_TIME
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        let fgos = Self {
+            root,
+            _one_at_a_time: guard,
+        };
         std::fs::create_dir_all(fgos.fgos_dir()).unwrap();
         std::fs::create_dir_all(fgos.scratch()).unwrap();
         fgos
@@ -121,10 +133,13 @@ pub fn within<T: Send + 'static>(limit: Duration, f: impl FnOnce() -> T + Send +
         .unwrap_or_else(|_| panic!("did not return within {limit:?}"))
 }
 
-/// Creates a FIFO at `path`.
+/// Creates a FIFO at `path`, without a child process.
 pub fn mkfifo(path: &Path) {
-    let status = Command::new("mkfifo").arg(path).status().unwrap();
-    assert!(status.success(), "mkfifo {}", path.display());
+    use std::os::unix::ffi::OsStrExt;
+    let c_path = std::ffi::CString::new(path.as_os_str().as_bytes()).unwrap();
+    // SAFETY: a NUL-terminated path that outlives the call.
+    let made = unsafe { libc::mkfifo(c_path.as_ptr(), 0o600) };
+    assert_eq!(made, 0, "mkfifo {}", path.display());
 }
 
 /// Installs `contents` at `path` by rename, so a reader never sees a part.
@@ -211,14 +226,4 @@ pub fn wait_exit(child: &mut Child) -> ExitStatus {
         }
         std::thread::sleep(Duration::from_millis(2));
     }
-}
-
-/// One spawning test at a time per binary: a fork copies every open
-/// description of the process until the child execs, which would keep
-/// another test's mailbox lock alive in the child.
-pub fn serial() -> std::sync::MutexGuard<'static, ()> {
-    static SERIAL: std::sync::Mutex<()> = std::sync::Mutex::new(());
-    SERIAL
-        .lock()
-        .unwrap_or_else(|poisoned| poisoned.into_inner())
 }
