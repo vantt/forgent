@@ -361,12 +361,9 @@ fn every_kind_of_hook_usage_error_exits_zero_prints_nothing_on_stdout_and_logs_i
             .stderr(Stdio::piped())
             .spawn()
             .unwrap();
-        child
-            .stdin
-            .take()
-            .unwrap()
-            .write_all(&setup.payload())
-            .unwrap();
+        // A usage error exits before it reads stdin, so the pipe may be
+        // closed already, as it may be for a CLI.
+        let _ = child.stdin.take().unwrap().write_all(&setup.payload());
         let out = child.wait_with_output().unwrap();
 
         assert!(out.status.success(), "{kind}: {}", out.status);
