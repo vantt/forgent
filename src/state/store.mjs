@@ -1035,9 +1035,10 @@ function revisionDriftIsSelfCaused(events, id, claim) {
     // `>=`, not `>`: `ts` has only millisecond resolution, and the very
     // first post-claim event can legitimately share the exact same
     // millisecond as `acquiredAt` (a real, intermittently-reproducing flake
-    // this fix caught in its own test suite) -- still strictly excludes an
-    // event from BEFORE the claim (e.g. the item's own `work.add`), which
-    // never shares that millisecond in practice.
+    // this fix caught in its own test suite). An event written just before
+    // the claim, such as the item's own `work.add`, can share that
+    // millisecond too, since a claim spawns nothing; it then counts as drift
+    // here, and a different writer's event refuses, which is the safe side.
     if (!Number.isFinite(eventTsMs) || !(eventTsMs >= acquiredAtMs)) continue;
     // v4 src is the store-recorded writer; legacy stamps may use numeric PIDs.
     const writerId = event.v === 4 ? event.src : event.payload?.writer?.id;
