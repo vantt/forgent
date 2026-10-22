@@ -46,9 +46,9 @@ pub(super) fn referenced(state: &MailboxState) -> BTreeSet<MessageId> {
 /// After an install: deletes the `dropped` bodies (no listing), and in a
 /// send also every regular file of the record directories that neither
 /// `Paths::is_known` nor a `kept` body names. An entry that is not a
-/// regular file stops the sweep before it deletes anything. Deletions go
-/// through descriptors of the directories the hold checked, and never
-/// follow a symlink.
+/// regular file stops the sweep before it deletes anything. Listing and
+/// deletion go through descriptors of the directories the hold checked,
+/// and never follow a symlink.
 pub(super) fn collect(
     paths: &Paths,
     dirs: &TrustedDirs,
@@ -69,9 +69,9 @@ pub(super) fn collect(
         .filter_map(Paths::body_name)
         .map(OsString::from)
         .collect();
-    let in_record = unnamed(&paths.record_dir(), |name| paths.is_known(name))?;
-    let in_bodies = unnamed(&paths.bodies_dir(), |name| kept.contains(name))?;
     let record = open_dir(&paths.record_dir(), dirs.record)?;
+    let in_record = unnamed(&record, &paths.record_dir(), |name| paths.is_known(name))?;
+    let in_bodies = unnamed(&bodies, &paths.bodies_dir(), |name| kept.contains(name))?;
     for name in &in_record {
         tally(sys::unlink_at(&record, name), collected);
     }
@@ -89,21 +89,24 @@ fn tally(result: io::Result<bool>, collected: &mut Collected) {
     }
 }
 
-/// The entries of `dir` that `keep` does not name; all must be regular
-/// files, judged without following a symlink.
-fn unnamed(dir: &Path, keep: impl Fn(&OsStr) -> bool) -> Result<Vec<OsString>, String> {
-    let fail = |e: io::Error| format!("{}: {e}", dir.display());
+/// The entries of the directory open as `dir` that `keep` does not name,
+/// listed through the descriptor; all must be regular files, judged
+/// without following a symlink. `path` only names it in a message.
+fn unnamed(
+    dir: &File,
+    path: &Path,
+    keep: impl Fn(&OsStr) -> bool,
+) -> Result<Vec<OsString>, String> {
+    let entries = sys::list_at(dir).map_err(|e| format!("{}: {e}", path.display()))?;
     let mut names = Vec::new();
-    for entry in std::fs::read_dir(dir).map_err(fail)? {
-        let entry = entry.map_err(fail)?;
-        let name = entry.file_name();
+    for (name, regular) in entries {
         if keep(&name) {
             continue;
         }
-        if !entry.file_type().map_err(fail)?.is_file() {
+        if !regular {
             return Err(format!(
                 "{}: {} is not a regular file; nothing was swept",
-                dir.display(),
+                path.display(),
                 name.to_string_lossy()
             ));
         }

@@ -23,6 +23,7 @@ mod sys;
 
 pub use fgos_holder_lock::Wait;
 pub use os_ids::OsIds;
+use paths::Creator;
 pub use paths::Paths;
 
 use fgos_durable_file::sync_directory;
@@ -288,12 +289,26 @@ pub struct Record {
 }
 
 impl Record {
-    /// Creates the record directories (mode 0700) when missing and syncs
-    /// the parent of each one it created. `fgos_dir` must exist.
+    /// Walks the directory chain from `fgos_dir` down to `bodies/`: checks
+    /// each directory that exists before creating anything below it, and
+    /// creates each missing one with mode 0700, syncing its parent.
+    /// `fgos_dir` must exist.
     pub fn open(fgos_dir: impl Into<PathBuf>) -> Result<Self, RecordError> {
         let paths = Paths::new(fgos_dir);
-        for dir in paths.owned_dirs() {
-            create_below(paths.fgos_dir(), &dir)?;
+        for (index, (dir, creator)) in paths.chain().into_iter().enumerate() {
+            match std::fs::symlink_metadata(&dir) {
+                Err(e) if e.kind() == io::ErrorKind::NotFound && index > 0 => {
+                    std::fs::DirBuilder::new()
+                        .mode(0o700)
+                        .create(&dir)
+                        .map_err(RecordError::io("create-dir"))?;
+                    if let Some(parent) = dir.parent() {
+                        sync_directory(parent).map_err(RecordError::io("create-dir-sync"))?;
+                    }
+                }
+                _ => {}
+            }
+            check_dir(&dir, creator)?;
         }
         Ok(Self { paths })
     }
@@ -477,37 +492,65 @@ impl Record {
         })
     }
 
-    /// The record directories must be real directories of this user, not
-    /// symlinks: a worker that can write `runtime/` must not steer the
-    /// record's reads, writes or deletions elsewhere. Returns their
-    /// identities, which a deletion checks again on the descriptor it uses.
+    /// Every directory of the chain, from the `.fgos` directory down, is
+    /// checked before the hold reads or writes anything: a worker that can
+    /// write `runtime/` must not steer the record's reads, writes or
+    /// deletions elsewhere. Returns the identities of `record/` and
+    /// `bodies/`, which a deletion checks again on the descriptor it uses.
+    /// The record still writes through paths; descriptor-relative I/O for
+    /// every step is item `tsk-1lx`.
     fn check_dirs(&self) -> Result<TrustedDirs, RecordError> {
-        let check = |dir: PathBuf| {
-            let untrusted = |detail: String| RecordError::RecordDirUntrusted {
-                path: dir.clone(),
-                detail,
-            };
-            let meta = std::fs::symlink_metadata(&dir).map_err(|e| untrusted(e.to_string()))?;
-            if !meta.file_type().is_dir() {
-                return Err(untrusted("not a directory".to_string()));
+        let mut ids = Vec::with_capacity(2);
+        for (dir, creator) in self.paths.chain() {
+            let id = check_dir(&dir, creator)?;
+            if dir == self.paths.record_dir() || dir == self.paths.bodies_dir() {
+                ids.push(id);
             }
-            if meta.uid() != sys::current_uid() {
-                return Err(untrusted(format!(
-                    "owned by uid {}, not {}",
-                    meta.uid(),
-                    sys::current_uid()
-                )));
-            }
-            Ok(DirId {
-                dev: meta.dev(),
-                ino: meta.ino(),
-            })
-        };
-        Ok(TrustedDirs {
-            record: check(self.paths.record_dir())?,
-            bodies: check(self.paths.bodies_dir())?,
-        })
+        }
+        match ids[..] {
+            [record, bodies] => Ok(TrustedDirs { record, bodies }),
+            _ => Err(RecordError::RecordDirUntrusted {
+                path: self.paths.record_dir(),
+                detail: "the directory chain lacks record/ or bodies/".to_string(),
+            }),
+        }
     }
+}
+
+/// One directory of the chain: a real directory, not a symlink, owned by
+/// this user, with the mode its creator gives it. The record's own
+/// directories carry no group or other bits; `.fgos` and `runtime/`, made
+/// by others with the user's umask, must not be world-writable.
+fn check_dir(dir: &Path, creator: Creator) -> Result<DirId, RecordError> {
+    let untrusted = |detail: String| RecordError::RecordDirUntrusted {
+        path: dir.to_path_buf(),
+        detail,
+    };
+    let meta = std::fs::symlink_metadata(dir).map_err(|e| untrusted(e.to_string()))?;
+    if !meta.file_type().is_dir() {
+        return Err(untrusted("not a directory".to_string()));
+    }
+    if meta.uid() != sys::current_uid() {
+        return Err(untrusted(format!(
+            "owned by uid {}, not {}",
+            meta.uid(),
+            sys::current_uid()
+        )));
+    }
+    let forbidden = match creator {
+        Creator::Record => 0o077,
+        Creator::Others => 0o002,
+    };
+    if meta.mode() & forbidden != 0 {
+        return Err(untrusted(format!(
+            "mode {:o} has bits {forbidden:o} set",
+            meta.mode() & 0o7777
+        )));
+    }
+    Ok(DirId {
+        dev: meta.dev(),
+        ino: meta.ino(),
+    })
 }
 
 /// Whether a writing hold also lists the record directories for files no
@@ -545,25 +588,6 @@ fn open_regular(path: &Path) -> io::Result<File> {
         ));
     }
     Ok(file)
-}
-
-/// Creates each missing directory from `base` down to `dir`, mode 0700,
-/// and syncs the parent of each one it created.
-fn create_below(base: &Path, dir: &Path) -> Result<(), RecordError> {
-    let below = dir
-        .strip_prefix(base)
-        .map_err(|_| RecordError::io("create-dir")(io::Error::other("outside the fgos dir")))?;
-    let mut parent = base.to_path_buf();
-    for part in below.components() {
-        let path = parent.join(part);
-        match std::fs::DirBuilder::new().mode(0o700).create(&path) {
-            Ok(()) => sync_directory(&parent).map_err(RecordError::io("create-dir-sync"))?,
-            Err(e) if e.kind() == io::ErrorKind::AlreadyExists => {}
-            Err(e) => return Err(RecordError::io("create-dir")(e)),
-        }
-        parent = path;
-    }
-    Ok(())
 }
 
 /// Calls the observer at a step before the commit point.

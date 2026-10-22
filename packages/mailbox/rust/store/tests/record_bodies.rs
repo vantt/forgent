@@ -385,3 +385,44 @@ fn a_bodies_directory_swapped_during_a_hold_is_never_used_for_deletion() {
     assert_eq!(held.warning.unwrap().step, Step::Collected);
     assert!(paths.body(&stray_id()).unwrap().exists());
 }
+
+/// A parent of `record/` replaced by a symlink steers nothing: the hold
+/// fails before its commit point, and nothing outside `.fgos` is written,
+/// listed for deletion or deleted, by a hold or by `Record::open`.
+#[test]
+fn a_symlinked_parent_of_the_record_steers_no_write_or_deletion_outside() {
+    let fgos = TempFgos::new("symlink-parent");
+    let record = fgos.record();
+    let limits = common::limits();
+    let to = two_heads(&record, &limits);
+    let outside = fgos.scratch().join("victim");
+    std::fs::create_dir_all(outside.join("record/bodies")).unwrap();
+    std::fs::write(outside.join("record/precious.txt"), "user data").unwrap();
+    std::fs::write(outside.join("record/bodies/also-precious"), "user data").unwrap();
+    // The outside tree has the record's own modes, so only the check of
+    // the parents can refuse it.
+    for dir in [outside.join("record"), outside.join("record/bodies")] {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(&dir, std::fs::Permissions::from_mode(0o700)).unwrap();
+    }
+    let before = (
+        listing(&outside.join("record")),
+        listing(&outside.join("record/bodies")),
+    );
+    let paths = fgos.paths();
+    std::fs::rename(paths.mailbox_dir(), fgos.scratch().join("moved-away")).unwrap();
+    std::os::unix::fs::symlink(&outside, paths.mailbox_dir()).unwrap();
+
+    let err = record
+        .send(rec::send_req("head-a", &to, BODY), Wait::Try, T0, &limits)
+        .unwrap_err();
+    assert_eq!(err.code(), "record-dir-untrusted");
+    let reopened = Record::open(fgos.fgos_dir()).unwrap_err();
+    assert_eq!(reopened.code(), "record-dir-untrusted");
+
+    let after = (
+        listing(&outside.join("record")),
+        listing(&outside.join("record/bodies")),
+    );
+    assert_eq!(after, before, "the outside tree changed");
+}

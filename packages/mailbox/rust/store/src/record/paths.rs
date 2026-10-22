@@ -87,9 +87,17 @@ impl Paths {
         name == SNAPSHOT_FILE || name == BODIES_DIR
     }
 
-    /// The directories the record creates, parents first.
-    pub(crate) fn owned_dirs(&self) -> [PathBuf; 3] {
-        [self.mailbox_dir(), self.record_dir(), self.bodies_dir()]
+    /// Every directory from the `.fgos` directory down to `bodies/`,
+    /// parents first, with who creates it: the record checks each one on
+    /// every hold and before creating anything below it.
+    pub(crate) fn chain(&self) -> [(PathBuf, Creator); 5] {
+        [
+            (self.fgos_dir.clone(), Creator::Others),
+            (self.fgos_dir.join(RUNTIME_DIR), Creator::Others),
+            (self.mailbox_dir(), Creator::Record),
+            (self.record_dir(), Creator::Record),
+            (self.bodies_dir(), Creator::Record),
+        ]
     }
 
     /// The snapshot's file name inside [`Paths::record_dir`].
@@ -106,4 +114,13 @@ impl Paths {
                 .all(|c| c.is_ascii_digit() || ('a'..='f').contains(&c));
         hex.then(|| format!("{id}{BODY_SUFFIX}"))
     }
+}
+
+/// Who creates a directory of the chain, which decides the mode it must
+/// have: the record creates its own with mode 0700; `.fgos` and `runtime/`
+/// are created by others, with the user's umask.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Creator {
+    Record,
+    Others,
 }

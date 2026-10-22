@@ -361,21 +361,53 @@ fn a_snapshot_that_is_a_fifo_never_blocks_the_hold() {
     assert!(lock_is_free(&fgos.paths()));
 }
 
+/// Every directory from the `.fgos` directory down to `bodies/` is checked
+/// on every hold before anything is read or written: not a symlink, owned
+/// by this user, and the mode its creator gives it. The record's own
+/// directories (`mailbox/`, `record/`, `bodies/`) carry no group or other
+/// bits; `.fgos` and `runtime/`, which others create, must not be
+/// world-writable (a group-writable `.fgos` is this machine's normal).
 #[test]
-fn a_symlinked_record_directory_is_refused_before_any_write() {
-    let fgos = TempFgos::new("symlink-record");
-    let record = fgos.record();
-    let elsewhere = fgos.scratch().join("record-elsewhere");
-    std::fs::create_dir(&elsewhere).unwrap();
-    std::fs::remove_dir_all(fgos.paths().record_dir()).unwrap();
-    std::os::unix::fs::symlink(&elsewhere, fgos.paths().record_dir()).unwrap();
-    let err = record
-        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
-            rec::register(state, "head-a", T0, &common::limits(), ids)
-        })
-        .unwrap_err();
-    assert_eq!(err.code(), "record-dir-untrusted");
-    assert_eq!(std::fs::read_dir(&elsewhere).unwrap().count(), 0);
+fn an_untrusted_record_directory_is_refused_before_any_write() {
+    use std::os::unix::fs::PermissionsExt;
+    let limits = common::limits();
+    let hold = |record: &fgos_mailbox::record::Record| {
+        record
+            .hold(Wait::Try, T0, &limits, |state, ids| {
+                rec::register(state, "head-a", T0, &limits, ids)
+            })
+            .map(|held| held.wrote)
+    };
+    let chmod = |path: &std::path::Path, mode: u32| {
+        std::fs::set_permissions(path, std::fs::Permissions::from_mode(mode)).unwrap()
+    };
+
+    // One temporary .fgos at a time: each case ends its own.
+    {
+        let fgos = TempFgos::new("symlink-record");
+        let record = fgos.record();
+        let elsewhere = fgos.scratch().join("record-elsewhere");
+        std::fs::create_dir(&elsewhere).unwrap();
+        std::fs::remove_dir_all(fgos.paths().record_dir()).unwrap();
+        std::os::unix::fs::symlink(&elsewhere, fgos.paths().record_dir()).unwrap();
+        assert_eq!(hold(&record).unwrap_err().code(), "record-dir-untrusted");
+        assert_eq!(std::fs::read_dir(&elsewhere).unwrap().count(), 0);
+    }
+    {
+        let fgos = TempFgos::new("group-record");
+        let record = fgos.record();
+        chmod(&fgos.paths().record_dir(), 0o770);
+        assert_eq!(hold(&record).unwrap_err().code(), "record-dir-untrusted");
+        assert!(!fgos.paths().snapshot().exists());
+    }
+    {
+        let fgos = TempFgos::new("world-fgos");
+        let record = fgos.record();
+        chmod(&fgos.fgos_dir(), 0o777);
+        assert_eq!(hold(&record).unwrap_err().code(), "record-dir-untrusted");
+        chmod(&fgos.fgos_dir(), 0o775);
+        assert!(hold(&record).unwrap(), "a group-writable .fgos is accepted");
+    }
 }
 
 #[test]
