@@ -1,7 +1,7 @@
 {
-  "sha": "51e36b06b574256b7d8136f397b8494778e9e09e",
-  "files": 596,
-  "tests": 8158,
+  "sha": "b19909f866dbd3c9cffe8392202cbe2a9b5dae4a",
+  "files": 595,
+  "tests": 8131,
   "wallSeconds": 202,
   "knownClones": [
     {
@@ -76,27 +76,6 @@
     },
     {
       "hash": "6eb56b5e1f5dde58",
-      "files": [
-        "test/setup/checks-doctor-config.test.mjs",
-        "test/setup/checks.test.mjs"
-      ]
-    },
-    {
-      "hash": "89e96d86b8d162fb",
-      "files": [
-        "test/setup/checks-doctor-config.test.mjs",
-        "test/setup/checks.test.mjs"
-      ]
-    },
-    {
-      "hash": "1766e76a78f58b1f",
-      "files": [
-        "test/setup/checks-doctor-config.test.mjs",
-        "test/setup/checks.test.mjs"
-      ]
-    },
-    {
-      "hash": "1e789b0a14ff04b3",
       "files": [
         "test/setup/checks-doctor-config.test.mjs",
         "test/setup/checks.test.mjs"
