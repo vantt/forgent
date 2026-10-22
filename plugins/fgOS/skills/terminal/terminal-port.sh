@@ -14,15 +14,20 @@ fgos_json_str() {
 # for the project, else the agent tool's session id, else the pane id. Only
 # [A-Za-z0-9._-] survive and the first character is alphanumeric, so the key
 # always satisfies the port's key pattern.
+# fgos_writer_id <root>: this caller's fgOS writer id as the activated host
+# resolves it (`fgos identity`); empty when there is no host or no answer.
+fgos_writer_id() {
+  [ -n "${1:-}" ] && command -v fgos >/dev/null 2>&1 && command -v node >/dev/null 2>&1 || return 0
+  (cd "$1" && fgos identity --json </dev/null 2>/dev/null) | node -e "
+    let s = '';
+    process.stdin.on('data', (d) => { s += d; }).on('end', () => {
+      try { const id = JSON.parse(s).data.id; if (id !== undefined && id !== null && id !== '') process.stdout.write(String(id)); } catch {}
+    });" 2>/dev/null || true
+}
+
 fgos_terminal_key() {
   local root="${1:-}" id="${FGOS_SESSION_ID:-}"
-  if [ -z "$id" ] && [ -n "$root" ] && [ -f "$root/src/util/session-identity.mjs" ] && command -v node >/dev/null 2>&1; then
-    id=$(node -e "
-      import(process.argv[1]).then(({ resolveWriterIdentity }) => {
-        process.stdout.write(String(resolveWriterIdentity().id));
-      }).catch(() => {});
-    " -- "$root/src/util/session-identity.mjs" 2>/dev/null || true)
-  fi
+  [ -n "$id" ] || id=$(fgos_writer_id "$root")
   [ -n "$id" ] || id="${CLAUDE_CODE_SESSION_ID:-}"
   [ -n "$id" ] || id="pane-${HERDR_PANE_ID:-}"
   id=$(printf '%s' "$id" | tr -c 'A-Za-z0-9._-' '-' | cut -c1-128)

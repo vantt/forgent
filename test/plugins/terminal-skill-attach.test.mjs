@@ -114,6 +114,17 @@ test('rename.sh attaches the caller pane and labels it through the port', () => 
   assert.equal(fake.closedPaneIds().length, 0);
 });
 
+test('rename.sh without FGOS_SESSION_ID keys and labels the pane with the writer id the activated host resolves', () => {
+  const pane = openPane('host-id');
+  const r = run('terminal/rename.sh', renameArgs, { HERDR_PANE_ID: pane, FGOS_SESSION_ID: '', CODEX_THREAD_ID: 'codex-thread-skill' });
+  assert.equal(r.status, 0, r.stderr);
+  const record = JSON.parse(fs.readFileSync(path.join(allocationsDir(), 'codex-thread-skill.json'), 'utf8'));
+  assert.equal(record.paneId, pane);
+  const rename = fake.calls().find((c) => c[0] === 'pane' && c[1] === 'rename' && c[2] === pane);
+  assert.ok(rename, 'a pane rename reached herdr');
+  assert.match(rename[3], /fg\.ssid:codex-thread-skill/);
+});
+
 test('rename.sh without herdr does nothing and exits 0', () => {
   const before = records().length;
   const calls = fake.calls().length;
