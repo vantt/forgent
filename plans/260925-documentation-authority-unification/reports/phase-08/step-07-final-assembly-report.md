@@ -7,14 +7,14 @@ Final owning-row decisions are applied through the digest-bound overlay, consume
 ## Counts
 
 - `applied-safe`: 0
-- `prepared-for-cutover`: 422
-- `preserved-history/fixture`: 9611
-- `individually parked`: 180
+- `prepared-for-cutover`: 444
+- `preserved-history/fixture`: 9555
+- `individually parked`: 214
 - `rejected-not-consumer`: 36191
 - consumer-class rows: 10213 (5,249 ADMIT; 4,964 admission-unspecified)
 - rejected rows checked separately: 36191
-- blocked row-readiness entries: 602
-- patch specifications: 214
+- blocked row-readiness entries: 658
+- patch specifications: 226
 - changed-candidate union: 54
 - park families: 23; members: 2311
 - alias writer violations: 0; checked 51 writer rows against 1559 effective old paths (not the empty adopted alias table)
@@ -24,10 +24,10 @@ All REJECT rows use `rejected-not-consumer`; every one resolves a non-null value
 
 ## Output sizes
 
-- `step-07-consumer-cutover-matrix.json`: 3633389 bytes
-- `step-07-patch-order.json`: 260715 bytes
-- `step-07-readiness.json`: 230731 bytes
-- all four generated outputs: 4151018 bytes (limit: < 6000000 bytes)
+- `step-07-consumer-cutover-matrix.json`: 3639317 bytes
+- `step-07-patch-order.json`: 284104 bytes
+- `step-07-readiness.json`: 255624 bytes
+- all four generated outputs: 4205648 bytes (limit: < 6000000 bytes)
 
 ## Explicit blockers
 
@@ -84,38 +84,40 @@ All REJECT rows use `rejected-not-consumer`; every one resolves a non-null value
 | r26:docs/architecture-manifest.json | 6 | 0 | 0 | 6 |
 | r26:docs/architecture-map.md | 0 | 0 | 1 | 0 |
 
-Applied flips: **2131**. Every member, including unchanged parks, has its old/new disposition, original physical record locator, evidence and named remaining blocker/owner in `step-07-park-resolution-applied.json`. Preservation proves the member operand, not full-file generation/parity. Three generated-index families are evaluated separately; complete v2 export closes data gaps, while successor scan/carriage and consumer co-cuts remain explicit. Original v1 rows and v2 reevaluations remain historical inputs; the L12-120 integration overlay is last-write.
+Applied flips: **2131**. Every member, including unchanged parks, has its old/new disposition, original physical record locator, evidence and named remaining blocker/owner in `step-07-park-resolution-applied.json`. Preservation proves the member operand, not full-file generation/parity. Three generated-index families are evaluated separately; complete v2 export closes data gaps, while successor scan/carriage and consumer co-cuts remain explicit. Original v1 rows and v2 reevaluations remain historical inputs; the L12-121 integration overlay is last-write. New parks outside those original families remain individually listed, not added to the conserved 2,311-member denominator.
 
 ## Export v2 and post-move preservation
 
 The Lead export is consumed read-only and never rerun. Its 214 reevaluations promoted 195 preserves and left 19 non-export parks. The existing decision-index generator proves parity only for the state-wins union with the retained committed index, not export-only reconstruction. The export records fgosDir but not the producing codeRoot commit; no missing provenance is invented.
 
-L12-120 rechecks all **9,650** input preserves on a physical scratch copy of the explicit move set through the existing enumerateDocEntries/buildEnduserIndex. **39** become patch: the review's 7 plus **32** additional conditional R28 pointers and gateway runtime/fixture co-cuts (including fixture parent directories). All row IDs, reasons and candidate scan checks are in `step-07-post-move-proof.json` and the exact inputs in `step-07-integration-inputs.json`. No additional park is created. The two legacy duplicate entries disappear; their aliases on surviving knowledge entries remain unchanged. Four generated members are `patch via existing generator`, never hand-edited output.
+L12-121 rechecks all **9,650** input preserves on a physical scratch copy through the existing enumerateDocEntries/buildEnduserIndex. **61** become patch and **34** become individually parked. The original 39 overturns remain; each further row is enumerated with source-confirmed premise evidence, exact successor or named blocker/owner. No role whitelist remains. All row IDs, reason/source/operand digests and candidate checks are in `step-07-post-move-proof.json`; exact composed inputs are in `step-07-integration-inputs.json`. The two legacy duplicates disappear, their surviving aliases remain, and four generated members are `patch via existing generator`.
 
 The enduser test L162/L167 lookup/assertion and L385/L386 frontmatter read are composed ONCE over the source pin, together with the REAL_DEMO_DOC_PATH fixture constant as an atomic co-cut. Forward and rollback diffs, source blob and expectedAfterSha256 are in `step-07-final-prepared-specs.json`; patch-order supersedes the earlier same-file hunk instead of applying both. Owning tests and independent composed-file acceptance remain owed.
 
-All 180 effective parks have member-specific owners and their L12-96 family-plan action in readiness. This overrides the historical v1 catch-all owner catalog, including its 161 parks. Two external locator parks remain separately joined in `step-07-park-resolution-applied.json#externalLocatorReevaluations`; they are outside the 46,404-row census and matrix recordCatalog, not silently counted as members.
+All 214 effective parks have member-specific owners and actions in readiness, including new non-family parks. This overrides the historical v1 catch-all catalog, including its 161 parks. The architecture manifests share the existing architecture-map blocker/owner; the seven AGENTS root pointers belong to the A34 cutover packet (L12-121 supersedes L12-60 only for those seven). Two external locator parks remain separately joined outside the 46,404-row census and are not silently counted.
 
 ## Effective park-family owners
 
 | Family | Park count | Owners |
 |---|---:|---|
-| gen-enduser-index | 13 | Enduser-index / doc-sources reader owner |
-| state-registry-export | 11 | Git / ScopedCommit owner; Knowledge-registry owner |
-| state-work-docsref | 3 | Work-state owner |
-| readset-post-retirement-scan | 31 | Component-boundary / documentation scan owner; Lead (placement decision) / Component-boundary owner |
-| state-inventory-oldpath | 1 | Knowledge migration / inventory owner |
-| decision-f-ratchet-retirement | 18 | Documentation ratchet / replacement-guard owner |
-| r26:docs/doc-governance.md | 17 | Documentation-governance owner |
-| gateway-ctr010-contract-citations | 16 | Gateway / CTR010 contract owner |
-| citation-convention-and-scan | 14 | Citation-drift checker / area-spec owners (RULE follow-up is independent) |
+| A34-AGENTS-root-pointers | 7 | AGENTS.md cutover packet |
+| carry-distribution-gateway-claims | 7 | Gateway owner; Packaging-distribution owner |
 | carry-foundations-and-retired-decision-narratives | 13 | Platform-foundations / locked-law holder owner |
 | carry-knowledge-registry-framework | 12 | Knowledge-registry owner |
 | carry-runner-workstate-doctrine | 11 | Runner owner; Work-state owner |
+| citation-convention-and-scan | 16 | Citation-drift checker / area-spec owners (RULE follow-up is independent) |
+| decision-f-ratchet-retirement | 18 | Documentation ratchet / replacement-guard owner |
+| gateway-ctr010-contract-citations | 16 | Gateway / CTR010 contract owner |
+| gen-enduser-index | 13 | Enduser-index / doc-sources reader owner |
+| post-move-holder-carriage | 6 | Knowledge-registry / documentation holder owner |
+| r26:docs/architecture-map.md | 3 | Architecture-map / component-boundary owner |
+| r26:docs/doc-governance.md | 17 | Documentation-governance owner |
+| readset-post-retirement-scan | 48 | Component-boundary / documentation scan owner; Documentation consumer-composition owner; Documentation-governance / successor-scan owner; Lead (placement decision) / Component-boundary owner |
 | split-area-holder-mapping | 8 | Decision-index generator / area-holder mapping owner |
-| carry-distribution-gateway-claims | 7 | Gateway owner; Packaging-distribution owner |
+| state-inventory-oldpath | 1 | Knowledge migration / inventory owner |
 | state-outcome-and-evidence | 4 | Work-state / retrospective validator owner |
-| r26:docs/architecture-map.md | 1 | Architecture-map / component-boundary owner |
+| state-registry-export | 11 | Git / ScopedCommit owner; Knowledge-registry owner |
+| state-work-docsref | 3 | Work-state owner |
 
 ## Current obligations and owners
 

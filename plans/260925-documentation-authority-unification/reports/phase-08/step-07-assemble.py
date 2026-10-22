@@ -505,11 +505,19 @@ def final_resolution(pin: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
         if change['rowId'] not in family_ids:
             if row['dispositionClass'] != 'preserved-history/fixture':
                 raise ValueError('non-family preserve input changed')
-            row.update(effectiveDisposition='patch', dispositionClass='prepared-for-cutover', patchSpecId='r26:' + row['file'])
+            disposition = change['newDisposition']
+            if disposition not in {'patch', 'parked'}:
+                raise ValueError('integration overturn must patch or name a park')
+            row.update(effectiveDisposition=disposition,
+                       dispositionClass='prepared-for-cutover' if disposition == 'patch' else 'individually parked',
+                       patchSpecId='r26:' + row['file'] if disposition == 'patch' else None,
+                       parkFamilyId=change.get('parkFamilyId') if disposition == 'parked' else row['parkFamilyId'],
+                       blocker=change['remainingBlocker'] if disposition == 'parked' else None)
         else:
             family = next(f for f in expected if f['familyId'] == change['familyId'])
             family['byDisposition']['preserve'] -= 1
-            family['byDisposition']['patch'] = family['byDisposition'].get('patch', 0) + 1
+            disposition = change['newDisposition']
+            family['byDisposition'][disposition] = family['byDisposition'].get(disposition, 0) + 1
     if effective['families'] != expected or effective['flips'] != resolution['effectiveFlips']:
         raise ValueError('effective family counts disagree with member join')
     effective['integrationReevaluations'] = integration['reevaluations']
@@ -521,7 +529,7 @@ def final_resolution(pin: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
     # as values. The explicit final overlay supersedes only effective fields.
     resolution.setdefault('exportV2Families', resolution['effectiveFamilies'])
     resolution.update(effectiveFamilies=effective['families'], effectiveFlips=effective['flips'],
-                      integrationAuthority='L12-120', integrationOverlay='step-07-integration-inputs.json',
+                      integrationAuthority=integration['authority'], integrationOverlay='step-07-integration-inputs.json',
                       integrationReevaluations=integration['reevaluations'],
                       effectiveParkOwners=integration['parkOwners'])
     (HERE / 'step-07-park-resolution-applied.json').write_text(compact_json(resolution))
@@ -567,7 +575,7 @@ def final_prepared_specs(pin: str) -> dict[str, Any]:
                       'roundtrip': True, 'composedOnce': True, 'rowIds': composed['rowIds'],
                       'supersedesSupplementalActions': superseded,
                       'composedRecordRefs': composed.get('composedRecordRefs', []),
-                      'evidence': 'step-07-integration-inputs.json; step-07-post-move-proof.json; L12-120',
+                      'evidence': 'step-07-integration-inputs.json; step-07-post-move-proof.json; ' + integration['authority'],
                       'remainingBlocker': 'Independent composed-file and co-cut owning-test replay before Phase 9 application; no test executed in this records turn.'})
     source_pins = {p: sha((ROOT / p).read_text()) for p in ('src/runner/dispatch/assignment-runner.mjs', 'src/runner/dispatch/execution-contract.mjs', 'src/runner/repo-locks.mjs', 'src/holder-lock/index.mjs', 'docs/platform/herdr-web-dashboard/spec.md', 'docs/knowledge/fgos-triage-table-columns/triage-table-columns.md')}
     result = {'sourceCommit': pin, 'specs': specs, 'citationSourcePins': source_pins, 'appliedToWorkspace': False, 'independentlyAccepted': False}
@@ -893,19 +901,18 @@ def assemble(pin_arg: str, output_dir: pathlib.Path, final: bool = False) -> dic
             for family in resolution['families']:
                 c = family['byDisposition']
                 report.append(f"| {family['familyId']} | {c.get('preserve', 0)} | {c.get('patch', 0)} | {c.get('parked', 0)} | {family['flips']} |")
-            report.extend(['', f"Applied flips: **{resolution['flips']}**. Every member, including unchanged parks, has its old/new disposition, original physical record locator, evidence and named remaining blocker/owner in `step-07-park-resolution-applied.json`. Preservation proves the member operand, not full-file generation/parity. Three generated-index families are evaluated separately; complete v2 export closes data gaps, while successor scan/carriage and consumer co-cuts remain explicit. Original v1 rows and v2 reevaluations remain historical inputs; the L12-120 integration overlay is last-write.", '', '## Export v2 and post-move preservation', '',
+            report.extend(['', f"Applied flips: **{resolution['flips']}**. Every member, including unchanged parks, has its old/new disposition, original physical record locator, evidence and named remaining blocker/owner in `step-07-park-resolution-applied.json`. Preservation proves the member operand, not full-file generation/parity. Three generated-index families are evaluated separately; complete v2 export closes data gaps, while successor scan/carriage and consumer co-cuts remain explicit. Original v1 rows and v2 reevaluations remain historical inputs; the L12-121 integration overlay is last-write. New parks outside those original families remain individually listed, not added to the conserved 2,311-member denominator.", '', '## Export v2 and post-move preservation', '',
                            'The Lead export is consumed read-only and never rerun. Its 214 reevaluations promoted 195 preserves and left 19 non-export parks. The existing decision-index generator proves parity only for the state-wins union with the retained committed index, not export-only reconstruction. The export records fgosDir but not the producing codeRoot commit; no missing provenance is invented.',
                            '',
-                           f"L12-120 rechecks all **9,650** input preserves on a physical scratch copy of the explicit move set through the existing enumerateDocEntries/buildEnduserIndex. **{len(resolution['integrationReevaluations'])}** become patch: the review's 7 plus **{len(resolution['integrationReevaluations']) - 7}** additional conditional R28 pointers and gateway runtime/fixture co-cuts (including fixture parent directories). All row IDs, reasons and candidate scan checks are in `step-07-post-move-proof.json` and the exact inputs in `step-07-integration-inputs.json`. No additional park is created. The two legacy duplicate entries disappear; their aliases on surviving knowledge entries remain unchanged. Four generated members are `patch via existing generator`, never hand-edited output.",
+                           f"L12-121 rechecks all **9,650** input preserves on a physical scratch copy through the existing enumerateDocEntries/buildEnduserIndex. **{sum(r['newDisposition'] == 'patch' for r in resolution['integrationReevaluations'])}** become patch and **{sum(r['newDisposition'] == 'parked' for r in resolution['integrationReevaluations'])}** become individually parked. The original 39 overturns remain; each further row is enumerated with source-confirmed premise evidence, exact successor or named blocker/owner. No role whitelist remains. All row IDs, reason/source/operand digests and candidate checks are in `step-07-post-move-proof.json`; exact composed inputs are in `step-07-integration-inputs.json`. The two legacy duplicates disappear, their surviving aliases remain, and four generated members are `patch via existing generator`.",
                            '',
                            'The enduser test L162/L167 lookup/assertion and L385/L386 frontmatter read are composed ONCE over the source pin, together with the REAL_DEMO_DOC_PATH fixture constant as an atomic co-cut. Forward and rollback diffs, source blob and expectedAfterSha256 are in `step-07-final-prepared-specs.json`; patch-order supersedes the earlier same-file hunk instead of applying both. Owning tests and independent composed-file acceptance remain owed.',
                            '',
-                           'All 180 effective parks have member-specific owners and their L12-96 family-plan action in readiness. This overrides the historical v1 catch-all owner catalog, including its 161 parks. Two external locator parks remain separately joined in `step-07-park-resolution-applied.json#externalLocatorReevaluations`; they are outside the 46,404-row census and matrix recordCatalog, not silently counted as members.',
+                           f"All {len(resolution['parkOwners'])} effective parks have member-specific owners and actions in readiness, including new non-family parks. This overrides the historical v1 catch-all catalog, including its 161 parks. The architecture manifests share the existing architecture-map blocker/owner; the seven AGENTS root pointers belong to the A34 cutover packet (L12-121 supersedes L12-60 only for those seven). Two external locator parks remain separately joined outside the 46,404-row census and are not silently counted.",
                            '', '## Effective park-family owners', '', '| Family | Park count | Owners |', '|---|---:|---|'])
-            for family in resolution['families']:
-                owners = [r for r in resolution['parkOwners'] if r['familyId'] == family['familyId']]
-                if owners:
-                    report.append(f"| {family['familyId']} | {len(owners)} | {'; '.join(sorted({r['owner'] for r in owners}))} |")
+            for family_id in sorted({r['familyId'] for r in resolution['parkOwners']}):
+                owners = [r for r in resolution['parkOwners'] if r['familyId'] == family_id]
+                report.append(f"| {family_id} | {len(owners)} | {'; '.join(sorted({r['owner'] for r in owners}))} |")
             report.extend(['', '## Current obligations and owners', ''])
             for item in special:
                 report.append(f"- **{item['id']}** — {item['status']}; owner: {item['owner']}. {item.get('blocker') or 'No outstanding prerequisite in this receipt.'} Evidence: `{item['evidence']}`.")

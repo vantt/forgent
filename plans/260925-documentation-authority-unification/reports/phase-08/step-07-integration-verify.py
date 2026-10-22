@@ -8,6 +8,7 @@ import collections
 import hashlib
 import json
 import pathlib
+import re
 import subprocess
 import sys
 import tempfile
@@ -77,7 +78,7 @@ for row in actual:
 assert dict(counts) == matrix['counts']['byDispositionClass']
 assert sum(writer_classes.values()) == 51
 assert not matrix['aliasViolations'] and not matrix['unmatchedRows']
-assert len(integration['parkOwners']) == 180
+assert len(integration['parkOwners']) == matrix['counts']['byDispositionClass']['individually parked']
 assert {r['rowId'] for r in integration['parkOwners']} == {r[0] for r in matrix['consumerRows'] if r[4] == 'individually parked'}
 assert all(r['owner'] and r['familyPlan'] and r['remainingBlocker'] and r['owner'] != 'Lead/documentation integration owner' for r in integration['parkOwners'])
 assert len(resolution['rows']) == len({r[0] for r in resolution['rows']}) == 2311
@@ -120,15 +121,59 @@ with tempfile.TemporaryDirectory(prefix='integration-patches-', dir='/tmp/fgos-w
         path_proofs.append({'id': spec['id'], 'path': spec['path'], 'sourceSha256': sha(source), 'afterSha256': sha(after), 'forwardAndRollbackExact': True})
 assert all(by_id[r][4] == 'prepared-for-cutover' for r in ['r03739', 'r03718', 'r03900', 'r03806', 'r26116', 'r26215', 'r26201'])
 assert all(by_id[r][4] == 'preserved-history/fixture' for r in ['r03719', 'r03809'])
+required_patches = ['r01010', 'r01106', 'r01108', 'r01135', 'r01136', 'r00820', 'r01033', 'r01037', 'r04466', 'r14203']
+required_parks = ['r02200', 'r04182', 'r00764', 'r00732', 'r00761', 'r00762', 'r00731', 'r00733', 'r00737']
+assert all(by_id[r][4] == 'prepared-for-cutover' for r in required_patches)
+assert all(by_id[r][4] == 'individually parked' for r in required_parks)
+park_by_id = {r['rowId']: r for r in integration['parkOwners']}
+for rid in ['r02200', 'r04182']:
+    assert park_by_id[rid]['remainingBlocker'] == park_by_id['r22947']['remainingBlocker']
+    assert park_by_id[rid]['owner'] == park_by_id['r22947']['owner']
+for rid in required_parks[2:]:
+    assert park_by_id[rid]['owner'] == 'AGENTS.md cutover packet'
+    assert park_by_id[rid]['remainingBlocker'] == 'AGENTS.md cutover packet (A34) rewrites root pointers to moved targets at cutover'
+old_integration = json.loads(subprocess.check_output(['git', '-C', str(ROOT), 'show', '7df3f2e34955494090ccb81e83b53b3b6f515ee0:' + PREFIX + '/step-07-integration-inputs.json']))
+old_ids = {r['rowId'] for r in old_integration['reevaluations']}
+assert len(old_ids) == 39
+assert all(by_id[r][4] == 'prepared-for-cutover' for r in old_ids)
+assert set(integration['additionalOverturnsSinceL12_120']) == {r['rowId'] for r in proof['overturns']} - old_ids
+assert proof['negativePremiseProbes'] == 3
+assert 'historical-fixture-or-frozen-gate-operand' not in proof['resultCatalog']
+assert len(proof['digestCatalog']) == len(set(proof['digestCatalog']))
+# Each input preserve joins a stated reason, operand and physical-source
+# digest, including inherited neutral-rule reasons; no role is an exemption.
+for check in proof['checks']:
+    rid = f'r{check[0]:05d}'
+    row = by_id[rid]
+    rec = records[row[1]][row[2] - 1]
+    item = next(i for f in ('references', 'dynamicTraces', 'authorAddedReferences') for i in rec.get(f, []) if str(i.get('referenceId') or i.get('id') or i.get('edgeId')) == row[3])
+    reason = item.get('reason') or rec.get('mechanicalClosure', {}).get('reason')
+    assert reason and sha(reason.encode()) == proof['digestCatalog'][check[2]], rid
+    token = str(item.get('matchedExpression') or item.get('pathOperand') or item.get('targetSetOrConstruction') or (item.get('callSite') or [None] * 5)[4] or '')
+    assert sha(token.encode()) == proof['digestCatalog'][check[3]], rid
+    assert proof['resultCatalog'][check[1]] in proof['premiseDescriptions']
+for change in proof['overturns']:
+    assert by_id[change['rowId']][4] == ('prepared-for-cutover' if change['newDisposition'] == 'patch' else 'individually parked')
+    if change['newDisposition'] == 'patch' and change['file'] != 'docs/enduser-docs-index.json':
+        spec = next(s for s in prepared['specs'] if s['path'] == change['file'] and s.get('composedOnce'))
+        assert change['rowId'] in spec['rowIds']
+        removed = '\n'.join(l[1:] for l in spec['diff'].splitlines() if l.startswith('-') and not l.startswith('---'))
+        unwrap = lambda s: re.sub(r'\r?\n\s*(?://|\*)?\s*', '', s)
+        assert any(p in unwrap(removed) for p in change['movingPaths']) or unwrap(change['token']) in unwrap(removed), change['rowId']
+    else:
+        assert change['newDisposition'] == 'patch' or (change['owner'] and change['remainingBlocker'])
+assert len(readiness['blockedRowReadiness']) == counts['prepared-for-cutover'] + counts['individually parked']
 four_bytes = sum(runs[0]['outputs'][name]['bytes'] for name in outputs[:4])
 assert four_bytes < 6000000
-result = {'sourceCommit': PIN, 'authority': 'L12-120', 'recordsOnly': True, 'counts': dict(counts),
-          'rowJoin': {'rows': len(actual), 'duplicates': 0, 'disagreements': 0, 'parkMembers': 2311, 'effectiveParks': 180, 'inputPreservesChecked': 9650, 'preservesOverturned': len(integration['reevaluations'])},
+result = {'sourceCommit': PIN, 'authority': 'L12-121', 'recordsOnly': True, 'counts': dict(counts),
+          'rowJoin': {'rows': len(actual), 'duplicates': 0, 'disagreements': 0, 'parkMembers': 2311, 'effectiveParks': len(integration['parkOwners']), 'inputPreservesChecked': 9650, 'preservesOverturned': len(integration['reevaluations'])},
           'aliasWriterCheck': {'oldPaths': len(aliases), 'writers': sum(writer_classes.values()), 'classes': dict(writer_classes), 'violations': 0},
           'historicalV1AndV2ValuesUnchanged': True, 'composedPatchProofs': path_proofs,
+          'premiseCoverage': {'allInputPreserves': len(proof['checks']), 'statedReasonAndOperandDigestJoins': len(proof['checks']), 'negativeProbes': proof['negativePremiseProbes'], 'roleExemption': False, 'proofHarnessSha256': sha((HERE / 'step-07-post-move-proof.mjs').read_bytes())},
+          'additionalOverturnsSinceL12_120': integration['additionalOverturnsSinceL12_120'],
           'limits': ['No owning product tests or full npm/cargo suites run; fixture Git writes remain prohibited.', 'No live state or exporter rerun; no Phase 9 readiness/independent acceptance.', 'Two fixture constant members remain parked pending full scan/co-cut acceptance; their exact supplemental patch is prepared, not applied.']}
 dump('step-07-integration-verification.json', result)
-dump('step-07-final-determinism.json', {'sourceCommit': PIN, 'authority': 'L12-120', 'command': ' '.join(argv),
+dump('step-07-final-determinism.json', {'sourceCommit': PIN, 'authority': 'L12-121', 'command': ' '.join(argv),
                                      'runs': runs, 'byteIdentical': True, 'fourGeneratedOutputBytes': four_bytes,
                                      'limitBytes': 6000000, 'owningRowVerification': 'step-07-integration-verification.json',
                                      'postMoveProof': 'step-07-post-move-proof.json', 'notClaimed': result['limits']})
