@@ -1,7 +1,7 @@
 ---
 phase: 7
 title: "Size ceiling and costs against S0"
-status: pending
+status: completed
 depends_on: [6]
 ---
 
@@ -69,3 +69,30 @@ Test 1 is green on a fresh main merge and the report states every scenario with 
 
 - Numbers on a loaded machine: record the load average beside each run (S0 did).
 - This phase changes no policy, whatever the numbers.
+
+## API drift
+
+None (main `636df9d87`).
+
+## Deviations
+
+- Windows are `human.fallbackWindowSec + 1` s apart, not `human.fallbackWindowSec`. The budget and the loop guard count an attempt until more than their window has passed (`Timestamp::is_past` is strict), so at exactly 600 s the previous window's sends still count and the 13th message to one recipient would be refused. The test asserts that `loop.windowSec` equals `human.fallbackWindowSec` before relying on it.
+- The ceiling test runs in 15.3 s in debug, so the plan's fallback (a smaller population) was not needed. It asserts that the count never exceeds `H_sender` (20,180; the steady value is 20,140) and is equal in the last two windows, and that the installed snapshot reads back equal to the state built.
+- Each measured hold of the example starts from the population's snapshot, put back untimed, because the plan's populations are fixed and a send adds a header. The contended row runs against a record that the second process keeps changing.
+- The example times each `Step` through the hold's observer and reports the p50 of each step's share. The claim+finish rows are two holds and are not split.
+- The example adds one row the plan did not list: `dead-bindings send`, the cost of owner Q2 option B's judgement of every binding at `send`.
+- The example reads the limits through the tests' shared loader (`#[path]` to `core/tests/common/support.rs`), the same one door the store's tests use.
+
+## Result against the coordinator's stop rule
+
+- The one-sender steady week (record only): no-mail p95 42.5 ms, under 50 ms. With 10 registered heads at their lifetime cap: p95 49.5 ms. With 100: p95 64.2 ms, over 50 ms.
+- The host's own cost per call comes on top of these numbers.
+- Per the coordinator's instruction (a steady-state no-mail read over 50 ms is owner Q1), no lever was picked, and the lane stops after this phase and reports. Phase 8 is not run.
+
+## Proof
+
+- `cargo test -p fgos-mailbox --test record_ceiling`: 1 passed (15.3 s, debug).
+- Mutant: doubling the core's header retention fails it ("20200 headers > ceiling 20180").
+- `cargo build --release -p fgos-mailbox --example mailbox-record-cost` builds; the run exited 0.
+- Report: `plans/reports/research-261022-1145-mailbox-v2-record-costs.md`.
+

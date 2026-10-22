@@ -158,6 +158,14 @@ Both questions let the plan continue on the provisional default; only the owner'
 - **Recommendation.** (a) for V2: measure and report; decide at V5 with the real hook numbers. If phase 7 already shows the steady state for one sender over 50 ms, (b) is the smallest change.
 - **Scope of the answer.** Header retention and snapshot size only; it does not change any send policy.
 - **Provisional default.** (a): V2 measures and reports; no core change.
+- **Measured at phase 7 (2026-10-22, [`research-261022-1145-mailbox-v2-record-costs.md`](../reports/research-261022-1145-mailbox-v2-record-costs.md), record alone, release build, ext4 on NVMe).**
+  - The one-sender steady week (20,140 headers, 7.0 MB): no-mail claim hold p50 30.0 ms, p95 42.5 ms.
+  - Plus 10 registered heads at their lifetime cap: p95 49.5 ms.
+  - Plus 100 such heads (39,940 headers, 13.8 MB): p50 58.0 ms, p95 64.2 ms. That is over 50 ms.
+  - The cost is the read and parse (about 14 ms at 7 MB) plus the re-encode for the no-write comparison (about 15 ms). Both grow linearly with the snapshot.
+  - The host's own cost per call comes on top of these record-only numbers.
+  - `mailbox.hook.lockWaitMs` bounds only the poll for the lock, not the hook's wall time (read, parse, re-encode, release).
+  - The default (a) is kept; no lever was picked. The answer is due now.
 
 ### Q2. Dead bindings stay addressable until pruned, which can take up to the header retention. Keep that?
 

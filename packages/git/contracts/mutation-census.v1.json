@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "760005a7cbc8c8f949069fd6774c7630655a384b461734729c41fc23c90bcde1",
+  "payloadDigest": "a2e2113e741bb62d58a862cf7b65a8ba54f4a8e407a33e7075c43364d8659f2b",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -409,6 +409,7 @@
     "packages/mailbox/rust/core/tests/stop_blocks.rs": "9ef7f43e3d444bb50c54ce2bbccae9a0a1f002fadc0768f6279483625404471e",
     "packages/mailbox/rust/core/tests/sweep.rs": "4db26a0474b48b97f327c757f899c2c8384fcdef511771f2fce22b033c772578",
     "packages/mailbox/rust/core/tests/wake.rs": "a4460aa55dde049c7a9e232c6ee1569f54b842bfcac322451aaf6e4ad5270ad2",
+    "packages/mailbox/rust/store/examples/mailbox-record-cost.rs": "83ec00cb577b71db477011e9684178885ce29dbcc7b23d95fc3f04ff31e20455",
     "packages/mailbox/rust/store/src/adapters/agy.rs": "2ca9d10a744245a4b233e26f64b96d6fde27de92394e60d9332b1a830979f9fe",
     "packages/mailbox/rust/store/src/adapters/claude.rs": "d999090b2570ce16ff6787de42cb5efe963eb41287b6bf0f8d9c3acdb303b8b1",
     "packages/mailbox/rust/store/src/adapters/codex.rs": "8c7242c132b50e4f44db955038da8c6f100e6d12436493e73c0ad0bb10fd3f5c",
@@ -433,6 +434,7 @@
     "packages/mailbox/rust/store/tests/hook_payloads.rs": "9aaa74b70caab9afb5000c56ba59d13106367aca4da0af8f4ea481ef2e805912",
     "packages/mailbox/rust/store/tests/limits_contract.rs": "f325afd89b20852e7396e15d5634a0b44095f21f9d7d80162fd00c6924f67ffc",
     "packages/mailbox/rust/store/tests/record_bodies.rs": "25864d278f0751eee44714537bc901f638453b844889ee3cfe8751b45420c680",
+    "packages/mailbox/rust/store/tests/record_ceiling.rs": "75b250c083b27385bf8f6076b62085b9c71a8139e6b114cd72f60d8e80cb3ea5",
     "packages/mailbox/rust/store/tests/record_contention.rs": "2c030a8d9d8e63fb5d81c6f2a2fd4f12a6a00af9a5b7600fe6656a4a0e480e16",
     "packages/mailbox/rust/store/tests/record_crash.rs": "4bd74600b1f3b2afa31052fbe430db43759020bffc283edc63de12905b9a4e5f",
     "packages/mailbox/rust/store/tests/record_prune.rs": "ad32e637745708632df92c177732c1d3a98413064cad098cbaf77d2404a25e1b",
