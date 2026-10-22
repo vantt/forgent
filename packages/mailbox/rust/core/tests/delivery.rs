@@ -279,6 +279,7 @@ fn a_drain_stamps_last_drain_at_when_mail_is_pending_even_if_it_takes_none_and_a
         &mut pair.ids,
     );
     assert!(empty.items.is_empty());
+    assert!(!empty.changed, "an empty drain reports no change");
     assert_eq!(pair.state, before);
 
     // Pending but not eligible at Stop: it carries no effective wake.
@@ -293,6 +294,7 @@ fn a_drain_stamps_last_drain_at_when_mail_is_pending_even_if_it_takes_none_and_a
     );
 
     assert!(stop.items.is_empty());
+    assert!(stop.changed, "the stamp is a change the store must write");
     assert_eq!(
         pair.state.binding(&key("b")).unwrap().last_drain_at,
         Some(t(120))

@@ -531,3 +531,22 @@ fn a_second_key_from_the_same_head_takes_its_binding_over_at_a_new_generation_an
         "the old context's mail is never shown"
     );
 }
+
+#[test]
+fn a_registration_refused_for_want_of_a_name_changes_nothing_not_even_the_clock() {
+    let limits = spec_limits();
+    let mut pair = Pair::new(t(0));
+    pair.send("a", B_NAME, "held", t(0));
+    assert!(pair.claim("b", Generation::FIRST, t(1)).token.is_some());
+    let past_deadline = Pair::after(t(1), limits.in_flight_ttl_sec);
+    let before = pair.state.clone();
+
+    let mut nameless = request("k-nameless", "codex", None, "head-nameless");
+    nameless.project = String::new();
+    let refused = pair
+        .state
+        .register(nameless, None, past_deadline, &limits, &mut pair.ids);
+
+    assert_eq!(refused, Err(RegisterRefusal::NameDoesNotFit));
+    assert_eq!(pair.state, before);
+}

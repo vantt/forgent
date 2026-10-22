@@ -195,13 +195,18 @@ pub struct NoticeFacts {
 pub struct Claim {
     pub token: Option<AttemptToken>,
     pub items: Vec<ClaimedItem>,
+    /// Whether the claim changed the state, so the store must write it:
+    /// true whenever mail was pending (the drain swept and stamped
+    /// `last_drain_at`), even if nothing was taken.
+    pub changed: bool,
 }
 
 impl Claim {
-    fn empty() -> Self {
+    fn empty(changed: bool) -> Self {
         Self {
             token: None,
             items: Vec::new(),
+            changed,
         }
     }
 }
@@ -379,7 +384,7 @@ impl MailboxState {
         ids: &mut dyn IdSource,
     ) -> Claim {
         if self.current_generation(key) != Some(generation) || !self.has_pending(key, generation) {
-            return Claim::empty();
+            return Claim::empty(false);
         }
         self.sweep(now, limits, ids);
         let now = self.last_now;
@@ -395,7 +400,7 @@ impl MailboxState {
             .iter()
             .any(|n| notice_eligible(n, key, generation, checkpoint));
         if !any_mail && !any_notice {
-            return Claim::empty();
+            return Claim::empty(true);
         }
         let token = AttemptToken::mint(ids);
         let deadline = now.plus_secs(limits.in_flight_ttl_sec);
@@ -409,6 +414,7 @@ impl MailboxState {
         Claim {
             token: Some(token),
             items,
+            changed: true,
         }
     }
 
