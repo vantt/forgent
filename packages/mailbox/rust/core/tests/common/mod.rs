@@ -260,3 +260,13 @@ impl Pair {
         self.try_send(req, now).unwrap()
     }
 }
+
+use fgos_mailbox_core::{ClaimedItem, ClaimedWhat, MailFrom};
+
+/// Who sent a claimed message; a test that asks this of a notice fails.
+pub fn mail_from(item: &ClaimedItem) -> &MailFrom {
+    match &item.what {
+        ClaimedWhat::Mail(from) => from,
+        ClaimedWhat::Notice(_) => panic!("{item:?} is a notice, not mail"),
+    }
+}

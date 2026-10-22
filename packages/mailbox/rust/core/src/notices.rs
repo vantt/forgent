@@ -44,6 +44,10 @@ pub struct Notice {
 pub struct NoticeMark(String);
 
 impl NoticeMark {
+    pub(crate) fn is_of(&self, key: &WriterKey) -> bool {
+        self.0.split('|').next() == Some(key.as_str())
+    }
+
     fn new(to: &WriterKey, reason: RefusalReason) -> Self {
         Self(format!(
             "{}|{}",

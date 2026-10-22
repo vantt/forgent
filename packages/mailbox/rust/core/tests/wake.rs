@@ -140,7 +140,11 @@ fn a_stop_claim_takes_only_effective_wake_messages_a_dropped_wake_message_waits_
     assert_eq!(taken, woken);
 
     let step = pair.deliver("b", now);
-    let kinds: Vec<_> = step.items.iter().map(|i| (i.id.clone(), i.kind)).collect();
+    let kinds: Vec<_> = step
+        .items
+        .iter()
+        .map(|i| (i.id.clone(), i.kind()))
+        .collect();
     assert_eq!(kinds.len(), 3);
     assert!(kinds.contains(&(sent[quota].id.clone(), Kind::Message)));
     assert!(kinds.contains(&(fyi.id, Kind::Message)));

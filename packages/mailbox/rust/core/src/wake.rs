@@ -25,6 +25,11 @@ pub enum WakeDrop {
 pub struct ExchangeKey(String);
 
 impl ExchangeKey {
+    /// Whether `account` is one of the exchange's two parties.
+    pub(crate) fn involves(&self, account: &str) -> bool {
+        self.0.split('|').any(|party| party == account)
+    }
+
     fn new(one: &Account, other: &Account) -> Self {
         let (a, b) = if one <= other {
             (one, other)
@@ -51,6 +56,23 @@ pub struct Exchange {
 pub struct WakeLifetimeKey(String);
 
 impl WakeLifetimeKey {
+    /// Whether this count belongs to `key` as sender (in `generation`, or in
+    /// any if `None`) or, when `as_recipient`, names it as recipient.
+    pub(crate) fn involves(
+        &self,
+        key: &WriterKey,
+        generation: Option<Generation>,
+        as_recipient: bool,
+    ) -> bool {
+        let Some((sender, recipient)) = self.0.split_once('|') else {
+            return false;
+        };
+        let (from, from_generation) = sender.split_once('@').unwrap_or((sender, ""));
+        let sends = from == key.as_str()
+            && generation.is_none_or(|g| from_generation == g.get().to_string());
+        sends || (as_recipient && recipient == key.as_str())
+    }
+
     fn new(from: &WriterKey, generation: Generation, to: &WriterKey) -> Self {
         Self(format!(
             "{}@{}|{}",

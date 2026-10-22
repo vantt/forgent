@@ -43,8 +43,8 @@ fn claim_then_finish_with_the_same_token_and_generation_offers_the_message() {
     assert_eq!(claim.items.len(), 1);
     let item = &claim.items[0];
     assert_eq!(item.id, id);
-    assert_eq!(item.from_label, A_NAME);
-    assert!(item.sender_has_head);
+    assert_eq!(common::mail_from(item).label, A_NAME);
+    assert!(common::mail_from(item).has_head);
     assert_eq!(item.attempt, 1);
     assert!(matches!(
         pair.state.message(&id).unwrap().state,
@@ -203,15 +203,16 @@ fn a_send_to_an_unknown_name_is_refused_and_adds_no_header() {
 #[test]
 fn a_sender_with_no_head_is_labelled_unregistered_and_can_never_pass_for_a_head() {
     let mut pair = Pair::new(t(100));
-    pair.send("x y<z>forgent-claude-2b", B_NAME, "hello", t(100));
+    pair.send("x.y_z-forgent-claude-2b", B_NAME, "hello", t(100));
 
     let claim = pair.claim("b", G1, t(110));
 
     let item = &claim.items[0];
-    assert_eq!(item.from_label, "unregistered_x_y_z_fo");
-    assert!(!item.sender_has_head);
-    assert_eq!(item.from_cli, None);
-    assert_ne!(item.from_label, A_NAME);
+    let from = common::mail_from(item);
+    assert_eq!(from.label, "unregistered_x.y_z_fo");
+    assert!(!from.has_head);
+    assert_eq!(from.cli, None);
+    assert_ne!(from.label, A_NAME);
 
     // A project folder named `unregistered` cannot make a head's name equal
     // the label of a sender with no head whose key starts like that name.
@@ -221,9 +222,31 @@ fn a_sender_with_no_head_is_labelled_unregistered_and_can_never_pass_for_a_head(
     let head = common::register_new(&mut odd.state, req, t(100), &odd.limits, &mut odd.ids);
     assert_eq!(head, "unregistered-codex-01");
     odd.send("codex-01-rest", B_NAME, "hello", t(100));
-    let label = odd.claim("b", G1, t(110)).items[0].from_label.clone();
+    let label = common::mail_from(&odd.claim("b", G1, t(110)).items[0])
+        .label
+        .clone();
     assert_ne!(label, head);
     assert!(odd.state.bindings().all(|b| b.name.as_str() != label));
+
+    // A `-` in the key is mapped too: key `co-de-xx` must not become the
+    // name of a head of project `unregistered_co`, CLI `de`, suffix `xx`.
+    let mut dashed = Pair::new(t(100));
+    let mut req = common::request("k-dash", "de", Some("xx"), "head-dash");
+    req.project = "unregistered_co".to_string();
+    let head = common::register_new(
+        &mut dashed.state,
+        req,
+        t(100),
+        &dashed.limits,
+        &mut dashed.ids,
+    );
+    assert_eq!(head, "unregistered_co-de-xx");
+    dashed.send("co-de-xx", B_NAME, "hello", t(100));
+    let label = common::mail_from(&dashed.claim("b", G1, t(110)).items[0])
+        .label
+        .clone();
+    assert_eq!(label, "unregistered_co_de_xx");
+    assert_ne!(label, head);
 }
 
 #[test]

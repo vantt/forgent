@@ -15,8 +15,9 @@ use std::fmt;
 const SYSTEM_LABEL: &str = "mailbox";
 
 /// The recipient label a refusal is counted under when the typed name did
-/// not resolve; never the typed text, which is unbounded.
-const UNRESOLVED: &str = "unresolved";
+/// not resolve; never the typed text, which is unbounded. `~` is outside
+/// the writer-key alphabet, so no head's key can take it.
+const UNRESOLVED: &str = "~unresolved";
 
 /// How many characters of a sender's key its label shows: a display width
 /// chosen with the label's shape, not a policy value.
@@ -144,19 +145,39 @@ pub enum Checkpoint {
     Step,
 }
 
+/// One claimed item: a message or a notice, never both.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ClaimedItem {
     pub id: MessageId,
-    pub kind: Kind,
-    /// The sender's short name, or `unregistered-…` for a sender with no
-    /// head, so a peer is never labelled as a head it is not.
-    pub from_label: String,
-    pub from_cli: Option<Cli>,
-    pub sender_has_head: bool,
-    /// The offer count including this one, printed in the frame.
+    /// The offer count including this one, printed in the frame; always 1
+    /// for a notice, which is offered once.
     pub attempt: u32,
-    /// What a notice is about; `Some` exactly when `kind` is `Notice`.
-    pub notice: Option<NoticeFacts>,
+    pub what: ClaimedWhat,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ClaimedWhat {
+    Mail(MailFrom),
+    Notice(NoticeFacts),
+}
+
+/// Who sent a claimed message.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MailFrom {
+    /// The sender's short name, or `unregistered_…` for a sender with no
+    /// head, so a peer is never labelled as a head it is not.
+    pub label: String,
+    pub cli: Option<Cli>,
+    pub has_head: bool,
+}
+
+impl ClaimedItem {
+    pub fn kind(&self) -> Kind {
+        match self.what {
+            ClaimedWhat::Mail(_) => Kind::Message,
+            ClaimedWhat::Notice(_) => Kind::Notice,
+        }
+    }
 }
 
 /// What a claimed notice reports.
@@ -293,11 +314,13 @@ impl MailboxState {
                 return Err(refusal);
             }
         };
-        let parent = admitted.parent.map(|i| {
-            let parent = &mut self.messages[i];
-            parent.answered = true;
-            parent.id.clone()
-        });
+        let parent = admitted
+            .parent
+            .and_then(|i| self.messages.get_mut(i))
+            .map(|parent| {
+                parent.answered = true;
+                parent.id.clone()
+            });
         let to_account = self.account(&admitted.to);
         let (effective_wake, wake_dropped) = self.effective_wake(
             &WakeParties {
@@ -313,7 +336,6 @@ impl MailboxState {
         );
         let header = Header {
             id: MessageId::mint(ids),
-            kind: Kind::Message,
             from_generation,
             from: req.from,
             to: admitted.to,
@@ -417,12 +439,12 @@ impl MailboxState {
                 let sender = self.binding(&from);
                 ClaimedItem {
                     id,
-                    kind: Kind::Message,
-                    from_label: self.sender_label(&from),
-                    from_cli: sender.map(|b| b.cli.clone()),
-                    sender_has_head: sender.is_some(),
                     attempt,
-                    notice: None,
+                    what: ClaimedWhat::Mail(MailFrom {
+                        label: self.sender_label(&from),
+                        cli: sender.map(|b| b.cli.clone()),
+                        has_head: sender.is_some(),
+                    }),
                 }
             })
             .collect()
@@ -456,12 +478,8 @@ impl MailboxState {
             .into_iter()
             .map(|(id, reason, about, about_to)| ClaimedItem {
                 id,
-                kind: Kind::Notice,
-                from_label: SYSTEM_LABEL.to_string(),
-                from_cli: None,
-                sender_has_head: false,
                 attempt: 1,
-                notice: Some(NoticeFacts {
+                what: ClaimedWhat::Notice(NoticeFacts {
                     reason,
                     about,
                     about_to: self.sender_label(&about_to),
@@ -572,7 +590,7 @@ impl MailboxState {
             })
             .map(|h| MessageView {
                 id: h.id.clone(),
-                kind: h.kind,
+                kind: Kind::Message,
                 from_label: self.sender_label(&h.from),
                 recorded_at: h.recorded_at,
                 offers: h.offers,

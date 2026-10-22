@@ -14,6 +14,7 @@
 mod counters;
 mod delivery;
 mod envelope;
+mod forget;
 mod frame;
 mod ids;
 mod limits;
@@ -28,11 +29,11 @@ mod wake;
 
 pub use counters::{Account, BoundedCounters, CounterReason, Party, PartyKey, UNREGISTERED};
 pub use delivery::{
-    Checkpoint, Claim, ClaimedItem, Finished, MessageView, NoticeFacts, Refusal, SendOutcome,
-    SendRequest,
+    Checkpoint, Claim, ClaimedItem, ClaimedWhat, Finished, MailFrom, MessageView, NoticeFacts,
+    Refusal, SendOutcome, SendRequest,
 };
 pub use envelope::{Header, Kind, MessageState, RefusalReason};
-pub use frame::{frame_sections, render_message, render_notice};
+pub use frame::{frame_sections, render};
 pub use ids::{
     AttemptToken, Cli, Generation, IdSource, InvalidValue, MessageId, ShortName, WriterKey,
 };

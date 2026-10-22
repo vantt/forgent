@@ -11,7 +11,8 @@ use std::collections::BTreeMap;
 
 /// The accounting identity shared by every sender with no registered head
 /// (the runner, the `fgos` CLI), so a rotating `from` cannot grow a map.
-pub const UNREGISTERED: &str = "unregistered";
+/// `~` is outside the writer-key alphabet, so no head's key can take it.
+pub const UNREGISTERED: &str = "~unregistered";
 
 /// Who a sender is for every per-sender policy and counter: its key when
 /// it names a binding, otherwise the shared `unregistered`. A `String`
@@ -101,6 +102,11 @@ impl PartyKey {
     fn new(reason: CounterReason, from: &str, to: &str) -> Self {
         Self(format!("{}|{from}|{to}", reason.code()))
     }
+
+    /// Whether `account` is this entry's sender or recipient.
+    fn involves(&self, account: &str) -> bool {
+        self.0.split('|').skip(1).any(|party| party == account)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -172,6 +178,11 @@ impl BoundedCounters {
     pub fn party_count(&self) -> usize {
         self.by_party.len()
     }
+
+    /// Removes every per-party entry naming `account`; totals stay.
+    pub(crate) fn forget(&mut self, account: &str) {
+        self.by_party.retain(|key, _| !key.involves(account));
+    }
 }
 
 impl MailboxState {
@@ -186,6 +197,16 @@ impl MailboxState {
             Account(key.as_str().to_string())
         } else {
             Account(UNREGISTERED.to_string())
+        }
+    }
+
+    /// Whether `key`'s accounting identity is `account`, without building
+    /// one.
+    pub(crate) fn is_account(&self, key: &WriterKey, account: &Account) -> bool {
+        if self.bindings.contains_key(key) {
+            account.0 == key.as_str()
+        } else {
+            account.0 == UNREGISTERED
         }
     }
 

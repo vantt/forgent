@@ -187,3 +187,14 @@ fn the_snapshot_version_check_refuses_a_newer_version_refuses_an_older_one_as_un
         })
     );
 }
+
+#[test]
+fn a_snapshot_of_another_version_does_not_deserialize_even_when_the_caller_skips_the_version_check()
+{
+    for other in [SNAPSHOT_SCHEMA_VERSION + 1, SNAPSHOT_SCHEMA_VERSION - 1] {
+        let mut snapshot = serde_json::to_value(populated_state()).unwrap();
+        snapshot["schema_version"] = serde_json::json!(other);
+        let error = serde_json::from_value::<MailboxState>(snapshot).unwrap_err();
+        assert!(error.to_string().contains("snapshot-"), "{error}");
+    }
+}

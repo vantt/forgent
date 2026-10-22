@@ -9,8 +9,10 @@
 //! Versioning: the core owns the snapshot's shape, so it owns its version.
 //! Every snapshot struct denies unknown fields, so an older core can never
 //! read a newer snapshot and silently drop what it does not know (and so
-//! reset a cap that is never reset). The store reads [`SnapshotVersion`]
-//! first and calls [`SnapshotVersion::check`] before it reads the state.
+//! reset a cap that is never reset). Deserializing a `MailboxState` refuses
+//! any version but the current one; the store may read [`SnapshotVersion`]
+//! first to tell a newer snapshot (never used, never overwritten) from an
+//! older one.
 use crate::counters::{Account, BoundedCounters};
 use crate::envelope::Header;
 use crate::ids::{MessageId, WriterKey};
@@ -19,7 +21,8 @@ use crate::policy::LifetimeKey;
 use crate::registry::Binding;
 use crate::time::Timestamp;
 use crate::wake::{Exchange, ExchangeKey, WakeLifetimeKey};
-use serde::{Deserialize, Serialize};
+use serde::de::Error as _;
+use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::{BTreeMap, VecDeque};
 
 /// The version of the snapshot shape this core reads and writes.
@@ -80,7 +83,9 @@ impl SnapshotVersion {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct MailboxState {
-    /// Always [`SNAPSHOT_SCHEMA_VERSION`] for a state this core made.
+    /// Always [`SNAPSHOT_SCHEMA_VERSION`]: deserialization refuses any
+    /// other, so a caller cannot skip the check.
+    #[serde(deserialize_with = "current_schema_version")]
     schema_version: u32,
     /// The latest time any operation has seen. A wall clock that steps back
     /// is read as this time, so no window shrinks and no deadline grows.
@@ -103,6 +108,14 @@ pub struct MailboxState {
     pub(crate) exchanges: BTreeMap<ExchangeKey, Exchange>,
     /// Effective wakes per registered sender generation and recipient.
     pub(crate) wake_lifetime: BTreeMap<WakeLifetimeKey, u32>,
+}
+
+fn current_schema_version<'de, D: Deserializer<'de>>(deserializer: D) -> Result<u32, D::Error> {
+    let schema_version = u32::deserialize(deserializer)?;
+    SnapshotVersion { schema_version }
+        .check()
+        .map_err(D::Error::custom)?;
+    Ok(schema_version)
 }
 
 impl Default for MailboxState {

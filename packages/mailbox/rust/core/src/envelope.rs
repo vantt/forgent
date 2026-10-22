@@ -48,7 +48,6 @@ pub enum MessageState {
 #[serde(deny_unknown_fields)]
 pub struct Header {
     pub id: MessageId,
-    pub kind: Kind,
     /// Attribution, not authority (spec §5.1).
     pub from: WriterKey,
     /// `None` for a sender with no registered head (the runner, the CLI).

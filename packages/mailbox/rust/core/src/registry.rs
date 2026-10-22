@@ -151,19 +151,19 @@ impl MailboxState {
             Liveness::Alive => Err(RegisterRefusal::Conflict),
             Liveness::Unknown => Err(RegisterRefusal::Deferred),
             Liveness::Dead => {
-                binding.generation = binding
-                    .generation
-                    .next()
-                    .ok_or(RegisterRefusal::GenerationExhausted)?;
+                let old = binding.generation;
+                binding.generation = old.next().ok_or(RegisterRefusal::GenerationExhausted)?;
                 binding.last_drain_at = None;
                 binding.head = req.head;
                 binding.handle = req.handle;
                 binding.registered_at = now;
                 binding.last_seen = now;
-                Ok(Registered::Replaced {
+                let replaced = Registered::Replaced {
                     name: binding.name.clone(),
                     generation: binding.generation,
-                })
+                };
+                self.drop_generation_records(&req.key, old);
+                Ok(replaced)
             }
         }
     }

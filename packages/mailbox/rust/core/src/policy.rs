@@ -4,7 +4,7 @@
 //! count toward the session budget and the lifetime cap.
 use crate::counters::Account;
 use crate::delivery::{Refusal, SendRequest};
-use crate::envelope::{Header, Kind, MessageState};
+use crate::envelope::{Header, MessageState};
 use crate::ids::{Generation, ShortName, WriterKey};
 use crate::limits::Limits;
 use crate::state::MailboxState;
@@ -22,6 +22,14 @@ impl LifetimeKey {
     pub(crate) fn new(key: &WriterKey, generation: Generation) -> Self {
         Self(format!("{}@{}", key.as_str(), generation.get()))
     }
+
+    /// Whether this count belongs to `key`, in any generation if `None`.
+    pub(crate) fn is_of(&self, key: &WriterKey, generation: Option<Generation>) -> bool {
+        match generation {
+            Some(generation) => *self == Self::new(key, generation),
+            None => self.0.split('@').next() == Some(key.as_str()),
+        }
+    }
 }
 
 /// What a send that passed every check records.
@@ -32,6 +40,16 @@ pub(crate) struct Admitted {
     /// Index of the derived parent in the header list.
     pub parent: Option<usize>,
     pub depth: u32,
+}
+
+/// Whether `header` went from `to` to `from`'s current generation.
+fn offered_to(
+    header: &Header,
+    to: &WriterKey,
+    from: &WriterKey,
+    from_generation: Option<Generation>,
+) -> bool {
+    &header.from == to && &header.to == from && Some(header.to_generation) == from_generation
 }
 
 fn pending(header: &Header) -> bool {
@@ -83,12 +101,14 @@ impl MailboxState {
     ) -> Result<Admitted, Refusal> {
         check_sender_key(&req.from, limits)?;
         let recipient = self.resolve(&req.to)?;
-        self.check_reply_hint(req, &recipient.key)?;
+        self.check_reply_hint(req, from_generation, &recipient.key)?;
         check_size(req, limits)?;
         self.check_budget(account, limits)?;
         self.check_lifetime(&req.from, from_generation, limits)?;
-        let parent = self.derived_parent(&recipient.key, &req.from);
-        let depth = parent.map_or(0, |i| self.messages[i].depth.saturating_add(1));
+        let parent = self.derived_parent(&recipient.key, &req.from, from_generation);
+        let depth = parent
+            .and_then(|i| self.messages.get(i))
+            .map_or(0, |h| h.depth.saturating_add(1));
         check_depth(depth, limits)?;
         self.check_loop(account, &recipient.key, now, limits)?;
         self.check_queue(&recipient.key, recipient.generation, limits)?;
@@ -103,16 +123,20 @@ impl MailboxState {
     }
 
     /// Check 3: a hint must name a message the recipient offered to the
-    /// sender. Notices live in their own lane and never qualify.
-    fn check_reply_hint(&self, req: &SendRequest<'_>, to: &WriterKey) -> Result<(), Refusal> {
+    /// sender's current generation. Notices live in their own lane and are
+    /// never searched; a sender with no head was offered nothing.
+    fn check_reply_hint(
+        &self,
+        req: &SendRequest<'_>,
+        from_generation: Option<Generation>,
+        to: &WriterKey,
+    ) -> Result<(), Refusal> {
         let Some(hint) = &req.reply_to else {
             return Ok(());
         };
         let offered = self.messages.iter().any(|h| {
             &h.id == hint
-                && h.kind == Kind::Message
-                && &h.from == to
-                && h.to == req.from
+                && offered_to(h, to, &req.from, from_generation)
                 && matches!(h.state, MessageState::Offered { .. })
         });
         if offered {
@@ -159,14 +183,18 @@ impl MailboxState {
     }
 
     /// The parent of a send from `from` to `to` (spec §5.4): the most
-    /// recently offered, unanswered message from `to` to `from`.
-    fn derived_parent(&self, to: &WriterKey, from: &WriterKey) -> Option<usize> {
+    /// recently offered, unanswered message from `to` to `from`'s current
+    /// generation. A new process of the sender inherits no chain.
+    fn derived_parent(
+        &self,
+        to: &WriterKey,
+        from: &WriterKey,
+        from_generation: Option<Generation>,
+    ) -> Option<usize> {
         self.messages
             .iter()
             .enumerate()
-            .filter(|(_, h)| {
-                h.kind == Kind::Message && &h.from == to && &h.to == from && !h.answered
-            })
+            .filter(|(_, h)| offered_to(h, to, from, from_generation) && !h.answered)
             .filter_map(|(i, h)| match h.state {
                 MessageState::Offered { at } => Some((at, i)),
                 _ => None,
@@ -187,10 +215,8 @@ impl MailboxState {
         let recent = self
             .messages
             .iter()
-            .filter(|h| {
-                h.kind == Kind::Message && &h.to == to && !now.is_past(h.recorded_at, window)
-            })
-            .filter(|h| &self.account(&h.from) == account)
+            .filter(|h| &h.to == to && !now.is_past(h.recorded_at, window))
+            .filter(|h| self.is_account(&h.from, account))
             .count();
         if recent >= limits.loop_guard.max_per_window as usize {
             return Err(Refusal::Loop {
@@ -233,7 +259,7 @@ impl MailboxState {
             .messages
             .iter()
             .filter(|h| &h.to == to && h.to_generation == generation && pending(h))
-            .filter(|h| &self.account(&h.from) == account)
+            .filter(|h| self.is_account(&h.from, account))
             .count();
         if held >= limits.queue.per_sender as usize {
             return Err(Refusal::SenderShareFull {

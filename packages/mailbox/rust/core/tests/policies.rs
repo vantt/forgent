@@ -60,19 +60,10 @@ fn a_reply_to_hint_is_refused_unless_it_names_a_message_the_recipient_offered_to
     let refused = pair.try_send(hinted("a", B_NAME, &pending), t(2));
     assert_eq!(code(&refused), "reply-to-not-offered");
 
-    // A notice id never qualifies: a notice about A's expired message.
-    let lost = pair.send("a", B_NAME, "never read", t(3));
+    // Notices live in their own lane, so their ids are never searched; the
+    // chain below starts once the pending message has expired.
     let due = Pair::after(t(3), ttl);
     pair.sweep(due);
-    let notice = pair
-        .state
-        .notices()
-        .find(|n| n.about == lost)
-        .unwrap()
-        .id
-        .clone();
-    let refused = pair.try_send(hinted("a", B_NAME, &notice), due);
-    assert_eq!(code(&refused), "reply-to-not-offered");
 
     // x: B to A at depth 0, offered and answered.
     let mut now = due;
@@ -357,6 +348,8 @@ fn the_a_b_c_a_cycle_keeps_depth_0_never_trips_the_loop_guard_and_is_stopped_by_
     ];
     let mut message = 0u64;
     let refusal = loop {
+        // A broken cap fails here instead of looping for ever.
+        assert!(message <= 3 * cap, "no refusal after {message} messages");
         let (from, to, reader) = hops[(message % 3) as usize];
         message += 1;
         let now = t(60 * message);
@@ -394,4 +387,143 @@ fn a_sender_key_longer_than_the_header_bound_is_refused_before_any_other_check_a
     );
     let at_bound = pair.try_send(plain(&"s".repeat(bound), B_NAME, "hi"), t(2));
     assert_eq!(code(&at_bound), "recorded");
+}
+
+#[test]
+fn a_new_sender_generation_inherits_no_reply_link_and_cannot_hint_at_mail_offered_to_the_old_one() {
+    let mut pair = Pair::new(t(0));
+    let question = pair.send("b", A_NAME, "question for the first process", t(1));
+    pair.deliver("a", t(2));
+    pair.take_over("a", "claude", t(3));
+
+    let mut hinted_req = plain("a", B_NAME, "re");
+    hinted_req.reply_to = Some(question.clone());
+    assert_eq!(
+        code(&pair.try_send(hinted_req, t(4))),
+        "reply-to-not-offered"
+    );
+    let fresh = pair
+        .try_send(plain("a", B_NAME, "hello from a new process"), t(5))
+        .unwrap();
+
+    assert_eq!(fresh.reply_to, None);
+    assert_eq!(fresh.depth, 0);
+    assert!(!pair.state.message(&question).unwrap().answered);
+}
+
+#[test]
+fn a_depth_capped_chain_does_not_block_a_new_process_of_its_sender() {
+    let mut pair = Pair::new(t(0));
+    let max_depth = pair.limits.chain.max_depth;
+    let mut now = t(0);
+    let (mut from, mut to) = ("a", B_NAME);
+    for _ in 0..=max_depth {
+        now = now.plus_secs(1);
+        pair.deliver(from, now);
+        pair.try_send(plain(from, to, "hop"), now).unwrap();
+        (from, to) = if from == "a" {
+            ("b", A_NAME)
+        } else {
+            ("a", B_NAME)
+        };
+    }
+    now = now.plus_secs(1);
+    pair.deliver(from, now);
+    assert_eq!(
+        code(&pair.try_send(plain(from, to, "one too many"), now)),
+        "too-deep"
+    );
+
+    pair.take_over(from, if from == "a" { "claude" } else { "codex" }, now);
+    let fresh = pair.try_send(
+        plain(from, to, "hello from a new process"),
+        now.plus_secs(1),
+    );
+
+    assert_eq!(code(&fresh), "recorded");
+}
+
+#[test]
+fn a_head_keyed_unregistered_keeps_its_own_account_apart_from_senders_with_no_head() {
+    let mut pair = Pair::new(t(0));
+    pair.add_head("unregistered", t(0));
+    let share = pair.limits.queue.per_sender;
+    for i in 0..share {
+        assert_eq!(
+            code(&pair.try_send(plain(&format!("cli-{i}"), B_NAME, "m"), t(1))),
+            "recorded"
+        );
+    }
+
+    let own = pair.try_send(plain("unregistered", B_NAME, "m"), t(1));
+
+    assert_eq!(code(&own), "recorded");
+}
+
+/// One state per adjacent pair of checks (k, k + 1) of spec §5.3 in which
+/// both fail; the first must win. Each failing condition is ordinary input
+/// or a limit set through configuration.
+#[test]
+fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
+    let long_key = |pair: &Pair| "k".repeat(pair.limits.frame.max_header_chars as usize + 1);
+    // From a to b, with b's question offered to a, so a's send has a parent.
+    let base = || {
+        let mut pair = Pair::new(t(0));
+        pair.send("b", A_NAME, "question", t(1));
+        pair.deliver("a", t(2));
+        pair
+    };
+    let too_large = |pair: &mut Pair| pair.limits.max_body_bytes = 0;
+    let no_budget = |pair: &mut Pair| pair.limits.session.budget = 0;
+    let no_lifetime = |pair: &mut Pair| pair.limits.session.lifetime_cap = 0;
+    let no_depth = |pair: &mut Pair| pair.limits.chain.max_depth = 0;
+    let no_loop = |pair: &mut Pair| pair.limits.loop_guard.max_per_window = 0;
+    let no_queue = |pair: &mut Pair| pair.limits.queue.cap = 0;
+    let no_share = |pair: &mut Pair| pair.limits.queue.per_sender = 0;
+    let not_offered = MessageId::from_text("never-offered");
+
+    let mut checked = Vec::new();
+    for (expected, later) in [
+        ("sender-key-too-long", "group"),
+        ("group", "unknown-name"),
+        ("unknown-name", "reply-to-not-offered"),
+        ("reply-to-not-offered", "too-large"),
+        ("too-large", "session-budget"),
+        ("session-budget", "lifetime-cap"),
+        ("lifetime-cap", "too-deep"),
+        ("too-deep", "loop"),
+        ("loop", "queue-full"),
+        ("queue-full", "sender-share-full"),
+    ] {
+        let mut pair = base();
+        let mut from = "a".to_string();
+        let mut to = B_NAME.to_string();
+        let mut hint = None;
+        for failing in [expected, later] {
+            match failing {
+                "sender-key-too-long" => from = long_key(&pair),
+                "group" => to = "x,y".to_string(),
+                // "x,y" also names nobody, so a group stays unknown too.
+                "unknown-name" if to.contains(',') => {}
+                "unknown-name" => to = "nobody".to_string(),
+                "reply-to-not-offered" => hint = Some(not_offered.clone()),
+                "too-large" => too_large(&mut pair),
+                "session-budget" => no_budget(&mut pair),
+                "lifetime-cap" => no_lifetime(&mut pair),
+                "too-deep" => no_depth(&mut pair),
+                "loop" => no_loop(&mut pair),
+                "queue-full" => no_queue(&mut pair),
+                "sender-share-full" => no_share(&mut pair),
+                other => panic!("no condition for {other}"),
+            }
+        }
+        let mut req = plain(&from, &to, "body");
+        req.reply_to = hint;
+
+        let result = pair.try_send(req, t(3));
+
+        assert_eq!(code(&result), expected, "{expected} before {later}");
+        checked.push(expected);
+    }
+    assert_eq!(checked.len(), 10);
 }

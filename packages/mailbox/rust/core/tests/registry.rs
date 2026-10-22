@@ -227,8 +227,8 @@ fn a_claude_head_keeps_its_own_two_characters_a_colliding_head_gets_three_hex_ch
     assert_eq!(suffix.len(), 3, "{second}");
     assert!(is_lower_hex(suffix), "{second}");
 
-    for invalid in ["2B", "x", "abc", "é1", "2-"] {
-        let key_text = format!("k-{invalid}");
+    for (i, invalid) in ["2B", "x", "abc", "é1", "2-"].into_iter().enumerate() {
+        let key_text = format!("k-invalid-{i}");
         let name = register_new(
             &mut state,
             request(&key_text, "claude", Some(invalid), "h"),
@@ -348,4 +348,113 @@ fn a_writer_key_longer_than_the_header_bound_is_refused_at_registration() {
         Err(RegisterRefusal::KeyTooLong)
     );
     assert_eq!(state, before);
+}
+
+#[test]
+fn a_writer_key_outside_the_session_identity_alphabet_is_refused_by_its_constructor() {
+    for bad in ["x|y", "a@1", "with space", "tab\tkey", "~unregistered", "é"] {
+        assert!(
+            fgos_mailbox_core::WriterKey::new(bad).is_err(),
+            "{bad} was accepted"
+        );
+    }
+    for good in ["0f3a-uuid", "att-1.2_3", "1234", "unregistered"] {
+        assert!(
+            fgos_mailbox_core::WriterKey::new(good).is_ok(),
+            "{good} was refused"
+        );
+    }
+    let snapshot = r#""x|y""#;
+    assert!(serde_json::from_str::<fgos_mailbox_core::WriterKey>(snapshot).is_err());
+}
+
+/// The keyed records of the snapshot, by map name, as JSON key lists.
+fn keyed_records(state: &MailboxState) -> Vec<(String, usize)> {
+    let snapshot = serde_json::to_value(state).unwrap();
+    [
+        "lifetime",
+        "wake_lifetime",
+        "exchanges",
+        "budget",
+        "notice_last",
+    ]
+    .into_iter()
+    .map(|map| (map.to_string(), snapshot[map].as_object().unwrap().len()))
+    .collect()
+}
+
+#[test]
+fn takeovers_drop_the_dead_generations_records_so_fifty_restarts_leave_no_growth() {
+    let mut pair = common::Pair::new(t(0));
+    let mut now = t(1);
+    pair.send_wake("a", common::B_NAME, now);
+    pair.deliver("b", now);
+    let after_one = keyed_records(&pair.state);
+
+    for _ in 0..50 {
+        pair.take_over("a", "claude", now);
+        now = now.plus_secs(pair.limits.wake.exchange_gap_sec + 1);
+        assert!(pair.send_wake("a", common::B_NAME, now).effective_wake);
+        pair.deliver("b", now);
+    }
+
+    assert_eq!(keyed_records(&pair.state), after_one);
+}
+
+#[test]
+fn forgetting_a_key_removes_every_record_of_it_and_a_later_registration_starts_clean_at_generation_1(
+) {
+    let mut pair = common::Pair::new(t(0));
+    let send = |pair: &mut common::Pair, body: &str, now| {
+        let req = common::plain("a", common::B_NAME, body);
+        pair.state
+            .send(req, now, &pair.limits, &mut pair.ids)
+            .map(|_| ())
+            .map_err(|r| r.code())
+    };
+    // a: one woken message read by b, one left unread, then its lifetime
+    // cap; the unread one expires into a notice and a notice mark for a.
+    pair.send_wake("a", common::B_NAME, t(1));
+    pair.deliver("b", t(1));
+    send(&mut pair, "unread", t(2)).unwrap();
+    pair.limits.session.lifetime_cap = 2;
+    assert_eq!(send(&mut pair, "capped", t(3)), Err("lifetime-cap"));
+    pair.sweep(common::Pair::after(t(2), pair.limits.record.ttl_sec));
+    let now = common::Pair::after(t(2), pair.limits.record.ttl_sec);
+    assert!(
+        keyed_records(&pair.state).iter().all(|(_, n)| *n > 0),
+        "{:?}",
+        keyed_records(&pair.state)
+    );
+    assert_eq!(pair.state.notices().count(), 1);
+
+    assert!(pair.state.forget_key(&key("a")));
+
+    assert!(pair.state.binding(&key("a")).is_none());
+    assert!(
+        keyed_records(&pair.state).iter().all(|(_, n)| *n == 0),
+        "{:?}",
+        keyed_records(&pair.state)
+    );
+    assert_eq!(pair.state.notices().count(), 0);
+    assert!(pair
+        .state
+        .messages()
+        .all(|h| h.from != key("a") && h.to != key("a")));
+    assert!(pair.state.counters().party_count() == 0);
+    assert!(!pair.state.forget_key(&key("a")));
+    let outcome = pair
+        .state
+        .register(
+            request("a", "claude", Some("2b"), "head-a2"),
+            None,
+            now,
+            &pair.limits,
+            &mut pair.ids,
+        )
+        .unwrap();
+    assert!(
+        matches!(outcome, Registered::Created { generation, .. } if generation == Generation::FIRST)
+    );
+    assert_eq!(send(&mut pair, "from a fresh process", now), Ok(()));
 }

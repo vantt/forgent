@@ -85,7 +85,12 @@ opaque_id!(
 );
 
 /// The session-identity writer id of a head: the key of its binding. Never
-/// typed by a person.
+/// typed by a person. Its alphabet is session identity's, `[A-Za-z0-9._-]`:
+/// every composite key of the snapshot joins keys with `|` or `@`, and the
+/// shared accounts start with `~`, all outside it, so no two different
+/// parts can encode the same key. Its length is bounded by
+/// `frame.maxHeaderChars` where the limits are at hand (registration and
+/// `send`).
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(try_from = "String", into = "String")]
 pub struct WriterKey(String);
@@ -93,8 +98,15 @@ pub struct WriterKey(String);
 impl WriterKey {
     pub fn new(text: impl Into<String>) -> Result<Self, InvalidValue> {
         let text = text.into();
-        if text.is_empty() {
-            return Err(InvalidValue::new("writer key", "must not be empty"));
+        let valid = !text.is_empty()
+            && text
+                .chars()
+                .all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-'));
+        if !valid {
+            return Err(InvalidValue::new(
+                "writer key",
+                "must be non-empty [A-Za-z0-9._-]",
+            ));
         }
         Ok(Self(text))
     }

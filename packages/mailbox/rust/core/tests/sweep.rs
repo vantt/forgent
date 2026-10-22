@@ -92,7 +92,11 @@ fn a_refused_message_whose_sender_has_no_head_or_a_newer_generation_creates_no_n
     assert_eq!(counters.total(CounterReason::NoticeUndeliverable), 2);
     assert_eq!(
         counters
-            .party(CounterReason::NoticeUndeliverable, "unregistered", "b")
+            .party(
+                CounterReason::NoticeUndeliverable,
+                fgos_mailbox_core::UNREGISTERED,
+                "b"
+            )
             .map(|p| p.count),
         Some(1)
     );
@@ -111,7 +115,7 @@ fn a_second_notice_of_the_same_reason_to_the_same_sender_inside_the_window_is_su
     assert_eq!(pair.state.notices().count(), 1);
     let claim = pair.claim("a", G1, first_due);
     assert_eq!(claim.items.len(), 1);
-    assert_eq!(claim.items[0].kind, Kind::Notice);
+    assert_eq!(claim.items[0].kind(), Kind::Notice);
     let finished = pair
         .state
         .finish(&key("a"), G1, &claim.token.unwrap(), first_due);

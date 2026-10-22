@@ -29,7 +29,11 @@ fn replay(
     let mut pair = Pair::new(t(0));
     pair.limits = limits;
     let mut results: Vec<Result<SendOutcome, Refusal>> = Vec::new();
+    // Bounded so a broken cap fails the test instead of hanging it: the
+    // longest replay stops at message wake.lifetimeCap * 2 + 1.
+    let most = 2 * u64::from(pair.limits.wake.lifetime_cap) + 1;
     for i in 1u64.. {
+        assert!(i <= most, "the replay ran past {most} messages");
         if let Some(Ok(last)) = results.last() {
             if turns == Turns::WhenWoken && !last.effective_wake {
                 break;
