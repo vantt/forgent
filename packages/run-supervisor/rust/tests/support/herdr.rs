@@ -81,7 +81,7 @@ impl FakeHerdr {
         herdr.env.push(("FAKE_HERDR_DIR".into(), self.dir.to_string_lossy().into_owned()));
         let driver = HerdrDriver::new(herdr);
         let policy = policy_by_name(None).unwrap();
-        let config = CoreConfig { state_root: self.state_root.clone(), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 8 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 5_000 };
+        let config = CoreConfig { state_root: self.state_root.clone(), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 8 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 5_000, shell_ready_timeout_ms: 10_000 };
         let core = Core::new(&driver, policy.as_ref(), config);
         f(&core)
     }

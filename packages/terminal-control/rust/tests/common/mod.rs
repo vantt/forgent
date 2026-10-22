@@ -10,10 +10,72 @@ use std::cell::{Cell, RefCell};
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ShellScript {
+    Ready,
+    PromptReadsFirstKey,
+    TypedAheadSkipsPrompt,
+    LineModeRead,
+    EchoOnly,
+}
+
 pub struct MemPane {
     pub tab: String,
     pub rect: Rect,
     pub info: ProcessInfo,
+    pub script: ShellScript,
+    pub screen: String,
+    pub probe_count: usize,
+    pub screen_reads: usize,
+    pub last_nonce: String,
+    pub on_launch_foreground: Option<ProcessInfo>,
+    pub env: Vec<(String, String)>,
+}
+
+impl MemPane {
+    pub fn new(pane_id: &str, tab: String, rect: Rect, info: ProcessInfo, env: Vec<(String, String)>) -> Self {
+        MemPane {
+            tab,
+            rect,
+            info,
+            script: ShellScript::Ready,
+            screen: format!("screen of {pane_id}"),
+            probe_count: 0,
+            screen_reads: 0,
+            last_nonce: String::new(),
+            on_launch_foreground: None,
+            env,
+        }
+    }
+
+    pub fn handle_pane_run(&mut self, command_line: &str) {
+        if let Some(rest) = command_line.strip_prefix("printf '%s%s\\n' fgos-ok- ") {
+            let nonce = rest.trim();
+            self.probe_count += 1;
+            self.last_nonce = nonce.to_string();
+            match self.script {
+                ShellScript::Ready | ShellScript::TypedAheadSkipsPrompt => {
+                    self.screen.push_str(&format!("\nfgos-ok-{nonce}\n"));
+                }
+                ShellScript::PromptReadsFirstKey => {
+                    // The start prompt takes the first typed line; the later ones reach the shell.
+                    if self.probe_count > 1 {
+                        self.screen.push_str(&format!("\nfgos-ok-{nonce}\n"));
+                    }
+                }
+                ShellScript::LineModeRead => {
+                    self.screen.push_str(&format!("\nread: consumed line (nonce {nonce})\n"));
+                }
+                ShellScript::EchoOnly => {
+                    self.screen.push_str(&format!("\nprintf '%s%s\\n' fgos-ok- {nonce}\n"));
+                }
+            }
+        } else {
+            if let Some(on_launch) = &self.on_launch_foreground {
+                self.info = on_launch.clone();
+            }
+        }
+    }
 }
 
 pub struct MemDriver {
@@ -25,6 +87,7 @@ pub struct MemDriver {
     pub incarnation_pid: Cell<u32>,
     /// A pane that vanishes at the moment something first asks for its geometry (another process closed it).
     pub vanish_on_layout: RefCell<Option<String>>,
+    pub vanish_on_process_info: RefCell<Option<String>>,
     next: Cell<u32>,
 }
 
@@ -46,6 +109,7 @@ impl MemDriver {
             log: RefCell::new(Vec::new()),
             incarnation_pid: Cell::new(4242),
             vanish_on_layout: RefCell::new(None),
+            vanish_on_process_info: RefCell::new(None),
             next: Cell::new(1),
         }
     }
@@ -81,9 +145,36 @@ impl MemDriver {
         self.panes.borrow_mut().get_mut(pane).unwrap().info =
             ProcessInfo { shell_pid, foreground_pgid: pgid, foreground };
     }
+    pub fn set_script(&self, pane: &str, script: ShellScript) {
+        let mut panes = self.panes.borrow_mut();
+        if let Some(p) = panes.get_mut(pane) {
+            p.script = script;
+        }
+    }
+
+    pub fn set_screen(&self, pane: &str, screen: impl Into<String>) {
+        let mut panes = self.panes.borrow_mut();
+        if let Some(p) = panes.get_mut(pane) {
+            p.screen = screen.into();
+        }
+    }
+
+    pub fn set_launch_foreground(&self, pane: &str, shell_pid: u32, foreground: Vec<ForegroundProcess>, pgid: u32) {
+        let mut panes = self.panes.borrow_mut();
+        if let Some(p) = panes.get_mut(pane) {
+            p.on_launch_foreground = Some(ProcessInfo {
+                shell_pid,
+                foreground_pgid: pgid,
+                foreground,
+            });
+        }
+    }
 
     pub fn tab_of(&self, pane: &str) -> String {
         self.panes.borrow()[pane].tab.clone()
+    }
+    pub fn env_of(&self, pane: &str) -> Option<Vec<(String, String)>> {
+        self.panes.borrow().get(pane).map(|p| p.env.clone())
     }
 
     fn current(&self) -> ServerIncarnation {
@@ -98,7 +189,7 @@ impl MemDriver {
     }
 }
 
-fn bare(shell: u32) -> ProcessInfo {
+pub fn bare(shell: u32) -> ProcessInfo {
     ProcessInfo {
         shell_pid: shell,
         foreground_pgid: shell,
@@ -125,7 +216,7 @@ impl TerminalDriver for MemDriver {
         let pane = self.id("p");
         self.log.borrow_mut().push(format!("tab.create {label} cwd={} env={} -> {tab}/{pane}", cwd.unwrap_or("-"), env.len()));
         self.tabs.borrow_mut().push((tab.clone(), label.to_string()));
-        self.panes.borrow_mut().insert(pane.clone(), MemPane { tab: tab.clone(), rect: self.area, info: bare(900) });
+        self.panes.borrow_mut().insert(pane.clone(), MemPane::new(&pane, tab.clone(), self.area, bare(900), env.to_vec()));
         Ok(CreatedPane { tab_id: tab, pane_id: pane })
     }
     fn pane_split(&self, anchor: &str, direction: Direction, ratio: f64, cwd: Option<&str>, env: &[(String, String)]) -> DriverResult<CreatedPane> {
@@ -145,8 +236,12 @@ impl TerminalDriver for MemDriver {
         let tab = a.tab.clone();
         drop(panes);
         let pane = self.id("p");
-        self.log.borrow_mut().push(format!("pane.split {anchor} {direction:?} {ratio} cwd={} env={} -> {pane}", cwd.unwrap_or("-"), env.len()));
-        self.panes.borrow_mut().insert(pane.clone(), MemPane { tab: tab.clone(), rect: new_rect, info: bare(901) });
+        self.log.borrow_mut().push(format!(
+            "pane.split {anchor} {direction:?} {ratio} cwd={} env={} -> {pane}",
+            cwd.unwrap_or("-"),
+            env.len()
+        ));
+        self.panes.borrow_mut().insert(pane.clone(), MemPane::new(&pane, tab.clone(), new_rect, bare(901), env.to_vec()));
         Ok(CreatedPane { tab_id: tab, pane_id: pane })
     }
     fn pane_close(&self, pane: &str, expected: &ServerIncarnation) -> DriverResult<CloseOutcome> {
@@ -170,6 +265,10 @@ impl TerminalDriver for MemDriver {
     }
     fn pane_run(&self, pane: &str, command_line: &str) -> DriverResult<()> {
         self.log.borrow_mut().push(format!("pane.run {pane} {command_line}"));
+        let mut panes = self.panes.borrow_mut();
+        if let Some(p) = panes.get_mut(pane) {
+            p.handle_pane_run(command_line);
+        }
         Ok(())
     }
     fn send_text(&self, pane: &str, text: &str, submit: bool) -> DriverResult<()> {
@@ -181,9 +280,18 @@ impl TerminalDriver for MemDriver {
         Ok(())
     }
     fn read_screen(&self, pane: &str, _lines: Option<u32>, _source: Option<&str>) -> DriverResult<String> {
-        Ok(format!("screen of {pane}"))
+        let mut panes = self.panes.borrow_mut();
+        if let Some(p) = panes.get_mut(pane) {
+            Ok(p.screen.clone())
+        } else {
+            Err(unknown("pane_not_found"))
+        }
     }
     fn process_info(&self, pane: &str) -> DriverResult<ProcessInfo> {
+        if self.vanish_on_process_info.borrow().as_deref() == Some(pane) {
+            self.vanish_on_process_info.borrow_mut().take();
+            self.kill_pane(pane);
+        }
         self.panes.borrow().get(pane).map(|p| p.info.clone()).ok_or_else(|| unknown("pane_not_found"))
     }
     fn activity(&self, _pane: &str) -> DriverResult<Activity> {
@@ -230,6 +338,7 @@ pub fn config(state_root: PathBuf) -> CoreConfig {
         limits: Limits { min_cols: 60, min_rows: 15, max_panes_per_tab: 4 },
         allocation_grace_ms: 60_000,
         launch_identify_timeout_ms: 500,
+        shell_ready_timeout_ms: 500,
     }
 }
 

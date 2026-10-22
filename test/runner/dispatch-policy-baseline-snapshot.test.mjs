@@ -12,6 +12,7 @@
 // No test in this file opens network connections or writes outside a throwaway temp directory.
 
 import '../helpers/process-tmp-root.mjs';
+import { committedConfigDir } from '../helpers/committed-config.mjs';
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -1060,7 +1061,7 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
   before(() => {
     tempHomeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-baseline-test-home-'));
     process.env.HOME = tempHomeDir;
-    cfg = loadRunnerConfigFromDir(process.cwd());
+    cfg = loadRunnerConfigFromDir(committedConfigDir());
     throwawayDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dispatch-snapshot-test-'));
   });
 

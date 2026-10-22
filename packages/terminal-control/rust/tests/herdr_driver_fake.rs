@@ -398,7 +398,7 @@ mod incarnation {
         // The pane's shell is its only foreground process, and this fake's shell runs what is typed at it.
         let fake = fake_at("shell-fg2", &sock).env("FAKE_HERDR_FOREGROUND", "shell");
         let driver = fake.driver();
-        let config = CoreConfig { state_root: fake.dir.join("state"), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 4 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 200 };
+        let config = CoreConfig { state_root: fake.dir.join("state"), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 4 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 200, shell_ready_timeout_ms: 200 };
         let core = Core::new(&driver, &MeasuredSplit, config);
         core.allocate(&AllocateRequest { key: "k".into(), group_key: "g".into(), display: Display { label: "shell-fg".into(), ..Default::default() }, role_hint: None, cwd: None, env: Default::default() }).unwrap();
 

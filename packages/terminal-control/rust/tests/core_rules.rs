@@ -217,7 +217,7 @@ fn a_caller_closes_its_own_attached_pane_and_no_other() {
 }
 
 #[test]
-fn cwd_and_env_reach_the_driver_for_a_new_tab_and_for_a_split() {
+fn cwd_and_merged_quiet_env_reach_the_driver_for_a_new_tab_and_for_a_split() {
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("spawn-env"));
     let mut first = request("a", "g");
@@ -227,8 +227,8 @@ fn cwd_and_env_reach_the_driver_for_a_new_tab_and_for_a_split() {
     let mut second = request("b", "g");
     second.cwd = Some("/other".into());
     core.allocate(&second).unwrap();
-    assert!(driver.calls("tab.create")[0].contains("cwd=/work env=1"));
-    assert!(driver.calls("pane.split")[0].contains("cwd=/other env=0"));
+    assert!(driver.calls("tab.create")[0].contains("cwd=/work env=2"));
+    assert!(driver.calls("pane.split")[0].contains("cwd=/other env=1"));
 }
 
 #[test]
