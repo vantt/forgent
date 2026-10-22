@@ -488,6 +488,8 @@ The big lead re-checked the evidence for every deviation before answering.
      - A compacted Worktree replay answers recovery-required. Refs replay is as in the reverted 8e1ecbf63.
      - The spec sentence comes before the code.
      - Reason: retained chains grow about 80 a day on a busy repository, and admission stays O(chains). Its visibility is owner pick A1.
+     - Trigger (OPC, 10-23): admission's own cost stays O(retained chains) × one `inspect` each. `retained_bytes` and the chain count (doctor's `git-operation-journal`) are the signal to schedule the item.
+   - **Result:** the phase 2 delta (`3a655a8b3`, `3f1a7ef3c`) got OPC's merge verdict. Admission read p50 at 322 chains went from 32.3 to 15.8 ms, and the tail peek was not done. Phases 1 and 2 were merged into the track branch, and the census was regenerated (`9d935588c`). Only CFG's 5 known `unresolved-binary` sites remain.
 
 ## Unresolved questions
 
