@@ -23,6 +23,7 @@ import {
   checkAllAgentHooks,
   getProjectShimPath,
   isShimRunnable,
+  agentHookRows,
 } from '../../src/setup/agent-hooks.mjs';
 
 function mkTempDir(prefix) {
@@ -348,4 +349,197 @@ process.exit(process.argv[2] === 'hook' ? 0 : 1);
     if (saved === undefined) delete process.env.FGOS_RUST_HOST_RECURSION_GUARD;
     else process.env.FGOS_RUST_HOST_RECURSION_GUARD = saved;
   }
+});
+
+// ---------------------------------------------------------------------------
+// The hook table and the mailbox rows
+// ---------------------------------------------------------------------------
+
+const FILES = { claude: '.claude/settings.json', codex: '.codex/hooks.json', agy: '.agents/hooks.json' };
+const INSTALL = { claude: installClaudeHook, codex: installCodexHook, agy: installAgyHook };
+const CHECK = { claude: checkClaudeHook, codex: checkCodexHook, agy: checkAgyHook };
+const readFile = (repoRoot, cli) => JSON.parse(fs.readFileSync(path.join(repoRoot, FILES[cli]), 'utf8'));
+
+/** Every hook object of `config` with `command`, wherever it sits. */
+function hooksWith(config, command) {
+  const found = [];
+  const walk = (node) => {
+    if (Array.isArray(node)) node.forEach(walk);
+    else if (node && typeof node === 'object') {
+      if (node.command === command) found.push(node);
+      Object.values(node).forEach(walk);
+    }
+  };
+  walk(config);
+  return found;
+}
+
+test('the hook table is the only source of each CLI\'s rows', () => {
+  const repoRoot = mkTempDir('agent-hooks-table-');
+  mockRunnableShim(repoRoot);
+  const rows = agentHookRows(repoRoot);
+  for (const cli of ['claude', 'codex', 'agy']) {
+    assert.equal(INSTALL[cli](repoRoot).wired, true);
+    INSTALL[cli](repoRoot);
+    const config = readFile(repoRoot, cli);
+    for (const row of rows.filter((r) => r.cli === cli)) {
+      const found = hooksWith(config, row.command);
+      assert.equal(found.length, 1, `${cli} ${row.kind} ${row.event}: exactly once after two installs`);
+      const entries = row.group ? config[row.group][row.event] : config.hooks[row.event];
+      const entry = entries.find((e) => e.hooks?.includes(found[0]));
+      assert.ok(entry, `${cli} ${row.kind} ${row.event}: nested in an entry with a hooks array`);
+      assert.equal(entry.matcher, row.matcher ?? undefined);
+    }
+    assert.equal(CHECK[cli](repoRoot).passed, true, CHECK[cli](repoRoot).message);
+  }
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('mailbox rows install Stop and PostToolUse for Claude Code and Codex and none for agy, omp or pi', () => {
+  const repoRoot = mkTempDir('agent-hooks-mailbox-rows-');
+  installAllAgentHooks(repoRoot);
+  const mailbox = agentHookRows(repoRoot).filter((row) => row.kind === 'mailbox');
+  assert.deepEqual(mailbox.map((row) => `${row.cli} ${row.event}`).sort(), ['claude PostToolUse', 'claude Stop', 'codex PostToolUse', 'codex Stop']);
+  const claude = readFile(repoRoot, 'claude');
+  assert.deepEqual(claude.hooks.Stop, [{ hooks: [{ type: 'command', command: mailbox.find((r) => r.cli === 'claude' && r.event === 'Stop').command, timeout: 10 }] }]);
+  assert.equal(claude.hooks.PostToolUse[0].matcher, '*');
+  const shim = path.join(fs.realpathSync(repoRoot), '.fgos', 'installation', 'bin', 'fgos');
+  const codex = readFile(repoRoot, 'codex');
+  assert.deepEqual(codex.hooks.Stop, [{ hooks: [{ type: 'command', command: `'${shim}' hook mailbox --cli codex --event stop`, timeout: 10 }] }]);
+  assert.deepEqual(codex.hooks.PostToolUse, [{ hooks: [{ type: 'command', command: `'${shim}' hook mailbox --cli codex --event post-tool-use`, timeout: 10 }] }]);
+  assert.ok(!JSON.stringify(readFile(repoRoot, 'agy')).includes('hook mailbox'));
+  for (const ext of ['.omp/extensions/fgos-hooks.ts', '.pi/extensions/fgos-hooks.ts']) {
+    assert.ok(!fs.readFileSync(path.join(repoRoot, ext), 'utf8').includes("'mailbox'"), ext);
+  }
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('the claude mailbox command is guarded and never execs', () => {
+  for (const row of agentHookRows('/x').filter((r) => r.cli === 'claude' && r.kind === 'mailbox')) {
+    assert.ok(row.command.includes('[ -x "$S" ] || exit 0;'), row.command);
+    assert.ok(row.command.endsWith('|| true'), row.command);
+    assert.ok(!/\bexec\b/.test(row.command), row.command);
+  }
+  // A project with no shim: the command exits 0 and prints nothing.
+  const repoRoot = mkTempDir('agent-hooks-guarded-');
+  const command = agentHookRows(repoRoot).find((r) => r.cli === 'claude' && r.event === 'Stop').command;
+  const res = spawnSync('/bin/sh', ['-c', command], { env: { ...process.env, CLAUDE_PROJECT_DIR: repoRoot }, input: '{}', encoding: 'utf8' });
+  assert.equal(res.status, 0);
+  assert.equal(res.stdout + res.stderr, '');
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('command is kind recognises its own entries with cli and event and never a user hook or a path containing a kind name', () => {
+  const base = mkTempDir('agent-hooks-kind-');
+  const repoRoot = path.join(base, 'my mailbox-app');
+  fs.mkdirSync(path.join(repoRoot, '.codex'), { recursive: true });
+  const moved = `'/old/place/.fgos/installation/bin/fgos' hook mailbox --cli codex --event stop`;
+  const userHooks = [
+    `/usr/local/bin/fgos hook mailbox --cli codex --event stop`,
+    `'/old/place/.fgos/installation/bin/fgos' hook mailbox --event stop --cli codex`,
+    `'/old/place/.fgos/installation/bin/fgos' hook mailbox-foo --cli codex --event stop`,
+  ];
+  fs.writeFileSync(path.join(repoRoot, '.codex', 'hooks.json'), JSON.stringify({ hooks: { Stop: [
+    { hooks: [{ type: 'command', command: moved }] },
+    ...userHooks.map((command) => ({ hooks: [{ type: 'command', command }] })),
+  ] } }));
+  installCodexHook(repoRoot);
+  const stop = readFile(repoRoot, 'codex').hooks.Stop;
+  const ours = agentHookRows(repoRoot).find((r) => r.cli === 'codex' && r.event === 'Stop').command;
+  assert.equal(stop[0].hooks[0].command, ours, 'our moved command is replaced in place');
+  assert.deepEqual(stop.slice(1).map((e) => e.hooks[0].command), userHooks, 'user hooks stay as they were');
+  assert.equal(stop.length, 4, 'nothing duplicated');
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('install preserves user hooks on the same events and is idempotent', () => {
+  const repoRoot = mkTempDir('agent-hooks-siblings-');
+  fs.mkdirSync(path.join(repoRoot, '.claude'), { recursive: true });
+  const userStop = { hooks: [{ type: 'command', command: 'say-done.sh' }] };
+  const older = `"\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos" hook mailbox --cli claude --event post-tool-use`;
+  fs.writeFileSync(path.join(repoRoot, '.claude', 'settings.json'), JSON.stringify({ hooks: {
+    Stop: [userStop],
+    PostToolUse: [{ matcher: '*', hooks: [{ type: 'command', command: 'audit.sh' }, { type: 'command', command: older }] }],
+  } }));
+  installClaudeHook(repoRoot);
+  installClaudeHook(repoRoot);
+  const settings = readFile(repoRoot, 'claude');
+  const rows = agentHookRows(repoRoot);
+  const post = rows.find((r) => r.cli === 'claude' && r.event === 'PostToolUse');
+  assert.deepEqual(settings.hooks.Stop[0], userStop);
+  assert.equal(settings.hooks.Stop.length, 2);
+  assert.equal(settings.hooks.PostToolUse.length, 1, 'our hook replaced inside the shared entry');
+  assert.deepEqual(settings.hooks.PostToolUse[0].hooks, [{ type: 'command', command: 'audit.sh' }, { type: 'command', command: post.command, timeout: 10 }]);
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('a command whose tail merely reads like ours is not owned', () => {
+  const repoRoot = mkTempDir('agent-hooks-tail-');
+  fs.mkdirSync(path.join(repoRoot, '.codex'), { recursive: true });
+  const lookalikes = [
+    `bash -c 'x; echo hook mailbox --cli codex --event stop'`,
+    `mywrap '${repoRoot}/.fgos/installation/bin/fgos' hook mailbox --cli codex --event stop`,
+  ];
+  fs.writeFileSync(path.join(repoRoot, '.codex', 'hooks.json'), JSON.stringify({ hooks: { Stop: lookalikes.map((command) => ({ hooks: [{ type: 'command', command }] })) } }));
+  installCodexHook(repoRoot);
+  const stop = readFile(repoRoot, 'codex').hooks.Stop;
+  assert.deepEqual(stop.slice(0, 2).map((e) => e.hooks[0].command), lookalikes);
+  assert.equal(stop.length, 3, 'ours was added beside them');
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('a wrong file shape is skipped silently and reported by check', () => {
+  const repoRoot = mkTempDir('agent-hooks-shape-');
+  mockRunnableShim(repoRoot);
+  const rows = agentHookRows(repoRoot);
+  const stop = rows.find((r) => r.cli === 'claude' && r.event === 'Stop');
+  installClaudeHook(repoRoot);
+  const settings = readFile(repoRoot, 'claude');
+  // The V4 L2 case: our Stop hook as a flat object, which Claude Code does not run.
+  settings.hooks.Stop = [{ type: 'command', command: stop.command }];
+  fs.writeFileSync(path.join(repoRoot, '.claude', 'settings.json'), JSON.stringify(settings));
+  const before = checkClaudeHook(repoRoot);
+  assert.equal(before.passed, false);
+  assert.match(before.message, /mailbox Stop.*in a shape Claude Code does not read: mailbox Stop/);
+  assert.equal(installClaudeHook(repoRoot).wired, true, 'the flat entry is skipped without an error');
+  const after = readFile(repoRoot, 'claude').hooks.Stop;
+  assert.deepEqual(after[0], { type: 'command', command: stop.command }, 'left as it was');
+  assert.equal(checkClaudeHook(repoRoot).passed, true);
+
+  // agy: a group whose PreToolUse holds a flat hook instead of a matcher group.
+  const dispatch = rows.find((r) => r.cli === 'agy' && r.kind === 'dispatch-decide');
+  fs.mkdirSync(path.join(repoRoot, '.agents'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, '.agents', 'hooks.json'), JSON.stringify({ [dispatch.group]: { enabled: true, PreToolUse: [{ type: 'command', command: dispatch.command }] } }));
+  assert.match(checkAgyHook(repoRoot).message, /in a shape AGY does not read: dispatch-decide PreToolUse/);
+  installAgyHook(repoRoot);
+  assert.equal(checkAgyHook(repoRoot).passed, true);
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('the doctor probe runs the mailbox kind with benign input and requires exit 0 and empty stdout', () => {
+  const repoRoot = mkTempDir('agent-hooks-probe-');
+  const shimPath = getProjectShimPath(repoRoot);
+  const log = path.join(repoRoot, 'argv.log');
+  fs.mkdirSync(path.dirname(shimPath), { recursive: true });
+  const shim = (mailboxStdout) => `#!/usr/bin/env node
+const fs = require('node:fs');
+fs.appendFileSync(${JSON.stringify(log)}, process.argv.slice(2).join(' ') + '\\n');
+if (process.argv[3] === 'mailbox') process.stdout.write(${JSON.stringify(mailboxStdout)});
+process.exit(0);
+`;
+  fs.writeFileSync(shimPath, shim(''), { mode: 0o755 });
+  assert.deepEqual(isShimRunnable(repoRoot), { runnable: true, reason: null });
+  assert.deepEqual(fs.readFileSync(log, 'utf8').trim().split('\n'), ['hook dispatch-decide'], 'without mailbox rows the probe skips the mailbox kind');
+
+  installCodexHook(repoRoot);
+  fs.rmSync(log);
+  assert.equal(checkCodexHook(repoRoot).passed, true);
+  assert.deepEqual(fs.readFileSync(log, 'utf8').trim().split('\n'), ['hook dispatch-decide', 'hook mailbox --cli codex --event post-tool-use']);
+  assert.ok(!fs.existsSync(path.join(repoRoot, '.fgos', 'runtime')), 'the probe created nothing');
+
+  fs.writeFileSync(shimPath, shim('{"x":1}'), { mode: 0o755 });
+  const failed = checkCodexHook(repoRoot);
+  assert.equal(failed.passed, false);
+  assert.match(failed.message, /mailbox \(codex\): printed on stdout/);
+  fs.rmSync(repoRoot, { recursive: true, force: true });
 });

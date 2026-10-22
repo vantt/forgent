@@ -15,6 +15,7 @@
 import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { mailboxHookTimeoutSec } from './mailbox-limits.mjs';
 
 export const SUPPORTED_AGENTS = ['claude', 'codex', 'agy', 'omp', 'pi'];
 
@@ -95,6 +96,12 @@ export function isShimRunnable(repoRoot, { mailboxCli = null } = {}) {
 
 const CLAUDE_SHIM = '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"';
 
+/** Claude Code's mailbox command: guarded, so a project without the shim or with a not-ready
+ * activation never shows an error, and never `exec`, so the shell stays between Claude Code and the
+ * host, where the caller check expects it (plan decision 14). */
+const claudeMailboxCommand = (event) =>
+  `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" hook mailbox --cli claude --event ${event} || true`;
+
 /**
  * Every fgOS hook a JSON hook file carries, one row per (cli, kind, event): the file, where the row
  * lives (`hooks.<Event>` entries, or an agy named group), its matcher (null: the entry has none), and
@@ -104,11 +111,25 @@ const CLAUDE_SHIM = '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"';
 const hookRows = (repoRoot) => [
   { cli: 'claude', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', matcher: 'Agent|Task', command: `${CLAUDE_SHIM} hook dispatch-decide`, legacyMarkers: ['dispatch-decide-hook.mjs'] },
   { cli: 'claude', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', matcher: 'AskUserQuestion', command: `${CLAUDE_SHIM} hook decision-question`, legacyMarkers: ['decision-question-hook.mjs'] },
+  // The mailbox's checkpoints (spec §6.1), in the shapes `adapters.v1.json` recorded: Stop with no
+  // matcher, PostToolUse for every tool.
+  { cli: 'claude', kind: HOOK_KINDS.MAILBOX, args: '--cli claude --event stop', event: 'Stop', matcher: null, command: claudeMailboxCommand('stop'), timeout: mailboxHookTimeoutSec() },
+  { cli: 'claude', kind: HOOK_KINDS.MAILBOX, args: '--cli claude --event post-tool-use', event: 'PostToolUse', matcher: '*', command: claudeMailboxCommand('post-tool-use'), timeout: mailboxHookTimeoutSec() },
   { cli: 'codex', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', matcher: '.*', command: shimCommand(repoRoot, 'hook dispatch-decide') },
   { cli: 'codex', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', matcher: 'RequestUserInput|ask.*', command: shimCommand(repoRoot, 'hook decision-question') },
+  // Codex runs a hook command through the user's `$SHELL -c`: the plain form is exec'd into the
+  // direct topology the caller check expects; a guarded form would keep the user's login shell at
+  // the head position (measured at V5). A missing shim therefore shows an error on each call.
+  { cli: 'codex', kind: HOOK_KINDS.MAILBOX, args: '--cli codex --event stop', event: 'Stop', matcher: null, command: shimCommand(repoRoot, 'hook mailbox --cli codex --event stop'), timeout: mailboxHookTimeoutSec() },
+  { cli: 'codex', kind: HOOK_KINDS.MAILBOX, args: '--cli codex --event post-tool-use', event: 'PostToolUse', matcher: null, command: shimCommand(repoRoot, 'hook mailbox --cli codex --event post-tool-use'), timeout: mailboxHookTimeoutSec() },
   { cli: 'agy', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', group: 'fgos-dispatch-guard', matcher: '.*', command: shimCommand(repoRoot, 'hook dispatch-decide --format=agy'), timeout: 10 },
   { cli: 'agy', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', group: 'fgos-decision-guard', matcher: 'ask.*|AskUserQuestion', command: shimCommand(repoRoot, 'hook decision-question --format=agy'), timeout: 10 },
 ];
+
+/** The table, read-only, for the doctor's own tests and docs. */
+export function agentHookRows(repoRoot) {
+  return hookRows(repoRoot);
+}
 
 const HOOK_FILES = {
   claude: { file: path.join('.claude', 'settings.json'), label: '.claude/settings.json', name: 'Claude Code', optional: false },
@@ -283,6 +304,7 @@ function generateInProcessExtensionSource() {
   return `// @ts-nocheck
 // fgos-hooks.ts — managed fgOS guard extension
 import { spawnSync } from 'node:child_process';
+import { mailboxHookTimeoutSec } from './mailbox-limits.mjs';
 import path from 'node:path';
 
 export default function (api: any) {
