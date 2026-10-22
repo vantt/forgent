@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "bad162465ad7fc286a92d8de796f3a901be5499fb2c285efff53c2070a1c9876",
+  "payloadDigest": "135d2438d0c1dca936197a0ec171722ccda7fd02612b389eda8cf6ba5515d901",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -91,7 +91,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
     "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
     "bin/fgos-runner.mjs": "dca3d8b530f20aaf8d9d8d424f12ec1c5d9670812566ab4d6c51583f3bb7b573",
-    "bin/fgos.mjs": "cf16abd1644fb6e51974bb71653add639f781a4313340521392724e871e42d7e",
+    "bin/fgos.mjs": "5f09355aad5b9ac2884db05471c6be1ad6652c00207b1d2fbba2292e7e43ac54",
     "core/skills/_shared/ak-cook-worker-contract.md": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
     "core/skills/_shared/capability-catalog.md": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -385,7 +385,7 @@
     "packages/identity/rust/src/launcher.rs": "dc386bb743b941d390e64b2dbb3fd0c36994415ce6f46ec0876cdd249e57b969",
     "packages/identity/rust/src/lib.rs": "004448b0a9528b5c2696adaa0e2662a1b5699b72798c2ec0b318764a1ba49dfb",
     "packages/identity/rust/src/machine.rs": "b0b603c2747156fc964d425e4f56324cabbb4e3306b9734bb1c25032451dbd15",
-    "packages/identity/rust/src/mint.rs": "8f6586782321fc051813d12b40b78de5148ea9f97d3485efa5619cc6fef87c2b",
+    "packages/identity/rust/src/mint.rs": "ec78f15b20a384b3cfb87740d2fbb47628c61d32a2b20f8fc262bb471505431e",
     "packages/identity/rust/src/proc_tree.rs": "8f85d27341e6f793f75f45350eea559db9be9c59c86269318880dcdb2fb2cb3a",
     "packages/identity/rust/src/project.rs": "455a059723bed5ea112e198e99e7ee02cdb55df19f0046f9fc26cc2c57122231",
     "packages/identity/rust/src/provider.rs": "ed51e40030b3b835b58a42fcec9c6fe7477811824fb18fbab73b109e5384688f",
@@ -678,7 +678,7 @@
     "src/holder-lock/registry.mjs": "7e8dd7dcd83b7a168a62070c0ab101270f8a29509060234c1f05556f11c2806f",
     "src/holder-lock/state-root.mjs": "0e675170f350824f7960dd2798c6fc02c1ac304919bd1bee9eefe601728f0698",
     "src/install/coexist.mjs": "099cfd22d3f84d221507697bfb0c84f336e4c85305433117e2390ebaad632a03",
-    "src/intake/classify.mjs": "e12aeddcc50ede2c469f21a8c71ad32401f23cdad3eead7f164bc11c7dcde7f1",
+    "src/intake/classify.mjs": "988c7876bb2fa1d711176f392fa52fda2f63b3fa383315d22d6a52f495d57a06",
     "src/intake/discovery.mjs": "6da596afa6d305cd8431a7f79659c04449bfe7ecd793bc5600fd11cd2cff9c1b",
     "src/intake/plan-verdict-from-plan-md.mjs": "1472684acd2398d71885e73ee5b365a42e9a263f5581ce5ce0518c857fb71f09",
     "src/intake/plan.mjs": "c3c72be35468420d9f42bcf23a0bdec9e48a11c1f4d8dd6bb4b9be09f4c60dc6",
@@ -821,11 +821,11 @@
     "src/runner/lock-fence.mjs": "55958945d9809538db3fd176497c2e4aafcbe4ba5b6a5589f61ae73c7c2d8ba8",
     "src/runner/lock-status.mjs": "c9a1521a142a1e2ffc794aab608a62b7cd7bd1c06967d17e7de648fd5d37fbdd",
     "src/runner/lock-wait.mjs": "833e0a3bf2d71d66358d4f230c7325ebedcba34444cdaa60324a4e4be2140301",
-    "src/runner/loop.mjs": "ed4fbb04799b1004c207baf8bcfc242594eedc0951dec04b61c35c07a935ea9d",
+    "src/runner/loop.mjs": "39f85c52cd1cb46b9eca7e6e73d9d74c8af8e2bface5db87f84551785a3bc263",
     "src/runner/main-checkout-activity.mjs": "84cd9b95e28c0c1004322b6edba0d2b4b45f9445eddc30613abd53314f13c071",
     "src/runner/main-checkout-reset-guard.mjs": "446d216c411dd5f59d512b5baf52b3a46eeb8ae03320f1d40be85e9447072d0c",
     "src/runner/main-fgos-checkpoint.mjs": "7bcdab7f2b887e149170b50180f97eae0ce666abff0aca88b9477357ed4d8e52",
-    "src/runner/merge.mjs": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577",
+    "src/runner/merge.mjs": "e65f05a1f86e4aa658c7ffb6caf5a2a79c81929b7132f96bd171b6fa69dc07b9",
     "src/runner/operation-capability.mjs": "6683b7da84274722aa5d464ccc8ec9d9e34b110f779e8ea5b6f6c1d0b3c820f5",
     "src/runner/operation-choice.mjs": "866b8b61bea02f3250d9d89cf826109065e35c899b64faad0cfddc524614277e",
     "src/runner/paths.mjs": "bfbb13456f940e02d77b5ad8515b015ec6c1f8a83ee6015086138eeaed96339f",
@@ -859,14 +859,14 @@
     "src/setup/git-checks.mjs": "1592427603412509eb41efd583dd9ae9734b71814f77ae1266078d449cb080d5",
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
     "src/setup/holder-lock-checks.mjs": "b51860bfe681104ab3ec462333150ea39d183e707162af4319d90e18040791f6",
-    "src/setup/identity-checks.mjs": "780fe8e248f9e26c1d658618d8a2f1764f4aa71898d1a06323e4a20f3eb3ae42",
+    "src/setup/identity-checks.mjs": "92c69d6e833f5ada65b1eb6b92e4ed1df662837615f3524f98c0060b952c173c",
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
     "src/setup/instruction-projections.mjs": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
     "src/setup/instruction-registry.mjs": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
     "src/setup/lock-record-checks.mjs": "08afa6351e5aa874f3fa45c57d81fc1f7266f47cf7f300005bd2e0a5de56c647",
     "src/setup/model-pool-checks.mjs": "4c115569d3644a395a09b0f6ea1d87205c791b18ccae021becd31a78bb360c6f",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "5b5be7a5ea6a0f071e821f6e0068f950d4f6678a1da83e756ed89c0cb40bbf9d",
+    "src/setup/registrations.mjs": "304d978b3a6f0f61e2e354554ec91eb2103c98c3ff7d2b784f17aa791ab2cbc0",
     "src/setup/run-supervisor-checks.mjs": "06d12ffdf06f05f27e3621d06c2f7e4680b838874e2fcd4fc45f9af3615aadef",
     "src/setup/seat-binding-checks.mjs": "b1efc2d1711dc21203c6482bf47ff4dfa7f8aa6f49b0d88a99a1479319a5f36f",
     "src/setup/seat-binding-conversion.mjs": "9f1b782a5a4a9059ad82fda27b79c6cc5ffaf057f6f1347e79ae5d74b49c00a1",
@@ -913,7 +913,7 @@
     "src/state/step-fsm.mjs": "bf1e935a355d2fbb7b8a5f0927138dea21b21c6226fe5a442c22bd1875445625",
     "src/state/store.mjs": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343",
     "src/state/tool-registry.mjs": "9a84242aeb83fe6e53822ef67f146ed383f1670e81ed4fb4c76f75d1ca5c0cc0",
-    "src/state/work.mjs": "ae5f1599cf36963602efd1e8b13ee2ac883997ea747cd99877364d0162c05059",
+    "src/state/work.mjs": "535588939d89f54956150430d6ebe3be9538799d636281b0c740835ea188fa9e",
     "src/state/worker-slots.mjs": "bc37bb0d995fe7339925c209c4e79232bdc5e3c079668f89c8f52313312dbf95",
     "src/terminal-control/client.mjs": "344249684fa950cf6caf984b1d9ae9f9a21b1c542bcf7110d3a7edd351d9076f",
     "src/terminal-control/config.mjs": "7160cced361f72be8a8c33baf7769bca8d8e6f24295fdae141695a64061c9341",
@@ -923,6 +923,7 @@
     "src/util/git-paths.mjs": "fbb0b5af5b149853b9d5279062d417cee88a24ce161f782b5ae6dec3d10f1941",
     "src/util/host-bin-path.mjs": "c9ba4f74f5969a42d3aca4a1583f4c3ecb2eba871f1fcf025ed7d38621f4353d",
     "src/util/host-bin.mjs": "f70cad1f07c7eb0f47bdafc0c766e2351e2310f48232b76ab4d29bab1fbcb826",
+    "src/util/identity-mint.mjs": "0f8ba6e4e9fd15e8dc8fcff62186ff54ae6e0daf5f5ec3c987c014b30a42f093",
     "src/util/normalize-path.mjs": "e1519327a67834d6309a0e92e69d5fb46bb671a7ddfbe9ef5c36acc22fc3062a",
     "src/util/release-binary-path.mjs": "f74aefea9a51b750049a9d32b62c2dbd9fb9782f944535b293e9cc352b466f76",
     "src/util/release-targets.mjs": "52157efccc71fa4bc260a47717ab48047792a7057329ab29d9bd6333c322029c",
@@ -947,7 +948,7 @@
     "src/verbs/merge/catchup.mjs": "3c73bf052a078cbe1ef40a271c32e7772da918637abf7cd2bbb7065dbd2be245",
     "src/verbs/merge/iron-law-level.mjs": "28037a676ec6f8533c2c8b0bcd66be0ec8dff1acfca0d656de7c5baa02043b73",
     "src/verbs/merge/merge.mjs": "0a453f93896685a77cf5494ff5d2f6f8106ff638e1b17079a368801fdb064f89",
-    "src/verbs/merge/promote-to-component.mjs": "da6e9b2efd3c5bdde96e04114b69e6d8b34511e88453bb91b505ca8d2ccfaa85",
+    "src/verbs/merge/promote-to-component.mjs": "dc1ab469b87a5360fad72ee50e1d75031651e420e7fd6c080e0253ce74fa1f2c",
     "src/verbs/merge/reject.mjs": "04fc387317e04a787917ea12a447a217928a1410e3439b422e76cf46638af7e6",
     "src/verbs/merge/review.mjs": "538e8087eed7befd51b7ef78a93d1b12fa13f0fff260ec40e50e7f8e019ac49a",
     "src/verbs/merge/sync-root.mjs": "c5e4e309c77ff490b1cf53b92f53c250b835cab6c41f1456c4facd0195df1ba1",
@@ -985,28 +986,28 @@
   "sites": [
     {
       "path": "bin/fgos.mjs",
-      "line": 3477,
+      "line": 3472,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? readSharedConfig(dir)[key]",
       "family": "unresolved-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3621,
+      "line": 3616,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? readSharedConfig(dir)[key]",
       "family": "unresolved-binary"
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 1216,
+      "line": 939,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? elements of section.commands",
       "family": "unresolved-binary"
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 1246,
+      "line": 969,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? elements of section.commands",
       "family": "unresolved-binary"
@@ -2908,7 +2909,7 @@
     },
     {
       "path": "src/setup/identity-checks.mjs",
-      "line": 34,
+      "line": 35,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
@@ -2992,7 +2993,7 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6336,
+      "line": 6342,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:128",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
@@ -3035,6 +3036,13 @@
     {
       "path": "src/util/host-bin.mjs",
       "line": 94,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/util/identity-mint.mjs",
+      "line": 70,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

@@ -111,7 +111,6 @@ mod sequence {
     pub const MAX_CLAIM_ATTEMPTS: usize = 5;
     /// A document this large is not read for ids.
     const MAX_DOC_BYTES: u64 = 4 * 1024 * 1024;
-    const MAX_DEPTH: usize = 8;
 
     /// A number claimed from a counter.
     #[derive(Debug, Clone, PartialEq, Eq)]
@@ -243,11 +242,11 @@ mod sequence {
     }
 
     /// The highest number of `kind` the documents under `root` already carry:
-    /// `D-ADR####` in a heading of `docs/**/*.md`, or the `NNNN-` prefix of a
+    /// `D-ADR####` in a heading of `docs/specs/*.md` or `docs/platform-foundations.md`, or the `NNNN-` prefix of a
     /// file directly in `docs/decisions/`. 0 when there is none.
     pub(crate) fn highest_in_documents(root: &Path, kind: SequenceKind) -> u64 {
         match kind {
-            SequenceKind::DAdr => walk_markdown(&root.join("docs"), 0)
+            SequenceKind::DAdr => decision_documents(root)
                 .into_iter()
                 .filter_map(|file| fs::read_to_string(file).ok())
                 .flat_map(|text| {
@@ -286,26 +285,22 @@ mod sequence {
             .collect()
     }
 
-    fn walk_markdown(dir: &Path, depth: usize) -> Vec<PathBuf> {
-        let mut files = Vec::new();
-        if depth > MAX_DEPTH {
-            return files;
-        }
-        for entry in fs::read_dir(dir).into_iter().flatten().flatten() {
-            let Ok(kind) = entry.file_type() else {
-                continue;
-            };
-            let path = entry.path();
-            if kind.is_dir() {
-                files.extend(walk_markdown(&path, depth + 1));
-            } else if kind.is_file()
-                && path.extension().is_some_and(|e| e == "md")
-                && entry.metadata().is_ok_and(|m| m.len() <= MAX_DOC_BYTES)
-            {
-                files.push(path);
-            }
-        }
+    /// The documents that define `D-ADR` ids: the area specs and the platform laws.
+    fn decision_documents(root: &Path) -> Vec<PathBuf> {
+        let mut files: Vec<PathBuf> = fs::read_dir(root.join("docs/specs"))
+            .into_iter()
+            .flatten()
+            .flatten()
+            .map(|entry| entry.path())
+            .filter(|path| path.extension().is_some_and(|e| e == "md"))
+            .collect();
+        files.push(root.join("docs/platform-foundations.md"));
         files
+            .into_iter()
+            .filter(|path| {
+                fs::metadata(path).is_ok_and(|m| m.is_file() && m.len() <= MAX_DOC_BYTES)
+            })
+            .collect()
     }
 
     #[cfg(test)]
