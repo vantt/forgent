@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { projectAgentMarkdown, AgentDefinitionError, findAgentYamlFiles, resolveAgentFiles } from '../../scripts/project-agents.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'project-agents-test-'));
@@ -17,7 +18,7 @@ function mkTempDir() {
 
 function writeSharedConfig(dir, runner) {
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner }));
+  writeProjectConfig(dir, { runner });
 }
 
 const VALID_YAML = `

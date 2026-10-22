@@ -15,6 +15,7 @@ import {
 import { claimWork, ClaimError } from '../../src/runner/claim-port.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
+import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 const FGOS_BIN = fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
 
@@ -213,7 +214,7 @@ function setup({ ceiling, occupants = 0 } = {}) {
     acquireClaim(dir, { id, actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });
   }
   if (ceiling !== undefined) {
-    fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify({ workerSlots: { ceiling } }));
+    writeProjectConfig(repoRoot, { workerSlots: { ceiling } });
   }
   return { repoRoot, dir };
 }
@@ -330,7 +331,7 @@ test('fgos report supplies its own rationale when no stop reason is given, since
 // validation code, and a whole runner drain-run dying with it.
 test('a shared config that is not valid JSON leaves claiming alive: no ceiling, no crash', async () => {
   const { repoRoot, dir } = setup();
-  fs.writeFileSync(path.join(dir, 'config.json'), '{ not json');
+  writeRawProjectConfig(repoRoot, '{ not json');
 
   await claimWork(dir, { id: 'target', actor: 'session', isolate: false, repoRoot });
 

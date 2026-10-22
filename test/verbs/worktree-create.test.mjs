@@ -6,6 +6,7 @@ import path from 'node:path';
 import { createWorktreeUseCase } from '../../src/verbs/worktree/create.mjs';
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 import { fixture } from '../git/worktree-fixture.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 test('public worktree create use case returns path and branch through the native port', {skip:process.platform==='win32'},()=>{
   const f=fixture('files',true);
@@ -56,11 +57,11 @@ test('worktree create runs the project setup commands after the port returns, wi
   const ctx={cwd:f.repoPath,repoRoot:f.repoPath,stateRoot:f.temp,writer:'fixture'};
   const configPath=path.join(f.repoPath,'.fgos','config.json');
   try {
-    fs.writeFileSync(configPath,JSON.stringify({worktreeSetup:{commands:['pwd > setup-marker && printf %s "$FGOS_REPO_ROOT" >> setup-marker']}}));
+    writeProjectConfig(f.repoPath, {worktreeSetup:{commands:['pwd > setup-marker && printf %s "$FGOS_REPO_ROOT" >> setup-marker']}});
     const made=createWorktreeUseCase(ctx,{path:'../provisioned',detach:true,base:f.tip},f.loader);
     const marker=fs.readFileSync(path.join(made.path,'setup-marker'),'utf8');
     assert.equal(marker.split('\n')[0],fs.realpathSync(made.path)); assert.ok(marker.endsWith(f.repoPath));
-    fs.writeFileSync(configPath,JSON.stringify({worktreeSetup:{commands:['exit 3']}}));
+    writeProjectConfig(f.repoPath, {worktreeSetup:{commands:['exit 3']}});
     assert.throws(()=>createWorktreeUseCase(ctx,{path:'../broken',detach:true,base:f.tip},f.loader),/worktree setup command failed/);
   } finally { f.cleanup(); }
 });

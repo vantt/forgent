@@ -15,6 +15,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
 import { acquire, acquireSync, probe, createLockScope, HolderLockError } from '../../src/holder-lock/index.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const FACADE_URL = pathToFileURL(path.join(root, 'src', 'holder-lock', 'index.mjs')).href;
@@ -151,7 +152,7 @@ test('a predecessor domain that cannot be killed fails by name within lock.prede
   const { dir, fgosDir } = makeProject();
   try {
     fs.mkdirSync(fgosDir, { recursive: true });
-    fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ lock: { predecessorKillWaitMs: 200 } }));
+    writeProjectConfig(dir, { lock: { predecessorKillWaitMs: 200 } });
     writePredecessor(fgosDir, processTuple(1));
     const started = Date.now();
     assert.throws(
@@ -181,7 +182,7 @@ test('a malformed lock.predecessorKillWaitMs is refused, never guessed around', 
     fs.mkdirSync(fgosDir, { recursive: true });
     // The same range doctor's lock-predecessor-kill-wait check enforces.
     for (const value of ['2s', 0, 60_001]) {
-      fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ lock: { predecessorKillWaitMs: value } }));
+      writeProjectConfig(dir, { lock: { predecessorKillWaitMs: value } });
       assert.throws(() => acquireSync(createLockScope('x'), LOCK, { fgosDir }), (err) => err.code === 'lock-config-invalid' && err.key === 'lock.predecessorKillWaitMs', `value ${JSON.stringify(value)}`);
       assert.equal(fs.existsSync(path.join(fgosDir, 'locks')), false, 'refused before any lock file was touched');
     }

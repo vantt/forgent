@@ -9,6 +9,7 @@ import { createWorktreeUseCase } from '../../src/verbs/worktree/create.mjs';
 import { removeWorktreeUseCase } from '../../src/verbs/worktree/remove.mjs';
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 import { fixture } from '../git/worktree-fixture.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const skip = { skip: process.platform === 'win32' };
 
@@ -80,7 +81,7 @@ function provisioningSetup() {
   fs.writeFileSync(path.join(skill, 'refs', 'guide.md'), 'guide');
   fs.symlinkSync('SKILL.md', path.join(skill, 'link.md'));
   fs.mkdirSync(path.join(f.repoPath, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(f.repoPath, '.fgos', 'config.json'), JSON.stringify({ worktreeSetup: { commands: ['mkdir -p skills && cp -R "$FGOS_REPO_ROOT/skills/ak-one" skills/'] } }));
+  writeProjectConfig(f.repoPath, { worktreeSetup: { commands: ['mkdir -p skills && cp -R "$FGOS_REPO_ROOT/skills/ak-one" skills/'] } });
   const bin = path.join(f.temp, 'bin'); fs.mkdirSync(bin);
   fs.writeFileSync(path.join(bin, 'npm'), '#!/bin/sh\nmkdir -p node_modules/dep && echo installed > node_modules/dep/index.js\n', { mode: 0o755 });
   const savedPath = process.env.PATH;
@@ -157,7 +158,7 @@ test('CLI adapter removes a provisioned, delivered worktree and reports a missin
     f.git('add', '.gitignore'); f.git('commit', '-qm', 'ignore copied skills');
     fs.mkdirSync(path.join(f.repoPath, 'skills', 'ak-one'), { recursive: true });
     fs.writeFileSync(path.join(f.repoPath, 'skills', 'ak-one', 'SKILL.md'), 'skill');
-    fs.writeFileSync(path.join(f.repoPath, '.fgos', 'config.json'), JSON.stringify({ worktreeSetup: { commands: ['mkdir -p skills && cp -R "$FGOS_REPO_ROOT/skills/ak-one" skills/'] } }));
+    writeProjectConfig(f.repoPath, { worktreeSetup: { commands: ['mkdir -p skills && cp -R "$FGOS_REPO_ROOT/skills/ak-one" skills/'] } });
     const cli = (...args) => spawnSync(process.execPath, [path.join(REPO_ROOT, 'bin/fgos.mjs'), 'worktree', ...args, '--json'], { cwd: f.repoPath, env, encoding: 'utf8' });
     const wt = path.join(f.temp, 'cli-worker');
     const created = cli('create', wt, '--detach');
