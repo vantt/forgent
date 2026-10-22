@@ -30,6 +30,7 @@ import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 import { probe, lockHolders, checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
 import { readBeacon, judgeBeacon, writeBeacon, DEFAULT_BEACON_WINDOW_MS } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
+import { checkLeaseCommitGuard } from '../src/runner/documentation-cutover-lease.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -496,6 +497,20 @@ async function main() {
   const rootRefusal = rootFileRefusal(committingToplevel);
   if (rootRefusal) {
     refuse(rootRefusal);
+    return;
+  }
+
+  let stagedForLease = [];
+  try {
+    const diffOut = execFileSync('git', ['diff', '--cached', '--name-only', '--diff-filter=ACMRD'], {
+      cwd: committingToplevel,
+      encoding: 'utf8',
+    });
+    stagedForLease = diffOut.split('\n').map((l) => l.trim()).filter(Boolean);
+  } catch {}
+  const leaseRefusal = checkLeaseCommitGuard(committingToplevel, { stagedPaths: stagedForLease });
+  if (leaseRefusal) {
+    refuse(leaseRefusal);
     return;
   }
 

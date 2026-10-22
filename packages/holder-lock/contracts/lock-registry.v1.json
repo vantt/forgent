@@ -40,6 +40,17 @@
       "note": "v1 source: src/runner/loop.mjs LOCK_FILE"
     },
     {
+      "name": "documentation-cutover",
+      "kind": "lease",
+      "scope": "repo",
+      "rank": 10,
+      "v3Path": "<fgosDir>/locks/documentation-cutover.lock",
+      "v1Shape": null,
+      "v1Path": null,
+      "fence": "none",
+      "owner": "documentation"
+    },
+    {
       "name": "sessions",
       "kind": "mutex",
       "scope": "repo",

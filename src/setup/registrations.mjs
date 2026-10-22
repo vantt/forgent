@@ -150,6 +150,7 @@ import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-contro
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkLockFences, fixLockFences, checkLockPredecessorKillWait, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
 import { checkLockRecordUnreadable } from './lock-record-checks.mjs';
 import { DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
+import { checkDocumentationCutoverLeaseDoctor } from '../runner/documentation-cutover-lease.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -2171,6 +2172,11 @@ registerCheck({
   id: 'state-root',
   description: 'Node and the Rust host resolve the same state root and lock root',
   check: (cwd) => checkStateRoot(cwd),
+});
+registerCheck({
+  id: 'documentation-cutover-lease',
+  description: 'the documentation-cutover write lease is not held; if held, the holder lock and token file match the sidecar',
+  check: (cwd) => checkDocumentationCutoverLeaseDoctor(cwd),
 });
 registerConfigDefault({ id: 'lock', key: 'lock', shape: { predecessorKillWaitMs: DEFAULT_KILL_WAIT_MS } });
 registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });

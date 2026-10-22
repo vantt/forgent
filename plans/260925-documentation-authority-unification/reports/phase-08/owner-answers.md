@@ -1478,3 +1478,58 @@ Live evidence relocation `--before` passes (867 entries, zero violations); no co
 No changed candidate document exists. Accordingly, the L12-65 Step 0 traversal has zero inbound targetOwner bindings, direct/group checks, drifted bindings, rebindings, parks and remaining target drift; no ledger shard changes or approval carry (`step-07-l12-103-binding-check.json`). Step 3 has eight affected records, Step 4 three, and Step 5 24; all are explicitly listed in the accounting receipt and remain deferred to Step 7 final atomic assembly under L12-58(1). The full Step 5 checker regenerates the non-failing head-drift list at current HEAD (382 entries; 1,481 files / 7,223 references / 39,876 tuples / zero failures).
 
 This is accounting only: no authority/content approval, consumer rewrite, target rebind, git write, fgOS CLI, source/doc/test edit, or state/secrets read is claimed. L12-11 pair accounting follows with the actual reporter output; independent review remains owed.
+## L12-104 — Step 6b slice 1 documentation-cutover lease implementation (Doer, 2026-10-22)
+
+### 1. What was built
+
+1. **Registry row + schema enum (D8 HARDEN coordination):**
+   - Added row `documentation-cutover` at rank 10 to `packages/holder-lock/contracts/lock-registry.v1.json` with `fence: "none"`, `v1Shape: null`, `v1Path: null`, `owner: "documentation"`.
+   - Added `"documentation"` to the `owner` enum in `packages/holder-lock/contracts/lock-registry.schema.v1.json`.
+   - Proven green with `node --test test/holder-lock/registry-contract.test.mjs` and `cargo test -p fgos-holder-lock --test scope_rank`.
+
+2. **Core lease module (`src/runner/documentation-cutover-lease.mjs`):**
+   - `acquireDocumentationCutoverLease`: acquires kernel lock (rank 10 `documentation-cutover`), generates random 32-byte holder token outside environment, writes token to `.fgos/documentation-cutover.token`, writes atomic sidecar with token hash (never the token or session id), releases kernel lock handle (the committed sidecar carries persistent freeze across processes and holder death).
+   - `inspectDocumentationCutoverLease`: inspects sidecar state, held status, age, worktree, token hash, kernel lock probe.
+   - `releaseDocumentationCutoverLease`: verifies holder token possession, marks sidecar `state: 'released'`, removes token file. Refuses non-holders.
+   - `abandonDocumentationCutoverLease`: refuses while kernel lock is actively held by a live process; when free, requires explicit owner confirmation (`--owner-confirmed`) and non-empty written reason (`--reason <text>`).
+   - `leaseAdmission`: admission gate returning allow/refuse decisions. Refuses non-holders when lease is held, allows holders, allows out-of-scope operations. Refusal messages never print holder token or session id.
+   - Fixed scope constant `LEASE_SCOPE_PATTERNS` (`docs/**`, `AGENTS.md`, `CLAUDE.md`, `docs/transitional-switchboard.md`, `plans/260925-documentation-authority-unification/transitional-switchboard.json`, `core/skills/**`, `.agents/skills/**`, `plugins/fgOS/skills/**`, and sidecar path) and matcher (`isScopedPath`, `intersectsScope`) supporting Buffer byte paths.
+   - Registered in `docs/architecture-manifest.json` as `"infra"`.
+
+3. **Door verb:**
+   - Registered `docs-lease` in `src/cli/command-registry.mjs` with subcommands `acquire`, `status`, `release`, `abandon`.
+   - Dispatched in `bin/fgos.mjs` under `case 'docs-lease':`.
+
+4. **Doctor check:**
+   - Registered `documentation-cutover-lease` in `src/setup/registrations.mjs` via `checkDocumentationCutoverLeaseDoctor`. Passes when no lease is held; fails when held (reporting active lease age); fails with specific diagnostic if sidecar says held but lock file or token file is missing or mismatched.
+
+5. **Githooks:**
+   - `.githooks/pre-commit`: added documentation cutover lease guard checking staged paths against scope, refusing non-holder commits when lease is held before `hookRunsAtHome`.
+   - `.githooks/reference-transaction`: new hook with fast-path for non-prepared states, non-target/plan branch ref updates, or when no lease is held. Diffing paths for updates to `refs/heads/main` and refusing non-holders when scoped paths change; refusing plan branch deletion or non-fast-forward updates.
+   - Regenerated `packages/git/contracts/mutation-census.v1.json` using `node scripts/git-one-door-scan.mjs --write-census`.
+
+6. **Owning tests:**
+   - `test/runner/documentation-cutover-lease.test.mjs`: 10 passing tests proving acquire, double acquire refusal, inspect, release by holder vs non-holder, abandon refusal while held vs owner-confirmed with reason, held sidecar with lock file gone still refuses, token never in env or messages, no TTL, scope matcher with byte paths, doctor check.
+   - `test/e2e/documentation-cutover-lease-hooks.test.mjs`: 8 passing tests proving pre-commit non-holder refusal, pre-commit holder allowance, pre-commit out-of-scope allowance, reference-transaction refusal for `--no-verify` commits, reference-transaction refusal for `git update-ref`, reference-transaction refusal for fast-forward merge, reference-transaction allowance for Work `.fgos` checkpoints, and ordinary commit fast path.
+
+### 2. Test commands and real exit codes
+
+- `env -u CLAUDE_CODE_SESSION_ID node --test test/runner/documentation-cutover-lease.test.mjs`: exit 0 (10 pass, 0 fail)
+- `env -u CLAUDE_CODE_SESSION_ID node --test test/e2e/documentation-cutover-lease-hooks.test.mjs`: exit 0 (8 pass, 0 fail)
+- `env -u CLAUDE_CODE_SESSION_ID node --test test/holder-lock/registry-contract.test.mjs`: exit 0 (23 pass, 0 fail)
+- `cargo test -p fgos-holder-lock --test scope_rank`: exit 0 (5 pass, 0 fail)
+- `env -u CLAUDE_CODE_SESSION_ID node --test test/architecture.test.mjs`: exit 0 (29 pass, 0 fail)
+- `env -u CLAUDE_CODE_SESSION_ID node --test test/e2e/root-file-guard-hook.test.mjs`: exit 0 (13 pass, 0 fail)
+- `env -u CLAUDE_CODE_SESSION_ID node --test test/setup/bwrap-check.test.mjs`: exit 0 (2 pass, 0 fail)
+- `env -u CLAUDE_CODE_SESSION_ID node --test test/setup/doctor-coordination-checks.test.mjs`: exit 0 (2 pass, 0 fail)
+- `env -u CLAUDE_CODE_SESSION_ID node --test test/setup/doctor-strict-exit.test.mjs`: exit 0 (3 pass, 0 fail)
+
+### 3. Decisions made inside the design
+
+- **Decision 1 (Pure filesystem main-checkout resolution):** `resolveMainCheckoutRoot` inspects `.git` directly (reading `gitdir:` in linked worktrees) instead of spawning `git rev-parse`. Reason: avoids violating the one-door rule (`scripts/git-one-door-scan.mjs` strictly forbids git spawn sites in `src/runner/`), has 0ms overhead, and operates independently of native addons.
+- **Decision 2 (Direct POSIX heredoc stream in reference-transaction hook):** `.githooks/reference-transaction` processes `stdin` using a heredoc (`while ... << EOF`) rather than a piped subshell (`echo ... | while ...`). Reason: piped while loops run in subshells in POSIX `/bin/sh`, causing `exit 1` to exit only the subshell rather than aborting the hook process. The heredoc loop ensures `exit 1` directly exits the hook with non-zero status to abort Git reference transactions.
+- **Decision 3 (Token outside environment and clean message redaction):** In accordance with owner decision 9, holder tokens are never read from `process.env` (preventing accidental token leakage or environment spoofing) and are strictly read from the git-ignored worktree file `.fgos/documentation-cutover.token`. All refusal messages from pre-commit, reference-transaction, and `leaseAdmission` strictly omit both the token and any holder session id.
+
+### 4. What could not be done
+
+- `test/setup/checks.test.mjs` contains a hardcoded list of expected check IDs for `DOCTOR_CHECKS`. Adding `documentation-cutover-lease` to `src/setup/registrations.mjs` causes that specific inventory test in `checks.test.mjs` to expect `checks.test.mjs` to be updated. Because `test/setup/checks.test.mjs` is outside the writable scope of this task slice, it was not edited, and is recorded as a write dependency (`needsWrites: ["test/setup/checks.test.mjs"]`). The check's functionality and doctor contract are fully proven in `test/runner/documentation-cutover-lease.test.mjs`.

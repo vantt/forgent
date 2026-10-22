@@ -122,6 +122,12 @@ import { resolveStateRoot as worktreeStateRoot } from '../src/holder-lock/state-
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSessionWorktree, SessionError } from '../src/runner/session.mjs';
 import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../src/runner/gateway-control.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
+import {
+  acquireDocumentationCutoverLease,
+  inspectDocumentationCutoverLease,
+  releaseDocumentationCutoverLease,
+  abandonDocumentationCutoverLease,
+} from '../src/runner/documentation-cutover-lease.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, resolveDomainName } from '../src/state/domain-registry.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
@@ -3843,6 +3849,46 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         });
       }
       throw new Error(`unknown worktree sub-verb: ${sub}`);
+    }
+    case 'docs-lease': {
+      const sub = requireField(positional[0], 'docs-lease requires a sub-verb: acquire | status | release | abandon');
+      const cwd = process.cwd();
+      const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
+      if (sub === 'acquire') {
+        const res = acquireDocumentationCutoverLease({ repoRoot: flags.worktree ?? repoRoot });
+        if (flags.json) return output(res);
+        console.log(`acquired documentation-cutover lease (token hash: ${res.tokenHash})`);
+        return;
+      }
+      if (sub === 'status') {
+        const res = inspectDocumentationCutoverLease({ repoRoot });
+        if (flags.json) return output(res);
+        if (!res.held) {
+          console.log(`documentation-cutover lease is ${res.state}`);
+        } else {
+          console.log(`documentation-cutover lease is held (age: ${Math.round(res.ageMs / 1000)}s, kernel lock: ${res.kernelLock})`);
+          console.log(`holder token hash: ${res.holderTokenHash}`);
+          console.log(`worktree: ${res.worktree}`);
+        }
+        return;
+      }
+      if (sub === 'release') {
+        const res = releaseDocumentationCutoverLease({ repoRoot, token: flags.token });
+        if (flags.json) return output(res);
+        console.log(`released documentation-cutover lease at ${res.releasedAt}`);
+        return;
+      }
+      if (sub === 'abandon') {
+        const res = abandonDocumentationCutoverLease({
+          repoRoot,
+          ownerConfirmed: Boolean(flags['owner-confirmed'] || flags.force),
+          reason: flags.reason,
+        });
+        if (flags.json) return output(res);
+        console.log(`abandoned documentation-cutover lease: ${res.reason}`);
+        return;
+      }
+      throw new Error(`unknown docs-lease sub-verb: ${sub}`);
     }
     // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
     // Epic 1, D6/D7): a first-class `session` verb family wiring session.mjs's
