@@ -2184,3 +2184,39 @@ Scratch state/fixtures directories were created first, state mode 0700. These ar
 Impact-analysis evidence is **degraded**: the assignment forbids fgOS CLI and checker sweeps, and no impact MCP tool is exposed. No capability query, index refresh or detect-changes is claimed. The inherited upstream consumers remain execution admission (Unit/Workflow), runner Land and Workflow Land; the fix stays in their existing shared predicate. Final read-only `git diff`/`git status --short` inspection confirmed only the two allowed source/test files before this report append. No Git writes ran in this repository; fixture Git writes belong to the permitted tests. No real lease was acquired on this repository, no secrets env file or workspace `.fgos` contents were read directly, and no lifecycle verbs ran. Existing test addon staging is test-owned. Runner owns the eventual commit.
 
 Deferred docs/CHANGELOG follow-up: describe `stray-main-token` refusal in the admission contract and Unreleased; retain O2/O3 and the actual release-residue preservation limit. No docs, skills, baselines, other code or other tests were edited. No full-suite-green, independent review, main landing or cutover claim is made. Markdown preview was not launched under this turn's constrained machine-IO brief; no preview URL is available. `needsWrites: []`.
+
+## L12-114 — Documentation cutover lease rehearsal on disposable clone (Doer delivery, 2026-10-22)
+
+### Rehearsal execution and findings
+
+Owner decision 6 and Lead brief `step-06b-rehearsal-brief.md` were executed end-to-end against a disposable clone at `/tmp/fgos-work/lease-rehearsal/repo` on branch `main` at commit `5dd5feeb41287623dd9d7e208b8922f47ab8d9a6`, with linked worktrees `/tmp/fgos-work/lease-rehearsal/holder` (`holder`) and `/tmp/fgos-work/lease-rehearsal/other` (`other`). All seven rehearsal steps were executed in sequence; every step passed without code modifications:
+
+1. **Initial status and doctor check:** `docs-lease status --json` reported `{state: "free", held: false, sidecar: null}` (exit 0). `doctor` check `documentation-cutover-lease` reported `passed: true` (`"no documentation-cutover lease is held; reference-transaction hook wired"`).
+2. **Acquisition:** `docs-lease acquire --worktree <holder> --json` acquired the lease and committed the held sidecar to `main` (`a8eef9f71`, `chore(docs): acquired documentation cutover lease`, base `5dd5feeb4`). The token was written exclusively to `/tmp/fgos-work/lease-rehearsal/holder/.fgos/documentation-cutover.token` (permissions `-rw-------`, 65 bytes). Neither CLI stdout nor the committed `plans/documentation-cutover-lease.json` contains the plaintext token; only the SHA-256 digest (`9f3bfbb3...`) is recorded.
+3. **Refusals:**
+   - *Pre-commit hook:* A non-holder commit touching `docs/refusal-test.md` in `other` was refused with `commit refused: the documentation-cutover write lease is held; non-holder commits to scoped paths are refused` (exit 1).
+   - *Reference-transaction hook:* The same scoped commit created on `other` with `--no-verify` followed by `git update-ref refs/heads/main HEAD` was aborted by the `reference-transaction` hook with `reference-transaction refused: reference update touches documentation scope or an unauthorized lease transition; failing closed` (exit 128), leaving `main` unchanged at `a8eef9f71`.
+   - *Execution admission:* Non-holder `fgos run "read docs" --json` in `other` was refused before dispatch side effects with `fgos: documentation cutover lease is held; non-holder operations are refused` (canonical exit 4, `policy-refusal`).
+   - *Runner Land door:* Non-holder land of scoped branch `other` via `landRunnerItem` threw `MergeError` (`documentation-cutover-lease`, `"documentation cutover lease is held; non-holder operations are refused"`) before candidate creation, leaving `main` unchanged and `operationId: null`.
+   - *Foreign checkout:* A caller from an unrelated temporary `git init` repo calling `landRunnerItem` threw `MergeError` (`documentation-cutover-lease`, `"documentation cutover lease is held; caller checkout must belong to the gated repository"`).
+4. **Allowed operations:**
+   - *Out-of-scope non-holder commit:* A commit touching `src/rehearsal-allowed.txt` in `other` was admitted by the pre-commit hook (commit `250caf632`, exit 0).
+   - *Holder scoped commit:* A commit touching `docs/guide.md` in `holder` was admitted by the pre-commit hook via valid holder token (commit `5cff9477a`, exit 0).
+   - *Holder Land door:* `landRunnerItem` targeting `main` with `callerCheckout: holder` landed cleanly (`LAND SUCCESS! Outcome: merged`), publishing merge commit `48b1ee21a` on `main`.
+5. **Release:** `docs-lease release --json` from `holder` committed the released sidecar on `main` (`ac0c0dc58`, `chore(docs): released documentation cutover lease`), reported `drift: ["docs"]`, and automatically deleted the holder token file `/tmp/fgos-work/lease-rehearsal/holder/.fgos/documentation-cutover.token`.
+6. **Re-acquire, abandon, and final cycle:**
+   - Re-acquire succeeded (`fb4509f2c`, `chore(docs): acquired documentation cutover lease`).
+   - Owner abandon with `--owner-confirmed --reason "rehearsal"` succeeded (`8b383aab7`, `chore(docs): abandoned documentation cutover lease`), recording the confirmed reason and holder hash in the sidecar.
+   - Re-acquire after abandon succeeded (`0a033952a`, `chore(docs): acquired documentation cutover lease`).
+   - Final release from `holder` succeeded (`900272044`, `chore(docs): released documentation cutover lease`, `drift: []`).
+7. **Rollback & cleanliness proof:**
+   - `git log --oneline main` confirms exactly the 8 authorized commits (`a8eef9f71`, `5cff9477a`, `48b1ee21a`, `ac0c0dc58`, `fb4509f2c`, `8b383aab7`, `0a033952a`, `900272044`) on top of input commit `5dd5feeb4`.
+   - Refused operations left zero candidate worktrees, lingering lock handles, or operations residue.
+   - The entire scratch directory `/tmp/fgos-work/lease-rehearsal` and state dir `/tmp/fgos-work/state` were removed at the end of the rehearsal.
+
+### Rehearsal specifics and boundary conditions
+
+- **Sparse checkout:** The clone used `--no-cone` sparse checkout excluding `plans/260925-documentation-authority-unification/reports/**` to avoid exhausting the 7.7GB `tmpfs` mounted at `/tmp` (which holds 6.4GB of historical report files if fully checked out across multiple worktrees).
+- **State root & addon descriptor:** Under the read-only sandbox mount of `/home/vantt/.local/state/fgos`, `FGOS_STATE_ROOT` was directed to `/tmp/fgos-work/state` (mode 0700) to permit GitDriver's runtime floor probe, and `native-addon.json` was placed in the disposable clone to resolve the native addon for the git hook environment where `FGOS_ACTIVE_MANIFEST_PATH` is scrubbed by Git.
+- **Token privacy:** The holder token is generated via `crypto.randomBytes(32)` at mode 0600 in the holder's `.fgos/`; neither CLI JSON envelopes nor committed sidecar bytes expose the plaintext token (only its SHA-256 hash).
+- **Scope:** No git write ran in this repository; no installed `fgos` CLI, workspace `.fgos` access, secrets read, or lifecycle verbs were used. Deliverable files are `reports/phase-08/step-06b-rehearsal.md` and this note. `needsWrites: []`.
