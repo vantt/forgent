@@ -1,0 +1,11 @@
+{
+  "contract": { "id": "mailbox-adapters", "version": 1 },
+  "description": "The CLI versions each mailbox hook adapter is proven against (docs/platform/agent-mailbox/spec.md §4.1, spelled testedAgainst here). A version is listed only when its Stop and PostToolUse payloads and the output shapes the CLI injected were recorded on it; the fixtures live under fixtures/hooks/<cli>/. A CLI of the first slice that could not be proven is listed under deferred with its reason, never left out silently.",
+  "testedAgainst": [
+    { "cli": "claude", "version": "2.1.307" }
+  ],
+  "deferred": [
+    { "cli": "codex", "version": "0.161.0", "reason": "not recorded: the tetnu account's Codex login is expired (every token refresh answered that the refresh token was already used, then 401), so the dump run made no model call and fired no hook; re-record after the owner logs that account in again" },
+    { "cli": "agy", "version": "1.4.4", "reason": "PostToolUse context not proven: agy 1.4.4 refused both candidate shapes (protojson: unknown field additionalContext, unknown field hookSpecificOutput); its post-tool hook result has only overwriteResult. The Stop block and the Stop and PostToolUse payloads are recorded under fixtures/hooks/agy/" }
+  ]
+}

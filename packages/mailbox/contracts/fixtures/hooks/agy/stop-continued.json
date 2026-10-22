@@ -1,0 +1,13 @@
+{
+  "artifactDirectoryPath": "/home/user/.agy-homes/account/.gemini/antigravity-cli/brain/00000000-0000-4000-8000-000000000002",
+  "conversationId": "00000000-0000-4000-8000-000000000002",
+  "error": "",
+  "executionNum": 1,
+  "fullyIdle": true,
+  "modelName": "<redacted>",
+  "terminationReason": "<redacted>",
+  "transcriptPath": "/home/user/.agy-homes/account/.gemini/antigravity-cli/brain/00000000-0000-4000-8000-000000000002/.system_generated/logs/transcript_full.jsonl",
+  "workspacePaths": [
+    "/run-dir/agy/accept/ws"
+  ]
+}

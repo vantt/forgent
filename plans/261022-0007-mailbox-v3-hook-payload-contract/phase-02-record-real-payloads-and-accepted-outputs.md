@@ -170,6 +170,32 @@ Write the tests before recording. They fail at first (there are no fixtures yet)
    Delete nothing the CLIs own.
 10. **Commit:** regenerate the census, then commit `test(mailbox): record Claude Code, Codex and agy hook payloads as fixtures`. Sync at the end of the phase, run the proof, push.
 
+## Deviations and results (implementation lead, 2026-10-22)
+
+**Recorded.** 9 recorder invocations, 7 of them reaching a model: Claude Code 2.1.307 dump, accept, subagent; Codex 0.161.0 dump (failed at login, no model call); agy 1.4.4 dump (first attempt refused its flags before any model call, so it ran once more), accept, accept with the fallback shape, subagent. No other repeat.
+
+**Deviations from the steps above.**
+
+- **Claude version** is 2.1.307 (the plan saw 2.1.306); recorded as installed. `--setting-sources ""` was not tried: `--setting-sources project` in a workspace with no project settings loads nothing but `--settings`, and the transcripts show no hook but the recorder's.
+- **Tool prompt.** `printenv A B C` prints values without names, so a missing variable shifts the others. The prompt runs `env | grep -E '^(CODEX_THREAD_ID|CLAUDE_CODE_SESSION_ID|FGOS_SESSION_ID)='` instead, which keeps the names.
+- **agy flags.** agy 1.4.4 reads the word right after `-p` as the prompt, so the recorder puts `-p <prompt>` last. agy's transcript is `transcript_full.jsonl`, named by the payload's `transcriptPath`.
+- **Environment evidence file.** The raw directory is deleted at the end of the phase, so the id variables each hook process and tool process saw are kept in a redacted `env.json` per CLI (placeholders keep equality with the payloads). Phases 5 and 6 read it instead of raw ids.
+- **Extra fixture.** agy's subagent fires a Stop of its own; it is kept as `stop-subagent.json`.
+- **Empty strings** stay empty (they carry nothing); every other string outside the safe list becomes `<redacted>`.
+- **Codex: deferred, nothing recorded.** The `tetnu` account's Codex login is expired: every token refresh answered "refresh token was already used", then 401, so the dump run fired no hook. The `auth.json` link was intact and the account file's bytes unchanged after the run (checked by digest); no login was attempted. The accept and subagent runs were not made. Re-recording needs the owner to log that account in again.
+- **agy PostToolUse context: no shape accepted (step 5 stop).** Both candidates were refused before reaching the model; agy's log: `failed to unmarshal result ... via protojson: unknown field "additionalContext"` (flat), and the same for `hookSpecificOutput` (nested). The 1.4.4 binary's `PostToolHookResult` has only `overwriteResult`. agy 1.4.2 accepted `additionalContext` on 2026-10-19 (spec §7), so this changed between 1.4.2 and 1.4.4. The agy Stop block is accepted, and the agy payloads are recorded.
+- **`adapters.v1.json`** lists only Claude Code under `testedAgainst`; Codex and agy are under a new `deferred` list, each with its reason. The test `every_cli_of_the_first_slice_is_tested` became `every_cli_of_the_first_slice_is_tested_or_deferred_with_a_reason`: a CLI must sit in exactly one of the two lists, so no gap is silent.
+
+**Subagent evidence (owner question Q1).**
+
+- Claude Code: the subagent's PostToolUse carries `agent_id` and `agent_type`; it fires `SubagentStart`/`SubagentStop` and no `Stop` of its own; its tool process sees the head's `CLAUDE_CODE_SESSION_ID`. Q1 closes for Claude with no change.
+- agy: `invoke_subagent` starts a separate conversation; the subagent's PostToolUse and Stop carry no `agent_id`/`agent_type` and differ from the head's only by `conversationId`; it fires its own Stop (`executionNum` 0); its tool process sees no id variable. Q1 option A's condition ("no Stop of its own") fails, so the provisional default is C. A head-bound `conversationId` (the handle) would tell the two apart; that is a design input for the controller, not decided here.
+- Codex: not recorded (login).
+
+**Hook PID namespace** equals the recorder's for every recorded call (Claude, agy).
+
+**Left outside the raw directory** (not deleted): Claude transcripts under `~/.claude/projects/-tmp-fgos-work-mailbox-v3-record-claude-{dump,accept,subagent}-ws/`; five agy conversations under the `tetnu` agy home's `.gemini/antigravity-cli/brain/` and its `cache/last_conversations.json`. No agy `trustedWorkspaces` entry was found.
+
 ## Acceptance criteria
 
 - Fixtures exist for all three CLIs and both events, recorded on the installed versions with no version change during a run. Each `source` names the versions, date, commands, removed variables and the injection record types; `adapters.v1.json` lists the same versions.
