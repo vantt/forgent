@@ -196,6 +196,13 @@ Write the tests before recording. They fail at first (there are no fixtures yet)
 
 **Left outside the raw directory** (not deleted): Claude transcripts under `~/.claude/projects/-tmp-fgos-work-mailbox-v3-record-claude-{dump,accept,subagent}-ws/`; five agy conversations under the `tetnu` agy home's `.gemini/antigravity-cli/brain/` and its `cache/last_conversations.json`. No agy `trustedWorkspaces` entry was found.
 
+## Plan owner decisions (2026-10-22, after phase 3; plan owner (agent))
+
+1. **M4, one binding per head.** A second key from the same head replaces the old binding like a dead-head takeover: a new generation, its own name, `stop_blocks` 0, and mail queued for the old key is never shown to the new context. Implemented in phase 5 with its owning test.
+2. **agy drain deferred in V3, for every event.** An agy subagent carries no marker and fires its own Stop; under decision 1 a subagent's first hook would replace the head's binding and take its mail, which is worse than missing mail. The agy fixtures stay as contract evidence (parse tests only); agy stays under `deferred` in `adapters.v1.json` (no subagent marker; 1.4.4 refuses `additionalContext`). `overwriteResult` is rejected as a delivery channel: it rewrites a tool's real output with peer text and mixes trust levels. Q1 resolves as option C for agy. What would unblock agy: a payload field naming the parent conversation, or a hook scope that fires for the head conversation only.
+3. **Codex deferred** until the owner logs the `tetnu` account in again; Codex is not run. Its parse and render are built only where a report already recorded the real shape; everything else stays deferred.
+4. **Phases 4 to 7 continue** with Claude Code as the only live-proven adapter. Phase 7 runs the branch docs and the crate and workspace gates; `npm test` only if a Node file changes; no code-review step (the plan owner runs an independent review).
+
 ## Acceptance criteria
 
 - Fixtures exist for all three CLIs and both events, recorded on the installed versions with no version change during a run. Each `source` names the versions, date, commands, removed variables and the injection record types; `adapters.v1.json` lists the same versions.
