@@ -8,4 +8,5 @@ pub const PROFILE: Profile = Profile {
     enter_gap_ms: 300,
     submit_by_prompt_door: false,
     trust_markers: &["is this a project you created or one you trust"],
+    start_banners: &[],
 };

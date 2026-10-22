@@ -195,6 +195,16 @@ pub struct Profile {
     pub submit_by_prompt_door: bool,
     /// Lowercase wordings of this CLI's folder-trust dialog.
     pub trust_markers: &'static [&'static str],
+    /// Start banners this CLI draws over its prompt; one is dismissed before anything is typed.
+    pub start_banners: &'static [StartBanner],
+}
+
+/// A start banner and the key that closes it.
+pub struct StartBanner {
+    /// Lowercase wording specific to the banner, never to the ready screen.
+    pub marker: &'static str,
+    /// The key name the pane's send-keys takes.
+    pub dismiss_key: &'static str,
 }
 
 /// The adapter for one CLI.
@@ -268,6 +278,21 @@ impl Terminal {
         }
     }
 
+    /// The start banner this CLI draws on the screen, if one is up and no trust dialog or dead
+    /// login is on it (those are answered by a person, never by a key press).
+    fn start_banner_on(&self, io: &mut dyn AgentIo) -> Option<(&'static StartBanner, String)> {
+        if self.profile.start_banners.is_empty() {
+            return None;
+        }
+        let screen = io.screen().ok()?;
+        if self.classify_blocked(&screen).is_some() {
+            return None;
+        }
+        let lowered = bottom_lines(&screen, 20).to_lowercase();
+        let banner = self.profile.start_banners.iter().find(|b| lowered.contains(b.marker))?;
+        Some((banner, screen))
+    }
+
     /// A ready verdict is only believed when the screen shows neither a trust
     /// dialog nor a dead login.
     fn ready_gate(&self, io: &mut dyn AgentIo, verdict: Readiness) -> Readiness {
@@ -303,7 +328,32 @@ impl Terminal {
         let mut last_screen: Option<String> = None;
         let mut stable_since: Option<u64> = None;
         let mut unruled_since: Option<u64> = None;
+        let mut presses = 0;
+        let mut pressed_on: Option<String> = None;
         loop {
+            if let Some((banner, screen)) = self.start_banner_on(io) {
+                // One key per changed screen, so a stale frame after a press never earns a second.
+                if presses < MAX_BANNER_PRESSES && pressed_on.as_ref() != Some(&screen) {
+                    let _ = io.send(&SendInput {
+                        text: None,
+                        keys: Some(vec![banner.dismiss_key.to_string()]),
+                        submit: false,
+                    });
+                    presses += 1;
+                    // The banner screen is the baseline: the screen under it counts as the prompt drawing.
+                    launch_screen = Some(screen.clone());
+                    pressed_on = Some(screen);
+                    last_screen = None;
+                    stable_since = None;
+                    unruled_since = None;
+                }
+                // No verdict is believed while the banner is up.
+                if io.now_ms() >= deadline {
+                    return Readiness::NotReady;
+                }
+                io.pause(POLL_MS);
+                continue;
+            }
             let seen = match io.inspect() {
                 Ok(seen) => seen,
                 Err(_) => return Readiness::NoDetector,
@@ -317,7 +367,14 @@ impl Terminal {
             if state == "idle" && !seen.visible_working {
                 if seen.matched_rule || seen.visible_idle {
                     io.pause(PROMPT_SETTLE_MS);
-                    return self.ready_gate(io, Readiness::Ready);
+                    // A banner that opened during the settle wait is dealt with at the top of the next pass.
+                    if self.start_banner_on(io).is_none() {
+                        return self.ready_gate(io, Readiness::Ready);
+                    }
+                    if io.now_ms() >= deadline {
+                        return Readiness::NotReady;
+                    }
+                    continue;
                 }
                 let since = *unruled_since.get_or_insert_with(|| io.now_ms());
                 let Ok(screen) = io.screen() else {

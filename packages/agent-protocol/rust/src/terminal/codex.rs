@@ -13,4 +13,5 @@ pub const PROFILE: Profile = Profile {
         "do you trust the contents of this directory",
         "trust this folder?",
     ],
+    start_banners: &[],
 };
