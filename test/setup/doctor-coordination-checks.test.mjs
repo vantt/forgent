@@ -5,6 +5,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { tmpdir } from 'node:os';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS } from '../../src/setup/registrations.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 function mkTempDir() {
   const dir = path.join(tmpdir(), 'fgos-doctor-coord-test-' + Math.random().toString(36).slice(2));
@@ -19,7 +20,7 @@ const fixPolicy = FIX_REGISTRATIONS.find(c => c.id === 'runner-coordination-orgP
 test('runner-coordination-orgPolicy-shape: valid policy -> unchanged', () => {
   const cwd = mkTempDir();
   const configPath = path.join(cwd, '.fgos', 'config.json');
-  fs.writeFileSync(configPath, JSON.stringify({ runner: { coordination: { orgPolicy: { dischargeOn: ['accepted', 'rejected'] } } } }));
+  writeProjectConfig(cwd, { runner: { coordination: { orgPolicy: { dischargeOn: ['accepted', 'rejected'] } } } });
   
   const res = checkPolicy(cwd);
   assert.equal(res.passed, true);
@@ -31,7 +32,7 @@ test('runner-coordination-orgPolicy-shape: valid policy -> unchanged', () => {
 test('runner-coordination-orgPolicy-shape: malformed policy -> check fail -> fixer reset về ["accepted"]', () => {
   const cwd = mkTempDir();
   const configPath = path.join(cwd, '.fgos', 'config.json');
-  fs.writeFileSync(configPath, JSON.stringify({ runner: { coordination: { orgPolicy: { dischargeOn: null } } } }));
+  writeProjectConfig(cwd, { runner: { coordination: { orgPolicy: { dischargeOn: null } } } });
   
   const res = checkPolicy(cwd);
   assert.equal(res.passed, false);

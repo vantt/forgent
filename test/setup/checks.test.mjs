@@ -52,6 +52,7 @@ import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT }
 import { addDecision } from '../../src/state/store.mjs';
 import { createSession } from '../../src/runner/session.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { writeGlobalConfig, writeProjectConfig, writeRawGlobalConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
@@ -889,7 +890,7 @@ function declareExecutor(cwd, id, fields) {
       cfg.runner.capabilities[purpose] ??= {};
     }
   }
-  fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
+  writeProjectConfig(cwd, cfg);
 }
 
 test('tool-registry-configured passes when no tool-capable executor is declared at all (inactive — a clean skip, never a failure)', () => {
@@ -1038,9 +1039,7 @@ test('config-not-stale reports failed/not-configured when the shared file is abs
 test('config-not-stale passes when the existing config already has every default key', () => {
   const cwd = mkTemp('doctor-config-full-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(cwd, {
       runner: {
         ...DEFAULT_RUNNER_CONFIG,
         capabilities: DEFAULT_CAPABILITY_SLOTS,
@@ -1061,8 +1060,7 @@ test('config-not-stale passes when the existing config already has every default
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
       docRegistry: { enforce: false },
       checkpoint: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
-    }),
-  );
+    });
   const { passed } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, true);
   fs.rmSync(cwd, { recursive: true, force: true });
@@ -1071,7 +1069,7 @@ test('config-not-stale passes when the existing config already has every default
 test('config-not-stale fails when the shared file is complete except gateBypass', () => {
   const cwd = mkTemp('doctor-config-no-gatebypass-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: DEFAULT_RUNNER_CONFIG }));
+  writeProjectConfig(cwd, { runner: DEFAULT_RUNNER_CONFIG });
   const { passed, message } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /gateBypass/);
@@ -1081,7 +1079,7 @@ test('config-not-stale fails when the shared file is complete except gateBypass'
 test('config-not-stale fails when the existing config is missing a default key', () => {
   const cwd = mkTemp('doctor-config-stale-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { executor: { command: 'claude', args: [] } } }));
+  writeProjectConfig(cwd, { runner: { executor: { command: 'claude', args: [] } } });
   const { passed, message } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /stale config/);
@@ -1111,7 +1109,7 @@ test('worker-slots-ceiling-usable fails on a ceiling that silently enforces noth
   for (const ceiling of ['8', 8.5, 0, -1, true, []]) {
     const cwd = mkTemp('doctor-slots-malformed-');
     fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling } }));
+    writeProjectConfig(cwd, { workerSlots: { ceiling } });
     const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
     assert.equal(passed, false, `malformed ceiling: ${JSON.stringify(ceiling)}`);
     assert.match(message, /enforces NOTHING/);
@@ -1125,7 +1123,7 @@ test('worker-slots-ceiling-usable fails on a ceiling that silently enforces noth
 test('worker-slots-ceiling-usable passes on the unarmed null fgos setup writes, and says so', () => {
   const cwd = mkTemp('doctor-slots-unarmed-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling: null } }));
+  writeProjectConfig(cwd, { workerSlots: { ceiling: null } });
   const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /unarmed/);
@@ -1136,7 +1134,7 @@ test('worker-slots-ceiling-usable passes on the unarmed null fgos setup writes, 
 test('worker-slots-ceiling-usable passes and names a real armed ceiling', () => {
   const cwd = mkTemp('doctor-slots-armed-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling: 6 } }));
+  writeProjectConfig(cwd, { workerSlots: { ceiling: 6 } });
   const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /workerSlots\.ceiling = 6/);
@@ -1168,7 +1166,7 @@ test('advise-execute-capabilities-configured fails when a slot is missing or mal
   ]) {
     const cwd = mkTemp('doctor-capabilities-malformed-');
     fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities } }));
+    writeProjectConfig(cwd, { runner: { capabilities } });
     const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
     assert.equal(passed, false, `capabilities: ${JSON.stringify(capabilities)}`);
     assert.match(message, /missing or has a malformed slot for/);
@@ -1179,10 +1177,7 @@ test('advise-execute-capabilities-configured fails when a slot is missing or mal
 test('advise-execute-capabilities-configured passes when both slots are declared', () => {
   const cwd = mkTemp('doctor-capabilities-ok-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }),
-  );
+  writeProjectConfig(cwd, { runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } });
   const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /declares "advise", "execute", and "code:implement"/);
@@ -1202,7 +1197,7 @@ test('capability-serves-valid fails when runner.capabilities is missing entirely
 test('capability-serves-valid passes on the curated defaults (serves on every slot, none identical, "review" present)', () => {
   const cwd = mkTemp('doctor-serves-ok-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }));
+  writeProjectConfig(cwd, { runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } });
   const { passed, message } = checkById('capability-serves-valid').check(cwd);
   assert.equal(passed, true, message);
   assert.match(message, /valid "serves" attribute set, none identical, and "review" is present/);
@@ -1212,7 +1207,7 @@ test('capability-serves-valid passes on the curated defaults (serves on every sl
 test('capability-serves-valid is a no-op pass on a config with no "serves" anywhere (an entry without one stays valid)', () => {
   const cwd = mkTemp('doctor-serves-none-declared-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: { advise: {}, execute: {}, review: {} } } }));
+  writeProjectConfig(cwd, { runner: { capabilities: { advise: {}, execute: {}, review: {} } } });
   const { passed, message } = checkById('capability-serves-valid').check(cwd);
   assert.equal(passed, true, message);
   fs.rmSync(cwd, { recursive: true, force: true });
@@ -1222,7 +1217,7 @@ test('capability-serves-valid fails when a "serves" value has an unknown key or 
   for (const badServes of [{ notARealKey: 'change' }, { mutates: 'yes' }, { outputKind: 42 }, { size: 'heavy' }, { rigor: 'high' }]) {
     const cwd = mkTemp('doctor-serves-malformed-');
     fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: { review: {}, execute: { serves: badServes } } } }));
+    writeProjectConfig(cwd, { runner: { capabilities: { review: {}, execute: { serves: badServes } } } });
     const { passed, message } = checkById('capability-serves-valid').check(cwd);
     assert.equal(passed, false, `serves: ${JSON.stringify(badServes)}`);
     assert.match(message, /invalid "serves"/);
@@ -1233,17 +1228,14 @@ test('capability-serves-valid fails when a "serves" value has an unknown key or 
 test('capability-serves-valid fails when two entries declare the identical "serves" attribute set', () => {
   const cwd = mkTemp('doctor-serves-duplicate-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(cwd, {
       runner: {
         capabilities: {
           review: { serves: { outputKind: 'finding', mutates: false } },
           'docs:review': { serves: { outputKind: 'finding', mutates: false } },
         },
       },
-    }),
-  );
+    });
   const { passed, message } = checkById('capability-serves-valid').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /declare the identical "serves" attribute set/);
@@ -1253,7 +1245,7 @@ test('capability-serves-valid fails when two entries declare the identical "serv
 test('capability-serves-valid fails when the "review" slot is missing', () => {
   const cwd = mkTemp('doctor-serves-no-review-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: { execute: { serves: { outputKind: 'change', mutates: true } } } } }));
+  writeProjectConfig(cwd, { runner: { capabilities: { execute: { serves: { outputKind: 'change', mutates: true } } } } });
   const { passed, message } = checkById('capability-serves-valid').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /missing the "review" slot/);
@@ -1271,7 +1263,7 @@ test('gate-bypass-configured check fails when the shared file has no gateBypass 
 test('gate-bypass-configured check fails when gateBypass.level is present but not a recognized level', () => {
   const cwd = mkTemp('doctor-gatebypass-bad-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ gateBypass: { level: 'total' } }));
+  writeProjectConfig(cwd, { gateBypass: { level: 'total' } });
   const { passed, message } = checkById('gate-bypass-configured').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /missing or not a recognized level/);
@@ -1281,7 +1273,7 @@ test('gate-bypass-configured check fails when gateBypass.level is present but no
 test('gate-bypass-configured check passes when gateBypass.level is a recognized level', () => {
   const cwd = mkTemp('doctor-gatebypass-ok-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ gateBypass: { level: 'standard' } }));
+  writeProjectConfig(cwd, { gateBypass: { level: 'standard' } });
   const { passed, message } = checkById('gate-bypass-configured').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /"standard"/);
@@ -1291,7 +1283,7 @@ test('gate-bypass-configured check passes when gateBypass.level is a recognized 
 test('gate-bypass-configured fix writes a default level when the shared file has no gateBypass key, preserving other keys', () => {
   const cwd = mkTemp('doctor-gatebypass-fix-absent-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { timeoutMs: 5000 } }));
+  writeProjectConfig(cwd, { runner: { timeoutMs: 5000 } });
   const { changed, message } = fixById('gate-bypass-configured').fix(cwd);
   assert.equal(changed, true);
   assert.match(message, new RegExp(`"${DEFAULT_LEVEL}"`));
@@ -1304,7 +1296,7 @@ test('gate-bypass-configured fix writes a default level when the shared file has
 test('gate-bypass-configured fix repairs a malformed level back to the default', () => {
   const cwd = mkTemp('doctor-gatebypass-fix-bad-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ gateBypass: { level: 'total' } }));
+  writeProjectConfig(cwd, { gateBypass: { level: 'total' } });
   const { changed } = fixById('gate-bypass-configured').fix(cwd);
   assert.equal(changed, true);
   const written = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'config.json'), 'utf8'));
@@ -1316,7 +1308,7 @@ test('gate-bypass-configured fix is idempotent: reports unchanged and never rewr
   const cwd = mkTemp('doctor-gatebypass-fix-noop-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   const sharedPath = path.join(cwd, '.fgos', 'config.json');
-  fs.writeFileSync(sharedPath, JSON.stringify({ gateBypass: { level: 'heavy' } }));
+  writeProjectConfig(cwd, { gateBypass: { level: 'heavy' } });
   const before = fs.statSync(sharedPath).mtimeMs;
   const { changed, message } = fixById('gate-bypass-configured').fix(cwd);
   assert.equal(changed, false);
@@ -1380,10 +1372,7 @@ test('herdr-launcher-configured check fails when the shared file has no herdrOrc
 test('herdr-launcher-configured check fails when a toggle is present but not a boolean', () => {
   const cwd = mkTemp('doctor-herdr-launcher-bad-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({ herdrOrchestrator: { autoDiscover: 'yes', autoMerge: false, autoRetro: false, autoCleanup: false } }),
-  );
+  writeProjectConfig(cwd, { herdrOrchestrator: { autoDiscover: 'yes', autoMerge: false, autoRetro: false, autoCleanup: false } });
   const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /autoDiscover/);
@@ -1393,10 +1382,7 @@ test('herdr-launcher-configured check fails when a toggle is present but not a b
 test('herdr-launcher-configured check passes when every toggle is a boolean', () => {
   const cwd = mkTemp('doctor-herdr-launcher-ok-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({ herdrOrchestrator: { autoDiscover: true, autoMerge: false, autoRetro: false, autoCleanup: false } }),
-  );
+  writeProjectConfig(cwd, { herdrOrchestrator: { autoDiscover: true, autoMerge: false, autoRetro: false, autoCleanup: false } });
   const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /autoDiscover=true/);
@@ -1421,10 +1407,7 @@ test('herdr-web-dashboard-configured check fails when the shared file has no her
 test('herdr-web-dashboard-configured check fails when staticServing is present but not a boolean', () => {
   const cwd = mkTemp('doctor-herdr-web-dashboard-bad-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({ herdrWebDashboard: { staticServing: 'yes' } }),
-  );
+  writeProjectConfig(cwd, { herdrWebDashboard: { staticServing: 'yes' } });
   const { passed, message } = checkById('herdr-web-dashboard-configured').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /staticServing/);
@@ -1434,10 +1417,7 @@ test('herdr-web-dashboard-configured check fails when staticServing is present b
 test('herdr-web-dashboard-configured check passes when staticServing is a boolean', () => {
   const cwd = mkTemp('doctor-herdr-web-dashboard-ok-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({ herdrWebDashboard: { staticServing: true } }),
-  );
+  writeProjectConfig(cwd, { herdrWebDashboard: { staticServing: true } });
   const { passed, message } = checkById('herdr-web-dashboard-configured').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /staticServing=true/);
@@ -1466,7 +1446,7 @@ test('config-awareness reports project active with global not present, when only
   const homeDir = mkTemp('doctor-awareness-project-only-home-');
   const cwd = mkTemp('doctor-awareness-project-only-cwd-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), '{}');
+  writeRawProjectConfig(cwd, '{}');
   withHome(homeDir, () => {
     const { passed, message } = checkById('config-awareness').check(cwd);
     assert.equal(passed, true);
@@ -1480,10 +1460,10 @@ test('config-awareness reports project active with global not present, when only
 test('config-awareness reports project active with global also present, when both exist', () => {
   const homeDir = mkTemp('doctor-awareness-both-home-');
   fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(homeDir, '.fgos', 'config.json'), '{}');
+  writeRawGlobalConfig(homeDir, '{}');
   const cwd = mkTemp('doctor-awareness-both-cwd-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), '{}');
+  writeRawProjectConfig(cwd, '{}');
   withHome(homeDir, () => {
     const { passed, message } = checkById('config-awareness').check(cwd);
     assert.equal(passed, true);
@@ -1497,7 +1477,7 @@ test('config-awareness reports project active with global also present, when bot
 test('config-awareness falls back to global active with project not present, when only global config exists', () => {
   const homeDir = mkTemp('doctor-awareness-global-only-home-');
   fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(homeDir, '.fgos', 'config.json'), '{}');
+  writeRawGlobalConfig(homeDir, '{}');
   const cwd = mkTemp('doctor-awareness-global-only-cwd-');
   withHome(homeDir, () => {
     const { passed, message } = checkById('config-awareness').check(cwd);
@@ -1514,7 +1494,7 @@ test('provider-capacity-state doctor check reports quarantine without clearing i
   const cwd = mkTemp('doctor-provider-capacity-cwd-');
   const fgosHome = path.join(homeDir, '.fgos');
   fs.mkdirSync(fgosHome, { recursive: true });
-  fs.writeFileSync(path.join(fgosHome, 'config.json'), JSON.stringify({
+  writeGlobalConfig(homeDir, {
     runner: {
       providers: {
         'openai-codex': {
@@ -1527,7 +1507,7 @@ test('provider-capacity-state doctor check reports quarantine without clearing i
         },
       },
     },
-  }, null, 2));
+  });
   const stateDir = path.join(fgosHome, 'runtime', 'provider-capacity');
   fs.mkdirSync(stateDir, { recursive: true });
   const statePath = path.join(stateDir, 'state.json');
@@ -1847,7 +1827,7 @@ function writeProjectCoordinationProtocol(dir, yamlBody) {
 
 function writeRunnerConfig(dir, runner) {
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner }, null, 2));
+  writeProjectConfig(dir, { runner });
 }
 
 test('operation-capability-resolves reports passing status for retired coordination protocols', () => {

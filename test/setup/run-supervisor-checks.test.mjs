@@ -26,6 +26,7 @@ import { readGateKillGraceMs, readCancelWaitMs, DEFAULT_GATE_KILL_GRACE_MS } fro
 import { recoverApplyUseCase, recoverObserveUseCase } from '../../src/verbs/dispatch/recover.mjs';
 import { descriptionHolders } from '../../src/holder-lock/driver.mjs';
 import { selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
+import { writeProjectConfig, writeGlobalConfig, globalConfigPath as globalConfigFile } from '../helpers/config-fixture.mjs';
 
 const HOST_BIN = process.env.FGOS_HOST_BIN;
 const HAS_FLOCK = spawnSync('flock', ['--version'], { stdio: 'ignore' }).status === 0;
@@ -48,11 +49,6 @@ function workspace(name) {
   const root = path.join(scratch, name);
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
   return root;
-}
-
-function writeConfig(file, config) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, `${JSON.stringify(config)}\n`);
 }
 
 /** A stand-in host binary that answers every route with `line` (and exits `status`). */
@@ -228,17 +224,18 @@ test('runtime-socket-dir: without a socket table nothing is judged or removed', 
 
 test('gate-kill-grace: absent is the default, project overrides global, below 1000 or not an integer fails', () => {
   const root = workspace('grace');
-  const globalConfigPath = path.join(scratch, 'grace-home', '.fgos', 'config.json');
+  const globalHome = path.join(scratch, 'grace-home');
+  const globalConfigPath = globalConfigFile(globalHome);
   assert.deepEqual(checkGateKillGrace(root, { globalConfigPath }), { passed: true, message: 'dispatch.gateKillGraceMs = 10000 (default)' });
 
-  writeConfig(globalConfigPath, { dispatch: { gateKillGraceMs: 4000 } });
+  writeGlobalConfig(globalHome, { dispatch: { gateKillGraceMs: 4000 } });
   assert.deepEqual(checkGateKillGrace(root, { globalConfigPath }), { passed: true, message: 'dispatch.gateKillGraceMs = 4000 (global)' });
 
-  writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { gateKillGraceMs: 2500 } });
+  writeProjectConfig(root, { dispatch: { gateKillGraceMs: 2500 } });
   assert.deepEqual(checkGateKillGrace(root, { globalConfigPath }), { passed: true, message: 'dispatch.gateKillGraceMs = 2500 (project)' });
 
   for (const bad of [999, 0, -5, 1500.5, '5000']) {
-    writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { gateKillGraceMs: bad } });
+    writeProjectConfig(root, { dispatch: { gateKillGraceMs: bad } });
     const res = checkGateKillGrace(root, { globalConfigPath });
     assert.equal(res.passed, false, `${JSON.stringify(bad)} is refused`);
     assert.match(res.message, /must be an integer of at least 1000 ms/);
@@ -248,9 +245,9 @@ test('gate-kill-grace: absent is the default, project overrides global, below 10
 test('the gate kill grace reader follows the same merge and refuses an unusable value', () => {
   const root = workspace('grace-reader');
   assert.equal(readGateKillGraceMs({ projectRoot: root }), DEFAULT_GATE_KILL_GRACE_MS);
-  writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { gateKillGraceMs: 3000 } });
+  writeProjectConfig(root, { dispatch: { gateKillGraceMs: 3000 } });
   assert.equal(readGateKillGraceMs({ projectRoot: root }), 3000);
-  writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { gateKillGraceMs: 10 } });
+  writeProjectConfig(root, { dispatch: { gateKillGraceMs: 10 } });
   assert.throws(() => readGateKillGraceMs({ projectRoot: root }), { name: 'RunnerConfigError', category: 'validation', code: 'invalid-gate-kill-grace', message: /dispatch\.gateKillGraceMs must be an integer of at least 1000/ });
 });
 
@@ -448,25 +445,26 @@ test('units-awaiting-resume: a unit whose attempt is not closed is not awaiting 
 
 test('cancel-wait: absent is the grace plus five seconds, project overrides global, unusable or shorter than the grace fails', () => {
   const root = workspace('cancel-wait');
-  const globalConfigPath = path.join(scratch, 'cancel-home', '.fgos', 'config.json');
+  const globalHome = path.join(scratch, 'cancel-home');
+  const globalConfigPath = globalConfigFile(globalHome);
   assert.deepEqual(checkCancelWait(root, { globalConfigPath }), { passed: true, message: 'dispatch.cancelWaitMs = 15000 (default)' });
 
-  writeConfig(globalConfigPath, { dispatch: { gateKillGraceMs: 2000 } });
+  writeGlobalConfig(globalHome, { dispatch: { gateKillGraceMs: 2000 } });
   assert.deepEqual(checkCancelWait(root, { globalConfigPath }), { passed: true, message: 'dispatch.cancelWaitMs = 7000 (default)' });
 
-  writeConfig(globalConfigPath, { dispatch: { cancelWaitMs: 20000 } });
+  writeGlobalConfig(globalHome, { dispatch: { cancelWaitMs: 20000 } });
   assert.deepEqual(checkCancelWait(root, { globalConfigPath }), { passed: true, message: 'dispatch.cancelWaitMs = 20000 (global)' });
 
-  writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { cancelWaitMs: 12000 } });
+  writeProjectConfig(root, { dispatch: { cancelWaitMs: 12000 } });
   assert.deepEqual(checkCancelWait(root, { globalConfigPath }), { passed: true, message: 'dispatch.cancelWaitMs = 12000 (project)' });
 
   for (const bad of [999, 0, 1500.5, '9000']) {
-    writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { cancelWaitMs: bad } });
+    writeProjectConfig(root, { dispatch: { cancelWaitMs: bad } });
     const res = checkCancelWait(root, { globalConfigPath });
     assert.equal(res.passed, false, `${JSON.stringify(bad)} is refused`);
     assert.match(res.message, /must be an integer of at least 1000 ms/);
   }
-  writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { cancelWaitMs: 5000 } });
+  writeProjectConfig(root, { dispatch: { cancelWaitMs: 5000 } });
   const short = checkCancelWait(root, { globalConfigPath: path.join(scratch, 'cancel-home-empty', 'config.json') });
   assert.equal(short.passed, false);
   assert.match(short.message, /shorter than dispatch\.gateKillGraceMs = 10000/);
@@ -475,9 +473,9 @@ test('cancel-wait: absent is the grace plus five seconds, project overrides glob
 test('the cancel wait reader shares the gate kill grace merge and refuses an unusable value', () => {
   const root = workspace('cancel-wait-reader');
   assert.equal(readCancelWaitMs({ projectRoot: root }), DEFAULT_GATE_KILL_GRACE_MS + 5000);
-  writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { gateKillGraceMs: 3000 } });
+  writeProjectConfig(root, { dispatch: { gateKillGraceMs: 3000 } });
   assert.equal(readCancelWaitMs({ projectRoot: root }), 8000);
-  writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { cancelWaitMs: 10 } });
+  writeProjectConfig(root, { dispatch: { cancelWaitMs: 10 } });
   assert.throws(() => readCancelWaitMs({ projectRoot: root }), { name: 'RunnerConfigError', category: 'validation', code: 'invalid-cancel-wait', message: /dispatch\.cancelWaitMs must be an integer of at least 1000/ });
   // The doctor check names the same key with the same words.
   assert.match(checkCancelWait(root, { globalConfigPath: path.join(scratch, 'no-global-config.json') }).message, /dispatch\.cancelWaitMs must be an integer of at least 1000/);

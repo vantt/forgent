@@ -15,6 +15,7 @@ import { convertRunnerConfig, ladderCommentLines, registeredCapabilitiesOf } fro
 import { createSeatBindingClient } from '../../src/seat-binding/client.mjs';
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { discoverWorkflows } from '../../src/workflow/loader.mjs';
+import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '../..');
 const BIN = path.join(REPO_ROOT, 'bin', 'fgos.mjs');
@@ -83,14 +84,14 @@ function loadWithOldRelease(projectDir, home, entry) {
 function homeWithRealGlobal() {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fence-home-'));
   fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(home, '.fgos', 'config.json'), `${JSON.stringify({ runner: fixture('global-runner') }, null, 2)}\n`);
+  writeGlobalConfig(home, { runner: fixture('global-runner') });
   return home;
 }
 
 function projectWith(runner) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fence-project-'));
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), `${JSON.stringify({ runner }, null, 2)}\n`);
+  writeProjectConfig(dir, { runner });
   return dir;
 }
 
