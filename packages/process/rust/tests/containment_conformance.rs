@@ -20,6 +20,8 @@ struct Props {
     term_without_handler_kills: bool,
     term_phase: bool,
     leader_exit_ends_domain: bool,
+    /// Pids a child writes are host pids (false inside a pid namespace).
+    child_pids_are_host_pids: bool,
     fast_iterations: u32,
 }
 
@@ -31,6 +33,7 @@ const fn props(
     term_kills: bool,
     term_phase: bool,
     leader_ends: bool,
+    host_pids: bool,
     fast: u32,
 ) -> Props {
     Props {
@@ -41,18 +44,19 @@ const fn props(
         term_without_handler_kills: term_kills,
         term_phase,
         leader_exit_ends_domain: leader_ends,
+        child_pids_are_host_pids: host_pids,
         fast_iterations: fast,
     }
 }
 
 #[cfg(target_os = "linux")]
-const LINUX_PGROUP_PROPS: Props = props("linux-pgroup", GuaranteeLevel::BestEffort, &["setsid", "reused pgid", "daemons"], true, true, true, false, 100);
+const LINUX_PGROUP_PROPS: Props = props("linux-pgroup", GuaranteeLevel::BestEffort, &["setsid", "reused pgid", "daemons"], true, true, true, false, true, 100);
 #[cfg(target_os = "linux")]
-const BWRAP_PIDNS_PROPS: Props = props("bwrap-pidns", GuaranteeLevel::Kernel, &["herdr", "systemd", "docker"], false, false, true, true, 100);
+const BWRAP_PIDNS_PROPS: Props = props("bwrap-pidns", GuaranteeLevel::Kernel, &["herdr", "systemd", "docker"], false, false, true, true, false, 100);
 #[cfg(target_os = "macos")]
-const MACOS_TREE_PROPS: Props = props("macos-tree", GuaranteeLevel::BestEffort, &["double fork", "reused pgid", "launchd"], true, true, true, false, 100);
+const MACOS_TREE_PROPS: Props = props("macos-tree", GuaranteeLevel::BestEffort, &["double fork", "reused pgid", "launchd"], true, true, true, false, true, 100);
 #[cfg(windows)]
-const WINDOWS_JOB_PROPS: Props = props("windows-job", GuaranteeLevel::Kernel, &["service", "COM server"], false, true, false, false, 20);
+const WINDOWS_JOB_PROPS: Props = props("windows-job", GuaranteeLevel::Kernel, &["service", "COM server"], false, true, false, false, true, 20);
 
 enum Workload<'a> {
     Tree(&'a Path),
@@ -138,8 +142,10 @@ fn tree_ends(driver: &dyn ContainmentDriver, props: &Props) {
     assert_eq!(driver.kill_all(&mut domain, 0), KillOutcome::Ok);
     assert_eq!(driver.is_empty(&mut domain), DomainState::Empty);
 
+    // Inside a pid namespace the written pids name nothing on the host; there
+    // `Empty` already means the kernel ended every member.
     #[cfg(unix)]
-    {
+    if props.child_pids_are_host_pids {
         assert!(!matches!(facts::observe(ProcId(setsid_pid)), Observed::Live { .. }), "setsid child was ended");
         if props.double_fork_escapee_survives {
             assert!(matches!(facts::observe(ProcId(escape_pid)), Observed::Live { .. }), "double fork escapee survives");
@@ -163,7 +169,12 @@ fn record_alone(driver: &dyn ContainmentDriver, _props: &Props) {
     let record = domain.domain().expect("domain record").clone();
     assert_eq!(domain_is_empty(&record), DomainState::NotEmpty);
     assert_eq!(domain_kill_all(&record), KillOutcome::Ok);
-    assert_eq!(domain_is_empty(&record), DomainState::Empty);
+    // The kill may settle asynchronously (a namespace teardown, a job).
+    let start = Instant::now();
+    while domain_is_empty(&record) != DomainState::Empty {
+        assert!(start.elapsed() < Duration::from_secs(5), "record never judged empty");
+        std::thread::sleep(Duration::from_millis(10));
+    }
     let _ = spawned.child.wait();
 }
 
