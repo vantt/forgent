@@ -1718,3 +1718,109 @@ Raw logs remain under `/tmp/fgos-work/slice2/`: `baseline-staged-test_*.log`, `b
 - GitNexus MCP is not exposed here, and the brief forbids fgOS CLI capability queries. Impact-analysis evidence is **degraded/unqueried**, not asserted inactive. Source/history searches and architecture checks are the available evidence; no graph blast-radius or `detect_changes` proof is claimed. Direct boundaries changed are seat binding, Unit admission/resume, Workflow start/preflight, and runner Land; independent review remains required.
 - No overall cutover completion, real freeze, independent acceptance or main landing is claimed. No write outside the authorized code/test/report set is needed for this slice.
 - Preview attempt: `mdview open /home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md` exited **1** (read-only database); no preview URL is available. A later whitespace check found a trailing blank line in this report (exit **2**); it was removed before final verification.
+
+## L12-108 — Hook cost, owner repair and holder proof (Lead under A42; Doer delivery, 2026-10-22)
+
+### Supplied Lead rulings
+
+Recorded from `step-06b-slice1-rework3-brief.md`, not a new owner decision or independent acceptance:
+
+1. The reference hook has a POSIX sh front end: buffer transaction stdin once, exit without Node outside `prepared` or without an exact `refs/heads/main` update. Node/import failures affect main updates only. Measure a no-lease branch's five commits and five-commit rebase against no hook.
+2. Doctor is not applicable unless this is a Git repository shipping `.githooks/reference-transaction`; consumer projects with their own pre-commit hooks must not become red.
+3. A main-50 borrower is not holder proof. A legal held→released transition also needs the committing checkout's token to hash to the old holder hash. Held→abandoned is an **owner door by design in this single-owner repository**: the new sidecar must contain an abandon record with explicit owner confirmation and a non-empty written reason. The hook does not recompute drift. **Phase 9 cutover must recompute scope digests itself from Git and must never trust the sidecar's `drift` or `releaseScopeDigests` as authority.**
+4. Confirmed owner abandon with a written reason is the only repair door for corrupt committed sidecars. Every other transition and ordinary commit keeps refusing on corrupt authority.
+5. A failed transition restores the main checkout sidecar to the current `refs/heads/main` bytes, or removes it if absent, and removes a freshly written acquisition token.
+6. Keep the persistent holder token in its ignored checkout-root `.fgos/`. `git clean -fdX` deletes it; only owner abandon recovers. No alternative token store or recovery mechanism is added.
+7. Holder cutover edits reach main **only through `landRunnerItem`**, whose existing slice-2 gate authenticates the source checkout token. Raw main ref movement into frozen scope remains refused for holders too. No raw-Git holder bypass is introduced here.
+8. Use each root's own first tree entry instead of paging its whole subtree; remove the redundant default-sidecar scope check.
+
+### Implementation, reuse and limits
+
+Input HEAD: `10a6b66cc`. Read the complete r3 review and brief. History searches found the old shell hook at `6aa3d5c19`, intentionally replaced at `8b20f5185` for NUL-safe Node policy. Reuse its **phase/ref shell filtering only**, retaining the newer shared Node parser, borrower check and byte-safe path policy. The existing `.githooks/pre-commit` is now the Node entry for both hooks, with one shared read-only Git adapter; the reference shell delegates to it in explicit reference-transaction mode. No new hook file, source-layer raw Git adapter, Git port, token environment variable or argv credential was added. Its ordinary pre-commit path and all non-lease guards are unchanged.
+
+`legalTransition` now authenticates release with the committing checkout's token, and validates the owner's abandon record separately. Corrupt authority reaches only that same sidecar-only, direct-parent, borrowed owner-abandon edge. Repair writes a valid abandoned sidecar; because the corrupt holder identity cannot be trusted, its replacement hash is freshly generated without writing a token. The shared parser remains unchanged.
+
+**Main commit versus linked holder:** ScopedCommit still commits in main under documentation-cutover-10 → main-50. For linked-holder release, the production door authenticates the caller's root token, then lends those already-authenticated bytes to main's existing token path for the synchronous commit, so both hooks can independently check the committing checkout. A `finally` restores main's previous token bytes or removes that temporary copy; the holder's persistent token is removed only after a successful commit. There is no new credential path or transport. Success and forced-commit-failure tests verify both cleanups, including preservation of an unrelated prior main token. This is cleanup for returned/throwing calls, **not a SIGKILL or power-loss cleanup guarantee**; no new crash-recovery mechanism is claimed.
+
+The existing atomic sidecar writer is factored into one byte writer reused for token lending and byte-exact rollback; the existing Inspect sidecar read is factored for rollback without parsing/reserializing corrupt evidence. Rollback re-reads current main rather than restoring the preflight snapshot. Scope digests request only the first matching entry for each root and compare its exact path, preserving explicit absent roots. Inspect's internal recursive listing is unchanged; this removes repeated **paging**, not all backend tree traversal. The scope matcher still accepts optional custom sidecars without checking the default sidecar twice.
+
+No slice-2 source/test file, setup registration, baseline, skill, or `docs/**` file was edited. Census regeneration also refreshes the four already-committed slice-2 source digests; those source files themselves are unchanged. The scanner reports **53 undeclared sites** (52 spawn + 1 unresolved binary), not a green one-door result. Sharing the hook adapter removes the duplicate reference-hook site from the prior 54; the remaining hook adapter is still reported, alongside the inherited script sites. No scanner rule or allowlist was weakened.
+
+### Finding → owning production-path proof
+
+`U` = `test/runner/documentation-cutover-lease.test.mjs`; `E` = `test/e2e/documentation-cutover-lease-hooks.test.mjs`. “Closed” below means authored and verified on this branch, **not** independently accepted.
+
+| Finding | Disposition and owning proof |
+| --- | --- |
+| NEW-1 | Closed: E `reference shell skips Node outside prepared main updates, including batched refs` proves zero Node spawns for non-prepared/non-main/exact-prefix-negative transactions and one spawn for a batched main update. Breaking the real policy import still permits a branch commit but refuses main. E `no-lease branch five commits and five-commit rebase stay close to no-hook cost` measures three paired runs: latest medians **52.048 ms bare / 223.664 ms hooked**, below `bare * 6 + 500 ms`. Both omit only the independent pre-commit hook with Git's normal `--no-verify`. |
+| NEW-2 | Closed: U `doctor is not applicable in non-git, plain git and consumer projects with their own hooks` includes consumer `.githooks/pre-commit` plus `core.hooksPath=.githooks`. U's existing wiring/held/missing-resource test remains green; setup registry wiring proof remains green. |
+| NEW-3 | Closed within the supplied trust boundary: E `a real main borrower cannot rewrite a held lease, change its hash, expand paths or change its parent` now tries the review's unchanged-hash/forged-empty-drift release, missing/blank/unconfirmed abandon records, and the earlier invalid transitions through **ordinary commit, --no-verify commit and raw update-ref**, all under a real borrowed main-50. E `CLI release and non-holder owner abandon each commit one legal sidecar transition` proves authentic linked-holder release and the deliberate owner door. Drift recomputation remains the explicit Phase 9 obligation above, not a hook guarantee. |
+| NEW-4 | Closed: E `corrupt or unknown committed sidecars are rejected consistently by both hooks and CLI acquire` preserves corrupt refusal cases, rejects acquire/release/unconfirmed abandon and forged borrowed repairs, rejects a confirmed repair without the borrower, then uses the real confirmed owner-abandon CLI to commit exactly one repair for each corrupt input. |
+| NEW-5 | Closed for synchronous failures: E `failed CLI transitions restore main sidecar bytes and remove only freshly written tokens` forces the real commit hook to reject. It checks absent, held, released and corrupt byte restoration, clean main status, fresh acquisition-token removal and existing holder-token preservation. E `concurrent raw main move during CLI acquire returns base-moved without retrying` now also asserts no sidecar/token residue and a clean checkout after the moved-base refusal. |
+| NEW-6 | Documented in the production module header and this ruling. E `git clean -fdX does not reopen the freeze in worktrees` now actually cleans the **holder**, proves token deletion and release refusal, keeps scoped commits refused, and recovers only through confirmed owner abandon. |
+| Holder landings / preserved reproductions | E holder raw-move test still refuses; E `reference guard preserves held main through aliases, batches, deletion and reset` adds the review's symbolic alias, branch-force alias, stdin update, main deletion and backwards-reset probes. Existing NUL/multi-path/rename/typechange/non-ASCII, cherry-pick/rebase/am/pull, checkpoint, borrowed-description, private-token CLI output, and twenty acquire-race trials remain passing. Slice-2 Land gate tests pass unchanged. |
+| Nits | U `scope root OIDs cover large subtrees and release records drift rather than refusing it` preserves the >600-entry/late-child-drift case and compares every returned root OID or absence against real `ls-tree`. U scope matcher still iterates the single production scope export. No owning behavior/test was retired; only the former full-paging test title was updated to describe the preserved behavior. |
+
+### Exact commands, exits and baseline comparison
+
+All manual scratch/logs are under `/tmp/fgos-work/lease-rework3/`. No suite launcher or `npm test` was used. The following was the final single-file command for **each** path in the first table:
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/lease-rework3 FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test "$file"
+```
+
+| Exact `$file` | Exit | Pass / fail |
+| --- | --- | --- |
+| `test/runner/documentation-cutover-lease.test.mjs` | 0 | 11 / 0 |
+| `test/e2e/documentation-cutover-lease-hooks.test.mjs` | 0 | 31 / 0 |
+| `test/setup/checks.test.mjs` | 0 | 110 / 0 |
+| `test/holder-lock/registry-contract.test.mjs` | 0 | 23 / 0 |
+| `test/architecture.test.mjs` | 0 | 29 / 0 |
+| `test/cli/subcommand-flag-drift.test.mjs` | 0 | 16 / 0 |
+| `test/e2e/root-file-guard-hook.test.mjs` | 0 | 13 / 0 |
+
+The same command was also run on all five slice-2 regression files below: **exit 1 each**, because the sandbox's default global state root and `/var/tmp` are read-only, plus missing native staging in tests without bootstrap. No code/test was changed to suppress those failures. As in L12-107, rerun each file with existing fixture/native controls:
+
+```sh
+# preload.mjs contains only:
+# import { ensureGitAddon } from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/git-addon.mjs';
+# ensureGitAddon();
+# state/ is an existing mode-0700 scratch directory.
+env -u CLAUDE_CODE_SESSION_ID FGOS_STATE_ROOT=/tmp/fgos-work/lease-rework3/state FGOS_TEST_FIXTURE_ROOT=/tmp/fgos-work/lease-rework3/fixtures TMPDIR=/tmp/fgos-work/lease-rework3 FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --import /tmp/fgos-work/lease-rework3/preload.mjs --test "$file"
+```
+
+| Exact `$file` | Controlled exit | Pass / fail | Baseline at input HEAD |
+| --- | --- | --- | --- |
+| `test/runner/execution/bind.test.mjs` | 0 | 78 / 0 | L12-107: 78 / 0 |
+| `test/runner/execution/run-case-admission.test.mjs` | 1 | 7 / 8 | Re-run: 7 / 8, exit 1 |
+| `test/runner/merge-land.test.mjs` | 0 | 18 / 0 | L12-107: 18 / 0 |
+| `test/workflow/case-admission-port.test.mjs` | 1 | 9 / 3 | Re-run: 9 / 3, exit 1 |
+| `test/runner/execution/run.test.mjs` | 1 | 44 / 38 | Re-run: 44 / 38, exit 1 |
+
+Baseline reproduction for the three still-red files: `git archive HEAD src bin scripts test core domains packages apps docs Cargo.toml Cargo.lock package.json package-lock.json README.md AGENTS.md .githooks .gitignore LICENSE | tar -x -C /tmp/fgos-work/lease-rework3/baseline-tree` (exit 0). Copy the same verified production addon and native helper to their manifest-relative paths in that scratch tree and install its `native-addon.json` descriptor (exit 0), using the normal package-descriptor channel, not a test bypass. For each of the three named files, the exact baseline command was:
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID FGOS_STATE_ROOT=/tmp/fgos-work/lease-rework3/state FGOS_TEST_FIXTURE_ROOT=/tmp/fgos-work/lease-rework3/fixtures TMPDIR=/tmp/fgos-work/lease-rework3 FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test "/tmp/fgos-work/lease-rework3/baseline-tree/$file"
+```
+
+Comparing failed **test-name sets** between baseline and controlled current runs gives **zero added and zero removed** for all three files (8, 3 and 38 failures respectively). This is not a full-suite-green claim. Logs are `final-test_*.log`, `prescribed-test_*.log`, `controlled-test_*.log` and `baseline-test_*.log` in the scratch directory.
+
+Other exact verification commands:
+
+```sh
+# exit 0, 5 pass; Cargo artifacts stay under this checkout's ignored target/.
+CARGO_TARGET_DIR="$PWD/target/lease-scope-rank" ~/.cargo/bin/cargo test -p fgos-holder-lock --test scope_rank
+# exit 1, census written; 53 undeclared sites disclosed above.
+env FGOS_STATE_ROOT=/tmp/fgos-work/lease-rework3/scan-state node scripts/git-one-door-scan.mjs --write-census
+# exit 0
+git diff --check
+```
+
+The original e2e development runs were red: the first shell/helper entry did not recognize the symlinked fixture entrypoint, and subsequent runs exposed an attempted corrupt-state reset (correctly refused) and byte-encoded native stderr in the forced-failure assertion. The final implementation reuses the existing hook entry rather than adding that entrypoint; the fixture unstages via index-only restore, and the assertion decodes the real native error bytes. No production refusal was bypassed to make those tests pass.
+
+### Handoff and remaining scope
+
+- No repository Git write, real documentation lease, lifecycle transition, main landing, new engine, dispatch or secrets-env read was performed. Test Git writes and lease operations were confined to temporary repositories. Existing test helpers staged native artifacts only under ignored `.fgos/runtime/`; Cargo used ignored `target/`. The required assignment acknowledgment/results live only in the assigned outbox.
+- Impact-analysis evidence is **degraded**, not asserted inactive: `fgos tool query --capability impact-analysis --status present` was attempted once because repository instructions require it; it exited **127** before a provider query (`no .fgos/installation found`). No bootstrap/retry/state operation followed. GitNexus MCP is not exposed. Caller/history searches and architecture tests are the available evidence; no graph blast-radius or `detect_changes` claim is made. The runner owns committing.
+- The authorized code slice is delivered; independent A38 review, Phase 9 drift recomputation, rehearsal, public documentation and main landing remain separate. `CHANGELOG.md` needs an authorized follow-up entry for the user-visible hook/doctor/repair fixes; it was not edited outside this slice and is listed in the result's `needsWrites`.
+- Preview attempted with `mdview open /home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md`: exit **1**, read-only database. No preview URL was produced.

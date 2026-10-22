@@ -1,17 +1,7 @@
-#!/usr/bin/env node
-// Guard main ref updates, including commits made with --no-verify.
-import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
-import { guardReferenceTransaction } from '../src/runner/documentation-cutover-lease-hook.mjs';
-
-if (process.argv[2] === 'prepared') {
-  const root = process.cwd();
-  const git = args => execFileSync('git', ['--no-replace-objects', ...args], {
-    cwd: root, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 64 * 1024 * 1024,
-  });
-  const refusal = guardReferenceTransaction({ git, root, input: fs.readFileSync(0, 'utf8') });
-  if (refusal) {
-    process.stderr.write(`${refusal}\n`);
-    process.exitCode = 1;
-  }
-}
+#!/bin/sh
+# Buffer ref lines once; byte-sensitive path policy remains in Node. Unrelated
+# ref operations must not pay Node startup or depend on its imports being valid.
+[ "$1" = prepared ] || exit 0
+INPUT=$(cat) || exit 1
+printf '%s\n' "$INPUT" | grep -q ' refs/heads/main$' || exit 0
+printf '%s\n' "$INPUT" | exec node "$(dirname "$0")/pre-commit" reference-transaction prepared

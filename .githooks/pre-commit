@@ -30,7 +30,7 @@ import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 import { probe, lockHolders, checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
 import { readBeacon, judgeBeacon, writeBeacon, DEFAULT_BEACON_WINDOW_MS } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
-import { guardCommit } from '../src/runner/documentation-cutover-lease-hook.mjs';
+import { guardCommit, guardReferenceTransaction } from '../src/runner/documentation-cutover-lease-hook.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -469,6 +469,15 @@ function scopedGrantAllows(committingToplevel) {
   } catch { return false; }
 }
 
+// Both Git hooks use this read-only adapter. The reference-transaction shell
+// starts Node here only for prepared main updates; ordinary ref operations do
+// not depend on any of these imports. Lease policy remains in the shared module.
+function leaseGitRead(args) {
+  return execFileSync('git', ['--no-replace-objects', ...args], {
+    cwd: process.cwd(), stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 64 * 1024 * 1024,
+  });
+}
+
 async function main() {
   const eventRefusal = addedEventPathRefusal(process.cwd());
   if (eventRefusal) { console.error(eventRefusal); process.exitCode = 1; return; }
@@ -500,10 +509,7 @@ async function main() {
     return;
   }
 
-  const leaseRefusal = guardCommit({ root: committingToplevel, git: args =>
-    execFileSync('git', ['--no-replace-objects', ...args], {
-      cwd: committingToplevel, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 64 * 1024 * 1024,
-    }) });
+  const leaseRefusal = guardCommit({ root: committingToplevel, git: leaseGitRead });
   if (leaseRefusal) {
     refuse(leaseRefusal);
     return;
@@ -587,4 +593,9 @@ async function main() {
   process.exit(0);
 }
 
-await main();
+if (process.argv[2] === 'reference-transaction' && process.argv[3] === 'prepared') {
+  const refusal = guardReferenceTransaction({ git: leaseGitRead, root: process.cwd(), input: fs.readFileSync(0, 'utf8') });
+  if (refusal) { process.stderr.write(`${refusal}\n`); process.exitCode = 1; }
+} else {
+  await main();
+}

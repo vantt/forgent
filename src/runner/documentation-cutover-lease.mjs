@@ -1,5 +1,9 @@
 // The committed main-ref sidecar persists the freeze; kernel locks serialize
-// transitions only. Tokens stay in the holder checkout, never in argv or env.
+// transitions only. Persistent tokens stay in the holder checkout's ignored
+// .fgos/, never in argv or env; release lends it to the main committer only
+// under main-50. git clean -fdX deletes the token: only owner abandon recovers.
+// Abandon is an explicit owner door in this single-owner repository, not holder
+// proof. Cutover consumers recompute digests; sidecar drift is not authority.
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -24,7 +28,8 @@ export function normalizeScopePath(raw) {
 }
 export function isScopedPath(target, { sidecarPath = DEFAULT_SIDECAR_PATH } = {}) {
   const name = normalizeScopePath(target);
-  return name === sidecarPath || LEASE_SCOPE_PATTERNS.some(pattern => pattern.endsWith('/**')
+  const patterns = sidecarPath === DEFAULT_SIDECAR_PATH ? LEASE_SCOPE_PATTERNS : [...LEASE_SCOPE_PATTERNS, sidecarPath];
+  return patterns.some(pattern => pattern.endsWith('/**')
     ? name === pattern.slice(0, -3) || name.startsWith(pattern.slice(0, -2))
     : name === pattern);
 }
@@ -39,13 +44,16 @@ export function readTokenFromWorktree(root) {
   try { return fs.readFileSync(path.join(root, DEFAULT_TOKEN_FILE), 'utf8').trim(); }
   catch { return null; }
 }
-export function writeSidecarAtomic(file, data) {
+function writeLeaseFileAtomic(file, bytes) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   const temp = `${file}.${crypto.randomUUID()}.tmp`;
   try {
-    fs.writeFileSync(temp, `${JSON.stringify(data, null, 2)}\n`, { mode: 0o600 });
+    fs.writeFileSync(temp, bytes, { mode: 0o600 });
     fs.renameSync(temp, file);
   } finally { fs.rmSync(temp, { force: true }); }
+}
+export function writeSidecarAtomic(file, data) {
+  writeLeaseFileAtomic(file, `${JSON.stringify(data, null, 2)}\n`);
 }
 
 /** One parser for Node gates and both Git hooks. Null alone means absent. */
@@ -59,20 +67,24 @@ export function parseSidecarJson(raw) {
   } catch { return { status: 'corrupt', error: 'invalid-sidecar' }; }
 }
 
+function readSidecarBlob(repoRoot, sidecarPath, revision) {
+  const inspect = createGitInspect(gitPortOptions(repoRoot));
+  const oid = revision ?? inspect.resolveRef({ name: 'refs/heads/main' })?.oid;
+  if (!oid) return null;
+  const [entry] = inspect.pathsAtRevision({ revision: oid, paths: [[...Buffer.from(sidecarPath)]], maxBlobBytes: 1048576 });
+  if (entry?.value.kind === 'absent') return null;
+  if (entry?.value.kind !== 'present') throw new Error('sidecar is not a blob');
+  return Buffer.from(entry.value.bytes);
+}
 export function readSidecarFromMain(repoRoot, sidecarPath = DEFAULT_SIDECAR_PATH, { revision } = {}) {
   try {
-    const inspect = createGitInspect(gitPortOptions(repoRoot));
-    const oid = revision ?? inspect.resolveRef({ name: 'refs/heads/main' })?.oid;
-    if (!oid) return { status: 'absent' };
-    const [entry] = inspect.pathsAtRevision({ revision: oid, paths: [[...Buffer.from(sidecarPath)]], maxBlobBytes: 1048576 });
-    if (entry?.value.kind === 'absent') return { status: 'absent' };
-    if (entry?.value.kind !== 'present') throw new Error('sidecar is not a blob');
-    return parseSidecarJson(Buffer.from(entry.value.bytes).toString('utf8'));
+    const raw = readSidecarBlob(repoRoot, sidecarPath, revision);
+    return parseSidecarJson(raw === null ? null : raw.toString('utf8'));
   } catch { return { status: 'corrupt', error: 'unreadable-sidecar' }; }
 }
 
-/** Listing each root separately, including every page, avoids repository-size
- * dependent omissions. Absent roots are explicit so additions also cause drift.
+/** The exact root sorts before its descendants: its first entry is sufficient,
+ * without paging its subtree. Absent roots are explicit so additions cause drift.
  * The sidecar is transition evidence, not payload: exclude it from its own digest. */
 export function computeScopeDigests(repoRoot, revision) {
   const inspect = createGitInspect(gitPortOptions(repoRoot));
@@ -81,18 +93,8 @@ export function computeScopeDigests(repoRoot, revision) {
   const digests = {};
   for (const pattern of LEASE_SCOPE_PATTERNS.filter(p => p !== DEFAULT_SIDECAR_PATH)) {
     const root = pattern.endsWith('/**') ? pattern.slice(0, -3) : pattern;
-    let digest = null;
-    let cursor;
-    do {
-      const page = inspect.listTree({ revision: oid, prefix: root, maxEntries: 256, ...(cursor ? { cursor } : {}) });
-      for (const entry of page.entries) {
-        const name = Buffer.from(entry.path).toString('utf8');
-        if (name === root) digest = entry.oid;
-      }
-      if (!page.complete && (!page.nextCursor || JSON.stringify(page.nextCursor) === JSON.stringify(cursor))) throw leaseError('scope-digests-unavailable', 'incomplete scope listing');
-      cursor = page.nextCursor;
-    } while (cursor);
-    digests[root] = digest;
+    const [entry] = inspect.listTree({ revision: oid, prefix: root, maxEntries: 1 }).entries;
+    digests[root] = entry && Buffer.from(entry.path).toString('utf8') === root ? entry.oid : null;
   }
   return digests;
 }
@@ -119,23 +121,45 @@ function transition(options, change) {
     const baseline = port.preflight({}, held);
     if (baseline.reference !== 'refs/heads/main') throw leaseError('main-not-checked-out', 'main checkout must be on refs/heads/main');
     const old = readSidecarFromMain(mainRoot, DEFAULT_SIDECAR_PATH, { revision: baseline.head });
-    if (old.status === 'corrupt') throw leaseError('corrupt-sidecar', 'lease sidecar on main is corrupt or unreadable');
+    if (old.status === 'corrupt' && !options.ownerConfirmed) throw leaseError('corrupt-sidecar', 'lease sidecar on main is corrupt or unreadable');
     const result = change({ facts, mainRoot, old, baseline });
-    writeSidecarAtomic(path.join(mainRoot, DEFAULT_SIDECAR_PATH), result.sidecar);
+    const sidecarFile = path.join(mainRoot, DEFAULT_SIDECAR_PATH);
     let receipt;
+    let restoreToken;
     try {
+      // ScopedCommit commits in main, not the calling linked checkout. Lend the
+      // already authenticated holder token to that committing checkout only for
+      // the synchronous commit, under main-50; restore its prior file afterwards.
+      if (result.result === 'released' && facts.worktreeRoot !== mainRoot) {
+        const tokenFile = path.join(mainRoot, DEFAULT_TOKEN_FILE);
+        const token = readTokenFromWorktree(facts.worktreeRoot);
+        if (hashHolderToken(token) !== old.sidecar.holderTokenHash) throw leaseError('not-holder', 'caller is not the lease holder');
+        let previous = null;
+        try { previous = fs.readFileSync(tokenFile); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+        restoreToken = () => previous === null ? fs.rmSync(tokenFile, { force: true }) : writeLeaseFileAtomic(tokenFile, previous);
+        writeLeaseFileAtomic(tokenFile, `${token}\n`);
+      }
+      writeSidecarAtomic(sidecarFile, result.sidecar);
       receipt = port.commit({ baseline, operationId: crypto.randomUUID(), request: {
         writes: [DEFAULT_SIDECAR_PATH], message: `chore(docs): ${result.result} documentation cutover lease`, cutoverGrant: null,
       } }, held);
+      if (receipt.status !== 'committed' || receipt.files.length !== 1 || receipt.files[0] !== DEFAULT_SIDECAR_PATH) {
+        throw leaseError('lease-commit-failed', `lease commit did not satisfy its contract (${receipt.status})`);
+      }
     } catch (error) {
+      try {
+        // Main may have moved after preflight: restore its current committed
+        // bytes, not the attempted transition or a stale baseline copy.
+        const raw = readSidecarBlob(mainRoot, DEFAULT_SIDECAR_PATH);
+        if (raw === null) fs.rmSync(sidecarFile, { force: true });
+        else writeLeaseFileAtomic(sidecarFile, raw);
+      } finally { result.onFailure?.(); }
       if (/baseline.*changed|base-moved|head.*changed|stale-baseline|source-baseline-stale/i.test(error.message)) throw leaseError('base-moved', 'base-moved: main moved during lease transition; refusing without retry');
       throw error;
-    }
-    if (receipt.status !== 'committed' || receipt.files.length !== 1 || receipt.files[0] !== DEFAULT_SIDECAR_PATH) {
-      throw leaseError('lease-commit-failed', `lease commit did not satisfy its contract (${receipt.status})`);
-    }
+    } finally { restoreToken?.(); }
     result.afterCommit?.();
     delete result.afterCommit;
+    delete result.onFailure;
     return { ...result, commit: receipt };
   } finally {
     main?.handle?.release();
@@ -144,6 +168,7 @@ function transition(options, change) {
 }
 export function acquireDocumentationCutoverLease(options = {}) {
   return transition(options, ({ facts, mainRoot, old, baseline }) => {
+    if (old.status === 'corrupt') throw leaseError('corrupt-sidecar', 'lease sidecar on main is corrupt or unreadable');
     if (old.status === 'held') throw leaseError('lease-already-held', 'documentation-cutover lease is already held');
     const inspect = createGitInspect(gitPortOptions(mainRoot));
     const holder = options.worktree ? checkoutFacts(options.worktree) : facts;
@@ -155,10 +180,10 @@ export function acquireDocumentationCutoverLease(options = {}) {
     const scopeDigests = computeScopeDigests(mainRoot, baseline.head);
     const token = generateHolderToken();
     const tokenPath = path.join(root, DEFAULT_TOKEN_FILE);
-    fs.mkdirSync(path.dirname(tokenPath), { recursive: true });
-    fs.writeFileSync(tokenPath, `${token}\n`, { mode: 0o600 });
+    writeLeaseFileAtomic(tokenPath, `${token}\n`);
     const tokenHash = hashHolderToken(token);
-    return { result: 'acquired', tokenHash, tokenPath, sidecar: {
+    return { result: 'acquired', tokenHash, tokenPath,
+      onFailure: () => fs.rmSync(tokenPath, { force: true }), sidecar: {
       contract: { id: 'documentation-cutover-lease', version: 1 }, state: 'held', holderTokenHash: tokenHash,
       acquiredAt: new Date().toISOString(), worktree: root, branch: 'main', baseCommit: baseline.head,
       scope: [...LEASE_SCOPE_PATTERNS], scopeDigests,
@@ -181,12 +206,14 @@ export function releaseDocumentationCutoverLease(options = {}) {
 export function abandonDocumentationCutoverLease(options = {}) {
   if (!options.ownerConfirmed || typeof options.reason !== 'string' || !options.reason.trim()) throw leaseError('owner-confirmation-required', 'abandon requires --owner-confirmed and a written --reason');
   return transition(options, ({ old, baseline, mainRoot }) => {
-    if (old.status !== 'held') throw leaseError('lease-not-held', 'documentation-cutover lease is not held');
+    if (!['held', 'corrupt'].includes(old.status)) throw leaseError('lease-not-held', 'documentation-cutover lease is not held');
     const abandonedAt = new Date().toISOString();
+    const holderTokenHash = old.sidecar?.holderTokenHash ?? hashHolderToken(generateHolderToken());
     return { result: 'abandoned', abandonedAt, reason: options.reason.trim(), sidecar: {
-      ...old.sidecar, state: 'abandoned', releaseScopeDigests: computeScopeDigests(mainRoot, baseline.head),
-      abandon: { abandonedAt, reason: options.reason.trim(), holderTokenHash: old.sidecar.holderTokenHash,
-        ageMs: Math.max(0, Date.now() - Date.parse(old.sidecar.acquiredAt)) },
+      contract: { id: 'documentation-cutover-lease', version: 1 },
+      ...old.sidecar, state: 'abandoned', holderTokenHash, releaseScopeDigests: computeScopeDigests(mainRoot, baseline.head),
+      abandon: { abandonedAt, ownerConfirmed: true, reason: options.reason.trim(), holderTokenHash,
+        ...(old.status === 'corrupt' ? { repair: 'corrupt-sidecar' } : { ageMs: Math.max(0, Date.now() - Date.parse(old.sidecar.acquiredAt)) }) },
     } };
   });
 }
@@ -217,10 +244,10 @@ export function checkLeaseCommitGuard(root = process.cwd(), options = {}) {
 }
 export function checkDocumentationCutoverLeaseDoctor(cwd = process.cwd()) {
   const mainRoot = resolveMainCheckoutRoot(cwd);
-  if (!mainRoot || !fs.existsSync(path.join(mainRoot, '.githooks'))) return { passed: true, message: 'not applicable: project does not use repository hooks' };
+  if (!mainRoot || !fs.existsSync(path.join(mainRoot, '.githooks/reference-transaction'))) return { passed: true, message: 'not applicable: project does not use repository hooks' };
   const inspect = createGitInspect(gitPortOptions(mainRoot));
   if (!inspect.resolveRef({ name: 'refs/heads/main' })?.oid) return { passed: true, message: 'not applicable: no main branch' };
-  if (!mainCheckoutHookWired(mainRoot) || !fs.existsSync(path.join(mainRoot, '.githooks/reference-transaction'))) return { passed: false, message: 'documentation-cutover reference-transaction hook is not wired' };
+  if (!mainCheckoutHookWired(mainRoot)) return { passed: false, message: 'documentation-cutover reference-transaction hook is not wired' };
   const lease = readSidecarFromMain(mainRoot);
   if (lease.status === 'corrupt') return { passed: false, message: 'documentation-cutover lease sidecar is corrupt or unreadable' };
   if (lease.status !== 'held') return { passed: true, message: 'no documentation-cutover lease is held; reference-transaction hook wired' };

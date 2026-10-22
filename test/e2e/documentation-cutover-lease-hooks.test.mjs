@@ -341,10 +341,13 @@ test('both hooks ignore forged working-tree sidecars', (t) => {
 test('git clean -fdX does not reopen the freeze in worktrees', (t) => {
   const f = fixture(t);
   const wt = f.addWorktree('clean-test-wt');
-  f.setupLease();
+  f.setupLease(wt);
+  assert.ok(fs.existsSync(path.join(wt, DEFAULT_TOKEN_FILE)));
 
-  // Run git clean -fdX
+  // Clean deletes the holder's ignored token but not the committed freeze.
   f.git(['clean', '-fdX'], wt);
+  assert.equal(fs.existsSync(path.join(wt, DEFAULT_TOKEN_FILE)), false);
+  assert.notEqual(f.rawCli(['release'], wt).status, 0);
 
   // Commit to docs must still be refused
   f.put('docs/clean-test.md', '# Clean Test\n', wt);
@@ -352,6 +355,8 @@ test('git clean -fdX does not reopen the freeze in worktrees', (t) => {
   const res = f.commit(['-m', 'clean test commit'], wt);
   assert.notEqual(res.status, 0);
   assert.match(res.stderr, /commit refused: the documentation-cutover write lease is held/);
+  f.git(['reset', '--hard', '-q'], wt);
+  assert.equal(f.cli(['abandon', '--owner-confirmed', '--reason', 'holder token removed by clean']).result, 'abandoned');
 });
 
 test('pre-commit refuses renaming a scoped file outside scope', (t) => {
@@ -407,6 +412,8 @@ test('CLI release and non-holder owner abandon each commit one legal sidecar tra
   assert.equal(released.result, 'released'); assert.deepEqual(released.drift, []);
   assert.equal(f.git(['rev-list', '--count', `${before}..main`]), '1');
   assert.equal(JSON.parse(f.git(['show', `main:${DEFAULT_SIDECAR_PATH}`])).state, 'released');
+  assert.equal(fs.existsSync(path.join(f.repo, DEFAULT_TOKEN_FILE)), false, 'borrowed token is removed from committing checkout');
+  assert.equal(fs.existsSync(path.join(holder, DEFAULT_TOKEN_FILE)), false, 'holder token is removed after successful release');
   // Released leases need neither a scoped diff nor native borrower/token
   // resolution. Reject those reads at the real Git adapter if attempted.
   const realGit = execFileSync('which', ['git'], { encoding: 'utf8' }).trim();
@@ -451,6 +458,30 @@ test('raw main movement into frozen scope is refused even from the holder checko
   assert.equal(f.git(['rev-parse', 'main']), old);
 });
 
+// Existing update-ref and porcelain tests do not exercise symbolic refs,
+// batched stdin, deletion or backwards movement of the authoritative branch.
+test('reference guard preserves held main through aliases, batches, deletion and reset', t => {
+  const f = fixture(t); f.setupLease();
+  const old = f.git(['rev-parse', 'main']);
+  f.put('docs/raw-alias.md', 'scoped candidate'); f.git(['add', 'docs/raw-alias.md']);
+  const candidate = f.git(['commit-tree', f.git(['write-tree']), '-p', old, '-m', 'raw candidate']);
+  f.git(['reset', '-q']);
+  f.git(['symbolic-ref', 'refs/heads/alias', 'refs/heads/main']);
+  const attempts = [
+    { args: ['update-ref', 'refs/heads/alias', candidate, old] },
+    { args: ['branch', '-f', 'alias', candidate] },
+    { args: ['update-ref', '--stdin'], input: `update refs/heads/main ${candidate} ${old}\n` },
+    { args: ['update-ref', '-d', 'refs/heads/main', old] },
+    { args: ['reset', '--hard', 'main^'] },
+  ];
+  for (const attempt of attempts) {
+    const res = spawnSync('git', attempt.args, { cwd: f.repo, env, input: attempt.input, encoding: 'utf8' });
+    assert.notEqual(res.status, 0, attempt.args.join(' '));
+    assert.match(res.stderr, /reference-transaction refused/);
+    assert.equal(f.git(['rev-parse', 'main']), old);
+  }
+});
+
 test('both hooks fail closed when their path diff fails under a held production lease', t => {
   const f = fixture(t); f.setupLease();
   f.put('docs/diff-failure.md', 'scoped change'); f.git(['add', 'docs/diff-failure.md']);
@@ -477,7 +508,45 @@ test('corrupt or unknown committed sidecars are rejected consistently by both ho
       assert.notEqual(res.status, 0); assert.match(res.stderr, /corrupt/);
     }
     assert.notEqual(f.rawCli(['acquire']).status, 0);
-    f.git(['-c', 'core.hooksPath=/dev/null', 'reset', '--hard', '-q']);
+    assert.notEqual(f.rawCli(['release']).status, 0);
+    assert.notEqual(f.rawCli(['abandon', '--reason', 'corrupt']).status, 0);
+    assert.notEqual(f.rawCli(['abandon', '--owner-confirmed', '--reason', ' ']).status, 0);
+    f.git(['restore', '--staged', '--', 'docs/corrupt.md']);
+    fs.rmSync(path.join(f.repo, 'docs/corrupt.md'));
+    const before = f.git(['rev-parse', 'main']);
+    if (raw === 'not JSON') {
+      // A borrower cannot use corruption as an acquire/release bypass, and a
+      // confirmed repair record without the borrower is not the owner door.
+      const repair = { state: 'abandoned', holderTokenHash: '0'.repeat(64), abandon: { ownerConfirmed: true, reason: 'repair' } };
+      const lock = acquireSync(createLockScope('corrupt-transition-adversary'), 'main-checkout', { fgosDir: path.join(f.repo, '.fgos') });
+      assert.equal(lock.result, 'acquired');
+      try {
+        for (const data of [
+          { ...repair, state: 'held' }, { ...repair, state: 'released' },
+          { ...repair, abandon: { ownerConfirmed: false, reason: 'repair' } },
+          { ...repair, abandon: { ownerConfirmed: true, reason: ' ' } }, repair,
+        ]) {
+          f.put(DEFAULT_SIDECAR_PATH, JSON.stringify(data)); f.git(['add', DEFAULT_SIDECAR_PATH]);
+          const candidate = f.git(['commit-tree', f.git(['write-tree']), '-p', before, '-m', 'forged repair']);
+          f.git(['restore', '--staged', '--', DEFAULT_SIDECAR_PATH]);
+          const result = data === repair
+            ? spawnSync('git', ['update-ref', 'refs/heads/main', candidate, before], { cwd: f.repo, env, encoding: 'utf8' })
+            : runBorrowed(lock.handle, { command: 'git', args: ['update-ref', 'refs/heads/main', candidate, before], cwd: f.repo, env });
+          assert.notEqual(data === repair ? result.status : result.exit, 0);
+          assert.match(result.stderr, /reference-transaction refused/);
+          assert.equal(f.git(['rev-parse', 'main']), before);
+        }
+      } finally { lock.handle.release(); }
+      f.put(DEFAULT_SIDECAR_PATH, raw);
+    }
+    const repaired = f.cli(['abandon', '--owner-confirmed', '--reason', 'repair corrupt lease']);
+    assert.equal(repaired.result, 'abandoned');
+    assert.equal(f.git(['rev-list', '--count', `${before}..main`]), '1');
+    const sidecar = JSON.parse(f.git(['show', `main:${DEFAULT_SIDECAR_PATH}`]));
+    assert.deepEqual(sidecar.abandon, repaired.sidecar.abandon);
+    assert.equal(sidecar.abandon.ownerConfirmed, true);
+    assert.equal(sidecar.abandon.repair, 'corrupt-sidecar');
+    assert.equal(f.git(['status', '--porcelain']), '');
   }
 });
 
@@ -488,6 +557,10 @@ test('a real main borrower cannot rewrite a held lease, change its hash, expand 
   const cases = [
     { data: { ...sidecarData, state: 'held' } },
     { data: { ...sidecarData, state: 'released', holderTokenHash: '0'.repeat(64) } },
+    { data: { ...sidecarData, state: 'released', drift: [], releaseScopeDigests: sidecarData.scopeDigests } },
+    { data: { ...sidecarData, state: 'abandoned' } },
+    { data: { ...sidecarData, state: 'abandoned', abandon: { ownerConfirmed: true, reason: ' ' } } },
+    { data: { ...sidecarData, state: 'abandoned', abandon: { ownerConfirmed: false, reason: 'lost token' } } },
     { data: { ...sidecarData, state: 'released' }, extra: true },
     { data: { ...sidecarData, state: 'released' }, parent: earlier },
     { data: { ...sidecarData, state: 'unknown' } },
@@ -501,6 +574,12 @@ test('a real main borrower cannot rewrite a held lease, change its hash, expand 
     const lock = acquireSync(createLockScope('transition-adversary'), 'main-checkout', { fgosDir: path.join(f.repo, '.fgos') });
     assert.equal(lock.result, 'acquired');
     try {
+      f.git(['add', DEFAULT_SIDECAR_PATH, ...(entry.extra ? ['docs/extra.md'] : [])]);
+      for (const flags of [[], ['--no-verify']]) {
+        const committed = runBorrowed(lock.handle, { command: 'git', args: ['commit', '-qm', 'forged transition', ...flags], cwd: f.repo, env });
+        assert.notEqual(committed.exit, 0); assert.match(committed.stderr, /commit refused|reference-transaction refused/);
+      }
+      f.git(['reset', '-q']);
       const result = runBorrowed(lock.handle, { command: 'git', args: ['update-ref', 'refs/heads/main', candidate, old], cwd: f.repo, env });
       assert.notEqual(result.exit, 0); assert.match(result.stderr, /reference-transaction refused/);
       assert.equal(f.git(['rev-parse', 'main']), old);
@@ -555,6 +634,105 @@ exec '${realGit}' "$@"
   assert.notEqual(res.status, 0); assert.match(res.stderr + res.stdout, /base-moved/);
   assert.equal(f.git(['rev-parse', 'main']), next);
   assert.throws(() => f.git(['show', `main:${DEFAULT_SIDECAR_PATH}`]));
+  assert.equal(fs.existsSync(path.join(f.repo, DEFAULT_SIDECAR_PATH)), false);
+  assert.equal(fs.existsSync(path.join(f.repo, DEFAULT_TOKEN_FILE)), false);
+  assert.equal(f.git(['status', '--porcelain']), '');
+});
+
+// No earlier proof measures the ref-only hot path or import-failure isolation.
+test('reference shell skips Node outside prepared main updates, including batched refs', t => {
+  const f = fixture(t);
+  const tools = path.join(f.temp, 'node-probe'); fs.mkdirSync(tools);
+  const log = path.join(f.temp, 'node-invocations');
+  fs.writeFileSync(path.join(tools, 'node'), `#!/bin/sh\nprintf 'spawn\\n' >> '${log}'\nexit 97\n`, { mode: 0o755 });
+  const hook = path.join(f.host, '.githooks/reference-transaction');
+  const run = (phase, input) => spawnSync(hook, [phase], { cwd: f.repo, env: { ...env, PATH: `${tools}:${env.PATH}` }, input, encoding: 'utf8' });
+  const line = ref => `${'1'.repeat(40)} ${'2'.repeat(40)} ${ref}\n`;
+  for (const phase of ['committed', 'aborted', 'preparing']) assert.equal(run(phase, line('refs/heads/main')).status, 0);
+  for (const input of ['', line('HEAD'), line('refs/heads/main-extra') + line('refs/heads/other')]) assert.equal(run('prepared', input).status, 0);
+  assert.equal(fs.existsSync(log), false);
+  assert.equal(run('prepared', line('HEAD') + line('refs/heads/main') + line('refs/heads/other')).status, 97);
+  assert.equal(fs.readFileSync(log, 'utf8'), 'spawn\n');
+
+  // Break the real import path: only main updates depend on the Node policy.
+  fs.unlinkSync(path.join(f.host, 'src/runner'));
+  f.git(['checkout', '-qb', 'ordinary-branch']);
+  f.put('existing.txt', 'branch edit'); f.git(['add', 'existing.txt']);
+  assert.equal(f.commit(['--no-verify', '-m', 'ordinary branch']).status, 0);
+  f.git(['checkout', '-q', 'main']);
+  f.put('existing.txt', 'main edit'); f.git(['add', 'existing.txt']);
+  const failed = f.commit(['--no-verify', '-m', 'main import failure']);
+  assert.notEqual(failed.status, 0); assert.match(failed.stderr, /Cannot find module|ERR_MODULE_NOT_FOUND/);
+});
+
+test('no-lease branch five commits and five-commit rebase stay close to no-hook cost', t => {
+  // Isolate reference-transaction cost: --no-verify omits the independent
+  // pre-commit hook in both runs. Three paired timings reduce scheduler noise.
+  const samples = { bare: [], hooked: [] };
+  for (let trial = 0; trial < 3; trial++) {
+    const f = fixture(t);
+    for (const mode of trial % 2 ? ['hooked', 'bare'] : ['bare', 'hooked']) {
+      f.git(['config', 'core.hooksPath', mode === 'bare' ? '/dev/null' : path.join(f.host, '.githooks')]);
+      const start = performance.now();
+      f.git(['checkout', '-qb', `${mode}-${trial}`, 'main']);
+      for (let i = 0; i < 5; i++) {
+        f.put('existing.txt', `${mode}-${trial}-${i}\n`); f.git(['add', 'existing.txt']);
+        f.git(['commit', '--no-verify', '-qm', `branch edit ${i}`]);
+      }
+      f.git(['-c', 'core.editor=true', 'rebase', '--force-rebase', 'HEAD~5']);
+      samples[mode].push(performance.now() - start);
+      assert.equal(f.git(['rev-list', '--count', 'main..HEAD']), '5');
+    }
+  }
+  const median = values => values.toSorted((a, b) => a - b)[1];
+  const bare = median(samples.bare), hooked = median(samples.hooked);
+  t.diagnostic(JSON.stringify({ bareMs: bare, hookedMs: hooked, samples }));
+  assert.ok(hooked <= bare * 6 + 500, `ref-only hook overhead: ${hooked}ms versus ${bare}ms without hooks`);
+});
+
+// Prior successful transitions did not force a rejected production commit.
+test('failed CLI transitions restore main sidecar bytes and remove only freshly written tokens', t => {
+  const f = fixture(t); const holder = f.addWorktree('holder');
+  const preCommit = path.join(f.host, '.githooks/pre-commit');
+  const fail = () => fs.writeFileSync(preCommit, '#!/bin/sh\necho forced-commit-failure >&2\nexit 73\n', { mode: 0o755 });
+  const enable = () => fs.copyFileSync(path.join(sourceRoot, '.githooks/pre-commit'), preCommit);
+  const rejected = res => {
+    assert.notEqual(res.status, 0);
+    const error = JSON.parse(res.stderr.replace(/^fgos: /, '').trim());
+    assert.equal(error.cause, 'commit-rejected');
+    assert.equal(Buffer.from(error.stderr).toString('utf8'), 'forced-commit-failure\n');
+  };
+  const acquireFails = () => {
+    const old = f.git(['rev-parse', 'main']);
+    const res = f.rawCli(['acquire', '--worktree', holder]);
+    rejected(res);
+    assert.equal(f.git(['rev-parse', 'main']), old);
+    assert.equal(fs.existsSync(path.join(holder, DEFAULT_TOKEN_FILE)), false);
+    assert.equal(f.git(['status', '--porcelain']), '');
+  };
+  fail(); acquireFails();
+  assert.equal(fs.existsSync(path.join(f.repo, DEFAULT_SIDECAR_PATH)), false);
+  enable(); f.setupLease(holder);
+  const heldBytes = fs.readFileSync(path.join(f.repo, DEFAULT_SIDECAR_PATH));
+  const token = fs.readFileSync(path.join(holder, DEFAULT_TOKEN_FILE));
+  f.put(DEFAULT_TOKEN_FILE, 'previous main token\n');
+  fail();
+  const res = f.rawCli(['release'], holder);
+  rejected(res);
+  assert.deepEqual(fs.readFileSync(path.join(f.repo, DEFAULT_SIDECAR_PATH)), heldBytes);
+  assert.deepEqual(fs.readFileSync(path.join(holder, DEFAULT_TOKEN_FILE)), token);
+  assert.equal(fs.readFileSync(path.join(f.repo, DEFAULT_TOKEN_FILE), 'utf8'), 'previous main token\n');
+  assert.equal(f.git(['status', '--porcelain']), '');
+  enable(); f.cli(['release'], holder);
+  const releasedBytes = fs.readFileSync(path.join(f.repo, DEFAULT_SIDECAR_PATH));
+  fail(); acquireFails();
+  assert.deepEqual(fs.readFileSync(path.join(f.repo, DEFAULT_SIDECAR_PATH)), releasedBytes);
+  enable(); f.put(DEFAULT_SIDECAR_PATH, 'corrupt bytes without newline'); f.git(['add', DEFAULT_SIDECAR_PATH]);
+  f.git(['-c', 'core.hooksPath=/dev/null', 'commit', '-qm', 'corrupt fixture']);
+  fail();
+  assert.notEqual(f.rawCli(['abandon', '--owner-confirmed', '--reason', 'repair']).status, 0);
+  assert.equal(fs.readFileSync(path.join(f.repo, DEFAULT_SIDECAR_PATH), 'utf8'), 'corrupt bytes without newline');
+  assert.equal(f.git(['status', '--porcelain']), '');
 });
 
 for (const operation of ['cherry-pick', 'rebase', 'am', 'pull']) {

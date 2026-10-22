@@ -5,6 +5,7 @@ import { checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../holder-lo
 import { resolveMainCheckoutRoot } from './paths.mjs';
 import {
   DEFAULT_SIDECAR_PATH, parseSidecarJson, intersectsScope, checkLeaseCommitGuard,
+  hashHolderToken, readTokenFromWorktree,
 } from './documentation-cutover-lease.mjs';
 
 function readBlob(git, revision) {
@@ -37,20 +38,29 @@ function borrower(root, env) {
 }
 function legalTransition(old, next, changed, ref, parent, oldOid, root, env) {
   if (ref !== 'refs/heads/main' || parent !== oldOid || changed.length !== 1 || changed[0] !== DEFAULT_SIDECAR_PATH) return false;
-  if (old.status === 'corrupt' || next.status === 'corrupt' || next.status === 'absent') return false;
-  const valid = old.status === 'held'
-    ? ['released', 'abandoned'].includes(next.state) && next.sidecar.holderTokenHash === old.sidecar.holderTokenHash
-    : next.state === 'held';
+  if (next.status === 'corrupt' || next.status === 'absent') return false;
+  // Owner abandon is deliberately available without the holder's token in this
+  // single-owner repository, including repair of corrupt committed evidence.
+  const ownerAbandon = next.state === 'abandoned' && next.sidecar.abandon?.ownerConfirmed === true
+    && typeof next.sidecar.abandon.reason === 'string' && next.sidecar.abandon.reason.trim().length > 0;
+  let valid;
+  if (old.status === 'corrupt') valid = ownerAbandon;
+  else if (old.status === 'held') {
+    valid = next.sidecar.holderTokenHash === old.sidecar.holderTokenHash
+      && (ownerAbandon || (next.state === 'released'
+        && hashHolderToken(readTokenFromWorktree(root)) === old.sidecar.holderTokenHash));
+  } else valid = next.state === 'held';
+  // The hook authenticates transitions, not drift. Cutover recomputes digests
+  // from Git and never treats sidecar drift/releaseScopeDigests as authority.
   return valid && borrower(root, env);
 }
 export function guardCommit({ git, root, env = process.env }) {
   try {
     const raw = readBlob(git, 'refs/heads/main');
     const old = parseSidecarJson(raw);
-    if (old.status === 'corrupt') throw new Error('corrupt lease sidecar');
     // Free/released leases freeze nothing. The ref hook validates a new held
     // transition before publication, including bootstrap and reacquire.
-    if (old.status !== 'held') return null;
+    if (old.status !== 'held' && old.status !== 'corrupt') return null;
     const changed = paths(git(['diff', '--cached', '--name-only', '-z', '--no-renames']));
     if (changed.includes(DEFAULT_SIDECAR_PATH)) {
       const next = parseSidecarJson(git(['show', `:${DEFAULT_SIDECAR_PATH}`]).toString('utf8'));
@@ -68,18 +78,19 @@ export function guardReferenceTransaction({ git, root, input, env = process.env 
       if (ref !== 'refs/heads/main') continue;
       const raw = readBlob(git, 'refs/heads/main');
       const old = parseSidecarJson(raw);
-      if (old.status === 'corrupt') throw new Error('corrupt lease sidecar');
       if (/^0+$/.test(nextOid)) {
+        if (old.status === 'corrupt') throw new Error('corrupt lease sidecar');
         if (old.status === 'held') throw new Error('cannot delete main while lease held');
         continue;
       }
       const nextRaw = readBlob(git, nextOid);
-      if (old.status !== 'held' && raw === nextRaw) continue;
+      if (old.status !== 'held' && old.status !== 'corrupt' && raw === nextRaw) continue;
       const before = /^0+$/.test(oldOid) ? git(['rev-parse', 'refs/heads/main']).toString('utf8').trim() : oldOid;
       const changed = paths(git(['diff-tree', '-r', '--name-only', '-z', '--no-renames', before, nextOid]));
-      if (!intersectsScope(changed)) continue;
+      if (old.status !== 'corrupt' && !intersectsScope(changed)) continue;
       const parents = git(['rev-list', '--parents', '-n', '1', nextOid]).toString('utf8').trim().split(/\s+/);
       if (legalTransition(old, parseSidecarJson(nextRaw), changed, ref, parents[1], oldOid, root, env)) continue;
+      if (old.status === 'corrupt') throw new Error('corrupt lease sidecar');
       // Raw main ref movement into frozen scope is refused even for holders.
       if (old.status === 'held' || changed.includes(DEFAULT_SIDECAR_PATH)) throw new Error('reference update touches documentation scope or an unauthorized lease transition');
     }

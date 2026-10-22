@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ce462907d6d36d51d14980dabb63d1ef5f1ebf2edb85440b79c73d4113a432ad",
+  "payloadDigest": "c071510f1adb358ece372ff4c7b150dcc28229d892289122220735bed8fde4fc",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -64,8 +64,8 @@
     ".agents/skills/fgos-researching/SKILL.md": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
     ".agents/skills/fgos-routing/SKILL.md": "8a215975394d282772c768e69a0767aabbf1a2ca30e0fe7959252f7fcdba3a8e",
     ".agents/skills/fgos-run/SKILL.md": "03546387e1980b232ef90159c93aa8b7e6f7da787f71980d284fceea855bdc11",
-    ".githooks/pre-commit": "3f14047e6baeded92704109dbb2c5be214406e1776a6cdc428c6684f2432a87b",
-    ".githooks/reference-transaction": "43cea25015b4249921af85b4fba3d183e0a9f802272b6f73e356572bbdae7dd4",
+    ".githooks/pre-commit": "eb3a0f73a083a23636cea8336db8dd29ef06400afc252cb66751ebfbfe5e95e6",
+    ".githooks/reference-transaction": "9b60aab15523d079ab62e8f6dc0bbb187c27149ec4fb24a980a15af534fb9d02",
     "apps/fgctl/src/main.rs": "3f59cfc17cfd6c8268d15dcbeb0649b8cead1d18c387c7b20e14ce55ab26b9ff",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "bfea8f7ae0cf3efc8ca60adba26fa645613ccf1b1196dc2d220b69562401b8c6",
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c8a6cb7619d9578e02479069fbb0f43a5206583b53a7c6d65373d285d69ca331",
@@ -789,11 +789,11 @@
     "src/runner/dispatch/worker-session-boot.mjs": "4b9ab1d22466839c51a8ce0c34d973018cf365e3992e6556c8bc15a9aa110e10",
     "src/runner/dispatch/worker-session.mjs": "35e0cfe18540bad339abbf93a2ecdb99b1924249f637ae5f54b48c532892c3b0",
     "src/runner/dispatch/write-scope.mjs": "b926332413077cfb8246da969373de205ecf003b3a263baf6c08177a27d3885a",
-    "src/runner/documentation-cutover-lease-hook.mjs": "e00f2ff49f17eb343de203377aef5b901403a2f7f6bb533020ecbadfb050121c",
-    "src/runner/documentation-cutover-lease.mjs": "d83610250a2f26dce50e38276d3b91c44e19cb25b81000e5768153cdf0ba4447",
+    "src/runner/documentation-cutover-lease-hook.mjs": "4dc5cc1750e0f3b30acf2a2293d0dcee383229da3e913fdfa7a7fbca001fcc84",
+    "src/runner/documentation-cutover-lease.mjs": "5f995ffbd3d561566e187165943f103fa6ad16c610f7833da7dc7d63182ab72a",
     "src/runner/execution/account-pin.mjs": "0a9d8f632bd5b814c056139df3b4e340aac0574d8bd7db6b60c7a7b0305d4cfe",
     "src/runner/execution/account-rotation.mjs": "f538c5b3f787f0add709535aa0f6629bd007520575a316e19781cef43050553a",
-    "src/runner/execution/bind.mjs": "ce1143da7c20dab1c78646dbe7eab41e9c3057c142334aae6799cc8f67f0f44a",
+    "src/runner/execution/bind.mjs": "045812927c23dab5615400cf9af29d7ea47822b86ebdf9d1ec4c892452f2c39f",
     "src/runner/execution/case-admission-port.mjs": "e616357c33473e946ccd8db9ff6fe26eb39c7f06a68867112a287cccbc579cda",
     "src/runner/execution/commit-unit-work.mjs": "a2c0ba962257c38dc3f2b9f50749d71f9be11c356f6f435267d4530e11c43793",
     "src/runner/execution/dry-bind.mjs": "0bea24d7c173865c94556a96c23725cba02f9baab9e80fc38d8dd4679105a5d1",
@@ -809,7 +809,7 @@
     "src/runner/execution/patterns/reviewed.mjs": "4d89cb1825bca71a291cefe82cbeb82c606f3e6b65877f722573592e82c37998",
     "src/runner/execution/patterns/role-tasks.mjs": "6df89972192146084a969ed83d56acdd25969f9eff8fa4f1a71c1a4f103bf3e9",
     "src/runner/execution/patterns/solo.mjs": "709db6262995af3a6dde9f6c6be4180ea99d01f0a8a9b2b84690382118495694",
-    "src/runner/execution/run.mjs": "5fe5fb5b146c42e8e82537296b70b10f29cf79eef8dab641c2fdf1e354ed40df",
+    "src/runner/execution/run.mjs": "818ee8babe0ebd1a6672e61ae664ac0fedd3020dcf718786f6e18c5c13be7e7e",
     "src/runner/execution/seat-ledger.mjs": "718c47642cb722a890ef3cb423cd4aec4803ea7d815b9f56ce725003a3293bc7",
     "src/runner/execution/seat-policy.mjs": "90fa9d9fc57d58e0e6329733ca3fd06df93bdfa3d5e613bcffd2051c295be501",
     "src/runner/execution/seat-resolver.mjs": "183949d11fa46eb92f8e4491a3d84a479f26f83f1ca6710e61de4ce3633a2a31",
@@ -832,7 +832,7 @@
     "src/runner/main-checkout-activity.mjs": "84cd9b95e28c0c1004322b6edba0d2b4b45f9445eddc30613abd53314f13c071",
     "src/runner/main-checkout-reset-guard.mjs": "446d216c411dd5f59d512b5baf52b3a46eeb8ae03320f1d40be85e9447072d0c",
     "src/runner/main-fgos-checkpoint.mjs": "7bcdab7f2b887e149170b50180f97eae0ce666abff0aca88b9477357ed4d8e52",
-    "src/runner/merge.mjs": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577",
+    "src/runner/merge.mjs": "18d15eeb66f35c55af3e3f6a687266f18a8b3ece3e9708d8ca244ba51c7f36a3",
     "src/runner/operation-capability.mjs": "6683b7da84274722aa5d464ccc8ec9d9e34b110f779e8ea5b6f6c1d0b3c820f5",
     "src/runner/operation-choice.mjs": "866b8b61bea02f3250d9d89cf826109065e35c899b64faad0cfddc524614277e",
     "src/runner/paths.mjs": "bfbb13456f940e02d77b5ad8515b015ec6c1f8a83ee6015086138eeaed96339f",
@@ -971,7 +971,7 @@
     "src/workflow/case-lock.mjs": "0b2c0cd79a19e61e647797d6cad0f7d051acc3ed368385722ec88b8ae1aca9bb",
     "src/workflow/case-projection.mjs": "51b9abf3ec6757c0c36dbe457ee0283a45848c382da0797b75ab75fa37ee2b86",
     "src/workflow/case-runtime.mjs": "140328e7bc6ab01d52ca2a68d4a1e080895147262a5738d9226ad64ba3b99516",
-    "src/workflow/case-start.mjs": "fe6e26382c5489a58278a22a2fe7e857bb55c6c78b3f2692c326f4a07299f4ef",
+    "src/workflow/case-start.mjs": "906bf3022b40e7e098d755e6d269384b555d43911d4d6cdce0e294868de926a1",
     "src/workflow/case-verbs.mjs": "ad292230aeefbe7da7ae107e14a6aaf024b0a68317f5f2152a0f0c4f781123d2",
     "src/workflow/checked.mjs": "a620d840253269121e89ebb7c4cada29d38752e55f16909edb7e3a92a8dad8bf",
     "src/workflow/definition.mjs": "0cffd5b7249459d8bed1ca777a1270019c355b64b807ef6290dab7b64d41c440",
@@ -991,21 +991,7 @@
   "sites": [
     {
       "path": ".githooks/pre-commit",
-      "line": 504,
-      "spawn": "execFileSync",
-      "binary": "git",
-      "family": "spawn",
-      "callers": [
-        ".githooks/pre-commit:52",
-        ".githooks/pre-commit:54",
-        ".githooks/pre-commit:59",
-        ".githooks/pre-commit:64",
-        ".githooks/pre-commit:69"
-      ]
-    },
-    {
-      "path": ".githooks/reference-transaction",
-      "line": 9,
+      "line": 476,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn"
@@ -1629,7 +1615,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:485"
+        ".githooks/pre-commit:494"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1643,7 +1629,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:491"
+        ".githooks/pre-commit:500"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1657,7 +1643,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:491"
+        ".githooks/pre-commit:500"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1671,7 +1657,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:521"
+        ".githooks/pre-commit:527"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1685,7 +1671,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:521"
+        ".githooks/pre-commit:527"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1699,7 +1685,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:521"
+        ".githooks/pre-commit:527"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1713,7 +1699,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:527"
+        ".githooks/pre-commit:533"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1727,7 +1713,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:527"
+        ".githooks/pre-commit:533"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1741,7 +1727,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:527"
+        ".githooks/pre-commit:533"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1755,7 +1741,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:527"
+        ".githooks/pre-commit:533"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1769,7 +1755,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:473"
+        ".githooks/pre-commit:482"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1783,7 +1769,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:473"
+        ".githooks/pre-commit:482"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1797,7 +1783,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:473"
+        ".githooks/pre-commit:482"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1811,7 +1797,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:479"
+        ".githooks/pre-commit:488"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1825,7 +1811,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:479"
+        ".githooks/pre-commit:488"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1839,7 +1825,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:479"
+        ".githooks/pre-commit:488"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1853,7 +1839,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:479"
+        ".githooks/pre-commit:488"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1867,7 +1853,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:512"
+        ".githooks/pre-commit:518"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1881,7 +1867,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:486"
+        ".githooks/pre-commit:495"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1897,12 +1883,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 477,
+      "line": 486,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:590"
+        ".githooks/pre-commit:600"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -3318,14 +3304,14 @@
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1430,
+      "line": 1436,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1430,
+      "line": 1436,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"
@@ -3385,14 +3371,14 @@
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 1216,
+      "line": 1222,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 1246,
+      "line": 1252,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(configuration file data)",
       "class": "configured-binary"

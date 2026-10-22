@@ -77,13 +77,19 @@ test('holder release from a subdirectory uses the checkout-root token and lands 
   assert.throws(() => release({ repoRoot: holder }), { code: 'lease-not-held' });
 });
 
-test('full scope digests cover every page and release records drift rather than refusing it', t => {
+test('scope root OIDs cover large subtrees and release records drift rather than refusing it', t => {
   const f = fixture(t);
   for (let i = 0; i < 300; i++) { f.put(`apps/${i}.txt`, 'outside'); f.put(`docs/${i}.md`, 'inside'); }
   f.git(['add', '.']); f.git(['commit', '-qm', 'large tree']);
   const acquired = acquire({ repoRoot: f.repoRoot });
   assert.equal(Object.keys(acquired.sidecar.scopeDigests).length, LEASE_SCOPE_PATTERNS.length - 1);
   const previous = computeScopeDigests(f.repoRoot);
+  for (const [root, digest] of Object.entries(previous)) {
+    const entry = f.git(['ls-tree', 'main', '--', root]);
+    assert.equal(digest, entry ? entry.split(/\s+/)[2] : null, root);
+  }
+  assert.equal(isScopedPath('custom/lease.json', { sidecarPath: 'custom/lease.json' }), true);
+  assert.equal(isScopedPath(DEFAULT_SIDECAR_PATH, { sidecarPath: 'custom/lease.json' }), true);
   f.put('docs/299.md', 'last page changed');
   f.git(['add', 'docs/299.md']); f.git(['-c', 'core.hooksPath=/dev/null', 'commit', '-qm', 'raw bypass']);
   const result = release({ repoRoot: f.repoRoot });
@@ -142,10 +148,14 @@ test('holder worktree must belong to this repository and its token cannot reside
   assert.throws(() => acquire({ repoRoot: f.repoRoot, worktree: nested }), { code: 'token-inside-scope' });
 });
 
-test('doctor is not applicable in plain git and non-git projects', t => {
+test('doctor is not applicable in non-git, plain git and consumer projects with their own hooks', t => {
   const f = fixture(t);
   assert.match(doctor(f.repoRoot).message, /not applicable/);
   assert.match(doctor(f.temp).message, /not applicable/);
+  f.put('.githooks/pre-commit', '#!/bin/sh\nexit 0\n');
+  fs.chmodSync(path.join(f.repoRoot, '.githooks/pre-commit'), 0o755);
+  f.git(['config', 'core.hooksPath', '.githooks']);
+  assert.deepEqual(doctor(f.repoRoot), { passed: true, message: 'not applicable: project does not use repository hooks' });
 });
 
 test('doctor verifies repository hook wiring and reports held authority without looking for a main-checkout token', t => {
