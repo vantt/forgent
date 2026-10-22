@@ -112,7 +112,7 @@ Nothing merges to main.
 - **§16** is unchanged: Q1 was resolved by the plan owner (option C for agy), recorded in §17 and §7.3.
 - **Review step skipped** at the plan owner's instruction; the plan owner runs an independent review.
 - **`npm test`** runs because the branch changed a Node file (`scripts/record-mailbox-hook-fixtures.mjs`).
-- **Hand-off report** is the controller's report from this run; no separate closing report file.
+- **Convention (plan owner, 2026-10-22).** The closing report and the journal take their paths from `fgos convention path`, and `fgos convention check` runs on the added files. The test paths of `fgos-mailbox` were repeated literals in four test files; they now live once in `tests/common/mod.rs` (`contracts_dir`, `hook_fixtures_dir`, `ADAPTERS_CONTRACT`, module `files`), and every test derives from them. Production code names the adapters contract once (`src/adapters/mod.rs`, embedded) and the frame and limits contracts once each in the core. The recorder names its raw base and fixture directory once each. The drain takes no directory and reads no file; `.fgos` resolution stays with the storage-root owner (`resolve_workspace_root`), which the shell calls.
 
 ## Plan owner decisions (2026-10-22, after phase 3; plan owner (agent))
 

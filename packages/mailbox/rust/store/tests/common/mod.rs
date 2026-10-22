@@ -11,11 +11,35 @@ use std::path::PathBuf;
 
 pub const ADAPTERS: [Adapter; 3] = [Adapter::Claude, Adapter::Codex, Adapter::Agy];
 
+/// The mailbox contracts directory; the one place the tests name it.
+pub fn contracts_dir() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../contracts")
+}
+
+/// The adapters contract inside [`contracts_dir`].
+pub const ADAPTERS_CONTRACT: &str = "adapters.v1.json";
+
+/// The recorded hook fixtures, one directory per CLI.
+pub fn hook_fixtures_dir() -> PathBuf {
+    contracts_dir().join("fixtures").join("hooks")
+}
+
+/// The file names inside one CLI's fixture directory, as
+/// `scripts/record-mailbox-hook-fixtures.mjs` writes them.
+pub mod files {
+    pub const STOP: &str = "stop.json";
+    pub const STOP_CONTINUED: &str = "stop-continued.json";
+    pub const POST_TOOL_USE: &str = "post-tool-use.json";
+    pub const POST_TOOL_USE_SUBAGENT: &str = "post-tool-use-subagent.json";
+    pub const ACCEPTED_STOP: &str = "accepted-stop.json";
+    pub const ACCEPTED_POST_TOOL_USE: &str = "accepted-post-tool-use.json";
+    pub const ENV: &str = "env.json";
+    pub const VECTORS: &str = "vectors.json";
+}
+
 /// The fixture directory of one CLI.
 pub fn fixture_dir(adapter: Adapter) -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("../../contracts/fixtures/hooks")
-        .join(adapter.word())
+    hook_fixtures_dir().join(adapter.word())
 }
 
 /// A JSON fixture of one CLI.
@@ -27,7 +51,7 @@ pub fn fixture(adapter: Adapter, file: &str) -> Value {
 
 /// The vectors of one CLI whose `kind` is `kind`.
 pub fn vectors(adapter: Adapter, kind: &str) -> Vec<Value> {
-    fixture(adapter, "vectors.json")["vectors"]
+    fixture(adapter, files::VECTORS)["vectors"]
         .as_array()
         .unwrap()
         .iter()

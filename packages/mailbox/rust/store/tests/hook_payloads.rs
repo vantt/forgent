@@ -7,7 +7,7 @@
 //! drained; the rest must stay quiet.
 mod common;
 
-use common::{fixture, hook_limits, limits, vector_input, vectors, SeqIds, ADAPTERS};
+use common::{files, fixture, hook_limits, limits, vector_input, vectors, SeqIds, ADAPTERS};
 use fgos_mailbox::hook::{
     begin, finish, render_reply, Adapter, Begun, Claimed, HeadFacts, HookCall, HookEvent,
     QuietReason,
@@ -44,7 +44,7 @@ fn key_from(vars: &Value) -> Option<WriterKey> {
 /// key `send` uses. Claude Code's hook sees the same variable; Codex's hook
 /// sees none, so its shell must take the key from elsewhere (V5).
 fn writer_of(adapter: Adapter) -> WriterKey {
-    key_from(&fixture(adapter, "env.json")["toolIdVars"])
+    key_from(&fixture(adapter, files::ENV)["toolIdVars"])
         .expect("the recorded tool saw a session id")
 }
 
@@ -181,7 +181,7 @@ impl Drain {
     /// The head is registered by its first hook, with nothing pending.
     fn registered(adapter: Adapter) -> Self {
         let mut drain = Self::new(adapter);
-        let first = drain.hook(HookEvent::PostToolUse, "post-tool-use.json");
+        let first = drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
         assert_eq!(first, quiet(QuietReason::NothingEligible));
         drain
     }
@@ -256,14 +256,14 @@ fn a_recorded_post_tool_use_offers_pending_mail_in_the_shape_the_cli_injected() 
         drain.add_peer("peer");
         let id = drain.send("peer", "hello from a peer", false);
 
-        let claimed = take(drain.hook(HookEvent::PostToolUse, "post-tool-use.json"));
+        let claimed = take(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
         let frames = frames_of(&claimed, &drain.bodies);
         let stdout = drain.deliver(&claimed);
 
         let out: Value = serde_json::from_str(&stdout).unwrap();
         assert_eq!(
             out,
-            accepted(adapter, "accepted-post-tool-use.json", &frames)
+            accepted(adapter, files::ACCEPTED_POST_TOOL_USE, &frames)
         );
         assert!(frames.contains("| hello from a peer"));
         assert!(matches!(drain.state_of(&id), MessageState::Offered { .. }));
@@ -277,21 +277,21 @@ fn a_recorded_stop_blocks_with_wake_mail_and_passes_without_it() {
         drain.add_peer("peer");
         drain.send("peer", "wake up", true);
 
-        let claimed = take(drain.hook(HookEvent::Stop, "stop.json"));
+        let claimed = take(drain.hook(HookEvent::Stop, files::STOP));
         let frames = frames_of(&claimed, &drain.bodies);
         let stdout = drain.deliver(&claimed);
         let out: Value = serde_json::from_str(&stdout).unwrap();
-        assert_eq!(out, accepted(adapter, "accepted-stop.json", &frames));
+        assert_eq!(out, accepted(adapter, files::ACCEPTED_STOP, &frames));
         assert_eq!(drain.stop_blocks(), 1);
 
         let plain = drain.send("peer", "read me later", false);
         assert_eq!(
-            drain.hook(HookEvent::Stop, "stop-continued.json"),
+            drain.hook(HookEvent::Stop, files::STOP_CONTINUED),
             quiet(QuietReason::NothingEligible)
         );
         assert_eq!(drain.state_of(&plain), MessageState::Recorded);
         assert_eq!(drain.stop_blocks(), 0, "a Stop that passes ends the run");
-        let next = take(drain.hook(HookEvent::PostToolUse, "post-tool-use.json"));
+        let next = take(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
         assert_eq!(next.items[0].id, plain);
     }
 }
@@ -319,7 +319,7 @@ fn inputs_that_cannot_be_a_head_event_are_quiet_and_change_nothing() {
         }
 
         drain.head.record.start_time = None;
-        let begun = drain.hook(HookEvent::PostToolUse, "post-tool-use.json");
+        let begun = drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
         assert_eq!(begun, quiet(QuietReason::HeadUnknown));
         assert_eq!(drain.state, before);
     }
@@ -334,7 +334,7 @@ fn a_subagent_event_takes_nothing_and_the_head_gets_the_mail_next() {
         let before = drain.state.clone();
 
         let mut subordinate =
-            vec![serde_json::to_vec(&fixture(adapter, "post-tool-use-subagent.json")).unwrap()];
+            vec![serde_json::to_vec(&fixture(adapter, files::POST_TOOL_USE_SUBAGENT)).unwrap()];
         for vector in vectors(adapter, "parse") {
             if vector["name"].as_str().unwrap().starts_with("agent-") {
                 subordinate.push(vector_input(adapter, &vector));
@@ -346,7 +346,7 @@ fn a_subagent_event_takes_nothing_and_the_head_gets_the_mail_next() {
             assert_eq!(drain.state, before);
         }
 
-        let claimed = take(drain.hook(HookEvent::PostToolUse, "post-tool-use.json"));
+        let claimed = take(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
         assert_eq!(claimed.items.len(), 1);
         assert_eq!(claimed.items[0].id, id);
     }
@@ -372,7 +372,7 @@ fn a_stored_dead_head_is_replaced_and_its_old_mail_never_offered() {
         let dead = Sleeper::start();
         drain.head.record = dead.record();
         assert_eq!(
-            drain.hook(HookEvent::PostToolUse, "post-tool-use.json"),
+            drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE),
             quiet(QuietReason::NothingEligible)
         );
         drain.add_peer("peer");
@@ -381,7 +381,7 @@ fn a_stored_dead_head_is_replaced_and_its_old_mail_never_offered() {
 
         drain.head.record = own_record();
         assert_eq!(
-            drain.hook(HookEvent::PostToolUse, "post-tool-use.json"),
+            drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE),
             quiet(QuietReason::NothingEligible)
         );
         let binding = drain.state.binding(&drain.writer).unwrap();
@@ -396,14 +396,14 @@ fn a_different_live_head_holding_the_key_is_not_drained_and_nothing_changes() {
         let mut drain = Drain::new(adapter);
         let live = Sleeper::start();
         drain.head.record = live.record();
-        drain.hook(HookEvent::PostToolUse, "post-tool-use.json");
+        drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
         drain.add_peer("peer");
         drain.send("peer", "for the live holder", false);
         let before = drain.state.clone();
 
         drain.head.record = own_record();
         assert_eq!(
-            drain.hook(HookEvent::PostToolUse, "post-tool-use.json"),
+            drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE),
             quiet(QuietReason::Registration(RegisterRefusal::Conflict))
         );
         assert_eq!(drain.state, before);
@@ -417,9 +417,9 @@ fn a_same_head_hook_with_no_mail_changes_nothing() {
         let mut drain = Drain::registered(adapter);
         let before = drain.state.clone();
         for (event, file) in [
-            (HookEvent::PostToolUse, "post-tool-use.json"),
-            (HookEvent::Stop, "stop.json"),
-            (HookEvent::Stop, "stop-continued.json"),
+            (HookEvent::PostToolUse, files::POST_TOOL_USE),
+            (HookEvent::Stop, files::STOP),
+            (HookEvent::Stop, files::STOP_CONTINUED),
         ] {
             assert_eq!(drain.hook(event, file), quiet(QuietReason::NothingEligible));
             assert_eq!(drain.state, before, "{file} wrote on the no-mail path");
@@ -442,20 +442,20 @@ fn stop_blocks_at_most_the_configured_times_in_a_row_counting_only_finished_bloc
 
         for done in 1..=max {
             wake_from_a_new_sender(&mut drain);
-            let claimed = take(drain.hook(HookEvent::Stop, "stop-continued.json"));
+            let claimed = take(drain.hook(HookEvent::Stop, files::STOP_CONTINUED));
             drain.deliver(&claimed);
             assert_eq!(drain.stop_blocks(), done);
         }
         let held = wake_from_a_new_sender(&mut drain);
         assert_eq!(
-            drain.hook(HookEvent::Stop, "stop-continued.json"),
+            drain.hook(HookEvent::Stop, files::STOP_CONTINUED),
             quiet(QuietReason::StopBlockCap)
         );
         assert_eq!(drain.state_of(&held), MessageState::Recorded);
         assert_eq!(drain.stop_blocks(), 0);
 
         // Claimed but never finished: the shell's write failed.
-        let unfinished = take(drain.hook(HookEvent::Stop, "stop-continued.json"));
+        let unfinished = take(drain.hook(HookEvent::Stop, files::STOP_CONTINUED));
         assert_eq!(unfinished.items[0].id, held);
         assert_eq!(drain.stop_blocks(), 0, "only finished blocks count");
 
@@ -464,11 +464,11 @@ fn stop_blocks_at_most_the_configured_times_in_a_row_counting_only_finished_bloc
         let mut drain = Drain::registered(adapter);
         for _ in 0..max {
             wake_from_a_new_sender(&mut drain);
-            let claimed = take(drain.hook(HookEvent::Stop, "stop-continued.json"));
+            let claimed = take(drain.hook(HookEvent::Stop, files::STOP_CONTINUED));
             drain.deliver(&claimed);
         }
         wake_from_a_new_sender(&mut drain);
-        let claimed = take(drain.hook(HookEvent::Stop, "stop.json"));
+        let claimed = take(drain.hook(HookEvent::Stop, files::STOP));
         drain.deliver(&claimed);
         assert_eq!(drain.stop_blocks(), 1);
     }
@@ -483,7 +483,7 @@ fn a_missing_body_is_framed_honestly_and_the_rest_of_the_claim_is_delivered() {
         let lost = drain.send("peer", "this one is lost", false);
         drain.bodies.remove(&lost);
 
-        let claimed = take(drain.hook(HookEvent::PostToolUse, "post-tool-use.json"));
+        let claimed = take(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
         assert_eq!(claimed.items.len(), 2);
         let stdout = drain.deliver(&claimed);
 
@@ -499,11 +499,11 @@ fn a_missing_body_is_framed_honestly_and_the_rest_of_the_claim_is_delivered() {
 #[test]
 fn the_writer_key_the_hook_derives_equals_the_one_its_tool_sees() {
     for adapter in tested() {
-        let env = fixture(adapter, "env.json");
+        let env = fixture(adapter, files::ENV);
         let from_tool = writer_of(adapter);
-        let payload = fixture(adapter, "post-tool-use.json");
+        let payload = fixture(adapter, files::POST_TOOL_USE);
         assert_eq!(payload["session_id"].as_str(), Some(from_tool.as_str()));
-        match key_from(&env["hookIdVars"]["post-tool-use.json"]) {
+        match key_from(&env["hookIdVars"][files::POST_TOOL_USE]) {
             Some(from_hook) => assert_eq!(from_hook, from_tool, "{}", adapter.word()),
             // Recorded: Codex's hook process sees no session-identity
             // variable, so the hook cannot derive the key from its
@@ -521,7 +521,7 @@ fn the_codex_thread_handle_is_taken_only_when_it_is_the_writer() {
 
     let mut other = Drain::new(Adapter::Codex);
     other.writer = WriterKey::new("a-sender-with-its-own-fgos-session-id").unwrap();
-    other.hook(HookEvent::PostToolUse, "post-tool-use.json");
+    other.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
     let binding = other.state.binding(&other.writer).unwrap();
     assert_eq!(binding.handle, None);
 }

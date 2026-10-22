@@ -2,7 +2,7 @@
 //! output (packages/mailbox/contracts/fixtures/hooks/<cli>/).
 mod common;
 
-use common::{event, fixture, fixture_dir, vector_input, vectors, ADAPTERS};
+use common::{event, files, fixture, fixture_dir, vector_input, vectors, ADAPTERS};
 use fgos_mailbox::hook::{Adapter, HookEvent, Payload, Unparsed};
 use serde_json::Value;
 
@@ -45,7 +45,7 @@ fn a_subagent_event_is_subordinate_however_the_marker_is_written() {
         let marked: Vec<Value> = vectors(adapter, "parse")
             .into_iter()
             .filter(|v| {
-                v["file"] == "post-tool-use-subagent.json"
+                v["file"] == files::POST_TOOL_USE_SUBAGENT
                     || v["name"].as_str().unwrap().starts_with("agent-")
             })
             .collect();
@@ -61,7 +61,7 @@ fn a_subagent_event_is_subordinate_however_the_marker_is_written() {
             assert!(payload.subordinate, "{} {}", adapter.word(), vector["name"]);
         }
     }
-    let head = fixture(Adapter::Claude, "post-tool-use.json");
+    let head = fixture(Adapter::Claude, files::POST_TOOL_USE);
     let payload = Adapter::Claude
         .parse(HookEvent::PostToolUse, &serde_json::to_vec(&head).unwrap())
         .unwrap();
@@ -75,8 +75,8 @@ fn a_subagent_event_is_subordinate_however_the_marker_is_written() {
 fn the_rendered_output_equals_what_the_cli_injected() {
     for adapter in ADAPTERS {
         for (event, file) in [
-            (HookEvent::Stop, "accepted-stop.json"),
-            (HookEvent::PostToolUse, "accepted-post-tool-use.json"),
+            (HookEvent::Stop, files::ACCEPTED_STOP),
+            (HookEvent::PostToolUse, files::ACCEPTED_POST_TOOL_USE),
         ] {
             let recorded = fixture_dir(adapter).join(file);
             let shape = adapter.shape(event);

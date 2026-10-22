@@ -18,7 +18,10 @@
 //!
 //! The shell also reads stdin with a cap, resolves the writer key through
 //! session identity, finds the head process with the CLI's head finder, and
-//! never passes a runner attempt's writer id (V5).
+//! never passes a runner attempt's writer id (V5). The drain reads and
+//! writes no file: the record directory comes from the storage-root owner
+//! (`resolve_workspace_root`) to the shell, and the bodies arrive through
+//! the `bodies` lookup.
 use super::{Adapter, HookEvent, HookLimits};
 use crate::adapters::Shape;
 use crate::head::{head_text, is_complete, judge_stored};

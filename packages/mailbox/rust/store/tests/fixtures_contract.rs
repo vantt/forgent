@@ -7,6 +7,9 @@
 //! Account names the guard refuses, the keys of the owner's
 //! `CODEX_ACCOUNTS` and `AGY_ACCOUNTS` tables: fgovn, tetnu, tetcu72,
 //! mucdong.
+mod common;
+
+use common::{contracts_dir, files, hook_fixtures_dir, ADAPTERS_CONTRACT};
 use serde_json::Value;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -40,10 +43,6 @@ const PLACEHOLDER_PREFIX: &str = "00000000-0000-4000-8000-";
 /// The shortest run of base64 or hex characters treated as a secret.
 const SECRET_RUN: usize = 32;
 
-fn contracts() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../../contracts")
-}
-
 fn fixture_files() -> Vec<PathBuf> {
     fn walk(dir: &Path, out: &mut Vec<PathBuf>) {
         for entry in fs::read_dir(dir).unwrap() {
@@ -56,14 +55,14 @@ fn fixture_files() -> Vec<PathBuf> {
         }
     }
     let mut files = Vec::new();
-    walk(&contracts().join("fixtures/hooks"), &mut files);
+    walk(&hook_fixtures_dir(), &mut files);
     files.sort();
     files
 }
 
 fn adapters() -> Value {
-    let text = fs::read_to_string(contracts().join("adapters.v1.json")).unwrap();
-    serde_json::from_str(&text).expect("adapters.v1.json is valid JSON")
+    let text = fs::read_to_string(contracts_dir().join(ADAPTERS_CONTRACT)).unwrap();
+    serde_json::from_str(&text).expect("the adapters contract is valid JSON")
 }
 
 fn tested_against() -> Vec<(String, String)> {
@@ -228,18 +227,18 @@ fn fixtures_hold_no_secret_or_personal_value() {
 #[test]
 fn every_tested_cli_has_its_fixtures() {
     for (cli, version) in tested_against() {
-        let dir = contracts().join("fixtures/hooks").join(&cli);
+        let dir = hook_fixtures_dir().join(&cli);
         for name in [
-            "stop.json",
-            "post-tool-use.json",
-            "accepted-stop.json",
-            "accepted-post-tool-use.json",
-            "vectors.json",
+            files::STOP,
+            files::POST_TOOL_USE,
+            files::ACCEPTED_STOP,
+            files::ACCEPTED_POST_TOOL_USE,
+            files::VECTORS,
         ] {
             assert!(dir.join(name).is_file(), "{cli} has no {name}");
         }
         let vectors: Value =
-            serde_json::from_str(&fs::read_to_string(dir.join("vectors.json")).unwrap()).unwrap();
+            serde_json::from_str(&fs::read_to_string(dir.join(files::VECTORS)).unwrap()).unwrap();
         assert_eq!(vectors["cli"], cli.as_str());
         let source = vectors["source"].as_str().unwrap();
         assert!(
