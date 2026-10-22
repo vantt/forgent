@@ -46,9 +46,10 @@ Every operation is addressed by a **key** (for a run, the attempt id) plus an op
 
 The operation inputs and results are in [terminal-control.port.v1.json](../../../packages/terminal-control/contracts/terminal-control.port.v1.json). This spec does not copy them.
 
-Two rules carry meaning beyond the field lists:
+Rules that carry meaning beyond the field lists:
 
-- `launch` types `cd <cwd> && <command>` into the pane and returns the identity of the process it started (pid, start time, boot id, process group), checked against the argv the caller asked for. The pane's shell stays as the parent (no `exec`): a pane whose root process is the command closes with it, and a pane kept for a person to read (`retain`) would be gone before they looked. A pane whose shell was replaced by a launcher is still recognised, because the shell pid is not excluded when the argv matches. The supervisor only releases its agent after that identity is durable.
+- `launch` types `cd <cwd> && <command>` into the pane and returns the identity of the process it started (pid, start time, boot id, process group), checked against the argv the caller asked for. Plain launch conducts a ready-shell handshake with probe commands (`printf '%s%s\n' fgos-ok- <nonce>`) before typing the launcher line (an unanswered probe is typed again after a third of `shellReadyTimeoutMs`, at most 3 probes in all): neither probe nor launcher line is typed unless `process_info` shows the shell itself holds the foreground (`is_bare_shell`). The marker `launch-requested` is written only after the handshake succeeds, immediately before typing the launch line. Residual risk: a line-mode `read` in the user's rc inside the shell takes one probe line as its answer, and Enter on a default-yes helper counts as yes; the proof is anti-accident, not anti-hostile-rc. The pane's shell stays as the parent (no `exec`): a pane whose root process is the command closes with it, and a pane kept for a person to read (`retain`) would be gone before they looked. A pane whose shell was replaced by a launcher is still recognised, because the shell pid is not excluded when the argv matches. The supervisor only releases its agent after that identity is durable.
+- `allocate` adds `DISABLE_AUTO_UPDATE=true` to the environment of every pane it creates (via `tab create` and `pane split`); a caller value in the request's `env` wins. Attached panes are untouched (the core never creates them). The variable reaches the pane's whole process tree and is inert for anything but oh-my-zsh; a user `zstyle ':omz:update' mode` overrides it, and there the ready-shell handshake carries correctness.
 - `send` types only while a program other than the pane's shell holds the pane's foreground (the same foreground fact `inspect` reports, including a launched command that `exec`-replaced the shell), through the prompt door as well. A pane whose shell is in the foreground, or whose foreground cannot be read or identified, gets nothing: the answer is `foreground-not-agent` with the reason. A shell runs typed text as commands, backtick spans included.
 - A pane taken with `attach` (a pane the caller already owns, for example the one `/fgOS:terminal` runs in) is never closed by the core. `release` on it only removes the label or the binding. `attach` may name a `groupKey`: the pane joins that group, so the group's next pane opens beside it (`FGOS_HERDR_ANCHOR_PANE` of a dispatching caller).
 - A fresh herdr session has no workspace to hold a tab. The herdr driver then creates the session's first workspace for the group's first `allocate`; its root pane is the slot and its tab takes the group's label.
@@ -56,7 +57,7 @@ Two rules carry meaning beyond the field lists:
 
 ## 4. Allocation record and markers
 
-The only thing Terminal Control writes is one **allocation record**, published once when the slot is allocated. Its shape and the two markers (`launched`, `released`, plus `launch-requested` written before the driver is asked to run anything) are in [allocation-record.v1.json](../../../packages/terminal-control/contracts/allocation-record.v1.json). It lives under the shared state root, per driver and per server incarnation, one file per key.
+The only thing Terminal Control writes is one **allocation record**, published once when the slot is allocated. Its shape and the two markers (`launched`, `released`, plus `launch-requested` written after the shell handshake, before the launch line) are in [allocation-record.v1.json](../../../packages/terminal-control/contracts/allocation-record.v1.json). It lives under the shared state root, per driver and per server incarnation, one file per key.
 
 Everything else is read live: whether the pane still exists, which process runs in it, which panes the tab has. A hint file that maps a group to a tab exists only to find it quickly; it is always checked against the live state before use and dropped when wrong. The record carries no holder: who may use a slot is a matter for the layer above.
 
@@ -82,6 +83,8 @@ A driver declares which capabilities it has; the core answers `unsupported` for 
 - tmux is deferred; the port has room for it and needs no change to the core.
 
 The Node client's current herdr calls map one to one onto port operations; the table is in the measurement report ([section 5](../../../plans/reports/implementation-261016-1352-terminal-control-herdr-measurements.md)).
+Plain `launch` requires capabilities `pane.run`, `read.screen`, and `process.info`. Activity launch requires `activity.state` and `process.info`.
+
 
 ## 7. Server incarnation and the known gap
 
@@ -128,7 +131,7 @@ The research's 85×20 and "at most 4" are not used; nobody measured them.
 ### Setup and doctor
 
 - **Directory.** `fgos setup` creates `<stateRoot>/terminal` (mode 0700; the `terminal-dir` fix), the parent of one record directory per driver. The state root is the single resolution of the holder-lock spec. Deleting it closes no pane: nobody closes a pane that has no record.
-- **No new environment variable.** `FGOS_HERDR_ANCHOR_PANE` stays as the input of `attach`; `FGOS_HERDR_BIN` stays as the herdr binary the caller resolved.
+- **No new environment variable.** `FGOS_HERDR_ANCHOR_PANE` stays as the input of `attach`; `FGOS_HERDR_BIN` stays as the herdr binary the caller resolved. `DISABLE_AUTO_UPDATE=true` is injected directly into created panes as a quiet shell default: this is not an fgOS config key, env var fgOS reads, file or tool dependency, so nothing registers with `fgos setup` or `fgos doctor`.
 - **Other releases.** Checked 2026-10-18: the release active in the forgentX, mdview and mcp-skill-hub workspaces (one digest) accepts a `terminal` section in the global and in the project config, so setup writes the key like `lock`. A release that refused unknown keys would have to be given the key in the project config only, until every workspace ran the new release.
 - **Doctor checks** (`src/setup/terminal-control-checks.mjs`; all read-only):
 
@@ -150,7 +153,7 @@ Two coordinators with the same `groupKey` (only when set by hand) can create two
 |---|---|---|
 | Coordinator dies before `allocate` | Nothing exists | — |
 | Coordinator dies after `allocate`, before handing over | The attempt lock was held before `allocate`, so it is released when the coordinator dies | Only the layer above (adopt) may close; it concludes `abandoned-not-started` and calls `release(key)`. Terminal Control's own scan never closes anything just because time passed: after `allocationGraceMs` it only reconciles with `inspect`; a slot not yet `launch-requested` whose pane holds only a bare shell is reported to doctor; `unknown` or already `launch-requested` is kept |
-| Supervisor dies with the slot allocated, not launched | The gate never ran or never connected, so no agent runs | Adopt concludes `abandoned`, then `release(key, close)` |
+| Supervisor dies / handshake times out before the launch line | No marker, plain allocated slot; the gate never ran, so no agent runs | Adopt concludes `abandoned`, scan reports the bare shell after grace |
 | Supervisor dies after `launch` returned | The attempt lock holds, the agent runs to its end or hard ceiling | Adopt after the lock is released, then `release` |
 | Slot retained (`retain`) | Kept until `until`; no process needs it | Closed only when past `until` **and** same incarnation **and** the foreground process is not a stranger; otherwise kept (time is not evidence) |
 | Resume meets an old slot | The old attempt still holds its lock, so resume only observes with `inspect(key)`; it never launches into an old slot. A new attempt is a new key and a new slot | — |
