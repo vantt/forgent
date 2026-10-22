@@ -34,6 +34,25 @@
  * Evidence: the transcript is primary (an injected frame is proven by its
  * record type and by the model's answer containing the nonce); the entry's
  * log and the snapshot corroborate. A check only the log supports says so.
+ *
+ * Safety
+ *
+ *   Every real case runs `claude --dangerously-skip-permissions` (and the
+ *   Codex half its full bypass) with no sandbox, under a case HOME whose
+ *   `.claude` links the owner's real `~/.claude`, and Codex with auth.json
+ *   linking the test account's real file. The working directory outside a
+ *   checkout keeps repository settings from loading; it does not keep the
+ *   model from writing: its shell tool can write the checkout, the real
+ *   `~/.claude` (settings, CLAUDE.md, credentials) and anything else the
+ *   user can. So a live run carries benign content only: scripted turns
+ *   and stand-in messages. Adversarial content (a laundering or injecting
+ *   peer body) needs a confined CLI first: the CLI under the repository's
+ *   confinement with only the case directory and the Claude state it needs
+ *   writable, or no permission bypass and an allow-list of the mailbox
+ *   verbs. Claude Code itself still writes the real `~/.claude/projects`
+ *   (transcripts) and `~/.claude/sessions` during a case. A Codex auth.json
+ *   replaced during a scene is set aside, never deleted, and blocks removing
+ *   the scene directory (scripts/lib/codex-auth-guard.mjs).
  */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -42,6 +61,7 @@ import crypto from 'node:crypto';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import * as live from '../../scripts/lib/mailbox-live-cli.mjs';
+import { authRefusalAfterRun, removeRunDir } from '../../scripts/lib/codex-auth-guard.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(SCRIPT), '..', '..');
@@ -154,7 +174,8 @@ function caseDir(name, dry) {
 function layOut(name, dry, example) {
   const dir = caseDir(name, dry);
   if (fs.existsSync(path.join(dir, 'spawned.json'))) die(`${name} already spawned a CLI (${dir}); a re-run needs the controller`);
-  fs.rmSync(dir, { recursive: true, force: true });
+  const refused = removeRunDir(dir);
+  if (refused) die(refused, 3);
   for (const sub of ['ws', 'bin', 'log', 'zdot', '.fgos']) fs.mkdirSync(path.join(dir, sub), { recursive: true });
   live.assertOutsideCheckout(path.join(dir, 'ws'));
   if (dry) fs.mkdirSync(caseHome(dir), { recursive: true });
@@ -900,7 +921,9 @@ function layOutDemo(name, dry, example) {
   for (const role of ['a', 'b']) {
     if (fs.existsSync(path.join(dir, `spawned-${role}.json`))) die(`${name} already spawned session ${role} (${dir}); a re-run needs the controller`);
   }
-  fs.rmSync(dir, { recursive: true, force: true });
+  // A Codex scene may have set a rotated auth.json aside here: never removed.
+  const refused = removeRunDir(dir);
+  if (refused) die(refused, 3);
   for (const sub of ['a-ws', 'b-ws', 'bin', 'log', 'zdot-a', 'zdot-b', '.fgos']) fs.mkdirSync(path.join(dir, sub), { recursive: true });
   live.assertOutsideCheckout(path.join(dir, 'a-ws'));
   writeWrapper(dir, example);
@@ -1284,6 +1307,11 @@ async function cmdDemo(name, dry, exampleArg) {
   writeJson(path.join(ctx.dir, 'result.json'), result);
   const failed = Object.entries(checks).filter(([, c]) => c.pass !== true).map(([k, c]) => `${k}=${c.pass}`);
   process.stdout.write(`${name}${dry ? ' (dry)' : ''}: ${failed.length ? `not passed: ${failed.join(', ')}` : 'every check passed'}; ${ctx.dir}/result.json\n`);
+  if (run.authAfter) {
+    // Last: a replaced auth.json is set aside and its path is the run's last line.
+    const refused = authRefusalAfterRun({ link: path.join(ctx.codexHome, 'auth.json'), ...run.authAfter, account: CODEX_TEST_ACCOUNT });
+    if (refused) die(refused, 3);
+  }
   return failed.length === 0;
 }
 

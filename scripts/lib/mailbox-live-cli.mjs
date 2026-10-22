@@ -14,8 +14,12 @@
  *   empty directory, so no user rc file defines shell functions (in the
  *   owner's shell `fgos` and `codex` are zsh functions) or reorders `PATH`
  *   in the model's shell tool; auto-update is disabled for the run.
- * - The run directory is outside every git checkout, so a full-bypass agent
- *   cannot write the repository and no repository hook file loads.
+ * - The run directory is outside every git checkout, so the CLI's working
+ *   directory is not a checkout and no repository settings or hook file
+ *   loads. It does not keep a full-bypass agent from writing: its shell tool
+ *   can write the repository, the owner's real `~/.claude` and any path the
+ *   user can, so a run carries benign content only (the Safety section of
+ *   test/live/mailbox-claude.live.mjs).
  * - Before a run, no hook file other than the run's own may load.
  * - Codex runs with `auth.json` a symlink to the account's file and a
  *   working `codex login status` (scripts/lib/codex-auth-guard.mjs).

@@ -53,9 +53,10 @@
  *       scripts/lib/codex-auth-guard.mjs).
  *
  * Where: <base> is ${TMPDIR:-/tmp}/fgos-work/mailbox-v3-record, outside every
- * git checkout, so a full-bypass agent cannot write the repository and the
- * repository's own hook files (.claude/settings.json, .agents/hooks.json)
- * never load. Each CLI is started with the allowlisted environment of
+ * git checkout, so the repository's own hook files (.claude/settings.json,
+ * .agents/hooks.json) never load. That does not keep a full-bypass agent
+ * from writing the repository or the account's real CLI directory; the
+ * recording prompts are benign for that reason. Each CLI is started with the allowlisted environment of
  * scripts/lib/mailbox-live-cli.mjs (no session-identity variable, an empty
  * ZDOTDIR, auto-update off), so a recorded id variable is one the CLI set
  * itself. The run guards live in that module, shared with the live suite.
@@ -96,7 +97,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { setAsideAuthFiles, setAsideReplacedAuth } from './lib/codex-auth-guard.mjs';
+import { authRefusalAfterRun, removeRunDir } from './lib/codex-auth-guard.mjs';
 import * as live from './lib/mailbox-live-cli.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
@@ -311,11 +312,8 @@ function cmdRun(cli, mode, flags) {
   if (authBefore) {
     const authAfter = codexAuthState(runDir, env);
     process.stdout.write(`codex auth.json: ${authAfter.isLink ? 'still a link to the account file' : 'NOT A LINK'}; login status ${authAfter.loggedIn ? 'ok' : 'FAILED'}\n`);
-    if (!(authAfter.isLink && authAfter.loggedIn)) {
-      const aside = setAsideReplacedAuth(path.join(runDir, 'home', 'auth.json'));
-      const kept = aside ? `; the replaced auth.json may hold the only valid token and was kept at ${aside} (mode 0600)` : '';
-      die(`the ${ACCOUNT} codex login link broke or its status failed${kept}; stop and ask the owner`, 3);
-    }
+    const refused = authRefusalAfterRun({ link: path.join(runDir, 'home', 'auth.json'), ...authAfter, account: ACCOUNT });
+    if (refused) die(refused, 3);
   }
 }
 
@@ -772,9 +770,8 @@ function cmdRedactAgentHead(cli) {
 
 function cmdClean(cli) {
   const dir = path.join(BASE, cli);
-  const kept = setAsideAuthFiles(dir);
-  if (kept.length) die(`refusing to clean: ${kept.join(', ')} may hold the account's only valid token; hand it to the owner first`);
-  fs.rmSync(dir, { recursive: true, force: true });
+  const refused = removeRunDir(dir);
+  if (refused) die(refused, 3);
   process.stdout.write(`removed ${dir}\n`);
 }
 

@@ -1,9 +1,11 @@
 /**
  * scripts/lib/codex-auth-guard.mjs
  *
- * The Codex login guard of scripts/record-mailbox-hook-fixtures.mjs. A
- * recording run's CODEX_HOME holds auth.json as a symlink to the account's
- * real file, so a token refresh during the run writes the real file. Whether
+ * The Codex login guard of every live run that starts Codex: the hook-fixture
+ * recorder (scripts/record-mailbox-hook-fixtures.mjs) and the live suite
+ * (test/live/mailbox-claude.live.mjs). A run's CODEX_HOME holds auth.json as
+ * a symlink to the account's real file, so a token refresh during the run
+ * writes the real file. Whether
  * Codex refreshes by writing in place or by renaming a new file over the
  * path could not be observed (no refresh happened during the recordings),
  * so the guard is safe for both: when the link was replaced by a plain file,
@@ -26,23 +28,73 @@ export function isAuthLink(link, target) {
 /**
  * When `link` is no longer a symlink but a plain file, move it aside as
  * `auth.json.rotated` (mode 0600) and return the new path; otherwise return
- * null. Never deletes anything.
+ * null. Never deletes anything: it throws rather than replace a file already
+ * set aside there.
  */
 export function setAsideReplacedAuth(link) {
   const stat = fs.lstatSync(link, { throwIfNoEntry: false });
   if (!stat || stat.isSymbolicLink()) return null;
   const aside = path.join(path.dirname(link), ROTATED_AUTH);
+  if (fs.existsSync(aside)) throw new Error(`${aside} exists already; ${link} is left in place`);
   fs.renameSync(link, aside);
   fs.chmodSync(aside, 0o600);
   return aside;
 }
 
+/**
+ * Every path under `dir`, never entering a symlinked directory: a run home
+ * links the account's real directories (a Claude case HOME's `.claude` is the
+ * owner's real `~/.claude`), and nothing there is the run's.
+ */
+function runFiles(dir) {
+  const found = [];
+  const pending = [dir];
+  while (pending.length) {
+    const at = pending.pop();
+    let entries;
+    try {
+      entries = fs.readdirSync(at, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      const file = path.join(at, entry.name);
+      found.push(file);
+      if (entry.isDirectory()) pending.push(file);
+    }
+  }
+  return found;
+}
+
 /** Every set-aside auth file under `dir`; cleaning must refuse while any exists. */
 export function setAsideAuthFiles(dir) {
-  if (!fs.existsSync(dir)) return [];
-  return fs
-    .readdirSync(dir, { recursive: true })
-    .map(String)
-    .filter((entry) => path.basename(entry) === ROTATED_AUTH)
-    .map((entry) => path.join(dir, entry));
+  return runFiles(dir).filter((file) => path.basename(file) === ROTATED_AUTH);
+}
+
+/**
+ * The check after a Codex run: null when the run home's auth.json is still the link to the
+ * account's file (`isLink`) and the login still works (`loggedIn`). Otherwise a replaced file at
+ * `link` is set aside first, and the refusal the caller exits 3 with is returned; its last line
+ * is the kept file's path, so it is the last thing the operator reads.
+ */
+export function authRefusalAfterRun({ link, isLink, loggedIn, account }) {
+  if (isLink && loggedIn) return null;
+  const aside = setAsideReplacedAuth(link);
+  const head = `the ${account} codex login link broke or its status failed (link ${isLink}, logged in ${loggedIn}); stop and ask the owner`;
+  return aside ? `${head}. The replaced auth.json may hold the only valid token; it was kept (mode 0600) at:\n${aside}` : head;
+}
+
+/**
+ * The one way a run directory is removed: refused while a set-aside auth file exists under
+ * `dir` (the refusal is returned; the caller exits 3), removed otherwise (null). Symlinks
+ * under it are removed as links, never followed.
+ */
+export function removeRunDir(dir) {
+  // A run that died before its after-run check leaves a replaced link as a
+  // plain auth.json: it is set aside here too (every run auth.json is a link).
+  for (const file of runFiles(dir)) if (path.basename(file) === 'auth.json') setAsideReplacedAuth(file);
+  const kept = setAsideAuthFiles(dir);
+  if (kept.length) return `refusing to remove ${dir}: ${kept.join(', ')} may hold the account's only valid token; hand it to the owner first`;
+  fs.rmSync(dir, { recursive: true, force: true });
+  return null;
 }
