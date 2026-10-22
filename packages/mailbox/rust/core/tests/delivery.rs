@@ -22,6 +22,8 @@ fn a_sent_message_is_recorded_for_the_recipients_current_generation() {
 
     assert_eq!(outcome.to.as_str(), B_NAME);
     assert_eq!(outcome.to_generation, g2);
+    assert_eq!(outcome.to_cli.as_str(), "codex", "the recipient's current binding");
+    assert_eq!(outcome.to_head, "a-new-head");
     assert_eq!(outcome.depth, 0);
     let header = pair.state.message(&outcome.id).unwrap();
     assert_eq!(header.state, MessageState::Recorded);

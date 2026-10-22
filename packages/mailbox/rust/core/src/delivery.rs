@@ -52,6 +52,10 @@ pub struct SendOutcome {
     pub id: MessageId,
     pub to: ShortName,
     pub to_generation: Generation,
+    /// The recipient's CLI and head process text, as its binding holds
+    /// them: what a store needs to read the recipient's CLI version.
+    pub to_cli: Cli,
+    pub to_head: String,
     pub depth: u32,
     pub reply_to: Option<MessageId>,
     pub effective_wake: bool,
@@ -417,6 +421,8 @@ impl MailboxState {
             id: header.id.clone(),
             to: admitted.to_name,
             to_generation: header.to_generation,
+            to_cli: admitted.to_cli,
+            to_head: admitted.to_head,
             depth: header.depth,
             reply_to: header.reply_to.clone(),
             effective_wake,

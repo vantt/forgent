@@ -15,6 +15,8 @@ pub mod adapters;
 pub mod head;
 pub mod hook;
 #[cfg(unix)]
+pub mod limits;
+#[cfg(unix)]
 pub mod record;
 #[cfg(unix)]
 pub mod verbs;

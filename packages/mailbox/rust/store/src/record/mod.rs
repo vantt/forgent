@@ -235,11 +235,14 @@ pub enum RecordError {
     },
 }
 
+/// The code of lock contention: a wait outcome, never a fault.
+pub const LOCK_BUSY: &str = "lock-busy";
+
 impl RecordError {
     /// A stable code per reason.
     pub fn code(&self) -> &'static str {
         match self {
-            Self::LockBusy { .. } => "lock-busy",
+            Self::LockBusy { .. } => LOCK_BUSY,
             Self::LockUnavailable { .. } => "lock-unavailable",
             Self::LockRegistry { .. } => "lock-registry",
             Self::SnapshotVersion(e) => e.code(),
@@ -340,6 +343,20 @@ impl Record {
 
     pub fn paths(&self) -> &Paths {
         &self.paths
+    }
+
+    /// The directory a file written without the mailbox lock lives in
+    /// (`runtime/mailbox/`), after the chain from `.fgos` down to it passed
+    /// the same trust check a hold applies; `None` when it did not.
+    pub(crate) fn trusted_mailbox_dir(&self) -> Option<PathBuf> {
+        let mailbox = self.paths.mailbox_dir();
+        for (dir, creator) in self.paths.chain() {
+            check_dir(&dir, creator).ok()?;
+            if dir == mailbox {
+                return Some(mailbox);
+            }
+        }
+        None
     }
 
     /// One hold: `mutate` runs on the installed state with a fresh id
@@ -630,6 +647,21 @@ pub(crate) fn open_regular(path: &Path) -> io::Result<File> {
         ));
     }
     Ok(file)
+}
+
+/// The bytes of the regular file at `path`, opened as [`open_regular`]
+/// does, refused with `InvalidData` when it holds more than `cap` bytes.
+pub(crate) fn read_regular_capped(path: &Path, cap: u64) -> io::Result<Vec<u8>> {
+    let file = open_regular(path)?;
+    let mut bytes = Vec::new();
+    file.take(cap.saturating_add(1)).read_to_end(&mut bytes)?;
+    if bytes.len() as u64 > cap {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "larger than its read cap",
+        ));
+    }
+    Ok(bytes)
 }
 
 /// Calls the observer at a step before the commit point.

@@ -1,0 +1,55 @@
+{
+  "maxBodyBytes": 16384,
+  "chain": {
+    "maxDepth": 6
+  },
+  "session": {
+    "budget": 20,
+    "lifetimeCap": 200
+  },
+  "human": {
+    "fallbackWindowSec": 600
+  },
+  "loop": {
+    "maxPerWindow": 12,
+    "windowSec": 600
+  },
+  "queue": {
+    "cap": 50,
+    "perSender": 10
+  },
+  "counters": {
+    "maxKeys": 64
+  },
+  "record": {
+    "ttlSec": 86400,
+    "bodyRetentionSec": 86400
+  },
+  "inFlightTtlSec": 120,
+  "maxOffers": 3,
+  "wake": {
+    "exchangeGapSec": 600,
+    "maxPerExchange": 5,
+    "lifetimeCap": 50
+  },
+  "notices": {
+    "cap": 10,
+    "windowSec": 600
+  },
+  "frame": {
+    "maxHeaderChars": 200
+  },
+  "stopBlock": {
+    "max": 3
+  },
+  "hook": {
+    "lockWaitMs": 100,
+    "budgetMs": 8000,
+    "maxReadBytes": 1048576,
+    "breaker": {
+      "failures": 3,
+      "pauseSec": 60
+    },
+    "p95TargetMs": 50
+  }
+}

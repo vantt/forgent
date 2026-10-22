@@ -19,6 +19,7 @@ const RECORD_DIR: &str = "record";
 const SNAPSHOT_FILE: &str = "snapshot.json";
 const BODIES_DIR: &str = "bodies";
 const BODY_SUFFIX: &str = ".body";
+const BREAKER_FILE: &str = "breaker.json";
 /// The holder-lock registry row the record takes.
 const LOCK_NAME: &str = "mailbox";
 /// The registry's template parameter for the `.fgos` directory.
@@ -45,6 +46,17 @@ impl Paths {
     /// For files written without the mailbox lock; never swept.
     pub fn mailbox_dir(&self) -> PathBuf {
         self.fgos_dir.join(RUNTIME_DIR).join(MAILBOX_DIR)
+    }
+
+    /// The hook's circuit-breaker state, beside `record/` (spec §4.1),
+    /// written without the mailbox lock.
+    pub fn breaker(&self) -> PathBuf {
+        self.mailbox_dir().join(BREAKER_FILE)
+    }
+
+    /// The breaker file's name inside [`Paths::mailbox_dir`].
+    pub(crate) const fn breaker_name() -> &'static str {
+        BREAKER_FILE
     }
 
     /// Written only by a holder of the mailbox lock.

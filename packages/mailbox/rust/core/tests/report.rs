@@ -17,6 +17,8 @@ fn outcome(effective_wake: bool, wake_dropped: Option<WakeDrop>) -> SendOutcome 
         id: MessageId::from_text("a1b2"),
         to: name("forgent-claude-7f"),
         to_generation: Generation::FIRST,
+        to_cli: fgos_mailbox_core::Cli::new("claude").unwrap(),
+        to_head: "{}".to_string(),
         depth: 0,
         reply_to: None,
         effective_wake,

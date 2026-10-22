@@ -11,9 +11,10 @@
 //! after a successful write, hold 2 runs `finish`. After a failed write the
 //! claim is never finished: it expires and the mail is offered again (the
 //! duplicate window of spec §5.2), instead of being marked offered and lost.
+use super::breaker::Breaker;
 use super::{
-    begin, finish, render_reply, Adapter, Begun, HeadFacts, HookCall, HookEvent, HookLimits,
-    QuietReason,
+    begin, finish, render_reply, Adapter, Begun, Claimed, HeadFacts, HookCall, HookEvent,
+    HookLimits, QuietReason,
 };
 use crate::adapters::TestedClis;
 use crate::head::{caller_is_head, Ancestry, NoHead, Topology};
@@ -130,6 +131,12 @@ pub enum Quiet {
     NotTheHead,
     /// A hold failed before its commit point; its code.
     Record(&'static str),
+    /// The circuit breaker is open: the drain is skipped before stdin is
+    /// read.
+    BreakerOpen,
+    /// The resolved writer is a runner attempt's (`att-…`): a runner head
+    /// is never registered and drains nothing.
+    RunnerHead,
 }
 
 /// What an entry logs about one call. It carries no body text.
@@ -149,13 +156,33 @@ pub struct ShellOutcome {
 
 /// One hook call. Never panics: a panic anywhere is caught and reported as
 /// `panicked`, with nothing further written.
+///
+/// The circuit breaker is read first: while it is open the call answers
+/// quiet before reading stdin. After the call, the outcome is counted.
 pub fn run(input: ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -> ShellOutcome {
-    catch_unwind(AssertUnwindSafe(|| drive(&input, stdin, stdout))).unwrap_or_else(|_| {
-        ShellOutcome {
-            panicked: true,
-            ..ShellOutcome::default()
-        }
-    })
+    let breaker = catch_unwind(AssertUnwindSafe(|| {
+        Breaker::load(input.record, &input.hook.hook.breaker)
+    }))
+    .ok();
+    if breaker
+        .as_ref()
+        .is_some_and(|breaker| breaker.is_open((input.clock)()))
+    {
+        return quiet(Quiet::BreakerOpen);
+    }
+    let outcome =
+        catch_unwind(AssertUnwindSafe(|| drive(&input, stdin, stdout))).unwrap_or_else(|_| {
+            ShellOutcome {
+                panicked: true,
+                ..ShellOutcome::default()
+            }
+        });
+    if let Some(breaker) = breaker {
+        let _ = catch_unwind(AssertUnwindSafe(|| {
+            breaker.after(&outcome, (input.clock)());
+        }));
+    }
+    outcome
 }
 
 fn quiet(reason: Quiet) -> ShellOutcome {
@@ -185,6 +212,9 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
         Ok(resolved) => resolved,
         Err(cause) => return quiet(Quiet::NoHead(cause)),
     };
+    if fgos_identity::is_attempt_writer_id(resolved.writer.as_str()) {
+        return quiet(Quiet::RunnerHead);
+    }
     let again = (input.ancestry)();
     if !again.is_some_and(|a| caller_is_head(&a, input.topology, &resolved.head.record)) {
         return quiet(Quiet::NotTheHead);
@@ -210,18 +240,8 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
             input.tested,
             ids,
         );
-        // The size of each claimed body, read in the hold that claimed it
-        // (spec §6.4).
-        let sizes: BTreeMap<MessageId, u64> = match &begun {
-            Begun::Claimed(claimed) => claimed
-                .items
-                .iter()
-                .filter_map(|item| {
-                    state
-                        .message(&item.id)
-                        .map(|h| (item.id.clone(), h.body_bytes))
-                })
-                .collect(),
+        let sizes = match &begun {
+            Begun::Claimed(claimed) => claimed_sizes(state, claimed),
             Begun::Quiet { .. } | Begun::Pointer(_) => BTreeMap::new(),
         };
         let changed = begun.state_changed();
@@ -257,38 +277,101 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
         Begun::Claimed(claimed) => claimed,
     };
     outcome.claimed = claimed.items.iter().map(|item| item.id.clone()).collect();
+    let emitted = emit_and_finish(
+        &Emit {
+            record: input.record,
+            wait,
+            limits: input.limits,
+            clock: input.clock,
+            gate: &input.gate,
+        },
+        &claimed,
+        &sizes,
+        stdout,
+    );
+    outcome.stdout_written = emitted.stdout_written;
+    outcome.finished = emitted.finished;
+    outcome.warnings.extend(emitted.warnings);
+    outcome
+}
 
+/// What [`emit_and_finish`] needs besides the claim.
+pub(crate) struct Emit<'a> {
+    pub record: &'a Record,
+    pub wait: Wait,
+    pub limits: &'a Limits,
+    pub clock: &'a dyn Fn() -> Timestamp,
+    pub gate: &'a WriteGate,
+}
+
+/// What the write and the finish did.
+pub(crate) struct Emitted {
+    pub stdout_written: bool,
+    pub finished: bool,
+    pub warnings: Vec<String>,
+}
+
+/// After hold 1, outside the lock: read the claimed bodies, render, write
+/// and flush stdout, and only after a successful write take hold 2 to
+/// finish. A failed write never finishes. The one write-then-finish order,
+/// shared by the hook and `inbox --claim`.
+pub(crate) fn emit_and_finish(
+    emit: &Emit<'_>,
+    claimed: &Claimed,
+    sizes: &BTreeMap<MessageId, u64>,
+    stdout: &mut dyn Write,
+) -> Emitted {
+    let mut emitted = Emitted {
+        stdout_written: false,
+        finished: false,
+        warnings: Vec::new(),
+    };
     let bodies: BTreeMap<MessageId, String> = sizes
         .iter()
         .filter_map(|(id, bytes)| {
-            input
-                .record
-                .body(id, *bytes, input.limits)
+            emit.record
+                .body(id, *bytes, emit.limits)
                 .map(|text| (id.clone(), text))
         })
         .collect();
-    let reply = render_reply(&claimed, &|id| bodies.get(id).cloned(), input.limits);
-
-    if !write_reply(&input.gate, stdout, &reply.stdout) {
-        return outcome;
+    let reply = render_reply(claimed, &|id| bodies.get(id).cloned(), emit.limits);
+    if !write_reply(emit.gate, stdout, &reply.stdout) {
+        return emitted;
     }
-    outcome.stdout_written = true;
+    emitted.stdout_written = true;
 
-    let now = (input.clock)();
-    match input.record.hold(wait, now, input.limits, |state, _| {
+    let now = (emit.clock)();
+    match emit.record.hold(emit.wait, now, emit.limits, |state, _| {
         finish(state, claimed.ticket(), now)
     }) {
         Ok(held) => {
-            outcome.finished = held.wrote;
-            outcome.warnings.extend(
+            emitted.finished = held.wrote;
+            emitted.warnings.extend(
                 held.warning
                     .iter()
                     .map(|w| format!("{:?}: {}", w.step, w.detail)),
             );
         }
-        Err(error) => outcome.warnings.push(format!("finish: {error}")),
+        Err(error) => emitted.warnings.push(format!("finish: {error}")),
     }
-    outcome
+    emitted
+}
+
+/// The sizes of the claimed bodies, read in the hold that claimed them
+/// (spec §6.4).
+pub(crate) fn claimed_sizes(
+    state: &fgos_mailbox_core::MailboxState,
+    claimed: &Claimed,
+) -> BTreeMap<MessageId, u64> {
+    claimed
+        .items
+        .iter()
+        .filter_map(|item| {
+            state
+                .message(&item.id)
+                .map(|h| (item.id.clone(), h.body_bytes))
+        })
+        .collect()
 }
 
 /// Writes and flushes `text` once the gate moved from idle to writing;

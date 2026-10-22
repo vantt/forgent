@@ -5,7 +5,7 @@
 use crate::counters::Account;
 use crate::delivery::{Refusal, SendRequest};
 use crate::envelope::{Header, MessageState};
-use crate::ids::{Generation, ShortName, WriterKey};
+use crate::ids::{Cli, Generation, ShortName, WriterKey};
 use crate::limits::Limits;
 use crate::state::MailboxState;
 use crate::time::Timestamp;
@@ -37,6 +37,8 @@ pub(crate) struct Admitted {
     pub to: WriterKey,
     pub to_name: ShortName,
     pub to_generation: Generation,
+    pub to_cli: Cli,
+    pub to_head: String,
     /// Index of the derived parent in the header list.
     pub parent: Option<usize>,
     pub depth: u32,
@@ -118,6 +120,8 @@ impl MailboxState {
             to: recipient.key.clone(),
             to_name: recipient.name.clone(),
             to_generation: recipient.generation,
+            to_cli: recipient.cli.clone(),
+            to_head: recipient.head.clone(),
             parent,
             depth,
         })

@@ -501,3 +501,365 @@ fn a_shell_whose_step_drain_finds_only_too_large_mail_writes_the_pointer_and_fin
     );
     assert_eq!(state_of(&record, &id), MessageState::Recorded);
 }
+
+/// [`call`] with a resolver that answers `writer` instead of the payload's.
+fn call_as(
+    record: &Record,
+    head: &Head,
+    writer: WriterKey,
+    stdin: &[u8],
+    stdout: &mut dyn Write,
+) -> ShellOutcome {
+    let limits = limits();
+    let hook = hook_limits();
+    let head_facts = HeadFacts {
+        record: head.record(),
+        own_suffix: None,
+        handle: None,
+    };
+    let resolve = move |_: &[u8], _: &Ancestry| {
+        Ok(Resolved {
+            writer: writer.clone(),
+            head: head_facts.clone(),
+        })
+    };
+    let caller = head.ancestry();
+    let ancestry = move || Some(caller.clone());
+    let clock = || T0;
+    let input = ShellInput {
+        adapter: Adapter::Claude,
+        event: HookEvent::PostToolUse,
+        project: "forgent",
+        record,
+        limits: &limits,
+        hook: &hook,
+        tested: TestedClis::embedded(),
+        clock: &clock,
+        ancestry: &ancestry,
+        topology: Topology::Direct,
+        resolve: &resolve,
+        gate: WriteGate::new(),
+    };
+    run(input, &mut &stdin[..], stdout)
+}
+
+#[test]
+fn a_runner_head_writer_is_quiet_and_registers_nothing() {
+    let fgos = TempFgos::new("shell-runner");
+    let record = fgos.record();
+    let head = Head::spawn();
+    let (stdin, _) = payload(files::POST_TOOL_USE);
+    let runner =
+        WriterKey::new(fgos_identity::mint_attempt_writer_id("asgn-1_x").unwrap()).unwrap();
+
+    let mut out = Vec::new();
+    let outcome = call_as(&record, &head, runner, &stdin, &mut out);
+
+    assert_eq!(outcome.quiet, Some(Quiet::RunnerHead));
+    assert!(out.is_empty());
+    assert!(!fgos.paths().snapshot().exists(), "nothing was registered");
+}
+
+/// Makes every hold fail with `snapshot-newer`, a counted failure.
+fn break_snapshot(fgos: &TempFgos) {
+    let snapshot = fgos.paths().snapshot();
+    let mut value: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(&snapshot).unwrap()).unwrap();
+    value["schema_version"] = 2.into();
+    std::fs::write(&snapshot, serde_json::to_vec(&value).unwrap()).unwrap();
+}
+
+/// A stdin that records whether anything read it.
+struct Watched<'a> {
+    bytes: &'a [u8],
+    read: bool,
+}
+
+impl io::Read for Watched<'_> {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        self.read = true;
+        self.bytes.read(buf)
+    }
+}
+
+fn breaker_limits() -> fgos_mailbox::hook::BreakerLimits {
+    hook_limits().hook.breaker
+}
+
+#[test]
+fn the_breaker_opens_after_the_configured_counted_failures_and_answers_quiet_before_reading_stdin()
+{
+    let fgos = TempFgos::new("shell-breaker-open");
+    let record = fgos.record();
+    let head = Head::spawn();
+    registered_with_mail(&record, &head);
+    break_snapshot(&fgos);
+    let (stdin, _) = payload(files::POST_TOOL_USE);
+
+    for _ in 0..breaker_limits().failures {
+        let outcome = call(&record, &head, head.ancestry(), &stdin, &mut Vec::new(), T0);
+        assert_eq!(outcome.quiet, Some(Quiet::Record("snapshot-newer")));
+    }
+    let mut watched = Watched {
+        bytes: &stdin,
+        read: false,
+    };
+    let limits = limits();
+    let hook = hook_limits();
+    let clock = || T0;
+    let ancestry = || Some(head.ancestry());
+    let resolve = |_: &[u8], _: &Ancestry| -> Result<Resolved, fgos_mailbox::head::NoHead> {
+        panic!("an open breaker resolves nothing")
+    };
+    let input = ShellInput {
+        adapter: Adapter::Claude,
+        event: HookEvent::PostToolUse,
+        project: "forgent",
+        record: &record,
+        limits: &limits,
+        hook: &hook,
+        tested: TestedClis::embedded(),
+        clock: &clock,
+        ancestry: &ancestry,
+        topology: Topology::Direct,
+        resolve: &resolve,
+        gate: WriteGate::new(),
+    };
+    let outcome = run(input, &mut watched, &mut Vec::new());
+
+    assert_eq!(outcome.quiet, Some(Quiet::BreakerOpen));
+    assert!(
+        !watched.read,
+        "an open breaker answers before stdin is read"
+    );
+}
+
+#[test]
+fn an_open_breaker_closes_after_its_pause() {
+    let fgos = TempFgos::new("shell-breaker-pause");
+    let record = fgos.record();
+    let head = Head::spawn();
+    let id = registered_with_mail(&record, &head);
+    let snapshot = fgos.paths().snapshot();
+    let good = std::fs::read(&snapshot).unwrap();
+    break_snapshot(&fgos);
+    let (stdin, _) = payload(files::POST_TOOL_USE);
+    for _ in 0..breaker_limits().failures {
+        call(&record, &head, head.ancestry(), &stdin, &mut Vec::new(), T0);
+    }
+    std::fs::write(&snapshot, &good).unwrap();
+    let pause = breaker_limits().pause_sec;
+
+    let inside = Timestamp::from_millis(T0.plus_secs(pause).as_millis() - 1);
+    let outcome = call(
+        &record,
+        &head,
+        head.ancestry(),
+        &stdin,
+        &mut Vec::new(),
+        inside,
+    );
+    assert_eq!(outcome.quiet, Some(Quiet::BreakerOpen));
+
+    let after = T0.plus_secs(pause);
+    let outcome = call(
+        &record,
+        &head,
+        head.ancestry(),
+        &stdin,
+        &mut Vec::new(),
+        after,
+    );
+    assert_eq!(outcome.claimed, vec![id]);
+    let breaker: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(fgos.paths().breaker()).unwrap()).unwrap();
+    assert_eq!(breaker["failures"], 0, "a success resets the count");
+    assert_eq!(breaker["openedAtMs"], serde_json::Value::Null);
+}
+
+#[test]
+fn lock_contention_config_errors_budget_exits_and_benign_quiets_never_count() {
+    use fgos_mailbox::hook::breaker::Breaker;
+    let fgos = TempFgos::new("shell-breaker-benign");
+    let record = fgos.record();
+    let limits = breaker_limits();
+    // Config errors stop the entry before the shell, and a budget exit ends
+    // the process from the watchdog: neither reaches the count. What does
+    // reach it and must not count: lock contention and every benign quiet.
+    let benign = [
+        Quiet::Record(fgos_mailbox::record::LOCK_BUSY),
+        Quiet::Drain(QuietReason::NothingEligible),
+        Quiet::NotTheHead,
+        Quiet::OverReadCap,
+        Quiet::RunnerHead,
+    ];
+    for quiet in benign {
+        for _ in 0..limits.failures + 1 {
+            let outcome = ShellOutcome {
+                quiet: Some(quiet.clone()),
+                ..ShellOutcome::default()
+            };
+            Breaker::load(&record, &limits).after(&outcome, T0);
+        }
+        assert!(
+            !Breaker::load(&record, &limits).is_open(T0),
+            "{quiet:?} counted"
+        );
+    }
+    assert!(
+        !fgos.paths().breaker().exists(),
+        "nothing counted, nothing written"
+    );
+    let panicked = ShellOutcome {
+        panicked: true,
+        ..ShellOutcome::default()
+    };
+    for _ in 0..limits.failures {
+        Breaker::load(&record, &limits).after(&panicked, T0);
+    }
+    assert!(
+        Breaker::load(&record, &limits).is_open(T0),
+        "a caught panic counts"
+    );
+}
+
+/// Writes a breaker file holding `text`.
+fn plant_breaker(fgos: &TempFgos, text: &str) {
+    std::fs::write(fgos.paths().breaker(), text).unwrap();
+}
+
+#[test]
+fn a_planted_future_open_time_cannot_extend_the_pause() {
+    use fgos_mailbox::hook::breaker::Breaker;
+    let fgos = TempFgos::new("shell-breaker-future");
+    let record = fgos.record();
+    let limits = breaker_limits();
+    let at = |ms: u64| format!(r#"{{"schema":1,"failures":3,"openedAtMs":{ms}}}"#);
+    let now = T0.as_millis();
+
+    plant_breaker(&fgos, &at(now + 3_600_000));
+    assert!(
+        !Breaker::load(&record, &limits).is_open(T0),
+        "an hour ahead reads as closed"
+    );
+    plant_breaker(&fgos, &at(now + 2_000));
+    assert!(
+        Breaker::load(&record, &limits).is_open(T0),
+        "within the clock skew it counts"
+    );
+    plant_breaker(&fgos, &at(now - 1_000));
+    assert!(Breaker::load(&record, &limits).is_open(T0));
+    plant_breaker(&fgos, &at(now - limits.pause_sec * 1000));
+    assert!(
+        !Breaker::load(&record, &limits).is_open(T0),
+        "the pause has passed"
+    );
+}
+
+#[test]
+fn a_corrupt_symlinked_or_oversized_breaker_file_reads_as_closed() {
+    use fgos_mailbox::hook::breaker::Breaker;
+    let fgos = TempFgos::new("shell-breaker-corrupt");
+    let record = fgos.record();
+    let limits = breaker_limits();
+    let open = format!(
+        r#"{{"schema":1,"failures":3,"openedAtMs":{}}}"#,
+        T0.as_millis()
+    );
+    plant_breaker(&fgos, &open);
+    assert!(
+        Breaker::load(&record, &limits).is_open(T0),
+        "the planted state is open"
+    );
+
+    for text in [
+        "not json".to_string(),
+        open.replace("\"schema\":1", "\"schema\":2"),
+        open.replace('}', r#","extra":1}"#),
+        format!("{open}{}", " ".repeat(5000)),
+    ] {
+        plant_breaker(&fgos, &text);
+        assert!(!Breaker::load(&record, &limits).is_open(T0), "{text:.40}");
+    }
+    std::fs::remove_file(fgos.paths().breaker()).unwrap();
+    let elsewhere = fgos.scratch().join("breaker-elsewhere.json");
+    std::fs::write(&elsewhere, &open).unwrap();
+    std::os::unix::fs::symlink(&elsewhere, fgos.paths().breaker()).unwrap();
+    assert!(
+        !Breaker::load(&record, &limits).is_open(T0),
+        "a symlink is never followed"
+    );
+}
+
+#[test]
+fn the_breaker_is_never_read_or_written_under_an_untrusted_directory() {
+    use fgos_mailbox::hook::breaker::Breaker;
+    use std::os::unix::fs::PermissionsExt;
+    let fgos = TempFgos::new("shell-breaker-untrusted");
+    let record = fgos.record();
+    let limits = breaker_limits();
+    let open = format!(
+        r#"{{"schema":1,"failures":3,"openedAtMs":{}}}"#,
+        T0.as_millis()
+    );
+    plant_breaker(&fgos, &open);
+    let runtime = fgos.fgos_dir().join("runtime");
+    let mode = std::fs::metadata(&runtime).unwrap().permissions().mode();
+    std::fs::set_permissions(&runtime, std::fs::Permissions::from_mode(mode | 0o002)).unwrap();
+
+    assert!(
+        !Breaker::load(&record, &limits).is_open(T0),
+        "an untrusted chain reads as closed"
+    );
+    let panicked = ShellOutcome {
+        panicked: true,
+        ..ShellOutcome::default()
+    };
+    Breaker::load(&record, &limits).after(&panicked, T0);
+    std::fs::set_permissions(&runtime, std::fs::Permissions::from_mode(mode)).unwrap();
+    assert_eq!(
+        std::fs::read_to_string(fgos.paths().breaker()).unwrap(),
+        open,
+        "nothing was written"
+    );
+}
+
+#[test]
+fn the_no_mail_path_writes_neither_snapshot_nor_breaker_file() {
+    let fgos = TempFgos::new("shell-no-mail");
+    let record = fgos.record();
+    let head = Head::spawn();
+    let (stdin, _) = payload(files::POST_TOOL_USE);
+    call(&record, &head, head.ancestry(), &stdin, &mut Vec::new(), T0);
+    let snapshot = fgos.paths().snapshot();
+    let before = std::fs::metadata(&snapshot).unwrap();
+    let before = (
+        before.modified().unwrap(),
+        std::os::unix::fs::MetadataExt::ino(&before),
+    );
+
+    let mut out = Vec::new();
+    let outcome = call(
+        &record,
+        &head,
+        head.ancestry(),
+        &stdin,
+        &mut out,
+        T0.plus_secs(1),
+    );
+
+    assert_eq!(
+        outcome.quiet,
+        Some(Quiet::Drain(QuietReason::NothingEligible))
+    );
+    assert!(out.is_empty() && !outcome.state_written);
+    let after = std::fs::metadata(&snapshot).unwrap();
+    assert_eq!(
+        (
+            after.modified().unwrap(),
+            std::os::unix::fs::MetadataExt::ino(&after)
+        ),
+        before
+    );
+    assert!(!fgos.paths().breaker().exists());
+}

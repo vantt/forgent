@@ -8,6 +8,8 @@ mod claude;
 #[cfg(unix)]
 pub mod claude_head;
 mod codex;
+#[cfg(unix)]
+pub mod version;
 
 use crate::head::Topology;
 use crate::hook::{Adapter, HookEvent, Payload, Unparsed};
@@ -27,12 +29,16 @@ pub enum Shape {
     PostToolUseContext,
     /// `{"decision":"block","reason":text}`
     StopBlock,
+    /// The text itself and a line end: a verb's stdout (`inbox --claim`),
+    /// not a hook's.
+    Plain,
 }
 
 impl Shape {
     /// The output carrying `text`, built as JSON so any text is escaped.
     pub fn render(self, text: &str) -> String {
         let value = match self {
+            Self::Plain => return format!("{text}\n"),
             Self::PostToolUseContext => json!({
                 "hookSpecificOutput": {
                     "hookEventName": "PostToolUse",
@@ -147,6 +153,7 @@ struct RawMeasured {
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct TestedClis {
     clis: Vec<String>,
+    versions: Vec<(String, String)>,
     facts: BTreeMap<String, AdapterFacts>,
 }
 
@@ -190,7 +197,16 @@ impl TestedClis {
                 "{missing} is tested but has no hookFacts"
             )));
         }
-        Ok(Self { clis, facts })
+        let versions = raw
+            .tested_against
+            .into_iter()
+            .map(|t| (t.cli, t.version))
+            .collect();
+        Ok(Self {
+            clis,
+            versions,
+            facts,
+        })
     }
 
     /// The contract this crate was built with. Its own test proves it
@@ -202,6 +218,11 @@ impl TestedClis {
 
     pub fn contains(&self, adapter: Adapter) -> bool {
         self.clis.iter().any(|cli| cli == adapter.word())
+    }
+
+    /// Whether `version` of `cli` is listed under `testedAgainst`.
+    pub fn lists_version(&self, cli: &str, version: &str) -> bool {
+        self.versions.iter().any(|(c, v)| c == cli && v == version)
     }
 
     /// The measured hook facts of a tested CLI.

@@ -12,10 +12,10 @@
 //! environment-chosen directory is one more lever for a same-user process.
 use crate::head::{is_complete, Ancestry, NoHead, Topology};
 use crate::hook::{HeadFacts, HookCallLimits};
-use crate::record::open_regular;
+use crate::record::read_regular_capped;
 use fgos_mailbox_core::WriterKey;
 use serde_json::Value;
-use std::io::{self, Read};
+use std::io;
 use std::path::Path;
 
 /// The head of the calling Claude Code session.
@@ -61,17 +61,10 @@ pub fn find_head(
 }
 
 fn read_session_file(path: &Path, hook: &HookCallLimits) -> Result<Value, NoHead> {
-    let file = open_regular(path).map_err(|e| match e.kind() {
+    let bytes = read_regular_capped(path, hook.max_read_bytes).map_err(|e| match e.kind() {
         io::ErrorKind::NotFound => NoHead::NoSessionFile,
         _ => NoHead::Unreadable,
     })?;
-    let mut bytes = Vec::new();
-    file.take(hook.max_read_bytes.saturating_add(1))
-        .read_to_end(&mut bytes)
-        .map_err(|_| NoHead::Unreadable)?;
-    if bytes.len() as u64 > hook.max_read_bytes {
-        return Err(NoHead::Unreadable);
-    }
     match serde_json::from_slice(&bytes) {
         Ok(value @ Value::Object(_)) => Ok(value),
         _ => Err(NoHead::Unreadable),

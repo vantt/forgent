@@ -44,7 +44,13 @@ pub fn stored_liveness(stored: &Binding) -> Liveness {
 }
 
 fn stored_record(stored: &Binding) -> Record {
-    serde_json::from_str(&stored.head)
+    record_of_head_text(&stored.head)
+}
+
+/// The process record a binding's head text holds (the inverse of
+/// [`head_text`]); an unreadable text is an empty record.
+pub(crate) fn record_of_head_text(text: &str) -> Record {
+    serde_json::from_str(text)
         .map(|value| Record::from_json(&value))
         .unwrap_or_default()
 }

@@ -330,3 +330,45 @@ pub fn finish(state: &mut MailboxState, ticket: &FinishTicket, now: Timestamp) -
     }
     finished
 }
+
+/// What `inbox --claim` found for one caller.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum InboxClaim {
+    /// The caller has no binding.
+    NoAddress,
+    /// Nothing pending.
+    Empty,
+    /// Every pending item, to write as plain text and then finish.
+    Claimed(Claimed),
+}
+
+/// Under mutex hold 1 of `inbox --claim`: every pending item of `key`'s
+/// current generation, unbounded (a tool's stdout has no inline limit),
+/// claimed like a step drain. Returns whether the state changed.
+pub(crate) fn claim_inbox(
+    state: &mut MailboxState,
+    key: &WriterKey,
+    now: Timestamp,
+    limits: &Limits,
+    ids: &mut dyn IdSource,
+) -> (InboxClaim, bool) {
+    let Some(generation) = state.binding(key).map(|b| b.generation) else {
+        return (InboxClaim::NoAddress, false);
+    };
+    let claim = state.claim(key, generation, Checkpoint::Step, now, limits, ids);
+    let Some(token) = claim.token else {
+        return (InboxClaim::Empty, claim.changed);
+    };
+    let claimed = Claimed {
+        items: claim.items,
+        too_large: 0,
+        shape: Shape::Plain,
+        ticket: FinishTicket {
+            key: key.clone(),
+            generation,
+            token,
+            stop_block: false,
+        },
+    };
+    (InboxClaim::Claimed(claimed), true)
+}

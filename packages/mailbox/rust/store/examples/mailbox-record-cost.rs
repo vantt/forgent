@@ -15,8 +15,6 @@
 //! measured hold the population's snapshot is put back (untimed), so every
 //! sample sees the same population. Every policy value comes from
 //! `packages/mailbox/contracts/limits.v1.json`.
-#[path = "../../core/tests/common/support.rs"]
-mod support;
 
 use fgos_mailbox::record::{Paths, Record, Reported, Step, Wait};
 use fgos_mailbox_core::{
@@ -35,7 +33,7 @@ const WAIT: Wait = Wait::Ms(30_000);
 const BACKGROUND: &str = "--background-sender";
 
 fn limits() -> Limits {
-    serde_json::from_value(support::config_section(&support::limits_contract())).unwrap()
+    fgos_mailbox::limits::load(None).unwrap().limits
 }
 
 fn key(text: &str) -> WriterKey {

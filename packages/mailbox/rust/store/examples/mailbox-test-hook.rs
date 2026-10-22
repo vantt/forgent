@@ -21,8 +21,6 @@
 //! failed. `--fgos-dir` must exist; nothing is created outside it.
 #[path = "../tests/common/ancestry.rs"]
 mod ancestry;
-#[path = "../../core/tests/common/support.rs"]
-mod support;
 
 use fgos_identity::{resolve_current, Source, WriterId};
 use fgos_mailbox::adapters::claude_head::find_head;
@@ -154,11 +152,8 @@ fn hook_args(flags: &Flags) -> Result<HookArgs, String> {
 }
 
 fn limits() -> (Limits, HookLimits) {
-    let section = support::config_section(&support::limits_contract());
-    (
-        serde_json::from_value(section.clone()).expect("the embedded contract fills Limits"),
-        serde_json::from_value(section).expect("the embedded contract fills HookLimits"),
-    )
+    let loaded = fgos_mailbox::limits::load(None).expect("the embedded contract loads");
+    (loaded.limits, loaded.hook)
 }
 
 fn now() -> Timestamp {
@@ -361,6 +356,12 @@ fn send(flags: &Flags) -> i32 {
         Wait::Ms(hook_limits.hook.lock_wait_ms),
         now(),
         &limits,
+        &fgos_mailbox::adapters::version::VersionSources {
+            claude_sessions: std::env::var_os("HOME")
+                .map(|home| PathBuf::from(home).join(".claude/sessions")),
+            codex_program: PathBuf::from("codex"),
+            max_read_bytes: hook_limits.hook.max_read_bytes,
+        },
     );
     let _ = writeln!(io::stdout().lock(), "{}", answer.text);
     if answer.recorded {

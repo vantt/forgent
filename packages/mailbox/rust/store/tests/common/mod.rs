@@ -99,12 +99,25 @@ pub fn vector_input(adapter: Adapter, vector: &Value) -> Vec<u8> {
     }
 }
 
-/// The core's limits as the contract states them.
+/// The core's limits as the product loader yields them without project
+/// config.
 pub fn limits() -> fgos_mailbox_core::Limits {
+    fgos_mailbox::limits::load(None).unwrap().limits
+}
+
+/// The hook's limits as the product loader yields them without project
+/// config.
+pub fn hook_limits() -> fgos_mailbox::hook::HookLimits {
+    fgos_mailbox::limits::load(None).unwrap().hook
+}
+
+/// The core's limits folded from the contract by the test support, an
+/// independent reading of the same file the loader embeds.
+pub fn limits_from_contract() -> fgos_mailbox_core::Limits {
     serde_json::from_value(support::config_section(&support::limits_contract())).unwrap()
 }
 
-/// The hook's limits as the contract states them.
-pub fn hook_limits() -> fgos_mailbox::hook::HookLimits {
+/// The hook's limits folded from the contract by the test support.
+pub fn hook_limits_from_contract() -> fgos_mailbox::hook::HookLimits {
     serde_json::from_value(support::config_section(&support::limits_contract())).unwrap()
 }

@@ -8,11 +8,10 @@ fgos-mailbox-core = { path = "../core" }
 fgos-process = { path = "../../../process/rust" }
 fgos-holder-lock = { path = "../../../holder-lock/rust" }
 fgos-durable-file = { path = "../../../durable-file/rust" }
+# Session identity reads and tests writer ids; the host provider is not needed.
+fgos-identity = { path = "../../../identity/rust", default-features = false }
 serde = { workspace = true }
 serde_json = { workspace = true }
 
 [target.'cfg(unix)'.dependencies]
 libc = { workspace = true }
-
-[dev-dependencies]
-fgos-identity = { path = "../../../identity/rust" }
