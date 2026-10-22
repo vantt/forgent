@@ -105,6 +105,15 @@ Nothing merges to main.
 
    The controller updates board row `MAIL` and the plan status on main.
 
+## Deviations (implementation lead, 2026-10-22)
+
+- **§6.4** says the schema stays at version 1 (phase 3 deviation), not version 2.
+- **§7** gains a subsection 7.3 with the V3 recordings instead of rewriting the measured table of 2026-10-19, which stays the record of that probe.
+- **§16** is unchanged: Q1 was resolved by the plan owner (option C for agy), recorded in §17 and §7.3.
+- **Review step skipped** at the plan owner's instruction; the plan owner runs an independent review.
+- **`npm test`** runs because the branch changed a Node file (`scripts/record-mailbox-hook-fixtures.mjs`).
+- **Hand-off report** is the controller's report from this run; no separate closing report file.
+
 ## Plan owner decisions (2026-10-22, after phase 3; plan owner (agent))
 
 1. **M4, one binding per head.** A second key from the same head replaces the old binding like a dead-head takeover: a new generation, its own name, `stop_blocks` 0, and mail queued for the old key is never shown to the new context. Implemented in phase 5 with its owning test.
