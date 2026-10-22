@@ -1,7 +1,7 @@
 ---
 title: "YAML Document + Config foundation, Slice A: fixture helper, crate fgos-yaml-doc, serde_yaml removal"
 description: "One shared config fixture helper for tests, the Rust crate fgos-yaml-doc with golden fixtures and fuzz targets, a three-candidate parser choice behind an owner gate, and the three serde_yaml users moved onto the crate."
-status: pending
+status: in-progress
 priority: P1
 effort: 56h
 branch: cfg/slice-a-yaml-document (linked worktree; never the shared main checkout)
@@ -59,7 +59,7 @@ Parallelism: 01 || 02 || 03 || 04 are file-disjoint (see ownership table). After
 
 Shared edits handled in order: root `Cargo.toml` (02 then 05); `packages/yaml-doc/rust/Cargo.toml` (02 then 05).
 
-## Frame (proposed scope and budget; owner confirms with plan approval)
+## Frame (approved by the owner 2026-10-22 15:10, with ideas I1 and I2)
 
 - Scope: the files in the ownership table; nothing else. Out of frame (ask first): changing a locked law, the spec's profile table, the `parseYaml` signature, adding a Node-side change.
 - Budget: about 2,600 lines Rust source, 1,600 lines Rust tests, about 130 fixture cases (JSON), 300 lines Node test helper and conversions (mechanical), 250 lines docs. Effort 56h (about 7 working days) excluding owner wait time.
@@ -121,7 +121,9 @@ Full text in [phase 04](phase-04-parser-evaluation-and-owner-gate.md). Phase 05 
 - Fuzz targets run for the recorded budget with no crash, hang or out-of-memory.
 - Upgrade record carries the owner's sign-off.
 
-## Ideas for the owner (beyond the spec; each only after you choose)
+## Ideas for the owner (beyond the spec; owner chose I1 and I2 on 2026-10-22, declined I3 and I4)
+
+I1 is done in phase 01 (architecture guard, in `test/architecture.test.mjs`); I2 in phase 03 (comment guard), recorded in the YAML Document spec's decision history in the same change.
 
 | Idea | Problem and evidence | Benefit |
 |---|---|---|
@@ -136,6 +138,5 @@ Slice B: crate `fgos-config`, descriptors under `core/config-schema/` (the stand
 
 ## Unresolved questions
 
-1. Frame budget above is a proposal; confirm or adjust at plan approval.
 2. Parser choice and vendoring layout: owner gate in phase 04.
 3. Fuzz sign-off timing: sign-off precedes the first fuzz run, so a finding later reopens the gate (stated in phase 04).
