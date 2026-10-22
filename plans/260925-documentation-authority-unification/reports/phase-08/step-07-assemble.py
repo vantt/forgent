@@ -74,12 +74,10 @@ def span_key(item: dict[str, Any]) -> str:
 
 
 def alias_paths() -> set[str]:
-    aliases = set()
-    for entry in read_json(PLAN / "alias-table.json").get("entries", []):
-        for key in ("alias", "oldPath", "from", "path"):
-            if entry.get(key):
-                aliases.add(entry[key])
-    return aliases
+    # The adopted alias table is empty before cutover. Test the paths which
+    # actually become aliases, excluding the three explicitly retained roots.
+    retained = {'docs/decisions/index.md', 'docs/enduser-docs-index.json', 'docs/architecture-manifest.json'}
+    return {r['oldPath'] for r in read_json(HERE / 'step-05-cutover-move-set.json')['paths'] if r['oldPath'] not in retained}
 
 
 def park_families() -> tuple[dict[tuple[str, int, str, str], str], list[dict[str, Any]]]:
@@ -445,180 +443,89 @@ def special_rows() -> list[dict[str, Any]]:
 
 
 def final_resolution(pin: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
-    """Apply final owning-row decisions as a digest-bound overlay, not to frozen receipts.
+    """Replay immutable v1 decisions, then the explicit v2 and integration overlays.
 
-    Step 3--5 records and their review hashes remain historical inputs. The final
-    matrix consumes every overlay row; no flipped disposition is merely projected.
+    This is the only final assembly door. Classification is a reviewed input,
+    not recomputed from v1's incomplete export on each replay.
     """
-    export = read_json(HERE / 'step-07-state-path-export.json')
-    proof = read_json(HERE / 'step-07-generator-path-proof.json')
-    bindings = read_json(HERE / 'step-07-final-binding-check.json')
-    actions = read_json(HERE / 'step-07-final-actions.json')
-    for evidence in (proof, bindings, actions):
-        if evidence['sourceCommit'] != pin:
-            raise ValueError('final evidence is not bound to this pin')
-    if proof['exportSha256'] != sha((HERE / 'step-07-state-path-export.json').read_text()):
-        raise ValueError('state export changed after proof')
-    if bindings['errors'] or proof['currentPathMoves']:
-        raise ValueError('unresolved binding or registry currentPath move')
-    by_key = {(str(pathlib.Path(r['record']).relative_to(HERE.relative_to(ROOT))), r['recordLine'], r['referenceId']): r for r in rows}
-    family_source = read_json(HERE / 'step-07-park-families.json')
-    source_records = {}
-    value_index: dict[str, list[str]] = collections.defaultdict(list)
-    for n, doc in enumerate(export['docs']):
-        for field in ('currentPath', 'aliases', 'sourceCaptureIds'):
-            values = doc.get(field, [])
-            if isinstance(values, str):
-                values = [values]
-            for i, value in enumerate(values):
-                value_index[value].append(f'/docs/{n}/{field}' + (f'/{i}' if field != 'currentPath' else ''))
-    slot_proof = {r['docId']: r for r in proof['registryPathEvidence']}
-    generic_blockers = {
-        'gen-doc-registry': 'export-omits-topic-lineage-and-full-generated-field-inputs',
-        'gen-enduser-index': 'final-scan-set-and-unregistered-slot-generator-output-not-composed',
-        'gen-decision-index': 'export-has-only-id-pathValues-not-scope-text-rationale-ts-for-state-wins-union',
-        'state-registry-export': 'full-projection-or-quadrant-input-parity-not-proved-by-path-only-export',
-        'state-work-docsref': 'export-omits-effective-content-worktree-and-branch-pins-and-complete-acceptance-tokens',
-        'state-inventory-oldpath': 'export-inventory-rows-have-only-oldPath-no-topicId-role-or-move-destinations',
-        'state-outcome-and-evidence': 'raw-outcome-path-reachability-and-truncated-acceptance-token-parity-unproven',
-        'readset-post-retirement-scan': 'successor-scan-set-not-composed-and-Lead-dynamic-023895-placement-owed',
-        'decision-f-ratchet-retirement': 'three-L12-89-replacement-guards-not-yet-composed-with-retirement',
-        'r26:docs/doc-governance.md': 'content-conservation-and-gate-reader-patches-not-yet-composed',
-        'gateway-ctr010-contract-citations': 'consumer-specific-YAML-citation-and-live-holder-carriage-not-yet-composed',
-        'citation-convention-and-scan': 'per-area-convention-and-recursive-spec-scan-coverage-not-yet-bound',
-        'carry-foundations-and-retired-decision-narratives': '13-verbatim-claim-passages-and-live-holder-carriage-not-yet-composed',
-        'carry-knowledge-registry-framework': '12-verbatim-claim-passages-and-live-holder-carriage-not-yet-composed',
-        'carry-runner-workstate-doctrine': '11-verbatim-claim-passages-and-live-holder-carriage-not-yet-composed',
-        'split-area-holder-mapping': 'published-area-to-holder-scope-table-and-consumer-patches-not-yet-composed',
-        'carry-distribution-gateway-claims': '8-verbatim-claim-passages-and-live-holder-carriage-not-yet-composed',
-        'r26:docs/architecture-map.md': 'target-lacks-required-0010-0015-0017-heading-carriage-and-reader-patch',
-    }
-    preserve_families = {'r26:docs/decisions/index.md', 'r26:docs/enduser-docs-index.json', 'r29-native-land-decisions-tree', 'r26:docs/architecture-manifest.json'}
-    applied = []
-    summaries = []
-    source_cache = {}
-    source_bindings = []
-    source_binding_ids = {}
-    historical_source_cache = {}
-    for family in family_source['families']:
-        family_id = family['id']
-        counts: collections.Counter[str] = collections.Counter()
-        for member in family['members']:
-            key = (member['recordFile'], member['recordLine'], member['id'])
-            row = by_key[key]
-            if row['recordDisposition'] != 'parked':
-                raise ValueError(f'park input changed: {key}')
-            record_file = member['recordFile']
-            if record_file not in source_records:
-                source_records[record_file] = jsonl(HERE / record_file)
-            rec = source_records[record_file][member['recordLine'] - 1]
-            item = next(i for field in ('references', 'dynamicTraces', 'authorAddedReferences') for i in rec.get(field, []) if item_id(i) == member['id'])
-            new = 'parked'
-            evidence = 'step-07-park-resolution-plan.json#' + family_id
-            blocker = generic_blockers.get(family_id)
-            pointers = []
-            if family_id in preserve_families:
-                new, blocker = 'preserve', None
-                evidence = 'owner-answers.md#L12-96'
-            elif family_id in {'gen-doc-registry', 'gen-enduser-index'}:
-                token = item.get('matchedExpression')
-                pointers = value_index.get(token, [])
-                if family_id == 'gen-doc-registry' and pointers:
-                    new, blocker = 'preserve', None
-                elif family_id == 'gen-enduser-index' and pointers:
-                    # Generated alias/currentPath must belong to a retained scanned slot,
-                    # not just equal another slot's historical string by coincidence.
-                    valid = [p for p in pointers if slot_proof[export['docs'][int(p.split('/')[2])]['docId']]['generatedAliasesEqual']]
-                    if valid:
-                        pointers, new, blocker = valid, 'preserve', None
-                evidence = 'step-07-generator-path-proof.json'
-            elif family_id == 'state-registry-export':
-                operand = str(item.get('pathOperand') or '')
-                # Only direct persisted operand/alias uses; full writers/scans and
-                # inventory joins retain their more demanding consumer proof.
-                if member['file'] not in {'scripts/knowledge-bootstrap.mjs', 'scripts/knowledge-migration.mjs'} and (
-                    'currentPath' in operand or 'aliases' in operand
-                ) and item.get('role') != 'document-reader-writer-or-default':
-                    new, blocker = 'preserve', None
-                    evidence = 'step-07-generator-path-proof.json#registryPathEvidence'
-            elif family_id == 'r26:docs/contracts/fgos-gateway-api-v1.yaml':
-                new = 'patch'
-                blocker = 'compose-other-file-hunks-and-independently-review-CTR010-co-cut'
-                evidence = 'step-07-final-prepared-specs.json#gateway-contract-reader-move'
-            if family_id == 'carry-distribution-gateway-claims' and member['id'] == 'reference-000209':
-                holder = (ROOT / 'docs/platform/herdr-web-dashboard/spec.md').read_text()
-                if '## Business Rules' not in holder or 'binds 0.0.0.0 by default, bind address configurable' not in holder or 'warning raised when the bind is not loopback' not in holder:
-                    raise ValueError('network R5 claim not conserved by current holder')
-                new = 'patch'
-                blocker = 'compose-other-network-comment-hunks-and-independent-review'
-                evidence = 'step-07-final-prepared-specs.json#network-r5-live-holder'
-            if family_id == 'gateway-ctr010-contract-citations' and member['id'] == 'reference-000307':
-                # Exact identical counterpart is already preserve in the Step 5 join.
-                # The full-history witness is stored with final obligations.
-                new, blocker = 'preserve', None
-                evidence = 'step-07-final-obligations.json#step5-carry:gateway-yaml-research-split'
-            source_binding = None
-            if new != 'parked':
-                path = member['file']
-                if path not in source_cache:
-                    source_cache[path] = (ROOT / path).read_text()
-                current = source_cache[path]
-                current_digest = sha(current)
-                source_binding = {'file': path, 'recordSourceSha256': rec.get('sourceSha256'), 'sourceSha256AtPin': current_digest, 'mode': 'unchanged-source-bytes'}
-                if current_digest != rec.get('sourceSha256'):
-                    witnesses = []
-                    for field in ('currentPassage', 'passage', 'operationWitness'):
-                        witness = item.get(field)
-                        if isinstance(witness, dict):
-                            witness = witness.get('text')
-                        if isinstance(witness, str) and witness and current.count(witness) == 1:
-                            witnesses.append(witness)
-                    if witnesses:
-                        witness = max(witnesses, key=len)
-                        offset = current.index(witness)
-                        start = current.count('\n', 0, offset) + 1
-                        lines = current.splitlines()
-                        source_binding.update(mode='exact-unique-current-passage', passageSha256=sha(witness), currentLine=start, neighbourhoodSha256=sha('\n'.join(lines[max(0, start - 3):start + witness.count('\n') + 2])))
-                    elif family_id == 'r29-native-land-decisions-tree':
-                        old_pin = rec['authorInputCommit']
-                        if (old_pin, path) not in historical_source_cache:
-                            historical_source_cache[(old_pin, path)] = subprocess.check_output(['git', '-C', str(ROOT), 'show', f'{old_pin}:{path}']).decode()
-                        if sha(historical_source_cache[(old_pin, path)]) != rec['sourceSha256'] or 'nextFreeDecisionId' in current or 'DECISION_INDEX_PATH' in current:
-                            raise ValueError('native Land historical preservation witness changed')
-                        subprocess.run(['git', '-C', str(ROOT), 'merge-base', '--is-ancestor', '63b777873c44e8977d16857e80246b043240ed0b', pin], check=True)
-                        source_binding.update(mode='historical-preserve-mechanism-retired-at-pin', historicalPin=old_pin, retirementCommit='63b777873c44e8977d16857e80246b043240ed0b', scope='No live native-numbered decision reader/writer or current caller remains; preserve historical identity only, not dormant live code.')
-                    else:
-                        new, blocker = 'parked', 'exact-current-source-passage-and-context-rebinding-required'
-                        source_binding['mode'] = 'unresolved-current-source-binding'
-                encoded = compact_json(source_binding)
-                if encoded not in source_binding_ids:
-                    source_binding_ids[encoded] = len(source_bindings)
-                    source_bindings.append(source_binding)
-                source_binding = source_binding_ids[encoded]
-            if blocker:
-                blocker = f'{family_id}:{member["id"]}@{member["file"]}: {blocker}'
-            counts[new] += 1
-            row['effectiveDisposition'] = new
-            if new == 'patch' and family_id == 'r26:docs/contracts/fgos-gateway-api-v1.yaml':
-                row['target'] = 'docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml'
-            if new == 'patch' and member['id'] == 'reference-000209':
-                row['target'] = 'docs/platform/herdr-web-dashboard/spec.md#business-rules'
-            row['dispositionClass'] = {'preserve': 'preserved-history/fixture', 'patch': 'prepared-for-cutover', 'parked': 'individually parked'}[new]
-            row['patchSpecId'] = patch_id('step-05', row['file'], item) if new == 'patch' else None
-            row['parkFamilyId'] = family_id
-            row['blocker'] = blocker if new == 'parked' else None
-            applied.append({'rowId': row['rowId'], 'recordFile': record_file, 'recordLine': member['recordLine'], 'file': member['file'], 'memberId': member['id'], 'familyId': family_id, 'oldDisposition': 'parked', 'newDisposition': new, 'evidence': evidence, 'exportPointers': pointers, 'remainingBlocker': blocker, 'sourceBindingIndex': source_binding, 'owner': 'Lead/documentation integration owner' if blocker else None})
-        summaries.append({'familyId': family_id, 'memberCount': len(family['members']), 'byDisposition': dict(sorted(counts.items())), 'flips': len(family['members']) - counts['parked']})
-    if len(applied) != 2311 or len({r['rowId'] for r in applied}) != 2311:
-        raise ValueError('final resolution loses or duplicates a park member')
-    records = sorted(source_records)
-    files = sorted({r['file'] for r in applied})
-    evidence = sorted({r['evidence'] for r in applied})
-    blockers = sorted({r['remainingBlocker'] for r in applied if r['remainingBlocker']})
-    compact_rows = [[r['rowId'], records.index(r['recordFile']), r['recordLine'], files.index(r['file']), r['memberId'], r['familyId'], r['oldDisposition'], r['newDisposition'], evidence.index(r['evidence']), r['exportPointers'], blockers.index(r['remainingBlocker']) if r['remainingBlocker'] else None, r['sourceBindingIndex']] for r in applied]
-    result = {'version': 1, 'sourceCommit': pin, 'authority': 'L12-96; L12-118', 'application': 'Effective final-owning-row overlay consumed by the final matrix. Frozen Step 3/4/5 records and their historical hashes are not rewritten; original and effective dispositions remain separately recoverable.', 'recordCatalog': [{'path': p, 'sha256': sha((HERE / p).read_text())} for p in records], 'fileCatalog': files, 'evidenceCatalog': evidence, 'blockerCatalog': [{'blocker': b, 'owner': 'Lead/documentation integration owner'} for b in blockers], 'total': len(applied), 'flips': sum(r['newDisposition'] != r['oldDisposition'] for r in applied), 'families': summaries, 'rowSchema': ['rowId', 'recordIndex', 'recordLine', 'fileIndex', 'memberId', 'familyId', 'oldDisposition', 'newDisposition', 'evidenceIndex', 'exportPointers', 'blockerIndex', 'sourceBindingIndex'], 'sourceBindingCatalog': source_bindings, 'rows': compact_rows}
-    (HERE / 'step-07-park-resolution-applied.json').write_text(compact_json(result))
-    return result
+    resolution = read_json(HERE / 'step-07-park-resolution-applied.json')
+    if resolution['effectiveSourceCommit'] != pin:
+        raise ValueError('effective resolution is not bound to this pin')
+    for rec in resolution['recordCatalog']:
+        if sha((HERE / rec['path']).read_text()) != rec['sha256']:
+            raise ValueError(f"record digest changed: {rec['path']}")
+    for binding in resolution['sourceBindingCatalog'] + resolution['reevaluationSourceBindings']:
+        actual = (ROOT / binding['file']).read_text()
+        pinned = subprocess.check_output(['git', '-C', str(ROOT), 'show', pin + ':' + binding['file']]).decode()
+        if sha(actual) != binding['sourceSha256AtPin'] or actual != pinned:
+            raise ValueError(f"source binding changed: {binding['file']}")
+    integration = read_json(HERE / 'step-07-integration-inputs.json')
+    proof = read_json(HERE / integration['proof'])
+    if integration['sourceCommit'] != pin or proof['sourceCommit'] != pin or sha((HERE / integration['proof']).read_text()) != integration['proofSha256']:
+        raise ValueError('post-move evidence is not pinned or digest-bound')
+    if proof['inputs']['exportSha256'] != sha((HERE / 'step-07-state-path-export-v2.json').read_text()) or proof['inputs']['moveSetSha256'] != sha((HERE / 'step-05-cutover-move-set.json').read_text()):
+        raise ValueError('candidate-tree inputs changed after proof')
+    export_proof = read_json(HERE / 'step-07-export-v2-proof.json')
+    if export_proof['sourceCommit'] != pin or export_proof['exportSha256'] != proof['inputs']['exportSha256']:
+        raise ValueError('v2 proof/export is not pinned')
+    for path, digest in export_proof['sourcePins'].items():
+        if sha((ROOT / path).read_text()) != digest:
+            raise ValueError(f'export proof source changed: {path}')
+    if {r['rowId'] for r in integration['reevaluations']} != {r['rowId'] for r in proof['overturns']}:
+        raise ValueError('integration drops a post-move overturn')
+    updates = {r['rowId']: r for r in resolution['reevaluations']}
+    updates.update({r['rowId']: r for r in integration['reevaluations']})
+    by_id = {r['rowId']: r for r in rows}
+    if len(resolution['rows']) != 2311 or len({r[0] for r in resolution['rows']}) != 2311:
+        raise ValueError('park conservation failed')
+    counts = collections.defaultdict(collections.Counter)
+    for old in resolution['rows']:
+        row = by_id[old[0]]
+        if (row['referenceId'], row['recordLine'], row['file'], row['recordDisposition']) != (old[4], old[2], resolution['fileCatalog'][old[3]], 'parked'):
+            raise ValueError(f'owning member join changed: {old[0]}')
+        update = updates.get(old[0])
+        disposition = update['newDisposition'] if update else old[7]
+        blocker = update['remainingBlocker'] if update else resolution['blockerCatalog'][old[10]]['blocker'] if old[10] is not None else None
+        row.update(effectiveDisposition=disposition,
+                   dispositionClass={'preserve': 'preserved-history/fixture', 'patch': 'prepared-for-cutover', 'parked': 'individually parked'}[disposition],
+                   patchSpecId='r26:' + row['file'] if disposition == 'patch' else None,
+                   parkFamilyId=old[5], blocker=blocker if disposition == 'parked' else None)
+        if disposition == 'patch' and old[5] == 'r26:docs/contracts/fgos-gateway-api-v1.yaml':
+            row['target'] = 'docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml'
+        if disposition == 'patch' and old[4] == 'reference-000209':
+            row['target'] = 'docs/platform/herdr-web-dashboard/spec.md#business-rules'
+        counts[old[5]][disposition] += 1
+    effective = copy.deepcopy(resolution)
+    effective['families'] = [{**f, 'byDisposition': dict(sorted(counts[f['familyId']].items())), 'flips': f['memberCount'] - counts[f['familyId']]['parked']} for f in resolution['families']]
+    effective['flips'] = sum(f['flips'] for f in effective['families'])
+    expected = copy.deepcopy(resolution.get('exportV2Families', resolution['effectiveFamilies']))
+    family_ids = {r[0] for r in resolution['rows']}
+    for change in integration['reevaluations']:
+        row = by_id[change['rowId']]
+        if change['rowId'] not in family_ids:
+            if row['dispositionClass'] != 'preserved-history/fixture':
+                raise ValueError('non-family preserve input changed')
+            row.update(effectiveDisposition='patch', dispositionClass='prepared-for-cutover', patchSpecId='r26:' + row['file'])
+        else:
+            family = next(f for f in expected if f['familyId'] == change['familyId'])
+            family['byDisposition']['preserve'] -= 1
+            family['byDisposition']['patch'] = family['byDisposition'].get('patch', 0) + 1
+    if effective['families'] != expected or effective['flips'] != resolution['effectiveFlips']:
+        raise ValueError('effective family counts disagree with member join')
+    effective['integrationReevaluations'] = integration['reevaluations']
+    effective['parkOwners'] = integration['parkOwners']
+    parked = {r['rowId'] for r in rows if r['dispositionClass'] == 'individually parked'}
+    if parked != {r['rowId'] for r in effective['parkOwners']}:
+        raise ValueError('park owner coverage disagrees with matrix')
+    # Keep the historical v1 catalogs/rows and v2 reevaluations byte-equivalent
+    # as values. The explicit final overlay supersedes only effective fields.
+    resolution.setdefault('exportV2Families', resolution['effectiveFamilies'])
+    resolution.update(effectiveFamilies=effective['families'], effectiveFlips=effective['flips'],
+                      integrationAuthority='L12-120', integrationOverlay='step-07-integration-inputs.json',
+                      integrationReevaluations=integration['reevaluations'],
+                      effectiveParkOwners=integration['parkOwners'])
+    (HERE / 'step-07-park-resolution-applied.json').write_text(compact_json(resolution))
+    return effective
 
 
 def final_prepared_specs(pin: str) -> dict[str, Any]:
@@ -635,6 +542,33 @@ def final_prepared_specs(pin: str) -> dict[str, Any]:
             if ''.join(difflib.restore(delta, 1)) != before or ''.join(difflib.restore(delta, 2)) != after:
                 raise ValueError('forward/inverse reconstruction failed')
             specs.append({'id': action['id'], 'path': path, 'sourceCommit': pin, 'sourceBlob': blob(pin, path), 'beforeSha256': sha(before), 'expectedAfterSha256': sha(after), 'replacedOccurrences': occurrences, 'diff': ''.join(difflib.unified_diff(before.splitlines(True), after.splitlines(True), fromfile='a/' + path, tofile='b/' + path)), 'rollbackDiff': ''.join(difflib.unified_diff(after.splitlines(True), before.splitlines(True), fromfile='a/' + path, tofile='b/' + path)), 'roundtrip': True, 'evidence': action['evidence'], 'remainingBlocker': action['remainingBlocker']})
+    integration = read_json(HERE / 'step-07-integration-inputs.json')
+    for composed in integration['composedPaths']:
+        path = composed['path']
+        before = (ROOT / path).read_text()
+        pinned = subprocess.check_output(['git', '-C', str(ROOT), 'show', pin + ':' + path]).decode()
+        if before != pinned or sha(before) != composed['sourceSha256']:
+            raise ValueError(f'composed patch source changed: {path}')
+        after = before
+        for replacement in composed['replacements']:
+            old, new = replacement['old'], replacement['new']
+            if after.count(old) != replacement['expectedOccurrences']:
+                raise ValueError(f'ambiguous composed replacement: {path}: {old}')
+            after = after.replace(old, new)
+        delta = list(difflib.ndiff(before.splitlines(True), after.splitlines(True)))
+        if ''.join(difflib.restore(delta, 1)) != before or ''.join(difflib.restore(delta, 2)) != after:
+            raise ValueError('composed forward/inverse roundtrip failed')
+        superseded = [s['id'] for s in specs if s['path'] == path]
+        specs = [s for s in specs if s['path'] != path]
+        specs.append({'id': 'composed:' + path, 'path': path, 'sourceCommit': pin,
+                      'sourceBlob': blob(pin, path), 'beforeSha256': sha(before),
+                      'expectedAfterSha256': sha(after), 'diff': ''.join(difflib.unified_diff(before.splitlines(True), after.splitlines(True), fromfile='a/' + path, tofile='b/' + path)),
+                      'rollbackDiff': ''.join(difflib.unified_diff(after.splitlines(True), before.splitlines(True), fromfile='a/' + path, tofile='b/' + path)),
+                      'roundtrip': True, 'composedOnce': True, 'rowIds': composed['rowIds'],
+                      'supersedesSupplementalActions': superseded,
+                      'composedRecordRefs': composed.get('composedRecordRefs', []),
+                      'evidence': 'step-07-integration-inputs.json; step-07-post-move-proof.json; L12-120',
+                      'remainingBlocker': 'Independent composed-file and co-cut owning-test replay before Phase 9 application; no test executed in this records turn.'})
     source_pins = {p: sha((ROOT / p).read_text()) for p in ('src/runner/dispatch/assignment-runner.mjs', 'src/runner/dispatch/execution-contract.mjs', 'src/runner/repo-locks.mjs', 'src/holder-lock/index.mjs', 'docs/platform/herdr-web-dashboard/spec.md', 'docs/knowledge/fgos-triage-table-columns/triage-table-columns.md')}
     result = {'sourceCommit': pin, 'specs': specs, 'citationSourcePins': source_pins, 'appliedToWorkspace': False, 'independentlyAccepted': False}
     (HERE / 'step-07-final-prepared-specs.json').write_text(compact_json(result))
@@ -671,7 +605,7 @@ def final_obligations(pin: str) -> list[dict[str, Any]]:
         add(name, 'landing-status', 'ready', 'AGENTS cutover packet owner', None, evidence + '; main ancestor ' + commit)
     add('plan-label-correction', 'record-correction', 'recorded', 'Lead integration reviewer', None, 'Plan B is convention, archived completed; Plan C plans/261006-1445-fgctl-dev-activation/plan.md is draft/unscheduled and explicitly NOT a cutover dependency (plan.md section 7.5). L12-99/preassembly named Plan C as Plan B incorrectly. The brief repeats that historical mislabel; no draft is falsely reported landed.')
     add('step-06b-lease', 'lease', 'delivered-reviewed-rehearsed', 'Lead / Git owner / Holder-lock owner', 'Land with Phase 9; Git-owner consent for Git spec section 7 and Holder-lock notification receipt remain owed. Integrated fresh Git scope/ref proof must precede cutover, not trust sidecar drift.', 'owner-answers.md#L12-115; step-06b-rehearsal.md; review-a38-step-06b-final.md (predates O1 follow-up)')
-    add('L12-96-state-export', 'state-export', 'delivered-bounded', 'Lead state-export owner / consumer proof owners', 'Export receipt exists; missing decision fields, inventory role/destinations, worktree pins and complete acceptance strings still block the affected individual members. Do not rerun/export live state in this turn.', 'step-07-state-path-export.json; step-07-generator-path-proof.json#limits')
+    add('L12-96-state-export', 'state-export', 'delivered', 'Lead state-export owner / consumer proof owners', None, 'step-07-state-path-export-v2.json; step-07-export-v2-proof.json; step-07-park-resolution-applied.json#reevaluations')
     add('registry-preexisting-missing-slot', 'input-gap', 'blocked', 'Knowledge-registry owner', 'One exported currentPath is absent at the pin: docs/knowledge/how-to-wire-a-skill-to-an-executor-by-purpose-not-by-name/wire-a-skill-to-an-executor-by-purpose-not-name.md. Unchanged path output is not document-existence proof.', 'step-07-generator-path-proof.json#registryPathEvidence')
     add('post-census-workflow-holder', 'new-main-source', 'blocked', 'Workflow owner / documentation migration owner', 'Current registrations.mjs:6382 cites docs/specs/workflow.md RUL-WF-27; docs/platform/workflow/spec.md is absent. Preserve current source until a real conserved successor is bound, not a guessed path rewrite.', 'step-05-step7-carry.json#earlier-post-census-workflow')
     add('retired-native-land-mechanism', 'prior-art', 'recorded', 'Identity / Git owners / integration reviewer', None, 'All eight family members preserve their exact historical identity. Current src/runner/merge.mjs has no nextFreeDecisionId/DECISION_INDEX_PATH: main commit 63b777873c44e8977d16857e80246b043240ed0b removed the numbered-file self-resolver intentionally for identity mint. The final source-binding catalog proves old source bytes and retirement ancestry, not dormant live code.')
@@ -697,7 +631,17 @@ def assemble(pin_arg: str, output_dir: pathlib.Path, final: bool = False) -> dic
     if output_dir.resolve() != HERE.resolve():
         raise ValueError(f"output dir must be the Phase 8 report directory: {HERE}")
     families, projections = park_families()
-    rows, alias_violations, unmatched = build_matrix(pin, alias_paths(), families)
+    aliases = alias_paths()
+    rows, alias_violations, unmatched = build_matrix(pin, aliases, families)
+    alias_check = {'basis': 'effective move-set oldPaths, not empty adopted alias-table.json', 'aliasPathCount': len(aliases), 'writerRows': 0, 'writerRowsByClass': {}}
+    writer_counts = collections.Counter()
+    for path in record_files('step-05-records'):
+        for record in jsonl(path):
+            for field in ('references', 'dynamicTraces', 'authorAddedReferences'):
+                for item in record.get(field, []):
+                    if item.get('aliasWriteCheck', {}).get('isWriter') or item.get('writeDestination'):
+                        writer_counts[disposition_class('step-05', item)] += 1
+    alias_check.update(writerRows=sum(writer_counts.values()), writerRowsByClass=dict(sorted(writer_counts.items())))
     resolution = None
     prepared = None
     if final:
@@ -771,6 +715,8 @@ def assemble(pin_arg: str, output_dir: pathlib.Path, final: bool = False) -> dic
         "dryRun": not final,
         "recordsOnly": True,
         "finalResolutionOverlay": 'step-07-park-resolution-applied.json' if final else None,
+        "integrationResolutionOverlay": 'step-07-integration-inputs.json' if final else None,
+        "aliasWriterCheck": alias_check,
         "counts": {
             "rows": len(rows),
             "consumerRows": len(consumer_rows),
@@ -824,7 +770,18 @@ def assemble(pin_arg: str, output_dir: pathlib.Path, final: bool = False) -> dic
             supplementary = [r for r in prepared['specs'] if r['path'] == spec['path']]
             if supplementary:
                 spec['supplementalPreparedSpecs'] = [{'record': 'step-07-final-prepared-specs.json', 'id': r['id'], 'forwardSha256': sha(r['diff']), 'rollbackSha256': sha(r['rollbackDiff'])} for r in supplementary]
-                spec['blockers'].append('supplemental-path-patch-must-compose-with-earlier-file-hunks')
+                if len(supplementary) == 1 and supplementary[0].get('composedOnce'):
+                    composed = supplementary[0]
+                    spec['supersededForwardDiffRefs'] = spec['forwardDiffRefs']
+                    spec['supersededRollbackDiffRefs'] = spec['rollbackDiffRefs']
+                    spec['forwardDiffRefs'] = [{'record': 'step-07-final-prepared-specs.json', 'id': composed['id'], 'sha256': sha(composed['diff'])}]
+                    spec['rollbackDiffRefs'] = [{'record': 'step-07-final-prepared-specs.json', 'id': composed['id'], 'sha256': sha(composed['rollbackDiff'])}]
+                    spec.update(composedOnce=True, expectedAfterSha256=composed['expectedAfterSha256'])
+                    spec['blockers'] = ['independent-composed-file-review-and-owning-co-cut-replay']
+                else:
+                    spec['blockers'].append('supplemental-path-patch-must-compose-with-earlier-file-hunks')
+            if spec['path'] == 'docs/enduser-docs-index.json':
+                spec['generatedAction'] = read_json(HERE / 'step-07-integration-inputs.json')['generatedAction']
         patch_order['supplementalPreparedSpecs'] = [{'record': 'step-07-final-prepared-specs.json', 'id': r['id'], 'path': r['path']} for r in prepared['specs']]
     blockers = collections.Counter(
         row['blocker'] for row in special if row.get('blocker')
@@ -872,6 +829,8 @@ def assemble(pin_arg: str, output_dir: pathlib.Path, final: bool = False) -> dic
         "blockedRowReadiness": blocked_row_readiness,
         "specialObligations": special,
         "parkProjection": projections,
+        "parkOwners": resolution['parkOwners'] if final else [],
+        "aliasWriterCheck": alias_check,
         "parkProjectionMemberCount": sum(row["memberCount"] for row in projections),
         "noReadinessClaim": True,
     }
@@ -908,7 +867,7 @@ def assemble(pin_arg: str, output_dir: pathlib.Path, final: bool = False) -> dic
                 f"- patch specifications: {len(patch_order['patches'])}",
                 f"- changed-candidate union: {len(candidates)}",
                 f"- park families: {len(projections)}; members: {readiness['parkProjectionMemberCount']}",
-                f"- alias writer violations: {len(alias_violations)}",
+                f"- alias writer violations: {len(alias_violations)}; checked {alias_check['writerRows']} writer rows against {alias_check['aliasPathCount']} effective old paths (not the empty adopted alias table)",
                 f"- rows fitting no class/family: {len(unmatched)}",
                 "",
                 "All REJECT rows use `rejected-not-consumer`; every one resolves a non-null value through the matrix custody catalog. `applied-safe` remains in the vocabulary at zero and the assembler stops if a future row lacks applied-edit evidence.",
@@ -934,10 +893,23 @@ def assemble(pin_arg: str, output_dir: pathlib.Path, final: bool = False) -> dic
             for family in resolution['families']:
                 c = family['byDisposition']
                 report.append(f"| {family['familyId']} | {c.get('preserve', 0)} | {c.get('patch', 0)} | {c.get('parked', 0)} | {family['flips']} |")
-            report.extend(['', f"Applied flips: **{resolution['flips']}**. Every member, including unchanged parks, has its old/new disposition, original physical record locator, evidence and named remaining blocker/owner in `step-07-park-resolution-applied.json`. Preservation proves the member operand, not full-file generation/parity. Three generated-index families are evaluated separately; missing export columns and unregistered/final-scan operands are not guessed.", '', '## Current obligations and owners', ''])
+            report.extend(['', f"Applied flips: **{resolution['flips']}**. Every member, including unchanged parks, has its old/new disposition, original physical record locator, evidence and named remaining blocker/owner in `step-07-park-resolution-applied.json`. Preservation proves the member operand, not full-file generation/parity. Three generated-index families are evaluated separately; complete v2 export closes data gaps, while successor scan/carriage and consumer co-cuts remain explicit. Original v1 rows and v2 reevaluations remain historical inputs; the L12-120 integration overlay is last-write.", '', '## Export v2 and post-move preservation', '',
+                           'The Lead export is consumed read-only and never rerun. Its 214 reevaluations promoted 195 preserves and left 19 non-export parks. The existing decision-index generator proves parity only for the state-wins union with the retained committed index, not export-only reconstruction. The export records fgosDir but not the producing codeRoot commit; no missing provenance is invented.',
+                           '',
+                           f"L12-120 rechecks all **9,650** input preserves on a physical scratch copy of the explicit move set through the existing enumerateDocEntries/buildEnduserIndex. **{len(resolution['integrationReevaluations'])}** become patch: the review's 7 plus **{len(resolution['integrationReevaluations']) - 7}** additional conditional R28 pointers and gateway runtime/fixture co-cuts (including fixture parent directories). All row IDs, reasons and candidate scan checks are in `step-07-post-move-proof.json` and the exact inputs in `step-07-integration-inputs.json`. No additional park is created. The two legacy duplicate entries disappear; their aliases on surviving knowledge entries remain unchanged. Four generated members are `patch via existing generator`, never hand-edited output.",
+                           '',
+                           'The enduser test L162/L167 lookup/assertion and L385/L386 frontmatter read are composed ONCE over the source pin, together with the REAL_DEMO_DOC_PATH fixture constant as an atomic co-cut. Forward and rollback diffs, source blob and expectedAfterSha256 are in `step-07-final-prepared-specs.json`; patch-order supersedes the earlier same-file hunk instead of applying both. Owning tests and independent composed-file acceptance remain owed.',
+                           '',
+                           'All 180 effective parks have member-specific owners and their L12-96 family-plan action in readiness. This overrides the historical v1 catch-all owner catalog, including its 161 parks. Two external locator parks remain separately joined in `step-07-park-resolution-applied.json#externalLocatorReevaluations`; they are outside the 46,404-row census and matrix recordCatalog, not silently counted as members.',
+                           '', '## Effective park-family owners', '', '| Family | Park count | Owners |', '|---|---:|---|'])
+            for family in resolution['families']:
+                owners = [r for r in resolution['parkOwners'] if r['familyId'] == family['familyId']]
+                if owners:
+                    report.append(f"| {family['familyId']} | {len(owners)} | {'; '.join(sorted({r['owner'] for r in owners}))} |")
+            report.extend(['', '## Current obligations and owners', ''])
             for item in special:
                 report.append(f"- **{item['id']}** — {item['status']}; owner: {item['owner']}. {item.get('blocker') or 'No outstanding prerequisite in this receipt.'} Evidence: `{item['evidence']}`.")
-            report.extend(['', '## Evidence and limits', '', '- Changed-candidate union is recomputed at the pin: every A47/incoming/imported and Phase 8-edited platform path has a file digest and dual-extractor binding receipt. Missing Session Identity is the explicit Identity section 7a retirement carry; it is not silently dropped.', '- `step-07-final-binding-check.json` verifies complete content/ancestry and neighbours, including the doctor-list edits e8e340887/a59ae8b01. No current target drift or rebind is hidden by ordinal rehashing. Historical priorReview snapshots are explicitly excluded, not rewritten.', '- Exact forward/inverse supplemental patches prepare gateway input/fixture path changes, the network R5 pointer and truthful triage comment, PF references, holder-lock header and both stale citations. Other file hunks still require final composition and independent acceptance. Existing patch-spec source digests are compared with this pin, with drift left as a per-spec blocker.', '- The effective move-set adjustment retains the generated docs/decisions/index.md (L12-96 Q2), enduser manifest and architecture manifest at their fixed paths. It drops the duplicate proposed decisions-index destination and suppresses those retired move proposals; the historical Step 5 move manifest is not silently rewritten. No hand edit of generated output is proposed.\n- Bounded generator parity is real, but not full live-state output certification. Decision scope/text/rationale/ts, inventory role/destination data, effective worktree pins and untruncated acceptance strings are not in the export. One current registry slot is already missing at the pin. These are named proof gaps, never fabricated state or a new export.', '- Plan A and the actual Plan B/convention landed. The draft is Plan C and is not a cutover dependency; the preassembly mislabel is corrected from committed plans and main ancestry, not from a guessed status.', '- Both runs of the final assembler must be byte-identical; `step-07-final-determinism.json` records actual hashes/bytes and verification commands. Pair accounting is performed last in both Phase 6 manifests; its real check-A pairs and byte-preserving insertion proof live in `step-07-final-pair-accounting.json`. This turn cannot pre-account its future runner commit.', '- `step-07-final-verification.json` records actual light exits: ratchet, doc-link tests, evidence --before and diff check, both main-drift tiers and unchanged protected files. The census was freshly re-enumerated; every introduced literal/documentation-dynamic site is named, with final semantic joining explicitly blocked. Two common-light files are not run because their fixtures write Git; no filtered run or false green.\n- No fgOS CLI, Git write, workspace .fgos or secrets read, product docs/code/test/skill/baseline mutation, full npm/cargo suite, live lease or post-cutover proof is performed. Impact analysis is degraded/unqueried under that boundary; no code symbol or graph proof is claimed.', ''])
+            report.extend(['', '## Evidence and limits', '', '- Changed-candidate union is recomputed at the pin: every A47/incoming/imported and Phase 8-edited platform path has a file digest and dual-extractor binding receipt. Missing Session Identity is the explicit Identity section 7a retirement carry; it is not silently dropped.', '- `step-07-final-binding-check.json` verifies complete content/ancestry and neighbours, including the doctor-list edits e8e340887/a59ae8b01. No current target drift or rebind is hidden by ordinal rehashing. Historical priorReview snapshots are explicitly excluded, not rewritten.', '- Exact forward/inverse supplemental patches prepare gateway input/fixture path changes, the network R5 pointer and truthful triage comment, PF references, holder-lock header and both stale citations. Other file hunks still require final composition and independent acceptance. Existing patch-spec source digests are compared with this pin, with drift left as a per-spec blocker.', '- The effective move-set adjustment retains the generated docs/decisions/index.md (L12-96 Q2), enduser manifest and architecture manifest at their fixed paths. It drops the duplicate proposed decisions-index destination and suppresses those retired move proposals; the historical Step 5 move manifest is not silently rewritten. No hand edit of generated output is proposed.\n- The v2 export supplies decision fields, inventory role/destination inputs, work/head pins and untruncated acceptance. Registry parity remains bounded rather than full live-state output certification. One registry currentPath remains absent at the pin, owned by the Knowledge-registry owner; unchanged operands are not existence proof.', '- Plan A and the actual Plan B/convention landed. The draft is Plan C and is not a cutover dependency; the preassembly mislabel is corrected from committed plans and main ancestry, not from a guessed status.', '- Both runs of the final assembler must be byte-identical; `step-07-final-determinism.json` records actual hashes/bytes and verification commands. Pair accounting is performed last; the integration receipt is `step-07-integration-pair-accounting.json`. This turn cannot pre-account its future runner commit; L12-11 requires a subsequent accounting-only Unit.', '- `step-07-final-verification.json` records actual light exits: ratchet, doc-link tests, evidence --before and diff check, both main-drift tiers and unchanged protected files. The census was freshly re-enumerated; every introduced literal/documentation-dynamic site is named, with final semantic joining explicitly blocked. Two common-light files are not run because their fixtures write Git; no filtered run or false green.\n- No fgOS CLI, Git write, workspace .fgos or secrets read, product docs/code/test/skill/baseline mutation, full npm/cargo suite, live lease or post-cutover proof is performed. Impact analysis is degraded/unqueried under that boundary; no code symbol or graph proof is claimed.', ''])
         if unmatched:
             report.extend(["", "Every unmatched row is a stop. See `step-07-consumer-cutover-matrix.json` → `unmatchedRows`."])
         report.extend(["", "## Final-pin rerun", "", f"```sh\n{rerun}\n```", ""])
@@ -972,7 +944,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--pin', required=True)
     parser.add_argument('--final', action='store_true', help='consume digest-bound final records and apply the final owning-row overlay')
-    parser.add_argument('--output-dir', required=True, type=pathlib.Path)
+    parser.add_argument('--output-dir', default=HERE, type=pathlib.Path)
     args = parser.parse_args()
     print(json.dumps(assemble(args.pin, args.output_dir, args.final), sort_keys=True))
 

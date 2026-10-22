@@ -1296,3 +1296,35 @@ No product or root-instruction edit, Git write, fgOS CLI, live state, full suite
 cutover readiness or independent acceptance. Next concrete action: Lead-started
 integration review, named proof/composition work, then the following runner-pair
 accounting checkpoint before committed-byte acceptance.
+
+## L12-120 — Integration fixes, records only
+
+Applied the supplied Lead ruling against the unchanged product pin `244a0435`;
+input records HEAD `a0aa5a2ac`. The physical scratch candidate scan checks all
+9,650 input preserves and overturns 39: the reviewed seven plus 23 gateway
+fixture/comment/directory co-cuts and nine conditional R28 pointers. No new
+park: final totals 0 applied-safe / 422 prepared / 9,611 preserved / 180 parked /
+36,191 rejected; 214 ordered patch specifications and 602 blocked readiness rows.
+The 2,311 family members reconcile as 2,117 preserve + 14 patch + 180 parked.
+
+One replay door is now `step-07-assemble.py --final --pin <product-pin>`; the
+scratch adapter is removed. Enduser lookup/assertion, direct frontmatter hunk
+and fixture constant have exact composed forward/inverse patches. All earlier
+same-file hunks are retained. Eighteen prepared patches apply and roll back
+exactly on scratch copies; no product/test/skill file is edited or executed.
+All 180 parks have specific owners plus family-plan actions; Lead remains only
+for its placement decision. The writer check uses 1,559 effective move old paths:
+51 writers, zero violations. The two external parks remain separately joined.
+
+`step-07-integration-verify.py` independently rejoins all 46,404 rows, proves zero
+classification disagreements, unchanged historical v1/v2 values and byte-identical
+replay of all seven outputs. Four handoff artifacts total 4,151,018 bytes.
+See `step-07-final-assembly-report.md`, `step-07-final-determinism.json` and
+`step-07-post-move-proof.json`. State-wins index parity is bounded; readiness
+stays false. Owning tests, carriage, lease consent and independent acceptance
+remain owed. No CLI, Git write, state/secrets read or full suite was run.
+
+Last task is exact committed-pair accounting in both Phase 6 manifests:
+`step-07-integration-pair-accounting.json`. This author turn's future runner
+commit is never guessed; Lead owes its separate L12-11 accounting checkpoint
+and fresh integration review. Preview stays with Lead under the records boundary.

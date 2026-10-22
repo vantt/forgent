@@ -7,27 +7,27 @@ Final owning-row decisions are applied through the digest-bound overlay, consume
 ## Counts
 
 - `applied-safe`: 0
-- `prepared-for-cutover`: 383
-- `preserved-history/fixture`: 9650
+- `prepared-for-cutover`: 422
+- `preserved-history/fixture`: 9611
 - `individually parked`: 180
 - `rejected-not-consumer`: 36191
 - consumer-class rows: 10213 (5,249 ADMIT; 4,964 admission-unspecified)
 - rejected rows checked separately: 36191
-- blocked row-readiness entries: 563
-- patch specifications: 207
+- blocked row-readiness entries: 602
+- patch specifications: 214
 - changed-candidate union: 54
 - park families: 23; members: 2311
-- alias writer violations: 0
+- alias writer violations: 0; checked 51 writer rows against 1559 effective old paths (not the empty adopted alias table)
 - rows fitting no class/family: 0
 
 All REJECT rows use `rejected-not-consumer`; every one resolves a non-null value through the matrix custody catalog. `applied-safe` remains in the vocabulary at zero and the assembler stops if a future row lacks applied-edit evidence.
 
 ## Output sizes
 
-- `step-07-consumer-cutover-matrix.json`: 3633136 bytes
-- `step-07-patch-order.json`: 244086 bytes
-- `step-07-readiness.json`: 128159 bytes
-- all four generated outputs: 4030225 bytes (limit: < 6000000 bytes)
+- `step-07-consumer-cutover-matrix.json`: 3633389 bytes
+- `step-07-patch-order.json`: 260715 bytes
+- `step-07-readiness.json`: 230731 bytes
+- all four generated outputs: 4151018 bytes (limit: < 6000000 bytes)
 
 ## Explicit blockers
 
@@ -61,12 +61,12 @@ All REJECT rows use `rejected-not-consumer`; every one resolves a non-null value
 | Family | Preserve | Patch | Individually parked | Flips |
 |---|---:|---:|---:|---:|
 | gen-doc-registry | 1318 | 0 | 0 | 1318 |
-| gen-enduser-index | 493 | 0 | 13 | 493 |
+| gen-enduser-index | 489 | 4 | 13 | 493 |
 | gen-decision-index | 78 | 0 | 0 | 78 |
 | state-registry-export | 47 | 0 | 11 | 47 |
 | state-work-docsref | 53 | 0 | 3 | 53 |
 | r26:docs/decisions/index.md | 51 | 0 | 0 | 51 |
-| r26:docs/enduser-docs-index.json | 36 | 0 | 0 | 36 |
+| r26:docs/enduser-docs-index.json | 33 | 3 | 0 | 36 |
 | readset-post-retirement-scan | 0 | 0 | 31 | 0 |
 | state-inventory-oldpath | 30 | 0 | 1 | 30 |
 | decision-f-ratchet-retirement | 0 | 0 | 18 | 0 |
@@ -84,17 +84,38 @@ All REJECT rows use `rejected-not-consumer`; every one resolves a non-null value
 | r26:docs/architecture-manifest.json | 6 | 0 | 0 | 6 |
 | r26:docs/architecture-map.md | 0 | 0 | 1 | 0 |
 
-Applied flips: **2131**. Every member, including unchanged parks, has its old/new disposition, original physical record locator, evidence and named remaining blocker/owner in `step-07-park-resolution-applied.json`. Preservation proves the member operand, not full-file generation/parity. Three generated-index families are evaluated separately; complete v2 data closes export gaps, while unregistered/final-scan and reader co-cut operands are not guessed. The original v1 rows remain immutable and the matrix consumes the appended v2 reevaluations.
+Applied flips: **2131**. Every member, including unchanged parks, has its old/new disposition, original physical record locator, evidence and named remaining blocker/owner in `step-07-park-resolution-applied.json`. Preservation proves the member operand, not full-file generation/parity. Three generated-index families are evaluated separately; complete v2 export closes data gaps, while successor scan/carriage and consumer co-cuts remain explicit. Original v1 rows and v2 reevaluations remain historical inputs; the L12-120 integration overlay is last-write.
 
-## Export v2
+## Export v2 and post-move preservation
 
-The Lead export is consumed read-only, never rerun. Re-evaluated **214** previously export-blocked members: **195 preserve**, **19 remain parked**, no new patch or applied edit. Original v1 application rows, catalogs and hashes remain intact; `reevaluations` is the last-write overlay for those 214 row IDs. The other 161 pre-existing parks and all prior preserves/patches are untouched. Export delivery is complete; **180** effective parks have only named non-export blockers.
+The Lead export is consumed read-only and never rerun. Its 214 reevaluations promoted 195 preserves and left 19 non-export parks. The existing decision-index generator proves parity only for the state-wins union with the retained committed index, not export-only reconstruction. The export records fgosDir but not the producing codeRoot commit; no missing provenance is invented.
 
-- All 78 decision-index operands preserve: the existing state-wins generator produces the complete retained committed index, SHA-256 `082c2741b963b714a6976882f28bc7e84d48f5138b0f62e4feafb2db7a203200`. Free-text rationale/history paths are not silently migrated.
-- 648 docsRef values and their joined/descendant paths are outside the move set. All 332 inventory rows retain alias traceability and compute their destination from the existing migration rule, not stale inventory targetPath. The missing registry currentPath remains missing, not materialized by simulation.
-- Three Work freshness members still need successor-aware handling of **44** refs; one acceptance reader still needs handling of **two** changed clauses among **99**. Three cleanup members preserve all **647** bounded success/failure verdicts but have **two** diagnostic branch deltas needing owning acceptance. No validator is weakened or historical evidence rewritten.
-- Ten doc-sources/quadrant members still need final scan/read-set composition. Two inherited Git expressions were replaced by typed Git/ScopedCommit operations; their current successor passages are recorded but independent changed-binding review is owed. These 19 parks are consumer/source proof work, not export gaps. The 13 unrelated enduser-index scan parks are unchanged.
-- Existing assembler enumeration/custody/order/readiness logic is rerun through a scratch-only adapter that consumes these committed records instead of its hardcoded v1 resolution provider. No code file is edited. Exact replay bytes and commands are retained in `step-07-export-v2-replay.json`; running the bare v1 assembler would discard v2 and is not this receipt's replay command.
+L12-120 rechecks all **9,650** input preserves on a physical scratch copy of the explicit move set through the existing enumerateDocEntries/buildEnduserIndex. **39** become patch: the review's 7 plus **32** additional conditional R28 pointers and gateway runtime/fixture co-cuts (including fixture parent directories). All row IDs, reasons and candidate scan checks are in `step-07-post-move-proof.json` and the exact inputs in `step-07-integration-inputs.json`. No additional park is created. The two legacy duplicate entries disappear; their aliases on surviving knowledge entries remain unchanged. Four generated members are `patch via existing generator`, never hand-edited output.
+
+The enduser test L162/L167 lookup/assertion and L385/L386 frontmatter read are composed ONCE over the source pin, together with the REAL_DEMO_DOC_PATH fixture constant as an atomic co-cut. Forward and rollback diffs, source blob and expectedAfterSha256 are in `step-07-final-prepared-specs.json`; patch-order supersedes the earlier same-file hunk instead of applying both. Owning tests and independent composed-file acceptance remain owed.
+
+All 180 effective parks have member-specific owners and their L12-96 family-plan action in readiness. This overrides the historical v1 catch-all owner catalog, including its 161 parks. Two external locator parks remain separately joined in `step-07-park-resolution-applied.json#externalLocatorReevaluations`; they are outside the 46,404-row census and matrix recordCatalog, not silently counted as members.
+
+## Effective park-family owners
+
+| Family | Park count | Owners |
+|---|---:|---|
+| gen-enduser-index | 13 | Enduser-index / doc-sources reader owner |
+| state-registry-export | 11 | Git / ScopedCommit owner; Knowledge-registry owner |
+| state-work-docsref | 3 | Work-state owner |
+| readset-post-retirement-scan | 31 | Component-boundary / documentation scan owner; Lead (placement decision) / Component-boundary owner |
+| state-inventory-oldpath | 1 | Knowledge migration / inventory owner |
+| decision-f-ratchet-retirement | 18 | Documentation ratchet / replacement-guard owner |
+| r26:docs/doc-governance.md | 17 | Documentation-governance owner |
+| gateway-ctr010-contract-citations | 16 | Gateway / CTR010 contract owner |
+| citation-convention-and-scan | 14 | Citation-drift checker / area-spec owners (RULE follow-up is independent) |
+| carry-foundations-and-retired-decision-narratives | 13 | Platform-foundations / locked-law holder owner |
+| carry-knowledge-registry-framework | 12 | Knowledge-registry owner |
+| carry-runner-workstate-doctrine | 11 | Runner owner; Work-state owner |
+| split-area-holder-mapping | 8 | Decision-index generator / area-holder mapping owner |
+| carry-distribution-gateway-claims | 7 | Gateway owner; Packaging-distribution owner |
+| state-outcome-and-evidence | 4 | Work-state / retrospective validator owner |
+| r26:docs/architecture-map.md | 1 | Architecture-map / component-boundary owner |
 
 ## Current obligations and owners
 
@@ -138,9 +159,9 @@ The Lead export is consumed read-only, never rerun. Re-evaluated **214** previou
 - `step-07-final-binding-check.json` verifies complete content/ancestry and neighbours, including the doctor-list edits e8e340887/a59ae8b01. No current target drift or rebind is hidden by ordinal rehashing. Historical priorReview snapshots are explicitly excluded, not rewritten.
 - Exact forward/inverse supplemental patches prepare gateway input/fixture path changes, the network R5 pointer and truthful triage comment, PF references, holder-lock header and both stale citations. Other file hunks still require final composition and independent acceptance. Existing patch-spec source digests are compared with this pin, with drift left as a per-spec blocker.
 - The effective move-set adjustment retains the generated docs/decisions/index.md (L12-96 Q2), enduser manifest and architecture manifest at their fixed paths. It drops the duplicate proposed decisions-index destination and suppresses those retired move proposals; the historical Step 5 move manifest is not silently rewritten. No hand edit of generated output is proposed.
-- The v2 export supplies the decision fields, inventory role/destination inputs, work/head pins and untruncated acceptance. Existing decision generation reproduces the complete committed index. Registry proofs remain bounded, not full live-state drift certification. One registry slot remains missing at the pin, owned by the Knowledge-registry owner; unchanged operands are not existence proof.
+- The v2 export supplies decision fields, inventory role/destination inputs, work/head pins and untruncated acceptance. Registry parity remains bounded rather than full live-state output certification. One registry currentPath remains absent at the pin, owned by the Knowledge-registry owner; unchanged operands are not existence proof.
 - Plan A and the actual Plan B/convention landed. The draft is Plan C and is not a cutover dependency; the preassembly mislabel is corrected from committed plans and main ancestry, not from a guessed status.
-- Both runs of the final assembler must be byte-identical; `step-07-final-determinism.json` records actual hashes/bytes and verification commands. Pair accounting is performed last in both Phase 6 manifests; its real check-A pairs and byte-preserving insertion proof live in `step-07-final-pair-accounting.json`. This turn cannot pre-account its future runner commit.
+- Both runs of the final assembler must be byte-identical; `step-07-final-determinism.json` records actual hashes/bytes and verification commands. Pair accounting is performed last; the integration receipt is `step-07-integration-pair-accounting.json`. This turn cannot pre-account its future runner commit; L12-11 requires a subsequent accounting-only Unit.
 - `step-07-final-verification.json` records actual light exits: ratchet, doc-link tests, evidence --before and diff check, both main-drift tiers and unchanged protected files. The census was freshly re-enumerated; every introduced literal/documentation-dynamic site is named, with final semantic joining explicitly blocked. Two common-light files are not run because their fixtures write Git; no filtered run or false green.
 - No fgOS CLI, Git write, workspace .fgos or secrets read, product docs/code/test/skill/baseline mutation, full npm/cargo suite, live lease or post-cutover proof is performed. Impact analysis is degraded/unqueried under that boundary; no code symbol or graph proof is claimed.
 
@@ -148,6 +169,5 @@ The Lead export is consumed read-only, never rerun. Re-evaluated **214** previou
 ## Final-pin rerun
 
 ```sh
-python3 -B /tmp/fgos-work/export-v2-apply/assemble.py
-# Restore exact scratch adapter from step-07-export-v2-replay.json first.
+python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-07-assemble.py --final --pin 244a0435466a46e56cd95b4a70bfe03f54670996 --output-dir plans/260925-documentation-authority-unification/reports/phase-08
 ```
