@@ -445,6 +445,37 @@ function environment(root, inspect) {
   };
 }
 
+// fsync state of the disk. One plain 4 KiB overwrite + fsync probe has two stable modes on a host
+// (measured on the owner's NVMe: 5.2 ms and 7.5 ms, a ratio of 1.44); push time follows them. The fast
+// mode is the lowest probe this process has seen, so no host number is hardcoded; a probe above
+// FSYNC_MODE_RATIO times that floor (midway between 1 and the observed 1.44) is in the slow mode.
+const FSYNC_MODE_RATIO = 1.2;
+let fsyncFloorMs = Infinity;
+function fsyncProbe(dir) {
+  fs.mkdirSync(dir, { recursive: true });
+  const file = path.join(dir, 'fsync-probe'), fd = fs.openSync(file, 'w'), block = Buffer.alloc(4096, 1), ms = [];
+  for (let i = 0; i < 200; i++) { fs.writeSync(fd, block, 0, 4096, 0); const t = performance.now(); fs.fsyncSync(fd); ms.push(performance.now() - t); }
+  fs.closeSync(fd); fs.unlinkSync(file);
+  const p50 = percentile(ms, 0.5);
+  fsyncFloorMs = Math.min(fsyncFloorMs, p50);
+  return Math.round(p50 * 100) / 100;
+}
+/** A round is fsync-fast only if the probes taken before and after it are all in the floor's mode. */
+export function classifyFsync(probes, floor) {
+  return probes.every((p) => p <= FSYNC_MODE_RATIO * floor) ? 'fsync-fast' : 'fsync-slow';
+}
+/** Push budgets apply only to an fsync-fast round; a slow round is reported, not judged (e3-budgets.md). */
+export function pushVerdict(p95, budgetMs, fsyncClass) {
+  return fsyncClass === 'fsync-slow' ? 'not-judged: fsync-slow' : p95 <= budgetMs ? 'passed' : 'failed';
+}
+/** pushRow paired with the fsync probe before and after it, so a flip during the round is caught. */
+function judgedPushRow(root, open, samples) {
+  const before = fsyncProbe(root), row = pushRow(root, open, samples), after = fsyncProbe(root);
+  const fsyncClass = classifyFsync([before, after], fsyncFloorMs);
+  const judge = (r, budgetMs) => ({ ...r, budgetP95Ms: budgetMs, p95OverBudget: Math.round(r.p95 / budgetMs * 100) / 100, verdict: pushVerdict(r.p95, budgetMs, fsyncClass) });
+  return { fsync: { beforeMs: before, afterMs: after, floorMs: Math.round(fsyncFloorMs * 100) / 100, class: fsyncClass }, withObjects: judge(row.withObjects, 250), withoutObjects: judge(row.withoutObjects, 150) };
+}
+
 /** Local transport push of one ref, with and without new objects, on fresh repositories under root. */
 function pushRow(root, open, samples) {
   const local = bareRepo(path.join(root, 'push-local.git'));
@@ -635,7 +666,8 @@ async function run(args) {
   }
 
   // Local transport push of one ref, with and without new objects.
-  say('push', pushRow(root, open, Number(args.pushSamples ?? 100)));
+  fsyncProbe(root);
+  say('push', judgedPushRow(root, open, Number(args.pushSamples ?? 100)));
 
   // Git subprocess count per operation (strace census in a separate process).
   {
@@ -815,7 +847,7 @@ async function pushOnly(args) {
     const dir = path.join(root, `round-${round}`);
     const mhz = () => { const f = os.cpus().map(c => c.speed); return Math.round(f.reduce((a, b) => a + b, 0) / f.length); };
     const before = { loadavg: os.loadavg(), mhz: mhz() };
-    const row = pushRow(dir, open, Number(args.pushSamples ?? 100));
+    const row = judgedPushRow(dir, open, Number(args.pushSamples ?? 100));
     const remote = path.join(dir, 'push-remote.git');
     const count = (sub, re) => { try { return fs.readdirSync(path.join(remote, sub)).filter(f => re.test(f)).length; } catch { return 0; } };
     const state = { ...footprint(remote), packs: count('objects/pack', /\.pack$/), looseRefs: footprint(path.join(remote, 'refs')).inodes };

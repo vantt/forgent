@@ -6383,7 +6383,7 @@ for (const id of ['git-worktree-recovery', 'git-component-compatible', 'git-tran
     'git-component-compatible': 'Combined addon contracts and Git feature floor',
     'git-transport-config': 'Repository transport settings refused by Publication/Remote',
     'git-trust-topology': 'Trusted repository layout and common directory',
-    'git-operation-journal': 'Readable Git WAL with no unresolved operations',
+    'git-operation-journal': 'Readable Git WAL with no unresolved operations, under the controller activation fence (`git-fence-missing` when the fence is gone)',
     'git-native-locks': 'Native Git lock residue (read-only detection)',
     'git-publication-refspecs': 'Additive Event Store mirror fetch mappings',
     'git-durability-capability': 'Measured Git durability guarantees',

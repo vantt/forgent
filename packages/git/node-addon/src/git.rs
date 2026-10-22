@@ -214,6 +214,9 @@ pub fn inspect_git(
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => false,
         Err(e) => return Err(error(e)),
     };
+    // The reader below skips the fence on purpose (it never writes); the
+    // fact is reported through the same check every WAL-writing door runs.
+    let activation_fence = wal::require_activation_fence(&repo).is_ok();
     let journal = if wal_present {
         let wal = wal::Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(error)?;
         let scan = wal.scan(100_000).map_err(error)?;
@@ -274,7 +277,7 @@ pub fn inspect_git(
     }
     native_locks.sort();
     Ok(
-        json!({"floor":floor,"commonDir":repo.common_dir(),"layout":format!("{:?}",repo.layout()),"journal":journal,"nativeLocks":native_locks,"untrustedTransportConfig":driver.untrusted_transport_config(&repo).map_err(operation)?,"reservedLegacyRefs":reserved_legacy_refs,"obsoleteFetchMapping":mappings.iter().any(|f| f.value == obsolete.as_bytes()),"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
+        json!({"floor":floor,"commonDir":repo.common_dir(),"layout":format!("{:?}",repo.layout()),"journal":journal,"activationFence":activation_fence,"nativeLocks":native_locks,"untrustedTransportConfig":driver.untrusted_transport_config(&repo).map_err(operation)?,"reservedLegacyRefs":reserved_legacy_refs,"obsoleteFetchMapping":mappings.iter().any(|f| f.value == obsolete.as_bytes()),"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
     )
 }
 #[napi]

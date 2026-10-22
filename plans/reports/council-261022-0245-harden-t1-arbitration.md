@@ -252,7 +252,10 @@ It touches nothing in `:227-331`, which is WORK's. WORK gets from T1:
   - **(c)** Drop it.
 - Recommendation: **(a)**. It touches WORK's region and adds a mechanism.
 
+## Owner answers (ask 1)
+
+2026-10-22 08:50, owner: "1a 2a 3a 4a 5a". Recorded as owner decisions 9–13 in the [HARDEN plan](../261021-1118-harden-low-layers-bottom-up/plan.md#owner-decisions); Q3 goes to TEST (H21), Q5 to WORK (H22).
+
 ## Unresolved questions
 
-1. Q1–Q5 above (owner ask 1).
-2. The fence deletion lands on the owner machine only after its three workspaces show `lock-fences` green; the guide will carry that line.
+1. The fence deletion lands on the owner machine only after its three workspaces show `lock-fences` green; the guide will carry that line.

@@ -679,7 +679,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'light',
     bindingSource: 'executor-id',
     provider: 'openai',
-    model: 'gpt-5.6-luna',
+    model: 'gpt-6-luna',
     command: 'codex',
     args: [
       'exec',
@@ -687,7 +687,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '-s',
       'danger-full-access',
       '--model',
-      'gpt-5.6-luna',
+      'gpt-6-luna',
       '<prompt>'
     ],
     envKeys: [],
@@ -829,11 +829,11 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'light',
     bindingSource: 'executor-id',
     provider: 'openai',
-    model: 'gpt-5.6-luna',
+    model: 'gpt-6-luna',
     command: 'pi',
     args: [
       '--model',
-      'gpt-5.6-luna',
+      'gpt-6-luna',
       '--thinking',
       'medium',
       '--tools',

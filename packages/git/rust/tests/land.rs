@@ -591,3 +591,42 @@ fn declared_resolution_bytes_are_frozen_before_consumer_verification() {
     assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), published, "{receipt:?}");
     assert_eq!(fs::read_to_string(f.main.join("a")).unwrap(), "consumer resolution\n");
 }
+
+#[test]
+fn land_doors_refuse_an_unfenced_workspace_without_writing_records() {
+    let f = Fixture::new();
+    let mut s = f
+        .driver
+        .prepare_land(&f.repo, vec![], &f.request, "fixture", "fenced")
+        .unwrap();
+    let e = evidence(&s);
+    let journal = || wal::Wal::with_filesystem(f.repo.common_dir(), wal::OsFileSystem).unwrap();
+    let before = journal().inspect("fenced").unwrap().records().len();
+    fs::remove_dir_all(
+        f.repo
+            .trusted_main_root()
+            .join(".fgos/locks/activation.lock"),
+    )
+    .unwrap();
+    fn refusal<T>(r: fgos_git::Result<T>) -> String {
+        match r {
+            Ok(_) => panic!("an unfenced workspace was admitted"),
+            Err(e) => format!("{e:?}"),
+        }
+    }
+    assert!(refusal(f.driver.publish_land(&f.repo, &mut s, &e)).contains("git-fence-missing"));
+    assert!(refusal(f.driver.acknowledge_land(
+        &f.repo,
+        "fixture",
+        "fenced",
+        "durable-consumer-ack"
+    ))
+    .contains("git-fence-missing"));
+    assert!(refusal(
+        f.driver
+            .prepare_land(&f.repo, vec![], &f.request, "fixture", "fresh")
+    )
+    .contains("git-fence-missing"));
+    assert_eq!(journal().inspect("fenced").unwrap().records().len(), before);
+    assert!(journal().inspect("fresh").is_err());
+}
