@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3b9f395250570d5f3d8748622738b29345343676fea79b78087f81c50949dd06",
+  "payloadDigest": "303796e84ff7d52a5319a5deb2804b9526c4d18107b9c5ca605c662e6371a75a",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -91,7 +91,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
     "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
     "bin/fgos-runner.mjs": "dca3d8b530f20aaf8d9d8d424f12ec1c5d9670812566ab4d6c51583f3bb7b573",
-    "bin/fgos.mjs": "5f09355aad5b9ac2884db05471c6be1ad6652c00207b1d2fbba2292e7e43ac54",
+    "bin/fgos.mjs": "6642186e1347d2c104c15b87c9d1e66953ea156502b69e9e6d611d6369970b23",
     "core/skills/_shared/ak-cook-worker-contract.md": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
     "core/skills/_shared/capability-catalog.md": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -295,7 +295,7 @@
     "packages/git/node-addon/src/holder_lock.rs": "2784130ce8c7f622de4d6980248547cbb42786baadc091e8ed6210aba38a8538",
     "packages/git/node-addon/src/lib.rs": "a969ae57ab54f526d4fc6fe1788ad2b5261a6eaab43ef762464e5ca564f711c2",
     "packages/git/node-addon/src/process.rs": "60cbc85ed1de5a7057e90c84fc1bbd6041332ba0cba336c6f6487471ab3fe657",
-    "packages/git/node-addon/src/session_identity.rs": "dd6e0c3dce078ab053aa9407f4b1394b0562e87aa9a8b45015c893626675ca78",
+    "packages/git/node-addon/src/session_identity.rs": "1f8c6b9a7b138555c164e46edd76203fe830ce4d947e3e4fd80b80ef497d9620",
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
     "packages/git/rust/src/driver.rs": "8cf69968d10f4ee48276e83cb2357844890ec9fb8748c830c8fbfae5c9980ab0",
     "packages/git/rust/src/grant.rs": "d4f47e49d85994778dc093098b47584e3f73c3cec5f501af82a1c5cd787446f2",
@@ -822,7 +822,7 @@
     "src/runner/lock-fence.mjs": "e128397527edce60462e4337ed2253383808747ef5f12dd19a8a4e35a12eaa5f",
     "src/runner/lock-status.mjs": "fc33d73f4e3fe2b65e6a1bdefaed2b59870a54edac15936c20f9681773910bcc",
     "src/runner/lock-wait.mjs": "833e0a3bf2d71d66358d4f230c7325ebedcba34444cdaa60324a4e4be2140301",
-    "src/runner/loop.mjs": "4be95c41913458eeb0d26ea2c7e64d15b81bec6e6ebdf8076a311f5a1782b143",
+    "src/runner/loop.mjs": "7a8b9f85476aef152293a78ee0ffdc7a05ae6d4efb86b3bda824c805af84fa55",
     "src/runner/main-checkout-activity.mjs": "84cd9b95e28c0c1004322b6edba0d2b4b45f9445eddc30613abd53314f13c071",
     "src/runner/main-checkout-reset-guard.mjs": "446d216c411dd5f59d512b5baf52b3a46eeb8ae03320f1d40be85e9447072d0c",
     "src/runner/main-fgos-checkpoint.mjs": "9ad033aaf03324cda92d6b96cc68e8c52514f4c225d3a55e3c2ed9820f25b847",
@@ -923,7 +923,7 @@
     "src/util/git-paths.mjs": "fbb0b5af5b149853b9d5279062d417cee88a24ce161f782b5ae6dec3d10f1941",
     "src/util/host-bin-path.mjs": "c9ba4f74f5969a42d3aca4a1583f4c3ecb2eba871f1fcf025ed7d38621f4353d",
     "src/util/host-bin.mjs": "f70cad1f07c7eb0f47bdafc0c766e2351e2310f48232b76ab4d29bab1fbcb826",
-    "src/util/identity-mint.mjs": "0f8ba6e4e9fd15e8dc8fcff62186ff54ae6e0daf5f5ec3c987c014b30a42f093",
+    "src/util/identity-mint.mjs": "3e22b76bb3738d6c37f90ed7a12cb6238fc777558146bb6c4d0fc55573ec6608",
     "src/util/normalize-path.mjs": "e1519327a67834d6309a0e92e69d5fb46bb671a7ddfbe9ef5c36acc22fc3062a",
     "src/util/release-binary-path.mjs": "f74aefea9a51b750049a9d32b62c2dbd9fb9782f944535b293e9cc352b466f76",
     "src/util/release-targets.mjs": "52157efccc71fa4bc260a47717ab48047792a7057329ab29d9bd6333c322029c",
@@ -947,7 +947,7 @@
     "src/verbs/merge/catchup.mjs": "3c73bf052a078cbe1ef40a271c32e7772da918637abf7cd2bbb7065dbd2be245",
     "src/verbs/merge/iron-law-level.mjs": "28037a676ec6f8533c2c8b0bcd66be0ec8dff1acfca0d656de7c5baa02043b73",
     "src/verbs/merge/merge.mjs": "0a453f93896685a77cf5494ff5d2f6f8106ff638e1b17079a368801fdb064f89",
-    "src/verbs/merge/promote-to-component.mjs": "dc1ab469b87a5360fad72ee50e1d75031651e420e7fd6c080e0253ce74fa1f2c",
+    "src/verbs/merge/promote-to-component.mjs": "ffd40882acc7bf5eba589d7e3bf9e743d7bd7fe8d05e5cbb5209a0b1f1b3b3a8",
     "src/verbs/merge/reject.mjs": "04fc387317e04a787917ea12a447a217928a1410e3439b422e76cf46638af7e6",
     "src/verbs/merge/review.mjs": "538e8087eed7befd51b7ef78a93d1b12fa13f0fff260ec40e50e7f8e019ac49a",
     "src/verbs/merge/sync-root.mjs": "c5e4e309c77ff490b1cf53b92f53c250b835cab6c41f1456c4facd0195df1ba1",
@@ -2951,13 +2951,6 @@
     {
       "path": "src/util/host-bin.mjs",
       "line": 94,
-      "spawn": "execFileSync",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/util/identity-mint.mjs",
-      "line": 70,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

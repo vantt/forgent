@@ -945,7 +945,7 @@ function submitWork(dir, text, opts = {}) {
   const size = opts.size ?? classified.size;
   const kind = opts.kind ?? classified.kind;
   const risk = opts.risk ?? classified.risk;
-  const id = mintWorkId({ fgosDir: dir });
+  const id = mintWorkId();
   const work = {
     id,
     title,
@@ -1094,7 +1094,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');
       }
       requireField(flags.title, 'add requires --title (the item\'s own title)');
-      const id = idFlag ?? mintWorkId({ fgosDir: dir });
+      const id = idFlag ?? mintWorkId();
       const work = {
         id,
         title: flags.title,

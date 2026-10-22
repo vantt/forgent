@@ -719,8 +719,8 @@ function sanitizeTitleForLog(title) {
 // the real verify later), deps/refs empty. discoveredFrom is non-blocking
 // provenance (excluded from the cycle-check by design). Every write goes
 // through queue.enqueue (the serialized write door) — never a raw addWork —
-// and the id is minted INSIDE the serialized callback, outside any state lock
-// (the mint door runs the host, which a lock holder must never wait on). The
+// and the id is minted INSIDE the serialized callback, before any state write
+// (minting is an in-process draw). The
 // same callback also re-scans the current view for a prior item with discoveredFrom === item.id and a
 // case/whitespace-insensitive matching title (review-fix S10, P2 finding):
 // the same worker output repeating a block, or a re-dispatched item
@@ -760,7 +760,7 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
           log(`fgos-runner: discovery-report for "${item.id}" ("${sanitizeTitleForLog(block.title)}") already captured, skipped (idempotent)`);
           return;
         }
-        const id = mintWorkId({ fgosDir: dir });
+        const id = mintWorkId();
         const derived = classify(block.title);
         const domainObj = getDomain(item.domain);
         const validKinds = classificationVocabulary(domainObj, 'kind');

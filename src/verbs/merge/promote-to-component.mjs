@@ -87,7 +87,7 @@ export async function promoteToComponentUseCase({ dir, repoRoot }, { ids, rootId
     if (rootTitle === undefined || rootTitle === null || rootTitle === '' || rootTitle === true) {
       throw new StoreError('validation', 'promote-to-component requires --root-id (an existing member to promote) or --root-title (to create a fresh root item).');
     }
-    rootId = mintWorkId({ fgosDir: dir });
+    rootId = mintWorkId();
     // A freshly created root is a pure milestone-style grouping item
     // (tsk-5t3a precedent, no code of its own) — 'light'/'true' mirror
     // that precedent's own minimal, trivially-true shape. 'light' is the
