@@ -4,7 +4,6 @@
 // `node --test` trải suite ra các core. Thân test bê nguyên văn; chỉ
 // import/helper đổi cho khớp phần nào file này thật sự dùng.
 import '../helpers/process-tmp-root.mjs';
-import { mailboxConfigShape } from '../../src/setup/mailbox-limits.mjs';
 import { test } from 'node:test';
 import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 import {
@@ -227,7 +226,7 @@ test('config-not-stale passes when the existing config already has every default
       gateway: { port: 4170, token: null },
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
       checkpoint: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
-      mailbox: mailboxConfigShape(),
+      mailbox: {},
       docRegistry: DEFAULT_DOC_REGISTRY_SETTINGS,
       eventStore: { remote: 'origin' },
     }),

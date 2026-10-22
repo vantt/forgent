@@ -4,8 +4,9 @@ use fgos_mailbox_core::Limits;
 use serde_json::Value;
 
 /// The readers a contract key may name: the core's `Limits`, the hook
-/// crate's `HookLimits`, or the live hook-cost harness.
-const READERS: [&str; 3] = ["core", "hook", "harness"];
+/// crate's `HookLimits`, the live hook-cost harness, or `fgos setup` (the
+/// install opt-in, which neither crate reads).
+const READERS: [&str; 4] = ["core", "hook", "harness", "setup"];
 
 fn keys(contract: &Value) -> &Vec<Value> {
     contract["keys"]

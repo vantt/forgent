@@ -1,33 +1,16 @@
 // mailbox-limits.mjs — the one Node reader of the mailbox's limits contract
 // (packages/mailbox/contracts/limits.v1.json, docs/platform/agent-mailbox/spec.md §12),
-// for the two setup consumers: the config section `fgos setup` registers, and
-// the hook rows' timeout. The Rust loader embeds the same file; the committed
-// fixture packages/mailbox/contracts/fixtures/config/mailbox-section.v1.json
-// is the one drift proof between the two readers.
+// for setup: the hook rows' timeout, and whether the project opted in to the
+// hook rows. The Rust loader embeds the same file; setup copies none of its
+// values into the project config.
 
 import { readFileSync } from 'node:fs';
+import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
 
 const LIMITS_CONTRACT = new URL('../../packages/mailbox/contracts/limits.v1.json', import.meta.url);
 
-/** The readers whose keys reach the mailbox's Rust limits; a `harness` key is
- * measured outside the product and never configured. */
-const PRODUCT_READERS = new Set(['core', 'hook']);
-
 function contractKeys() {
   return JSON.parse(readFileSync(LIMITS_CONTRACT, 'utf8')).keys;
-}
-
-/** The `mailbox` config section with every product key at its contract
- * default, nested by its dotted name below `mailbox`. */
-export function mailboxConfigShape() {
-  const section = {};
-  for (const entry of contractKeys().filter((k) => PRODUCT_READERS.has(k.reader))) {
-    const parts = entry.key.split('.').slice(1);
-    let node = section;
-    for (const part of parts.slice(0, -1)) node = node[part] ??= {};
-    node[parts.at(-1)] = entry.default;
-  }
-  return section;
 }
 
 /** Seconds a CLI should allow one mailbox hook call before it cuts it: the
@@ -36,4 +19,11 @@ export function mailboxConfigShape() {
 export function mailboxHookTimeoutSec() {
   const budget = contractKeys().find((k) => k.key === 'mailbox.hook.budgetMs').default;
   return Math.ceil(budget / 1000) + 2;
+}
+
+/** Whether the project opted in to the mailbox hook rows: `mailbox.enabled` in its
+ * .fgos/config.json (spec §16 item 23, option (b)). Provisional until the owner answers
+ * that item: absent, false or an unreadable config means not enabled. */
+export function mailboxEnabled(repoRoot) {
+  return readSharedConfigOrEmpty(repoRoot)?.mailbox?.enabled === true;
 }

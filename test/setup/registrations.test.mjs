@@ -1227,20 +1227,36 @@ test('Event Store remote defaults to origin and setup preserves an explicit remo
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 
-test('every mailbox limits key registers one config default with its contract value', () => {
-  const contract = JSON.parse(fs.readFileSync(new URL('../../packages/mailbox/contracts/limits.v1.json', import.meta.url), 'utf8'));
+test('setup registers the mailbox section but writes no mailbox value; the values stay in the limits contract', () => {
   const entries = CONFIG_DEFAULT_REGISTRATIONS.filter((c) => c.key === 'mailbox');
-  assert.equal(entries.length, 1, 'one mailbox section');
-  const at = (shape, dotted) => dotted.split('.').slice(1).reduce((node, part) => node?.[part], shape);
-  for (const key of contract.keys) {
-    const value = at(entries[0].shape, key.key);
-    if (key.reader === 'harness') assert.equal(value, undefined, `${key.key} is measured, never configured`);
-    else assert.equal(value, key.default, key.key);
-  }
+  assert.equal(entries.length, 1, 'one mailbox section, so doctor and setup know it');
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mailbox-config-'));
+  try {
+    ensureSharedConfigDefaults(temp);
+    assert.deepEqual(JSON.parse(fs.readFileSync(path.join(temp, '.fgos/config.json'))).mailbox, {}, 'no contract value is copied into the tracked config');
+    const config = JSON.parse(fs.readFileSync(path.join(temp, '.fgos/config.json')));
+    config.mailbox = { enabled: true, queue: { cap: 7 } };
+    fs.writeFileSync(path.join(temp, '.fgos/config.json'), JSON.stringify(config));
+    ensureSharedConfigDefaults(temp);
+    assert.deepEqual(JSON.parse(fs.readFileSync(path.join(temp, '.fgos/config.json'))).mailbox, { enabled: true, queue: { cap: 7 } }, 'what the user set is kept as it is, and nothing is added');
+  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 
-test('the registered mailbox section equals the committed fixture the rust loader reads', () => {
-  const fixture = JSON.parse(fs.readFileSync(new URL('../../packages/mailbox/contracts/fixtures/config/mailbox-section.v1.json', import.meta.url), 'utf8'));
-  const entry = CONFIG_DEFAULT_REGISTRATIONS.find((c) => c.key === 'mailbox');
-  assert.deepEqual(entry.shape, fixture);
+test('the mailbox check passes as not enabled until the project opts in, and names the opt-in', () => {
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'mailbox-hook');
+  assert.ok(check, 'a mailbox check is registered');
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mailbox-check-'));
+  try {
+    const absent = check.check(temp);
+    assert.equal(absent.passed, true);
+    assert.match(absent.message, /not enabled/);
+    assert.match(absent.message, /mailbox\.enabled/);
+    fs.mkdirSync(path.join(temp, '.fgos'));
+    fs.writeFileSync(path.join(temp, '.fgos/config.json'), JSON.stringify({ mailbox: { enabled: false } }));
+    assert.match(check.check(temp).message, /not enabled/);
+    fs.writeFileSync(path.join(temp, '.fgos/config.json'), JSON.stringify({ mailbox: { enabled: true } }));
+    const on = check.check(temp);
+    assert.equal(on.passed, true);
+    assert.match(on.message, /^enabled/);
+  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });

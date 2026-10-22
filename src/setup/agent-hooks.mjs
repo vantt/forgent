@@ -15,7 +15,7 @@
 import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { mailboxHookTimeoutSec } from './mailbox-limits.mjs';
+import { mailboxEnabled, mailboxHookTimeoutSec } from './mailbox-limits.mjs';
 
 export const SUPPORTED_AGENTS = ['claude', 'codex', 'agy', 'omp', 'pi'];
 
@@ -137,8 +137,37 @@ const HOOK_FILES = {
   agy: { file: path.join('.agents', 'hooks.json'), label: '.agents/hooks.json', name: 'AGY', optional: true, dir: '.agents' },
 };
 
+/** The rows a project gets for one CLI: the mailbox rows only when the project opted in. */
 function rowsOf(repoRoot, cli) {
-  return hookRows(repoRoot).filter((row) => row.cli === cli);
+  const mailbox = mailboxEnabled(repoRoot);
+  return hookRows(repoRoot).filter((row) => row.cli === cli && (mailbox || row.kind !== HOOK_KINDS.MAILBOX));
+}
+
+/** The table's rows a project does not get (the mailbox rows of a project that has not opted in). */
+function withheldRowsOf(repoRoot, cli) {
+  if (mailboxEnabled(repoRoot)) return [];
+  return hookRows(repoRoot).filter((row) => row.cli === cli && row.kind === HOOK_KINDS.MAILBOX);
+}
+
+/** Takes out the hook objects whose command is exactly a withheld row's, never a user's lookalike;
+ * an entry or event they leave empty goes with them. Returns whether anything changed. */
+function removeNestedRow(hooks, row) {
+  const entries = hooks[row.event];
+  if (!Array.isArray(entries)) return false;
+  let changed = false;
+  for (const entry of entries) {
+    if (!Array.isArray(entry?.hooks)) continue;
+    const kept = entry.hooks.filter((h) => h?.command !== row.command);
+    if (kept.length !== entry.hooks.length) {
+      entry.hooks = kept;
+      changed = true;
+    }
+  }
+  if (!changed) return false;
+  const left = entries.filter((e) => !Array.isArray(e?.hooks) || e.hooks.length > 0);
+  if (left.length) hooks[row.event] = left;
+  else delete hooks[row.event];
+  return true;
 }
 
 /** Whether a hook object is this row's: its exact command, an older fgOS command (legacy marker),
@@ -206,6 +235,9 @@ function installRows(repoRoot, cli) {
   const config = readJsonSafe(filePath);
   if (config === null) return { wired: false, skippedExisting: 'malformed' };
   let changed = false;
+  if (config.hooks && typeof config.hooks === 'object') {
+    for (const row of withheldRowsOf(repoRoot, cli)) changed = removeNestedRow(config.hooks, row) || changed;
+  }
   for (const row of rowsOf(repoRoot, cli)) {
     if (row.group) {
       changed = installGroupRow(config, row) || changed;

@@ -194,6 +194,8 @@ function layOut(name, dry, built) {
   fs.copyFileSync(built.path, path.join(dir, 'release', 'bin', 'fgos'));
   fs.chmodSync(path.join(dir, 'release', 'bin', 'fgos'), 0o755);
   writeJson(path.join(project, '.fgos', 'installation', 'activation.json'), { status: 'ready', releasePath: path.join(dir, 'release') });
+  // The project opts in to the mailbox rows, as a user would (spec §16 item 23, provisional).
+  writeJson(path.join(project, '.fgos', 'config.json'), { mailbox: { enabled: true } });
   if (dry) fs.mkdirSync(homeOf(dir), { recursive: true });
   else if (CLI_OF[name] === 'claude') live.makeClaudeHome({ home: homeOf(dir), claudeDir: CLAUDE_DIR });
   else fs.mkdirSync(homeOf(dir), { recursive: true });
@@ -859,6 +861,7 @@ function cmdCost(runs, which = 'branch') {
   fs.copyFileSync(built.path, host);
   fs.chmodSync(host, 0o755);
   writeJson(path.join(projectOf(dir), '.fgos', 'installation', 'activation.json'), { status: 'ready', releasePath: path.join(dir, 'release') });
+  writeJson(path.join(projectOf(dir), '.fgos', 'config.json'), { mailbox: { enabled: true } });
   fs.mkdirSync(path.join(homeOf(dir), '.claude', 'sessions'), { recursive: true });
   const session = crypto.randomUUID();
   const start = fs.readFileSync(`/proc/${process.pid}/stat`, 'utf8').split(') ')[1].split(' ')[19];

@@ -57,7 +57,7 @@ import {
   installPiHook,
 } from './agent-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
-import { mailboxConfigShape } from './mailbox-limits.mjs';
+import { mailboxEnabled } from './mailbox-limits.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import {
   readWorkflowDefinitionFiles,
@@ -2357,17 +2357,25 @@ export const PI_EXECUTOR_DEFAULT = Object.freeze({
   providerModel: 'openai',
 });
 
-// The agent mailbox's limits (docs/platform/agent-mailbox/spec.md §12): the
-// size, budget, loop, queue, wake, offer, notice, frame and hook keys the
-// mailbox reads from the `mailbox` section of the project's .fgos/config.json.
-// Each value is its starting value from packages/mailbox/contracts/limits.v1.json,
-// unmeasured placeholders unless that contract says otherwise; the Rust loader
-// reads only the project file and takes any key missing there from the same
-// contract, so a value here matters only when someone changes it.
+// The agent mailbox's section (docs/platform/agent-mailbox/spec.md §12): it holds
+// overrides only. Every key, its starting value and its reader live in
+// packages/mailbox/contracts/limits.v1.json; the Rust loader takes any key
+// missing here from that contract, so setup copies no value in (a copied value
+// would read as a deliberate project choice and outlive later contract tuning).
+// `mailbox.enabled: true` opts the project in to the hook rows (provisional,
+// until the owner answers spec §16 item 23).
 registerConfigDefault({
   id: 'mailbox',
   key: 'mailbox',
-  shape: mailboxConfigShape(),
+  shape: {},
+});
+
+registerCheck({
+  id: 'mailbox-hook',
+  description: 'agent mailbox: whether this project opted in to the mailbox hook rows (mailbox.enabled)',
+  check: (cwd) => (mailboxEnabled(cwd)
+    ? { passed: true, message: 'enabled: the Claude Code and Codex hook checks require the mailbox rows; limits and overrides: packages/mailbox/contracts/limits.v1.json, under mailbox.* in .fgos/config.json' }
+    : { passed: true, message: 'not enabled: set mailbox.enabled: true in .fgos/config.json, then run fgos doctor --fix, to install the mailbox hook rows (provisional opt-in, spec §16 item 23)' }),
 });
 
 registerConfigDefault({
