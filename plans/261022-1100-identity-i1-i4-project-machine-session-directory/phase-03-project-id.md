@@ -4,34 +4,34 @@ title: "Project id (rung I1)"
 status: pending
 priority: P2
 effort: "3h"
-dependencies: []
+dependencies: [1]
 ---
 
 # Phase 03: Project id (I1)
 
 ## Goal
-Every repository using fgOS carries one project id in a tracked file, the same in every clone on every machine; `fgos identity project --json` prints it; a fork keeps it until `fgos identity project --new`.
+Every repository using fgOS carries one project id in the tracked file `.fgos/project.json`, the same in every clone on every machine; `fgos identity project --json` prints it; a fork keeps it until `fgos identity project --new`.
 
-## Facts (scout report §4)
-- `.fgos/project.json` is not ignored, is not blocked by the pre-commit root allowlist (the check ignores paths with `/`), and needs no change to `.gitattributes` or the strip rules (barrier F10).
-- Linked worktrees have no `.fgos/` (ADR0020, `src/runner/worktree.mjs:730-776`), and worker branches cannot commit under `.fgos/` (`.githooks/pre-commit:222-246`). So the file is written only from the main checkout and read through the main checkout's `.fgos` (`getMainFgosDir`, `src/state/runtime-coordination.mjs:23`; Rust: the trusted main root used by `packages/distribution/rust/src/workspace.rs:28`).
-- Precedent for a tracked pin written by setup: `.fgos/distribution.json` (`packages/distribution/rust/src/init.rs:38`).
+## Facts (scout §4; red-team finding 3)
+- `.fgos/project.json` is not ignored, is not blocked by the pre-commit root allowlist, and needs no change to `.gitattributes` or the strip rules (barrier F10).
+- Linked worktrees have no `.fgos/` (ADR0020, `src/runner/worktree.mjs:730-776`), and worker branches cannot commit under `.fgos/` (`.githooks/pre-commit:222-246`).
+- Three machines each have their own clone; an automatic mint on each would give three ids before the first push.
 
 ## Design
-- File `.fgos/project.json`: `{"v":1,"projectId":"<32 hex>","handle":"<slug>","createdAt":"<iso>"}`. Id: 128 random bits. Handle: a Convention `project-handle` identifier, defaulting to the repository folder name reduced to the identifier alphabet at mint time only (rule 1 of spec section 4: a name may seed a handle, never the id).
-- Mint: setup fix `identity-project-id` on the main checkout when the file is absent; never rewrites an existing file. `fgos identity project --new [--handle <h>]` re-mints on purpose (fork split, spec decision 3) and prints the commit to make.
-- Doctor: check `identity-project-id` (present, valid, read from the main checkout). The doctor warning "two remotes publish one project id" needs the shared directory and lands in phase 05.
-- Read path: `fgos_identity::project(repo)` resolves the trusted main root first, so a call from a worktree reads the main checkout's file.
+- File: `{"v":1,"projectId":"<32 hex>","handle":"<slug>","createdAt":"<iso>"}`. Id: `fgos_session_identity::text::random_hex128`. Handle: Convention kind `project-handle` (first `a-z`, rest `a-z0-9-`, max 40), defaulting to `slug(<folder name>)` at mint time only (spec section 4 rule 1: a name may seed a handle, never the id).
+- **No automatic mint.** `fgos identity project --init [--handle <h>]` (operation `identity.write`) mints only on the main checkout and refuses when the file already exists, when run in a linked worktree, or when the remote's default branch already tracks `.fgos/project.json` (`git ls-tree` on the fetched remote ref through the Git component); it prints the commit command. `--new` re-mints on purpose (fork split, spec decision 3).
+- Doctor check `identity-project-id`: pass when present and valid on the main checkout; warn when absent with "run `fgos identity project --init` once on one machine, commit, pull elsewhere"; there is no fix.
+- Read path: `fgos_session_identity::project(repo)` resolves the trusted main root first (as `packages/distribution/rust/src/workspace.rs:28` does), so a call from a worktree reads the main checkout's file.
+- This repository: the IDENT lead runs `--init` once on `fg-server` and commits `.fgos/project.json` on main by pathspec before the release lands; the other machines get it by pull.
 
 ## Files
-- Create: `packages/identity/rust/src/project.rs`, `tests/project.rs`, `packages/identity/contracts/identity.project.v1.json`.
-- Modify: `packages/identity/rust/src/{lib.rs,provider.rs}`, `src/setup/identity-checks.mjs`, `src/setup/registrations.mjs`, `test/setup/identity-checks.test.mjs`, `packages/convention/contracts/convention.{rules,golden}.v1.json`, `apps/fgos/src/cli_projector.rs`, `apps/fgos/tests/cli_tests.rs`, `docs/platform/identity/spec.md`, `docs/platform/event-store/spec.md` (inventory of tracked `.fgos` files, its line 565), `docs/specs/distribution.md` row 7, `CHANGELOG.md`.
-- This repository: commit the minted `.fgos/project.json` on main by explicit pathspec.
+- Create: `packages/session-identity/rust/src/project.rs`, `tests/project.rs`.
+- Modify: `packages/session-identity/rust/{Cargo.toml,src/lib.rs,src/provider.rs}` (dep on the Git component for the trusted main root and remote ref read), `Cargo.lock`, `packages/session-identity/contracts/identity.{read,write}.v1.json`, `src/setup/identity-checks.mjs`, `src/setup/registrations.mjs`, `test/setup/identity-checks.test.mjs`, `test/setup/checks.test.mjs`, `packages/convention/contracts/convention.{rules,golden}.v1.json`, `apps/fgos/src/cli_projector.rs`, `apps/fgos/tests/cli_tests.rs`, `docs/platform/identity/spec.md`, `docs/platform/event-store/spec.md` (inventory of tracked `.fgos` files, line 565), `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`, `docs/specs/distribution.md` row 7, `CHANGELOG.md`.
 
 ## Verification
-- `cargo test -p fgos-identity` (mint once; never overwrite; `--new` changes the id; worktree call reads the main file).
-- `node scripts/run-tests.mjs test/setup/identity-checks.test.mjs`
-- `npm run fgos:dev -- doctor --fix </dev/null` on a fresh clone in a temp dir mints the file; `git -C <clone> status --short` shows only `.fgos/project.json`; a second clone of the same commit prints the same id.
+- `cargo test -p fgos-session-identity` (init once; refuse when present, in a worktree, and when the remote already tracks the file; `--new` changes the id; a worktree read returns the main file).
+- `node scripts/run-tests.mjs test/setup/identity-checks.test.mjs test/setup/checks.test.mjs`
+- Two temp clones of one bare repo: `--init` and push in the first; `--init` in the second after `git fetch` refuses; after pull both print the same id.
 
 ## Risk and rollback
-- A tracked file appears in projects using fgOS after their next setup. It is small and harmless; rollback deletes it with a revert. The fix never runs in a worktree, so no worker branch can trip the pre-commit guard.
+- Nothing is minted without an explicit command, so no project gets a surprise tracked file. Rollback: revert, and delete the file by a commit.

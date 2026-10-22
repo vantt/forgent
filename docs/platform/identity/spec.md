@@ -8,7 +8,7 @@ Design status: G0 signed 2026-10-22 for rungs I1-I4; I5 (authenticity mechanism)
 Implementation status: Not started
 Canonical: Yes for rungs I1-I4 (G0 signed 2026-10-22, section 10)
 Owner: Identity component (proposed)
-Source (planned): packages/identity/rust (proposed; see open question 1)
+Source: packages/session-identity/rust today (the one identity crate); renamed to packages/identity/rust after HARDEN T1 phase 6 lands
 Related:
 - docs/platform/session-identity/spec.md (writer id of a process; attribution, not authentication)
 - docs/platform/event-store/spec.md section 5 (machine id, store id) and section 14 (sharing through git)
@@ -126,3 +126,4 @@ Rules:
   5. The I5 authenticity mechanism is decided at the close of I4, with evidence of which signing keys the machines really have; G0 does not cover I5.
   6. From the landing of I3, new board rows and log lines name agents and machines by handle; old log lines stay as history; the IDENT lead rewrites the "ai làm" column of live rows once when I3 lands.
 - 2026-10-22 — Owner approves the read surface of section 5: one read per identity (machine, project, session) plus `resolve` and `list`; bare `fgos identity` keeps its answer.
+- 2026-10-22 — **Decision 1 sharpened by the owner: one component, one authority, one crate** ("1 component thôi, đã cấp phát ở mọi mức độ rồi thì không cần 2 authority"). Identity grows inside the existing crate `packages/session-identity/rust`; no second crate is created. The writer-id rule becomes the local part of the session identity. Package, crate and spec are renamed to Identity in one change after HARDEN T1 phase 6 lands; until then the name stays to avoid colliding with T1. Reverse if the rename turns out to need an alias crate (it must not; L10).
