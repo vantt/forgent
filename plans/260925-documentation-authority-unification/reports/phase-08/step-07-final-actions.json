@@ -1,0 +1,70 @@
+{
+  "sourceCommit": "3feee742010e60faf20758acd4acf569f2efc19b",
+  "latestMain": "9c7edde30",
+  "authority": "L12-96; step-07-final-assembly-brief.md (records only)",
+  "actions": [
+    {
+      "id": "network-r5-live-holder",
+      "paths": ["apps/fgos-gateway/web/src/lib/network.ts"],
+      "old": "docs/specs/herdr-\n// web-dashboard.md",
+      "new": "docs/platform/herdr-web-dashboard/spec.md#business-rules",
+      "replaceAll": false,
+      "evidence": "Final source reference-000209 and Step4 class6-l-000067. Current candidate Business Rules R5 explicitly carries 0.0.0.0 default bind, configurability and the non-loopback warning. Only the wrapped comment pointer changes; preserve network behavior and contract-field observation.",
+      "remainingBlocker": "Compose with the other network.ts contract pointer hunk; independent review before cutover."
+    },
+    {
+      "id": "triage-comment-truth",
+      "paths": ["packages/herdr-fgos-common/rust/src/fgos.rs"],
+      "old": "/// had `computePriority` run, e.g. still at `todo`) sorts LAST, same\n/// absent-sorts-last convention `docs/reference/triage-table-columns.md`\n/// already documents for `goalTier`.",
+      "new": "/// had `computePriority` run, e.g. still at `todo`) sorts LAST, as\n/// implemented by the sort below.\n/// `docs/knowledge/fgos-triage-table-columns/triage-table-columns.md` describes\n/// table rendering; it does not specify absent-goalTier sort order.",
+      "replaceAll": false,
+      "evidence": "Current parse_triage sorts None priority as i64::MAX. Candidate triage-table document covers rendering, not absent goalTier ordering. No sort code or assertion changes; correct only the unsupported citation claim.",
+      "remainingBlocker": "Compose with other final-pin file hunks; independent review before cutover."
+    },
+    {
+      "id": "holder-lock-current-header",
+      "paths": ["docs/platform/holder-lock/spec.md"],
+      "old": "The main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17; the hot state mutex is section 15.",
+      "new": "The main checkout single door and `worktree-admin` are implemented as specified in sections 14 and 16; the hot state mutex is section 15. The former fence interface is retired by the in-process holder-lock cutover.",
+      "replaceAll": false,
+      "evidence": "L11-23 and L12-117/T1: current header already records the in-process facade, but still cites retired fence section 17. Current repo-locks and public holder-lock facade are pinned in the prepared-spec receipt. No Event Store status change.",
+      "remainingBlocker": "Holder-lock owner and independent promotion review before Phase 9 application; no workspace header edit in this records turn."
+    },
+    {
+      "id": "gateway-contract-reader-move",
+      "paths": ["apps/fgos-gateway/src/gateway.rs", "apps/fgos-gateway/src/mcp.rs"],
+      "old": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "new": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+      "replaceAll": true,
+      "evidence": "L12-96 families 12/21; both contract copies have SHA256 9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f at the pin. Includes embedded fixture destinations and comments, preserving CTR010 and every assertion.",
+      "remainingBlocker": "Compose other Step 3/4/5 hunks in these two files once; resolve YAML citation carries and independently review/replay the whole co-cut before applying. This is a bounded path patch, not complete file composition."
+    },
+    {
+      "id": "intent-ledger-main-reference-reconciliation",
+      "paths": ["plans/reports/phase-lead-261018-2025-controller-death-p06-doctor-docs-changelog.md"],
+      "old": "intent ledger PF-I011/PF-I012",
+      "new": "intent ledger PF-I022/PF-I023",
+      "replaceAll": false,
+      "evidence": "Phase 9 landing requirement; candidate ledger rows PF-I022 (dead-controller resume) and PF-I023 (cwd custody gap), distinct from existing PF-I011/PF-I012. Only the sole main report reference changes; no identity renumbering.",
+      "remainingBlocker": "Independent integration review and Phase 9 application; report path is outside this turn's workspace write scope."
+    },
+    {
+      "id": "stale-assignment-provenance-citation",
+      "paths": ["docs/platform/agent-coordination/contracts/assignment-run-runresult.md"],
+      "old": "assignment-runner.mjs:431,560,574 (provenance.kind inline/declared/unit-run)",
+      "new": "assignment-runner.mjs:349-385,495-516,973-975 (provenance.kind inline/declared/unit-run checks: assertInlineMutatingAssignmentAuthorized, validateAssignmentLegality, seatIdOf)",
+      "replaceAll": false,
+      "evidence": "Current src/runner/dispatch/assignment-runner.mjs: named functions check provenance.kind at 351,370,514,974. Current target citation is stale. Source digest is pinned in the prepared-spec receipt.",
+      "remainingBlocker": "Independent promotion-truth review and Phase 9 application; this turn does not edit the document."
+    },
+    {
+      "id": "stale-execution-budget-citation",
+      "paths": ["docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md"],
+      "old": "execution-contract.mjs:345-346,371-382",
+      "new": "execution-contract.mjs:372-383",
+      "replaceAll": false,
+      "evidence": "Current src/runner/dispatch/execution-contract.mjs:346-347 is role validation; 372-383 owns budget type, timeoutMs/maxRuns and telemetry-only tokens. Source digest is pinned in the prepared-spec receipt.",
+      "remainingBlocker": "Independent promotion-truth review and Phase 9 application; this turn does not edit the document."
+    }
+  ]
+}

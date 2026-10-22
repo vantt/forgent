@@ -1263,3 +1263,30 @@ Final frozen-input verification: full checker 1481 memberships / 7223 refs / 398
 Accounted `ab3eb83d7`: 87 main commits / 98 imported paths / five changed documentation paths across 27 exact path families. Evidence relocation `--before` passes 867/0 with the 44-row consumer table unchanged; ratchet passes 997 files and its unchanged tests pass 28/28, so no exception digest changed. Both protected extractors agree; eight direct bindings remain content/ancestry exact, with zero rebinds or ledger edits. Step 3/4/5 overlaps are 5/2/20 and remain deferred to Step 7. Fresh Step 5 checker: 1,481 files / 7,223 refs / 39,876 tuples / 0 failures; the 189-entry HEAD drift list is regenerated as non-failing. Exact receipts are `step-00-l12-98-*` and `step-05-l12-98-merge-accounting.json`; separate L12-11 committed-pair accounting follows this written checkpoint.
 
 Pair accounting is complete in both Phase 6 manifests: exact pairs `4be19d6cb/step-06-accounting-brief-ab3eb83d7.md` and carried `aa0df7deb/step-06-pair-accounting-brief-698fd721a.md`, with no other manifest-byte change. Post-append A reports zero unaccounted pairs for each manifest; B/H/I remain green. The working-tree A result is expected to stay non-green until the runner commits this accounting round, whose own new pairs belong to the next accounting checkpoint.
+
+## L12-118 — Final-pin records assembly
+
+Pin `3feee742010e60faf20758acd4acf569f2efc19b`; latest imported main `9c7edde30`.
+Applied final owning-row overlay for all 23 park families / 2,311 members:
+1,929 preserve, seven patch, 375 individually parked; 1,936 flips. Final matrix:
+0 applied-safe, 383 prepared, 9,455 preserved, 375 parked, 36,191 rejected;
+207 patch specifications and explicit inverse ordering. Generated index stays at
+`docs/decisions/index.md`; the duplicate move is dropped only as a proposal.
+
+Both unchanged extractors verify 2,049 current bindings across the 54-path
+changed-candidate union, no drift or new rebinding. Two-tier main drift and
+protected hashes pass; ratchet, 20 doc-link tests and evidence --before 867/0
+pass. Two complete Git-writing fixture suites remain with Lead, unfiltered.
+Fresh census names 79 introduced literals / 1,158 documentation-cued dynamic
+sites for semantic record joining. The export's missing inputs, source-binding
+exception, 16 inherited carries and lease/A34/entry-merge duties remain named.
+Plan A and actual Plan B/convention landed; the draft is Plan C, not Plan B.
+
+Entry point: `step-07-final-assembly-report.md`. Actual two-run hashes and
+compactness/conservation proof: `step-07-final-determinism.json`. Last-task
+17-pair append/reconstruction and real post-append exits:
+`step-07-final-pair-accounting.json`; this runner commit is not pre-accounted.
+No product or root-instruction edit, Git write, fgOS CLI, live state, full suite,
+cutover readiness or independent acceptance. Next concrete action: Lead-started
+integration review, named proof/composition work, then the following runner-pair
+accounting checkpoint before committed-byte acceptance.
