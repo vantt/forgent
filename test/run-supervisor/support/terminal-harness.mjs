@@ -119,6 +119,8 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
       }
       return {
         kind: 'agent',
+        // The agent serves the claude family, whatever program the fixture runs: its cells are the claude ones.
+        providerModel: 'claude',
         command,
         args,
         adapter: 'herdr-spawn',
@@ -164,7 +166,7 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
       fs.writeFileSync(path.join(configDir, 'config.json'), JSON.stringify({
         runner: {
           defaultExecutor: executorIds[0],
-          rigorToTier: { standard: 'standard' },
+          defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
           timeoutMs: 60_000,
           executors: Object.fromEntries(executorIds.map((id) => [id, {
             kind: 'agent',
@@ -176,7 +178,8 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
             ],
           }])),
           modelPolicies: Object.fromEntries(executorIds.map((id) => [id, { standard: 'sonnet' }])),
-          capabilities: { 'docs:write': { prefer: executorIds.map((id) => ({ executor: id, invocation: `${id}-cli` })) } },
+          // A bare executor id leaves the transport to bind(): a named invocation is a hard pin and herdr never replaces it.
+          capabilities: { 'docs:write': { prefer: executorIds.map((id) => ({ executor: id })) } },
         },
       }, null, 2));
       const unitFile = path.join(repoDir, 'unit.json');

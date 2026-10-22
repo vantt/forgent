@@ -19,6 +19,13 @@ test('a seat refused for provider capacity is a provider limit, so its pool move
   assert.equal(outcomeOfRunResult(refusedCapacity()), 'provider-limit');
 });
 
+test('a seat whose named account could not be leased is a provider limit under its own failure code', () => {
+  const conflict = refusedCapacity();
+  conflict.classification.failure = { family: 'provider', code: 'provider-capacity-lease-conflict', message: 'provider capacity refused for "claude": provider-capacity.lease-conflict' };
+  conflict.classification.policy = { disposition: 'needs-input', code: 'provider-capacity-lease-conflict' };
+  assert.equal(outcomeOfRunResult(conflict), 'provider-limit');
+});
+
 test('a failed result with no outcome field is a failure, not a pass', () => {
   const result = refusedCapacity();
   result.classification.failure = { family: 'unknown', code: 'something-else' };

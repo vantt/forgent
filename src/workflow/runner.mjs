@@ -39,12 +39,14 @@ import {
   unitOverridesOf,
   unitPatternOf,
 } from './unit-handoff.mjs';
-import { runUnit, snapshotRunnerConfig, detectHerdrPresent } from '../runner/execution/run.mjs';
+import { runUnit, detectHerdrPresent } from '../runner/execution/run.mjs';
 import { CaseAdmissionRefusedError } from '../runner/execution/case-admission-port.mjs';
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
 import { closeCaseUnderHold } from './case-close.mjs';
+import { workflowPersonaScope } from './loader.mjs';
+import { unitFieldsOfTemplate } from './steps.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
-import { RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError, ensureRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 
 /** One log line for the events that mark a step's progress, null for every other event. */
 function progressLine({ ts, type, payload }) {
@@ -83,6 +85,8 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
   // The one port every Unit of this run is admitted and settled through: it never acquires `advance`,
   // because this proposer already holds it.
   const port = createCaseAdmissionPort({ repoRoot: mainRoot, caseId: workflowRunId, heldAdvance: hold });
+  // Where the persona lookup of this run's Units starts: the workflow's own folder and owning domain, from its location.
+  const personaScope = workflowPersonaScope(workflow.id, { packageRoot: mainRoot });
 
   // A run recorded before cases existed is opened on its first advance, with its guide's defaults.
   {
@@ -262,20 +266,10 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
             const unitData = {
               id: u.id,
               objective: handoff.objective || `Execute unit ${u.id} in step ${step.id}`,
-              capability: u.template.capability,
-              pattern: u.template.pattern || 'solo',
-              rigor: u.template.rigor,
-              writes: u.template.writes || [],
+              ...unitFieldsOfTemplate(u.template),
               dependsOn: u.dependsOn || [],
               inputs: handoff.inputs,
               stanceOptions: state.stanceOptions?.length ? state.stanceOptions : u.template.stanceOptions,
-              ...(u.template.anonymizeInputs ? { anonymizeInputs: true } : {}),
-              ...(u.template.blind ? { blind: true } : {}),
-              ...(u.template.prefer ? { prefer: u.template.prefer } : {}),
-              ...(u.template.persona ? { persona: u.template.persona } : {}),
-              ...(u.template.timeoutMs !== undefined ? { timeoutMs: u.template.timeoutMs } : {}),
-              ...(u.template.verify !== undefined ? { verify: u.template.verify } : {}),
-              ...(u.template.skills !== undefined ? { skills: u.template.skills } : {}),
             };
 
             // A unit left `running` with a recorded Unit run id was started by a controller that died:
@@ -363,10 +357,12 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                 cwd: unitWorktree,
                 worktree: unitWorktree,
                 pattern: unitPatternOf(u.template),
+                personaScope,
+                workflowId: workflow.id,
                 overrides: await (async () => {
                   let unitAccount = state.account ?? null;
                   if (unitAccount !== null) {
-                    const runnerConfig = snapshotRunnerConfig(mainRoot).runner;
+                    const runnerConfig = ensureRunnerConfigForDir(mainRoot);
                     const testOverrides = unitOverridesOf(u, state.seats?.personas, {
                       effort: state.effort,
                       timeoutMs: state.timeoutMs,
@@ -377,7 +373,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                       runnerConfig,
                       { session: { headless: true, herdrPresent: detectHerdrPresent() }, overrides: testOverrides },
                     );
-                    if (!dry.roles.some((r) => r.account)) {
+                    if (!dry.seats.some((r) => r.account)) {
                       // No seat of this unit runs on the account's provider: the unit runs unpinned,
                       // and the run says so instead of dropping the pin silently.
                       recordEvent({

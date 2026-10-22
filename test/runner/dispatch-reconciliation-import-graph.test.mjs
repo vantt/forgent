@@ -194,6 +194,8 @@ const EXPECTED_CLOSURE = [
   // The account inventory provider-capacity.mjs reads for a pool declared in runner.llmAccounts
   // (imports only provider-adapter.mjs and provider-capacity.mjs; no process control).
   'src/runner/dispatch/llm-accounts.mjs',
+  // The effort levels provider-adapter.mjs reports as renderable (a leaf: no imports).
+  'src/runner/dispatch/tier-cell.mjs',
   'src/config/global-config.mjs',
   'src/config/shared-config-file.mjs',
   'src/setup/config-merge.mjs',
@@ -230,6 +232,8 @@ const EXPECTED_CLOSURE = [
   'src/holder-lock/lock-scope.mjs',
   'src/holder-lock/state-root.mjs',
   'src/util/host-bin-path.mjs',
+  // Whether a state lock is held (a counter, no imports): the provider state lock notes it.
+  'src/util/state-lock-held.mjs',
   // The per-cwd dispatch lock the planner reports on (holder list or probe
   // through the door; no process control of its own) and the leaf error type
   // its acquire raises.

@@ -24,7 +24,9 @@ function mkTempGitRepo() {
 
 function writeRunnerConfigFixture(root, cfg) {
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({ runner: cfg }, null, 2));
+  // A project config in the seat-binding schema: the loader refuses one that has no marker.
+  const patterns = { ...cfg.patterns, seatBinding: { schema: 1 } };
+  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({ runner: { ...cfg, patterns } }, null, 2));
 }
 
 function runHook(repoRoot, payload) {
@@ -40,7 +42,7 @@ test('allows a real Agent call with no registered executor for its subagent_type
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 5000,
   });
   const result = runHook(repoRoot, { tool_name: 'Agent', tool_input: { subagent_type: 'general-purpose' }, cwd: repoRoot });
@@ -56,7 +58,7 @@ test('blocks a real Agent call whose subagent_type resolves to a registered out-
     capabilities: { blocked: { prefer: 'tool-only' } },
     executors: { 'tool-only': { kind: 'tool', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 5000,
   });
   const result = runHook(repoRoot, { tool_name: 'Agent', tool_input: { subagent_type: 'blocked' }, cwd: repoRoot });
@@ -74,7 +76,7 @@ test('allows a real Task call the same way an Agent call resolves (both tool nam
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 5000,
   });
   const result = runHook(repoRoot, { tool_name: 'Task', tool_input: { subagent_type: 'general-purpose' }, cwd: repoRoot });
@@ -120,7 +122,7 @@ test('defaults subagent_type to "general-purpose" when tool_input omits it, matc
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 5000,
   });
   const result = runHook(repoRoot, { tool_name: 'Agent', tool_input: {}, cwd: repoRoot });

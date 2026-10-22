@@ -127,32 +127,16 @@ export function pathsOverlap(a, b) {
   return false;
 }
 
+/** A capability is declared by its exact key, one of its aliases, or its `<prefix>:*` entry. */
 function isCapabilityDeclared(cap, catalog) {
   if (!catalog || typeof catalog !== 'object') return true;
+  const prefixKey = cap.includes(':') ? `${cap.split(':')[0]}:*` : null;
   if (Array.isArray(catalog) || catalog instanceof Set) {
     const set = catalog instanceof Set ? catalog : new Set(catalog);
-    if (set.has(cap)) return true;
-    if (cap.includes(':')) {
-      const verb = cap.split(':')[1];
-      if (set.has(verb)) return true;
-    }
-    return false;
+    return set.has(cap) || (prefixKey !== null && set.has(prefixKey));
   }
-  if (Object.prototype.hasOwnProperty.call(catalog, cap)) return true;
-  if (cap.includes(':')) {
-    const verb = cap.split(':')[1];
-    if (Object.prototype.hasOwnProperty.call(catalog, verb)) return true;
-  }
-  for (const [name, entry] of Object.entries(catalog)) {
-    if (name === cap) return true;
-    if (entry?.aliases && Array.isArray(entry.aliases) && entry.aliases.includes(cap)) return true;
-    if (cap.includes(':')) {
-      const verb = cap.split(':')[1];
-      if (name === verb) return true;
-      if (entry?.aliases && Array.isArray(entry.aliases) && entry.aliases.includes(verb)) return true;
-    }
-  }
-  return false;
+  if (Object.hasOwn(catalog, cap) || (prefixKey !== null && Object.hasOwn(catalog, prefixKey))) return true;
+  return Object.values(catalog).some((entry) => Array.isArray(entry?.aliases) && entry.aliases.includes(cap));
 }
 
 function extractUnitBlocks(content) {

@@ -5,8 +5,6 @@ import '../helpers/process-tmp-root.mjs';
 import { assert, checkById, fs, mkTemp, path, withHome } from './helpers/setup-checks-harness.mjs';
 import { test } from 'node:test';
 
-const RIGOR_TO_TIER = { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' };
-
 function agent(providerModel, command = providerModel) {
   return { kind: 'agent', providerModel, command, args: ['{prompt}'], invocations: [{ id: `${command}-cli`, via: 'cli', adapter: 'cli-spawn', command, args: ['{prompt}'] }] };
 }
@@ -21,7 +19,8 @@ function runCheck(id, runner, globalRunner, setup) {
       runner: {
         executor: { command: 'claude', args: ['{prompt}'] },
         timeoutMs: 5000,
-        rigorToTier: RIGOR_TO_TIER,
+        defaults: { tier: 'standard' },
+        patterns: { seatBinding: { schema: 1 } },
         modelPolicies: { claude: { standard: 'sonnet' } },
         ...runner,
       },
@@ -124,53 +123,38 @@ test('llm-accounts-vs-legacy compares only once runner.llmAccounts exists, and w
   assert.match(differ.message, /^warning: .*only in runner\.providers: gemini\/tetcu72.*only in runner\.llmAccounts: gemini\/other/);
 });
 
-test('global-model-policies-portable fails on a list or model@pool cell in the global config', () => {
+test('global-model-policies-portable fails on a list, model@pool or object cell in the global config', () => {
   const plain = runCheck('global-model-policies-portable', {}, { modelPolicies: { claude: { advanced: 'opus' } } });
   assert.equal(plain.passed, true);
 
-  const extended = runCheck('global-model-policies-portable', {}, { modelPolicies: { claude: { advanced: ['opus@vertex', 'opus'] }, deepseek: { standard: 'deepseek-v4@openrouter' } } });
+  const extended = runCheck('global-model-policies-portable', {}, { modelPolicies: { claude: { advanced: ['opus@vertex', 'opus'] }, deepseek: { standard: 'deepseek-v4@openrouter' }, gemini: { flagship: { model: 'gemini-pro', effort: 'high' } } } });
   assert.equal(extended.passed, false);
-  assert.match(extended.message, /claude\.advanced, deepseek\.standard/);
+  assert.match(extended.message, /claude\.advanced, deepseek\.standard, gemini\.flagship/);
 });
 
-test('capability-rigor-ceiling names a capability whose rigor lifts it above runner.maxTier, with its model', () => {
-  const runner = {
-    maxTier: 'advanced',
-    executors: { claude: agent('claude') },
-    modelPolicies: { claude: { standard: 'sonnet', advanced: 'sonnet', flagship: 'opus', frontier: 'fable' } },
-    capabilities: {
-      synthesize: { prefer: ['claude'], rigor: 'critical' },
-      implement: { prefer: ['claude'], rigor: 'standard' },
-    },
-  };
-  const lifted = runCheck('capability-rigor-ceiling', runner);
-  assert.equal(lifted.passed, true);
-  assert.match(lifted.message, /synthesize \(rigor critical\) runs at frontier: claude fable/);
-  assert.doesNotMatch(lifted.message, /implement/);
-
-  const none = runCheck('capability-rigor-ceiling', { ...runner, maxTier: 'frontier' });
-  assert.match(none.message, /no capability rigor lifts a seat above runner\.maxTier frontier/);
-
-  const unset = runCheck('capability-rigor-ceiling', { ...runner, maxTier: undefined });
-  assert.match(unset.message, /runner\.maxTier not set/);
-});
-
-test('tier-fallback is quiet without a list, passes a served list and warns about a family the walk would skip', () => {
+test('tier-fallback is quiet without a list, passes a served list of all six tiers, and warns about a missing tier or a family the walk would skip', () => {
   const none = runCheck('tier-fallback', {});
   assert.equal(none.passed, true);
   assert.match(none.message, /not declared/);
 
   const executors = { claude: agent('claude'), gemini: agent('gemini', 'agy') };
-  const modelPolicies = { claude: { advanced: 'sonnet' }, gemini: { advanced: 'gemini-flash' } };
-  const served = runCheck('tier-fallback', { executors, modelPolicies, tierFallback: { advanced: ['gemini', 'claude'] } });
+  const tiers = ['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier'];
+  const cells = Object.fromEntries(tiers.map((tier) => [tier, 'm']));
+  const modelPolicies = { claude: cells, gemini: cells };
+  const served = runCheck('tier-fallback', { executors, modelPolicies, tierFallback: Object.fromEntries(tiers.map((tier) => [tier, ['gemini', 'claude']])) });
   assert.equal(served.passed, true);
-  assert.match(served.message, /declares the walk order of 1 tier\(s\): advanced/);
+  assert.match(served.message, /declares the walk order of 6 tier\(s\): nano, mini, standard, advanced, flagship, frontier/);
 
-  const skipped = runCheck('tier-fallback', { executors, modelPolicies, tierFallback: { advanced: ['gemini', 'z-ai', 'claude'], flagship: ['claude'] } });
+  const partial = runCheck('tier-fallback', { executors, modelPolicies, tierFallback: { advanced: ['gemini', 'claude'] } });
+  assert.equal(partial.passed, true);
+  assert.match(partial.message, /^warning: .*mini: no list, so a seat at mini has no walk after a failure/);
+  assert.doesNotMatch(partial.message, /advanced: no list/);
+
+  const skipped = runCheck('tier-fallback', { executors, modelPolicies: { claude: { advanced: 'sonnet' }, gemini: { advanced: 'gemini-flash' } }, tierFallback: { advanced: ['gemini', 'z-ai', 'claude'], flagship: ['claude'] } });
   assert.equal(skipped.passed, true);
-  assert.match(skipped.message, /^warning: .*advanced: z-ai has no modelPolicies cell at advanced/);
+  assert.match(skipped.message, /advanced: z-ai has no modelPolicies cell at advanced/);
   assert.match(skipped.message, /flagship: claude has no modelPolicies cell at flagship/);
 
-  const unserved = runCheck('tier-fallback', { executors: { claude: agent('claude') }, modelPolicies, tierFallback: { advanced: ['gemini'] } });
+  const unserved = runCheck('tier-fallback', { executors: { claude: agent('claude') }, modelPolicies: { claude: { advanced: 'sonnet' }, gemini: { advanced: 'gemini-flash' } }, tierFallback: { advanced: ['gemini'] } });
   assert.match(unserved.message, /advanced: no agent executor serves gemini/);
 });

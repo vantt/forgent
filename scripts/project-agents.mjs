@@ -29,11 +29,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
-import { readSharedConfig } from '../src/config/shared-config-file.mjs';
-import { resolveTierModel } from '../src/runner/dispatch.mjs';
 import { RIGOR_VALUES } from '../src/runner/rigor.mjs';
-import { DEFAULT_RIGOR_TO_TIER } from '../src/runner/dispatch/config.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { parseYaml } from '../src/util/yaml.mjs';
 
@@ -50,47 +46,7 @@ const FORBIDDEN_PLATFORM_NAMES = ['claude', 'codex', 'anthropic'];
 
 const REQUIRED_FIELDS = ['name', 'version', 'description', 'role', 'persona', 'decision_boundary', 'rigor', 'tool-scope'];
 
-export const DEFAULT_MODELS = { low: 'haiku', standard: 'sonnet', high: 'opus', critical: 'opus' };
-
 export class AgentDefinitionError extends Error {}
-
-// Reads the shared config file at the MAIN CHECKOUT, not at REPO_ROOT
-// (this script's own on-disk location -- correct for agents/.claude/agents,
-// wrong here): `.fgos/` is unconditionally wiped from every freshly-created
-// worktree (ADR0020), so a worktree-local REPO_ROOT would silently find
-// nothing and fall back to defaults on every run inside one, defeating the
-// point of reading real config at all (tsk-5hv, found by fgos-validating).
-// `resolveMainCheckoutRoot` (not `resolveRepoRoot`, both `src/runner/
-// paths.mjs`: `resolveRepoRoot` shells out to `--show-toplevel` and
-// returns a worktree's own root unchanged, not its main checkout) is the
-// one helper that actually resolves via `--git-common-dir` the way this
-// needs.
-// tsk-5tm D9: delegates to `resolveTierModel` (the one canonical tier->model
-// resolver) to read `modelPolicies.claude`.
-// directly (this function's pre-D9 shape) meant a `modelPolicies`-only
-// config -- the shape this repo's OWN committed `.fgos/config.json` now
-// uses -- would silently fall through to DEFAULT_MODELS below with no
-// error, hiding any real customization to `modelPolicies.claude`.
-// Exported for a real integration test (tsk-5tm) -- previously this
-// function was module-private, its own root resolution not injectable, and
-// untested; the exact blind spot that let it silently keep reading the
-// legacy `models` shape unnoticed. `mainCheckoutRootOverride` is test-only
-// (every real call site omits it, resolving exactly as before).
-export function readRunnerModels(mainCheckoutRootOverride) {
-  const mainCheckoutRoot = mainCheckoutRootOverride ?? resolveMainCheckoutRoot(REPO_ROOT) ?? REPO_ROOT;
-  const cfg = readSharedConfig(mainCheckoutRoot);
-  const runnerCfg = cfg.runner ?? {};
-  const models = {};
-  for (const rigor of RIGOR_VALUES) {
-    const tier = runnerCfg.rigorToTier?.[rigor] ?? DEFAULT_RIGOR_TO_TIER[rigor];
-    try {
-      models[rigor] = resolveTierModel(runnerCfg, tier);
-    } catch {
-      models[rigor] = DEFAULT_MODELS[rigor];
-    }
-  }
-  return models;
-}
 
 function assertPlatformAgnostic(name, text) {
   const lower = text.toLowerCase();
@@ -176,17 +132,21 @@ export function findAgentYamlFiles(repoRoot) {
 }
 
 /** Pure: source yaml text -> generated adapter markdown text. */
-export function projectAgentMarkdown(name, sourceYamlText, models, sourcePath = `agents/${name}.yaml`) {
+/**
+ * The generated adapter names no model: a persona's `rigor` says how careful it is (checker count,
+ * independence), never how strong a model it needs, and the model a seat runs is Seat Binding's answer
+ * for the project's config. The agent inherits the model of the session that runs it.
+ */
+export function projectAgentMarkdown(name, sourceYamlText, sourcePath = `agents/${name}.yaml`) {
   const def = parseYaml(sourceYamlText, { filename: sourcePath });
   assertPlatformAgnostic(name, sourceYamlText);
   validateDefinition(name, def);
 
-  const model = models[def.rigor];
   const tools = def['tool-scope'].join(', ');
 
   // skills (tsk-397 D20): OPTIONAL -- declared capabilities of this agent-type
   // used for eligibility matching against a task-spec's requires-skill.
-  const frontmatterLines = ['---', `name: ${def.name}`, `description: ${def.description}`, `model: ${model}`, `tools: ${tools}`];
+  const frontmatterLines = ['---', `name: ${def.name}`, `description: ${def.description}`, `tools: ${tools}`];
   if (Array.isArray(def.skills) && def.skills.length > 0) {
     frontmatterLines.push(`skills: [${def.skills.join(', ')}]`);
   }
@@ -278,7 +238,6 @@ function main() {
     return;
   }
 
-  const models = readRunnerModels();
   fs.mkdirSync(TARGET_DIR, { recursive: true });
 
   for (const file of agentFiles) {
@@ -286,7 +245,7 @@ function main() {
     const def = parseYaml(sourceYamlText, { filename: file.filePath });
     const name = def?.name ?? file.name;
     const relPath = path.relative(REPO_ROOT, file.filePath);
-    const markdown = projectAgentMarkdown(name, sourceYamlText, models, relPath);
+    const markdown = projectAgentMarkdown(name, sourceYamlText, relPath);
     fs.writeFileSync(path.join(TARGET_DIR, `${name}.md`), markdown, 'utf8');
     console.log(`projected ${relPath} -> .claude/agents/${name}.md`);
   }

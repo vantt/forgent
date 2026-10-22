@@ -14,6 +14,10 @@ Template layer: follow the loop in [plan.md](plan.md#the-per-layer-loop).
 
 Spec [run-supervisor](../../docs/platform/run-supervisor/spec.md) (supervisor, gate, adopt door); [component-boundary](../../docs/platform/component-boundary.md) rows Run Supervisor and Launch gate; [audit 09-28](../reports/audit-260928-2318-dispatch-engine-stability-speed-simplicity-report.md) S1–S7 (re-verify, many sites moved); [TEST plan](../261020-1757-test-governance-port-inventory-and-slow-file-extraction/plan.md) phase 2 run-supervisor row (143 Node tests in 23 files vs 136 Rust).
 
+## Received from other lanes (record here, never lose)
+
+- **R5: seat launch cost (TEST → HARDEN T4, 2026-10-22 00:44).** Each real seat launch through the host costs ≈ 1.2 s: host supervisor, bwrap, two Node child processes for `attempt-step` (`src/run-supervisor/attempt-step.mjs`, 150–250 ms each) and ≈ 15 confined git calls. 466 launches across `run`, `workflow-runner`, `run-provider-failover`, `advisory-m-contracts`, `units-runner`, `playbook-observable-order` tests (411 at best without losing proofs); the seat path blocks the event loop, so in-file concurrency gives nothing (44 s vs 42 s). TEST's estimate: `attempt-step` in-process or in the host (Rust `packages/run-supervisor/rust/src/attempt_step.rs` already exists) cuts each seat-running file by ≈ 25–35% and the user's unit cost too. T4 council measures it and decides the shape; the confined git share is R2 (T2). Evidence: [TEST phase 3 exec report](../reports/phase-lead-261021-2137-test-governance-p3-exec.md), main `b9e354f15`.
+
 ## Components, crates, Node
 
 | Component | Rust | Node around it |

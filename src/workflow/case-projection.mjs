@@ -10,6 +10,7 @@
 
 import { normalizeGuide } from './guide-schema.mjs';
 import { projectWorkflowState } from './store.mjs';
+import { seatKeyOf, isVerdictResult, isVerifyResult } from '../runner/execution/legacy-seat-read.mjs';
 
 /** Event kinds a case adds to the ledger, beside the step events a playbook already writes. */
 export const CASE_EVENT_KINDS = Object.freeze(['case.opened', 'binding', 'route', 'reservation', 'settle', 'gate.answer', 'case.closed']);
@@ -239,10 +240,10 @@ export function projectCase(events, { currentDigests = {} } = {}) {
 export function receiptsFromResults({ unitRunId, results = [], milestone = null, subjectDigest = null }) {
   const receipts = [];
   for (const result of results) {
-    const role = String(result?.role ?? '');
-    if (/^verif(y|ier)$/.test(role) && result.outcome === 'pass') {
+    const role = String(seatKeyOf(result) ?? '');
+    if (isVerifyResult(result) && result.outcome === 'pass') {
       receipts.push({ kind: 'verify', evaluator: 'harness-verify', passed: true, unitRunId, role, milestone, subjectDigest });
-    } else if (/^(reviewer|red-team|checker)/.test(role) && ['pass', 'findings'].includes(result.outcome)) {
+    } else if (isVerdictResult(result) && ['pass', 'findings'].includes(result.outcome)) {
       receipts.push({ kind: 'verdict', evaluator: 'reviewer-verdict', passed: result.outcome === 'pass', unitRunId, role, milestone, subjectDigest });
     }
   }

@@ -34,6 +34,11 @@ steps:
         template:
           capability: business:perspectives
           pattern: panel
+          seats:
+            - { seat: member-1, role: producer }
+            - { seat: member-2, role: producer }
+            - { seat: member-3, role: producer }
+            - { seat: synthesis, role: synthesizer }
           blind: true
           objective: Analyze strategic problem from multiple independent business angles (product, finance, customer)
   - id: critique

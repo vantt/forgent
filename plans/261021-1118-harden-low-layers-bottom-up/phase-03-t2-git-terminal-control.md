@@ -18,6 +18,7 @@ Specs: [git](../../docs/platform/git/spec.md) (§12 one-door gate, §15 E6 test 
 ## Received from other lanes (record here, never lose)
 
 - **R2: contained git cost (TEST runner lead, 2026-10-21 23:10).** Every Rust git-port command runs under `bwrap --unshare-pid --as-pid-1 --dev-bind / /`; 10 `addWorktreeSync` calls = 218 bwrap + 249 git execs, ≈ 0.5 s per worktree add against ≈ 20 ms for a plain `git worktree add`. Users pay it on every worktree add; it is the main cost of the runner test area. Same root as ledger H6 (now an input row of the OPC design, `plans/reports/design-261020-1035-operation-scoped-containment.md`). The T2 Git council owns it together with the GIT lane's OPC design: decide which git calls need a pid namespace, and whether one containment domain per typed operation replaces one bwrap per git child. Evidence: `plans/reports/phase-lead-261021-2137-test-governance-p3-runner.md` §4.
+  - **When R2 lands, ping TEST** (`forgent-f8`, or whoever owns TEST then): the owner cut `test/runner/worktree-admin-multiprocess.test.mjs` from 8 × 20 to 8 × 5 rounds (`ROUNDS`) until contained git is cheap; TEST plan row W2 (`plans/261020-1757-…/plan.md`) puts it back to 20. Recorded 2026-10-22 07:58.
 
 ## Components, crates, Node
 

@@ -149,7 +149,7 @@ function runnerConfigFor(executorScript) {
   return confinedRunnerConfig({
     executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'], providerModel: 'claude' },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 15000,
   });
 }

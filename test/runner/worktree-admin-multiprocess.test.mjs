@@ -47,18 +47,22 @@ function addingChild(root, base, tag, count) {
   return new Promise((resolve) => child.once('exit', (code) => resolve({ code, stderr })));
 }
 
-test('8 processes adding worktrees for 20 rounds leave every worktree registered and intact', { skip, timeout: 240000 }, async () => {
+// Each worktree add runs git inside bwrap (about 0.5 s), so 20 rounds cost 70-90 s. 5 rounds keep
+// 8 real processes racing for the worktree-admin lock; go back to 20 once contained git is cheap.
+const ROUNDS = 5;
+
+test(`8 processes adding worktrees for ${ROUNDS} rounds leave every worktree registered and intact`, { skip, timeout: 240000 }, async () => {
   const { root, git } = tempRepo();
   const base = path.join(root, 'wts');
   fs.mkdirSync(base);
-  const results = await Promise.all(Array.from({ length: 8 }, (_, n) => addingChild(root, base, `p${n}`, 20)));
+  const results = await Promise.all(Array.from({ length: 8 }, (_, n) => addingChild(root, base, `p${n}`, ROUNDS)));
   for (const r of results) assert.equal(r.code, 0, r.stderr);
   const listed = git('worktree', 'list', '--porcelain').stdout.split('\n').filter((l) => l.startsWith('worktree '));
-  assert.equal(listed.length, 1 + 8 * 20);
+  assert.equal(listed.length, 1 + 8 * ROUNDS);
   const fsck = git('worktree', 'list');
   assert.equal(fsck.status, 0, fsck.stderr);
-  assert.equal(fs.readdirSync(path.join(root, '.git', 'worktrees')).length, 8 * 20);
-  assert.equal(git('branch', '--list', 'fgw/*').stdout.trim().split('\n').length, 8 * 20);
+  assert.equal(fs.readdirSync(path.join(root, '.git', 'worktrees')).length, 8 * ROUNDS);
+  assert.equal(git('branch', '--list', 'fgw/*').stdout.trim().split('\n').length, 8 * ROUNDS);
 });
 
 test('a process holding main does not block addWorktree, and worktree-admin does not block main', { skip }, async () => {

@@ -18,6 +18,12 @@ export const EXECUTION_STATUSES = Object.freeze(['completed', 'failed', 'cancell
 export const ASSESSMENT_VERDICTS = Object.freeze(['pass', 'findings', 'blocked', 'inconclusive', 'not-applicable']);
 export const CONFIDENCE_LEVELS = Object.freeze(['verified', 'reported', 'inferred', 'no-evidence', 'failed']);
 export const FAILURE_FAMILIES = Object.freeze(['provider', 'resource', 'contract', 'policy', 'external-interference', 'unknown']);
+/**
+ * The failure code a run settles with when its lease was refused because the account Seat Binding named
+ * could not be taken. Any other capacity refusal settles as `provider-capacity-refused`; a record written
+ * before this code existed keeps that one.
+ */
+export const LEASE_CONFLICT_FAILURE_CODE = 'provider-capacity-lease-conflict';
 export const POLICY_DISPOSITIONS = Object.freeze(['allow', 'refuse', 'needs-input', 'not-applicable']);
 export const DELIVERY_MODES = Object.freeze(['fresh', 'resumed', 'replayed', 'recovered', 'legacy-derived']);
 export const PROVENANCE_VALUES = Object.freeze(['native-v2', 'native-v3', 'native-v4', 'legacy-derived', 'contract-corrupt']);

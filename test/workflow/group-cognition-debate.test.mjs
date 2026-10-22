@@ -48,10 +48,10 @@ test('group-cognition debate step: both sides argue, answer each other, and an i
   assert.equal(state.status, 'completed');
   const unit = debateUnit(state);
   assert.equal(unit.outcome, 'pass');
-  const seats = unit.results.map((r) => `${r.role}/${r.round ?? 1}`).sort();
+  const seats = unit.results.map((r) => `${r.seat}/${r.round ?? 1}`).sort();
   assert.deepEqual(seats, ['antithesis/1', 'antithesis/2', 'judge/1', 'thesis/1', 'thesis/2']);
 
-  const families = (role) => new Set(unit.results.filter((r) => r.role === role).map((r) => familyOf(root, r)));
+  const families = (role) => new Set(unit.results.filter((r) => r.seat === role).map((r) => familyOf(root, r)));
   const [judgeFamily] = families('judge');
   assert.ok(!families('thesis').has(judgeFamily), 'the judge differs in family from the thesis side');
   assert.ok(!families('antithesis').has(judgeFamily), 'the judge differs in family from the antithesis side');
@@ -82,7 +82,7 @@ test('group-cognition debate step: a pool of two families cannot seat an indepen
   const unit = debateUnit(state);
   assert.notEqual(state.status, 'completed');
   assert.equal(unit.outcome, 'policy-refusal');
-  const judge = unit.results.find((r) => r.role === 'judge');
-  assert.equal(judge.refused?.reason ?? judge.runResult?.refused?.reason, 'independence');
+  const judge = unit.results.find((r) => r.seat === 'judge');
+  assert.equal(judge.refused?.reason ?? judge.runResult?.refused?.reason, 'independence-unsatisfiable');
   assert.equal(state.steps['action-synthesis'].units['synthesize-action'], undefined, 'no synthesis runs on an unruled debate');
 });

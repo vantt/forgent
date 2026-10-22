@@ -1,5 +1,5 @@
 // dispatch/resolve.mjs — unit -> executor -> model/tier/command resolution
-// (D7, tsk-2uf-1): `resolveTierModel`, the purpose/executorId resolution chain
+// (D7, tsk-2uf-1): the purpose/executorId resolution chain
 // (`resolveExecutorAndOverrides`), and
 // `resolveExecutorConfig` (the executor-block resolve + cross-provider
 // governance gate `dispatch/transport.mjs`'s `resolveExecutorCommand`
@@ -9,8 +9,7 @@
 // barrel. See `docs/history/dispatch-activation-and-handoff-redesign/
 // CONTEXT.md` D7 for the split rationale.
 
-import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, MODEL_POLICY_TIERS, normalizePreferCandidates } from './config.mjs';
-import { parseTierCell } from './tier-cell.mjs';
+import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, normalizePreferCandidates } from './config.mjs';
 import { credentialStoreOf } from './provider-capacity.mjs';
 
 /**
@@ -131,57 +130,9 @@ export function resolveCapabilityDetailsFromHints({
   return { capability, anchorCapability };
 }
 
-/**
- * Every entry of the cell cfg.modelPolicies[provider][tier], in order, as
- * `{model, pool, explicitPool}` (see `parseTierCell`), whichever pool serves
- * them: each is a candidate of the seat's walk.
- * Valid tiers: nano | mini | standard | advanced | flagship | frontier.
- */
-export function resolveTierCandidates(cfg, tier, provider = 'claude') {
-  if (!MODEL_POLICY_TIERS.includes(tier)) {
-    throw new RunnerConfigError(`unrecognized tier "${tier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
-  }
-  const policies = cfg && cfg.modelPolicies;
-  if (!policies || typeof policies !== 'object') {
-    throw new RunnerConfigError(`no modelPolicies configured.`);
-  }
-  const providerPolicy = policies[provider];
-  if (!providerPolicy || typeof providerPolicy !== 'object') {
-    throw new RunnerConfigError(`no modelPolicies configured for provider "${provider}".`);
-  }
-  const cell = providerPolicy[tier];
-  if (cell === undefined) {
-    throw new RunnerConfigError(`no model configured for tier "${tier}" under provider "${provider}".`);
-  }
-  try {
-    return parseTierCell(cell, provider);
-  } catch (err) {
-    throw new RunnerConfigError(`no model configured for tier "${tier}" under provider "${provider}": ${err.message}.`);
-  }
-}
-
 /** What a seat that needs a model is told when its family has no cell at the tier it runs at. */
 export function tierCellMissingDetail(family, tier) {
   return `no model for tier "${tier}" under family "${family}" (runner.modelPolicies.${family}.${tier})`;
-}
-
-/**
- * The families `cfg.tierFallback.<tier>` declares as the walk order for a seat that failed at `tier`, or
- * null when the tier declares none (the walk then follows the capability's `prefer` order).
- */
-export function tierFallbackOf(cfg, tier) {
-  const families = cfg?.tierFallback?.[tier];
-  return Array.isArray(families) ? [...families] : null;
-}
-
-/**
- * Resolve a tier to the model name the provider family runs first: the model of the first entry of
- * cfg.modelPolicies[provider][tier], whichever pool serves it (the primary candidate of the seat's
- * walk). Callers that need the pool, or whether the pool can serve the call, read the candidates:
- * bind() expands every entry and drops the ones whose pool is unusable.
- */
-export function resolveTierModel(cfg, tier, provider = 'claude') {
-  return resolveTierCandidates(cfg, tier, provider)[0].model;
 }
 
 /**
@@ -190,7 +141,7 @@ export function resolveTierModel(cfg, tier, provider = 'claude') {
  * then a Claude-CLI-command inference, then the resolved command literal
  * itself. Extracted (pure move, byte-identical for every existing caller)
  * from `resolveExecutorConfig`'s own inline derivation below so a second
- * caller (`assignment-policy.mjs`'s pre-spawn policy resolution, which has
+ * caller (the dispatch policy's pre-spawn policy resolution, which has
  * no resolved `executor.command` yet) reads the SAME rule instead of a
  * third, independently-drifting copy of it — `resolvedCommand` defaults to
  * `'claude'` for that caller, which resolves through the

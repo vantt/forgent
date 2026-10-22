@@ -162,7 +162,7 @@ test('the registered check reads the project config and the overridden HOME, nev
   try {
     const dir = codexHome(fixture.home, '.codex-reg');
     fs.mkdirSync(path.join(fixture.project, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(fixture.project, '.fgos', 'config.json'), JSON.stringify({ runner: { executor: { command: 'claude', args: [] }, timeoutMs: 1000, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, modelPolicies: { openai: { nano: 'm', mini: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' } }, executors: { openai: { kind: 'agent', providerModel: 'openai', invocations: [{ id: 'codex-cli', via: 'cli', command: 'codex', args: [], env: { CODEX_HOME: dir } }] } } } }));
+    fs.writeFileSync(path.join(fixture.project, '.fgos', 'config.json'), JSON.stringify({ runner: { executor: { command: 'claude', args: [] }, timeoutMs: 1000, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, modelPolicies: { openai: { nano: 'm', mini: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' } }, executors: { openai: { kind: 'agent', providerModel: 'openai', invocations: [{ id: 'codex-cli', via: 'cli', command: 'codex', args: [], env: { CODEX_HOME: dir } }] } } } }));
     process.env.HOME = fixture.home;
     const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-cli-project-trusted');
     const result = entry.check(fixture.project);

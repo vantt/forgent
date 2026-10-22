@@ -12,7 +12,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
-import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { bindableExecute } from '../helpers/work-seat-config.mjs';
+const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { runOutcome } from '../../src/runner/dispatch/run-result.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { interpretAssignmentRunResult } from '../../src/runner/operation-choice.mjs';
@@ -72,7 +74,7 @@ function fixture() {
   const runner = {
     executor: { command: process.execPath, args: [script, '{prompt}'], allowCrossProvider: true },
     modelPolicies: { fake: { standard: 'fake-standard' }, claude: { standard: 'fake-standard' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 20000,
     executors: {
       fake: {
@@ -189,7 +191,7 @@ process.stdout.write('reviewed\\n');
     const runnerConfig = {
       executor: { allowCrossProvider: true, command: process.execPath, args: [script, '{prompt}'] },
       modelPolicies: { claude: { standard: 'test-model' } },
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
       timeoutMs: 20000,
     };
     const assignment = buildAssignment({ workId: 'tsk-stray-commit', stage: 'planning', operation: 'validate-plan' });
@@ -265,7 +267,7 @@ process.stdout.write('reviewed\\n');
     const runnerConfig = {
       executor: { allowCrossProvider: true, command: process.execPath, args: [script, '{prompt}'] },
       modelPolicies: { claude: { standard: 'test-model' } },
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
       timeoutMs: 20000,
     };
     const assignment = buildAssignment({ workId: 'tsk-stray-asgn', stage: 'planning', operation: 'validate-plan' });

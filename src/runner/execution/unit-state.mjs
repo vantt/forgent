@@ -22,7 +22,7 @@ export function currentAttemptOf(assignmentsDir, assignmentId) {
   return fs.existsSync(dir) ? { dir, runId: current.runId } : null;
 }
 
-/** The last attempt recorded for each role/round of a unit record. */
+/** The last attempt recorded for each seat/round of a unit record. */
 export function lastAttempts(unitRecord) {
   return Object.values(unitRecord.bindings ?? {}).map((attempts) => attempts[attempts.length - 1]).filter(Boolean);
 }

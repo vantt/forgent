@@ -84,7 +84,7 @@ function setupRepo({ capabilities } = {}) {
   const pool = { prefer: [{ executor: 'fake' }], rigor: 'standard' };
   const runner = {
     defaultExecutor: 'fake',
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { node: { nano: 'node-nano', standard: 'node-std', flagship: 'node-flagship', frontier: 'node-frontier' } },
     executors: { fake: executor },
     capabilities: capabilities ?? { review: pool, 'coding:review': pool, implement: pool, 'code:implement': pool },
@@ -280,7 +280,7 @@ test('stopped, human-only and direct-stage-skill choices never spawn a unit', as
   assert.equal(fs.existsSync(path.join(repo, '.fgos', 'assignments')), false);
 });
 
-test('rigor: each Work source reaches the assignment policy and is never lowered', async () => {
+test('rigor: each Work source reaches the unit as a rigor demand, is never lowered, and never moves the tier', async () => {
   const cases = [
     { name: 'work.rigor high', extra: { rigor: 'high' }, expect: 'high' },
     { name: 'risk heavy without rigor', extra: { risk: 'heavy' }, expect: 'high' },
@@ -294,8 +294,8 @@ test('rigor: each Work source reaches the assignment policy and is never lowered
     assert.equal(unitJson(repo, outcome.unitRunId).unit.rigor, c.expect, c.name);
     const asgn = JSON.parse(fs.readFileSync(path.join(repo, '.fgos', 'assignments', outcome.unitRunId, 'producer', '1', 'assignment.json'), 'utf8'));
     assert.equal(asgn.policy.rigor, c.expect, c.name);
-    const tier = runner.rigorToTier[c.expect];
-    assert.equal(asgn.policy.tier, tier, c.name);
+    // Rigor sets checkers and independence; the tier is the config's, so a high rigor binds the default tier.
+    assert.equal(asgn.policy.tier, runner.defaults.tier, c.name);
   }
 });
 
@@ -466,7 +466,7 @@ test('a resumed declared unit keeps its stored pattern, never the caller pattern
     pattern: { pattern: 'reviewed' },
     repoRoot: repo, cwd: repo, worktree: repo, session: { headless: true, herdrPresent: false },
   });
-  assert.deepEqual(resumed.results.map((r) => r.role).filter((r) => r !== 'producer'), []);
+  assert.deepEqual(resumed.results.map((r) => r.seat).filter((r) => r !== 'producer'), []);
   assert.equal(unitJson(repo, first.unitRunId).pattern, 'solo');
 });
 

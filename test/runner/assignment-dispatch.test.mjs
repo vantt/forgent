@@ -8,8 +8,10 @@ import crypto from 'node:crypto';
 import { execSync, execFileSync, execFile, spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import { executeAssignment, commitRunSettlement, settleRunOutcome, resolveWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { RunnerConfigError, DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch/config.mjs';
+import { executeAssignment as executeAssignmentRaw, commitRunSettlement, settleRunOutcome, resolveWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { bindable, bindableExecute } from '../helpers/work-seat-config.mjs';
+const executeAssignment = bindableExecute(executeAssignmentRaw);
+import { RunnerConfigError, FRESH_PROJECT_RUNNER_CONFIG } from '../../src/runner/dispatch/config.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { acquireRunControl, releaseRunControl } from '../../src/runner/dispatch/run-lock.mjs';
@@ -135,7 +137,7 @@ test('executeAssignment executes non-mutating validate-plan assignment through f
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const work = { id: 'tsk-test-1', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({
@@ -165,7 +167,7 @@ test('executeAssignment captures stderr and nonzero exit code as failed result w
   const tempDir = mkTempDir();
   const executorScript = writeFailingExecutor(tempDir, 2);
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const work = { id: 'tsk-test-fail', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({
@@ -194,7 +196,7 @@ test('executeAssignment captures timeout with partial stdout and writes failed R
   const tempDir = mkTempDir();
   const executorScript = writeHangingExecutor(tempDir);
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 500 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 500 };
 
   const work = { id: 'tsk-test-timeout', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({
@@ -272,7 +274,7 @@ test('compileDispatchPlan produces selector.type: "assignment" and resolves exec
     operation: 'validate-plan',
   });
 
-  const plan = compileDispatchPlan(cfg, {
+  const plan = compileDispatchPlan(bindable(cfg), {
     assignment: assignment.assignmentId,
     assignmentItem: assignment,
   });
@@ -301,7 +303,7 @@ test('decideExecutorCli resolves dispatch plan for an assignment', async () => {
   // a machine without one (a CI runner) cannot satisfy.
   fs.writeFileSync(
     path.join(tempDir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: structuredClone(DEFAULT_RUNNER_CONFIG) }, null, 2),
+    JSON.stringify({ runner: bindable(structuredClone(FRESH_PROJECT_RUNNER_CONFIG)) }, null, 2),
   );
 
   const decided = await decideExecutorCli(undefined, {
@@ -340,7 +342,7 @@ test('compileDispatchPlan and executeAssignment respect cliOverride.preferExecut
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
-  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   timeoutMs: 5000, };
 
   const assignment = buildAssignment({
@@ -483,7 +485,7 @@ test('read-only assignment whose checkout gains a commit during the run is accep
     command: process.execPath,
     args: [executorScript, '{prompt}'],
     allowCrossProvider: true,
-  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, };
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, };
 
   const runResult = await executeAssignment(assignment, {
     cwd: tempDir,
@@ -550,6 +552,7 @@ test('provider capacity selection happens after Run admission, records redacted 
     cwd: tempDir,
     repoRoot: tempDir,
     runnerConfig,
+    cliOverride: { leaseAccount: 'tetcu72' },
     providerCapacityRuntimeDir: runtimeDir,
   });
 
@@ -624,8 +627,7 @@ test('provider capacity refusal after Run admission settles the attempt (never a
 
   // Pre-seed the ONE declared account as already quarantined (manual-clear,
   // no expiry) so real selection logic genuinely refuses -- not a stubbed
-  // refusal, the actual rankProviderAccounts/acquireProviderAccountLease
-  // path this test exercises end to end.
+  // refusal, the actual acquireNamedAccountLease path this test exercises end to end.
   const { statePath } = providerCapacityStatePaths(runtimeDir);
   fs.mkdirSync(path.dirname(statePath), { recursive: true });
   fs.writeFileSync(statePath, JSON.stringify({
@@ -647,6 +649,7 @@ test('provider capacity refusal after Run admission settles the attempt (never a
     cwd: tempDir,
     repoRoot: tempDir,
     runnerConfig,
+    cliOverride: { leaseAccount: 'tetcu72' },
     providerCapacityRuntimeDir: runtimeDir,
   });
 
@@ -654,7 +657,7 @@ test('provider capacity refusal after Run admission settles the attempt (never a
   assert.equal(result.status, 'failed');
   assert.equal(result.classification.execution.status, 'failed');
   assert.equal(result.classification.failure.family, 'provider');
-  assert.equal(result.classification.failure.code, 'provider-capacity-refused');
+  assert.equal(result.classification.failure.code, 'provider-capacity-lease-conflict');
   assert.match(result.classification.failure.message, /provider capacity refused/);
   // "needs-input" -- not a terminal contract violation -- matches the
   // bounded settle-and-reattempt spirit: a caller may retry with
@@ -673,14 +676,8 @@ test('provider capacity refusal after Run admission settles the attempt (never a
   assert.equal(fs.existsSync(codex.argvCapturePath), false, 'a refused account must never let the worker actually spawn');
 });
 
-// Phase B (plans/260917-executor-profile-schema-migration/plan.md): real
-// cross-provider PlacementPolicy fallback in production dispatch, wired
-// via dispatch/recovery.mjs's `resolveFallback` into the exact
-// provider-capacity-refused branch the H2 test above proves settles
-// cleanly. Each test below shares that same two-provider fixture shape
-// (`claude` primary / `codex-bwrap` fallback, each its own provider),
-// varying only which accounts are pre-quarantined and which
-// `fallbackExecutors` are declared.
+// A two-provider fixture shape (`claude` / `codex-bwrap`, each its own provider and account), varying only
+// which accounts are pre-quarantined. A launch names the account it leases (`cliOverride.leaseAccount`).
 function buildFallbackFixture(tempDir, { primaryQuarantined, fallbackQuarantined, secondFallbackQuarantined = null } = {}) {
   const claudeExecutor = writeArgvRecordingExecutor(tempDir, 'claude-fallback-primary');
   const codexExecutor = writeArgvRecordingExecutor(tempDir, 'codex-fallback-candidate');
@@ -727,147 +724,6 @@ function buildFallbackFixture(tempDir, { primaryQuarantined, fallbackQuarantined
   }));
   return { claudeExecutor, codexExecutor, runnerConfig, runtimeDir };
 }
-
-test('Phase B: no fallbackExecutors declared -> byte-identical terminal provider-capacity-refused settlement (regression guard)', async () => {
-  const tempDir = mkTempDir();
-  const { runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
-
-  const work = { id: 'tsk-fallback-none-declared', status: 'todo', workflowStep: 'planning', domain: 'coding' };
-  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
-  const result = await executeAssignment(assignment, {
-    cwd: tempDir,
-    repoRoot: tempDir,
-    runnerConfig,
-    providerCapacityRuntimeDir: runtimeDir,
-    // No cliOverride.fallbackExecutors at all.
-  });
-
-  assert.equal(result.classification.failure.code, 'provider-capacity-refused');
-  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
-  const runMeta = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
-  assert.equal(runMeta.executorId, 'claude', 'executorId must stay the primary -- no fallback was ever declared');
-  assert.equal(runMeta.fallback, undefined, 'run.json must carry no fallback field at all when nothing was declared');
-  const evidence = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
-  assert.equal(evidence.fallback, undefined, 'evidence.json must carry no fallback field at all when nothing was declared');
-});
-
-test('Phase B: a declared fallback with real capacity is actually dispatched, evidenced, and the primary account is untouched', async () => {
-  const tempDir = mkTempDir();
-  const { claudeExecutor, codexExecutor, runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
-
-  const work = { id: 'tsk-fallback-selected', status: 'todo', workflowStep: 'planning', domain: 'coding' };
-  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
-  const result = await executeAssignment(assignment, {
-    cwd: tempDir,
-    repoRoot: tempDir,
-    runnerConfig,
-    providerCapacityRuntimeDir: runtimeDir,
-    cliOverride: { fallbackExecutors: ['codex-bwrap'] },
-  });
-
-  // Dispatch proceeded -- this is NOT a provider-capacity-refused terminal
-  // settlement, the worker actually ran against the fallback.
-  assert.notEqual(result.classification?.failure?.code, 'provider-capacity-refused');
-  assert.equal(fs.existsSync(codexExecutor.argvCapturePath), true, 'the fallback worker must actually have spawned');
-  assert.equal(fs.existsSync(claudeExecutor.argvCapturePath), false, 'the refused primary must never spawn');
-
-  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
-  const runMeta = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
-  assert.equal(runMeta.executorId, 'codex-bwrap');
-  assert.equal(runMeta.fallback.declaredPrimary, 'claude');
-  assert.equal(runMeta.fallback.resolved, 'codex-bwrap');
-  assert.equal(runMeta.fallback.reasonCode, 'provider-capacity-refused');
-
-  const dispatchPlan = JSON.parse(fs.readFileSync(path.join(runDir, 'dispatch-plan.json'), 'utf8'));
-  assert.equal(dispatchPlan.executorId, 'codex-bwrap');
-  assert.equal(dispatchPlan.provenance?.executor?.source?.scope, 'fallback', 'the scoped plan must honestly record it was resolved via the fallback path, not cliOverride');
-
-  const computedDigest = `sha256:${crypto.createHash('sha256').update(fs.readFileSync(path.join(runDir, 'dispatch-plan.json'), 'utf8').trimEnd()).digest('hex')}`;
-  // run.json's dispatchPlanDigest must agree with the SAME formula the
-  // runner itself used (JSON.stringify of the in-memory plan object, not a
-  // digest of the file bytes -- re-derive via the object to avoid a
-  // whitespace-sensitive false failure).
-  const rederivedDigest = `sha256:${crypto.createHash('sha256').update(JSON.stringify(dispatchPlan)).digest('hex')}`;
-  assert.equal(runMeta.dispatchPlanDigest, rederivedDigest, 'run.json.dispatchPlanDigest must match the persisted dispatch-plan.json -- confinement prep cross-checks this and throws on any mismatch');
-
-  const capacity = inspectProviderCapacity({ runnerConfig, runtimeDir });
-  assert.deepEqual(capacity.providers.claude.accounts['claude-acct'].openLeases, [], 'the refused primary account must never receive a lease');
-  assert.deepEqual(capacity.providers['openai-codex'].accounts['codex-acct'].openLeases, [], 'the fallback lease must be released after settlement (finally-block release keyed by the CURRENT providerCapacitySelection)');
-});
-
-test('Phase B: every declared candidate governance-refused or unresolvable -> falls through to terminal settlement, never a bare throw', async () => {
-  const tempDir = mkTempDir();
-  const { runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
-
-  const work = { id: 'tsk-fallback-all-refused', status: 'todo', workflowStep: 'planning', domain: 'coding' };
-  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
-  const result = await executeAssignment(assignment, {
-    cwd: tempDir,
-    repoRoot: tempDir,
-    runnerConfig,
-    providerCapacityRuntimeDir: runtimeDir,
-    cliOverride: { fallbackExecutors: ['codex-bwrap'] },
-    options: { disallowedExecutors: ['codex-bwrap'] },
-  });
-
-  assert.equal(result.classification.failure.code, 'provider-capacity-refused', 'must still settle as terminal, never throw');
-  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
-  const runMeta = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
-  assert.equal(runMeta.executorId, 'claude', 'executorId stays the primary -- the fallback was never adopted');
-  const evidence = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
-  assert.equal(evidence.fallback.declaredPrimary, 'claude');
-  assert.equal(evidence.fallback.skippedCandidates.length, 1);
-  assert.equal(evidence.fallback.skippedCandidates[0].executorId, 'codex-bwrap');
-  // 'compiler-mismatch', not 'candidate-not-governed': the candidate IS a
-  // declared executorPreference entry (resolveFallback's own
-  // "never-declared" bucket), it is the disallowedExecutors governance
-  // check INSIDE the real compileDispatchPlan() recompilation that refuses
-  // it -- proving the exact same governance re-admission this phase's own
-  // design argument (recovery.mjs's resolveFallback is a strict superset
-  // of placement-policy.mjs's disallowed-provider/executor checks) relies on.
-  assert.equal(evidence.fallback.skippedCandidates[0].reasonCode, 'compiler-mismatch');
-});
-
-test('Phase B: bounded to exactly one capacity attempt -- a second declared candidate with real capacity is never tried', async () => {
-  const tempDir = mkTempDir();
-  const { runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: true });
-  const thirdExecutor = writeArgvRecordingExecutor(tempDir, 'third-fallback-candidate');
-  runnerConfig.executors['pi-fallback'] = {
-    command: process.execPath,
-    args: [thirdExecutor.scriptPath, '{prompt}', '--model', '{model}'],
-    providerModel: 'test-provider-c',
-    kind: 'agent',
-    allowCrossProvider: true,
-  };
-  runnerConfig.modelPolicies['test-provider-c'] = { standard: 'model-c-standard' };
-  runnerConfig.providers['test-provider-c'] = {
-    accounts: { 'pi-acct': { label: 'pi/third', credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'pi-home') } } },
-  };
-
-  const work = { id: 'tsk-fallback-bounded', status: 'todo', workflowStep: 'planning', domain: 'coding' };
-  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
-  const result = await executeAssignment(assignment, {
-    cwd: tempDir,
-    repoRoot: tempDir,
-    runnerConfig,
-    providerCapacityRuntimeDir: runtimeDir,
-    // Both declared fallback candidates are governed and compile clean;
-    // the FIRST (codex-bwrap) has its account quarantined too, the SECOND
-    // (pi-fallback) has real capacity -- but only the first is ever
-    // attempted; the second must never be leased.
-    cliOverride: { fallbackExecutors: ['codex-bwrap', 'pi-fallback'] },
-  });
-
-  assert.equal(result.classification.failure.code, 'provider-capacity-refused');
-  assert.equal(fs.existsSync(thirdExecutor.argvCapturePath), false, 'the never-attempted second fallback candidate must never spawn');
-  const capacity = inspectProviderCapacity({ runnerConfig, runtimeDir });
-  assert.deepEqual(capacity.providers['test-provider-c'].accounts['pi-acct'].openLeases, [], 'the never-attempted candidate must never receive a lease');
-
-  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
-  const evidence = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
-  assert.equal(evidence.fallback.attempted, 'codex-bwrap', 'exactly the first candidate must be the one whose capacity was attempted');
-  assert.equal(evidence.fallback.skippedCandidates.length, 0, 'the second candidate is never reached at all -- it is bounded-out, not skipped-for-cause');
-});
 
 // --- executor-id-consolidation Step 2: fallback confinement preservation --
 // a provider-capacity fallback substitution must never silently trade a
@@ -933,51 +789,7 @@ function buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocatio
   return { claudeExecutor, codexUnconfinedExecutor, codexConfinedExecutor, runnerConfig, runtimeDir };
 }
 
-test('Step 2: a fallback candidate with NO confined invocation at all is refused, never silently dispatched unconfined, when the primary was confined', async () => {
-  const tempDir = mkTempDir();
-  const { claudeExecutor, codexUnconfinedExecutor, runnerConfig, runtimeDir } = buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocation: false });
-
-  const work = { id: 'tsk-confinement-fallback-refused', status: 'todo', workflowStep: 'planning', domain: 'coding' };
-  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
-  await assert.rejects(
-    () => executeAssignment(assignment, {
-      cwd: tempDir,
-      repoRoot: tempDir,
-      runnerConfig,
-      providerCapacityRuntimeDir: runtimeDir,
-      cliOverride: { fallbackExecutors: ['codex-bwrap'] },
-    }),
-    (err) => {
-      assert.match(err.message, /fallback executor "codex-bwrap" has no confined invocation available/);
-      assert.match(err.message, /primary "claude"/);
-      return true;
-    },
-  );
-  assert.equal(fs.existsSync(codexUnconfinedExecutor.argvCapturePath), false, 'the unconfined fallback invocation must never spawn');
-  assert.equal(fs.existsSync(claudeExecutor.argvCapturePath), false, 'the quarantined primary must never spawn either');
-});
-
-test('Step 2: a fallback candidate WITH a confined invocation is dispatched through that confined invocation specifically, not its unconfined default', async () => {
-  const tempDir = mkTempDir();
-  const { claudeExecutor, codexUnconfinedExecutor, codexConfinedExecutor, runnerConfig, runtimeDir } = buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocation: true });
-
-  const work = { id: 'tsk-confinement-fallback-selected', status: 'todo', workflowStep: 'planning', domain: 'coding' };
-  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
-  const result = await executeAssignment(assignment, {
-    cwd: tempDir,
-    repoRoot: tempDir,
-    runnerConfig,
-    providerCapacityRuntimeDir: runtimeDir,
-    cliOverride: { fallbackExecutors: ['codex-bwrap'] },
-  });
-
-  assert.notEqual(result.classification?.failure?.code, 'provider-capacity-refused');
-  assert.equal(fs.existsSync(codexConfinedExecutor.argvCapturePath), true, 'the CONFINED invocation must be the one that actually spawned');
-  assert.equal(fs.existsSync(codexUnconfinedExecutor.argvCapturePath), false, 'the unconfined default invocation on the same executor must never spawn once confinement is required');
-  assert.equal(fs.existsSync(claudeExecutor.argvCapturePath), false, 'the quarantined primary must never spawn');
-});
-
-test('with a renewal function, a confined launch renews the login of the account actually provisioned, the executor-fallback account included', async () => {
+test('with a renewal function, a confined launch renews the login of the account actually provisioned, the account of an executor chosen by name included', async () => {
   const tempDir = mkTempDir();
   const { runnerConfig, runtimeDir } = buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocation: true });
   const calls = [];
@@ -988,12 +800,12 @@ test('with a renewal function, a confined launch renews the login of the account
     repoRoot: tempDir,
     runnerConfig,
     providerCapacityRuntimeDir: runtimeDir,
-    cliOverride: { fallbackExecutors: ['codex-bwrap'] },
+    cliOverride: { preferExecutor: 'codex-bwrap', preferInvocation: 'cli-bwrap', leaseAccount: 'codex-acct' },
     providerCredentialRenew: async (request) => { calls.push(request); return { status: 'fresh', reason: 'outside-window' }; },
   });
 
   assert.equal(calls.length, 1, 'renewed once, before the private home is built');
-  assert.equal(calls[0].provider, 'openai-codex', 'the fallback account, not the quarantined primary');
+  assert.equal(calls[0].provider, 'openai-codex', 'the account of the executor the launch named');
   assert.equal(calls[0].accountId, 'codex-acct');
   assert.equal(calls[0].runtimeDir, runtimeDir);
   assert.deepEqual(calls[0].credentialSource, { kind: 'codex-home', home: path.join(tempDir, 'codex-home') });
@@ -1012,7 +824,7 @@ test('a renewal that did not leave the login fresh is reported on stderr by code
         buildAssignment({ work: { id: `tsk-renew-report-${index}`, status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' }),
         {
           cwd: tempDir, repoRoot: tempDir, runnerConfig, providerCapacityRuntimeDir: runtimeDir,
-          cliOverride: { fallbackExecutors: ['codex-bwrap'] },
+          cliOverride: { preferExecutor: 'codex-bwrap', preferInvocation: 'cli-bwrap', leaseAccount: 'codex-acct' },
           providerCredentialRenew: async () => outcome,
         },
       );
@@ -1031,11 +843,11 @@ test('a renewal function that throws never fails the dispatch, and an unconfined
     buildAssignment({ work: { id: 'tsk-renew-throws', status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' }),
     {
       cwd: tempDir, repoRoot: tempDir, runnerConfig: confined.runnerConfig, providerCapacityRuntimeDir: confined.runtimeDir,
-      cliOverride: { fallbackExecutors: ['codex-bwrap'] },
+      cliOverride: { preferExecutor: 'codex-bwrap', preferInvocation: 'cli-bwrap', leaseAccount: 'codex-acct' },
       providerCredentialRenew: async () => { throw new Error('renewal exploded'); },
     },
   );
-  assert.notEqual(throwing.classification?.failure?.code, 'provider-capacity-refused');
+  assert.notEqual(throwing.classification?.failure?.code, 'provider-capacity-lease-conflict');
   assert.equal(fs.existsSync(confined.codexConfinedExecutor.argvCapturePath), true, 'the launch went on');
 
   const unconfinedDir = mkTempDir();
@@ -1045,47 +857,11 @@ test('a renewal function that throws never fails the dispatch, and an unconfined
     buildAssignment({ work: { id: 'tsk-renew-unconfined', status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' }),
     {
       cwd: unconfinedDir, repoRoot: unconfinedDir, runnerConfig: unconfined.runnerConfig, providerCapacityRuntimeDir: unconfined.runtimeDir,
+      cliOverride: { leaseAccount: 'claude-acct' },
       providerCredentialRenew: async () => { called += 1; return { status: 'fresh' }; },
     },
   );
   assert.equal(called, 0, 'no login is copied into an unconfined launch, so nothing is renewed for it');
-});
-
-test('Phase B: a resumed Run that already committed a fallback rehydrates the fallback, never recompiles the refused primary', async () => {
-  const tempDir = mkTempDir();
-  const { claudeExecutor, codexExecutor, runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
-
-  const work = { id: 'tsk-fallback-resume', status: 'todo', workflowStep: 'planning', domain: 'coding' };
-  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
-  const first = await executeAssignment(assignment, {
-    cwd: tempDir,
-    repoRoot: tempDir,
-    runnerConfig,
-    providerCapacityRuntimeDir: runtimeDir,
-    cliOverride: { fallbackExecutors: ['codex-bwrap'] },
-  });
-  assert.equal(first.executorId, 'codex-bwrap');
-
-  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
-  // Simulate a crash-then-resume: same runId/attempt, result.json/commands
-  // wiped as if the worker never got to settle, run.json (with its
-  // committed `fallback` field) and dispatch-plan.json survive untouched.
-  fs.rmSync(path.join(runDir, 'result.json'), { force: true });
-  fs.rmSync(path.join(runDir, 'controller'), { recursive: true, force: true });
-  fs.writeFileSync(path.join(runDir, 'agent-result.json'), '');
-  fs.rmSync(path.join(runDir, 'agent-result.json'), { force: true });
-
-  const resumed = await executeAssignment(assignment, {
-    cwd: tempDir,
-    repoRoot: tempDir,
-    runnerConfig,
-    providerCapacityRuntimeDir: runtimeDir,
-    cliOverride: { fallbackExecutors: ['codex-bwrap'] },
-  });
-
-  assert.equal(resumed.executorId, 'codex-bwrap', 'resume must rehydrate the fallback, never recompile/re-dispatch the refused primary');
-  const runMeta = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
-  assert.equal(runMeta.executorId, 'codex-bwrap');
 });
 
 test('tool executors bypass provider capacity selection even with matching provider accounts configured', async () => {
@@ -1123,6 +899,8 @@ test('tool executors bypass provider capacity selection even with matching provi
     cwd: tempDir,
     repoRoot: tempDir,
     runnerConfig,
+    // A tool executor is not an agent seat: Seat Binding chooses nothing for it, so the caller states the tier and model.
+    cliOverride: { tier: 'standard', model: 'gpt-test-standard' },
     providerCapacityRuntimeDir: runtimeDir,
   });
 
@@ -1182,7 +960,7 @@ test('a genuinely mutating assignment (implement-item, default implementer role)
       args: [reviewer.scriptPath, '{prompt}'],
       allowCrossProvider: true,
     },
-  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   timeoutMs: 5000, };
 
   const work = { id: 'tsk-cell63-worker-unaffected', status: 'todo', workflowStep: 'executing', domain: 'coding' };
@@ -1220,7 +998,7 @@ test('Cell 6.3 Fix Round 1: absent claude-reviewer config entry falls back uncha
       allowCrossProvider: true,
     },
     // no "claude-reviewer" entry configured
-  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   timeoutMs: 5000, };
 
   const work = { id: 'tsk-cell63-absent-fallback', status: 'todo', workflowStep: 'planning', domain: 'coding' };
@@ -1268,7 +1046,7 @@ fs.writeFileSync(path.join(runDir, 'outbox', 'result-1.json'), JSON.stringify({ 
 console.log('done');
 `);
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 20000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 20000 };
   const work = { id: 'tsk-outbox', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'validate-plan' });
 
@@ -1294,7 +1072,7 @@ fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status
 console.log('done');
 `);
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 20000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 20000 };
   const work = { id: 'tsk-flat', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'validate-plan' });
 
@@ -1320,7 +1098,7 @@ fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ contra
   });
   const result = await executeAssignment(assignment, {
     cwd: tempDir, repoRoot: tempDir,
-    runnerConfig: { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 },
+    runnerConfig: { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 },
   });
   assert.equal(result.classification.outcome.category, 'policy');
   assert.equal(result.classification.confidence.level, 'failed');
@@ -1348,7 +1126,7 @@ fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status
   });
   const result = await executeAssignment(assignment, {
     cwd: tempDir, repoRoot: tempDir,
-    runnerConfig: { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 },
+    runnerConfig: { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 },
   });
   assert.equal(result.classification.outcome.category, 'policy');
   assert.equal(result.classification.confidence.level, 'failed');
@@ -1436,7 +1214,7 @@ function spawnExecuteAssignment(tempDir, assignment, runnerConfig, extraOpts = {
 }
 
 function admissionRunnerConfig(executorScript) {
-  return { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  return bindable({ executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 });
 }
 
 test('executeAssignment: the same (retryId, destination, payloadDigest) tuple returns the identical committed Run without dispatching a second executor', async () => {
@@ -2525,161 +2303,6 @@ test('M12 lock: settlement evaluates changedFiles and classification in opts.cwd
   );
 });
 
-test('N1 / M13 / M13b lock: executeAssignment captures both gitBefore/dirtyBefore and gitAfter/dirtyAfter in effectiveCwd when cwd !== effectiveCwd', async () => {
-  const tempDir = mkTempDir();
-  const cwdDir = path.join(tempDir, 'opts-cwd');
-  const effectiveCwdDir = path.join(tempDir, 'effective-cwd');
-  fs.mkdirSync(cwdDir, { recursive: true });
-  fs.mkdirSync(effectiveCwdDir, { recursive: true });
-
-  // Init git repo in cwdDir
-  execFileSync('git', ['init'], { cwd: cwdDir, stdio: 'ignore' });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: cwdDir, stdio: 'ignore' });
-  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: cwdDir, stdio: 'ignore' });
-  fs.writeFileSync(path.join(cwdDir, 'cwd-file.txt'), 'cwd init\n');
-  execFileSync('git', ['add', '.'], { cwd: cwdDir, stdio: 'ignore' });
-  execFileSync('git', ['commit', '-m', 'cwd commit'], { cwd: cwdDir, stdio: 'ignore' });
-  const cwdHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: cwdDir, encoding: 'utf8' }).trim();
-
-  // Init git repo in effectiveCwdDir
-  execFileSync('git', ['init'], { cwd: effectiveCwdDir, stdio: 'ignore' });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: effectiveCwdDir, stdio: 'ignore' });
-  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: effectiveCwdDir, stdio: 'ignore' });
-  fs.writeFileSync(path.join(effectiveCwdDir, 'eff-file.txt'), 'eff init\n');
-  execFileSync('git', ['add', '.'], { cwd: effectiveCwdDir, stdio: 'ignore' });
-  execFileSync('git', ['commit', '-m', 'eff commit before'], { cwd: effectiveCwdDir, stdio: 'ignore' });
-  const effHeadBefore = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: effectiveCwdDir, encoding: 'utf8' }).trim();
-
-  // Worker script modifies effectiveCwdDir by creating a new file
-  const executorScript = path.join(tempDir, 'worker-script.mjs');
-  fs.writeFileSync(
-    executorScript,
-    `
-import fs from 'node:fs';
-import path from 'node:path';
-const prompt = process.argv.slice(2).join(' ');
-const runDirMatch = /(?:Write structured JSON to|Claim path:)[ \t]+(\S+agent-result\.json)/.exec(prompt);
-let runDir = runDirMatch ? path.dirname(runDirMatch[1]) : null;
-if (!runDir) {
-  const asgnBase = path.join(${JSON.stringify(cwdDir)}, '.fgos', 'assignments');
-  if (fs.existsSync(asgnBase)) {
-    for (const d of fs.readdirSync(asgnBase)) {
-      const candidate = path.join(asgnBase, d, 'runs', '01');
-      if (fs.existsSync(candidate)) { runDir = candidate; break; }
-    }
-  }
-}
-if (!runDir) runDir = process.cwd();
-// Write dirty file into effectiveCwdDir
-const targetDir = ${JSON.stringify(effectiveCwdDir)};
-fs.writeFileSync(path.join(targetDir, 'worker-created.txt'), 'created by worker\\n');
-// Write agent-result.json
-fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({
-  status: 'done',
-  summary: 'Created worker file in effective cwd',
-}));
-fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nWorker done\\n');
-`,
-  );
-
-  const assignment = buildAssignment({
-    work: { id: 'tsk-n1-m13-test', status: 'todo', workflowStep: 'executing', domain: 'coding' },
-    stage: 'executing',
-    operation: 'implement-item',
-  });
-
-  const asgnDir = path.join(cwdDir, '.fgos', 'assignments', assignment.assignmentId);
-  const runDir = path.join(asgnDir, 'runs', '01');
-  const genDir = path.join(asgnDir, 'admission', 'generations');
-  fs.mkdirSync(runDir, { recursive: true });
-  fs.mkdirSync(genDir, { recursive: true });
-
-  const persistedPlan = {
-    executorId: 'test-fallback',
-    policy: { executorPreference: ['test-fallback'] },
-    mechanism: 'out-of-process',
-    invocation: {
-      via: 'cli',
-      adapter: 'cli-spawn',
-      protocol: 'prompt-stdout-v1',
-      cwd: effectiveCwdDir,
-    },
-  };
-
-  const runJson = {
-    contract: 'assignment-run.v2',
-    runId: `run_${assignment.assignmentId}_01`,
-    assignmentId: assignment.assignmentId,
-    attempt: 1,
-    phase: 'admitted',
-    status: 'running',
-    executorId: 'test-fallback',
-    fallback: { resolved: 'test-fallback' },
-    dispatchPlanDigest: `sha256:${crypto.createHash('sha256').update(JSON.stringify(persistedPlan)).digest('hex')}`,
-    cwd: cwdDir,
-  };
-
-  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify(runJson, null, 2));
-  fs.writeFileSync(path.join(runDir, 'dispatch-plan.json'), JSON.stringify(persistedPlan, null, 2));
-
-  const admissionRecord = {
-    attempt: 1,
-    attemptStr: '01',
-    runId: `run_${assignment.assignmentId}_01`,
-    retryId: 'retry-n1-test',
-    predecessorRunId: null,
-    destination: 'dest-n1',
-    admissionPayloadDigest: 'digest-n1',
-    admittedAt: new Date().toISOString(),
-  };
-  fs.writeFileSync(path.join(genDir, '0000000001.json'), JSON.stringify(admissionRecord, null, 2));
-
-  const result = await executeAssignment(assignment, {
-    cwd: cwdDir,
-    repoRoot: cwdDir,
-    runnerConfig: {
-      executors: {
-        'test-fallback': {
-          adapter: 'cli-spawn',
-          allowCrossProvider: true,
-          command: process.execPath,
-          args: [executorScript, '{prompt}'],
-        },
-      },
-      executor: {
-        allowCrossProvider: true,
-        command: process.execPath,
-        args: [executorScript, '{prompt}'],
-      },
-      modelPolicies: { claude: { standard: 'test-model' } },
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-      timeoutMs: 10000,
-    },
-    retryId: 'retry-n1-test',
-    destination: 'dest-n1',
-    payloadDigest: 'digest-n1',
-  });
-
-  assert.equal(result.status, 'done');
-  // Evidence must reflect effectiveCwdDir, NOT cwdDir!
-  assert.equal(result.evidence.gitBefore, effHeadBefore, 'gitBefore must be captured from effectiveCwd');
-  assert.notEqual(result.evidence.gitBefore, cwdHead, 'gitBefore must NOT be from cwdDir');
-  assert.equal(result.evidence.gitAfter, effHeadBefore, 'gitAfter must be captured from effectiveCwd');
-  assert.notEqual(result.evidence.gitAfter, cwdHead, 'gitAfter must NOT be from cwdDir');
-  assert.ok(
-    result.evidence.changedFiles.includes('worker-created.txt'),
-    'changedFiles must capture files from effectiveCwd',
-  );
-
-  const evidenceJson = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
-  assert.ok(
-    evidenceJson.dirtyAfter.includes('worker-created.txt'),
-    'dirtyAfter in evidence.json must capture files from effectiveCwd (kills M13 / M13b)',
-  );
-  assert.equal(evidenceJson.gitAfter, effHeadBefore);
-  assert.notEqual(evidenceJson.gitAfter, cwdHead);
-});
-
 test('a dispatch whose only account is locked for a dead login tries one real call and runs once the call succeeds', async () => {
   const tempDir = mkTempDir();
   const { runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
@@ -2691,12 +2314,13 @@ test('a dispatch whose only account is locked for a dead login tries one real ca
     cwd: tempDir,
     repoRoot: tempDir,
     runnerConfig,
+    cliOverride: { leaseAccount: 'claude-acct' },
     providerCapacityRuntimeDir: runtimeDir,
     providerCredentialProbe: async ({ accountId }) => { calls.push(accountId); return { ok: true }; },
   });
 
   assert.deepEqual(calls, ['claude-acct']);
-  assert.notEqual(result.classification?.failure?.code, 'provider-capacity-refused');
+  assert.notEqual(result.classification?.failure?.code, 'provider-capacity-lease-conflict');
   const state = JSON.parse(fs.readFileSync(providerCapacityStatePaths(runtimeDir).statePath, 'utf8'));
   assert.equal(state.providers.claude.accounts['claude-acct'].quarantine, null);
   assert.equal(state.audit.at(-1).actor, 'fgos provider-capacity probe');
@@ -2709,14 +2333,14 @@ test('a dispatch whose locked account still fails the call is refused as before,
   const probe = async ({ accountId }) => { calls.push(accountId); return { ok: false, detail: 'the login is still rejected' }; };
   const dispatch = (id) => executeAssignment(
     buildAssignment({ work: { id, status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' }),
-    { cwd: tempDir, repoRoot: tempDir, runnerConfig, providerCapacityRuntimeDir: runtimeDir, providerCredentialProbe: probe },
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig, cliOverride: { leaseAccount: 'claude-acct' }, providerCapacityRuntimeDir: runtimeDir, providerCredentialProbe: probe },
   );
 
   const first = await dispatch('tsk-probe-fails-1');
   const second = await dispatch('tsk-probe-fails-2');
 
-  assert.equal(first.classification.failure.code, 'provider-capacity-refused');
-  assert.equal(second.classification.failure.code, 'provider-capacity-refused');
+  assert.equal(first.classification.failure.code, 'provider-capacity-lease-conflict');
+  assert.equal(second.classification.failure.code, 'provider-capacity-lease-conflict');
   assert.deepEqual(calls, ['claude-acct'], 'one call in the cooldown, however many dispatches ask');
 });
 
@@ -2725,7 +2349,7 @@ test('without a probe function a locked account is refused and nothing is called
   const { runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
   const assignment = buildAssignment({ work: { id: 'tsk-no-probe', status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' });
 
-  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, providerCapacityRuntimeDir: runtimeDir });
+  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, cliOverride: { leaseAccount: 'claude-acct' }, providerCapacityRuntimeDir: runtimeDir });
 
-  assert.equal(result.classification.failure.code, 'provider-capacity-refused');
+  assert.equal(result.classification.failure.code, 'provider-capacity-lease-conflict');
 });

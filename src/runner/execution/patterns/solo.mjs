@@ -1,7 +1,9 @@
 /**
  * Solo collaboration pattern.
- * Single producer role execution.
+ * One producer seat.
  */
+
+import { resolveSeats } from '../seat-resolver.mjs';
 
 export const VALID_OUTCOMES = Object.freeze([
   'pass',
@@ -18,23 +20,18 @@ export const VALID_OUTCOMES = Object.freeze([
  * @param {object} unit - The unit data contract.
  * @param {object} cfg - Runner configuration snapshot.
  * @param {object} hooks - Injected execution hooks.
- * @param {Function} hooks.runRole - Function to dispatch a role out-of-process.
+ * @param {Function} hooks.runRole - Function that binds and dispatches one seat.
  * @param {Function} [hooks.verify] - Deterministic verify hook.
  * @param {Function|Array} [hooks.history] - Prior attempts/results.
  * @param {object} [params] - Pattern parameters.
  * @returns {Promise<{ outcome: string, rounds: number, results: Array<object> }>}
  */
 export async function runSolo(unit, cfg, { runRole, verify, history } = {}, params = {}) {
-  const role = params?.role || 'producer';
+  const [seat] = resolveSeats({ pattern: { pattern: 'solo', params }, unit, runnerConfig: cfg });
   const prior = typeof history === 'function' ? history() : (Array.isArray(history) ? history : []);
-  const existing = prior?.find((r) => r.role === role && r.outcome === 'pass');
+  const existing = prior?.find((r) => r.seat === seat.seat && r.outcome === 'pass');
 
-  const readOnly = (unit?.writes || []).length === 0;
-  const result = existing || await runRole({
-    role,
-    unit,
-    readOnly,
-  });
+  const result = existing || await runRole({ seat, unit });
 
   return {
     outcome: result.outcome,

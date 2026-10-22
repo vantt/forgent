@@ -2,35 +2,37 @@ import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import {
-  resolveAssignmentDispatchPolicy,
-  resolveStrongerTier,
-  TIER_STRENGTH,
-} from '../../src/runner/dispatch/assignment-policy.mjs';
+import { effectiveDispatchPolicy as policyOf } from '../../src/runner/dispatch/plan.mjs';
+import { bindable } from '../helpers/work-seat-config.mjs';
 import { RunnerConfigError, supportsPolicyTier } from '../../src/runner/dispatch/config.mjs';
-import { resolveTierModel, deriveProviderFamily, resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
+import { deriveProviderFamily, resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
 import { resolveStrongerRigor } from '../../src/runner/rigor.mjs';
 import { workRigorFor } from '../../src/runner/work-dispatch.mjs';
 
-test('resolveStrongerTier correctly orders tiers monotonically', () => {
-  assert.equal(resolveStrongerTier('standard', 'nano'), 'standard');
-  assert.equal(resolveStrongerTier('standard', 'flagship'), 'flagship');
-  assert.equal(resolveStrongerTier('standard', 'frontier'), 'frontier');
-  assert.equal(resolveStrongerTier('advanced', 'flagship'), 'flagship');
-});
 
-test('resolveStrongerTier rejects malformed tiers instead of letting a stronger tier mask them', () => {
-  assert.throws(
-    () => resolveStrongerTier('not-a-tier', 'frontier'),
-    (err) => err instanceof RunnerConfigError && /invalid tier/.test(err.message),
-  );
+const ALL_TIER_MODELS = { nano: 'm', mini: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' };
+// The config of a caller that states none: two agent executors, claude and pi.
+const twoExecutorConfig = () => ({
+  executor: { command: 'claude' },
+  executors: { claude: { kind: 'agent', providerModel: 'claude', command: 'claude', args: ['{prompt}'] }, pi: { kind: 'agent', providerModel: 'pi', command: 'pi', args: ['{prompt}'] } },
+  modelPolicies: { claude: ALL_TIER_MODELS, pi: ALL_TIER_MODELS },
+});
+const effectiveDispatchPolicy = (args) => policyOf({ ...args, runnerConfig: bindable(args.runnerConfig ?? twoExecutorConfig()) });
+
+// A runner config as a project writes it: the tier a seat runs at is declared, never derived from rigor.
+const claudeConfig = (extra = {}) => ({
+  executor: { command: 'claude', args: ['{prompt}'] },
+  modelPolicies: {
+    claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet-plus', flagship: 'opus', frontier: 'fable' },
+  },
+  ...extra,
 });
 
 test('resolveStrongerRigor rejects malformed rigor instead of letting a stronger demand mask it', () => {
   assert.throws(() => resolveStrongerRigor('not-a-rigor', 'critical'), /invalid rigor/);
 });
 
-test('resolveAssignmentDispatchPolicy resolves validate-plan defaults: reviewer/code-reviewer/claude/standard', () => {
+test('the dispatch policy resolves validate-plan defaults: reviewer/code-reviewer/claude/standard', () => {
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
@@ -49,21 +51,20 @@ test('resolveAssignmentDispatchPolicy resolves validate-plan defaults: reviewer/
     },
   };
 
-  const effective = resolveAssignmentDispatchPolicy({
+  const effective = effectiveDispatchPolicy({
     assignment,
     runnerConfig,
   });
 
   assert.equal(effective.role, 'reviewer');
   assert.equal(effective.persona, 'code-reviewer');
-  assert.deepEqual(effective.executorPreference, ['claude']);
+  assert.equal(effective.executorId, 'claude');
   assert.equal(effective.providerModel, 'claude');
   assert.equal(effective.tier, 'standard');
   assert.equal(effective.model, 'claude-3-7-sonnet-20250219');
   assert.equal(effective.visibility, 'headless');
   assert.deepEqual(effective.constraints.requiresSkills, ['fgos-coding-validating']);
   assert.ok(Object.isFrozen(effective));
-  assert.ok(Object.isFrozen(effective.executorPreference));
   assert.ok(Object.isFrozen(effective.constraints));
 });
 
@@ -71,19 +72,19 @@ test('a family with no cell at the tier is refused as tier-cell-missing, naming 
   const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
   const runnerConfig = { executor: { command: 'claude' }, modelPolicies: { claude: { nano: 'haiku' } } };
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({ assignment, runnerConfig }),
+    () => effectiveDispatchPolicy({ assignment, runnerConfig }),
     (err) => err instanceof RunnerConfigError
       && err.code === 'tier-cell-missing'
-      && err.message === 'tier-cell-missing: no model for tier "standard" under family "claude" (runner.modelPolicies.claude.standard)',
+      && /^tier-cell-missing: .*standard — no allowed executor has a cell; change /.test(err.message),
   );
 });
 
-test('high-risk work raises tier rigor to flagship or frontier without downgrade', () => {
+test('high-risk work raises the rigor the policy records and never the tier', () => {
   const heavyWork = {
     id: 'tsk-risk-1',
     risk: 'heavy',
   };
-  // The Work layer folds risk into the assignment's own rigor; dispatch only reads that.
+  // The Work layer folds risk into the assignment's own rigor; dispatch only reads that, as a demand.
   const assignment = {
     ...buildAssignment({
       stage: 'planning',
@@ -92,11 +93,11 @@ test('high-risk work raises tier rigor to flagship or frontier without downgrade
     rigor: workRigorFor(heavyWork),
   };
 
-  const effective = resolveAssignmentDispatchPolicy({
-    assignment,
-  });
+  const effective = effectiveDispatchPolicy({ assignment, runnerConfig: claudeConfig() });
 
-  assert.equal(effective.tier, 'flagship');
+  assert.equal(effective.rigor, 'high');
+  assert.equal(effective.tier, 'standard');
+  assert.equal(effective.model, 'sonnet');
 });
 
 test('assignment explicit policy can narrow executor preference to pi over operation default', () => {
@@ -105,16 +106,15 @@ test('assignment explicit policy can narrow executor preference to pi over opera
     operation: 'validate-plan',
     policy: {
       preferExecutor: 'pi',
-      fallbackExecutors: ['claude'],
     },
   });
 
-  const effective = resolveAssignmentDispatchPolicy({
+  const effective = effectiveDispatchPolicy({
     assignment,
   });
 
-  assert.equal(effective.executorPreference[0], 'pi');
-  assert.deepEqual(effective.executorPreference, ['pi', 'claude']);
+  assert.equal(effective.executorId, 'pi');
+  assert.equal(effective.executorPreference, undefined);
 });
 
 test('CLI/human explicit override wins over Assignment policy preference', () => {
@@ -129,18 +129,18 @@ test('CLI/human explicit override wins over Assignment policy preference', () =>
 
   const cliOverride = {
     preferExecutor: 'claude',
-    tier: 'frontier',
+    tier: 'nano',
     preferPersona: 'custom-reviewer',
     visibility: 'visible',
   };
 
-  const effective = resolveAssignmentDispatchPolicy({
+  const effective = effectiveDispatchPolicy({
     assignment,
     cliOverride,
   });
 
-  assert.equal(effective.executorPreference[0], 'claude');
-  assert.equal(effective.tier, 'frontier');
+  assert.equal(effective.executorId, 'claude');
+  assert.equal(effective.tier, 'nano');
   assert.equal(effective.persona, 'custom-reviewer');
   assert.equal(effective.visibility, 'visible');
 });
@@ -151,7 +151,7 @@ test('literal model override is accepted when passed via CLI override or assignm
     operation: 'validate-plan',
   });
 
-  const effective = resolveAssignmentDispatchPolicy({
+  const effective = effectiveDispatchPolicy({
     assignment,
     cliOverride: { model: 'claude-3-opus-custom' },
   });
@@ -178,7 +178,7 @@ test('governance gate rejects disallowed egress/provider', () => {
 
   assert.throws(
     () =>
-      resolveAssignmentDispatchPolicy({
+      effectiveDispatchPolicy({
         assignment,
         runnerConfig,
         options: { disallowedProviders: ['disallowed-provider'] },
@@ -200,53 +200,17 @@ test('literal model override is rejected if it originates from workflow YAML pol
   };
 
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({ assignment }),
+    () => effectiveDispatchPolicy({ assignment }),
     (err) => err instanceof RunnerConfigError && /workflow YAML cannot pin literal model names/i.test(err.message),
   );
 });
 
-// --- Phase 00 R5: direct policy-tier resolver (fixes B1) ---
 
-test('resolveTierModel resolves policy tiers above "standard" directly against a provider table', () => {
-  const cfg = {
-    modelPolicies: {
-      claude: {
-        nano: 'claude-3-5-haiku-20241022',
-        standard: 'claude-3-7-sonnet-20250219',
-        advanced: 'claude-3-7-sonnet-20250219',
-        flagship: 'claude-opus-analytical',
-        frontier: 'claude-opus-critical',
-      },
-    },
-  };
-
-  assert.equal(resolveTierModel(cfg, 'flagship', 'claude'), 'claude-opus-analytical');
-  assert.equal(resolveTierModel(cfg, 'frontier', 'claude'), 'claude-opus-critical');
-});
-
-test('resolveTierModel fails closed with a named RunnerConfigError for an unsupported provider/tier pair', () => {
-  const cfg = {
-    modelPolicies: {
-      claude: { standard: 'claude-3-7-sonnet-20250219' },
-      'z-ai': { nano: 'glm-5.2' },
-    },
-  };
-
-  assert.throws(
-    () => resolveTierModel(cfg, 'flagship', 'claude'),
-    (err) => err instanceof RunnerConfigError && /flagship/.test(err.message) && /claude/.test(err.message),
-  );
-  assert.throws(
-    () => resolveTierModel(cfg, 'standard', 'z-ai'),
-    (err) => err instanceof RunnerConfigError && /standard/.test(err.message) && /z-ai/.test(err.message),
-  );
-});
-
-
-test('resolveAssignmentDispatchPolicy resolves an flagship-tier work item against a provider that declares it (B1 end-to-end)', () => {
+test('a tier the config declares resolves against the provider that has a cell for it', () => {
   const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
   const runnerConfig = {
     executor: { command: 'claude' },
+    defaults: { tier: 'flagship' },
     modelPolicies: {
       claude: {
         standard: 'claude-3-7-sonnet-20250219',
@@ -255,31 +219,26 @@ test('resolveAssignmentDispatchPolicy resolves an flagship-tier work item agains
     },
   };
 
-  const effective = resolveAssignmentDispatchPolicy({
-    assignment: { ...assignment, rigor: workRigorFor({ id: 'tsk-b1-1', risk: 'heavy' }) },
-    runnerConfig,
-  });
+  const effective = effectiveDispatchPolicy({ assignment, runnerConfig });
 
   assert.equal(effective.tier, 'flagship');
   assert.equal(effective.model, 'claude-opus-analytical');
+  assert.deepEqual(effective.provenance.tier.source, { scope: 'seat-binding', id: 'defaults.tier' });
 });
 
-test('resolveAssignmentDispatchPolicy fails closed (throws, never a silent null model) when the resolved tier is unsupported by the provider', () => {
+test('the dispatch policy fails closed (throws, never a silent null model) when the resolved tier is unsupported by the provider', () => {
   const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
   const runnerConfig = {
     executor: { command: 'claude' },
+    defaults: { tier: 'flagship' },
     modelPolicies: {
       claude: { standard: 'claude-3-7-sonnet-20250219' }, // no "flagship" entry
     },
   };
 
   assert.throws(
-    () =>
-      resolveAssignmentDispatchPolicy({
-        assignment: { ...assignment, rigor: workRigorFor({ id: 'tsk-b1-2', risk: 'heavy' }) },
-        runnerConfig,
-      }),
-    (err) => err instanceof RunnerConfigError && /flagship/.test(err.message),
+    () => effectiveDispatchPolicy({ assignment, runnerConfig }),
+    (err) => err instanceof RunnerConfigError && err.code === 'tier-cell-missing' && /flagship/.test(err.message),
   );
 });
 
@@ -292,7 +251,7 @@ test('deriveProviderFamily reads providerModel off the registered executor entry
   assert.equal(deriveProviderFamily(undefined), 'claude');
 });
 
-test('resolveAssignmentDispatchPolicy derives providerModel from the registered executor entry\'s own providerModel field, not the executor id string', () => {
+test('the dispatch policy derives providerModel from the registered executor entry\'s own providerModel field, not the executor id string', () => {
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
@@ -308,7 +267,7 @@ test('resolveAssignmentDispatchPolicy derives providerModel from the registered 
     },
   };
 
-  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig });
+  const effective = effectiveDispatchPolicy({ assignment, runnerConfig });
 
   assert.equal(effective.executorId, 'glm-cli');
   assert.equal(effective.providerModel, 'z-ai');
@@ -316,13 +275,13 @@ test('resolveAssignmentDispatchPolicy derives providerModel from the registered 
   assert.notEqual(effective.providerModel, effective.executorId);
 });
 
-test('resolveAssignmentDispatchPolicy agrees with resolve.mjs\'s resolveExecutorConfig on provider family for a registered executor with no providerModel/provider whose real command is not a Claude CLI command (codex-cli shape)', () => {
+test('the dispatch policy agrees with resolve.mjs\'s resolveExecutorConfig on provider family for a registered executor with no providerModel/provider whose real command is not a Claude CLI command (codex-cli shape)', () => {
   const executors = {
     'codex-cli': {
       kind: 'agent',
       allowCrossProvider: true,
       invocations: [
-        { via: 'cli', adapter: 'cli-spawn', command: 'codex', args: ['exec', '{prompt}'] },
+        { id: 'codex-cli-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'codex', args: ['exec', '{prompt}'], confinement: { backend: 'bwrap' } },
       ],
     },
   };
@@ -340,7 +299,7 @@ test('resolveAssignmentDispatchPolicy agrees with resolve.mjs\'s resolveExecutor
     policy: { preferExecutor: 'codex-cli' },
   });
 
-  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig });
+  const effective = effectiveDispatchPolicy({ assignment, runnerConfig });
 
   // Pins the fix: a single-argument deriveProviderFamily call silently
   // defaults its resolvedCommand parameter to "claude", so before the fix
@@ -356,7 +315,7 @@ test('resolveAssignmentDispatchPolicy agrees with resolve.mjs\'s resolveExecutor
   assert.equal(resolvedExecutor.governance.providerFamily, effective.providerModel);
 });
 
-test('resolveAssignmentDispatchPolicy defaults providerModel to "claude" only when the executor is registered but declares no providerModel of its own', () => {
+test('the dispatch policy defaults providerModel to "claude" only when the executor is registered but declares no providerModel of its own', () => {
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
@@ -372,12 +331,12 @@ test('resolveAssignmentDispatchPolicy defaults providerModel to "claude" only wh
     },
   };
 
-  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig });
+  const effective = effectiveDispatchPolicy({ assignment, runnerConfig });
 
   assert.equal(effective.providerModel, 'claude');
 });
 
-test('resolveAssignmentDispatchPolicy rejects an unregistered preferExecutor before spawn when a runnerConfig executor registry is present', () => {
+test('the dispatch policy rejects an unregistered preferExecutor before spawn when a runnerConfig executor registry is present', () => {
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
@@ -388,59 +347,13 @@ test('resolveAssignmentDispatchPolicy rejects an unregistered preferExecutor bef
     executors: {
       claude: { kind: 'agent', command: 'claude' },
     },
+    modelPolicies: { claude: { standard: 'claude-3-7-sonnet-20250219' } },
   };
 
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({ assignment, runnerConfig }),
-    (err) => err instanceof RunnerConfigError && /totally-made-up-executor/.test(err.message) && /not a registered executor/i.test(err.message),
+    () => effectiveDispatchPolicy({ assignment, runnerConfig }),
+    (err) => err instanceof RunnerConfigError && /totally-made-up-executor/.test(err.message) && /not registered/i.test(err.message),
   );
-});
-
-test('resolveAssignmentDispatchPolicy never validates preferExecutor registration when runnerConfig declares no executors registry at all (config genuinely unavailable to check against)', () => {
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'validate-plan',
-    policy: { preferExecutor: 'pi' },
-  });
-  const runnerConfig = {
-    executor: { command: 'claude' },
-    modelPolicies: { claude: { standard: 'claude-3-7-sonnet-20250219' }, pi: { standard: 'pi-default-model' } },
-  };
-
-  // No `executors` map on runnerConfig -- nothing to check registration
-  // against, so this must NOT throw (matches every other optional-runnerConfig
-  // treatment in this file).
-  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig });
-  assert.equal(effective.executorId, 'pi');
-});
-
-test('resolveAssignmentDispatchPolicy derives providerModel via deriveProviderFamily on the isImplicitDefaultExecutor exemption, not the raw executor id (Phase 00 R6 fix F1)', () => {
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'validate-plan',
-  });
-  const runnerConfig = {
-    executor: { command: 'claude' },
-    // Non-empty registry that does NOT list 'claude' -- the real scenario
-    // (this machine's own .fgos/config.json registers 'pi' but not
-    // 'claude') that forced the isImplicitDefaultExecutor exemption.
-    executors: {
-      pi: { kind: 'agent', command: 'pi' },
-    },
-    modelPolicies: {
-      claude: { standard: 'claude-3-7-sonnet-20250219' },
-    },
-  };
-
-  // preferExecutor left at its default -> primaryExecutor resolves to 'claude'.
-  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig });
-
-  assert.equal(effective.executorId, 'claude');
-  // Pinned expected value: deriveProviderFamily({command: 'claude'}, 'claude')
-  // resolves through CLAUDE_CLI_COMMANDS to 'claude' -- correctly derived,
-  // not merely coincidentally equal to the raw executor id.
-  assert.equal(effective.providerModel, 'claude');
-  assert.equal(effective.model, 'claude-3-7-sonnet-20250219');
 });
 
 test('governance disallowedProviders (family) and disallowedExecutors (id) are independent checks (Phase 00 R6 fix F2)', () => {
@@ -459,7 +372,7 @@ test('governance disallowedProviders (family) and disallowedExecutors (id) are i
         'z-ai': { standard: 'glm-4.6' },
       },
     };
-    return resolveAssignmentDispatchPolicy({ assignment, runnerConfig, options });
+    return effectiveDispatchPolicy({ assignment, runnerConfig, options });
   };
 
   // Baseline: neither list blocks -- resolves cleanly.
@@ -487,84 +400,23 @@ test('governance disallowedProviders (family) and disallowedExecutors (id) are i
   assert.equal(notBlockedByExecutorList.providerModel, 'z-ai');
 });
 
-test('resolveAssignmentDispatchPolicy fails closed with a named RunnerConfigError when governance options are present but runnerConfig.executors is absent (Phase 00 R6 fix RT1)', () => {
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'validate-plan',
-    policy: { preferExecutor: 'glm-cli' },
-  });
-  const runnerConfig = {
-    executor: { command: 'claude' },
-    // No `executors` registry at all -- the exact RT1 live-reproduction shape.
-    modelPolicies: {
-      claude: { standard: 'claude-3-7-sonnet-20250219' },
-      'z-ai': { standard: 'glm-4.6' },
-    },
-  };
-  const cliOverride = { preferExecutor: 'glm-cli' };
-
-  assert.throws(
-    () =>
-      resolveAssignmentDispatchPolicy({
-        assignment,
-        runnerConfig,
-        cliOverride,
-        options: { disallowedProviders: ['z-ai'] },
-      }),
-    (err) =>
-      err instanceof RunnerConfigError &&
-      /runnerConfig\.executors is absent/.test(err.message) &&
-      /"glm-cli"/.test(err.message),
-  );
-
-  // Same shape with `disallowedExecutors` instead must throw too.
-  assert.throws(
-    () =>
-      resolveAssignmentDispatchPolicy({
-        assignment,
-        runnerConfig,
-        cliOverride,
-        options: { disallowedExecutors: ['glm-cli'] },
-      }),
-    (err) => err instanceof RunnerConfigError && /runnerConfig\.executors is absent/.test(err.message),
-  );
-});
-
-test('resolveAssignmentDispatchPolicy does not require an executors registry when no governance options are present (no regression to the F1 exemption path)', () => {
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'validate-plan',
-    policy: { preferExecutor: 'pi' },
-  });
-  const runnerConfig = {
-    executor: { command: 'claude' },
-    modelPolicies: { claude: { standard: 'claude-3-7-sonnet-20250219' }, pi: { standard: 'pi-default-model' } },
-  };
-
-  // No `executors` map, no governance options -- must resolve successfully,
-  // same as the pre-existing "genuinely unavailable to check against" test.
-  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig, options: {} });
-  assert.equal(effective.executorId, 'pi');
-
-  const effectiveNoOptions = resolveAssignmentDispatchPolicy({ assignment, runnerConfig });
-  assert.equal(effectiveNoOptions.executorId, 'pi');
-});
-
 // --- Phase 00 R7: field-level policy provenance ---
 
-test('resolveAssignmentDispatchPolicy attaches field-level provenance additively, without changing the existing flat fields', () => {
+test('the dispatch policy attaches field-level provenance additively, without changing the existing flat fields', () => {
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
     policy: { preferExecutor: 'pi' },
   });
-  const cliOverride = { tier: 'frontier' };
+  // The caller states a tier and a model: a seat the runner already bound is taken as given.
+  const cliOverride = { tier: 'frontier', model: 'bound-model' };
 
-  const effective = resolveAssignmentDispatchPolicy({ assignment, cliOverride });
+  const effective = effectiveDispatchPolicy({ assignment, cliOverride, runnerConfig: twoExecutorConfig() });
 
   // Flat fields still present, unchanged in shape.
   assert.equal(effective.role, 'reviewer');
   assert.equal(effective.tier, 'frontier');
+  assert.equal(effective.model, 'bound-model');
 
   // New provenance field, additive.
   assert.ok(effective.provenance);
@@ -575,28 +427,17 @@ test('resolveAssignmentDispatchPolicy attaches field-level provenance additively
   assert.ok(Object.isFrozen(effective.provenance));
 });
 
-test('provenance.model.source and provenance.persona.source default to {scope: "default"} objects, never undefined, when no runnerConfig and no persona override apply (Phase 00 R7 fix F4)', () => {
-  // `shape-plan` (unlike `validate-plan`) declares no `policy` block at all
-  // in feature.yaml -- role `implementer`, no `preferPersona` of its own --
-  // so nothing but the role-based reviewer default could ever supply a
-  // persona, and that default does not fire for this non-reviewer role.
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'shape-plan',
-  });
-
-  // No runnerConfig at all -> no model source can resolve. Non-reviewer role
-  // and no persona override -> no persona source can resolve either.
-  const effective = resolveAssignmentDispatchPolicy({ assignment });
-
-  assert.equal(effective.role, 'implementer');
-  assert.equal(effective.persona, undefined);
-  assert.equal(effective.model, null);
-
-  assert.deepEqual(effective.provenance.model.source, { scope: 'default' });
-  assert.deepEqual(effective.provenance.persona.source, { scope: 'default' });
+test('a policy with no runner config and no bound tier and model is refused by name, never decided in Node', () => {
+  const assignment = buildAssignment({ stage: 'planning', operation: 'shape-plan' });
+  assert.throws(
+    () => policyOf({ assignment }),
+    (err) => err instanceof RunnerConfigError && err.code === 'runner-config-missing',
+  );
+  const bound = policyOf({ assignment, cliOverride: { tier: 'standard', model: 'bound-model' } });
+  assert.equal(bound.model, 'bound-model');
+  assert.deepEqual(bound.provenance.model.source, { scope: 'cliOverride' });
+  assert.deepEqual(bound.provenance.persona.source, { scope: 'default' });
 });
-
 // --- Phase 00 R8: pure provider capability validation ---
 
 test('supportsPolicyTier is a pure boolean query with no I/O -- true only for a declared string model', () => {
@@ -661,18 +502,12 @@ function nanoOnlyInlineAssignment(overrides = {}) {
 
 // ─── Phase 2: rigor demand → tier supply ────────────────────────────────
 
-import { REASONING_EFFORT_VALUES } from '../../src/runner/dispatch/assignment-policy.mjs';
+import { REASONING_EFFORT_VALUES } from '../../src/runner/dispatch/config.mjs';
 
-test('resolveAssignmentDispatchPolicy: rigor maps through runner.rigorToTier and records demand-side provenance', () => {
-  const runnerConfig = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    modelPolicies: {
-      claude: { nano: 'haiku', standard: 'sonnet', flagship: 'opus', frontier: 'fable' },
-    },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-  };
+test('the dispatch policy: rigor is recorded as a demand and the tier comes from the config, with both sources named', () => {
+  const runnerConfig = claudeConfig({ capabilities: { review: { tier: 'flagship', rigor: 'critical' } } });
 
-  const effective = resolveAssignmentDispatchPolicy({
+  const effective = effectiveDispatchPolicy({
     assignment: buildAssignment({
       stage: 'planning',
       operation: 'validate-plan',
@@ -681,131 +516,101 @@ test('resolveAssignmentDispatchPolicy: rigor maps through runner.rigorToTier and
     runnerConfig,
   });
 
-  assert.equal(effective.rigor, 'high');
+  assert.equal(effective.rigor, 'critical', 'the capability rigor is the stronger demand');
   assert.equal(effective.tier, 'flagship');
   assert.equal(effective.model, 'opus');
-  assert.deepEqual(effective.provenance.rigor, { value: 'high', source: { scope: 'opPolicy', id: 'validate-plan' } });
-  assert.deepEqual(effective.provenance.tier, { value: 'flagship', source: { scope: 'rigor', id: 'high' } });
+  assert.deepEqual(effective.provenance.rigor, { value: 'critical', source: { scope: 'capability', id: 'review' } });
+  assert.deepEqual(effective.provenance.tier, { value: 'flagship', source: { scope: 'seat-binding', id: 'capabilities."review".tier' } });
 });
 
-test('resolveAssignmentDispatchPolicy applies the canonically derived capability rigor floor when an operation declares no capability', () => {
-  const runnerConfig = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    capabilities: { review: { rigor: 'high' } },
-    modelPolicies: {
-      claude: { standard: 'sonnet', flagship: 'opus' },
-    },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-  };
+test('the dispatch policy applies the canonically derived capability rigor when an operation declares no capability, as a demand only', () => {
+  const runnerConfig = claudeConfig({ capabilities: { review: { rigor: 'high' } } });
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
     policy: { rigor: 'standard' },
   });
 
-  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig });
+  const effective = effectiveDispatchPolicy({ assignment, runnerConfig });
 
   assert.equal(effective.rigor, 'high');
-  assert.equal(effective.tier, 'flagship');
-  assert.equal(effective.model, 'opus');
+  assert.equal(effective.tier, 'standard', 'a capability rigor never chooses a tier');
+  assert.equal(effective.model, 'sonnet');
   assert.deepEqual(effective.provenance.rigor, { value: 'high', source: { scope: 'capability', id: 'review' } });
 });
 
-test('resolveAssignmentDispatchPolicy: explicit tier only raises the tier chosen from rigor', () => {
-  const runnerConfig = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    modelPolicies: {
-      claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet-plus', flagship: 'opus', frontier: 'fable' },
-    },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-  };
+test('the dispatch policy: an explicit tier at or below the resolved tier is taken, above it is refused', () => {
+  const runnerConfig = claudeConfig({ defaults: { tier: 'flagship' } });
   const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { rigor: 'standard' } });
 
-  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig, cliOverride: { tier: 'advanced' } });
+  const lower = effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride: { tier: 'advanced' } });
+  assert.equal(lower.rigor, 'standard');
+  assert.equal(lower.tier, 'advanced');
+  assert.equal(lower.model, 'sonnet-plus');
+  assert.deepEqual(lower.provenance.tier.source, { scope: 'seat-binding', id: 'override' });
 
-  assert.equal(effective.rigor, 'standard');
-  assert.equal(effective.tier, 'advanced');
-  assert.equal(effective.model, 'sonnet-plus');
-  assert.deepEqual(effective.provenance.tier.source, { scope: 'cliOverride' });
+  assert.throws(
+    () => effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride: { tier: 'frontier' } }),
+    (err) => err instanceof RunnerConfigError && err.code === 'tier-escalation-unauthorized',
+  );
 });
 
-test('resolveAssignmentDispatchPolicy: a weaker later explicit tier cannot hide a stronger earlier tier', () => {
+test('the dispatch policy: the caller\'s explicit tier is the most specific and wins over the assignment\'s own', () => {
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
     policy: { rigor: 'standard', tier: 'flagship' },
   });
-  const effective = resolveAssignmentDispatchPolicy({ assignment, cliOverride: { tier: 'nano' } });
+  const runnerConfig = claudeConfig({ defaults: { tier: 'flagship' } });
 
-  assert.equal(effective.tier, 'flagship');
-  assert.deepEqual(effective.provenance.tier.source, { scope: 'opPolicy', id: 'validate-plan' });
+  assert.equal(effectiveDispatchPolicy({ assignment, runnerConfig }).tier, 'flagship');
+  const lowered = effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride: { tier: 'nano' } });
+  assert.equal(lowered.tier, 'nano');
+  assert.equal(lowered.model, 'haiku');
 });
 
-test('resolveAssignmentDispatchPolicy: explicit low rigor maps to nano rather than inheriting an implicit standard floor', () => {
+test('the dispatch policy: an explicit low rigor is recorded and lowers nothing: the tier stays the config\'s', () => {
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
     policy: { rigor: 'low' },
   });
-  const effective = resolveAssignmentDispatchPolicy({
-    assignment,
-    runnerConfig: {
-      executor: { command: 'claude' },
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-      modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet' } },
-    },
-  });
+  const effective = effectiveDispatchPolicy({ assignment, runnerConfig: claudeConfig() });
 
   assert.equal(effective.rigor, 'low');
-  assert.equal(effective.tier, 'nano');
+  assert.equal(effective.tier, 'standard');
 });
 
-test('resolveAssignmentDispatchPolicy rejects malformed rigor even when a stronger source would otherwise win', () => {
+test('the dispatch policy rejects malformed rigor even when a stronger source would otherwise win', () => {
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
     policy: { rigor: 'critical' },
   });
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({ assignment: { ...assignment, rigor: 'unknown' } }),
+    () => effectiveDispatchPolicy({ assignment: { ...assignment, rigor: 'unknown' } }),
     (err) => err instanceof RunnerConfigError && /assignment rigor/.test(err.message),
   );
 });
 
-test('resolveAssignmentDispatchPolicy rejects a malformed rigor mapping before explicit tier composition', () => {
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'validate-plan',
-    policy: { rigor: 'critical' },
-  });
-  assert.throws(
-    () => resolveAssignmentDispatchPolicy({
-      assignment,
-      runnerConfig: { rigorToTier: { critical: 'not-a-tier' } },
-      cliOverride: { tier: 'nano', model: 'literal-model' },
-    }),
-    (err) => err instanceof RunnerConfigError && /rigorToTier maps rigor "critical" to invalid tier/.test(err.message),
-  );
-});
-
-test('resolveAssignmentDispatchPolicy rejects the retired policy key outside the persisted-assignment load boundary', () => {
+test('the dispatch policy rejects the retired policy key outside the persisted-assignment load boundary', () => {
   const retiredField = ['min', 'Tier'].join('');
   const assignment = {
     ...buildAssignment({ stage: 'planning', operation: 'validate-plan' }),
     policy: { [retiredField]: 'frontier' },
   };
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({ assignment }),
+    () => effectiveDispatchPolicy({ assignment }),
     (err) => err instanceof RunnerConfigError && /was removed/.test(err.message),
   );
 });
 
-test('resolveAssignmentDispatchPolicy rejects explicit tier provenance from a portable operation scope', () => {
+test('the dispatch policy rejects explicit tier provenance from a portable operation scope', () => {
   const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({
+    () => effectiveDispatchPolicy({
       assignment,
-      policyInputs: {
+      cliOverride: {
         tier: 'frontier',
         policyProvenance: { tier: { scope: 'operation', id: 'validate-plan' } },
       },
@@ -814,41 +619,41 @@ test('resolveAssignmentDispatchPolicy rejects explicit tier provenance from a po
   );
 });
 
-test('resolveAssignmentDispatchPolicy rejects explicit tier attributed to operation YAML', () => {
+test('the dispatch policy rejects explicit tier attributed to operation YAML', () => {
   const assignment = {
     ...buildAssignment({ stage: 'planning', operation: 'validate-plan' }),
     policy: { _fromYaml: true, tier: 'flagship' },
   };
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({ assignment }),
+    () => effectiveDispatchPolicy({ assignment }),
     (err) => err instanceof RunnerConfigError && /workflow YAML cannot set explicit tier/.test(err.message),
   );
 });
 
-test('resolveAssignmentDispatchPolicy rejects malformed assignment policy containers', () => {
+test('the dispatch policy rejects malformed assignment policy containers', () => {
   const base = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
   for (const policy of [null, [], 'critical']) {
     assert.throws(
-      () => resolveAssignmentDispatchPolicy({ assignment: { ...base, policy } }),
+      () => effectiveDispatchPolicy({ assignment: { ...base, policy } }),
       (err) => err instanceof RunnerConfigError && /assignment\.policy must be an object/.test(err.message),
     );
   }
 });
 
-test('resolveAssignmentDispatchPolicy: Work size never enters dispatch and the item rigor, carried as assignment.rigor, determines policy tier', () => {
+test('the dispatch policy: Work size never enters dispatch and the item rigor, carried as assignment.rigor, sets the policy rigor and not the tier', () => {
   const work = { id: 'tsk-work-1', size: 'heavy', rigor: 'high' };
   const assignment = { ...buildAssignment({ workId: work.id, stage: 'planning', operation: 'validate-plan' }), rigor: workRigorFor(work) };
-  const effective = resolveAssignmentDispatchPolicy({ assignment });
-  assert.equal(effective.tier, 'flagship');
+  const effective = effectiveDispatchPolicy({ assignment, runnerConfig: claudeConfig() });
+  assert.equal(effective.tier, 'standard');
   assert.equal(effective.provenance.rigor.value, 'high');
   assert.equal(effective.provenance.rigor.source.scope, 'assignment');
 });
 
-test('resolveAssignmentDispatchPolicy refuses a Work item instead of ignoring it', () => {
+test('the dispatch policy refuses a Work item instead of ignoring it', () => {
   const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
   for (const key of ['work', 'workItem']) {
     assert.throws(
-      () => resolveAssignmentDispatchPolicy({ assignment, [key]: { id: 'tsk-x', rigor: 'critical' } }),
+      () => effectiveDispatchPolicy({ assignment, [key]: { id: 'tsk-x', rigor: 'critical' } }),
       (err) => err instanceof RunnerConfigError && /takes no Work item/.test(err.message),
       key,
     );
@@ -863,47 +668,53 @@ const ALL_TIERS_CONFIG = {
 test('assignment.rigor never lowers a stronger operation rigor or a capability floor', () => {
   // Operation rigor high, caller demands low: stays high.
   const opHigh = { ...buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { rigor: 'high' } }), rigor: 'low' };
-  assert.equal(resolveAssignmentDispatchPolicy({ assignment: opHigh }).rigor, 'high');
+  assert.equal(effectiveDispatchPolicy({ assignment: opHigh }).rigor, 'high');
   // Capability floor critical, caller demands low first: the floor raises it.
   const capFloor = { ...buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { capability: 'judge' } }), rigor: 'low' };
-  const effective = resolveAssignmentDispatchPolicy({ assignment: capFloor, runnerConfig: { ...ALL_TIERS_CONFIG, capabilities: { judge: { rigor: 'critical' } } } });
+  const effective = effectiveDispatchPolicy({ assignment: capFloor, runnerConfig: { ...ALL_TIERS_CONFIG, capabilities: { judge: { rigor: 'critical' } } } });
   assert.equal(effective.rigor, 'critical');
   assert.equal(effective.provenance.rigor.source.scope, 'capability');
   // risk: heavy folded by the Work layer reaches dispatch as high and is not lowered by an operation low.
   const opLow = { ...buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { rigor: 'low' } }), rigor: workRigorFor({ id: 't', risk: 'heavy' }) };
-  assert.equal(resolveAssignmentDispatchPolicy({ assignment: opLow }).rigor, 'high');
+  assert.equal(effectiveDispatchPolicy({ assignment: opLow }).rigor, 'high');
 });
 
 test('assignment.domain picks the domain review capability floor, as the Work domain used to', () => {
   const runnerConfig = { ...ALL_TIERS_CONFIG, capabilities: { 'coding:review': { rigor: 'high' } } };
   const plain = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
-  const base = resolveAssignmentDispatchPolicy({ assignment: { ...plain, domain: undefined }, runnerConfig });
+  const base = effectiveDispatchPolicy({ assignment: { ...plain, domain: undefined }, runnerConfig });
   assert.notEqual(base.provenance.rigor.source.id, 'coding:review');
-  const withDomain = resolveAssignmentDispatchPolicy({ assignment: { ...plain, domain: 'coding' }, runnerConfig });
+  const withDomain = effectiveDispatchPolicy({ assignment: { ...plain, domain: 'coding' }, runnerConfig });
   assert.equal(withDomain.rigor, 'high');
   assert.deepEqual(withDomain.provenance.rigor.source, { scope: 'capability', id: 'coding:review' });
 });
 
-test('resolveAssignmentDispatchPolicy: reasoningEffort derives only from rigor and an explicit tier does not raise it', () => {
-  const expectedEffort = { low: 'low', standard: 'medium', high: 'high', critical: 'max' };
-  for (const [rigor, expected] of Object.entries(expectedEffort)) {
-    const effective = resolveAssignmentDispatchPolicy({
+test('the dispatch policy: reasoningEffort comes only from an explicit level, and rigor sets none', () => {
+  for (const rigor of ['low', 'standard', 'high', 'critical']) {
+    const effective = effectiveDispatchPolicy({
       assignment: buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { rigor } }),
-      cliOverride: { tier: 'frontier' },
+      runnerConfig: claudeConfig(),
     });
-    assert.equal(effective.reasoningEffort, expected, `${rigor} rigor determines reasoning effort`);
-    assert.deepEqual(effective.provenance.reasoningEffort.source, { scope: 'derived', id: `rigor.${rigor}` });
+    assert.equal(effective.reasoningEffort, undefined, `${rigor} rigor asks for no effort: the invocation runs at its own default`);
+    assert.deepEqual(effective.provenance.reasoningEffort.source, { scope: 'default' });
   }
+  const explicit = effectiveDispatchPolicy({
+    assignment: buildAssignment({ stage: 'planning', operation: 'validate-plan' }),
+    runnerConfig: claudeConfig(),
+    cliOverride: { reasoningEffort: 'high' },
+  });
+  assert.equal(explicit.reasoningEffort, 'high');
+  assert.deepEqual(explicit.provenance.reasoningEffort.source, { scope: 'cliOverride' });
 });
 
-test('resolveAssignmentDispatchPolicy: explicit reasoningEffort remains most-specific-wins', () => {
+test('the dispatch policy: explicit reasoningEffort remains most-specific-wins', () => {
   const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { rigor: 'critical' } });
-  const effective = resolveAssignmentDispatchPolicy({ assignment, cliOverride: { reasoningEffort: 'low' } });
+  const effective = effectiveDispatchPolicy({ assignment, cliOverride: { reasoningEffort: 'low' } });
 
   assert.equal(effective.reasoningEffort, 'low');
   assert.deepEqual(effective.provenance.reasoningEffort.source, { scope: 'cliOverride' });
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({ assignment, cliOverride: { reasoningEffort: 'not-a-real-effort' } }),
+    () => effectiveDispatchPolicy({ assignment, cliOverride: { reasoningEffort: 'not-a-real-effort' } }),
     (err) => err instanceof RunnerConfigError && /invalid reasoningEffort/i.test(err.message),
   );
 });

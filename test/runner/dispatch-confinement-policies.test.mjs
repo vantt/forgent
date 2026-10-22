@@ -37,7 +37,7 @@ function mkTempConfig(runnerObj) {
   fs.writeFileSync(file, JSON.stringify({
     executor: { command: 'node', args: ['{prompt}'] },
     modelPolicies: { node: { standard: 'sonnet' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 60000,
     ...runnerObj,
   }, null, 2));

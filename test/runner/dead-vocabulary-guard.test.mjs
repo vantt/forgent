@@ -157,7 +157,6 @@ test('dead vocabulary guard: .fgos/config.json does not contain runner.models or
 
 import os from 'node:os';
 import { loadRunnerConfig, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
-import { resolveTierModel } from '../../src/runner/dispatch/resolve.mjs';
 
 function mkTempConfig(runnerObj) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dead-vocab-test-'));
@@ -170,7 +169,7 @@ test('dead vocabulary guard: loadRunnerConfig rejects dead keys with actionable 
   const base = {
     executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 1000,
   };
 
@@ -224,71 +223,18 @@ test('dead vocabulary guard: loadRunnerConfig rejects dead keys with actionable 
   );
 });
 
-test('resolveTierModel: resolves tier to model via modelPolicies[provider][tier]', () => {
-  const cfg = {
-    modelPolicies: {
-      claude: {
-        nano: 'haiku',
-        standard: 'sonnet',
-        advanced: 'sonnet-advanced',
-        flagship: 'opus',
-        frontier: 'fable',
-      },
-      gemini: {
-        nano: 'flash-low',
-        standard: 'flash-medium',
-        advanced: 'flash-high',
-        flagship: 'pro-low',
-        frontier: 'pro-high',
-      },
-    },
-  };
-
-  // Valid policy tiers
-  assert.equal(resolveTierModel(cfg, 'nano', 'claude'), 'haiku');
-  assert.equal(resolveTierModel(cfg, 'standard', 'claude'), 'sonnet');
-  assert.equal(resolveTierModel(cfg, 'advanced', 'claude'), 'sonnet-advanced');
-  assert.equal(resolveTierModel(cfg, 'flagship', 'claude'), 'opus');
-  assert.equal(resolveTierModel(cfg, 'frontier', 'claude'), 'fable');
-
-  // Phase 3: light/heavy are retired from resolveTierModel
-  assert.throws(
-    () => resolveTierModel(cfg, 'light', 'gemini'),
-    (err) => err instanceof RunnerConfigError && /unrecognized tier "light"/.test(err.message),
-  );
-  assert.throws(
-    () => resolveTierModel(cfg, 'heavy', 'gemini'),
-    (err) => err instanceof RunnerConfigError && /unrecognized tier "heavy"/.test(err.message),
-  );
-  // Invalid tier throws
-  assert.throws(
-    () => resolveTierModel(cfg, 'non-existent-tier', 'claude'),
-    (err) => err instanceof RunnerConfigError && /unrecognized tier/.test(err.message),
-  );
-
-  // Missing provider throws
-  assert.throws(
-    () => resolveTierModel(cfg, 'standard', 'unknown-provider'),
-    (err) => err instanceof RunnerConfigError && /no modelPolicies configured for provider/.test(err.message),
-  );
-
-  // Missing tier in provider table throws
-  const incompleteCfg = { modelPolicies: { custom: { nano: 'only-nano' } } };
-  assert.throws(
-    () => resolveTierModel(incompleteCfg, 'standard', 'custom'),
-    (err) => err instanceof RunnerConfigError && /no model configured for tier "standard" under provider "custom"/.test(err.message),
-  );
-});
-import { resolveAssignmentDispatchPolicy } from '../../src/runner/dispatch/assignment-policy.mjs';
+import { effectiveDispatchPolicy as policyOf } from '../../src/runner/dispatch/plan.mjs';
+import { bindable } from '../helpers/work-seat-config.mjs';
+const effectiveDispatchPolicy = (args) => policyOf({ ...args, runnerConfig: bindable(args.runnerConfig) });
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 
-test('dead vocabulary guard: capabilities.<cap>.rigor floor elevates tier and capabilities.*.overrides is rejected (D19)', () => {
+test('dead vocabulary guard: capabilities.<cap>.rigor is a demand that moves no tier, and capabilities.*.overrides is rejected (D19)', () => {
   const baseConfig = {
     executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: {
       claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet-adv', flagship: 'opus', frontier: 'fable' },
     },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 1000,
   };
 
@@ -304,7 +250,7 @@ test('dead vocabulary guard: capabilities.<cap>.rigor floor elevates tier and ca
     (err) => err instanceof RunnerConfigError && /capabilities\.code:review\.overrides was removed; use "capabilities\.code:review\.rigor"/.test(err.message),
   );
 
-  // 2. capabilities.<cap>.rigor floor elevates tier
+  // 2. capabilities.<cap>.rigor is a demand: it raises the effective rigor and never the tier
   const runnerConfig = {
     ...baseConfig,
     capabilities: {
@@ -317,12 +263,20 @@ test('dead vocabulary guard: capabilities.<cap>.rigor floor elevates tier and ca
     policy: { capability: 'code:review', rigor: 'standard' },
   });
 
-  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig });
-  assert.equal(effective.rigor, 'high', 'capability floor high should win over step standard');
-  assert.equal(effective.tier, 'flagship', 'high rigor maps to flagship tier');
-  assert.equal(effective.model, 'opus');
+  const effective = effectiveDispatchPolicy({ assignment, runnerConfig });
+  assert.equal(effective.rigor, 'high', 'capability rigor high should win over step standard');
+  assert.equal(effective.tier, 'standard', 'high rigor does not map to a tier: the config declares it');
+  assert.equal(effective.model, 'sonnet');
   assert.equal(effective.provenance.rigor.source.scope, 'capability');
   assert.equal(effective.provenance.rigor.source.id, 'code:review');
+
+  // The tier a capability runs at is declared next to its rigor.
+  const declared = effectiveDispatchPolicy({
+    assignment,
+    runnerConfig: { ...runnerConfig, capabilities: { 'code:review': { rigor: 'high', tier: 'flagship' } } },
+  });
+  assert.equal(declared.tier, 'flagship');
+  assert.equal(declared.model, 'opus');
 });
 
 import * as workModule from '../../src/state/work.mjs';

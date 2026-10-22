@@ -2,12 +2,12 @@ import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
-import { resolveAssignmentDispatchPolicy } from '../../src/runner/dispatch/assignment-policy.mjs';
+import { effectiveDispatchPolicy as policyOf } from '../../src/runner/dispatch/plan.mjs';
+// These cases are about repeatMode, not the seat: the caller states the tier and the model it bound.
+const effectiveDispatchPolicy = (args) => policyOf({ cliOverride: { tier: 'standard', model: 'bound-model' }, ...args });
 import { assessBwrap } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import {
   assess,
-  resolveFallback,
   ASSESS_OUTCOMES,
   REPEAT_MODE_VALUES,
   RecoveryError,
@@ -42,7 +42,7 @@ test('assess refuses an undeclared or invalid repeatMode outright -- never treat
   assert.throws(() => assess(REAL_PLAN, 'read-only', null, null), RecoveryError);
 });
 
-test('resolveAssignmentDispatchPolicy resolves repeatMode from declared policy only -- Assignment.mutation never changes the outcome', () => {
+test('the dispatch policy resolves repeatMode from declared policy only -- Assignment.mutation never changes the outcome', () => {
   const base = (mutation, repeatMode) => ({
     operation: 'review-item',
     role: 'reviewer',
@@ -53,8 +53,8 @@ test('resolveAssignmentDispatchPolicy resolves repeatMode from declared policy o
 
   // Neither assignment declares repeatMode; mutation differs. Both resolve
   // to `null` -- mutation is never consulted as a fallback source.
-  const readOnlyUndeclared = resolveAssignmentDispatchPolicy({ assignment: base('read-only', undefined) });
-  const mutatingUndeclared = resolveAssignmentDispatchPolicy({ assignment: base('mutating', undefined) });
+  const readOnlyUndeclared = effectiveDispatchPolicy({ assignment: base('read-only', undefined) });
+  const mutatingUndeclared = effectiveDispatchPolicy({ assignment: base('mutating', undefined) });
   assert.equal(readOnlyUndeclared.repeatMode, null);
   assert.equal(mutatingUndeclared.repeatMode, null);
 
@@ -62,17 +62,17 @@ test('resolveAssignmentDispatchPolicy resolves repeatMode from declared policy o
   // directions -- a 'mutating' assignment does not get bumped to
   // 'post-delivery', and a 'read-only' one does not get bumped down to
   // 'pre-delivery'.
-  const mutatingPreDelivery = resolveAssignmentDispatchPolicy({ assignment: base('mutating', 'pre-delivery') });
+  const mutatingPreDelivery = effectiveDispatchPolicy({ assignment: base('mutating', 'pre-delivery') });
   assert.equal(mutatingPreDelivery.repeatMode, 'pre-delivery');
   assert.equal(mutatingPreDelivery.provenance.repeatMode.value, 'pre-delivery');
 
-  const readOnlyPostDelivery = resolveAssignmentDispatchPolicy({ assignment: base('read-only', 'post-delivery') });
+  const readOnlyPostDelivery = effectiveDispatchPolicy({ assignment: base('read-only', 'post-delivery') });
   assert.equal(readOnlyPostDelivery.repeatMode, 'post-delivery');
 });
 
-test('resolveAssignmentDispatchPolicy rejects a repeatMode value outside REPEAT_MODE_VALUES', () => {
+test('the dispatch policy rejects a repeatMode value outside REPEAT_MODE_VALUES', () => {
   assert.throws(() =>
-    resolveAssignmentDispatchPolicy({
+    effectiveDispatchPolicy({
       assignment: { operation: 'x', role: 'reviewer', policy: { repeatMode: 'always' }, skills: [] },
     }),
   );
@@ -83,33 +83,6 @@ test('resolveAssignmentDispatchPolicy rejects a repeatMode value outside REPEAT_
 test('assess parks as effect-unknown when the plan carries no provider endpoint at all', () => {
   assert.equal(assess({}, 'pre-delivery', null, null), 'effect-unknown');
   assert.equal(assess(null, 'post-delivery', null, null), 'effect-unknown');
-});
-
-test('a resolveFallback result that never reached "scoped" always parks as effect-unknown ("fallback compiler mismatch")', () => {
-  const notGoverned = resolveFallback({ policy: { executorPreference: ['claude'] }, provenance: {} }, 'nope', {
-    compilePlan: () => { throw new Error('unreachable'); },
-  });
-  assert.equal(notGoverned.status, 'candidate-not-governed');
-  assert.equal(assess(notGoverned, 'post-delivery', { policy: { controls: fullControls('allow') } }, { outcome: 'enforced' }), 'effect-unknown');
-
-  // Same proof against a REAL compiler-mismatch, chaining the actual
-  // compiler's refusal through resolveFallback and into assess.
-  const cfg = {
-    modelPolicies: { claude: { nano: 'claude-haiku', standard: 'claude-sonnet', advanced: 'claude-sonnet', flagship: 'claude-opus', frontier: 'claude-opus' } },
-    executors: { claude: { command: 'claude', args: [] } },
-  };
-  const assignment = {
-    operation: 'review-item',
-    role: 'reviewer',
-    policy: { preferExecutor: 'claude', fallbackExecutors: ['ghost'] },
-    skills: [],
-  };
-  const originalPlan = compileDispatchPlan(cfg, { assignment });
-  const compilerMismatch = resolveFallback(originalPlan, 'ghost', {
-    compilePlan: (id) => compileDispatchPlan(cfg, { assignment, cliOverride: { preferExecutor: id } }),
-  });
-  assert.equal(compilerMismatch.status, 'compiler-mismatch');
-  assert.equal(assess(compilerMismatch, 'post-delivery', {}, { outcome: 'enforced' }), 'effect-unknown');
 });
 
 // ─── pre-delivery: allowed today, unconditionally ───

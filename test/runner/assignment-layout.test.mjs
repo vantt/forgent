@@ -65,7 +65,7 @@ test('shared layout fixture yields every safe directory candidate, never worker 
 
 test('nested runs without assignment metadata are discoverable by inspection, show-run, watch and the running-run reconciler', async (t) => {
   const { root, fgosDir, base } = temp(t);
-  const id = 'unit-run-example/panelist-1/1-fb1';
+  const id = 'unit-run-example/member-1/1-fb1';
   const runDir = path.join(base, id, 'runs', '02');
   const runId = `run_${id}_02`;
   writeJson(path.join(runDir, 'run.json'), { runId, assignmentId: id, status: 'running', cwd: root });

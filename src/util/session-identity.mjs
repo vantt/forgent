@@ -19,6 +19,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveActiveHostBin } from './host-bin-path.mjs';
+import { stateLockHeld } from './state-lock-held.mjs';
 
 export const REGISTRY = 'registry';
 export const ENV = 'env';
@@ -42,19 +43,6 @@ export class WriterIdentityError extends Error {
     this.code = code;
     this.category = 'precondition';
   }
-}
-
-let heldLocks = 0;
-
-/** Called by withStateTx right after taking a lock. */
-export function noteLockHeld() {
-  heldLocks += 1;
-}
-
-/** Called by withStateTx exactly once when that lock is
- * really released. */
-export function noteLockReleased() {
-  heldLocks = Math.max(0, heldLocks - 1);
 }
 
 function parseIdentity(stdout, bin) {
@@ -106,7 +94,7 @@ function classifyExecError(err, bin) {
  * FGOS_INVOCATION_RECORD_PATH, so the verb writes nothing.
  */
 export function probeIdentity(bin, fgosDir) {
-  if (heldLocks > 0) {
+  if (stateLockHeld()) {
     throw new WriterIdentityError(
       'identity-in-lock',
       'resolving the writer identity would exec the host while the state lock is held; resolve before taking the lock',
@@ -200,7 +188,7 @@ export function mintAttemptWriterId(attemptId, { bin, fgosDir } = {}) {
   }
   const cached = attemptAnswers.get(attemptId);
   if (cached) return cached;
-  if (heldLocks > 0) {
+  if (stateLockHeld()) {
     throw new WriterIdentityError(
       'identity-in-lock',
       'minting an attempt writer id would exec the host while the state lock is held; mint before taking the lock',

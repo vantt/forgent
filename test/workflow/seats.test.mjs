@@ -21,8 +21,9 @@ function withoutSeatFields(definition) {
     for (const unit of step.units) {
       const { template } = unit;
       if (template.pattern === 'panel') {
-        delete template.params?.members;
-        for (const role of Object.keys(template.params?.roleTasks ?? {})) if (/^panelist-\d+$/.test(role)) delete template.params.roleTasks[role];
+        // The expansion re-seats the generic members: their seats and the tasks keyed by them are the seat fields.
+        template.seats = (template.seats ?? []).filter((seat) => seat.role !== 'producer');
+        for (const seat of Object.keys(template.params?.roleTasks ?? {})) if (/^member-\d+$/.test(seat)) delete template.params.roleTasks[seat];
         if (template.params && Object.keys(template.params.roleTasks ?? {}).length === 0) delete template.params.roleTasks;
         if (template.params && Object.keys(template.params).length === 0) delete template.params;
       }
@@ -41,13 +42,15 @@ test('every generic base keeps its topology, gates, blind flags and checker and 
     const panels = workflow.steps.flatMap((step) => step.units).filter((unit) => unit.template.pattern === 'panel');
     assert.ok(panels.length >= 1);
     for (const { template } of panels) {
-      assert.equal(template.params.members, 3);
+      assert.deepEqual(template.seats.filter((seat) => seat.role === 'producer').map((seat) => seat.seat), ['member-1', 'member-2', 'member-3']);
+      assert.equal(template.seats.filter((seat) => seat.role === 'synthesizer').length, 1, 'the synthesizer seat is kept');
+      assert.equal(template.params?.members, undefined);
       LENSES.forEach((lens, i) => {
-        const task = template.params.roleTasks[`panelist-${i + 1}`];
+        const task = template.params.roleTasks[`member-${i + 1}`];
         assert.equal(task, seatTask(lens));
         assert.ok(task.includes(lens) && task.endsWith('{objective}'));
       });
-      assert.deepEqual(Object.keys(template.params.roleTasks).filter((r) => r.startsWith('panelist-')), ['panelist-1', 'panelist-2', 'panelist-3']);
+      assert.deepEqual(Object.keys(template.params.roleTasks).filter((r) => r.startsWith('member-')), ['member-1', 'member-2', 'member-3']);
     }
   }
 });
@@ -72,8 +75,8 @@ test('expansion is deterministic and never mutates the registered definition', (
 test('lens order sets the seat mapping and trimmed lenses are stored verbatim', () => {
   const { workflow, provenance } = expandWorkflowSeats(base('group-cognition'), ['  second angle  ', 'first angle'], {});
   const [panel] = workflow.steps[0].units;
-  assert.equal(panel.template.params.roleTasks['panelist-1'], seatTask('second angle'));
-  assert.equal(panel.template.params.roleTasks['panelist-2'], seatTask('first angle'));
+  assert.equal(panel.template.params.roleTasks['member-1'], seatTask('second angle'));
+  assert.equal(panel.template.params.roleTasks['member-2'], seatTask('first angle'));
   assert.deepEqual(provenance.seats, ['second angle', 'first angle']);
 });
 
@@ -82,6 +85,7 @@ test('delphi seats the same lenses on both proposal rounds so same-seat inputs s
   const rounds = workflow.steps.flatMap((step) => step.units).filter((unit) => unit.template.pattern === 'panel');
   assert.deepEqual(rounds.map((unit) => unit.id), ['propose-round-1', 'propose-round-2']);
   assert.deepEqual(rounds[0].template.params, rounds[1].template.params);
+  assert.deepEqual(rounds[0].template.seats, rounds[1].template.seats);
   assert.equal(rounds[1].template.inputs.some((entry) => entry.sameSeat), true, 'the round-2 same-seat input is untouched');
   assert.equal(rounds[1].template.blind, true);
 });
@@ -89,7 +93,7 @@ test('delphi seats the same lenses on both proposal rounds so same-seat inputs s
 test('no seat maximum: many seats expand, the synthesizer text is untouched', () => {
   const many = Array.from({ length: 12 }, (_, i) => `perspective number ${i + 1}`);
   const { workflow } = expandWorkflowSeats(base('nominal-group'), many, {});
-  assert.equal(workflow.steps[0].units[0].template.params.members, 12);
+  assert.equal(workflow.steps[0].units[0].template.seats.filter((seat) => seat.role === 'producer').length, 12);
   assert.equal(Object.keys(workflow.steps[0].units[0].template.params.roleTasks).length, 12);
   assert.equal(workflow.steps[0].units[0].template.params.roleTasks.synthesizer, undefined);
 });
@@ -142,7 +146,7 @@ test('invalid seat lists are refused with the reason', () => {
 });
 
 const persona = (name, text = `name: ${name}\ndescription: ${name} posture\n`) => ({
-  name, tier: 'workspace', source: `fgos/agents/${name}.yaml`, text, digest: `digest-of-${name}`,
+  name, tier: 'workspace', source: `fgos/agents/${name}.yaml`, identity: `workspace:fgos/agents/${name}`, text, digest: `digest-of-${name}`,
 });
 
 test('a named persona seat keeps its order, gets no lens task and is recorded with the pinned text', () => {
@@ -151,13 +155,13 @@ test('a named persona seat keeps its order, gets no lens task and is recorded wi
     personas: { 'finance-controller': finance },
   });
   const [panel] = workflow.steps[0].units;
-  assert.equal(panel.template.params.members, 3);
-  assert.equal(panel.template.params.roleTasks['panelist-1'], seatTask('first angle'));
-  assert.equal(panel.template.params.roleTasks['panelist-2'], undefined, 'the persona carries the posture; the seat keeps the unit objective');
-  assert.equal(panel.template.params.roleTasks['panelist-3'], seatTask('third angle'));
+  assert.equal(panel.template.seats.filter((seat) => seat.role === 'producer').length, 3);
+  assert.equal(panel.template.params.roleTasks['member-1'], seatTask('first angle'));
+  assert.equal(panel.template.params.roleTasks['member-2'], undefined, 'the persona carries the posture; the seat keeps the unit objective');
+  assert.equal(panel.template.params.roleTasks['member-3'], seatTask('third angle'));
   assert.deepEqual(provenance.seats, ['first angle', '@finance-controller', 'third angle']);
   assert.deepEqual(provenance.personas, [{
-    seat: 'panelist-2', name: 'finance-controller', tier: 'workspace', source: 'fgos/agents/finance-controller.yaml',
+    seat: 'member-2', name: 'finance-controller', tier: 'workspace', source: 'fgos/agents/finance-controller.yaml', identity: 'workspace:fgos/agents/finance-controller',
     digest: 'digest-of-finance-controller', text: finance.text,
   }]);
   assert.ok(!JSON.stringify(workflow).includes('weigh {objective} literally'), 'persona text is never copied into the definition');
@@ -169,8 +173,8 @@ test('delphi binds a persona to the same seat in both rounds and the list may be
   const { workflow, provenance } = expandWorkflowSeats(base('delphi'), ['@b-two', '@a-one'], { personas });
   const rounds = workflow.steps.flatMap((step) => step.units).filter((unit) => unit.template.pattern === 'panel');
   assert.deepEqual(rounds[0].template.params, rounds[1].template.params);
-  assert.deepEqual(provenance.personas.map((p) => [p.seat, p.name]), [['panelist-1', 'b-two'], ['panelist-2', 'a-one']]);
-  assert.equal(Object.keys(rounds[0].template.params.roleTasks).filter((r) => r.startsWith('panelist-')).length, 0);
+  assert.deepEqual(provenance.personas.map((p) => [p.seat, p.name]), [['member-1', 'b-two'], ['member-2', 'a-one']]);
+  assert.equal(Object.keys(rounds[0].template.params.roleTasks).filter((r) => r.startsWith('member-')).length, 0);
 });
 
 test('a persona entry that was not resolved is refused, and an inline-only list records no personas', () => {
@@ -184,14 +188,16 @@ test('bases with curated seats or no generic panel are refused with a reason', (
   assert.throws(() => expandWorkflowSeats(base('architecture-advisory-reopen'), LENSES, {}), /has no panel unit that accepts --seats/);
   const solo = validateWorkflow({ id: 'solo-only', steps: [{ id: 's', units: [{ id: 'u', template: { capability: 'docs:write', pattern: 'solo' } }] }] });
   assert.throws(() => expandWorkflowSeats(solo, LENSES, {}), /has no panel unit that accepts --seats/);
-  const customRoles = validateWorkflow({ id: 'custom-roles', steps: [{ id: 's', units: [{ id: 'u', template: { capability: 'docs:write', pattern: 'panel', params: { role: ['a', 'b'] } } }] }] });
-  assert.throws(() => expandWorkflowSeats(customRoles, LENSES, {}), /custom role names/);
+  const personaSeats = validateWorkflow({ id: 'persona-seats', steps: [{ id: 's', units: [{ id: 'u', template: { capability: 'docs:write', pattern: 'panel', seats: [
+    { seat: 'a', role: 'producer', persona: 'finance' }, { seat: 'b', role: 'producer' }, { seat: 'chair', role: 'synthesizer' },
+  ] } }] }] });
+  assert.throws(() => expandWorkflowSeats(personaSeats, LENSES, {}), /own persona or tier/);
   // A base that mixes a generic panel with a curated one is refused whole.
   const mixed = validateWorkflow({
     id: 'mixed',
     steps: [{ id: 's', units: [
       { id: 'generic', template: { capability: 'docs:write', pattern: 'panel' } },
-      { id: 'curated', template: { capability: 'docs:write', pattern: 'panel', params: { roleTasks: { 'panelist-1': 'x {objective}' } } } },
+      { id: 'curated', template: { capability: 'docs:write', pattern: 'panel', seats: [{ seat: 'a', role: 'producer' }, { seat: 'chair', role: 'synthesizer' }], params: { roleTasks: { a: 'x {objective}' } } } },
     ] }],
   });
   assert.throws(() => expandWorkflowSeats(mixed, LENSES, {}), /unit "curated"/);

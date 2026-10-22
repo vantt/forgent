@@ -8,7 +8,9 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { bindableExecute } from '../helpers/work-seat-config.mjs';
+const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 import { invokeDispatchReconcileOperation } from '../../src/verbs/dispatch/reconcile.mjs';
 import { planReconciliation } from '../../src/runner/dispatch/reconciliation-planner.mjs';
@@ -48,7 +50,7 @@ function runnerConfig(executorScript, extra = {}) {
       ...(extra.executor ?? {}),
     },
     modelPolicies: { claude: { standard: 'test-model', advanced: 'test-analytical-model' }, [process.execPath]: { standard: 'test-model', advanced: 'test-analytical-model' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: extra.timeoutMs ?? 5000,
     ...(extra.config ?? {}),
   };

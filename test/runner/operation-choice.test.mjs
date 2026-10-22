@@ -18,7 +18,9 @@ import {
 } from '../../src/runner/operation-choice.mjs';
 import { operationsForStep, getDomain } from '../../src/state/domain-registry.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { bindableExecute } from '../helpers/work-seat-config.mjs';
+const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { resolveRunWorkerArtifactPath } from '../../src/runner/dispatch/settlement.mjs';
 import { listAssignmentRuns } from '../../src/runner/dispatch/assignment-layout.mjs';
 import { runOnce as loopRunOnce } from '../../src/runner/loop.mjs';
@@ -262,7 +264,7 @@ test('validate-plan no-evidence does not move Work', async () => {
     allowCrossProvider: true,
     command: process.execPath,
     args: [executorScript, '{prompt}'],
-  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const work = { id: 'tsk-no-ev', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const choice = chooseStageOperation({
@@ -298,7 +300,7 @@ test('validate-plan failed does not move Work', async () => {
     allowCrossProvider: true,
     command: process.execPath,
     args: [executorScript, '{prompt}'],
-  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const work = { id: 'tsk-fail-op', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const choice = chooseStageOperation({
@@ -333,7 +335,7 @@ test('reported READY allows existing planning edge path', async () => {
     allowCrossProvider: true,
     command: process.execPath,
     args: [executorScript, '{prompt}'],
-  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const work = { id: 'tsk-ready-op', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const choice = chooseStageOperation({

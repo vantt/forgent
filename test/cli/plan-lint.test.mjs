@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 import { DEFAULT_CAPABILITY_SLOTS } from '../../src/setup/registrations.mjs';
-import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
+import { FRESH_PROJECT_RUNNER_CONFIG } from '../../src/runner/dispatch/config.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -36,7 +36,7 @@ function run(cwd, args) {
 }
 
 // `ensureRunnerConfigForDir`'s bare-bootstrap fallback (no prior `fgos
-// setup`) writes DEFAULT_RUNNER_CONFIG only -- no `capabilities` catalog at
+// setup`) writes the fresh project runner config only -- no `capabilities` catalog at
 // all (that catalog is registered separately, via `fgos setup`'s
 // config-default registry, and running the real `setup` verb per fixture
 // here is too slow -- ~20s each -- for a unit-test suite). Write the same
@@ -45,7 +45,7 @@ function run(cwd, args) {
 // here starts from that same state without paying for the real subprocess.
 function tmpCwd() {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-plan-lint-cli-'));
-  const runner = { ...DEFAULT_RUNNER_CONFIG, executor: { command: 'true', args: [] }, capabilities: DEFAULT_CAPABILITY_SLOTS };
+  const runner = { ...FRESH_PROJECT_RUNNER_CONFIG, executor: { command: 'true', args: [] }, capabilities: DEFAULT_CAPABILITY_SLOTS };
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), `${JSON.stringify({ runner }, null, 2)}\n`);
   return cwd;

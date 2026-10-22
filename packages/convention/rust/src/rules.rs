@@ -10,6 +10,60 @@ pub struct RuleSet {
     #[serde(rename = "errorCodes")]
     pub error_codes: Vec<String>,
     pub rules: Vec<Rule>,
+    #[serde(default)]
+    pub identifiers: Vec<IdentifierRule>,
+    #[serde(default, rename = "definitionFiles")]
+    pub definition_files: Vec<DefinitionFileRule>,
+}
+
+/// The file name of a definition (`wf.<name>.yaml`, `agent.<name>.yaml`): a fixed prefix and suffix
+/// around a name that follows one of the identifier rules.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DefinitionFileRule {
+    pub id: String,
+    pub prefix: String,
+    pub suffix: String,
+    pub name_identifier: String,
+}
+
+impl DefinitionFileRule {
+    /// The name inside `file_name`, or None when the file name does not follow this rule.
+    pub fn name_of<'a>(&self, file_name: &'a str, identifiers: &[IdentifierRule]) -> Option<&'a str> {
+        let name = file_name.strip_prefix(self.prefix.as_str())?.strip_suffix(self.suffix.as_str())?;
+        let rule = identifiers.iter().find(|rule| rule.id == self.name_identifier)?;
+        rule.check(name).ok().map(|_| name)
+    }
+}
+
+/// A name that becomes a path or ref segment: the first character, the rest, a length cap and
+/// the names the layout or the runner owns.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct IdentifierRule {
+    pub id: String,
+    pub first: String,
+    pub rest: String,
+    pub max_length: usize,
+    #[serde(default)]
+    pub reserved: Vec<String>,
+}
+
+impl IdentifierRule {
+    /// `Err` carries the stable code: `invalid-identifier` or `reserved-identifier`.
+    pub fn check(&self, value: &str) -> Result<(), &'static str> {
+        let mut chars = value.chars();
+        let ok = chars.next().is_some_and(|c| self.first.contains(c))
+            && value.chars().count() <= self.max_length
+            && chars.all(|c| self.rest.contains(c));
+        if !ok {
+            return Err("invalid-identifier");
+        }
+        if self.reserved.iter().any(|name| name == value) {
+            return Err("reserved-identifier");
+        }
+        Ok(())
+    }
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -217,6 +271,14 @@ fn is_wildcard(segment: &str) -> bool {
 impl RuleSet {
     pub fn by_kind(&self, kind: &str) -> Option<&Rule> {
         self.rules.iter().find(|rule| rule.kind == kind)
+    }
+
+    pub fn identifier(&self, id: &str) -> Option<&IdentifierRule> {
+        self.identifiers.iter().find(|rule| rule.id == id)
+    }
+
+    pub fn definition_file(&self, id: &str) -> Option<&DefinitionFileRule> {
+        self.definition_files.iter().find(|rule| rule.id == id)
     }
 
     pub fn placement_rules(&self) -> impl Iterator<Item = &Rule> {

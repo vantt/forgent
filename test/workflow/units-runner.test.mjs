@@ -79,7 +79,7 @@ function setupRepo({ effortCli = false } = {}) {
   fs.writeFileSync(path.join(tmp, '.fgos', 'config.json'), JSON.stringify({
     runner: {
       defaultExecutor: 'test-node',
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' },
       modelPolicies: { node: { standard: 'node-std' } },
       executors: {
         'test-node': {
@@ -93,7 +93,7 @@ function setupRepo({ effortCli = false } = {}) {
         },
       },
       capabilities: { 'docs:write': { prefer: [{ executor: 'test-node' }], rigor: 'standard' } },
-      patterns: { defaultRule: { mutatingMinRigor: 'standard' }, reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'] } } },
+      patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' }, reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'] } } },
     },
   }, null, 2));
   return tmp;
@@ -151,23 +151,7 @@ test('a units file runs through startWorkflow, and a unit\'s prefer and persona 
   assert.deepEqual(record.overrides, []);
 });
 
-test('a unit\'s timeoutMs in a units file reaches the Unit and its dispatch; one out of range is refused before any run exists', async () => {
-  const tmp = setupRepo();
-  const file = unitsFile(tmp, [{ id: 'heavy', objective: 'Read the readme', capability: 'docs:write', timeoutMs: 5400000 }]);
-  const state = await startWorkflow({ unitsPath: file, ...opts(tmp) });
-  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
-  const unitRunId = state.steps.heavy.units.heavy.unitRunId;
-  assert.equal(unitRecordOf(tmp, unitRunId).unit.timeoutMs, 5400000);
-  assert.deepEqual(producerAssignment(tmp, unitRunId).binding.provenance.timeoutMs, { value: 5400000, source: 'unit' });
-  assert.equal(JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, 'producer', '1', 'runs', '01', 'run.json'), 'utf8')).timeoutMs, 5400000);
-
-  assert.throws(() => validateWorkflow({
-    id: 'too-long',
-    steps: [{ id: 's', units: [{ id: 'u', template: { capability: 'docs:write', objective: 'Read', writes: [], timeoutMs: 99 * 3600000 } }] }],
-  }), /timeoutMs must be at most 4h/);
-});
-
-test('--effort becomes a human-cli reasoningEffort override on every unit, kept in the run for resume', async () => {
+test('--effort becomes a reasoningEffort override on every unit, with no origin that claims a person typed it, kept in the run for resume', async () => {
   const tmp = setupRepo({ effortCli: true });
   const workflow = validateWorkflow({
     id: 'effort',
@@ -179,8 +163,8 @@ test('--effort becomes a human-cli reasoningEffort override on every unit, kept 
   assert.equal(readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })[0].payload.effort, 'high');
 
   const unitRunId = state.steps.s.units.u.unitRunId;
-  assert.deepEqual(producerAssignment(tmp, unitRunId).binding.provenance.reasoningEffort, { value: 'high', source: 'override:human-cli' });
-  assert.ok(unitRecordOf(tmp, unitRunId).overrides.some((o) => o.reasoningEffort === 'high' && o.origin === 'human-cli' && !o.scope));
+  assert.deepEqual(producerAssignment(tmp, unitRunId).binding.provenance.reasoningEffort, { value: 'high', source: 'override' });
+  assert.ok(unitRecordOf(tmp, unitRunId).overrides.some((o) => o.reasoningEffort === 'high' && o.origin === undefined && !o.scope));
   assert.match(state.steps.s.units.u.results.at(-1).runResult.agentClaim.summary, /Effort: high/, 'the CLI was launched with --effort high');
 });
 
@@ -425,12 +409,12 @@ test('--timeout gives every unit of the workflow run its own timeoutMs, kept for
 
   const unitRunId = answered.steps.s.units.u.unitRunId;
   const record = unitRecordOf(tmp, unitRunId);
-  assert.ok(record.overrides.some((o) => o.timeoutMs === 5400000 && o.origin === 'human-cli' && !o.scope));
-  assert.deepEqual(producerAssignment(tmp, unitRunId).binding.provenance.timeoutMs, { value: 5400000, source: 'override:human-cli' });
+  assert.ok(record.overrides.some((o) => o.timeoutMs === 5400000 && o.origin === undefined && !o.scope));
+  assert.deepEqual(producerAssignment(tmp, unitRunId).binding.provenance.timeoutMs, { value: 5400000, source: 'override' });
   assert.equal(producerAssignment(tmp, unitRunId).binding.timeoutMs, 5400000);
 });
 
-test('a unit with its own timeoutMs wins over workflow start --timeout', async () => {
+test('a unit\'s timeoutMs in a units file reaches the Unit and its dispatch and wins over workflow start --timeout; one out of range is refused', async () => {
   const tmp = setupRepo();
   const file = unitsFile(tmp, [
     { id: 'u-default', objective: 'Read', capability: 'docs:write' },
@@ -443,11 +427,18 @@ test('a unit with its own timeoutMs wins over workflow start --timeout', async (
   const runA = state.steps['u-default'].units['u-default'].unitRunId;
   const runB = state.steps['u-custom'].units['u-custom'].unitRunId;
 
-  assert.deepEqual(producerAssignment(tmp, runA).binding.provenance.timeoutMs, { value: 5400000, source: 'override:human-cli' });
+  assert.deepEqual(producerAssignment(tmp, runA).binding.provenance.timeoutMs, { value: 5400000, source: 'override' });
   assert.equal(producerAssignment(tmp, runA).binding.timeoutMs, 5400000);
 
   assert.deepEqual(producerAssignment(tmp, runB).binding.provenance.timeoutMs, { value: 120000, source: 'unit' });
   assert.equal(producerAssignment(tmp, runB).binding.timeoutMs, 120000);
+  assert.equal(unitRecordOf(tmp, runB).unit.timeoutMs, 120000);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', runB, 'producer', '1', 'runs', '01', 'run.json'), 'utf8')).timeoutMs, 120000);
+
+  assert.throws(() => validateWorkflow({
+    id: 'too-long',
+    steps: [{ id: 's', units: [{ id: 'u', template: { capability: 'docs:write', objective: 'Read', writes: [], timeoutMs: 99 * 3600000 } }] }],
+  }), /timeoutMs must be at most 4h/);
 });
 
 test('--account pins provider account on every unit of the workflow run, kept for resume', async () => {
@@ -490,7 +481,7 @@ test('--account pins provider account on every unit of the workflow run, kept fo
     const unitRunId = answered.steps.s.units.u.unitRunId;
     const binding = producerAssignment(tmp, unitRunId).binding;
     assert.deepEqual(binding.account, { pool: 'node', id: 'acct-test' });
-    assert.deepEqual(binding.provenance.account, { value: 'node/acct-test', source: 'override:human-cli' });
+    assert.deepEqual(binding.provenance.account, { value: 'node/acct-test', source: 'override' });
   } finally {
     if (prevHome === undefined) delete process.env.HOME;
     else process.env.HOME = prevHome;

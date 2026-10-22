@@ -110,16 +110,16 @@ export function digestSubject(subject, root) {
 }
 
 /**
- * Digest of what Unit runs reported: the bytes of the report file of every named role as they are now,
+ * Digest of what Unit runs reported: the bytes of the report file of every named seat as they are now,
  * read through the one hand-off resolver. A report that cannot be resolved makes the digest unknown (null).
  *
- * @param {Array<{ unitRunId: string, roles: string[] }>} units
+ * @param {Array<{ unitRunId: string, seats: string[] }>} units
  */
 export function digestUnitRunReports(units, mainRoot) {
   try {
     const refs = [];
-    for (const { unitRunId, roles } of [...units].sort((a, b) => a.unitRunId.localeCompare(b.unitRunId))) {
-      for (const role of [...roles].sort()) refs.push(`unit-run:${unitRunId}/${role}`);
+    for (const { unitRunId, seats } of [...units].sort((a, b) => a.unitRunId.localeCompare(b.unitRunId))) {
+      for (const seat of [...seats].sort()) refs.push(`unit-run:${unitRunId}/${seat}`);
     }
     // The bytes that lie there now, whatever settlement recorded: a digest that went unknown when a report was
     // edited could never be bound to an approval of the edited content.

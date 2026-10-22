@@ -9,7 +9,6 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { parseTierCell, isExtendedTierCell } from '../../src/runner/dispatch/tier-cell.mjs';
-import { resolveTierModel, resolveTierCandidates } from '../../src/runner/dispatch/resolve.mjs';
 import { loadRunnerConfigFromDir, supportsPolicyTier, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { bind } from '../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
@@ -58,28 +57,7 @@ const policies = {
   },
 };
 
-test('resolveTierModel returns the first entry, unchanged for a plain string, whichever pool serves it', () => {
-  assert.equal(resolveTierModel(policies, 'standard', 'claude'), 'sonnet');
-  assert.equal(resolveTierModel(policies, 'standard', 'deepseek'), 'deepseek-v4');
-  assert.equal(resolveTierModel(policies, 'advanced', 'deepseek'), 'deepseek-v4-pro');
-});
-
-test('resolveTierModel refuses a tier the family has no cell for', () => {
-  assert.throws(() => resolveTierModel(policies, 'nano', 'deepseek'), (err) => {
-    assert.ok(err instanceof RunnerConfigError);
-    assert.match(err.message, /no model configured for tier "nano"/);
-    return true;
-  });
-});
-
-test('resolveTierCandidates lists every entry, other pools included', () => {
-  assert.deepEqual(resolveTierCandidates(policies, 'standard', 'deepseek').map((e) => `${e.model}@${e.pool}`), [
-    'deepseek-v4@openrouter',
-    'deepseek-v4-std@deepseek',
-  ]);
-});
-
-test('supportsPolicyTier answers what resolveTierModel would do, without throwing', () => {
+test('supportsPolicyTier answers whether a family has a cell at a tier, without throwing', () => {
   assert.equal(supportsPolicyTier(policies, 'deepseek', 'standard'), true);
   assert.equal(supportsPolicyTier(policies, 'deepseek', 'advanced'), true);
   assert.equal(supportsPolicyTier(policies, 'deepseek', 'nano'), false);
@@ -93,7 +71,7 @@ function loadWith(projectPolicies, globalPolicies) {
   fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
   fs.writeFileSync(
     path.join(dir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: projectPolicies, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' } } }),
+    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: projectPolicies, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } } } }),
   );
   if (globalPolicies) fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: { modelPolicies: globalPolicies } }));
   const prevHome = process.env.HOME;
@@ -140,7 +118,7 @@ test('the global config keeps plain strings but drops list and model@pool cells,
 function bindConfig(cell) {
   return {
     modelPolicies: { f: { standard: cell } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     capabilities: { work: { prefer: [{ executor: 'fam' }] } },
     executors: {
       fam: { kind: 'agent', providerModel: 'f', command: 'fam', invocations: [{ id: 'fam-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' } }] },
@@ -162,5 +140,79 @@ test('bind never runs an entry whose pool nothing can pay for, even when it is t
   const result = bind(ask, { runnerConfig: bindConfig('x@other'), ...headless });
   assert.notEqual(result.model, 'x');
   assert.notEqual(result.model, 'x@other');
-  assert.doesNotMatch(result.provenance?.model?.source ?? '', /resolveTierModel/);
+});
+
+// ---- the {model, pool?, effort?} object form ----------------------------------------------------
+
+test('an object cell names a model, and optionally a pool and a reasoning effort', () => {
+  assert.deepEqual(parseTierCell({ model: 'sonnet' }, 'claude'), [{ model: 'sonnet', pool: 'claude', explicitPool: false }]);
+  assert.deepEqual(parseTierCell({ model: 'sonnet', effort: 'high' }, 'claude'), [{ model: 'sonnet', pool: 'claude', explicitPool: false, effort: 'high' }]);
+  assert.deepEqual(
+    parseTierCell({ model: 'deepseek-v4', pool: 'openrouter', effort: 'max' }, 'deepseek'),
+    [{ model: 'deepseek-v4', pool: 'openrouter', explicitPool: true, effort: 'max' }],
+  );
+});
+
+test('an object cell takes its model literally, so a model id with "@" is not split', () => {
+  assert.deepEqual(parseTierCell({ model: 'claude-opus-4@20250514', pool: 'vertex' }, 'claude'), [
+    { model: 'claude-opus-4@20250514', pool: 'vertex', explicitPool: true },
+  ]);
+});
+
+test('a list may mix strings and objects and keeps its order', () => {
+  assert.deepEqual(parseTierCell([{ model: 'm1', effort: 'low' }, 'm2@pool', 'm3'], 'fam'), [
+    { model: 'm1', pool: 'fam', explicitPool: false, effort: 'low' },
+    { model: 'm2', pool: 'pool', explicitPool: true },
+    { model: 'm3', pool: 'fam', explicitPool: false },
+  ]);
+});
+
+test('an object cell with no model, an unknown key, an empty pool or an effort outside the vocabulary is refused', () => {
+  assert.throws(() => parseTierCell({ effort: 'high' }, 'claude'), /"model"/);
+  assert.throws(() => parseTierCell({ model: '' }, 'claude'), /"model"/);
+  assert.throws(() => parseTierCell({ model: 'sonnet', thinking: 'high' }, 'claude'), /unknown key "thinking"/);
+  assert.throws(() => parseTierCell({ model: 'sonnet', pool: ' ' }, 'claude'), /"pool"/);
+  for (const effort of ['xhigh', 'minimal', 'off', 7, '']) {
+    assert.throws(() => parseTierCell({ model: 'sonnet', effort }, 'claude'), /"effort" must be one of low\/medium\/high\/max/);
+  }
+});
+
+test('an object cell counts as extended, so a release that reads one model string cannot take it', () => {
+  assert.equal(isExtendedTierCell({ model: 'sonnet' }), true);
+  assert.equal(isExtendedTierCell(null), false);
+});
+
+test('an object cell\'s effort reaches the binding as the cell\'s promise, and supportsPolicyTier sees the cell', () => {
+  const cfg = { modelPolicies: { claude: { advanced: [{ model: 'opus', effort: 'high' }, 'sonnet'] } } };
+  assert.equal(supportsPolicyTier(cfg, 'claude', 'advanced'), true);
+  const runnerConfig = bindConfig([{ model: 'opus', effort: 'high' }, 'sonnet']);
+  runnerConfig.executors.fam.command = 'claude';
+  const result = bind(ask, { runnerConfig, ...headless });
+  assert.ok(!result.refused, JSON.stringify(result.refused));
+  assert.equal(result.model, 'opus');
+  assert.equal(result.reasoningEffort, 'high');
+  assert.deepEqual(result.provenance.reasoningEffort, { value: 'high', source: 'cell' });
+});
+
+test('a project config may write object cells; a bad one fails to load and names the cell', () => {
+  const { cfg } = loadWith({ claude: { standard: 'sonnet', advanced: { model: 'opus', effort: 'high' } } });
+  assert.deepEqual(cfg.modelPolicies.claude.advanced, { model: 'opus', effort: 'high' });
+  assert.throws(() => loadWith({ claude: { advanced: { model: 'opus', effort: 'xhigh' } } }), /modelPolicies\.claude\.advanced.*effort/);
+  assert.throws(() => loadWith({ claude: { advanced: { effort: 'high' } } }), /modelPolicies\.claude\.advanced.*model/);
+});
+
+test('the global config drops an object cell like a list cell, naming it once', () => {
+  const { cfg, stderr } = loadWith(
+    { claude: { standard: 'sonnet' } },
+    { claude: { advanced: 'opus', frontier: { model: 'opus', effort: 'high' } } },
+  );
+  assert.equal(cfg.modelPolicies.claude.advanced, 'opus');
+  assert.equal(cfg.modelPolicies.claude.frontier, undefined);
+  assert.match(stderr, /runner\.modelPolicies\.claude\.frontier/);
+});
+
+test('bind runs the model of an object cell like the model of a string cell', () => {
+  const result = bind(ask, { runnerConfig: bindConfig({ model: 'm-obj' }), ...headless });
+  assert.ok(!result.refused, JSON.stringify(result.refused));
+  assert.equal(result.model, 'm-obj');
 });

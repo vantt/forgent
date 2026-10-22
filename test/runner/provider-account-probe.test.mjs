@@ -203,7 +203,7 @@ test('every CLI starts before any finishes, each under a read-only posture bindi
   assert.equal(calls.length, 4);
   for (const { assignment, runnerConfig, cliOverride } of calls) {
     assert.equal(assignment.binding.posture, 'read-only');
-    assert.deepEqual(cliOverride, { preferExecutor: 'openai', preferInvocation: assignment.binding.invocation }, 'the door launches the pinned invocation, not its own pick');
+    assert.deepEqual(cliOverride, { preferExecutor: 'openai', preferInvocation: assignment.binding.invocation, leaseAccount: 'acct' }, 'the door launches the pinned invocation and leases the account it probes, not its own pick');
     assert.equal(assignment.policy.preferInvocation, assignment.binding.invocation);
     assert.equal(assignment.provenance.contract.mutation, 'read-only');
     assert.deepEqual(Object.keys(runnerConfig.providers.openai.accounts), ['acct']);

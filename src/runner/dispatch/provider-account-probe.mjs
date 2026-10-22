@@ -247,7 +247,8 @@ export async function runAccountProbe({
     try {
       // The pin travels both on the Assignment (what it is bound to) and as the door's override (what the
       // door actually launches), exactly as a Workflow unit dispatch passes it.
-      const cliOverride = { preferExecutor: inv.executorId, preferInvocation: inv.invocationId };
+      // The probe names the account it probes; the lease takes exactly that one.
+      const cliOverride = { preferExecutor: inv.executorId, preferInvocation: inv.invocationId, leaseAccount: accountId };
       run = readRunOutcome(await dispatch(assignment, { runnerConfig, cliOverride }), { repoRoot });
     } catch (err) {
       run = { ok: false, text: err?.message ?? String(err), failureCode: err?.errorClass ?? null, runDir: err?.runDir ?? null, paneId: err?.paneId ?? null, terminalKey: err?.terminalKey ?? null, herdrSession: err?.herdrSession ?? null };

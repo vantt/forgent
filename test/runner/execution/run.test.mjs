@@ -8,9 +8,11 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 
+import { resolveSeats } from '../../../src/runner/execution/seat-resolver.mjs';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { runUnit as coreRunUnit, recordInlineRun, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
-import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError, loadRunnerConfigFromDir } from '../../../src/runner/dispatch/config.mjs';
+import { seatConfigDigestOf } from '../../../src/runner/execution/seat-policy.mjs';
 import { writeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 import { installCancelOnSignal, resetCancelRequest } from '../../../src/run-supervisor/cancel-registry.mjs';
@@ -41,12 +43,7 @@ function setupGitRepo() {
   const runnerConfig = {
     runner: {
       defaultExecutor: 'test-node',
-      rigorToTier: {
-        low: 'nano',
-        standard: 'standard',
-        high: 'flagship',
-        critical: 'frontier',
-      },
+      defaults: { tier: 'standard' },
       modelPolicies: {
         node: {
           standard: 'node-std',
@@ -84,7 +81,7 @@ function setupGitRepo() {
           rigor: 'standard',
         },
       },
-      patterns: {
+      patterns: { seatBinding: { schema: 1 },
         defaultRule: { mutatingMinRigor: 'standard' },
         reviewed: {
           maxRounds: 2,
@@ -203,7 +200,9 @@ test('recordInlineRun admits valid producer nonce with existing evidenceRefs', (
   // Create pending-inline.json
   const pending = {
     unitRunId,
+    seat: 'producer',
     role: 'producer',
+    posture: { inlineAllowed: true },
     round: 1,
     nonce: 'secret-nonce-1234',
   };
@@ -250,7 +249,9 @@ test('recordInlineRun refuses invalid nonce, non-producer role, or missing evide
 
   const pending = {
     unitRunId,
+    seat: 'producer',
     role: 'producer',
+    posture: { inlineAllowed: true },
     round: 1,
     nonce: 'valid-nonce',
   };
@@ -265,7 +266,7 @@ test('recordInlineRun refuses invalid nonce, non-producer role, or missing evide
   // 2. Non-producer role
   assert.throws(
     () => recordInlineRun({ unitRunId, role: 'reviewer', round: 1, nonce: 'valid-nonce', evidenceRefs: ['README.md'], repoRoot }),
-    /only producer role may record inline run/,
+    /only the seat that was waiting inline may record an inline run/,
   );
 
   // 3. Non-existent evidence file
@@ -282,26 +283,6 @@ test('architecture guard: src/runner/execution/run.mjs does NOT import state, co
   assert.ok(!/from\s+['"].*coordination\//.test(content));
   assert.ok(!/from\s+['"].*worktree/.test(content));
   assert.ok(!/from\s+['"].*merge/.test(content));
-});
-
-test('mutating gate: admits mutating unit in linked worktree matching unit.json', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  const unit = {
-    id: 'u-mutate-1',
-    objective: 'Implement feature',
-    capability: 'docs:write',
-    writes: ['src/feature.txt'],
-  };
-
-  const res = await runUnit({
-    unitData: unit,
-    repoRoot,
-    cwd: worktreeDir,
-    pattern: 'solo',
-  });
-
-  assert.ok(res.unitRunId);
-  assert.equal(res.rounds, 1);
 });
 
 test('mutating gate: refuses mutating unit in main checkout', async () => {
@@ -399,21 +380,28 @@ async function mutatingGateFixture({ writeUnitJson = true, corrupt = false, twoC
   const unitRunId = 'unit-run-gate-' + Math.random().toString(36).slice(2, 8);
   const unitDir = path.join(repoRoot, '.fgos', 'assignments', unitRunId);
   fs.mkdirSync(unitDir, { recursive: true });
-  const record = {
-    unit: { id: 'u-gate', objective: 'Gate probe', capability: 'docs:write', writes: ['file.txt'] },
-    overrides: [],
-    configSnapshot: snapshotRunnerConfig(repoRoot),
-    worktree: fs.realpathSync(worktreeDir),
-  };
   if (twoCandidates) {
-    // A second executor behind the first, so a fallback walk has somewhere to go.
-    const runner = record.configSnapshot.runner;
+    // A second executor behind the first, so a fallback walk has somewhere to go. The replay reads the
+    // committed config, so the second executor is committed to the project config.
+    const file = path.join(repoRoot, '.fgos', 'config.json');
+    const committed = JSON.parse(fs.readFileSync(file, 'utf8'));
+    const runner = committed.runner;
     runner.executors['test-node-2'] = { ...runner.executors['test-node'], providerModel: 'node2' };
     runner.capabilities['docs:write'].prefer = [{ executor: 'test-node' }, { executor: 'test-node-2' }];
     runner.modelPolicies.node2 = runner.modelPolicies.node;
+    fs.writeFileSync(file, JSON.stringify(committed, null, 2));
   }
-  if (attempts) record.bindings = { 'producer/1': attempts(unitRunId) };
-  if (bindings) record.bindings = bindings(unitRunId);
+  const record = {
+    unit: { id: 'u-gate', objective: 'Gate probe', capability: 'docs:write', writes: ['file.txt'] },
+    overrides: [],
+    // Taking the snapshot fills in the config's missing defaults, so the digest is read after it.
+    configSnapshot: snapshotRunnerConfig(repoRoot),
+    worktree: fs.realpathSync(worktreeDir),
+  };
+  // What a bind records: the digest of the seat config it was bound under.
+  const configDigest = seatConfigDigestOf(loadRunnerConfigFromDir(repoRoot)).digest;
+  if (attempts) record.bindings = { 'producer/1': attempts(unitRunId, configDigest) };
+  if (bindings) record.bindings = bindings(unitRunId, configDigest);
   if (writeUnitJson) {
     fs.writeFileSync(path.join(unitDir, 'unit.json'), corrupt ? '{not json' : JSON.stringify(record, null, 2));
   }
@@ -429,7 +417,7 @@ async function mutatingGateFixture({ writeUnitJson = true, corrupt = false, twoC
     writes: ['file.txt'],
   };
   const run = (assignment) => executeAssignment(assignment, { cwd: worktreeDir, repoRoot, isReadOnlyMode: false });
-  return { baseAssignment, run, record };
+  return { baseAssignment, run, record, repoRoot, configDigest };
 }
 
 test('mutating gate: refuses a unit-run assignment whose unit.json is missing', async () => {
@@ -447,14 +435,25 @@ test('mutating gate: refuses a unit-run assignment that carries no binding', asy
   await assert.rejects(() => run(baseAssignment), /carries no binding/);
 });
 
+// What bind() records for each fixture executor: its own family is its pool, its cell's model, and the digest of
+// the seat config it was bound under.
+const gateBinding = (executor, configDigest) => ({ executor, invocation: 'cli-default', pool: executor === 'test-node' ? 'node' : 'node2', model: 'node-std', bindingInput: { configDigest } });
+const gateAttempt = (unitRunId, n, executor, outcome, configDigest) => ({
+  role: 'producer',
+  round: 1,
+  assignmentId: n === 0 ? `${unitRunId}/producer/1` : `${unitRunId}/producer/1-fb${n}`,
+  binding: gateBinding(executor, configDigest),
+  ...(outcome ? { outcome } : {}),
+});
+
 test('mutating gate: refuses a binding that differs from the one bind() recomputes', async () => {
-  const { baseAssignment, run } = await mutatingGateFixture();
+  const { baseAssignment, run } = await mutatingGateFixture({ attempts: (id, digest) => [gateAttempt(id, 0, 'test-node', undefined, digest)] });
   const forged = { ...baseAssignment, binding: { executor: 'some-other-executor', tier: 'standard', posture: 'write' } };
   await assert.rejects(() => run(forged), /binding mismatch/);
 });
 
 test('mutating gate: refuses an assignment that pins an executor other than the verified binding', async () => {
-  const { baseAssignment, run, record } = await mutatingGateFixture();
+  const { baseAssignment, run, record } = await mutatingGateFixture({ attempts: (id, digest) => [gateAttempt(id, 0, 'test-node', undefined, digest)] });
   const { bind } = await import('../../../src/runner/execution/bind.mjs');
   const verified = bind(
     { unit: record.unit, role: 'producer', readOnly: false, overrides: [] },
@@ -469,21 +468,47 @@ test('mutating gate: refuses an assignment that pins an executor other than the 
   await assert.rejects(() => run(pinned), /pins executor "rogue-executor"/);
 });
 
-// What bind() records for each fixture executor: its own family is its pool, and its cell's model.
-const gateBinding = (executor) => ({ executor, invocation: 'cli-default', pool: executor === 'test-node' ? 'node' : 'node2', model: 'node-std' });
-const gateAttempt = (unitRunId, n, executor, outcome) => ({
-  role: 'producer',
-  round: 1,
-  assignmentId: n === 0 ? `${unitRunId}/producer/1` : `${unitRunId}/producer/1-fb${n}`,
-  binding: gateBinding(executor),
-  ...(outcome ? { outcome } : {}),
+test('mutating gate: an assignment whose attempt the runner never recorded has no binding input to replay', async () => {
+  const { baseAssignment, run } = await mutatingGateFixture();
+  const forged = { ...baseAssignment, binding: { executor: 'test-node', tier: 'standard', posture: 'workspace-write' } };
+  await assert.rejects(() => run(forged), (err) => err.code === 'binding-replay-snapshot-missing');
+});
+
+test('mutating gate: a config committed after the bind refuses the write, whatever copy of the config unit.json holds', async () => {
+  const { baseAssignment, run, record, repoRoot, configDigest } = await mutatingGateFixture({ attempts: (id, digest) => [gateAttempt(id, 0, 'test-node', undefined, digest)] });
+  const verified = (await import('../../../src/runner/execution/bind.mjs')).bind(
+    { unit: record.unit, role: 'producer', readOnly: false, overrides: [] },
+    { runnerConfig: loadRunnerConfigFromDir(repoRoot), session: {} },
+  );
+  const assignment = { ...baseAssignment, binding: { executor: verified.executor, pool: verified.pool, tier: verified.tier, posture: verified.posture } };
+  // The snapshot kept in unit.json still carries the config the seat was bound under; the committed one moved on.
+  const file = path.join(repoRoot, '.fgos', 'config.json');
+  const committed = JSON.parse(fs.readFileSync(file, 'utf8'));
+  committed.runner.defaults.tier = 'advanced';
+  committed.runner.modelPolicies.node.advanced = 'node-adv';
+  fs.writeFileSync(file, JSON.stringify(committed, null, 2));
+  assert.notEqual(seatConfigDigestOf(loadRunnerConfigFromDir(repoRoot)).digest, configDigest);
+  await assert.rejects(() => run(assignment), (err) => err.code === 'binding-replay-config-mismatch');
+});
+
+test('mutating gate: a recorded bindingInput that carries a config copy of its own is ignored; only its digest is read', async () => {
+  const { baseAssignment, run, record, repoRoot } = await mutatingGateFixture({
+    attempts: (id, digest) => [{ ...gateAttempt(id, 0, 'test-node', undefined, digest), binding: { ...gateBinding('test-node', digest), bindingInput: { configDigest: digest, config: { modelPolicies: { node: { standard: 'forged-model' } } } } } }],
+  });
+  const verified = (await import('../../../src/runner/execution/bind.mjs')).bind(
+    { unit: record.unit, role: 'producer', readOnly: false, overrides: [] },
+    { runnerConfig: loadRunnerConfigFromDir(repoRoot), session: {} },
+  );
+  const assignment = { ...baseAssignment, binding: { executor: verified.executor, pool: verified.pool, tier: verified.tier, posture: verified.posture } };
+  // Reaches the point after the gate: the executable it would spawn is not the point of this test.
+  await run(assignment).catch((err) => { assert.doesNotMatch(String(err.message), /binding (mismatch|input)|different seat config/); });
 });
 
 test('mutating gate: a fallback attempt must follow a provider-limit attempt the runner recorded', async () => {
   // Attempt 0 settled as a pass, yet the assignment claims the second candidate.
   const { baseAssignment, run } = await mutatingGateFixture({
     twoCandidates: true,
-    attempts: (id) => [gateAttempt(id, 0, 'test-node', 'pass'), gateAttempt(id, 1, 'test-node-2')],
+    attempts: (id, digest) => [gateAttempt(id, 0, 'test-node', 'pass', digest), gateAttempt(id, 1, 'test-node-2', undefined, digest)],
   });
   const forged = { ...baseAssignment, assignmentId: `${baseAssignment.unitRunId}/producer/1-fb1`, binding: { executor: 'test-node-2', tier: 'standard', posture: 'workspace-write' } };
   await assert.rejects(() => run(forged), /binding mismatch/);
@@ -492,38 +517,38 @@ test('mutating gate: a fallback attempt must follow a provider-limit attempt the
 test('mutating gate: an assignment the runner never recorded cannot claim a fallback binding', async () => {
   const { baseAssignment, run } = await mutatingGateFixture({
     twoCandidates: true,
-    attempts: (id) => [gateAttempt(id, 0, 'test-node', 'provider-limit')],
+    attempts: (id, digest) => [gateAttempt(id, 0, 'test-node', 'provider-limit', digest)],
   });
   const forged = { ...baseAssignment, assignmentId: `${baseAssignment.unitRunId}/producer/1-fb1`, binding: { executor: 'test-node-2', tier: 'standard', posture: 'workspace-write' } };
-  await assert.rejects(() => run(forged), /binding mismatch/);
+  await assert.rejects(() => run(forged), (err) => err.code === 'binding-replay-snapshot-missing');
 });
 
 test('mutating gate: a recorded fallback attempt cannot be rebound to the candidate that already hit its limit', async () => {
   const { baseAssignment, run } = await mutatingGateFixture({
     twoCandidates: true,
-    attempts: (id) => [gateAttempt(id, 0, 'test-node', 'provider-limit'), gateAttempt(id, 1, 'test-node-2')],
+    attempts: (id, digest) => [gateAttempt(id, 0, 'test-node', 'provider-limit', digest), gateAttempt(id, 1, 'test-node-2', undefined, digest)],
   });
   const replay = { ...baseAssignment, assignmentId: `${baseAssignment.unitRunId}/producer/1-fb1`, binding: { executor: 'test-node', tier: 'standard', posture: 'workspace-write' } };
   await assert.rejects(() => run(replay), /binding mismatch/);
 });
 
 test('mutating gate: a producer cannot borrow the fallback attempt of another role or round', async () => {
-  const other = (id, role, round) => [
-    { role, round, assignmentId: `${id}/${role}/${round}`, binding: gateBinding('test-node'), outcome: 'provider-limit' },
-    { role, round, assignmentId: `${id}/${role}/${round}-fb1`, binding: gateBinding('test-node-2') },
+  const other = (id, role, round, digest) => [
+    { role, round, assignmentId: `${id}/${role}/${round}`, binding: gateBinding('test-node', digest), outcome: 'provider-limit' },
+    { role, round, assignmentId: `${id}/${role}/${round}-fb1`, binding: gateBinding('test-node-2', digest) },
   ];
   const { baseAssignment, run } = await mutatingGateFixture({
     twoCandidates: true,
-    bindings: (id) => ({
-      'producer/1': [gateAttempt(id, 0, 'test-node', 'pass')],
-      'checker/1': other(id, 'checker', 1),
-      'producer/2': other(id, 'producer', 2),
+    bindings: (id, digest) => ({
+      'producer/1': [gateAttempt(id, 0, 'test-node', 'pass', digest)],
+      'checker/1': other(id, 'checker', 1, digest),
+      'producer/2': other(id, 'producer', 2, digest),
     }),
   });
   const claimed = { executor: 'test-node-2', tier: 'standard', posture: 'workspace-write' };
   for (const borrowed of ['checker/1-fb1', 'producer/2-fb1']) {
     const forged = { ...baseAssignment, assignmentId: `${baseAssignment.unitRunId}/${borrowed}`, binding: claimed };
-    await assert.rejects(() => run(forged), /binding mismatch/, borrowed);
+    await assert.rejects(() => run(forged), (err) => err.code === 'binding-replay-snapshot-missing', borrowed);
   }
 });
 
@@ -578,21 +603,6 @@ function reviewedConfig(repoRoot, executorNames) {
   fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
 }
 
-test('a reviewed run never lets the producer family also check its own work', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha', 'beta']);
-  const res = await runUnit({
-    unitData: { id: 'u-indep', objective: 'Write docs', capability: 'docs:write', writes: [], pattern: 'reviewed' },
-    repoRoot,
-    cwd: worktreeDir,
-    worktree: worktreeDir,
-    pattern: 'reviewed',
-  });
-  const byRole = Object.fromEntries(res.results.map((r) => [r.role, r.runResult?.executorId]));
-  assert.equal(byRole.producer, 'alpha');
-  assert.equal(byRole.reviewer, 'beta', 'the reviewer must run on a different provider family than the producer');
-});
-
 test('a reviewed run with a single provider family refuses the checker instead of self-reviewing', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha']);
@@ -604,28 +614,18 @@ test('a reviewed run with a single provider family refuses the checker instead o
     pattern: 'reviewed',
   });
   assert.equal(res.outcome, 'policy-refusal');
-  const checker = res.results.find((r) => r.role === 'reviewer');
-  assert.equal(checker.refused.reason, 'independence');
+  const checker = res.results.find((r) => r.seat === 'reviewer');
+  assert.equal(checker.refused.reason, 'independence-unsatisfiable');
 });
 
-test('panel members run on different provider families', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma']);
-  const res = await runUnit({
-    unitData: { id: 'u-panel', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
-    repoRoot,
-    cwd: worktreeDir,
-    worktree: worktreeDir,
-    pattern: 'panel',
-  });
-  const members = res.results.filter((r) => r.role.startsWith('panelist-')).map((r) => r.runResult?.executorId);
-  assert.equal(members.length, 3);
-  assert.equal(new Set(members).size, 3, `panelists must not share a provider family, got ${members.join(',')}`);
-});
+// A panel unit declares its seats: `n` producer members and one synthesizer.
+function panelSeats(n) {
+  return [...Array.from({ length: n }, (_, i) => ({ seat: `member-${i + 1}`, role: 'producer' })), { seat: 'synthesizer', role: 'synthesizer' }];
+}
 
 function panelRun(id, members) {
   const { repoRoot, worktreeDir } = setupGitRepo();
-  return { repoRoot, worktreeDir, pattern: members ? { pattern: 'panel', params: { members } } : 'panel', id };
+  return { repoRoot, worktreeDir, pattern: 'panel', id };
 }
 
 const summaryOf = (repoRoot, res) => JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'unit-summary.json'), 'utf8'));
@@ -634,7 +634,7 @@ test('a panel with fewer provider families than members runs anyway: seats share
   const { repoRoot, worktreeDir, pattern } = panelRun('u-panel-2', 6);
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma']);
   const res = await runUnit({
-    unitData: { id: 'u-panel-2', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    unitData: { id: 'u-panel-2', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(6) },
     repoRoot,
     cwd: worktreeDir,
     worktree: worktreeDir,
@@ -642,62 +642,36 @@ test('a panel with fewer provider families than members runs anyway: seats share
   });
   assert.equal(res.outcome, 'pass');
   assert.ok(!res.results.some((r) => r.refused), 'no seat is refused for sharing a family');
-  const byRole = Object.fromEntries(res.results.map((r) => [r.role, r.runResult?.executorId]));
+  const byRole = Object.fromEntries(res.results.map((r) => [r.seat, r.runResult?.executorId]));
   assert.deepEqual(
-    [1, 2, 3, 4, 5, 6].map((n) => byRole[`panelist-${n}`]),
+    [1, 2, 3, 4, 5, 6].map((n) => byRole[`member-${n}`]),
     ['alpha', 'beta', 'gamma', 'alpha', 'beta', 'gamma'],
     'seats are bound in listed order, each on the first unused family in pool order, then the least used',
   );
   const summary = summaryOf(repoRoot, res);
   assert.equal(summary.seats.filter((seat) => seat.kind === 'panelist').length, 6);
   assert.deepEqual(summary.sharedFamilies.map((entry) => entry.seats.length).sort(), [2, 2, 3]);
-  const alpha = summary.sharedFamilies.find((entry) => entry.seats.includes('panelist-1/1'));
-  assert.deepEqual(alpha.seats, ['panelist-1/1', 'panelist-4/1', 'synthesizer/1']);
+  const alpha = summary.sharedFamilies.find((entry) => entry.seats.includes('member-1/1'));
+  assert.deepEqual(alpha.seats, ['member-1/1', 'member-4/1', 'synthesizer/1']);
 });
 
-test('a panel with enough provider families lands every seat on its own family and the summary shows no sharing', async () => {
-  const { repoRoot, worktreeDir, pattern } = panelRun('u-panel-3', 3);
+test('a panel with enough provider families lands every seat on its own family, the synthesizer on one no panelist used, and only the synthesizer is told to read the panelist reports', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
   const res = await runUnit({
-    unitData: { id: 'u-panel-3', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    unitData: { id: 'u-panel-refs', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3) },
     repoRoot,
     cwd: worktreeDir,
     worktree: worktreeDir,
-    pattern,
+    pattern: 'panel',
   });
   assert.equal(res.outcome, 'pass');
   assert.deepEqual(res.results.map((r) => r.runResult?.executorId), ['alpha', 'beta', 'gamma', 'delta']);
   assert.equal(summaryOf(repoRoot, res).sharedFamilies, undefined);
-});
-
-test('the panel synthesizer runs on a provider family none of the panelists used', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
-  const res = await runUnit({
-    unitData: { id: 'u-panel-synth', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
-    repoRoot,
-    cwd: worktreeDir,
-    worktree: worktreeDir,
-    pattern: 'panel',
-  });
-  const members = res.results.filter((r) => r.role.startsWith('panelist-')).map((r) => r.runResult?.executorId);
-  const synth = res.results.find((r) => r.role === 'synthesizer');
-  assert.equal(members.length, 3);
+  const members = res.results.filter((r) => r.seat.startsWith('member-')).map((r) => r.runResult?.executorId);
+  const synth = res.results.find((r) => r.seat === 'synthesizer');
   assert.ok(synth?.runResult?.executorId, `synthesizer should have run, got ${JSON.stringify(res).slice(0, 1500)}`);
   assert.ok(!members.includes(synth.runResult.executorId), 'synthesizer shares a provider family with a panelist');
-});
-
-test('the panel synthesizer is told to read every panelist report; the panelists are told nothing', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
-  const res = await runUnit({
-    unitData: { id: 'u-panel-refs', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
-    repoRoot,
-    cwd: worktreeDir,
-    worktree: worktreeDir,
-    pattern: 'panel',
-  });
-  assert.equal(res.outcome, 'pass');
   const assignmentOf = (role) =>
     JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, role, '1', 'assignment.json'), 'utf8'));
 
@@ -705,20 +679,20 @@ test('the panel synthesizer is told to read every panelist report; the panelists
   assert.equal(refs.length, 3, `synthesizer refs: ${JSON.stringify(refs)}`);
   for (const [i, ref] of refs.entries()) {
     assert.ok(path.isAbsolute(ref), `ref is absolute: ${ref}`);
-    assert.ok(ref.includes(`/panelist-${i + 1}/`), `ref ${i} points at panelist-${i + 1}: ${ref}`);
+    assert.ok(ref.includes(`/member-${i + 1}/`), `ref ${i} points at member-${i + 1}: ${ref}`);
     assert.ok(/(report-\d+|agent-report)\.md$/.test(ref), `ref is a report: ${ref}`);
     assert.ok(fs.existsSync(ref), `ref exists: ${ref}`);
   }
-  for (const n of [1, 2, 3]) assert.deepEqual(assignmentOf(`panelist-${n}`).contextRefs, []);
+  for (const n of [1, 2, 3]) assert.deepEqual(assignmentOf(`member-${n}`).contextRefs, []);
 
   // Each role is told its own task: the panelists the plain objective, the synthesizer a synthesis of it.
-  for (const n of [1, 2, 3]) assert.equal(assignmentOf(`panelist-${n}`).objective, 'Review the design');
+  for (const n of [1, 2, 3]) assert.equal(assignmentOf(`member-${n}`).objective, 'Review the design');
   const synthObjective = assignmentOf('synthesizer').objective;
   assert.match(synthObjective, /synthesizer/i);
   assert.ok(synthObjective.includes('Review the design'), 'the panel\'s task is quoted to the synthesizer');
 });
 
-test('a unit-run input reaches the roles as the absolute path of that role\'s report, resolved once into unit.json', async () => {
+test('a unit-run input reaches the roles as the absolute path of that role\'s report, resolved once into unit.json; a resume refuses a record from a newer release', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha']);
   const run = (unitData, extra = {}) =>
@@ -752,23 +726,15 @@ test('a unit-run input reaches the roles as the absolute path of that role\'s re
   delete unitJson.resolvedInputs;
   fs.writeFileSync(path.join(dirOfB, 'unit.json'), JSON.stringify(unitJson));
   await assert.rejects(() => run(undefined, { resumeUnitRunId: second.unitRunId }), /no resolvedInputs/);
-});
 
-test('a resume refuses a unit record carrying a seatSchema from a newer release, and the record stays readable', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha']);
-  const run = (unitData, extra = {}) =>
-    runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'solo', ...extra });
-  const first = await run({ id: 'u-seat', objective: 'Write docs', capability: 'docs:write', writes: [] });
-  assert.equal(first.outcome, 'pass');
-  const unitPath = path.join(repoRoot, '.fgos', 'assignments', first.unitRunId, 'unit.json');
-  const record = JSON.parse(fs.readFileSync(unitPath, 'utf8'));
-  fs.writeFileSync(unitPath, JSON.stringify({ ...record, seatSchema: 1 }));
+  // A record carrying a seatSchema from a newer release is refused on resume and left untouched.
+  const firstPath = path.join(repoRoot, '.fgos', 'assignments', first.unitRunId, 'unit.json');
+  fs.writeFileSync(firstPath, JSON.stringify({ ...JSON.parse(fs.readFileSync(firstPath, 'utf8')), seatSchema: 2 }));
   await assert.rejects(
     () => run(undefined, { resumeUnitRunId: first.unitRunId }),
     (err) => err.code === 'record-from-newer-release' && /seatSchema/.test(err.message),
   );
-  assert.equal(JSON.parse(fs.readFileSync(unitPath, 'utf8')).seatSchema, 1, 'the refused record is left untouched');
+  assert.equal(JSON.parse(fs.readFileSync(firstPath, 'utf8')).seatSchema, 2, 'the refused record is left untouched');
 });
 
 test('anonymizeInputs hands the role a copy under a neutral name, keeps the mapping in unit.json, and a resume reuses it', async () => {
@@ -851,7 +817,7 @@ test('a unit-run input that cannot be resolved is refused before any unit direct
   assert.deepEqual(after, before);
 });
 
-test('a reviewed run tells the reviewer to review and hands it the producer\'s report', async () => {
+test('a reviewed run never lets the producer family also check its own work; the reviewer is told to review and handed the producer\'s report', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta']);
   const res = await runUnit({
@@ -862,6 +828,9 @@ test('a reviewed run tells the reviewer to review and hands it the producer\'s r
     pattern: 'reviewed',
   });
   assert.equal(res.outcome, 'pass');
+  const byRole = Object.fromEntries(res.results.map((r) => [r.seat, r.runResult?.executorId]));
+  assert.equal(byRole.producer, 'alpha');
+  assert.equal(byRole.reviewer, 'beta', 'the reviewer must run on a different provider family than the producer');
   const assignmentOf = (role) =>
     JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, role, '1', 'assignment.json'), 'utf8'));
 
@@ -877,21 +846,24 @@ test('a reviewed run tells the reviewer to review and hands it the producer\'s r
   assert.ok(fs.existsSync(reviewer.contextRefs[0]));
 });
 
-test('a panel whose every provider family is taken by panelists still runs the synthesizer, on the least used family', async () => {
+test('panel members run on different provider families; when they take every family the synthesizer still runs, on the least used one', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma']);
   const res = await runUnit({
-    unitData: { id: 'u-panel-synth-2', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    unitData: { id: 'u-panel-synth-2', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3) },
     repoRoot,
     cwd: worktreeDir,
     worktree: worktreeDir,
     pattern: 'panel',
   });
   assert.equal(res.outcome, 'pass');
-  const synth = res.results.find((r) => r.role === 'synthesizer');
+  const members = res.results.filter((r) => r.seat.startsWith('member-')).map((r) => r.runResult?.executorId);
+  assert.equal(members.length, 3);
+  assert.equal(new Set(members).size, 3, `panelists must not share a provider family, got ${members.join(',')}`);
+  const synth = res.results.find((r) => r.seat === 'synthesizer');
   assert.equal(synth.refused, undefined);
   assert.equal(synth.runResult.executorId, 'alpha', 'every family is used once, so pool order breaks the tie');
-  assert.deepEqual(synth.binding.provenance.familySpread.value.sharedWith, ['panelist-1']);
+  assert.deepEqual(synth.binding.provenance.familySpread.value.sharedWith, ['member-1']);
 });
 
 // A worker that writes a file in its worktree and never touches git.
@@ -1114,7 +1086,7 @@ test('a blind panel synthesizer reads its panelists\' reports as copies in its o
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
   const res = await runUnit({
-    unitData: { id: 'u-panel-blind', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', blind: true },
+    unitData: { id: 'u-panel-blind', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3), blind: true },
     repoRoot,
     cwd: worktreeDir,
     worktree: worktreeDir,
@@ -1125,28 +1097,28 @@ test('a blind panel synthesizer reads its panelists\' reports as copies in its o
   const refs = JSON.parse(fs.readFileSync(path.join(synthDir, 'assignment.json'), 'utf8')).contextRefs;
   assert.deepEqual(refs.map((ref) => path.dirname(ref)), [1, 2, 3].map(() => path.join(synthDir, 'inputs')));
   for (const [i, ref] of refs.entries()) {
-    assert.ok(ref.includes(`panelist-${i + 1}`), `ref ${i} is the copy of panelist-${i + 1}'s report: ${ref}`);
+    assert.ok(ref.includes(`member-${i + 1}`), `ref ${i} is the copy of member-${i + 1}'s report: ${ref}`);
     assert.ok(fs.statSync(ref).size > 0 && !fs.lstatSync(ref).isSymbolicLink());
   }
 });
 
-test('each role of a panel gets its own seat\'s earlier report as own-previous, blind or not, and not the other seats\'', async () => {
+test('each role of a panel gets its own seat\'s earlier report as own-previous, blind or not, and not the other seats\'; a seat the earlier run did not have is refused by name', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
   const run = (unitData) => runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'panel' });
-  const first = await run({ id: 'u-round-1', objective: 'Propose', capability: 'docs:write', writes: [], pattern: 'panel' });
-  const reportOf = (role) => path.join(repoRoot, first.results.find((r) => r.role === role).runResult.settleReports[0].path);
+  const first = await run({ id: 'u-round-1', objective: 'Propose', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3) });
+  const reportOf = (role) => path.join(repoRoot, first.results.find((r) => r.seat === role).runResult.settleReports[0].path);
 
   for (const blind of [false, true]) {
     const res = await run({
-      id: `u-round-2-${blind}`, objective: 'Revise', capability: 'docs:write', writes: [], pattern: 'panel', blind,
+      id: `u-round-2-${blind}`, objective: 'Revise', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3), blind,
       inputs: [`unit-run:${first.unitRunId}/{seat}`],
     });
     assert.equal(res.outcome, 'pass');
     const unitDir = path.join(repoRoot, '.fgos', 'assignments', res.unitRunId);
     assert.deepEqual(JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8')).resolvedInputs, [], 'resolved per role, not for the unit');
 
-    for (const role of ['panelist-1', 'panelist-2', 'panelist-3']) {
+    for (const role of ['member-1', 'member-2', 'member-3']) {
       const roleDir = path.join(unitDir, role, '1');
       const refs = JSON.parse(fs.readFileSync(path.join(roleDir, 'assignment.json'), 'utf8')).contextRefs;
       const own = path.join(roleDir, 'inputs', 'own-previous.md');
@@ -1158,15 +1130,8 @@ test('each role of a panel gets its own seat\'s earlier report as own-previous, 
     assert.ok(synthRefs.some((ref) => ref.endsWith('own-previous.md')));
     assert.equal(synthRefs.length, 4);
   }
-});
-
-test('a seat the earlier run did not have is refused with a named reason when that role is dispatched', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
-  const run = (unitData, pattern) => runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern });
-  const first = await run({ id: 'u-panel', objective: 'Write docs', capability: 'docs:write', writes: [], pattern: 'panel' }, 'panel');
   await assert.rejects(
-    () => run({ id: 'u-own', objective: 'x', capability: 'docs:write', writes: [], pattern: 'solo', inputs: [`unit-run:${first.unitRunId}/{seat}`] }, 'solo'),
+    () => runUnit({ unitData: { id: 'u-own', objective: 'x', capability: 'docs:write', writes: [], pattern: 'solo', inputs: [`unit-run:${first.unitRunId}/{seat}`] }, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'solo' }),
     /no-such-seat/,
   );
 });
@@ -1183,12 +1148,9 @@ test('unit summaries cover refusal, thrown execution and resume without duplicat
   assert.equal(readSummary().outcome, 'policy-refusal');
   assert.deepEqual(readSummary().seats, []);
   assert.equal(readSummary().workflow, null);
-  // An unknown pattern throws after owner metadata exists.
-  await assert.rejects(runUnit({ unitData, repoRoot, cwd: worktreeDir, pattern: 'nonexistent-pattern' }));
-  const other = fs.readdirSync(path.dirname(dir)).find((name) => name !== refused.unitRunId);
-  const thrown = JSON.parse(fs.readFileSync(path.join(path.dirname(dir), other, 'unit-summary.json'), 'utf8'));
-  assert.equal(thrown.outcome, 'execution-failure');
-  assert.ok(thrown.settledAt);
+  // An unknown pattern has no seats to resolve: the run is refused before any unit directory exists.
+  await assert.rejects(runUnit({ unitData, repoRoot, cwd: worktreeDir, pattern: 'nonexistent-pattern' }), /Unknown collaboration pattern/);
+  assert.deepEqual(fs.readdirSync(path.dirname(dir)), [refused.unitRunId]);
   // A resumed solo uses settled history and never launches the unavailable executor.
   const runDir = path.join(dir, 'producer', '1', 'runs', '01');
   fs.mkdirSync(runDir, { recursive: true });
@@ -1212,14 +1174,21 @@ function recordedUnitFixture(t, pattern = 'solo') {
   fs.mkdirSync(unitDir, { recursive: true });
   const record = {
     unit: { id: 'recorded-question', objective: 'Answer the question', capability: 'not-configured:answer',
-      writes: [], pattern, stanceOptions: ['a', 'b'] },
+      writes: [], pattern, stanceOptions: ['a', 'b'], ...(pattern === 'panel' ? { seats: panelSeats(3) } : {}) },
     pattern,
+    seatSchema: 1,
     resolvedInputs: [],
     configSnapshot: snapshotRunnerConfig(repoRoot),
     overrides: [],
     worktree: fs.realpathSync(worktreeDir),
     createdAt: '2026-10-05T01:00:00Z',
   };
+  // A pattern the resolver does not know leaves a record with no seats, which a resume then refuses.
+  try {
+    record.seats = resolveSeats({ pattern, unit: record.unit, runnerConfig: record.configSnapshot.runner });
+  } catch {
+    record.seats = [];
+  }
   fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(record));
   const readRecord = () => JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
   const readSummary = () => JSON.parse(fs.readFileSync(path.join(unitDir, 'unit-summary.json'), 'utf8'));
@@ -1228,7 +1197,7 @@ function recordedUnitFixture(t, pattern = 'solo') {
 
 function pendingInlineFixture(fixture) {
   fs.writeFileSync(path.join(fixture.unitDir, 'pending-inline.json'), JSON.stringify({
-    role: 'producer', round: 1, nonce: 'single-use', binding: { executor: 'lead' },
+    seat: 'producer', role: 'producer', posture: { inlineAllowed: true }, round: 1, nonce: 'single-use', binding: { executor: 'lead' },
   }));
   return { repoRoot: fixture.repoRoot, unitRunId: fixture.unitRunId, role: 'producer', round: 1,
     nonce: 'single-use', evidenceRefs: ['README.md'], result: { status: 'done', summary: 'Answered' } };
@@ -1246,7 +1215,7 @@ test('inline reviewed producer remains pending and resume continues through chec
   const resumed = await runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
     resumeUnitRunId: fixture.unitRunId });
   assert.equal(resumed.outcome, 'policy-refusal');
-  assert.deepEqual(resumed.results.map(({ role }) => role), ['producer', 'reviewer']);
+  assert.deepEqual(resumed.results.map(({ seat }) => seat), ['producer', 'reviewer']);
   assert.ok(resumed.results[1].refused);
   assert.equal(fs.readFileSync(producerResult, 'utf8'), originalProducer);
   assert.equal(fixture.readRecord().settlement.outcome, 'policy-refusal');
@@ -1404,7 +1373,7 @@ test('a reviewed execution error publishes its summary only after the dispatched
     resumeUnitRunId: fixture.unitRunId }), (error) => error instanceof RunnerConfigError && /cannot be bound inline/.test(error.message));
   const summary = fixture.readSummary();
   assert.equal(summary.outcome, 'execution-failure');
-  const sibling = summary.seats.find((seat) => seat.role === 'red-team');
+  const sibling = summary.seats.find((seat) => seat.seat === 'red-team');
   assert.ok(sibling?.final.runId);
   assert.equal(sibling.final.outcome, 'pass');
   assert.equal(sibling.kind, 'checker');
@@ -1870,7 +1839,7 @@ test('a reviewed run at rigor high puts the producer and both checkers on three 
   withModelPolicies(repoRoot, ['alpha', 'beta', 'gamma']);
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-high-3', rigor: 'high' });
   assert.equal(res.outcome, 'pass');
-  const byRole = Object.fromEntries(res.results.map((r) => [r.role, r.runResult?.executorId]));
+  const byRole = Object.fromEntries(res.results.map((r) => [r.seat, r.runResult?.executorId]));
   assert.equal(new Set([byRole.producer, byRole.reviewer, byRole['red-team']]).size, 3, JSON.stringify(byRole));
 });
 
@@ -1881,8 +1850,8 @@ test('a reviewed run at rigor high refuses the checker that no unused family can
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-high-2', rigor: 'high' });
   assert.equal(res.outcome, 'policy-refusal');
   const refused = res.results.find((r) => r.refused);
-  assert.equal(refused.role, 'red-team');
-  assert.equal(refused.refused.reason, 'independence');
+  assert.equal(refused.seat, 'red-team');
+  assert.equal(refused.refused.reason, 'independence-unsatisfiable');
 });
 
 test('a reviewed run at rigor standard lets two checkers share a family, as before', async () => {
@@ -1891,7 +1860,7 @@ test('a reviewed run at rigor standard lets two checkers share a family, as befo
   withModelPolicies(repoRoot, ['alpha', 'beta']);
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-std-2', rigor: 'standard' }, { pattern: 'reviewed', params: { minCheckers: ['reviewer', 'red-team'] } });
   assert.equal(res.outcome, 'pass');
-  const byRole = Object.fromEntries(res.results.map((r) => [r.role, r.runResult?.executorId]));
+  const byRole = Object.fromEntries(res.results.map((r) => [r.seat, r.runResult?.executorId]));
   assert.equal(byRole.reviewer, byRole['red-team']);
   assert.notEqual(byRole.producer, byRole.reviewer);
 });
@@ -1902,7 +1871,7 @@ test('a unit verify command runs in the worktree after the producing round and a
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-verify-ok', verify: `node -e "require('fs').writeFileSync('verify-ran.txt', process.cwd())"` });
   assert.equal(res.outcome, 'pass');
   assert.equal(res.verify, undefined, 'a run that verified says nothing about missing verify');
-  assert.equal(res.results.filter((r) => r.role === 'verify' && r.outcome === 'pass').length, 1);
+  assert.equal(res.results.filter((r) => r.seat === 'verify' && r.outcome === 'pass').length, 1);
   assert.equal(fs.realpathSync(fs.readFileSync(path.join(worktreeDir, 'verify-ran.txt'), 'utf8')), fs.realpathSync(worktreeDir));
 });
 
@@ -1924,7 +1893,7 @@ test('a writing unit\'s verify child borrows the custody lease while it runs', {
   const script = `const fs = require('fs'); fs.writeFileSync(${JSON.stringify(probe)}, JSON.stringify({ name: process.env.FGOS_LOCK_FD, ino: String(fs.fstatSync(3, { bigint: true }).ino) }))`;
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-verify-custody', writes: ['docs'], verify: `node -e ${JSON.stringify(script)}` });
   assert.equal(res.outcome, 'pass', JSON.stringify(res));
-  assert.equal(res.results.find((r) => r.role === 'producer').commit.status, 'committed');
+  assert.equal(res.results.find((r) => r.seat === 'producer').commit.status, 'committed');
   const seen = JSON.parse(fs.readFileSync(probe, 'utf8'));
   const lock = resolveLock('dispatch-cwd', { fgosDir: path.join(repoRoot, '.fgos'), cwd: worktreeDir }).v3Path;
   assert.equal(seen.name, 'dispatch-cwd:3');
@@ -1974,7 +1943,7 @@ test('a reviewed run with no verify command passes but says it verified nothing;
   assert.equal(res.outcome, 'pass');
   assert.equal(res.verify.ran, false);
   assert.match(res.verify.reason, /no verify command/);
-  assert.equal(res.results.some((r) => r.role === 'verify'), false);
+  assert.equal(res.results.some((r) => r.seat === 'verify'), false);
 });
 
 test('a solo run needs no verify and does not claim to have skipped one', async () => {

@@ -110,10 +110,10 @@ function writeRunnerConfig(repoRoot, executorScript) {
       runner: confinedRunnerConfig({
         // The fixture domains' execute step resolves to the generic `execute` capability;
         // a Unit binds only from a pool the config names.
-        capabilities: { execute: { prefer: [{ executor: 'fgos-coding-implement' }] } },
+        capabilities: { execute: { prefer: [{ executor: 'fgos-coding-implement' }] }, 'synthetic:*': { prefer: [{ executor: 'fgos-coding-implement' }] } },
         executor: { providerModel: 'claude', allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
         modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
-        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+        defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
         timeoutMs: 15000,
         parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
       }),

@@ -23,7 +23,8 @@ This is the council for layer **T1** of the HARDEN lane: **Holder-lock, Session 
 4. How T0 ended (this layer builds on it):
    - `plans/reports/closing-261021-2213-harden-t0-process-facts-door.md`;
    - `plans/reports/council-261021-1507-harden-t0-arbitration.md` §2 (the T0 shapes, now in the specs).
-5. Specs and laws:
+5. The measured baseline: `plans/reports/research-261022-0138-harden-t1-baseline.md`. Argue speed claims from these numbers or from your own measurement, and pair any fsync-bound timing with a plain fsync probe (this NVMe's fsync is bimodal, 5.2 or 7.5 ms).
+6. Specs and laws:
    - `docs/platform/holder-lock/spec.md`, `docs/platform/session-identity/spec.md`, `docs/platform/convention/spec.md`;
    - `docs/platform/process/spec.md`, the T0 door;
    - `docs/platform/component-boundary.md`;

@@ -42,8 +42,8 @@ test('seat providers list who ran each seat and where a failover moved it from',
         units: {
           u1: {
             results: [
-              { role: 'panelist-1', round: 1, outcome: 'pass', binding: { executor: 'claude-herdr', invocation: 'i1', model: 'sonnet', persona: 'p' }, runResult: { policy: { providerModel: 'claude' } } },
-              { role: 'panelist-2', round: 1, outcome: 'pass', binding: { executor: 'glm', invocation: 'i2', model: 'glm', persona: 'q', provenance: { fallbackFrom: { executor: 'xai', kind: 'next-candidate', reason: 'provider-limit' } } }, runResult: { policy: { providerModel: 'z-ai' } } },
+              { seat: 'member-1', role: 'producer', round: 1, outcome: 'pass', binding: { executor: 'claude-herdr', invocation: 'i1', model: 'sonnet', persona: 'p' }, runResult: { policy: { providerModel: 'claude' } } },
+              { seat: 'member-2', role: 'producer', round: 1, outcome: 'pass', binding: { executor: 'glm', invocation: 'i2', model: 'glm', persona: 'q', provenance: { fallbackFrom: { executor: 'xai', kind: 'next-candidate', reason: 'provider-limit' } } }, runResult: { policy: { providerModel: 'z-ai' } } },
             ],
           },
         },
@@ -51,7 +51,10 @@ test('seat providers list who ran each seat and where a failover moved it from',
     },
   });
   assert.equal(rows.length, 2);
-  assert.deepEqual(rows[0], { step: 's1', unit: 'u1', role: 'panelist-1', round: 1, persona: 'p', executor: 'claude-herdr', invocation: 'i1', family: 'claude', model: 'sonnet', outcome: 'pass', movedFrom: null });
+  assert.deepEqual(rows[0], { step: 's1', unit: 'u1', seat: 'member-1', role: 'producer', round: 1, persona: 'p', executor: 'claude-herdr', invocation: 'i1', family: 'claude', model: 'sonnet', outcome: 'pass', movedFrom: null });
   assert.deepEqual(rows[1].movedFrom, { executor: 'xai', kind: 'next-candidate', reason: 'provider-limit' });
+  // A result written before seats existed carries only the name it was keyed by, which is its seat.
+  const [legacy] = seatProviders({ steps: { s: { units: { u: { results: [{ role: 'panelist-1', round: 1, outcome: 'pass' }] } } } } });
+  assert.equal(legacy.seat, 'panelist-1');
   assert.deepEqual(seatProviders({}), []);
 });

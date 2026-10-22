@@ -76,6 +76,7 @@ export function translateUnitsToWorkflow(unitsPath) {
           ...(unit.rigor !== undefined ? { rigor: unit.rigor } : {}),
           writes: [...unit.writes],
           ...(unit.persona !== undefined ? { persona: unit.persona } : {}),
+          ...(unit.seats !== undefined ? { seats: unit.seats.map((entry) => ({ ...entry })) } : {}),
           ...(unit.prefer !== undefined ? { prefer: structuredClone(unit.prefer) } : {}),
           ...(unit.timeoutMs !== undefined ? { timeoutMs: unit.timeoutMs } : {}),
           ...(unit.verify !== undefined ? { verify: unit.verify } : {}),

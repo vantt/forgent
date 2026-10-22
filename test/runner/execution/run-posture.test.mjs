@@ -104,14 +104,14 @@ function setupProbeRepo(executorNames) {
   const cfg = {
     runner: {
       defaultExecutor: executorNames[0],
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' },
       modelPolicies: Object.fromEntries(executorNames.map((name) => [name, { nano: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' }])),
       executors,
       capabilities: {
         'docs:write': { prefer, rigor: 'standard' },
         'docs:review': { prefer, persona: 'code-reviewer', rigor: 'standard' },
       },
-      patterns: {
+      patterns: { seatBinding: { schema: 1 },
         defaultRule: { mutatingMinRigor: 'standard' },
         reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'], high: ['reviewer'], critical: ['reviewer'] } },
       },

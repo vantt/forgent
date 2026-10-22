@@ -17,7 +17,7 @@ import { recordCustodyHandoff } from './cwd-lock.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
-import { normalizeRunResultV2, interpretRunResult, ASSESSMENT_VERDICTS, runOutcome } from './run-result.mjs';
+import { normalizeRunResultV2, interpretRunResult, ASSESSMENT_VERDICTS, runOutcome, LEASE_CONFLICT_FAILURE_CODE } from './run-result.mjs';
 import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
 import {
   commitRunSettlement,
@@ -48,9 +48,11 @@ import crypto from 'node:crypto';
 import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
 import { inspectEntries, inspectPath } from '../../util/git-paths.mjs';
 import { bind } from '../execution/bind.mjs';
+import { seatConfigDigestOf } from '../execution/seat-policy.mjs';
 import { walkStateOf } from '../execution/account-rotation.mjs';
+import { bindSeatOf } from '../execution/seat-resolver.mjs';
 import { legacyStateKey } from './llm-accounts.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir, withDefaultExecutor } from './config.mjs';
+import { RunnerConfigError, ensureRunnerConfigForDir, loadRunnerConfigFromDir, withDefaultExecutor } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
@@ -58,10 +60,9 @@ import { executeExecutorCli, withRunDirReadAccess } from './cli.mjs';
 import { mintAttemptWriterId, resolveWriterIdentity } from '../../util/session-identity.mjs';
 import { resolveExecutorEnv, workerBaseEnv, caseContextEnv, CASE_ID_ENV, CASE_RESERVATION_ENV } from './adapters.mjs';
 import { compileDispatchPlan } from './plan.mjs';
-import { resolveFallback } from './recovery.mjs';
-import { deriveProviderFamily, resolveTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
+import { deriveProviderFamily } from './resolve.mjs';
 import { normalizeProviderFamily, checkProviderDisallowed, collectModelWarnings } from './provider-adapter.mjs';
-import { explicitReasoningEffort, refuseWorkItemInput } from './assignment-policy.mjs';
+import { refuseWorkItemInput } from './work-item-input.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, normalizeSavedPolicyTier, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -122,13 +123,14 @@ import {
   readEffectiveExecutionContract,
 } from './effective-execution-contract.mjs';
 import {
-  acquireProviderAccountLease,
+  acquireNamedAccountLease,
   classifyProviderCapacityFault,
   commandCli,
   credentialSourceForCli,
   credentialStoreOf,
   defaultProviderCapacityRuntimeDir,
   hasProviderAccounts,
+  LEASE_CONFLICT_REASON,
   probeQuarantinedAccounts,
   quarantineProviderAccount,
   redactProviderCapacitySelection,
@@ -169,15 +171,6 @@ function fallbackMutationForAssignment(asgn) {
   }
 }
 
-function resolveExecutorCommandFallback(entry, executorId) {
-  if (entry?.command) return entry.command;
-  if (Array.isArray(entry?.invocations)) {
-    const cli = entry.invocations.find((inv) => inv?.via === 'cli');
-    if (cli?.command) return cli.command;
-  }
-  return executorId;
-}
-
 /**
  * The login stores a launch of `executorId` may read, before the invocation is settled: the store key of the
  * pinned invocation when the caller pinned one, else of the executor's `cli` invocations in declaration
@@ -208,44 +201,6 @@ function declaredStoreCli(cfg, executorId, pinnedInvocationId) {
   const invocations = Array.isArray(entry?.invocations) ? entry.invocations.filter((inv) => inv?.via === 'cli') : [];
   const invocation = pinnedInvocationId ? invocations.find((inv) => inv.id === pinnedInvocationId) : invocations[0];
   return invocation ? (credentialStoreOf({ ...invocation, command: invocation.command ?? entry.command })?.use ?? null) : null;
-}
-
-function resolveProviderFamilyForExecutor(entry, executorId) {
-  const declared = entry?.providerModel || entry?.provider;
-  if (declared) return normalizeProviderFamily(declared);
-  const cmd = resolveExecutorCommandFallback(entry, executorId);
-  return normalizeProviderFamily(deriveProviderFamily(entry, cmd), cmd);
-}
-
-
-function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
-  if (executorId === sourceExecutorId) return policy;
-  const executorEntry = cfg?.executors?.[executorId];
-  const providerModel = resolveProviderFamilyForExecutor(executorEntry, executorId);
-  // dispatch-engine-liveness-hardening Phase 7: `resolveVerifiedAssignmentModel`
-  // retired -- both sides call the identical `resolveTierModel(cfg, policy.tier, provider)` with
-  // identical inputs, so divergence was never possible.
-  // (a provenance/ownership label, not a second competing computation).
-  const model = providerModel === policy.providerModel
-    ? policy.model
-    : resolveTierModel(cfg, policy.tier, providerModel);
-  return {
-    ...policy,
-    executorId,
-    providerModel,
-    model,
-    provenance: {
-      ...policy.provenance,
-      provider: providerModel === policy.providerModel ? policy.provenance?.provider : {
-        value: providerModel,
-        source: { scope: 'readOnlyExecutorRedirect', id: executorId },
-      },
-      model: model === policy.model ? policy.provenance?.model : {
-        value: model,
-        source: { scope: 'readOnlyExecutorRedirect', id: `${providerModel}.${policy.tier}` },
-      },
-    },
-  };
 }
 
 /**
@@ -464,26 +419,6 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
       );
     }
 
-    const recomputed = bind(
-      {
-        unit: unitRecord.unit,
-        role: seatRoleOf(asgn),
-        readOnly: false,
-        overrides: unitRecord.overrides || [],
-      },
-      {
-        runnerConfig: unitRecord.configSnapshot?.runner || opts.runnerConfig,
-        session: opts.session || {},
-      },
-      walkStateOf(unitRecord, { role: seatRoleOf(asgn), round: asgn.round, assignmentId: asgn.assignmentId }),
-    );
-
-    if (recomputed.refused) {
-      throw new RunnerConfigError(
-        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" recomputed binding refused: ${recomputed.refused.reason} (${recomputed.refused.detail})`,
-      );
-    }
-
     // Fail closed: a mutating unit-run assignment must carry the binding that
     // bind() produced for it. Without one there is nothing to compare, and an
     // assignment could pin any executor through `policy.preferExecutor`.
@@ -493,14 +428,53 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
         `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" carries no binding -- refused`,
       );
     }
+
+    // Replay: what the seat was bound from is read back from the record, and stage 1 is recomputed from
+    // the committed config (the caller's live one, else the project's on disk) -- never from a copy kept in
+    // unit.json, which a worker can write. A config that changed since the bind (its digest differs from the
+    // one the bind recorded) refuses the write.
+    const seat = seatIdOf(asgn);
+    const recorded = (unitRecord.bindings?.[`${seat}/${asgn.round}`] ?? []).find((attempt) => attempt?.assignmentId === asgn.assignmentId);
+    const boundDigest = recorded?.binding?.bindingInput?.configDigest;
+    if (!boundDigest) {
+      throw new RunnerConfigError(
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" has no recorded binding input to replay -- refused`,
+        { code: 'binding-replay-snapshot-missing' },
+      );
+    }
+    const committed = opts.committedRunnerConfig ?? loadRunnerConfigFromDir(root);
+    if (seatConfigDigestOf(committed).digest !== boundDigest) {
+      throw new RunnerConfigError(
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" was bound under a different seat config than the committed one -- refused`,
+        { code: 'binding-replay-config-mismatch' },
+      );
+    }
+    const recomputed = bind(
+      {
+        unit: unitRecord.unit,
+        ...bindSeatOf(unitRecord, seat),
+        readOnly: false,
+        overrides: unitRecord.overrides || [],
+      },
+      { runnerConfig: committed, session: opts.session || {} },
+      { walk: walkStateOf(unitRecord, { seat, round: asgn.round, assignmentId: asgn.assignmentId }) },
+    );
+
+    if (recomputed.refused) {
+      throw new RunnerConfigError(
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" recomputed binding refused: ${recomputed.refused.reason} (${recomputed.refused.detail})`,
+      );
+    }
+
     if (
       recomputed.executor !== asgnBinding.executor ||
       (recomputed.pool ?? null) !== (asgnBinding.pool ?? null) ||
       recomputed.tier !== asgnBinding.tier ||
+      (recomputed.reasoningEffort ?? null) !== (asgnBinding.reasoningEffort ?? null) ||
       recomputed.posture !== asgnBinding.posture
     ) {
       throw new RunnerConfigError(
-        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" binding mismatch: recomputed { executor: "${recomputed.executor}", pool: "${recomputed.pool ?? ''}", tier: "${recomputed.tier}", posture: "${recomputed.posture}" } does not match assignment { executor: "${asgnBinding.executor}", pool: "${asgnBinding.pool ?? ''}", tier: "${asgnBinding.tier}", posture: "${asgnBinding.posture}" } -- refused`,
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" binding mismatch: recomputed { executor: "${recomputed.executor}", pool: "${recomputed.pool ?? ''}", tier: "${recomputed.tier}", effort: "${recomputed.reasoningEffort ?? ''}", posture: "${recomputed.posture}" } does not match assignment { executor: "${asgnBinding.executor}", pool: "${asgnBinding.pool ?? ''}", tier: "${asgnBinding.tier}", effort: "${asgnBinding.reasoningEffort ?? ''}", posture: "${asgnBinding.posture}" } -- refused`,
       );
     }
     const pinnedExecutor = asgn.policy?.preferExecutor ?? opts.cliOverride?.preferExecutor;
@@ -995,182 +969,10 @@ function admitRunAttempt(
   return { attemptNum: record.attempt, attemptStr: record.attemptStr, runId: record.runId, runDir, resumed: false };
 }
 
-/**
- * Phase B (plans/260917-executor-profile-schema-migration/plan.md): when
- * the primary executor's provider-capacity lease is refused, attempt ONE
- * real dispatch against a declared fallback executor instead of settling
- * the Run as failed immediately. assignment-policy.mjs's own
- * `fallbackExecutors`/`executorPreference` field has been
- * "reserved-not-executed" (Phase 00 R10) until now; this closes that gap.
- *
- * Reuses dispatch/recovery.mjs's `resolveFallback` (built by an earlier,
- * unrelated track, never wired to a real caller) for the governance/
- * compile check: it re-runs the exact same `compileDispatchPlan()`
- * resolution with `cliOverride.preferExecutor` forced to the candidate,
- * verifies the scoped plan's governance verdict reads "allowed" and its
- * tier/visibility provenance agrees with the original plan, and never
- * silently downgrades a governance floor.
- * inside `resolveAssignmentDispatchPolicy`), plus a full, correctly
- * recompiled invocation/confinement-policy for the candidate, "for free".
- *
- * This function only picks a candidate and (at most once) attempts its
- * provider-capacity lease -- design.md's own "no retry loop owned by the
- * rotator": the FIRST scoped, out-of-process, non-tool candidate is the
- * only one whose capacity is ever checked; every candidate before it that
- * fails governance/compile/mechanism is recorded in `skippedCandidates`
- * and passed over, never retried. It never writes to disk or mutates the
- * caller's in-scope variables -- the caller commits (or discards) the
- * result.
- *
- * @returns {{adopted: false, evidence: object|null} | {adopted: true, plan: object, executorId: string, lease: object|null, evidence: object}}
- */
-function attemptProviderCapacityFallback({
-  cfg,
-  compiledPlan,
-  resolvedExecutorId,
-  primaryRefusalReason,
-  effectiveAssignment,
-  runId,
-  cliOverride,
-  options,
-  hasLiveTaskAccess,
-  providerCapacityRuntimeDir,
-  providerCapacityRunIsDead,
-  providerCapacityIsRunWorkerAlive,
-}) {
-  const declaredCandidates = Array.isArray(compiledPlan.policy?.executorPreference)
-    ? compiledPlan.policy.executorPreference.slice(1)
-    : [];
-  const skippedCandidates = [];
-  // M6: same normalized derivation as the primary's own providerCapacityProvider,
-  // recorded once here so every candidate's evidence below can name the
-  // provider family this fallback is actually switching FROM.
-  const fromProvider = normalizeProviderFamily(compiledPlan.policy?.providerModel || deriveProviderFamily(cfg.executors?.[resolvedExecutorId] ?? cfg.executor));
-
-  for (const candidateId of declaredCandidates) {
-    if (candidateId === resolvedExecutorId) continue; // not a fallback from itself
-
-    let fallbackResolution;
-    try {
-      fallbackResolution = resolveFallback(compiledPlan, candidateId, {
-        compilePlan: (id) => compileDispatchPlan(cfg, {
-          assignment: effectiveAssignment.assignmentId,
-          assignmentItem: effectiveAssignment,
-          hasLiveTaskAccess: hasLiveTaskAccess ?? false,
-          cliOverride: {
-            ...(cliOverride || {}),
-            preferExecutor: id,
-            policyProvenance: {
-              ...(cliOverride?.policyProvenance || {}),
-              executor: { scope: 'fallback', from: resolvedExecutorId, reasonCode: 'provider-capacity-refused' },
-            },
-          },
-          options,
-        }),
-      });
-    } catch (err) {
-      skippedCandidates.push({ executorId: candidateId, reasonCode: 'compiler-error', reason: err.message });
-      continue;
-    }
-
-    if (fallbackResolution.status !== 'scoped') {
-      skippedCandidates.push({ executorId: candidateId, reasonCode: fallbackResolution.status, reason: fallbackResolution.reason ?? null });
-      continue;
-    }
-
-    const plan = fallbackResolution.plan;
-    // Same three guards the primary's own `shouldSelectProviderAccount`
-    // applies (executeAssignment, above) -- resolveFallback proves
-    // governance/tier/visibility, never mechanism.
-    if (plan.mechanism !== 'out-of-process' || cfg.executors?.[candidateId]?.kind === 'tool') {
-      skippedCandidates.push({ executorId: candidateId, reasonCode: 'unsupported-mechanism' });
-      continue;
-    }
-
-    // Found the one candidate to attempt -- bounded to exactly this one,
-    // regardless of how many more are declared after it.
-    // M6: normalized so a fallback candidate's provider-capacity lookup
-    // uses the same canonical key ('openai' ≡ 'openai-codex') as inventory
-    // validation and the fault classifier, never a raw config-declared spelling.
-    const provider = normalizeProviderFamily(plan.policy?.providerModel || deriveProviderFamily(cfg.executors?.[candidateId] ?? cfg.executor));
-    const switchedAt = new Date().toISOString();
-    // M6: fromProvider/toProvider make a cross-provider-family fallback
-    // switch explicit in the persisted evidence (e.g. an openai-codex
-    // primary exhausted, falling back to a claude candidate), instead of
-    // an auditor having to re-derive both providers from the executor
-    // config themselves to notice the switch happened at all.
-    const baseEvidence = {
-      declaredPrimary: resolvedExecutorId,
-      reasonCode: 'provider-capacity-refused',
-      primaryRefusalReason,
-      skippedCandidates,
-      fromProvider,
-      toProvider: provider,
-    };
-
-    if (!hasProviderAccounts(cfg, provider)) {
-      // Not managed by the rotator at all -- the same rule the primary
-      // already follows (`shouldSelectProviderAccount`): nothing to lease,
-      // proceed unconditionally.
-      return {
-        adopted: true,
-        plan,
-        executorId: candidateId,
-        lease: null,
-        evidence: { ...baseEvidence, resolved: candidateId, resolvedCapacity: 'not-managed', switchedAt },
-      };
-    }
-
-    // C2c: same reasoning as the primary lease acquisition above -- a
-    // throw (lock-stale timeout, corrupt state) must never escape this
-    // candidate loop uncaught; it is exactly as valid a "this candidate
-    // isn't usable" outcome as a normal `status: 'refused'` return, so the
-    // loop can try the next declared candidate instead of the whole
-    // fallback attempt aborting unclassified.
-    let lease;
-    try {
-      lease = acquireProviderAccountLease({
-        runnerConfig: cfg,
-        provider,
-        assignmentId: effectiveAssignment.assignmentId,
-        runId,
-        runtimeDir: providerCapacityRuntimeDir,
-        runIsDead: providerCapacityRunIsDead,
-        isRunWorkerAlive: providerCapacityIsRunWorkerAlive,
-      });
-    } catch (err) {
-      lease = { status: 'refused', reason: err.code === 'provider-capacity-lock-stale' ? 'provider-capacity.lock-stale' : 'provider-capacity.acquire-failed' };
-    }
-    if (lease?.status === 'selected') {
-      return {
-        adopted: true,
-        plan,
-        executorId: candidateId,
-        lease,
-        evidence: { ...baseEvidence, resolved: candidateId, resolvedCapacity: 'selected', switchedAt },
-      };
-    }
-    return {
-      adopted: false,
-      evidence: { ...baseEvidence, attempted: candidateId, attemptedRefusalReason: lease?.reason ?? 'provider-capacity.exhausted-or-quarantined' },
-    };
-  }
-
-  return {
-    adopted: false,
-    // No fallback declared at all (declaredCandidates.length === 0) must
-    // stay `null` -- the caller's terminal settlement only adds an
-    // `evidence.json`/`stderr.log` fallback trace when non-null, so an
-    // assignment with no fallbackExecutors dispatches byte-identically to
-    // before this phase.
-    evidence: declaredCandidates.length ? { declaredPrimary: resolvedExecutorId, reasonCode: 'provider-capacity-refused', primaryRefusalReason, skippedCandidates } : null,
-  };
-}
-
 // The seat a unit-run assignment fills: a unit running a Work step operation stamps the
-// operation's role on the assignment and keeps the seat's own name in provenance.
-function seatRoleOf(asgn) {
-  return asgn.provenance?.kind === 'unit-run' ? (asgn.provenance.role ?? asgn.role) : asgn.role;
+// operation's role on the assignment and keeps the seat's own id in provenance.
+function seatIdOf(asgn) {
+  return asgn.provenance?.kind === 'unit-run' ? (asgn.provenance.seat ?? asgn.role) : asgn.role;
 }
 
 /**
@@ -1398,7 +1200,7 @@ export async function executeAssignment(assignment, opts = {}) {
 
   // Enforce decide-first governance gate (Step 06). Dispatch Core Contract
   // Normalization Slice D: compileDispatchPlan() now merges
-  // resolveAssignmentDispatchPolicy()'s tier/model/providerModel/provenance
+  // the dispatch policy's tier/model/providerModel/provenance
   // into the plan itself (compiledPlan.policy) and enforces the
   // decided-executor-vs-policy-executor agreement internally -- this call
   // site no longer resolves policy a second time or re-checks that
@@ -1406,12 +1208,7 @@ export async function executeAssignment(assignment, opts = {}) {
   // agree or throw, never usefully disagree. Rigor monotonicity reads the
   // assignment's own policy and `rigor` (the caller's demand); dispatch is
   // never handed a Work item.
-  // `let`, not `const`: a provider-capacity refusal below (Phase B,
-  // plans/260917-executor-profile-schema-migration/plan.md) may replace
-  // this with a governance-scoped fallback candidate's own compiled plan,
-  // via `attemptProviderCapacityFallback`. Every reassignment site is
-  // marked with that same phase reference.
-  let compiledPlan = compileDispatchPlan(cfg, {
+  const compiledPlan = compileDispatchPlan(cfg, {
     assignment: effectiveAssignment.assignmentId,
     assignmentItem: effectiveAssignment,
     hasLiveTaskAccess: opts.hasLiveTaskAccess ?? false,
@@ -1424,7 +1221,7 @@ export async function executeAssignment(assignment, opts = {}) {
     throw new RunnerConfigError(`dispatch decide blocked operation "${effectiveAssignment.operation}": ${reason}`);
   }
 
-  let effectivePolicy = compiledPlan.policy;
+  const effectivePolicy = compiledPlan.policy;
 
   // One confinement path: an Assignment bound by bind() carries its posture, and
   // that posture alone picks the requirement handed to the Confinement Authority.
@@ -1438,23 +1235,11 @@ export async function executeAssignment(assignment, opts = {}) {
           : compiledPlan.policy.confinement)
       : { mode: 'unconfined', policyId: null, policy: null };
 
-  // executor-id-consolidation Step 2 (fallback confinement preservation):
-  // captured HERE, before any read-only-redirect or provider-capacity
-  // fallback substitution below can reassign `effectivePolicy`/
-  // `resolvedExecutorId` -- this is "the declared primary candidate" every
-  // later substitution gets compared against, never recomputed from an
-  // already-substituted policy (resume rehydration, below, overwrites
-  // `effectivePolicy` with a fallback-scoped recompilation whose own
-  // `executorPreference[0]` is the FALLBACK id, not the true original
-  // primary).
-  const declaredPrimaryExecutorId = effectivePolicy.executorPreference?.[0] ?? 'claude';
-
-  const defaultExecutorId = effectivePolicy.executorPreference?.[0] ?? 'claude';
+  const defaultExecutorId = effectivePolicy.executorId ?? 'claude';
   const hasExplicitInvocationPin = typeof opts.cliOverride?.preferInvocation === 'string' && opts.cliOverride.preferInvocation.trim();
   let resolvedExecutorId = defaultExecutorId;
-  effectivePolicy = policyForActualExecutor(cfg, effectivePolicy, resolvedExecutorId, defaultExecutorId);
   // Cell 6.7 Bug B: `resolvedExecutorId` can diverge from `defaultExecutorId`
-  // for a redirected read-only op (above). `policy.executorPreference[0]`
+  // for a redirected read-only op (above). `policy.executorId`
   // (persisted below, unchanged) always records the DECLARED preference
   // before that redirection, while `executorId` records what ACTUALLY ran --
   // these are two distinct, non-contradictory fields by design, not a stale
@@ -1462,7 +1247,6 @@ export async function executeAssignment(assignment, opts = {}) {
   // persisted record instead of leaving an auditor to infer it by comparing
   // the two fields themselves.
   const executorRedirected = resolvedExecutorId !== defaultExecutorId;
-  // `let`: see the Phase B note on `compiledPlan` above.
   let resolvedAdapter = compiledPlan?.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
   // The compiled plan describes the pinned invocation already; this only covers a pin
   // the plan could not see (a compiled plan that predates the pin on resume).
@@ -1472,10 +1256,9 @@ export async function executeAssignment(assignment, opts = {}) {
     if (pinnedInvocation?.adapter) resolvedAdapter = pinnedInvocation.adapter;
   }
 
-  let effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
   if (effectiveMutation === 'mutating' && opts.forceSharedCwd === true) {
     throw new DispatchError('custody-required', '--force-shared-cwd cannot be used with writes', {
-      cwd: effectiveCwd, executorId: resolvedExecutorId, capability: compiledPlan.capability,
+      cwd, executorId: resolvedExecutorId, capability: compiledPlan.capability,
     });
   }
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
@@ -1500,7 +1283,7 @@ export async function executeAssignment(assignment, opts = {}) {
   const admitted = admitRunAttempt(assignmentDir, runsDir, effectiveAssignment.assignmentId, {
     retryId: opts.retryId,
     predecessorRunId: opts.predecessorRunId ?? null,
-    destination: opts.destination ?? effectiveCwd,
+    destination: opts.destination ?? cwd,
     payloadDigest: opts.payloadDigest ?? defaultAdmissionPayloadDigest,
     expectedRunId: opts.expectedRunId,
     // M1: operator escape valve for a prior attempt this host can no
@@ -1539,44 +1322,6 @@ export async function executeAssignment(assignment, opts = {}) {
   const effectiveContractPath = path.join(runDir, EFFECTIVE_EXECUTION_CONTRACT_FILE);
   let providerCapacitySelection = null;
   let providerCapacityEvidence = null;
-  let fallbackEvidence = null;
-  // executor-id-consolidation Step 2: true once `resolvedExecutorId` has
-  // been substituted away from `declaredPrimaryExecutorId` by the
-  // provider-capacity fallback mechanism specifically (resume rehydration
-  // below, or a live fallback adoption further down) -- deliberately NEVER
-  // set by the read-only-redirect substitution above, which is a separate,
-  // already-existing mechanism this step does not touch.
-  let fallbackSubstituted = false;
-
-  // Phase B resume rehydration: a prior attempt at this exact Run already
-  // switched to a fallback executor and persisted that switch (see the
-  // `fallback` commit below) before crashing/restarting -- a resume must
-  // pick up that SAME executor, never recompile the primary. Getting this
-  // wrong throws later, at confinement prep
-  // (confinement/request.mjs's crossCheckAssignmentLaunchContext compares
-  // the in-memory plan's digest against the ALREADY-PERSISTED
-  // run.json.dispatchPlanDigest and refuses on any mismatch).
-  if (admitted.resumed) {
-    try {
-      const runJson = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
-      if (runJson.fallback?.resolved && fs.existsSync(dispatchPlanPath)) {
-        const persistedPlan = JSON.parse(fs.readFileSync(dispatchPlanPath, 'utf8'));
-        if (persistedPlan.executorId === runJson.fallback.resolved) {
-          compiledPlan = persistedPlan;
-          effectivePolicy = persistedPlan.policy;
-          resolvedExecutorId = runJson.fallback.resolved;
-          resolvedAdapter = persistedPlan.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
-          effectiveCwd = persistedPlan.invocation?.cwd ?? persistedPlan.cwd ?? cwd;
-          fallbackEvidence = runJson.fallback;
-          fallbackSubstituted = true;
-        }
-      }
-    } catch {
-      // No readable run.json/dispatch-plan.json yet, or no fallback ever
-      // committed for this Run -- resume proceeds against the primary
-      // exactly as before this phase.
-    }
-  }
 
   // M6: normalized ('openai' ≡ 'openai-codex') so leases, quarantine, and
   // the fault classifier all key the same provider inventory bucket
@@ -1596,10 +1341,9 @@ export async function executeAssignment(assignment, opts = {}) {
   // needs its own lease exactly like a fresh dispatch does. The excluded
   // `!admitted.resumed` used to skip leasing here unconditionally, leaving
   // a relaunched resumed Run to run with no provider-capacity account at
-  // all instead of re-acquiring (rankProviderAccounts' own sticky lookup,
-  // keyed by state.assignments[provider:assignmentId], already prefers the
-  // SAME account the original attempt held, once reclaimDeadLeases frees
-  // its now-dead lease).
+  // all instead of re-acquiring (the account the binding names, which ranks
+  // the account this assignment already held first, once reclaimDeadLeases
+  // frees its now-dead lease).
   const shouldSelectProviderAccount =
     compiledPlan.mechanism === 'out-of-process' &&
     cfg.executors?.[resolvedExecutorId]?.kind !== 'tool' &&
@@ -1628,16 +1372,22 @@ export async function executeAssignment(assignment, opts = {}) {
       } catch { /* the selection below reports what is unusable */ }
     }
     try {
-      providerCapacitySelection = acquireProviderAccountLease({
-        runnerConfig: cfg,
-        provider: providerCapacityProvider,
-        assignmentId: effectiveAssignment.assignmentId,
-        runId,
-        runtimeDir: opts.providerCapacityRuntimeDir,
-        runIsDead: opts.providerCapacityRunIsDead,
-        isRunWorkerAlive: providerCapacityIsRunWorkerAlive,
-        cli: leaseCli,
-      });
+      // The account is named by the binding (Seat Binding ranked it); the lease only takes it. A caller that
+      // names none (a launch with no binding) cannot lease.
+      providerCapacitySelection = opts.cliOverride?.leaseAccount
+        ? acquireNamedAccountLease({
+          runnerConfig: cfg,
+          provider: providerCapacityProvider,
+          accountId: opts.cliOverride.leaseAccount,
+          accountViewDigest: opts.cliOverride.accountViewDigest ?? null,
+          assignmentId: effectiveAssignment.assignmentId,
+          runId,
+          runtimeDir: opts.providerCapacityRuntimeDir,
+          runIsDead: opts.providerCapacityRunIsDead,
+          isRunWorkerAlive: providerCapacityIsRunWorkerAlive,
+          cli: leaseCli,
+        })
+        : { status: 'refused', provider: providerCapacityProvider, reason: 'provider-capacity.no-named-account', detail: 'the launch names no account to lease (it carries no binding)' };
     } catch (err) {
       providerCapacitySelection = {
         status: 'refused',
@@ -1696,149 +1446,75 @@ export async function executeAssignment(assignment, opts = {}) {
       // supersedes this settled attempt through the same path every other
       // retry already uses -- this settlement does not need its own retry
       // loop, only to stop being unsettled.
-      //
-      // Phase B (plans/260917-executor-profile-schema-migration/plan.md):
-      // before settling as terminal, attempt ONE real dispatch against a
-      // declared fallback executor. An assignment with no declared
-      // fallbackExecutors takes this exact branch and falls straight
-      // through unchanged (`fallbackOutcome.evidence` stays `null`), so
-      // that case remains byte-identical to before this phase.
-      const primaryRefusalReason = providerCapacitySelection.reason;
-      const fallbackOutcome = attemptProviderCapacityFallback({
-        cfg,
-        compiledPlan,
-        resolvedExecutorId,
-        primaryRefusalReason,
-        effectiveAssignment,
+      // A refusal is settled as a provider failure the runner's walk answers: the lease takes exactly the account
+      // Seat Binding named, so there is no second choice to make here.
+      const settledAt = new Date().toISOString();
+      const stderrText = `provider capacity refused for "${providerCapacityProvider}": ${providerCapacitySelection.reason}${providerCapacitySelection.detail ? ` (${providerCapacitySelection.detail})` : ''}`;
+      fs.writeFileSync(path.join(runDir, 'stdout.log'), '');
+      fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
+      const evidenceData = {
+        operationMutability: isReadOnlyAssignment(effectiveAssignment) ? 'read-only' : 'mutates-repo',
+        gitBefore: null,
+        gitAfter: null,
+        gitBeforeSource: 'pre-launch',
+        dirtyBefore: [],
+        dirtyAfter: [],
+        mutatedDirtyBeforeFiles: [],
+        changedFiles: [],
+        changedFileReasons: {},
+        attribution: [],
+        artifacts: [],
+        tests: [],
+      };
+      fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
+      const refusedRunResult = normalizeRunResultV2({
         runId,
-        cliOverride: opts.cliOverride,
-        options: opts.options,
-        hasLiveTaskAccess: opts.hasLiveTaskAccess,
-        providerCapacityRuntimeDir: opts.providerCapacityRuntimeDir,
-        providerCapacityRunIsDead: opts.providerCapacityRunIsDead,
-        providerCapacityIsRunWorkerAlive,
+        assignmentId: effectiveAssignment.assignmentId,
+        workId: effectiveAssignment.workId,
+        executorId: resolvedExecutorId,
+        policy: effectivePolicy,
+        settledAt,
+        role: effectiveAssignment.role,
+        operation: effectiveAssignment.operation,
+        isReadOnlyOperation: evidenceData.operationMutability === 'read-only',
+        runtime: {
+          exitCode: null,
+          executionError: { code: providerCapacitySelection.reason === LEASE_CONFLICT_REASON ? LEASE_CONFLICT_FAILURE_CODE : 'provider-capacity-refused', message: stderrText },
+          stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
+          stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
+        },
+        evidence: evidenceData,
       });
-
-      let fallbackAdopted = false;
-      if (fallbackOutcome.adopted) {
-        // Commit the switch to disk BEFORE reassigning any in-memory
-        // variable, so a crash between the two leaves disk and memory
-        // consistent with EITHER the primary or the fallback, never a mix.
-        // `dispatchPlanDigest` must move together with `dispatch-plan.json`
-        // -- confinement/request.mjs's crossCheckAssignmentLaunchContext
-        // throws on any disagreement between them.
-        const newDigest = `sha256:${crypto.createHash('sha256').update(JSON.stringify(fallbackOutcome.plan)).digest('hex')}`;
+      // This early-exit runs BEFORE the main acquireRunControl at line 2231, so
+      // no control token exists yet. Acquire one now, use the shared atomic
+      // settlement primitive (CAS + immutable publication), and return.
+      // The settled generation record fences any future controller from acquiring
+      // this Run — consistent with every other settlement path (F-01).
+      const refusalControlHolder = buildRunControlHolder(`${runId}:${process.pid}:provider-capacity-refusal`);
+      const refusalControl = acquireRunControl(runDir, { holder: refusalControlHolder, purpose: 'provider-capacity-refusal' });
+      if (refusalControl.status !== 'acquired') {
+        // Already settled by another path — rehydrate and return.
         try {
-          fs.writeFileSync(dispatchPlanPath, `${JSON.stringify(fallbackOutcome.plan, null, 2)}\n`);
-          fsyncFileBestEffort(dispatchPlanPath);
-          const runJsonPath = path.join(runDir, 'run.json');
-          const runJson = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
-          fs.writeFileSync(
-            runJsonPath,
-            `${JSON.stringify({ ...runJson, executorId: fallbackOutcome.executorId, dispatchPlanDigest: newDigest, fallback: fallbackOutcome.evidence }, null, 2)}\n`,
-          );
-          fsyncFileBestEffort(runJsonPath);
-          fallbackAdopted = true;
-        } catch (err) {
-          // The patch itself failed -- never run with a half-switched state
-          // (dispatch-plan.json/run.json disagreeing with what actually
-          // executes). Release any lease the fallback acquired and fall
-          // through to the terminal settlement below, as if the fallback
-          // had never been attempted.
-          if (fallbackOutcome.lease?.status === 'selected') {
-            releaseSelectedProviderLease(fallbackOutcome.lease, runId, opts.providerCapacityRuntimeDir);
-          }
-          fallbackOutcome.evidence = { ...fallbackOutcome.evidence, resolved: null, commitError: err.message };
-        }
-      }
-
-      if (fallbackAdopted) {
-        compiledPlan = fallbackOutcome.plan;
-        effectivePolicy = fallbackOutcome.plan.policy;
-        resolvedExecutorId = fallbackOutcome.executorId;
-        resolvedAdapter = fallbackOutcome.plan.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
-        effectiveCwd = fallbackOutcome.plan.invocation?.cwd ?? fallbackOutcome.plan.cwd ?? cwd;
-        providerCapacitySelection = fallbackOutcome.lease;
-        fallbackEvidence = fallbackOutcome.evidence;
-        fallbackSubstituted = true;
-        // Fall through: the rest of executeAssignment now dispatches
-        // against the fallback exactly as it would have against the
-        // primary. The `status === 'selected'` block right below picks up
-        // `providerCapacitySelection` (now the fallback's own lease, or
-        // `null` for an unmanaged fallback provider) and runs once for
-        // whichever selection won -- never duplicated.
-      } else {
-        const settledAt = new Date().toISOString();
-        const stderrText = fallbackOutcome.evidence
-          ? `provider capacity refused for "${providerCapacityProvider}": ${primaryRefusalReason} (fallback attempt also failed: ${JSON.stringify(fallbackOutcome.evidence)})`
-          : `provider capacity refused for "${providerCapacityProvider}": ${primaryRefusalReason}`;
-        fs.writeFileSync(path.join(runDir, 'stdout.log'), '');
-        fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
-        const evidenceData = {
-          operationMutability: isReadOnlyAssignment(effectiveAssignment) ? 'read-only' : 'mutates-repo',
-          gitBefore: null,
-          gitAfter: null,
-          gitBeforeSource: 'pre-launch',
-          dirtyBefore: [],
-          dirtyAfter: [],
-          mutatedDirtyBeforeFiles: [],
-          changedFiles: [],
-          changedFileReasons: {},
-          attribution: [],
-          artifacts: [],
-          tests: [],
-          ...(fallbackOutcome.evidence ? { fallback: fallbackOutcome.evidence } : {}),
-        };
-        fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
-        const refusedRunResult = normalizeRunResultV2({
-          runId,
-          assignmentId: effectiveAssignment.assignmentId,
-          workId: effectiveAssignment.workId,
-          executorId: resolvedExecutorId,
-          policy: effectivePolicy,
-          settledAt,
-          role: effectiveAssignment.role,
-          operation: effectiveAssignment.operation,
-          isReadOnlyOperation: evidenceData.operationMutability === 'read-only',
-          runtime: {
-            exitCode: null,
-            executionError: { code: 'provider-capacity-refused', message: stderrText },
-            stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
-            stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
-          },
-          evidence: evidenceData,
-        });
-        // This early-exit runs BEFORE the main acquireRunControl at line 2231, so
-        // no control token exists yet. Acquire one now, use the shared atomic
-        // settlement primitive (CAS + immutable publication), and return.
-        // The settled generation record fences any future controller from acquiring
-        // this Run — consistent with every other settlement path (F-01).
-        const refusalControlHolder = buildRunControlHolder(`${runId}:${process.pid}:provider-capacity-refusal`);
-        const refusalControl = acquireRunControl(runDir, { holder: refusalControlHolder, purpose: 'provider-capacity-refusal' });
-        if (refusalControl.status !== 'acquired') {
-          // Already settled by another path — rehydrate and return.
-          try {
-            const resultJsonPath = path.join(runDir, 'result.json');
-            if (fs.existsSync(resultJsonPath)) {
-              const res = interpretRunResult(resultJsonPath, { expectedRunId: runId });
-              if (!res.corrupt && !res.contractCorrupt && !res.resultCorrupt && res.classification?.provenance !== 'contract-corrupt') {
-                return Object.freeze(res);
-              }
+          const resultJsonPath = path.join(runDir, 'result.json');
+          if (fs.existsSync(resultJsonPath)) {
+            const res = interpretRunResult(resultJsonPath, { expectedRunId: runId });
+            if (!res.corrupt && !res.contractCorrupt && !res.resultCorrupt && res.classification?.provenance !== 'contract-corrupt') {
+              return Object.freeze(res);
             }
-          } catch {}
-          throw new RunnerConfigError(
-            `executeAssignment: provider-capacity refusal could not acquire control for Run "${runId}" (status: "${refusalControl.status}")`,
-            { code: 'run-control-held', phase: 'provider-capacity-refusal' },
-          );
-        }
-        return commitRunSettlement({
-          runDir,
-          runId,
-          controlEpoch: refusalControl.controlEpoch,
-          controlToken: refusalControl.controlToken,
-          runResult: refusedRunResult,
-        });
+          }
+        } catch {}
+        throw new RunnerConfigError(
+          `executeAssignment: provider-capacity refusal could not acquire control for Run "${runId}" (status: "${refusalControl.status}")`,
+          { code: 'run-control-held', phase: 'provider-capacity-refusal' },
+        );
       }
+      return commitRunSettlement({
+        runDir,
+        runId,
+        controlEpoch: refusalControl.controlEpoch,
+        controlToken: refusalControl.controlToken,
+        runResult: refusedRunResult,
+      });
     }
     if (providerCapacitySelection?.status === 'selected') {
       providerCapacityEvidence = {
@@ -1872,7 +1548,7 @@ export async function executeAssignment(assignment, opts = {}) {
       dispatchPlan: compiledPlan,
       runId,
       runDir,
-      cwd: effectiveCwd,
+      cwd,
       repoRoot: root,
       runnerConfig: cfg,
       timeoutMs,
@@ -1966,7 +1642,7 @@ export async function executeAssignment(assignment, opts = {}) {
   // agent-result.json and agent-report.md. Use absolute path to avoid worktree ambiguity.
   // Phase 02 (executor-policy-dispatch-seams): thread the ALREADY-resolved
   // persona (effectivePolicy.persona/provenance.persona, computed above by
-  // the same resolveAssignmentDispatchPolicy() every dispatch path shares)
+  // the same the dispatch policy every dispatch path shares)
   // into the actual worker-visible prompt -- previously resolved but never
   // delivered. Additive: `undefined` when no persona resolved, byte-identical
   // to the pre-Phase-02 prompt for every such assignment.
@@ -1990,8 +1666,8 @@ export async function executeAssignment(assignment, opts = {}) {
 
   // Step 04 §5.3: snapshot dirty state BEFORE the run so pre-existing dirty files
   // are never counted as post-run evidence.
-  const dirtyBefore = safeGitStatusFiles(effectiveCwd);
-  const dirtyBeforeSnapshots = snapshotDirtyBeforeFiles(effectiveCwd, dirtyBefore);
+  const dirtyBefore = safeGitStatusFiles(cwd);
+  const dirtyBeforeSnapshots = snapshotDirtyBeforeFiles(cwd, dirtyBefore);
 
   // Cell 6.7 G6: capture gitBefore BEFORE the worker launches, unconditionally
   // (not only on a settled/happy path) -- a worker that commits then crashes
@@ -2001,7 +1677,7 @@ export async function executeAssignment(assignment, opts = {}) {
   // rawResult's own headBefore (when the out-of-process adapter also
   // captured one) is intentionally not consulted, so provenance stays
   // consistent across both the settle and the crash path.
-  const gitBefore = safeGitHead(effectiveCwd);
+  const gitBefore = safeGitHead(cwd);
   // safeGitHead already fails closed to null internally and never throws,
   // so no runtime path today fails to reach the capture above --
   // gitBeforeSource is always 'pre-launch'. The literal is still named
@@ -2041,8 +1717,8 @@ export async function executeAssignment(assignment, opts = {}) {
 
   const executorId = resolvedExecutorId;
   // ADR-006 R7 sibling bug (RT059-F1): `compiledPlan.policy` (the object
-  // `resolveAssignmentDispatchPolicy()` returns -- tier/model/providerModel/
-  // confinement/executorPreference) has never carried an `adapter` field.
+  // the dispatch policy returns -- tier/model/providerModel/
+  // confinement/executorId) has never carried an `adapter` field.
   // The real resolved adapter lives at `compiledPlan.invocation.adapter`
   // (plan.mjs: `invocation = { via: 'cli', adapter: resolvedForDispatch.adapter
   // ?? executor?.adapter ?? 'cli-spawn', ... }`). Reading the wrong (always
@@ -2056,7 +1732,7 @@ export async function executeAssignment(assignment, opts = {}) {
   const terminalMode = resolvedAdapter === 'herdr-spawn';
   const supervised = resolvedAdapter === 'cli-spawn' || terminalMode;
   if (effectiveMutation === 'mutating' && !supervised) {
-    throw new DispatchError('custody-domain-required', 'a mutating producer requires a supervised declared process domain', { adapter: resolvedAdapter, cwd: effectiveCwd, executorId, capability: compiledPlan.capability });
+    throw new DispatchError('custody-domain-required', 'a mutating producer requires a supervised declared process domain', { adapter: resolvedAdapter, cwd, executorId, capability: compiledPlan.capability });
   }
   // A supervised dispatch is an Assignment-owned recoverable one: a resume finds the same launchCommandId
   // identity a first attempt admitted, and the receipt lands under the same runDir.
@@ -2126,7 +1802,7 @@ export async function executeAssignment(assignment, opts = {}) {
     const attemptSettings = supervised ? readLaunchSettings(root) : null;
     // The main checkout as it is before the agent starts: what is dirty outside the workspace afterwards
     // and was not before is reported on the result.
-    const strayWatch = supervised ? watchWritesOutsideWorkspace({ repoRoot: root, cwd: effectiveCwd }) : null;
+    const strayWatch = supervised ? watchWritesOutsideWorkspace({ repoRoot: root, cwd }) : null;
     const attemptStepEnv = supervised ? attemptStepEnvOf(fgosDir) : null;
     if (supervised) {
       attemptLocks = acquireAttemptLocks({
@@ -2157,7 +1833,7 @@ export async function executeAssignment(assignment, opts = {}) {
         contract: 'evaluator-baseline.v1',
         runId,
         assignmentId: effectiveAssignment.assignmentId,
-        cwd: effectiveCwd,
+        cwd,
         gitBefore,
         gitBeforeSource,
         dirtyBefore,
@@ -2191,56 +1867,17 @@ export async function executeAssignment(assignment, opts = {}) {
       // 4. Resolve executor command params
       let resolvedCmd;
       try {
-        // executor-id-consolidation Step 2 (fallback confinement
-        // preservation): only relevant when `resolvedExecutorId` was
-        // substituted by the provider-capacity fallback mechanism
-        // specifically (never for the unsubstituted primary, and never
-        // for the separate, already-existing read-only-redirect
-        // substitution -- see `fallbackSubstituted`'s own doc comment
-        // above). A confined primary (`declaredPrimaryExecutorId`) whose
-        // fallback candidate has no confined invocation available refuses
-        // outright -- caught by the same catch block below that already
-        // turns a resolveExecutorCommand failure into a structured
-        // "submission-refused" outcome -- rather than silently
-        // dispatching the fallback unconfined.
-        let fallbackInvocationId;
-        if (fallbackSubstituted) {
-          let primaryConfinement;
-          try {
-            primaryConfinement = resolveExecutorConfig(cfg, undefined, declaredPrimaryExecutorId).confinement;
-          } catch {
-            primaryConfinement = undefined;
-          }
-          const primaryWasConfined = primaryConfinement && typeof primaryConfinement === 'object' && Object.keys(primaryConfinement).length > 0;
-          if (primaryWasConfined) {
-            fallbackInvocationId = selectConfinedInvocationId(cfg.executors?.[resolvedExecutorId]);
-            if (!fallbackInvocationId) {
-              throw new RunnerConfigError(
-                `fallback executor "${resolvedExecutorId}" has no confined invocation available -- refusing to silently downgrade from primary "${declaredPrimaryExecutorId}"'s required confinement.`,
-              );
-            }
-          }
-        }
-
         resolvedCmd = resolveExecutorCommand(cfg, {
           prompt,
           model: effectivePolicy.model,
           requestedModel: opts.cliOverride?.model,
-          reasoningEffort: explicitReasoningEffort(effectivePolicy),
+          reasoningEffort: effectivePolicy.reasoningEffort,
           tier: effectivePolicy.tier,
           executorId: resolvedExecutorId,
           fgosDir,
-          attestRoot: effectiveCwd,
-          // Three sources, most-specific-wins: an EXPLICIT caller pin
-          // (`opts.cliOverride.preferInvocation` -- a code-panel actor's
-          // own deliberate choice, already guarded above so the redirect
-          // never overrides it) always wins first; the provider-capacity
-          // fallback's own confinement-preservation pick is next (it only
-          // ever applies to a fallback-substituted executor, never the
-          // unsubstituted primary the explicit pin would target); the
-          // read-only-redirect's own declared pin is the last fallback
-          // source; neither pins anything for the unsubstituted
-          invocationId: (hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : undefined) ?? fallbackInvocationId,
+          attestRoot: cwd,
+          // An explicit caller pin names the invocation; otherwise the executor's own choice stands.
+          invocationId: hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : undefined,
         });
         // Admitted into a case: the worker's own environment names it, from this admission and no other.
         if (opts.caseContext) resolvedCmd = { ...resolvedCmd, env: { ...resolvedCmd.env, ...caseContextEnv(opts.caseContext) } };
@@ -2291,11 +1928,11 @@ export async function executeAssignment(assignment, opts = {}) {
           providerCapacity: providerCapacityForLaunch,
           ...(opts.blind === true ? { blind: true } : {}),
           context: {
-            cwd: effectiveCwd,
+            cwd,
             ...(opts.blind === true ? { contextRefs: effectiveAssignment.contextRefs } : {}),
             // A workspace-write posture grants the directory the work happens in
             // (the Unit worktree), never the main checkout that holds fgOS state.
-            repoRoot: postureBinding?.posture === 'workspace-write' ? effectiveCwd : root,
+            repoRoot: postureBinding?.posture === 'workspace-write' ? cwd : root,
             runDir: path.resolve(runDir),
             fgosDir,
             timeoutMs,
@@ -2341,7 +1978,7 @@ export async function executeAssignment(assignment, opts = {}) {
         dispatchPlan: compiledPlan,
         runId,
         runDir,
-        cwd: effectiveCwd,
+        cwd,
         repoRoot: root,
         runnerConfig: cfg,
         timeoutMs,
@@ -2364,7 +2001,7 @@ export async function executeAssignment(assignment, opts = {}) {
           attemptId: launchCommandId,
           runId,
           runDir,
-          cwd: effectiveCwd,
+          cwd,
           repoRoot: root,
           prompt,
           workId: resolvedExecutorId,
@@ -2389,7 +2026,7 @@ export async function executeAssignment(assignment, opts = {}) {
           terminalConfig: opts.terminalConfig,
           // The persisted contract does not name the role; the brief a pane worker reads has to
           // (an assessment role must be told its claim needs assessment.verdict).
-          effectiveContract: { ...effectiveContract, assignment: { role: effectiveAssignment.role, operation: effectiveAssignment.operation } },
+          effectiveContract: { ...effectiveContract, assignment: { role: effectiveAssignment.role, posture: effectiveAssignment.posture, operation: effectiveAssignment.operation } },
         });
       }
 
@@ -2436,7 +2073,7 @@ export async function executeAssignment(assignment, opts = {}) {
       writeSettleContext(path.resolve(runDir), {
         launchCommandId,
         repoRoot: root,
-        strayWatch: { repoRoot: root, cwd: effectiveCwd, before: strayWatch.before },
+        strayWatch: { repoRoot: root, cwd, before: strayWatch.before },
         resolvedExecutorId,
         effectivePolicy,
         executorRedirected,
@@ -2444,7 +2081,6 @@ export async function executeAssignment(assignment, opts = {}) {
         modelCheck: launchModelCheck ?? null,
         providerCapacitySelection,
         providerCapacityEvidence,
-        fallbackEvidence,
         inputDigests,
         providerCapacityRuntimeDir: opts.providerCapacityRuntimeDir ?? null,
       });
@@ -2548,7 +2184,7 @@ export async function executeAssignment(assignment, opts = {}) {
           runnerConfig: cfg,
           model: effectivePolicy.model,
           requestedModel: opts.cliOverride?.model,
-          reasoningEffort: explicitReasoningEffort(effectivePolicy),
+          reasoningEffort: effectivePolicy.reasoningEffort,
           tier: effectivePolicy.tier,
           timeoutMs,
           onChunk: opts.onChunk,
@@ -2560,7 +2196,7 @@ export async function executeAssignment(assignment, opts = {}) {
           // The persisted contract does not name the role; the brief a pane worker reads has to
           // (an assessment role must be told its claim needs assessment.verdict).
           effectiveContract: effectiveContract
-            ? { ...effectiveContract, assignment: { role: effectiveAssignment.role, operation: effectiveAssignment.operation } }
+            ? { ...effectiveContract, assignment: { role: effectiveAssignment.role, posture: effectiveAssignment.posture, operation: effectiveAssignment.operation } }
             : effectiveContract,
           ...(providerCapacityForLaunch ? { providerCapacity: providerCapacityForLaunch } : {}),
           // Read-only Assignments never take the per-cwd lock on the supervisor path above; the
@@ -2571,7 +2207,7 @@ export async function executeAssignment(assignment, opts = {}) {
           ...(postureBinding?.posture
             ? {
                 requirement: confinementRequirement,
-                ...(postureBinding.posture === 'workspace-write' ? { workspaceRoot: effectiveCwd } : {}),
+                ...(postureBinding.posture === 'workspace-write' ? { workspaceRoot: cwd } : {}),
               }
             : {}),
           ...(hasExplicitInvocationPin ? { invocationId: opts.cliOverride.preferInvocation } : {}),
@@ -2626,12 +2262,12 @@ export async function executeAssignment(assignment, opts = {}) {
       settledAt: new Date().toISOString(),
       stdoutText: rawResult?.stdout || '',
       stderrText: rawResult?.stderr || (executionError ? executionError.message : ''),
-      effectiveCwd,
+      cwd,
       gitBefore,
       gitBeforeSource,
-      gitAfter: rawResult?.headAfter ?? safeGitHead(effectiveCwd),
+      gitAfter: rawResult?.headAfter ?? safeGitHead(cwd),
       dirtyBefore,
-      dirtyAfter: safeGitStatusFiles(effectiveCwd),
+      dirtyAfter: safeGitStatusFiles(cwd),
       dirtyBeforeSnapshots,
       inputDigests,
       resolvedExecutorId,
@@ -2641,7 +2277,6 @@ export async function executeAssignment(assignment, opts = {}) {
       modelWarnings,
       providerCapacitySelection,
       providerCapacityEvidence,
-      fallbackEvidence,
       executionError,
       launchCommandId: null,
       adapterOutcome: rawResult?.adapterOutcome || rawResult?.outcome || rawResult?.status,

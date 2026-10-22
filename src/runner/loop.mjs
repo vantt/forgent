@@ -79,7 +79,8 @@ import {
   MAX_VISITS,
   BREAKER_MISSES,
 } from './anti-loop.mjs';
-import { resolveTierModel } from './dispatch.mjs';
+import { bind } from './execution/bind.mjs';
+import { workUnitFor } from './work-dispatch.mjs';
 import { spawnWorker, workUnitIdFor } from './work-dispatch.mjs';
 import { appendEvent } from '../state/events.mjs';
 import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
@@ -1590,18 +1591,24 @@ export async function runOnce(options = {}) {
       if (hasExceededMaxVisits(visits, maxVisits)) {
         return { outcome: 'dry-run', plan: { park: item.id, reason: 'anti-loop-max-visits', visits }, reap, parked, exitCode: 0 };
       }
+      // The preview binds the worker's seat the way the run will: the tier and the model are Seat
+      // Binding's answer for the item's unit. The item's rigor is a demand (checkers, independence)
+      // and never moves them.
       const itemRigor = item.rigor ?? (item.risk === 'heavy' ? 'high' : 'standard');
-      const tier = config.rigorToTier?.[itemRigor] ?? 'standard';
+      const { unitData } = workUnitFor(item, { cfg: config, worktree: repoRoot });
+      const bound = bind({ unit: unitData, role: 'producer' }, { runnerConfig: config, session: { headless: true, herdrPresent: false } });
+      const tier = bound.refused ? null : bound.tier;
       const plan = {
         dispatch: item.id,
         rigor: itemRigor,
         tier,
-        model: resolveTierModel(config, tier),
+        model: bound.refused ? null : bound.model,
+        ...(bound.refused ? { refused: bound.refused } : {}),
         branch: branchNameFor(item.id),
         verify: item.verify,
         visits,
       };
-      log(`fgos-runner: dry-run — would dispatch "${item.id}" (tier ${plan.tier} -> ${plan.model}) on ${plan.branch}`);
+      log(`fgos-runner: dry-run — would dispatch "${item.id}" (${bound.refused ? `refused: ${bound.refused.reason}` : `tier ${plan.tier} -> ${plan.model}`}) on ${plan.branch}`);
       return { outcome: 'dry-run', plan, reap, parked, exitCode: 0 };
     }
 

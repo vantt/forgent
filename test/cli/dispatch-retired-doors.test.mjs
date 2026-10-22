@@ -46,6 +46,7 @@ function eventLines(fgosDir) {
 function writeConfig(fgosDir) {
   fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({
     runner: {
+      patterns: { seatBinding: { schema: 1 } },
       executor: { command: 'claude', args: ['{prompt}'] },
       capabilities: { blocked: { prefer: 'tool-only' } },
       executors: {

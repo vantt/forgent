@@ -116,6 +116,8 @@ export async function fanoutBatchExecutorCli(
           cwd: wtPath,
           repoRoot: root,
           caseAdmission: createCaseAdmissionPort({ repoRoot: root }),
+          // A fanned-out Work item chooses no persona, seat or capability and may raise nothing.
+          raiseAuthorized: false,
           session: { headless: true, herdrPresent: false },
           onUnitRunCreated: (id) => { unitRunId = id; },
         });
