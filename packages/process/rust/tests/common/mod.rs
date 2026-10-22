@@ -183,3 +183,16 @@ pub fn run_helper_role() {
         other => panic!("unknown role {other}"),
     }
 }
+
+/// How many processes have `pattern` in their command line (`pgrep -f`).
+#[cfg(unix)]
+pub fn running(pattern: &str) -> usize {
+    let out = std::process::Command::new("pgrep").args(["-f", pattern]).output().expect("pgrep");
+    String::from_utf8_lossy(&out.stdout).lines().count()
+}
+
+/// Ends every process with `pattern` in its command line.
+#[cfg(unix)]
+pub fn end_all(pattern: &str) {
+    let _ = std::process::Command::new("pkill").args(["-KILL", "-f", pattern]).status();
+}

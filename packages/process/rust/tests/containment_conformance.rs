@@ -7,8 +7,11 @@ use std::path::Path;
 use std::time::{Duration, Instant};
 
 use fgos_process::containment::{ContainmentDriver, GuaranteeLevel, SpawnSpec};
+#[cfg(windows)]
 use fgos_process::facts::{self, Observed};
-use fgos_process::{domain_is_empty, domain_kill_all, DomainState, KillOutcome, ProcId};
+#[cfg(windows)]
+use fgos_process::ProcId;
+use fgos_process::{domain_is_empty, domain_kill_all, DomainState, KillOutcome};
 
 use common::{scratch, wait_for};
 
@@ -20,8 +23,6 @@ struct Props {
     term_without_handler_kills: bool,
     term_phase: bool,
     leader_exit_ends_domain: bool,
-    /// Pids a child writes are host pids (false inside a pid namespace).
-    child_pids_are_host_pids: bool,
     fast_iterations: u32,
 }
 
@@ -33,7 +34,6 @@ const fn props(
     term_kills: bool,
     term_phase: bool,
     leader_ends: bool,
-    host_pids: bool,
     fast: u32,
 ) -> Props {
     Props {
@@ -44,19 +44,18 @@ const fn props(
         term_without_handler_kills: term_kills,
         term_phase,
         leader_exit_ends_domain: leader_ends,
-        child_pids_are_host_pids: host_pids,
         fast_iterations: fast,
     }
 }
 
 #[cfg(target_os = "linux")]
-const LINUX_PGROUP_PROPS: Props = props("linux-pgroup", GuaranteeLevel::BestEffort, &["setsid", "reused pgid", "daemons"], true, true, true, false, true, 100);
+const LINUX_PGROUP_PROPS: Props = props("linux-pgroup", GuaranteeLevel::BestEffort, &["setsid", "reused pgid", "daemons"], true, true, true, false, 100);
 #[cfg(target_os = "linux")]
-const BWRAP_PIDNS_PROPS: Props = props("bwrap-pidns", GuaranteeLevel::Kernel, &["herdr", "systemd", "docker"], false, false, true, true, false, 100);
+const BWRAP_PIDNS_PROPS: Props = props("bwrap-pidns", GuaranteeLevel::Kernel, &["herdr", "systemd", "docker"], false, false, true, true, 100);
 #[cfg(target_os = "macos")]
-const MACOS_TREE_PROPS: Props = props("macos-tree", GuaranteeLevel::BestEffort, &["double fork", "reused pgid", "launchd"], true, true, true, false, true, 100);
+const MACOS_TREE_PROPS: Props = props("macos-tree", GuaranteeLevel::BestEffort, &["double fork", "reused pgid", "launchd"], true, true, true, false, 100);
 #[cfg(windows)]
-const WINDOWS_JOB_PROPS: Props = props("windows-job", GuaranteeLevel::Kernel, &["service", "COM server"], false, true, false, false, true, 20);
+const WINDOWS_JOB_PROPS: Props = props("windows-job", GuaranteeLevel::Kernel, &["service", "COM server"], false, true, false, false, 20);
 
 enum Workload<'a> {
     Tree(&'a Path),
@@ -78,9 +77,12 @@ fn attach_stdio(mut s: SpawnSpec, dir: &Path) -> SpawnSpec {
 #[cfg(unix)]
 fn workload(w: Workload) -> SpawnSpec {
     match w {
+        // Every member keeps a marker path in its argv, so the host sees it in
+        // any pid namespace: `<dir>/member` for the tree, `<dir>/escape` for
+        // the setsid + double-fork escapee.
         Workload::Tree(dir) => common::spec([
             "sh", "-c",
-            "if command -v setsid >/dev/null 2>&1; then r() { setsid \"$@\"; }; else r() { perl -MPOSIX -e 'POSIX::setsid(); exec @ARGV' \"$@\"; }; fi; for i in $(seq 1 15); do sleep 600 & done; r sleep 600 & echo $! > \"$1/setsid.pid\"; (r sh -c 'echo $$ > \"$1/escape.pid\"; exec sleep 600' sh \"$1\" &); wait",
+            "if command -v setsid >/dev/null 2>&1; then r() { setsid \"$@\"; }; else r() { perl -MPOSIX -e 'POSIX::setsid(); exec @ARGV' \"$@\"; }; fi; loop='while :; do sleep 1; done'; for i in $(seq 1 15); do sh -c \"$loop\" member \"$1/member\" & done; r sh -c \"$loop\" member \"$1/member\" & (r sh -c \"$loop\" escape \"$1/escape\" &); wait",
             "sh", &dir.display().to_string(),
         ]),
         Workload::Sleeper => common::spec(["sleep", "600"]),
@@ -129,10 +131,15 @@ fn tree_ends(driver: &dyn ContainmentDriver, props: &Props) {
     assert_eq!(driver.is_empty(&mut domain), DomainState::NotEmpty);
 
     #[cfg(unix)]
-    let (setsid_pid, escape_pid) = (
-        wait_for(&dir.join("setsid.pid")).trim().parse::<u32>().unwrap(),
-        wait_for(&dir.join("escape.pid")).trim().parse::<u32>().unwrap(),
-    );
+    let (member, escape) = (dir.join("member").display().to_string(), dir.join("escape").display().to_string());
+    #[cfg(unix)]
+    {
+        let start = Instant::now();
+        while common::running(&member) < 16 || common::running(&escape) < 1 {
+            assert!(start.elapsed() < Duration::from_secs(20), "tree never started");
+            std::thread::sleep(Duration::from_millis(20));
+        }
+    }
     #[cfg(windows)]
     let pids: Vec<u32> = ["child", "detached", "nest", "grandchild"]
         .iter()
@@ -142,18 +149,12 @@ fn tree_ends(driver: &dyn ContainmentDriver, props: &Props) {
     assert_eq!(driver.kill_all(&mut domain, 0), KillOutcome::Ok);
     assert_eq!(driver.is_empty(&mut domain), DomainState::Empty);
 
-    // Inside a pid namespace the written pids name nothing on the host; there
-    // `Empty` already means the kernel ended every member.
     #[cfg(unix)]
-    if props.child_pids_are_host_pids {
-        assert!(!matches!(facts::observe(ProcId(setsid_pid)), Observed::Live { .. }), "setsid child was ended");
-        if props.double_fork_escapee_survives {
-            assert!(matches!(facts::observe(ProcId(escape_pid)), Observed::Live { .. }), "double fork escapee survives");
-            // SAFETY: cleans up the escaped test child process.
-            unsafe { libc::kill(escape_pid as libc::pid_t, libc::SIGKILL) };
-        } else {
-            assert!(!matches!(facts::observe(ProcId(escape_pid)), Observed::Live { .. }), "escapee does not survive on this driver");
-        }
+    {
+        assert_eq!(common::running(&member), 0, "every tree member was ended");
+        let escaped = common::running(&escape) > 0;
+        common::end_all(&escape);
+        assert_eq!(escaped, props.double_fork_escapee_survives, "escapee survives only on drivers that name that escape");
     }
     #[cfg(windows)]
     for pid in pids {
@@ -169,12 +170,7 @@ fn record_alone(driver: &dyn ContainmentDriver, _props: &Props) {
     let record = domain.domain().expect("domain record").clone();
     assert_eq!(domain_is_empty(&record), DomainState::NotEmpty);
     assert_eq!(domain_kill_all(&record), KillOutcome::Ok);
-    // The kill may settle asynchronously (a namespace teardown, a job).
-    let start = Instant::now();
-    while domain_is_empty(&record) != DomainState::Empty {
-        assert!(start.elapsed() < Duration::from_secs(5), "record never judged empty");
-        std::thread::sleep(Duration::from_millis(10));
-    }
+    assert_eq!(domain_is_empty(&record), DomainState::Empty);
     let _ = spawned.child.wait();
 }
 
@@ -211,6 +207,7 @@ fn spawn_plumbing(driver: &dyn ContainmentDriver, props: &Props) {
     let stdout = fs::read_to_string(dir.join("stdout.txt")).unwrap_or_default();
     let stderr = fs::read_to_string(dir.join("stderr.txt")).unwrap_or_default();
     assert!(stdout.contains("stdin:conformance stdin"), "stdin: {stdout}");
+    assert!(stdout.contains(&format!("cwd:{}", fs::canonicalize(&dir).unwrap().display())), "cwd: {stdout}");
     assert!(stdout.contains("a:alpha") && stdout.contains("b:beta"), "env: {stdout}");
     assert!(stderr.contains("err:out"), "stderr: {stderr}");
 }
