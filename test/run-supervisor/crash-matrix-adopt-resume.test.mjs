@@ -348,8 +348,8 @@ const MODES = {
     rows: TERMINAL_CRASH,
     make: terminalCtx,
     attempts: ({ project }) => project.attemptDirs(),
-    // A confined agent's own notes go with its private home; each agent launch is one `pane run`.
-    agentStarts: ({ project }) => project.callsStarting('pane run').length,
+    // A confined agent's own notes go with its private home; each agent launch is one `pane run` (excluding handshake probes).
+    agentStarts: ({ project }) => project.paneRuns().length,
     paneCloses: ({ project }) => project.callsStarting('pane close').length,
     startResume: ({ project }) => startTerminalResume(project, unitRunIdOf(project)),
     adoptEnv: ({ project }) => ({ ...project.env(), HERDR_ENV: '1' }),

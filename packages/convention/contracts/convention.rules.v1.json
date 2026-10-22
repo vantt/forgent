@@ -115,6 +115,30 @@
       "rest": "abcdefghijklmnopqrstuvwxyz0123456789-",
       "maxLength": 64,
       "reserved": []
+    },
+    {
+      "id": "machine-handle",
+      "description": "A machine's human handle, the part after @ in every session handle; derived from the machine id or chosen as an alias. Composition (<cli>-<suffix>@<handle>) is Identity's, not Convention's.",
+      "first": "abcdefghijklmnopqrstuvwxyz",
+      "rest": "abcdefghijklmnopqrstuvwxyz0123456789-",
+      "maxLength": 40,
+      "reserved": []
+    },
+    {
+      "id": "project-handle",
+      "description": "A project's human handle, chosen once when the project id is minted (default: the slug of the folder name); the part before @ in a clone name. Never an id: two projects may share one.",
+      "first": "abcdefghijklmnopqrstuvwxyz",
+      "rest": "abcdefghijklmnopqrstuvwxyz0123456789-",
+      "maxLength": 40,
+      "reserved": []
+    },
+    {
+      "id": "session-suffix",
+      "description": "The 4-character base32 suffix of a session handle, derived from the hash of the local session id.",
+      "first": "abcdefghijklmnopqrstuvwxyz234567",
+      "rest": "abcdefghijklmnopqrstuvwxyz234567",
+      "maxLength": 4,
+      "reserved": []
     }
   ],
   "definitionFiles": [

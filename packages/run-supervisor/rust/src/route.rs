@@ -113,7 +113,11 @@ fn probe(route: &str, args: &[String]) -> i32 {
                 fgos_process::containment::GuaranteeLevel::BestEffort => "best-effort",
                 fgos_process::containment::GuaranteeLevel::Unsupported => "unsupported",
             };
-            serde_json::json!({"driver": guarantee.driver, "level": level, "escapes": guarantee.escapes})
+            let mut obj = serde_json::json!({"driver": guarantee.driver, "level": level, "escapes": guarantee.escapes});
+            if let Some(reason) = guarantee.selected_because {
+                obj["selectedBecause"] = serde_json::json!(reason);
+            }
+            obj
         }
         Err(err) => serde_json::json!({"driver": null, "level": "unsupported", "escapes": [], "error": err.name()}),
     };

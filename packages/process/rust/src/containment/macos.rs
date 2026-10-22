@@ -100,6 +100,7 @@ impl ContainmentDriver for MacosTree {
                 "a group or tree scan made after the root died can meet a reused pgid",
                 "processes started by a launchd or XPC service on the agent's request",
             ],
+            selected_because: None,
         }
     }
 }

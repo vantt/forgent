@@ -208,5 +208,14 @@ pub fn domain_is_empty(domain: &Domain) -> DomainState {
 
 /// One-shot [`DomainWatch::kill_all`].
 pub fn domain_kill_all(domain: &Domain) -> KillOutcome {
-    domain_watch(domain).kill_all()
+    let outcome = domain_watch(domain).kill_all();
+    // Answer after the namespace is torn down, as the other drivers answer
+    // after their domain is empty. Watch callers with their own bound (the
+    // predecessor rule) keep the immediate return of `DomainWatch::kill_all`.
+    if let (KillOutcome::Ok, Domain::LinuxGate(gate)) = (&outcome, domain) {
+        if cfg!(target_os = "linux") && gate.start_time != containment::EXITED_GATE {
+            containment::wait_dead(gate);
+        }
+    }
+    outcome
 }

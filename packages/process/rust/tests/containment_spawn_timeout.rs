@@ -3,7 +3,6 @@
 //! mode) or anything it started running.
 #![cfg(target_os = "linux")]
 
-use std::collections::BTreeMap;
 use std::fs;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -11,7 +10,9 @@ use std::sync::Arc;
 use std::thread::sleep;
 use std::time::{Duration, Instant};
 
-use fgos_process::containment::{BwrapPidns, ContainmentDriver, SpawnSpec, StartMode};
+use fgos_process::containment::{BwrapPidns, ContainmentDriver};
+
+mod common;
 
 /// Host pids of live processes whose command line contains `token`.
 fn processes_with(token: &str) -> Vec<u32> {
@@ -32,35 +33,14 @@ fn processes_with(token: &str) -> Vec<u32> {
 
 #[test]
 fn a_timed_out_spawn_leaves_no_process_of_the_attempt() {
-    if !std::path::Path::new("/usr/bin/bwrap").exists() {
-        eprintln!("skip: spawn-timeout: no-bwrap");
-        return;
-    }
-    let usable = std::process::Command::new("/usr/bin/bwrap")
-        .args(["--unshare-user", "--unshare-pid", "--as-pid-1", "--dev-bind", "/", "/", "--proc", "/proc", "--", "/bin/true"])
-        .status()
-        .map(|s| s.success())
-        .unwrap_or(false);
-    if !usable {
-        eprintln!("skip: spawn-timeout: no-bwrap-pidns");
-        return;
-    }
+    let _ = (&common::scratch, &common::wait_for);
+    let Some(_) = common::require_bwrap() else { return; };
     // A decimal duration that no other process on the machine has.
     let token = format!("299.{}", std::process::id());
     let wrapper = PathBuf::from(format!("{}/tests/fixtures/bwrap-without-info-fd.sh", env!("CARGO_MANIFEST_DIR")));
     let driver = BwrapPidns::new(wrapper);
     let mut domain = driver.create("att-timeout").unwrap();
-    let spec = SpawnSpec {
-        argv: vec!["/bin/sleep".into(), token.clone()],
-        bwrap_prefix: None,
-        fd_map: Vec::new(),
-        env: BTreeMap::from([("PATH".to_string(), "/usr/bin:/bin".to_string())]),
-        cwd: std::env::temp_dir(),
-        stdin: None,
-        stdout: None,
-        stderr: None,
-        mode: StartMode::Direct,
-    };
+    let spec = common::spec(["/bin/sleep", &token]);
 
     // The namespace really stands during the wait: watch for the gate command.
     let seen = Arc::new(AtomicBool::new(false));

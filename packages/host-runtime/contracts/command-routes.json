@@ -410,13 +410,36 @@
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
-    "accepted_flags": [
-      "dir",
-      "fgos-dir",
-      "help",
-      "json",
-      "pid"
-    ]
+    "subcommand_flags": {
+      "machine": [
+        "alias",
+        "dir",
+        "help",
+        "json"
+      ],
+      "project": [
+        "dir",
+        "handle",
+        "help",
+        "init",
+        "json",
+        "new"
+      ],
+      "session": [
+        "dir",
+        "fgos-dir",
+        "help",
+        "json",
+        "pid"
+      ],
+      "writer": [
+        "dir",
+        "fgos-dir",
+        "help",
+        "json",
+        "pid"
+      ]
+    }
   },
   "init": {
     "selector": "init",

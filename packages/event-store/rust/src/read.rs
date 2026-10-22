@@ -110,7 +110,7 @@ fn tips(
         }
         let (kind, suffix) = rest.split_once('/').unwrap();
         let machine = suffix.split('/').next().unwrap();
-        if !crate::identity::valid_machine_id(machine) {
+        if !fgos_identity::machine::valid_machine_id(machine) {
             return Err(invalid("invalid machine in ref"));
         }
         let scope = match kind {
@@ -469,7 +469,7 @@ pub fn reconcile_durable_history(
         .as_str()
         .strip_prefix(prefix)
         .and_then(|s| s.split('/').next())
-        .filter(|s| crate::identity::valid_machine_id(s))
+        .filter(|s| fgos_identity::machine::valid_machine_id(s))
         .ok_or_else(|| invalid("own history ref does not match stream scope"))?;
     let page = port
         .list_refs(
