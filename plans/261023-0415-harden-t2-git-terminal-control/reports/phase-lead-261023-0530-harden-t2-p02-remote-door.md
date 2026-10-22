@@ -97,3 +97,28 @@ Per-pass cap (big lead's answer): `wal::COMPACT_PER_PASS = 8` next to `RECENT_TE
 2. (answered) Worktree gets no deferral channel; a silent retry is enough.
 3. (answered) Cap of 8 per pass, done.
 4. `rg "fn transfer_call"` line in the phase file contradicts the "call halves stay" text; the grep line probably meant `transfer_url`.
+
+## OPC changes round: commits `004807272` (Git area) and `c158aaa53` (docs)
+
+Re-review only `004807272`; `c158aaa53` is one spec sentence (remote section, `docs/platform/git/spec.md`: the scp form is accepted as ssh, bracketed IPv6 scp is refused although Git accepts it).
+
+1. **Create chains kept** (`worktree.rs`): a WorktreeCreate chain is eligible only when both its registration (`<common>/worktrees/<registration>`) and its checkout path are gone; Move and Remove stay eligible. Proof: the prune case `missing_checkout_prune_requires_owned_create_and_preserves_unknown_residue` now runs `RECENT_TERMINAL + COMPACT_PER_PASS + 2` finished filler chains and two further operations before the prune, asserts the `create` chain is still readable, and the prune succeeds. Checked red: with the predicate forced to `true` that case fails (`inspect("create").is_ok()`), as does the keep-assert in the cap case.
+2. **Worktree same-id replay**: `compacted_replay` reads the ledger only. Create: the request digest `(kind, Absent, base, writer)` is rebuilt from the caller's request; match -> `worktree-operation-already-completed` (completed), `worktree-operation-not-completed` (not completed), anything else `operation-recovery-required`; a different request -> `operation-id-conflict`. Remove: the ledger's expected tip equals the proof's and next is absent; completed -> `Ok(())`. Move: expected equals next equals the caller's tip; completed -> `worktree-operation-already-completed`. Deviation to know: Remove and Move requests contain live registration identities and tips that do not exist after the effect, so they are checked against the tips the ledger kept, not the full request digest; nor is the binding digest compared (it includes the custody resource that exists only while the path does). No Rust owner test for Worktree replay existed, so `a_compacted_worktree_id_replays_its_recorded_outcome_without_reading_the_disk` is new: create id, remove, compaction (both ids ledger-only), the same create id replayed -> already-completed, the same remove -> done, a different create under the same id -> conflict.
+3. **Starvation**: `compact_finished` skips a failed candidate and goes on; at most `COMPACT_PER_PASS` (8) successes and `2 * COMPACT_PER_PASS` attempts per pass; order by the install time of the chain's first record (`Wal::first_change`, `record 0`, which never moves; the directory time that pin-release moves is used only to pick the 4 recent chains). Proof (extended cap case): 8 oldest chains each carry a leftover write temporary (so `compact` refuses), 14 healthy chains behind them; the first pass compacts exactly 8 healthy chains starting at the oldest healthy one, leaves the broken cohort readable, and two more operations drain the remaining eligible healthy chains.
+4. **Interrupted deletions**: the pass first resumes ids that appear in both the operations and the ledger directories, through the existing `resume_compaction`, counted in the same bounds. Limit found: `compact_inner` unlinks records from sequence 0 upward, so once the first unlink happened the intent record is gone, and `resume_compaction` needs the intent from its caller; an automatic pass can rebuild it only while record 0 survives (a crash between the ledger install and the first unlink). Residue without its intent is skipped with a named `compaction-deferred` cause. Proof: `a_deletion_cut_short_after_the_ledger_was_written_is_finished_by_a_later_pass` (residue made by compacting and restoring the untouched records beside the ledger entry).
+5. Spec sentence: `c158aaa53`.
+
+Other test changes: the old cap and replay cases that created real worktrees and expected their create chains compacted were replaced by the three cases above (a create chain with a checkout is kept; 8 + 14 finished chains drain; the stopped-chain case now uses the shared `finished_chains` helper). The Refs replay case is untouched.
+
+Results (target `t2-p02b-target`; the shared `t2-p02-target` was not used):
+- `land_crash_matrix`: `ok. 15 passed; 0 failed; 2 ignored`; `recovery_matrix`: 30 single-case runs, each `ok. 1 passed`.
+- `worktree`: `ok. 13 passed`; `refs_remote`: `ok. 18 passed`; `sequence`: `ok. 6 passed`.
+- `publication --no-fail-fast`: `FAILED. 32 passed; 2 failed; 1 ignored` (busy and borrow-unavailable, phase 5, unchanged). `ssh_transport`: `FAILED. 5 passed; 1 failed` (the phase 3 hook case, unchanged).
+- Node: boot, `test/git/worktree.test.mjs`, `test/git/refs.test.mjs`: `ℹ tests 32 / pass 32 / fail 0`.
+- clippy `-p fgos-git -p fgos-identity --all-targets -D warnings`: clean.
+
+Note: `packages/git/contracts/mutation-census.v1.json` shows as modified in this worktree (not mine; the big lead regenerates it); I did not stage it.
+
+## Git-area commits for OPC's delta review
+
+`004807272` only (after `ee541123e`, `df4c30d82` merged). Earlier, not yet merged: `8e1ecbf63`, `7bac1c05f` (superseded in part by `004807272`).
