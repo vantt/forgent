@@ -3,7 +3,7 @@ mod common;
 use common::{spec_limits, t};
 use fgos_mailbox_core::{
     delivery_report, inbox_text, record_error_text, refusal_text, Generation, Kind, MessageId,
-    MessageView, Refusal, SendOutcome, ShortName, WakeDrop,
+    MessageView, Refusal, SendOutcome, ShortName, VersionClause, WakeDrop,
 };
 use serde_json::json;
 
@@ -27,7 +27,11 @@ fn outcome(effective_wake: bool, wake_dropped: Option<WakeDrop>) -> SendOutcome 
 #[test]
 fn a_send_without_an_effective_wake_reports_recorded_and_its_next_tool_call() {
     assert_eq!(
-        delivery_report(&outcome(false, None), &spec_limits()),
+        delivery_report(
+            &outcome(false, None),
+            &VersionClause::Tested,
+            &spec_limits()
+        ),
         "recorded a1b2 for forgent-claude-7f\nqueued: it sees it at its next tool call."
     );
 }
@@ -35,7 +39,7 @@ fn a_send_without_an_effective_wake_reports_recorded_and_its_next_tool_call() {
 #[test]
 fn a_send_with_an_effective_wake_reports_its_next_tool_call_or_the_end_of_its_turn() {
     assert_eq!(
-        delivery_report(&outcome(true, None), &spec_limits()),
+        delivery_report(&outcome(true, None), &VersionClause::Tested, &spec_limits()),
         "recorded a1b2 for forgent-claude-7f\nqueued: it sees it at its next tool call or when its turn ends."
     );
 }
@@ -44,6 +48,7 @@ fn a_send_with_an_effective_wake_reports_its_next_tool_call_or_the_end_of_its_tu
 fn a_send_whose_wake_the_exchange_quota_dropped_says_so_and_still_reports_recorded() {
     let text = delivery_report(
         &outcome(false, Some(WakeDrop::ExchangeQuota)),
+        &VersionClause::Tested,
         &spec_limits(),
     );
     let lines: Vec<&str> = text.lines().collect();
@@ -58,7 +63,11 @@ fn a_send_whose_wake_the_exchange_quota_dropped_says_so_and_still_reports_record
 
 #[test]
 fn a_send_whose_wake_the_lifetime_cap_dropped_says_so() {
-    let text = delivery_report(&outcome(false, Some(WakeDrop::LifetimeCap)), &spec_limits());
+    let text = delivery_report(
+        &outcome(false, Some(WakeDrop::LifetimeCap)),
+        &VersionClause::Tested,
+        &spec_limits(),
+    );
     assert_eq!(
         text.lines().last(),
         Some("The wake lifetime cap toward this recipient is reached; it will see this at its next checkpoint.")
@@ -199,4 +208,36 @@ fn a_record_error_reads_as_contract_text_that_names_the_code_and_says_not_to_loo
         record_error_text("lock-busy"),
         "Not done: the mailbox record failed (lock-busy) and nothing was changed. Try once more later; do not loop."
     );
+}
+
+#[test]
+fn the_untested_and_unknown_version_clauses_follow_the_turn_sentence() {
+    let limits = spec_limits();
+    let untested = delivery_report(
+        &outcome(false, Some(WakeDrop::LifetimeCap)),
+        &VersionClause::Untested("9.9.9\" <x>".to_string()),
+        &limits,
+    );
+    let lines: Vec<&str> = untested.lines().collect();
+    assert_eq!(lines[1], "queued: it sees it at its next tool call.");
+    assert!(lines[2].contains("9.9.9___x_"), "{}", lines[2]);
+    assert!(
+        !lines[2].contains('<'),
+        "the version goes through the header escape"
+    );
+    assert!(lines[3].contains("lifetime cap"));
+
+    let unknown = delivery_report(&outcome(true, None), &VersionClause::Unknown, &limits);
+    let lines: Vec<&str> = unknown.lines().collect();
+    assert_eq!(lines.len(), 3);
+    assert!(lines[1].contains("turn ends"));
+    assert!(lines[2].contains("could not be read"), "{}", lines[2]);
+}
+
+#[test]
+fn the_too_large_pointer_names_the_count_and_the_claim_command() {
+    let text = fgos_mailbox_core::too_large_pointer(3);
+    assert!(text.starts_with("3 "), "{text}");
+    assert!(text.ends_with("fgos mailbox inbox --claim"), "{text}");
+    assert!(!text.contains('\n'));
 }

@@ -5,7 +5,7 @@
 use crate::record::{Record, Reported, Wait};
 use fgos_mailbox_core::{
     delivery_report, inbox_text, record_error_text, refusal_text, Limits, SendRequest, Timestamp,
-    WriterKey,
+    VersionClause, WriterKey,
 };
 
 /// The answer to one `send`.
@@ -29,7 +29,7 @@ pub fn send(
     match record.send(req, wait, now, limits) {
         Ok(held) => match held.value {
             Ok(outcome) => SendAnswer {
-                text: delivery_report(&outcome, limits),
+                text: delivery_report(&outcome, &VersionClause::Tested, limits),
                 recorded: true,
             },
             Err(refusal) => SendAnswer {

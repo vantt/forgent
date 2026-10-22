@@ -10,12 +10,24 @@ use crate::frame::{escape_header, fill, section};
 use crate::limits::Limits;
 use crate::wake::WakeDrop;
 
+/// What the sender learns of the recipient's CLI version (spec §4.1): a
+/// version under `testedAgainst` adds nothing; an untested or unreadable
+/// one adds its sentence after the tier sentence. The hook keeps draining
+/// either way.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum VersionClause {
+    Tested,
+    Untested(String),
+    Unknown,
+}
+
 /// The answer to a recorded send: `recorded <id> for <name>`, when the
-/// recipient will see it, and why its wake was dropped, if it was. Every
-/// drained CLI is tier `turn` until a wake channel exists (no push or pull
-/// tier yet, spec §6.2), so the sentence says the next tool call, or also
-/// the end of its turn when the wake took effect.
-pub fn delivery_report(outcome: &SendOutcome, limits: &Limits) -> String {
+/// recipient will see it, what its CLI version means, and why its wake was
+/// dropped, if it was. Every drained CLI is tier `turn` until a wake
+/// channel exists (no push or pull tier yet, spec §6.2), so the sentence
+/// says the next tool call, or also the end of its turn when the wake took
+/// effect.
+pub fn delivery_report(outcome: &SendOutcome, version: &VersionClause, limits: &Limits) -> String {
     let id = escape_header(outcome.id.as_str(), limits);
     let to = escape_header(outcome.to.as_str(), limits);
     let mut lines = vec![fill(
@@ -30,6 +42,14 @@ pub fn delivery_report(outcome: &SendOutcome, limits: &Limits) -> String {
         })
         .to_string(),
     );
+    match version {
+        VersionClause::Tested => {}
+        VersionClause::Untested(text) => lines.push(fill(
+            section("report.untested-version"),
+            &[("version", &escape_header(text, limits))],
+        )),
+        VersionClause::Unknown => lines.push(section("report.version-unknown").to_string()),
+    }
     if let Some(dropped) = outcome.wake_dropped {
         lines.push(
             section(match dropped {

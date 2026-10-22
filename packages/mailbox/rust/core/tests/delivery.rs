@@ -303,3 +303,239 @@ fn a_drain_stamps_last_drain_at_when_mail_is_pending_even_if_it_takes_none_and_a
     );
     assert_eq!(pair.state.binding(&key("a")).unwrap().last_drain_at, None);
 }
+
+/// The worst-case frame size of each item a plain step claim would take
+/// now, in claim order, measured on a copy of the state.
+fn worst_cases(pair: &Pair, key_text: &str, now: fgos_mailbox_core::Timestamp) -> Vec<usize> {
+    let mut copy = pair.state.clone();
+    let mut ids = pair.ids.clone();
+    let claim = copy.claim(
+        &key(key_text),
+        G1,
+        Checkpoint::Step,
+        now,
+        &pair.limits,
+        &mut ids,
+    );
+    claim
+        .items
+        .iter()
+        .map(|item| {
+            let bytes = pair.state.message(&item.id).map_or(0, |h| h.body_bytes);
+            fgos_mailbox_core::worst_case_len(item, bytes, &pair.limits)
+        })
+        .collect()
+}
+
+/// The smallest bound whose step budget is exactly `budget`.
+fn bound_for(budget: usize) -> u64 {
+    (budget + fgos_mailbox_core::pointer_reserve()) as u64
+}
+
+#[test]
+fn a_step_claim_takes_messages_in_order_only_while_their_worst_case_frames_fit_the_bound() {
+    let mut pair = Pair::new(t(100));
+    let first = pair.send("a", B_NAME, "one", t(100));
+    let second = pair.send("a", B_NAME, "two, a little longer", t(101));
+    let third = pair.send("a", B_NAME, "six", t(102));
+    let sizes = worst_cases(&pair, "b", t(110));
+    // The second fits alone but not beside the first; the third would fit
+    // beside the first, and is still not taken: the claim keeps the order.
+    let budget = sizes[0] + 2 + sizes[2];
+    assert!(sizes[1] <= budget && sizes[0] + 2 + sizes[1] > budget);
+
+    let claim = pair.state.claim(
+        &key("b"),
+        G1,
+        Checkpoint::BoundedStep(bound_for(budget)),
+        t(110),
+        &pair.limits,
+        &mut pair.ids,
+    );
+
+    let taken: Vec<_> = claim.items.iter().map(|i| i.id.clone()).collect();
+    assert_eq!(taken, vec![first]);
+    assert_eq!(claim.too_large, 0);
+    for id in [second, third] {
+        let header = pair.state.message(&id).unwrap();
+        assert_eq!(header.state, MessageState::Recorded);
+        assert_eq!(header.offers, 0);
+    }
+}
+
+#[test]
+fn a_message_whose_worst_case_frame_alone_exceeds_the_bound_stays_recorded_and_is_counted_as_too_large(
+) {
+    let mut pair = Pair::new(t(100));
+    let big_body = "x".repeat(4000);
+    let big = pair.send("a", B_NAME, &big_body, t(100));
+    let small = pair.send("a", B_NAME, "small", t(101));
+    let sizes = worst_cases(&pair, "b", t(110));
+    let bound = bound_for(sizes[1]);
+    assert!(sizes[0] > sizes[1]);
+
+    let claim = pair.state.claim(
+        &key("b"),
+        G1,
+        Checkpoint::BoundedStep(bound),
+        t(110),
+        &pair.limits,
+        &mut pair.ids,
+    );
+
+    // The oldest message is too large alone; the later, smaller one is still taken.
+    assert_eq!(
+        claim.items.iter().map(|i| i.id.clone()).collect::<Vec<_>>(),
+        vec![small]
+    );
+    assert_eq!(claim.too_large, 1);
+    let header = pair.state.message(&big).unwrap();
+    assert_eq!(header.state, MessageState::Recorded);
+    assert_eq!(header.offers, 0);
+}
+
+#[test]
+fn a_bounded_step_whose_every_item_is_too_large_takes_nothing_and_still_counts_them() {
+    let mut pair = Pair::new(t(100));
+    let big = pair.send("a", B_NAME, &"x".repeat(4000), t(100));
+
+    let claim = pair.state.claim(
+        &key("b"),
+        G1,
+        Checkpoint::BoundedStep(bound_for(10)),
+        t(110),
+        &pair.limits,
+        &mut pair.ids,
+    );
+
+    assert!(claim.items.is_empty());
+    assert_eq!(claim.token, None);
+    assert_eq!(claim.too_large, 1);
+    assert!(
+        claim.changed,
+        "a drain that found mail pending stamps last_drain_at"
+    );
+    assert_eq!(
+        pair.state.message(&big).unwrap().state,
+        MessageState::Recorded
+    );
+}
+
+#[test]
+fn a_stop_claim_and_a_plain_step_claim_are_not_limited_by_a_bound() {
+    let mut pair = Pair::new(t(100));
+    let body = "x".repeat(pair.limits.max_body_bytes as usize);
+    let mut req = common::plain("a", B_NAME, &body);
+    req.wake = true;
+    let woke = pair.try_send(req, t(100)).unwrap().id;
+    let stop = pair.state.claim(
+        &key("b"),
+        G1,
+        Checkpoint::Stop,
+        t(110),
+        &pair.limits,
+        &mut pair.ids,
+    );
+    assert_eq!(stop.items.len(), 1);
+    assert_eq!(stop.items[0].id, woke);
+    assert_eq!(stop.too_large, 0);
+
+    let mut pair = Pair::new(t(100));
+    let plain = pair.send("a", B_NAME, &body, t(100));
+    let step = pair.claim("b", G1, t(110));
+    assert_eq!(
+        step.items.iter().map(|i| i.id.clone()).collect::<Vec<_>>(),
+        vec![plain]
+    );
+    assert_eq!(step.too_large, 0);
+}
+
+#[test]
+fn a_notice_is_claimed_under_a_bounded_step() {
+    let mut pair = Pair::new(t(0));
+    let id = pair.send("a", B_NAME, "hello", t(10));
+    pair.sweep(t(10).plus_secs(pair.limits.record.ttl_sec + 1));
+    assert_eq!(
+        pair.state.notices().count(),
+        1,
+        "the refusal made a notice to a"
+    );
+
+    let claim = pair.state.claim(
+        &key("a"),
+        G1,
+        Checkpoint::BoundedStep(bound_for(10_000)),
+        t(10).plus_secs(pair.limits.record.ttl_sec + 2),
+        &pair.limits,
+        &mut pair.ids,
+    );
+
+    assert_eq!(claim.items.len(), 1);
+    assert_eq!(claim.items[0].kind(), fgos_mailbox_core::Kind::Notice);
+    match &claim.items[0].what {
+        fgos_mailbox_core::ClaimedWhat::Notice(facts) => assert_eq!(facts.about, id),
+        other => panic!("expected a notice, got {other:?}"),
+    }
+}
+
+#[test]
+fn the_pointer_line_fits_inside_the_bound() {
+    let mut pair = Pair::new(t(100));
+    pair.send("a", B_NAME, &"<&>\n".repeat(900), t(100));
+    pair.send("a", B_NAME, "one", t(101));
+    pair.send("a", B_NAME, "two", t(102));
+    let sizes = worst_cases(&pair, "b", t(110));
+    let bound = bound_for(sizes[1] + 2 + sizes[2]);
+
+    let claim = pair.state.claim(
+        &key("b"),
+        G1,
+        Checkpoint::BoundedStep(bound),
+        t(110),
+        &pair.limits,
+        &mut pair.ids,
+    );
+
+    assert_eq!(claim.items.len(), 2);
+    assert_eq!(claim.too_large, 1);
+    let frames: Vec<String> = claim
+        .items
+        .iter()
+        .map(|item| {
+            let body = if item.id == claim.items[0].id {
+                "one"
+            } else {
+                "two"
+            };
+            fgos_mailbox_core::render(item, Some(body), &pair.limits)
+        })
+        .collect();
+    let reply = format!(
+        "{}\n\n{}",
+        frames.join("\n\n"),
+        fgos_mailbox_core::too_large_pointer(claim.too_large)
+    );
+    assert!(reply.len() as u64 <= bound, "{} > {bound}", reply.len());
+}
+
+#[test]
+fn the_blank_line_between_two_frames_counts_against_the_bound() {
+    let mut pair = Pair::new(t(100));
+    let first = pair.send("a", B_NAME, "one", t(100));
+    pair.send("a", B_NAME, "two", t(101));
+    let sizes = worst_cases(&pair, "b", t(110));
+
+    let claim = pair.state.claim(
+        &key("b"),
+        G1,
+        Checkpoint::BoundedStep(bound_for(sizes[0] + 1 + sizes[1])),
+        t(110),
+        &pair.limits,
+        &mut pair.ids,
+    );
+
+    assert_eq!(
+        claim.items.iter().map(|i| i.id.clone()).collect::<Vec<_>>(),
+        vec![first]
+    );
+}

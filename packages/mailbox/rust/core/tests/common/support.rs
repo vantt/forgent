@@ -14,12 +14,15 @@ pub fn limits_contract() -> Value {
 }
 
 /// Folds the contract's dotted keys into the nested `mailbox` config section,
-/// the shape a configuration reader hands to `Limits`.
+/// the shape a configuration reader hands to `Limits`. A key whose reader is
+/// neither `core` nor `hook` (the harness's) is left out, as the loader does.
 pub fn config_section(contract: &Value) -> Value {
     let mut section = Map::new();
     for entry in contract["keys"]
         .as_array()
         .expect("contract has a keys list")
+        .iter()
+        .filter(|entry| entry["reader"] == "core" || entry["reader"] == "hook")
     {
         let key = entry["key"].as_str().expect("every key is a string");
         let path = key
@@ -43,7 +46,7 @@ pub fn config_section(contract: &Value) -> Value {
 }
 
 /// A counter id source: 1, 2, 3 … A real implementation of the port.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SeqIds {
     last: u64,
 }

@@ -239,3 +239,49 @@ fn render_notice(item: &ClaimedItem, facts: &NoticeFacts, limits: &Limits) -> St
         ],
     )
 }
+
+/// The bytes a gutter and an entity can add per body byte: `&` becomes
+/// `&amp;` (5 bytes), and a line break of one byte becomes a new line
+/// with its gutter.
+const ENTITY_GROWTH: usize = 5;
+const GUTTER_GROWTH: usize = GUTTER.len();
+
+/// The largest size the frame of `item` can render to when its body holds
+/// `body_bytes` bytes, or when the body cannot be read: the frame around
+/// an empty body, plus `5 × body_bytes` (entity growth) and
+/// `2 × (body_bytes + 1)` (a gutter on every line; a body of only line
+/// breaks has one more line than bytes), or the body-missing line when that
+/// is longer. A notice has no body; its size is its rendered size.
+pub fn worst_case_len(item: &ClaimedItem, body_bytes: u64, limits: &Limits) -> usize {
+    match &item.what {
+        ClaimedWhat::Notice(facts) => render_notice(item, facts, limits).len(),
+        ClaimedWhat::Mail(from) => {
+            let bytes = usize::try_from(body_bytes).unwrap_or(usize::MAX);
+            let around = render_message(item, from, Some(""), limits).len();
+            let body = bytes
+                .saturating_mul(ENTITY_GROWTH)
+                .saturating_add(bytes.saturating_add(1).saturating_mul(GUTTER_GROWTH));
+            let label = escape_header(&from.label, limits);
+            let missing = fill(section("message.body-missing"), &[("from", &label)]).len();
+            around.saturating_add(body.max(missing))
+        }
+    }
+}
+
+/// The line a step drain prints when `count` waiting items are too large
+/// for its channel: it names the count and the command that reads them.
+pub fn too_large_pointer(count: u32) -> String {
+    fill(
+        section("message.too-large-for-channel"),
+        &[("count", &count.to_string())],
+    )
+}
+
+/// What a bounded step keeps free for the pointer line: its length at the
+/// largest count, plus the blank line that joins it to the frames.
+pub fn pointer_reserve() -> usize {
+    too_large_pointer(u32::MAX).len() + FRAME_SEPARATOR.len()
+}
+
+/// What joins two frames, and the last frame to the pointer line.
+pub const FRAME_SEPARATOR: &str = "\n\n";

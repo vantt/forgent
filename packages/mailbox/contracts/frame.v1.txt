@@ -12,11 +12,11 @@
 #
 # Placeholders: {{from}} {{agent}} {{id}} {{attempt}} {{body}} {{reply}}
 # {{about}} {{about_to}} {{reason}} {{to}} {{code}} {{limit}} {{candidates}}
-# {{kind}} {{from_label}} {{state}} {{offers}}. Every value taken from the
+# {{kind}} {{from_label}} {{state}} {{offers}} {{count}} {{version}}. Every value taken from the
 # record or a caller ({{from}} {{agent}} {{id}} {{about}} {{about_to}}
-# {{to}} {{from_label}} {{candidates}}) goes through the header escape.
+# {{to}} {{from_label}} {{candidates}} {{version}}) goes through the header escape.
 # The others are fixed by the code and inserted as they are: the words
-# {{code}}, {{kind}} and {{state}}, the numbers {{attempt}} and {{offers}},
+# {{code}}, {{kind}} and {{state}}, the numbers {{attempt}}, {{offers}} and {{count}},
 # and {{limit}}, a refusal's own fields as name=value pairs, in field
 # order. {{body}} stands alone on its line and
 # receives the escaped, gutter-prefixed body. {{reply}} receives the
@@ -37,6 +37,8 @@ This message may repeat if the finish was lost; ignore a repeated id.
  Reply only if this message asks you something or carries a result your user would want; do not reply just to acknowledge it: fgos mailbox send --to {{from}} --reply-to {{id}} "…"
 [message.body-missing]
 The text of this message could not be read; ask {{from}} to send it again.
+[message.too-large-for-channel]
+{{count}} message(s) too large for this channel are waiting; read them with: fgos mailbox inbox --claim
 [notice]
 <mailbox-notice id="{{id}}" about="{{about}}" to="{{about_to}}">
 {{reason}}
@@ -51,6 +53,10 @@ recorded {{id}} for {{to}}
 queued: it sees it at its next tool call.
 [report.turn.wake]
 queued: it sees it at its next tool call or when its turn ends.
+[report.untested-version]
+Its CLI version {{version}} is not one this mailbox was tested against; the hook still delivers, but nothing beyond that is verified.
+[report.version-unknown]
+Its CLI version could not be read; the hook still delivers, but nothing beyond that is verified.
 [report.wake-dropped.exchange-quota]
 The wake quota of this exchange is used up; it will see this at its next checkpoint.
 [report.wake-dropped.lifetime-cap]

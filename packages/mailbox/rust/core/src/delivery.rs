@@ -1,6 +1,7 @@
 //! Send, claim, emit, finish and the read-only inbox (spec §5.2).
 use crate::counters::CounterReason;
 use crate::envelope::{Header, Kind, MessageState, RefusalReason};
+use crate::frame;
 use crate::ids::{AttemptToken, Cli, Generation, IdSource, MessageId, ShortName, WriterKey};
 use crate::limits::Limits;
 use crate::names::{self, ResolveRefusal};
@@ -145,11 +146,42 @@ impl fmt::Display for Refusal {
 impl std::error::Error for Refusal {}
 
 /// Where a drain runs. `Step` stands for every checkpoint that drains all
-/// pending mail (after a tool call, a typed prompt, `inbox --claim`).
+/// pending mail (after a typed prompt, `inbox --claim`). `BoundedStep(n)`
+/// is a step whose channel shows at most `n` bytes inline (a CLI's
+/// `PostToolUse` context): it takes pending items in order while their
+/// worst-case frames fit, skips an item too large alone, and keeps room
+/// for the pointer line that names the skipped ones. `Stop` takes only
+/// effective wakes and is never bounded.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Checkpoint {
     Stop,
     Step,
+    BoundedStep(u64),
+}
+
+impl Checkpoint {
+    /// Whether this checkpoint takes every pending item, not only the
+    /// effective wakes: both kinds of step.
+    pub const fn takes_all_pending(self) -> bool {
+        matches!(self, Self::Step | Self::BoundedStep(_))
+    }
+
+    pub const fn is_stop(self) -> bool {
+        matches!(self, Self::Stop)
+    }
+
+    /// The bytes the claimed frames may take: the bound less the pointer
+    /// line and the blank line before it; `None` when unbounded.
+    fn budget(self) -> Option<usize> {
+        match self {
+            Self::BoundedStep(bound) => Some(
+                usize::try_from(bound)
+                    .unwrap_or(usize::MAX)
+                    .saturating_sub(frame::pointer_reserve()),
+            ),
+            Self::Stop | Self::Step => None,
+        }
+    }
 }
 
 /// One claimed item: a message or a notice, never both.
@@ -206,16 +238,29 @@ pub struct Claim {
     /// true whenever mail was pending (the drain swept and stamped
     /// `last_drain_at`), even if nothing was taken.
     pub changed: bool,
+    /// Eligible items a bounded step left recorded because each one's
+    /// worst-case frame alone exceeds the step's budget; always 0 at an
+    /// unbounded checkpoint.
+    pub too_large: u32,
 }
 
 impl Claim {
-    fn empty(changed: bool) -> Self {
+    fn empty(changed: bool, too_large: u32) -> Self {
         Self {
             token: None,
             items: Vec::new(),
             changed,
+            too_large,
         }
     }
+}
+
+/// One eligible item a claim may take: an index into the messages or the
+/// notices.
+#[derive(Debug, Clone, Copy)]
+enum Pick {
+    Message(usize),
+    Notice(usize),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -255,7 +300,7 @@ fn notice_eligible(
     generation: Generation,
     checkpoint: Checkpoint,
 ) -> bool {
-    checkpoint == Checkpoint::Step
+    checkpoint.takes_all_pending()
         && notice.state == NoticeState::Recorded
         && &notice.to == to
         && notice.to_generation == generation
@@ -273,7 +318,7 @@ fn eligible(
     header.state == MessageState::Recorded
         && &header.to == to
         && header.to_generation == generation
-        && (checkpoint == Checkpoint::Step || header.effective_wake)
+        && (checkpoint.takes_all_pending() || header.effective_wake)
 }
 
 impl MailboxState {
@@ -381,9 +426,11 @@ impl MailboxState {
         Ok(outcome)
     }
 
-    /// Claims every eligible message to `key`, oldest first, under one
-    /// attempt token. A claim by a generation that is not current takes
-    /// nothing and changes nothing.
+    /// Claims the eligible messages to `key`, oldest first, then its
+    /// eligible notices, under one attempt token. A bounded step takes only
+    /// what fits its budget (see [`Checkpoint`]); what it skips stays
+    /// recorded, unchanged. A claim by a generation that is not current
+    /// takes nothing and changes nothing.
     pub fn claim(
         &mut self,
         key: &WriterKey,
@@ -394,23 +441,16 @@ impl MailboxState {
         ids: &mut dyn IdSource,
     ) -> Claim {
         if self.current_generation(key) != Some(generation) || !self.has_pending(key, generation) {
-            return Claim::empty(false);
+            return Claim::empty(false, 0);
         }
         self.sweep(now, limits, ids);
         let now = self.last_now;
         if let Some(binding) = self.bindings.get_mut(key) {
             binding.last_drain_at = Some(now);
         }
-        let any_mail = self
-            .messages
-            .iter()
-            .any(|h| eligible(h, key, generation, checkpoint));
-        let any_notice = self
-            .notices
-            .iter()
-            .any(|n| notice_eligible(n, key, generation, checkpoint));
-        if !any_mail && !any_notice {
-            return Claim::empty(true);
+        let (picks, too_large) = self.select(key, generation, checkpoint, limits);
+        if picks.is_empty() {
+            return Claim::empty(true, too_large);
         }
         let token = AttemptToken::mint(ids);
         let deadline = now.plus_secs(limits.in_flight_ttl_sec);
@@ -419,89 +459,136 @@ impl MailboxState {
             deadline,
             generation,
         };
-        let mut items = self.take_messages(key, checkpoint, &hold, now);
-        items.extend(self.take_notices(key, checkpoint, &hold));
+        let items = picks
+            .into_iter()
+            .map(|pick| match pick {
+                Pick::Message(i) => self.take_message(i, &hold, now),
+                Pick::Notice(i) => self.take_notice(i, &hold),
+            })
+            .collect();
         Claim {
             token: Some(token),
             items,
             changed: true,
+            too_large,
         }
     }
 
-    /// Moves the eligible mail to in-flight under `hold`, oldest first.
-    fn take_messages(
-        &mut self,
+    /// The items a claim takes, in frame order (messages oldest first, then
+    /// notices), and how many a bounded step skipped as too large alone.
+    /// A bounded step stops at the first item that fits alone but not
+    /// beside those already taken.
+    fn select(
+        &self,
         key: &WriterKey,
+        generation: Generation,
         checkpoint: Checkpoint,
-        hold: &Hold<'_>,
-        now: Timestamp,
-    ) -> Vec<ClaimedItem> {
-        let mut taken = Vec::new();
-        for header in &mut self.messages {
-            if eligible(header, key, hold.generation, checkpoint) {
-                header.offers += 1;
-                header.changed_at = now;
-                header.state = MessageState::InFlight {
-                    token: hold.token.clone(),
-                    deadline: hold.deadline,
-                    generation: hold.generation,
-                };
-                taken.push((header.id.clone(), header.from.clone(), header.offers));
+        limits: &Limits,
+    ) -> (Vec<Pick>, u32) {
+        let eligible = self
+            .messages
+            .iter()
+            .enumerate()
+            .filter(|(_, h)| eligible(h, key, generation, checkpoint))
+            .map(|(i, _)| Pick::Message(i))
+            .chain(
+                self.notices
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, n)| notice_eligible(n, key, generation, checkpoint))
+                    .map(|(i, _)| Pick::Notice(i)),
+            );
+        let Some(budget) = checkpoint.budget() else {
+            return (eligible.collect(), 0);
+        };
+        let mut picks = Vec::new();
+        let mut too_large = 0u32;
+        let mut used = 0usize;
+        for pick in eligible {
+            let size = self.worst_case_of(pick, limits);
+            if size > budget {
+                too_large = too_large.saturating_add(1);
+                continue;
             }
+            let joined = if picks.is_empty() {
+                size
+            } else {
+                size.saturating_add(frame::FRAME_SEPARATOR.len())
+            };
+            if used.saturating_add(joined) > budget {
+                break;
+            }
+            used += joined;
+            picks.push(pick);
         }
-        taken
-            .into_iter()
-            .map(|(id, from, attempt)| {
-                let sender = self.binding(&from);
-                ClaimedItem {
-                    id,
-                    attempt,
-                    what: ClaimedWhat::Mail(MailFrom {
-                        label: self.sender_label(&from),
-                        cli: sender.map(|b| b.cli.clone()),
-                        has_head: sender.is_some(),
-                    }),
-                }
-            })
-            .collect()
+        (picks, too_large)
     }
 
-    /// Moves the eligible notices to in-flight under `hold`, oldest first.
-    /// A notice is offered once, so its attempt is always the first.
-    fn take_notices(
-        &mut self,
-        key: &WriterKey,
-        checkpoint: Checkpoint,
-        hold: &Hold<'_>,
-    ) -> Vec<ClaimedItem> {
-        let mut taken = Vec::new();
-        for notice in &mut self.notices {
-            if notice_eligible(notice, key, hold.generation, checkpoint) {
-                notice.state = NoticeState::InFlight {
-                    token: hold.token.clone(),
-                    deadline: hold.deadline,
-                    generation: hold.generation,
-                };
-                taken.push((
-                    notice.id.clone(),
-                    notice.reason,
-                    notice.about.clone(),
-                    notice.about_to.clone(),
-                ));
+    /// The largest frame `pick` can render to, as it would be claimed now.
+    fn worst_case_of(&self, pick: Pick, limits: &Limits) -> usize {
+        match pick {
+            Pick::Message(i) => {
+                let header = &self.messages[i];
+                let item = self.mail_item(header, header.offers.saturating_add(1));
+                frame::worst_case_len(&item, header.body_bytes, limits)
+            }
+            Pick::Notice(i) => {
+                frame::worst_case_len(&self.notice_item(&self.notices[i]), 0, limits)
             }
         }
-        taken
-            .into_iter()
-            .map(|(id, reason, about, about_to)| ClaimedItem {
-                id,
-                attempt: 1,
-                what: ClaimedWhat::Notice(NoticeFacts {
-                    reason,
-                    about,
-                    about_to: self.sender_label(&about_to),
-                }),
-            })
-            .collect()
+    }
+
+    /// The claimed item of a message at offer `attempt`.
+    fn mail_item(&self, header: &Header, attempt: u32) -> ClaimedItem {
+        let sender = self.binding(&header.from);
+        ClaimedItem {
+            id: header.id.clone(),
+            attempt,
+            what: ClaimedWhat::Mail(MailFrom {
+                label: self.sender_label(&header.from),
+                cli: sender.map(|b| b.cli.clone()),
+                has_head: sender.is_some(),
+            }),
+        }
+    }
+
+    /// The claimed item of a notice; a notice is offered once, so its
+    /// attempt is always the first.
+    fn notice_item(&self, notice: &Notice) -> ClaimedItem {
+        ClaimedItem {
+            id: notice.id.clone(),
+            attempt: 1,
+            what: ClaimedWhat::Notice(NoticeFacts {
+                reason: notice.reason,
+                about: notice.about.clone(),
+                about_to: self.sender_label(&notice.about_to),
+            }),
+        }
+    }
+
+    /// Moves one eligible message to in-flight under `hold`.
+    fn take_message(&mut self, i: usize, hold: &Hold<'_>, now: Timestamp) -> ClaimedItem {
+        let header = &mut self.messages[i];
+        header.offers += 1;
+        header.changed_at = now;
+        header.state = MessageState::InFlight {
+            token: hold.token.clone(),
+            deadline: hold.deadline,
+            generation: hold.generation,
+        };
+        let attempt = header.offers;
+        self.mail_item(&self.messages[i], attempt)
+    }
+
+    /// Moves one eligible notice to in-flight under `hold`.
+    fn take_notice(&mut self, i: usize, hold: &Hold<'_>) -> ClaimedItem {
+        let notice = &mut self.notices[i];
+        notice.state = NoticeState::InFlight {
+            token: hold.token.clone(),
+            deadline: hold.deadline,
+            generation: hold.generation,
+        };
+        self.notice_item(&self.notices[i])
     }
 
     /// Finishes a claim after its frame was emitted. Each message still in

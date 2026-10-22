@@ -354,6 +354,12 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
             ][..],
         ),
         ("inbox.no-address", &[][..]),
+        (
+            "message.too-large-for-channel",
+            &["{{count}}", "fgos mailbox inbox --claim"][..],
+        ),
+        ("report.untested-version", &["{{version}}"][..]),
+        ("report.version-unknown", &[][..]),
     ];
     for (name, tokens) in expect {
         let text = section(name);
@@ -366,4 +372,61 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
         "{{body}} must stand alone"
     );
     assert_eq!(sections.len(), expect.len());
+}
+
+#[test]
+fn the_worst_case_frame_size_is_never_smaller_than_the_rendered_frame_of_a_hostile_body() {
+    let limits = spec_limits();
+    let max = limits.max_body_bytes as usize;
+    let fill = |unit: &str| unit.repeat(max / unit.len());
+    let bodies = [
+        String::new(),
+        "x".to_string(),
+        fill("&"),
+        fill("<"),
+        fill(">"),
+        fill("\n"),
+        fill("\r\n"),
+        fill("\r"),
+        fill("\u{2028}"),
+        fill("\u{0085}"),
+        fill("&\n<"),
+        fill("a&b\r\n<c>\u{2028}\t"),
+        fill("\u{200B}"),
+    ];
+    for (with_head, label) in [(true, "forgent-claude-2b"), (false, "unregistered_\"<x>\"")] {
+        let item = item(label, with_head);
+        for body in &bodies {
+            let bound = fgos_mailbox_core::worst_case_len(&item, body.len() as u64, &limits);
+            let rendered = render(&item, Some(body), &limits).len();
+            assert!(
+                rendered <= bound,
+                "body of {} bytes rendered {rendered} > {bound}",
+                body.len()
+            );
+            let missing = render(&item, None, &limits).len();
+            assert!(
+                missing <= bound,
+                "a missing body rendered {missing} > {bound}"
+            );
+        }
+    }
+}
+
+#[test]
+fn the_worst_case_size_of_a_notice_is_its_rendered_size() {
+    let limits = spec_limits();
+    let notice = ClaimedItem {
+        id: MessageId::from_text("9"),
+        attempt: 1,
+        what: ClaimedWhat::Notice(fgos_mailbox_core::NoticeFacts {
+            reason: RefusalReason::OfferCap,
+            about: MessageId::from_text("7"),
+            about_to: "forgent-codex-9c".to_string(),
+        }),
+    };
+    assert_eq!(
+        fgos_mailbox_core::worst_case_len(&notice, 0, &limits),
+        render(&notice, None, &limits).len()
+    );
 }
