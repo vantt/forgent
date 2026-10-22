@@ -111,12 +111,17 @@ export function checkProcessContainment(repoRoot, { platform = process.platform,
   if (error) return { passed: false, message: `no host binary to ask for the containment driver: ${error}` };
   const answer = probeRoute(bin, 'supervise');
   if (answer.error) return { passed: false, message: `${bin} did not report its containment driver: ${answer.error}` };
-  const { driver, level, escapes = [], error: driverError } = answer.containment ?? {};
+  const { driver, level, escapes = [], error: driverError, selectedBecause } = answer.containment ?? {};
   const escapeText = escapes.length > 0 ? `; escapes: ${listed(escapes)}` : '';
   if (level === 'kernel') return { passed: true, message: `${driver}, level kernel${escapeText}` };
   if (level === 'best-effort') {
     if (platform === 'linux') {
-      return { passed: true, message: warn(`${driver}, level best-effort: bwrap with a user namespace is unavailable here (no bwrap, or user namespaces are disabled), so agents run in a process group${escapeText}. Install bwrap and enable unprivileged user namespaces for kernel containment`) };
+      if (selectedBecause?.startsWith('containment-mount-refused:')) {
+        const line = selectedBecause.slice('containment-mount-refused:'.length).trim();
+        return { passed: true, message: warn(`${driver}, level best-effort: a host mount cannot be remounted (${line}); unmount or fix it to get kernel containment${escapeText}`) };
+      }
+      const reason = selectedBecause ? `(${selectedBecause})` : '(no bwrap, or user namespaces are disabled)';
+      return { passed: true, message: warn(`${driver}, level best-effort: bwrap with a user namespace is unavailable here ${reason}, so agents run in a process group${escapeText}. Install bwrap and enable unprivileged user namespaces for kernel containment`) };
     }
     return { passed: true, message: info(`${driver}, level best-effort${escapeText}`) };
   }

@@ -58,7 +58,8 @@ function writeConfig(file, config) {
 /** A stand-in host binary that answers every route with `line` (and exits `status`). */
 function fakeHost(name, line, status = 0) {
   const file = path.join(scratch, name);
-  fs.writeFileSync(file, `#!/bin/sh\nroute="$2"\nprintf '%s\\n' '${line}' | sed "s/@ROUTE@/$route/"\nexit ${status}\n`, { mode: 0o755 });
+  const escaped = line.replaceAll("'", "'\\''");
+  fs.writeFileSync(file, `#!/bin/sh\nroute="$2"\nprintf '%s\\n' '${escaped}' | sed "s/@ROUTE@/$route/"\nexit ${status}\n`, { mode: 0o755 });
   return file;
 }
 
@@ -114,6 +115,16 @@ test('process-containment: kernel passes; best-effort warns on Linux and informs
   assert.match(linux.message, /Install bwrap and enable unprivileged user namespaces/);
   assert.match(checkProcessContainment(root, { bin: bestEffort, platform: 'darwin' }).message, /^info: linux-pgroup, level best-effort/);
 
+  const mountRefused = fakeHost('h-mount', probeLine({
+    driver: 'linux-pgroup',
+    level: 'best-effort',
+    selectedBecause: "containment-mount-refused: bwrap: Can't bind mount /oldroot/var/tmp/x on /newroot/var/tmp/x: Invalid argument",
+    escapes: ['setsid descendants leave the process group'],
+  }));
+  const mountRes = checkProcessContainment(root, { bin: mountRefused, platform: 'linux' });
+  assert.equal(mountRes.passed, true);
+  assert.match(mountRes.message, /^warning: linux-pgroup, level best-effort: a host mount cannot be remounted \(bwrap: Can't bind mount \/oldroot\/var\/tmp\/x on \/newroot\/var\/tmp\/x: Invalid argument\); unmount or fix it to get kernel containment/);
+  assert.doesNotMatch(mountRes.message, /user namespaces are disabled/);
   const none = checkProcessContainment(root, { bin: fakeHost('h-none', probeLine({ driver: null, level: 'unsupported', escapes: [], error: 'unsupported-platform' })) });
   assert.equal(none.passed, false);
   assert.match(none.message, /no containment driver on this machine \(unsupported-platform\)/);
