@@ -1575,9 +1575,13 @@ pub fn main_checkout_root(start: &Path) -> Result<Option<PathBuf>> {
         .map_err(|_| refusal("trusted-main-gitfile-unsupported"))?;
     let common = fs::canonicalize(admin.join(line(&common_hint)?)).map_err(io)?;
     let backlink = fs::read(admin.join("gitdir")).map_err(io)?;
+    // Git may write the back-link relative to the admin directory
+    // (`worktree.useRelativePaths`); read it as git does, then compare the
+    // real paths.
+    let backlink = fs::canonicalize(admin.join(line(&backlink)?)).ok();
     if common.file_name() != Some(std::ffi::OsStr::new(".git"))
         || admin.parent() != Some(common.join("worktrees").as_path())
-        || Path::new(line(&backlink)?) != main.join(".git")
+        || backlink != Some(main.join(".git"))
     {
         return Err(refusal("untrusted-worktree"));
     }
