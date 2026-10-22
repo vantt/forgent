@@ -163,6 +163,23 @@ fn containment_direct_refuses_die_with_parent_by_name() {
 }
 
 #[test]
+fn a_refused_mount_is_named_in_the_containment_error() {
+    let driver = BwrapPidns::new(fixture("bwrap-refuses-mount.sh").into());
+    let mut domain = driver.create("attempt-refused-mount").unwrap();
+    let err = driver.spawn_in(&mut domain, spec(&["true"], StartMode::Terminal)).err().expect("the refusing bwrap cannot start a gate");
+    assert_eq!(err.name(), "namespace-unavailable");
+    let display = err.to_string();
+    assert!(display.starts_with("namespace-unavailable: containment-mount-refused: "), "Display names cause, got: {display}");
+    match err {
+        fgos_process::containment::ContainmentError::NamespaceUnavailable(msg) => {
+            assert!(msg.starts_with("containment-mount-refused: "), "cause name is containment-mount-refused, got: {msg}");
+            assert!(msg.contains("Can't bind mount /oldroot/var/tmp/x"), "the refused mount is named, got: {msg}");
+        }
+        other => panic!("expected namespace-unavailable, got {other}"),
+    }
+}
+
+#[test]
 fn containment_select_prefers_bwrap_pidns_when_user_namespaces_work() {
     let Some(_) = common::require_bwrap() else { return };
     let driver = select(&SelectEnv::default()).unwrap();

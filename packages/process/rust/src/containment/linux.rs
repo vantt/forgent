@@ -7,7 +7,7 @@ use std::io::{self, Read};
 use std::os::fd::{AsRawFd, FromRawFd};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
-use std::sync::{Mutex, OnceLock};
+use std::sync::{LazyLock, Mutex};
 use std::time::{Duration, Instant};
 
 use super::pgroup::{self, apply_stdio, wait_until, ListFn, Members, Unlistable, POLL};
@@ -19,18 +19,24 @@ use crate::{signal_settled, Domain, DomainState, FdSlot, KillOutcome, ProcId};
 
 /// Where bwrap is looked for when nothing names it.
 const BWRAP_LOCATIONS: [&str; 3] = ["/usr/bin/bwrap", "/bin/bwrap", "/usr/local/bin/bwrap"];
+/// What bwrap's early exit is called; a diagnostic line may follow it.
+const NO_GATE_PID: &str = "bwrap ended without reporting a gate pid";
+/// The most stderr the diagnostic re-run keeps, and the longest it runs.
+const DIAGNOSTIC_STDERR_BYTES: u64 = 4096;
+const DIAGNOSTIC_TIMEOUT: Duration = Duration::from_secs(2);
 /// The longest wait for bwrap to report the gate's pid.
 const INFO_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// The driver for this machine: `bwrap-pidns` when bwrap can make a pid
 /// namespace, else `linux-pgroup`.
 pub(crate) fn select(env: &SelectEnv) -> Box<dyn ContainmentDriver> {
-    if let Some(bwrap) = bwrap_path(env) {
-        if pidns_usable(&bwrap) {
-            return Box::new(BwrapPidns { bwrap });
-        }
+    match bwrap_path(env) {
+        Some(bwrap) => match pidns_usable(&bwrap) {
+            Ok(()) => Box::new(BwrapPidns { bwrap }),
+            Err(reason) => Box::new(LinuxPgroup::with_reason(reason)),
+        },
+        None => Box::new(LinuxPgroup::with_reason("bwrap-not-found")),
     }
-    Box::new(LinuxPgroup)
 }
 
 fn bwrap_path(env: &SelectEnv) -> Option<PathBuf> {
@@ -42,24 +48,38 @@ fn bwrap_path(env: &SelectEnv) -> Option<PathBuf> {
 
 /// Can `bwrap` make a user plus pid namespace here? Probed once per process
 /// and path by running a real command in one.
-fn pidns_usable(bwrap: &Path) -> bool {
-    static PROBED: OnceLock<Mutex<HashMap<PathBuf, bool>>> = OnceLock::new();
-    let cache = PROBED.get_or_init(|| Mutex::new(HashMap::new()));
-    if let Some(known) = cache.lock().ok().and_then(|map| map.get(bwrap).copied()) {
+fn pidns_usable(bwrap: &Path) -> Result<(), String> {
+    static PROBED: LazyLock<Mutex<HashMap<PathBuf, Result<(), String>>>> = LazyLock::new(|| Mutex::new(HashMap::new()));
+    if let Some(known) = PROBED.lock().ok().and_then(|map| map.get(bwrap).cloned()) {
         return known;
     }
-    let usable = Command::new(bwrap)
+    let output = Command::new(bwrap)
         .args(["--unshare-user", "--unshare-pid", "--as-pid-1", "--dev-bind", "/", "/", "--proc", "/proc", "--", "/bin/true"])
         .stdin(Stdio::null())
         .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
-        .map(|status| status.success())
-        .unwrap_or(false);
-    if let Ok(mut map) = cache.lock() {
-        map.insert(bwrap.to_path_buf(), usable);
+        .stderr(Stdio::piped())
+        .output();
+    let result = match output {
+        Ok(out) if out.status.success() => Ok(()),
+        Ok(out) => {
+            let stderr_str = String::from_utf8_lossy(&out.stderr);
+            let first_line = stderr_str.lines().map(str::trim).find(|line| !line.is_empty()).unwrap_or("probe failed");
+            if is_mount_refusal(first_line) {
+                Err(format!("containment-mount-refused: {first_line}"))
+            } else {
+                Err(format!("user-namespace-refused: {first_line}"))
+            }
+        }
+        Err(err) => Err(format!("user-namespace-refused: {err}")),
+    };
+    if let Ok(mut map) = PROBED.lock() {
+        map.insert(bwrap.to_path_buf(), result.clone());
     }
-    usable
+    result
+}
+
+fn is_mount_refusal(line: &str) -> bool {
+    line.contains("Can't bind mount") || line.contains("remount")
 }
 
 /// `bwrap-pidns`: the gate is pid 1 of a fresh pid namespace, so the domain is
@@ -138,6 +158,11 @@ impl ContainmentDriver for BwrapPidns {
             Ok(pid) => pid,
             Err(why) => {
                 end_failed_spawn(&mut child);
+                let why = match why.starts_with(NO_GATE_PID).then(|| refusal_line(&prefix)).flatten() {
+                    Some(line) if is_mount_refusal(&line) => format!("containment-mount-refused: {line}"),
+                    Some(line) => format!("{NO_GATE_PID}: {line}"),
+                    None => why,
+                };
                 return Err(ContainmentError::NamespaceUnavailable(why));
             }
         };
@@ -198,8 +223,37 @@ impl ContainmentDriver for BwrapPidns {
             driver: "bwrap-pidns",
             level: GuaranteeLevel::Kernel,
             escapes: vec!["processes created by a daemon outside the namespace on the agent's request (herdr, systemd, docker)"],
+            selected_because: None,
         }
     }
+}
+
+/// Why bwrap ended without a gate pid, said by bwrap itself. Its stderr is the
+/// gate's own for the gate's whole life, so it cannot be piped on the real
+/// spawn; after a failed spawn the same set-up is run once more around
+/// `/bin/true` with stderr captured. A refusal that comes from the machine (a
+/// mount that cannot be remounted) repeats, so the re-run names it. Nothing is
+/// decided from the answer; `None` keeps the caller's sentence.
+fn refusal_line(prefix: &[String]) -> Option<String> {
+    let mut rerun = Command::new(&prefix[0])
+        .args(&prefix[1..])
+        .args(["--", "/bin/true"])
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped())
+        .spawn()
+        .ok()?;
+    let stderr = rerun.stderr.take()?;
+    let (sender, receiver) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let mut text = Vec::new();
+        let _ = stderr.take(DIAGNOSTIC_STDERR_BYTES).read_to_end(&mut text);
+        let _ = sender.send(text);
+    });
+    let text = receiver.recv_timeout(DIAGNOSTIC_TIMEOUT).unwrap_or_default();
+    let _ = rerun.kill();
+    let _ = rerun.wait();
+    String::from_utf8_lossy(&text).lines().map(str::trim).find(|line| !line.is_empty()).map(str::to_owned)
 }
 
 /// A spawn that failed after bwrap started: end the whole attempt, not just the
@@ -227,7 +281,17 @@ fn end_failed_spawn(monitor: &mut Child) {
 /// `linux-pgroup`: the gate leads its own session and process group, and the
 /// supervisor is the subreaper (the gate sets it for itself). Best-effort: a descendant that calls `setsid`
 /// and double-forks leaves both the group and the scanned tree.
-pub struct LinuxPgroup;
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct LinuxPgroup {
+    pub selected_because: Option<String>,
+}
+
+impl LinuxPgroup {
+    pub fn with_reason(reason: impl Into<String>) -> Self {
+        Self { selected_because: Some(reason.into()) }
+    }
+}
+
 
 impl ContainmentDriver for LinuxPgroup {
     fn name(&self) -> &'static str {
@@ -302,6 +366,7 @@ impl ContainmentDriver for LinuxPgroup {
                 "a group scan made after the leader died can meet a reused pgid",
                 "daemons outside the domain",
             ],
+            selected_because: self.selected_because.clone(),
         }
     }
 }
@@ -446,7 +511,7 @@ fn read_child_pid(mut read_end: File) -> Result<u32, String> {
             return Ok(pid);
         }
         if read == 0 {
-            return Err("bwrap ended without reporting a gate pid (user namespaces unavailable?)".into());
+            return Err(format!("{NO_GATE_PID} (user namespaces unavailable?)"));
         }
     }
 }

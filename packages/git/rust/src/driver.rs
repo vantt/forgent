@@ -3278,7 +3278,7 @@ mod tests {
         git(&dir.0, &["init", "-q"]);
         let mut driver = GitDriver::new(&state.0).unwrap();
         // A process-group domain sees the background member the root leaves.
-        driver.containment = Box::new(UnemptiedDriver { inner: Box::new(fgos_process::containment::LinuxPgroup) });
+        driver.containment = Box::new(UnemptiedDriver { inner: Box::new(fgos_process::containment::LinuxPgroup::default()) });
         let repo = resolve(&driver, &dir.0);
         let err = driver
             .invoke(
@@ -3348,7 +3348,7 @@ mod tests {
         git(&sub_dir, &["config", "filter.x.clean", script.to_str().unwrap()]);
 
         let mut driver = GitDriver::new(&state.0).unwrap();
-        driver.containment = Box::new(fgos_process::containment::LinuxPgroup);
+        driver.containment = Box::new(fgos_process::containment::LinuxPgroup::default());
         let repo = resolve(&driver, &super_dir.0);
 
         let err = driver
