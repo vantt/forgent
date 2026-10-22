@@ -10,7 +10,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { StringDecoder } from 'node:string_decoder';
 import { spawn } from 'node:child_process';
-import { acquireSync, createLockScope, spawnWithLocks, resolveLock, resolveStateRoot, readPredecessorKillWaitMs, HolderLockError } from '../holder-lock/index.mjs';
+import { acquireSync, createLockScope, spawnWithLocks, resolveLock, resolveStateRoot, HolderLockError } from '../holder-lock/index.mjs';
+import { DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
 import { admitSuccessor } from '../runner/dispatch/cwd-lock.mjs';
 import { DispatchError } from '../runner/dispatch/dispatch-error.mjs';
 import { computeSha256Digest, publishImmutableProof, publishMutableProjection } from '../runner/dispatch/proof-helpers.mjs';
@@ -138,13 +139,13 @@ function boottimeAfter(afterMs) {
 }
 
 /** The environment of every step and of the supervisor: nothing but what the Node payload reads. */
-export function attemptStepEnv({ fgosDir, env = process.env } = {}) {
+export function attemptStepEnv({ env = process.env } = {}) {
   const out = {};
   for (const name of ENV_ALLOW) if (typeof env[name] === 'string') out[name] = env[name];
   for (const [name, value] of Object.entries(env)) {
     if (name.startsWith('FGOS_') && typeof value === 'string' && name !== 'FGOS_LOCK_FD' && name !== 'FGOS_LOCK_JOB' && name !== 'FGOS_RUST_HOST_RECURSION_GUARD') out[name] = value;
   }
-  out.FGOS_STATE_ROOT = resolveStateRoot({ env, fgosDir }).stateRoot;
+  out.FGOS_STATE_ROOT = resolveStateRoot({ env }).stateRoot;
   return out;
 }
 
@@ -246,9 +247,9 @@ export function writeSettleContext(runDir, context) {
   publishMutableProjection(path.join(runDir, 'controller', 'settle-context.json'), { v: 1, ...context });
 }
 
-/** Read the controller side settings once: the kill grace and the predecessor kill wait. */
+/** Read the controller side settings once: the kill grace, and the predecessor kill wait the envelope carries. */
 export function readLaunchSettings(projectRoot) {
-  return { gateKillGraceMs: readGateKillGraceMs({ projectRoot }), killWaitMs: readPredecessorKillWaitMs({ projectRoot }) };
+  return { gateKillGraceMs: readGateKillGraceMs({ projectRoot }), killWaitMs: DEFAULT_KILL_WAIT_MS };
 }
 
 /**

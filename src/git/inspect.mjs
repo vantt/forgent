@@ -26,7 +26,7 @@ export function gitWriter(fgosDir) {
 
 export function gitPortOptions(repoPath, { mutation = false } = {}) {
   outsideGate();
-  const stateRoot = resolveStateRoot({ fgosDir: path.join(repoPath, '.fgos') }).stateRoot;
+  const stateRoot = resolveStateRoot().stateRoot;
   const seed = { stateRoot, repoPath, trustedMain: repoPath };
   if (!mutation) return seed;
   const facts = createGitInspect(seed).resolveRepo();

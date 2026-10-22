@@ -27,7 +27,7 @@
   },
   "errorStdout": { "v": 1, "protocol": 1, "result": "error", "code": { "enum": ["usage", "host-version-mismatch"] }, "message": "string" },
   "notes": [
-    "exit code 3 for host-version-mismatch matches the other internal routes (internal-route.state-root.v1.json)",
-    "the state root comes from the same single resolution as holder-lock (internal-route.state-root.v1.json); the route never resolves its own"
+    "exit code 3 for host-version-mismatch matches the other internal routes (internal-route.lock-fd.v1.json)",
+    "the state root comes from the same single resolution as holder-lock (state-root.vectors.v1.json); the route never resolves its own"
   ]
 }

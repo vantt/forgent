@@ -36,7 +36,7 @@ function withQueueHint(err) {
 
 function holderText(holders) {
   if (holders.kind !== 'list') return `holder not listable: ${holders.reason}`;
-  return holders.pids.length > 0 ? `pid ${holders.pids.join(', ')}` : 'holder just left';
+  return holders.holders.length > 0 ? `pid ${holders.holders.map((h) => h.pid).join(', ')}` : 'holder just left';
 }
 
 /**

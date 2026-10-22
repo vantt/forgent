@@ -37,7 +37,7 @@
   "$defs": {
     "lock": {
       "type": "object",
-      "required": ["name", "kind", "scope", "rank", "v3Path", "v1Shape", "v1Path", "fence", "owner"],
+      "required": ["name", "kind", "scope", "rank", "v3Path", "owner"],
       "additionalProperties": false,
       "properties": {
         "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
@@ -45,27 +45,9 @@
         "scope": { "enum": ["repo", "machine", "run"] },
         "rank": { "type": "integer", "minimum": 1 },
         "v3Path": { "type": ["string", "null"] },
-        "v1Shape": { "enum": ["file-link", "file-wx", "ledger-dir", "file-by-cwd", null] },
-        "v1Path": { "type": ["string", "array", "null"], "items": { "type": "string" } },
-        "fence": { "enum": ["tombstone", "blocking-generation", "none", null] },
-        "fenceNote": { "type": "string" },
         "owner": { "enum": ["4.2", "4.3", "4.4", "6.2", "event-store", "git"] },
         "note": { "type": "string" }
-      },
-      "allOf": [
-        {
-          "if": { "required": ["owner"], "properties": { "owner": { "const": "4.2" } } },
-          "then": {
-            "required": ["fence", "v1Shape", "v1Path", "v3Path"],
-            "properties": {
-              "fence": { "enum": ["tombstone", "blocking-generation", "none"] },
-              "v1Shape": { "enum": ["file-link", "file-wx", "ledger-dir", "file-by-cwd"] },
-              "v1Path": { "type": ["string", "array"] },
-              "v3Path": { "type": "string" }
-            }
-          }
-        }
-      ]
+      }
     }
   }
 }

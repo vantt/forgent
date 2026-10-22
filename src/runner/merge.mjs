@@ -858,7 +858,8 @@ export async function landRunnerItem(repoRoot, item, {
   const fgosDir = path.join(repoRoot, '.fgos');
   const mergeSlot = ['merge-slot', { fgosDir, ref: encodeURIComponent(destination) }, `merge slot of "${destination}"`];
   const lockHeld = ([lock, params, label]) => {
-    const holders = lockHolders(lock, params).pids ?? [];
+    const listed = lockHolders(lock, params);
+    const holders = listed.kind === 'list' ? listed.holders.map((h) => h.pid) : [];
     return new MergeError(`cannot merge "${branch}" into "${target}": ${label} is held by another process${holders.length ? ` (pid ${holders.join(', ')})` : ''}.`, {
       branch, targetRef: target, code: 'lock-held', holders, lock,
     });

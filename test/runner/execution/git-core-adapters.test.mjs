@@ -31,7 +31,7 @@ function fixture(conflict = false) {
 function hook(f, owned) {
   const hooks=path.join(f.main,'hooks'), count=path.join(f.temp,'count');fs.mkdirSync(hooks);
   fs.writeFileSync(path.join(hooks,'pre-commit'),`#!/bin/sh\necho call >> '${count}'\nprintf '  original refusal\\nsecond line\\n' >&2\nexit 1\n`,{mode:0o755});
-  if(owned) createGitRepositoryConfig({stateRoot:resolveStateRoot({fgosDir:path.join(f.main,'.fgos')}).stateRoot,repoPath:f.main,trustedMain:f.main}).ensureHooks({ownedPath:hooks,operationId:'owned-hook'});
+  if(owned) createGitRepositoryConfig({stateRoot:resolveStateRoot().stateRoot,repoPath:f.main,trustedMain:f.main}).ensureHooks({ownedPath:hooks,operationId:'owned-hook'});
   else f.git(f.main,'config','core.hooksPath',hooks);
   return {count,file:path.join(hooks,'pre-commit')};
 }

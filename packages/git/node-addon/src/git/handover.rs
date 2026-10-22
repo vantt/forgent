@@ -1,4 +1,5 @@
 //! Private capability and one-use typed Externals. No fd-taking operation API.
+use crate::holder_lock::LockExternal;
 use crate::{check, error};
 use fgos_holder_lock::BorrowedHandle;
 #[cfg(unix)]
@@ -24,7 +25,7 @@ pub fn mint_git_loan(
     name: String,
     path: String,
     kill_wait_ms: u32,
-    reach_floor_ticks: Option<String>,
+    lock: External<LockExternal>,
     protected_roots: Vec<u32>,
 ) -> Result<External<Loan>> {
     check()?;
@@ -37,11 +38,7 @@ pub fn mint_git_loan(
                 fd,
                 Resource::new(name, path),
                 u64::from(kill_wait_ms),
-                reach_floor_ticks
-                    .as_deref()
-                    .map(str::parse)
-                    .transpose()
-                    .map_err(error)?,
+                lock.0.lock().map_err(error)?.as_ref().ok_or_else(|| error("holder-lock-closed"))?.since(),
                 protected_roots,
             )
         }
@@ -55,7 +52,7 @@ pub fn mint_git_loan(
             name,
             path,
             kill_wait_ms,
-            reach_floor_ticks,
+            lock,
             protected_roots,
         );
         Err(error("git-lock-handover-unsupported"))

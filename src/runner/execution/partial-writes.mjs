@@ -8,13 +8,12 @@
 // is not run again by itself.
 // Architecture guard: MUST NOT import src/state/** or src/runner/coordination/**.
 
-import path from 'node:path';
 import { createGitInspect } from '../../git/inspect.mjs';
 import { resolveStateRoot } from '../../holder-lock/index.mjs';
 
 /** Typed snapshot translation; byte parsing and fingerprints belong to Git. */
 export function worktreeSnapshot({ worktree, repoRoot, loaderOptions }) {
-  const port = createGitInspect({ stateRoot: resolveStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot,
+  const port = createGitInspect({ stateRoot: resolveStateRoot().stateRoot,
     repoPath: worktree, trustedMain: repoRoot }, loaderOptions);
   const snapshot = port.snapshotWrites({ paths: [], maxBytes: Number.MAX_SAFE_INTEGER });
   const files = {};

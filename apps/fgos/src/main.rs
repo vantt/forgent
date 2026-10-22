@@ -149,7 +149,7 @@ fn main() {
     let args: Vec<std::ffi::OsString> = std::env::args_os().collect();
 
     // `fgos internal ...`: host routes for the Node payload (lock-fd,
-    // state-root, quiesce-scan, lock-borrow-vectors). Dispatched before the
+    // lock-hold, quiesce-scan, lock-borrow-vectors). Dispatched before the
     // route table, composition and any spawn, so no child of this process
     // can inherit a descriptor handed to a route; not listed in
     // command-routes.json or help.
@@ -168,12 +168,6 @@ fn main() {
         if args.get(2).is_some_and(|a| a == "terminal-control") {
             let rest: Vec<String> = args[3..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
             std::process::exit(fgos_terminal_control::route::main(&rest));
-        }
-        // `identity <op>`: the writer-id rules the Node payload must not copy
-        // (see `fgos_identity::route`).
-        if args.get(2).is_some_and(|a| a == "identity") {
-            let rest: Vec<String> = args[3..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
-            std::process::exit(fgos_identity::route::main(&rest));
         }
         // `seat-binding <op>`: the seat binding decision the Node payload must
         // not copy (see `fgos_seat_binding::route`).

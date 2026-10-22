@@ -17,7 +17,6 @@ pub mod project;
 #[cfg(feature = "provider")]
 pub mod provider;
 pub mod resolve;
-pub mod route;
 pub mod session;
 pub mod text;
 

@@ -222,7 +222,7 @@ export function acquireRunnerLock(dir) {
     }
   }
   const holders = lockHolders('runner', params);
-  const holderPid = holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
+  const holderPid = holders.kind === 'list' && holders.holders.length > 0 ? holders.holders[0].pid : null;
   return { acquired: false, holderPid, lockPath };
 }
 

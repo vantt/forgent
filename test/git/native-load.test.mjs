@@ -22,7 +22,7 @@ const options = { descriptor };
 const addon = loadNativeAddon(options);
 
 test('one combined load reports both crate versions and Node-API line', () => {
-  assert.deepEqual(addon.versions(), { addon: '0.2.0', git: '0.2.0', eventStore: '0.2.0', napi: 8, process: 1, durableFile: '0.2.0', canonicalJson: 1, contracts: { gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 } });
+  assert.deepEqual(addon.versions(), { addon: '0.2.0', git: '0.2.0', eventStore: '0.2.0', napi: 8, process: 1, durableFile: '0.2.0', canonicalJson: 1, holderLock: 1, sessionIdentity: 1, contracts: { gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 } });
   assert.equal(loadNativeAddon(options), addon);
 });
 test('a second physical addon copy refuses at load, while a child owns its own marker', () => {
@@ -85,6 +85,23 @@ test('the door refuses a symlinked addon and a value that is not JSON, and write
     fs.writeFileSync(path.join(temp, 'occupied', 'inner'), 'x');
     assert.throws(() => replaceDurably(temp, 'occupied', 'c', 0o600), (e) => e.installed === 'none' && /failed at name-installed \(installed: none\)/.test(e.message));
     assert.deepEqual(fs.readdirSync(temp).filter((n) => /^\.durable-file-.*\.tmp$/.test(n)), []);
+  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});
+
+test('the door refuses holes, nested non-finite numbers and undefined array members that JSON would silently turn into null', () => {
+  // eslint-disable-next-line no-sparse-arrays
+  for (const bad of [[1, undefined], [1, , 2], NaN, 10n, () => 1, { a: [NaN] }, [Infinity]]) assert.throws(() => canonicalJson(bad), { code: 'canonical-json-not-json' });
+  assert.equal(canonicalJson({ b: [1], a: undefined }), '{"b":[1]}');
+  assert.equal(canonicalJson({ at: new Date(Date.UTC(2026, 9, 22)) }), '{"at":"2026-10-22T00:00:00.000Z"}');
+});
+
+test('a durable write refuses an omitted or invalid mode by name before it touches any file', () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-door-mode-'));
+  try {
+    const refused = { code: 'durable-file-mode-invalid', installed: 'none' };
+    assert.throws(() => replaceDurably(temp, 'x', 'c'), refused);
+    for (const mode of [-1, 1.5, 0o10000]) assert.throws(() => installOnce(temp, 'x', 'c', mode), refused);
+    assert.deepEqual(fs.readdirSync(temp), []);
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 

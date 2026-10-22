@@ -159,3 +159,17 @@ pub fn scan(filter: Value) -> Result<Value> {
             .into(),
     })
 }
+
+/// This process and its ancestors, nearest first, read one pid at a time; off Linux the chain is this process alone.
+#[napi(namespace = "process", js_name = "selfChain")]
+pub fn self_chain() -> Result<Vec<u32>> {
+    check()?;
+    let mut chain = vec![std::process::id()];
+    while let Some(relation) = facts::relation_of(ProcId(*chain.last().expect("the chain starts with this process"))) {
+        if relation.parent <= 1 || chain.contains(&relation.parent) {
+            break;
+        }
+        chain.push(relation.parent);
+    }
+    Ok(chain)
+}

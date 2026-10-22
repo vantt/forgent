@@ -27,7 +27,7 @@ function advanceLockParams(mainRoot, workflowRunId) {
 /** Pid of a process holding the run's advance lock, or null when the kernel cannot list one. */
 function advanceHolderPid(params) {
   const holders = lockHolders('advance', params);
-  return holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
+  return holders.kind === 'list' && holders.holders.length > 0 ? holders.holders[0].pid : null;
 }
 
 /** `{ pid }` of the process currently advancing the run (pid null when unlistable), null when nothing holds it. */
@@ -38,7 +38,7 @@ function liveAdvanceHolder(mainRoot, workflowRunId) {
   // The kernel's holder list takes no lock, so a status read never makes a concurrent advance see
   // the lock held; the probe, which does, is only for a platform that cannot list holders.
   const holders = lockHolders('advance', params);
-  if (holders.kind === 'list') return holders.pids.length > 0 ? { pid: holders.pids[0] } : null;
+  if (holders.kind === 'list') return holders.holders.length > 0 ? { pid: holders.holders[0].pid } : null;
   return probe('advance', params).result === 'free' ? null : { pid: null };
 }
 

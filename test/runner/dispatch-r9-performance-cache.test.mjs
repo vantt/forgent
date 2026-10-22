@@ -9,6 +9,7 @@ import {
   saveProbeCacheRecord,
   loadProbeCacheRecord,
   clearProbeCache,
+  resolveAttestationStoreDir,
   DEFAULT_PROBE_CACHE_TTL_MS,
 } from "../../src/runner/dispatch/confinement/attestation-store.mjs";
 import {
@@ -18,6 +19,25 @@ import {
   clearAllRunsCache,
   inspectDispatchRuntime,
 } from "../../src/runner/dispatch/runtime-inspection.mjs";
+
+test("the attestation store follows the state-root pin, even when XDG_STATE_HOME is blank", (t) => {
+  const keys = ["FGOS_STATE_ROOT", "FGOS_CONFINEMENT_ATTESTATION_STORE_PATH", "XDG_STATE_HOME"];
+  const saved = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
+  t.after(() => {
+    for (const key of keys) {
+      if (saved[key] === undefined) delete process.env[key];
+      else process.env[key] = saved[key];
+    }
+  });
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-attest-pin-"));
+  t.after(() => fs.rmSync(scratch, { recursive: true, force: true }));
+  delete process.env.FGOS_CONFINEMENT_ATTESTATION_STORE_PATH;
+  process.env.FGOS_STATE_ROOT = scratch;
+  process.env.XDG_STATE_HOME = path.join(scratch, "xdg-elsewhere");
+  assert.equal(resolveAttestationStoreDir(), path.join(scratch, "attestations"));
+  process.env.XDG_STATE_HOME = "   ";
+  assert.equal(resolveAttestationStoreDir(), path.join(scratch, "attestations"));
+});
 
 test("R9: attestation store caches probe results by fingerprint with TTL", () => {
   clearProbeCache();

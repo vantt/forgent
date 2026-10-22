@@ -24,7 +24,7 @@ import {
 } from '../../src/setup/run-supervisor-checks.mjs';
 import { readGateKillGraceMs, readCancelWaitMs, DEFAULT_GATE_KILL_GRACE_MS } from '../../src/run-supervisor/gate-kill-grace.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../../src/verbs/dispatch/recover.mjs';
-import { descriptionHolders } from '../../src/holder-lock/driver.mjs';
+import { fileHolders } from '../../src/holder-lock/index.mjs';
 import { selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
 
 const HOST_BIN = process.env.FGOS_HOST_BIN;
@@ -349,8 +349,8 @@ test('run-attempts-stuck: a held lock is a running attempt, not a finding', { sk
   children.add(holder);
   const deadline = Date.now() + 5000;
   for (;;) {
-    const holders = descriptionHolders(lock);
-    if (holders.kind === 'list' && holders.pids.includes(holder.pid)) break;
+    const holders = fileHolders('attempt', lock);
+    if (holders.kind === 'list' && holders.holders.some((h) => h.pid === holder.pid)) break;
     assert.ok(Date.now() < deadline, 'flock did not take the lock');
     await new Promise((resolve) => { setTimeout(resolve, 20); });
   }

@@ -10,6 +10,7 @@ import { gitPortOptions, createGitInspect } from '../git/inspect.mjs';
 import { createGitScopedCommit } from '../git/scoped-commit.mjs';
 import { checkpointLegacyEventFiles, commitLegacyEventFiles } from '../state/legacy-event-git-adapter.mjs';
 import { runOpportunisticMainCheckoutChecks } from '../state/events-jsonl-truncation-guard.mjs';
+import { fgosDirFromRoot } from './paths.mjs';
 
 /** Work policy only. Call before entering Git locks. The legacy callback is
  * a declaration translation: no add/commit/reset command is executed here. */
@@ -19,7 +20,7 @@ export function prepareMainFgosCheckpoint(dir, repoRoot, opts = {}) {
     if (args[0] === 'commit') declaration = { message: args[2] };
   } });
   if (!declaration) return null;
-  const base = path.basename(dir) === '.fgos' ? dir : path.join(dir, '.fgos');
+  const base = path.basename(dir) === '.fgos' ? dir : fgosDirFromRoot(dir);
   const files = [];
   const add = file => { if (fs.existsSync(file)) files.push(path.relative(repoRoot, file).replaceAll('\\', '/')); };
   add(path.join(base, 'events.jsonl'));

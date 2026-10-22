@@ -322,7 +322,7 @@ function refusingHook(repoRoot, message) {
   const hooks = path.join(repoRoot, 'refusing-hooks');
   fs.mkdirSync(hooks, { recursive: true });
   fs.writeFileSync(path.join(hooks, 'pre-commit'), `#!/bin/sh\necho "${message}" >&2\nexit 1\n`, { mode: 0o755 });
-  createGitRepositoryConfig({stateRoot:resolveStateRoot({fgosDir:path.join(repoRoot,'.fgos')}).stateRoot,repoPath:repoRoot,trustedMain:repoRoot}).ensureHooks({ownedPath:hooks,operationId:'owned-refusing-hook'});
+  createGitRepositoryConfig({stateRoot:resolveStateRoot().stateRoot,repoPath:repoRoot,trustedMain:repoRoot}).ensureHooks({ownedPath:hooks,operationId:'owned-refusing-hook'});
   return () => gitIn(repoRoot, 'config', '--unset', 'core.hooksPath');
 }
 

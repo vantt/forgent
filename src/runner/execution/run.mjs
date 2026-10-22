@@ -4,6 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
 import { createGitInspect, gitWriter } from '../../git/inspect.mjs';
 
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
@@ -54,7 +55,7 @@ import { defaultConfinementTempRoots } from '../dispatch/confinement/backend-reg
 
 /** Write `file` atomically so a reader never sees half a record. */
 function writeJsonAtomic(file, value) {
-  const tmp = `${file}.${process.pid}.${crypto.randomBytes(4).toString('hex')}.tmp`;
+  const tmp = `${file}.${uniqueTmpTag()}.tmp`;
   try {
     fs.writeFileSync(tmp, JSON.stringify(value, null, 2));
     fs.renameSync(tmp, file);
@@ -118,7 +119,7 @@ export function detectHerdrPresent(env = process.env) {
  */
 export function resolveGitRoots(cwd = process.cwd(), { allowNoRepository = false } = {}) {
   try {
-    const result = createGitInspect({stateRoot:resolveStateRoot({fgosDir:path.join(cwd,'.fgos')}).stateRoot,
+    const result = createGitInspect({stateRoot:resolveStateRoot().stateRoot,
       repoPath:cwd,trustedMain:cwd}).resolveRepo();
     // A read-only caller may work in a directory that is no repository: Inspect's typed answer is
     // `notARepository`, and the directory is its own project root.
