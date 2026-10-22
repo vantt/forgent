@@ -3003,10 +3003,10 @@ mod tests {
         assert!(repo.layout.shallow);
     }
     #[test]
-    fn a_failed_read_names_the_same_layout_cause_whichever_read_hits_it() {
+    fn a_failed_read_names_the_layout_cause_whichever_read_hits_it() {
         // `layouts_preserve_missing_object_diagnostics_without_fetch` checks the cause of one read.
         // The reads that turn a failed Git child into a cause each carry their own copy of the
-        // promisor, alternates and shallow ladder, and the copies must agree on one repository.
+        // promisor, alternates and shallow ladder; each read must name the layout's cause.
         let bogus = "1234567890123456789012345678901234567890";
         let state = Temp::new();
         let dir = Temp::new();
@@ -3032,22 +3032,62 @@ mod tests {
             note("resolve_head", driver.resolve_head(repo).unwrap_err());
             causes
         };
-        let agree = |causes: &[(&'static str, String)]| causes.iter().all(|(_, c)| *c == causes[0].1);
+        let expect = |causes: Vec<(&'static str, String)>, cause: &str| {
+            let want: Vec<_> = ["checked", "inspect_input", "resolve_head"]
+                .map(|read| (read, cause.to_owned()))
+                .into();
+            assert_eq!(causes, want);
+        };
 
         // A shallow boundary only.
         fs::write(dir.0.join(".git/HEAD"), format!("{bogus}\n")).unwrap();
-        let shallow = causes(&resolve(&driver, &dir.0));
-        // Alternates as well as the shallow boundary.
+        expect(causes(&resolve(&driver, &dir.0)), "shallow-history-incomplete");
+        // Alternates as well as the shallow boundary: alternates name the cause.
         fs::write(
             dir.0.join(".git/objects/info/alternates"),
             b"/missing/alternate\n",
         )
         .unwrap();
-        let both = causes(&resolve(&driver, &dir.0));
-        assert!(
-            agree(&shallow) && agree(&both),
-            "shallow only: {shallow:?}; alternates and shallow: {both:?}"
+        expect(causes(&resolve(&driver, &dir.0)), "alternate-object-unavailable");
+    }
+    #[test]
+    fn a_missing_tree_or_path_is_an_alternates_error_and_stays_absent_when_only_shallow() {
+        // The tree and path reads answer a missing object themselves: with alternates the object
+        // may live elsewhere, so absence is an error; a shallow boundary alone cuts history, not
+        // trees, so absence stays absence.
+        let state = Temp::new();
+        let dir = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        git(
+            &dir.0,
+            &["-c", "user.name=Test", "-c", "user.email=t@e", "commit", "--allow-empty", "-qm", "initial"],
         );
+        let head = String::from_utf8(git(&dir.0, &["rev-parse", "HEAD"])).unwrap();
+        let driver = GitDriver::new(&state.0).unwrap();
+        let reads = |repo: &RepoHandle| {
+            let head = Oid::parse(head.trim(), repo.object_format()).unwrap();
+            (
+                driver.list_tree(repo, &head, b"nope/x", None, 10),
+                driver.read_paths_at(repo, &head, &[b"nope/x".to_vec()], 1024),
+            )
+        };
+
+        fs::write(dir.0.join(".git/shallow"), head.as_bytes()).unwrap();
+        let (tree, paths) = reads(&resolve(&driver, &dir.0));
+        assert!(tree.unwrap().entries.is_empty());
+        assert!(matches!(paths.unwrap()[0].value, PathValue::Absent));
+
+        fs::write(
+            dir.0.join(".git/objects/info/alternates"),
+            b"/missing/alternate\n",
+        )
+        .unwrap();
+        let (tree, paths) = reads(&resolve(&driver, &dir.0));
+        assert_eq!(tree.unwrap_err().cause, "alternate-object-unavailable");
+        match &paths.unwrap()[0].value {
+            PathValue::Error(e) => assert_eq!(e.cause, "alternate-object-unavailable"),
+            other => panic!("{other:?}"),
+        }
     }
     #[test]
     fn linked_registration_and_fake_gitdir() {

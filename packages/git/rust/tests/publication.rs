@@ -2383,7 +2383,7 @@ struct Race {
     repo: RepoHandle,
     id: &'static str,
     step: &'static str,
-    fired: std::sync::atomic::AtomicBool,
+    fired: std::sync::Arc<std::sync::atomic::AtomicBool>,
 }
 impl FileSystem for Race {
     fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
@@ -2397,19 +2397,12 @@ impl FileSystem for Race {
     }
 }
 
-fn is_kebab(cause: &str) -> bool {
-    !cause.is_empty()
-        && cause
-            .bytes()
-            .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
-}
-
 #[test]
 fn publication_names_a_busy_wal_like_every_other_port() {
     // `attempted_operation_is_never_replayed_after_fault_or_aba` injects faults but never a second
     // writer. A writer that wins the next record of this operation's chain makes the loser's append
-    // fail as busy; the caller must see a refusal with a lookup-able kebab cause, not recovery-required
-    // carrying a debug dump of the internal error.
+    // fail as busy; the caller must see a refusal named `busy`, like Refs gives, not
+    // recovery-required carrying a debug dump of the internal error.
     let t = Temp::new();
     let root = t.0.join("repo");
     init(&root, "sha1", "files");
@@ -2419,6 +2412,7 @@ fn publication_names_a_busy_wal_like_every_other_port() {
     let port = PublicationPort::new(&driver, authority(&repo, &mut h));
     let a = commit(&port, &repo, vec![], "a");
     drop(port);
+    let fired = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
     let racing = PublicationPort::with_filesystem(
         &driver,
         authority(&repo, &mut h),
@@ -2426,7 +2420,7 @@ fn publication_names_a_busy_wal_like_every_other_port() {
             repo: resolve(&driver, &root),
             id: "busy",
             step: "pin-read-back",
-            fired: Default::default(),
+            fired: fired.clone(),
         },
     );
     let e = racing
@@ -2439,11 +2433,10 @@ fn publication_names_a_busy_wal_like_every_other_port() {
         )
         .unwrap_err();
     assert!(
-        e.code == ResultCode::Refused && is_kebab(&e.cause),
-        "{:?} {:?}",
-        e.code,
-        e.cause
+        fired.load(Ordering::SeqCst),
+        "the competing record was never appended: {e:?}"
     );
+    assert_eq!((e.code, e.cause.as_str()), (ResultCode::Refused, "busy"));
 }
 
 #[test]

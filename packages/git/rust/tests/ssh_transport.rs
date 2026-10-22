@@ -23,6 +23,17 @@ static NEXT: AtomicU64 = AtomicU64::new(0);
 static SERIAL: Mutex<()> = Mutex::new(());
 static FAKE: OnceLock<PathBuf> = OnceLock::new();
 
+extern "C" {
+    fn atexit(callback: extern "C" fn()) -> i32;
+}
+
+/// Removes the fake's private directory when the test process exits, after the last case.
+extern "C" fn remove_fake() {
+    if let Some(dir) = FAKE.get().and_then(|log| log.parent()) {
+        let _ = fs::remove_dir_all(dir);
+    }
+}
+
 fn git(path: &Path, args: &[&str]) -> String {
     let out = Command::new("git")
         .arg("-C")
@@ -43,9 +54,17 @@ fn git(path: &Path, args: &[&str]) -> String {
 /// refuses any host other than `example.invalid` and any account other than `git`, the way a forge refuses an unknown user.
 fn fake_ssh() -> &'static Path {
     FAKE.get_or_init(|| {
-        let dir =
-            std::env::temp_dir().join(format!("fgos-ssh-transport-bin-{}", std::process::id()));
-        fs::create_dir_all(&dir).unwrap();
+        let nanos = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let dir = std::env::temp_dir().join(format!(
+            "fgos-ssh-transport-bin-{}-{nanos}",
+            std::process::id()
+        ));
+        // A fresh private directory: never one left by an earlier process with the same id.
+        fs::create_dir(&dir).unwrap();
+        fs::set_permissions(&dir, fs::Permissions::from_mode(0o700)).unwrap();
         let real_git = String::from_utf8(Command::new("which").arg("git").output().unwrap().stdout)
             .unwrap()
             .trim()
@@ -91,6 +110,8 @@ esac
         let mut paths = vec![dir.clone()];
         paths.extend(std::env::split_paths(&old));
         std::env::set_var("PATH", std::env::join_paths(paths).unwrap());
+        // SAFETY: registers a plain function that only removes the directory created above.
+        assert_eq!(unsafe { atexit(remove_fake) }, 0);
         log
     })
 }
@@ -101,6 +122,16 @@ fn serial() -> (MutexGuard<'static, ()>, &'static Path) {
     let log = fake_ssh();
     let _ = fs::remove_file(log);
     (guard, log)
+}
+
+/// Every ssh call of the case went to the one account, and there was at least one.
+fn assert_ssh_calls_all_to_git(log: &Path) {
+    let calls = ssh_calls(log);
+    assert!(!calls.is_empty(), "the case never reached ssh");
+    assert!(
+        calls.iter().all(|host| host == "git@example.invalid"),
+        "{calls:?}"
+    );
 }
 
 fn ssh_calls(log: &Path) -> Vec<String> {
@@ -218,9 +249,7 @@ fn a_repository_whose_origin_is_in_scp_form_claims_a_counter_number_through_that
         .unwrap()
         .unwrap();
     assert_eq!((tip.oid, tip.number), (claimed, 1));
-    assert!(ssh_calls(log)
-        .iter()
-        .all(|host| host == "git@example.invalid"));
+    assert_ssh_calls_all_to_git(log);
 }
 
 #[test]
@@ -308,9 +337,78 @@ fn the_remote_port_hands_git_the_url_the_remote_is_configured_with() {
         ),
         git(&f.path, &["rev-parse", "refs/heads/trunk"])
     );
-    assert!(ssh_calls(log)
-        .iter()
-        .all(|host| host == "git@example.invalid"));
+    assert_ssh_calls_all_to_git(log);
+}
+
+#[test]
+fn a_changed_ssh_account_on_the_origin_is_refused() {
+    // The pin cases use path origins. An ssh user name selects the account the transfer runs as,
+    // so the pin must tell `git@host` from `root@host`; no other case compares them. Refused
+    // before any transfer starts.
+    let (_serial, log) = serial();
+    let f = Fixture::new();
+    f.set_origin(&f.ssh_origin());
+    let pinned = f.grant();
+    f.set_origin(&format!("ssh://root@example.invalid{}", f.bare()));
+    let mappings = [RefMapping {
+        source: RefName::parse("refs/heads/trunk").unwrap(),
+        destination: RefName::parse("refs/heads/shared").unwrap(),
+    }];
+    let err = f
+        .driver
+        .push_refs(&f.repo, vec![], &pinned, &mappings, "fixture", "other-account")
+        .expect_err("a different ssh account than the pinned one");
+    assert!(
+        err.cause
+            .contains("remote-url-not-pinned-or-credentials-present"),
+        "{}",
+        err.cause
+    );
+    assert!(ssh_calls(log).is_empty(), "the refused origin reached ssh");
+}
+
+#[test]
+fn a_push_the_remote_refuses_for_another_reason_keeps_that_refusal() {
+    // No existing case proves it: the stale-lease case rejects because the counter moved. Here the
+    // remote advertises the counter at the expected tip (the lease holds) and its own receive hook
+    // declines the update. The fake ssh runs plain git on the origin, so the origin's hook runs; the
+    // driver's hook-disabling configuration reaches only the local git. The caller must get that
+    // refusal, not a "read it again" answer that makes it retry forever.
+    let (_serial, _log) = serial();
+    let f = Fixture::new();
+    let origin = f.root.join("origin.git");
+    // A userless ssh origin: the pin reads back unchanged, so this case needs no account rule.
+    f.set_origin(&format!("ssh://example.invalid{}", f.bare()));
+    // The counter already exists on the origin at number 1, written by plain git.
+    let tree = git(&origin, &["hash-object", "-t", "tree", "-w", "/dev/null"]);
+    let first = git(&origin, &["-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit-tree", &tree, "-m", "1"]);
+    git(&origin, &["update-ref", "refs/fgos/seq/d-adr", &first]);
+    let home = f.driver.sequence_home(&f.repo);
+    let tip = f
+        .driver
+        .sequence_tip(&f.repo, &home, "d-adr")
+        .unwrap()
+        .unwrap();
+    assert_eq!(tip.oid.as_str(), first);
+
+    let marker = f.root.join("hook-ran");
+    let hook = origin.join("hooks/pre-receive");
+    fs::write(
+        &hook,
+        format!("#!/bin/sh\necho ran > '{}'\necho 'declined by policy' >&2\nexit 1\n", marker.display()),
+    )
+    .unwrap();
+    fs::set_permissions(&hook, fs::Permissions::from_mode(0o755)).unwrap();
+
+    let refused = f
+        .driver
+        .sequence_push(&f.repo, &home, "d-adr", Some(&tip.oid), 2, "claim-b");
+    assert!(marker.exists(), "the remote never reached its receive hook");
+    assert!(
+        refused.is_err(),
+        "a policy refusal must not be reported as a lost lease: {refused:?}"
+    );
+    assert_eq!(git(&origin, &["rev-parse", "refs/fgos/seq/d-adr"]), first);
 }
 
 // --- Publication ---------------------------------------------------------------------------
@@ -412,7 +510,5 @@ fn publication_accepts_the_pin_it_is_given_for_an_ssh_url_with_a_user_name() {
         ),
         commit.as_str()
     );
-    assert!(ssh_calls(log)
-        .iter()
-        .all(|host| host == "git@example.invalid"));
+    assert_ssh_calls_all_to_git(log);
 }

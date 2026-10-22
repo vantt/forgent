@@ -231,15 +231,14 @@ fn a_config_edit_that_failed_between_rename_and_parent_sync_is_not_acknowledged_
         .unwrap_err();
     let wal = Wal::open(&f.repo).unwrap();
     let chain = wal.inspect("fault").unwrap();
+    // Either the outcome says the edit is not acknowledged, or it stays pending for recovery
+    // (which the dead-writer case above owns); an acknowledgement must not rest on observation.
     match chain.outcome() {
-        Some(Outcome::Transfer {
-            acknowledged,
-            details,
-            ..
-        }) => assert!(
-            !(*acknowledged && details.iter().any(|d| d == "effectObservedOnly")),
-            "acknowledged on observation alone: {details:?}"
+        Some(Outcome::Transfer { acknowledged, .. }) => assert!(
+            !*acknowledged,
+            "acknowledged although the parent directory sync failed"
         ),
+        None => {}
         other => panic!("unexpected outcome {other:?}"),
     }
     // The edit is in the file exactly once, and the fault left no native lock behind.
