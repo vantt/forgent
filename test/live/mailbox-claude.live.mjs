@@ -144,6 +144,7 @@ function buildHost() {
     cwd: REPO_ROOT, env: { ...process.env, CARGO_BUILD_JOBS: '4' }, encoding: 'utf8', maxBuffer: 1024 * 1024,
   });
   if (shim.status !== 0 || !shim.stdout.startsWith('#!/bin/sh')) die('the workspace shim generator did not run');
+  fs.rmSync(BRANCH_SHIM, { force: true });
   fs.writeFileSync(BRANCH_SHIM, shim.stdout, { mode: 0o555 });
   writeJson(BUILD_FILE, { commit: headCommit(), sha256: sha256(host), path: host, shimSha256: sha256(BRANCH_SHIM), builtAt: new Date().toISOString() });
   return host;
@@ -369,7 +370,8 @@ function prompts(name, { peer } = {}) {
 2. Run this shell command once: ${waitFile('go.txt')}; fgos mailbox inbox
 3. Run this shell command once: fgos mailbox send --to ${peer} "C1 says hello"
 4. Do not run any other tool after step 3.
-5. End with one line that starts with FINAL: followed by every token that starts with MBX- that a mailbox message asked you to include, separated by spaces, or FINAL: none`;
+5. Write the integers from 1 to 400, separated by single spaces.
+6. End with one line that starts with FINAL: followed by every token that starts with MBX- that a mailbox message asked you to include, separated by spaces, or FINAL: none`;
     case 'T1':
     case 'T2': {
       const steps = [];
