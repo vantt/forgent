@@ -139,7 +139,8 @@ fn a_pane_whose_shell_never_becomes_ready_ends_as_not_started_and_the_steps_stil
     assert_eq!(receipt["reason"], "start-refused:terminal-launch-not-started");
     assert!(run.json("agent-binding.json").is_none() && run.json("supervisor-binding.json").is_none(), "no gate was bound");
     assert!(run.json("steps/release-slot.json").is_some(), "the steps still run");
-    assert!(herdr.sent().is_empty(), "nothing but probes reached the pane: {:?}", herdr.sent());
+    let runs = herdr.calls_starting("pane run");
+    assert!(!runs.is_empty() && runs.iter().all(|c| c.contains("fgos-ok-")), "only probes were typed: {runs:?}");
     assert!(!herdr.dir.join("script.pid").exists(), "the launcher was never typed: only probes ran");
 }
 
