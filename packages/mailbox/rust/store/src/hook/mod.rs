@@ -3,6 +3,8 @@
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod drain;
 mod limits;
+#[cfg(unix)]
+pub mod shell;
 
 pub use drain::{
     begin, finish, render_reply, Begun, Claimed, FinishTicket, HeadFacts, HookCall, HookReply,

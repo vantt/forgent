@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Hook shell and the send and inbox verbs"
-status: pending
+status: done
 depends_on: [4, 5]
 live_calls: 0
 ---
@@ -60,3 +60,13 @@ Behaviour already owned elsewhere is not re-proven: the change-report write rule
 
 - `arm_budget` exiting while hold 2 runs: the kernel releases the lock with the process and the install is atomic (V2 `record_crash.rs`); the claim then expires and repeats, which the frame already says may happen.
 - `catch_unwind` needs `AssertUnwindSafe`; the record and the state are not used after a panic.
+
+## Done on the branch (implementation lead, 2026-10-22)
+
+- `cargo test --locked -p fgos-mailbox --test hook_shell --test verbs -- --test-threads=4`: 8 (7 behaviours and the `child_entry` dispatcher the watchdog test runs as a child) + 3 passed; whole store crate 111 passed; clippy (`-D warnings`) and fmt clean.
+
+### Deviations
+
+- The resolver is `Fn(&[u8], &Ancestry) -> Result<Resolved, NoHead>`: the finder needs the ancestry. `ShellInput` also carries an `ancestry` reader (called before the resolver and again before hold 1) and the `write_started` flag the watchdog shares; `arm_budget` takes that flag.
+- Quiet reasons of the shell itself are `shell::Quiet` (`Drain(QuietReason)`, `NoAncestry`, `NoHead(NoHead)`, `NotTheHead`, `Record(code)`); a payload over the read cap is `Drain(Malformed)`.
+- `verbs::inbox` returns `Result<String, &'static str>` (the record's error code), so the entry can exit 1 when the record failed; `verbs::send` answers a record failure with its code, as planned.
