@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 08:10 (phiên `forgentx-95`, owner 07:55 "tiếp đi em"): **MP-B1 06 viết lại theo hình SEAT, chờ owner duyệt:** [đề xuất](../reports/proposal-261022-0756-mp-b1-06-seat-config-for-three-workspaces.md) cho forgentX (code `advanced`, `execute` advanced, `docs:write` flagship prefer openai → pi gpt-6.1-sol), mdview và mcp-skill-hub (`tierFallback`, khối `architecture:*` flagship/frontier, `maxTier` flagship; mcp-skill-hub từ 0 lên 59 ghế bind); 4 câu Q1–Q4. Mọi hiệu ứng bind kiểm bằng `dispatch explain` + doctor trên bản nháp; chưa sửa config nào.
+
 - 2026-10-22 05:10 (forgentx-5f, DOC): **SEAT đã vào nhánh DOC** (merge `2cf668766` + `cef806a1e`, ghi sổ L12-101/103); review độc lập bắt 23 binding Step 0 ở `docs/specs/runner.md` bị gắn theo vị trí sau khi main bớt 2 khối, đã sửa (L12-102). Bước 7 có bộ lắp ráp tất định (L12-99/100). Còn chờ: D8 (HARDEN) cho Bước 6b, config tier (owner).
 - 2026-10-22 04:25 (phiên `forgentx-95`): **Land bù SEAT ở máy owner:** release `sha256:a2b19d78…` từ main `f315b99c7` (fix `a4db2b947`: `stripConfigComments` thành JSON round trip, census 0 site) active ở cả 3 workspace; `git-mutation-one-door` đạt khắp nơi, mọi row bắt buộc đạt; smoke đọc qua (lần đầu omp thoát ra shell, gate `foreground-not-agent` huỷ đúng, chạy lại qua). Còn chờ owner: tier config `docs:write` flagship + `execute` advanced cho forgentX (DOC đang chạy standard). Đảo lại nếu: một workspace hỏng vì bản này → `fgctl upgrade --from …sha256:52a7e0ac…`.
 
