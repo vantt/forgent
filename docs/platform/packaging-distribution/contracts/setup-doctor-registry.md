@@ -90,9 +90,9 @@ plain `fgos`. Diagnosis never changes the activation implicitly.
 
 | Check | Pass | Fail | Not applicable |
 | --- | --- | --- | --- |
-| `documentation-cutover-lease` | Repository hooks are wired and the committed main-ref sidecar is absent, released or abandoned. | Hook wiring is missing; committed sidecar is corrupt/unreadable; or a lease is held. Held state reports age and frozen scope, or a missing kernel lock resource. | Outside Git, without the repository's `.githooks/reference-transaction`, or without a main branch. |
+| `documentation-cutover-lease` | Repository hooks are wired, the committed main-ref sidecar is absent, released or abandoned, and no stray main token exists. | Committed sidecar is corrupt/unreadable; a token exists in main while main is not the recorded holder; applicable hook wiring is missing; or a lease is held. Held state reports age and frozen scope, or a missing hook/kernel lock resource. | Outside Git or without a main branch; also without `.githooks/reference-transaction` when authority is neither held nor corrupt and no stray main token exists. |
 
-This check is read-only, with no registered fix or config default. It does not search main for a linked holder's token or validate token possession. The [lease contract](../../holder-lock/spec.md#documentation-cutover-write-lease) owns recovery and the pending stray-main-token diagnostic.
+This check reads committed main-ref authority before treating missing repository hooks as not applicable: held/corrupt authority still fails if the reference hook disappears. It diagnoses a stray main token by file presence and the recorded holder checkout, without validating a linked holder's token possession. Acquire refuses the same stray condition with `stray-main-token`; held-lease admission also refuses main callers with that residue. The check is read-only, with no registered fix, config default or automatic token cleanup. After checking committed state and the recorded holder, the owner removes residue by hand; a real holder's release restores any pre-existing main token bytes. The [lease contract](../../holder-lock/spec.md#documentation-cutover-write-lease) owns the release crash window and recovery.
 
 `fgos doctor --fix`:
 
