@@ -15,7 +15,7 @@ Each file belongs to exactly one runner test. A case that two runners could run 
 | `path.v1.json` | `tests/golden_path.rs` | path text form |
 | `comment.v1.json` | `tests/golden_comment.rs` | comment injection guard |
 | `merge.v1.json` | `tests/golden_merge.rs` | merge primitive |
-| `edit.v1.json` | the edit runner (lands with edits) | byte fidelity, edits, comments, re-parse check |
+| `edit.v1.json` | `tests/golden_edit.rs` | byte fidelity, edits, comments, re-parse check |
 | `yaml-test-mapping.v1.json` | `tests/fixture_shape.rs` | every case of `test/util/yaml.test.mjs` mapped to its fixture ids |
 
 `tests/fixture_shape.rs` owns only fixture integrity (well-formed, known rule ids, unique ids,

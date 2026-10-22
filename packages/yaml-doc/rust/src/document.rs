@@ -74,11 +74,11 @@ pub struct NodeSpans {
 /// One YAML document under one profile.
 #[derive(Debug)]
 pub struct Document {
-    text: String,
+    pub(crate) text: String,
     profile: Profile,
     file: String,
     value: Value,
-    tree: Tree,
+    pub(crate) tree: Tree,
     lines: LineIndex,
     revision: String,
 }

@@ -15,4 +15,5 @@ pub mod prescan;
 mod profile;
 
 pub use document::{parse, Document, NodeSpans};
+pub use edit::{CommentLoss, Comments, Position};
 pub use model::{rule, Limits, Profile, Refusal, Segment, Span, Value};
