@@ -1,7 +1,7 @@
 ---
 title: "Mailbox V2: the record adapter in crate fgos-mailbox"
 description: "Build rung V2 of the Agent Mailbox ladder: the metadata snapshot under the holder-lock `mailbox` mutex written with durable-file, immutable body files with garbage collection, a kill matrix at every write step, two-process contention with the wait cap, the Q2 pruning of dead bindings, and the size ceiling and costs measured against S0, proven by cargo test -p fgos-mailbox on branch mailbox/v1-v3 only."
-status: pending
+status: completed
 priority: P2
 effort: ~3.5d (8 phases, strictly sequential)
 branch: main (plan only); all code on branch mailbox/v1-v3 in linked worktree /home/vantt/projects/forgent-mailbox, never merged to main until the owner says feasibility is proven
@@ -47,14 +47,14 @@ V2 does **not** prove: any hook payload or CLI (V3/V4), the shell's write-then-f
 
 | # | Phase | Proof | Status |
 |---|---|---|---|
-| 1 | [Preconditions and the `mailbox` lock row](phase-01-preconditions-and-lock-row.md) | Node registry contract test pins the row; `cargo test -p fgos-holder-lock` | pending |
-| 2 | [Paths, id source and the snapshot hold](phase-02-paths-ids-and-snapshot-hold.md) | `tests/record_snapshot.rs`: hold, no-write when unchanged, versions, frozen v1 fixture, refused send persisted | pending |
-| 3 | [Immutable bodies, safe reads and garbage collection](phase-03-bodies-and-garbage-collection.md) | `tests/record_bodies.rs` | pending |
-| 4 | [Kill matrix at every write step](phase-04-kill-matrix.md) | `tests/record_crash.rs` (SIGKILL per step) | pending |
-| 5 | [Two processes contending, with the wait cap](phase-05-two-process-contention.md) | `tests/record_contention.rs` | pending |
-| 6 | [Q2 pruning, the dead-binding consequence and the handle bound](phase-06-q2-pruning-and-handle-bound.md) | `tests/record_prune.rs`; core `tests/registry.rs` | pending |
-| 7 | [Size ceiling and costs against S0](phase-07-size-ceiling-and-costs.md) | `tests/record_ceiling.rs`; cost report from `examples/mailbox-record-cost.rs` | pending |
-| 8 | [Branch docs, full gates, review, hand-off](phase-08-branch-docs-gates-and-handoff.md) | workspace cargo gates and `npm test` green on the branch | pending |
+| 1 | [Preconditions and the `mailbox` lock row](phase-01-preconditions-and-lock-row.md) | Node registry contract test pins the row; `cargo test -p fgos-holder-lock` | done |
+| 2 | [Paths, id source and the snapshot hold](phase-02-paths-ids-and-snapshot-hold.md) | `tests/record_snapshot.rs`: hold, no-write when unchanged, versions, frozen v1 fixture, refused send persisted | done |
+| 3 | [Immutable bodies, safe reads and garbage collection](phase-03-bodies-and-garbage-collection.md) | `tests/record_bodies.rs` | done |
+| 4 | [Kill matrix at every write step](phase-04-kill-matrix.md) | `tests/record_crash.rs` (SIGKILL per step) | done |
+| 5 | [Two processes contending, with the wait cap](phase-05-two-process-contention.md) | `tests/record_contention.rs` | done |
+| 6 | [Q2 pruning, the dead-binding consequence and the handle bound](phase-06-q2-pruning-and-handle-bound.md) | `tests/record_prune.rs`; core `tests/registry.rs` | done |
+| 7 | [Size ceiling and costs against S0](phase-07-size-ceiling-and-costs.md) | `tests/record_ceiling.rs`; cost report from `examples/mailbox-record-cost.rs` | done |
+| 8 | [Branch docs, full gates, review, hand-off](phase-08-branch-docs-gates-and-handoff.md) | workspace cargo gates and `npm test` green on the branch | done |
 
 Strictly sequential: every phase adds to `src/record/` and to the shared test support.
 
