@@ -417,6 +417,13 @@
         "help",
         "json"
       ],
+      "mint": [
+        "dir",
+        "help",
+        "json",
+        "kind",
+        "release"
+      ],
       "project": [
         "dir",
         "handle",
