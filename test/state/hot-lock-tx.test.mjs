@@ -174,7 +174,14 @@ test('a record that cannot be released never replaces the callback result or its
   // A directory in place of the record file makes the final unlink fail with a non-retryable error.
   const breakRelease = () => { fs.unlinkSync(record); fs.mkdirSync(record); };
   try {
-    assert.equal(withStateTx(f.fgosDir, () => { breakRelease(); return 'committed'; }, { prefetched: writer }), 'committed');
+    const warnings = [];
+    const write = process.stderr.write;
+    process.stderr.write = chunk => { warnings.push(String(chunk)); return true; };
+    try {
+      assert.equal(withStateTx(f.fgosDir, () => { breakRelease(); return 'committed'; }, { prefetched: writer }), 'committed');
+    } finally { process.stderr.write = write; }
+    // The warning names the error the unlink really raised, not the retry-exhausted code.
+    assert.match(warnings.join(''), /warning: (EISDIR|EPERM) state: the record at/);
     fs.rmSync(record, { recursive: true });
     const boom = new RangeError('callback failed');
     assert.throws(() => withStateTx(f.fgosDir, () => { breakRelease(); throw boom; }, { prefetched: writer }), error => error === boom && !!error.releaseFailure);

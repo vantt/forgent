@@ -408,7 +408,7 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
       // failure would retry and append twice. The record stays; the next acquirer waits it out and reports it
       // with `fgos lock fence`, and a failed callback carries it as `releaseFailure`.
       if (typeof failure?.error === 'object' && failure.error !== null) failure.error.releaseFailure ??= releaseError;
-      else if (!failure) process.stderr.write(`fgos: warning: hot-lock-release-stuck ${resource}: the record at "${paths.record}" stays; run \`fgos lock fence ${resource}\` once this process is gone\n`);
+      else if (!failure) process.stderr.write(`fgos: warning: ${releaseError?.code ?? 'hot-lock-release-failed'} ${resource}: the record at "${paths.record}" stays; run \`fgos lock fence ${resource}\` once this process is gone\n`);
     }
   }
   return result;

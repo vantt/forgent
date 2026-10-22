@@ -8,9 +8,10 @@ import { fixture, addon, loaderOptions } from './phase07-fixture.mjs';
 import { openStore, eventStoreConfig } from '../../src/event-store/index.mjs';
 import { withWorkState, readWorkState } from '../../src/state/work-event-store.mjs';
 import { hotLockDepth } from '../../src/state/hot-lock.mjs';
+import { withConsumerState } from '../../src/state/consumer-event-gate.mjs';
 import { readRawEvents, currentEffectiveView } from '../../src/state/store.mjs';
 import { releaseClaimTx, readClaim, readClaims } from '../../src/state/runtime-coordination.mjs';
-import { viewRevision, VIEW_SCHEMA_VERSION } from '../../src/state/replay.mjs';
+import { viewRevision, VIEW_SCHEMA_VERSION, foldEvents } from '../../src/state/replay.mjs';
 
 const contract = path.resolve('packages/work-state/contracts/event-streams.v1.json');
 const config = eventStoreConfig({ eventStore: { seal: { intervalSec: 86400 }, rebuild: { maxAttempts: 3 } } });
@@ -215,9 +216,11 @@ test('missing, corrupt, old-schema and old-snapshot caches are replaced by a ver
   assert.equal(cache(f).revision, valid.revision);
 });
 
-test('a cached view is reused after an append and after a seal, and dropped when foreign history arrives', t => {
+test('a cached view is reused after an append and after a seal, and refolded when an event it does not cover arrives', t => {
   // Owning proof of cache reuse and of the catch-up that continues from the previous read; the gate tests above
-  // always start from a fresh read, so none of them can observe either.
+  // always start from a fresh read, so none of them can observe either. The event that arrives is appended
+  // through the same store; a cache that goes stale because another machine's history was fetched is proven
+  // across clones in work-conflicts.test.mjs.
   const f = workFixture(t);
   f.run(tx => tx.append({ type: 'work.add', payload: { id: 'one', title: 'source' } }));
   const requests = [];
@@ -359,13 +362,14 @@ test('an ordinary mutation that keeps losing the catch-up race spends its own bu
   assert.ok(preparations > config.rebuild.maxAttempts, 'the rebuild budget is not the mutation budget');
 });
 
-test('staged events record existence on every Work event and the expected status only on events that move status', t => {
+test('staged events record existence on every Work event and the expected status only on moves, so a concurrent status change never drops a step or an edit', t => {
   const f = workFixture(t);
   f.run(tx => {
     tx.append({ type: 'work.add', payload: { id: 'one', title: 'one', status: 'todo' } });
     tx.append({ type: 'work.move', payload: { id: 'one', from: 'todo', to: 'doing' } });
     tx.append({ type: 'work.move', payload: { id: 'one', from: 'doing', to: 'done' } });
     tx.append({ type: 'work.edit', payload: { id: 'one', patch: { title: 'two' } } });
+    tx.append({ type: 'work.step', payload: { id: 'one', from: 'planning', to: 'executing' } });
     tx.append({ type: 'work.outcome', payload: { id: 'one', actual: { ok: true } } });
     tx.append({ type: 'work.discovery', payload: { id: 'discovery-1', clear: true } });
     tx.append({ type: 'work.edit', payload: { id: 'ghost', patch: { title: 'nobody' } } });
@@ -376,11 +380,25 @@ test('staged events record existence on every Work event and the expected status
     ['work.move', { exists: true, expectedStatus: 'todo' }],
     ['work.move', { exists: true, expectedStatus: 'doing' }],
     ['work.edit', { exists: true }],
+    ['work.step', { exists: true }],
     ['work.outcome', { exists: true }],
     ['work.discovery', undefined],
     ['work.edit', { exists: false }],
   ]);
   assert.equal(/"precondition"\s*:/.test(JSON.stringify(cache(f))), false, 'no precondition leaks into the saved view');
+});
+
+test('a consumer that passes no extra roots cannot write into the caller directory, while the default grants it', t => {
+  // Porting passes none: all its effects land in the main cache, and its caller may name a tracked directory.
+  const f = workFixture(t);
+  const caller = path.join(f.repo, 'tracked-caller');
+  fs.mkdirSync(caller);
+  const policy = { stream: 'project', resource: 'state', readState: store => readWorkState(store, {}), fold: foldEvents, lifecycle: new Set(), persist() {} };
+  const writeInto = options => withConsumerState(caller, f.hot, 'work-test', tx => tx.writeText(path.join(caller, 'out.txt'), 'x'), { store: f.store, config, policy, ...options });
+  assert.throws(() => writeInto({ extraRoots: [] }), { code: 'state-tx-path-outside' });
+  assert.equal(fs.existsSync(path.join(caller, 'out.txt')), false);
+  writeInto({});
+  assert.equal(fs.readFileSync(path.join(caller, 'out.txt'), 'utf8'), 'x');
 });
 
 test('the gate reads its configuration from the trusted main root, not from the linked worktree', t => {

@@ -18,10 +18,11 @@ function advance(cursor, events) {
  * Catch up outside the mutex, then fold only the own-stream tail inside it.
  * `rebuild` demands a current candidate rather than installing a stale fold.
  * `beforeGate` computes evidence that requires full history outside the gate.
+ * `extraRoots` replaces the default write roots (the caller's own `.fgos` when it is not the main one).
  * An already-prepared store is also accepted (the same native facade, useful
  * to callers that already resolved repository authority).
  */
-export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config, rebuild = false, beforeGate, heldRanks = [], readRoots = [], policy, onTiming } = {}) {
+export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config, rebuild = false, beforeGate, heldRanks = [], readRoots = [], extraRoots, policy, onTiming } = {}) {
   const measure = (stage, run) => {
     if (!onTiming) return run();
     const start = performance.now();
@@ -32,7 +33,9 @@ export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config,
   if (!store) throw new TypeError('a prepared consumer store is required');
   config ??= readEventStoreConfig(path.dirname(mainFgosDir));
   const attempts = rebuild ? config.rebuild.maxAttempts : MUTATION_ATTEMPTS;
-  const extraRoots = path.resolve(mainFgosDir) === path.resolve(dir) ? [] : [dir];
+  // Directories besides the main `.fgos` the transaction may write. By default the caller's own `.fgos`; a consumer
+  // whose effects all land in the main cache (porting) passes `[]`, so a caller directory is never granted.
+  const writeRoots = extraRoots ?? (path.resolve(mainFgosDir) === path.resolve(dir) ? [] : [dir]);
   let recoveryAttempted = false;
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     const candidate = readState(store, { heldRanks, rebuild });
@@ -58,7 +61,7 @@ export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config,
         tx.tail = tail;
         return fn(tx);
       }, { resource, prefetched: {
-        mainFgosDir, writer, extraRoots, readRoots, stageEffects: true,
+        mainFgosDir, writer, extraRoots: writeRoots, readRoots, stageEffects: true,
         commitEvents(tx, events) {
           if (!events.length) return;
           measure('prepareEvents', () => prepareEvents?.(tx, events));

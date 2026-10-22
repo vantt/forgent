@@ -76,7 +76,8 @@ function transact(dir, fn, options = {}) {
   const writer = String(resolveWriterIdentity(main).id);
   const prepared = options.store ? options : { ...prepareWorkStore(dir, main), ...options };
   const cache = resolveFgosFile(main, FGOS_FILE.PORTING_STATE);
-  return withConsumerState(dir, main, writer, fn, { ...prepared, policy: {
+  // Every porting effect lands in the main `.fgos` cache, so the caller's directory is granted no write access.
+  return withConsumerState(dir, main, writer, fn, { ...prepared, extraRoots: [], policy: {
     stream: STREAM, resource: 'porting-events', readState,
     fold: foldPortingEvents, lifecycle: new Set(),
     persist: tx => tx.writeJson(cache, { ...tx.view, cursor: tx.cursor }),

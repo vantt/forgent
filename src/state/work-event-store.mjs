@@ -85,13 +85,13 @@ export function withWorkState(dir, mainFgosDir, writer, fn, options = {}) {
     prepareEvents(tx, events) {
       // Each event records what its writer saw. Existence rides every Work event so a record for a vanished
       // item cannot apply; the status an item must still hold rides only the events that move it, so a
-      // concurrent status change never drops an edit, an attempt or an outcome.
+      // concurrent status change never drops an edit, a step change, an attempt or an outcome.
       const decided = new Map();
       for (const event of events) {
         const id = event.payload?.id;
         if (!event.type.startsWith('work.') || !id || event.type === 'work.discovery') continue;
         const current = decided.get(id) ?? { exists: !!tx.view.work[id], status: tx.view.work[id]?.status };
-        const movesStatus = event.type === 'work.move' || event.type === 'work.step' || event.type === 'work.stage';
+        const movesStatus = event.type === 'work.move';
         const { expectedStatus, ...condition } = event.payload.precondition ?? {};
         event.payload.precondition = { ...condition, exists: current.exists,
           ...(movesStatus && current.exists ? { expectedStatus: current.status } : {}) };
