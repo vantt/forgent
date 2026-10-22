@@ -1,0 +1,48 @@
+{
+  "contract": "seat-binding.tier-ladder.v1",
+  "comment": "The tier ladder, weakest first: the one list of tier names, their strength and their definitions. The Seat Binding crate and the Node runner config loader both read this file.",
+  "tiers": [
+    {
+      "name": "nano",
+      "strength": 1,
+      "work": "cơ học, không suy luận",
+      "selfCheck": "chỉ nhận ra hoặc biến đổi theo mẫu?",
+      "examples": "classify, extract, format, route, vote"
+    },
+    {
+      "name": "mini",
+      "strength": 2,
+      "work": "suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp",
+      "selfCheck": "đủ thông tin, chỉ hiểu và tóm tắt?",
+      "examples": "tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ"
+    },
+    {
+      "name": "standard",
+      "strength": 3,
+      "work": "theo một kế hoạch có sẵn, nhiều bước",
+      "selfCheck": "có kế hoạch và hướng dẫn chi tiết?",
+      "examples": "code theo plan, viết test, refactor theo mô tả"
+    },
+    {
+      "name": "advanced",
+      "strength": 4,
+      "work": "tự tìm đường, không có đáp án sẵn",
+      "selfCheck": "phải điều tra và quyết cách làm?",
+      "examples": "debug khó, code phức tạp, nhiều file không có plan"
+    },
+    {
+      "name": "flagship",
+      "strength": 5,
+      "work": "phán đoán, thiết kế, phê bình",
+      "selfCheck": "kết quả là một ý kiến hay một thiết kế?",
+      "examples": "review, red-team, thiết kế giải pháp, synthesis của panel"
+    },
+    {
+      "name": "frontier",
+      "strength": 6,
+      "work": "quyết định đắt nhất",
+      "selfCheck": "khó đảo, đắt nếu sai?",
+      "examples": "khoá kiến trúc, synthesis cuối của hội đồng quan trọng"
+    }
+  ]
+}

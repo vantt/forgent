@@ -262,31 +262,32 @@ test('config-not-stale fails when the existing config is missing a default key',
 // deliberately distinct from config-not-stale's generic "key present at
 // all" scan above (a malformed-but-present level is never "missing").
 
-// ─── invariant-checks-configured (docs/history/tsk-516-approve-reverify-
-// scope/CONTEXT.md D6): same check+configDefault registry shape as
-// gate-bypass below. The check deliberately never EXECUTES the configured
-// commands — they are arbitrary project-supplied shell strings, and doctor
-// is a cheap, side-effect-free diagnosis — so what it can and does answer is
-// the misconfiguration that actually bites: a present-but-unusable section
-// reads as zero commands at return/merge, silently disabling the gate while
-// looking configured.
+// ─── invariant-checks-configured: like worktree-setup-configured below, an
+// absent section or an empty list is a valid choice (no invariant check runs,
+// which is what `fgos setup` writes for a project that names none); only a
+// present-but-malformed section fails, since it reads as zero commands and
+// silently skips the gate. Never executes the configured commands.
 
-test('invariant-checks-configured fails when the section is missing entirely', () => {
-  const cwd = mkTemp('doctor-invariant-absent-');
-  const { passed, message } = checkById('invariant-checks-configured').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /invariantChecks section missing/);
-  fs.rmSync(cwd, { recursive: true, force: true });
+test('invariant-checks-configured passes when the section is absent or empty', () => {
+  for (const config of [{}, { invariantChecks: { commands: [] } }]) {
+    const cwd = mkTemp('doctor-invariant-empty-');
+    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify(config));
+    const { passed, message } = checkById('invariant-checks-configured').check(cwd);
+    assert.equal(passed, true, JSON.stringify(config));
+    assert.match(message, /no invariant check runs at return\/merge/);
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
 });
 
-test('invariant-checks-configured fails when the section is present but yields no runnable command', () => {
-  for (const malformed of [{ commands: [] }, { commands: 'not-a-list' }, {}, { commands: ['', '  '] }]) {
+test('invariant-checks-configured fails when the section is present but malformed', () => {
+  for (const malformed of [{ commands: 'not-a-list' }, {}, { commands: ['', '  '] }, { commands: ['real --check', 7] }, ['real --check'], null]) {
     const cwd = mkTemp('doctor-invariant-malformed-');
     fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
     fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ invariantChecks: malformed }));
     const { passed, message } = checkById('invariant-checks-configured').check(cwd);
     assert.equal(passed, false, `malformed: ${JSON.stringify(malformed)}`);
-    assert.match(message, /present but yields no runnable command/);
+    assert.match(message, /present but malformed/);
     fs.rmSync(cwd, { recursive: true, force: true });
   }
 });
@@ -300,8 +301,7 @@ test('invariant-checks-configured passes and names the configured commands', () 
   );
   const { passed, message } = checkById('invariant-checks-configured').check(cwd);
   assert.equal(passed, true);
-  assert.match(message, /1 command\(s\)/);
-  assert.match(message, /node --test test\/architecture\.test\.mjs/);
+  assert.match(message, /1 command\(s\): node --test test\/architecture\.test\.mjs/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 

@@ -4,7 +4,7 @@ use std::fs;
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 
-use fgos_session_identity::{resolve_current, Source};
+use fgos_identity::{resolve_current, Source};
 
 /// Shard file stem for the current process's writer, from the session
 /// identity authority: the session id itself for an `env`/`registry`

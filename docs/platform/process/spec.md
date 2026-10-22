@@ -15,7 +15,7 @@ Related:
 - docs/platform/holder-lock/spec.md
 - docs/platform/run-supervisor/spec.md
 - docs/platform/component-boundary.md
-- docs/platform/session-identity/spec.md
+- docs/platform/identity/spec.md
 - docs/specs/runner.md
 - plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md
 - plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md
@@ -126,7 +126,7 @@ The containment port (`create`, `spawn_in`, `is_empty`, `kill_all`, `guarantee`)
 |---|---|
 | defines (judge vectors) | [process-facts.judge.v1.json](../../../packages/process/contracts/process-facts.judge.v1.json) |
 | consumed by | [holder-lock/spec.md](../holder-lock/spec.md) |
-| sibling L0/L1 authority | [session-identity/spec.md](../session-identity/spec.md) |
+| sibling L0/L1 authority | [identity/spec.md](../identity/spec.md) |
 | boundary | [component-boundary.md](../component-boundary.md) |
 | Node door and its callers | [door.mjs](../../../src/native/door.mjs), [process-identity.mjs](../../../src/runner/dispatch/process-identity.mjs), [runner.md](../../specs/runner.md) |
 | plan | [plan.md](../../../plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md) |

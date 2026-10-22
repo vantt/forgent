@@ -47,33 +47,37 @@ export function readSharedConfig(dir) {
 //
 // Declared here, in the config layer, rather than hardcoded in the runner:
 // fgOS is a platform, and a project using it has its own invariant command,
-// not this repo's test layout (D6). This constant is only the default that
-// `fgos setup` writes -- the runner reads whatever the project's own config
-// actually says, and an absent section means no invariant check runs at all,
-// leaving behavior identical to before this existed.
+// not this repo's test layout (D6). The default `fgos setup` writes is
+// therefore the empty list: no project gets a command it never chose, and a
+// project that names one keeps it in its own config (this repository names
+// `node --test test/architecture.test.mjs` in its own `.fgos/config.json`).
+// An absent section and an empty list both mean no invariant check runs.
 //
 // Lives in this domain-layer module (not next to its `registerConfigDefault`
 // call in the use-case layer) so both the use-case registration and the
 // infra-layer runner import it DOWNWARD -- an infra->use-case import would
-// break the one-way-down rule test/architecture.test.mjs enforces, which is
-// the very invariant this feature exists to protect.
-export const DEFAULT_INVARIANT_CHECK_COMMANDS = ['node --test test/architecture.test.mjs'];
+// break the one-way-down rule test/architecture.test.mjs enforces.
+export const DEFAULT_INVARIANT_CHECK_COMMANDS = [];
+
+// The non-empty command strings of a `{ commands: [...] }` section, `[]` for
+// an absent or malformed one. Shared by every command-list section so they
+// read alike.
+function readCommandList(dir, key) {
+  const section = readSharedConfig(dir)[key];
+  if (!section || typeof section !== 'object' || Array.isArray(section)) return [];
+  if (!Array.isArray(section.commands)) return [];
+  return section.commands.filter((command) => typeof command === 'string' && command.trim() !== '');
+}
 
 /**
  * The invariant-check commands configured at `dir`, as a list of real
  * command strings. Returns `[]` for every shape that isn't a genuine list
  * of non-empty strings -- an absent section, a malformed one, or a list
- * with nothing runnable in it. Never falls back to
- * `DEFAULT_INVARIANT_CHECK_COMMANDS`: that default belongs to what `fgos
- * setup` WRITES, never to what a reader silently assumes -- otherwise a
- * project that deliberately configured no invariant checks would still get
- * this repo's own test command imposed on it.
+ * with nothing runnable in it. A reader never assumes a command the project
+ * did not name.
  */
 export function readInvariantCheckCommands(dir) {
-  const section = readSharedConfig(dir).invariantChecks;
-  if (!section || typeof section !== 'object' || Array.isArray(section)) return [];
-  if (!Array.isArray(section.commands)) return [];
-  return section.commands.filter((command) => typeof command === 'string' && command.trim() !== '');
+  return readCommandList(dir, 'invariantChecks');
 }
 
 // Project-specific commands every runner-created worktree runs after its
@@ -86,14 +90,10 @@ export const DEFAULT_WORKTREE_SETUP_COMMANDS = [];
 /**
  * The worktree setup commands configured at `dir` (`worktreeSetup.commands`),
  * as a list of non-empty command strings. `[]` for an absent or malformed
- * section -- same never-assume-a-default discipline as
- * `readInvariantCheckCommands`.
+ * section, like `readInvariantCheckCommands`.
  */
 export function readWorktreeSetupCommands(dir) {
-  const section = readSharedConfig(dir).worktreeSetup;
-  if (!section || typeof section !== 'object' || Array.isArray(section)) return [];
-  if (!Array.isArray(section.commands)) return [];
-  return section.commands.filter((command) => typeof command === 'string' && command.trim() !== '');
+  return readCommandList(dir, 'worktreeSetup');
 }
 
 /**

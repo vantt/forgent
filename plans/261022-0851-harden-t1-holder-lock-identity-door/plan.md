@@ -138,6 +138,10 @@ Per the parent plan: before T2 merges, revert the T1 merge commit on main and re
 4. **Phases 3 and 4 run in parallel** under the generated-artifact rule (census and suite baseline are regenerated on rebase, never merged by hand).
 5. **Add `--lock <name>` to `fgos lock-status`** (D-T1-4): it replaces the hook's Node scan and avoids probing fourteen unrelated locks per commit; the six lines in `bin/fgos.mjs` (T9's file) are noted on the board.
 
+### Big lead amendment (2026-10-22 12:55, after phase 2's measurement)
+
+**D-T1-4 amended: the hook keeps the native route `lock-fd --shared-try`, not `fgos lock-status`.** Phase 2 measured `fgos lock-status` at 1.08 s per commit, because it is a legacy-cli verb and so starts Node; today's hook pays one native route spawn of about 1.3 ms. The hook is a process-boundary caller that cannot load the in-process door from the checkout (RT-M1), so it keeps the old mode under its old name and contract, in the same category as `--borrowed-check`. This also keeps the hook working under older activated releases. The `--lock` filter on `fgos lock-status` is dropped, and `bin/fgos.mjs` is not touched (answer 5 is withdrawn). The writer identity stays `fgos identity --json`, a native verb at 9 ms.
+
 ## Red Team Review
 
 ### Session — 2026-10-22 09:12–09:45 (reports in `reports/red-team-261022-0912-{failure,assume,security,scope}.md`)

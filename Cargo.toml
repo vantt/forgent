@@ -14,7 +14,7 @@ members = [
     "packages/convention/rust",
     "packages/run-result/rust",
     "packages/herdr-fgos-common/rust",
-    "packages/session-identity/rust",
+    "packages/identity/rust",
     "packages/process/rust",
     "packages/holder-lock/rust",
     "packages/run-supervisor/rust",

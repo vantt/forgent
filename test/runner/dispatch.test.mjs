@@ -1247,7 +1247,7 @@ function committedRunnerConfig() {
 
 test('the committed .fgos/config.json runner section loads and is well-formed', () => {
   const cfg = committedRunnerConfig();
-  assert.deepEqual(Object.keys(cfg.modelPolicies.claude).sort(), ['flagship', 'advanced', 'frontier', 'nano', 'standard'].sort());
+  assert.deepEqual(Object.keys(cfg.modelPolicies.claude).sort(), ['flagship', 'advanced', 'frontier', 'mini', 'nano', 'standard'].sort());
 });
 
 test('the committed .fgos/config.json runner section wires the consolidated gemini executor to gemini\'s own modelPolicies, not claude\'s (D9, tsk-5tm-5 — the bug this piece originally fixed)', () => {
@@ -1919,7 +1919,9 @@ test('codex\'s cli-bypass invocation consumes model placeholder in invocation ar
   assert.equal(effectivePolicy.providerModel, 'openai');
   assert.equal(effectivePolicy.rigor, 'high');
   assert.equal(effectivePolicy.tier, 'flagship');
-  const flagshipModel = cfg.modelPolicies.openai.flagship;
+  // A cell is a model string or { model, effort }; only the model reaches --model.
+  const flagshipCell = cfg.modelPolicies.openai.flagship;
+  const flagshipModel = typeof flagshipCell === 'string' ? flagshipCell : flagshipCell?.model;
   assert.ok(typeof flagshipModel === 'string' && flagshipModel.length > 0, 'project config names an openai flagship model');
   assert.equal(effectivePolicy.model, flagshipModel);
 

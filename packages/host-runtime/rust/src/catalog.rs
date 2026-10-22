@@ -49,13 +49,13 @@ pub const CATALOG: &[OperationDescriptor] = &[
         streaming_mode: StreamingMode::None,
     },
     OperationDescriptor {
-        operation_id: OperationId::from_static("session-identity.resolve"),
-        owning_component_id: Cow::Borrowed("session-identity"),
-        request_contract: ContractRef::from_static("session-identity.resolve.request", "1.0.0"),
-        outcome_contract: ContractRef::from_static("session-identity.resolve.outcome", "1.0.0"),
+        operation_id: OperationId::from_static("identity.writer"),
+        owning_component_id: Cow::Borrowed("identity"),
+        request_contract: ContractRef::from_static("identity.writer.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("identity.writer.outcome", "1.0.0"),
         effect: OperationEffect::Read,
         idempotency: OperationIdempotency::Safe,
-        authority_policy_id: Cow::Borrowed("session-identity.read"),
+        authority_policy_id: Cow::Borrowed("identity.read"),
         allowed_host_kinds: &["cli"],
         streaming_mode: StreamingMode::None,
     },
@@ -108,7 +108,7 @@ mod tests {
         assert!(ids.contains(&"observe.metrics"));
         assert!(ids.contains(&"observe.friction"));
         assert!(ids.contains(&"convention.query"));
-        assert!(ids.contains(&"session-identity.resolve"));
+        assert!(ids.contains(&"identity.writer"));
     }
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips
