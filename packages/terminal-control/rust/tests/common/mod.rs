@@ -17,6 +17,8 @@ pub enum ShellScript {
     TypedAheadSkipsPrompt,
     LineModeRead,
     NonShellForeground,
+    EchoThenReady,
+    EchoOnly,
 }
 
 pub struct MemPane {
@@ -26,6 +28,8 @@ pub struct MemPane {
     pub script: ShellScript,
     pub screen: String,
     pub probe_count: usize,
+    pub screen_reads: usize,
+    pub last_nonce: String,
     pub on_launch_foreground: Option<ProcessInfo>,
 }
 
@@ -38,6 +42,8 @@ impl MemPane {
             script: ShellScript::Ready,
             screen: format!("screen of {pane_id}"),
             probe_count: 0,
+            screen_reads: 0,
+            last_nonce: String::new(),
             on_launch_foreground: None,
         }
     }
@@ -46,6 +52,7 @@ impl MemPane {
         if let Some(rest) = command_line.strip_prefix("printf '%s%s\\n' fgos-ok- ") {
             let nonce = rest.trim();
             self.probe_count += 1;
+            self.last_nonce = nonce.to_string();
             match self.script {
                 ShellScript::Ready | ShellScript::TypedAheadSkipsPrompt => {
                     self.screen.push_str(&format!("\nfgos-ok-{nonce}\n"));
@@ -61,6 +68,12 @@ impl MemPane {
                     self.screen.push_str(&format!("\nread: consumed line (nonce {nonce})\n"));
                 }
                 ShellScript::NonShellForeground => {}
+                ShellScript::EchoThenReady => {
+                    self.screen.push_str(&format!("\nprintf '%s%s\\n' fgos-ok- {nonce}\n"));
+                }
+                ShellScript::EchoOnly => {
+                    self.screen.push_str(&format!("\nprintf '%s%s\\n' fgos-ok- {nonce}\n"));
+                }
             }
         } else {
             if let Some(on_launch) = &self.on_launch_foreground {
@@ -266,8 +279,14 @@ impl TerminalDriver for MemDriver {
         Ok(())
     }
     fn read_screen(&self, pane: &str, _lines: Option<u32>, _source: Option<&str>) -> DriverResult<String> {
-        let panes = self.panes.borrow();
-        if let Some(p) = panes.get(pane) {
+        let mut panes = self.panes.borrow_mut();
+        if let Some(p) = panes.get_mut(pane) {
+            if p.script == ShellScript::EchoThenReady && p.probe_count == 1 {
+                p.screen_reads += 1;
+                if p.screen_reads > 1 {
+                    p.screen.push_str(&format!("\nfgos-ok-{}\n", p.last_nonce));
+                }
+            }
             Ok(p.screen.clone())
         } else {
             Err(unknown("pane_not_found"))

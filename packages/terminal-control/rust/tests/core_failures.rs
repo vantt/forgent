@@ -361,6 +361,72 @@ fn a_shell_whose_start_prompt_eats_the_first_key_still_gets_an_intact_launch_lin
 }
 
 #[test]
+fn an_echo_only_screen_does_not_trigger_an_early_retype_while_a_swallowed_key_screen_still_does() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("echo-swallow-contrast"));
+    let slot_swallow = core.allocate(&request("swallow", "g")).unwrap().slot;
+    driver.set_script(&slot_swallow.pane_id, ShellScript::PromptReadsFirstKey);
+    let mut child = spawn_sleeper();
+    driver.set_launch_foreground(
+        &slot_swallow.pane_id,
+        900,
+        vec![
+            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
+            ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] },
+        ],
+        child.id(),
+    );
+    let out_swallow = core.launch("swallow", &launch_spec()).unwrap();
+    assert!(matches!(out_swallow, LaunchOutcome::Launched(_)), "{out_swallow:?}");
+    let runs_swallow = driver.calls("pane.run");
+    assert_eq!(runs_swallow.len(), 3, "swallowed key must trigger an early probe 2 then launcher: {runs_swallow:?}");
+    child.kill().unwrap();
+    child.wait().unwrap();
+
+    let slot_echo = core.allocate(&request("echo", "g")).unwrap().slot;
+    driver.set_script(&slot_echo.pane_id, ShellScript::EchoThenReady);
+    let mut child_echo = spawn_sleeper();
+    driver.set_launch_foreground(
+        &slot_echo.pane_id,
+        900,
+        vec![
+            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
+            ForegroundProcess { pid: child_echo.id(), argv: vec!["sleep".into(), "30".into()] },
+        ],
+        child_echo.id(),
+    );
+    let out_echo = core.launch("echo", &launch_spec()).unwrap();
+    assert!(matches!(out_echo, LaunchOutcome::Launched(_)), "{out_echo:?}");
+    let runs_echo: Vec<String> = driver
+        .calls("pane.run")
+        .into_iter()
+        .filter(|c| c.contains(&slot_echo.pane_id))
+        .collect();
+    assert_eq!(runs_echo.len(), 2, "echo-only screen must not trigger an early retype: probe 1 then launcher: {runs_echo:?}");
+    assert!(runs_echo[0].contains("printf '%s%s\\n' fgos-ok- "));
+    assert!(runs_echo[1].contains("cd '/tmp' && 'sleep' '30'"));
+    child_echo.kill().unwrap();
+    child_echo.wait().unwrap();
+}
+
+#[test]
+fn a_shell_serving_only_typed_echo_retypes_only_after_backoff_and_caps_at_three_probes() {
+    let driver = MemDriver::new(352, 69);
+    let mut cfg = config(state_dir("echo-only-backoff"));
+    cfg.shell_ready_timeout_ms = 60;
+    let core = Core::new(&driver, &MeasuredSplit, cfg);
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    driver.set_script(&slot.pane_id, ShellScript::EchoOnly);
+    let out = core.launch("a", &launch_spec()).unwrap();
+    assert!(matches!(&out, LaunchOutcome::NotStarted { reason } if reason.contains("not become ready")), "{out:?}");
+    let runs = driver.calls("pane.run");
+    assert_eq!(runs.len(), 3, "must type at most three probes after backoff: {runs:?}");
+    for r in &runs {
+        assert!(r.contains("printf '%s%s\\n' fgos-ok- "));
+    }
+}
+
+#[test]
 fn a_line_typed_before_the_start_prompt_draws_is_not_swallowed_and_launches_once() {
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("typed-ahead"));

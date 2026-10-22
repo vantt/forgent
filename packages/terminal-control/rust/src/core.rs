@@ -70,6 +70,9 @@ fn store_err(e: std::io::Error) -> Refusal {
 fn shell_quote(s: &str) -> String {
     format!("'{}'", s.replace('\'', "'\\''"))
 }
+/// Reads a 128-bit hex nonce from /dev/urandom, failing closed if unavailable.
+/// Kept local to avoid a dependency on event-store (where identity::random_id is crate-private).
+/// Never uses a time-derived nonce so old tokens in scrollback cannot satisfy the handshake.
 fn random_nonce() -> Result<String, LaunchOutcome> {
     use std::fs::File;
     use std::io::Read;
@@ -86,6 +89,22 @@ fn random_nonce() -> Result<String, LaunchOutcome> {
         let _ = write!(s, "{b:02x}");
     }
     Ok(s)
+}
+
+fn is_error_style_line(line: &str) -> bool {
+    let lower = line.to_ascii_lowercase();
+    lower.contains("not found")
+        || lower.contains("not-found")
+        || lower.contains("error")
+        || lower.contains("no such file")
+        || lower.contains("cannot execute")
+}
+
+fn has_consumed_error_evidence(screen: &str, prev_nonce: &str) -> bool {
+    let echo_cmd = format!("fgos-ok- {prev_nonce}");
+    screen.lines().any(|line| {
+        line.contains(prev_nonce) && !line.contains(&echo_cmd) && is_error_style_line(line)
+    })
 }
 
 fn sleep_poll(step: Duration, deadline: Instant) {
@@ -471,9 +490,10 @@ impl<'a> Core<'a> {
     fn wait_for_shell(&self, pane: &str) -> Result<Option<LaunchOutcome>, Refusal> {
         let deadline = Instant::now() + Duration::from_millis(self.config.shell_ready_timeout_ms);
         let backoff = Duration::from_millis(self.config.shell_ready_timeout_ms / 3);
-        let poll_step = Duration::from_millis(100);
+        let poll_step = Duration::from_millis(100).min(backoff).max(Duration::from_millis(1));
         let mut nonces: Vec<String> = Vec::new();
         let mut last_probe_at: Option<Instant> = None;
+        let mut screen = String::new();
 
         loop {
             let info = match self.driver.process_info(pane) {
@@ -498,7 +518,18 @@ impl<'a> Core<'a> {
                 continue;
             }
 
-            if nonces.is_empty() {
+            let should_probe = if nonces.is_empty() {
+                true
+            } else if nonces.len() < 3 {
+                let prev_nonce = nonces.last().unwrap();
+                let consumed = has_consumed_error_evidence(&screen, prev_nonce);
+                let backoff_elapsed = last_probe_at.map(|t| t.elapsed() >= backoff).unwrap_or(false);
+                consumed || backoff_elapsed
+            } else {
+                false
+            };
+
+            if should_probe {
                 let nonce = match random_nonce() {
                     Ok(n) => n,
                     Err(not_started) => return Ok(Some(not_started)),
@@ -509,7 +540,7 @@ impl<'a> Core<'a> {
                 last_probe_at = Some(Instant::now());
             }
 
-            let screen = match self.driver.read_screen(pane, Some(40), Some("recent-unwrapped")) {
+            screen = match self.driver.read_screen(pane, Some(40), Some("recent-unwrapped")) {
                 Ok(s) => s,
                 Err(_) => {
                     if let Ok(PaneLiveness::Gone) = self.driver.pane_liveness(pane) {
@@ -523,33 +554,8 @@ impl<'a> Core<'a> {
                 return Ok(None);
             }
 
-            if nonces.len() < 3 {
-                let prev_nonce = nonces.last().unwrap();
-                let consumed = screen.contains(prev_nonce);
-                let backoff_elapsed = last_probe_at.map(|t| t.elapsed() >= backoff).unwrap_or(false);
-                if consumed || backoff_elapsed {
-                    let nonce = match random_nonce() {
-                        Ok(n) => n,
-                        Err(not_started) => return Ok(Some(not_started)),
-                    };
-                    let probe_cmd = format!("printf '%s%s\\n' fgos-ok- {nonce}");
-                    self.driver.pane_run(pane, &probe_cmd)?;
-                    nonces.push(nonce);
-                    last_probe_at = Some(Instant::now());
-
-                    let screen = match self.driver.read_screen(pane, Some(40), Some("recent-unwrapped")) {
-                        Ok(s) => s,
-                        Err(_) => {
-                            if let Ok(PaneLiveness::Gone) = self.driver.pane_liveness(pane) {
-                                return Err(unknown("pane is gone"));
-                            }
-                            String::new()
-                        }
-                    };
-                    if nonces.iter().any(|n| screen.contains(&format!("fgos-ok-{n}"))) {
-                        return Ok(None);
-                    }
-                }
+            if nonces.len() < 3 && has_consumed_error_evidence(&screen, nonces.last().unwrap()) {
+                continue;
             }
 
             if Instant::now() >= deadline {
