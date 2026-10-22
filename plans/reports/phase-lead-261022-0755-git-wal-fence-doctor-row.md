@@ -103,7 +103,15 @@ Tests (principle 8):
 
 ## 3. Gates
 
-See the Status block in the final message for the results of the runs (cargo test, clippy, node tests, full npm test).
+- `cargo test -p fgos-git -p fgos-distribution -p fgos-node-addon`: all result lines ok.
+- `cargo clippy -p fgos-git -p fgos-distribution -p fgos-node-addon -p fgctl --all-targets -- -D warnings`: clean.
+- Focused node tests (`test/setup/git-checks.test.mjs`, `test/git/native-load.test.mjs`): both new tests pass.
+- Full `npm test` (tracked `.fgos/config.json` restored for the run, stub state restored after): 8849 tests,
+  8749 pass, 4 fail, none in Git/doctor code: `decideExecutorCli resolves dispatch plan for an assignment`,
+  `two checkers whose leases conflict at once rebind...`, `a host that does not know the route throws
+  host-version-mismatch`, `the row fails on a host that has no seat-binding route` (dispatch, seat-binding and
+  host-route tests; probably a host binary older than source in this worktree). Not compared against a clean
+  baseline run of the full suite.
 Pre-existing, not caused here: `cargo fmt --check` reports a diff in `apps/fgctl/src/main.rs`; the test
 `an unused controller fence does not turn a channel without activation red` fails on this worktree without
 and with my change (`git-addon-unavailable` outside an activated release); it is a `checkLockFences` test that
