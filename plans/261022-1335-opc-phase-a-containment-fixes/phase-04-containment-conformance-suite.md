@@ -15,30 +15,37 @@ The simplicity seat's §3.5 cut the behaviour list to one owning proof each. CI 
 
 ## Requirements
 
-1. **One test body per behaviour**, generic over `&dyn ContainmentDriver`, instantiated per driver available on the platform. A driver missing on the host is reported as skipped with its reason, never silently passed.
+These requirements follow TEST's review of 2026-10-22 (`forgent-f8`): four objections and three conditions, all accepted.
 
-   | Behaviour | What the body asserts |
+1. **One test body per behaviour**, generic over `&dyn ContainmentDriver`, in one new module. Its per-driver copies are retired in the same change. The duplicated behaviours that move:
+
+   | Behaviour | Today's copies |
    |---|---|
-   | (a) | `create` + `spawn_in` runs the argv with exact env, cwd and stdio; exit status reaches the caller |
-   | (b) | a background child left by the root is found: `is_empty` is not `Empty` until `kill_all` |
-   | (c) | a `setsid` + double-fork escapee is killed by kernel drivers, or matches the driver's named escape in `guarantee().escapes` on best-effort drivers |
-   | (d) | `kill_all(grace)`: SIGTERM first, SIGKILL after the grace, then empty |
-   | (e) | `Unknown` is never `Empty` |
-   | (f) | the child's fd table holds only its fd map plus stdio (from `spawn_fds_leak.rs`) |
-   | (g) | `guarantee()` names the driver, its level and its escapes |
+   | (T) a tree including a `setsid` child ends | `containment_pgroup.rs:70`, `containment_macos.rs:70`, `containment_bwrap.rs:96`, `containment_windows.rs:204` (job close ends child, grandchild and detached child) |
+   | (R) the record alone judges and ends the domain | `containment_pgroup.rs:105`, `containment_macos.rs:96` |
+   | (F) a hundred fast exits are normal spawns | `containment_pgroup.rs:133`, `containment_macos.rs:131`, `containment_bwrap.rs:245` |
 
-2. **Driver quirks stated as properties, not hidden** (correctness F5, F6):
-   - On `bwrap-pidns`, a pid-1 child without a SIGTERM handler ignores SIGTERM and dies only at SIGKILL.
-   - bwrap reports a signalled child as `128+n`, while `linux-pgroup` reports no code.
+   New behaviours join the same module: (A) exact argv, env, cwd and stdio reach the child, and its exit reaches the caller; (D) `kill_all(grace)` is SIGTERM, then SIGKILL after the grace, then empty; (G) `guarantee()` names the driver, its level and its escapes.
+2. **Quirks as properties.** A per-driver property table is read by the shared body, with no `if driver == …` branch inside a body. Rows:
+   - SIGTERM to a pid-1 child without a handler is dropped on `bwrap-pidns`;
+   - the exit encoding: `128+n` on bwrap, no code on `linux-pgroup`.
 
-   Each driver declares these properties, and the body asserts against the declaration.
-3. **Driver-only behaviours stay in their driver file**, only where no common body can observe them: the bwrap prefix rules, the Windows job views, macOS's 500 ms rescan.
-4. **Net test lines ≤ 0** across the six files. Every retired case names the body that now owns it, in the commit message and in the TEST review note (design principle 8).
-5. **CI:** the `process-containment` workflow also runs on pull requests and on pushes to `main` that touch `packages/process/**`.
+   Each row has one test that observes it, so the table cannot drift from reality.
+3. **Instances exist only where their driver can.** Per-OS instances are compiled with `cfg(target_os)`. A macOS or Windows instance never shows as a passing skip on the Linux job. On Linux, a host where the bwrap probe fails reports the `bwrap-pidns` instance as not run, naming the probe reason, never as passed.
+4. **`spawn_fds_leak.rs` stays its own owner.** It proves the descriptor rule of `spawn_with_fds`, which is not a driver behaviour. It is not instantiated per driver and not consolidated.
+5. **Driver-specific tests stay in their driver files, and must not be consolidated:**
+   - `containment_bwrap.rs:76` (the gate is pid 1, `NSpid`);
+   - `containment_bwrap.rs:178` and `:187` (the gate outlives, or dies with, a killed supervisor);
+   - `containment_bwrap.rs:196` and `:221`;
+   - `containment_pgroup.rs:117` (grace snapshot);
+   - `containment_pgroup.rs:171` (no subreaper);
+   - `containment_windows.rs:235` and `:250`.
+6. **Net test lines ≤ 0** across the containment test files. Phase 05's report carries an inventory listing every retired test with its new owner, and a mutation spot-check: break one driver on purpose in a scratch branch, never committed, and show that only that driver's instance fails.
+7. **CI:** the `process-containment` workflow also runs on pull requests and on pushes to `main` that touch `packages/process/**`.
 
 ## Files
 
-- `packages/process/rust/tests/`: one new module for the conformance bodies, the per-driver instantiation in the existing files, and the deleted duplicate cases.
+- `packages/process/rust/tests/`: one new conformance module, the per-driver instantiation, and the retired duplicates in `containment_{bwrap,pgroup,macos,windows}.rs`. `spawn_fds_leak.rs` is not touched.
 - `.github/workflows/process-containment.yml`.
 
 ## Steps

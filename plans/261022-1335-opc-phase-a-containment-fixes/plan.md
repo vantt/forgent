@@ -37,7 +37,7 @@ Không thêm cơ chế mới. Ước tính khoảng 200 dòng src, test không t
 | AC2 | A refused `kill_all` after a deadline or output limit returns `containment-unproven` within a bound and never hangs. | phase 01 driver test (a member stopped with SIGSTOP) |
 | AC3 | A refused bwrap mount surfaces as `namespace-unavailable: containment-mount-refused: <bwrap line>`, and doctor `process-containment` names the driver and why it was chosen. | phase 02 tests |
 | AC4 | On `linux-pgroup`, a contained read that ran user code never reports plain success while a marked `setsid` escapee survives. | phase 03 crate test in `packages/git/rust`, using an injected `LinuxPgroup` driver |
-| AC5 | One conformance body per behaviour, instantiated for `bwrap-pidns`, `linux-pgroup`, `macos-tree` and `windows-job`; net test lines ≤ 0; CI runs it on changes to `packages/process/**`. | phase 04; TEST review |
+| AC5 | One conformance body per behaviour, instantiated per OS for `bwrap-pidns`, `linux-pgroup`, `macos-tree` and `windows-job`; quirks are a property table, each row observed by a test; net test lines ≤ 0, with a retired-test inventory and a mutation spot-check; CI runs it on changes to `packages/process/**`. | phase 04; TEST review (10-22, accepted) |
 | AC6 | E1 still held, E4 held on both Linux drivers, E3 rows within budget, `npm test` and `cargo test --workspace` green. Suite wall time and contained-git census are recorded before and after. | phase 00 and phase 05 |
 
 ## Phases
@@ -60,7 +60,7 @@ Phases 01 and 03 both edit the contained branch of `packages/git/rust/src/driver
   - the contained branch of `packages/git/rust/src/driver.rs` (≈ :1165-1245) and its `user_code_may_run`;
   - the host route that reports `containment` to doctor;
   - `src/setup/run-supervisor-checks.mjs` (`checkProcessContainment`);
-  - `packages/process/rust/tests/*containment*`, `spawn_fds_leak.rs`;
+  - `packages/process/rust/tests/containment_*.rs` (`spawn_fds_leak.rs` stays as is);
   - crate tests in `packages/git/rust`;
   - `.github/workflows/process-containment.yml`;
   - `packages/process/contracts/containment.port.v1.json` (error causes only, no new operation);
