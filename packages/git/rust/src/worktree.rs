@@ -1,7 +1,7 @@
 //! Worktree administration. One rank-40 hold spans inspection and mutation.
 use crate::{
     driver::Policy,
-    refs::{admission, failure, install_pin, pending, recovery, release_pin, Authority},
+    refs::{admission, compact_finished, failure, install_pin, pending, recovery, release_pin, Authority},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
 };
@@ -531,7 +531,18 @@ impl GitDriver {
             scope.handle("worktree-admin").expect("acquired"),
             wal,
             &terminal,
-        )
+        )?;
+        // A compaction that cannot finish leaves its chain retained for the next pass; the
+        // operation that already succeeded does not fail for it.
+        let _deferred = compact_finished(self, repo, scope, wal, |k| {
+            matches!(
+                k,
+                OperationKind::WorktreeCreate { .. }
+                    | OperationKind::WorktreeMove { .. }
+                    | OperationKind::WorktreeRemove { .. }
+            )
+        });
+        Ok(())
     }
     /// A caller supplies a full immutable base; provisioning happens after return.
     pub fn create_worktree(

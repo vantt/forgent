@@ -199,9 +199,6 @@ pub struct RemoteGrant {
     pub pinned_url: String,
 }
 
-/// Terminal chains of a ref kept whole by admission before compaction.
-const RECENT_TERMINAL: usize = 4;
-
 pub struct PublicationPort<'a, F = wal::OsFileSystem> {
     driver: &'a GitDriver,
     authority: HolderAuthority<'a>,
@@ -302,7 +299,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         }
         // Newest first; an unreadable change time sorts oldest.
         terminal.sort_by_key(|t| std::cmp::Reverse(t.0));
-        for (_, old) in terminal.into_iter().skip(RECENT_TERMINAL) {
+        for (_, old) in terminal.into_iter().skip(wal::RECENT_TERMINAL) {
             if let Err(e) = self.release_pin_and_compact(repo, &old) { eprintln!("git compaction deferred: {old}: {}", e.cause); }
         }
         Ok(())

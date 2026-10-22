@@ -1781,6 +1781,10 @@ impl<F: FileSystem> Wal<F> {
     }
 }
 
+/// Terminal chains of one operation family kept whole by compaction, so a
+/// just-finished id still replays with its full receipt.
+pub const RECENT_TERMINAL: usize = 4;
+
 /// Compact terminal receipt. Keys are short to maintain the ≤512-byte bound
 /// even for SHA-256 refs. Request/resource/authority bindings remain immutable.
 #[derive(Debug, Clone, Serialize, Deserialize)]

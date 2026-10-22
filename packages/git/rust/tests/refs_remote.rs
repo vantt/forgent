@@ -1012,3 +1012,106 @@ fn non_event_transfer_accepts_main_checkout_loan_without_worktree_admin() {
     assert_eq!(git(Path::new(&remote.pinned_url), &["rev-parse", "refs/heads/shared"]), f.second.as_str());
     assert!(!f.path.join(".fgos/locks/worktree-admin.lock").exists());
 }
+
+/// Moves `name` to `to` just before the target compare-and-swap, the way a third writer would.
+struct MoveBeforeCas {
+    path: PathBuf,
+    name: &'static str,
+    to: String,
+}
+impl FileSystem for MoveBeforeCas {
+    fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+        if step == "before-target-cas" {
+            git(&self.path, &["update-ref", self.name, &self.to]);
+        }
+        Ok(())
+    }
+}
+
+#[test]
+fn a_compacted_ref_operation_replays_the_answer_a_retained_one_gives() {
+    // No existing case replays an id after compaction: a success keeps its receipt, a lost
+    // compare-and-swap stays stale, and an operation abandoned before its attempt stays
+    // recovery-required, exactly as while the chain was retained.
+    let f = Fixture::new("files");
+    git(&f.path, &["commit", "--allow-empty", "-qm", "three"]);
+    let third = git(&f.path, &["rev-parse", "HEAD"]);
+    let branch = |n: &str| RefName::parse(&format!("refs/heads/{n}")).unwrap();
+    let (won, lost, abandoned) = (branch("won"), branch("lost"), branch("abandoned"));
+    for name in [&lost, &abandoned] {
+        git(&f.path, &["update-ref", name.as_str(), f.first.as_str()]);
+    }
+
+    let first_receipt = f
+        .driver
+        .ensure_branch(&f.repo, vec![], &won, &f.second, "fixture", "op-won")
+        .unwrap();
+    let first_loss = f
+        .driver
+        .change_ref(
+            &f.repo,
+            vec![],
+            &lost,
+            &ExpectedTip::Oid(f.first.clone()),
+            &ExpectedTip::Oid(f.second.clone()),
+            false,
+            "fixture",
+            "op-lost",
+            &MoveBeforeCas {
+                path: f.path.clone(),
+                name: "refs/heads/lost",
+                to: third,
+            },
+        )
+        .unwrap_err();
+    assert_eq!((first_loss.code, first_loss.cause.as_str()), (ResultCode::Stale, "compare-and-swap-stale"));
+    let first_abandon = f
+        .driver
+        .advance_ref(&f.repo, vec![], &abandoned, &f.second, &f.first, "fixture", "op-abandoned")
+        .unwrap_err();
+    assert_eq!(first_abandon.code, ResultCode::Stale);
+
+    // Enough later operations to push the three above out of the recent few.
+    for n in 0..wal::RECENT_TERMINAL + 2 {
+        f.driver
+            .ensure_branch(&f.repo, vec![], &branch(&format!("filler{n}")), &f.first, "fixture", &format!("op-filler-{n}"))
+            .unwrap();
+    }
+    let wal = wal::Wal::open(&f.repo).unwrap();
+    for id in ["op-won", "op-lost", "op-abandoned"] {
+        assert!(wal.compacted(id).unwrap().is_some(), "{id} was not compacted");
+        assert!(wal.inspect(id).is_err(), "{id} still has a record directory");
+    }
+
+    let replay = f
+        .driver
+        .ensure_branch(&f.repo, vec![], &won, &f.second, "fixture", "op-won")
+        .expect("a compacted success replays its receipt");
+    assert_eq!(
+        serde_json::to_value(&replay).unwrap(),
+        serde_json::to_value(&first_receipt).unwrap()
+    );
+    let replay_loss = f
+        .driver
+        .change_ref(
+            &f.repo,
+            vec![],
+            &lost,
+            &ExpectedTip::Oid(f.first.clone()),
+            &ExpectedTip::Oid(f.second.clone()),
+            false,
+            "fixture",
+            "op-lost",
+            &wal::OsFileSystem,
+        )
+        .unwrap_err();
+    assert_eq!((replay_loss.code, replay_loss.cause.as_str()), (ResultCode::Stale, "compare-and-swap-stale"));
+    let replay_abandon = f
+        .driver
+        .advance_ref(&f.repo, vec![], &abandoned, &f.second, &f.first, "fixture", "op-abandoned")
+        .unwrap_err();
+    assert_eq!(
+        (replay_abandon.code, replay_abandon.cause.as_str()),
+        (ResultCode::RecoveryRequired, "operation-recovery-required")
+    );
+}

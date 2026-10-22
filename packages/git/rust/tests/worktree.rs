@@ -678,3 +678,77 @@ fn missing_owned_detached_history_keeps_its_registration_when_no_delivery_ref_ex
     assert_eq!(fs::read_to_string(f.repo.common_dir().join("worktrees/owned/HEAD")).unwrap().trim(), tip);
     assert_eq!(git(&f.path, &["show", &format!("{tip}:valuable")]), "keep unique history");
 }
+
+impl Fixture {
+    fn create_numbered(&self, n: usize) {
+        self.driver
+            .create_worktree(
+                &self.repo,
+                vec![],
+                &WorktreeCreate {
+                    path: self.root.join(format!("many-{n}")),
+                    branch: None,
+                    base: self.tip.clone(),
+                    session_id: None,
+                },
+                "fixture",
+                &format!("many-{n}"),
+            )
+            .unwrap();
+    }
+}
+
+#[test]
+fn finished_worktree_operations_beyond_the_recent_few_leave_no_record_directory() {
+    // The WAL case proves compaction of a bounded chain; no case proves the Worktree port ever
+    // runs it, so every finished worktree operation used to stay as a record directory for good.
+    let f = Fixture::new();
+    for n in 0..wal::RECENT_TERMINAL + 3 {
+        f.create_numbered(n);
+    }
+    let wal = Wal::open(&f.repo).unwrap();
+    assert_eq!(wal.retained(1000).unwrap().len(), wal::RECENT_TERMINAL);
+    for n in 0..3 {
+        let id = format!("many-{n}");
+        assert!(wal.compacted(&id).unwrap().is_some(), "{id} was not compacted");
+    }
+    // The newest few stay whole.
+    assert!(wal.inspect(&format!("many-{}", wal::RECENT_TERMINAL + 2)).is_ok());
+}
+
+#[test]
+fn a_chain_stopped_between_its_outcome_and_its_pin_release_is_released_and_compacted_by_the_next_operation() {
+    // No other case leaves a terminal chain whose pin is still installed: such a chain used to be
+    // skipped by every later pass and kept its pin and record directory forever.
+    let f = Fixture::new();
+    let scope = f.scope();
+    f.attempt(
+        &scope,
+        "stuck",
+        OperationKind::WorktreeCreate {
+            path: f.root.join("stuck").to_str().unwrap().into(),
+            registration: "stuck".into(),
+            branch: None,
+            session_id: None,
+        },
+    );
+    drop(scope);
+    let wal = Wal::open(&f.repo).unwrap();
+    let attempted = wal.inspect("stuck").unwrap();
+    wal.append(
+        &attempted,
+        Phase::Outcome(wal::Outcome::Worktree {
+            completed: false,
+            details: vec![],
+        }),
+    )
+    .unwrap();
+    let pin = "refs/fgos/git-operations/stuck/candidate";
+    assert_eq!(git(&f.path, &["rev-parse", pin]), f.tip.as_str());
+
+    for n in 0..wal::RECENT_TERMINAL + 1 {
+        f.create_numbered(n);
+    }
+    assert!(wal.compacted("stuck").unwrap().is_some());
+    assert_eq!(git(&f.path, &["for-each-ref", "--format=%(refname)", pin]), "");
+}

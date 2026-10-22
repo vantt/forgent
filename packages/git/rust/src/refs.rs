@@ -394,6 +394,48 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
     wal.append(&release, Phase::PinReleased).map_err(failure)?;
     Ok(())
 }
+/// Releases the pin of every finished chain of one operation family beyond the
+/// `RECENT_TERMINAL` most recently changed, then compacts it, under the
+/// caller's live `worktree-admin` scope. An older chain that stopped between
+/// its outcome and its pin release is finished here. A chain that cannot be
+/// finished stays retained for the next pass, and its cause is returned.
+/// Unresolved chains are never touched.
+pub(crate) fn compact_finished<F: wal::FileSystem>(
+    driver: &GitDriver,
+    repo: &RepoHandle,
+    scope: &LockScope<'_>,
+    wal: &Wal<F>,
+    family: fn(&OperationKind) -> bool,
+) -> Vec<String> {
+    let mut warnings = vec![];
+    let chains = match wal.retained(100_000) {
+        Ok(chains) => chains,
+        Err(e) => return vec![format!("compaction-deferred: {e}")],
+    };
+    let mut finished: Vec<_> = chains
+        .into_iter()
+        .filter(|c| c.outcome().is_some() && family(&c.intent().kind))
+        .map(|c| (wal.last_change(&c.last().operation_id), c))
+        .collect();
+    finished.sort_by_key(|(changed, _)| std::cmp::Reverse(*changed));
+    for (_, chain) in finished.into_iter().skip(wal::RECENT_TERMINAL) {
+        let id = chain.last().operation_id.clone();
+        let result = (|| {
+            release_pin(driver, repo, scope.handle("worktree-admin").ok_or_else(|| failure("worktree-admin-missing"))?, wal, &chain)?;
+            let released = wal.inspect(&id).map_err(failure)?;
+            let authority = Authority {
+                scope,
+                binding: released.intent().authority_binding.clone(),
+            };
+            wal.compact(&released, &crate::driver::WalReader { driver, repo }, &authority)
+                .map_err(failure)
+        })();
+        if let Err(e) = result {
+            warnings.push(format!("compaction-deferred: {id}: {}", e.cause));
+        }
+    }
+    warnings
+}
 impl GitDriver {
     pub(crate) fn ignored_checkout_collisions(
         &self,
@@ -714,6 +756,7 @@ impl GitDriver {
             expected: tip(old),
             next: tip(next),
         };
+        let replay_intent = intent.clone();
         let chain = match wal.begin(id, intent, &authority).map_err(failure)? {
             Begin::Created(c) => c,
             Begin::Existing(c) => {
@@ -743,7 +786,27 @@ impl GitDriver {
                     _ => Err(recovery("operation-recovery-required")),
                 };
             }
-            Begin::Compacted(_) => return Err(recovery("operation-recovery-required")),
+            Begin::Compacted(c) => {
+                return match c.outcome().map_err(failure)? {
+                    Outcome::Success {
+                        observed,
+                        attribution,
+                    } => receipt(
+                        id,
+                        &replay_intent,
+                        expected(&observed, repo)?,
+                        attribution == wal::Attribution::ThisInvocationWonCas,
+                        if checkout {
+                            Checkout::Reconciled
+                        } else {
+                            Checkout::NotApplicable
+                        },
+                        Remote::NotRequested,
+                    ),
+                    Outcome::Loss { .. } => Err(stale("compare-and-swap-stale")),
+                    _ => Err(recovery("operation-recovery-required")),
+                };
+            }
         };
         if direct(self, repo, name)? != *old {
             wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
@@ -922,7 +985,10 @@ impl GitDriver {
                 )
                 .map_err(failure)?;
             release_pin(self, repo, admin, &wal, &terminal)?;
-            receipt(
+            let warnings = compact_finished(self, repo, &scope, &wal, |k| {
+                matches!(k, OperationKind::RefUpdate { .. } | OperationKind::RefDelete)
+            });
+            let mut done = receipt(
                 id,
                 attempted.intent(),
                 observed,
@@ -933,7 +999,9 @@ impl GitDriver {
                     Checkout::NotApplicable
                 },
                 Remote::NotRequested,
-            )
+            )?;
+            done.durability.capability_evidence.extend(warnings);
+            Ok(done)
         })();
         effect.map_err(|e| {
             if e.code == ResultCode::Stale {
