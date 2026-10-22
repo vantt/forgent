@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5c3a86c0a0c35622fa82dfbea0f669a15f7298db1bbc616c995cd7c53460de57",
+  "payloadDigest": "db2bbf371117eedd99cc95e70795e8fc16b15129a13832accbc0e28d11c68ffa",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -189,7 +189,7 @@
     "packages/agent-protocol/rust/tests/terminal_vectors.rs": "4ce5222b93e3a657220a83a652d6d51de83bfbd9b6eb2a1a71ecd24a5937a91c",
     "packages/canonical-json/rust/src/lib.rs": "e390b41a00319d727bd0f0d44ad7f6fda85218a53bae914186699f91a27b7944",
     "packages/convention/rust/src/lib.rs": "659d829be33a7eceff3e2e1e0a804740b58374e9d5a4b9eefca4c2b9f014496b",
-    "packages/convention/rust/src/operations.rs": "cb2cb56e25a81f5475fc6120353fcf1e5483ebce9d0df80de16bfb3b69919d30",
+    "packages/convention/rust/src/operations.rs": "4ca00bed057ce292d0f37f5ca15e20ffabab2ebeb35e81ceacff59949b8a9aba",
     "packages/convention/rust/src/provider.rs": "9c7421733033e3355e94f94b6ba64d38801032cd8c53357206c161bde1b997c1",
     "packages/convention/rust/src/rules.rs": "9138347391a55a7f5999abf845c85891b568a257c2804ab32d8a0a3ac036fae9",
     "packages/convention/rust/tests/golden.rs": "79e0c50467a8548ffa3c18621c17bb97d3e051657a60613d5d96c1f66bbab80d",
@@ -276,7 +276,7 @@
     "packages/event-store/rust/tests/walk_certified.rs": "0ae2d9f7f3fc96b748167c0a3f9b5de4d3ad7a3e57d6a65ced896f93b9a2db55",
     "packages/git/node-addon/build.rs": "fcbd1ff3f627a7553fa1704dc6f558998daff8bc256015c37aace62cc49ce584",
     "packages/git/node-addon/examples/e3_fixture.rs": "f3a98f5c8de968be2109b9958a5a7d0efeca7fa5000493278277d7bba035a75a",
-    "packages/git/node-addon/src/canonical_json.rs": "6837d46ba14f53228b7d9ccc6e4fdba8bf42210f46cadeee48ce32c8d4a03fd8",
+    "packages/git/node-addon/src/canonical_json.rs": "e91f461709624467b89c145b906be459015ac77622522d9cf5e1b663a49bf14b",
     "packages/git/node-addon/src/durable_file.rs": "92d33582a588824a105683b230a694f3b103657b1b1520fc0b86bac079c490e1",
     "packages/git/node-addon/src/event_store.rs": "4db4794487da76c656b1812924e1b499bf8dbe6c807d8b3a3ea18857cfed60da",
     "packages/git/node-addon/src/git.rs": "380bbcf7b7bef7efb1011ee030f8e5b1131f60b372ce22e55443f065fd26be45",
@@ -335,8 +335,8 @@
     "packages/herdr-fgos-common/rust/src/ports.rs": "45c92b4f8a06e62a79a09655fe9c484a85dc9745049cfea6849245b886f4913f",
     "packages/herdr-fgos-common/rust/src/settings.rs": "656623292616ca598ebd64dde89c343bdc5fc0ae8d78a7f91b809b959ec3f11b",
     "packages/holder-lock/rust/src/borrow_vectors.rs": "564243e258853156023e35dbad8c09498a0af1cbfd1b7fb832f8f1d1cef99f7e",
-    "packages/holder-lock/rust/src/borrow_windows.rs": "4c56123e70e6c3519eb74ba4866fe6470f9bd428bbf5743957ee6925f9f067e4",
-    "packages/holder-lock/rust/src/driver/flock.rs": "bfcc9c74db6eb5212fb77a306fc2358c69b3306c8ea6f4a2237dae3e322dd8f1",
+    "packages/holder-lock/rust/src/borrow_windows.rs": "d2ca4abeeebf6df80c2b3251dc7609d5649e804df8e6f6e4e820d9caadf1e7c2",
+    "packages/holder-lock/rust/src/driver/flock.rs": "8ccf2b683bbf66dabdc5b869498c8f6c2b0f7aca645406d19a5b643831527110",
     "packages/holder-lock/rust/src/driver/mod.rs": "9186ee0c26277887bd02cc45c06c88e3121447c3910e917a7ad5eb86f2ce13f0",
     "packages/holder-lock/rust/src/driver/windows.rs": "547a69f0c5d1e25ec3f2bd818a76dde4654651ed5c29101797a66e27b80eade7",
     "packages/holder-lock/rust/src/helper.rs": "f4f626f0a45b7d99c5bfbe95f4c791b782ee9ba1f9fecbf930f8618ee405ac6d",
@@ -361,7 +361,7 @@
     "packages/holder-lock/rust/tests/windows_lockfileex.rs": "79e5688336e2a2968f72a65802e8cd722f2c614334e8494eeb2c2b452bfc4273",
     "packages/host-runtime/rust/src/authority_gate.rs": "ad3c0a21cc5b98ec3d8d321d0b700d1378a35fe3a8531b7ed32ccabbf2e4fe17",
     "packages/host-runtime/rust/src/catalog.rs": "ab8f38aacc5ebf813585fdd54bafd7ef7bceba68e25d4c2808bb1464722a47c9",
-    "packages/host-runtime/rust/src/civil_time.rs": "a081fa34dd0cc596dba8d072490e28ee4a941f8e8a6068568ed12783a0be33ac",
+    "packages/host-runtime/rust/src/civil_time.rs": "e8d9e38de59f98e49b42fc0916e48a6e99013323f7805a36a168e019087fd4cc",
     "packages/host-runtime/rust/src/contracts.rs": "da9000674648a399cd32f628213a8d16cd1ce220eacb4e4896d9fad05c0af5cf",
     "packages/host-runtime/rust/src/invocation_service.rs": "bd9602d7ae4849bb434d2fe92aaa098c28ce9225ab6ef30b61fbbdb1a197bd55",
     "packages/host-runtime/rust/src/lib.rs": "1f25c007b30a9638c5c7571b040f80520a7a8a7277240ad4cd77e7c4ade73a3b",
@@ -412,7 +412,7 @@
     "packages/observe/rust/tests/fixture_test.rs": "1eadd8be1d535b05899e299f6a7a3a4d9a718d9311502e881b76a78f30985677",
     "packages/observe/rust/tests/harness_protocols_test.rs": "6dbd5029eddedc023ac9862b7cce8fb1da97a85440362f2d8bf35e6641f5dac2",
     "packages/observe/rust/tests/store_lock_multiprocess.rs": "d6b92d856d2dd22fd3679154f9f517a17a2333e91d3077ffab7d5b872c8c9bdb",
-    "packages/process/rust/src/containment/linux.rs": "f25d987c4925dbffab85434c77fa1a50e58ebbe7d25a13c156e2c34e7a930b57",
+    "packages/process/rust/src/containment/linux.rs": "2f23ea68f7d9ae1c75530cab457a5a18b783353b13b6c121d545d951e90ab181",
     "packages/process/rust/src/containment/macos.rs": "ae4a4a7599e446b795f1e361654f15b3acda90449e00531394f67644b23494a9",
     "packages/process/rust/src/containment/mod.rs": "a0bdea4b1b5ef198089c09975d01ecc8ad24025672edf6d434f8687cfdd68f65",
     "packages/process/rust/src/containment/pgroup.rs": "70eae45ba0ea30ddd05210a2910fc1627e28f2dcdf95b5f6db55e191ac8ec0fd",
@@ -547,7 +547,7 @@
     "packages/work-state/rust/src/legacy_friction.rs": "4fc646bb8bac02b8670ff8a2c5eb40bbd3d52c7d80c6b3c1e79aaa68423e512e",
     "packages/work-state/rust/src/lib.rs": "11f49bcb01e30b7ad8d466114292e0b4efe5ccbb03ca3100e18b72bbad687ffb",
     "packages/work-state/rust/src/work_source.rs": "0222f9d33ca3db5200588ed6662530218cb9717f0a9ed322a5d58a54536b94dd",
-    "scripts/backfill-status-category.mjs": "bff22a3805f8a38f1c7d93b7cee3b53ee5b6dde0d978b4fdbfb760c1cc3622d6",
+    "scripts/backfill-status-category.mjs": "559976e36826b535131e2638e024186a051182339b8012b89b857efa4422582f",
     "scripts/backfill-unit-summaries.mjs": "a11d12e63191bc31bf7a27b2c7279ac5ea8403730045dbbaa8f8ce2738b275e5",
     "scripts/build-domain-registry.mjs": "ad239f74764832366c3c3bd43c674012904a78944bd6d6b9d2c8eb481c1a62c0",
     "scripts/build-rust-distribution.mjs": "b84bd0fb5fc14963ef6a500020ee84280844482da3e4429060694053e9f61aaf",
@@ -601,8 +601,8 @@
     "scripts/measure-coordination-baseline.mjs": "b890da1963fd4ee50ac84cd53e5e9b45aa7ce37a92d51c6a633bdb2374ec6a7a",
     "scripts/measure-p08-performance.mjs": "2ab686e2e3f880f584a2f9278a6bbb27a49d71effcdb65215f1cbd3865099e3e",
     "scripts/measure-verify-cost.mjs": "76c5bc7fe1894af9eb5c7bf6de2177797bfb3ff4ff05b0826c3c7c6e765e5895",
-    "scripts/migrate-actor-to-role.mjs": "4501c681a7a0399e0e57d1cf48b43ba650934b49b84acac8a446cdd99db44a48",
-    "scripts/migrate-status-proposed-to-awaiting-approval.mjs": "ac3fd799390ee06d504b49f497f41f117526b961d4ebaf3883fca91b63cf2546",
+    "scripts/migrate-actor-to-role.mjs": "c7cbf743d674d30e02cbd92046a76c30d375994292fead5c89d9445065b0ae36",
+    "scripts/migrate-status-proposed-to-awaiting-approval.mjs": "3c68423a369856864d8d675596c45328a78b410f76c715af07684738f9ab4ca5",
     "scripts/migration-proof-2a.mjs": "c8097ce5bb23d816e31280eaafdb56a2b8ccc3fc3e13c763375255ef46705c80",
     "scripts/next-doc-id.mjs": "7e88c69cf6c78b4cce5240d3fcc34a1182fc963933435827a58974df5458bc9d",
     "scripts/package-release-assets.mjs": "088b9a0ad108920363ba5b4f540fb0c93b45b2960990981ab4e7558cff5fc59e",
@@ -612,7 +612,7 @@
     "scripts/regenerate-observe-fixtures.mjs": "07c5b42795e22c36d75363e2265cf59b6f6244d63f7413d9dacf9fe0e3071631",
     "scripts/run-rust-dev-host.mjs": "e10af7fa8c280ecb62cbde50e8d2e2160e1135b2bdd20c02867d0f0351ba641b",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "a4a56dba93a272daccf0648dbd250f766fb6a92cb5013b7620d6034b02446395",
+    "scripts/run-tests.mjs": "9495f5fe973cfcd2b4367c8092dddf58c0dce818acbc3fda13eb4ecad2acfc53",
     "scripts/stress-test-files.mjs": "c3ccd385982e8e1865b54e02abef044ae3e85a4547f34c9efd2fcbcc66d37240",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
     "scripts/test-proof-inventory.mjs": "61a54de2d57888dadb31138db836c569d5663046f4f835bf63061b43cbb77a35",
@@ -673,8 +673,8 @@
     "src/intake/plan.mjs": "c3c72be35468420d9f42bcf23a0bdec9e48a11c1f4d8dd6bb4b9be09f4c60dc6",
     "src/intake/risk-keywords.mjs": "b71f9c07e58ad759538ac3a287027273d08b9a65a397be2f39b2716595f14445",
     "src/intake/verify-pattern-check.mjs": "1cfe3feb6375b999c4b851f6e9ef8fce7b1fb1209a81c29dd0a043939cb69e0c",
-    "src/native/door.mjs": "f055f5dde19688c20abd50409a95013abbc9e25207b001ea859e4380c28a9a3c",
-    "src/observe/friction-client.mjs": "fa010f78de11c002da7ed01141a38ef5e65c072e937a1589642f0ed3ced8229d",
+    "src/native/door.mjs": "a65a3dd728a04e9eb52897e57d2fc11fce0398e7c7f35dafd4c01b371989eb04",
+    "src/observe/friction-client.mjs": "8dbce03318efff0234eed9c99117a217fa2c1e6e81049bada559e47bca9d9949",
     "src/report/authoritative-match.mjs": "385fd87aaaab0441c290d0203f5903a9b1edc614e7bead7e0970dc6aabd6b596",
     "src/report/capability-plan-lint.mjs": "7649ad794e0171be44317557be7c10a8d558299e031d41bd28c36a746e0b5aff",
     "src/report/context-render.mjs": "21f0d004ecc62a6be3d059f2c4911dd9dd9fcd3c646d348625e8277efb750fdb",
@@ -717,7 +717,7 @@
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
     "src/runner/dispatch/cli.mjs": "7e8f9fa875274013f49c64929188e3a640cecd1790447c7f83795d9319c70363",
     "src/runner/dispatch/config.mjs": "5f5fc1775e9a50d48c86980c1b41aafcc573499b31cbd06f529d3afbe9b56aec",
-    "src/runner/dispatch/confinement/attestation-store.mjs": "3b8fc1e59ac9282338f6bf0c9bdee8c787f67cc7f1853943509ffec6ff72d5d7",
+    "src/runner/dispatch/confinement/attestation-store.mjs": "79e413d77b1a92e5f5016fe5c0da789bb6810824c0c747ce7c1e38c70fbea284",
     "src/runner/dispatch/confinement/authority.mjs": "e618d5997f85e200c50f6459c43f08f31852bbd6cefb6c27c128c4e845c78709",
     "src/runner/dispatch/confinement/backend-registry.mjs": "8c07146b675d4ad1086c88685de4a521c7004bc00de39e20d2dbb99d96bfa1ff",
     "src/runner/dispatch/confinement/bypass-pairing.mjs": "0414c5c19c96bbdd2a53dfbbdefd0eae0fd69d02abd09d37e69e03981f472f62",
@@ -757,7 +757,7 @@
     "src/runner/dispatch/run-lock.mjs": "4dcd9ff6f8ee5697304e3e033503d57b4fc75ff2a0e3b3e5010869f1fa7594ba",
     "src/runner/dispatch/run-result.mjs": "9d0bf13cc9f695ae58d60052debbdf446868260b481c6ef036f9acaa611890f9",
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
-    "src/runner/dispatch/runtime-inspection.mjs": "e3f115ea6367dc266ae8d92dda03005af458ffaa99c54bb997689563006ab0fd",
+    "src/runner/dispatch/runtime-inspection.mjs": "9dd6b23334375ec14319cb45546f73bc2598c3676ef55dd4f01abf651cd7a9b3",
     "src/runner/dispatch/settlement.mjs": "171c6ba0444214c62db034f7ebcfc301e04de77091ea2437139f417262dac780",
     "src/runner/dispatch/stop-processes-inside.mjs": "705cafdb80283046c205646fd4f4742b47469172557d770ec67e468a96d28bb1",
     "src/runner/dispatch/stray-writes.mjs": "8ab287ef44a7e731d4c22fb50e820017645d707e9b41b63a75b7fb4bc028f2ff",
@@ -807,13 +807,13 @@
     "src/runner/github-adapter.mjs": "162d7b2064b9b311ea88afba25567601420626743dff6b72b0aba78f42220c00",
     "src/runner/goal-check.mjs": "f21520e58727a016945c052c2b04f72ec9120192c4cdfaaaf34526ea0bb090e0",
     "src/runner/iron-law-gate.mjs": "37e253ef40240e535e6587d41b393e6ddecc7cb174104760d0f48ba168203d43",
-    "src/runner/lock-fence.mjs": "d1fcf44fecbbc53573051bb7e69d95a3dbcfc9f5b301ad7d0de9027eac715d13",
+    "src/runner/lock-fence.mjs": "847ac3fa00e396d14bb51948427aae630bce8ccdae6b832834b4f862679c94ff",
     "src/runner/lock-status.mjs": "5e0f5837dd3e53d56a10d75d1add28176c325ce45db536c2cf1e12ed92dbdb21",
     "src/runner/lock-wait.mjs": "833e0a3bf2d71d66358d4f230c7325ebedcba34444cdaa60324a4e4be2140301",
     "src/runner/loop.mjs": "fa7676c6803545c5b9c62dc99400d1374fe7b8940d451a929708b54cd3fedc7b",
     "src/runner/main-checkout-activity.mjs": "84cd9b95e28c0c1004322b6edba0d2b4b45f9445eddc30613abd53314f13c071",
     "src/runner/main-checkout-reset-guard.mjs": "446d216c411dd5f59d512b5baf52b3a46eeb8ae03320f1d40be85e9447072d0c",
-    "src/runner/main-fgos-checkpoint.mjs": "7bcdab7f2b887e149170b50180f97eae0ce666abff0aca88b9477357ed4d8e52",
+    "src/runner/main-fgos-checkpoint.mjs": "9ad033aaf03324cda92d6b96cc68e8c52514f4c225d3a55e3c2ed9820f25b847",
     "src/runner/merge.mjs": "e473a4b7e64f33179a05931d6d590c47850be01701df6b04c2b4a6d0a1525373",
     "src/runner/operation-capability.mjs": "6683b7da84274722aa5d464ccc8ec9d9e34b110f779e8ea5b6f6c1d0b3c820f5",
     "src/runner/operation-choice.mjs": "866b8b61bea02f3250d9d89cf826109065e35c899b64faad0cfddc524614277e",
@@ -851,11 +851,11 @@
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
     "src/setup/instruction-projections.mjs": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
     "src/setup/instruction-registry.mjs": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-    "src/setup/lock-record-checks.mjs": "08afa6351e5aa874f3fa45c57d81fc1f7266f47cf7f300005bd2e0a5de56c647",
+    "src/setup/lock-record-checks.mjs": "0252f2cf1ff5616705d01acd1b1fa7ca0d25843cb628cdaaa309f35288549a73",
     "src/setup/model-pool-checks.mjs": "4c115569d3644a395a09b0f6ea1d87205c791b18ccae021becd31a78bb360c6f",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
     "src/setup/registrations.mjs": "8888eb9d4a764e9ef7602aa30368665cb68df874631bb2bbdcfaf904815c51c5",
-    "src/setup/run-supervisor-checks.mjs": "93789ede921ca39d33fa7883fd8ae0daff5b6c120581534446c761b5e2fa0a06",
+    "src/setup/run-supervisor-checks.mjs": "fc16097f8196e704000475883ddba4f3bf34ecb466e014fef10ee0576eac0340",
     "src/setup/seat-binding-checks.mjs": "b1efc2d1711dc21203c6482bf47ff4dfa7f8aa6f49b0d88a99a1479319a5f36f",
     "src/setup/seat-binding-conversion.mjs": "9f1b782a5a4a9059ad82fda27b79c6cc5ffaf057f6f1347e79ae5d74b49c00a1",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
@@ -883,7 +883,7 @@
     "src/state/graph-harness.mjs": "6d93e939f7d13ec8f24957eca8b02bc66aad00573c4369175bcb426915ac789b",
     "src/state/graph-metrics.mjs": "ce0c9112f0a22ae408a442773fc91628eb225ef103bc9024a16ce926c1f0f167",
     "src/state/handoff.mjs": "352dbce5f607f2ad478bf0119fbf875bf640142f3438a745ebcead4804dd4d38",
-    "src/state/hot-lock.mjs": "e2d2749a182772094c263a82680939922ab111c6e2c0f03b888fb394dfd6d71a",
+    "src/state/hot-lock.mjs": "38cfa526908b2319281fa44a4ea89f8d399d319840c6840919101df62bb14727",
     "src/state/impact.mjs": "5baf4a1efb7cb4e7b7b8c307e16a9671b925efe103246515b49f29710a8ddb4c",
     "src/state/knowledge-registry.mjs": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
     "src/state/legacy-event-git-adapter.mjs": "8b65b55aacf9a3b321e51847e4c5f8c4829c0d2fd6f5de2ad52046c0ac1bf7e9",
@@ -2078,51 +2078,75 @@
     },
     {
       "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 51,
+      "line": 56,
       "spawn": "Command::new",
       "binary": "/bin/bwrap",
       "class": "argv-runner",
-      "resolvedAt": "packages/process/rust/src/containment/linux.rs:29"
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:34"
     },
     {
       "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 51,
+      "line": 56,
       "spawn": "Command::new",
       "binary": "/usr/bin/bwrap",
       "class": "argv-runner",
-      "resolvedAt": "packages/process/rust/src/containment/linux.rs:29"
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:34"
     },
     {
       "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 51,
+      "line": 56,
       "spawn": "Command::new",
       "binary": "/usr/local/bin/bwrap",
       "class": "argv-runner",
-      "resolvedAt": "packages/process/rust/src/containment/linux.rs:29"
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:34"
     },
     {
       "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 129,
+      "line": 134,
       "spawn": "Command::new",
       "binary": "/bin/bwrap",
       "class": "argv-runner",
-      "resolvedAt": "packages/process/rust/src/containment/linux.rs:30"
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:35"
     },
     {
       "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 129,
+      "line": 134,
       "spawn": "Command::new",
       "binary": "/usr/bin/bwrap",
       "class": "argv-runner",
-      "resolvedAt": "packages/process/rust/src/containment/linux.rs:30"
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:35"
     },
     {
       "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 129,
+      "line": 134,
       "spawn": "Command::new",
       "binary": "/usr/local/bin/bwrap",
       "class": "argv-runner",
-      "resolvedAt": "packages/process/rust/src/containment/linux.rs:30"
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:35"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 226,
+      "spawn": "Command::new",
+      "binary": "/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:35"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 226,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:35"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 226,
+      "spawn": "Command::new",
+      "binary": "/usr/local/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:35"
     },
     {
       "path": "packages/process/rust/tests/containment_bwrap.rs",
@@ -2155,14 +2179,14 @@
     {
       "path": "packages/run-supervisor/rust/src/supervise.rs",
       "line": 415,
-      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:129",
+      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:226",
       "binary": "(parsed configuration (envelope[\"containment\"][\"bwrapPrefix\"].as_array().and_then(|))",
       "class": "configured-binary"
     },
     {
       "path": "packages/run-supervisor/rust/src/supervise/unix.rs",
       "line": 184,
-      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:129",
+      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:226",
       "binary": "(parsed configuration (envelope[\"containment\"][\"bwrapPrefix\"].as_array().map(|items))",
       "class": "configured-binary"
     },
@@ -2493,13 +2517,6 @@
         "scripts/git/e3-bench.mjs:443"
       ],
       "class": "sandbox-door"
-    },
-    {
-      "path": "scripts/run-tests.mjs",
-      "line": 582,
-      "spawn": "hostSpeaksLockProtocol -> scripts/run-tests.mjs:595",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
     },
     {
       "path": "src/event-store/native.mjs",

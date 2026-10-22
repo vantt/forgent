@@ -1,6 +1,6 @@
 # HARDEN T1 phase 4 — hot-mutex fixes, state-root copies, leaf fixes, size debt (phase lead report)
 
-Branch `harden/t1-p04-hot-mutex-leaf-fixes`. **Untested: edits are complete and committed, nothing was built or run during OPC's build window** (only `node --check` on every changed `.mjs` and `rustfmt --check` parse of every changed `.rs`, which found no syntax error). Verification, the corpus rerun, the regenerated census and baseline, and the measured costs below are pending.
+Branch `harden/t1-p04-hot-mutex-leaf-fixes`. **Verified after the build window (see "Verification results" at the end); the first commit was untested** (only `node --check` on every changed `.mjs` and `rustfmt --check` parse of every changed `.rs`, which found no syntax error). Verification, the corpus rerun, the regenerated census and baseline, and the measured costs below are pending.
 
 ## What changed
 
@@ -53,14 +53,14 @@ The phase estimated Node -4 / Rust -25 / tests -320. Node and Rust run over beca
 
 Added 3 cases (two Windows hot-lock, one Windows `settle` unit test), merged 3 gateway cases into 1, retired 8 cases + 1 file (1 case `/bytes equal/` line, `hot-lock-known-exec-sites` whole). Host spawns removed: the `git archive` + tar + 3 old-lock processes of `hot-lock-known-exec-sites` (120 s budget), the python zombie fixture, a gateway zombie child. New spawns on Linux: none. Run times before/after: pending the build window.
 
-## Pending after "resume builds"
+## Verification results (after "resume builds")
 
-1. `cargo test -p fgos-holder-lock -p fgos-process -p fgos-convention -p fgos-host-runtime -p fgos-node-addon`, then `cargo test --workspace` and `cargo clippy --workspace --all-targets -- -D warnings` (CARGO_TARGET_DIR `/home/vantt/projects/forgent-worktrees/harden-t1-p04-target`). The addon must be rebuilt: the Node `canonicalJson` now sends text.
-2. The one-file Node runs of the phase's Verification list; phase 1's S-F1, RT-M5, T0-R2, RT-M11 must turn green and P-N8, P-N9 and the T0-R1 refusals must stay green.
-3. Corpus byte-equality: the script in `guide-261021-2213-harden-t0-owner-machine-landing.md` over `/home/vantt/projects/forgent/.fgos`, expecting `canonical-corpus: all equal`.
-4. Measured canonical-JSON 200-key p50 against T0's 384 µs and the seat's 81 µs (expected about 48 µs).
-5. Regenerate `test/suite-baseline.json` and `packages/git/contracts/mutation-census.v1.json` (generated-artifact rule; not touched yet).
-6. The greps of the phase's Verification section.
+- `cargo test -p fgos-holder-lock -p fgos-process -p fgos-convention -p fgos-host-runtime -p fgos-node-addon --no-fail-fast`: green (`containment_bwrap` 11 passed, including `a_refused_mount_is_named_in_the_containment_error`). `cargo test --workspace --no-fail-fast`: exit 0, 218 `test result: ok`, no FAILED. `cargo clippy --workspace --all-targets -- -D warnings`: clean. Cargo target `/home/vantt/projects/forgent-worktrees/harden-t1-p04-target`. The Windows-only code (`borrow_windows.rs` `settle` and its test, the two Windows hot-lock cases) and the macOS `cfg` branch of `flock.rs` were not compiled or run on this Linux machine.
+- Node one-file runs (env from `ensureGitAddon`, `env -u CLAUDE_CODE_SESSION_ID`): `native-load` (T0-R2 and T0-R1 guard plus the new `Date` assertion), `hot-lock-tx` (P-N8, P-N9), `hot-lock-contract`, `hot-lock-guard`, `dispatch-r9-performance-cache` (RT-M5): 35 pass, 0 fail (36 tests, 1 skipped). `hot-lock-multiprocess` (S-F1), `gateway-control`, `stop-processes-inside`, `run-lock-identity`, `process-facts-vectors`: 29 pass, 0 fail, 1 skipped. `architecture`, `fgos-lock-fence`, `lock-record-checks`, `friction-client`, `session`, `windows-hot-lock` (skipped off win32): 65 pass, 0 fail, 5 skipped. Also `test-proof-inventory` 32/32 and `one-door` + `e3-census` 9/9. One failure on the first run was mine (the contract test listed the new error out of sort order); fixed in a second commit.
+- Corpus byte-equality over `/home/vantt/projects/forgent/.fgos`: `{"files":14616,"docs":25291,"subtrees":4544622,"mismatches":0,"skipped":9,"bad":[]}` then `canonical-corpus: all equal`.
+- Canonical JSON, 200-key flat object, p50: **45.5 µs** with the release addon (11.9 µs `JSON.stringify` with the replacer + 33.1 µs native), against T0's 384 µs and the seat's 81 µs. With the debug addon the staged test build uses, the same call is 287 µs (native 275 µs), so only the release number compares. A heavier 200-key object with nested members measures 948 µs on the debug addon.
+- Regenerated on this branch only: `packages/git/contracts/mutation-census.v1.json` (0 undeclared sites) and `test/suite-baseline.json` (601 files / 8202 calls -> 600 / 8187, 59 known clones).
+- Verification greps: no `XDG_STATE_HOME` or `.local/state` outside the state-root module; the `rfind(')')` hits are `facts.rs` and `proc_tree.rs` only. The `path.join(x, '.fgos')` grep still lists four lines in `session.mjs` (`:88, :119, :147, :320`): they join a repo or worktree onto the `.fgos` symlink name, not a derivation of the state directory; the phase's `session.mjs:64` target was already on `fgosDirFromRoot`.
 
 ## Notes for the big lead
 
