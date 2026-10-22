@@ -304,7 +304,6 @@ function generateInProcessExtensionSource() {
   return `// @ts-nocheck
 // fgos-hooks.ts — managed fgOS guard extension
 import { spawnSync } from 'node:child_process';
-import { mailboxHookTimeoutSec } from './mailbox-limits.mjs';
 import path from 'node:path';
 
 export default function (api: any) {
@@ -351,32 +350,44 @@ export default function (api: any) {
 `;
 }
 
-export function installOmpHook(repoRoot) {
-  const extPath = path.join(repoRoot, '.omp', 'extensions', 'fgos-hooks.ts');
+/** The in-process extension of OMP or Pi (`dir` is `.omp` or `.pi`): one generated file. */
+function installExtension(repoRoot, dir) {
+  const extPath = path.join(repoRoot, dir, 'extensions', 'fgos-hooks.ts');
   mkdirSync(path.dirname(extPath), { recursive: true });
   writeFileSync(extPath, generateInProcessExtensionSource(), 'utf8');
   return { wired: true, skippedExisting: null };
 }
 
-export function checkOmpHook(cwd) {
-  const ompDir = path.join(cwd, '.omp');
-  const extPath = path.join(ompDir, 'extensions', 'fgos-hooks.ts');
-  if (!existsSync(ompDir) && !existsSync(extPath)) {
-    return { passed: true, message: 'OMP hooks not required (no .omp/ directory)' };
+/**
+ * The extension is ours only byte for byte: the file the CLI loads must be the
+ * one the installer generates, so an edited or stale file (one that no longer
+ * loads) fails here instead of passing on its guard names.
+ */
+function checkExtension(cwd, dir, label) {
+  const extPath = path.join(cwd, dir, 'extensions', 'fgos-hooks.ts');
+  const shown = `${dir}/extensions/fgos-hooks.ts`;
+  if (!existsSync(path.join(cwd, dir)) && !existsSync(extPath)) {
+    return { passed: true, message: `${label} hooks not required (no ${dir}/ directory)` };
   }
-
   if (!existsSync(extPath)) {
-    return { passed: false, message: '.omp/extensions/fgos-hooks.ts not found — run fgos doctor --fix' };
+    return { passed: false, message: `${shown} not found — run fgos doctor --fix` };
   }
-  const content = readFileSync(extPath, 'utf8');
-  if (!content.includes('dispatch-decide') || !content.includes('decision-question')) {
-    return { passed: false, message: '.omp/extensions/fgos-hooks.ts is missing guard handlers — run fgos doctor --fix' };
+  if (readFileSync(extPath, 'utf8') !== generateInProcessExtensionSource()) {
+    return { passed: false, message: `${shown} differs from the generated extension — run fgos doctor --fix` };
   }
   const probe = isShimRunnable(cwd);
   if (!probe.runnable) {
-    return { passed: false, message: `OMP extension present but local shim not runnable (${probe.reason})` };
+    return { passed: false, message: `${label} extension present but local shim not runnable (${probe.reason})` };
   }
-  return { passed: true, message: 'OMP extension hook wired and verified runnable' };
+  return { passed: true, message: `${label} extension hook wired and verified runnable` };
+}
+
+export function installOmpHook(repoRoot) {
+  return installExtension(repoRoot, '.omp');
+}
+
+export function checkOmpHook(cwd) {
+  return checkExtension(cwd, '.omp', 'OMP');
 }
 
 // ---------------------------------------------------------------------------
@@ -384,31 +395,11 @@ export function checkOmpHook(cwd) {
 // ---------------------------------------------------------------------------
 
 export function installPiHook(repoRoot) {
-  const extPath = path.join(repoRoot, '.pi', 'extensions', 'fgos-hooks.ts');
-  mkdirSync(path.dirname(extPath), { recursive: true });
-  writeFileSync(extPath, generateInProcessExtensionSource(), 'utf8');
-  return { wired: true, skippedExisting: null };
+  return installExtension(repoRoot, '.pi');
 }
 
 export function checkPiHook(cwd) {
-  const piDir = path.join(cwd, '.pi');
-  const extPath = path.join(piDir, 'extensions', 'fgos-hooks.ts');
-  if (!existsSync(piDir) && !existsSync(extPath)) {
-    return { passed: true, message: 'Pi hooks not required (no .pi/ directory)' };
-  }
-
-  if (!existsSync(extPath)) {
-    return { passed: false, message: '.pi/extensions/fgos-hooks.ts not found — run fgos doctor --fix' };
-  }
-  const content = readFileSync(extPath, 'utf8');
-  if (!content.includes('dispatch-decide') || !content.includes('decision-question')) {
-    return { passed: false, message: '.pi/extensions/fgos-hooks.ts is missing guard handlers — run fgos doctor --fix' };
-  }
-  const probe = isShimRunnable(cwd);
-  if (!probe.runnable) {
-    return { passed: false, message: `Pi extension present but local shim not runnable (${probe.reason})` };
-  }
-  return { passed: true, message: 'Pi extension hook wired and verified runnable' };
+  return checkExtension(cwd, '.pi', 'Pi');
 }
 
 // ---------------------------------------------------------------------------

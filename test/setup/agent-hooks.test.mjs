@@ -260,52 +260,36 @@ test('codex and agy hook commands run from a directory other than the project, e
 // 4. OMP
 // ---------------------------------------------------------------------------
 
-test('installOmpHook writes .omp/extensions/fgos-hooks.ts and checkOmpHook probes cleanly', () => {
-  const repoRoot = mkTempDir('agent-hooks-omp-');
+// OMP and Pi load the same generated extension in process; a file that does not
+// load drops both guards, so the owning proof imports what the installer wrote.
+for (const [cli, install, check] of [['omp', installOmpHook, checkOmpHook], ['pi', installPiHook, checkPiHook]]) {
+  test(`the ${cli} extension the installer writes loads, and check passes only on the exact generated file`, async () => {
+    const repoRoot = mkTempDir(`agent-hooks-${cli}-`);
+    assert.equal(check(repoRoot).passed, true, 'no extension directory: not required');
 
-  assert.equal(checkOmpHook(repoRoot).passed, true);
+    install(repoRoot);
+    const extFile = path.join(repoRoot, `.${cli}`, 'extensions', 'fgos-hooks.ts');
+    const content = fs.readFileSync(extFile, 'utf8');
+    for (const [, spec] of content.matchAll(/^import .* from '([^']+)';$/gm)) {
+      assert.match(spec, /^node:/, `the extension imports only node builtins, not ${spec}`);
+    }
+    const mod = await import(`${extFile}?load=${Date.now()}`);
+    assert.equal(typeof mod.default, 'function', 'the extension loads and exports its entry');
+    assert.match(content, /hook', 'dispatch-decide'/);
+    assert.match(content, /hook', 'decision-question'/);
 
-  installOmpHook(repoRoot);
-  const extFile = path.join(repoRoot, '.omp', 'extensions', 'fgos-hooks.ts');
-  assert.equal(fs.existsSync(extFile), true);
-  const content = fs.readFileSync(extFile, 'utf8');
-  assert.match(content, /dispatch-decide/);
-  assert.match(content, /decision-question/);
-  assert.match(content, /api\.on\('tool_call'/);
+    assert.equal(check(repoRoot).passed, false, 'without a runnable shim the check fails');
+    mockRunnableShim(repoRoot);
+    assert.equal(check(repoRoot).passed, true);
 
-  // Without shim, check fails
-  assert.equal(checkOmpHook(repoRoot).passed, false);
+    fs.writeFileSync(extFile, `${content}\n// edited\n`);
+    const drift = check(repoRoot);
+    assert.equal(drift.passed, false, 'a file that differs from the generated one fails, even with both guard names in it');
+    assert.match(drift.message, /doctor --fix/);
 
-  mockRunnableShim(repoRoot);
-  assert.equal(checkOmpHook(repoRoot).passed, true);
-
-  fs.rmSync(repoRoot, { recursive: true, force: true });
-});
-
-// ---------------------------------------------------------------------------
-// 5. Pi
-// ---------------------------------------------------------------------------
-
-test('installPiHook writes .pi/extensions/fgos-hooks.ts and checkPiHook probes cleanly', () => {
-  const repoRoot = mkTempDir('agent-hooks-pi-');
-
-  assert.equal(checkPiHook(repoRoot).passed, true);
-
-  installPiHook(repoRoot);
-  const extFile = path.join(repoRoot, '.pi', 'extensions', 'fgos-hooks.ts');
-  assert.equal(fs.existsSync(extFile), true);
-  const content = fs.readFileSync(extFile, 'utf8');
-  assert.match(content, /dispatch-decide/);
-  assert.match(content, /decision-question/);
-
-  // Without shim, check fails
-  assert.equal(checkPiHook(repoRoot).passed, false);
-
-  mockRunnableShim(repoRoot);
-  assert.equal(checkPiHook(repoRoot).passed, true);
-
-  fs.rmSync(repoRoot, { recursive: true, force: true });
-});
+    fs.rmSync(repoRoot, { recursive: true, force: true });
+  });
+}
 
 // ---------------------------------------------------------------------------
 // 6. Aggregate installer and checker
