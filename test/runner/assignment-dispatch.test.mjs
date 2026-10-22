@@ -1,4 +1,6 @@
 import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -20,6 +22,11 @@ import { initStore, addWork, listWork, settleClaim } from '../../src/state/store
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 import { inspectProviderCapacity, providerCapacityStatePaths, PROVIDER_CAPACITY_STATE_CONTRACT } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { normalizeRunResultV2 } from '../../src/runner/dispatch/run-result.mjs';
+
+// The store directory of a fixture repository: the Event Store opens from `<repo>/.fgos`.
+function storeOf(root) {
+  return path.join(root, '.fgos');
+}
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-asgn-dispatch-test-'));
@@ -376,7 +383,7 @@ test('compileDispatchPlan and executeAssignment respect cliOverride.preferExecut
 });
 
 test('settleClaim atomically applies patch before releasing runtime claim (Finding P2 fix)', () => {
-  const dir = path.join(mkTempDir(), '.fgos');
+  const dir = initializeWorkRepository(mkTempDir());
   initStore(dir);
   addWork(dir, { id: 'tsk-settle-patch', title: 'Test Settle Patch', domain: 'coding', kind: 'feature', status: 'todo', workflowStep: 'executing', risk: 'standard', priority: 0, verify: 'true', deps: [], refs: [] });
 
@@ -399,7 +406,7 @@ test('settleClaim atomically applies patch before releasing runtime claim (Findi
 });
 
 test('settleClaim({ patch }) runs full editWork validation suite (Finding P2 fix)', () => {
-  const dir = path.join(mkTempDir(), '.fgos');
+  const dir = initializeWorkRepository(mkTempDir());
   initStore(dir);
   addWork(dir, { id: 'tsk-a', title: 'Task A', domain: 'coding', kind: 'feature', status: 'doing', workflowStep: 'executing', risk: 'standard', priority: 0, verify: 'true', deps: [], refs: [] });
 
@@ -423,14 +430,15 @@ test('read-only assignment whose checkout gains a commit during the run is accep
   const tempDir = mkTempDir();
   execSync('git init', { cwd: tempDir, stdio: 'ignore' });
   execSync('git config user.name "Test" && git config user.email "test@test.local"', { cwd: tempDir, stdio: 'ignore' });
-  initStore(tempDir);
+  activateGitFixture(tempDir);
+  initStore(storeOf(tempDir));
 
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-commit-readonly');
   fs.mkdirSync(docsDir, { recursive: true });
   fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: tiny\nPlan.\n');
   execSync(`git add ${docsDir} && git commit -m "add plan"`, { cwd: tempDir, stdio: 'ignore' });
 
-  addWork(tempDir, {
+  addWork(storeOf(tempDir), {
     id: 'tsk-commit-readonly',
     title: 'Test read-only commit rollback',
     workflowStep: 'planning',
@@ -446,7 +454,7 @@ test('read-only assignment whose checkout gains a commit during the run is accep
   });
 
   const assignment = buildAssignment({
-    work: listWork(tempDir).work['tsk-commit-readonly'],
+    work: listWork(storeOf(tempDir)).work['tsk-commit-readonly'],
     stage: 'planning',
     operation: 'validate-plan',
   });

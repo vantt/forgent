@@ -1,5 +1,7 @@
 import { bindable } from '../helpers/work-seat-config.mjs';
 import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -70,8 +72,9 @@ function mkTempGitRepo() {
   execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
   const headCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  activateGitFixture(repoRoot);
   const fgosDir = path.join(repoRoot, '.fgos');
-  fs.mkdirSync(fgosDir);
+  fs.mkdirSync(fgosDir, { recursive: true });
   return { repoRoot, fgosDir, headCommit };
 }
 
@@ -2089,7 +2092,7 @@ test('resolveExecutorCommand result carries the providerModel-derived family, no
 });
 
 test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" executor is not registered and fgosDir is given', () => {
-  const dir = mkTempDir();
+  const dir = initializeWorkRepository(mkTempDir());
   initStore(dir);
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
@@ -2104,7 +2107,7 @@ test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" execut
 });
 
 test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" executor is registered but not present on this machine', () => {
-  const dir = mkTempDir();
+  const dir = initializeWorkRepository(mkTempDir());
   initStore(dir);
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
@@ -2119,7 +2122,7 @@ test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" execut
 });
 
 test('resolveExecutorCommand resolves a metadata-only kind:"cli" executor straight through to the global executor for the command (executors.<tier> is retired, no intermediate stop)', () => {
-  const dir = mkTempDir();
+  const dir = initializeWorkRepository(mkTempDir());
   initStore(dir);
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
@@ -2149,7 +2152,7 @@ test('resolveExecutorCommand skips the fgos-tool-query presence check entirely w
 
 for (const kind of ['mcp', 'skill', 'http', 'binary']) {
   test(`resolveExecutorCommand throws a RunnerConfigError when a kind:"${kind}" executor is not registered and fgosDir is given (D13)`, () => {
-    const dir = mkTempDir();
+    const dir = initializeWorkRepository(mkTempDir());
     initStore(dir);
     const cfg = {
       executor: { command: '/global/executor', args: ['{prompt}'] },
@@ -2164,7 +2167,7 @@ for (const kind of ['mcp', 'skill', 'http', 'binary']) {
   });
 
   test(`resolveExecutorCommand throws a RunnerConfigError when a kind:"${kind}" executor is registered but not present on this machine (D13)`, () => {
-    const dir = mkTempDir();
+    const dir = initializeWorkRepository(mkTempDir());
     initStore(dir);
     const scanTarget = ['mcp', 'skill'].includes(kind) ? mkTempDir() : undefined;
     const cfg = {
@@ -2194,7 +2197,7 @@ for (const kind of ['mcp', 'skill', 'http', 'binary']) {
 }
 
 test('resolveExecutorCommand still skips both the presence check and the cross-provider check for a kind:"task" executor, even unregistered and non-Claude-shaped (D13: kind !== "task" excludes task by construction)', () => {
-  const dir = mkTempDir();
+  const dir = initializeWorkRepository(mkTempDir());
   initStore(dir);
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
@@ -2243,7 +2246,7 @@ test('resolveExecutorCommand resolves a kind:"task" executor naming only agentTy
 
 test('resolveExecutorCommand resolves an agentType executor identically whether fgosDir is given (cli-dispatch/spawnWorker-style) or omitted (task-dispatch/executeExecutorCli-style)', () => {
   const cfg = agentTypeCfg();
-  const dir = mkTempDir();
+  const dir = initializeWorkRepository(mkTempDir());
   initStore(dir);
   const withFgosDir = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'my-agent-executor', fgosDir: dir });
   const withoutFgosDir = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'my-agent-executor' });
@@ -3023,7 +3026,7 @@ test('resolveExecutorCommand with no executors block at all never triggers cross
 });
 
 test('resolveExecutorCommand throws for a non-Claude "cli" executor even when fgosDir is given (cross-provider governance is independent of the retired presence gate, tsk-5tm-1 D1)', () => {
-  const dir = mkTempDir();
+  const dir = initializeWorkRepository(mkTempDir());
   initStore(dir);
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
@@ -4291,7 +4294,7 @@ test('resolveAgentTypeForTaskSpec refuses (returns null) across all 4 unvalidate
 
 test('decideExecutorCli resolves work-item-based (--work) to the same result a positional executorId would, plus the resolved executorId -- explicit executors.<id> override case', async () => {
   const root = mkTempDir();
-  const fgosDir = path.join(root, '.fgos');
+  const fgosDir = initializeWorkRepository(root);
   addWork(fgosDir, {
     id: 'tsk-fanout-candidate',
     title: 'Fanout candidate',
@@ -4318,7 +4321,7 @@ test('decideExecutorCli resolves work-item-based (--work) to the same result a p
 
 test('resolveWorkForDispatch hands dispatch a generic hint, never the Work item', () => {
   const root = mkTempDir();
-  const fgosDir = path.join(root, '.fgos');
+  const fgosDir = initializeWorkRepository(root);
   addWork(fgosDir, { id: 'tsk-hint', title: 'Hint', kind: 'task', status: 'todo', deps: [], risk: 'heavy', refs: ['a.md'], verify: 'npm test', domain: 'coding' });
   const hint = resolveWorkForDispatch({ workId: 'tsk-hint', fgosDir });
   assert.deepEqual(Object.keys(hint).sort(), ['agentType', 'domain', 'rigor', 'workExecutorId']);
@@ -4329,7 +4332,7 @@ test('resolveWorkForDispatch hands dispatch a generic hint, never the Work item'
 
 test('decide --work: an item with its own agentType resolves the same executor and mechanism as one without', async () => {
   const root = mkTempDir();
-  const fgosDir = path.join(root, '.fgos');
+  const fgosDir = initializeWorkRepository(root);
   const base = { kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test' };
   addWork(fgosDir, { id: 'tsk-plain', title: 'Plain', ...base });
   addWork(fgosDir, { id: 'tsk-own-agent', title: 'Own agent', ...base });
@@ -4403,7 +4406,7 @@ test('dispatch doors refuse a Work item instead of ignoring it', async () => {
 
 test('decideExecutorCli resolves work-item-based (--work) via capabilities.fgos-coding-implement.prefer -- the real tsk-34n/D3 migration shape (no literal executors.fgos-coding-implement entry, only agy declaring "for")', async () => {
   const root = mkTempDir();
-  const fgosDir = path.join(root, '.fgos');
+  const fgosDir = initializeWorkRepository(root);
   addWork(fgosDir, {
     id: 'tsk-fanout-prefer-candidate',
     title: 'Fanout candidate resolved via prefer',
@@ -4436,7 +4439,7 @@ test('decideExecutorCli resolves work-item-based (--work) via capabilities.fgos-
 
 test('decideExecutorCli resolves work-item-based (--work) to "in-process" by default when the resolved executorId has NO explicit cfg.executors entry -- the real, common fgos-fanout case (D4 fix): a coding-domain work item is a same-provider, soul-needing rootTask (0026 rule 2), never the generic "no executor -> out-of-process" fallback a NAMED executorId lookup keeps unchanged', async () => {
   const root = mkTempDir();
-  const fgosDir = path.join(root, '.fgos');
+  const fgosDir = initializeWorkRepository(root);
   addWork(fgosDir, {
     id: 'tsk-fanout-unregistered',
     title: 'Fanout candidate with no executors.<id> override',
@@ -4471,7 +4474,7 @@ test('decideExecutorCli resolves work-item-based (--work) to "in-process" by def
 
 test('decideExecutorCli resolves work-item-based (--work) to "out-of-process" when the caller has no live Task access, even with no explicit cfg.executors entry -- never claims in-process dishonestly', async () => {
   const root = mkTempDir();
-  const fgosDir = path.join(root, '.fgos');
+  const fgosDir = initializeWorkRepository(root);
   addWork(fgosDir, {
     id: 'tsk-fanout-no-live-access',
     title: 'Fanout candidate, caller declares no live Task access',
@@ -4493,7 +4496,7 @@ test('decideExecutorCli resolves work-item-based (--work) to "out-of-process" wh
 
 test('decideExecutorCli throws a RunnerConfigError when --work names a work item that does not exist -- never silently "unavailable" (a typo/stale id is a real usage error, unlike an unconfigured purpose)', async () => {
   const root = mkTempDir();
-  fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
+  initializeWorkRepository(root);
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
@@ -4507,7 +4510,7 @@ test('decideExecutorCli throws a RunnerConfigError when --work names a work item
 
 test('a positional executorId still wins over --work when both are somehow passed, same precedence --for already has', async () => {
   const root = mkTempDir();
-  const fgosDir = path.join(root, '.fgos');
+  const fgosDir = initializeWorkRepository(root);
   addWork(fgosDir, {
     id: 'tsk-fanout-candidate-2',
     title: 'Fanout candidate 2',

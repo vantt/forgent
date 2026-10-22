@@ -12,6 +12,7 @@ import { confinedRunnerConfig } from '../runner/loop-worker-fixture.helper.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
+import { readRawEvents } from '../../src/state/store.mjs';
 
 // Workers run confined (bwrap) as Unit runs; the runner child inherits this
 // file-local backend registry through its environment.
@@ -114,42 +115,9 @@ function envelopeData(stdout) {
   return JSON.parse(stdout).data;
 }
 
-// Tầng A/T2/T3 (TA-D2/TA-D7/TA-D12): new events land in a per-writer file
-// under `.fgos/events/<writer-id>-<openTs>.jsonl` (one per CLI subprocess
-// invocation here), not baseline-0's `.fgos/events.jsonl` alone (still read
-// too — legacy content lives there, zero rewrite). This file's own "never
-// imports src/runner or src/state directly" rule (top of file) means the
-// TA-D7 total order `(ts, file, seq)` is re-derived here — same order
-// production replay produces, read as an outside observer would.
+// The whole Work history, read through the Event Store (the only place it lives).
 function events(cwd) {
-  const tagged = [];
-  const logPath = path.join(cwd, '.fgos', 'events.jsonl');
-  if (fs.existsSync(logPath)) {
-    for (const line of fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean)) {
-      tagged.push({ ev: JSON.parse(line), file: '' });
-    }
-  }
-  const eventsDir = path.join(cwd, '.fgos', 'events');
-  let names = [];
-  try {
-    names = fs
-      .readdirSync(eventsDir, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
-      .map((entry) => entry.name);
-  } catch {
-    names = [];
-  }
-  for (const name of names) {
-    for (const line of fs.readFileSync(path.join(eventsDir, name), 'utf8').split('\n').filter(Boolean)) {
-      tagged.push({ ev: JSON.parse(line), file: name });
-    }
-  }
-  tagged.sort((a, b) => {
-    if (a.ev.ts !== b.ev.ts) return a.ev.ts < b.ev.ts ? -1 : 1;
-    if (a.file !== b.file) return a.file < b.file ? -1 : 1;
-    return (a.ev.seq ?? 0) - (b.ev.seq ?? 0);
-  });
-  return tagged.map(({ ev }) => ev);
+  return readRawEvents(path.join(cwd, '.fgos'));
 }
 
 function writeRunnerConfig(repoRoot, executorScript) {
@@ -215,7 +183,8 @@ function currentHead(repoRoot) {
  * `return`). */
 function commitPending(repoRoot, message) {
   gitAt(repoRoot, ['add', '-A']);
-  gitAt(repoRoot, ['commit', '-q', '-m', message]);
+  // State no longer lands in git, so a step may leave nothing to fold: the commit still marks the step's place in history.
+  gitAt(repoRoot, ['commit', '-q', '--allow-empty', '-m', message]);
 }
 
 function branchExists(repoRoot, branch) {
