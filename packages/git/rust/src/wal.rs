@@ -1439,10 +1439,8 @@ impl<F: FileSystem> Wal<F> {
     pub fn inspect(&self, id: &str) -> WalResult<Chain> {
         let dir = self.operation(id, false)?;
         let mut names = Vec::new();
-        for (scanned, e) in fs::read_dir(dir.path())?.enumerate() {
-            if scanned >= MAX_RECORDS * 2 {
-                return Err(corrupt("directory scan bound"));
-            }
+        let mut scanned = 0;
+        for e in fs::read_dir(dir.path())? {
             let e = e?;
             let name = e
                 .file_name()
@@ -1450,6 +1448,10 @@ impl<F: FileSystem> Wal<F> {
                 .map_err(|_| corrupt("non UTF-8 record name"))?;
             if is_durable_temporary(&name) {
                 continue;
+            }
+            scanned += 1;
+            if scanned > MAX_RECORDS * 2 {
+                return Err(corrupt("directory scan bound"));
             }
             if names.len() >= MAX_RECORDS {
                 return Err(corrupt("record bound"));
@@ -2329,10 +2331,7 @@ impl<F: FileSystem> Wal<F> {
         if dir.path().join(record_name(0)).try_exists()? {
             return Ok(true);
         }
-        for (n, entry) in fs::read_dir(dir.path())?.enumerate() {
-            if n >= MAX_RECORDS * 2 {
-                return Err(corrupt("pre-intent scan bound"));
-            }
+        for entry in fs::read_dir(dir.path())? {
             let name = entry?.file_name().to_string_lossy().into_owned();
             if !is_durable_temporary(&name) {
                 return Err(corrupt("unknown pre-intent artifact"));
@@ -2420,12 +2419,18 @@ impl<F: FileSystem> Wal<F> {
                             !self.has_intent(&operation)? || self.inspect(&id)?.outcome().is_some();
                         let mut bytes = metadata.len();
                         let mut incomplete = false;
-                        for (n, file) in fs::read_dir(operation.path())?.enumerate() {
-                            if n >= MAX_RECORDS * 2 {
+                        let mut counted = 0;
+                        for file in fs::read_dir(operation.path())? {
+                            let file = file?;
+                            if is_durable_temporary(&file.file_name().to_string_lossy()) {
+                                continue;
+                            }
+                            counted += 1;
+                            if counted > MAX_RECORDS * 2 {
                                 incomplete = true;
                                 break;
                             }
-                            bytes += file?.metadata()?.len();
+                            bytes += file.metadata()?.len();
                         }
                         Ok((terminal, bytes, metadata.modified().ok(), incomplete))
                     };
