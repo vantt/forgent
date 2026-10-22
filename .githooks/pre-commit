@@ -28,6 +28,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 import { checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
+import { runLockRouteSync, ROUTE_CALL_TIMEOUT_MS } from '../src/holder-lock/driver.mjs';
 import { readBeacon, judgeBeacon, writeBeacon, DEFAULT_BEACON_WINDOW_MS } from '../src/runner/main-checkout-activity.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -105,17 +106,13 @@ function resolveTtlMs() {
 }
 
 // The hook is a cold client of the activated host: the lock and the writer
-// identity are answered by `fgos lock-status` and `fgos identity` of the
-// binary `resolveActiveHostBin` finds, never by code loaded from this
-// checkout. The host refuses every legacy verb under its recursion guard, and
-// a commit made from a shell under a `fgos` verb carries it, so the child
-// runs without it (and without the invocation record path, so a read-only
-// call writes no record).
+// identity are answered by native routes of the binary `resolveActiveHostBin`
+// finds (`fgos internal lock-fd --shared-try`, `fgos identity`), never by lock
+// code loaded from this checkout (the in-process door refuses there).
 const HOST_CALL_TIMEOUT_MS = 20_000;
 
-function hostData(bin, args, cwd) {
+function identityData(bin, args, cwd) {
   const env = { ...process.env };
-  delete env.FGOS_RUST_HOST_RECURSION_GUARD;
   delete env.FGOS_INVOCATION_RECORD_PATH;
   const stdout = execFileSync(bin, args, {
     env, cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: HOST_CALL_TIMEOUT_MS, killSignal: 'SIGKILL', maxBuffer: 1024 * 1024, windowsHide: true,
@@ -137,12 +134,14 @@ function hostData(bin, args, cwd) {
 //     alone would refuse it.
 //   - 'held': another process holds the mutex: refuse.
 //   - 'free': nobody holds it: an ordinary commit.
-// `fgos lock-status --lock main-checkout` is a probe (a shared, non-blocking
-// try on a fresh description), so it never waits on the lock. Without a host
-// binary no fgOS process can hold the mutex either (every holder runs inside
-// a release), so the commit proceeds with a warning; any other failure
+// The probe is `fgos internal lock-fd --shared-try` on a fresh description of
+// the lock file: one non-blocking shared try, so it never waits on the lock
+// and never obstructs a holder; it is a native route (a process boundary the
+// hook cannot cross in process), a millisecond, not a Node start. Without a
+// host binary no fgOS process can hold the mutex either (every holder runs
+// inside a release), so the commit proceeds with a warning; any other failure
 // refuses (fail-closed).
-function mainLockVerdict(fgosDir, repoRoot, bin) {
+function mainLockVerdict(fgosDir, bin) {
   const lockPath = resolveLock('main-checkout', { fgosDir }).v3Path;
   if (process.env[LOCK_FD_ENV]) {
     try {
@@ -155,12 +154,21 @@ function mainLockVerdict(fgosDir, repoRoot, bin) {
     process.stderr.write('warning: the main-checkout lock could not be checked (no fgos host binary found); continuing.\n');
     return { kind: 'free' };
   }
+  let fd;
   try {
-    const { mainCheckout } = hostData(bin, ['lock-status', '--json', '--lock', 'main-checkout'], repoRoot);
-    if (mainCheckout?.outcome === 'free' || mainCheckout?.outcome === 'held') return { kind: mainCheckout.outcome };
-    return { kind: 'error', message: `lock-status answered ${JSON.stringify(mainCheckout?.outcome)}` };
+    fd = fs.openSync(lockPath, fs.constants.O_RDWR);
+  } catch (err) {
+    // A lock file that does not exist was never taken: nobody holds it.
+    return err?.code === 'ENOENT' ? { kind: 'free' } : { kind: 'error', message: err?.message ?? String(err) };
+  }
+  try {
+    const { result, detail } = runLockRouteSync({ bin, args: ['--shared-try'], fd, timeoutMs: ROUTE_CALL_TIMEOUT_MS });
+    if (result === 'free' || result === 'held') return { kind: result };
+    return { kind: 'error', message: `the lock route answered ${JSON.stringify(result)}${detail ? `: ${detail}` : ''}` };
   } catch (err) {
     return { kind: 'error', message: err?.message ?? String(err) };
+  } finally {
+    fs.closeSync(fd);
   }
 }
 
@@ -550,7 +558,7 @@ async function main() {
 
   const fgosDir = path.join(repoRoot, '.fgos');
   const { bin: hostBin, tried } = resolveActiveHostBin({ fgosDir });
-  const lockVerdict = mainLockVerdict(fgosDir, repoRoot, hostBin);
+  const lockVerdict = mainLockVerdict(fgosDir, hostBin);
   if (lockVerdict.kind === 'borrower') {
     // fgOS's own commit under the mutex it holds: it neither checks nor
     // writes the activity beacon.
@@ -577,7 +585,7 @@ async function main() {
     return;
   }
   try {
-    const { id, source } = hostData(hostBin, ['identity', '--json', '--pid', String(process.pid), '--fgos-dir', fgosDir], repoRoot);
+    const { id, source } = identityData(hostBin, ['identity', '--json', '--pid', String(process.pid), '--fgos-dir', fgosDir], repoRoot);
     if (typeof source !== 'string' || (typeof id !== 'string' && !Number.isInteger(id))) throw new Error(`${hostBin} identity printed an unexpected answer`);
     writer = { id, source };
   } catch (err) {
