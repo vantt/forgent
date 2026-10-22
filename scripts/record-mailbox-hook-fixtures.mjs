@@ -61,8 +61,11 @@
  *       facts the report tables read, and for ladder the per-step verdict.
  *   clean-probe <cli> <probe mode> [--dry]
  *       Deletes one probe run directory, with clean's auth refusal.
- *   probe-hook | probe-sibling | probe-tool | stub
- *       The probe hooks, the tool dump and the dry runs' CLI.
+ *   probe-hook | probe-sibling | probe-tool
+ *       The probe hooks and the tool dump. The dry runs' CLI is
+ *       test/live/mailbox-recorder-stub.mjs, outside the shipped scripts,
+ *       because it runs the configured hook and tool commands through a
+ *       shell.
  *
  * Where: <base> is ${TMPDIR:-/tmp}/fgos-work/mailbox-v3-record, outside every
  * git checkout, so the repository's own hook files (.claude/settings.json,
@@ -111,9 +114,12 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { authRefusalAfterRun, removeRunDir } from './lib/codex-auth-guard.mjs';
 import * as live from './lib/mailbox-live-cli.mjs';
+import { repositoryDirs } from './lib/git-dir-layout.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(SCRIPT), '..');
+/** The dry runs' CLI (a checkout only: `test/` is not shipped). */
+const STUB_SCRIPT = path.join(REPO_ROOT, 'test', 'live', 'mailbox-recorder-stub.mjs');
 const BASE = path.join(process.env.TMPDIR || '/tmp', 'fgos-work', 'mailbox-v3-record');
 const FIXTURES = path.join(REPO_ROOT, 'packages', 'mailbox', 'contracts', 'fixtures', 'hooks');
 /** The account a run uses: `--account <name>`, or `tetnu`. */
@@ -1150,7 +1156,7 @@ async function cmdProbe(cli, mode, flags) {
 }
 
 function runPrint({ cli, ws, env, args, dry }) {
-  const command = dry ? [process.execPath, SCRIPT, 'stub', cli, ...args] : [CLI_BIN[cli], ...args];
+  const command = dry ? [process.execPath, STUB_SCRIPT, cli, ...args] : [CLI_BIN[cli], ...args];
   const child = spawnSync('timeout', ['300', ...command], { cwd: ws, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 64 * 1024 * 1024 });
   fs.writeFileSync(path.join(path.dirname(ws), 'output.txt'), `${child.stdout || ''}\n--- stderr ---\n${child.stderr || ''}`);
   return { exit: child.status };
@@ -1158,8 +1164,9 @@ function runPrint({ cli, ws, env, args, dry }) {
 
 /** The installed host of the main checkout: Terminal Control's internal route is reached through it. */
 function installedHost() {
-  const common = spawnSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: REPO_ROOT, encoding: 'utf8' }).stdout.trim();
-  const host = path.join(path.dirname(common), '.fgos', 'installation', 'bin', 'fgos');
+  const dirs = repositoryDirs(REPO_ROOT);
+  if (!dirs) die(`no repository at ${REPO_ROOT}`);
+  const host = path.join(path.dirname(dirs.commonDir), '.fgos', 'installation', 'bin', 'fgos');
   if (!fs.existsSync(host)) die(`no installed host at ${host}`);
   return host;
 }
@@ -1183,7 +1190,7 @@ async function runInPane({ runDir, ws, env, args, dry }) {
   const group = `mbx-probe${dry ? '-dry' : ''}`;
   const key = `${group}-p2`;
   const bin = dry ? process.execPath : CLI_BIN.claude;
-  const cliArgs = dry ? [SCRIPT, 'stub', 'claude', '--interactive', ...args] : args;
+  const cliArgs = dry ? [STUB_SCRIPT, 'claude', '--interactive', ...args] : args;
   const allocated = tc.allocate({ key, groupKey: group, display: { label: 'mailbox probe P2 (Claude interactive)', role: 'probe', agent: 'claude' }, cwd: ws });
   if (allocated.result !== 'slot') die(`allocate ${key}: ${JSON.stringify(allocated)}`, 3);
   const pairs = Object.entries(env).map(([k, v]) => `${k}=${v}`);
@@ -1201,66 +1208,6 @@ async function runInPane({ runDir, ws, env, args, dry }) {
   const released = tc.release({ key, disposition: 'close' }).result;
   if (dry) spawnSync('herdr', ['--session', DRY_HERDR_SESSION, 'server', 'stop'], { env: { ...process.env, ...herdrEnv }, stdio: 'ignore' });
   return { exit: stopSeen ? 0 : null, pane: { key, paneId: allocated.paneId ?? allocated.slot?.paneId ?? null, launch: launched.result, released, stopSeen, waitedMs: Date.now() - startedMs } };
-}
-
-/**
- * The dry runs' CLI: everything real except the model. It runs the prompt's
- * numbered shell commands in zsh (Claude Code keeps a `cd`; Codex starts each
- * in the session directory), fires the configured hooks through `sh -c` with
- * payloads in the recorded field names, and writes what they print where
- * the CLI keeps its model input: a Claude transcript under $HOME/.claude or
- * a Codex rollout under $CODEX_HOME.
- */
-function cmdStub(cli, rawArgv) {
-  const interactive = rawArgv.includes('--interactive');
-  const argv = rawArgv.filter((a) => a !== '--interactive');
-  const prompt = argv[argv.length - 1];
-  const session = crypto.randomUUID();
-  const ws = process.cwd();
-  let settings;
-  let transcript;
-  let record;
-  if (cli === 'claude') {
-    settings = readJson(argv[argv.indexOf('--settings') + 1]).hooks;
-    const dir = path.join(process.env.HOME, '.claude', 'projects', 'stub');
-    fs.mkdirSync(dir, { recursive: true });
-    transcript = path.join(dir, `${session}.jsonl`);
-    record = (text) => fs.appendFileSync(transcript, `${JSON.stringify({ type: 'attachment', attachment: { type: 'hook_additional_context', content: [text], hookEvent: 'PostToolUse' } })}\n`);
-  } else {
-    settings = readJson(path.join(process.env.CODEX_HOME, 'hooks.json')).hooks;
-    const dir = path.join(process.env.CODEX_HOME, 'sessions', 'stub');
-    fs.mkdirSync(dir, { recursive: true });
-    transcript = path.join(dir, `rollout-${session}.jsonl`);
-    record = (text) => fs.appendFileSync(transcript, `${JSON.stringify({ type: 'response_item', payload: { type: 'message', role: 'developer', content: [{ type: 'input_text', text }] } })}\n`);
-  }
-  const hookEnv = { ...process.env, ...(cli === 'claude' ? { CLAUDE_PROJECT_DIR: ws } : {}) };
-  const toolEnv = { ...process.env, [cli === 'claude' ? 'CLAUDE_CODE_SESSION_ID' : 'CODEX_THREAD_ID']: session };
-  const fire = (event, payload) => (settings[event] ?? [])
-    .filter((group) => !group.matcher || group.matcher === '*' || new RegExp(group.matcher).test(payload.tool_name))
-    .flatMap((group) => group.hooks)
-    .map((hook) => spawnSync('sh', ['-c', hook.command], { input: JSON.stringify(payload), env: hookEnv, cwd: ws, encoding: 'utf8', timeout: 30_000 }).stdout);
-  let cwd = ws;
-  const commands = [...prompt.matchAll(/Run the shell command: `([^`]+)`/g)].map((m) => m[1]);
-  commands.forEach((command, i) => {
-    const cd = /^cd '(.+)'$/.exec(command);
-    if (cd && cli === 'claude') cwd = cd[1];
-    else if (!cd) spawnSync('zsh', ['-c', command], { cwd, env: toolEnv, stdio: 'ignore' });
-    const payload = { session_id: session, transcript_path: transcript, cwd: ws, hook_event_name: 'PostToolUse', tool_name: 'Bash', tool_input: { command }, tool_use_id: `stub-${i}` };
-    for (const out of fire('PostToolUse', payload)) {
-      try {
-        const text = JSON.parse(out).hookSpecificOutput?.additionalContext;
-        if (text) record(text);
-      } catch {
-        // a hook that printed nothing
-      }
-    }
-  });
-  fire('Stop', { session_id: session, transcript_path: transcript, cwd: ws, hook_event_name: 'Stop', stop_hook_active: false });
-  process.stdout.write('done\n');
-  if (interactive) {
-    setInterval(() => {}, 1 << 30);
-    for (const signal of ['SIGTERM', 'SIGHUP']) process.on(signal, () => process.exit(0));
-  }
 }
 
 /** Where a run's model input lives: the Claude transcript or the Codex rollout of its first call. */
@@ -1387,9 +1334,6 @@ async function main() {
       break;
     case 'probe-tool':
       cmdProbeTool(rest[0]);
-      break;
-    case 'stub':
-      cmdStub(rest[0], rest.slice(1));
       break;
     case 'summarize':
       cmdSummarize(rest[0], rest[1], rest.slice(2));
