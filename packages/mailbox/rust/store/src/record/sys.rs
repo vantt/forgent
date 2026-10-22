@@ -1,5 +1,9 @@
 //! The operating-system calls the record needs that the standard library
 //! does not offer. Nothing else in the crate uses `unsafe`.
+//!
+//! Copies of these calls live in other crates too; item `tsk-1lx` (one
+//! shared leaf for euid and dirfd syscalls) moves them into one low layer.
+//! Until it lands, this module is the mailbox's only `unsafe`.
 #![allow(unsafe_code)]
 
 /// The effective user id of this process.
