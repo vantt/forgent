@@ -3,7 +3,7 @@
 //! Implements `ObservationSource` with `source_id: "work"`.
 //! Reads the Event Store project stream for timing events
 //! (`added`, `moved`, `asked`, `answered`, `gate-approved`).
-//! Reads state.json (`.fgos/cache/state.json` or `.fgos/state.json`) for folded state properties:
+//! Reads state.json (`.fgos/cache/state.json`) for folded state properties:
 //! outcomes, settlements, learnings, and entropy signals (missing-actual, stale-doing, stage-entry, awaiting-human).
 
 use fgos_observe::{Observation, ObservationSource, SourceError, Subject, SubjectKind, Window};
@@ -83,21 +83,10 @@ impl WorkSource {
 
     pub const VIEW_SCHEMA_VERSION: u64 = 6;
 
-    /// Read raw state json from `.fgos/cache/state.json` or `.fgos/state.json`
+    /// Read raw state json from the Work cache `.fgos/cache/state.json`. The tracked `.fgos/state.json` view is
+    /// retired and never read.
     pub fn read_state_json(root: &Path) -> Option<Value> {
-        let fgos_dir = root.join(".fgos");
-        let cache_state = fgos_dir.join("cache").join("state.json");
-        let fallback_state = fgos_dir.join("state.json");
-
-        let state_path = if cache_state.is_file() {
-            Some(cache_state)
-        } else if fallback_state.is_file() {
-            Some(fallback_state)
-        } else {
-            None
-        };
-
-        let path = state_path?;
+        let path = root.join(".fgos").join("cache").join("state.json");
         let content = fs::read_to_string(path).ok()?;
         let val: Value = serde_json::from_str(&content).ok()?;
         if val.get("viewSchemaVersion").and_then(|v| v.as_u64()) != Some(Self::VIEW_SCHEMA_VERSION)
@@ -724,7 +713,8 @@ mod tests {
             }
         }"#;
 
-        fs::write(fgos_dir.join("state.json"), state_json).unwrap();
+        fs::create_dir_all(fgos_dir.join("cache")).unwrap();
+        fs::write(fgos_dir.join("cache").join("state.json"), state_json).unwrap();
 
         let signals = WorkSource::read_entropy_signals(&dir);
         assert_eq!(signals.missing_actual, 1);
@@ -753,6 +743,27 @@ mod tests {
     }
 
     #[test]
+    fn test_tracked_state_json_view_is_never_read() {
+        let dir =
+            std::env::temp_dir().join(format!("fgos_test_work_tracked_view_{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        let fgos_dir = dir.join(".fgos");
+        fs::create_dir_all(&fgos_dir).unwrap();
+
+        // The tracked `.fgos/state.json` is a retired stale view: even at the current schema version it is not
+        // the Work cache, so no reader may fall back to it.
+        fs::write(
+            fgos_dir.join("state.json"),
+            r#"{ "viewSchemaVersion": 6, "work": { "tsk-1": { "id": "tsk-1", "status": "doing" } } }"#,
+        )
+        .unwrap();
+
+        assert!(WorkSource::read_state_json(&dir).is_none());
+
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
     fn test_state_view_from_an_older_schema_version_is_not_read() {
         let dir =
             std::env::temp_dir().join(format!("fgos_test_work_entropy_old_{}", std::process::id()));
@@ -766,7 +777,8 @@ mod tests {
             "viewSchemaVersion": 3,
             "work": { "tsk-3": { "id": "tsk-3", "status": "todo", "stage": "discovery", "domain": "coding" } }
         }"#;
-        fs::write(fgos_dir.join("state.json"), state_json).unwrap();
+        fs::create_dir_all(fgos_dir.join("cache")).unwrap();
+        fs::write(fgos_dir.join("cache").join("state.json"), state_json).unwrap();
 
         assert!(WorkSource::read_state_json(&dir).is_none());
         assert_eq!(WorkSource::read_entropy_signals(&dir).stage_entry, 0);
