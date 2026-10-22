@@ -16,7 +16,7 @@ pub const MAX_ATTEMPT_ID_LENGTH: usize = MAX_ID_LENGTH - ATTEMPT_PREFIX.len();
 pub struct InvalidAttemptId;
 
 impl InvalidAttemptId {
-    /// The error name the contract and the route use.
+    /// The error name the contract uses.
     pub const NAME: &'static str = "invalid-attempt-id";
 }
 

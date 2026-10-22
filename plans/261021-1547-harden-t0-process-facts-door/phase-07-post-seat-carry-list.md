@@ -1,7 +1,7 @@
 ---
 phase: 07
 title: "Post-SEAT carry list: assignment-runner, run.mjs, unit-summary.mjs, main.rs"
-status: pending
+status: done
 depends_on: [05]
 parallel: "gated on SEAT landing on main; after that it may run beside phase 06 (disjoint files except registrations.mjs, where phase 06 deletes a range this phase does not touch) and before phase 08 when SEAT has landed; otherwise it stays open and is recorded in the close report"
 effort: ~0.5d
@@ -9,6 +9,8 @@ net_size: "Node −6 / Rust 0 / tests 0 (estimate)"
 ---
 
 # Phase 07 — Post-SEAT carry list
+
+> Done 2026-10-22 in HARDEN T1 phase 6, commit `10a065b38` (staging judge, run-lock forwarders, temp names; `apps/fgos/src/main.rs` needed no T0 edit). The identity route deletion that touched `main.rs` is `ae778a00e`.
 
 > SEAT landed on main 2026-10-22 02:48. This phase is folded into the T1 sub-plan as [phase 06 of `261022-0851-harden-t1-holder-lock-identity-door`](../261022-0851-harden-t1-holder-lock-identity-door/phase-06-identity-door-counter-t0-carry.md) (section "T0's post-SEAT carry list"), with the sites re-verified on `e94b1618d`; that phase closes it and marks this file done.
 

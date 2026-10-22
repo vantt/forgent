@@ -21,6 +21,8 @@ export const observe = (pid) => facts().observe(pid);
 export const selfRecord = () => facts().selfRecord();
 /** Signal ('term' | 'kill' | 'int') the process `record` names, only if it is still that process. */
 export const signalByIdentity = (record, signal) => facts().signalByIdentity(record, signal);
+/** This process and its ancestors, nearest first (this process alone where the platform cannot walk the tree). */
+export const selfChain = () => facts().selfChain();
 /** Every live process with `{pid, tuple, exe, cwd, cmdline, env, unreadable}`, or 'unsupported'. */
 export const scan = (filter) => facts().scan(filter);
 /** 'dead' only when the judge proves it; alive and unknown are both 'held' (a record this observer cannot disprove is never reclaimed). */

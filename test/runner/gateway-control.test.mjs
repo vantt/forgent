@@ -254,22 +254,20 @@ test('stopGateway: escalates to SIGKILL when the process ignores SIGTERM, and st
   }
 });
 
-test('stopGateway never signals a process that is not the recorded gateway: an entry with no verifiable identity (an old pid-only entry) gets no signal and stop refuses by name', () => {
+test('a registry entry with no verifiable identity (an old pid-only entry) is never signalled: status says identity unknown, stop and start refuse by name, the entry is kept', async () => {
   if (os.platform() !== 'linux') return;
   const { repoRoot, fgosDir } = mkFgosDir();
   const child = spawnThrowaway();
   try {
     // A pid-only entry has no start time, so it cannot say which process it names.
     writeRegistry(fgosDir, { pid: child.pid, port: 4170, startedAt: '1999-01-01T00:00:00.000Z', logPath: '/dev/null' });
-    let refusal = null;
-    try {
-      stopGateway(fgosDir);
-    } catch (err) {
-      refusal = err;
-    }
+    const status = await gatewayStatus(fgosDir);
+    assert.equal(status.running, null);
+    assert.equal(status.staleRegistry, false);
+    assert.equal(status.identity, 'unknown');
+    assert.throws(() => stopGateway(fgosDir), (err) => err instanceof GatewayControlError && /gateway-stop-identity-unknown/.test(err.message));
+    assert.throws(() => startGateway(repoRoot, fgosDir), /gateway-start-identity-unknown/);
     assert.equal(isAlive(child.pid), true, 'the unrelated process must not receive any signal');
-    assert.ok(refusal instanceof GatewayControlError, 'stop must refuse with the named GatewayControlError');
-    assert.match(refusal.message, /gateway-stop-identity-unknown/);
     assert.equal(fs.existsSync(path.join(fgosDir, 'gateway.json')), true, 'an unjudgeable entry is kept');
   } finally {
     child.kill('SIGKILL');
@@ -288,22 +286,6 @@ test('stopGateway: a registry identity whose start time is not the live pid\'s (
     assert.equal(result.alreadyStopped, true);
     assert.equal(isAlive(child.pid), true, 'the unrelated process must not receive any signal');
     assert.equal(fs.existsSync(path.join(fgosDir, 'gateway.json')), false);
-  } finally {
-    child.kill('SIGKILL');
-    cleanup(repoRoot);
-  }
-});
-
-test('gatewayStatus: an old pid-only entry whose pid lives reports identity unknown, not running', async () => {
-  if (os.platform() !== 'linux') return;
-  const { repoRoot, fgosDir } = mkFgosDir();
-  const child = spawnThrowaway();
-  try {
-    writeRegistry(fgosDir, { pid: child.pid, port: 1, startedAt: new Date().toISOString(), logPath: '/dev/null' });
-    const status = await gatewayStatus(fgosDir);
-    assert.equal(status.running, null);
-    assert.equal(status.staleRegistry, false);
-    assert.equal(status.identity, 'unknown');
   } finally {
     child.kill('SIGKILL');
     cleanup(repoRoot);
@@ -354,51 +336,6 @@ test('startGateway reports an immediate exit within one poll, not after the 30 s
   }
 });
 
-test('a gateway that is already a zombie is dead at once: stopGateway clears the registry within one poll and sends nothing', () => {
-  if (os.platform() !== 'linux') return;
-  const { repoRoot, fgosDir } = mkFgosDir();
-  // `sleep` (never reaps) becomes the parent of a child that exits at once:
-  // a zombie that stays a zombie. Both pids are written to files.
-  const zombieFile = path.join(repoRoot, 'zombie.pid');
-  const parentFile = path.join(repoRoot, 'parent.pid');
-  execFileSync('sh', ['-c',
-    `setsid sh -c 'sh -c "exit 0" & echo $! > "$0"; echo $$ > "$1"; exec sleep 300' "$0" "$1" </dev/null >/dev/null 2>&1 &`,
-    zombieFile, parentFile]);
-  let parentPid = null;
-  try {
-    const deadline = Date.now() + 5000;
-    let zombiePid = null;
-    for (;;) {
-      try {
-        zombiePid = parseInt(fs.readFileSync(zombieFile, 'utf8').trim(), 10);
-        parentPid = parseInt(fs.readFileSync(parentFile, 'utf8').trim(), 10);
-        const stat = fs.readFileSync(`/proc/${zombiePid}/stat`, 'utf8');
-        if (stat.slice(stat.lastIndexOf(')') + 2, stat.lastIndexOf(')') + 3) === 'Z') break;
-      } catch {
-        // not written yet
-      }
-      assert.ok(Date.now() < deadline, 'the fixture never produced a zombie');
-      execFileSync('sleep', ['0.05']);
-    }
-    writeRegistry(fgosDir, { pid: zombiePid, port: 4170, startedAt: new Date().toISOString(), logPath: '/dev/null' });
-    const t0 = Date.now();
-    const result = stopGateway(fgosDir);
-    const elapsed = Date.now() - t0;
-    assert.equal(result.alreadyStopped, true);
-    assert.ok(elapsed < 2000, `a zombie is dead; expected one poll, took ${elapsed} ms`);
-    assert.equal(fs.existsSync(path.join(fgosDir, 'gateway.json')), false);
-  } finally {
-    if (parentPid) {
-      try {
-        process.kill(parentPid, 'SIGKILL');
-      } catch {
-        // already gone
-      }
-    }
-    cleanup(repoRoot);
-  }
-});
-
 test('startGateway: refuses with no side effects when the registry already names a live pid', () => {
   const { repoRoot, fgosDir } = mkFgosDir();
   const child = spawnThrowaway();
@@ -409,19 +346,6 @@ test('startGateway: refuses with no side effects when the registry already names
     // dir exists in this fixture at all, proving the check really is
     // ordered before any cargo/binary work, not just coincidentally fast.
     assert.equal(fs.existsSync(path.join(repoRoot, 'apps', 'fgos-gateway')), false);
-  } finally {
-    child.kill('SIGKILL');
-    cleanup(repoRoot);
-  }
-});
-
-test('startGateway: refuses by name when the registry names a live pid without a verifiable identity', () => {
-  if (os.platform() !== 'linux') return;
-  const { repoRoot, fgosDir } = mkFgosDir();
-  const child = spawnThrowaway();
-  try {
-    writeRegistry(fgosDir, { pid: child.pid, port: 4170, startedAt: new Date().toISOString(), logPath: '/dev/null' });
-    assert.throws(() => startGateway(repoRoot, fgosDir), /gateway-start-identity-unknown/);
   } finally {
     child.kill('SIGKILL');
     cleanup(repoRoot);

@@ -17,7 +17,7 @@ import {
 } from '../../src/seat-binding/client.mjs';
 import { golden, caseInput } from './golden-cases.helper.mjs';
 import { MODEL_POLICY_TIERS } from '../../src/runner/dispatch/config.mjs';
-import { noteLockHeld, noteLockReleased } from '../../src/util/state-lock-held.mjs';
+import { enterHotLock } from '../../src/holder-lock/hot-guard.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const HOST_BIN = process.env.FGOS_HOST_BIN;
@@ -115,15 +115,15 @@ test('no host in reach throws seat-binding-no-host-binary naming where it looked
   }
 });
 
-test('a process holding a state lock never execs the host: seat-binding-in-lock', () => {
+test('a process inside the hot mutex never execs the host: seat-binding-in-lock', () => {
   const marker = path.join(scratch, 'exec-marker');
   const host = script('marker-host.sh', `touch '${marker}'\nexit 1`);
-  noteLockHeld();
+  const leaveHotLock = enterHotLock();
   try {
     expectCode(() => createSeatBindingClient({ hostBin: host }).tierLadder(), 'seat-binding-in-lock');
     expectCode(() => createSeatBindingClient({ hostBin: host }).bindSeat(golden.base), 'seat-binding-in-lock');
   } finally {
-    noteLockReleased();
+    leaveHotLock();
   }
   assert.equal(fs.existsSync(marker), false);
 });

@@ -156,7 +156,7 @@ export function acquireSessionsLock(fgosDir, { timeoutMs = 10000 } = {}) {
   const res = acquireSync(createLockScope('sessions'), 'sessions', params, { waitMs: timeoutMs });
   if (res.result === 'acquired') return res.handle;
   const holders = lockHolders('sessions', params);
-  const holderPid = holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
+  const holderPid = holders.kind === 'list' && holders.holders.length > 0 ? holders.holders[0].pid : null;
   const lockPath = resolveLock('sessions', params).v3Path;
   throw new SessionError(
     `timed out acquiring sessions.lock at "${lockPath}" after ${timeoutMs}ms` + (holderPid ? ` (held by pid ${holderPid})` : ''),

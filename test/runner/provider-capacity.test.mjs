@@ -460,7 +460,7 @@ test('a state-lock holder killed by SIGKILL frees the lock at once', { timeout: 
   t.after(() => fs.rmSync(runtimeDir, { recursive: true, force: true }));
   const { holder, exited, ready } = spawnStateLockHolder(t, 0);
   await ready;
-  assert.deepEqual(lockHolders('provider-state', { lockRoot: resolveLockRoot() }).pids, [holder.pid], 'the kernel lists the live holder');
+  assert.deepEqual(lockHolders('provider-state', { lockRoot: resolveLockRoot() }).holders.map((h) => h.pid), [holder.pid], 'the kernel lists the live holder');
   const args = { runnerConfig: runnerConfig(), provider: 'openai-codex', runId: 'run_after_kill', runtimeDir };
   assert.throws(() => acquireNamedAccountLease({
     accountId: 'a', ...args, lockWaitMs: 50 }), ProviderCapacityLockError);
@@ -470,7 +470,7 @@ test('a state-lock holder killed by SIGKILL frees the lock at once', { timeout: 
   assert.equal(acquireNamedAccountLease({
     accountId: 'a', ...args, lockWaitMs: 1000 })?.status, 'selected');
   assert.ok(Date.now() - started < 1000, 'no wait for a dead holder');
-  assert.deepEqual(lockHolders('provider-state', { lockRoot: resolveLockRoot() }).pids, []);
+  assert.deepEqual(lockHolders('provider-state', { lockRoot: resolveLockRoot() }).holders, []);
 });
 
 test('classifier quarantines only high-confidence stderr/provider outcomes', () => {

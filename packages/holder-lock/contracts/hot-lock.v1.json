@@ -24,7 +24,7 @@
     "allOf": [
       "the judge of the recorded tuple answers dead (zombie counts as dead; alive and unknown never qualify)",
       "the cleaner holds the kernel lock <resource>.reclaim",
-      "the record is read again under that kernel lock and its bytes equal the bytes the judge saw",
+      "the record is read again under that kernel lock; the bytes must equal what the judge saw and the judge must still answer dead",
       "only then unlink the record, release the kernel lock, and try the link again"
     ],
     "never": [
@@ -43,8 +43,9 @@
   "errors": {
     "exec-under-hot-lock": { "category": "precondition", "meaning": "a child process was started inside the critical section; thrown at the call, with the stack" },
     "hot-lock-reentry": { "category": "precondition", "meaning": "a hot mutex was acquired while this process already holds one; thrown at once, without waiting" },
-    "hot-lock-timeout": { "category": "lock-timeout", "meaning": "the record stayed held (or unjudgeable) for the whole wait; carries holder pid and, when the record could not be read, reason lock-record-unreadable" },
-    "lock-record-unreadable": { "category": "lock-timeout", "meaning": "reason on hot-lock-timeout: the record exists but does not parse; only an owner running `fgos lock fence` clears it" },
+    "hot-lock-timeout": { "category": "lock-timeout", "meaning": "the record stayed held, open by another process (Windows sharing violation) or unjudgeable for the whole wait; carries holder pid and, when the record could not be read or judged, reason lock-record-unreadable" },
+    "lock-record-unreadable": { "category": "lock-timeout", "meaning": "reason on hot-lock-timeout: the record exists but does not parse or its holder cannot be judged; only an owner running `fgos lock fence` clears it" },
+    "hot-lock-release-stuck": { "category": "precondition", "meaning": "the record could not be unlinked after the bounded Windows retries; the record stays and `fgos lock fence <resource>` is the way out" },
     "state-tx-revoked": { "category": "precondition", "meaning": "a transaction object was used after its callback returned" },
     "state-tx-async": { "category": "precondition", "meaning": "the callback returned a thenable; the lock is already released when this is thrown" }
   }

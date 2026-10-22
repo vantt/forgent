@@ -14,6 +14,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { createGitInspect, gitPortOptions } from '../src/git/inspect.mjs';
+import { loadNativeAddon } from '../src/git/native.mjs';
 import { scan, writeMutationCensus } from './git-one-door-scan.mjs';
 import { repositoryDirs, repositoryFiles } from './lib/git-dir-layout.mjs';
 import { fileURLToPath } from 'node:url';
@@ -506,8 +507,7 @@ export function buildRustDistribution({
  */
 function readCheckoutWithAddon(repoRoot, releaseRoot, hostBin) {
   const out = execFileSync(process.execPath, [__filename, READ_CHECKOUT, repoRoot, releaseRoot], {
-    // The host this build just compiled answers the state-root and lock routes at this checkout's
-    // protocol; a clean checkout outside an activated workspace has no other one.
+    // The host this build just compiled is the only one a clean checkout outside an activated workspace has.
     env: { ...process.env, FGOS_HOST_BIN: hostBin },
     encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'inherit'],
   });
@@ -520,7 +520,11 @@ const ADDON_RELATIVE = 'libexec/native/fgos.node';
 if (process.argv[2] === READ_CHECKOUT && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   const [repoRoot, releaseRoot] = process.argv.slice(3);
   const nativeAddon = nativeAddonComponent(path.join(releaseRoot, ADDON_RELATIVE), ADDON_RELATIVE, repoRoot);
-  const openInspect = () => createGitInspect(gitPortOptions(repoRoot), { descriptor: { manifest: { components: { nativeAddon } }, releaseRoot } });
+  const descriptor = { manifest: { components: { nativeAddon } }, releaseRoot };
+  // This child runs from a checkout, so its own release is not the one it was started from: it takes the state
+  // root from the addon it was just handed (the host's own formula) and pins it for every port it opens.
+  if (!process.env.FGOS_STATE_ROOT?.trim()) process.env.FGOS_STATE_ROOT = loadNativeAddon({ descriptor }).holderLock.stateRoot({ ...process.env }).stateRoot;
+  const openInspect = () => createGitInspect(gitPortOptions(repoRoot), { descriptor });
   writeMutationCensus(repoRoot, scan({ root: repoRoot, openInspect }));
   process.stdout.write(JSON.stringify(listLegacyNodeSourceFiles(repoRoot, openInspect)));
 } else if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {

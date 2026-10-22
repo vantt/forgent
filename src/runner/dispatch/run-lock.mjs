@@ -19,21 +19,13 @@
 // heartbeat-mitigated TTL takeover): a live PID remains HELD no matter how
 // stale its heartbeat looks. `ttlMs` only gates whether a contender bothers
 // to probe process liveness at all; the actual reclaim decision is PID-dead
-// proof (`isProcessAlive` returns false), never elapsed time alone.
+// proof (`resolveHolderLiveness` answers `dead`), never elapsed time alone.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { installOnce } from '../../native/door.mjs';
-import { observe, selfRecord, resolveHolderLiveness } from './process-identity.mjs';
-
-// --- PID liveness --------------------------------------------------------
-
-/** Whether a process with `pid` exists (a zombie counts). Kept by name for the assignment runner's callers;
- * the observation is the process door's. */
-export function isProcessAlive(pid) {
-  return Number.isInteger(pid) && pid > 0 && observe(pid).kind !== 'absent';
-}
+import { selfRecord, resolveHolderLiveness } from './process-identity.mjs';
 
 // --- Control holder identity (H1) -----------------------------------------
 
@@ -46,10 +38,6 @@ export function buildRunControlHolder(id) {
   const self = selfRecord();
   return { id, ...self, processStartTime: self.startTime };
 }
-
-/** Whether a recorded control holder is still the live process that acquired the lock: the process door's
- * judge; `dead` only when it proves death. Kept here for the assignment runner's importers. */
-export { resolveHolderLiveness };
 
 // --- Fsynced atomic publication -------------------------------------------
 
@@ -237,7 +225,7 @@ function releaseMarkerPath(releasesDir, epoch) {
  * current holder's process liveness at all (an efficiency guard against
  * probing a healthy holder on every contention) -- omitting it means every
  * call probes. The actual reclaim decision is always PID-dead proof: a live
- * `holder.pid` (per `isProcessAlive`) is HELD regardless of how stale the
+ * `holder.pid` (per `resolveHolderLiveness`) is HELD regardless of how stale the
  * recorded generation looks. A `finally` release marker is evidence of a
  * clean release; its absence never proves the holder crashed and is never
  * treated as such.

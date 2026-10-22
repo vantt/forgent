@@ -15,8 +15,8 @@
 
 import crypto from 'node:crypto';
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
+import { resolveStateRoot } from '../../../holder-lock/state-root.mjs';
 import { uniqueTmpTag } from '../../../util/unique-tmp-tag.mjs';
 
 export const ATTESTATION_CONTRACT = 'confinement-attestation.v1';
@@ -164,7 +164,7 @@ export function resolveAttestationStoreDir(context = {}) {
   if (context.attestationStoreDir) {
     return path.resolve(context.attestationStoreDir);
   }
-  return path.join(process.env.XDG_STATE_HOME || path.join(os.homedir(), '.local', 'state'), 'fgos', 'attestations');
+  return path.join(resolveStateRoot().stateRoot, 'attestations');
 }
 
 /**

@@ -17,7 +17,7 @@ import {
   QUEUE_HELD_ENV,
   QUEUE_SWITCH_ENV,
 } from '../../scripts/lib/full-suite-queue.mjs';
-import { queueWithHostBin, runTests } from '../../scripts/run-tests.mjs';
+import { queueAfterStaging, runTests } from '../../scripts/run-tests.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const QUEUE_URL = pathToFileURL(path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs')).href;
@@ -191,53 +191,28 @@ test('runTests takes the queue only when there are files to run, marks the child
   assert.equal(childEnvSeen[QUEUE_HELD_ENV], '1');
 });
 
-test('the CLI door builds a host binary before the queue only when none resolves, and exports it on its own env', () => {
-  const saved = process.env.FGOS_HOST_BIN;
-  delete process.env.FGOS_HOST_BIN;
-  try {
-    let seen;
-    const release = queueWithHostBin({ env: {} }, {
-      resolve: () => null,
-      ensure: () => '/built/by/cargo/fgos',
-      queue: () => {
-        seen = process.env.FGOS_HOST_BIN;
-        return () => {};
-      },
-    });
-    release();
-    assert.equal(seen, '/built/by/cargo/fgos', 'the lock driver reads FGOS_HOST_BIN from this process, so it is set before the queue');
+test('the CLI door stages the checkout\'s door before it takes the queue, and gives the queue back when a later step fails', () => {
+  const order = [];
+  const release = queueAfterStaging({ env: {} }, {
+    stage: () => order.push('stage'),
+    queue: () => { order.push('queue'); return () => order.push('release'); },
+    artifacts: () => order.push('artifacts'),
+  });
+  assert.deepEqual(order, ['stage', 'queue', 'artifacts'], 'the lock driver needs the staged door, so staging comes first; the heavy build stays inside the queue');
+  release();
 
-    const warnings = [];
-    let queued = false;
-    queueWithHostBin({ env: {} }, {
-      resolve: () => null,
-      ensure: () => { throw new Error('cargo is required'); },
-      queue: () => { queued = true; return () => {}; },
-      log: (msg) => warnings.push(msg),
-    });
-    assert.equal(queued, true, 'a failed build still reaches the queue, which then names what is missing');
-    assert.match(warnings.join('\n'), /failed to ensure host binary: cargo is required/);
+  const failed = [];
+  assert.throws(() => queueAfterStaging({ env: {} }, {
+    stage: () => {},
+    queue: () => () => failed.push('release'),
+    artifacts: () => { throw new Error('release build failed'); },
+  }), /release build failed/);
+  assert.deepEqual(failed, ['release']);
 
-    // A binary that already resolves is used as is: building outside the
-    // queue could replace the one a queued run elsewhere is executing.
-    queueWithHostBin({ env: {} }, {
-      resolve: () => '/activated/fgos',
-      speaksLockProtocol: () => true,
-      ensure: () => assert.fail('nothing is built before the queue when a host binary resolves'),
-      queue: () => () => {},
-    });
-
-    // A resolved host that does not speak this checkout's lock protocol is replaced by a built one.
-    let queuedWith;
-    queueWithHostBin({ env: {} }, {
-      resolve: () => '/activated/fgos',
-      speaksLockProtocol: () => false,
-      ensure: () => '/built/by/cargo/fgos',
-      queue: () => { queuedWith = process.env.FGOS_HOST_BIN; return () => {}; },
-    });
-    assert.equal(queuedWith, '/built/by/cargo/fgos');
-  } finally {
-    if (saved === undefined) delete process.env.FGOS_HOST_BIN;
-    else process.env.FGOS_HOST_BIN = saved;
-  }
+  let queued = false;
+  assert.throws(() => queueAfterStaging({ env: {} }, {
+    stage: () => { throw new Error('cargo is required'); },
+    queue: () => { queued = true; return () => {}; },
+  }), /cargo is required/);
+  assert.equal(queued, false, 'a failed staging never takes the queue');
 });

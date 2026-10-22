@@ -28,7 +28,7 @@ test('Windows retains controller custody while its supervisor declares the produ
     cwdLeaseFile: custody.path, cwdLeaseOwner: custody.domainEndpoint(),
     attempt: { command: process.execPath, args: ['-e', 'setTimeout(() => {}, 1000)'], env: stepEnv },
     timeoutMs: 10000, gateKillGraceMs: 1000, killWaitMs: 2000, cli: 'claude', stepEnv,
-    identity: { writerId: mintAttemptWriterId(attemptId, { bin: host.hostBin }), parentWriterId: null },
+    identity: { writerId: mintAttemptWriterId(attemptId), parentWriterId: null },
   });
   body.steps = [];
   const envelope = writeAttemptFiles({ runDir, body, secretEnv: {}, controlEpoch: 1, controlToken: 'test' });
