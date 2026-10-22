@@ -58,9 +58,17 @@ def read(name, default=""):
         return default
 
 
+def is_launch_run(line):
+    parts = line.split("\t")
+    for i in range(len(parts) - 1):
+        if parts[i] == "pane" and parts[i + 1] == "run":
+            return not any("printf '%s%s\\n' fgos-ok-" in p for p in parts)
+    return False
+
+
 def runs_started():
     """How many commands `pane run` has started so far (the calls log has one line per call)."""
-    return sum(1 for line in read("calls.log").splitlines() if line.startswith("pane\trun\t"))
+    return sum(1 for line in read("calls.log").splitlines() if is_launch_run(line))
 
 
 def scoped(stem, ext, default=""):
@@ -143,6 +151,11 @@ if (group, action) == ("pane", "get"):
     say({"pane": {"pane_id": TARGET, "tab_id": TARGET.replace(":p", ":t"), "agent_status": "idle"}, "type": "pane_info"})
 if (group, action) == ("pane", "run"):
     line = rest[1]
+    if line.startswith("printf '%s%s\\n' fgos-ok-"):
+        res = subprocess.run(["sh", "-c", line], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        with open(path(f"probe.{TARGET}.txt"), "a") as f:
+            f.write(res.stdout)
+        say({"type": "ok"})
     proc = subprocess.Popen(
         ["setsid", "script", "-qefc", line, path("typescript.log")],
         stdin=subprocess.DEVNULL,
@@ -169,7 +182,7 @@ if (group, action) == ("pane", "process-info"):
         live = [{"argv": ["sh"], "cmdline": "sh", "cwd": "/", "name": "sh", "pid": shell}]
     say({"process_info": {"foreground_process_group_id": live[0]["pid"], "foreground_processes": live, "pane_id": TARGET, "shell_pid": shell}, "type": "pane_process_info"})
 if (group, action) == ("pane", "read"):
-    sys.stdout.write(scoped("screen", ".txt"))
+    sys.stdout.write(scoped("screen", ".txt") + read(f"probe.{TARGET}.txt"))
     sys.exit(0)
 if (group, action) == ("pane", "send-text"):
     log("sent.jsonl", json.dumps({"kind": "text", "text": rest[1]}))

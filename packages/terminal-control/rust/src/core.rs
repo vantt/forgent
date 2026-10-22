@@ -44,6 +44,8 @@ pub struct CoreConfig {
     pub allocation_grace_ms: u64,
     /// How long `launch` waits to see the launched root process.
     pub launch_identify_timeout_ms: u64,
+    /// How long `launch` waits for the pane's shell to prove it executes commands.
+    pub shell_ready_timeout_ms: u64,
 }
 
 pub struct Core<'a> {
@@ -68,6 +70,32 @@ fn store_err(e: std::io::Error) -> Refusal {
 fn shell_quote(s: &str) -> String {
     format!("'{}'", s.replace('\'', "'\\''"))
 }
+fn random_nonce() -> Result<String, LaunchOutcome> {
+    use std::fs::File;
+    use std::io::Read;
+    let mut bytes = [0u8; 16];
+    let mut file = File::open("/dev/urandom").map_err(|e| LaunchOutcome::NotStarted {
+        reason: format!("cannot read /dev/urandom for probe nonce: {e}"),
+    })?;
+    file.read_exact(&mut bytes).map_err(|e| LaunchOutcome::NotStarted {
+        reason: format!("cannot read /dev/urandom for probe nonce: {e}"),
+    })?;
+    let mut s = String::with_capacity(32);
+    for b in bytes {
+        use std::fmt::Write;
+        let _ = write!(s, "{b:02x}");
+    }
+    Ok(s)
+}
+
+fn sleep_poll(step: Duration, deadline: Instant) {
+    let now = Instant::now();
+    if now < deadline {
+        let rem = deadline - now;
+        std::thread::sleep(step.min(rem));
+    }
+}
+
 
 /// A group pane that is alive right now, with its record.
 struct LivePane {
@@ -394,10 +422,27 @@ impl<'a> Core<'a> {
         }
         match &spec.activity {
             Some(_) => self.need("activity.state")?,
-            None => self.need("pane.run")?,
+            None => {
+                self.need("pane.run")?;
+                self.need("read.screen")?;
+            }
         }
         self.need("process.info")?;
         let line = launch_line(spec)?;
+
+        if store.has_marker(key, MarkerKind::LaunchRequested) {
+            return Ok(LaunchOutcome::NotStarted { reason: "launch was already requested for this slot".into() });
+        }
+
+        if spec.activity.is_none() {
+            if let Some(not_started) = self.wait_for_shell(&record.pane_id)? {
+                return Ok(not_started);
+            }
+            let info = self.driver.process_info(&record.pane_id)?;
+            if !identity::is_bare_shell(&info) {
+                return Ok(LaunchOutcome::NotStarted { reason: "pane foreground is not the shell".into() });
+            }
+        }
 
         let requested = LaunchRequestedMarker { v: VERSION, key: key.to_string(), at: self.now() };
         if !store.publish_marker(key, MarkerKind::LaunchRequested, &requested).map_err(store_err)? {
@@ -421,6 +466,107 @@ impl<'a> Core<'a> {
         let launched = LaunchedMarker { v: VERSION, key: key.to_string(), at: self.now(), identity: identity.clone() };
         store.publish_marker(key, MarkerKind::Launched, &launched).map_err(store_err)?;
         Ok(LaunchOutcome::Launched(identity))
+    }
+
+    fn wait_for_shell(&self, pane: &str) -> Result<Option<LaunchOutcome>, Refusal> {
+        let deadline = Instant::now() + Duration::from_millis(self.config.shell_ready_timeout_ms);
+        let backoff = Duration::from_millis(self.config.shell_ready_timeout_ms / 3);
+        let poll_step = Duration::from_millis(100);
+        let mut nonces: Vec<String> = Vec::new();
+        let mut last_probe_at: Option<Instant> = None;
+
+        loop {
+            let info = match self.driver.process_info(pane) {
+                Ok(info) => info,
+                Err(_) => {
+                    if let Ok(PaneLiveness::Gone) = self.driver.pane_liveness(pane) {
+                        return Err(unknown("pane is gone"));
+                    }
+                    if Instant::now() >= deadline {
+                        break;
+                    }
+                    sleep_poll(poll_step, deadline);
+                    continue;
+                }
+            };
+
+            if !identity::is_bare_shell(&info) {
+                if Instant::now() >= deadline {
+                    break;
+                }
+                sleep_poll(poll_step, deadline);
+                continue;
+            }
+
+            if nonces.is_empty() {
+                let nonce = match random_nonce() {
+                    Ok(n) => n,
+                    Err(not_started) => return Ok(Some(not_started)),
+                };
+                let probe_cmd = format!("printf '%s%s\\n' fgos-ok- {nonce}");
+                self.driver.pane_run(pane, &probe_cmd)?;
+                nonces.push(nonce);
+                last_probe_at = Some(Instant::now());
+            }
+
+            let screen = match self.driver.read_screen(pane, Some(40), Some("recent-unwrapped")) {
+                Ok(s) => s,
+                Err(_) => {
+                    if let Ok(PaneLiveness::Gone) = self.driver.pane_liveness(pane) {
+                        return Err(unknown("pane is gone"));
+                    }
+                    String::new()
+                }
+            };
+
+            if nonces.iter().any(|n| screen.contains(&format!("fgos-ok-{n}"))) {
+                return Ok(None);
+            }
+
+            if nonces.len() < 3 {
+                let prev_nonce = nonces.last().unwrap();
+                let consumed = screen.contains(prev_nonce);
+                let backoff_elapsed = last_probe_at.map(|t| t.elapsed() >= backoff).unwrap_or(false);
+                if consumed || backoff_elapsed {
+                    let nonce = match random_nonce() {
+                        Ok(n) => n,
+                        Err(not_started) => return Ok(Some(not_started)),
+                    };
+                    let probe_cmd = format!("printf '%s%s\\n' fgos-ok- {nonce}");
+                    self.driver.pane_run(pane, &probe_cmd)?;
+                    nonces.push(nonce);
+                    last_probe_at = Some(Instant::now());
+
+                    let screen = match self.driver.read_screen(pane, Some(40), Some("recent-unwrapped")) {
+                        Ok(s) => s,
+                        Err(_) => {
+                            if let Ok(PaneLiveness::Gone) = self.driver.pane_liveness(pane) {
+                                return Err(unknown("pane is gone"));
+                            }
+                            String::new()
+                        }
+                    };
+                    if nonces.iter().any(|n| screen.contains(&format!("fgos-ok-{n}"))) {
+                        return Ok(None);
+                    }
+                }
+            }
+
+            if Instant::now() >= deadline {
+                break;
+            }
+            sleep_poll(poll_step, deadline);
+        }
+
+        if nonces.is_empty() {
+            Ok(Some(LaunchOutcome::NotStarted {
+                reason: "pane foreground is not the shell".into(),
+            }))
+        } else {
+            Ok(Some(LaunchOutcome::NotStarted {
+                reason: "pane shell did not become ready in time".into(),
+            }))
+        }
     }
 
     fn identify_root(&self, pane: &str, spec: &LaunchSpec) -> Option<ProcessIdentity> {

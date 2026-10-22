@@ -15,7 +15,7 @@ export const FAKE_HERDR = path.resolve('packages/run-supervisor/rust/tests/fixtu
 const AGENT = path.resolve('test/run-supervisor/fixtures/terminal-agent.mjs');
 const CONTROLLER = path.resolve('test/run-supervisor/fixtures/terminal-controller.mjs');
 
-export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms).unref());
 
 export async function waitUntil(predicate, { timeoutMs = 60_000, intervalMs = 20, what = 'condition' } = {}) {
   const deadline = Date.now() + timeoutMs;
@@ -85,8 +85,14 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
   fs.writeFileSync(herdrBin, `#!/bin/sh\nFAKE_HERDR_DIR=${herdrDir} exec ${FAKE_HERDR} "$@"\n`, { mode: 0o755 });
 
   const herdrSocket = path.join(scratch, 'herdr.sock');
-  const server = net.createServer();
+  const sockets = new Set();
+  const server = net.createServer((socket) => {
+    socket.unref();
+    sockets.add(socket);
+    socket.on('close', () => sockets.delete(socket));
+  });
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(herdrSocket, resolve); });
+  server.unref();
 
   let registryPath = null;
   if (confined) {
@@ -269,6 +275,8 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
         if (pid > 0) process.kill(pid, 'SIGKILL');
       } catch { /* no pane was ever started */ }
       for (const pid of project.agentStarts()) { try { process.kill(pid, 'SIGKILL'); } catch { /* gone */ } }
+      for (const s of sockets) { try { s.destroy(); } catch {} }
+      sockets.clear();
       server.close();
       // FGOS_KEEP_TEST_FIXTURES=1 keeps the project for a look at what a failed run left.
       if (process.env.FGOS_KEEP_TEST_FIXTURES) process.stderr.write(`kept terminal test project: ${scratch} (${outside})\n`);
