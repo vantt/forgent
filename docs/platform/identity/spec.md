@@ -30,6 +30,17 @@ This component answers four questions with one authority. Every answer is global
 
 A fifth question, **is this message really from who it claims**, is in scope as a later rung (section 7). The first rungs give attribution only, like Session Identity today.
 
+It also answers a sixth question for every other owner: **which id does this new record get**, so that work items, decisions, backlog rows, run and claim ids never collide across machines (section 4a). The record stays with its owner; only the id comes from here.
+
+**Not this component.** The word "identity" has other owners in fgOS, and they keep them:
+
+| Term | Owner |
+|---|---|
+| Process identity (pid, boot id, start time, liveness) | Process (`fgos_process::facts`) |
+| Git author and committer identity (`user.name`, `user.email`) | Git |
+| Event Store store identity (`store.json`) | Event Store; the store id itself is minted here |
+| Release and activation identity (hashes) | Distribution |
+
 ## 2. Problem, with evidence (2026-10-22)
 
 | Symptom | Evidence |
@@ -73,6 +84,18 @@ Rules:
 3. **One authority per identity.** Event Store keeps using the machine id and store id but no longer mints them. Session Identity remains the resolver of "which local session is this process" (open question 1 decides whether it becomes part of this component).
 4. **Short handles are resolved, never trusted.** A handle resolves through the directory to exactly one full id, or the call fails with "ambiguous" or "not found" and lists the candidates.
 5. **Formats are Convention kinds.** The textual shapes (id syntax, handle syntax) are registered with Convention so that every caller checks them the same way.
+
+## 4a. Minting ids for every owner (settled 2026-10-22)
+
+Three rules, no daemon, no server of its own, almost no garbage:
+
+1. **Random ids** (work items, backlog rows, project id, run, claim and reservation ids): `<prefix>-<10 lowercase base32 characters>`, 50 random bits, no state and no coordination. A kind that must sort by time puts a time part before the random part. An id is never derived from a title or another content field, because two machines with the same content would get the same id.
+2. **Machine-scoped ids** (machine-local things such as sessions): `<machine-id>/<local id>`, unique by construction once machine ids are.
+3. **Sequential ids** (`D-ADR####`, decision file numbers): the format is not changed, no temporary id, no suffix, no renumbering. Each sequence kind has one counter ref on the project's remote, `refs/fgos/seq/<kind>`, pointing at one commit with no parent whose message is the last number claimed. To claim, read the ref, add one, create a new parentless commit and push it with `--force-with-lease=<ref>:<old sha>` (`<ref>:` when the ref does not exist yet); the forge accepts it only if nobody claimed in between, and a refused claimer fetches and tries the next number. A number is claimed right before the commit that uses it; if that commit fails and nobody claimed after, the ref is pushed back with the same lease. Without a network the claim fails and the writer retries; the format is never changed to work around it. A repository with no remote claims against its local ref.
+
+Garbage: one ref and one commit of about 200 bytes per sequence kind on the remote; each claim replaces the previous commit. Evidence: probe on `github.com/vantt/forgent` (`plans/reports/research-261022-1217-identity-sequence-counter-ref-github-probe.md`): a race of two claims accepted exactly one, the loser's retry got the next number, a stale lease was refused, one claim costs about 2.5-3 s. When GitHub removes replaced commits is not observable.
+
+Pushes and ref writes go through the Git component, like every other git mutation.
 
 ## 5. Directory and resolution across machines
 
@@ -128,3 +151,4 @@ Rules:
 - 2026-10-22 — Owner approves the read surface of section 5: one read per identity (machine, project, session) plus `resolve` and `list`; bare `fgos identity` keeps its answer.
 - 2026-10-22 — **Decision 1 sharpened by the owner: one component, one authority, one crate** ("1 component thôi, đã cấp phát ở mọi mức độ rồi thì không cần 2 authority"). Identity grows inside the existing crate `packages/session-identity/rust`; no second crate is created. The writer-id rule becomes the local part of the session identity. Package, crate and spec are renamed to Identity in one change after HARDEN T1 phase 6 lands; until then the name stays to avoid colliding with T1. Reverse if the rename turns out to need an alias crate (it must not; L10).
 - 2026-10-22 11:32 — **Owner chooses option A: Identity mints every kind of id**, participants (machine, project, clone, session) and artifacts (work items, decisions, backlog rows, run and claim ids), through one mint door; record owners keep their records and call the door. The component, crate and spec are renamed to Identity; the verb stays `fgos identity`. **Nothing is built until a cheap mechanism against cross-machine collisions is settled** (owner: "sẽ không làm cho tới khi xác định được cơ chế rẻ tiền để chống trùng xuyên máy"). The plan of 2026-10-22 is held until then.
+- 2026-10-22 13:08 — **Owner settles the anti-collision mechanism** (section 4a): random ids of 50 bits, machine-scoped ids, and one counter ref per sequence kind claimed by compare-and-swap push. The owner ruled that sequential ids keep their exact format (no temporary ids, suffixes or renumbering) and that garbage must stay minimal; per-number claim refs were rejected for leaving one ref per claim. The lane leaves `held`. Rename to Identity runs first, because no branch has edited the crate yet (checked 13:08 on every `origin/harden/*` branch). Reverse rule 3 if the forge ever accepts a stale lease.

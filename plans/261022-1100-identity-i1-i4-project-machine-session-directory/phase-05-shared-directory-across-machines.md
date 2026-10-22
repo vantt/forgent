@@ -18,7 +18,7 @@ A session on one machine resolves a session on another machine after one `fgos e
 - Event Store publication live: the consumer registry `packages/event-store/contracts/consumers.v1.json` is empty and the store is dormant on main (scout §6). Identity would be its first or second consumer; the cutover order is decided with the GIT/ES lane on the board before this phase is planned in detail.
 
 ## Design (outline; detailed when the wait clears)
-- Event type `identity.directory-entry` (domain `identity`, scope `project`) in `packages/session-identity/contracts/identity.events.v1.json`, registered as a consumer with a rebuildable view under the user state root.
+- Event type `identity.directory-entry` (domain `identity`, scope `project`) in `packages/identity/contracts/identity.events.v1.json`, registered as a consumer with a rebuildable view under the user state root.
 - Each machine publishes its own entries on its own ref; resolve reads the local view and reports the age of the last fetch; a remote session is never reported alive.
 - Doctor warning: two remotes publish one project id (spec decision 3).
 - Machine handle uniqueness across machines: a duplicate slug falls back to the full machine id until an alias is set.
