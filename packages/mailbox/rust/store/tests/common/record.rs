@@ -177,7 +177,9 @@ pub fn child_arg() -> String {
     std::env::var(ARG).unwrap_or_default()
 }
 
-/// Starts this test binary as a child running `role`.
+/// Starts this test binary as a child running `role`. Its stdin is a pipe
+/// the parent keeps: a child blocked on [`child_await_byte`] goes on only
+/// when the parent calls [`release`].
 pub fn spawn(role: &str, fgos: &TempFgos, arg: &str) -> Child {
     Command::new(std::env::current_exe().unwrap())
         .args([
@@ -191,7 +193,7 @@ pub fn spawn(role: &str, fgos: &TempFgos, arg: &str) -> Child {
         .env(FGOS_DIR, fgos.fgos_dir())
         .env(SCRATCH, fgos.scratch())
         .env(ARG, arg)
-        .stdin(Stdio::null())
+        .stdin(Stdio::piped())
         .stdout(Stdio::null())
         .stderr(Stdio::inherit())
         .spawn()
@@ -225,5 +227,69 @@ pub fn wait_exit(child: &mut Child) -> ExitStatus {
             panic!("child did not exit within {DEADLINE:?}");
         }
         std::thread::sleep(Duration::from_millis(2));
+    }
+}
+
+/// Lets a child blocked on [`child_await_byte`] go on.
+pub fn release(child: &mut Child) {
+    use std::io::Write;
+    child.stdin.as_mut().unwrap().write_all(b"g").unwrap();
+}
+
+/// In a child: blocks until the parent calls [`release`].
+pub fn child_await_byte() {
+    use std::io::Read;
+    let mut byte = [0u8; 1];
+    std::io::stdin().read_exact(&mut byte).unwrap();
+}
+
+/// In a child: waits until `path` exists (a start barrier the parent
+/// installs), within the deadline.
+pub fn child_await_file(path: &Path) {
+    let deadline = Instant::now() + DEADLINE;
+    while !path.exists() {
+        assert!(Instant::now() < deadline, "never saw {}", path.display());
+        std::thread::sleep(Duration::from_millis(1));
+    }
+}
+
+/// Parks the calling thread until the process is killed.
+pub fn park_forever() -> ! {
+    loop {
+        std::thread::park();
+    }
+}
+
+/// The process record of a real process that has exited: started, read,
+/// killed and reaped. Never a fabricated pid.
+pub fn dead_head_record() -> fgos_process::facts::Record {
+    let mut child = Command::new("sleep")
+        .arg("600")
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .spawn()
+        .unwrap();
+    let record = fgos_process::facts::identity_of(fgos_process::ProcId(child.id()))
+        .unwrap()
+        .to_record();
+    child.kill().unwrap();
+    child.wait().unwrap();
+    record
+}
+
+/// This process's own record, a live head.
+pub fn own_head_record() -> fgos_process::facts::Record {
+    fgos_process::facts::self_identity().unwrap().to_record()
+}
+
+/// A registration of `writer` whose head is `head`.
+pub fn register_request(writer: &str, head: &fgos_process::facts::Record) -> RegisterRequest {
+    RegisterRequest {
+        key: key(writer),
+        cli: Cli::new("claude").unwrap(),
+        project: "forgent".to_string(),
+        own_suffix: None,
+        head: fgos_mailbox::head::head_text(head),
+        handle: None,
     }
 }

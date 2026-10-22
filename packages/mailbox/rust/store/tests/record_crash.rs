@@ -60,9 +60,7 @@ fn child_entry() {
     let block_at = |at: Step| {
         if at == step {
             rec::publish(&ready, &format!("{at:?}"));
-            loop {
-                std::thread::park();
-            }
+            rec::park_forever();
         }
         Ok(())
     };

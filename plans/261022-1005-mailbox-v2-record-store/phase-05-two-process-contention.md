@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Two processes contending, with the wait cap"
-status: pending
+status: completed
 depends_on: [4]
 ---
 
@@ -47,3 +47,23 @@ Five tests green on a fresh main merge, three consecutive runs.
 ## Risk and rollback
 
 - Test 4 needs a dead head record: spawn a child, take its record with `fgos_process::facts::identity_of(pid).expect(..).to_record()` (`facts.rs:50,285`; V3's `tests/head.rs:8-12` does the same for its own process with `self_identity()`), kill and reap it, then use that record. Never fabricate a pid.
+
+## API drift
+
+None (main `636df9d87`, unchanged since phase 4).
+
+## Deviations
+
+- No production code changed: every test passed against the hold of phases 2–4 on its first run.
+- Test 1: the two senders are registered heads, so each has its own account. Their binding heads are opaque test text, not process records: a sender's head is never judged in this test, so a live record would add nothing.
+- Test 3: `queue.cap` pending messages need `queue.cap / queue.perSender` registered senders, because one account may hold only `queue.perSender` of one recipient's queue.
+- Test 4: the dead head is a real `sleep` process, read with `identity_of`, killed and reaped (shared helper `dead_head_record`). Each contender writes its outcome and parks; the parent reads both outcomes and the snapshot, then kills both children.
+- Test 5: the child holds the lock parked at `Locked` and goes on only when the parent writes one byte to its stdin. The shared runner now always gives children a stdin pipe that the parent keeps. Holder-lock reports the timed-out wait as `Acquire::Timeout { waited_ms }`, and the test asserts `waited_ms >= mailbox.hook.lockWaitMs`.
+- A shared start barrier: each child announces `<name>.ready` and waits for the parent's `start` file.
+
+## Proof
+
+- `cargo test -p fgos-mailbox --test record_contention`, three runs in a row: 6 passed each time (5 tests plus `child_entry`).
+- `cargo test -p fgos-mailbox -p fgos-mailbox-core`: 176 passed.
+- Breaking the hold to release the lock right after the read (before the install) failed tests 1–4. Over three runs, the lost-update test failed every time and each of the others failed at least twice. Dropping the reported wait from `lock-busy` failed test 5. The hold was restored after each check.
+
