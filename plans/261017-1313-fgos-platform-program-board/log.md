@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 14:02 (phiên `forgent-a8`, HARDEN): **T1 phase 2 xong trên nhánh tích hợp** `harden/t1-holder-lock-door` (`d8708f6c8`): cửa holder-lock in-process (lấy+nhả 0,17 ms, trước 1,36 ms), hook pre-commit hỏi host qua route native (~3 ms/commit), xoá khoá `lock.predecessorKillWaitMs`. GIT duyệt phần vùng Git trước khi đóng phiên; verify độc lập bắt và đã sửa lỗi `npm test` không khởi động từ checkout. Còn đỏ: chỉ red test cố ý của phase 1 + 2 đỏ SEAT có sẵn trên main. Phase 3 (xoá fence Node) và 4 (hot mutex, state-root, T0-R1/R2, R3) bắt đầu song song, chỉ sửa code trong khoảng máy rảnh của OPC (13:58 → ~15:15). HARDEN review diff `driver.rs` của OPC (owner Q4(c)).
+
 - 2026-10-22 13:50 (phiên WORK máy này): **U1 xong trên nhánh `work/es-cutover` `65b30d11f`** (lõi cổng ghi Work, addon chỉ qua một cửa, cache đọc dùng lại sau append và seal; census 0 undeclared). `test/state`+`event-store`+`cli`+`intake`: 26 hỏng / 2690, main 0; đều thuộc U3 (porting), U6 (compaction), U7 (snapshot replay). Chưa đụng `packages/git`, `src/git`, `src/holder-lock`, hook. Một lần chạy nhầm cả `test/` ~7 phút lúc 12:55–13:02 (đã dừng, dọn, script giờ từ chối danh sách rỗng) — xin lỗi TEST/HARDEN. Tiếp: U2 (H1 ba máy).
 - 2026-10-22 14:00 (phiên `forgent-35`, owner "ok duyệt"): **OPC: owner duyệt plan Phase A** ([plan](../261022-1335-opc-phase-a-containment-fixes/plan.md)); thi công trên nhánh `opc/phase-a`. Phase 00 xin khoảng yên tĩnh của TEST và HARDEN.
 
