@@ -1,0 +1,543 @@
+{
+  "inputHEAD": "7ea23e385c8a7b146aab8365d37ece7d15409352",
+  "lastPriorAccounting": [
+    "0fe60f65f",
+    "8b60e8e68"
+  ],
+  "beforeReport": "/tmp/fgos-work/p8-audit-0yofl1r3/report.json",
+  "method": "Append check A exact unaccounted commit/path pairs to each existing checks.mjs exceptions array. Authority follows the producing commit record; no approval. All bytes outside the single insertion remain identical.",
+  "environmentAdaptation": {
+    "reason": "Unmodified reporter returned checks=null; both checks.mjs stderr report ENOBUFS from default execFileSync Git-log capture.",
+    "preloadSource": "const cp=require('node:child_process'); const original=cp.execFileSync; cp.execFileSync=function(file,args,options){return original(file,args,{...options,maxBuffer:Math.max(options?.maxBuffer??0,128*1024*1024)});}; require('node:module').syncBuiltinESMExports();\n",
+    "preloadSha256": "ebebcc069e7d8f707254652b4cdd946f5f60056020a2bde5e07cbd5a036c45d2",
+    "effect": "Raise only child-process capture maxBuffer to 128 MiB in scratch; unchanged checks and exit codes, no skips."
+  },
+  "manifests": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "beforeSha256": "95e97a16f3fae05dc87134a9de958af24412ba311d13b1bb25ba6dbaf267d0f0",
+      "afterSha256": "6efd3b17f66dd5002950d414a58068d1032fd9aa0252ee1104deef5870763412",
+      "beforeExceptionCount": 4005,
+      "appendedCount": 29,
+      "pairs": [
+        {
+          "commit": "7ea23e385c8a7b146aab8365d37ece7d15409352",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-06b-closeout-accounting-brief.md",
+          "authority": "Lead brief"
+        },
+        {
+          "commit": "fdc84570c7c4e30de4ca29237bbef2c19b1e800c",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "authority": "L12-114"
+        },
+        {
+          "commit": "fdc84570c7c4e30de4ca29237bbef2c19b1e800c",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-06b-rehearsal.md",
+          "authority": "L12-114"
+        },
+        {
+          "commit": "5dd5feeb41287623dd9d7e208b8922f47ab8d9a6",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-06b-rehearsal-brief.md",
+          "authority": "Lead brief"
+        },
+        {
+          "commit": "3226c40665507265322a2c29ea2f1e23454d6f32",
+          "path": "CHANGELOG.md",
+          "authority": "L12-111"
+        },
+        {
+          "commit": "3226c40665507265322a2c29ea2f1e23454d6f32",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "authority": "L12-111"
+        },
+        {
+          "commit": "ba1d05d55315e2827158145d54f62b1fc51c4d6e",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "authority": "L12-113"
+        },
+        {
+          "commit": "ba1d05d55315e2827158145d54f62b1fc51c4d6e",
+          "path": "src/runner/documentation-cutover-lease.mjs",
+          "authority": "L12-113"
+        },
+        {
+          "commit": "ba1d05d55315e2827158145d54f62b1fc51c4d6e",
+          "path": "test/runner/documentation-cutover-lease.test.mjs",
+          "authority": "L12-113"
+        },
+        {
+          "commit": "bb5c78e620f93066dd55de7467ea45379b218614",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-06b-final.md",
+          "authority": "review report"
+        },
+        {
+          "commit": "bb5c78e620f93066dd55de7467ea45379b218614",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-06b-o1-brief.md",
+          "authority": "Lead brief"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "CHANGELOG.md",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "packages/git/contracts/mutation-census.v1.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-check-result.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check-result.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-binding-check.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-census.log",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-deferred-rebinds.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-merge-accounting.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-merge-rebindings.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-out-of-scope-binding.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-pair-accounting.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-ratchet-tests.log",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-ratchet.log",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-retired-candidate-carries.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-verification.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        }
+      ],
+      "afterExceptionCount": 4034,
+      "singleLiteralInsertion": {
+        "offset": 1172725,
+        "bytes": 6068,
+        "removedInsertionRestoresOriginalBytes": true,
+        "offsetUnit": "Unicode code points",
+        "byteOffset": 1172725
+      },
+      "otherManifestFieldsUnchanged": true,
+      "otherScriptBytesUnchanged": true
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "beforeSha256": "db83746db22d0caf581dc7ee95db74f98b0dff1927c18d924c4e8be3b9b32ff1",
+      "afterSha256": "7cbf52d1ad71c8b2341211a66be1e2c8d27dda4feadeb4bdd801ae4d07dfab14",
+      "beforeExceptionCount": 4005,
+      "appendedCount": 29,
+      "pairs": [
+        {
+          "commit": "7ea23e385c8a7b146aab8365d37ece7d15409352",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-06b-closeout-accounting-brief.md",
+          "authority": "Lead brief"
+        },
+        {
+          "commit": "fdc84570c7c4e30de4ca29237bbef2c19b1e800c",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "authority": "L12-114"
+        },
+        {
+          "commit": "fdc84570c7c4e30de4ca29237bbef2c19b1e800c",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-06b-rehearsal.md",
+          "authority": "L12-114"
+        },
+        {
+          "commit": "5dd5feeb41287623dd9d7e208b8922f47ab8d9a6",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-06b-rehearsal-brief.md",
+          "authority": "Lead brief"
+        },
+        {
+          "commit": "3226c40665507265322a2c29ea2f1e23454d6f32",
+          "path": "CHANGELOG.md",
+          "authority": "L12-111"
+        },
+        {
+          "commit": "3226c40665507265322a2c29ea2f1e23454d6f32",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "authority": "L12-111"
+        },
+        {
+          "commit": "ba1d05d55315e2827158145d54f62b1fc51c4d6e",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "authority": "L12-113"
+        },
+        {
+          "commit": "ba1d05d55315e2827158145d54f62b1fc51c4d6e",
+          "path": "src/runner/documentation-cutover-lease.mjs",
+          "authority": "L12-113"
+        },
+        {
+          "commit": "ba1d05d55315e2827158145d54f62b1fc51c4d6e",
+          "path": "test/runner/documentation-cutover-lease.test.mjs",
+          "authority": "L12-113"
+        },
+        {
+          "commit": "bb5c78e620f93066dd55de7467ea45379b218614",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-06b-final.md",
+          "authority": "review report"
+        },
+        {
+          "commit": "bb5c78e620f93066dd55de7467ea45379b218614",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-06b-o1-brief.md",
+          "authority": "Lead brief"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "CHANGELOG.md",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "packages/git/contracts/mutation-census.v1.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-check-result.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check-result.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-binding-check.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-census.log",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-deferred-rebinds.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-merge-accounting.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-merge-rebindings.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-out-of-scope-binding.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-pair-accounting.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-ratchet-tests.log",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-ratchet.log",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-retired-candidate-carries.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        },
+        {
+          "commit": "8b60e8e68f66eef52a62918e0d9cf0db1c0f769b",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-verification.json",
+          "authority": "Lead commit of carried outputs (L12-112)"
+        }
+      ],
+      "afterExceptionCount": 4034,
+      "singleLiteralInsertion": {
+        "offset": 1188330,
+        "bytes": 6068,
+        "removedInsertionRestoresOriginalBytes": true,
+        "offsetUnit": "Unicode code points",
+        "byteOffset": 1188330
+      },
+      "otherManifestFieldsUnchanged": true,
+      "otherScriptBytesUnchanged": true
+    }
+  ],
+  "authoritySources": {
+    "3226c4066": "Docs follow-up delivery is appended under L12-111 and explicitly includes the L12-113 ruling.",
+    "8b60e8e68": "Lead commit of carried outputs (L12-112); 0fe60f65f has no check A offender pairs.",
+    "bb5c78e62": "The producing commit contains a review report and Lead brief; each path gets its own authority."
+  },
+  "finalReporter": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--require=/tmp/fgos-work/closeout-accounting/read-buffer.cjs python3 -B plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py",
+    "exit": 1,
+    "head": "7ea23e385c8a7b146aab8365d37ece7d15409352",
+    "scratchReport": "/tmp/fgos-work/p8-audit-9izxfost/report.json",
+    "fullScratchReportSha256": "84a8c8dc900583534f21f2cd145ed0c922152e6ad175c8e2a3534937e1742b3e",
+    "ok": false,
+    "manifests": [
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+        "commands": [
+          {
+            "script": "ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "audit-ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "checks.mjs",
+            "exit": 1
+          }
+        ],
+        "failingRows": [],
+        "ownership": {
+          "noNewDoubleOwnership": true,
+          "nativePlatformTargetIdentityDuplicates": 0,
+          "newActiveSourcePairCollisions": []
+        },
+        "accountedPairs": 4034,
+        "unaccountedPairs": [],
+        "newWorkingViolations": [
+          "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-06b-closeout-pair-accounting.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-06b-closeout-rebindings.json"
+        ],
+        "B": {
+          "rows": [
+            {
+              "path": "scripts/generate-doc-inventory.mjs",
+              "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+              "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+            },
+            {
+              "path": "scripts/doc-inventory-artifact.mjs",
+              "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+              "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+            },
+            {
+              "path": "scripts/generate-shipped-path-inventory.mjs",
+              "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+              "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+            },
+            {
+              "path": "scripts/check-legacy-docs-ratchet.mjs",
+              "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+              "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+            },
+            {
+              "path": "scripts/lib/is-main-module.mjs",
+              "expected": "680570946fa1381474900c9192795514b5b88f48",
+              "actual": "680570946fa1381474900c9192795514b5b88f48"
+            }
+          ],
+          "ok": true
+        },
+        "HFindings": [],
+        "I": {
+          "equal": false,
+          "links": [
+            "docs/platform/**",
+            "docs/platform/<area",
+            "docs/platform/README.md",
+            "docs/platform/agent-mailbox/spec.md",
+            "docs/platform/agent-protocol/spec.md",
+            "docs/platform/component-boundary.md",
+            "docs/platform/config/spec.md",
+            "docs/platform/event-store/spec.md",
+            "docs/platform/git/spec.md",
+            "docs/platform/holder-lock/spec.md",
+            "docs/platform/identity/spec.md",
+            "docs/platform/packaging-distribution/README.md",
+            "docs/platform/packaging-distribution/vision.md",
+            "docs/platform/process/spec.md",
+            "docs/platform/run-supervisor/spec.md",
+            "docs/platform/terminal-control/spec.md",
+            "docs/platform/yaml-document/spec.md"
+          ],
+          "equalToHEAD": true,
+          "frozenBaselineUnchanged": true
+        },
+        "checksOk": false
+      },
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+        "commands": [
+          {
+            "script": "ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "audit-ownership.mjs",
+            "exit": 0
+          },
+          {
+            "script": "checks.mjs",
+            "exit": 1
+          }
+        ],
+        "failingRows": [],
+        "ownership": {
+          "noNewDoubleOwnership": true,
+          "nativePlatformTargetIdentityDuplicates": 0,
+          "newActiveSourcePairCollisions": []
+        },
+        "accountedPairs": 4034,
+        "unaccountedPairs": [],
+        "newWorkingViolations": [
+          "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-06b-closeout-pair-accounting.json",
+          "plans/260925-documentation-authority-unification/reports/phase-08/step-06b-closeout-rebindings.json"
+        ],
+        "B": {
+          "rows": [
+            {
+              "path": "scripts/generate-doc-inventory.mjs",
+              "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+              "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+            },
+            {
+              "path": "scripts/doc-inventory-artifact.mjs",
+              "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+              "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+            },
+            {
+              "path": "scripts/generate-shipped-path-inventory.mjs",
+              "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+              "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+            },
+            {
+              "path": "scripts/check-legacy-docs-ratchet.mjs",
+              "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+              "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+            },
+            {
+              "path": "scripts/lib/is-main-module.mjs",
+              "expected": "680570946fa1381474900c9192795514b5b88f48",
+              "actual": "680570946fa1381474900c9192795514b5b88f48"
+            }
+          ],
+          "ok": true
+        },
+        "HFindings": [],
+        "I": {
+          "equal": false,
+          "links": [
+            "docs/platform/**",
+            "docs/platform/<area",
+            "docs/platform/README.md",
+            "docs/platform/agent-mailbox/spec.md",
+            "docs/platform/agent-protocol/spec.md",
+            "docs/platform/component-boundary.md",
+            "docs/platform/config/spec.md",
+            "docs/platform/event-store/spec.md",
+            "docs/platform/git/spec.md",
+            "docs/platform/holder-lock/spec.md",
+            "docs/platform/identity/spec.md",
+            "docs/platform/packaging-distribution/README.md",
+            "docs/platform/packaging-distribution/vision.md",
+            "docs/platform/process/spec.md",
+            "docs/platform/run-supervisor/spec.md",
+            "docs/platform/terminal-control/spec.md",
+            "docs/platform/yaml-document/spec.md"
+          ],
+          "equalToHEAD": true,
+          "frozenBaselineUnchanged": true
+        },
+        "checksOk": false
+      }
+    ]
+  },
+  "finalVerification": {
+    "gitDiffCheckExit": 0,
+    "onlyThreeAuthorizedBindingRowsChanged": true,
+    "sourceIdentitiesAndDigestsUnchanged": true,
+    "singleInsertionReconstructsEachHEADManifest": true,
+    "allOtherManifestFieldsAndScriptBytesIdentical": true,
+    "writeScopeVerified": true,
+    "trackedChanges": 4,
+    "untrackedCloseoutProofFiles": 2,
+    "futureRunnerCommit": "Not fabricated or pre-accounted; Lead owes actual commit/path accounting under L12-11."
+  }
+}

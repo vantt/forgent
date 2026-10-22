@@ -2220,3 +2220,38 @@ Owner decision 6 and Lead brief `step-06b-rehearsal-brief.md` were executed end-
 - **State root & addon descriptor:** Under the read-only sandbox mount of `/home/vantt/.local/state/fgos`, `FGOS_STATE_ROOT` was directed to `/tmp/fgos-work/state` (mode 0700) to permit GitDriver's runtime floor probe, and `native-addon.json` was placed in the disposable clone to resolve the native addon for the git hook environment where `FGOS_ACTIVE_MANIFEST_PATH` is scrubbed by Git.
 - **Token privacy:** The holder token is generated via `crypto.randomBytes(32)` at mode 0600 in the holder's `.fgos/`; neither CLI JSON envelopes nor committed sidecar bytes expose the plaintext token (only its SHA-256 hash).
 - **Scope:** No git write ran in this repository; no installed `fgos` CLI, workspace `.fgos` access, secrets read, or lifecycle verbs were used. Deliverable files are `reports/phase-08/step-06b-rehearsal.md` and this note. `needsWrites: []`.
+
+## L12-115 — Close Step 6b and reconcile bindings and committed pairs (Doer, 2026-10-22)
+
+Under Lead brief `step-06b-closeout-accounting-brief.md`, **Step 6b is closed on the plan branch**. L12-104 through L12-114 record the delivered documentation-cutover lease: committed-main sidecar authority, checkout-local holder token, serialized acquire/release/owner-abandon through ScopedCommit, fail-closed pre-commit/reference-transaction guards, doctor registration, operation-local Unit/Workflow admission and both runner/Workflow Land gates. Later corrections bind callers to the gated repository, retain Workflow origin, preserve holder tokens after landed receipt failures, and refuse stray-main-token admission. The two documentation turns (`b6edb9712`, `3226c4066`) describe the contracts and known limits. Closure here is the authorized delivery/accounting checkpoint; it is not main landing or Phase 9 cutover.
+
+### Recorded reviews and rehearsal
+
+| Independent review report | Recorded verdict | Follow-up |
+| --- | --- | --- |
+| `review-a38-step-06b-slice1.md` | rework | L12-105: committed authority, private holder custody, hooks and transitions |
+| `review-a38-step-06b-slice1-r2.md` | rework | L12-106: production ScopedCommit, NUL-safe paths, real scope digests and doctor applicability |
+| `review-a38-step-06b-slice1-r3.md` | rework | L12-108: hook fast path/cost, authenticated release, corrupt repair and rollback |
+| `review-a38-step-06b-slice1-r4.md` | ok, four Low observations | L12-111: stray-token diagnostics, held-hook wiring, receipt preservation; maintenance limits retained |
+| `review-a38-step-06b-slice2.md` | rework | L12-109: explicit caller, both Land gates, pure binding and admission before effects |
+| `review-a38-step-06b-slice2-r2.md` | rework | L12-111: same-repository caller proof and standalone native test staging |
+| `review-a38-step-06b-final.md` | ok, three Low observations | L12-113 closes O1 with owning proof; O2 recorded-origin answers and O3 low-level cwd fallback remain documented |
+
+The final review predates the O1 gate follow-up; this records turn does not invent a later independent verdict. L12-113 records final targeted results **15/15 lease, 31/31 hook e2e and 19/19 runner Land**, including its initial environment failures. L12-114 / `step-06b-rehearsal.md` record **all seven rehearsal steps passing** on a disposable clone at `5dd5feeb4`: free status/doctor, acquire/token privacy, non-holder/raw-main/foreign refusals, allowed holder/out-of-scope operations and holder Land, release/drift, abandon/reacquire/final release, and cleanup. These are historical results, not reruns in this records turn. No full-suite-green claim is added.
+
+### Step 0 and L12-11 accounting
+
+Both unchanged embedded extractors freshly agree on the complete historical and current units of **all three edited documents**. Recursive traversal of ledger and pilot decisions checks **eight direct bindings / zero contextual group members**: one holder-lock binding, seven setup/doctor bindings, zero inbound Git bindings. Current extraction covers **144 holder-lock / 286 Git / 45 setup-doctor units**. Exact full text, heading ancestry and both immediate neighbour texts/digests uniquely identify the three retained setup/doctor passages. Re-place **27 → 29, 28 → 30 and 29 → 31**, preserving all three target digests and source identities. Only `ledger/decisions/s4-packaging-distribution-distribution.json` changes; all three rows remain **pending independent review, with no approval carried**. Complete witnesses, independently recomputed digests and zero remaining drift are in `step-06b-closeout-rebindings.json`. This closes the three inherited drift carries named by L12-112; it does not erase the historical carry record or unrelated Step 7 obligations.
+
+Check A reports exactly **29 unaccounted commit/path pairs in each manifest** since the last `0fe60f65f` / `8b60e8e68` accounting. Append those exact pairs to both Phase 6 `checks.mjs` exception arrays, using each producing record's authority (L12-111/113/114, Lead brief, review report, or Lead commit of carried outputs under L12-112). Each array grows **4,005 → 4,034 entries**. A single literal insertion in each manifest reconstructs its HEAD bytes exactly when removed; every other byte stays unchanged. `step-06b-closeout-pair-accounting.json` records all pairs, source authorities, before/after hashes and insertion proofs. The unmodified reporter initially exceeded Node's default Git-log capture buffer (`ENOBUFS`); the established scratch-only 128 MiB preload changes capture capacity, not checks or return codes.
+
+Post-append reproduction finds **zero failing ownership rows and zero committed unaccounted pairs in both manifests**. Ownership and audit-ownership scripts exit 0. The overall reporter remains exit 1 only for this turn's authorized uncommitted closeout records under check A; the runner's future commit cannot be pre-accounted. Frozen B passes, H has zero findings, reader links equal HEAD, and the frozen reader baseline remains unchanged. Exact final command outcomes and working-path diagnostics are retained with the pair-accounting receipt. Lead must account this turn's actual runner commit under L12-11 after it exists.
+
+### Open Step 7 carries
+
+- Land the lease implementation and its contracts **with the Phase 9 cutover**, after the authorized verification and fresh Git digest recomputation; sidecar drift values are not cutover authority.
+- Obtain **Git-owner consent for Git spec section 7 before landing**. This turn does not assert consent.
+- Ensure the **holder-lock owner is notified of the section 7 `documentation-cutover` registry row** (rank 10, fence none, documentation owner, public acquire only). This remains an owner handoff carry; no notification receipt exists in this turn and no external message was sent.
+- Preserve independent review of these three changed bindings and earlier pending rebinds, plus L12-112 retirement/conservation and Step 3/4/5 final-assembly carries. Token residue after interrupted lending requires checked manual cleanup; corrupt-sidecar pack-refs/gc refusal, claim-before-admission and legacy origin limits remain documented.
+
+Only the explicitly writable records, decision shard and two exception insertions changed. No product code/docs/tests/skills/baselines, workspace `.fgos`, secrets file, fgOS CLI, Git write, lifecycle verb or subagent was used. Required outbox files are the assignment exception; runner owns commit. MDView MCP is unavailable and no preview was launched under this records-only write boundary. `needsWrites: []`.

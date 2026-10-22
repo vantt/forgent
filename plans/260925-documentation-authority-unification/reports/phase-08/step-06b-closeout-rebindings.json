@@ -1,0 +1,1749 @@
+{
+  "inputHEAD": "7ea23e385c8a7b146aab8365d37ece7d15409352",
+  "authority": "Lead brief / L12-115",
+  "method": "Both unchanged embedded unitsOf extractors agree on complete historical/current units; match full text, digest, heading ancestry and both immediate neighbours. Ordinals are recorded outputs only. No source/native identity or approval is carried.",
+  "extractorsAgree": true,
+  "extractors": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "script": "step10-sync287-lib.mjs",
+      "sha256": "083795c90eac1d5601fedc2261390f15668fceed68a3053777960fea9a927dc3"
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "script": "lib.mjs",
+      "sha256": "48e153938d145bd41986b47ba816d4506db1a90c664170ee08e17bc60341ba41"
+    }
+  ],
+  "checkedFiles": [
+    "docs/platform/holder-lock/spec.md",
+    "docs/platform/git/spec.md",
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md"
+  ],
+  "countsByFile": {
+    "docs/platform/holder-lock/spec.md": {
+      "historicalUnits": {
+        "b6edb9712-parent": 125,
+        "b6edb9712": 139,
+        "3226c4066-parent": 139,
+        "3226c4066": 144,
+        "HEAD": 144
+      },
+      "directBindings": 1,
+      "groupMembers": 0,
+      "rebindings": 0
+    },
+    "docs/platform/git/spec.md": {
+      "historicalUnits": {
+        "b6edb9712-parent": 279,
+        "b6edb9712": 286,
+        "3226c4066-parent": 286,
+        "3226c4066": 286,
+        "HEAD": 286
+      },
+      "directBindings": 0,
+      "groupMembers": 0,
+      "rebindings": 0
+    },
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md": {
+      "historicalUnits": {
+        "b6edb9712-parent": 43,
+        "b6edb9712": 45,
+        "3226c4066-parent": 45,
+        "3226c4066": 45,
+        "HEAD": 45
+      },
+      "directBindings": 7,
+      "groupMembers": 0,
+      "rebindings": 3
+    }
+  },
+  "checkedBindings": [
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        10
+      ],
+      "claimId": "claim_ac8cc5d1152e7a057ffbef1e804079aa",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "beforeAnchor": "contributor-hooks-setup",
+      "beforeDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+      "afterAnchor": "contributor-hooks-setup",
+      "afterDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+      "historicalWitness": {
+        "ref": "b6edb9712-parent",
+        "unit": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Contributor hooks setup",
+          "anchor": "contributor-hooks-setup",
+          "githubAnchor": "contributor-hooks-setup",
+          "stableAnchor": "h-d6329adac9c0",
+          "startLine": 153,
+          "endLine": 153,
+          "textDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+          "sample": "Contributor hooks setup",
+          "sectionPayloadDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "followingBlockDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "identityFingerprint": "c4d5b89fd8ed99a07024c496386969022c40c075bf0bc95629b02860c583d086",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Contributor hooks setup",
+          "sectionText": "##### Contributor hooks setup\n\n- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-26",
+          "githubAnchor": "unheaded-block-26",
+          "stableAnchor": "unheaded-block-26",
+          "title": "Unheaded block 26",
+          "startLine": 151,
+          "endLine": 151,
+          "textDigest": "65ef150ce20bd76be43ca121bcc0c31f7d6cc68d35c77284dbb43070231b03dc",
+          "sample": "Added in candidate — complete source units from `docs/specs/distribution.md` at blob `13d2e172de35a570d148022d4c859cac05223acb`, after the boundary main sync. Dated decisions, impl",
+          "identityFingerprint": "73910365c03e2b8e8af103401ad1d7c110159d3624e77f2b132aa72d905dbdcd",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "Added in candidate — complete source units from `docs/specs/distribution.md` at blob `13d2e172de35a570d148022d4c859cac05223acb`, after the boundary main sync. Dated decisions, implementation rules and recorded gaps are retained; current assertions remain subject to the independent truth sample."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-27",
+          "githubAnchor": "unheaded-block-27",
+          "stableAnchor": "unheaded-block-27",
+          "title": "Unheaded block 27",
+          "startLine": 155,
+          "endLine": 178,
+          "textDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "sample": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this re",
+          "identityFingerprint": "84d5b75480549a2ee4a9c52b20563ba7cc5eaff063b44f522cc44e5511acd3b5",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Contributor hooks setup"
+          ],
+          "text": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+        }
+      },
+      "currentWitness": {
+        "unit": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Contributor hooks setup",
+          "anchor": "contributor-hooks-setup",
+          "githubAnchor": "contributor-hooks-setup",
+          "stableAnchor": "h-0a33ff63db77",
+          "startLine": 159,
+          "endLine": 159,
+          "textDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+          "sample": "Contributor hooks setup",
+          "sectionPayloadDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "followingBlockDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "identityFingerprint": "c4d5b89fd8ed99a07024c496386969022c40c075bf0bc95629b02860c583d086",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Contributor hooks setup",
+          "sectionText": "##### Contributor hooks setup\n\n- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-28",
+          "githubAnchor": "unheaded-block-28",
+          "stableAnchor": "unheaded-block-28",
+          "title": "Unheaded block 28",
+          "startLine": 157,
+          "endLine": 157,
+          "textDigest": "65ef150ce20bd76be43ca121bcc0c31f7d6cc68d35c77284dbb43070231b03dc",
+          "sample": "Added in candidate — complete source units from `docs/specs/distribution.md` at blob `13d2e172de35a570d148022d4c859cac05223acb`, after the boundary main sync. Dated decisions, impl",
+          "identityFingerprint": "73910365c03e2b8e8af103401ad1d7c110159d3624e77f2b132aa72d905dbdcd",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "Added in candidate — complete source units from `docs/specs/distribution.md` at blob `13d2e172de35a570d148022d4c859cac05223acb`, after the boundary main sync. Dated decisions, implementation rules and recorded gaps are retained; current assertions remain subject to the independent truth sample."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-29",
+          "githubAnchor": "unheaded-block-29",
+          "stableAnchor": "unheaded-block-29",
+          "title": "Unheaded block 29",
+          "startLine": 161,
+          "endLine": 184,
+          "textDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "sample": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this re",
+          "identityFingerprint": "84d5b75480549a2ee4a9c52b20563ba7cc5eaff063b44f522cc44e5511acd3b5",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Contributor hooks setup"
+          ],
+          "text": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+        }
+      },
+      "neighbourTextAndDigestsEqual": true,
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        11
+      ],
+      "claimId": "claim_5c58459a3d4fb3c94d3d177ae5ff71ad",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "beforeAnchor": "unheaded-block-27",
+      "beforeDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+      "afterAnchor": "unheaded-block-29",
+      "afterDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+      "historicalWitness": {
+        "ref": "b6edb9712-parent",
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-27",
+          "githubAnchor": "unheaded-block-27",
+          "stableAnchor": "unheaded-block-27",
+          "title": "Unheaded block 27",
+          "startLine": 155,
+          "endLine": 178,
+          "textDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "sample": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this re",
+          "identityFingerprint": "84d5b75480549a2ee4a9c52b20563ba7cc5eaff063b44f522cc44e5511acd3b5",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Contributor hooks setup"
+          ],
+          "text": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Contributor hooks setup",
+          "anchor": "contributor-hooks-setup",
+          "githubAnchor": "contributor-hooks-setup",
+          "stableAnchor": "h-d6329adac9c0",
+          "startLine": 153,
+          "endLine": 153,
+          "textDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+          "sample": "Contributor hooks setup",
+          "sectionPayloadDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "followingBlockDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "identityFingerprint": "c4d5b89fd8ed99a07024c496386969022c40c075bf0bc95629b02860c583d086",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Contributor hooks setup",
+          "sectionText": "##### Contributor hooks setup\n\n- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+        },
+        "next": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Setup",
+          "anchor": "setup",
+          "githubAnchor": "setup",
+          "stableAnchor": "h-8b25d66670bc",
+          "startLine": 180,
+          "endLine": 180,
+          "textDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+          "sample": "Setup",
+          "sectionPayloadDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "followingBlockDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "identityFingerprint": "451b3f0ee715b54c4437416eedc7d469d868d68b927ce27e9ace4b614d285d75",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Setup",
+          "sectionText": "##### Setup\n\n- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        }
+      },
+      "currentWitness": {
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-29",
+          "githubAnchor": "unheaded-block-29",
+          "stableAnchor": "unheaded-block-29",
+          "title": "Unheaded block 29",
+          "startLine": 161,
+          "endLine": 184,
+          "textDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "sample": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this re",
+          "identityFingerprint": "84d5b75480549a2ee4a9c52b20563ba7cc5eaff063b44f522cc44e5511acd3b5",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Contributor hooks setup"
+          ],
+          "text": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Contributor hooks setup",
+          "anchor": "contributor-hooks-setup",
+          "githubAnchor": "contributor-hooks-setup",
+          "stableAnchor": "h-0a33ff63db77",
+          "startLine": 159,
+          "endLine": 159,
+          "textDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+          "sample": "Contributor hooks setup",
+          "sectionPayloadDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "followingBlockDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "identityFingerprint": "c4d5b89fd8ed99a07024c496386969022c40c075bf0bc95629b02860c583d086",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Contributor hooks setup",
+          "sectionText": "##### Contributor hooks setup\n\n- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+        },
+        "next": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Setup",
+          "anchor": "setup",
+          "githubAnchor": "setup",
+          "stableAnchor": "h-7603a3df0127",
+          "startLine": 186,
+          "endLine": 186,
+          "textDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+          "sample": "Setup",
+          "sectionPayloadDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "followingBlockDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "identityFingerprint": "451b3f0ee715b54c4437416eedc7d469d868d68b927ce27e9ace4b614d285d75",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Setup",
+          "sectionText": "##### Setup\n\n- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        }
+      },
+      "neighbourTextAndDigestsEqual": true,
+      "drift": true,
+      "beforeRow": {
+        "claimId": "claim_5c58459a3d4fb3c94d3d177ae5ff71ad",
+        "sourceUnitDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-27",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+        "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-8, under \"Contributor hooks setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-21. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-21 -> unheaded-block-25. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending. Step 2 merge pre-step at 587c2a791a06cdd091c6437d46a5f367e9bf9e0a: unheaded-block-25 -> unheaded-block-27. Unique full historical passage digest and exact text survive under unchanged heading ancestry; positional block shift caused by inserted git-transport-config paragraph before retained appendix. Source identity unchanged; no native identity assignment; independent review pending, no approval carry.",
+        "targetUnitDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Contributor hooks setup"
+        ],
+        "reviewNote": "Step 2 merge pre-step: changed binding; independent review pending; no approval carried."
+      },
+      "afterRow": {
+        "claimId": "claim_5c58459a3d4fb3c94d3d177ae5ff71ad",
+        "sourceUnitDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-29",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:fgos-run_unit-run-179267cde43cfc@2026-10-22",
+        "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-8, under \"Contributor hooks setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-21. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-21 -> unheaded-block-25. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending. Step 2 merge pre-step at 587c2a791a06cdd091c6437d46a5f367e9bf9e0a: unheaded-block-25 -> unheaded-block-27. Unique full historical passage digest and exact text survive under unchanged heading ancestry; positional block shift caused by inserted git-transport-config paragraph before retained appendix. Source identity unchanged; no native identity assignment; independent review pending, no approval carry. Step 6b closeout at 7ea23e385c8a7b146aab8365d37ece7d15409352: unheaded-block-27 -> unheaded-block-29. Unique complete historical passage and immediate neighbours survive under unchanged heading ancestry; insertion before retained detail shifted the ordinal. Source identity unchanged; independent review pending, no approval carry.",
+        "targetUnitDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Contributor hooks setup"
+        ],
+        "reviewNote": "Step 6b closeout: content-and-neighbour rebind; independent review pending; no approval carried."
+      },
+      "removedApprovalFields": {},
+      "method": "Unique exact complete passage, heading ancestry and both immediate neighbour texts/digests; anchor-only re-placement."
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        12
+      ],
+      "claimId": "claim_2cca265eea57df2daf94c3b3876393f3",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "beforeAnchor": "setup",
+      "beforeDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+      "afterAnchor": "setup",
+      "afterDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+      "historicalWitness": {
+        "ref": "b6edb9712-parent",
+        "unit": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Setup",
+          "anchor": "setup",
+          "githubAnchor": "setup",
+          "stableAnchor": "h-8b25d66670bc",
+          "startLine": 180,
+          "endLine": 180,
+          "textDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+          "sample": "Setup",
+          "sectionPayloadDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "followingBlockDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "identityFingerprint": "451b3f0ee715b54c4437416eedc7d469d868d68b927ce27e9ace4b614d285d75",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Setup",
+          "sectionText": "##### Setup\n\n- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-27",
+          "githubAnchor": "unheaded-block-27",
+          "stableAnchor": "unheaded-block-27",
+          "title": "Unheaded block 27",
+          "startLine": 155,
+          "endLine": 178,
+          "textDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "sample": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this re",
+          "identityFingerprint": "84d5b75480549a2ee4a9c52b20563ba7cc5eaff063b44f522cc44e5511acd3b5",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Contributor hooks setup"
+          ],
+          "text": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-28",
+          "githubAnchor": "unheaded-block-28",
+          "stableAnchor": "unheaded-block-28",
+          "title": "Unheaded block 28",
+          "startLine": 182,
+          "endLine": 214,
+          "textDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "sample": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for ev",
+          "identityFingerprint": "48447621ee00b66d1bf54560f32c99d5392879efb1c1bfe602dfffdd88856907",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Setup"
+          ],
+          "text": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        }
+      },
+      "currentWitness": {
+        "unit": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Setup",
+          "anchor": "setup",
+          "githubAnchor": "setup",
+          "stableAnchor": "h-7603a3df0127",
+          "startLine": 186,
+          "endLine": 186,
+          "textDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+          "sample": "Setup",
+          "sectionPayloadDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "followingBlockDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "identityFingerprint": "451b3f0ee715b54c4437416eedc7d469d868d68b927ce27e9ace4b614d285d75",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Setup",
+          "sectionText": "##### Setup\n\n- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-29",
+          "githubAnchor": "unheaded-block-29",
+          "stableAnchor": "unheaded-block-29",
+          "title": "Unheaded block 29",
+          "startLine": 161,
+          "endLine": 184,
+          "textDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "sample": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this re",
+          "identityFingerprint": "84d5b75480549a2ee4a9c52b20563ba7cc5eaff063b44f522cc44e5511acd3b5",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Contributor hooks setup"
+          ],
+          "text": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-30",
+          "githubAnchor": "unheaded-block-30",
+          "stableAnchor": "unheaded-block-30",
+          "title": "Unheaded block 30",
+          "startLine": 188,
+          "endLine": 220,
+          "textDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "sample": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for ev",
+          "identityFingerprint": "48447621ee00b66d1bf54560f32c99d5392879efb1c1bfe602dfffdd88856907",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Setup"
+          ],
+          "text": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        }
+      },
+      "neighbourTextAndDigestsEqual": true,
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        13
+      ],
+      "claimId": "claim_40d8d8f06aaedbc16cdcc4f8603e6d09",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "beforeAnchor": "doctor",
+      "beforeDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+      "afterAnchor": "doctor",
+      "afterDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+      "historicalWitness": {
+        "ref": "b6edb9712-parent",
+        "unit": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Doctor",
+          "anchor": "doctor",
+          "githubAnchor": "doctor",
+          "stableAnchor": "h-1d14ad78a4ae",
+          "startLine": 216,
+          "endLine": 216,
+          "textDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+          "sample": "Doctor",
+          "sectionPayloadDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "followingBlockDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "identityFingerprint": "a694327a97e6bc17eb43b0e007434c507ed05c3ed2f9f453246af7adb4cae615",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Doctor",
+          "sectionText": "##### Doctor\n\n- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-28",
+          "githubAnchor": "unheaded-block-28",
+          "stableAnchor": "unheaded-block-28",
+          "title": "Unheaded block 28",
+          "startLine": 182,
+          "endLine": 214,
+          "textDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "sample": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for ev",
+          "identityFingerprint": "48447621ee00b66d1bf54560f32c99d5392879efb1c1bfe602dfffdd88856907",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Setup"
+          ],
+          "text": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-29",
+          "githubAnchor": "unheaded-block-29",
+          "stableAnchor": "unheaded-block-29",
+          "title": "Unheaded block 29",
+          "startLine": 218,
+          "endLine": 232,
+          "textDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "sample": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not",
+          "identityFingerprint": "9dea4519717d2a2949595589e0a3cac9e1775ab91fe80629f3382c8e19176800",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Doctor"
+          ],
+          "text": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        }
+      },
+      "currentWitness": {
+        "unit": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Doctor",
+          "anchor": "doctor",
+          "githubAnchor": "doctor",
+          "stableAnchor": "h-6945bd164daf",
+          "startLine": 222,
+          "endLine": 222,
+          "textDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+          "sample": "Doctor",
+          "sectionPayloadDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "followingBlockDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "identityFingerprint": "a694327a97e6bc17eb43b0e007434c507ed05c3ed2f9f453246af7adb4cae615",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Doctor",
+          "sectionText": "##### Doctor\n\n- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        },
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-30",
+          "githubAnchor": "unheaded-block-30",
+          "stableAnchor": "unheaded-block-30",
+          "title": "Unheaded block 30",
+          "startLine": 188,
+          "endLine": 220,
+          "textDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "sample": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for ev",
+          "identityFingerprint": "48447621ee00b66d1bf54560f32c99d5392879efb1c1bfe602dfffdd88856907",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Setup"
+          ],
+          "text": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-31",
+          "githubAnchor": "unheaded-block-31",
+          "stableAnchor": "unheaded-block-31",
+          "title": "Unheaded block 31",
+          "startLine": 224,
+          "endLine": 238,
+          "textDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "sample": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not",
+          "identityFingerprint": "9dea4519717d2a2949595589e0a3cac9e1775ab91fe80629f3382c8e19176800",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Doctor"
+          ],
+          "text": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        }
+      },
+      "neighbourTextAndDigestsEqual": true,
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        14
+      ],
+      "claimId": "claim_1b418e3e2ee62a83adc1420a4967de62",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "beforeAnchor": "unheaded-block-29",
+      "beforeDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+      "afterAnchor": "unheaded-block-31",
+      "afterDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+      "historicalWitness": {
+        "ref": "b6edb9712-parent",
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-29",
+          "githubAnchor": "unheaded-block-29",
+          "stableAnchor": "unheaded-block-29",
+          "title": "Unheaded block 29",
+          "startLine": 218,
+          "endLine": 232,
+          "textDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "sample": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not",
+          "identityFingerprint": "9dea4519717d2a2949595589e0a3cac9e1775ab91fe80629f3382c8e19176800",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Doctor"
+          ],
+          "text": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Doctor",
+          "anchor": "doctor",
+          "githubAnchor": "doctor",
+          "stableAnchor": "h-1d14ad78a4ae",
+          "startLine": 216,
+          "endLine": 216,
+          "textDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+          "sample": "Doctor",
+          "sectionPayloadDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "followingBlockDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "identityFingerprint": "a694327a97e6bc17eb43b0e007434c507ed05c3ed2f9f453246af7adb4cae615",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Doctor",
+          "sectionText": "##### Doctor\n\n- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        },
+        "next": null
+      },
+      "currentWitness": {
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-31",
+          "githubAnchor": "unheaded-block-31",
+          "stableAnchor": "unheaded-block-31",
+          "title": "Unheaded block 31",
+          "startLine": 224,
+          "endLine": 238,
+          "textDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "sample": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not",
+          "identityFingerprint": "9dea4519717d2a2949595589e0a3cac9e1775ab91fe80629f3382c8e19176800",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Doctor"
+          ],
+          "text": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Doctor",
+          "anchor": "doctor",
+          "githubAnchor": "doctor",
+          "stableAnchor": "h-6945bd164daf",
+          "startLine": 222,
+          "endLine": 222,
+          "textDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+          "sample": "Doctor",
+          "sectionPayloadDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "followingBlockDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "identityFingerprint": "a694327a97e6bc17eb43b0e007434c507ed05c3ed2f9f453246af7adb4cae615",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Doctor",
+          "sectionText": "##### Doctor\n\n- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        },
+        "next": null
+      },
+      "neighbourTextAndDigestsEqual": true,
+      "drift": true,
+      "beforeRow": {
+        "claimId": "claim_1b418e3e2ee62a83adc1420a4967de62",
+        "sourceUnitDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-29",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+        "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-10, under \"Doctor\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-23. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-23 -> unheaded-block-27. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending. Step 2 merge pre-step at 587c2a791a06cdd091c6437d46a5f367e9bf9e0a: unheaded-block-27 -> unheaded-block-29. Unique full historical passage digest and exact text survive under unchanged heading ancestry; positional block shift caused by inserted git-transport-config paragraph before retained appendix. Source identity unchanged; no native identity assignment; independent review pending, no approval carry.",
+        "targetUnitDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Doctor"
+        ],
+        "reviewNote": "Step 2 merge pre-step: changed binding; independent review pending; no approval carried."
+      },
+      "afterRow": {
+        "claimId": "claim_1b418e3e2ee62a83adc1420a4967de62",
+        "sourceUnitDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-31",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:fgos-run_unit-run-179267cde43cfc@2026-10-22",
+        "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-10, under \"Doctor\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-23. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-23 -> unheaded-block-27. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending. Step 2 merge pre-step at 587c2a791a06cdd091c6437d46a5f367e9bf9e0a: unheaded-block-27 -> unheaded-block-29. Unique full historical passage digest and exact text survive under unchanged heading ancestry; positional block shift caused by inserted git-transport-config paragraph before retained appendix. Source identity unchanged; no native identity assignment; independent review pending, no approval carry. Step 6b closeout at 7ea23e385c8a7b146aab8365d37ece7d15409352: unheaded-block-29 -> unheaded-block-31. Unique complete historical passage and immediate neighbours survive under unchanged heading ancestry; insertion before retained detail shifted the ordinal. Source identity unchanged; independent review pending, no approval carry.",
+        "targetUnitDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Doctor"
+        ],
+        "reviewNote": "Step 6b closeout: content-and-neighbour rebind; independent review pending; no approval carried."
+      },
+      "removedApprovalFields": {},
+      "method": "Unique exact complete passage, heading ancestry and both immediate neighbour texts/digests; anchor-only re-placement."
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "registryGaps",
+        5
+      ],
+      "claimId": "claim_891db485a75cdb558cf725c3315f3857",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "beforeAnchor": "unheaded-block-28",
+      "beforeDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+      "afterAnchor": "unheaded-block-30",
+      "afterDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+      "historicalWitness": {
+        "ref": "b6edb9712-parent",
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-28",
+          "githubAnchor": "unheaded-block-28",
+          "stableAnchor": "unheaded-block-28",
+          "title": "Unheaded block 28",
+          "startLine": 182,
+          "endLine": 214,
+          "textDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "sample": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for ev",
+          "identityFingerprint": "48447621ee00b66d1bf54560f32c99d5392879efb1c1bfe602dfffdd88856907",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Setup"
+          ],
+          "text": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Setup",
+          "anchor": "setup",
+          "githubAnchor": "setup",
+          "stableAnchor": "h-8b25d66670bc",
+          "startLine": 180,
+          "endLine": 180,
+          "textDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+          "sample": "Setup",
+          "sectionPayloadDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "followingBlockDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "identityFingerprint": "451b3f0ee715b54c4437416eedc7d469d868d68b927ce27e9ace4b614d285d75",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Setup",
+          "sectionText": "##### Setup\n\n- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        },
+        "next": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Doctor",
+          "anchor": "doctor",
+          "githubAnchor": "doctor",
+          "stableAnchor": "h-1d14ad78a4ae",
+          "startLine": 216,
+          "endLine": 216,
+          "textDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+          "sample": "Doctor",
+          "sectionPayloadDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "followingBlockDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "identityFingerprint": "a694327a97e6bc17eb43b0e007434c507ed05c3ed2f9f453246af7adb4cae615",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Doctor",
+          "sectionText": "##### Doctor\n\n- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        }
+      },
+      "currentWitness": {
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-30",
+          "githubAnchor": "unheaded-block-30",
+          "stableAnchor": "unheaded-block-30",
+          "title": "Unheaded block 30",
+          "startLine": 188,
+          "endLine": 220,
+          "textDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "sample": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for ev",
+          "identityFingerprint": "48447621ee00b66d1bf54560f32c99d5392879efb1c1bfe602dfffdd88856907",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Setup"
+          ],
+          "text": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Setup",
+          "anchor": "setup",
+          "githubAnchor": "setup",
+          "stableAnchor": "h-7603a3df0127",
+          "startLine": 186,
+          "endLine": 186,
+          "textDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+          "sample": "Setup",
+          "sectionPayloadDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "followingBlockDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "identityFingerprint": "451b3f0ee715b54c4437416eedc7d469d868d68b927ce27e9ace4b614d285d75",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Setup",
+          "sectionText": "##### Setup\n\n- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        },
+        "next": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Doctor",
+          "anchor": "doctor",
+          "githubAnchor": "doctor",
+          "stableAnchor": "h-6945bd164daf",
+          "startLine": 222,
+          "endLine": 222,
+          "textDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+          "sample": "Doctor",
+          "sectionPayloadDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "followingBlockDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "identityFingerprint": "a694327a97e6bc17eb43b0e007434c507ed05c3ed2f9f453246af7adb4cae615",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Doctor",
+          "sectionText": "##### Doctor\n\n- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        }
+      },
+      "neighbourTextAndDigestsEqual": true,
+      "drift": true,
+      "beforeRow": {
+        "claimId": "claim_891db485a75cdb558cf725c3315f3857",
+        "sourceUnitDigest": "124a985f241cc7cc18930c76b9911b2d71a2bcda8ca361d9520aa6560e7e912a",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-28",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+        "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-9, under \"Setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-22. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-22 -> unheaded-block-26. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending. Step 2 merge pre-step at 587c2a791a06cdd091c6437d46a5f367e9bf9e0a: unheaded-block-26 -> unheaded-block-28. Unique full historical passage digest and exact text survive under unchanged heading ancestry; positional block shift caused by inserted git-transport-config paragraph before retained appendix. Source identity unchanged; no native identity assignment; independent review pending, no approval carry.",
+        "targetUnitDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Setup"
+        ],
+        "sourcePath": "docs/specs/distribution.md",
+        "reviewNote": "Step 2 merge pre-step: changed binding; independent review pending; no approval carried."
+      },
+      "afterRow": {
+        "claimId": "claim_891db485a75cdb558cf725c3315f3857",
+        "sourceUnitDigest": "124a985f241cc7cc18930c76b9911b2d71a2bcda8ca361d9520aa6560e7e912a",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-30",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:fgos-run_unit-run-179267cde43cfc@2026-10-22",
+        "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-9, under \"Setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-22. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-22 -> unheaded-block-26. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending. Step 2 merge pre-step at 587c2a791a06cdd091c6437d46a5f367e9bf9e0a: unheaded-block-26 -> unheaded-block-28. Unique full historical passage digest and exact text survive under unchanged heading ancestry; positional block shift caused by inserted git-transport-config paragraph before retained appendix. Source identity unchanged; no native identity assignment; independent review pending, no approval carry. Step 6b closeout at 7ea23e385c8a7b146aab8365d37ece7d15409352: unheaded-block-28 -> unheaded-block-30. Unique complete historical passage and immediate neighbours survive under unchanged heading ancestry; insertion before retained detail shifted the ordinal. Source identity unchanged; independent review pending, no approval carry.",
+        "targetUnitDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Setup"
+        ],
+        "sourcePath": "docs/specs/distribution.md",
+        "reviewNote": "Step 6b closeout: content-and-neighbour rebind; independent review pending; no approval carried."
+      },
+      "removedApprovalFields": {},
+      "method": "Unique exact complete passage, heading ancestry and both immediate neighbour texts/digests; anchor-only re-placement."
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "keys": [
+        "registryGaps",
+        12
+      ],
+      "claimId": "claim_acd9a23bb5fe3a5dda7169c04a12b409",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "beforeAnchor": "unheaded-block-1",
+      "beforeDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
+      "afterAnchor": "unheaded-block-1",
+      "afterDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
+      "historicalWitness": {
+        "ref": "b6edb9712-parent",
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-1",
+          "githubAnchor": "unheaded-block-1",
+          "stableAnchor": "unheaded-block-1",
+          "title": "Unheaded block 1",
+          "startLine": 3,
+          "endLine": 26,
+          "textDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
+          "sample": "```txt\nDocument type: Contract\nAudience: Maintainer, implementation agent, reviewer\nPurpose: Define the doctor/fix registry contract and legacy setup compatibility used by packagin",
+          "identityFingerprint": "f35630a577a3a4ffe9cde926613961474ed4cf79e29bfabf3d1df18722d0892d",
+          "ancestry": [
+            "Contract: Setup Doctor Registry"
+          ],
+          "text": "```txt\nDocument type: Contract\nAudience: Maintainer, implementation agent, reviewer\nPurpose: Define the doctor/fix registry contract and legacy setup compatibility used by packaging-distribution\nDesign status: Draft\nImplementation status: Implemented\nCanonical: Yes, after review\nOwner: Platform documentation\nSource type: Promoted from docs/specs/distribution.md and src/setup/**\nLast reviewed: 2026-09-13\nRelated:\n- src/setup/checks.mjs\n- src/setup/registrations.mjs\n- bin/fgos.mjs\n- test/setup/registrations.test.mjs\nImplementation: Original section-specific implementation statements retained; carriage is pending independent review\nProvenance: Existing area document plus source-detail carriage at 77830ba77eb05991d95b005919776ee6254e833b\nWriter type: Human + agent coauthor\nCanonical for: The topic stated by this document, subject to the unchanged switchboard route and independent review\nUse this when: Reading this area topic and its retained design details\nDo not use this for: Claiming a truth review or an authority cutover from carriage alone\nSupersedes: No authority transition in this carriage pass\nSuperseded by: None recorded\n```"
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 1,
+          "title": "Contract: Setup Doctor Registry",
+          "anchor": "contract-setup-doctor-registry",
+          "githubAnchor": "contract-setup-doctor-registry",
+          "stableAnchor": "h-b6d7c4e64ae4",
+          "startLine": 1,
+          "endLine": 1,
+          "textDigest": "38dd34d9cb812f932b6ce74f7952bc0d21b98cdcff2add15056d26d85da54463",
+          "sample": "Contract: Setup Doctor Registry",
+          "sectionPayloadDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
+          "followingBlockDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
+          "identityFingerprint": "ebf8d29f5c821992bda990ba54d20ee257d96196943ef1bec05e741458d1d32a",
+          "ancestry": [],
+          "text": "# Contract: Setup Doctor Registry",
+          "sectionText": "# Contract: Setup Doctor Registry\n\n```txt\nDocument type: Contract\nAudience: Maintainer, implementation agent, reviewer\nPurpose: Define the doctor/fix registry contract and legacy setup compatibility used by packaging-distribution\nDesign status: Draft\nImplementation status: Implemented\nCanonical: Yes, after review\nOwner: Platform documentation\nSource type: Promoted from docs/specs/distribution.md and src/setup/**\nLast reviewed: 2026-09-13\nRelated:\n- src/setup/checks.mjs\n- src/setup/registrations.mjs\n- bin/fgos.mjs\n- test/setup/registrations.test.mjs\nImplementation: Original section-specific implementation statements retained; carriage is pending independent review\nProvenance: Existing area document plus source-detail carriage at 77830ba77eb05991d95b005919776ee6254e833b\nWriter type: Human + agent coauthor\nCanonical for: The topic stated by this document, subject to the unchanged switchboard route and independent review\nUse this when: Reading this area topic and its retained design details\nDo not use this for: Claiming a truth review or an authority cutover from carriage alone\nSupersedes: No authority transition in this carriage pass\nSuperseded by: None recorded\n```"
+        },
+        "next": {
+          "unitKind": "heading",
+          "level": 2,
+          "title": "1. Purpose",
+          "anchor": "1-purpose",
+          "githubAnchor": "1-purpose",
+          "stableAnchor": "h-e753b4bf72ea",
+          "startLine": 28,
+          "endLine": 28,
+          "textDigest": "dd7d5b40f1d9981d48b9d683db6be68aa8993e6b876d56fb279c52af47d7ccdf",
+          "sample": "1. Purpose",
+          "sectionPayloadDigest": "d8a9ddcaaef66bf045879c2099f8e7460998bd53c89d76c1fc4016a740d94a18",
+          "followingBlockDigest": "32c705528748c56a85d705990e3ed5672b84a509ddf12e88fb8e54121ed7e85f",
+          "identityFingerprint": "0de1581aecf9f26c1b3c199898ac98d6707d6c2c7741945e30d785ff31e629f2",
+          "ancestry": [
+            "Contract: Setup Doctor Registry"
+          ],
+          "text": "## 1. Purpose",
+          "sectionText": "## 1. Purpose\n\nThe doctor/fix registry is the extension point for environment readiness. Modules register checks, fixes, and config defaults instead of adding one-off repair logic.\n\nTarget architecture has no separate `fgos setup` verb for workspace onboarding. `fgctl init` is the one-command workspace onboarding orchestrator; after activation it invokes active local `fgos init`, `fgos doctor --fix`, and `fgos doctor`. Legacy shell/global integration remains compatibility behavior under the explicit deprecated fallback window: 30 calendar days after preview release publication, unless a later release decision replaces that policy.\n\nCurrent Node `fgos setup` remains implemented as deprecated legacy compatibility and consumes the same registry while it exists."
+        }
+      },
+      "currentWitness": {
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-1",
+          "githubAnchor": "unheaded-block-1",
+          "stableAnchor": "unheaded-block-1",
+          "title": "Unheaded block 1",
+          "startLine": 3,
+          "endLine": 26,
+          "textDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
+          "sample": "```txt\nDocument type: Contract\nAudience: Maintainer, implementation agent, reviewer\nPurpose: Define the doctor/fix registry contract and legacy setup compatibility used by packagin",
+          "identityFingerprint": "f35630a577a3a4ffe9cde926613961474ed4cf79e29bfabf3d1df18722d0892d",
+          "ancestry": [
+            "Contract: Setup Doctor Registry"
+          ],
+          "text": "```txt\nDocument type: Contract\nAudience: Maintainer, implementation agent, reviewer\nPurpose: Define the doctor/fix registry contract and legacy setup compatibility used by packaging-distribution\nDesign status: Draft\nImplementation status: Implemented\nCanonical: Yes, after review\nOwner: Platform documentation\nSource type: Promoted from docs/specs/distribution.md and src/setup/**\nLast reviewed: 2026-09-13\nRelated:\n- src/setup/checks.mjs\n- src/setup/registrations.mjs\n- bin/fgos.mjs\n- test/setup/registrations.test.mjs\nImplementation: Original section-specific implementation statements retained; carriage is pending independent review\nProvenance: Existing area document plus source-detail carriage at 77830ba77eb05991d95b005919776ee6254e833b\nWriter type: Human + agent coauthor\nCanonical for: The topic stated by this document, subject to the unchanged switchboard route and independent review\nUse this when: Reading this area topic and its retained design details\nDo not use this for: Claiming a truth review or an authority cutover from carriage alone\nSupersedes: No authority transition in this carriage pass\nSuperseded by: None recorded\n```"
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 1,
+          "title": "Contract: Setup Doctor Registry",
+          "anchor": "contract-setup-doctor-registry",
+          "githubAnchor": "contract-setup-doctor-registry",
+          "stableAnchor": "h-b6d7c4e64ae4",
+          "startLine": 1,
+          "endLine": 1,
+          "textDigest": "38dd34d9cb812f932b6ce74f7952bc0d21b98cdcff2add15056d26d85da54463",
+          "sample": "Contract: Setup Doctor Registry",
+          "sectionPayloadDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
+          "followingBlockDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
+          "identityFingerprint": "ebf8d29f5c821992bda990ba54d20ee257d96196943ef1bec05e741458d1d32a",
+          "ancestry": [],
+          "text": "# Contract: Setup Doctor Registry",
+          "sectionText": "# Contract: Setup Doctor Registry\n\n```txt\nDocument type: Contract\nAudience: Maintainer, implementation agent, reviewer\nPurpose: Define the doctor/fix registry contract and legacy setup compatibility used by packaging-distribution\nDesign status: Draft\nImplementation status: Implemented\nCanonical: Yes, after review\nOwner: Platform documentation\nSource type: Promoted from docs/specs/distribution.md and src/setup/**\nLast reviewed: 2026-09-13\nRelated:\n- src/setup/checks.mjs\n- src/setup/registrations.mjs\n- bin/fgos.mjs\n- test/setup/registrations.test.mjs\nImplementation: Original section-specific implementation statements retained; carriage is pending independent review\nProvenance: Existing area document plus source-detail carriage at 77830ba77eb05991d95b005919776ee6254e833b\nWriter type: Human + agent coauthor\nCanonical for: The topic stated by this document, subject to the unchanged switchboard route and independent review\nUse this when: Reading this area topic and its retained design details\nDo not use this for: Claiming a truth review or an authority cutover from carriage alone\nSupersedes: No authority transition in this carriage pass\nSuperseded by: None recorded\n```"
+        },
+        "next": {
+          "unitKind": "heading",
+          "level": 2,
+          "title": "1. Purpose",
+          "anchor": "1-purpose",
+          "githubAnchor": "1-purpose",
+          "stableAnchor": "h-e753b4bf72ea",
+          "startLine": 28,
+          "endLine": 28,
+          "textDigest": "dd7d5b40f1d9981d48b9d683db6be68aa8993e6b876d56fb279c52af47d7ccdf",
+          "sample": "1. Purpose",
+          "sectionPayloadDigest": "d8a9ddcaaef66bf045879c2099f8e7460998bd53c89d76c1fc4016a740d94a18",
+          "followingBlockDigest": "32c705528748c56a85d705990e3ed5672b84a509ddf12e88fb8e54121ed7e85f",
+          "identityFingerprint": "0de1581aecf9f26c1b3c199898ac98d6707d6c2c7741945e30d785ff31e629f2",
+          "ancestry": [
+            "Contract: Setup Doctor Registry"
+          ],
+          "text": "## 1. Purpose",
+          "sectionText": "## 1. Purpose\n\nThe doctor/fix registry is the extension point for environment readiness. Modules register checks, fixes, and config defaults instead of adding one-off repair logic.\n\nTarget architecture has no separate `fgos setup` verb for workspace onboarding. `fgctl init` is the one-command workspace onboarding orchestrator; after activation it invokes active local `fgos init`, `fgos doctor --fix`, and `fgos doctor`. Legacy shell/global integration remains compatibility behavior under the explicit deprecated fallback window: 30 calendar days after preview release publication, unless a later release decision replaces that policy.\n\nCurrent Node `fgos setup` remains implemented as deprecated legacy compatibility and consumes the same registry while it exists."
+        }
+      },
+      "neighbourTextAndDigestsEqual": true,
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-holder-lock-predecessor.json",
+      "keys": [
+        "registryGaps",
+        0
+      ],
+      "claimId": "claim_7cfb055e3f10b99944ffec46ce877653",
+      "targetOwner": "docs/platform/holder-lock/spec.md",
+      "beforeAnchor": "unheaded-block-1",
+      "beforeDigest": "0aebfc93d80f4472c3eff584fc0ff50ee506e394fddeb182544c24834f07453e",
+      "afterAnchor": "unheaded-block-1",
+      "afterDigest": "0aebfc93d80f4472c3eff584fc0ff50ee506e394fddeb182544c24834f07453e",
+      "historicalWitness": {
+        "ref": "3226c4066-parent",
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-1",
+          "githubAnchor": "unheaded-block-1",
+          "stableAnchor": "unheaded-block-1",
+          "title": "Unheaded block 1",
+          "startLine": 3,
+          "endLine": 23,
+          "textDigest": "0aebfc93d80f4472c3eff584fc0ff50ee506e394fddeb182544c24834f07453e",
+          "sample": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel l",
+          "identityFingerprint": "50a2fa06f38d1d20570afe67a5a00bf9324d7ad9896d563b87c26af484efcb16",
+          "ancestry": [
+            "Holder-lock Component Specification"
+          ],
+          "text": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port\nDesign status: Accepted\nImplementation status: In progress (contracts and registry landed; crate, routes, Node facade, fences, fgctl gate and the cutover of ten locks land in parallel phases; the main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17 and land with the main-door track; the hot state mutex stays with the state store pending implementation of the signed Event Store decision D-ADR0055, section 15)\nCanonical: Yes\nOwner: Holder-lock component\nSource: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)\nContracts: packages/holder-lock/contracts/\nLast reviewed: 2026-10-17\nRelated:\n- docs/platform/process/spec.md\n- docs/platform/component-boundary.md\n- docs/platform/identity/spec.md\n- docs/specs/distribution.md\n- docs/specs/runner.md\n- plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md\n- plans/261016-1306-main-checkout-single-door-hot-lock/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 1,
+          "title": "Holder-lock Component Specification",
+          "anchor": "holder-lock-component-specification",
+          "githubAnchor": "holder-lock-component-specification",
+          "stableAnchor": "h-0d9734634b5a",
+          "startLine": 1,
+          "endLine": 1,
+          "textDigest": "c8bee39ca96aad6da23b66104158c8437b5126195c101c90e5b1f6f6c9f74693",
+          "sample": "Holder-lock Component Specification",
+          "sectionPayloadDigest": "0aebfc93d80f4472c3eff584fc0ff50ee506e394fddeb182544c24834f07453e",
+          "followingBlockDigest": "0aebfc93d80f4472c3eff584fc0ff50ee506e394fddeb182544c24834f07453e",
+          "identityFingerprint": "10834078bac5ddeec09990c0c79c49f82b6af67302f6c34f525a9e0a70930e28",
+          "ancestry": [],
+          "text": "# Holder-lock Component Specification",
+          "sectionText": "# Holder-lock Component Specification\n\n```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port\nDesign status: Accepted\nImplementation status: In progress (contracts and registry landed; crate, routes, Node facade, fences, fgctl gate and the cutover of ten locks land in parallel phases; the main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17 and land with the main-door track; the hot state mutex stays with the state store pending implementation of the signed Event Store decision D-ADR0055, section 15)\nCanonical: Yes\nOwner: Holder-lock component\nSource: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)\nContracts: packages/holder-lock/contracts/\nLast reviewed: 2026-10-17\nRelated:\n- docs/platform/process/spec.md\n- docs/platform/component-boundary.md\n- docs/platform/identity/spec.md\n- docs/specs/distribution.md\n- docs/specs/runner.md\n- plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md\n- plans/261016-1306-main-checkout-single-door-hot-lock/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+        },
+        "next": {
+          "unitKind": "heading",
+          "level": 2,
+          "title": "1. Purpose",
+          "anchor": "1-purpose",
+          "githubAnchor": "1-purpose",
+          "stableAnchor": "h-74247b760be3",
+          "startLine": 25,
+          "endLine": 25,
+          "textDigest": "49173a978f4b96f50b7bd009d30f24b6fbc25e7b803df8d14547dfc3e0a8a6ef",
+          "sample": "1. Purpose",
+          "sectionPayloadDigest": "e58bfb49ad38fa2e1a6adc402cdc54de28fa8949c892d0dc2ff74afa31c8f804",
+          "followingBlockDigest": "9290f9b1124b0c7a8aa9a822860257698b6e1c0a0a4ccb18b855caf1e3c7aa56",
+          "identityFingerprint": "817d427e815c8558e253d1ae198473ac784938c00a465a9627c5c34d21535b48",
+          "ancestry": [
+            "Holder-lock Component Specification"
+          ],
+          "text": "## 1. Purpose",
+          "sectionText": "## 1. Purpose\n\nHolder-lock answers one question for every cold lock in fgOS: who holds this resource right now, as the kernel sees it. A lock is a kernel lock on an open file description. The kernel releases it when every process holding a copy of that description has died, so no decision anywhere in the component is derived from a pid, a TTL, a start time or an mtime. The one pid the component reads is the locker identity the kernel itself stamps on a lock record (`flock` stores the calling process's pid on the description's lock); it is compared only against this live process's own pid, never used to infer liveness or ownership of a record.\n\nEvery caller (the Node facade, a Rust crate, a git hook) goes through one port with one set of operations. Each operating system has one driver behind the port, and the port reports the guarantee level that driver gives on the filesystem the lock files live on. Nothing in the public interface is POSIX-only: a caller never sees a file descriptor or a handle of the operating system.\n\nThe component owns the cold locks, the main checkout mutex, the merge slot and `worktree-admin` (sections 14 and 16). The state store's hot mutex (`state`, `porting-events`) is built on the same facade for its cleanup lock but is implemented by the state store, not by this component (section 15)."
+        }
+      },
+      "currentWitness": {
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-1",
+          "githubAnchor": "unheaded-block-1",
+          "stableAnchor": "unheaded-block-1",
+          "title": "Unheaded block 1",
+          "startLine": 3,
+          "endLine": 23,
+          "textDigest": "0aebfc93d80f4472c3eff584fc0ff50ee506e394fddeb182544c24834f07453e",
+          "sample": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel l",
+          "identityFingerprint": "50a2fa06f38d1d20570afe67a5a00bf9324d7ad9896d563b87c26af484efcb16",
+          "ancestry": [
+            "Holder-lock Component Specification"
+          ],
+          "text": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port\nDesign status: Accepted\nImplementation status: In progress (contracts and registry landed; crate, routes, Node facade, fences, fgctl gate and the cutover of ten locks land in parallel phases; the main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17 and land with the main-door track; the hot state mutex stays with the state store pending implementation of the signed Event Store decision D-ADR0055, section 15)\nCanonical: Yes\nOwner: Holder-lock component\nSource: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)\nContracts: packages/holder-lock/contracts/\nLast reviewed: 2026-10-17\nRelated:\n- docs/platform/process/spec.md\n- docs/platform/component-boundary.md\n- docs/platform/identity/spec.md\n- docs/specs/distribution.md\n- docs/specs/runner.md\n- plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md\n- plans/261016-1306-main-checkout-single-door-hot-lock/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 1,
+          "title": "Holder-lock Component Specification",
+          "anchor": "holder-lock-component-specification",
+          "githubAnchor": "holder-lock-component-specification",
+          "stableAnchor": "h-0d9734634b5a",
+          "startLine": 1,
+          "endLine": 1,
+          "textDigest": "c8bee39ca96aad6da23b66104158c8437b5126195c101c90e5b1f6f6c9f74693",
+          "sample": "Holder-lock Component Specification",
+          "sectionPayloadDigest": "0aebfc93d80f4472c3eff584fc0ff50ee506e394fddeb182544c24834f07453e",
+          "followingBlockDigest": "0aebfc93d80f4472c3eff584fc0ff50ee506e394fddeb182544c24834f07453e",
+          "identityFingerprint": "10834078bac5ddeec09990c0c79c49f82b6af67302f6c34f525a9e0a70930e28",
+          "ancestry": [],
+          "text": "# Holder-lock Component Specification",
+          "sectionText": "# Holder-lock Component Specification\n\n```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port\nDesign status: Accepted\nImplementation status: In progress (contracts and registry landed; crate, routes, Node facade, fences, fgctl gate and the cutover of ten locks land in parallel phases; the main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17 and land with the main-door track; the hot state mutex stays with the state store pending implementation of the signed Event Store decision D-ADR0055, section 15)\nCanonical: Yes\nOwner: Holder-lock component\nSource: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)\nContracts: packages/holder-lock/contracts/\nLast reviewed: 2026-10-17\nRelated:\n- docs/platform/process/spec.md\n- docs/platform/component-boundary.md\n- docs/platform/identity/spec.md\n- docs/specs/distribution.md\n- docs/specs/runner.md\n- plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md\n- plans/261016-1306-main-checkout-single-door-hot-lock/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+        },
+        "next": {
+          "unitKind": "heading",
+          "level": 2,
+          "title": "1. Purpose",
+          "anchor": "1-purpose",
+          "githubAnchor": "1-purpose",
+          "stableAnchor": "h-74247b760be3",
+          "startLine": 25,
+          "endLine": 25,
+          "textDigest": "49173a978f4b96f50b7bd009d30f24b6fbc25e7b803df8d14547dfc3e0a8a6ef",
+          "sample": "1. Purpose",
+          "sectionPayloadDigest": "e58bfb49ad38fa2e1a6adc402cdc54de28fa8949c892d0dc2ff74afa31c8f804",
+          "followingBlockDigest": "9290f9b1124b0c7a8aa9a822860257698b6e1c0a0a4ccb18b855caf1e3c7aa56",
+          "identityFingerprint": "817d427e815c8558e253d1ae198473ac784938c00a465a9627c5c34d21535b48",
+          "ancestry": [
+            "Holder-lock Component Specification"
+          ],
+          "text": "## 1. Purpose",
+          "sectionText": "## 1. Purpose\n\nHolder-lock answers one question for every cold lock in fgOS: who holds this resource right now, as the kernel sees it. A lock is a kernel lock on an open file description. The kernel releases it when every process holding a copy of that description has died, so no decision anywhere in the component is derived from a pid, a TTL, a start time or an mtime. The one pid the component reads is the locker identity the kernel itself stamps on a lock record (`flock` stores the calling process's pid on the description's lock); it is compared only against this live process's own pid, never used to infer liveness or ownership of a record.\n\nEvery caller (the Node facade, a Rust crate, a git hook) goes through one port with one set of operations. Each operating system has one driver behind the port, and the port reports the guarantee level that driver gives on the filesystem the lock files live on. Nothing in the public interface is POSIX-only: a caller never sees a file descriptor or a handle of the operating system.\n\nThe component owns the cold locks, the main checkout mutex, the merge slot and `worktree-admin` (sections 14 and 16). The state store's hot mutex (`state`, `porting-events`) is built on the same facade for its cleanup lock but is implemented by the state store, not by this component (section 15)."
+        }
+      },
+      "neighbourTextAndDigestsEqual": true,
+      "drift": false
+    }
+  ],
+  "rebindings": [
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        11
+      ],
+      "claimId": "claim_5c58459a3d4fb3c94d3d177ae5ff71ad",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "beforeAnchor": "unheaded-block-27",
+      "beforeDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+      "afterAnchor": "unheaded-block-29",
+      "afterDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+      "historicalWitness": {
+        "ref": "b6edb9712-parent",
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-27",
+          "githubAnchor": "unheaded-block-27",
+          "stableAnchor": "unheaded-block-27",
+          "title": "Unheaded block 27",
+          "startLine": 155,
+          "endLine": 178,
+          "textDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "sample": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this re",
+          "identityFingerprint": "84d5b75480549a2ee4a9c52b20563ba7cc5eaff063b44f522cc44e5511acd3b5",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Contributor hooks setup"
+          ],
+          "text": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Contributor hooks setup",
+          "anchor": "contributor-hooks-setup",
+          "githubAnchor": "contributor-hooks-setup",
+          "stableAnchor": "h-d6329adac9c0",
+          "startLine": 153,
+          "endLine": 153,
+          "textDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+          "sample": "Contributor hooks setup",
+          "sectionPayloadDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "followingBlockDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "identityFingerprint": "c4d5b89fd8ed99a07024c496386969022c40c075bf0bc95629b02860c583d086",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Contributor hooks setup",
+          "sectionText": "##### Contributor hooks setup\n\n- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+        },
+        "next": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Setup",
+          "anchor": "setup",
+          "githubAnchor": "setup",
+          "stableAnchor": "h-8b25d66670bc",
+          "startLine": 180,
+          "endLine": 180,
+          "textDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+          "sample": "Setup",
+          "sectionPayloadDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "followingBlockDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "identityFingerprint": "451b3f0ee715b54c4437416eedc7d469d868d68b927ce27e9ace4b614d285d75",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Setup",
+          "sectionText": "##### Setup\n\n- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        }
+      },
+      "currentWitness": {
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-29",
+          "githubAnchor": "unheaded-block-29",
+          "stableAnchor": "unheaded-block-29",
+          "title": "Unheaded block 29",
+          "startLine": 161,
+          "endLine": 184,
+          "textDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "sample": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this re",
+          "identityFingerprint": "84d5b75480549a2ee4a9c52b20563ba7cc5eaff063b44f522cc44e5511acd3b5",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Contributor hooks setup"
+          ],
+          "text": "- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Contributor hooks setup",
+          "anchor": "contributor-hooks-setup",
+          "githubAnchor": "contributor-hooks-setup",
+          "stableAnchor": "h-0a33ff63db77",
+          "startLine": 159,
+          "endLine": 159,
+          "textDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+          "sample": "Contributor hooks setup",
+          "sectionPayloadDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "followingBlockDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+          "identityFingerprint": "c4d5b89fd8ed99a07024c496386969022c40c075bf0bc95629b02860c583d086",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Contributor hooks setup",
+          "sectionText": "##### Contributor hooks setup\n\n- **Blocked when:** never — this is an explicit command a contributor runs\n  themselves; it always runs when invoked.\n- **What changes:** running the setup command wires up this repository's\n  pre-commit hook for the person who just cloned it. It is never triggered\n  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)\n  — a contributor runs it once, by hand, after cloning.\n- **Side effects:** none beyond the local git config change; nothing is\n  installed and no network access happens.\n- **Afterwards:** the contributor's local clone has the pre-commit hook\n  wired up, identically to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual step for contributors, not a requirement for installing\n  or running `fgos` itself.\n- In fgOS source checkouts, the hook refuses newly staged root files outside\n  its own allowlist, including linked worktrees and `fgw/*` branches. Existing\n  root modifications/deletions remain permitted. Allowlist changes must land\n  separately on main before root additions use them; the index cannot authorize\n  itself. Merge commits skip only this root guard, never existing data-loss\n  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.\n- In fgOS source checkouts, the hook sends newly staged, copied, or renamed\n  Markdown files directly under `plans/reports/` and `plans/journals/` to the\n  native Convention checker. Violations and unavailable, old, or failed hosts\n  emit warnings only; the hook never blocks the commit for Convention results.\n  Nested evidence and per-plan `reports/` directories are outside this scope."
+        },
+        "next": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Setup",
+          "anchor": "setup",
+          "githubAnchor": "setup",
+          "stableAnchor": "h-7603a3df0127",
+          "startLine": 186,
+          "endLine": 186,
+          "textDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+          "sample": "Setup",
+          "sectionPayloadDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "followingBlockDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "identityFingerprint": "451b3f0ee715b54c4437416eedc7d469d868d68b927ce27e9ace4b614d285d75",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Setup",
+          "sectionText": "##### Setup\n\n- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        }
+      },
+      "neighbourTextAndDigestsEqual": true,
+      "drift": true,
+      "beforeRow": {
+        "claimId": "claim_5c58459a3d4fb3c94d3d177ae5ff71ad",
+        "sourceUnitDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-27",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+        "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-8, under \"Contributor hooks setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-21. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-21 -> unheaded-block-25. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending. Step 2 merge pre-step at 587c2a791a06cdd091c6437d46a5f367e9bf9e0a: unheaded-block-25 -> unheaded-block-27. Unique full historical passage digest and exact text survive under unchanged heading ancestry; positional block shift caused by inserted git-transport-config paragraph before retained appendix. Source identity unchanged; no native identity assignment; independent review pending, no approval carry.",
+        "targetUnitDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Contributor hooks setup"
+        ],
+        "reviewNote": "Step 2 merge pre-step: changed binding; independent review pending; no approval carried."
+      },
+      "afterRow": {
+        "claimId": "claim_5c58459a3d4fb3c94d3d177ae5ff71ad",
+        "sourceUnitDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-29",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:fgos-run_unit-run-179267cde43cfc@2026-10-22",
+        "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-8, under \"Contributor hooks setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-21. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-21 -> unheaded-block-25. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending. Step 2 merge pre-step at 587c2a791a06cdd091c6437d46a5f367e9bf9e0a: unheaded-block-25 -> unheaded-block-27. Unique full historical passage digest and exact text survive under unchanged heading ancestry; positional block shift caused by inserted git-transport-config paragraph before retained appendix. Source identity unchanged; no native identity assignment; independent review pending, no approval carry. Step 6b closeout at 7ea23e385c8a7b146aab8365d37ece7d15409352: unheaded-block-27 -> unheaded-block-29. Unique complete historical passage and immediate neighbours survive under unchanged heading ancestry; insertion before retained detail shifted the ordinal. Source identity unchanged; independent review pending, no approval carry.",
+        "targetUnitDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Contributor hooks setup"
+        ],
+        "reviewNote": "Step 6b closeout: content-and-neighbour rebind; independent review pending; no approval carried."
+      },
+      "removedApprovalFields": {},
+      "method": "Unique exact complete passage, heading ancestry and both immediate neighbour texts/digests; anchor-only re-placement."
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        14
+      ],
+      "claimId": "claim_1b418e3e2ee62a83adc1420a4967de62",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "beforeAnchor": "unheaded-block-29",
+      "beforeDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+      "afterAnchor": "unheaded-block-31",
+      "afterDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+      "historicalWitness": {
+        "ref": "b6edb9712-parent",
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-29",
+          "githubAnchor": "unheaded-block-29",
+          "stableAnchor": "unheaded-block-29",
+          "title": "Unheaded block 29",
+          "startLine": 218,
+          "endLine": 232,
+          "textDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "sample": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not",
+          "identityFingerprint": "9dea4519717d2a2949595589e0a3cac9e1775ab91fe80629f3382c8e19176800",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Doctor"
+          ],
+          "text": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Doctor",
+          "anchor": "doctor",
+          "githubAnchor": "doctor",
+          "stableAnchor": "h-1d14ad78a4ae",
+          "startLine": 216,
+          "endLine": 216,
+          "textDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+          "sample": "Doctor",
+          "sectionPayloadDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "followingBlockDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "identityFingerprint": "a694327a97e6bc17eb43b0e007434c507ed05c3ed2f9f453246af7adb4cae615",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Doctor",
+          "sectionText": "##### Doctor\n\n- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        },
+        "next": null
+      },
+      "currentWitness": {
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-31",
+          "githubAnchor": "unheaded-block-31",
+          "stableAnchor": "unheaded-block-31",
+          "title": "Unheaded block 31",
+          "startLine": 224,
+          "endLine": 238,
+          "textDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "sample": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not",
+          "identityFingerprint": "9dea4519717d2a2949595589e0a3cac9e1775ab91fe80629f3382c8e19176800",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Doctor"
+          ],
+          "text": "- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Doctor",
+          "anchor": "doctor",
+          "githubAnchor": "doctor",
+          "stableAnchor": "h-6945bd164daf",
+          "startLine": 222,
+          "endLine": 222,
+          "textDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+          "sample": "Doctor",
+          "sectionPayloadDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "followingBlockDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "identityFingerprint": "a694327a97e6bc17eb43b0e007434c507ed05c3ed2f9f453246af7adb4cae615",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Doctor",
+          "sectionText": "##### Doctor\n\n- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        },
+        "next": null
+      },
+      "neighbourTextAndDigestsEqual": true,
+      "drift": true,
+      "beforeRow": {
+        "claimId": "claim_1b418e3e2ee62a83adc1420a4967de62",
+        "sourceUnitDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-29",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+        "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-10, under \"Doctor\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-23. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-23 -> unheaded-block-27. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending. Step 2 merge pre-step at 587c2a791a06cdd091c6437d46a5f367e9bf9e0a: unheaded-block-27 -> unheaded-block-29. Unique full historical passage digest and exact text survive under unchanged heading ancestry; positional block shift caused by inserted git-transport-config paragraph before retained appendix. Source identity unchanged; no native identity assignment; independent review pending, no approval carry.",
+        "targetUnitDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Doctor"
+        ],
+        "reviewNote": "Step 2 merge pre-step: changed binding; independent review pending; no approval carried."
+      },
+      "afterRow": {
+        "claimId": "claim_1b418e3e2ee62a83adc1420a4967de62",
+        "sourceUnitDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-31",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:fgos-run_unit-run-179267cde43cfc@2026-10-22",
+        "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-10, under \"Doctor\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-23. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-23 -> unheaded-block-27. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending. Step 2 merge pre-step at 587c2a791a06cdd091c6437d46a5f367e9bf9e0a: unheaded-block-27 -> unheaded-block-29. Unique full historical passage digest and exact text survive under unchanged heading ancestry; positional block shift caused by inserted git-transport-config paragraph before retained appendix. Source identity unchanged; no native identity assignment; independent review pending, no approval carry. Step 6b closeout at 7ea23e385c8a7b146aab8365d37ece7d15409352: unheaded-block-29 -> unheaded-block-31. Unique complete historical passage and immediate neighbours survive under unchanged heading ancestry; insertion before retained detail shifted the ordinal. Source identity unchanged; independent review pending, no approval carry.",
+        "targetUnitDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Doctor"
+        ],
+        "reviewNote": "Step 6b closeout: content-and-neighbour rebind; independent review pending; no approval carried."
+      },
+      "removedApprovalFields": {},
+      "method": "Unique exact complete passage, heading ancestry and both immediate neighbour texts/digests; anchor-only re-placement."
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "registryGaps",
+        5
+      ],
+      "claimId": "claim_891db485a75cdb558cf725c3315f3857",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "beforeAnchor": "unheaded-block-28",
+      "beforeDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+      "afterAnchor": "unheaded-block-30",
+      "afterDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+      "historicalWitness": {
+        "ref": "b6edb9712-parent",
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-28",
+          "githubAnchor": "unheaded-block-28",
+          "stableAnchor": "unheaded-block-28",
+          "title": "Unheaded block 28",
+          "startLine": 182,
+          "endLine": 214,
+          "textDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "sample": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for ev",
+          "identityFingerprint": "48447621ee00b66d1bf54560f32c99d5392879efb1c1bfe602dfffdd88856907",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Setup"
+          ],
+          "text": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Setup",
+          "anchor": "setup",
+          "githubAnchor": "setup",
+          "stableAnchor": "h-8b25d66670bc",
+          "startLine": 180,
+          "endLine": 180,
+          "textDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+          "sample": "Setup",
+          "sectionPayloadDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "followingBlockDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "identityFingerprint": "451b3f0ee715b54c4437416eedc7d469d868d68b927ce27e9ace4b614d285d75",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Setup",
+          "sectionText": "##### Setup\n\n- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        },
+        "next": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Doctor",
+          "anchor": "doctor",
+          "githubAnchor": "doctor",
+          "stableAnchor": "h-1d14ad78a4ae",
+          "startLine": 216,
+          "endLine": 216,
+          "textDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+          "sample": "Doctor",
+          "sectionPayloadDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "followingBlockDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "identityFingerprint": "a694327a97e6bc17eb43b0e007434c507ed05c3ed2f9f453246af7adb4cae615",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Doctor",
+          "sectionText": "##### Doctor\n\n- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        }
+      },
+      "currentWitness": {
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-30",
+          "githubAnchor": "unheaded-block-30",
+          "stableAnchor": "unheaded-block-30",
+          "title": "Unheaded block 30",
+          "startLine": 188,
+          "endLine": 220,
+          "textDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "sample": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for ev",
+          "identityFingerprint": "48447621ee00b66d1bf54560f32c99d5392879efb1c1bfe602dfffdd88856907",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail",
+            "Setup"
+          ],
+          "text": "- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        },
+        "previous": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Setup",
+          "anchor": "setup",
+          "githubAnchor": "setup",
+          "stableAnchor": "h-7603a3df0127",
+          "startLine": 186,
+          "endLine": 186,
+          "textDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+          "sample": "Setup",
+          "sectionPayloadDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "followingBlockDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+          "identityFingerprint": "451b3f0ee715b54c4437416eedc7d469d868d68b927ce27e9ace4b614d285d75",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Setup",
+          "sectionText": "##### Setup\n\n- **Blocked when:** never — running `fgos setup` always attempts its work;\n  a shell profile that does not exist is simply skipped rather than\n  refused.\n- **What changes:** for every shell profile the caller actually has (bash's\n  and/or zsh's, whichever exist), the shell helper's source line is added\n  if not already present — never duplicated on a repeat run. The local\n  project config file is also brought up to date: any setting present in\n  the current default schema but missing from the caller's file is added,\n  without ever changing a setting the caller already customized; a config\n  file that already has every current default is left untouched. The same\n  fill-missing-only treatment is applied to the **global** config file\n  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the\n  same default schema the project-local file gets, or fills in any missing\n  key, every time it runs, regardless of which project it's run from;\n  a value the caller already customized at the global level is never\n  overwritten. The lock directories of row 5g are created when missing:\n  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);\n  the `lock` config section (`predecessorKillWaitMs: 2000`) is one of the\n  defaults the fill-missing-only merge adds. Because setup runs every\n  registered fix, it also attempts the `lock-fences` cutover step (row 7b),\n  which places nothing unless the workspace's activated release already\n  runs holder-lock and no other fgOS process of the workspace is running.\n- **Side effects:** the caller's own shell profile file(s), local project\n  config file, global config file (`~/.fgos/config.json`), and the two lock\n  directories may be created or modified; nothing outside the caller's own\n  environment is touched, and no network access happens.\n- **Afterwards:** the caller sees exactly what changed — which profile\n  file(s) gained the source line (or already had it), which project config\n  settings were newly added (or that none were needed), and which global\n  config settings were newly added (or that none were needed, or that the\n  global file was just created). Nothing is done silently; running `fgos\n  setup` again when everything is already current reports that plainly,\n  without repeating any change."
+        },
+        "next": {
+          "unitKind": "heading",
+          "level": 5,
+          "title": "Doctor",
+          "anchor": "doctor",
+          "githubAnchor": "doctor",
+          "stableAnchor": "h-6945bd164daf",
+          "startLine": 222,
+          "endLine": 222,
+          "textDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+          "sample": "Doctor",
+          "sectionPayloadDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "followingBlockDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+          "identityFingerprint": "a694327a97e6bc17eb43b0e007434c507ed05c3ed2f9f453246af7adb4cae615",
+          "ancestry": [
+            "Contract: Setup Doctor Registry",
+            "Retained Distribution Source Detail"
+          ],
+          "text": "##### Doctor",
+          "sectionText": "##### Doctor\n\n- **Blocked when:** never — `fgos doctor` always runs every check and\n  reports the result; it never fails the invocation itself, only reports\n  individual checks as passing or not. Exit stays 0 because `fgctl\n  init|upgrade|repair` run it as their tail and mark the install degraded on\n  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.\n- **What changes:** nothing — this is a read-only diagnostic. It never\n  writes a config file, never modifies a shell profile, and never installs\n  anything, even when a check reports a problem (`config-not-stale`\n  failing on a missing config file reports that plainly rather than\n  creating one).\n- **Side effects:** none.\n- **Afterwards:** the caller sees each named check (Data Dictionary #7) and\n  whether it passed, including enough detail to know what to do next (e.g.\n  which config settings are missing, or that `fgos setup` has not been run\n  yet)."
+        }
+      },
+      "neighbourTextAndDigestsEqual": true,
+      "drift": true,
+      "beforeRow": {
+        "claimId": "claim_891db485a75cdb558cf725c3315f3857",
+        "sourceUnitDigest": "124a985f241cc7cc18930c76b9911b2d71a2bcda8ca361d9520aa6560e7e912a",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-28",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+        "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-9, under \"Setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-22. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-22 -> unheaded-block-26. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending. Step 2 merge pre-step at 587c2a791a06cdd091c6437d46a5f367e9bf9e0a: unheaded-block-26 -> unheaded-block-28. Unique full historical passage digest and exact text survive under unchanged heading ancestry; positional block shift caused by inserted git-transport-config paragraph before retained appendix. Source identity unchanged; no native identity assignment; independent review pending, no approval carry.",
+        "targetUnitDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Setup"
+        ],
+        "sourcePath": "docs/specs/distribution.md",
+        "reviewNote": "Step 2 merge pre-step: changed binding; independent review pending; no approval carried."
+      },
+      "afterRow": {
+        "claimId": "claim_891db485a75cdb558cf725c3315f3857",
+        "sourceUnitDigest": "124a985f241cc7cc18930c76b9911b2d71a2bcda8ca361d9520aa6560e7e912a",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "targetAnchor": "unheaded-block-30",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:fgos-run_unit-run-179267cde43cfc@2026-10-22",
+        "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-9, under \"Setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-22. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-22 -> unheaded-block-26. Unique exact historical passage digest survives in the current file under the same named heading ancestry; resolve the shifted block by full passage equality, not its former ordinal. Source identity unchanged; no native identity assignment or approval carry; independent review pending. Step 2 merge pre-step at 587c2a791a06cdd091c6437d46a5f367e9bf9e0a: unheaded-block-26 -> unheaded-block-28. Unique full historical passage digest and exact text survive under unchanged heading ancestry; positional block shift caused by inserted git-transport-config paragraph before retained appendix. Source identity unchanged; no native identity assignment; independent review pending, no approval carry. Step 6b closeout at 7ea23e385c8a7b146aab8365d37ece7d15409352: unheaded-block-28 -> unheaded-block-30. Unique complete historical passage and immediate neighbours survive under unchanged heading ancestry; insertion before retained detail shifted the ordinal. Source identity unchanged; independent review pending, no approval carry.",
+        "targetUnitDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+        "targetAncestry": [
+          "Contract: Setup Doctor Registry",
+          "Retained Distribution Source Detail",
+          "Setup"
+        ],
+        "sourcePath": "docs/specs/distribution.md",
+        "reviewNote": "Step 6b closeout: content-and-neighbour rebind; independent review pending; no approval carried."
+      },
+      "removedApprovalFields": {},
+      "method": "Unique exact complete passage, heading ancestry and both immediate neighbour texts/digests; anchor-only re-placement."
+    }
+  ],
+  "groupMemberChecks": [],
+  "remainingDrift": 0,
+  "independentReview": "pending for every changed binding; no approval carry",
+  "needsWrites": [],
+  "directChecked": 8,
+  "groupMembersChecked": 0,
+  "digestVerification": {
+    "allSnapshotUnitsVerified": true,
+    "headingRecipe": "SHA256(heading + newline + level + newline + title + newline + sectionPayloadDigest + newline + followingBlockDigest-or-empty); section payload independently hashed",
+    "blockRecipe": "SHA256(complete trimmed block text)",
+    "snapshotUnitCount": 2337
+  },
+  "historicalRevisions": {
+    "b6edb9712^": "edae53271c1ce4d430d8058c30e5179aeb98e341",
+    "b6edb9712": "b6edb9712b399fdd1a681e34bb3e15c463c9e2ce",
+    "3226c4066^": "ba1d05d55315e2827158145d54f62b1fc51c4d6e",
+    "3226c4066": "3226c40665507265322a2c29ea2f1e23454d6f32",
+    "HEAD": "7ea23e385c8a7b146aab8365d37ece7d15409352"
+  },
+  "decisionTraversal": {
+    "ledger/decisions": {
+      "jsonFilesRecursivelyVisited": 131,
+      "allNestedTargetOwnerBindingsVisited": true,
+      "contextualGroupsTargetingCheckedFiles": 0
+    },
+    "pilot/decisions": {
+      "jsonFilesRecursivelyVisited": 7,
+      "allNestedTargetOwnerBindingsVisited": true,
+      "contextualGroupsTargetingCheckedFiles": 0
+    }
+  },
+  "currentFileSha256": {
+    "docs/platform/holder-lock/spec.md": "29ff60a99cf84a4b17e2de8d2cbfd68f7bff827aafa1c94d4a83b01d84cb49cd",
+    "docs/platform/git/spec.md": "c9c8026b4bb0d73cc0eca78ccea380dd99f319593649de8e768247abcbb5a0cd",
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md": "d29184600b47ee5234c7d6f3d4f6bbfae6f5b15d98f488f1be250489cfbb89d4"
+  }
+}
