@@ -52,6 +52,13 @@ import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT }
 import { addDecision } from '../../src/state/store.mjs';
 import { createSession } from '../../src/runner/session.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
+
+// Single-file runs need the same real native payload as the suite launcher.
+// Keep Git's probe cache in this test process's private temporary tree.
+process.env.FGOS_STATE_ROOT = mkTemp('fgos-checks-state-');
+ensureScriptAddon();
+Object.assign(NO_CLAUDE_ENV, process.env);
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 

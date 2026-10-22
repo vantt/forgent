@@ -2175,7 +2175,7 @@ registerCheck({
 });
 registerCheck({
   id: 'documentation-cutover-lease',
-  description: 'the documentation-cutover write lease is not held; if held, the holder lock and token file match the sidecar',
+  description: 'repository documentation-cutover hooks are wired and no committed lease freezes the documentation scope',
   check: (cwd) => checkDocumentationCutoverLeaseDoctor(cwd),
 });
 registerConfigDefault({ id: 'lock', key: 'lock', shape: { predecessorKillWaitMs: DEFAULT_KILL_WAIT_MS } });

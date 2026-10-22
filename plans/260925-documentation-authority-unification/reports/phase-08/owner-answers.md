@@ -1564,3 +1564,85 @@ Closed all five High findings (H1–H5), all Medium findings (M1–M7), and all 
 - `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test test/cli/subcommand-flag-drift.test.mjs`: exit 0 (16 pass, 0 fail)
 - `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test --test-name-pattern="DOCTOR_CHECKS has exactly" test/setup/checks.test.mjs`: exit 0 (1 pass, 0 fail)
 - `env -u CLAUDE_CODE_SESSION_ID node --test test/e2e/root-file-guard-hook.test.mjs`: exit 0 (13 pass, 0 fail)
+
+## L12-106 — Sidecar transitions through ScopedCommit (Lead under A42; Doer delivery, 2026-10-22)
+
+### Supplied Lead rulings
+
+1. Supersede L12-105 ruling 1's stop-and-report clause: the existing ScopedCommit door is usable. Each successful acquire/release/owner-abandon performs exactly one declared sidecar commit in the main checkout. Order is documentation-cutover rank 10 → main-checkout rank 50 in one LockScope → preflight → committed sidecar read and scope evidence at `baseline.head` → sidecar write → ScopedCommit → release handles. Main movement refuses as `base-moved`, without an internal retry.
+2. Both hooks use one Node policy helper. A main sidecar transition requires first parent = old OID, exactly the sidecar changed, a legal state edge, unchanged holder hash when leaving held, and the real main-50 borrower test. Raw main movement touching frozen scope is refused for holders too. Corrupt states, diff errors and borrower-check errors fail closed. NUL path bytes never pass through shell substitution.
+3. Compute complete payload-root tree/blob OIDs at the pinned base with all listing pages; computation errors refuse acquisition. Release records `releaseScopeDigests` and `drift[]`, reports drift and still commits release. The sidecar is transition evidence rather than payload and is excluded from its own digest to avoid a self-referential digest/automatic acquisition drift; every payload root, including absent roots, has an explicit entry.
+4. Owner-abandon requires confirmation and a written reason and cannot proceed while the kernel transition lock is held. A **non-holder with the CLI can abandon by design** in this single-owner repository; the owner flag is deliberate authorization, not token possession or inferred session death.
+5. Doctor is not applicable outside Git, without these repository hooks, or without main. Within this repository's hook layout it checks wiring, committed state and the lock resource; it never searches for the holder token in main.
+6. Token paths resolve from the registered checkout root, including calls from subdirectories. Foreign worktrees and holder checkouts nested inside frozen roots refuse. The scope list has one export; hooks and doctor consume it. Reuse `resolveMainCheckoutRoot`, Git Inspect, holder-lock and ScopedCommit, not parallel implementations. No shared switchboard constant exists in `src`; the one named `SWITCHBOARD_PATH` literal identifies that file, with no plan ID in the identifier. Its path is the necessary switchboard exception, not a second scope list.
+7. Evidence must exercise the production CLI/door, not an injected sidecar committer. Before implementation, the real Git borrow probe passed for **both** hooks. No typed Git port change was needed.
+
+### Delivery and correction of the earlier claim
+
+L12-105's statement that production H1 was closed was incorrect: its tests injected a raw-git committer that the CLI never supplied. That callback and all its fixture uses are gone. Production transitions now use `createGitScopedCommit(...).commit(...)` with the actual main handle. The CLI JSON path also had an untested `output is not defined` error; real CLI tests exposed and fixed it by returning through the normal envelope door.
+
+The implementation reuses the main-checkpoint adapter pattern, the existing root resolver and public holder-lock borrower test. The new hook helper supplies shared parsing, byte-path handling and transition policy; its Git adapter is read-only. Free/released pre-commit checks skip lease diffs/native resolution, while reference-transaction validates a new held transition before publication. A released sidecar therefore does not permanently disable the fast path. Runtime state writes and test Git mutations were confined to temporary fixture repositories except for the existing addon staging helper caveat below. No real lease, main landing, repository git write, worker commit, dispatch, or lifecycle mutation was performed.
+
+### Re-review finding → owning production-path proof
+
+`U` = `test/runner/documentation-cutover-lease.test.mjs`; `E` = `test/e2e/documentation-cutover-lease-hooks.test.mjs`. Names below identify runnable tests, not acceptance by the independent reviewer.
+
+| Findings in r2 (including carried findings) | Proof / disposition |
+|---|---|
+| H1, N8 | U `production acquire commits exactly the sidecar with base evidence and keeps the token private`: no callback, committed main blob, exactly one changed path, clean checkout. E `CLI release and non-holder owner abandon each commit one legal sidecar transition`: real CLI acquisition, release and abandon, one commit per transition. |
+| H2, N4 | U `holder release from a subdirectory uses the checkout-root token and lands on main`; U `holder worktree must belong to this repository and its token cannot reside inside scope`. E linked-worktree holder/non-holder and CLI release from `holder/docs`. |
+| H3, N2 | E `reference hook preserves NUL boundaries for multi-path commits and renames with --no-verify`, non-ASCII paths with/without verification, pre-commit rename and typechange tests. Out-of-scope paths sort before scoped ones in the multi-path reproduction. |
+| H4 | U `two production acquire processes have exactly one winner across twenty trials`: both processes call the production door and exit; main retains held authority and the non-holder is refused. |
+| H5 | U production-acquire token/private-output assertions; E every `setupLease` uses real CLI JSON and asserts it excludes the saved raw token. No token argv flag or environment grant remains. |
+| M1, N5, N7 | E `corrupt or unknown committed sidecars are rejected consistently by both hooks and CLI acquire`; U corrupt-sidecar Node-gate cases. Both hooks and Node gates use the same parser. |
+| M2, N3, N6 | U `full scope digests cover every page and release records drift rather than refusing it`: >600 entries and a last-page edit. E `CLI release reports raw hook-disabled drift and commits the release without reopening early`; E `failed scope reads refuse CLI acquire before recording holder evidence`. |
+| M3 | U owner-abandon confirmation/reason/live-lock test; E one real non-holder owner-abandon wiring proof. No force alias, TTL or process-identity liveness inference. |
+| M4 | Existing root-anchored token ignore rule remains; U checkout-root token assertions and clean-status assertion now exercise the correct token location, rather than `docs/.fgos`. |
+| M5 | The duplicate resolver and Git writes are removed. U subdirectory and foreign-worktree proofs use Inspect; architecture passes with the existing resolver import. |
+| M6, N9 | E `both hooks fail closed when their path diff fails under a held production lease` uses the real Git executable adapter. E CLI transition test makes an ordinary released-state commit while lease-specific diffs fail and the native host is unavailable: both hooks take the fast path. |
+| M7, N1 | U doctor plain-Git/non-Git not-applicable proof and wired/held/missing-lock proof; full setup checks pass. Main has no token in the held linked-worktree scenario and is not diagnosed as missing one. |
+| L1, L2 | One exported scope list, one switchboard constant, no finding/ruling/phase labels in product code or test titles. Scope matcher test iterates the actual export. Architecture and source checks pass. |
+| L3 | Census regenerated, not hand-trimmed. Generator still reports 54 inherited undeclared sites in existing documentation/inventory/verification scripts (53 spawn + 1 unresolved binary), outside this lease slice. This is a retained limitation, not a green one-door claim. |
+| L4, L5 | Previously accepted/not-applicable dispositions remain; no plan-branch guard was restored. |
+| Main movement / transition forgery | E concurrent raw-main-move test: main advances during scope listing after real preflight, CLI returns `base-moved`, no held blob reaches main and no retry occurs. E real-main-borrower adversary test rejects held→held, hash change, extra paths, wrong parent and unknown states. |
+| Raw movement coverage | E update-ref (with and without expected old), fast-forward, `--no-verify`, cherry-pick, rebase, am and pull all refuse scoped movement; the genuine `.fgos`-only checkpoint tree remains permitted. Forged working copies and `git clean -fdX` do not reopen authority. |
+
+### Exact verification commands and observed exits
+
+The first command was run **before** changing the implementation. The required seven Node files have **229 passing tests** in their latest complete runs; Rust has 5. Tests stage/use the actual native payload, not skipped checks. Full setup checks originally failed without a native payload; their fixture bootstrap now uses the existing staging helper and a private state root, preserving all 110 cases.
+
+```sh
+# Borrow prerequisite: exit 0, 1 pass
+ env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test --test-name-pattern='both commit hooks observe' test/e2e/documentation-cutover-lease-hooks.test.mjs
+# Final unit run: exit 0, 11 pass (including twenty race trials)
+ env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test test/runner/documentation-cutover-lease.test.mjs
+# Final complete hook run: exit 0, 27 pass
+ env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test test/e2e/documentation-cutover-lease-hooks.test.mjs
+# After making the CLI refusal code explicit in stderr and tightening its assertion: exit 0, 1 pass
+ env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test --test-name-pattern='concurrent raw main move' test/e2e/documentation-cutover-lease-hooks.test.mjs
+# exit 0, 23 pass
+ env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test test/holder-lock/registry-contract.test.mjs
+# exit 0, 29 pass
+ env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test test/architecture.test.mjs
+# exit 0, 16 pass
+ env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test test/cli/subcommand-flag-drift.test.mjs
+# exit 0, 110 pass (not a name-filtered inventory-only run)
+ env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test test/setup/checks.test.mjs
+# exit 0, 13 pass
+ env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test test/e2e/root-file-guard-hook.test.mjs
+# exit 0, 5 pass; CARGO_TARGET_DIR is this linked checkout's ignored target/
+ CARGO_TARGET_DIR="$PWD/target/lease-scope-rank" ~/.cargo/bin/cargo test -p fgos-holder-lock --test scope_rank
+# exit 1: writes the generated census, then reports the inherited 54 script sites
+ FGOS_STATE_ROOT=/tmp/fgos-work/lease-scan-state node scripts/git-one-door-scan.mjs --write-census
+# exit 0
+ git diff --check
+```
+
+The unit command also had one later **exit 1** in the final verification loop: the existing holder-lock `--guarantee` helper timed out and answered `killed` (`lock-route-bad-output`) in the first acquire test; the other ten cases, including twenty races, passed. A complete manual rerun of the identical command passed 11/11. This is retained as a foundation/environment flake; no production retry, timeout bypass or weakened assertion was added. Development runs additionally exposed the old CLI JSON error, absent native fixture activation and missing native setup-test bootstrap; these were fixed rather than suppressed.
+
+### Limits and handoff
+
+- The existing `ensureScriptAddon` test helper stages a native host/addon/manifest under this checkout's ignored `.fgos/runtime/git-addon/…`. Its automatic staging was observed during the prescribed single-file tests. **This is a caveat against the brief's blanket no-`.fgos` instruction**: no manual `.fgos` editing, state/event mutation or real lease was performed, but the helper does have runtime cache writes. It was not removed or cleaned blindly. A future strictly no-runtime-write test invocation needs a pre-provisioned matching native environment or a separately authorized fixture-staging adjustment.
+- No GitNexus MCP tool was exposed in this worker, and the brief forbids the fgOS CLI in this repository. Caller/source searches and the architecture proof were used; no graph blast-radius or `detect_changes` claim is made. The runner, not this worker, owns committing.
+- Dispatch, Workflow-start and Land admission, cutover preconditions/rehearsal, spec/changelog text and independent A38 acceptance remain later authorized slices. No real migration freeze or overall Step 6b completion is claimed.
+- Markdown preview was attempted with `mdview open /home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md`; exit 1, read-only database. No preview URL was produced.

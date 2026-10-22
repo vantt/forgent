@@ -3855,15 +3855,14 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const cwd = process.cwd();
       const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
       if (sub === 'acquire') {
-        const holderWorktree = flags.worktree ? path.resolve(flags.worktree) : cwd;
-        const res = acquireDocumentationCutoverLease({ repoRoot: holderWorktree, worktree: holderWorktree });
-        if (flags.json) return output({ result: res.result, tokenHash: res.tokenHash, tokenPath: res.tokenPath, sidecar: res.sidecar });
+        const res = acquireDocumentationCutoverLease({ repoRoot: cwd, worktree: flags.worktree ? path.resolve(flags.worktree) : undefined });
+        if (flags.json) return { result: res.result, tokenHash: res.tokenHash, tokenPath: res.tokenPath, sidecar: res.sidecar };
         console.log(`acquired documentation-cutover lease (token hash: ${res.tokenHash})`);
         return;
       }
       if (sub === 'status') {
         const res = inspectDocumentationCutoverLease({ repoRoot });
-        if (flags.json) return output(res);
+        if (flags.json) return res;
         if (!res.held) {
           console.log(`documentation-cutover lease is ${res.state}`);
         } else {
@@ -3875,8 +3874,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       if (sub === 'release') {
         const res = releaseDocumentationCutoverLease({ repoRoot: cwd });
-        if (flags.json) return output(res);
-        console.log(`released documentation-cutover lease at ${res.releasedAt}`);
+        if (flags.json) return res;
+        console.log(`released documentation-cutover lease at ${res.releasedAt}; drift: ${res.drift.length ? res.drift.join(', ') : 'none'}`);
         return;
       }
       if (sub === 'abandon') {
@@ -3885,7 +3884,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           ownerConfirmed: Boolean(flags['owner-confirmed']),
           reason: flags.reason,
         });
-        if (flags.json) return output(res);
+        if (flags.json) return res;
         console.log(`abandoned documentation-cutover lease: ${res.reason}`);
         return;
       }

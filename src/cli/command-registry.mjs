@@ -404,7 +404,7 @@ export const COMMAND_REGISTRY = [
     description: 'Manage the exclusive documentation-cutover write lease (acquire, inspect status, release, abandon).',
     subcommands: {
       acquire: {
-        description: 'Acquire the documentation-cutover write lease, taking the kernel lock and recording held state in the sidecar.',
+        description: 'Acquire the documentation-cutover write lease and commit its held sidecar on main through ScopedCommit.',
         parameters: { type: 'object', properties: { worktree: { type: 'string' } }, required: [] },
         examples: ['fgos docs-lease acquire'],
       },
@@ -414,12 +414,12 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos docs-lease status', 'fgos docs-lease status --json'],
       },
       release: {
-        description: 'Release the documentation-cutover write lease (holder only).',
+        description: 'Release the documentation-cutover write lease (holder only), recording and reporting scope drift.',
         parameters: { type: 'object', properties: {}, required: [] },
         examples: ['fgos docs-lease release'],
       },
       abandon: {
-        description: 'Abandon a held documentation-cutover write lease when the holder process is dead (requires owner confirmation and reason).',
+        description: 'Owner door to abandon a held documentation-cutover write lease when its transition lock is free (requires confirmation and reason).',
         parameters: {
           type: 'object',
           properties: {

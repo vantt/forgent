@@ -1,584 +1,187 @@
 import '../helpers/process-tmp-root.mjs';
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync, spawnSync, spawn } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const BUILT_HOST = process.env.FGOS_HOST_BIN || path.join(REPO_ROOT, 'target', 'debug', 'fgos');
-if (!process.env.FGOS_HOST_BIN && fs.existsSync(BUILT_HOST)) {
-  process.env.FGOS_HOST_BIN = BUILT_HOST;
-}
-
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
-try {
-  ensureScriptAddon();
-} catch {}
-
-// Ensure state root is writable for Git Inspect driver
-if (!process.env.FGOS_STATE_ROOT) {
-  const tmpState = path.join(os.tmpdir(), 'fgos-state-test');
-  fs.mkdirSync(tmpState, { recursive: true, mode: 0o700 });
-  process.env.FGOS_STATE_ROOT = tmpState;
-}
-
-import {
-  DEFAULT_LOCK_NAME,
-  DEFAULT_SIDECAR_PATH,
-  DEFAULT_TOKEN_FILE,
-  LEASE_SCOPE_PATTERNS,
-  isScopedPath,
-  intersectsScope,
-  generateHolderToken,
-  hashHolderToken,
-  readSidecar,
-  writeSidecarAtomic,
-  readSidecarFromMain,
-  computeScopeDigests,
-  acquireDocumentationCutoverLease,
-  inspectDocumentationCutoverLease,
-  releaseDocumentationCutoverLease,
-  abandonDocumentationCutoverLease,
-  leaseAdmission,
-  checkLeaseCommitGuard,
-  checkDocumentationCutoverLeaseDoctor,
-} from '../../src/runner/documentation-cutover-lease.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
+import {
+  DEFAULT_LOCK_NAME, DEFAULT_SIDECAR_PATH, DEFAULT_TOKEN_FILE, LEASE_SCOPE_PATTERNS,
+  isScopedPath, intersectsScope, hashHolderToken, readSidecarFromMain, computeScopeDigests,
+  acquireDocumentationCutoverLease as acquire, inspectDocumentationCutoverLease as inspect,
+  releaseDocumentationCutoverLease as release, abandonDocumentationCutoverLease as abandon,
+  leaseAdmission, checkLeaseCommitGuard, checkDocumentationCutoverLeaseDoctor as doctor,
+} from '../../src/runner/documentation-cutover-lease.mjs';
 
-function commitSidecarFixture(repoRoot, sidecarData) {
-  const sidecarPath = path.join(repoRoot, DEFAULT_SIDECAR_PATH);
-  fs.mkdirSync(path.dirname(sidecarPath), { recursive: true });
-  const content = typeof sidecarData === 'string' ? sidecarData : `${JSON.stringify(sidecarData, null, 2)}\n`;
-  fs.writeFileSync(sidecarPath, content);
-  execFileSync('git', ['add', DEFAULT_SIDECAR_PATH], { cwd: repoRoot });
-  execFileSync('git', ['commit', '-qm', 'chore: documentation-cutover lease sidecar', '--no-verify'], { cwd: repoRoot });
+const stateRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-state-'));
+process.env.FGOS_STATE_ROOT = stateRoot;
+after(() => fs.rmSync(stateRoot, { recursive: true, force: true }));
+ensureScriptAddon();
+const sourceRoot = fileURLToPath(new URL('../../', import.meta.url));
+function fixture(t) {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-'));
+  t.after(() => fs.rmSync(temp, { recursive: true, force: true }));
+  const repoRoot = path.join(temp, 'repo'); fs.mkdirSync(repoRoot);
+  const git = (args, cwd = repoRoot) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  const put = (name, data, root = repoRoot) => { const dest = path.join(root, name); fs.mkdirSync(path.dirname(dest), { recursive: true }); fs.writeFileSync(dest, data); };
+  git(['init', '-qb', 'main']); git(['config', 'user.name', 'Fixture']); git(['config', 'user.email', 'fixture@example.invalid']);
+  put('README.md', 'fixture\n'); put('.gitignore', '.fgos/\n'); put('docs/index.md', 'docs\n');
+  git(['add', '.']); git(['commit', '-qm', 'baseline']);
+  const fence = path.join(repoRoot, '.fgos/locks/activation.lock');
+  fs.mkdirSync(fence, { recursive: true });
+  fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
+  const worktree = (branch = 'holder') => { const root = path.join(temp, branch); git(['worktree', 'add', '-qb', branch, root]); return root; };
+  return { repoRoot, temp, git, put, worktree };
 }
 
-function tempWorktree(t) {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-test-'));
-  t.after(() => fs.rmSync(tmpDir, { recursive: true, force: true }));
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: tmpDir });
-  execFileSync('git', ['config', 'user.name', 'Test Fixture'], { cwd: tmpDir });
-  execFileSync('git', ['config', 'user.email', 'test@fixture.invalid'], { cwd: tmpDir });
-  fs.writeFileSync(path.join(tmpDir, 'README.md'), '# Initial\n');
-  fs.mkdirSync(path.join(tmpDir, 'docs'), { recursive: true });
-  fs.writeFileSync(path.join(tmpDir, 'docs/index.md'), '# Docs\n');
-  execFileSync('git', ['add', '.'], { cwd: tmpDir });
-  execFileSync('git', ['commit', '-qm', 'initial'], { cwd: tmpDir });
-  fs.mkdirSync(path.join(tmpDir, '.fgos', 'locks'), { recursive: true });
-
-  const hooksDir = path.join(tmpDir, '.githooks');
-  fs.mkdirSync(hooksDir, { recursive: true });
-  fs.writeFileSync(path.join(hooksDir, 'reference-transaction'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
-  execFileSync('git', ['config', 'core.hooksPath', hooksDir], { cwd: tmpDir });
-
-  return tmpDir;
-}
-
-function linkedWorktree(mainRepo, branchName = 'side') {
-  const wtDir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-wt-')), 'wt');
-  execFileSync('git', ['worktree', 'add', '-q', '-b', branchName, wtDir], { cwd: mainRepo });
-  return wtDir;
-}
-
-test('scope matcher matches defined doc roots and rejects out-of-scope paths', () => {
-  // 1. docs/**
-  assert.equal(isScopedPath('docs/index.md'), true);
-  assert.equal(isScopedPath('docs/specs/runner.md'), true);
-  assert.equal(isScopedPath('docs/platform/git/spec.md'), true);
-
-  // 2. AGENTS.md, CLAUDE.md
-  assert.equal(isScopedPath('AGENTS.md'), true);
-  assert.equal(isScopedPath('CLAUDE.md'), true);
-
-  // 3. Transitional switchboard
-  assert.equal(isScopedPath('docs/transitional-switchboard.md'), true);
-  assert.equal(isScopedPath('plans/260925-documentation-authority-unification/transitional-switchboard.json'), true);
-
-  // 4. Skills
-  assert.equal(isScopedPath('core/skills/fgos-run/SKILL.md'), true);
-  assert.equal(isScopedPath('.agents/skills/distill/SKILL.md'), true);
-  assert.equal(isScopedPath('plugins/fgOS/skills/plan/SKILL.md'), true);
-
-  // 5. Sidecar path itself
-  assert.equal(isScopedPath(DEFAULT_SIDECAR_PATH), true);
-  assert.equal(isScopedPath('custom/sidecar.json', { sidecarPath: 'custom/sidecar.json' }), true);
-
-  // 6. Byte path (Buffer)
-  assert.equal(isScopedPath(Buffer.from('docs/platform/spec.md')), true);
-  assert.equal(isScopedPath(Buffer.from('src/index.js')), false);
-
-  // 7. Non-ASCII paths (Finding H3)
+test('scope matcher derives all roots from one list and accepts byte paths without whitespace trimming', () => {
+  for (const pattern of LEASE_SCOPE_PATTERNS) {
+    const name = pattern.replace('/**', '/nested/file.md');
+    assert.equal(isScopedPath(name), true); assert.equal(isScopedPath(Buffer.from(name)), true);
+  }
   assert.equal(isScopedPath('docs/tiếng.md'), true);
-  assert.equal(isScopedPath(Buffer.from('docs/tiếng.md')), true);
-  assert.equal(isScopedPath('src/tiếng.js'), false);
-
-  // 8. Out-of-scope paths
-  assert.equal(isScopedPath('src/runner/documentation-cutover-lease.mjs'), false);
-  assert.equal(isScopedPath('package.json'), false);
-  assert.equal(isScopedPath('README.md'), false);
-  assert.equal(isScopedPath('.githooks/pre-commit'), false);
-  assert.equal(isScopedPath('packages/holder-lock/index.mjs'), false);
-
-  // intersectsScope helper
-  assert.equal(intersectsScope(['src/a.js', 'docs/b.md', 'test/c.js']), true);
-  assert.equal(intersectsScope(['src/a.js', 'test/c.js']), false);
-  assert.equal(intersectsScope([]), false);
+  assert.equal(isScopedPath(' docs/file.md'), false);
+  assert.equal(intersectsScope(['apps/code', 'docs/a\nb.md']), true);
+  assert.equal(intersectsScope(['README.md', 'src/code']), false);
 });
 
-test('acquire succeeds, generates holder token, writes sidecar on main and never returns raw token', (t) => {
-  const repoRoot = tempWorktree(t);
-  const tokenPath = path.join(repoRoot, DEFAULT_TOKEN_FILE);
-
-  const res = acquireDocumentationCutoverLease({
-    repoRoot,
-    commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-  });
-  assert.equal(res.result, 'acquired');
-  // Raw token is NEVER returned in res (Ruling 2, Finding H5)
-  assert.equal(res.token, undefined);
-  assert.ok(res.tokenHash);
-  assert.equal(res.tokenPath, tokenPath);
-
-  // Token file written in holder worktree
-  assert.ok(fs.existsSync(tokenPath));
-  const savedToken = fs.readFileSync(tokenPath, 'utf8').trim();
-  assert.equal(hashHolderToken(savedToken), res.tokenHash);
-
-  // Sidecar blob committed on refs/heads/main (Ruling 1)
-  const mainSidecar = readSidecarFromMain(repoRoot);
-  assert.equal(mainSidecar.status, 'held');
-  assert.equal(mainSidecar.sidecar.holderTokenHash, res.tokenHash);
-  assert.equal(mainSidecar.sidecar.state, 'held');
-
-  // Verify scopeDigests recorded on main
-  assert.ok(mainSidecar.sidecar.scopeDigests);
-  assert.ok(mainSidecar.sidecar.scopeDigests.docs);
-
-  // Verify unverified cleanWorktrees flag was removed (Ruling 8, Finding M2)
-  assert.equal(mainSidecar.sidecar.cleanWorktrees, undefined);
+test('production acquire commits exactly the sidecar with base evidence and keeps the token private', t => {
+  const f = fixture(t); const before = f.git(['rev-parse', 'HEAD']);
+  const result = acquire({ repoRoot: f.repoRoot });
+  assert.equal(result.result, 'acquired'); assert.equal(result.token, undefined);
+  const token = fs.readFileSync(result.tokenPath, 'utf8').trim();
+  assert.equal(hashHolderToken(token), result.tokenHash); assert.ok(!JSON.stringify(result).includes(token));
+  const held = readSidecarFromMain(f.repoRoot);
+  assert.equal(held.status, 'held'); assert.equal(held.sidecar.baseCommit, before);
+  assert.deepEqual(f.git(['diff-tree', '-r', '--no-commit-id', '--name-only', 'HEAD']).split('\n'), [DEFAULT_SIDECAR_PATH]);
+  assert.equal(f.git(['status', '--porcelain']), '');
+  assert.equal(held.sidecar.cleanWorktrees, undefined);
+  assert.equal(inspect({ repoRoot: f.repoRoot }).held, true);
+  assert.throws(() => acquire({ repoRoot: f.repoRoot }), { code: 'lease-already-held' });
 });
 
-test('double acquire is refused when lease is held', (t) => {
-  const repoRoot = tempWorktree(t);
-  acquireDocumentationCutoverLease({
-    repoRoot,
-    commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-  });
-
-  assert.throws(
-    () => acquireDocumentationCutoverLease({
-      repoRoot,
-      commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-    }),
-    (err) => err.code === 'lease-already-held' && err.message.includes('already held'),
-  );
+test('holder release from a subdirectory uses the checkout-root token and lands on main', t => {
+  const f = fixture(t); const holder = f.worktree(); const other = f.worktree('other');
+  const result = acquire({ repoRoot: path.join(holder, 'docs') });
+  assert.equal(result.tokenPath, path.join(holder, DEFAULT_TOKEN_FILE));
+  assert.equal(fs.existsSync(path.join(holder, 'docs/.fgos')), false);
+  assert.throws(() => release({ repoRoot: other }), { code: 'not-holder' });
+  assert.equal(doctor(f.repoRoot).passed, true); // consumer repos do not use these hooks
+  const released = release({ repoRoot: path.join(holder, 'docs') });
+  assert.equal(released.result, 'released'); assert.deepEqual(released.drift, []);
+  assert.equal(readSidecarFromMain(f.repoRoot).state, 'released');
+  assert.equal(fs.existsSync(result.tokenPath), false);
+  assert.throws(() => release({ repoRoot: holder }), { code: 'lease-not-held' });
 });
 
-test('inspect reports status from refs/heads/main, held flag, age and token hash', (t) => {
-  const repoRoot = tempWorktree(t);
-
-  // Before acquire: free
-  const initial = inspectDocumentationCutoverLease({ repoRoot });
-  assert.equal(initial.state, 'free');
-  assert.equal(initial.held, false);
-
-  // After acquire: held
-  const acq = acquireDocumentationCutoverLease({
-    repoRoot,
-    commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-  });
-  const status = inspectDocumentationCutoverLease({ repoRoot });
-  assert.equal(status.state, 'held');
-  assert.equal(status.held, true);
-  assert.equal(status.holderTokenHash, acq.tokenHash);
-  assert.ok(status.ageMs >= 0);
-  assert.equal(status.worktree, repoRoot);
+test('full scope digests cover every page and release records drift rather than refusing it', t => {
+  const f = fixture(t);
+  for (let i = 0; i < 300; i++) { f.put(`apps/${i}.txt`, 'outside'); f.put(`docs/${i}.md`, 'inside'); }
+  f.git(['add', '.']); f.git(['commit', '-qm', 'large tree']);
+  const acquired = acquire({ repoRoot: f.repoRoot });
+  assert.equal(Object.keys(acquired.sidecar.scopeDigests).length, LEASE_SCOPE_PATTERNS.length - 1);
+  const previous = computeScopeDigests(f.repoRoot);
+  f.put('docs/299.md', 'last page changed');
+  f.git(['add', 'docs/299.md']); f.git(['-c', 'core.hooksPath=/dev/null', 'commit', '-qm', 'raw bypass']);
+  const result = release({ repoRoot: f.repoRoot });
+  assert.deepEqual(result.drift, ['docs']);
+  assert.notEqual(result.sidecar.releaseScopeDigests.docs, previous.docs);
+  assert.deepEqual(readSidecarFromMain(f.repoRoot).sidecar.drift, ['docs']);
 });
 
-test('release is allowed for holder and refused for non-holder', (t) => {
-  const repoRoot = tempWorktree(t);
-  const tokenPath = path.join(repoRoot, DEFAULT_TOKEN_FILE);
-  acquireDocumentationCutoverLease({
-    repoRoot,
-    commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-  });
-
-  // Non-holder in a linked worktree with no token is refused
-  const otherDir = linkedWorktree(repoRoot, 'non-holder-side');
-  assert.throws(
-    () => releaseDocumentationCutoverLease({
-      repoRoot: otherDir,
-      commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-    }),
-    (err) => err.code === 'not-holder',
-  );
-
-  // Holder release in repoRoot succeeds
-  const rel = releaseDocumentationCutoverLease({
-    repoRoot,
-    commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-  });
-  assert.equal(rel.result, 'released');
-  assert.ok(rel.releasedAt);
-
-  // Token file removed
-  assert.equal(fs.existsSync(tokenPath), false);
-
-  // Sidecar state on refs/heads/main updated to released
-  const sidecar = readSidecarFromMain(repoRoot);
-  assert.equal(sidecar.status, 'present');
-  assert.equal(sidecar.state, 'released');
-
-  // Second release throws lease-not-held
-  assert.throws(
-    () => releaseDocumentationCutoverLease({
-      repoRoot,
-      commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-    }),
-    (err) => err.code === 'lease-not-held',
-  );
+test('owner abandon needs confirmation and reason, refuses a live kernel holder, and lands for a non-holder', t => {
+  const f = fixture(t); const holder = f.worktree(); acquire({ repoRoot: holder });
+  assert.throws(() => abandon({ repoRoot: f.repoRoot, reason: 'lost holder' }), { code: 'owner-confirmation-required' });
+  assert.throws(() => abandon({ repoRoot: f.repoRoot, ownerConfirmed: true, reason: ' ' }), { code: 'owner-confirmation-required' });
+  const scope = createLockScope('live-transition');
+  const locked = acquireSync(scope, DEFAULT_LOCK_NAME, { fgosDir: path.join(f.repoRoot, '.fgos') });
+  assert.equal(locked.result, 'acquired');
+  try { assert.throws(() => abandon({ repoRoot: f.repoRoot, ownerConfirmed: true, reason: 'lost holder' }), { code: 'lock-held' }); }
+  finally { locked.handle.release(); }
+  const result = abandon({ repoRoot: f.repoRoot, ownerConfirmed: true, reason: 'lost holder' });
+  assert.equal(readSidecarFromMain(f.repoRoot).state, 'abandoned');
+  assert.equal(result.sidecar.abandon.holderTokenHash, result.sidecar.holderTokenHash);
+  assert.ok(result.sidecar.abandon.ageMs >= 0);
 });
 
-test('release-time digest comparison catches drift and refuses release (Ruling 8, Finding M2)', (t) => {
-  const repoRoot = tempWorktree(t);
-  acquireDocumentationCutoverLease({
-    repoRoot,
-    commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-  });
-
-  // Out-of-band drift on main: modify docs/index.md directly on main
-  fs.writeFileSync(path.join(repoRoot, 'docs/index.md'), '# Drifted Docs\n');
-  execFileSync('git', ['add', 'docs/index.md'], { cwd: repoRoot });
-  execFileSync('git', ['commit', '-qm', 'raw bypass commit on main', '--no-verify'], { cwd: repoRoot });
-
-  // Release must catch the drifted scope digest and refuse
-  assert.throws(
-    () => releaseDocumentationCutoverLease({
-      repoRoot,
-      commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-    }),
-    (err) => err.code === 'scope-drift' && err.message.includes('drifted during lease: docs'),
-  );
-});
-
-test('abandon refused while kernel lock held; requires owner flag and reason when kernel lock free (Ruling 4)', (t) => {
-  const repoRoot = tempWorktree(t);
-  const fgosDir = path.join(repoRoot, '.fgos');
-  acquireDocumentationCutoverLease({
-    repoRoot,
-    commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-  });
-
-  // 1. When kernel lock is held by a live process: abandon refused
-  const scope = createLockScope('live-holder-test');
-  const kernelHold = acquireSync(scope, DEFAULT_LOCK_NAME, { fgosDir });
-  assert.equal(kernelHold.result, 'acquired');
-
+test('committed freeze ignores forged disk copies, missing locks, environment tokens and clean', t => {
+  const f = fixture(t); const holder = f.worktree(); const other = f.worktree('other');
+  const result = acquire({ repoRoot: holder });
+  const token = fs.readFileSync(result.tokenPath, 'utf8').trim();
+  f.put(DEFAULT_SIDECAR_PATH, '{"state":"released"}', other);
+  fs.rmSync(path.join(f.repoRoot, '.fgos/locks'), { recursive: true });
+  f.git(['clean', '-fdX'], holder);
+  assert.equal(inspect({ repoRoot: other }).held, true);
+  const prior = process.env.FGOS_DOCS_LEASE_TOKEN; process.env.FGOS_DOCS_LEASE_TOKEN = token;
   try {
-    assert.throws(
-      () => abandonDocumentationCutoverLease({
-        repoRoot,
-        ownerConfirmed: true,
-        reason: 'Holder dead',
-        commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-      }),
-      (err) => err.code === 'lock-held',
-    );
-  } finally {
-    kernelHold.handle.release();
-  }
-
-  // 2. Kernel lock is free: abandon without owner flag is refused
-  assert.throws(
-    () => abandonDocumentationCutoverLease({
-      repoRoot,
-      reason: 'Holder dead',
-      commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-    }),
-    (err) => err.code === 'owner-confirmation-required',
-  );
-
-  // 3. Undocumented force flag is NOT accepted (Ruling 4)
-  assert.throws(
-    () => abandonDocumentationCutoverLease({
-      repoRoot,
-      force: true,
-      reason: 'Holder dead',
-      commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-    }),
-    (err) => err.code === 'owner-confirmation-required',
-  );
-
-  // 4. Abandon without reason is refused
-  assert.throws(
-    () => abandonDocumentationCutoverLease({
-      repoRoot,
-      ownerConfirmed: true,
-      reason: '   ',
-      commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-    }),
-    (err) => err.code === 'owner-confirmation-required',
-  );
-
-  // 5. Abandon with owner flag and written reason succeeds
-  const ab = abandonDocumentationCutoverLease({
-    repoRoot,
-    ownerConfirmed: true,
-    reason: 'Session crashed during cutover',
-    commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-  });
-  assert.equal(ab.result, 'abandoned');
-  assert.equal(ab.reason, 'Session crashed during cutover');
-
-  // Verify abandon record carries holderTokenHash and ageMs (Finding M3, §3.7)
-  const sidecar = readSidecarFromMain(repoRoot);
-  assert.equal(sidecar.state, 'abandoned');
-  assert.equal(sidecar.sidecar.abandon.reason, 'Session crashed during cutover');
-  assert.ok(sidecar.sidecar.abandon.holderTokenHash);
-  assert.ok(typeof sidecar.sidecar.abandon.ageMs === 'number');
+    const refused = leaseAdmission({ repoRoot: other, paths: ['docs/a.md'] });
+    assert.equal(refused.allowed, false); assert.ok(!refused.message.includes(token));
+    assert.ok(checkLeaseCommitGuard(other, { stagedPaths: ['docs/a.md'] }));
+    assert.equal(leaseAdmission({ repoRoot: other, paths: ['src/code'] }).allowed, true);
+  } finally { if (prior === undefined) delete process.env.FGOS_DOCS_LEASE_TOKEN; else process.env.FGOS_DOCS_LEASE_TOKEN = prior; }
 });
 
-test('held sidecar with lock file gone still refuses (no TTL, fail-closed)', (t) => {
-  const repoRoot = tempWorktree(t);
-  acquireDocumentationCutoverLease({
-    repoRoot,
-    commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-  });
-
-  // Remove lock file (simulating git clean -fdX or main-checkout-reset)
-  const lockFile = path.join(repoRoot, '.fgos', 'locks', `${DEFAULT_LOCK_NAME}.lock`);
-  if (fs.existsSync(lockFile)) fs.unlinkSync(lockFile);
-
-  // Inspect still reports held
-  const status = inspectDocumentationCutoverLease({ repoRoot });
-  assert.equal(status.state, 'held');
-  assert.equal(status.held, true);
-
-  // leaseAdmission still refuses non-holder
-  const otherWorktree = linkedWorktree(repoRoot, 'non-holder-check');
-  const adm = leaseAdmission({ repoRoot: otherWorktree, paths: ['docs/test.md'] });
-  assert.equal(adm.allowed, false);
-  assert.equal(adm.reason, 'documentation-cutover-lease');
-});
-
-test('token is never printed in refusal messages or exposed in env (Finding H5)', (t) => {
-  const repoRoot = tempWorktree(t);
-  const acq = acquireDocumentationCutoverLease({
-    repoRoot,
-    commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-  });
-  const token = fs.readFileSync(acq.tokenPath, 'utf8').trim();
-
-  // leaseAdmission refusal message in non-holder worktree
-  const otherWorktree = linkedWorktree(repoRoot, 'non-holder-msg');
-  const adm = leaseAdmission({ repoRoot: otherWorktree, paths: ['docs/test.md'] });
-  assert.equal(adm.allowed, false);
-  assert.equal(adm.message.includes(token), false);
-  assert.equal(adm.message.includes(acq.tokenHash), false);
-
-  // pre-commit guard refusal message
-  const guard = checkLeaseCommitGuard(otherWorktree, { stagedPaths: ['docs/test.md'] });
-  assert.ok(guard);
-  assert.equal(guard.includes(token), false);
-  assert.equal(guard.includes(acq.tokenHash), false);
-
-  // Environment variables do NOT grant holder rights
-  const savedEnv = process.env.CLAUDE_CODE_SESSION_ID;
-  const savedDocsEnv = process.env.FGOS_DOCS_LEASE_TOKEN;
-  try {
-    process.env.CLAUDE_CODE_SESSION_ID = token;
-    process.env.FGOS_DOCS_LEASE_TOKEN = token;
-
-    const foreignAdm = leaseAdmission({ repoRoot: otherWorktree, paths: ['docs/platform.md'] });
-    assert.equal(foreignAdm.allowed, false);
-  } finally {
-    if (savedEnv !== undefined) process.env.CLAUDE_CODE_SESSION_ID = savedEnv;
-    else delete process.env.CLAUDE_CODE_SESSION_ID;
-    if (savedDocsEnv !== undefined) process.env.FGOS_DOCS_LEASE_TOKEN = savedDocsEnv;
-    else delete process.env.FGOS_DOCS_LEASE_TOKEN;
+test('corrupt committed sidecars fail closed for acquire and every Node gate', t => {
+  const f = fixture(t);
+  for (const raw of ['<<< conflict >>>', '{"state":"HELD"}', '{"state":"held"}']) {
+    f.put(DEFAULT_SIDECAR_PATH, raw); f.git(['add', DEFAULT_SIDECAR_PATH]); f.git(['commit', '-qm', 'corrupt fixture']);
+    assert.throws(() => acquire({ repoRoot: f.repoRoot }), { code: 'corrupt-sidecar' });
+    assert.equal(leaseAdmission({ repoRoot: f.repoRoot }).allowed, false);
+    assert.match(checkLeaseCommitGuard(f.repoRoot, { stagedPaths: ['docs/a'] }), /corrupt/);
+    assert.equal(inspect({ repoRoot: f.repoRoot }).state, 'corrupt');
   }
 });
 
-test('forged working-tree sidecar is ignored because authority lives on main (Finding H1, Ruling 1)', (t) => {
-  const repoRoot = tempWorktree(t);
-  acquireDocumentationCutoverLease({
-    repoRoot,
-    commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-  });
-
-  const otherWorktree = linkedWorktree(repoRoot, 'forged-sidecar-wt');
-
-  // Non-holder attempts to forge sidecar in working tree
-  const forgedSidecarPath = path.join(otherWorktree, DEFAULT_SIDECAR_PATH);
-  fs.mkdirSync(path.dirname(forgedSidecarPath), { recursive: true });
-  fs.writeFileSync(forgedSidecarPath, JSON.stringify({ state: 'released' }));
-
-  // Inspect and admission must ignore working-tree file and consult refs/heads/main
-  const status = inspectDocumentationCutoverLease({ repoRoot: otherWorktree });
-  assert.equal(status.state, 'held');
-
-  const adm = leaseAdmission({ repoRoot: otherWorktree, paths: ['docs/secret.md'] });
-  assert.equal(adm.allowed, false);
+test('holder worktree must belong to this repository and its token cannot reside inside scope', t => {
+  const f = fixture(t); const other = fixture(t);
+  assert.throws(() => acquire({ repoRoot: f.repoRoot, worktree: other.repoRoot }), { code: 'invalid-worktree' });
+  const nested = path.join(f.repoRoot, 'docs/holder'); f.git(['worktree', 'add', '-qb', 'nested', nested]);
+  assert.throws(() => acquire({ repoRoot: f.repoRoot, worktree: nested }), { code: 'token-inside-scope' });
 });
 
-test('git clean -fdX does not reopen the freeze (Finding H1, Repro F)', (t) => {
-  const repoRoot = tempWorktree(t);
-  acquireDocumentationCutoverLease({
-    repoRoot,
-    commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-  });
-
-  // Clean working tree
-  execFileSync('git', ['clean', '-fdX'], { cwd: repoRoot });
-
-  // Lease remains held because committed on refs/heads/main
-  const status = inspectDocumentationCutoverLease({ repoRoot });
-  assert.equal(status.state, 'held');
-
-  const otherWorktree = linkedWorktree(repoRoot, 'clean-check-wt');
-  const adm = leaseAdmission({ repoRoot: otherWorktree, paths: ['docs/architecture.md'] });
-  assert.equal(adm.allowed, false);
+test('doctor is not applicable in plain git and non-git projects', t => {
+  const f = fixture(t);
+  assert.match(doctor(f.repoRoot).message, /not applicable/);
+  assert.match(doctor(f.temp).message, /not applicable/);
 });
 
-test('corrupt sidecar on main fails closed (Finding M1, Ruling 5)', (t) => {
-  const repoRoot = tempWorktree(t);
-
-  // Commit corrupt JSON sidecar to refs/heads/main
-  commitSidecarFixture(repoRoot, '<<< conflict >>>');
-
-  // leaseAdmission must refuse (fail closed)
-  const adm = leaseAdmission({ repoRoot, paths: ['docs/file.md'] });
-  assert.equal(adm.allowed, false);
-  assert.match(adm.reason, /corrupt/);
-
-  // checkLeaseCommitGuard must refuse
-  const guard = checkLeaseCommitGuard(repoRoot, { stagedPaths: ['docs/file.md'] });
-  assert.ok(guard);
-  assert.match(guard, /corrupt/);
-
-  // Doctor check reports corrupt sidecar
-  const doc = checkDocumentationCutoverLeaseDoctor(repoRoot);
-  assert.equal(doc.passed, false);
-  assert.match(doc.message, /corrupt/);
+test('doctor verifies repository hook wiring and reports held authority without looking for a main-checkout token', t => {
+  const f = fixture(t);
+  f.put('.githooks/pre-commit', '#!/bin/sh\nexit 0\n');
+  f.put('.githooks/reference-transaction', '#!/bin/sh\nexit 0\n');
+  for (const name of ['pre-commit', 'reference-transaction']) fs.chmodSync(path.join(f.repoRoot, '.githooks', name), 0o755);
+  assert.equal(doctor(f.repoRoot).passed, false);
+  assert.match(doctor(f.repoRoot).message, /not wired/);
+  f.git(['config', 'core.hooksPath', '.githooks']);
+  assert.equal(doctor(f.repoRoot).passed, true);
+  const holder = f.worktree(); acquire({ repoRoot: holder });
+  assert.equal(fs.existsSync(path.join(f.repoRoot, DEFAULT_TOKEN_FILE)), false);
+  const active = doctor(f.repoRoot);
+  assert.equal(active.passed, false); assert.match(active.message, /actively held/); assert.doesNotMatch(active.message, /token.*missing/);
+  fs.rmSync(path.join(f.repoRoot, '.fgos/locks', `${DEFAULT_LOCK_NAME}.lock`));
+  assert.match(doctor(f.repoRoot).message, /resource is missing/);
 });
 
-test('holder process death leaves lease held across processes (Finding H4, §3.7)', (t) => {
-  const repoRoot = tempWorktree(t);
-
-  // Child process acquires lease and commits sidecar
-  const tokenPath = path.join(repoRoot, DEFAULT_TOKEN_FILE);
-  const sidecarPath = path.join(repoRoot, DEFAULT_SIDECAR_PATH);
-  const token = generateHolderToken();
-  const tokenHash = hashHolderToken(token);
-  fs.writeFileSync(tokenPath, `${token}\n`, { mode: 0o600 });
-  const sidecarData = {
-    contract: { id: 'documentation-cutover-lease', version: 1 },
-    state: 'held',
-    holderTokenHash: tokenHash,
-    acquiredAt: new Date().toISOString(),
-    worktree: repoRoot,
-    branch: 'main',
-    baseCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim(),
-    scope: [...LEASE_SCOPE_PATTERNS],
-    scopeDigests: computeScopeDigests(repoRoot),
-  };
-  commitSidecarFixture(repoRoot, sidecarData);
-
-  // After acquiring process has died and exited:
-  // Lease is still held on main!
-  const status = inspectDocumentationCutoverLease({ repoRoot });
-  assert.equal(status.state, 'held');
-
-  // Non-holder operations are refused in another worktree
-  const otherWorktree = linkedWorktree(repoRoot, 'non-holder-death-wt');
-  const adm = leaseAdmission({ repoRoot: otherWorktree, paths: ['docs/guide.md'] });
-  assert.equal(adm.allowed, false);
-
-  // Holder process presenting token in holder worktree can release
-  const rel = releaseDocumentationCutoverLease({
-    repoRoot,
-    commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-  });
-  assert.equal(rel.result, 'released');
-});
-
-test('two-process acquire race has exactly one winner (Finding H4, Ruling 7, N=20 trials)', async (t) => {
-  const trials = 20;
-
-  for (let trial = 0; trial < trials; trial++) {
-    const repoRoot = tempWorktree(t);
-    const workerScript = `
-      import { ensureScriptAddon } from ${JSON.stringify(path.join(REPO_ROOT, 'scripts/lib/git-ports.mjs'))};
-      try { ensureScriptAddon(); } catch {}
-      import { acquireDocumentationCutoverLease } from ${JSON.stringify(path.join(REPO_ROOT, 'src/runner/documentation-cutover-lease.mjs'))};
-      try {
-        const res = acquireDocumentationCutoverLease({ repoRoot: ${JSON.stringify(repoRoot)} });
-        process.stdout.write(JSON.stringify({ status: 'acquired', hash: res.tokenHash }));
-      } catch (err) {
-        process.stdout.write(JSON.stringify({ status: 'refused', code: err.code }));
-      }
-    `;
-
-    const runWorker = () => new Promise((resolve) => {
-      const child = spawn(process.execPath, ['--input-type=module', '-e', workerScript], {
-        env: process.env,
-        stdio: ['ignore', 'pipe', 'ignore'],
-      });
-      let out = '';
-      child.stdout.on('data', (d) => { out += d.toString(); });
-      child.on('close', () => {
-        try { resolve(JSON.parse(out)); } catch { resolve({ status: 'error', out }); }
-      });
+test('two production acquire processes have exactly one winner across twenty trials', async t => {
+  for (let trial = 0; trial < 20; trial++) {
+    const f = fixture(t);
+    const script = `import { ensureScriptAddon } from ${JSON.stringify(path.join(sourceRoot, 'scripts/lib/git-ports.mjs'))};
+      ensureScriptAddon();
+      import { acquireDocumentationCutoverLease } from ${JSON.stringify(path.join(sourceRoot, 'src/runner/documentation-cutover-lease.mjs'))};
+      try { const r = acquireDocumentationCutoverLease({repoRoot:${JSON.stringify(f.repoRoot)}}); console.log(JSON.stringify({status:r.result})); }
+      catch(e) { console.log(JSON.stringify({status:'refused',code:e.code,message:e.message})); }`;
+    const worker = () => new Promise((resolve, reject) => {
+      const child = spawn(process.execPath, ['--input-type=module', '-e', script], { env: process.env, stdio: ['ignore', 'pipe', 'pipe'] });
+      let out = ''; let err = ''; child.stdout.on('data', d => out += d); child.stderr.on('data', d => err += d);
+      child.once('error', reject); child.once('close', () => { try { resolve(JSON.parse(out.trim())); } catch { reject(new Error(out + err)); } });
     });
-
-    const [r1, r2] = await Promise.all([runWorker(), runWorker()]);
-
-    const acquiredCount = (r1.status === 'acquired' ? 1 : 0) + (r2.status === 'acquired' ? 1 : 0);
-    assert.equal(acquiredCount, 1, `Trial ${trial}: expected exactly 1 acquire winner, got ${acquiredCount} (r1: ${JSON.stringify(r1)}, r2: ${JSON.stringify(r2)})`);
+    const results = await Promise.all([worker(), worker()]);
+    assert.equal(results.filter(r => r.status === 'acquired').length, 1, JSON.stringify(results));
+    assert.equal(readSidecarFromMain(f.repoRoot).status, 'held');
+    // Both producers have exited; committed authority still refuses non-holders.
+    const other = f.worktree('non-holder'); assert.equal(leaseAdmission({ repoRoot: other }).allowed, false);
   }
-});
-test('doctor check verifies sidecar on main, kernel lock, ref hook wired, and does not report token missing from main (Ruling 10, Finding M7)', (t) => {
-  const repoRoot = tempWorktree(t);
-  const lockDir = path.join(repoRoot, '.fgos', 'locks');
-  const lockFile = path.join(lockDir, `${DEFAULT_LOCK_NAME}.lock`);
-  // 1. No lease: passes (when ref hook wired)
-  const checkFree = checkDocumentationCutoverLeaseDoctor(repoRoot);
-  assert.equal(checkFree.passed, true);
-
-  // 2. Ref hook not wired: fails
-  execFileSync('git', ['config', '--unset', 'core.hooksPath'], { cwd: repoRoot });
-  const checkNoHook = checkDocumentationCutoverLeaseDoctor(repoRoot);
-  assert.equal(checkNoHook.passed, false);
-  assert.match(checkNoHook.message, /reference-transaction hook is not wired/);
-
-  // Re-wire hook
-  const hooksDir = path.join(repoRoot, '.githooks');
-  execFileSync('git', ['config', 'core.hooksPath', hooksDir], { cwd: repoRoot });
-
-  // 3. Acquire lease in a linked worktree
-  const linkedWt = linkedWorktree(repoRoot, 'holder-branch');
-
-  acquireDocumentationCutoverLease({
-    repoRoot: linkedWt,
-    worktree: linkedWt,
-    commitSidecar: (data) => commitSidecarFixture(repoRoot, data),
-  });
-
-  // Ensure kernel lock file exists in main
-  fs.writeFileSync(lockFile, '');
-
-  // 4. Running doctor from main checkout must NOT report "token missing" merely because token is in holder worktree (Ruling 10, Finding M7)
-  const checkFromMain = checkDocumentationCutoverLeaseDoctor(repoRoot);
-  assert.equal(checkFromMain.passed, false);
-  assert.ok(checkFromMain.message.includes('actively held'));
-  assert.equal(checkFromMain.message.includes('token file is missing'), false);
-
-  // 5. Running doctor from holder worktree verifies token
-  const checkFromHolder = checkDocumentationCutoverLeaseDoctor(linkedWt);
-  assert.equal(checkFromHolder.passed, false);
-  assert.ok(checkFromHolder.message.includes('actively held'));
 });

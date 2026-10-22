@@ -1,5 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -9,9 +9,15 @@ import { fileURLToPath } from 'node:url';
 import {
   DEFAULT_SIDECAR_PATH,
   DEFAULT_TOKEN_FILE,
-  generateHolderToken,
-  hashHolderToken,
 } from '../../src/runner/documentation-cutover-lease.mjs';
+
+import { acquireSync, createLockScope, runBorrowed } from '../../src/holder-lock/index.mjs';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
+
+const stateRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-hooks-state-'));
+process.env.FGOS_STATE_ROOT = stateRoot;
+after(() => fs.rmSync(stateRoot, { recursive: true, force: true }));
+ensureScriptAddon();
 
 const sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const BUILT_HOST = process.env.FGOS_HOST_BIN || path.join(sourceRoot, 'target', 'debug', 'fgos');
@@ -47,10 +53,15 @@ function fixture(t) {
 
   put('README.md', '# Fixture\n');
   put('existing.txt', 'baseline\n');
+  put('.gitignore', '.fgos/\n');
   put('apps/fgos/Cargo.toml', '[package]\nname="fixture"\n');
   put('docs/guide.md', '# Guide\n');
   git(['add', '.']);
   git(['commit', '-q', '-m', 'fixture baseline']);
+
+  const fence = path.join(repo, '.fgos/locks/activation.lock');
+  fs.mkdirSync(fence, { recursive: true });
+  fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
 
   // Copy hooks to hook-host
   const preCommitDest = path.join(host, '.githooks/pre-commit');
@@ -81,23 +92,20 @@ function fixture(t) {
       timeout: 30_000,
     });
 
-  const setupLease = (token = generateHolderToken(), worktree = repo) => {
-    const tokenHash = hashHolderToken(token);
-    const sidecarData = {
-      contract: { id: 'documentation-cutover-lease', version: 1 },
-      state: 'held',
-      holderTokenHash: tokenHash,
-      acquiredAt: new Date().toISOString(),
-      worktree,
-      branch: 'main',
-      baseCommit: git(['rev-parse', 'HEAD']),
-      scope: ['docs/**', 'AGENTS.md', 'CLAUDE.md'],
-      scopeDigests: {},
-    };
-    put(DEFAULT_SIDECAR_PATH, `${JSON.stringify(sidecarData, null, 2)}\n`);
-    git(['add', DEFAULT_SIDECAR_PATH]);
-    git(['commit', '-q', '--no-verify', '-m', 'chore: setup lease sidecar on main']);
-    return { token, tokenHash, sidecarData };
+  const rawCli = (args, cwd = repo, extraEnv = {}) => spawnSync(process.execPath, [path.join(sourceRoot, 'bin/fgos.mjs'), 'docs-lease', ...args, '--json'], {
+    cwd, env: { ...env, ...extraEnv }, encoding: 'utf8', timeout: 60_000,
+  });
+  const cli = (args, cwd = repo) => {
+    const res = rawCli(args, cwd);
+    assert.equal(res.status, 0, res.stderr + res.stdout);
+    const output = JSON.parse(res.stdout);
+    return output.data ?? output;
+  };
+  const setupLease = (worktree) => {
+    const result = cli(['acquire', '--worktree', worktree ?? addWorktree('lease-holder')]);
+    const token = fs.readFileSync(result.tokenPath, 'utf8').trim();
+    assert.equal(JSON.stringify(result).includes(token), false, 'CLI must not print the token');
+    return { token, tokenHash: result.tokenHash, sidecarData: result.sidecar };
   };
 
   const addWorktree = (branchName = 'side') => {
@@ -107,8 +115,41 @@ function fixture(t) {
     return wt;
   };
 
-  return { temp, repo, host, git, put, commit, setupLease, addWorktree };
+  return { temp, repo, host, git, put, commit, setupLease, addWorktree, cli, rawCli };
 }
+
+test('both commit hooks observe the real main-checkout borrowed description', (t) => {
+  const f = fixture(t);
+  // A probe, not an injected committer: Git itself spawns both hooks with the
+  // description lent by the public holder-lock door.
+  const probeSource = `#!/usr/bin/env node
+import fs from 'node:fs';
+import { checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from ${JSON.stringify(new URL('../../src/holder-lock/index.mjs', import.meta.url).href)};
+const fgosDir = ${JSON.stringify(path.join(f.repo, '.fgos'))};
+let answer;
+try { answer = checkBorrowedDescription(resolveLock('main-checkout', { fgosDir }).v3Path, { fgosDir }); }
+catch (error) { answer = { result: 'error', message: error.message }; }
+fs.appendFileSync(${JSON.stringify(path.join(f.temp, 'borrow-observations.jsonl'))}, JSON.stringify({hook: process.argv[1], state: process.argv[2], env: process.env[LOCK_FD_ENV], ...answer}) + '\\n');
+if (answer.result !== 'borrower') process.exit(1);
+`;
+  for (const name of ['pre-commit', 'reference-transaction']) {
+    fs.writeFileSync(path.join(f.host, '.githooks', name), probeSource, { mode: 0o755 });
+  }
+  const scope = createLockScope('lease-hook-borrow-proof');
+  const acquired = acquireSync(scope, 'main-checkout', { fgosDir: path.join(f.repo, '.fgos') });
+  assert.equal(acquired.result, 'acquired');
+  try {
+    f.put('existing.txt', 'borrowed change\n');
+    f.git(['add', 'existing.txt']);
+    const result = runBorrowed(acquired.handle, { command: 'git', args: ['commit', '-qm', 'borrowed commit'], cwd: f.repo, env });
+    const observations = fs.readFileSync(path.join(f.temp, 'borrow-observations.jsonl'), 'utf8').trim().split('\n').map(JSON.parse);
+    assert.equal(result.exit, 0, `${result.stderr}\n${JSON.stringify(observations)}`);
+    assert.ok(observations.some(row => row.hook.endsWith('/pre-commit') && row.result === 'borrower'));
+    assert.ok(observations.some(row => row.hook.endsWith('/reference-transaction') && row.state === 'prepared' && row.result === 'borrower'));
+  } finally {
+    acquired.handle.release();
+  }
+});
 
 test('pre-commit refuses non-holder commit touching scoped paths', (t) => {
   const f = fixture(t);
@@ -126,7 +167,7 @@ test('pre-commit refuses non-holder commit touching scoped paths', (t) => {
 test('pre-commit allows holder commit touching scoped paths', (t) => {
   const f = fixture(t);
   const wtHolder = f.addWorktree('holder-branch');
-  const { token } = f.setupLease(generateHolderToken(), wtHolder);
+  const { token } = f.setupLease(wtHolder);
 
   // Write holder token file in holder worktree
   f.put(DEFAULT_TOKEN_FILE, `${token}\n`, wtHolder);
@@ -223,16 +264,14 @@ test('reference-transaction refuses fast-forward merge on scoped paths for non-h
 
 test('reference-transaction allows ref updates touching only .fgos/ (Work checkpoint)', (t) => {
   const f = fixture(t);
-  const parentCommit = f.git(['rev-parse', 'HEAD']);
-
-  // Create tree touching only .fgos/
-  f.put('.fgos/checkpoint.txt', 'checkpoint data\n');
-  f.git(['add', '.fgos/checkpoint.txt']);
-  const fgosTreeSha = f.git(['write-tree']);
-  f.git(['reset', '-q', 'HEAD']);
-
   f.setupLease();
   const leaseHead = f.git(['rev-parse', 'HEAD']);
+
+  // Preserve the authoritative sidecar while building an out-of-scope tree.
+  f.put('.fgos/checkpoint.txt', 'checkpoint data\n');
+  f.git(['add', '-f', '.fgos/checkpoint.txt']);
+  const fgosTreeSha = f.git(['write-tree']);
+  f.git(['reset', '-q', 'HEAD']);
 
   const newCommit = f.git(['commit-tree', fgosTreeSha, '-p', leaseHead, '-m', 'checkpoint commit']);
 
@@ -247,13 +286,13 @@ test('reference-transaction allows ref updates touching only .fgos/ (Work checkp
   assert.equal(f.git(['rev-parse', 'HEAD']), newCommit);
 });
 
-test('linked-worktree holder vs non-holder (Finding H2, Ruling 2)', (t) => {
+test('linked-worktree holder and non-holder have separate token authority', (t) => {
   const f = fixture(t);
   const wtHolder = f.addWorktree('holder-worktree');
   const wtOther = f.addWorktree('other-worktree');
 
   // Setup lease with wtHolder as holder
-  const { token } = f.setupLease(generateHolderToken(), wtHolder);
+  const { token } = f.setupLease(wtHolder);
 
   // Write token file ONLY in wtHolder
   f.put(DEFAULT_TOKEN_FILE, `${token}\n`, wtHolder);
@@ -272,7 +311,7 @@ test('linked-worktree holder vs non-holder (Finding H2, Ruling 2)', (t) => {
   assert.match(otherRes.stderr, /commit refused: the documentation-cutover write lease is held/);
 });
 
-test('forged working-tree sidecar in worktree is ignored by both hooks (Finding H1, Repro C2)', (t) => {
+test('both hooks ignore forged working-tree sidecars', (t) => {
   const f = fixture(t);
   const wtOther = f.addWorktree('forged-worktree');
   f.setupLease();
@@ -288,7 +327,7 @@ test('forged working-tree sidecar in worktree is ignored by both hooks (Finding 
   assert.notEqual(commitRes.status, 0);
   assert.match(commitRes.stderr, /commit refused: the documentation-cutover write lease is held/);
 
-  // 2. Reference-transaction hook must still refuse update-ref refs/heads/main even with forged sidecar (Repro C2)
+  // Reference updates must also ignore forged checkout-local evidence.
   const exploitCommit = f.git(['commit-tree', f.git(['write-tree'], wtOther), '-p', leaseHead, '-m', 'exploit tree'], wtOther);
   const bypassRes = spawnSync('git', ['update-ref', 'refs/heads/main', exploitCommit, leaseHead], {
     cwd: wtOther,
@@ -299,7 +338,7 @@ test('forged working-tree sidecar in worktree is ignored by both hooks (Finding 
   assert.notEqual(bypassRes.status, 0);
   assert.match(bypassRes.stderr, /reference-transaction refused/);
 });
-test('git clean -fdX does not reopen the freeze in worktrees (Finding H1, Repro F)', (t) => {
+test('git clean -fdX does not reopen the freeze in worktrees', (t) => {
   const f = fixture(t);
   const wt = f.addWorktree('clean-test-wt');
   f.setupLease();
@@ -315,7 +354,7 @@ test('git clean -fdX does not reopen the freeze in worktrees (Finding H1, Repro 
   assert.match(res.stderr, /commit refused: the documentation-cutover write lease is held/);
 });
 
-test('rename out of scope is caught and refused by -z --no-renames (Finding H3)', (t) => {
+test('pre-commit refuses renaming a scoped file outside scope', (t) => {
   const f = fixture(t);
   f.setupLease();
 
@@ -328,7 +367,7 @@ test('rename out of scope is caught and refused by -z --no-renames (Finding H3)'
   assert.match(res.stderr, /commit refused: the documentation-cutover write lease is held/);
 });
 
-test('non-ASCII path is caught and refused with and without --no-verify (Finding H3)', (t) => {
+test('non-ASCII paths are refused with and without --no-verify', (t) => {
   const f = fixture(t);
   f.setupLease();
 
@@ -346,7 +385,7 @@ test('non-ASCII path is caught and refused with and without --no-verify (Finding
   assert.match(res2.stderr, /reference-transaction refused/);
 });
 
-test('typechange is caught and refused (Finding H3)', (t) => {
+test('pre-commit refuses a scoped file changed to a symlink', (t) => {
   const f = fixture(t);
   f.setupLease();
 
@@ -360,28 +399,178 @@ test('typechange is caught and refused (Finding H3)', (t) => {
   assert.match(res.stderr, /commit refused: the documentation-cutover write lease is held/);
 });
 
-test('rebase and cherry-pick touching scoped paths are caught and refused by reference-transaction', (t) => {
-  const f = fixture(t);
-
-  // Create commit touching docs on branch feature
-  f.git(['checkout', '-q', '-b', 'feature']);
-  f.put('docs/feature.md', '# Feature\n');
-  f.git(['add', 'docs/feature.md']);
-  f.git(['commit', '-q', '--no-verify', '-m', 'feature doc commit']);
-  const featureSha = f.git(['rev-parse', 'HEAD']);
-
-  // Switch back to main and acquire lease
-  f.git(['checkout', '-q', 'main']);
-  f.setupLease();
-
-  // Attempt cherry-pick onto main
-  const cpRes = spawnSync('git', ['cherry-pick', featureSha], {
-    cwd: f.repo,
-    env,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe'],
-  });
-
-  assert.notEqual(cpRes.status, 0);
-  assert.match(cpRes.stderr, /reference-transaction refused/);
+test('CLI release and non-holder owner abandon each commit one legal sidecar transition', t => {
+  const f = fixture(t); const holder = f.addWorktree('holder');
+  f.setupLease(holder);
+  const before = f.git(['rev-parse', 'main']);
+  const released = f.cli(['release'], path.join(holder, 'docs'));
+  assert.equal(released.result, 'released'); assert.deepEqual(released.drift, []);
+  assert.equal(f.git(['rev-list', '--count', `${before}..main`]), '1');
+  assert.equal(JSON.parse(f.git(['show', `main:${DEFAULT_SIDECAR_PATH}`])).state, 'released');
+  // Released leases need neither a scoped diff nor native borrower/token
+  // resolution. Reject those reads at the real Git adapter if attempted.
+  const realGit = execFileSync('which', ['git'], { encoding: 'utf8' }).trim();
+  const fastTools = path.join(f.temp, 'fast-tools'); fs.mkdirSync(fastTools);
+  fs.writeFileSync(path.join(fastTools, 'git'), `#!/bin/sh
+case "$1:$2" in --no-replace-objects:diff|--no-replace-objects:diff-tree) exit 42 ;; esac
+exec '${realGit}' "$@"
+`, { mode: 0o755 });
+  f.put('docs/after-release.md', 'ordinary commit after release'); f.git(['add', 'docs/after-release.md']);
+  const fast = f.commit(['-m', 'ordinary released commit'], f.repo, { PATH: `${fastTools}:${env.PATH}`, GIT_EXEC_PATH: fastTools, FGOS_HOST_BIN: '/nonexistent/fgos' });
+  assert.equal(fast.status, 0, fast.stderr);
+  f.setupLease(holder);
+  const ownerBefore = f.git(['rev-parse', 'main']);
+  const abandoned = f.cli(['abandon', '--owner-confirmed', '--reason', 'lost holder']);
+  assert.equal(abandoned.result, 'abandoned');
+  assert.equal(f.git(['rev-list', '--count', `${ownerBefore}..main`]), '1');
+  assert.equal(JSON.parse(f.git(['show', `main:${DEFAULT_SIDECAR_PATH}`])).state, 'abandoned');
 });
+
+test('reference hook preserves NUL boundaries for multi-path commits and renames with --no-verify', t => {
+  const f = fixture(t); f.setupLease(); const before = f.git(['rev-parse', 'main']);
+  for (const [outside, inside] of [['apps/first.txt', 'docs/multi.md'], ['.gitignore', 'docs/tiếng.md']]) {
+    f.put(outside, 'outside\n'); f.put(inside, 'inside\n'); f.git(['add', outside, inside]);
+    const res = f.commit(['--no-verify', '-m', 'multi-path bypass']);
+    assert.notEqual(res.status, 0); assert.match(res.stderr, /reference-transaction refused/);
+    assert.equal(f.git(['rev-parse', 'main']), before);
+    f.git(['reset', '--hard', '-q']);
+  }
+  f.git(['mv', 'docs/guide.md', 'apps/renamed.md']);
+  const res = f.commit(['--no-verify', '-m', 'rename bypass']);
+  assert.notEqual(res.status, 0); assert.match(res.stderr, /reference-transaction refused/);
+  assert.equal(f.git(['rev-parse', 'main']), before);
+});
+
+test('raw main movement into frozen scope is refused even from the holder checkout without an expected old value', t => {
+  const f = fixture(t); const holder = f.addWorktree('holder'); f.setupLease(holder);
+  const old = f.git(['rev-parse', 'main']);
+  f.put('docs/raw.md', 'raw\n', holder); f.git(['add', 'docs/raw.md'], holder);
+  const next = f.git(['commit-tree', f.git(['write-tree'], holder), '-p', old, '-m', 'raw candidate'], holder);
+  const res = spawnSync('git', ['update-ref', 'refs/heads/main', next], { cwd: holder, env, encoding: 'utf8' });
+  assert.notEqual(res.status, 0); assert.match(res.stderr, /reference-transaction refused/);
+  assert.equal(f.git(['rev-parse', 'main']), old);
+});
+
+test('both hooks fail closed when their path diff fails under a held production lease', t => {
+  const f = fixture(t); f.setupLease();
+  f.put('docs/diff-failure.md', 'scoped change'); f.git(['add', 'docs/diff-failure.md']);
+  const realGit = execFileSync('which', ['git'], { encoding: 'utf8' }).trim();
+  const tools = path.join(f.temp, 'diff-tools'); fs.mkdirSync(tools);
+  fs.writeFileSync(path.join(tools, 'git'), `#!/bin/sh
+case "$1:$2" in --no-replace-objects:diff|--no-replace-objects:diff-tree) exit 42 ;; esac
+exec '${realGit}' "$@"
+`, { mode: 0o755 });
+  for (const flags of [[], ['--no-verify']]) {
+    const result = f.commit([...flags, '-m', 'diff failure'], f.repo, { PATH: `${tools}:${env.PATH}`, GIT_EXEC_PATH: tools });
+    assert.notEqual(result.status, 0); assert.match(result.stderr, /fail.*closed/);
+  }
+});
+
+test('corrupt or unknown committed sidecars are rejected consistently by both hooks and CLI acquire', t => {
+  const f = fixture(t);
+  for (const raw of ['not JSON', '{"state":"HELD"}', '{"state":"held"}']) {
+    f.put(DEFAULT_SIDECAR_PATH, raw); f.git(['add', DEFAULT_SIDECAR_PATH]);
+    f.git(['-c', 'core.hooksPath=/dev/null', 'commit', '-qm', 'corrupt fixture']);
+    f.put('docs/corrupt.md', raw); f.git(['add', 'docs/corrupt.md']);
+    for (const flags of [[], ['--no-verify']]) {
+      const res = f.commit([...flags, '-m', 'corrupt bypass']);
+      assert.notEqual(res.status, 0); assert.match(res.stderr, /corrupt/);
+    }
+    assert.notEqual(f.rawCli(['acquire']).status, 0);
+    f.git(['-c', 'core.hooksPath=/dev/null', 'reset', '--hard', '-q']);
+  }
+});
+
+test('a real main borrower cannot rewrite a held lease, change its hash, expand paths or change its parent', t => {
+  const f = fixture(t); const { sidecarData } = f.setupLease();
+  const old = f.git(['rev-parse', 'main']);
+  const earlier = f.git(['rev-parse', 'main^']);
+  const cases = [
+    { data: { ...sidecarData, state: 'held' } },
+    { data: { ...sidecarData, state: 'released', holderTokenHash: '0'.repeat(64) } },
+    { data: { ...sidecarData, state: 'released' }, extra: true },
+    { data: { ...sidecarData, state: 'released' }, parent: earlier },
+    { data: { ...sidecarData, state: 'unknown' } },
+  ];
+  for (const entry of cases) {
+    f.put(DEFAULT_SIDECAR_PATH, JSON.stringify(entry.data));
+    f.git(['add', DEFAULT_SIDECAR_PATH]);
+    if (entry.extra) { f.put('docs/extra.md', 'extra'); f.git(['add', 'docs/extra.md']); }
+    const candidate = f.git(['commit-tree', f.git(['write-tree']), '-p', entry.parent ?? old, '-m', 'invalid transition']);
+    f.git(['reset', '-q']);
+    const lock = acquireSync(createLockScope('transition-adversary'), 'main-checkout', { fgosDir: path.join(f.repo, '.fgos') });
+    assert.equal(lock.result, 'acquired');
+    try {
+      const result = runBorrowed(lock.handle, { command: 'git', args: ['update-ref', 'refs/heads/main', candidate, old], cwd: f.repo, env });
+      assert.notEqual(result.exit, 0); assert.match(result.stderr, /reference-transaction refused/);
+      assert.equal(f.git(['rev-parse', 'main']), old);
+    } finally { lock.handle.release(); }
+  }
+});
+
+test('CLI release reports raw hook-disabled drift and commits the release without reopening early', t => {
+  const f = fixture(t); const holder = f.addWorktree('holder'); f.setupLease(holder);
+  f.put('docs/guide.md', 'raw bypass\n'); f.git(['add', 'docs/guide.md']);
+  f.git(['-c', 'core.hooksPath=/dev/null', 'commit', '-qm', 'bypass']);
+  const result = f.cli(['release'], holder);
+  assert.deepEqual(result.drift, ['docs']);
+  const committed = JSON.parse(f.git(['show', `main:${DEFAULT_SIDECAR_PATH}`]));
+  assert.deepEqual(committed.drift, ['docs']); assert.equal(committed.state, 'released');
+});
+
+test('failed scope reads refuse CLI acquire before recording holder evidence', t => {
+  const f = fixture(t); const before = f.git(['rev-parse', 'main']);
+  const realGit = execFileSync('which', ['git'], { encoding: 'utf8' }).trim();
+  const tools = path.join(f.temp, 'unreadable-tools'); fs.mkdirSync(tools);
+  fs.writeFileSync(path.join(tools, 'git'), `#!/bin/sh
+case " $* " in *" ls-tree -r -t -z --full-tree "*) exit 42 ;; esac
+exec '${realGit}' "$@"
+`, { mode: 0o755 });
+  const result = f.rawCli(['acquire'], f.repo, { PATH: `${tools}:${env.PATH}` });
+  assert.notEqual(result.status, 0); assert.match(result.stderr + result.stdout, /42|git.*refused|git.*failed|git.*exit/);
+  assert.equal(f.git(['rev-parse', 'main']), before);
+  assert.equal(fs.existsSync(path.join(f.repo, DEFAULT_SIDECAR_PATH)), false);
+  assert.equal(fs.existsSync(path.join(f.repo, DEFAULT_TOKEN_FILE)), false);
+});
+
+test('concurrent raw main move during CLI acquire returns base-moved without retrying', t => {
+  const f = fixture(t); const old = f.git(['rev-parse', 'main']);
+  const next = f.git(['commit-tree', f.git(['rev-parse', 'HEAD^{tree}']), '-p', old, '-m', 'concurrent main']);
+  const realGit = execFileSync('which', ['git'], { encoding: 'utf8' }).trim();
+  const tools = path.join(f.temp, 'tools'); fs.mkdirSync(tools);
+  const marker = path.join(f.temp, 'moved');
+  // External Git driver shim moves main exactly when acquire lists its scope,
+  // after production preflight. No callback or bypass is added to lease code.
+  fs.writeFileSync(path.join(tools, 'git'), `#!/bin/sh
+case " $* " in
+  *" ls-tree -r -t -z --full-tree "*)
+    if mkdir '${marker}' 2>/dev/null; then
+      '${realGit}' -C '${f.repo}' -c core.hooksPath=/dev/null update-ref refs/heads/main '${next}' '${old}' || exit 90
+    fi ;;
+esac
+exec '${realGit}' "$@"
+`, { mode: 0o755 });
+  const res = f.rawCli(['acquire'], f.repo, { PATH: `${tools}:${env.PATH}` });
+  assert.ok(fs.existsSync(marker), res.stderr + res.stdout);
+  assert.notEqual(res.status, 0); assert.match(res.stderr + res.stdout, /base-moved/);
+  assert.equal(f.git(['rev-parse', 'main']), next);
+  assert.throws(() => f.git(['show', `main:${DEFAULT_SIDECAR_PATH}`]));
+});
+
+for (const operation of ['cherry-pick', 'rebase', 'am', 'pull']) {
+  test(`reference guard refuses ${operation} of scoped changes onto main`, t => {
+    const f = fixture(t);
+    f.git(['checkout', '-qb', 'feature']);
+    f.put('docs/feature.md', '# Feature\n'); f.git(['add', 'docs/feature.md']);
+    f.git(['commit', '-q', '--no-verify', '-m', 'feature doc commit']);
+    const featureSha = f.git(['rev-parse', 'HEAD']);
+    const patch = operation === 'am' ? f.git(['format-patch', '-1', '--stdout', featureSha]) + '\n' : undefined;
+    f.git(['checkout', '-q', 'main']); f.setupLease();
+    const before = f.git(['rev-parse', 'main']);
+    const args = operation === 'pull' ? ['pull', '--no-rebase', '--no-edit', '.', 'feature']
+      : operation === 'am' ? ['am'] : [operation, featureSha];
+    const result = spawnSync('git', args, { cwd: f.repo, env, encoding: 'utf8', input: patch, timeout: 30_000 });
+    assert.notEqual(result.status, 0); assert.match(result.stderr, /reference-transaction refused/);
+    assert.equal(f.git(['rev-parse', 'main']), before);
+  });
+}

@@ -30,7 +30,7 @@ import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 import { probe, lockHolders, checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
 import { readBeacon, judgeBeacon, writeBeacon, DEFAULT_BEACON_WINDOW_MS } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
-import { checkLeaseCommitGuard } from '../src/runner/documentation-cutover-lease.mjs';
+import { guardCommit } from '../src/runner/documentation-cutover-lease-hook.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -500,35 +500,13 @@ async function main() {
     return;
   }
 
-  let sidecarRaw = null;
-  try {
-    sidecarRaw = execFileSync('git', ['cat-file', '-p', 'refs/heads/main:plans/documentation-cutover-lease.json'], {
-      cwd: committingToplevel,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    });
-  } catch {}
-
-  if (sidecarRaw !== null) {
-    let stagedForLease = [];
-    let diffFailed = false;
-    try {
-      const diffOut = execFileSync('git', ['diff', '--cached', '--name-only', '-z', '--no-renames'], {
-        cwd: committingToplevel,
-      });
-      stagedForLease = diffOut.toString('utf8').split('\0').filter(Boolean);
-    } catch {
-      diffFailed = true;
-    }
-    if (diffFailed) {
-      refuse('commit refused: unable to determine staged paths while documentation-cutover lease is held; failing closed.');
-      return;
-    }
-    const leaseRefusal = checkLeaseCommitGuard(committingToplevel, { stagedPaths: stagedForLease, rawSidecarBlob: sidecarRaw });
-    if (leaseRefusal) {
-      refuse(leaseRefusal);
-      return;
-    }
+  const leaseRefusal = guardCommit({ root: committingToplevel, git: args =>
+    execFileSync('git', ['--no-replace-objects', ...args], {
+      cwd: committingToplevel, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 64 * 1024 * 1024,
+    }) });
+  if (leaseRefusal) {
+    refuse(leaseRefusal);
+    return;
   }
 
   await warnOnConventionViolations(committingToplevel);
