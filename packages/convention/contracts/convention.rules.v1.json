@@ -125,6 +125,14 @@
       "reserved": []
     },
     {
+      "id": "project-handle",
+      "description": "A project's human handle, chosen once when the project id is minted (default: the slug of the folder name); the part before @ in a clone name. Never an id: two projects may share one.",
+      "first": "abcdefghijklmnopqrstuvwxyz",
+      "rest": "abcdefghijklmnopqrstuvwxyz0123456789-",
+      "maxLength": 40,
+      "reserved": []
+    },
+    {
       "id": "session-suffix",
       "description": "The 4-character base32 suffix of a session handle, derived from the hash of the local session id.",
       "first": "abcdefghijklmnopqrstuvwxyz234567",

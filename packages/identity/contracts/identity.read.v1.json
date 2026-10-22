@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "identity.read.request",
   "title": "Identity read request v1",
-  "description": "`fgos identity machine` and `fgos identity session`. Read-only: never mints, never writes. `machine` answers the machine id, its handle and its alias; `session` answers this session's full id and handle. A refusal (exit 65, no envelope) names its reason: machine-id-missing when no machine id was minted, unresolved when the caller cannot be told from any other.",
+  "description": "`fgos identity machine`, `fgos identity session` and `fgos identity project`. Read-only: never mints, never writes. `machine` answers the machine id, its handle and its alias; `session` answers this session's full id and handle. A refusal (exit 65, no envelope) names its reason: machine-id-missing when no machine id was minted, unresolved when the caller cannot be told from any other. `project` answers the project id, handle and creation time read from the tracked file .fgos/project.json of the main checkout (also from a linked worktree); a refusal names project-id-missing when no id was minted, project-id-unreadable when the file is not valid, not-a-repository outside a git repository, git-read-failed when the repository cannot be read.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -15,6 +15,7 @@
     }
   },
   "x-stateRoot": "the fgOS state root (FGOS_STATE_ROOT, else the holder-lock resolution); files machine-id and machine-alias",
+  "x-projectFile": ".fgos/project.json of the main checkout: {v: 1, projectId: 32 hex, handle: Convention project-handle, createdAt}",
   "definitions": {
     "outcome": {
       "$id": "identity.read.outcome",
@@ -65,12 +66,39 @@
               "description": "<cli>-<4 chars of base32 sha256(local id)>@<machine-handle>"
             }
           }
+        },
+        {
+          "type": "object",
+          "description": "project",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "handle",
+            "createdAt"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{32}$"
+            },
+            "handle": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+            },
+            "createdAt": {
+              "type": "string"
+            }
+          }
         }
       ],
       "x-refusals": [
         "machine-id-missing",
         "machine-id-unreadable",
-        "unresolved"
+        "unresolved",
+        "project-id-missing",
+        "project-id-unreadable",
+        "not-a-repository",
+        "git-read-failed"
       ]
     }
   }

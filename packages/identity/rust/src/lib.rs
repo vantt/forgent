@@ -12,6 +12,8 @@ pub mod launcher;
 pub mod machine;
 pub mod proc_tree;
 #[cfg(feature = "provider")]
+pub mod project;
+#[cfg(feature = "provider")]
 pub mod provider;
 pub mod resolve;
 pub mod route;
@@ -23,8 +25,10 @@ pub use launcher::{scrub_and_set, EmptyWriterId};
 pub use errors::Error;
 pub use proc_tree::{os_process_tree, ProcStat, ProcessTree};
 #[cfg(feature = "provider")]
+pub use project::{project_info, project_init, ProjectInfo, ProjectMinted};
+#[cfg(feature = "provider")]
 pub use provider::{
-    machine_info, session_info, set_alias, IdentityProvider, IdentityRequest, MachineInfo, Refusal,
+    machine_info, session_info, set_alias, IdentityProvider, IdentityRequest, MachineInfo, ProjectAction, Refusal,
     SessionInfo, Verb, writer_answer,
     AVAILABLE_SUBCOMMANDS, IDENTITY_DESCRIPTOR, IDENTITY_OPERATION_ID, IDENTITY_READ_DESCRIPTOR,
     IDENTITY_READ_OPERATION_ID, IDENTITY_WRITE_DESCRIPTOR, IDENTITY_WRITE_OPERATION_ID,

@@ -1,15 +1,17 @@
 // identity-checks.test.mjs -- the doctor row and the setup fix of the machine
 // id. The id's shape is owned by the Rust crate (packages/identity/rust/tests);
 // this file proves only the wiring: warn when absent, mint once on --fix,
-// pass with the id and handle afterwards, never replace.
+// pass with the id and handle afterwards, never replace. The project id row
+// warns when absent, has no fix, and passes once `identity project --init` ran.
 import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { loaderOptions } from '../event-store/phase07-fixture.mjs';
-import { checkIdentityMachineId, fixIdentityMachineId } from '../../src/setup/identity-checks.mjs';
+import { checkIdentityMachineId, checkIdentityProjectId, fixIdentityMachineId } from '../../src/setup/identity-checks.mjs';
 
 const HOST = process.env.FGOS_HOST_BIN;
 
@@ -52,4 +54,26 @@ test('fails when the machine id file is not a valid id', (t) => {
   const result = checkIdentityMachineId(root, { hostBin: HOST });
   assert.equal(result.passed, false);
   assert.match(result.message, /machine-id-unreadable|invalid machine id/);
+});
+
+test('project id row warns while the repository has none, passes after the explicit mint, fails on a broken file', (t) => {
+  assert.ok(HOST && fs.existsSync(HOST), 'set FGOS_HOST_BIN to a host built from this checkout');
+  const { root } = withStateRoot(t);
+  const repo = path.join(root, 'sample-app');
+  fs.mkdirSync(repo);
+  execFileSync('/usr/bin/git', ['init', '-q'], { cwd: repo });
+
+  const absent = checkIdentityProjectId(repo, { hostBin: HOST });
+  assert.equal(absent.passed, true);
+  assert.match(absent.message, /^warning: no project id yet; run `fgos identity project --init` once on one machine, commit, pull elsewhere/);
+
+  const minted = JSON.parse(execFileSync(HOST, ['identity', 'project', '--init', '--json'], { cwd: repo, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })).data;
+  const present = checkIdentityProjectId(repo, { hostBin: HOST });
+  assert.equal(present.passed, true);
+  assert.equal(present.message, `project ${minted.id}, handle sample-app`);
+
+  fs.writeFileSync(path.join(repo, '.fgos', 'project.json'), 'not json');
+  const broken = checkIdentityProjectId(repo, { hostBin: HOST });
+  assert.equal(broken.passed, false);
+  assert.match(broken.message, /project-id-unreadable|not a project file/);
 });

@@ -995,8 +995,8 @@ export const COMMAND_REGISTRY = [
   },
   withSubcommands({
     name: 'identity',
-    invoke: 'fgos identity [writer|machine|session]',
-    description: 'Read-only unless --alias: who this process and this machine are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle and its alias; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`). Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
+    invoke: 'fgos identity [writer|machine|session|project]',
+    description: 'Read-only unless --alias, --init or --new: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle and its alias; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
     subcommands: {
       writer: {
         description: 'Which writer the calling process is, as {id, source}. Same as bare `fgos identity`; the hook path reads it.',
@@ -1033,8 +1033,21 @@ export const COMMAND_REGISTRY = [
         },
         examples: ['fgos identity session --json'],
       },
+      project: {
+        description: 'This project: {id, handle, createdAt} read from the tracked file .fgos/project.json of the main checkout, so every clone, machine and linked worktree prints the same id. `--init` mints it once (main checkout only; refused when the file exists or the remote default branch already tracks it) and prints the commit command; nothing mints it automatically. `--new` mints a different id on purpose, to split a fork. Exit 65 [project-id-missing] when no id was minted yet.',
+        parameters: {
+          type: 'object',
+          properties: {
+            init: { type: 'boolean', description: 'Mint the project id once. Refused when the file exists, in a linked worktree, or when the remote default branch already tracks it.' },
+            new: { type: 'boolean', description: 'Mint a different project id on purpose (a fork split), replacing the file.' },
+            handle: { type: 'string', description: 'The project handle for --init or --new (a lowercase handle of at most 40 characters); default: the slug of the folder name.' },
+          },
+          required: [],
+        },
+        examples: ['fgos identity project --json', 'fgos identity project --init', 'fgos identity project --init --handle forgent'],
+      },
     },
-    examples: ['fgos identity', 'fgos identity machine --json', 'fgos identity session --json'],
+    examples: ['fgos identity', 'fgos identity machine --json', 'fgos identity session --json', 'fgos identity project --json'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,

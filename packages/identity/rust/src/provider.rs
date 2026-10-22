@@ -1,11 +1,13 @@
 //! Native host provider for `fgos identity`: three operations behind one
 //! verb. Bare `identity` answers the writer (`identity.writer`, read-only,
-//! the hook path); `identity machine|session` read (`identity.read`);
-//! `identity machine --alias` writes (`identity.write`).
+//! the hook path); `identity machine|session|project` read (`identity.read`);
+//! `identity machine --alias` and `identity project --init|--new` write
+//! (`identity.write`).
 
 use crate::errors::Error;
 use crate::machine;
 use crate::proc_tree::os_process_tree;
+use crate::project;
 use crate::resolve::{resolve, WriterIdentity};
 use crate::session::{self, PidFacts};
 use fgos_host_runtime::{
@@ -24,7 +26,7 @@ pub const IDENTITY_READ_OPERATION_ID: &str = "identity.read";
 pub const IDENTITY_WRITE_OPERATION_ID: &str = "identity.write";
 
 /// Subcommands after `identity`; bare `identity` is `writer`.
-pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["writer", "machine", "session"];
+pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["writer", "machine", "session", "project"];
 
 pub const IDENTITY_DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {
     provider_id: Cow::Borrowed("identity.writer"),
@@ -84,6 +86,20 @@ pub enum Verb {
     Machine { alias: Option<String> },
     /// `session`: this session's full id and handle.
     Session,
+    /// `project [--init|--new] [--handle <h>]`.
+    Project(ProjectAction),
+}
+
+/// What `identity project` does.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub enum ProjectAction {
+    /// Read the project id of this repository.
+    #[default]
+    Read,
+    /// `--init`: mint it once; refused when it exists or the remote has one.
+    Init { handle: Option<String> },
+    /// `--new`: mint it again on purpose (a fork split).
+    New { handle: Option<String> },
 }
 
 /// `pid`: the process asking. When absent, the process that started this
@@ -101,8 +117,10 @@ impl IdentityRequest {
     pub fn operation_id(&self) -> &'static str {
         match &self.verb {
             Verb::Writer => IDENTITY_OPERATION_ID,
-            Verb::Machine { alias: None } | Verb::Session => IDENTITY_READ_OPERATION_ID,
-            Verb::Machine { alias: Some(_) } => IDENTITY_WRITE_OPERATION_ID,
+            Verb::Machine { alias: None } | Verb::Session | Verb::Project(ProjectAction::Read) => {
+                IDENTITY_READ_OPERATION_ID
+            }
+            Verb::Machine { alias: Some(_) } | Verb::Project(_) => IDENTITY_WRITE_OPERATION_ID,
         }
     }
 }
@@ -300,6 +318,22 @@ fn answer(request: &IdentityRequest) -> Result<serde_json::Value, Refusal> {
                 None => machine_info(&root)?,
             };
             Ok(serde_json::to_value(info).expect("MachineInfo always serializes"))
+        }
+        Verb::Project(action) => {
+            let dir = std::env::current_dir().map_err(|e| Refusal {
+                reason: "no-working-directory",
+                detail: e.to_string(),
+            })?;
+            let value = match action {
+                ProjectAction::Read => serde_json::to_value(project::project_info(&root, &dir)?),
+                ProjectAction::Init { handle } => {
+                    serde_json::to_value(project::project_init(&root, &dir, handle.as_deref(), false)?)
+                }
+                ProjectAction::New { handle } => {
+                    serde_json::to_value(project::project_init(&root, &dir, handle.as_deref(), true)?)
+                }
+            };
+            Ok(value.expect("project answers always serialize"))
         }
         Verb::Session => {
             let machine = machine_info(&root)?;

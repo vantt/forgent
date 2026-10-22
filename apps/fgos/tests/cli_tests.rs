@@ -1386,6 +1386,48 @@ fn identity_machine_reads_refuses_and_sets_the_alias_through_the_state_root() {
     let _ = fs::remove_dir_all(&state);
 }
 
+/// `fgos identity project` over a scratch repository: the wiring of the verb
+/// (route, operation per flag, cwd as the repository, exit code of a refusal,
+/// flag validation). The mint rules and refusals are owned by the identity
+/// crate's project tests.
+#[test]
+fn identity_project_reads_mints_once_and_refuses_a_second_mint_through_the_cwd() {
+    let base = std::env::temp_dir().join(format!("fgos_test_identity_project_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&base);
+    let repo = base.join("sample-app");
+    fs::create_dir_all(&repo).unwrap();
+    let init = Command::new("/usr/bin/git").args(["init", "-q"]).current_dir(&repo).output().unwrap();
+    assert!(init.status.success());
+    let project = |args: &[&str]| {
+        identity_command(&[&["project"], args].concat())
+            .env("FGOS_STATE_ROOT", base.join("state"))
+            .current_dir(&repo)
+            .output()
+            .unwrap()
+    };
+
+    let missing = project(&["--json"]);
+    assert_eq!(missing.status.code(), Some(65));
+    assert!(String::from_utf8_lossy(&missing.stderr).contains("[project-id-missing]"));
+
+    let minted = identity_data(&project(&["--init", "--json"]));
+    assert_eq!(minted["handle"], "sample-app");
+    assert_eq!(minted["file"], ".fgos/project.json");
+    assert_eq!(identity_data(&project(&["--json"]))["id"], minted["id"]);
+
+    let again = project(&["--init"]);
+    assert_eq!(again.status.code(), Some(65));
+    assert!(String::from_utf8_lossy(&again.stderr).contains("[project-id-exists]"));
+
+    let renamed = identity_data(&project(&["--new", "--handle", "other"]));
+    assert_ne!(renamed["id"], minted["id"]);
+    assert_eq!(renamed["handle"], "other");
+
+    assert_ne!(project(&["--handle", "x"]).status.code(), Some(0), "--handle alone writes nothing");
+    assert_ne!(project(&["--init", "--new"]).status.code(), Some(0));
+    let _ = fs::remove_dir_all(&base);
+}
+
 /// Spawns fgos with a stdin pipe whose writer stays open (what a heredoc, an
 /// agent Bash tool, or `sleep 30 | fgos ...` hands the child). Returns the
 /// exit status if the child finishes within `limit`, otherwise kills it and
