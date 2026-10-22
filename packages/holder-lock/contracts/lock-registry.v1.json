@@ -1,6 +1,6 @@
 {
   "contract": { "id": "lock-registry", "version": 1 },
-  "description": "One row per lock. Rust and Node read this file; it is the only list of which locks exist, in which order they may be taken, and which fence the cutover places for them. v3Path is relative to <fgosDir>/locks/, <lockRoot>/ or <runDir>/ as written. v1Path is the legacy location (repo-relative, `.fgos/...`, or absolute pattern); v1 code is checked by running it from the track's base commit, because the v1 code is deleted by the cutover.",
+  "description": "One row per lock. Rust and Node read this file; it is the only list of which locks exist and in which order they may be taken. v3Path is relative to <fgosDir>/locks/, <lockRoot>/ or <runDir>/ as written.",
   "ranks": {
     "10": { "kinds": ["lease"], "note": "runner, gateway" },
     "15": { "kinds": ["lease"], "note": "attempt" },
@@ -21,9 +21,6 @@
       "scope": "repo",
       "rank": 10,
       "v3Path": "<fgosDir>/locks/gateway.lock",
-      "v1Shape": "file-link",
-      "v1Path": ".fgos/gateway.lock",
-      "fence": "tombstone",
       "owner": "4.2",
       "note": "v1 source: src/runner/gateway-control.mjs LOCK_FILE"
     },
@@ -33,9 +30,6 @@
       "scope": "repo",
       "rank": 10,
       "v3Path": "<fgosDir>/locks/runner.lock",
-      "v1Shape": "file-link",
-      "v1Path": ".fgos/runner.lock",
-      "fence": "tombstone",
       "owner": "4.2",
       "note": "v1 source: src/runner/loop.mjs LOCK_FILE"
     },
@@ -45,9 +39,6 @@
       "scope": "repo",
       "rank": 80,
       "v3Path": "<fgosDir>/locks/sessions.lock",
-      "v1Shape": "file-link",
-      "v1Path": ".fgos/sessions.lock",
-      "fence": "tombstone",
       "owner": "4.2",
       "note": "v1 source: src/runner/session.mjs SESSIONS_LOCK"
     },
@@ -57,10 +48,6 @@
       "scope": "run",
       "rank": 80,
       "v3Path": "<workflowRunDir>/locks/advance.lock",
-      "v1Shape": "file-wx",
-      "v1Path": ".fgos/workflow-runs/<id>/advance.lock",
-      "fence": "tombstone",
-      "fenceNote": "every run that exists at cutover; not placed lazily",
       "owner": "4.2",
       "note": "v1 source: src/workflow/runner.mjs ADVANCE_LOCK_FILE"
     },
@@ -70,9 +57,6 @@
       "scope": "repo",
       "rank": 80,
       "v3Path": "<fgosDir>/locks/reconcile.lock",
-      "v1Shape": "file-link",
-      "v1Path": ".fgos/dispatch/reconcile.lock",
-      "fence": "tombstone",
       "owner": "4.2",
       "note": "v1 source: src/runner/dispatch/reconciliation-planner.mjs localLock"
     },
@@ -82,10 +66,6 @@
       "scope": "run",
       "rank": 80,
       "v3Path": "<runDir>/locks/recovery.lock",
-      "v1Shape": "file-wx",
-      "v1Path": "<runDir>/.recovery.lock",
-      "fence": "tombstone",
-      "fenceNote": "every run that exists at cutover; not placed lazily",
       "owner": "4.2",
       "note": "Dispatch recovery uses its runDir; Git recovery reuses this entry with runDir=<common>/fgos/git. v1 source: src/verbs/dispatch/recover.mjs withRunLock"
     },
@@ -95,10 +75,6 @@
       "scope": "machine",
       "rank": 80,
       "v3Path": "<lockRoot>/full-suite.lock",
-      "v1Shape": "file-wx",
-      "v1Path": "<os.tmpdir()>/fgos-full-suite.lock",
-      "fence": "none",
-      "fenceNote": "a tombstone makes the old branch's queue loop forever (scripts/lib/full-suite-queue.mjs); without a fence an old branch only runs the suite unqueued, which is harmless",
       "owner": "4.2",
       "note": "v1 source: scripts/lib/full-suite-queue.mjs DEFAULT_LOCK_PATH"
     },
@@ -108,10 +84,6 @@
       "scope": "machine",
       "rank": 80,
       "v3Path": "<lockRoot>/provider-account/<provider>/<account>.lock",
-      "v1Shape": "ledger-dir",
-      "v1Path": "~/.fgos/runtime/provider-capacity/account-locks/<provider>/<account>/lock/",
-      "fence": "blocking-generation",
-      "fenceNote": "every account that exists at cutover; a tombstone does not stop a generation ledger",
       "owner": "4.2",
       "note": "v1 source: src/runner/dispatch/provider-capacity.mjs tryAcquireAccountLock"
     },
@@ -121,9 +93,6 @@
       "scope": "machine",
       "rank": 80,
       "v3Path": "<lockRoot>/provider-state.lock",
-      "v1Shape": "ledger-dir",
-      "v1Path": "~/.fgos/runtime/provider-capacity/state-lock/",
-      "fence": "blocking-generation",
       "owner": "4.2",
       "note": "v1 source: src/runner/dispatch/provider-capacity.mjs state lock"
     },
@@ -133,10 +102,6 @@
       "scope": "repo",
       "rank": 30,
       "v3Path": "<fgosDir>/locks/dispatch-cwd--<cwdDevIno>.lock",
-      "v1Shape": "file-by-cwd",
-      "v1Path": ".fgos/dispatch--<encodeURIComponent(cwd)>.lock",
-      "fence": "tombstone",
-      "fenceNote": "both the path.resolve form and the realpath form, for every worktree and claim that exists at cutover; scope stays fgosDir",
       "owner": "4.2",
       "note": "v3 key <cwdDevIno> is dev-ino of the cwd after realpath, so every spelling of one directory (symlinks included) names one lock. v1 source: src/runner/main-checkout-lock.mjs dispatchLockFile"
     },
@@ -146,9 +111,6 @@
       "scope": "repo",
       "rank": 50,
       "v3Path": "<fgosDir>/locks/main-checkout.lock",
-      "v1Shape": "file-link",
-      "v1Path": ".fgos/main-checkout.lock",
-      "fence": "tombstone",
       "owner": "4.3",
       "note": "v1 source: src/runner/main-checkout-lock.mjs; borrowed by git children through contracts/main-checkout-borrow.v1.json"
     },
@@ -158,11 +120,7 @@
       "scope": "repo",
       "rank": 20,
       "v3Path": "<fgosDir>/locks/merge-slot--<ref>.lock",
-      "v1Shape": "file-link",
-      "v1Path": ".fgos/merge-slot--<ref>.lock",
-      "fence": "tombstone",
       "owner": "4.3",
-      "fenceNote": "a tombstone for every refs/heads/* that exists at cutover",
       "note": "<ref> is encodeURIComponent(target ref), as v1 mergeSlotLockFile in src/runner/main-checkout-lock.mjs writes it"
     },
     {
@@ -171,9 +129,6 @@
       "scope": "repo",
       "rank": 60,
       "v3Path": "<fgosDir>/locks/state.reclaim.lock",
-      "v1Shape": "file-link",
-      "v1Path": [".fgos/events.lock", ".fgos/runtime/claims.lock"],
-      "fence": "tombstone",
       "owner": "4.3",
       "note": "events and claims merge into one hot mutex; v3Path is the kernel lock that serialises cleanup of a dead holder, the hot record itself is <fgosDir>/locks/state.hot (contracts/hot-lock.v1.json)"
     },
@@ -183,9 +138,6 @@
       "scope": "repo",
       "rank": 60,
       "v3Path": "<fgosDir>/locks/porting-events.reclaim.lock",
-      "v1Shape": "file-link",
-      "v1Path": ".fgos/porting/events.lock",
-      "fence": "tombstone",
       "owner": "4.3",
       "note": "v1 source: src/state/porting-store.mjs"
     },
@@ -195,9 +147,6 @@
       "scope": "repo",
       "rank": 40,
       "v3Path": "<fgosDir>/locks/worktree-admin.lock",
-      "v1Shape": null,
-      "v1Path": null,
-      "fence": null,
       "owner": "4.3",
       "note": "new lock, no v1 predecessor"
     },
@@ -207,9 +156,6 @@
       "scope": "repo",
       "rank": 80,
       "v3Path": "<fgosDir>/locks/activation-v2.lock",
-      "v1Shape": "file-link",
-      "v1Path": [".fgos/installation/activation.lock", ".fgos/locks/activation.lock"],
-      "fence": "tombstone",
       "owner": "4.4",
       "note": "fgctl places the old v3 fence under both activation locks at first git-wal-v1 activation; the 4.4 fence remains"
     },
@@ -219,9 +165,6 @@
       "scope": "machine",
       "rank": 80,
       "v3Path": "<lockRoot>/install.lock",
-      "v1Shape": "file-wx",
-      "v1Path": "<stateRoot>/install.lock",
-      "fence": "tombstone",
       "owner": "4.4",
       "note": "v1 source: packages/distribution/rust/src/store.rs InstallLockGuard; <stateRoot> is the machine release store root and <lockRoot> is <stateRoot>/locks"
     },
@@ -231,9 +174,6 @@
       "scope": "repo",
       "rank": 80,
       "v3Path": "<fgosDir>/locks/observe.lock",
-      "v1Shape": "file-wx",
-      "v1Path": ".fgos/observe/.lock",
-      "fence": "tombstone",
       "owner": "4.4",
       "note": "v1 source: packages/observe/rust/src/store_lock.rs acquire_store_lock"
     },
@@ -243,9 +183,6 @@
       "scope": "run",
       "rank": 15,
       "v3Path": "<runDir>/runs/<NN>/attempt.lock",
-      "v1Shape": null,
-      "v1Path": null,
-      "fence": null,
       "owner": "6.2",
       "note": "new lock; the file lives in the run directory and is removed with the run"
     },
@@ -255,9 +192,6 @@
       "scope": "repo",
       "rank": 58,
       "v3Path": "<eventOpenRoot>/locks/event-seal.lock",
-      "v1Shape": null,
-      "v1Path": null,
-      "fence": "none",
       "owner": "event-store"
     },
     {
@@ -266,9 +200,6 @@
       "scope": "repo",
       "rank": 70,
       "v3Path": "<eventOpenRoot>/locks/event-append.lock",
-      "v1Shape": null,
-      "v1Path": null,
-      "fence": "none",
       "owner": "event-store"
     },
     {
@@ -277,9 +208,6 @@
       "scope": "repo",
       "rank": 80,
       "v3Path": "<fgosDir>/locks/repo-config.lock",
-      "v1Shape": null,
-      "v1Path": null,
-      "fence": "none",
       "owner": "git"
     }
   ]

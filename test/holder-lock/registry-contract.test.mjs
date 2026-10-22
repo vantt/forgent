@@ -80,12 +80,6 @@ test('registry validates against its schema', () => {
   assert.deepEqual(validate(registry, schema, schema), []);
 });
 
-test('the schema rejects a 4.2 lock without a fence', () => {
-  const broken = structuredClone(registry);
-  delete broken.locks.find((lock) => lock.owner === '4.2').fence;
-  assert.notDeepEqual(validate(broken, schema, schema), []);
-});
-
 test('lock names are unique', () => {
   const names = registry.locks.map((lock) => lock.name);
   assert.deepEqual(names.filter((name, i) => names.indexOf(name) !== i), []);
@@ -110,28 +104,6 @@ test('ranks follow the documented ordering of the locks', () => {
   }
   assert.equal(rankOf.runner, rankOf.gateway);
   assert.equal(rankOf['porting-events'], rankOf.state);
-});
-
-test('every lock owned by 4.2 has a fence and a v1 shape that agrees with it', () => {
-  const owned = registry.locks.filter((lock) => lock.owner === '4.2');
-  assert.equal(owned.length, 10);
-  for (const lock of owned) {
-    assert.ok(['tombstone', 'blocking-generation', 'none'].includes(lock.fence), `${lock.name}: fence ${lock.fence}`);
-    if (lock.v1Shape === 'ledger-dir') assert.equal(lock.fence, 'blocking-generation', `${lock.name}: a ledger needs a blocking generation`);
-    else if (lock.fence !== 'none') assert.equal(lock.fence, 'tombstone', `${lock.name}: file locks are fenced by tombstone`);
-    if (lock.fence === 'none') assert.ok(lock.fenceNote, `${lock.name}: an unfenced lock must say why`);
-  }
-  assert.deepEqual(owned.filter((lock) => lock.fence === 'none').map((lock) => lock.name), ['full-suite']);
-});
-
-test('a tombstoned lock never takes its v3 lock at the path its tombstone occupies', () => {
-  // Compare both paths in one spelling: <lockRoot> is <stateRoot>/locks and <fgosDir> is the repo's .fgos.
-  const spell = (template) => template.replace('<lockRoot>', '<stateRoot>/locks').replace('<fgosDir>', '.fgos');
-  for (const lock of registry.locks.filter((row) => row.fence === 'tombstone' && typeof row.v3Path === 'string')) {
-    for (const v1 of [lock.v1Path].flat().filter((value) => typeof value === 'string')) {
-      assert.notEqual(spell(lock.v3Path), spell(v1), `${lock.name}: v3 ${lock.v3Path} lands on the tombstone at ${v1}`);
-    }
-  }
 });
 
 test('machine and run locks keep the scope the plan gives them', () => {
@@ -183,12 +155,12 @@ test('judge vector names are unique', () => {
   assert.deepEqual(names.filter((name, i) => names.indexOf(name) !== i), []);
 });
 
-test('the repo lock family keeps its ranks, v3 paths and tombstone fences', () => {
+test('the repo lock family keeps its ranks and v3 paths', () => {
   const byName = Object.fromEntries(registry.locks.map((lock) => [lock.name, lock]));
   const expected = {
-    'merge-slot': { kind: 'mutex', rank: 20, v3Path: '<fgosDir>/locks/merge-slot--<ref>.lock', v1Path: '.fgos/merge-slot--<ref>.lock', fence: 'tombstone' },
-    'worktree-admin': { kind: 'mutex', rank: 40, v3Path: '<fgosDir>/locks/worktree-admin.lock', v1Path: null, fence: null },
-    'main-checkout': { kind: 'mutex', rank: 50, v3Path: '<fgosDir>/locks/main-checkout.lock', v1Path: '.fgos/main-checkout.lock', fence: 'tombstone' },
+    'merge-slot': { kind: 'mutex', rank: 20, v3Path: '<fgosDir>/locks/merge-slot--<ref>.lock' },
+    'worktree-admin': { kind: 'mutex', rank: 40, v3Path: '<fgosDir>/locks/worktree-admin.lock' },
+    'main-checkout': { kind: 'mutex', rank: 50, v3Path: '<fgosDir>/locks/main-checkout.lock' },
   };
   for (const [name, want] of Object.entries(expected)) {
     const lock = byName[name];
@@ -199,18 +171,17 @@ test('the repo lock family keeps its ranks, v3 paths and tombstone fences', () =
   }
 });
 
-test('the Rust-owned activation, install and observe locks are leaf mutexes fenced by tombstone', () => {
+test('the Rust-owned activation, install and observe locks are leaf mutexes', () => {
   const rustOwned = registry.locks.filter((lock) => lock.owner === '4.4');
   assert.deepEqual(rustOwned.map((lock) => lock.name).sort(), ['activation', 'install', 'observe']);
   const expected = {
-    activation: { scope: 'repo', v3Path: '<fgosDir>/locks/activation-v2.lock', v1Shape: 'file-link', v1Path: ['.fgos/installation/activation.lock', '.fgos/locks/activation.lock'] },
-    install: { scope: 'machine', v3Path: '<lockRoot>/install.lock', v1Shape: 'file-wx', v1Path: '<stateRoot>/install.lock' },
-    observe: { scope: 'repo', v3Path: '<fgosDir>/locks/observe.lock', v1Shape: 'file-wx', v1Path: '.fgos/observe/.lock' },
+    activation: { scope: 'repo', v3Path: '<fgosDir>/locks/activation-v2.lock' },
+    install: { scope: 'machine', v3Path: '<lockRoot>/install.lock' },
+    observe: { scope: 'repo', v3Path: '<fgosDir>/locks/observe.lock' },
   };
   for (const lock of rustOwned) {
     assert.equal(lock.kind, 'mutex', `${lock.name}: kind`);
     assert.equal(lock.rank, 80, `${lock.name}: rank`);
-    assert.equal(lock.fence, 'tombstone', `${lock.name}: fence`);
     const want = expected[lock.name];
     for (const key of Object.keys(want)) assert.deepEqual(lock[key], want[key], `${lock.name}: ${key}`);
   }
@@ -283,8 +254,7 @@ test('event-store mutex contracts pin names, ranks, paths and owner schema', () 
   for (const [name, rank] of [['event-seal', 58], ['event-append', 70]]) {
     const row = registry.locks.find((lock) => lock.name === name);
     assert.deepEqual(row, { name, kind: 'mutex', scope: 'repo', rank,
-      v3Path: `<eventOpenRoot>/locks/${name}.lock`, v1Shape: null, v1Path: null,
-      fence: 'none', owner: 'event-store' });
+      v3Path: `<eventOpenRoot>/locks/${name}.lock`, owner: 'event-store' });
     assert.deepEqual(validate(row, schema.$defs.lock, schema), []);
     assert.notDeepEqual(validate({ ...row, owner: 'unknown' }, schema.$defs.lock, schema), []);
     const missing = { ...row }; delete missing.owner;
@@ -292,25 +262,7 @@ test('event-store mutex contracts pin names, ranks, paths and owner schema', () 
   }
 });
 
-test('Git repo-config is a rank 80 leaf and Node leaves the held controller path to fgctl', async () => {
-  const fs = await import('node:fs');
-  const os = await import('node:os');
-  const { placeFences, fenceStatus } = await import('../../src/holder-lock/fences.mjs');
+test('Git repo-config is a rank 80 leaf', () => {
   const row = registry.locks.find(row => row.name === 'repo-config');
   assert.deepEqual({ kind: row.kind, rank: row.rank, owner: row.owner }, { kind: 'mutex', rank: 80, owner: 'git' });
-  const dir = fs.mkdtempSync(join(os.tmpdir(), 'fgos-controller-fence-'));
-  try {
-    const old = join(dir, '.fgos/locks/activation.lock');
-    fs.mkdirSync(dirname(old), { recursive: true });
-    fs.writeFileSync(old, 'held inode');
-    const options = { fgosDir: join(dir, '.fgos'), workspaceRoot: dir, worktrees: [], branches: [], stateRoot: join(dir, 'state'), owners: ['4.4'] };
-    assert.equal(placeFences(options).ok, true);
-    assert.equal(fs.readFileSync(old, 'utf8'), 'held inode');
-    const status = fenceStatus(options);
-    const target = status.targets.find(target => target.path === old);
-    assert.equal(target.managedBy, 'fgctl');
-    assert.equal(target.fenced, false);
-    assert.deepEqual(status.controllerMissing, [old]);
-    assert.ok(!status.missing.includes(old) && !status.v1Present.includes(old), 'the held controller file never blocks or counts against Node placement');
-  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });

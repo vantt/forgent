@@ -147,7 +147,7 @@ import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir
 import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
 import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations, fixTerminalDir } from './terminal-control-checks.mjs';
 import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
-import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkLockFences, fixLockFences, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
+import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
 import { checkLockRecordUnreadable } from './lock-record-checks.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
@@ -2132,10 +2132,9 @@ registerCheck({
 
 // Holder-lock (docs/platform/holder-lock/spec.md): the kernel-lock guarantee
 // of both lock directories, the borrow vectors, who holds each lock, the
-// cutover fences, the predecessor kill wait and the one state root. Bodies
-// live in holder-lock-checks.mjs. The `lock-dirs` fix creates the two lock
-// directories; the `lock-fences` fix is the cutover step and acts only in a
-// workspace whose activated release already runs these locks.
+// predecessor kill wait and the one state root. Bodies live in
+// holder-lock-checks.mjs. The `lock-dirs` fix creates the two lock
+// directories.
 registerCheck({
   id: 'lock-kernel-semantics',
   description: 'the holder-lock driver gives kernel lock exclusion on <fgosDir>/locks and <lockRoot>, proven by a two-process probe on each mount',
@@ -2150,11 +2149,6 @@ registerCheck({
   id: 'lock-holders',
   description: 'every holder of a holder-lock lock is a fgOS process or a borrowed child, and no predecessor domain is left running',
   check: (cwd) => checkLockHolders(cwd),
-});
-registerCheck({
-  id: 'lock-fences',
-  description: 'every legacy lock path carries its cutover fence, so an older fgOS binary fails loudly instead of holding the old lock',
-  check: (cwd) => checkLockFences(cwd),
 });
 registerCheck({
   id: 'lock-record-unreadable',
@@ -2214,7 +2208,6 @@ registerCheck({
 registerFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });
 registerFix({ id: 'run-attempts-stuck', fix: (cwd) => fixRunAttemptsStuck(cwd) });
 registerFix({ id: 'legacy-attempts-stuck', fix: (cwd) => fixLegacyAttemptsStuck(cwd, { door: { observe: recoverObserveUseCase, apply: recoverApplyUseCase } }) });
-registerFix({ id: 'lock-fences', fix: (cwd) => fixLockFences(cwd) });
 
 // tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/
 // CONTEXT.md D2): the two role-by-intelligence capability slots --

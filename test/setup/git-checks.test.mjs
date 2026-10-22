@@ -7,7 +7,6 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { checkGit, compatibleGitContracts } from '../../src/setup/git-checks.mjs';
-import { checkLockFences } from '../../src/setup/holder-lock-checks.mjs';
 import { ensureGitAddon, root as addonRoot } from '../../scripts/git-addon.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { resolveStateRoot } from '../../src/holder-lock/state-root.mjs';
@@ -28,15 +27,6 @@ test('a malformed explicit addon remains a failing diagnostic', () => {
     const result = checkGit(root, 'git-component-compatible', { descriptor: { releaseRoot: root, manifest: {} } });
     assert.equal(result.passed, false);
     assert.match(result.message, /git-addon-unavailable/);
-  } finally { fs.rmSync(root, { recursive: true, force: true }); }
-});
-
-test('an unused controller fence does not turn a channel without activation red', () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-no-controller-'));
-  try {
-    const result = checkLockFences(root, { providerRuntimeDir: path.join(root, 'providers') });
-    assert.equal(result.passed, true, result.message);
-    assert.doesNotMatch(result.message, /git-fence-missing/);
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
 

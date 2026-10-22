@@ -25,9 +25,6 @@ fn rust_paths_names_and_ranks_match_shared_registry() {
         assert_eq!(row["kind"], "mutex");
         assert_eq!(row["scope"], "repo");
         assert_eq!(row["owner"], "event-store");
-        assert_eq!(row["fence"], "none");
-        assert!(row["v1Shape"].is_null());
-        assert!(row["v1Path"].is_null());
         assert_eq!(
             row["v3Path"]
                 .as_str()
