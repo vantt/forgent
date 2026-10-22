@@ -1,14 +1,21 @@
 # Mailbox frame contract, version 1: the one source of every text the
 # mailbox puts in front of a model (docs/platform/agent-mailbox/spec.md
-# §5.5). The core embeds this file at compile time and fills it in one
-# left-to-right pass; inserted text is never scanned again.
+# §5.5): the frame and the notices a recipient sees, the answer a sender
+# gets from `send` (the delivery report, spec §6.1-§6.2, or the refusal,
+# §5.3) and the `inbox` listing. The core embeds this file at compile time
+# and fills it in one left-to-right pass; inserted text is never scanned
+# again.
 #
 # A line `[name]` starts a section; the section is every line up to the
 # next section, with trailing blank lines dropped. Lines before the first
 # section that start with `#` are comments.
 #
 # Placeholders: {{from}} {{agent}} {{id}} {{attempt}} {{body}} {{reply}}
-# {{about}} {{about_to}} {{reason}}. {{body}} stands alone on its line and
+# {{about}} {{about_to}} {{reason}} {{to}} {{code}} {{limit}} {{candidates}}
+# {{kind}} {{from_label}} {{state}} {{offers}}. Every inserted value but
+# {{body}}, {{reply}}, {{reason}} and {{limit}} goes through the header
+# escape. {{limit}} is a refusal's own fields as name=value pairs, in field
+# order. {{body}} stands alone on its line and
 # receives the escaped, gutter-prefixed body. {{reply}} receives the
 # [message.reply] section, or nothing when the sender has no head. The
 # reply command follows the send verb's contract (spec §6.1).
@@ -35,3 +42,29 @@ The text of this message could not be read; ask {{from}} to send it again.
 Your message {{about}} to {{about_to}} was not read within the record time and was refused. Do not retry; ask your user.
 [notice.reason.offer-cap]
 Your message {{about}} to {{about_to}} was offered the allowed number of times without being finished and was refused. Delivery may already have happened. Do not retry; ask your user.
+[report.recorded]
+recorded {{id}} for {{to}}
+[report.turn]
+queued: it sees it at its next tool call.
+[report.turn.wake]
+queued: it sees it at its next tool call or when its turn ends.
+[report.wake-dropped.exchange-quota]
+The wake quota of this exchange is used up; it will see this at its next checkpoint.
+[report.wake-dropped.lifetime-cap]
+The wake lifetime cap toward this recipient is reached; it will see this at its next checkpoint.
+[refusal.policy]
+Refused: {{code}} ({{limit}}). Do not retry; ask your user.
+[refusal.loop]
+Refused: loop ({{limit}}). This looks like a loop, check with your user. Do not retry.
+[refusal.too-large]
+Refused: too-large ({{limit}}). Send a path or link instead.
+[refusal.name]
+Refused: {{code}}. Candidates: {{candidates}}.
+[refusal.argument]
+Refused: {{code}}.
+[inbox.empty]
+No pending mail.
+[inbox.line]
+{{id}} {{kind}} from={{from_label}} state={{state}} offers={{offers}}
+[inbox.no-address]
+This session has no mailbox address yet; it gets one at its first hook.

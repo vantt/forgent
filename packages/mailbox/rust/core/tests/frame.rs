@@ -325,6 +325,34 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
                 "Do not retry; ask your user.",
             ][..],
         ),
+        ("report.recorded", &["{{id}}", "{{to}}"][..]),
+        ("report.turn", &["next tool call"][..]),
+        ("report.turn.wake", &["next tool call", "turn ends"][..]),
+        (
+            "report.wake-dropped.exchange-quota",
+            &["next checkpoint"][..],
+        ),
+        ("report.wake-dropped.lifetime-cap", &["next checkpoint"][..]),
+        (
+            "refusal.policy",
+            &["{{code}}", "{{limit}}", "Do not retry; ask your user."][..],
+        ),
+        ("refusal.loop", &["{{limit}}", "Do not retry."][..]),
+        ("refusal.too-large", &["{{limit}}"][..]),
+        ("refusal.name", &["{{code}}", "{{candidates}}"][..]),
+        ("refusal.argument", &["{{code}}"][..]),
+        ("inbox.empty", &[][..]),
+        (
+            "inbox.line",
+            &[
+                "{{id}}",
+                "{{kind}}",
+                "{{from_label}}",
+                "{{state}}",
+                "{{offers}}",
+            ][..],
+        ),
+        ("inbox.no-address", &[][..]),
     ];
     for (name, tokens) in expect {
         let text = section(name);

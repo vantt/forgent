@@ -50,7 +50,7 @@ fn parse_sections() -> Vec<(&'static str, &'static str)> {
 /// A section of the embedded contract. Every section exists: the contract
 /// is compiled in and its test proves each one, so the empty fallback is
 /// never used; it keeps rendering free of panics.
-fn section(name: &str) -> &'static str {
+pub(crate) fn section(name: &str) -> &'static str {
     frame_sections()
         .iter()
         .find(|(n, _)| *n == name)
@@ -59,7 +59,7 @@ fn section(name: &str) -> &'static str {
 
 /// Fills `{{name}}` placeholders in one left-to-right pass. Inserted text is
 /// never scanned again, so a value holding a placeholder stays literal.
-fn fill(template: &str, values: &[(&str, &str)]) -> String {
+pub(crate) fn fill(template: &str, values: &[(&str, &str)]) -> String {
     let mut out = String::with_capacity(template.len());
     let mut rest = template;
     while let Some(open) = rest.find("{{") {
@@ -89,7 +89,7 @@ fn fill(template: &str, values: &[(&str, &str)]) -> String {
 
 /// A header value: the name alphabet only, every other character `_`,
 /// at most `frame.maxHeaderChars` characters.
-fn escape_header(value: &str, limits: &Limits) -> String {
+pub(crate) fn escape_header(value: &str, limits: &Limits) -> String {
     value
         .chars()
         .map(|c| if in_name_alphabet(c) { c } else { '_' })

@@ -1,0 +1,194 @@
+mod common;
+
+use common::{spec_limits, t};
+use fgos_mailbox_core::{
+    delivery_report, inbox_text, refusal_text, Generation, Kind, MessageId, MessageView, Refusal,
+    SendOutcome, ShortName, WakeDrop,
+};
+use serde_json::json;
+
+/// A name as the snapshot stores it: any text a foreign writer put there.
+fn name(text: &str) -> ShortName {
+    serde_json::from_value(json!(text)).unwrap()
+}
+
+fn outcome(effective_wake: bool, wake_dropped: Option<WakeDrop>) -> SendOutcome {
+    SendOutcome {
+        id: MessageId::from_text("a1b2"),
+        to: name("forgent-claude-7f"),
+        to_generation: Generation::FIRST,
+        depth: 0,
+        reply_to: None,
+        effective_wake,
+        wake_dropped,
+    }
+}
+
+#[test]
+fn a_send_without_an_effective_wake_reports_recorded_and_its_next_tool_call() {
+    assert_eq!(
+        delivery_report(&outcome(false, None), &spec_limits()),
+        "recorded a1b2 for forgent-claude-7f\nqueued: it sees it at its next tool call."
+    );
+}
+
+#[test]
+fn a_send_with_an_effective_wake_reports_its_next_tool_call_or_the_end_of_its_turn() {
+    assert_eq!(
+        delivery_report(&outcome(true, None), &spec_limits()),
+        "recorded a1b2 for forgent-claude-7f\nqueued: it sees it at its next tool call or when its turn ends."
+    );
+}
+
+#[test]
+fn a_send_whose_wake_the_exchange_quota_dropped_says_so_and_still_reports_recorded() {
+    let text = delivery_report(
+        &outcome(false, Some(WakeDrop::ExchangeQuota)),
+        &spec_limits(),
+    );
+    let lines: Vec<&str> = text.lines().collect();
+    assert_eq!(lines[0], "recorded a1b2 for forgent-claude-7f");
+    assert_eq!(lines[1], "queued: it sees it at its next tool call.");
+    assert_eq!(
+        lines[2],
+        "The wake quota of this exchange is used up; it will see this at its next checkpoint."
+    );
+    assert_eq!(lines.len(), 3);
+}
+
+#[test]
+fn a_send_whose_wake_the_lifetime_cap_dropped_says_so() {
+    let text = delivery_report(&outcome(false, Some(WakeDrop::LifetimeCap)), &spec_limits());
+    assert_eq!(
+        text.lines().last(),
+        Some("The wake lifetime cap toward this recipient is reached; it will see this at its next checkpoint.")
+    );
+}
+
+#[test]
+fn each_refusal_code_renders_from_its_section_and_policy_refusals_say_do_not_retry() {
+    const NO_RETRY: &str = "Do not retry; ask your user.";
+    let cases: Vec<(Refusal, &str, bool)> = vec![
+        (
+            Refusal::SessionBudget {
+                budget: 20,
+                window_sec: 600,
+            },
+            "Refused: session-budget (budget=20 window_sec=600). Do not retry; ask your user.",
+            true,
+        ),
+        (
+            Refusal::LifetimeCap { cap: 200 },
+            "Refused: lifetime-cap (cap=200). Do not retry; ask your user.",
+            true,
+        ),
+        (
+            Refusal::TooDeep { max_depth: 4 },
+            "Refused: too-deep (max_depth=4). Do not retry; ask your user.",
+            true,
+        ),
+        (
+            Refusal::QueueFull { cap: 8 },
+            "Refused: queue-full (cap=8). Do not retry; ask your user.",
+            true,
+        ),
+        (
+            Refusal::SenderShareFull { per_sender: 4 },
+            "Refused: sender-share-full (per_sender=4). Do not retry; ask your user.",
+            true,
+        ),
+        (
+            Refusal::Loop {
+                max_per_window: 6,
+                window_sec: 300,
+            },
+            "Refused: loop (max_per_window=6 window_sec=300). This looks like a loop, check with your user. Do not retry.",
+            false,
+        ),
+        (
+            Refusal::TooLarge { max_bytes: 65536 },
+            "Refused: too-large (max_bytes=65536). Send a path or link instead.",
+            false,
+        ),
+        (
+            Refusal::UnknownName { candidates: vec![] },
+            "Refused: unknown-name. Candidates: none.",
+            false,
+        ),
+        (
+            Refusal::AmbiguousName {
+                candidates: vec![name("forgent-claude-7f"), name("forgent-claude-7a")],
+            },
+            "Refused: ambiguous-name. Candidates: forgent-claude-7f, forgent-claude-7a.",
+            false,
+        ),
+        (Refusal::Group, "Refused: group.", false),
+        (Refusal::SelfSend, "Refused: self.", false),
+        (
+            Refusal::ReplyToNotOffered,
+            "Refused: reply-to-not-offered.",
+            false,
+        ),
+        (
+            Refusal::SenderKeyTooLong { max_chars: 200 },
+            "Refused: sender-key-too-long.",
+            false,
+        ),
+    ];
+    for (refusal, expected, policy) in cases {
+        let text = refusal_text(&refusal, &spec_limits());
+        assert_eq!(text, expected, "{}", refusal.code());
+        assert_eq!(text.contains(NO_RETRY), policy, "{}", refusal.code());
+        let loop_like = matches!(refusal, Refusal::Loop { .. });
+        assert_eq!(
+            text.contains("Do not retry"),
+            policy || loop_like,
+            "{}",
+            refusal.code()
+        );
+    }
+}
+
+#[test]
+fn a_name_refusal_lists_the_candidates_through_the_header_escape() {
+    let refusal = Refusal::UnknownName {
+        candidates: vec![name("evil<tag \"x\"\nnext")],
+    };
+    assert_eq!(
+        refusal_text(&refusal, &spec_limits()),
+        "Refused: unknown-name. Candidates: evil_tag__x__next."
+    );
+}
+
+#[test]
+fn an_inbox_listing_has_one_line_per_pending_item_with_its_state_and_says_no_pending_mail_when_empty(
+) {
+    let limits = spec_limits();
+    let items = vec![
+        MessageView {
+            id: MessageId::from_text("a1"),
+            kind: Kind::Message,
+            from_label: "forgent-codex-2c".to_string(),
+            recorded_at: t(10),
+            offers: 0,
+            in_flight: false,
+        },
+        MessageView {
+            id: MessageId::from_text("b2"),
+            kind: Kind::Notice,
+            from_label: "mailbox".to_string(),
+            recorded_at: t(11),
+            offers: 1,
+            in_flight: true,
+        },
+    ];
+    assert_eq!(
+        inbox_text(Some(&items), &limits),
+        "a1 message from=forgent-codex-2c state=recorded offers=0\nb2 notice from=mailbox state=in-flight offers=1"
+    );
+    assert_eq!(inbox_text(Some(&[]), &limits), "No pending mail.");
+    assert_eq!(
+        inbox_text(None, &limits),
+        "This session has no mailbox address yet; it gets one at its first hook."
+    );
+}

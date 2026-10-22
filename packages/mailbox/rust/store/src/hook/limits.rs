@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct HookLimits {
     pub stop_block: StopBlockLimits,
-    pub hook: LockWaitLimits,
+    pub hook: HookCallLimits,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -23,8 +23,15 @@ pub struct StopBlockLimits {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct LockWaitLimits {
+pub struct HookCallLimits {
     /// The longest wait, in milliseconds, for the mailbox lock before a hook
     /// skips its drain; the next hook call tries again.
     pub lock_wait_ms: u64,
+    /// The whole-hook failure ceiling in milliseconds, not a target: an
+    /// entry still running when it passes exits 0 without printing, unless
+    /// its stdout write has started.
+    pub budget_ms: u64,
+    /// The largest foreign JSON document the hook reads, in bytes: its stdin
+    /// payload and the CLI's own session file.
+    pub max_read_bytes: u64,
 }
