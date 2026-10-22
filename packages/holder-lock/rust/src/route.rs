@@ -22,7 +22,7 @@ use crate::state_root;
 
 mod hold;
 
-/// The protocol the lock routes speak (`lock-fd`, `lock-hold`, `state-root`,
+/// The protocol the lock routes speak (`lock-fd`, `lock-hold`,
 /// `lock-borrow-vectors`). Protocol 1 was the first
 /// release; a payload that still sends it is refused, and every answer
 /// carries 2, so an older facade fails closed on either side.
@@ -158,7 +158,7 @@ pub fn main(args: &[OsString]) -> i32 {
         }
     }
     let Some((route, rest)) = strings.split_first() else {
-        return usage("fgos internal <lock-fd|lock-hold|state-root|quiesce-scan|lock-borrow-vectors> --protocol 2 ...");
+        return usage("fgos internal <lock-fd|lock-hold|quiesce-scan|lock-borrow-vectors> --protocol 2 ...");
     };
     // The protocol is checked before anything else about the call, so a
     // payload of another release always learns that first.
@@ -180,7 +180,6 @@ pub fn main(args: &[OsString]) -> i32 {
     match route.as_str() {
         "lock-fd" => lock_fd(&others),
         "lock-hold" => lock_hold(&others),
-        "state-root" => state_root_route(&others),
         "quiesce-scan" => quiesce_scan(&others),
         "lock-borrow-vectors" => lock_borrow_vectors(&others),
         other => usage(&format!("unknown internal route {other}")),
@@ -304,19 +303,6 @@ fn lock_hold(args: &[String]) -> i32 {
     {
         emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": "lock-hold is the Windows helper; other platforms hand a descriptor to lock-fd" }), EXIT_UNAVAILABLE)
     }
-}
-
-fn state_root_route(args: &[String]) -> i32 {
-    if let Some(extra) = args.first() {
-        return usage(&format!("unknown argument {extra}"));
-    }
-    let (root, source) = state_root::state_root();
-    let fields = json!({
-        "stateRoot": root.to_string_lossy(),
-        "lockRoot": root.join("locks").to_string_lossy(),
-        "source": source.as_str(),
-    });
-    emit(None, fields, EXIT_OK)
 }
 
 fn lock_borrow_vectors(args: &[String]) -> i32 {

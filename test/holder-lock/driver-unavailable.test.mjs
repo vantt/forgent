@@ -50,8 +50,8 @@ process.stdout.write(JSON.stringify(out));
     const out = JSON.parse(res.stdout);
     for (const door of ['acquireSync', 'acquire', 'probe', 'stateRoot']) {
       assert.equal(out[door].code, 'lock-driver-unavailable', `${door}: ${JSON.stringify(out[door])}`);
-      // The state root still asks the host (it moves to the door with the resolver); every lock operation asks the addon.
-      assert.equal(out[door].reason, door === 'stateRoot' ? 'no-host-binary' : 'addon-not-shipped', door);
+      // Every lock operation and the unpinned state root ask the same door.
+      assert.equal(out[door].reason, 'addon-not-shipped', door);
       assert.equal(out[door].name, 'HolderLockError', door);
     }
     assert.equal(out.locksDirExists, false, 'no lock directory is created when there is no driver');

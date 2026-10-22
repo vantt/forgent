@@ -56,9 +56,9 @@ test('operations that touch the terminal can answer unsupported and unknown', ()
 });
 
 test('the route reports a protocol mismatch the same way the other internal routes do', () => {
-  const stateRoot = JSON.parse(readFileSync(join(root, 'packages', 'holder-lock', 'contracts', 'internal-route.state-root.v1.json'), 'utf8'));
-  const mismatchCode = (contract) => Object.entries(contract.exitCodes).find(([, meaning]) => meaning.startsWith('host-version-mismatch'))?.[0];
-  assert.equal(mismatchCode(route), mismatchCode(stateRoot));
+  const lockFd = JSON.parse(readFileSync(join(root, 'packages', 'holder-lock', 'contracts', 'internal-route.lock-fd.v1.json'), 'utf8'));
+  const mismatchCode = (contract) => Object.entries(contract.exitCodes).find(([, meaning]) => meaning.includes('host-version-mismatch'))?.[0];
+  assert.equal(mismatchCode(route), mismatchCode(lockFd));
   assert.ok(route.errorStdout.code.enum.includes('host-version-mismatch'));
 });
 

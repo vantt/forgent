@@ -18,7 +18,7 @@ import { nativeDoor, nativeHelperExe } from '../native/door.mjs';
 import { HolderLockError, PROTOCOL, parseRouteLine } from './protocol.mjs';
 
 const MAX_OUTPUT_BYTES = 64 * 1024;
-/** Bound for the route calls that neither wait nor kill: the borrowed check and the state root. */
+/** Bound for the route calls that neither wait nor kill: the borrowed check. */
 export const ROUTE_CALL_TIMEOUT_MS = 2000;
 /** Headroom added to every bounded wait, so the helper is only killed when it really hung. */
 export const ROUTE_SLACK_MS = 1000;
@@ -205,6 +205,8 @@ function viaDoor(call) {
 
 /** Lock the open description `fd`: `{ result, ... , lock? }`; `lock` (an acquired lock) belongs to the facade's entry for this fd. */
 export const doorLockFd = (fd, wait, killWaitMs, predecessorKinds) => viaDoor((ns, cap) => ns.lockFd(cap, fd, 'ex', wait, killWaitMs, predecessorKinds ?? []));
+/** The state root of `env` and what decided it: `{ stateRoot, lockRoot, source }`, the host's own formula. */
+export const doorStateRoot = (env) => viaDoor((ns) => ns.stateRoot({ ...env }));
 export const doorProbe = (lockPath) => viaDoor((ns) => ns.probe(path.resolve(lockPath)));
 export const doorDrain = (lock, childPid, protectedRoots) => viaDoor((ns, cap) => ns.drainChild(cap, lock, childPid, protectedRoots));
 export const doorClearDomain = (lock, lockPath) => viaDoor((ns, cap) => ns.clearDomain(cap, lock, path.resolve(lockPath)));
@@ -249,30 +251,4 @@ export function assertDriverUsable(lockPath) {
     throw unavailable('unsupported-platform', `${dir}: no holder-lock driver on ${guarantee.platform} (${(guarantee.notes ?? []).join('; ')})`, { lockDir: dir, guarantee });
   }
   return guarantee;
-}
-
-/** Run `fgos internal state-root` once and return `{ stateRoot, lockRoot, source }`.
- * `env` is the environment the root is resolved FROM (the caller's, by
- * default this process's); it reaches the route minus the invocation
- * record path, like every other route call. */
-export function runStateRootRoute({ fgosDir, env = process.env } = {}) {
-  const bin = hostBin({ fgosDir });
-  const res = spawnSync(bin, ['internal', 'state-root', '--protocol', String(PROTOCOL)], {
-    env: routeEnv(env),
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe'],
-    timeout: ROUTE_CALL_TIMEOUT_MS,
-    killSignal: 'SIGKILL',
-    maxBuffer: MAX_OUTPUT_BYTES,
-    windowsHide: true,
-  });
-  const line = interpretRoute(res, bin, 'state-root');
-  // A killed helper is a route that hung, not a lock result: nothing to keep.
-  if (line.result === 'killed') {
-    throw new HolderLockError('lock-route-error', `${bin} state-root did not answer within ${ROUTE_CALL_TIMEOUT_MS} ms and was killed. ${ROUTE_NEXT_STEP}`);
-  }
-  if (typeof line.stateRoot !== 'string' || typeof line.lockRoot !== 'string' || typeof line.source !== 'string') {
-    throw new HolderLockError('lock-route-bad-output', `${bin} state-root answered without stateRoot/lockRoot/source: ${String(res.stdout ?? '').slice(0, 200)}. ${ROUTE_NEXT_STEP}`);
-  }
-  return { stateRoot: line.stateRoot, lockRoot: line.lockRoot, source: line.source };
 }

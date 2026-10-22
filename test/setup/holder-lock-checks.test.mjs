@@ -17,12 +17,12 @@ const {
   checkLockBorrowVectors,
   guaranteeRefusal,
   checkLockHolders,
-  checkStateRoot,
+  UNKNOWN_JUDGE_GRACE_MS,
   fixLockDirs,
   cutOverLockFiles,
 } = await import('../../src/setup/holder-lock-checks.mjs');
 const { fileHolders } = await import('../../src/holder-lock/index.mjs');
-const { observe } = await import('../../src/runner/dispatch/process-identity.mjs');
+const { observe, selfRecord } = await import('../../src/runner/dispatch/process-identity.mjs');
 
 const HOST_BIN = process.env.FGOS_HOST_BIN;
 const STATE_ROOT = process.env.FGOS_STATE_ROOT;
@@ -108,7 +108,8 @@ test('lock-kernel-semantics warns for a missing lock directory, then passes on t
   assert.equal(res.passed, true, res.message);
   assert.doesNotMatch(res.message, /^warning:/);
   assert.match(res.message, /workspace .*"driver":"flock","exclusion":"kernel","borrow":"kernel","holders":"kernel"}, two-process probe green/);
-  assert.match(res.message, /machine .*, two-process probe green$/);
+  assert.match(res.message, /machine .*, two-process probe green/);
+  assert.ok(res.message.endsWith(`; stateRoot ${STATE_ROOT} (pinned); killWaitMs 2000 (fixed)`), res.message);
   assert.deepEqual(fs.readdirSync(path.join(root, '.fgos', 'locks')), [], 'the probe file is removed');
 });
 
@@ -242,17 +243,54 @@ test('lock-holders scans every registry row that has a lock file, repo-config in
   assert.deepEqual(rows.map((row) => row.lock).filter((name) => ['attempt', 'event-seal', 'event-append'].includes(name)), []);
 });
 
-// ─── state-root ─────────────────────────────────────────────────────────
+// ─── hot records, judged by lock-holders ────────────────────────────────
 
-test('state-root: Node and the host agree; a pinned root also shows the unpinned answer', () => {
-  const root = workspace('state-root');
-  const pinned = checkStateRoot(root);
-  assert.equal(pinned.passed, true, pinned.message);
-  assert.ok(pinned.message.startsWith(`stateRoot ${STATE_ROOT}, lockRoot ${path.join(STATE_ROOT, 'locks')} (pinned); without the pin the host resolves stateRoot `), pinned.message);
+const hotRecord = (root, resource) => path.join(root, '.fgos', 'locks', `${resource}.hot`);
 
-  const home = path.join(scratch, 'state-root-home');
-  const { FGOS_STATE_ROOT: _pin, FGOS_STATE_HOME: _home, XDG_STATE_HOME: _xdg, ...rest } = process.env;
-  const unpinned = checkStateRoot(root, { env: { ...rest, HOME: home } });
-  // Node asks the route once per process and keeps the answer; the host answers the same environment.
-  assert.equal(unpinned.passed, true, unpinned.message);
+function hotWorkspace(name) {
+  const root = workspace(name);
+  fs.mkdirSync(path.join(root, '.fgos', 'locks'), { recursive: true });
+  return root;
+}
+
+test('lock-holders: no hot record passes', () => {
+  const result = checkLockHolders(hotWorkspace('hot-none'));
+  assert.equal(result.passed, true);
+  assert.doesNotMatch(result.message, /^warning:/);
+});
+
+test('lock-holders: a hot record of a live process with its full tuple passes', () => {
+  const root = hotWorkspace('hot-live');
+  const me = selfRecord();
+  fs.writeFileSync(hotRecord(root, 'state'), JSON.stringify({ v: 1, pid: process.pid, startTime: me.startTime, bootId: me.bootId, pidNs: me.pidNs }));
+  assert.doesNotMatch(checkLockHolders(root).message, /^warning:/);
+});
+
+test('lock-holders: a hot record that does not parse warns with its path and the fence command, for the right resource only', () => {
+  const root = hotWorkspace('hot-garbage');
+  fs.writeFileSync(hotRecord(root, 'porting-events'), '{"v":1,"pid":');
+  const result = checkLockHolders(root);
+  assert.equal(result.passed, true);
+  assert.match(result.message, /^warning: /);
+  assert.ok(result.message.includes(hotRecord(root, 'porting-events')), result.message);
+  assert.match(result.message, /fgos lock fence porting-events/);
+  assert.doesNotMatch(result.message, /fgos lock fence state/);
+});
+
+test('lock-holders: a hot record without a pid is unreadable', () => {
+  const root = hotWorkspace('hot-no-pid');
+  fs.writeFileSync(hotRecord(root, 'state'), JSON.stringify({ v: 1 }));
+  assert.match(checkLockHolders(root).message, /fgos lock fence state/);
+});
+
+test('lock-holders: a hot record naming a live pid in a foreign namespace warns only after the grace', () => {
+  const root = hotWorkspace('hot-foreign-ns');
+  const me = selfRecord();
+  // The recorded namespace differs from ours, so the judge cannot place the live pid.
+  fs.writeFileSync(hotRecord(root, 'state'), JSON.stringify({ v: 1, pid: process.pid, startTime: me.startTime, bootId: me.bootId, pidNs: 'pid:[0]' }));
+  const young = checkLockHolders(root);
+  const old = checkLockHolders(root, { now: Date.now() + UNKNOWN_JUDGE_GRACE_MS + 60_000 });
+  assert.doesNotMatch(young.message, /^warning:/);
+  assert.match(old.message, /cannot be judged here/);
+  assert.match(old.message, /fgos lock fence state/);
 });
