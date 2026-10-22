@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "76b90ac23260a7f69a60eeff13399a990b9d0c8bf45bccca89bdfd4d6d8ac793",
+  "payloadDigest": "d33e5aad9e3d69d9eaf551eec8f6f86f3966177df8c4f17150fdd0faf83a7919",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -91,7 +91,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
     "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
     "bin/fgos-runner.mjs": "dca3d8b530f20aaf8d9d8d424f12ec1c5d9670812566ab4d6c51583f3bb7b573",
-    "bin/fgos.mjs": "fd5053973e0b16f5d25a5230ac2f8db71803a82c6da3b4afbc6b9ef1adf6c9f5",
+    "bin/fgos.mjs": "85041e1f3aad00e0e1bdc1467630a748aba0c7cf243114627b6d7fe095562105",
     "core/skills/_shared/ak-cook-worker-contract.md": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
     "core/skills/_shared/capability-catalog.md": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -545,7 +545,6 @@
     "packages/work-state/rust/src/legacy_friction.rs": "e4ba455ec43b3340dca4c9583728eb5fcbacf594f58ee99d045d2366187ca3a9",
     "packages/work-state/rust/src/lib.rs": "439f5861e946ee9880c6137d54e8285b44c6ba02c41c19eb720bf293c9196c51",
     "packages/work-state/rust/src/work_source.rs": "6f50af247209fd8e6ff6b30a2a5f66e7e1506748f1d7a4d8a5b5962ca37ed063",
-    "scripts/backfill-status-category.mjs": "bff22a3805f8a38f1c7d93b7cee3b53ee5b6dde0d978b4fdbfb760c1cc3622d6",
     "scripts/backfill-unit-summaries.mjs": "f42d32b5f9dd889a7a16f1debe8d564eb2dccecae02fd39e80a705cd99ecbc04",
     "scripts/build-domain-registry.mjs": "ad239f74764832366c3c3bd43c674012904a78944bd6d6b9d2c8eb481c1a62c0",
     "scripts/build-rust-distribution.mjs": "b84bd0fb5fc14963ef6a500020ee84280844482da3e4429060694053e9f61aaf",
@@ -561,7 +560,7 @@
     "scripts/ci-external-consumer.sh": "d097aeeacae5d35e7e2163e8d4fcc859df69efe57c05c22ca940e83beb6ab954",
     "scripts/decision-question-hook.mjs": "5f4d242754bea6fa460288e790a4354d6780d847305ef3779c4547137d6872d1",
     "scripts/dispatch-decide-hook.mjs": "c3385557ec6c469ea6709d30dcbcd704a1a74d1c7f5011109bfc0f999dec08af",
-    "scripts/event-store/forge-probe.sh": "ded9901fbe85905bcb51610754943f449737ef91fc11b02dcba6936102dd22c8",
+    "scripts/event-store/forge-probe.sh": "9a0e3a46191ba9a7f1c582927760ec48c6aed5cbc2a613e5c35d77cc75a27a84",
     "scripts/event-store/power-loss-driver.mjs": "f7f88a6d9e80fe17027d7d6981c04f544d4b49e6629e46b0cfbdcbdeac75a7a3",
     "scripts/event-store/power-loss.sh": "f0023c1352dc57b85aba68c844d5abc28e8967a9a892c557d80b77434b9b2136",
     "scripts/event-store/store-increment-worker.mjs": "677424f7dae51f0566c9eb61cd96171347084ef2d93f5da1fc8133cea2f5af2a",
@@ -598,8 +597,6 @@
     "scripts/measure-coordination-baseline.mjs": "b890da1963fd4ee50ac84cd53e5e9b45aa7ce37a92d51c6a633bdb2374ec6a7a",
     "scripts/measure-p08-performance.mjs": "2ab686e2e3f880f584a2f9278a6bbb27a49d71effcdb65215f1cbd3865099e3e",
     "scripts/measure-verify-cost.mjs": "97768198548908742f0687b069fbe77dfc35839a88e4906f3813afbdd5918abc",
-    "scripts/migrate-actor-to-role.mjs": "4501c681a7a0399e0e57d1cf48b43ba650934b49b84acac8a446cdd99db44a48",
-    "scripts/migrate-status-proposed-to-awaiting-approval.mjs": "ac3fd799390ee06d504b49f497f41f117526b961d4ebaf3883fca91b63cf2546",
     "scripts/next-doc-id.mjs": "7e88c69cf6c78b4cce5240d3fcc34a1182fc963933435827a58974df5458bc9d",
     "scripts/package-release-assets.mjs": "088b9a0ad108920363ba5b4f540fb0c93b45b2960990981ab4e7558cff5fc59e",
     "scripts/prepare-release.mjs": "f896378a498bd154408b5116a7172e0c3c3f8c73ffd2ccee7a4930200d9e8ade",
@@ -624,7 +621,7 @@
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
     "src/cli/approve-fault-log.mjs": "e362c6b4a676839f6010c08d1df648f5973c2d9ec7a13acf97e40f93b57b42ab",
-    "src/cli/command-registry.mjs": "e881c6a33a912cc22a7f6e5cb4c014bdd845c15135a8782552d0066cad1bd7dd",
+    "src/cli/command-registry.mjs": "922737734735f2bdbc36e7207818216546558bf51878e7ce6e4217a89d93d273",
     "src/cli/deprecation.mjs": "45e7d11ad8681fc89e4c99f4ef53b7c93a477f6b5fdd6708eddcf0b579dd3985",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/invocation-fault-log.mjs": "c36b79eb7fa658c6c685d1dc99204ddf9de96b29e10eb5d03f82141cf9ab2fa9",
@@ -810,7 +807,7 @@
     "src/runner/loop.mjs": "e5752a575e76e4eb14cf2d43e96e7c8cadad098e628fad8fbb2c804f10bc0a15",
     "src/runner/main-checkout-activity.mjs": "84cd9b95e28c0c1004322b6edba0d2b4b45f9445eddc30613abd53314f13c071",
     "src/runner/main-checkout-reset-guard.mjs": "446d216c411dd5f59d512b5baf52b3a46eeb8ae03320f1d40be85e9447072d0c",
-    "src/runner/merge.mjs": "4ee80ae923c0076bd24eda5530a36406516ce8712dead138a4ee13e807bc10fe",
+    "src/runner/merge.mjs": "2d2cbc647ae36d5a47197e3f668561f08358a3e77dd51758c3f79aabfbaf8e00",
     "src/runner/operation-capability.mjs": "6683b7da84274722aa5d464ccc8ec9d9e34b110f779e8ea5b6f6c1d0b3c820f5",
     "src/runner/operation-choice.mjs": "866b8b61bea02f3250d9d89cf826109065e35c899b64faad0cfddc524614277e",
     "src/runner/paths.mjs": "1c20a7dab2f568b281f4b6eb5aff0a4465ab492cb16f5665c2b6d1d19c4a5ea7",
@@ -837,8 +834,8 @@
     "src/setup/checks.mjs": "2f3c4acc846e49d15fe2f9006e87a58215a7be559020304968cdb182cfaa75cd",
     "src/setup/claude-code-hooks.mjs": "d9f4cdbe8c4cec4cb3ea7c67798d24b49e3c86a0d97a041b202dec8def2332fe",
     "src/setup/config-merge.mjs": "2780e5fb05bb3a10aecff0f21eca4394738489960c2dbd9d86dff9f6c74cc176",
-    "src/setup/event-store-checks.mjs": "2af5215a4933ea47638121c0997e8684fe9afb5eb6a616bf8bab8757cd24f645",
-    "src/setup/event-store-fixes.mjs": "4f3a95add8dee1f08c1dd2d38fdb0cf7b5ee7101909faf965c0b2e6ebdaa142e",
+    "src/setup/event-store-checks.mjs": "4a5b9cdf563d720e7d34fdc11cb2df115e61e550df0c0afb8f624299d689de60",
+    "src/setup/event-store-fixes.mjs": "f377e0684d0f595be8d1699022e2d4978f3d7a66c39328af0e28625543369c6b",
     "src/setup/executor-posture-coverage.mjs": "b9bb0adc2d173321342aaede10d6e767f221d9194f197bee5f8dcb23901843c4",
     "src/setup/executor-profile-warnings.mjs": "7edcf8b4ddb7030651b4607e364b7a2e4a78e9166c967893c25880a949ea37be",
     "src/setup/git-checks.mjs": "2acc4c9db0b4b5ff809f931989ec69ca7aba49e433e08c93382573189e126e21",
@@ -850,7 +847,7 @@
     "src/setup/lock-record-checks.mjs": "08afa6351e5aa874f3fa45c57d81fc1f7266f47cf7f300005bd2e0a5de56c647",
     "src/setup/model-pool-checks.mjs": "4c115569d3644a395a09b0f6ea1d87205c791b18ccae021becd31a78bb360c6f",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "b3a3aa4dc8aa8aab678bbf2ef65654ce8a12d8ce478af45aae7cb90e9fe62430",
+    "src/setup/registrations.mjs": "9a788ccc82585d8f1d35ae9242982ea61db6c073c2a9f2fe8c012c034a6ac842",
     "src/setup/run-supervisor-checks.mjs": "93789ede921ca39d33fa7883fd8ae0daff5b6c120581534446c761b5e2fa0a06",
     "src/setup/seat-binding-checks.mjs": "b1efc2d1711dc21203c6482bf47ff4dfa7f8aa6f49b0d88a99a1479319a5f36f",
     "src/setup/seat-binding-conversion.mjs": "9f1b782a5a4a9059ad82fda27b79c6cc5ffaf057f6f1347e79ae5d74b49c00a1",
@@ -870,9 +867,8 @@
     "src/state/domain-registry.mjs": "afbac9ca5e143a188a44648d0910e7108a1bace06d378bcd46289ccb53aede51",
     "src/state/drift-status.mjs": "06f3f9c4e100043af574a11e4cf967281e49c960b77a5477ca024b816611fd65",
     "src/state/envelope.mjs": "faf5419c15516ea0a3c2862a149708ce3df17cca40101dae71bf99eeaf93868e",
-    "src/state/event-log.mjs": "01462c9477f1ecc9affc10f391703e2a0d61f3e57943b016f5a9dc3846b834f7",
-    "src/state/events.mjs": "1d2550961576a26f052fb1a4c64b75352182b866c3c025ae17bad0a8d6ae69f8",
-    "src/state/fgos-file-registry.mjs": "c03512b786ed5059aac637fe2fcc828bec4e77e083676f8c4a49c794372b7f0d",
+    "src/state/event-log.mjs": "5bab741c9c18ebe2f50b2059b166263d7d4ab524dc6a8e8d2c70c2707bfe5f5b",
+    "src/state/fgos-file-registry.mjs": "e76414c84daa3350327b4b4b570997b47fb042cf523c935edf848e0a14c79a10",
     "src/state/frontier.mjs": "dca56e29f4928eb025fb2bf085c75a7d1969d59b3b645754b3dc6b44e3db47d7",
     "src/state/gate-bypass.mjs": "723e40beb662fb094a4ee832fa0755cfc554d01c7623cf411eeda1092e9247b8",
     "src/state/graph-harness.mjs": "6d93e939f7d13ec8f24957eca8b02bc66aad00573c4369175bcb426915ac789b",
@@ -881,22 +877,21 @@
     "src/state/hot-lock.mjs": "729b7612cf482f110d8919b2ba617df669e11f930733948d8af11123a5c8eaf1",
     "src/state/impact.mjs": "5baf4a1efb7cb4e7b7b8c307e16a9671b925efe103246515b49f29710a8ddb4c",
     "src/state/knowledge-registry.mjs": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
-    "src/state/main-checkout-guard-warnings.mjs": "7075e5a06ee1664c953880fded940832c46533ccefda4a81801dd0c03584ab64",
     "src/state/plan-pool.mjs": "20c667909048853fa2dddf239b27467c29dbe8551cd7c90fef88c241143483ad",
     "src/state/porting-store.mjs": "b5069c780287cf0d239d4522144ece0a1248c78163d51de20f2940735274a7e2",
     "src/state/porting.mjs": "4191acd3af3ca878dd7ae10bab67d859d545ca870722b3276cd39aeba9d173f3",
     "src/state/postland-drift.mjs": "66bba6e35a60cfa81a7b430a51a816f142b0cc3e9307d7c7b421be111152299b",
     "src/state/priority-formula.mjs": "5a1767b93f0155567472eb059899aa993a147ecc0e0aaf75dafe8e93da72d6fe",
-    "src/state/replay.mjs": "3512d5e660504525fbd256106413b82a21634d826875c99712d97d3a321ae28c",
+    "src/state/replay.mjs": "0c35bfdc99adb47121aad04350971ca2916b58951306244ce528f6711e255260",
     "src/state/retro-pool.mjs": "bed4fe7e4a09ee49d3ae019e30dc21b73bc00bbbc8a20be3eec4cdf6352140ae",
     "src/state/retrospective-doors.mjs": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3",
     "src/state/runtime-coordination.mjs": "e546b13c02a8ae1c903fe5a0bb0974dcc41f85526a82111b8d82f0c925bb8ca5",
     "src/state/status-fsm.mjs": "6853485189d2e25e6ee2a5997d11f0b2ae4e608cf5ed6332df010b2e703b76b0",
     "src/state/step-fsm.mjs": "bf1e935a355d2fbb7b8a5f0927138dea21b21c6226fe5a442c22bd1875445625",
-    "src/state/store.mjs": "55cdc3829958d82251bc96602480650c96c44521ec08e04704c4603f0539a22f",
+    "src/state/store.mjs": "029b0d5da59fd6c4ce373e3faa97b911b77880febbabd70f0ab729fd855073c0",
     "src/state/tool-registry.mjs": "04adcb5dd417ae49a7f5e823665b8b9c763aa05bc505d86ef7ef61d6a099af2a",
     "src/state/work-event-store.mjs": "6d952ce26a0888658648edfafcd6ba128f83bcedc5b25055dace61ff17efe1a8",
-    "src/state/work.mjs": "ae5f1599cf36963602efd1e8b13ee2ac883997ea747cd99877364d0162c05059",
+    "src/state/work.mjs": "6c19dd633b78002149550bab47592fa9ce759a2a0fad340f9b868c2555e7d9f0",
     "src/state/worker-slots.mjs": "bc37bb0d995fe7339925c209c4e79232bdc5e3c079668f89c8f52313312dbf95",
     "src/terminal-control/client.mjs": "344249684fa950cf6caf984b1d9ae9f9a21b1c542bcf7110d3a7edd351d9076f",
     "src/terminal-control/config.mjs": "7160cced361f72be8a8c33baf7769bca8d8e6f24295fdae141695a64061c9341",
@@ -921,12 +916,12 @@
     "src/verbs/dispatch/watch.mjs": "e82fb8d94c5d76bc64b006bab2742e777f50785a4c4b12c91f15723864e457a3",
     "src/verbs/events/context.mjs": "5a47ea5bc1a590619f137cef40455898d99595e6bb8ba5a2b6d75570b101557b",
     "src/verbs/events/export.mjs": "b1af8d42892ffcfccf6521e6cebec5f0507289b18be9c1283f1514f9f00ce3e2",
-    "src/verbs/events/migrate.mjs": "2e154a86ac58cecac85c2cfde964595ee6211e13d79d55784565df55dcbac4b2",
+    "src/verbs/events/migrate.mjs": "36b95fbb3cdb35b8098bbe6d68f11d7f9a8526b4de4e053e1cddc95017cd3b69",
     "src/verbs/events/parity.mjs": "6431bfc150b5876ec83bf6ff63023aeee9fe3c0b33d2e8ed54114b443e088ed7",
-    "src/verbs/events/rebuild.mjs": "6b27eb8b67e23bbbeb84f79cbe88923af2229d9ead96e8906d03bf83c257df7d",
+    "src/verbs/events/rebuild.mjs": "4e6f58a44c3546b7b30249e430c2bef861bd451dc14c0afe497c48508228d08d",
     "src/verbs/events/status.mjs": "6fb73280f473c45dc2de55c1ad4514235a0f5e9563ebf7e2801d7b4c072ffc6f",
     "src/verbs/events/sync.mjs": "d83b18e084460987b49d3c811c18851368d217efb2d2f354cb675231692030f8",
-    "src/verbs/merge/approve.mjs": "bca3a1ec5dc29c10205bde45e9c9f220e550f0f18a7beb1ba96d45247aead5bb",
+    "src/verbs/merge/approve.mjs": "7c6bfb0e04289beffb5c1d00e5d3221ca561af132c78f35262bd4874712641a7",
     "src/verbs/merge/catchup.mjs": "3c73bf052a078cbe1ef40a271c32e7772da918637abf7cd2bbb7065dbd2be245",
     "src/verbs/merge/iron-law-level.mjs": "28037a676ec6f8533c2c8b0bcd66be0ec8dff1acfca0d656de7c5baa02043b73",
     "src/verbs/merge/merge.mjs": "0a453f93896685a77cf5494ff5d2f6f8106ff638e1b17079a368801fdb064f89",
@@ -968,14 +963,14 @@
   "sites": [
     {
       "path": "bin/fgos.mjs",
-      "line": 3475,
+      "line": 3488,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? readSharedConfig(dir)[key]",
       "family": "unresolved-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3619,
+      "line": 3632,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? readSharedConfig(dir)[key]",
       "family": "unresolved-binary"
@@ -2737,14 +2732,6 @@
       "class": "configured-binary"
     },
     {
-      "path": "src/setup/event-store-checks.mjs",
-      "line": 32,
-      "spawn": "checkEventStore -> src/setup/event-store-checks.mjs:56",
-      "binary": "param options",
-      "class": "uncalled-wrapper",
-      "function": "eventStoreDoctor"
-    },
-    {
       "path": "src/setup/holder-lock-checks.mjs",
       "line": 279,
       "spawn": "twoProcessProbe -> src/setup/holder-lock-checks.mjs:137",
@@ -2767,84 +2754,84 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2925,
+      "line": 2901,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2939,
+      "line": 2915,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2993,
+      "line": 2969,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3005,
+      "line": 2981,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 4271,
+      "line": 4247,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5414,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1592",
+      "line": 5390,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1594",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5461,
+      "line": 5437,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:595",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5502,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1592",
+      "line": 5478,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1594",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5509,
+      "line": 5485,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:518",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5870,
+      "line": 5846,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6121,
+      "line": 6097,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:109",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6153,
+      "line": 6129,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:126",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
@@ -2904,78 +2891,6 @@
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
-    },
-    {
-      "path": "src/verbs/events/export.mjs",
-      "line": 14,
-      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "exportUseCase"
-    },
-    {
-      "path": "src/verbs/events/migrate.mjs",
-      "line": 80,
-      "spawn": "eventStoreFacts -> src/event-store/native.mjs:153",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "migrateUseCase"
-    },
-    {
-      "path": "src/verbs/events/migrate.mjs",
-      "line": 82,
-      "spawn": "checkStopped -> src/holder-lock/fences.mjs:484",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "migrateUseCase"
-    },
-    {
-      "path": "src/verbs/events/migrate.mjs",
-      "line": 85,
-      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "migrateUseCase"
-    },
-    {
-      "path": "src/verbs/events/migrate.mjs",
-      "line": 93,
-      "spawn": "migrationParity -> src/verbs/events/migrate.mjs:49",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "migrateUseCase"
-    },
-    {
-      "path": "src/verbs/events/migrate.mjs",
-      "line": 107,
-      "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "migrateUseCase"
-    },
-    {
-      "path": "src/verbs/events/rebuild.mjs",
-      "line": 6,
-      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "rebuildStoreUseCase"
-    },
-    {
-      "path": "src/verbs/events/status.mjs",
-      "line": 3,
-      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "statusUseCase"
-    },
-    {
-      "path": "src/verbs/events/sync.mjs",
-      "line": 3,
-      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "syncUseCase"
     }
   ]
 }
