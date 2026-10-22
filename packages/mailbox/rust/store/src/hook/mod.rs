@@ -1,7 +1,13 @@
 //! The hook kind (spec §6.1): what a checkpoint hook of a head CLI does with
 //! the mailbox.
+#![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+mod drain;
 mod limits;
 
+pub use drain::{
+    begin, finish, render_reply, Begun, Claimed, FinishTicket, HeadFacts, HookCall, HookReply,
+    QuietReason,
+};
 pub use limits::{HookLimits, StopBlockLimits};
 
 use fgos_mailbox_core::Cli;

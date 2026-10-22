@@ -1,0 +1,537 @@
+//! The payload suite of rung V3: the drain over each CLI's recorded hook
+//! payloads (packages/mailbox/contracts/fixtures/hooks/<cli>/). Every input
+//! is real: recorded payloads, the writer key derived through session
+//! identity from the recorded environment, this test process's own
+//! process record standing in for a live head, contract limits and the
+//! shared id source. Only a CLI the adapters contract lists as tested is
+//! drained; the rest must stay quiet.
+mod common;
+
+use common::{fixture, hook_limits, limits, vector_input, vectors, SeqIds, ADAPTERS};
+use fgos_mailbox::hook::{
+    begin, finish, render_reply, Adapter, Begun, Claimed, HeadFacts, HookCall, HookEvent,
+    QuietReason,
+};
+use fgos_mailbox_core::{
+    Generation, MailboxState, MessageId, MessageState, RegisterRefusal, RegisterRequest,
+    SendRequest, Timestamp, WriterKey,
+};
+use fgos_process::facts::{identity_of, self_identity, Record};
+use fgos_process::ProcId;
+use serde_json::Value;
+use std::collections::BTreeMap;
+use std::process::{Child, Command};
+
+const PROJECT: &str = "forgent";
+
+fn t(secs: u64) -> Timestamp {
+    Timestamp::from_millis(secs * 1000)
+}
+
+fn tested() -> Vec<Adapter> {
+    ADAPTERS.into_iter().filter(|a| a.is_tested()).collect()
+}
+
+/// The writer key the hook of the recorded `file` derives from the id
+/// variables its process saw, through session identity.
+fn writer_from_env(adapter: Adapter, file: &str) -> WriterKey {
+    let vars = fixture(adapter, "env.json")["hookIdVars"][file].clone();
+    let lookup = |name: &str| vars[name].as_str().map(String::from);
+    let identity = fgos_session_identity::env_identity(&lookup, None)
+        .expect("the recorded hook saw a session id");
+    WriterKey::new(identity.id.to_string()).unwrap()
+}
+
+fn own_record() -> Record {
+    self_identity().unwrap().to_record()
+}
+
+/// A drain harness over one CLI: the snapshot, the bodies the store would
+/// hold, and the head's facts.
+struct Drain {
+    adapter: Adapter,
+    state: MailboxState,
+    bodies: BTreeMap<MessageId, String>,
+    ids: SeqIds,
+    writer: WriterKey,
+    head: HeadFacts,
+    now: u64,
+}
+
+impl Drain {
+    fn new(adapter: Adapter) -> Self {
+        Self {
+            adapter,
+            state: MailboxState::new(),
+            bodies: BTreeMap::new(),
+            ids: SeqIds::default(),
+            writer: writer_from_env(adapter, "post-tool-use.json"),
+            head: HeadFacts {
+                record: own_record(),
+                own_suffix: Some("2b".to_string()),
+                handle: None,
+            },
+            now: 100,
+        }
+    }
+
+    fn tick(&mut self) -> Timestamp {
+        self.now += 1;
+        t(self.now)
+    }
+
+    /// One hook call with the recorded payload `file`.
+    fn hook(&mut self, event: HookEvent, file: &str) -> Begun {
+        let stdin = serde_json::to_vec(&fixture(self.adapter, file)).unwrap();
+        self.hook_bytes(event, &stdin)
+    }
+
+    fn hook_bytes(&mut self, event: HookEvent, stdin: &[u8]) -> Begun {
+        let now = self.tick();
+        let call = HookCall {
+            adapter: self.adapter,
+            event,
+            stdin,
+            writer: self.writer.clone(),
+            project: PROJECT,
+            head: self.head.clone(),
+        };
+        begin(
+            &mut self.state,
+            &call,
+            now,
+            &limits(),
+            &hook_limits(),
+            &mut self.ids,
+        )
+    }
+
+    fn name(&self) -> String {
+        self.state.binding(&self.writer).unwrap().name.to_string()
+    }
+
+    /// Registers a peer head `key` (another process) that can send.
+    fn add_peer(&mut self, key: &str) {
+        let now = self.tick();
+        self.state
+            .register(
+                RegisterRequest {
+                    key: WriterKey::new(key).unwrap(),
+                    cli: fgos_mailbox_core::Cli::new("codex").unwrap(),
+                    project: PROJECT.to_string(),
+                    own_suffix: None,
+                    head: format!("peer-process-{key}"),
+                    handle: None,
+                },
+                None,
+                now,
+                &limits(),
+                &mut self.ids,
+            )
+            .unwrap();
+    }
+
+    /// A peer sends to the head; wake mail must take effect.
+    fn send(&mut self, from: &str, body: &str, wake: bool) -> MessageId {
+        let now = self.tick();
+        let to = self.name();
+        let outcome = self
+            .state
+            .send(
+                SendRequest {
+                    from: WriterKey::new(from).unwrap(),
+                    to,
+                    body,
+                    wake,
+                    reply_to: None,
+                },
+                now,
+                &limits(),
+                &mut self.ids,
+            )
+            .unwrap();
+        assert_eq!(outcome.effective_wake, wake, "the wake must take effect");
+        self.bodies.insert(outcome.id.clone(), body.to_string());
+        outcome.id
+    }
+
+    /// The shell after a claim: render, write (here: return), finish.
+    fn deliver(&mut self, claimed: &Claimed) -> String {
+        let bodies = self.bodies.clone();
+        let reply = render_reply(claimed, &|id| bodies.get(id).cloned(), &limits());
+        let now = self.tick();
+        finish(&mut self.state, claimed.ticket(), now);
+        reply.stdout
+    }
+
+    fn stop_blocks(&self) -> u32 {
+        self.state.binding(&self.writer).unwrap().stop_blocks
+    }
+
+    fn state_of(&self, id: &MessageId) -> MessageState {
+        self.state.message(id).unwrap().state.clone()
+    }
+
+    /// The head is registered by its first hook, with nothing pending.
+    fn registered(adapter: Adapter) -> Self {
+        let mut drain = Self::new(adapter);
+        let first = drain.hook(HookEvent::PostToolUse, "post-tool-use.json");
+        assert_eq!(first, quiet(QuietReason::NothingEligible));
+        drain
+    }
+}
+
+fn quiet(reason: QuietReason) -> Begun {
+    Begun::Quiet { reason }
+}
+
+fn take(begun: Begun) -> Claimed {
+    match begun {
+        Begun::Claimed(claimed) => claimed,
+        other => panic!("expected a claim, got {other:?}"),
+    }
+}
+
+/// The CLI's recorded accepted output with `text` in place of `{{TEXT}}`.
+fn accepted(adapter: Adapter, file: &str, text: &str) -> Value {
+    let mut value = fixture(adapter, file);
+    fn fill(value: &mut Value, text: &str) {
+        match value {
+            Value::String(s) if s == "{{TEXT}}" => *s = text.to_string(),
+            Value::Object(map) => map.values_mut().for_each(|v| fill(v, text)),
+            _ => {}
+        }
+    }
+    fill(&mut value, text);
+    value
+}
+
+fn frames_of(claimed: &Claimed, bodies: &BTreeMap<MessageId, String>) -> String {
+    claimed
+        .items
+        .iter()
+        .map(|item| {
+            fgos_mailbox_core::render(item, bodies.get(&item.id).map(String::as_str), &limits())
+        })
+        .collect::<Vec<_>>()
+        .join("\n\n")
+}
+
+/// A child process the test owns; killed and reaped when dropped.
+struct Sleeper(Child);
+
+impl Sleeper {
+    fn start() -> Self {
+        Self(Command::new("sleep").arg("30").spawn().unwrap())
+    }
+
+    fn record(&self) -> Record {
+        identity_of(ProcId(self.0.id())).unwrap().to_record()
+    }
+
+    fn end(mut self) {
+        self.0.kill().unwrap();
+        self.0.wait().unwrap();
+    }
+}
+
+impl Drop for Sleeper {
+    fn drop(&mut self) {
+        let _ = self.0.kill();
+        let _ = self.0.wait();
+    }
+}
+
+#[test]
+fn a_recorded_post_tool_use_offers_pending_mail_in_the_shape_the_cli_injected() {
+    assert!(!tested().is_empty(), "no CLI is tested");
+    for adapter in tested() {
+        let mut drain = Drain::registered(adapter);
+        drain.add_peer("peer");
+        let id = drain.send("peer", "hello from a peer", false);
+
+        let claimed = take(drain.hook(HookEvent::PostToolUse, "post-tool-use.json"));
+        let frames = frames_of(&claimed, &drain.bodies);
+        let stdout = drain.deliver(&claimed);
+
+        let out: Value = serde_json::from_str(&stdout).unwrap();
+        assert_eq!(
+            out,
+            accepted(adapter, "accepted-post-tool-use.json", &frames)
+        );
+        assert!(frames.contains("| hello from a peer"));
+        assert!(matches!(drain.state_of(&id), MessageState::Offered { .. }));
+    }
+}
+
+#[test]
+fn a_recorded_stop_blocks_with_wake_mail_and_passes_without_it() {
+    for adapter in tested() {
+        let mut drain = Drain::registered(adapter);
+        drain.add_peer("peer");
+        drain.send("peer", "wake up", true);
+
+        let claimed = take(drain.hook(HookEvent::Stop, "stop.json"));
+        let frames = frames_of(&claimed, &drain.bodies);
+        let stdout = drain.deliver(&claimed);
+        let out: Value = serde_json::from_str(&stdout).unwrap();
+        assert_eq!(out, accepted(adapter, "accepted-stop.json", &frames));
+        assert_eq!(drain.stop_blocks(), 1);
+
+        let plain = drain.send("peer", "read me later", false);
+        assert_eq!(
+            drain.hook(HookEvent::Stop, "stop-continued.json"),
+            quiet(QuietReason::NothingEligible)
+        );
+        assert_eq!(drain.state_of(&plain), MessageState::Recorded);
+        assert_eq!(drain.stop_blocks(), 0, "a Stop that passes ends the run");
+        let next = take(drain.hook(HookEvent::PostToolUse, "post-tool-use.json"));
+        assert_eq!(next.items[0].id, plain);
+    }
+}
+
+#[test]
+fn inputs_that_cannot_be_a_head_event_are_quiet_and_change_nothing() {
+    for adapter in tested() {
+        let mut drain = Drain::registered(adapter);
+        drain.add_peer("peer");
+        drain.send("peer", "pending", false);
+        let before = drain.state.clone();
+
+        for vector in vectors(adapter, "parse") {
+            let Some(reason) = vector["expect"]["unparsed"].as_str() else {
+                continue;
+            };
+            let expected = match reason {
+                "malformed" => QuietReason::Malformed,
+                _ => QuietReason::EventMismatch,
+            };
+            let event = common::event(&vector["event"]);
+            let begun = drain.hook_bytes(event, &vector_input(adapter, &vector));
+            assert_eq!(begun, quiet(expected), "{}", vector["name"]);
+            assert_eq!(drain.state, before, "{} changed the state", vector["name"]);
+        }
+
+        drain.head.record.start_time = None;
+        let begun = drain.hook(HookEvent::PostToolUse, "post-tool-use.json");
+        assert_eq!(begun, quiet(QuietReason::HeadUnknown));
+        assert_eq!(drain.state, before);
+    }
+}
+
+#[test]
+fn a_subagent_event_takes_nothing_and_the_head_gets_the_mail_next() {
+    for adapter in tested() {
+        let mut drain = Drain::registered(adapter);
+        drain.add_peer("peer");
+        let id = drain.send("peer", "for the head only", false);
+        let before = drain.state.clone();
+
+        let mut subordinate =
+            vec![serde_json::to_vec(&fixture(adapter, "post-tool-use-subagent.json")).unwrap()];
+        for vector in vectors(adapter, "parse") {
+            if vector["name"].as_str().unwrap().starts_with("agent-") {
+                subordinate.push(vector_input(adapter, &vector));
+            }
+        }
+        for stdin in &subordinate {
+            let begun = drain.hook_bytes(HookEvent::PostToolUse, stdin);
+            assert_eq!(begun, quiet(QuietReason::Subordinate));
+            assert_eq!(drain.state, before);
+        }
+
+        let claimed = take(drain.hook(HookEvent::PostToolUse, "post-tool-use.json"));
+        assert_eq!(claimed.items.len(), 1);
+        assert_eq!(claimed.items[0].id, id);
+    }
+}
+
+#[test]
+fn the_first_hook_registers_the_head_at_generation_one() {
+    for adapter in tested() {
+        let drain = Drain::registered(adapter);
+        let binding = drain.state.binding(&drain.writer).unwrap();
+        assert_eq!(binding.generation, Generation::FIRST);
+        assert_eq!(
+            binding.name.as_str(),
+            format!("{PROJECT}-{}-2b", adapter.word())
+        );
+    }
+}
+
+#[test]
+fn a_stored_dead_head_is_replaced_and_its_old_mail_never_offered() {
+    for adapter in tested() {
+        let mut drain = Drain::new(adapter);
+        let dead = Sleeper::start();
+        drain.head.record = dead.record();
+        assert_eq!(
+            drain.hook(HookEvent::PostToolUse, "post-tool-use.json"),
+            quiet(QuietReason::NothingEligible)
+        );
+        drain.add_peer("peer");
+        let old = drain.send("peer", "for the dead process", false);
+        dead.end();
+
+        drain.head.record = own_record();
+        assert_eq!(
+            drain.hook(HookEvent::PostToolUse, "post-tool-use.json"),
+            quiet(QuietReason::NothingEligible)
+        );
+        let binding = drain.state.binding(&drain.writer).unwrap();
+        assert_eq!(binding.generation, Generation::FIRST.next().unwrap());
+        assert_eq!(drain.state_of(&old), MessageState::Recorded);
+    }
+}
+
+#[test]
+fn a_different_live_head_holding_the_key_is_not_drained_and_nothing_changes() {
+    for adapter in tested() {
+        let mut drain = Drain::new(adapter);
+        let live = Sleeper::start();
+        drain.head.record = live.record();
+        drain.hook(HookEvent::PostToolUse, "post-tool-use.json");
+        drain.add_peer("peer");
+        drain.send("peer", "for the live holder", false);
+        let before = drain.state.clone();
+
+        drain.head.record = own_record();
+        assert_eq!(
+            drain.hook(HookEvent::PostToolUse, "post-tool-use.json"),
+            quiet(QuietReason::Registration(RegisterRefusal::Conflict))
+        );
+        assert_eq!(drain.state, before);
+        live.end();
+    }
+}
+
+#[test]
+fn a_same_head_hook_with_no_mail_changes_nothing() {
+    for adapter in tested() {
+        let mut drain = Drain::registered(adapter);
+        let before = drain.state.clone();
+        for (event, file) in [
+            (HookEvent::PostToolUse, "post-tool-use.json"),
+            (HookEvent::Stop, "stop.json"),
+            (HookEvent::Stop, "stop-continued.json"),
+        ] {
+            assert_eq!(drain.hook(event, file), quiet(QuietReason::NothingEligible));
+            assert_eq!(drain.state, before, "{file} wrote on the no-mail path");
+        }
+    }
+}
+
+#[test]
+fn stop_blocks_at_most_the_configured_times_in_a_row_counting_only_finished_blocks() {
+    let max = hook_limits().stop_block.max;
+    for adapter in tested() {
+        let mut drain = Drain::registered(adapter);
+        let mut senders = 0;
+        let mut wake_from_a_new_sender = |drain: &mut Drain| {
+            senders += 1;
+            let peer = format!("peer-{senders}");
+            drain.add_peer(&peer);
+            drain.send(&peer, "wake up", true)
+        };
+
+        for done in 1..=max {
+            wake_from_a_new_sender(&mut drain);
+            let claimed = take(drain.hook(HookEvent::Stop, "stop-continued.json"));
+            drain.deliver(&claimed);
+            assert_eq!(drain.stop_blocks(), done);
+        }
+        let held = wake_from_a_new_sender(&mut drain);
+        assert_eq!(
+            drain.hook(HookEvent::Stop, "stop-continued.json"),
+            quiet(QuietReason::StopBlockCap)
+        );
+        assert_eq!(drain.state_of(&held), MessageState::Recorded);
+        assert_eq!(drain.stop_blocks(), 0);
+
+        // Claimed but never finished: the shell's write failed.
+        let unfinished = take(drain.hook(HookEvent::Stop, "stop-continued.json"));
+        assert_eq!(unfinished.items[0].id, held);
+        assert_eq!(drain.stop_blocks(), 0, "only finished blocks count");
+
+        // A count left over from an interrupted turn is reset by the turn's
+        // first Stop.
+        let mut drain = Drain::registered(adapter);
+        for _ in 0..max {
+            wake_from_a_new_sender(&mut drain);
+            let claimed = take(drain.hook(HookEvent::Stop, "stop-continued.json"));
+            drain.deliver(&claimed);
+        }
+        wake_from_a_new_sender(&mut drain);
+        let claimed = take(drain.hook(HookEvent::Stop, "stop.json"));
+        drain.deliver(&claimed);
+        assert_eq!(drain.stop_blocks(), 1);
+    }
+}
+
+#[test]
+fn a_missing_body_is_framed_honestly_and_the_rest_of_the_claim_is_delivered() {
+    for adapter in tested() {
+        let mut drain = Drain::registered(adapter);
+        drain.add_peer("peer");
+        let kept = drain.send("peer", "this one is readable", false);
+        let lost = drain.send("peer", "this one is lost", false);
+        drain.bodies.remove(&lost);
+
+        let claimed = take(drain.hook(HookEvent::PostToolUse, "post-tool-use.json"));
+        assert_eq!(claimed.items.len(), 2);
+        let stdout = drain.deliver(&claimed);
+
+        assert!(stdout.contains("| this one is readable"));
+        assert!(stdout.contains("The text of this message could not be read"));
+        assert!(!stdout.contains("this one is lost"));
+        for id in [kept, lost] {
+            assert!(matches!(drain.state_of(&id), MessageState::Offered { .. }));
+        }
+    }
+}
+
+#[test]
+fn the_writer_key_the_hook_derives_equals_the_one_its_tool_sees() {
+    for adapter in tested() {
+        let env = fixture(adapter, "env.json");
+        let tool = env["toolIdVars"].clone();
+        let lookup = |name: &str| tool[name].as_str().map(String::from);
+        let from_tool = fgos_session_identity::env_identity(&lookup, None).unwrap();
+        let from_hook = writer_from_env(adapter, "post-tool-use.json");
+        assert_eq!(from_tool.id.to_string(), from_hook.as_str());
+        let payload = fixture(adapter, "post-tool-use.json");
+        assert_eq!(payload["session_id"].as_str(), Some(from_hook.as_str()));
+    }
+}
+
+#[test]
+fn a_cli_that_is_not_tested_is_never_drained() {
+    for adapter in ADAPTERS.into_iter().filter(|a| !a.is_tested()) {
+        let mut drain = Drain {
+            writer: WriterKey::new(format!("{}-head", adapter.word())).unwrap(),
+            ..Drain::new(Adapter::Claude)
+        };
+        drain.adapter = adapter;
+        for vector in vectors(adapter, "parse") {
+            if vector["expect"]["unparsed"].is_string() {
+                continue;
+            }
+            let event = common::event(&vector["event"]);
+            let begun = drain.hook_bytes(event, &vector_input(adapter, &vector));
+            let subordinate = vector["expect"]["subordinate"] == true;
+            let expected = if subordinate {
+                QuietReason::Subordinate
+            } else {
+                QuietReason::Untested
+            };
+            assert_eq!(
+                begun,
+                quiet(expected),
+                "{} {}",
+                adapter.word(),
+                vector["name"]
+            );
+            assert_eq!(drain.state, MailboxState::new());
+        }
+    }
+}

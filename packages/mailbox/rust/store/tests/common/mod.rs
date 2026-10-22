@@ -62,3 +62,13 @@ pub fn vector_input(adapter: Adapter, vector: &Value) -> Vec<u8> {
         bytes
     }
 }
+
+/// The core's limits as the contract states them.
+pub fn limits() -> fgos_mailbox_core::Limits {
+    serde_json::from_value(support::config_section(&support::limits_contract())).unwrap()
+}
+
+/// The hook's limits as the contract states them.
+pub fn hook_limits() -> fgos_mailbox::hook::HookLimits {
+    serde_json::from_value(support::config_section(&support::limits_contract())).unwrap()
+}

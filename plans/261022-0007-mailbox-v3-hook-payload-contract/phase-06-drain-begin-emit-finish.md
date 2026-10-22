@@ -139,6 +139,15 @@ Each per-CLI case is one loop over the three CLIs' vectors, not three copies. Ea
 - **Rendering.** Every claimed item is rendered through the core's single `render(item, body: Option<&str>, limits)` (phase 3 deviation): `bodies(&item.id)` is passed as is, and `None` gives the body-missing frame. There is no `render_message`, `render_notice` or `render_message_body_missing`.
 - **Shared accounts.** The core now writes the shared senders as `~unregistered` and `~unresolved`, outside the writer-key alphabet; the drain needs no change for it.
 
+## Deviations and results (implementation lead, 2026-10-22, at phase 6)
+
+- **`render_reply(claimed, bodies, limits)`** takes no adapter or event: `begin` puts the recorded output shape into `Claimed`, so a claim can only exist for a CLI with a proven shape, and the shell cannot pair a claim with the wrong output.
+- **`QuietReason::Untested`** is new: a CLI not listed under `testedAgainst` in `adapters.v1.json`, or with no recorded shape for the event, is quiet before registration and changes nothing (plan owner decisions 2 and 3). Its owning test is `a_cli_that_is_not_tested_is_never_drained`: every Codex and agy vector is quiet (`Untested`, or `Subordinate` for agy) with the snapshot untouched.
+- **Codex-only cases deferred.** `the_codex_thread_handle_is_taken_only_when_it_is_the_writer` and the Codex half of the key-equality test need a drained Codex and its recorded env; they wait for the Codex recording. `begin` therefore does not read `payload.thread` yet; decision 13's rule lands with the Codex drain, together with its test.
+- **No drain vectors.** The suite reads the recorded fixtures by name; every recorded payload already has a parse vector. agy's `env.json` (no id variable reaches its hook or tool processes) is evidence for V7's key derivation and is read by no test.
+- **Writer key** for Claude comes from the recorded hook environment through `env_identity`; the agy pid-shaped key was not needed because agy is not drained.
+- **Result.** `tests/hook_payloads.rs`: 12 passed.
+
 ## Plan owner decisions (2026-10-22, after phase 3; plan owner (agent))
 
 1. **M4, one binding per head.** A second key from the same head replaces the old binding like a dead-head takeover: a new generation, its own name, `stop_blocks` 0, and mail queued for the old key is never shown to the new context. Implemented in phase 5 with its owning test.
