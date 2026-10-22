@@ -674,23 +674,18 @@
       "sourceUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "rationale": "Source: docs/io-contract.md:24-34#unheaded-block-5 (current lines); unit SHA256 d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:83-93#unheaded-block-10 (current lines); unit SHA256 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec Session Identity\" (platform/session-identity/spec.md) → \"spec Session Identity\" (../../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/io-contract.md#unheaded-block-5 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều vào — verb + danh tính\", target context \"CLI I/O Contract / 2. Input Direction Verb And Identity / Writer Source Trust Levels\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/io-contract.md:24-34#unheaded-block-5 (current lines); unit SHA256 d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:83-93#unheaded-block-10 (current lines); unit SHA256 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec Session Identity\" (platform/session-identity/spec.md) → \"spec Session Identity\" (../../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/io-contract.md#unheaded-block-5 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều vào — verb + danh tính\", target context \"CLI I/O Contract / 2. Input Direction Verb And Identity / Writer Source Trust Levels\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. L12-112 authorized continuation: merge 66b637a10 renames the local-writer spec path and Rust crate. The complete prior passage becomes the uniquely matching current passage after only session-identity/spec.md -> identity/spec.md and fgos-session-identity -> fgos-identity. Both unchanged embedded extractors confirm full content, heading ancestry and immediate neighbours; target unheaded-block-10 SHA256 f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2. Earlier current-target/link statements describe the retained prior witness, not the current binding. Source identity and historical residual unchanged; no approval carry; independent review pending. Exact old/new passages and neighbours: step-07-l12-112-out-of-scope-binding.json.",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-10",
-      "reviewNote": "deep: io-contract unheaded-block-5 L24-34 to cli-io-contract unheaded-block-10 L83-93; rationale source and target ranges, digests, differ statement, link count 1/1 and resolved destinations (both docs/platform/session-identity/spec.md) all reproduce; after applying the one link rebase the two units are byte equal, so nothing is lost or added; last reviewed digest 8aa84914 at 345f15d95 equals the shard row there",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-04-62751458b.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be",
+      "reviewNote": "L12-112 authorized continuation: content-and-neighbour identity rename rebind; independent review pending, no approval carry.",
+      "targetUnitDigest": "f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2",
       "targetAncestry": [
         "CLI I/O Contract",
         "2. Input Direction Verb And Identity",
         "Writer Source Trust Levels"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      ]
     },
     {
       "claimId": "claim_a14f9308d3f04e10e670c6f178d4ee33",
@@ -825,21 +820,16 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/io-contract.md",
       "targetAnchor": "unheaded-block-5",
-      "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
-      "reviewStatus": "reviewed",
+      "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry. L12-112 authorized continuation: merge 66b637a10 renames the local-writer spec path and Rust crate. The complete prior passage becomes the uniquely matching current passage after only session-identity/spec.md -> identity/spec.md and fgos-session-identity -> fgos-identity. Both unchanged embedded extractors confirm full content, heading ancestry and immediate neighbours; target unheaded-block-5 SHA256 9f77932759044d8262649ccec0ae84a8f707efefe51b300ddeb68cec32dc6b5b. Earlier current-target/link statements describe the retained prior witness, not the current binding. Source identity and historical residual unchanged; no approval carry; independent review pending. Exact old/new passages and neighbours: step-07-l12-112-out-of-scope-binding.json.",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-      "reviewNote": "deep: partial-carry gap, historical docs/io-contract.md unheaded-block-5 L24-31 at 2300d6557 (8 lines) against successor L24-34 (11 lines); my own ordered line subsequence leaves exactly 3 residual lines whose sha256 b276baca equals the remainder and the residual file, the digest fa53d50b recomputes at 2300d6557 and d3828696 at HEAD (hand recompute of the historical unit also equal, seed 20261016); rationale tells the truth that historical lines changed and the residual is kept verbatim; stale pending-review tail is the frozen L10-28 tail",
+      "reviewNote": "L12-112 authorized continuation: content-and-neighbour identity rename rebind; independent review pending, no approval carry.",
       "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_f5365b8e40fb58c75adc56a574263242, residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957. Source fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9; primary target d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-01-62751458b.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
+      "targetUnitDigest": "9f77932759044d8262649ccec0ae84a8f707efefe51b300ddeb68cec32dc6b5b",
       "targetAncestry": [
         "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
         "Chiều vào — verb + danh tính"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      ]
     }
   ],
   "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
