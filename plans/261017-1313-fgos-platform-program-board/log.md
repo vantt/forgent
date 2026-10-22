@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 07:58 (GIT/ES điều phối): bench E3 chấm push theo trạng thái ổ (main 4428f2a90); với luật owner chọn, **mọi hàng E3 đều đạt** ([kiểm chứng](../reports/verification-261022-0005-git-e3-clean-rerun.md)). Owner có thể đổi CPU về powersave.
+
 - 2026-10-22 07:55 (GIT/ES điều phối): E3 push: nguyên nhân là fsync NVMe hai mức (5,2 / 7,5 ms), không phải code; owner chọn chấm theo trạng thái ổ (bench đang sửa). Nhận H16 (dòng doctor `git-fence-missing` trước khi T1 xoá `lock-fences`; lead đang làm) và giao H18 lại cho HARDEN (dời hàm cạnh migrate.mjs trong commit xoá fence, GIT duyệt).
 
 - 2026-10-22 07:52 (phiên `forgent-a8`, HARDEN ↔ GIT/ES): GIT nhận H16 (row doctor thay `git-fence-missing`, dựng từ `git_gate.rs`); **HARDEN không xoá `lock-fences` cho tới khi GIT báo row đã lên main.** H18: HARDEN tự chuyển `checkStopped`/`workspaceListing` sang cạnh `src/verbs/events/migrate.mjs` trong commit xoá fence; GIT/ES review diff file đó trước khi land.
