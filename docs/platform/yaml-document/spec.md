@@ -5,11 +5,11 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for reading, editing and merging YAML text while keeping every byte a caller did not change, comments included
 Design status: Signed by the owner on 2026-10-22 as a whole; amendments go through "Lịch sử quyết định"
-Implementation status: Not started
+Implementation status: Rust crate done (parse, both profiles, limits, edits, comments, merge, fuzzed; parser `saphyr-parser` 0.2.2 vendored, record in packages/yaml-doc/upgrade-record.md); Rust consumers moved off serde_yaml; Node door (section 10) not started
 Canonical: Yes
 Owner: YAML Document component (proposed)
-Source (planned): packages/yaml-doc/rust (crate fgos-yaml-doc)
-Contracts (planned): packages/yaml-doc/contracts/
+Source: packages/yaml-doc/rust (crate fgos-yaml-doc)
+Contracts: packages/yaml-doc/contracts/
 Last reviewed: 2026-10-22
 Related:
 - docs/platform/config/spec.md (the one component above this one that applies a schema)
