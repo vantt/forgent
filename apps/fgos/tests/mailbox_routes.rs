@@ -680,8 +680,9 @@ fn codex_like(dir: &Path) -> PathBuf {
     bin
 }
 
-/// The Codex hook through `codex_like` with `home` (or none).
-fn codex_hook(scene: &Scene, home: Option<&Path>) -> Output {
+/// The Codex hook through `codex_like` with `home` (or none), and a
+/// `CLAUDE_PROJECT_DIR` its environment may carry.
+fn codex_hook(scene: &Scene, home: Option<&Path>, claude_project_dir: Option<&Path>) -> Output {
     let mut payload: serde_json::Value = serde_json::from_slice(
         &fs::read(
             repo_root().join("packages/mailbox/contracts/fixtures/hooks/codex/post-tool-use.json"),
@@ -711,6 +712,9 @@ fn codex_hook(scene: &Scene, home: Option<&Path>) -> Output {
     if let Some(home) = home {
         command.env("HOME", home);
     }
+    if let Some(dir) = claude_project_dir {
+        command.env("CLAUDE_PROJECT_DIR", dir);
+    }
     let mut child = command.spawn().unwrap();
     child
         .stdin
@@ -724,7 +728,7 @@ fn codex_hook(scene: &Scene, home: Option<&Path>) -> Output {
 #[test]
 fn a_codex_hook_registers_from_its_payload_only_when_home_is_set() {
     let scene = Scene::new("codex-home");
-    let out = codex_hook(&scene, None);
+    let out = codex_hook(&scene, None, None);
     assert_eq!(out.status.code(), Some(0));
     assert!(out.stdout.is_empty() && out.stderr.is_empty(), "{out:?}");
     assert!(
@@ -733,11 +737,49 @@ fn a_codex_hook_registers_from_its_payload_only_when_home_is_set() {
     );
     assert!(!scene.main().join(".local").exists());
 
-    let out = codex_hook(&scene, Some(&scene.home()));
+    // A Claude Code variable a Codex session inherited never picks the record.
+    git(
+        &scene.root,
+        &["init", "-q", "--initial-branch=trunk", "other"],
+    );
+    fs::create_dir_all(scene.root.join("other/.fgos")).unwrap();
+    let out = codex_hook(&scene, Some(&scene.home()), Some(&scene.root.join("other")));
     assert_eq!(out.status.code(), Some(0), "{out:?}");
+    assert!(
+        !scene.root.join("other/.fgos/runtime").exists(),
+        "CLAUDE_PROJECT_DIR is read for Claude Code only"
+    );
     assert!(
         scene.head_name().starts_with("main-codex"),
         "{}",
         scene.head_name()
     );
+}
+
+#[test]
+fn a_hook_payload_over_the_read_cap_leaves_its_reason_in_the_hook_outcome_file() {
+    let scene = Scene::new("outcome");
+    // The file goes only into a mailbox directory that exists: the head's
+    // first call registers it.
+    let out = scene.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    assert!(
+        !scene.mailbox_dir().join("hook-outcome.json").exists(),
+        "a benign call writes no outcome"
+    );
+    fs::write(
+        scene.main().join(".fgos/config.json"),
+        r#"{"mailbox":{"hook":{"maxReadBytes":16}}}"#,
+    )
+    .unwrap();
+    let out = scene.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    assert!(out.stdout.is_empty(), "{out:?}");
+    let line: serde_json::Value = serde_json::from_slice(
+        &fs::read(scene.mailbox_dir().join("hook-outcome.json"))
+            .expect("the entry recorded the skipped drain"),
+    )
+    .unwrap();
+    assert_eq!(line["reason"], "over-read-cap");
+    assert_eq!(line["cli"], "claude");
 }

@@ -1,24 +1,28 @@
 //! `fgos hook mailbox --cli <claude|codex> --event <stop|post-tool-use>`:
 //! the mailbox's checkpoint, served natively before the composition root
 //! (the route table's `native_kinds` of `hook`). A thin, straight-line
-//! wiring of the store's hook shell to the real process: no logic, no log
-//! line, and exit 0 on every path, a usage error included (spec §6.1, §8
+//! wiring of the store's hook shell to the real process: no logic, and
+//! exit 0 on every path, a usage error and a panic included (spec §6.1, §8
 //! item 7: exit 2 from a `Stop` hook blocks the stop in Claude Code), with
-//! nothing on stdout or stderr unless frames are delivered.
+//! nothing on stdout or stderr unless frames are delivered. A call that
+//! skipped or failed its drain leaves its reason in the hook outcome file
+//! (`hook::outcome_log`).
 //!
 //! Order: HOME present (else quiet: no reader of the CLI's own state, and
 //! the Git component's state root would resolve relative to the cwd,
 //! `tsk-43x4`); the flags; the record directory from the disk-only main
-//! checkout read; the project config and the limits; the budget watchdog;
+//! checkout read (from `CLAUDE_PROJECT_DIR` for Claude Code only); the project config and the limits; the budget watchdog;
 //! then the shell, which reads the breaker before stdin, opens the record
 //! only after the caller check, and takes the mailbox lock with nothing
 //! else held: this process holds no other `LockScope` at any point.
 use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::ancestry::ancestry_of;
+use fgos_mailbox::hook::outcome_log;
 use fgos_mailbox::hook::resolve::{resolver_for, HookEnv};
 use fgos_mailbox::hook::shell::{self, ShellInput, WriteGate};
 use fgos_mailbox::hook::{Adapter, HookEvent};
 use fgos_mailbox::limits::{load, read_project_config};
+use fgos_mailbox::record::Paths;
 use fgos_mailbox_core::Timestamp;
 use std::ffi::OsString;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -26,7 +30,8 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 /// Runs one hook call and ends the process with status 0.
 pub fn main(args: &[OsString]) -> ! {
     shell::silence_panics();
-    run(args);
+    // A panic anywhere on this path still ends the call with status 0.
+    let _ = std::panic::catch_unwind(|| run(args));
     std::process::exit(0)
 }
 
@@ -70,10 +75,13 @@ fn run(args: &[OsString]) {
     let Ok(cwd) = std::env::current_dir() else {
         return;
     };
-    let Ok(fgos_dir) = super::mailbox_root::mailbox_fgos_dir(
-        std::env::var_os("CLAUDE_PROJECT_DIR").as_deref(),
-        &cwd,
-    ) else {
+    // Only Claude Code sets the variable; a Codex session that inherited
+    // one from its shell must not reach another project's record.
+    let project_dir = match adapter {
+        Adapter::Claude => std::env::var_os("CLAUDE_PROJECT_DIR"),
+        Adapter::Codex | Adapter::Agy => None,
+    };
+    let Ok(fgos_dir) = super::mailbox_root::mailbox_fgos_dir(project_dir.as_deref(), &cwd) else {
         return;
     };
     let Ok(defaults) = load(None) else {
@@ -115,9 +123,10 @@ fn run(args: &[OsString]) {
         resolve: &resolve,
         gate,
     };
-    shell::run(
+    let outcome = shell::run(
         input,
         &mut std::io::stdin().lock(),
         &mut std::io::stdout().lock(),
     );
+    outcome_log::record(&Paths::new(&fgos_dir), adapter, event, &outcome, now());
 }
