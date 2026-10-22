@@ -394,34 +394,82 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
     wal.append(&release, Phase::PinReleased).map_err(failure)?;
     Ok(())
 }
-/// Releases the pin of every finished chain of one operation family beyond the
-/// `RECENT_TERMINAL` most recently changed (at most `COMPACT_PER_PASS`, oldest
-/// first), then compacts it, under the
-/// caller's live `worktree-admin` scope. An older chain that stopped between
-/// its outcome and its pin release is finished here. A chain that cannot be
-/// finished stays retained for the next pass, and its cause is returned.
+/// Finishes compaction under the caller's live `worktree-admin` scope, with
+/// at most `COMPACT_PER_PASS` successes and twice as many attempts per pass.
+/// First, deletions an earlier pass was interrupted in (ledger installed,
+/// records left) are resumed. Then every finished chain of one operation
+/// family (`eligible`) beyond the `RECENT_TERMINAL` most recently changed has
+/// its pin released and is compacted, oldest first by the time its first record
+/// was installed. An older chain that stopped between its outcome and its pin
+/// release is finished here. A chain that cannot be finished stays retained, is
+/// skipped, and its cause is returned: it never blocks the chains behind it.
 /// Unresolved chains are never touched.
 pub(crate) fn compact_finished<F: wal::FileSystem>(
     driver: &GitDriver,
     repo: &RepoHandle,
     scope: &LockScope<'_>,
     wal: &Wal<F>,
-    family: fn(&OperationKind) -> bool,
+    eligible: impl Fn(&wal::Chain) -> bool,
 ) -> Vec<String> {
+    let reader = crate::driver::WalReader { driver, repo };
     let mut warnings = vec![];
+    let (mut done, mut attempts) = (0, 0);
+    let budget = |done: usize, attempts: usize| {
+        done < wal::COMPACT_PER_PASS && attempts < 2 * wal::COMPACT_PER_PASS
+    };
+    let mut ids = std::collections::BTreeSet::new();
+    let interrupted: Vec<String> = match wal.scan(100_000) {
+        // An id listed in both the operations and the ledger directory is a deletion cut short.
+        Ok(scan) => scan
+            .entries
+            .into_iter()
+            .filter(|e| !ids.insert(e.operation_id.clone()))
+            .map(|e| e.operation_id)
+            .collect(),
+        Err(e) => return vec![format!("compaction-deferred: {e}")],
+    };
+    for id in interrupted {
+        if !budget(done, attempts) {
+            return warnings;
+        }
+        attempts += 1;
+        let result = wal.inspect(&id).map_err(failure).and_then(|chain| {
+            let authority = Authority {
+                scope,
+                binding: chain.intent().authority_binding.clone(),
+            };
+            wal.resume_compaction(&id, &reader, chain.intent(), &authority)
+                .map_err(failure)
+        });
+        match result {
+            Ok(()) => done += 1,
+            Err(e) => warnings.push(format!("compaction-deferred: {id}: {}", e.cause)),
+        }
+    }
     let chains = match wal.retained(100_000) {
         Ok(chains) => chains,
-        Err(e) => return vec![format!("compaction-deferred: {e}")],
+        Err(e) => {
+            warnings.push(format!("compaction-deferred: {e}"));
+            return warnings;
+        }
     };
     let mut finished: Vec<_> = chains
         .into_iter()
-        .filter(|c| c.outcome().is_some() && family(&c.intent().kind))
+        .filter(|c| c.outcome().is_some() && eligible(c))
         .map(|c| (wal.last_change(&c.last().operation_id), c))
         .collect();
     finished.sort_by_key(|(changed, _)| std::cmp::Reverse(*changed));
-    // Newest first above, so the eligible tail reversed is oldest first.
-    let eligible = finished.into_iter().skip(wal::RECENT_TERMINAL).rev().take(wal::COMPACT_PER_PASS);
-    for (_, chain) in eligible {
+    let mut older: Vec<_> = finished
+        .into_iter()
+        .skip(wal::RECENT_TERMINAL)
+        .map(|(_, c)| (wal.first_change(&c.last().operation_id), c))
+        .collect();
+    older.sort_by(|a, b| (a.0, &a.1.last().operation_id).cmp(&(b.0, &b.1.last().operation_id)));
+    for (_, chain) in older {
+        if !budget(done, attempts) {
+            break;
+        }
+        attempts += 1;
         let id = chain.last().operation_id.clone();
         let result = (|| {
             release_pin(driver, repo, scope.handle("worktree-admin").ok_or_else(|| failure("worktree-admin-missing"))?, wal, &chain)?;
@@ -430,11 +478,11 @@ pub(crate) fn compact_finished<F: wal::FileSystem>(
                 scope,
                 binding: released.intent().authority_binding.clone(),
             };
-            wal.compact(&released, &crate::driver::WalReader { driver, repo }, &authority)
-                .map_err(failure)
+            wal.compact(&released, &reader, &authority).map_err(failure)
         })();
-        if let Err(e) = result {
-            warnings.push(format!("compaction-deferred: {id}: {}", e.cause));
+        match result {
+            Ok(_) => done += 1,
+            Err(e) => warnings.push(format!("compaction-deferred: {id}: {}", e.cause)),
         }
     }
     warnings
@@ -988,8 +1036,8 @@ impl GitDriver {
                 )
                 .map_err(failure)?;
             release_pin(self, repo, admin, &wal, &terminal)?;
-            let warnings = compact_finished(self, repo, &scope, &wal, |k| {
-                matches!(k, OperationKind::RefUpdate { .. } | OperationKind::RefDelete)
+            let warnings = compact_finished(self, repo, &scope, &wal, |c| {
+                matches!(c.intent().kind, OperationKind::RefUpdate { .. } | OperationKind::RefDelete)
             });
             let mut done = receipt(
                 id,
