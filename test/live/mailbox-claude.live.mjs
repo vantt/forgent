@@ -155,6 +155,8 @@ function layOut(name, dry, example) {
   fs.rmSync(dir, { recursive: true, force: true });
   for (const sub of ['ws', 'bin', 'log', 'zdot', '.fgos']) fs.mkdirSync(path.join(dir, sub), { recursive: true });
   live.assertOutsideCheckout(path.join(dir, 'ws'));
+  if (dry) fs.mkdirSync(caseHome(dir), { recursive: true });
+  else live.makeClaudeHome({ home: caseHome(dir), claudeDir: CLAUDE_DIR });
   writeWrapper(dir, example);
   if (CASES.includes(name)) writeJson(path.join(dir, 'settings.json'), settingsFor(name, dir, example));
   return dir;
@@ -212,19 +214,33 @@ function settingsFor(name, dir, example) {
   return null;
 }
 
-/** The allowlisted environment of a case's CLI; a dry run's stub keeps its own HOME. */
-function caseEnv(dir, dry) {
+/** The account's real Claude Code directory, linked into every real case's HOME. */
+const CLAUDE_DIR = path.join(os.homedir(), '.claude');
+
+/** The case's HOME: for a real case, only a link to the real `~/.claude` (no
+ * shell rc file, so Claude Code's shell snapshot defines no `fgos` function);
+ * for a dry case a plain directory the stub writes its session file and
+ * transcript into. */
+function caseHome(dir) {
+  return path.join(dir, 'home');
+}
+
+/** The allowlisted environment of a case's CLI, with the case's HOME. */
+function caseEnv(dir) {
   return live.cliEnv({
     zdotdir: path.join(dir, 'zdot'),
     pathPrefix: path.join(dir, 'bin'),
-    extra: dry ? { HOME: path.join(dir, 'home') } : {},
+    extra: { HOME: caseHome(dir) },
   });
 }
 
 // ---------------------------------------------------------------- prompts
 
 const L1_TOOL1 = "type fgos > tool-fgos.txt; p=$$; for i in 1 2 3 4 5 6; do echo \"$p $(cat /proc/$p/comm)\"; p=$(cut -d' ' -f4 /proc/$p/stat); done > tool-proc.txt; env | cut -d= -f1 | sort > tool-env-names.txt; echo step1";
-const L1_TOOL2 = 'sleep 25; fgos mailbox inbox';
+/** Step 2 waits for the harness's go file with the loop Claude Code 2.1.308's
+ * own refusal of `sleep 25; …` suggests (`until <check>; do sleep 2; done`);
+ * the harness writes the file once M1 is recorded, or at once when it stops. */
+const L1_TOOL2 = 'until [ -f go.txt ]; do sleep 2; done; fgos mailbox inbox';
 
 const PROMPTS = {
   L1: `This is a test of a message hook. Do exactly these steps and nothing else.
@@ -375,8 +391,15 @@ function cmdStubClaude(argv) {
   script.tools.forEach((command, i) => {
     const id = `toolu_stub_${i}`;
     record({ type: 'assistant', message: { role: 'assistant', content: [{ type: 'tool_use', id, name: 'Bash', input: { command } }] } });
-    const ran = spawnSync('zsh', ['-c', command], { env, cwd: ws, encoding: 'utf8' });
+    // Claude Code 2.1.308 refuses a command that starts with a long sleep
+    // followed by another command, and runs the rest in a shell built from
+    // $HOME/.zshrc; the stub does the same.
+    const blocked = /^\s*sleep\s+\d+\s*[;&]/.test(command);
+    const ran = blocked
+      ? { stdout: '', stderr: `<tool_use_error>Blocked: ${command}</tool_use_error>` }
+      : spawnSync('zsh', ['-c', `[ -f "$HOME/.zshrc" ] && source "$HOME/.zshrc"; ${command}`], { env, cwd: ws, encoding: 'utf8' });
     record({ type: 'user', message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: id, content: `${ran.stdout}${ran.stderr}` }] } });
+    if (blocked) return;
     const payload = { ...fixture('post-tool-use.json'), session_id: uuid, transcript_path: transcript, cwd: ws, tool_use_id: id, tool_input: { command } };
     const outs = fire('PostToolUse', payload);
     blockFor(STUB_TURN_MS);
@@ -508,7 +531,7 @@ function readTranscript(file) {
 /** The harness's own send: from a sender with no head, through the example. */
 function harnessSend(example, dir, dry, to, body, wake) {
   // Its own empty ZDOTDIR: the model's shell may write into the case's.
-  const env = live.cliEnv({ zdotdir: path.join(dir, 'zdot-send'), extra: dry ? { HOME: path.join(dir, 'home') } : {} });
+  const env = live.cliEnv({ zdotdir: path.join(dir, 'zdot-send'), extra: { HOME: caseHome(dir) } });
   const args = ['send', '--fgos-dir', path.join(dir, '.fgos'), ...(wake ? ['--wake'] : []), '--to', to, body];
   const out = spawnSync(example, args, { env, encoding: 'utf8' });
   return { status: out.status, text: (out.stdout || '').trim(), id: /^recorded (\S+) for/.exec(out.stdout || '')?.[1] ?? null, at: Date.now() };
@@ -516,7 +539,7 @@ function harnessSend(example, dir, dry, to, body, wake) {
 
 /** Starts the CLI (or the stub); the real one only after `spawned.json` is written. */
 function startCli(name, dir, dry, uuid) {
-  const env = caseEnv(dir, dry);
+  const env = caseEnv(dir);
   const args = live.claudeArgs({ settings: path.join(dir, 'settings.json'), prompt: PROMPTS[name], sessionId: uuid });
   const version = dry ? 'stub' : semver(live.cliVersion('claude', env));
   if (!dry) {
@@ -541,16 +564,21 @@ function startCli(name, dir, dry, uuid) {
   return state;
 }
 
-function finishVersion(cli, dry) {
+function finishVersion(cli, dry, dir) {
   cli.versionAfter = dry ? 'stub' : semver(live.cliVersion('claude', cli.env));
-  return cli.versionBefore === cli.versionAfter && (dry || !versionProblem('claude', cli.versionAfter));
+  if (!dry && !live.claudeHomeIntact({ home: caseHome(dir), claudeDir: CLAUDE_DIR })) {
+    process.stderr.write(`mailbox-claude.live: ${caseHome(dir)}/.claude is no longer the link to the real directory; stop and tell the owner\n`);
+    cli.homeBroken = true;
+  }
+  return cli.versionBefore === cli.versionAfter && !cli.homeBroken && (dry || !versionProblem('claude', cli.versionAfter));
 }
 
 const check = (pass, evidence) => ({ pass, evidence });
 const notObserved = (evidence) => ({ pass: 'not-observed', evidence });
 
 async function runL1(dir, dry, example, uuid) {
-  const home = dry ? path.join(dir, 'home') : os.homedir();
+  const home = caseHome(dir);
+  const go = () => fs.writeFileSync(path.join(dir, 'ws', 'go.txt'), 'go\n');
   const mid = `MBX-MID-${nonce()}`;
   const stop = `MBX-STOP-${nonce()}`;
   const cli = startCli('L1', dir, dry, uuid);
@@ -566,11 +594,14 @@ async function runL1(dir, dry, example, uuid) {
   if (registration && wrapperReached) {
     const name = bindingOf(snapshot(dir), uuid)?.name;
     m1 = harnessSend(example, dir, dry, name, `Please include the token ${mid} in your final answer. No reply is needed.`, false);
+    go();
     m1Claim = await waitFor('M1 claim', () => hookLog(dir).find((l) => l.kind === 'outcome' && l.event === 'post-tool-use' && l.claimed.includes(m1.id)), cli);
     if (m1Claim) m2 = harnessSend(example, dir, dry, name, `Please include the token ${stop} in your final answer. No reply is needed.`, true);
   }
+  // Never leave step 2 waiting on a case that stopped early.
+  if (!fs.existsSync(path.join(dir, 'ws', 'go.txt'))) go();
   await cli.done;
-  const versionsOk = finishVersion(cli, dry);
+  const versionsOk = finishVersion(cli, dry, dir);
   const log = hookLog(dir);
   const transcript = readTranscript(findTranscript(home, uuid));
   const snap = snapshot(dir);
@@ -626,7 +657,7 @@ async function runL1(dir, dry, example, uuid) {
 }
 
 async function runL2(dir, dry, example, uuid) {
-  const home = dry ? path.join(dir, 'home') : os.homedir();
+  const home = caseHome(dir);
   const cli = startCli('L2', dir, dry, uuid);
   const registration = await waitFor('registration', () => hookLog(dir).find((l) => l.kind === 'outcome' && l.event === 'post-tool-use'), cli);
   let sent = null;
@@ -635,7 +666,7 @@ async function runL2(dir, dry, example, uuid) {
     sent = harnessSend(example, dir, dry, name, `A wake message ${`MBX-L2-${nonce()}`}. No reply is needed.`, true);
   }
   await cli.done;
-  const versionsOk = finishVersion(cli, dry);
+  const versionsOk = finishVersion(cli, dry, dir);
   const transcript = readTranscript(findTranscript(home, uuid));
   const turnEnded = transcript.assistantTexts.length > 0 && cli.status === 0;
   const stderr = fs.readFileSync(path.join(dir, 'stderr.txt'), 'utf8');
@@ -654,13 +685,13 @@ async function runL2(dir, dry, example, uuid) {
 }
 
 async function runL3(name, dir, dry, uuid) {
-  const home = dry ? path.join(dir, 'home') : os.homedir();
+  const home = caseHome(dir);
   const bound = frameBound();
   const sizes = [bound.bytes / 64, bound.bytes / 16, bound.bytes / 4, bound.bytes].map(Math.floor);
   writeJson(path.join(dir, 'ladder.json'), { sizes, bound });
   const cli = startCli(name, dir, dry, uuid);
   await cli.done;
-  const versionsOk = finishVersion(cli, dry);
+  const versionsOk = finishVersion(cli, dry, dir);
   const transcript = readTranscript(findTranscript(home, uuid));
   const injected = name === 'L3a' ? transcript.contexts : transcript.blocks;
   const label = name === 'L3a' ? 'CTX-END:' : 'STOP-END:';
@@ -715,10 +746,14 @@ async function cmdRun(name, dry, exampleArg) {
 
 // ---------------------------------------------------------------- check and report
 
+/** Whether `fgos` is the case wrapper in the shell Claude Code gives the model:
+ * Claude Code sources `$HOME/.zshrc` into its snapshot (ignoring ZDOTDIR), so
+ * the check sources the same file under the case HOME a real case gets. */
 function wrapperWins(example) {
-  const dir = layOut('wrapper-check', true, example);
-  const env = caseEnv(dir, false);
-  const out = spawnSync('zsh', ['-ic', 'whence -w fgos; whence -p fgos'], { env, cwd: path.join(dir, 'ws'), encoding: 'utf8' });
+  const dir = layOut('wrapper-check', false, example);
+  const env = caseEnv(dir);
+  const script = '[ -f "$HOME/.zshrc" ] && source "$HOME/.zshrc"; whence -w fgos; whence -p fgos';
+  const out = spawnSync('zsh', ['-c', script], { env, cwd: path.join(dir, 'ws'), encoding: 'utf8' });
   const lines = (out.stdout || '').trim().split('\n');
   const ok = lines[0] === 'fgos: command' && lines[1] === path.join(dir, 'bin', 'fgos');
   return { ok, lines };

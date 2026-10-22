@@ -1,7 +1,7 @@
 ---
 phase: 8
 title: "Live Claude Code suite"
-status: done, with failed checks reported
+status: done
 depends_on: [2, 3, 7]
 live_calls: 4
 ---
@@ -118,3 +118,12 @@ The report, backed by each case's `result.json`. The phase is done when every ca
 - A dry run's stub keeps its own `HOME` (`<case>/home`), where it writes its session file and transcript, instead of writing a fake session file into the owner's `~/.claude/sessions`; everything else is the real example, record, wrapper and log. The stub waits 3 s per model turn, the window a real model's answer gives the harness.
 - The full size `S` computed from the contracts is 896,700 bytes (the plan estimated about 820 KB).
 - The wrapper-wins check passed but did not predict Claude Code's own snapshot (finding 1 of the report); a re-run of L1 needs a changed design, which is the controller's decision.
+
+### Plan owner's decisions after the first report (2026-10-22), applied
+
+1. **L1 redesign, one re-run.** Step 2 waits with the loop Claude Code's own refusal suggests (`until [ -f go.txt ]; do sleep 2; done; fgos mailbox inbox`, the harness writes the go file); phase 9 uses the same wait. Every real case runs with an isolated `HOME` holding only a link to the real `~/.claude`, because Claude Code builds its shell snapshot from `$HOME/.zshrc` and ignores `ZDOTDIR` (read from the binary, no model call; `claude auth status` logged in under such a `HOME`). Test harness only; product frames still say `fgos`. The stub reproduces both behaviours. `check` passed, then L1 re-ran once (the first run kept as `<base>/L1-run1`) and **passed every check**.
+2. **V5 requirement:** a size bound for `PostToolUse` `additionalContext` from the limits contract (Claude Code moves 14,010 bytes or more to a file). No key at V4.
+3. **V5 requirement:** tell a tool command (`zsh` → `claude`) from a hook (`sh` → `claude`); candidates: a hook parent that is `sh` with no tty, or the stdin payload's presence and shape.
+4. The 42 `npm test` failures wait for phase 10's comparison with clean main.
+
+Recorded in spec §17 (the 2026-10-22 "V4 live suite decisions" row). Live spend after this: phase 8 5 invocations, V4 total 10.

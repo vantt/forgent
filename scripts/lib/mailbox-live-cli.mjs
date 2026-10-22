@@ -165,3 +165,26 @@ export function codexAuthState({ home, accountAuth, env }) {
   const status = spawnSync('codex', ['login', 'status'], { env: { ...env, CODEX_HOME: home }, stdio: 'ignore' });
   return { isLink, loggedIn: status.status === 0 };
 }
+
+/**
+ * A run `HOME` for Claude Code holding only a symlink `.claude` to the
+ * account's `claudeDir`: credentials, session files and transcripts stay the
+ * real ones (a refresh writes through the link into the real directory),
+ * while the owner's shell rc files are absent. Claude Code builds its Bash
+ * tool's shell snapshot from `join(os.homedir(), ".zshrc")` (or `.bashrc`,
+ * `.profile`), ignoring `ZDOTDIR`, and the owner's rc files define shell
+ * functions such as `fgos`. Claude Code writes its own `.claude.json` here.
+ */
+export function makeClaudeHome({ home, claudeDir }) {
+  fs.mkdirSync(home, { recursive: true });
+  const rc = ['.zshrc', '.bashrc', '.profile', '.zshenv', '.bash_profile'].filter((f) => fs.existsSync(path.join(home, f)));
+  if (rc.length) throw new LiveCliError(`${home} holds shell rc files: ${rc.join(', ')}`);
+  fs.symlinkSync(claudeDir, path.join(home, '.claude'));
+}
+
+/** Whether a run `HOME`'s `.claude` is still the symlink to `claudeDir`. */
+export function claudeHomeIntact({ home, claudeDir }) {
+  const link = path.join(home, '.claude');
+  const stat = fs.lstatSync(link, { throwIfNoEntry: false });
+  return Boolean(stat?.isSymbolicLink() && fs.readlinkSync(link) === claudeDir);
+}
