@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1824e334e71abc3f2b9a5465d479882a87ea41c275b31a7d167788a276bf5d17",
+  "payloadDigest": "c92a85db2946ad2cf5eb8406ab9321b61734ae5dde7612f493d48ddc9f30903e",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -539,17 +539,17 @@
     "packages/secrets/rust/tests/file_source.rs": "e429f988918a71caeb39381404febb51d076cd43f24c8b19e9c060611c92c290",
     "packages/secrets/rust/tests/no_stdin.rs": "d69c7ddeafbaabe151b3f58211ff00fdb3d6e8347b348c45c4e142a60a71fb8f",
     "packages/secrets/rust/tests/resolver.rs": "bfa7437b4749119b415a7cce89cb36321f98831aa6c4b0a3e17f0933a445e1a2",
-    "packages/terminal-control/rust/src/core.rs": "73bc299f4218f2addc8b095c71105810acd13843acf25efd7d8f9b3686ab41b4",
-    "packages/terminal-control/rust/src/driver/herdr.rs": "1fc61503c034f9e92710ccaffc40e339d1649a98d57192e2592deddd7a066738",
+    "packages/terminal-control/rust/src/core.rs": "a82b2f1e9294cb020456dc14dd23d917d3c89e4b21de82acc224ffcafa930711",
+    "packages/terminal-control/rust/src/driver/herdr.rs": "2b51ec455019f7ce9ad014dca4405b585c3a65cf96c350faa787654c644ca925",
     "packages/terminal-control/rust/src/driver/mod.rs": "b91485514211ef7863daab5fead7d4b3d79556351098eca1a4a1d3df57e61956",
-    "packages/terminal-control/rust/src/identity.rs": "ff668e3b7070fadc567a2d2331dc0316fa759471f060e5901c594a67a3e2b090",
+    "packages/terminal-control/rust/src/identity.rs": "0f70b107b04c93dd56df95a6fea23e2d58d1afb8bedb126abafa67e9af5ba6d1",
     "packages/terminal-control/rust/src/lib.rs": "f420d65492eb50bf458a3ab331d5483707ee4326db490ab440a6aab0fb9ba263",
     "packages/terminal-control/rust/src/policy/measured_split.rs": "e85e54b4b4f5ca70790a63b353baff9ea6571994574863d4d4f9632b26bf5364",
     "packages/terminal-control/rust/src/policy/mod.rs": "ca5cd13ede6082f30444181540ee1fad258af09cce183d55d52ac49235b2f067",
-    "packages/terminal-control/rust/src/port.rs": "01fc418ff83bb4d6f35029c61c88a9269b39176363b04fa4c772fa03e4025df0",
+    "packages/terminal-control/rust/src/port.rs": "66a828d4ce8f2582b0cf4a8825af6d28ff7687db625fecf5f5d3261ba73c50d6",
     "packages/terminal-control/rust/src/record.rs": "1f1273e1b1b89bc5970c7073d74145c5700272fad5803e8571474d2987a1b3a2",
     "packages/terminal-control/rust/src/route.rs": "c93a4f48c915385c13a6c52c27605de933dbae4b89aeaaa8697ca6f228af4c98",
-    "packages/terminal-control/rust/src/store.rs": "0686de9aeac86fd0dcb74c176672f85beacb48778051e7046b736c776e9f500b",
+    "packages/terminal-control/rust/src/store.rs": "b09a2d7cd0d7af2291f377d2fc998f065d788d0b0d51a38a938c00f53955fbd2",
     "packages/terminal-control/rust/tests/common/mod.rs": "e447178f1482507811f3ce01031cd585d1422c0c79800d731c0a51cf677ab05a",
     "packages/terminal-control/rust/tests/core_failures.rs": "63bdf9c0bf646ce24259f1a9e1f3ef8fac2708244ecdcca1b6d6890b930d19a3",
     "packages/terminal-control/rust/tests/core_rules.rs": "ef78be93da91ac9d01037583e19d66f69a9655fd647f00570c55e16301278466",
@@ -2293,7 +2293,7 @@
     {
       "path": "packages/run-supervisor/rust/src/terminal_slot.rs",
       "line": 49,
-      "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:230",
+      "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:246",
       "binary": "(env *)",
       "class": "configured-binary"
     },
@@ -2355,16 +2355,16 @@
     },
     {
       "path": "packages/terminal-control/rust/src/driver/herdr.rs",
-      "line": 230,
+      "line": 246,
       "spawn": "Command::new",
       "binary": "herdr",
       "class": "argv-runner",
-      "resolvedAt": "packages/terminal-control/rust/src/driver/herdr.rs:48"
+      "resolvedAt": "packages/terminal-control/rust/src/driver/herdr.rs:49"
     },
     {
       "path": "packages/terminal-control/rust/src/route.rs",
       "line": 151,
-      "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:230",
+      "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:246",
       "binary": "(parsed configuration (match envelope.get(\"herdrBin\") { None | Some(Value::Null) =>))",
       "class": "configured-binary"
     },
