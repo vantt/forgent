@@ -390,6 +390,28 @@ function stubAnswer(answer, seen) {
   return 'done';
 }
 
+/**
+ * The Node binary under the file name `codex`, for the Codex stub: the
+ * mailbox accepts a direct head only when its executable is named as the
+ * adapters contract lists (`codex`), so the stub runs under a hard link of
+ * Node with that name. It lives in the checkout's runtime scratch space
+ * (the same disk as Node, never the RAM-backed /tmp); a copy is the
+ * fallback when no link can be made.
+ */
+function codexStubBin() {
+  const bin = path.join(REPO_ROOT, '.fgos', 'runtime', 'tmp', 'mailbox-live-stub', 'codex');
+  if (!fs.existsSync(bin)) {
+    fs.mkdirSync(path.dirname(bin), { recursive: true });
+    try {
+      fs.linkSync(process.execPath, bin);
+    } catch {
+      fs.copyFileSync(process.execPath, bin);
+      fs.chmodSync(bin, 0o755);
+    }
+  }
+  return bin;
+}
+
 /** Splits a hook command written as `'path' word 'path' …` into argv. */
 function commandWords(command) {
   return [...command.matchAll(/'([^']*)'|(\S+)/g)].map((m) => m[1] ?? m[2]);
@@ -460,7 +482,7 @@ function cmdStub(kind, rawArgv) {
   const fire = (event, payload) => entries(event).map((hook) => {
     const options = { input: JSON.stringify(payload), env, cwd: ws, encoding: 'utf8', timeout: 60_000 };
     const words = commandWords(hook.command);
-    const out = codex ? spawnSync(words[0], words.slice(1), options) : spawnSync('sh', ['-c', hook.command], options);
+    const out = codex ? spawnSync(words[0], words.slice(1), options) : spawnSync('/bin/sh', ['-c', hook.command], options);
     try {
       return out.stdout ? JSON.parse(out.stdout) : null;
     } catch {
@@ -962,7 +984,7 @@ function startSession({ dir, role, dry, cli, ws, env, args, versionCli }) {
   }
   const out = fs.openSync(path.join(dir, `${role}-output.txt`), 'w');
   const err = fs.openSync(path.join(dir, `${role}-stderr.txt`), 'w');
-  const command = dry ? ['node', SCRIPT, cli === 'codex' ? 'stub-codex' : 'stub-claude', ...args] : [versionCli, ...args];
+  const command = dry ? [cli === 'codex' ? codexStubBin() : 'node', SCRIPT, cli === 'codex' ? 'stub-codex' : 'stub-claude', ...args] : [versionCli, ...args];
   const child = spawn('timeout', ['600', ...command], { cwd: ws, env, stdio: ['ignore', out, err] });
   const end = () => child.kill('SIGTERM');
   process.on('exit', end);
@@ -1029,7 +1051,7 @@ async function paneStarter(ctx) {
   ctx.panes = { group, workspace: focusedWorkspace(herdrEnv), keys: {}, herdrEnv };
   const start = async (role, { cli, args, env }) => {
     const key = `${group}-${role === 'a' ? 'minh' : 'lan'}`;
-    const bin = ctx.dry ? process.execPath : cli === 'codex' ? CODEX_BIN : CLAUDE_BIN;
+    const bin = ctx.dry ? (cli === 'codex' ? codexStubBin() : process.execPath) : cli === 'codex' ? CODEX_BIN : CLAUDE_BIN;
     const cliArgs = ctx.dry ? [SCRIPT, `stub-${cli}`, '--interactive', ...args] : args;
     const version = ctx.dry ? 'stub' : semver(live.cliVersion(bin, env));
     // A refusal throws, never exits, so the scene's `finish` still runs.
