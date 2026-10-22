@@ -1,10 +1,10 @@
-//! Session Identity: the single authority for "who is the writer of the
+//! Identity (local session writer id): the single authority for "who is the writer of the
 //! calling process, and how far can that id be trusted".
 //!
 //! The rule lives in [`resolve`]; the OS is reached only through the
 //! [`ProcessTree`] port, so the rule is tested against fake process tables
 //! and the real `/proc` adapter stays a thin driver. Contract and shared
-//! vectors: `packages/session-identity/contracts/`.
+//! vectors: `packages/identity/contracts/`.
 
 pub mod attempt;
 pub mod launcher;

@@ -1,5 +1,5 @@
 [package]
-name = "fgos-session-identity"
+name = "fgos-identity"
 version.workspace = true
 edition.workspace = true
 

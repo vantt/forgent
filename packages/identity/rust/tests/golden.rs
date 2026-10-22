@@ -1,4 +1,4 @@
-use fgos_session_identity::{
+use fgos_identity::{
     env_identity, resolve, tree_identity, ProcStat, ProcessTree, ENV_ORDER, MAX_ID_LENGTH,
     REGISTRY_FILE,
 };
@@ -7,8 +7,8 @@ use serde_json::Value;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-const GOLDEN: &str = include_str!("../../contracts/session-identity.golden.v1.json");
-const CONTRACT: &str = include_str!("../../contracts/session-identity.resolve.v1.json");
+const GOLDEN: &str = include_str!("../../contracts/identity.writer.golden.v1.json");
+const CONTRACT: &str = include_str!("../../contracts/identity.writer.v1.json");
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -57,7 +57,7 @@ fn golden() -> Golden {
 
 fn scratch_dir(name: &str) -> PathBuf {
     let dir = std::env::temp_dir().join(format!(
-        "fgos-session-identity-golden-{}-{}",
+        "fgos-identity-golden-{}-{}",
         std::process::id(),
         name.replace(|c: char| !c.is_ascii_alphanumeric(), "-")
     ));
@@ -92,7 +92,7 @@ fn registry_dir(case: &EnvCase) -> Option<PathBuf> {
 #[test]
 fn env_cases_follow_the_golden_vectors() {
     let golden = golden();
-    assert_eq!(golden.contract, "session-identity.golden.v1");
+    assert_eq!(golden.contract, "identity.writer.golden.v1");
     for case in &golden.env_cases {
         let dir = registry_dir(case);
         let env = case.env.clone();
