@@ -322,7 +322,8 @@ Mostly relevant after the project has real work items.
 | `root-drift` | No `fgw/<root>` branch is ahead of its target | `drifted root branch(es) need syncing: ... -- run fgos sync-root <root-id>` | you | `fgos sync-root <root-id>` |
 | `leaf-notify-drift` | No live session branch has post-land drift | names the branch | you | Rebase or resync the named branch |
 | `delivered-not-on-trunk` | Every handed-over item's branch is reachable from the trunk | names the item | you | Merge or catch up the named item |
-| `main-checkout-guard-warnings` | The main-checkout guard log has no recorded regressions | `1300 main checkout guard warning(s) recorded` | info | Read the log named in the message; clear only after review |
+| `event-store-refspec` | The remote has the Event Store fetch mappings and no push mapping that names `refs/fgos/*` | `event-store-refspec-missing; run setup` | tool | `fgos doctor --fix` installs the mappings |
+| `event-store-legacy-layout` | No tracked event file (`.fgos/events.jsonl`, `.fgos/events/`) is left in the main checkout | `event-store-migration-required: run fgos events migrate in the main checkout with writers stopped` | you | `fgos events migrate --check`, then `fgos events migrate`, with every writer stopped |
 | `no-stuck-merge-abort` | The main checkout has no lingering `MERGE_HEAD` | `merge in progress or stuck (MERGE_HEAD=...) -- run fgos main-checkout-reset ...` | you | `--fix` never acts here by design. Review `git status`, then `fgos main-checkout-reset --sha <sha> --confirm` |
 | `runner-coordination-orgPolicy-shape` | `runner.coordination.orgPolicy.dischargeOn` is an array of strings | `... dischargeOn must be an array of strings` | tool | `fgos doctor --fix` resets it to the default |
 | `coordination-protocol-fixtures-valid` | Coordination protocol definitions validate | `coordination protocol fixtures retired` | info | none |
