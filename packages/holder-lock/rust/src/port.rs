@@ -1137,7 +1137,6 @@ fn capture_available(pipe: &mut impl std::io::Read, bytes: &mut Vec<u8>, limit: 
     }
 }
 
-
 #[cfg(unix)]
 fn capture_chunk(pipe: &mut impl std::io::Read, bytes: &mut Vec<u8>, limit: usize, stream: &'static str) -> Result<Option<bool>, BorrowError> {
     let mut buf = [0; 8192];

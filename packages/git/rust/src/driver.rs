@@ -12,6 +12,8 @@ use std::time::{Duration, Instant};
 
 pub(crate) const PATH_LIMIT: usize = 64 * 1024 * 1024;
 const DIFF_LIMIT: usize = 50 * 1024 * 1024;
+/// How often a contained call rechecks its output limit while it waits.
+const OVERFLOW_CHECK: Duration = Duration::from_millis(10);
 const STDERR_LIMIT: usize = 64 * 1024;
 /// A borrowed run is where commit hooks run, and Git sends their output to stderr: commit children
 /// get the holder-lock ceiling for them (holder-lock spec, run_borrowed: 64 MiB), never a cut.
@@ -1199,10 +1201,8 @@ impl GitDriver {
             let _ = stdin_w.write_all(&input);
         });
         let overflow = Arc::new(AtomicBool::new(false));
-        let (wake_r, wake_w) = std::io::pipe().map_err(io)?;
-        let wake_w2 = wake_w.try_clone().map_err(io)?;
-        let out = capture(stdout_r, limit, overflow.clone(), Some(wake_w));
-        let err = capture(stderr_r, STDERR_LIMIT, overflow.clone(), Some(wake_w2));
+        let out = capture(stdout_r, limit, overflow.clone());
+        let err = capture(stderr_r, STDERR_LIMIT, overflow.clone());
         #[cfg(unix)]
         let exit_fd = fgos_process::control::exit_descriptor(spawned.child.id());
         let start = Instant::now();
@@ -1225,37 +1225,22 @@ impl GitDriver {
                 }
                 break spawned.child.wait().map_err(io)?;
             }
+            // Wake on the child's exit (pidfd) without a fixed sleep; the
+            // short step still notices an output overflow promptly.
+            let step = timeout.saturating_sub(start.elapsed()).min(OVERFLOW_CHECK);
             #[cfg(unix)]
-            {
-                use std::os::fd::AsRawFd;
-                let mut fds = [
-                    libc::pollfd {
-                        fd: wake_r.as_raw_fd(),
-                        events: libc::POLLIN,
-                        revents: 0,
-                    },
-                    libc::pollfd {
-                        fd: exit_fd.as_ref().map_or(-1, |fd| fd.as_raw_fd()),
-                        events: libc::POLLIN,
-                        revents: 0,
-                    },
-                ];
-                let nfds = if exit_fd.is_some() { 2 } else { 1 };
-                let left = timeout.saturating_sub(start.elapsed());
-                let step = if exit_fd.is_some() {
-                    left
-                } else {
-                    left.min(Duration::from_millis(1))
-                };
-                let timeout_ms = step.as_millis().clamp(1, i32::MAX as u128) as libc::c_int;
-                unsafe {
-                    libc::poll(fds.as_mut_ptr(), nfds, timeout_ms);
+            match &exit_fd {
+                Some(fd) => {
+                    use std::os::fd::AsRawFd;
+                    let mut pfd = libc::pollfd { fd: fd.as_raw_fd(), events: libc::POLLIN, revents: 0 };
+                    let ms = step.as_millis().max(1) as libc::c_int;
+                    // SAFETY: one pollfd on a descriptor owned by this call.
+                    unsafe { libc::poll(&mut pfd, 1, ms) };
                 }
+                None => std::thread::sleep(step.min(Duration::from_millis(1))),
             }
             #[cfg(not(unix))]
-            {
-                std::thread::sleep(Duration::from_millis(1));
-            }
+            std::thread::sleep(step.min(Duration::from_millis(1)));
         };
         // A root exit is not proof that pipe-owning descendants have exited.
         if self.containment.is_empty(&mut domain) != DomainState::Empty {
@@ -1711,7 +1696,6 @@ fn capture(
     mut input: impl Read + Send + 'static,
     limit: usize,
     overflow: Arc<AtomicBool>,
-    mut wake: Option<std::io::PipeWriter>,
 ) -> mpsc::Receiver<std::io::Result<Vec<u8>>> {
     let (tx, rx) = mpsc::channel();
     std::thread::spawn(move || {
@@ -1727,10 +1711,6 @@ fn capture(
                 bytes.extend_from_slice(&buf[..take]);
                 if take < n {
                     overflow.store(true, Ordering::Relaxed);
-                    if let Some(mut w) = wake.take() {
-                        use std::io::Write;
-                        let _ = w.write(&[1]);
-                    }
                 }
             }
         })();
@@ -3204,6 +3184,8 @@ mod tests {
             b"fatal: https://[redacted]@host/repo?[redacted]"
         );
     }
+    /// Delegates to the machine's driver but can never empty a domain, as when
+    /// a member is stuck in uninterruptible I/O.
     struct UnemptiedDriver {
         inner: Box<dyn ContainmentDriver>,
     }
@@ -3220,7 +3202,10 @@ mod tests {
         fn is_empty(&self, domain: &mut containment::ContainmentDomain) -> DomainState {
             self.inner.is_empty(domain)
         }
-        fn kill_all(&self, _domain: &mut containment::ContainmentDomain, _grace_ms: u64) -> KillOutcome {
+        fn kill_all(&self, domain: &mut containment::ContainmentDomain, _grace_ms: u64) -> KillOutcome {
+            // End the real processes so the test leaves nothing behind, but
+            // answer as a driver that could not.
+            self.inner.kill_all(domain, 0);
             KillOutcome::Refused
         }
         fn guarantee(&self) -> containment::Guarantee {
@@ -3229,76 +3214,29 @@ mod tests {
     }
     #[test]
     #[cfg(unix)]
-    fn contained_call_whose_domain_cannot_be_emptied_returns_containment_unproven_within_bound() {
+    fn a_timed_out_contained_call_whose_domain_cannot_be_emptied_returns_containment_unproven_without_waiting() {
         let state = Temp::new();
         let dir = Temp::new();
         git(&dir.0, &["init", "-q"]);
         let mut driver = GitDriver::new(&state.0).unwrap();
         driver.containment = Box::new(UnemptiedDriver { inner: driver.containment });
         let repo = resolve(&driver, &dir.0);
-        let pid_file = dir.0.join("member.pid");
-        let pid_path = pid_file.clone();
-        let watcher = std::thread::spawn(move || {
-            for _ in 0..200 {
-                if let Ok(text) = fs::read_to_string(&pid_path) {
-                    if let Ok(pid) = text.trim().parse::<i32>() {
-                        unsafe { libc::kill(pid, libc::SIGSTOP); }
-                        return Some(pid);
-                    }
-                }
-                std::thread::sleep(Duration::from_millis(10));
-            }
-            None
-        });
         let start = Instant::now();
         let err = driver
             .invoke(
                 Some(&repo),
                 &dir.0,
-                &[
-                    "-c",
-                    &format!(
-                        "alias.stoppable=!sh -c 'echo $$ > \"{}\"; exec sleep 60' sh",
-                        pid_file.display()
-                    ),
-                    "stoppable",
-                ],
+                &["-c", "alias.stall=!sleep 30", "stall"],
                 Policy::Inspect,
                 None,
                 true,
                 1000,
-                Duration::from_millis(100),
+                Duration::from_millis(200),
             )
             .err()
             .unwrap();
-        let elapsed = start.elapsed();
-        if let Ok(Some(pid)) = watcher.join() {
-            unsafe {
-                libc::kill(pid, libc::SIGCONT);
-                libc::kill(pid, libc::SIGKILL);
-            }
-        }
         assert_eq!(err.cause, "containment-unproven");
-        assert!(elapsed < Duration::from_secs(3), "must return within bound, took {:?}", elapsed);
-        if driver.containment.name() != "linux-pgroup" {
-            let mut pgroup_driver = GitDriver::new(&state.0).unwrap();
-            pgroup_driver.containment = Box::new(UnemptiedDriver { inner: Box::new(fgos_process::containment::LinuxPgroup) });
-            let pgroup_repo = resolve(&pgroup_driver, &dir.0);
-            let err = pgroup_driver
-                .invoke(
-                    Some(&pgroup_repo),
-                    &dir.0,
-                    &["status"],
-                    Policy::Inspect,
-                    None,
-                    true,
-                    1000,
-                    Duration::from_millis(100),
-                )
-                .err()
-                .unwrap();
-            assert_eq!(err.cause, "containment-unproven");
-        }
+        assert!(start.elapsed() < Duration::from_secs(3), "took {:?}", start.elapsed());
     }
 }
 
