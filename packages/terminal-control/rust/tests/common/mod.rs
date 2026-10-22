@@ -223,13 +223,7 @@ impl TerminalDriver for MemDriver {
     fn tab_create(&self, label: &str, cwd: Option<&str>, env: &[(String, String)]) -> DriverResult<CreatedPane> {
         let tab = self.id("t");
         let pane = self.id("p");
-        let caller_env_count = env.iter().filter(|(k, _)| k != "DISABLE_AUTO_UPDATE").count();
-        self.log.borrow_mut().push(format!(
-            "tab.create {label} cwd={} env={} pairs={:?} -> {tab}/{pane}",
-            cwd.unwrap_or("-"),
-            caller_env_count,
-            env
-        ));
+        self.log.borrow_mut().push(format!("tab.create {label} cwd={} env={} -> {tab}/{pane}", cwd.unwrap_or("-"), env.len()));
         self.tabs.borrow_mut().push((tab.clone(), label.to_string()));
         self.panes.borrow_mut().insert(pane.clone(), MemPane::new(&pane, tab.clone(), self.area, bare(900), env.to_vec()));
         Ok(CreatedPane { tab_id: tab, pane_id: pane })
@@ -251,12 +245,10 @@ impl TerminalDriver for MemDriver {
         let tab = a.tab.clone();
         drop(panes);
         let pane = self.id("p");
-        let caller_env_count = env.iter().filter(|(k, _)| k != "DISABLE_AUTO_UPDATE").count();
         self.log.borrow_mut().push(format!(
-            "pane.split {anchor} {direction:?} {ratio} cwd={} env={} pairs={:?} -> {pane}",
+            "pane.split {anchor} {direction:?} {ratio} cwd={} env={} -> {pane}",
             cwd.unwrap_or("-"),
-            caller_env_count,
-            env
+            env.len()
         ));
         self.panes.borrow_mut().insert(pane.clone(), MemPane::new(&pane, tab.clone(), new_rect, bare(901), env.to_vec()));
         Ok(CreatedPane { tab_id: tab, pane_id: pane })
