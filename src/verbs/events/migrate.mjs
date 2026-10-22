@@ -2,13 +2,12 @@
 // remain the only Git doors. Q5(a): reviewed code lands before this commit.
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
-import { eventStoreFacts } from '../../event-store/index.mjs';
+import { decodeLegacyFiles, eventStoreFacts } from '../../event-store/index.mjs';
 import { isDeepStrictEqual } from 'node:util';
 import { checkStopped } from '../../holder-lock/fences.mjs';
 import { workspaceListing } from '../../setup/holder-lock-checks.mjs';
 import { fixEventStoreLockDirs, fixEventStoreMachineId, fixEventStoreRefspec } from '../../setup/event-store-fixes.mjs';
-import { foldEvents, readAllEventsFromDir, buildSnapshotFromDir, serializeView } from '../../state/replay.mjs';
+import { foldEvents, serializeView } from '../../state/replay.mjs';
 import { parseEventLines } from '../../state/event-log.mjs';
 import { foldPortingEvents } from '../../state/porting-store.mjs';
 import { eventsContext } from './context.mjs';
@@ -25,39 +24,54 @@ function put(root, name, bytes) {
 function attributes(bytes) {
   return Buffer.from(bytes.toString('utf8').split(/(?<=\n)/).filter(line => line.trimStart().startsWith('#') || !['.fgos/events.jsonl', '.fgos/events*.jsonl', '.fgos/events/*.jsonl', '.fgos/events/**'].includes(line.trim().split(/\s+/)[0].replace(/^\//, '')) || !line.split(/\s+/).includes('merge=union')).join(''));
 }
-export function migrationParity({ inventory, events }, { baseline, cache } = {}) {
-  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-migrate-parity-'));
-  try {
-    for (const [name, bytes] of Object.entries(inventory.files)) if (name.startsWith('.fgos/')) put(scratch, name.slice(6), Buffer.from(bytes));
-    const workEvents = events.filter(e => !e.provenance.file.startsWith('porting/')).map(e => JSON.parse(e.raw));
-    const imported = foldEvents(workEvents);
-    const legacy = foldEvents(readAllEventsFromDir(scratch));
-    const differences = entityDifferences(legacy, imported).map(d => ({ source: 'legacy-fold', ...d }));
-    if (!differences.length && serializeView(legacy).viewStr !== serializeView(imported).viewStr) differences.push({ source: 'legacy-fold', collection: '$serialization' });
-    const compare = (source, value) => {
-      const expected = plainView(value);
-      const diff = entityDifferences(expected, imported);
-      differences.push(...diff.map(d => ({ source, ...d })));
-      if (!diff.length && serializeView(expected).viewStr !== serializeView(imported).viewStr) differences.push({ source, collection: '$serialization', legacy: serializeView(expected).viewStr, v4: serializeView(imported).viewStr });
-      if (value.revision && value.revision !== serializeView(imported).revision) differences.push({ source, collection: '$revision', legacy: value.revision, v4: serializeView(imported).revision });
-    };
-    if (baseline) compare('baseline', JSON.parse(fs.readFileSync(baseline, 'utf8')));
-    let cacheCompared = false;
-    if (cache && fs.existsSync(cache)) {
-      const saved = JSON.parse(fs.readFileSync(cache, 'utf8'));
-      if (isDeepStrictEqual(saved.snapshot, buildSnapshotFromDir(scratch))) { compare('previous-cache', saved); cacheCompared = true; }
-    }
-    // Porting keeps physical log order and its own reducer, independent of Work.
-    const porting = events.filter(e => e.provenance.file.startsWith('porting/'));
-    let portingCount = 0;
-    if (inventory.portingLog) {
-      const left = foldPortingEvents(parseEventLines(Buffer.from(inventory.files[inventory.portingLog]).toString('utf8'), inventory.portingLog)).porting;
-      const right = foldPortingEvents(porting.map(e => JSON.parse(e.raw))).porting;
-      portingCount = Object.keys(right).length;
-      differences.push(...entityDifferences({ porting: left }, { porting: right }).map(d => ({ source: 'porting-fold', ...d })));
-    }
-    return { equal: differences.length === 0, differences, cacheCompared, workEvents: workEvents.length, portingEntities: portingCount, revision: serializeView(imported).revision };
-  } finally { fs.rmSync(scratch, { recursive: true, force: true }); }
+// The legacy files of an inventory in the shape the crate's decoder takes: the baseline under '' and shards by name.
+function legacyFiles(inventory) {
+  return Object.fromEntries(Object.entries(inventory.files)
+    .filter(([name]) => name === '.fgos/events.jsonl' || /^\.fgos\/events\/[^/]+\.jsonl$/.test(name))
+    .map(([name, bytes]) => [name === '.fgos/events.jsonl' ? '' : path.basename(name), Buffer.from(bytes).toString('utf8')]));
+}
+// The per-file size and last line a saved view recorded for the legacy files it folded.
+export function legacyInventorySnapshot(inventory) {
+  const files = { '': { size: 0, lastLine: null } };
+  let maxTs = '';
+  for (const [name, bytes] of Object.entries(inventory)) {
+    if (name !== '.fgos/events.jsonl' && !/^\.fgos\/events\/[^/]+\.jsonl$/.test(name)) continue;
+    const raw = Buffer.from(bytes).toString('utf8');
+    const lastLine = raw.endsWith('\n') ? raw.slice(0, -1).split('\n').at(-1) || null : null;
+    files[name === '.fgos/events.jsonl' ? '' : path.basename(name)] = { size: Buffer.from(bytes).length, lastLine };
+    if (lastLine) { const ts = JSON.parse(lastLine).ts; if (typeof ts === 'string' && ts > maxTs) maxTs = ts; }
+  }
+  return { files, maxTs };
+}
+export function migrationParity({ inventory, events }, { baseline, cache, loaderOptions } = {}) {
+  const workEvents = events.filter(e => !e.provenance.file.startsWith('porting/')).map(e => JSON.parse(e.raw));
+  const imported = foldEvents(workEvents);
+  const legacy = foldEvents(decodeLegacyFiles(legacyFiles(inventory), loaderOptions).map(e => e.event));
+  const differences = entityDifferences(legacy, imported).map(d => ({ source: 'legacy-fold', ...d }));
+  if (!differences.length && serializeView(legacy).viewStr !== serializeView(imported).viewStr) differences.push({ source: 'legacy-fold', collection: '$serialization' });
+  const compare = (source, value) => {
+    const expected = plainView(value);
+    const diff = entityDifferences(expected, imported);
+    differences.push(...diff.map(d => ({ source, ...d })));
+    if (!diff.length && serializeView(expected).viewStr !== serializeView(imported).viewStr) differences.push({ source, collection: '$serialization', legacy: serializeView(expected).viewStr, v4: serializeView(imported).viewStr });
+    if (value.revision && value.revision !== serializeView(imported).revision) differences.push({ source, collection: '$revision', legacy: value.revision, v4: serializeView(imported).revision });
+  };
+  if (baseline) compare('baseline', JSON.parse(fs.readFileSync(baseline, 'utf8')));
+  let cacheCompared = false;
+  if (cache && fs.existsSync(cache)) {
+    const saved = JSON.parse(fs.readFileSync(cache, 'utf8'));
+    if (isDeepStrictEqual(saved.snapshot, legacyInventorySnapshot(inventory.files))) { compare('previous-cache', saved); cacheCompared = true; }
+  }
+  // Porting keeps physical log order and its own reducer, independent of Work.
+  const porting = events.filter(e => e.provenance.file.startsWith('porting/'));
+  let portingCount = 0;
+  if (inventory.portingLog) {
+    const left = foldPortingEvents(parseEventLines(Buffer.from(inventory.files[inventory.portingLog]).toString('utf8'), inventory.portingLog)).porting;
+    const right = foldPortingEvents(porting.map(e => JSON.parse(e.raw))).porting;
+    portingCount = Object.keys(right).length;
+    differences.push(...entityDifferences({ porting: left }, { porting: right }).map(d => ({ source: 'porting-fold', ...d })));
+  }
+  return { equal: differences.length === 0, differences, cacheCompared, workEvents: workEvents.length, portingEntities: portingCount, revision: serializeView(imported).revision };
 }
 
 export async function migrateUseCase(ctx, options = {}) {
@@ -76,7 +90,7 @@ export async function migrateUseCase(ctx, options = {}) {
     if (!check.passed) refuse('event-store-legacy-mismatch', JSON.stringify(check.problems));
     return { unchanged: true, message: 'Event Store migration already complete' };
   }
-  const parity = migrationParity(snapshot, { baseline: options.baseline && path.resolve(cwd, options.baseline), cache: path.join(cwd, '.fgos/cache/state.json') });
+  const parity = migrationParity(snapshot, { baseline: options.baseline && path.resolve(cwd, options.baseline), cache: path.join(cwd, '.fgos/cache/state.json'), loaderOptions: ctx.loaderOptions });
   if (!parity.equal) refuse('event-store-migration-parity', JSON.stringify(parity.differences), { differences: parity.differences });
   const files = Object.fromEntries(Object.entries(snapshot.inventory.files).map(([p, bytes]) => [p, Buffer.from(bytes)]));
   const deletions = Object.keys(files).filter(p => p !== '.gitattributes');

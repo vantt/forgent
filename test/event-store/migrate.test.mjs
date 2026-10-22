@@ -5,23 +5,37 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { root } from '../../scripts/git-addon.mjs';
-import { fixture, addon, loaderOptions } from './phase07-fixture.mjs';
+import { fixture, addon, loaderOptions, legacyOrderOf } from './phase07-fixture.mjs';
 import { openStore } from '../../src/event-store/index.mjs';
 import { migrationParity, migrateUseCase, importPlan, cutoverFailure } from '../../src/verbs/events/migrate.mjs';
-import { readAllEventsFromDir, foldEvents, buildSnapshotFromDir, serializeView } from '../../src/state/replay.mjs';
+import { foldEvents, serializeView } from '../../src/state/replay.mjs';
 import { checkEventStore } from '../../src/setup/event-store-checks.mjs';
 const ts = '2026-01-01T00:00:00.000Z';
 import { trackedLegacy } from './phase08-fixture.mjs';
 const snapshot = f => f.store.readLegacyFromHead({ check: true }, []);
+// What a pre-cutover writer saved beside its view: each legacy file's size and last line, and the newest timestamp.
+function savedSnapshot(dir) {
+  const files = { '': { size: 0, lastLine: null } };
+  let maxTs = '';
+  const names = [['', path.join(dir, 'events.jsonl')], ...fs.readdirSync(path.join(dir, 'events')).filter(n => n.endsWith('.jsonl')).map(n => [n, path.join(dir, 'events', n)])];
+  for (const [key, file] of names) {
+    if (!fs.existsSync(file)) continue;
+    const text = fs.readFileSync(file, 'utf8');
+    const lastLine = text.trimEnd().split('\n').at(-1) || null;
+    files[key] = { size: Buffer.byteLength(text), lastLine };
+    if (lastLine && JSON.parse(lastLine).ts > maxTs) maxTs = JSON.parse(lastLine).ts;
+  }
+  return { files, maxTs };
+}
 
 test('HEAD inventory, check-only parity, anchored cache and explicit baseline use real tracked bytes', t => {
   const f = fixture(t); const files = trackedLegacy(f);
   const before = snapshot(f);
   assert.deepEqual(Object.keys(before.inventory.files).sort(), Object.keys(files).sort());
   assert.equal(before.inventory.portingLog, 'docs/distillery/state/porting/events.jsonl');
-  const view = foldEvents(readAllEventsFromDir(path.join(f.repo, '.fgos')));
+  const view = foldEvents(legacyOrderOf(path.join(f.repo, '.fgos')));
   const baseline = path.join(f.temp, 'baseline.json'); fs.writeFileSync(baseline, JSON.stringify({ ...view, revision: serializeView(view).revision }));
-  const cache = path.join(f.temp, 'cache.json'); fs.writeFileSync(cache, JSON.stringify({ ...view, snapshot: buildSnapshotFromDir(path.join(f.repo, '.fgos')) }));
+  const cache = path.join(f.temp, 'cache.json'); fs.writeFileSync(cache, JSON.stringify({ ...view, snapshot: savedSnapshot(path.join(f.repo, '.fgos')) }));
   const parity = migrationParity(before, { baseline, cache });
   assert.equal(parity.equal, true, JSON.stringify(parity)); assert.equal(parity.cacheCompared, true); assert.equal(parity.portingEntities, 1);
   assert.equal(f.git('for-each-ref', 'refs/fgos/legacy'), '');

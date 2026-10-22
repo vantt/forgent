@@ -228,17 +228,10 @@ export function readerFindings(sources) {
   }
   return stableFindings(sites, 'retired-event');
 }
+// Each remaining site goes with the code that owns it: the doctor rows, compaction and the truncation guard
+// retire with the legacy event duties, the `repair` verb and the event-log re-exports with the removals.
 const dormantReaderFindings = {
   "bin/fgos.mjs: repairTruncatedLastLine: retired-event": 1,
-  "scripts/backfill-unit-summaries.mjs: readFileSync: retired-event": 1,
-  "scripts/measure-verify-cost.mjs: import readEvents: retired-event": 1,
-  "scripts/measure-verify-cost.mjs: readEvents: retired-event": 1,
-  "scripts/measure-verify-cost.mjs: readFileSync: retired-event": 1,
-  "scripts/migration-proof-2a.mjs: readFileSync: retired-event": 1,
-  "scripts/probe-storytelling-material.mjs: import readEvents: retired-event": 1,
-  "scripts/probe-storytelling-material.mjs: readEvents: retired-event": 1,
-  "src/runner/attestation-guard.mjs: import readEvents: retired-event": 1,
-  "src/runner/attestation-guard.mjs: readEvents: retired-event": 1,
   "src/setup/registrations.mjs: readEventsJsonLines: retired-event": 2,
   "src/setup/registrations.mjs: readFileSync: retired-event": 1,
   "src/state/events-compaction.mjs: import readEvents: retired-event": 1,
@@ -246,10 +239,8 @@ const dormantReaderFindings = {
   "src/state/events-jsonl-truncation-guard.mjs: advanceEventsJsonlTruncationGuard: retired-event": 1,
   "src/state/events.mjs: import readEvents: retired-event": 1,
   "src/state/events.mjs: import readEventsFromByte: retired-event": 1,
-  "src/state/porting-store.mjs: import readEvents: retired-event": 1,
   "src/state/replay.mjs: import readEvents: retired-event": 1,
-  "src/state/replay.mjs: import readEventsFromByte: retired-event": 1,
-  "src/verbs/events/migrate.mjs: import readAllEventsFromDir: retired-event": 1
+  "src/state/replay.mjs: import readEventsFromByte: retired-event": 1
 };
 
 test('dormant reader census retains declared sites and rejects additions or stale debt',()=>{

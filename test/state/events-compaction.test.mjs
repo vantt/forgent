@@ -15,7 +15,8 @@ import {
   compactColdWriterFiles,
   DEFAULT_COMPACTION_EVENT_THRESHOLD,
 } from '../../src/state/events-compaction.mjs';
-import { readAllEventsFromDir, rebuildViewFromDir } from '../../src/state/replay.mjs';
+import { foldEvents } from '../../src/state/replay.mjs';
+import { readEvents } from '../../src/state/event-log.mjs';
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -36,6 +37,17 @@ function ev(seq, ts, type, payload, src = 'writer-x') {
 function writeJsonl(filePath, events) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, events.map((e) => `${JSON.stringify(e)}\n`).join(''), 'utf8');
+}
+
+// Every event of the baseline and the live shards, one per hash, oldest first: what compaction must never change.
+function liveEvents(dir) {
+  const eventsDir = path.join(dir, 'events');
+  const files = [path.join(dir, 'events.jsonl'), ...fs.readdirSync(eventsDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl')).map((entry) => path.join(eventsDir, entry.name))];
+  const byHash = new Map();
+  for (const file of files) if (fs.existsSync(file)) for (const event of readEvents(file)) byHash.set(event.h, event);
+  // Compaction renumbers seq in the merged baseline; the fact it preserves is what happened, when.
+  return [...byHash.values()].sort((a, b) => (a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0)).map(({ ts, type, payload }) => ({ ts, type, payload }));
 }
 
 function setMtime(filePath, ms) {
@@ -213,7 +225,7 @@ test('compactColdWriterFiles archives cold files into events/archive/, writes a 
   execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });
 
   activateGitFixture(repoRoot);
-  const viewBefore = rebuildViewFromDir(dir);
+  const eventsBefore = liveEvents(dir);
 
   const now = Date.now();
   setMtime(coldAPath, now - 1000 * 60 * 60 * 48);
@@ -238,8 +250,7 @@ test('compactColdWriterFiles archives cold files into events/archive/, writes a 
   assert.equal(manifest.baseline, result.baseline);
   assert.deepEqual(manifest.originals.sort(), ['writer-a-1.jsonl', 'writer-b-1.jsonl']);
 
-  const viewAfter = rebuildViewFromDir(dir);
-  assert.deepEqual(viewAfter, viewBefore, 'compaction must never change the folded view');
+  assert.deepEqual(liveEvents(dir), eventsBefore, 'compaction must never change the events a reader sees');
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
@@ -300,9 +311,8 @@ test('crash-mid-compaction: baseline-<ts>.jsonl and its originals coexisting (ar
   const merged = mergeAndDedupeEvents([{ name: 'writer-a-1.jsonl', events: [e1, e2] }]);
   writeJsonl(path.join(eventsDir, 'baseline-20260823T000000000Z.jsonl'), merged); // the candidate, already written before the crash
 
-  const events = readAllEventsFromDir(dir);
+  const events = liveEvents(dir);
   assert.equal(events.length, 2, 'dedupe-by-hash collapses the straddle -- never double-counted');
-  const view = rebuildViewFromDir(dir);
-  assert.equal(view.work.a.status, 'doing');
+  assert.equal(foldEvents(events).work.a.status, 'doing');
   fs.rmSync(dir, { recursive: true, force: true });
 });

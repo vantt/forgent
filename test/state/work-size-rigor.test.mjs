@@ -117,7 +117,7 @@ test('bắt đầu từ state.json cũ (không có viewSchemaVersion) -> view đ
   };
   fs.writeFileSync(resolveFgosFile(fgosDir, FGOS_FILE.STATE), JSON.stringify(legacyState, null, 2), 'utf8');
 
-  // rebuildViewFromDir must reject the unversioned/mismatched snapshot and re-fold from events
+  // rebuildView must reject the unversioned/mismatched snapshot and re-fold from events
   const freshView = rebuild(fgosDir);
   const item = freshView.work['tsk-snap-1'];
   assert.ok(item);
