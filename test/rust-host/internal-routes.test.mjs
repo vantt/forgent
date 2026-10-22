@@ -54,7 +54,7 @@ test('internal is neither a route nor in the help manifest', () => {
 });
 
 test('a protocol other than the route protocol fails closed with exit 3 and host-version-mismatch', () => {
-  for (const args of [['state-root'], ['state-root', '--protocol', '1'], ['state-root', '--protocol', '3'], ['lock-fd', '--try'], ['lock-fd', '--protocol', '1', '--try'], ['lock-borrow-vectors', '--protocol', '9'], ['terminal-control', 'capabilities', '--json'], ['terminal-control', 'capabilities', '--protocol', '2', '--json']]) {
+  for (const args of [['lock-fd', '--try'], ['lock-fd', '--protocol', '1', '--try'], ['lock-borrow-vectors', '--protocol', '9'], ['terminal-control', 'capabilities', '--json'], ['terminal-control', 'capabilities', '--protocol', '2', '--json']]) {
     const result = host(args);
     assert.equal(result.status, 3, args.join(' '));
     const parsed = line(result);
@@ -65,15 +65,6 @@ test('a protocol other than the route protocol fails closed with exit 3 and host
   const unknown = host(['nope', '--protocol', '2']);
   assert.equal(unknown.status, 2);
   assert.equal(line(unknown).code, 'usage');
-});
-
-test('state-root answers the pinned root and its lock root', () => {
-  const result = host(['state-root', '--protocol', '2'], { env: { FGOS_STATE_ROOT: path.join(scratch, 'state') } });
-  assert.equal(result.status, 0, result.stderr);
-  const parsed = line(result);
-  assert.equal(parsed.stateRoot, path.join(scratch, 'state'));
-  assert.equal(parsed.lockRoot, path.join(scratch, 'state', 'locks'));
-  assert.equal(parsed.source, 'pinned');
 });
 
 test('the run supervisor routes fail closed on a protocol other than 1', () => {

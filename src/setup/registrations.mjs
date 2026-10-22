@@ -147,8 +147,7 @@ import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir
 import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
 import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations, fixTerminalDir } from './terminal-control-checks.mjs';
 import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
-import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
-import { checkLockRecordUnreadable } from './lock-record-checks.mjs';
+import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -2131,10 +2130,10 @@ registerCheck({
 });
 
 // Holder-lock (docs/platform/holder-lock/spec.md): the kernel-lock guarantee
-// of both lock directories, the borrow vectors, who holds each lock, the
-// predecessor kill wait and the one state root. Bodies live in
-// holder-lock-checks.mjs. The `lock-dirs` fix creates the two lock
-// directories.
+// of both lock directories (with the state root and the fixed kill wait it
+// prints), the borrow vectors, and who holds each lock (with the hot records
+// of the state store). Bodies live in holder-lock-checks.mjs. The
+// `lock-dirs` fix creates the two lock directories.
 registerCheck({
   id: 'lock-kernel-semantics',
   description: 'the holder-lock driver gives kernel lock exclusion on <fgosDir>/locks and <lockRoot>, proven by a two-process probe on each mount',
@@ -2147,18 +2146,8 @@ registerCheck({
 });
 registerCheck({
   id: 'lock-holders',
-  description: 'every holder of a holder-lock lock is a fgOS process or a borrowed child, and no predecessor domain is left running',
+  description: 'every holder of a holder-lock lock is a fgOS process or a borrowed child, no predecessor domain is left running, and the state and porting-events hot records parse and their holder can be judged',
   check: (cwd) => checkLockHolders(cwd),
-});
-registerCheck({
-  id: 'lock-record-unreadable',
-  description: 'the state and porting-events hot records parse and their holder can be judged; otherwise fgos lock fence names the way out',
-  check: (cwd) => checkLockRecordUnreadable(cwd),
-});
-registerCheck({
-  id: 'state-root',
-  description: 'Node and the Rust host resolve the same state root and lock root',
-  check: (cwd) => checkStateRoot(cwd),
 });
 registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
 

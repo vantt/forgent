@@ -161,9 +161,6 @@ fn protocol_and_usage_errors_fail_closed() {
     // Protocol 1 is the retired lock protocol: every lock route refuses it and answers 2, so a payload of the
     // first release fails closed. quiesce-scan keeps protocol 1 and answers it.
     let lock_routes = [
-        vec!["state-root"],
-        vec!["state-root", "--protocol", "1"],
-        vec!["state-root", "--protocol", "3"],
         vec!["lock-fd", "--borrowed-check", "/x"],
         vec!["lock-fd", "--protocol", "1", "--borrowed-check", "/x"],
         vec!["lock-hold", "--protocol", "1", "--path", "/x", "--mode", "ex", "--work", "/x"],
@@ -190,18 +187,6 @@ fn protocol_and_usage_errors_fail_closed() {
     }
     let out = Command::new(fgos()).arg("internal").output().unwrap();
     assert_eq!(out.status.code(), Some(2));
-}
-
-#[test]
-fn state_root_route_resolves_the_one_root() {
-    let _serial = serial();
-    let out = base(&["state-root", "--protocol", "2"]).env("FGOS_STATE_HOME", "/custom/state").env_remove("FGOS_STATE_ROOT").output().unwrap();
-    assert_eq!(out.status.code(), Some(0));
-    let v = json_line(&out);
-    assert_eq!((v["stateRoot"].as_str(), v["lockRoot"].as_str(), v["source"].as_str()), (Some("/custom/state"), Some("/custom/state/locks"), Some("fgos-state-home")));
-    let out = base(&["state-root", "--protocol", "2"]).env("FGOS_STATE_ROOT", "/pinned/fgos").env("HOME", "/sandbox").output().unwrap();
-    let v = json_line(&out);
-    assert_eq!((v["stateRoot"].as_str(), v["source"].as_str()), (Some("/pinned/fgos"), Some("pinned")));
 }
 
 #[test]

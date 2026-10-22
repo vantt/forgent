@@ -71,8 +71,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'lock-kernel-semantics',
       'lock-borrow-vectors',
       'lock-holders',
-      'lock-record-unreadable',
-      'state-root',
       'process-containment',
       'run-supervisor-route',
       'runtime-socket-dir',

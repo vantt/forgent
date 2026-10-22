@@ -147,7 +147,7 @@ fn main() {
     let args: Vec<std::ffi::OsString> = std::env::args_os().collect();
 
     // `fgos internal ...`: host routes for the Node payload (lock-fd,
-    // state-root, quiesce-scan, lock-borrow-vectors). Dispatched before the
+    // lock-hold, quiesce-scan, lock-borrow-vectors). Dispatched before the
     // route table, composition and any spawn, so no child of this process
     // can inherit a descriptor handed to a route; not listed in
     // command-routes.json or help.

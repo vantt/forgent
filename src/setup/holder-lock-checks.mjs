@@ -12,11 +12,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
-import { hostBin, guaranteeFor, runStateRootRoute, doorTwoProcessProbe } from '../holder-lock/driver.mjs';
+import { hostBin, guaranteeFor, doorTwoProcessProbe } from '../holder-lock/driver.mjs';
 import { fileHolders, predecessorState } from '../holder-lock/index.mjs';
-import { PROTOCOL } from '../holder-lock/protocol.mjs';
-import { resolveStateRoot, STATE_ROOT_ENV, LOCKS_DIR } from '../holder-lock/state-root.mjs';
+import { PROTOCOL, DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
+import { resolveStateRoot, LOCKS_DIR } from '../holder-lock/state-root.mjs';
 import { loadLockRegistry } from '../holder-lock/registry.mjs';
+import { hotPaths, readHotRecord, judgeHotRecord } from '../state/hot-lock.mjs';
+import { fgosDirFromRoot } from '../runner/paths.mjs';
 import { judge } from '../runner/dispatch/process-identity.mjs';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { listOpenAttemptDirs } from '../run-supervisor/client.mjs';
@@ -31,10 +33,6 @@ function listed(items) {
   return items.length > MAX_LISTED ? `${head}; and ${items.length - MAX_LISTED} more` : head;
 }
 
-export function fgosDirOf(repoRoot) {
-  return path.join(path.resolve(repoRoot), '.fgos');
-}
-
 function isDirectory(dir) {
   try {
     return fs.statSync(dir).isDirectory();
@@ -43,19 +41,18 @@ function isDirectory(dir) {
   }
 }
 
-/** The machine lock root, or `{ error }` naming why it cannot be resolved. */
-function machineLockRoot(fgosDir) {
+/** The machine state root and lock root with what decided them, or `{ error }` naming why it cannot be resolved. */
+function machineLockRoot() {
   try {
-    return { lockRoot: resolveStateRoot({ fgosDir }).lockRoot };
+    return resolveStateRoot();
   } catch (err) {
     return { error: err.message };
   }
 }
 
 /** Both lock directories this workspace uses, workspace first. */
-function lockDirs(repoRoot) {
-  const fgosDir = fgosDirOf(repoRoot);
-  const machine = machineLockRoot(fgosDir);
+function lockDirs(repoRoot, machine = machineLockRoot()) {
+  const fgosDir = fgosDirFromRoot(repoRoot);
   return [
     { label: 'workspace', dir: path.join(fgosDir, LOCKS_DIR) },
     machine.error ? { label: 'machine', error: machine.error } : { label: 'machine', dir: machine.lockRoot },
@@ -93,7 +90,8 @@ export async function checkLockKernelSemantics(repoRoot) {
   const failures = [];
   const warnings = [];
   const passes = [];
-  for (const { label, dir, error } of lockDirs(repoRoot)) {
+  const machine = machineLockRoot();
+  for (const { label, dir, error } of lockDirs(repoRoot, machine)) {
     if (error) {
       failures.push(`${label} lock root unresolved: ${error}`);
       continue;
@@ -122,7 +120,9 @@ export async function checkLockKernelSemantics(repoRoot) {
       failures.push(`${label} ${dir} ${shape}: two-process probe failed: ${err.message}`);
     }
   }
-  const all = [...failures, ...warnings, ...passes].join('; ');
+  // The two fixed facts of the lock layer stay visible: the state root the locks live under and the predecessor kill wait.
+  const facts = [machine.error ? null : `stateRoot ${machine.stateRoot} (${machine.source})`, `killWaitMs ${DEFAULT_KILL_WAIT_MS} (fixed)`].filter(Boolean);
+  const all = [...failures, ...warnings, ...passes, ...facts].join('; ');
   if (failures.length > 0) return { passed: false, message: all };
   if (warnings.length > 0) return { passed: true, message: warn(all) };
   return { passed: true, message: all };
@@ -140,7 +140,7 @@ export async function checkLockKernelSemantics(repoRoot) {
 export function checkLockBorrowVectors(repoRoot) {
   let bin;
   try {
-    bin = hostBin({ fgosDir: fgosDirOf(repoRoot) });
+    bin = hostBin({ fgosDir: fgosDirFromRoot(repoRoot) });
   } catch (err) {
     return { passed: false, message: `cannot run the borrow vectors: ${err.message}` };
   }
@@ -286,6 +286,54 @@ function predecessorProblem(lockFile) {
   return `${recordPath}: ${record.domainKind} domain ${JSON.stringify(record.domainId)} is not empty (${verdict}); the next holder kills it, or an acquire answers held (predecessor-domain-not-empty)`;
 }
 
+// ---------------------------------------------------------------------
+// hot records (judged beside their reclaim lock files, by lock-holders)
+// ---------------------------------------------------------------------
+
+/** The hot resources of the state store, by registry name (contracts/hot-lock.v1.json). */
+const HOT_RESOURCES = ['state', 'porting-events'];
+/** How long a record the judge cannot place may sit before it is worth a warning. */
+export const UNKNOWN_JUDGE_GRACE_MS = 5 * 60 * 1000;
+
+function recordAgeMs(recordPath, now) {
+  try {
+    return now - fs.statSync(recordPath).mtimeMs;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Why a hot record needs a person, or `null` when it is absent or healthy.
+ * A record that does not parse is a problem at once; a parsed record whose
+ * holder the judge answers `unknown` for longer than the grace is one too (a
+ * live holder answers `unknown` only when the process table or its namespace
+ * cannot be read, so a young record is just a busy holder).
+ */
+function hotRecordProblem(resource, fgosDir, now) {
+  const { record: recordPath } = hotPaths(fgosDir, resource);
+  let seen;
+  try {
+    seen = readHotRecord(recordPath);
+  } catch (err) {
+    return `${resource}: ${recordPath} cannot be read (${err.code ?? err.message})`;
+  }
+  if (seen.state === 'absent') return null;
+  if (seen.state === 'retry') return `${resource}: ${recordPath} is open by another process (sharing violation, ${seen.code}); stop that process`;
+  if (seen.state === 'unreadable') return `${resource}: ${recordPath} does not parse (${JSON.stringify(seen.raw.slice(0, 80))})`;
+  if (judgeHotRecord(seen.record) !== 'unknown') return null;
+  const age = recordAgeMs(recordPath, now);
+  if (age <= UNKNOWN_JUDGE_GRACE_MS) return null;
+  return `${resource}: ${recordPath} names pid ${seen.record.pid} that cannot be judged here, for ${Math.round(age / 60000)} min`;
+}
+
+/** The hot records of this workspace that need a person, each with the one way out. Never repaired here. */
+function hotRecordProblems(fgosDir, now) {
+  return HOT_RESOURCES.map((resource) => ({ resource, problem: hotRecordProblem(resource, fgosDir, now) }))
+    .filter((entry) => entry.problem)
+    .map(({ resource, problem }) => `${problem}; once the holder is confirmed gone, run: fgos lock fence ${resource}`);
+}
+
 /**
  * For every lock file of this release's registry rows: who holds it, as
  * the kernel lists it. A holder that is neither a fgOS process nor a child
@@ -293,9 +341,9 @@ function predecessorProblem(lockFile) {
  * `predecessor.json` naming a domain that is not empty warns with the
  * domain. A platform that cannot list holders is informational.
  */
-export function checkLockHolders(repoRoot) {
-  const fgosDir = fgosDirOf(repoRoot);
-  const machine = machineLockRoot(fgosDir);
+export function checkLockHolders(repoRoot, { now = Date.now() } = {}) {
+  const fgosDir = fgosDirFromRoot(repoRoot);
+  const machine = machineLockRoot();
   const notes = machine.error ? [`machine locks not scanned: ${machine.error}`] : [];
   let rows;
   try {
@@ -327,49 +375,13 @@ export function checkLockHolders(repoRoot) {
       }
     }
   }
-  const problems = [...foreign, ...predecessors];
+  const problems = [...foreign, ...predecessors, ...hotRecordProblems(fgosDir, now)];
   const summary = `${files} lock file(s) of ${rows.length} locks, ${held} held`;
   if (problems.length > 0) return { passed: true, message: warn(`${listed(problems)} (${summary})`) };
   if (unlistable.length > 0 && unlistable.length === files) {
     return { passed: true, message: `info: holders not listable here: ${listed(unlistable)} (${summary})${notes.length ? `; ${notes.join('; ')}` : ''}` };
   }
   return { passed: true, message: `${summary}, every holder a fgOS process or a borrowed child${notes.length ? `; ${notes.join('; ')}` : ''}` };
-}
-
-// ---------------------------------------------------------------------
-// state-root
-// ---------------------------------------------------------------------
-
-/**
- * `stateRoot`, `lockRoot` and their source as Node resolves them, next to
- * what the Rust host answers for the same environment. A difference fails.
- * When the root is pinned, the host's answer without the pin is shown too.
- */
-export function checkStateRoot(repoRoot, { env = process.env } = {}) {
-  const fgosDir = fgosDirOf(repoRoot);
-  let node;
-  let host;
-  try {
-    node = resolveStateRoot({ env, fgosDir });
-    host = runStateRootRoute({ fgosDir, env });
-  } catch (err) {
-    return { passed: false, message: `cannot resolve the state root: ${err.message}` };
-  }
-  const describe = (r) => `stateRoot ${r.stateRoot}, lockRoot ${r.lockRoot} (${r.source})`;
-  // Two spellings of one directory (a trailing slash in a pin) are the same root.
-  const same = (a, b) => path.resolve(a) === path.resolve(b);
-  if (!same(node.stateRoot, host.stateRoot) || !same(node.lockRoot, host.lockRoot)) {
-    return { passed: false, message: `Node and the host disagree: Node ${describe(node)}; host ${describe(host)}` };
-  }
-  if (node.source !== 'pinned') return { passed: true, message: describe(node) };
-  const { [STATE_ROOT_ENV]: _pin, ...unpinned } = env;
-  let natural = null;
-  try {
-    natural = runStateRootRoute({ fgosDir, env: unpinned });
-  } catch {
-    natural = null;
-  }
-  return { passed: true, message: `${describe(node)}${natural ? `; without the pin the host resolves ${describe(natural)}` : ''}` };
 }
 
 // ---------------------------------------------------------------------

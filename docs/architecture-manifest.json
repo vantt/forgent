@@ -228,7 +228,6 @@
     "src/setup/git-checks.mjs": "infra",
     "src/setup/run-supervisor-checks.mjs": "infra",
     "src/setup/terminal-control-checks.mjs": "infra",
-    "src/setup/lock-record-checks.mjs": "infra",
     "src/setup/agent-cli-trust.mjs": "infra",
     "src/setup/blind-steps-proven-pools.mjs": "use-case",
     "src/setup/workflow-definition-files.mjs": "use-case",
