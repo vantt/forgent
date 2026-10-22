@@ -1,0 +1,13 @@
+# Step 6b close-out: rebind drifted Step 0 bindings and pair accounting (Doer brief)
+
+Status: Lead brief (records turn).
+
+You are Doer for Phase 8 of plan 260925-documentation-authority-unification in the fgOS repo. Step 6b is built, reviewed, documented and rehearsed (L12-104..L12-114). The Phase 8 docs turns b6edb9712 and 3226c4066 edited candidate documents `docs/platform/holder-lock/spec.md`, `docs/platform/git/spec.md` and `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`; the reproduction reporter now fails ownership with 3 drifted Step 0 bindings, all targeting `setup-doctor-registry.md` (run `env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py` to see `failingRows`).
+
+1. Rebind every drifted binding (all three files, not only the reported three — run the Step 0 binding check, same procedure as L12-65/L12-112, over the three edited files) by content AND neighbouring blocks, never by block index (L12-102); prove each digest; no approval carry; record in `step-06b-closeout-rebindings.json`.
+2. Pair accounting (L12-11): take check A's exact unaccounted commit/path pairs for both phase-06 manifests since the last pair accounting (0fe60f65f / 8b60e8e68) and append each as {commit, path, authority} in the existing format (authority = the L12 entry each commit recorded: L12-104..L12-114, or "Lead brief"/"review report"/"Lead commit of carried outputs (L12-112)"). Change no other byte. Rerun the reporter: zero failing rows and zero unaccounted pairs other than this turn's own commit.
+3. Record L12-115 in owner-answers.md: Step 6b closed (what was built, review rounds and verdicts, rehearsal result), the rebinds, the pair counts, and the open carries for Step 7 (lease landing with the Phase 9 cutover; Git-owner consent for the git spec §7 text before landing; holder-lock owner notified of the registry row).
+
+Writable (exact): plans/260925-documentation-authority-unification/reports/phase-08/**, plans/260925-documentation-authority-unification/ledger/decisions/**, plans/260925-documentation-authority-unification/pilot/decisions/**, plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json, plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json. Nothing else. Never a git write, never the fgos CLI, never .fgos/ or secrets, never scripts/run-tests.mjs or npm test. python -B; scratch /tmp/fgos-work/.
+
+Final message: first line a conventional commit subject (at most 100 characters, no plan ids, phase or finding labels), then a short Vietnamese summary (anh/em).
