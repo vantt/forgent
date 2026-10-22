@@ -1022,7 +1022,7 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watc
         let (mut out_open, mut err_open) = (true, true);
         // Wake on pipe activity or on the root's exit instead of sleeping in
         // fixed steps; without a process descriptor, wake at least every 1 ms.
-        let exit_fd = exit_descriptor(pid);
+        let exit_fd = fgos_process::control::exit_descriptor(pid);
         loop {
             if Instant::now() >= io.deadline {
                 return Err(BorrowError::Deadline { termination: Termination::KilledAfterGrace });
@@ -1137,24 +1137,6 @@ fn capture_available(pipe: &mut impl std::io::Read, bytes: &mut Vec<u8>, limit: 
     }
 }
 
-/// A descriptor that becomes readable when child `pid` exits (Linux pidfd).
-/// `None` where the kernel has none; callers then poll in short steps.
-#[cfg(unix)]
-fn exit_descriptor(pid: u32) -> Option<std::os::fd::OwnedFd> {
-    #[cfg(target_os = "linux")]
-    {
-        use std::os::fd::FromRawFd;
-        // SAFETY: pidfd_open takes a pid and flags; the result is owned below.
-        let fd = unsafe { libc::syscall(libc::SYS_pidfd_open, pid as libc::pid_t, 0 as libc::c_uint) };
-        // SAFETY: a non-negative result is a new descriptor owned by nobody else.
-        (fd >= 0).then(|| unsafe { std::os::fd::OwnedFd::from_raw_fd(fd as libc::c_int) })
-    }
-    #[cfg(not(target_os = "linux"))]
-    {
-        let _ = pid;
-        None
-    }
-}
 
 #[cfg(unix)]
 fn capture_chunk(pipe: &mut impl std::io::Read, bytes: &mut Vec<u8>, limit: usize, stream: &'static str) -> Result<Option<bool>, BorrowError> {

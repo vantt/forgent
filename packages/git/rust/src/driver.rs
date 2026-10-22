@@ -1,7 +1,7 @@
 //! The sole Git spawn door. Raw argv and borrowed spawn are crate-private.
 use crate::*;
 use fgos_process::containment::{self, ContainmentDriver, SpawnSpec, StartMode};
-use fgos_process::DomainState;
+use fgos_process::{DomainState, KillOutcome};
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use std::fs::{self, File};
 use std::io::Read;
@@ -1199,8 +1199,12 @@ impl GitDriver {
             let _ = stdin_w.write_all(&input);
         });
         let overflow = Arc::new(AtomicBool::new(false));
-        let out = capture(stdout_r, limit, overflow.clone());
-        let err = capture(stderr_r, STDERR_LIMIT, overflow.clone());
+        let (wake_r, wake_w) = std::io::pipe().map_err(io)?;
+        let wake_w2 = wake_w.try_clone().map_err(io)?;
+        let out = capture(stdout_r, limit, overflow.clone(), Some(wake_w));
+        let err = capture(stderr_r, STDERR_LIMIT, overflow.clone(), Some(wake_w2));
+        #[cfg(unix)]
+        let exit_fd = fgos_process::control::exit_descriptor(spawned.child.id());
         let start = Instant::now();
         let mut stopped = None;
         let status = loop {
@@ -1213,15 +1217,51 @@ impl GitDriver {
                 } else {
                     "git-timeout"
                 });
-                self.containment.kill_all(&mut domain, 3000);
+                if self.containment.kill_all(&mut domain, 3000) != KillOutcome::Ok {
+                    std::thread::spawn(move || {
+                        let _ = spawned.child.wait();
+                    });
+                    return Err(refusal("containment-unproven"));
+                }
                 break spawned.child.wait().map_err(io)?;
             }
-            std::thread::sleep(Duration::from_millis(2));
+            #[cfg(unix)]
+            {
+                use std::os::fd::AsRawFd;
+                let mut fds = [
+                    libc::pollfd {
+                        fd: wake_r.as_raw_fd(),
+                        events: libc::POLLIN,
+                        revents: 0,
+                    },
+                    libc::pollfd {
+                        fd: exit_fd.as_ref().map_or(-1, |fd| fd.as_raw_fd()),
+                        events: libc::POLLIN,
+                        revents: 0,
+                    },
+                ];
+                let nfds = if exit_fd.is_some() { 2 } else { 1 };
+                let left = timeout.saturating_sub(start.elapsed());
+                let step = if exit_fd.is_some() {
+                    left
+                } else {
+                    left.min(Duration::from_millis(1))
+                };
+                let timeout_ms = step.as_millis().clamp(1, i32::MAX as u128) as libc::c_int;
+                unsafe {
+                    libc::poll(fds.as_mut_ptr(), nfds, timeout_ms);
+                }
+            }
+            #[cfg(not(unix))]
+            {
+                std::thread::sleep(Duration::from_millis(1));
+            }
         };
         // A root exit is not proof that pipe-owning descendants have exited.
         if self.containment.is_empty(&mut domain) != DomainState::Empty {
-            self.containment.kill_all(&mut domain, 3000);
-            if self.containment.is_empty(&mut domain) != DomainState::Empty {
+            if self.containment.kill_all(&mut domain, 3000) != KillOutcome::Ok
+                || self.containment.is_empty(&mut domain) != DomainState::Empty
+            {
                 // Readers are detached, never block indefinitely on an escapee.
                 return Err(refusal("containment-unproven"));
             }
@@ -1671,6 +1711,7 @@ fn capture(
     mut input: impl Read + Send + 'static,
     limit: usize,
     overflow: Arc<AtomicBool>,
+    mut wake: Option<std::io::PipeWriter>,
 ) -> mpsc::Receiver<std::io::Result<Vec<u8>>> {
     let (tx, rx) = mpsc::channel();
     std::thread::spawn(move || {
@@ -1686,6 +1727,10 @@ fn capture(
                 bytes.extend_from_slice(&buf[..take]);
                 if take < n {
                     overflow.store(true, Ordering::Relaxed);
+                    if let Some(mut w) = wake.take() {
+                        use std::io::Write;
+                        let _ = w.write(&[1]);
+                    }
                 }
             }
         })();
@@ -3158,6 +3203,102 @@ mod tests {
             redact(b"fatal: https://user:secret@host/repo?token=secret\n"),
             b"fatal: https://[redacted]@host/repo?[redacted]"
         );
+    }
+    struct UnemptiedDriver {
+        inner: Box<dyn ContainmentDriver>,
+    }
+    impl ContainmentDriver for UnemptiedDriver {
+        fn name(&self) -> &'static str {
+            self.inner.name()
+        }
+        fn create(&self, attempt_id: &str) -> std::result::Result<containment::ContainmentDomain, containment::ContainmentError> {
+            self.inner.create(attempt_id)
+        }
+        fn spawn_in(&self, domain: &mut containment::ContainmentDomain, spec: SpawnSpec) -> std::result::Result<containment::Spawned, containment::ContainmentError> {
+            self.inner.spawn_in(domain, spec)
+        }
+        fn is_empty(&self, domain: &mut containment::ContainmentDomain) -> DomainState {
+            self.inner.is_empty(domain)
+        }
+        fn kill_all(&self, _domain: &mut containment::ContainmentDomain, _grace_ms: u64) -> KillOutcome {
+            KillOutcome::Refused
+        }
+        fn guarantee(&self) -> containment::Guarantee {
+            self.inner.guarantee()
+        }
+    }
+    #[test]
+    #[cfg(unix)]
+    fn contained_call_whose_domain_cannot_be_emptied_returns_containment_unproven_within_bound() {
+        let state = Temp::new();
+        let dir = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        driver.containment = Box::new(UnemptiedDriver { inner: driver.containment });
+        let repo = resolve(&driver, &dir.0);
+        let pid_file = dir.0.join("member.pid");
+        let pid_path = pid_file.clone();
+        let watcher = std::thread::spawn(move || {
+            for _ in 0..200 {
+                if let Ok(text) = fs::read_to_string(&pid_path) {
+                    if let Ok(pid) = text.trim().parse::<i32>() {
+                        unsafe { libc::kill(pid, libc::SIGSTOP); }
+                        return Some(pid);
+                    }
+                }
+                std::thread::sleep(Duration::from_millis(10));
+            }
+            None
+        });
+        let start = Instant::now();
+        let err = driver
+            .invoke(
+                Some(&repo),
+                &dir.0,
+                &[
+                    "-c",
+                    &format!(
+                        "alias.stoppable=!sh -c 'echo $$ > \"{}\"; exec sleep 60' sh",
+                        pid_file.display()
+                    ),
+                    "stoppable",
+                ],
+                Policy::Inspect,
+                None,
+                true,
+                1000,
+                Duration::from_millis(100),
+            )
+            .err()
+            .unwrap();
+        let elapsed = start.elapsed();
+        if let Ok(Some(pid)) = watcher.join() {
+            unsafe {
+                libc::kill(pid, libc::SIGCONT);
+                libc::kill(pid, libc::SIGKILL);
+            }
+        }
+        assert_eq!(err.cause, "containment-unproven");
+        assert!(elapsed < Duration::from_secs(3), "must return within bound, took {:?}", elapsed);
+        if driver.containment.name() != "linux-pgroup" {
+            let mut pgroup_driver = GitDriver::new(&state.0).unwrap();
+            pgroup_driver.containment = Box::new(UnemptiedDriver { inner: Box::new(fgos_process::containment::LinuxPgroup) });
+            let pgroup_repo = resolve(&pgroup_driver, &dir.0);
+            let err = pgroup_driver
+                .invoke(
+                    Some(&pgroup_repo),
+                    &dir.0,
+                    &["status"],
+                    Policy::Inspect,
+                    None,
+                    true,
+                    1000,
+                    Duration::from_millis(100),
+                )
+                .err()
+                .unwrap();
+            assert_eq!(err.cause, "containment-unproven");
+        }
     }
 }
 
