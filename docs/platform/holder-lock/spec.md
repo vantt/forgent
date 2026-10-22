@@ -128,7 +128,7 @@ The opaque addon handover protects acquired handles from request-data forgery; i
 
 | Kind | Mechanism | Used for |
 |---|---|---|
-| `mutex` | Kernel lock, held briefly | sessions, advance, reconcile, recovery, provider account, provider state, main checkout, `worktree-admin`, merge slot, `event-seal` (58), `event-append` (70); later observe, activation, install |
+| `mutex` | Kernel lock, held briefly | sessions, advance, reconcile, recovery, provider account, provider state, main checkout, `worktree-admin`, merge slot, `event-seal` (58), `event-append` (70), `repo-config`, `mailbox`; later observe, activation, install |
 | `lease` | Kernel lock, held for the length of a long job; may be handed to a gate | gateway, runner, dispatch cwd, full-suite; later the attempt lock, whose file lives in the run directory |
 | `hot-mutex` | link-created record for the fast path; the row's kernel lock (`<resource>.reclaim.lock`) only serialises cleanup of a dead holder's record (section 15) | `state`, `porting-events` |
 | `beacon` | Not a lock | the main-checkout activity file (read by the hook only when the commit is not a borrower, section 14) |
@@ -141,7 +141,7 @@ Run control is not a kind: its ledger and CAS stay as they are, with no garbage 
 
 `<eventOpenRoot>` is the resolved Git common directory plus `fgos/events`; Event Store owns its two repo mutexes, `event-seal` (58) and `event-append` (70), at `<eventOpenRoot>/locks/<name>.lock`. Both have no legacy shape/path and fence `none`. Only Rust resolves this template; Node refuses these rows with `lock-not-node-owned`. Append is released before Git calls; seal is never taken inside the Work gate.
 
-One row per lock: `name`, `kind`, `scope` (`repo`, `machine`, `run`), `rank`, `v3Path`, `v1Shape` (`file-link`, `file-wx`, `ledger-dir`, `file-by-cwd`), `v1Path`, `fence` (`tombstone`, `blocking-generation`, `none`), `owner` (the track that cuts it over: `4.2`, `4.3`, `4.4`, `6.2`, `event-store`), and notes. A row owned by this track must carry a fence, a legacy shape, a legacy path and a new path.
+One row per lock: `name`, `kind`, `scope` (`repo`, `machine`, `run`), `rank`, `v3Path`, `v1Shape` (`file-link`, `file-wx`, `ledger-dir`, `file-by-cwd`), `v1Path`, `fence` (`tombstone`, `blocking-generation`, `none`), `owner` (the track that cuts it over: `4.2`, `4.3`, `4.4`, `6.2`, `event-store`, `git`, `mailbox`), and notes. A row owned by this track must carry a fence, a legacy shape, a legacy path and a new path.
 
 Ranks (a scope may only take a lock of a higher rank than every lock it holds):
 
@@ -157,7 +157,7 @@ Ranks (a scope may only take a lock of a higher rank than every lock it holds):
 | 58 | `event-seal` | mutex |
 | 60 | `state`, `porting-events` | hot-mutex |
 | 70 | `event-append` | mutex |
-| 80 | leaves: `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `observe`, `activation`, `install` | mutex, lease |
+| 80 | leaves: `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `observe`, `activation`, `install`, `repo-config`, `mailbox` | mutex, lease |
 
 Locks cut over by this track: `gateway`, `runner`, `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `dispatch-cwd`. Their new files live under `<fgosDir>/locks/` (repo scope), `<lockRoot>/` (machine scope) or a `locks/` directory inside the run (`<workflowRunDir>/locks/advance.lock`, `<runDir>/locks/recovery.lock`), so a run's new lock never lands on the tombstone of its legacy path. The dispatch cwd lock is keyed by the directory's identity after `realpath` (`<fgosDir>/locks/dispatch-cwd--<dev>-<ino>.lock`), so a worktree reached through a symlink is the same lock. The npm package and the staged legacy-node payload ship the registry file, because every lock of this track resolves through it. The dispatch cwd lock keeps the `fgosDir` scope; a machine-wide cwd lock is a separate item, opened only when two workspaces share one cwd for real.
 
@@ -170,6 +170,8 @@ Locks cut over by the Rust-callers track (registry owner `4.4`), all leaves of r
 | `observe` | repo | `<fgosDir>/locks/observe.lock` | `.fgos/observe/.lock` | Observe store (`fgos metrics`, `fgos friction`) |
 
 Git adds `repo-config`, a repo mutex at rank 80, `<fgosDir>/locks/repo-config.lock`, with no legacy path. It serializes the local fetch-mapping writer; Git's native `config.lock` also excludes ordinary Git config writers.
+
+Mailbox adds `mailbox`, a repo mutex at rank 80, `<fgosDir>/locks/mailbox.lock`, with no legacy path. It serializes every mutation of the agent mailbox's snapshot (docs/platform/agent-mailbox/spec.md §6.4); held briefly, never across an emit, and only Rust takes it.
 
 The observe lock waits at most 5 s, has no TTL, and the shard snapshot is written under it. The activation and install locks are held by `fgctl` through the crate it links; a holder that is killed leaves the lock free at once. Until the main-checkout lock is cut over, `fgctl` checks the main checkout with `probe` (shared, non-blocking, never held) plus the v1 read, and reads a directory at `.fgos/main-checkout.lock` (a tombstone) as "moved".
 

@@ -321,3 +321,13 @@ test('Git repo-config is a rank 80 leaf and Node leaves the held controller path
     assert.ok(!status.missing.includes(old) && !status.v1Present.includes(old), 'the held controller file never blocks or counts against Node placement');
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });
+
+test('the mailbox mutex is a repo leaf at rank 80 owned by the mailbox', () => {
+  const row = registry.locks.find((lock) => lock.name === 'mailbox');
+  assert.deepEqual(row, { name: 'mailbox', kind: 'mutex', scope: 'repo', rank: 80,
+    v3Path: '<fgosDir>/locks/mailbox.lock', v1Shape: null, v1Path: null,
+    fence: 'none', owner: 'mailbox' });
+  assert.deepEqual(validate(row, schema.$defs.lock, schema), []);
+  assert.notDeepEqual(validate({ ...row, owner: 'unknown' }, schema.$defs.lock, schema), []);
+  assert.match(registry.ranks['80'].note, /\bmailbox\b/);
+});
