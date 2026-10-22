@@ -496,8 +496,6 @@ pub struct BorrowOutcome {
     pub leftovers_killed: u32,
 }
 
-/// Environment marker of a watched borrow: unique per run, inherited by every
-/// descendant of the child.
 #[cfg(unix)]
 use fgos_process::containment::{watch_token, WATCH_ENV};
 

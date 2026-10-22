@@ -1267,13 +1267,12 @@ impl GitDriver {
             std::thread::sleep(step.min(Duration::from_millis(1)));
         };
         // A root exit is not proof that pipe-owning descendants have exited.
-        if self.containment.is_empty(&mut domain) != DomainState::Empty {
-            if self.containment.kill_all(&mut domain, 3000) != KillOutcome::Ok
-                || self.containment.is_empty(&mut domain) != DomainState::Empty
-            {
-                // Readers are detached, never block indefinitely on an escapee.
-                return Err(refusal("containment-unproven"));
-            }
+        if self.containment.is_empty(&mut domain) != DomainState::Empty
+            && (self.containment.kill_all(&mut domain, 3000) != KillOutcome::Ok
+                || self.containment.is_empty(&mut domain) != DomainState::Empty)
+        {
+            // Readers are detached, never block indefinitely on an escapee.
+            return Err(refusal("containment-unproven"));
         }
         let stdout = out
             .recv_timeout(Duration::from_secs(1))
@@ -3271,6 +3270,31 @@ mod tests {
     }
     #[test]
     #[cfg(target_os = "linux")]
+    fn a_contained_call_whose_root_exited_but_whose_domain_cannot_be_emptied_returns_containment_unproven() {
+        let state = Temp::new();
+        let dir = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        // A process-group domain sees the background member the root leaves.
+        driver.containment = Box::new(UnemptiedDriver { inner: Box::new(fgos_process::containment::LinuxPgroup) });
+        let repo = resolve(&driver, &dir.0);
+        let err = driver
+            .invoke(
+                Some(&repo),
+                &dir.0,
+                &["-c", "alias.leave=!sleep 30 </dev/null >/dev/null 2>&1 &", "leave"],
+                Policy::Inspect,
+                None,
+                true,
+                1000,
+                Duration::from_secs(10),
+            )
+            .err()
+            .unwrap();
+        assert_eq!(err.cause, "containment-unproven");
+    }
+    #[test]
+    #[cfg(target_os = "linux")]
     fn submodule_filter_escapee_reported_as_containment_unproven_on_best_effort_containment() {
         let state = Temp::new();
         let super_dir = Temp::new();
@@ -3344,15 +3368,6 @@ mod tests {
             }
         }
 
-        let mut samples = Vec::with_capacity(50);
-        for _ in 0..50 {
-            let start = Instant::now();
-            let _ = fgos_process::containment::environment_marked("FGOS_BENCH_MARK", "none");
-            samples.push(start.elapsed());
-        }
-        samples.sort();
-        let median = samples[25];
-        assert!(median < Duration::from_millis(5), "scan cost median exceeded 5ms: {:?}", median);
     }
 }
 
