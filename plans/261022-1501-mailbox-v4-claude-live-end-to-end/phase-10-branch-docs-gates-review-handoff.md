@@ -1,7 +1,7 @@
 ---
 phase: 10
 title: "Branch docs, full gates, review, hand-off"
-status: pending
+status: done
 depends_on: [9]
 live_calls: 0
 ---
@@ -53,3 +53,10 @@ An independent `ak-code-review` of the branch diff since the V4 base recorded in
 ## Done when
 
 Every gate green on fresh main (or its failures shown identical to clean main), the review has no open Critical or High, and the controller has the hand-off.
+
+## Done on the branch (implementation lead, 2026-10-22/23)
+
+- Docs: spec header, §4.1, §6.1 (shell as built, caller check, the discriminator measurement), §6.2 (V4 delivery report), §7.4 (recorded at V4), §11 (owning files, items left), §12 (`mailbox.hook.maxReadBytes`), §14 V4 row (built) and V5 row (inherited items), §17 (plan decisions 1–14, the owner's answer, the live-suite and demo decisions); reading map entry for V4. No CHANGELOG line, no setup or doctor registration (nothing is installed).
+- Gates: see the closing report `plans/reports/closing-261022-2306-mailbox-v4-claude-live-end-to-end.md`. Rust crates, clippy and fmt green; the workspace's one failure (`gate_portable`) passed alone on a re-run and touches no V4 file; `npm test` fails the same 21 titles on the branch and on a clean `origin/main` sibling worktree; the census check fails the same 5 sites on both; convention check clean.
+- **Review: skipped by the controller's instruction** (the controller runs an independent review).
+- Journal: `plans/journals/journal-261022-2306-mailbox-v4-claude-live-end-to-end.md`.
