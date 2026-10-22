@@ -162,12 +162,3 @@ impl StoreIdentity {
         Self::open(layout, machine)
     }
 }
-
-/// Setup-only atomic mint, owned by the Identity component.
-pub fn mint_machine_id(state_root: &Path, hostname: &str) -> Result<(bool, String), Error> {
-    fgos_identity::machine::mint(state_root, hostname).map_err(|e| match e {
-        fgos_identity::Error::Install(e) => Error::from_install_error(e),
-        fgos_identity::Error::Io(e) => io(e),
-        e => invalid(e.to_string()),
-    })
-}

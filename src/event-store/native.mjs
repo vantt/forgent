@@ -161,13 +161,8 @@ export function eventStoreAddonAvailable(loaderOptions) {
   const native = call(() => loadNativeAddon(loaderOptions));
   return typeof native.resolveEventStore === 'function' && typeof native.openStore === 'function'
     && typeof native.eventStoreFacts === 'function' && typeof native.ensureEventStoreRefspecs === 'function'
-    && typeof native.mintEventStoreMachineId === 'function' && typeof native.eventStoreBranchKey === 'function'
+    && typeof native.eventStoreBranchKey === 'function'
     && ['read', 'append', 'promote', 'sync', 'maintenance', 'status', 'exportJsonl', 'exportLegacyLayout', 'readLegacyFromHead', 'importLegacy', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
-}
-
-export function mintEventStoreMachineId(stateRoot, hostname, loaderOptions) {
-  outsideGate([]);
-  return call(() => loadNativeAddon(loaderOptions).mintEventStoreMachineId(stateRoot, hostname));
 }
 
 /** Decode an explicit legacy inventory through the crate's frozen ordering rule. */

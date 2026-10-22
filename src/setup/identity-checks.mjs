@@ -5,16 +5,18 @@
 //
 // The checks ask the host (`fgos identity machine|project --json`) instead of
 // reading the files, so the one validator of each id's shape stays in the Rust crate.
-// The fix mints through the same N-API door Event Store's migration uses
-// (`fixEventStoreMachineId`), never a second implementation.
+// The fix mints through the Identity N-API door (`mintMachineId`, the one mint
+// `events migrate` also calls), never a second implementation.
 // Levels follow the doctor convention: `passed: false` fails, a message that
 // starts with `warning:` warns, anything else passes.
 
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
+import { resolveStateRoot } from '../holder-lock/state-root.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
-import { fixEventStoreMachineId } from './event-store-fixes.mjs';
+import { mintMachineId } from '../util/identity-mint.mjs';
 
 const TIMEOUT_MS = 2000;
 
@@ -81,9 +83,79 @@ export function checkIdentityProjectId(cwd, { hostBin } = {}) {
 /** identity-machine-id (setup): mint the machine id once; never replaces an existing one. */
 export function fixIdentityMachineId(cwd, options = {}) {
   try {
-    const { changed, machineId } = fixEventStoreMachineId(cwd, options);
+    const { changed, machineId } = mintMachineId(options.stateRoot ?? resolveStateRoot().stateRoot);
     return { changed, message: changed ? `minted machine id ${machineId}` : `machine id ${machineId} already minted` };
   } catch (err) {
     return { changed: false, message: `machine id not minted: ${err.message}` };
   }
+}
+
+const MAX_REGISTRY_BYTES = 8 * 1024 * 1024;
+
+function readText(file) {
+  try {
+    const stat = fs.statSync(file);
+    return stat.isFile() && stat.size <= MAX_REGISTRY_BYTES ? fs.readFileSync(file, 'utf8') : null;
+  } catch {
+    return null;
+  }
+}
+
+/** The id registries of one checkout: backlog rows, `D-ADR` headings, decision file numbers. */
+function readIdRegistries(root) {
+  const backlogIds = [];
+  for (const line of (readText(path.join(root, 'docs/backlog.md')) ?? '').split('\n')) {
+    const id = /^\|\s*([^|\s][^|]*?)\s*\|/.exec(line)?.[1];
+    if (id && id !== 'ID' && !/^-+$/.test(id)) backlogIds.push(id);
+  }
+  // One decision may be recorded in several area specs; it is the same decision while every
+  // heading gives it the same short title, and two titles under one number are two decisions.
+  const adrTitles = new Map();
+  const specsDir = path.join(root, 'docs/specs');
+  const documents = [path.join(root, 'docs/platform-foundations.md')];
+  try {
+    for (const name of fs.readdirSync(specsDir)) if (name.endsWith('.md')) documents.push(path.join(specsDir, name));
+  } catch {
+    // a checkout without specs has no decisions to scan
+  }
+  for (const file of documents) {
+    for (const line of (readText(file) ?? '').split('\n')) {
+      const heading = /^#+\s+(D-ADR\d{4})\s*(?:\(([^)]*)\))?/.exec(line);
+      if (!heading) continue;
+      const titles = adrTitles.get(heading[1]) ?? new Set();
+      titles.add((heading[2] ?? '').trim());
+      adrTitles.set(heading[1], titles);
+    }
+  }
+  const fileNumbers = [];
+  try {
+    for (const name of fs.readdirSync(path.join(root, 'docs/decisions'))) {
+      const number = /^(\d{4})-/.exec(name)?.[1];
+      if (number) fileNumbers.push(number);
+    }
+  } catch {
+    // the decision corpus is retired in most checkouts
+  }
+  return { backlogIds, adrTitles, fileNumbers };
+}
+
+const duplicates = (values) => [...new Set(values.filter((value, index) => values.indexOf(value) !== index))];
+
+/**
+ * identity-ids-unique: no two backlog rows share an id, no `D-ADR` number is headed with two
+ * different titles, and no two decision files share a number. The safety net behind the mint
+ * door: a second writer that bypassed it shows up here, never as a silent clash.
+ */
+export function checkIdentityIdsUnique(cwd) {
+  // The registries are tracked documents, so the checkout the command runs in is the one to read.
+  const { backlogIds, adrTitles, fileNumbers } = readIdRegistries(cwd);
+  const problems = [
+    ...duplicates(backlogIds).map((id) => `backlog id ${id} is used by more than one row`),
+    ...[...adrTitles].filter(([, titles]) => titles.size > 1).map(([id, titles]) => `${id} is headed with different titles (${[...titles].map((t) => JSON.stringify(t)).join(', ')})`),
+    ...duplicates(fileNumbers).map((number) => `decision file number ${number} is used by more than one file`),
+  ];
+  if (problems.length > 0) {
+    return { passed: false, message: `${problems.join('; ')} -- ids that travel between machines come from \`fgos identity mint <kind>\`; renumber the later one` };
+  }
+  return { passed: true, message: `${backlogIds.length} backlog ids, ${adrTitles.size} D-ADR numbers and ${fileNumbers.length} decision files, none repeated` };
 }

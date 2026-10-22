@@ -35,7 +35,8 @@ use serde_json::{json, Value};
 use fgos_process::facts;
 
 use crate::envelope;
-use crate::publish::{iso_utc_now, publish_once};
+use crate::publish::publish_once;
+use fgos_identity::text::iso_utc_now;
 
 #[cfg(unix)]
 mod unix;

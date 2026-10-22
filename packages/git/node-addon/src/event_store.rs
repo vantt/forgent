@@ -598,17 +598,6 @@ impl EventStore {
 }
 
 #[napi]
-pub fn mint_event_store_machine_id(state_root: String, hostname: String) -> Result<Value> {
-    available()?;
-    let (changed, machine) =
-        fgos_event_store::identity::mint_machine_id(Path::new(&state_root), &hostname)
-            .map_err(error)?;
-    Ok(
-        json!({"changed":changed,"machineId":machine,"message":if changed {"machine id minted once"} else {"machine id already exists"}}),
-    )
-}
-
-#[napi]
 impl EventStore {
     /// Pure HEAD reads; `check` also refuses dirty/untracked migration inputs.
     #[napi]

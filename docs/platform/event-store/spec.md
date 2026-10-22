@@ -594,7 +594,7 @@ Config defaults merged by `fgos setup` (added only when missing, global then pro
 
 Repository-local git config, never tracked: the fetch refspecs of section 14 (`+refs/fgos/events/*:refs/fgos/remotes/<remote>/events/*` and the legacy one), and the optional `fgos.machineId`.
 
-Setup fixes: `event-store-machine-id` (mint `<stateRoot>/machine-id` when missing); `event-store-refspec` (add the fetch refspecs when the remote exists and they are missing; never a push refspec); `event-store-lock-dirs` (create `<eventOpenRoot>/locks` with mode 0700).
+Setup fixes: `event-store-refspec` (add the fetch refspecs when the remote exists and they are missing; never a push refspec); `event-store-lock-dirs` (create `<eventOpenRoot>/locks` with mode 0700). The machine id is minted by the Identity component (setup fix `identity-machine-id`, N-API `sessionIdentity.mintMachineId`), never by Event Store; `events migrate` calls the same mint when the id is missing.
 
 Doctor checks, registered in `src/setup/registrations.mjs`:
 

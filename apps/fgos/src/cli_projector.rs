@@ -119,7 +119,10 @@ pub fn native_operation_id(route_operation: &str, args: &[OsString]) -> Result<S
 
 /// `fgos identity [--pid <n>] [--fgos-dir <dir>] [--json]`, `fgos identity
 /// machine [--alias <name>] [--json]`, `fgos identity project [--init|--new]
-/// [--handle <name>] [--json]`. `--dir` is accepted and ignored on
+/// [--handle <name>] [--json]`, `fgos identity session [--register] [--role
+/// lead:<LANE>] [--take]`, `fgos identity resolve <query>`, `fgos identity list
+/// [--project] [--prune]`, `fgos identity mint <kind> [--release <number>]
+/// [--json]`. `--dir` is accepted and ignored on
 /// every verb, because the shell integration appends it.
 fn project_identity_request(
     args: &[OsString],
@@ -136,12 +139,24 @@ fn project_identity_request(
             &["--alias", "--dir"],
         ),
         Some("session") => (
-            fgos_identity::Verb::Session,
-            &["--pid", "--fgos-dir", "--dir"],
+            fgos_identity::Verb::Session(fgos_identity::SessionAction::Read),
+            &["--pid", "--fgos-dir", "--register", "--role", "--take", "--dir"],
+        ),
+        Some("resolve") => (
+            fgos_identity::Verb::Resolve { query: String::new() },
+            &["--dir"],
+        ),
+        Some("list") => (
+            fgos_identity::Verb::List { project: false, prune: false },
+            &["--project", "--prune", "--dir"],
         ),
         Some("project") => (
             fgos_identity::Verb::Project(fgos_identity::ProjectAction::Read),
             &["--init", "--new", "--handle", "--dir"],
+        ),
+        Some("mint") => (
+            fgos_identity::Verb::Mint { kind: String::new(), release: None },
+            &["--release", "--dir"],
         ),
         Some(other) => {
             return Err(format!(
@@ -154,6 +169,35 @@ fn project_identity_request(
         verb,
         ..Default::default()
     };
+    // `mint <kind>` and `resolve <query>`: one positional argument.
+    match &mut request.verb {
+        fgos_identity::Verb::Mint { kind, .. } => {
+            let name = args
+                .get(index)
+                .map(|value| value.to_string_lossy().into_owned())
+                .filter(|value| !value.starts_with('-'))
+                .ok_or_else(|| {
+                    format!("mint requires an id kind. Available: {}", fgos_identity::KIND_NAMES.join(", "))
+                })?;
+            index += 1;
+            *kind = name;
+        }
+        fgos_identity::Verb::Resolve { query } => {
+            let name = args
+                .get(index)
+                .map(|value| value.to_string_lossy().into_owned())
+                .filter(|value| !value.starts_with('-'))
+                .ok_or_else(|| "resolve requires a handle or a role such as lead:MAIL".to_string())?;
+            index += 1;
+            *query = name;
+        }
+        _ => {}
+    }
+    let mut register = false;
+    let mut take = false;
+    let mut role: Option<String> = None;
+    let mut by_project = false;
+    let mut prune = false;
     // `Some(fork)` once `--init` (false) or `--new` (true) was given.
     let mut mint: Option<bool> = None;
     let mut handle: Option<String> = None;
@@ -163,12 +207,20 @@ fn project_identity_request(
         if value == "--json" {
             continue;
         }
-        if value == "--init" || value == "--new" {
+        if ["--init", "--new", "--register", "--take", "--project", "--prune"].contains(&value.as_str()) {
             if !allowed.contains(&value.as_str()) {
                 return Err(format!("unknown identity option '{value}'"));
             }
-            if mint.replace(value == "--new").is_some() {
-                return Err("--init and --new are exclusive and each given once".into());
+            match value.as_str() {
+                "--init" | "--new" => {
+                    if mint.replace(value == "--new").is_some() {
+                        return Err("--init and --new are exclusive and each given once".into());
+                    }
+                }
+                "--register" => register = true,
+                "--take" => take = true,
+                "--project" => by_project = true,
+                _ => prune = true,
             }
             continue;
         }
@@ -201,6 +253,22 @@ fn project_identity_request(
                     .ok_or_else(|| format!("--pid must be a positive integer, got '{flag_value}'"))?;
                 request.pid = Some(pid);
             }
+            "--release" => {
+                let number = flag_value
+                    .parse::<u64>()
+                    .ok()
+                    .filter(|number| *number > 0)
+                    .ok_or_else(|| format!("--release must be a positive number, got '{flag_value}'"))?;
+                if let fgos_identity::Verb::Mint { release, .. } = &mut request.verb {
+                    *release = Some(number);
+                }
+            }
+            "--role" => {
+                if flag_value.is_empty() {
+                    return Err("--role requires a value".into());
+                }
+                role = Some(flag_value);
+            }
             "--handle" => {
                 if flag_value.is_empty() {
                     return Err("--handle requires a value".into());
@@ -222,6 +290,21 @@ fn project_identity_request(
                 request.fgos_dir = Some(std::path::PathBuf::from(flag_value));
             }
         }
+    }
+    match &mut request.verb {
+        fgos_identity::Verb::Session(action) => {
+            if take && role.is_none() {
+                return Err("--take needs --role".into());
+            }
+            if register || role.is_some() {
+                *action = fgos_identity::SessionAction::Register { role, take };
+            }
+        }
+        fgos_identity::Verb::List { project, prune: pruned } => {
+            *project = by_project;
+            *pruned = prune;
+        }
+        _ => {}
     }
     if matches!(request.verb, fgos_identity::Verb::Project(_)) {
         request.verb = fgos_identity::Verb::Project(match (mint, handle) {
@@ -387,6 +470,60 @@ mod tests {
             operation(&["identity", "project", "--handle", "app", "--new"]),
             "identity.write"
         );
+        assert_eq!(operation(&["identity", "mint", "work", "--json"]), "identity.write");
+        assert_eq!(operation(&["identity", "resolve", "lead:MAIL"]), "identity.read");
+        assert_eq!(operation(&["identity", "list", "--project"]), "identity.read");
+        assert_eq!(operation(&["identity", "list", "--prune"]), "identity.write");
+        assert_eq!(operation(&["identity", "session", "--register"]), "identity.write");
+        assert_eq!(
+            operation(&["identity", "session", "--role", "lead:MAIL", "--take"]),
+            "identity.write"
+        );
+    }
+
+    #[test]
+    fn identity_directory_flags_belong_to_their_verbs_only() {
+        let request = |args: &[&str]| {
+            let args: Vec<OsString> = args.iter().map(OsString::from).collect();
+            project_identity_request(&args)
+        };
+        let registered = request(&["identity", "session", "--role=lead:MAIL", "--take", "--json"]).unwrap();
+        assert_eq!(
+            registered.verb,
+            fgos_identity::Verb::Session(fgos_identity::SessionAction::Register {
+                role: Some("lead:MAIL".into()),
+                take: true
+            })
+        );
+        assert_eq!(
+            request(&["identity", "resolve", "claude-4f2a@fg", "--json"]).unwrap().verb,
+            fgos_identity::Verb::Resolve { query: "claude-4f2a@fg".into() }
+        );
+        assert_eq!(
+            request(&["identity", "list", "--project", "--prune"]).unwrap().verb,
+            fgos_identity::Verb::List { project: true, prune: true }
+        );
+        assert!(request(&["identity", "session", "--take"]).is_err(), "--take needs --role");
+        assert!(request(&["identity", "resolve"]).is_err());
+        assert!(request(&["identity", "machine", "--register"]).is_err());
+        assert!(request(&["identity", "list", "--role", "lead:MAIL"]).is_err());
+    }
+
+    #[test]
+    fn identity_mint_takes_a_kind_and_an_optional_release_number() {
+        let request = |args: &[&str]| {
+            let args: Vec<OsString> = args.iter().map(OsString::from).collect();
+            project_identity_request(&args)
+        };
+        let minted = request(&["identity", "mint", "d-adr", "--release", "73", "--json"]).unwrap();
+        assert_eq!(
+            minted.verb,
+            fgos_identity::Verb::Mint { kind: "d-adr".into(), release: Some(73) }
+        );
+        let message = request(&["identity", "mint", "--json"]).unwrap_err();
+        assert!(message.contains("requires an id kind") && message.contains("d-adr"), "{message}");
+        assert!(request(&["identity", "mint", "d-adr", "--release", "0"]).is_err());
+        assert!(request(&["identity", "machine", "--release", "3"]).is_err());
     }
 
     #[test]

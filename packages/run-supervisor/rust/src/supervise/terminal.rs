@@ -33,7 +33,8 @@ use serde_json::{json, Value};
 
 use super::{os, request_stop, write_atomic, Refusal, TerminalEnd, Watch, GATE_STOP_SLACK, HEARTBEAT_EVERY, HELLO_LIMIT, TICK};
 use crate::go_channel::{read_frame, write_frame};
-use crate::publish::{iso_utc_now, publish_once};
+use crate::publish::publish_once;
+use fgos_identity::text::iso_utc_now;
 use crate::route::EXIT_ENVELOPE_INVALID;
 use crate::terminal_slot::Backend;
 

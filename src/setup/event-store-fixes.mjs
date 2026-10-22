@@ -1,9 +1,9 @@
 // Dormant setup fixes. Git RepositoryConfig remains the sole Git config writer.
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
-import { ensureEventStoreRefspecs, mintEventStoreMachineId } from '../event-store/index.mjs';
+import { ensureEventStoreRefspecs } from '../event-store/index.mjs';
+import { mintMachineId } from '../util/identity-mint.mjs';
 import { eventStoreSetupContext } from './event-store-checks.mjs';
 
 function realDirectory(dir) {
@@ -14,11 +14,9 @@ function realDirectory(dir) {
   const meta = fs.lstatSync(absolute);
   if (!meta.isDirectory() || meta.isSymbolicLink()) throw new Error(`unsafe directory: ${absolute}`);
 }
+/** `events migrate` repairs a missing machine id through the one Identity mint; never replaces an existing id. */
 export function fixEventStoreMachineId(cwd, options = {}) {
-  const stateRoot = options.stateRoot ?? resolveStateRoot().stateRoot;
-  fs.mkdirSync(stateRoot, { recursive: true, mode: 0o700 });
-  const canonicalRoot = fs.realpathSync(stateRoot);
-  return mintEventStoreMachineId(canonicalRoot, os.hostname(), options.loaderOptions);
+  return mintMachineId(options.stateRoot ?? resolveStateRoot().stateRoot);
 }
 export function fixEventStoreRefspec(cwd, options = {}) {
   const { base, facts, config } = eventStoreSetupContext(cwd, options);

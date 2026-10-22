@@ -414,4 +414,13 @@ check exists it is named, otherwise the reviewer checks it.
    test names the test that now owns the behaviour, or says the behaviour was
    removed. Reports never count "all N assertion lines kept" as success.
 
+#### Id Minting
+
+- id: `id-minting`
+- source: `core/instructions/id-minting.md`
+
+# Id Minting
+
+Every id that travels between machines (a work item, a backlog row, a `D-ADR####` decision number, a decision file number) comes from `fgos identity mint <kind>` (`work`, `backlog`, `d-adr`, `decision-file`; `--json` for machine output). Never read the highest number and add one, never derive an id from a title. The mint door owns the rule (`docs/platform/identity/spec.md`, section 4a); a `d-adr` or `decision-file` claim needs the network and fails clearly without it, and the format never changes to work around that.
+
 <!-- fgos:instruction-projection:end -->

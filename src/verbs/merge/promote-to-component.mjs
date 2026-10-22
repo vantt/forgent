@@ -11,7 +11,7 @@
 // field parent"). Records one real decision summarizing every member's
 // outcome.
 import { listWork, addWork, editWork, addDecision, StoreError } from '../../state/store.mjs';
-import { generateId } from '../../intake/classify.mjs';
+import { mintWorkId } from '../../util/identity-mint.mjs';
 import { isMainWorktree } from '../../runner/worktree.mjs';
 import { resolveIntegrationBranch, retargetMember } from '../../runner/promote-engine.mjs';
 import { acknowledgeLand } from '../../runner/merge.mjs';
@@ -87,7 +87,7 @@ export async function promoteToComponentUseCase({ dir, repoRoot }, { ids, rootId
     if (rootTitle === undefined || rootTitle === null || rootTitle === '' || rootTitle === true) {
       throw new StoreError('validation', 'promote-to-component requires --root-id (an existing member to promote) or --root-title (to create a fresh root item).');
     }
-    rootId = generateId(rootTitle, Object.keys(view.work));
+    rootId = mintWorkId();
     // A freshly created root is a pure milestone-style grouping item
     // (tsk-5t3a precedent, no code of its own) — 'light'/'true' mirror
     // that precedent's own minimal, trivially-true shape. 'light' is the

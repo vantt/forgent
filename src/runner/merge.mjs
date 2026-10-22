@@ -85,19 +85,6 @@ function diffPaths(port, before, after, scope = {}) {
   return paths;
 }
 
-/** Every file path starting with the literal `prefix` at the commit or tree
- * `revision`. */
-function treePaths(port, revision, prefix) {
-  const paths = [];
-  let cursor;
-  do {
-    const page = port.listTree({ revision, prefix, maxEntries: 4096, cursor });
-    paths.push(...page.entries.filter(entry => entry.kind !== 'tree').map(entry => Buffer.from(entry.path).toString('utf8')));
-    cursor = page.nextCursor;
-  } while (cursor);
-  return paths;
-}
-
 // Review patches retain the existing 50 MiB ceiling and caller override.
 // Inspect enforces the bound before returning patch text to Node.
 const DIFF_MAX_BUFFER = 50 * 1024 * 1024;
@@ -397,247 +384,6 @@ export function changedFiles(repoRoot, item, opts = {}) {
     throw new MergeError(`computing changed files for branch "${branch}" failed: ${err.message}`, { branch });
   }
 }
-
-// DECISION-ID COLLISION AUTO-RESOLVE (tsk-3mv-1, CONTEXT.md D1a): a
-// content-agnostic conflict shape, proven real on `tsk-66l`
-// (docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md)
-// -- two branches independently pick the same "next free" decision-record
-// id and both insert a row for it into `docs/decisions/0000-index.md` at
-// the same position. `classifyDecisionIndexCollision` below only ever
-// RECOGNIZES this shape (never resolves anything); the caller decides
-// whether to attempt a resolve, and the resolve itself renumbers ONLY
-// `branch`'s own colliding decision file(s) -- `HEAD`'s (main's) numbering
-// is always treated as already-authoritative, matching the how-to's own
-// "find the real next-free ID from main" step. Any conflict shape this
-// classifier does not recognize returns null, and the caller falls
-// through to the exact same abort-and-report `conflict` outcome as before
-// this feature existed -- self-resolve is additive, never a new way to
-// silently keep the wrong content (CONTEXT.md's pinned "self-resolvable
-// merge-conflict" boundary is a hard line, not a suggestion).
-
-const DECISION_INDEX_PATH = 'docs/decisions/0000-index.md';
-const DECISION_FILE_RE = /^docs\/decisions\/(\d{4})-([^/]+)\.md$/;
-const DECISION_ROW_RE = /^\|\s*\[(\d{4})\]\(([^)]+)\)\s*\|/;
-
-/** Split a conflicted file's raw text (as `git merge --no-commit --no-ff`
- * leaves it on disk) into an ordered list of segments -- plain `{type:
- * 'text', lines}` runs and `{type: 'conflict', oursLines, theirsLines}`
- * hunks -- so a caller can reconstruct the file with only the conflict
- * hunks replaced. Tolerates zero conflict markers (an all-text list),
- * though a caller in this module never calls it on an unconflicted file. */
-export function splitConflictSegments(text) {
-  const lines = text.split('\n');
-  const segments = [];
-  let textLines = [];
-  let i = 0;
-  while (i < lines.length) {
-    if (lines[i].startsWith('<<<<<<<')) {
-      if (textLines.length > 0) {
-        segments.push({ type: 'text', lines: textLines });
-        textLines = [];
-      }
-      i++;
-      const oursLines = [];
-      while (i < lines.length && !lines[i].startsWith('=======')) {
-        oursLines.push(lines[i]);
-        i++;
-      }
-      i++; // skip the "=======" separator itself
-      const theirsLines = [];
-      while (i < lines.length && !lines[i].startsWith('>>>>>>>')) {
-        theirsLines.push(lines[i]);
-        i++;
-      }
-      i++; // skip the ">>>>>>> branch" marker itself
-      segments.push({ type: 'conflict', oursLines, theirsLines });
-    } else {
-      textLines.push(lines[i]);
-      i++;
-    }
-  }
-  if (textLines.length > 0) {
-    segments.push({ type: 'text', lines: textLines });
-  }
-  return segments;
-}
-
-/**
- * Classify whether the conflicted text of `docs/decisions/0000-index.md`
- * (as `git merge-tree --write-tree` leaves it in its merged tree, read by
- * `declareLandFiles` only when that index is the ONLY conflicted path --
- * any other conflicted path, or more than one, is never this shape) is a
- * self-resolvable decision-ID collision. Requires every conflict hunk in it to be a pure
- * two-sided row INSERTION -- both `oursLines` and `theirsLines` are
- * non-empty, share no identical line (a same-row edit reads as one side
- * repeating what the other kept, which this never treats as a safe
- * insertion), and every line on both sides matches the index's own `|
- * [NNNN](file.md) | ... |` row shape. Returns `null` for anything else --
- * a real content dispute, a non-index conflict, or a hunk this classifier
- * cannot confidently read as "two independent new rows" -- so the caller's
- * only choice on `null` is the pre-existing abort-and-report path.
- */
-function classifyDecisionIndexText(raw) {
-  const segments = splitConflictSegments(raw);
-  const conflicts = segments.filter((s) => s.type === 'conflict');
-  if (conflicts.length === 0) {
-    return null;
-  }
-  const oursIds = new Set();
-  const theirsIds = new Set();
-  const oursLinks = new Set();
-  const theirsLinks = new Set();
-  for (const hunk of conflicts) {
-    if (hunk.oursLines.length === 0 || hunk.theirsLines.length === 0) {
-      return null; // a pure delete/keep on either side is not two insertions
-    }
-    const oursSet = new Set(hunk.oursLines);
-    if (hunk.theirsLines.some((line) => oursSet.has(line))) {
-      return null; // an identical line on both sides doesn't read as two independent inserts
-    }
-    for (const line of hunk.oursLines) {
-      const m = line.match(DECISION_ROW_RE);
-      if (!m) return null;
-      oursIds.add(m[1]);
-      oursLinks.add(m[2]);
-    }
-    for (const line of hunk.theirsLines) {
-      const m = line.match(DECISION_ROW_RE);
-      if (!m) return null;
-      theirsIds.add(m[1]);
-      theirsLinks.add(m[2]);
-    }
-  }
-  // The decisive signal a same-id COLLISION (two independent new rows that
-  // happen to claim the same next-free number) is not the same thing as a
-  // same-ROW EDIT (both sides changing an existing row's text differently):
-  // a genuine insertion collision always links to two DIFFERENT files (each
-  // side wrote its own new decision doc); an edit dispute always links to
-  // the SAME already-existing file on both sides. Any shared link target
-  // between ours/theirs means at least one hunk is really an edit dispute,
-  // not two independent inserts -- bail to the safe abort-and-report path.
-  if ([...oursLinks].some((link) => theirsLinks.has(link))) {
-    return null;
-  }
-  const collidingIds = [...theirsIds].filter((id) => oursIds.has(id)).sort();
-  return { segments, oursIds, theirsIds, collidingIds };
-}
-
-/** The next free 4-digit decision id after every id already present on
- * `refs` -- a single ref, or an array of refs when more than one tree's
- * decision files must be considered together (tsk-2iz: the auto-resolve
- * resolution in `declareLandFiles` needs BOTH the target and the incoming source's
- * own new decision files, never `HEAD` alone -- a branch can carry new,
- * non-colliding decision files ABOVE `HEAD`'s own max that `HEAD`-only
- * would never see, minting an id that then collides with one of those
- * files). The index file itself, id "0000", is excluded from every ref --
- * it is the index, never a decision record. Mirrors the how-to's own "read
- * the highest existing number on disk and add one" rule, generalized to
- * consider every tree that could hold a colliding number, instead of a
- * person reading just one tree by hand. */
-export function nextFreeDecisionId(repoRoot, refs) {
-  const refList = Array.isArray(refs) ? refs : [refs];
-  const port = inspectGit(repoRoot);
-  let max = 0;
-  for (const ref of refList) {
-    for (const f of treePaths(port, resolveRefSha(repoRoot, ref), 'docs/decisions/')) {
-      const m = f.match(DECISION_FILE_RE);
-      if (m && m[1] !== '0000') {
-        max = Math.max(max, parseInt(m[1], 10));
-      }
-    }
-  }
-  return String(max + 1).padStart(4, '0');
-}
-
-/** A decision doc's own text with its title and heading lines citing
- * `newId` instead of `oldId` -- the two mechanical, always-present
- * self-references every decision doc carries. A `supersedes`/`superseded_by`
- * cross-reference to a DIFFERENT decision's id is deliberately left
- * untouched (it names another doc, not this one), and free-text prose that
- * cites the doc's own old number by hand is a documented residual
- * limitation, the same illustrative-not-exhaustive stance `iron-law.mjs`'s
- * own module list takes. */
-function renumberDecisionText(text, oldId, newId) {
-  const oldIdRe = new RegExp(`\\b${oldId}\\b`);
-  const lines = text.split('\n');
-  let titleFixed = false;
-  let headingFixed = false;
-  for (let i = 0; i < lines.length; i++) {
-    if (!titleFixed && lines[i].startsWith('title:') && oldIdRe.test(lines[i])) {
-      lines[i] = lines[i].replace(oldIdRe, newId);
-      titleFixed = true;
-      continue;
-    }
-    if (!headingFixed && lines[i].startsWith('# ') && oldIdRe.test(lines[i])) {
-      lines[i] = lines[i].replace(oldIdRe, newId);
-      headingFixed = true;
-    }
-  }
-  return lines.join('\n');
-}
-
-/** Rebuild `docs/decisions/0000-index.md`'s conflicted text with every
- * conflict hunk replaced by the union of both sides' rows, sorted
- * numerically by decision id -- `idRenames` (a `Map<oldId, {newId,
- * newPath}>`, only ever populated for `theirs`-side ids that collided with
- * an `ours` id) rewrites a renamed row's `[oldId](oldPath)` link to
- * `[newId](newPath)` before sorting. Returns the text; the caller declares
- * it as candidate bytes. */
-function rebuildDecisionIndex(classification, idRenames) {
-  const rewriteRow = (line) => {
-    const m = line.match(DECISION_ROW_RE);
-    const rename = idRenames.get(m[1]);
-    if (!rename) return line;
-    return line
-      .replace(`[${m[1]}]`, `[${rename.newId}]`)
-      .replace(`(${m[2]})`, `(${path.basename(rename.newPath)})`);
-  };
-  const rowSortKey = (line) => line.match(DECISION_ROW_RE)[1];
-
-  const rebuilt = classification.segments.map((segment) => {
-    if (segment.type === 'text') {
-      return segment.lines.join('\n');
-    }
-    const rows = [...segment.oursLines, ...segment.theirsLines.map(rewriteRow)];
-    rows.sort((a, b) => (rowSortKey(a) < rowSortKey(b) ? -1 : 1));
-    return rows.join('\n');
-  }).join('\n');
-  return rebuilt;
-}
-
-// tsk-1lv-2: a "mirrors merge.mjs collision-resolve subsystem" auto-resolve
-// for the new GENERATED docs/decisions/index.md was attempted here and
-// removed after direct reproduction proved it structurally unreachable for
-// the specific scenario tested (two branches each committing a decision +
-// regenerated index): a `fgw/<id>` worker branch can never legitimately
-// carry a `.fgos/`-derived regenerated file through its own commit,
-// because regenerating `docs/decisions/index.md` correctly requires
-// reading `.fgos/events.jsonl`, which a worktree never carries in the
-// first place (ADR0020) -- so no branch can produce a *meaningful*
-// regenerated version to collide over in a runner merge for a normal,
-// well-formed regenerate. Cross-checked against `docs/how-to/fix-fgos-
-// write-rejected-merge-block.md`'s own documented precedent (tsk-n4i-1/
-// tsk-5vf/tsk-4eu/tsk-5ge/tsk-28o/tsk-3v2 -- six independent real
-// occurrences of the SAME `.fgos/`-staged wall, a different scenario from
-// this one).
-//
-// **This does NOT make a hostile or accidental regeneration impossible to
-// merge (tsk-1lv review-fix F12, corrected here)** -- `fgos-write-rejected`
-// (`declareLandFiles`) only rejects a merge that changes a path
-// under `.fgos/`; `docs/decisions/index.md` itself is an ordinary tracked
-// doc file, not a `.fgos/` path, so that wall never inspects it at all. A
-// worktree running `fgos decision-index` with no real store to read from
-// (the exact ADR0020 gap above) computes the "no decisions yet" placeholder
-// -- committing and merging THAT is a real, ordinary git merge
-// a runner merge would happily accept, silently blanking every platform
-// decision's projection. The actual fix is a guard at the write site, not
-// a merge-time collision-resolve: `generateDecisionIndex`
-// (`src/report/decision-index.mjs`) now refuses to overwrite an index that
-// already has real rows with freshly-computed content that has none.
-// `docs/decisions/0000-index.md` (the OLD hand-authored corpus above) is a
-// genuinely different case: those files are ordinary tracked source a work
-// item's own branch legitimately creates as part of its real diff, never a
-// `.fgos/`-derived regeneration.
 
 /**
  * A lock-held answer from the repo-lock door as the MergeError every merge
@@ -1073,8 +819,7 @@ function declareStoreFiles(repoRoot, item, { target, source, tree, conflictedPat
 /**
  * The trusted-side resolutions a Land candidate of `source` onto `target`
  * needs, as declared candidate files, read from a read-only
- * `git merge-tree` of the two exact OIDs: a decision-id collision on the
- * decision index is renumbered and unioned, and the store rule
+ * `git merge-tree` of the two exact OIDs: the store rule
  * (`declareStoreFiles`) keeps the target's `.fgos` bytes. Anything else
  * returns the outcome the merge verbs already report: `conflict`, or
  * `fgos-write-rejected` with the paths a branch tried to write under `.fgos`.
@@ -1082,34 +827,12 @@ function declareStoreFiles(repoRoot, item, { target, source, tree, conflictedPat
 export function declareLandFiles(repoRoot, item, target, source) {
   const { tree, conflictedPaths } = readMergeTree(repoRoot, target, source);
   const files = new Map();
-  const declare = (relPath, bytes) => files.set(relPath, { path: relPath, bytes: bytes === null ? null : [...bytes] });
-  let selfResolved = false;
-  if (conflictedPaths.length === 1 && conflictedPaths[0] === DECISION_INDEX_PATH) {
-    const classification = classifyDecisionIndexText(readPathsAt(repoRoot, tree, [DECISION_INDEX_PATH]).get(DECISION_INDEX_PATH)?.toString('utf8') ?? '');
-    if (!classification) return { outcome: 'conflict' };
-    const port = inspectGit(repoRoot);
-    const targetFiles = new Set(treePaths(port, target, 'docs/decisions/'));
-    const sourceFiles = treePaths(port, source, 'docs/decisions/');
-    const idRenames = new Map();
-    let nextId = nextFreeDecisionId(repoRoot, [target, source]);
-    for (const oldId of classification.collidingIds) {
-      const oldPath = sourceFiles.find((f) => f.match(DECISION_FILE_RE)?.[1] === oldId && !targetFiles.has(f));
-      if (!oldPath) return { outcome: 'conflict' };
-      const newPath = `docs/decisions/${nextId}-${oldPath.match(DECISION_FILE_RE)[2]}.md`;
-      declare(oldPath, null);
-      declare(newPath, Buffer.from(renumberDecisionText(readPathsAt(repoRoot, source, [oldPath]).get(oldPath).toString('utf8'), oldId, nextId)));
-      idRenames.set(oldId, { newId: nextId, newPath });
-      nextId = String(parseInt(nextId, 10) + 1).padStart(4, '0');
-    }
-    declare(DECISION_INDEX_PATH, Buffer.from(rebuildDecisionIndex(classification, idRenames)));
-    selfResolved = true;
-  }
   const { unresolved, written: rejected } = declareStoreFiles(repoRoot, item, {
-    target, source, tree, conflictedPaths: selfResolved ? [] : conflictedPaths,
+    target, source, tree, conflictedPaths,
   }, files);
   if (unresolved.length > 0) return { outcome: 'conflict' };
-  if (rejected.length > 0) return { outcome: 'fgos-write-rejected', paths: rejected, ...(selfResolved && { selfResolved }) };
-  return { files: [...files.values()], selfResolved };
+  if (rejected.length > 0) return { outcome: 'fgos-write-rejected', paths: rejected };
+  return { files: [...files.values()] };
 }
 
 /**
@@ -1166,7 +889,7 @@ export async function landRunnerItem(repoRoot, item, {
   const source = resolveRefSha(repoRoot, branch);
   const declared = declareLandFiles(repoRoot, item, pinned, source);
   if (declared.outcome) return { ...declared, branch };
-  const { files, selfResolved } = declared;
+  const { files } = declared;
   // Read the paths this branch brings before it lands: afterwards the target
   // contains it and the diff that names them is empty (tsk-2ypd).
   const landedFiles = changedFiles(repoRoot, item, { trunk: target });
@@ -1215,7 +938,7 @@ export async function landRunnerItem(repoRoot, item, {
       if (check.passed) {
         // The repo-invariant gate runs on the exact tree about to land.
         const invariant = await runInvariantChecks(readInvariantCheckCommands(repoRoot), candidate.worktree, timeoutMs);
-        if (!invariant.passed) return settled({ outcome: 'verify-fail', branch, check: invariantFailureAsCheck(invariant), ...(selfResolved && { selfResolved }) });
+        if (!invariant.passed) return settled({ outcome: 'verify-fail', branch, check: invariantFailureAsCheck(invariant) });
       }
     } else {
       check = {
@@ -1223,14 +946,14 @@ export async function landRunnerItem(repoRoot, item, {
         output: `verify skipped: the merged tree is identical to ${item.branchHeadAtReturn}, already verified green at return (${target} is an ancestor of "${branch}" or advanced only on paths it never touched, and the branch tip has not moved since)`,
       };
     }
-    if (!check.passed) return settled({ outcome: 'verify-fail', branch, check, ...(selfResolved && { selfResolved }) });
+    if (!check.passed) return settled({ outcome: 'verify-fail', branch, check });
     phase = 'publish';
     const receipt = await port.publish({
       source: candidate.source, target: candidate.target,
       candidate: candidate.candidate, treeDigest: candidate.treeDigest,
       evidenceDigest: crypto.createHash('sha256').update(JSON.stringify({ item: item.id, check })).digest('hex'),
     }, { waitMs: lockWaitMs });
-    return settled({ outcome: 'merged', branch, check, receipt, ...(selfResolved && { selfResolved }) }, 'delivered');
+    return settled({ outcome: 'merged', branch, check, receipt }, 'delivered');
   } catch (err) {
     let detail;
     try { detail = JSON.parse(err.message); } catch { detail = {}; }
