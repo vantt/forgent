@@ -1,7 +1,7 @@
 ---
 phase: 9
 title: "Feasibility demo: two real CLI sessions talk through the mailbox"
-status: in progress (D1, D2 done; D3, D4 wait for the owner's go)
+status: done
 depends_on: [8]
 live_calls: 8
 ---
@@ -133,3 +133,9 @@ D1 and D2 `result.json` and the report. D1 must pass for the phase to pass; a D2
 - **Dry runs: D3 and D4 passed every check**, in real panes of a separate herdr session `mbx-dry` (started with `ensureWorkerSession`, which refuses the owner's session; stopped afterwards), with the stub CLIs launched through the same door. Nothing touched the owner's herdr. The labels herdr reported: tab `mailbox demo D3 (Claude-Claude)` with panes `D3 Minh · Claude`, `D3 Lan · Claude`; tab `mailbox demo D4 (Claude-Codex)` with panes `D4 Minh · Claude`, `D4 Lan · Codex`.
 - **Which workspace:** measured on the separate session, `herdr tab create` without `--workspace` (what the driver runs for a group's first pane) uses the **focused** workspace and ignores `HERDR_WORKSPACE_ID`. Read-only on the owner's server now: the focused workspace is `forgent` (`w4`). The harness records the focused workspace just before it allocates.
 - **Not verified without a model or a real CLI:** that interactive Claude Code 2.1.308 starts without any first-run screen under the seeded `HOME`, and that interactive Codex 0.161.0 starts without one in a non-git workspace (its trust entry is in `config.toml`; `--skip-git-repo-check` exists only for `exec`).
+
+## D3 and D4 run (2026-10-22, after the go)
+
+- **D3 (Claude ↔ Claude, panes): passed every check**, the nonce on every line; no first-run screen. Panes closed afterwards by the plan owner at the owner's request; Terminal Control reads both slots gone.
+- **D4 (Claude ↔ Codex, panes; feasibility demo, not a support claim): delivery proven for turns 1–3, stalled at the idle recipient.** Codex in interactive mode ended its turn instead of running the scripted waits, and `[3/4]` stayed `recorded` at the idle Codex. The owner asked to stop; the plan owner closed the panes; both slots read gone.
+- Findings recorded in the report: interactive Codex skips scripted waits; an idle interactive recipient needs the wake channel of a later rung. Live spend of phase 9: 8 invocations.

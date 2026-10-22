@@ -89,3 +89,36 @@ Idle wake (no wake channel in V4), interactive sessions (D3 and D4, waiting for 
 Live spend after phase 9's print-mode part: phase 9 4 invocations (Claude 3, Codex 1); V4 total 14.
 
 Plan owner's decision after D1/D2: D1 counts as passed for delivery; Lan's prompt now names the nonce explicitly for every later scene. D3 and D4 (interactive panes) are prepared and dry-run in a separate herdr session; they wait for the owner's go.
+
+## Phase 9: interactive scenes in two visible panes (owner watching)
+
+Both scenes ran once each after the plan owner's go, with `forgent` (`w4`) focused and 21 GB available (re-checked before each). Panes were opened through Terminal Control's internal route with the installed host, each CLI started as `env -i <allowlisted env> <cli> …` with its prompt as the first message (one line), and released `retain` with no deadline. No first-run screen stalled any pane: the seeded `HOME` and `skipDangerousModePermissionPrompt` were enough for Claude Code 2.1.308, and interactive Codex 0.161.0 started without a prompt in the trusted workspace.
+
+### D3, Claude to Claude, interactive (2 invocations): passed
+
+Tab `w4:t2Q` "mailbox demo D3 (Claude-Claude)", panes `w4:p3Z` "D3 Minh · Claude" and `w4:p30` "D3 Lan · Claude".
+
+> **Minh:** [1/4] Chào Lan, code của em chạy mượt như nụ cười của em vậy, cho anh mời em ly cà phê nhé? ec0b3c8f  
+> **Lan:** [2/4] Haha anh lại nịnh em rồi, cà phê thì được, nhưng anh phải hứa không soi code em lúc em đang debug nha. ec0b3c8f  
+> **Minh:** [3/4] Haha, anh hứa không soi code em lúc em đang debug nha, chỉ ngắm em thôi. ec0b3c8f  
+> **Lan:** [4/4] Ngắm thì anh cứ ngắm, nhưng nhớ uống cà phê rồi đi ngủ sớm nha, hẹn anh lần sau. ec0b3c8f  
+
+Every check passed: four sends in order with their delivery-report sentences, four messages alternating and linked at depths 0–3, all `offered`; turns 1 and 3 claimed at Lan's `post-tool-use` hooks, turns 2 and 4 at Minh's; each transcript holds the other's frame; both sessions' final lines (two `LAN:`, two `MINH:`) carry the nonce; two bindings only; both panes launched and identified. Times from Minh's start: registrations at 3.5 s and 7.6 s, messages at 9.7, 15.1, 18.5 and 22.0 s. Afterwards, at the owner's request, the plan owner closed both panes directly with `herdr pane close` (the tab went with them); Terminal Control's `inspect` then reads both slots `pane: gone`, so nothing needed reconciling.
+
+### D4, Claude to Codex, interactive (2 invocations; feasibility demo, not a support claim): delivery proven for turns 1–3, stalled at the idle recipient
+
+Tab `w4:t2R` "mailbox demo D4 (Claude-Codex)", panes `w4:p41` "D4 Minh · Claude" and `w4:p42` "D4 Lan · Codex".
+
+> **Minh:** [1/4] Chào Lan, code của em chạy mượt như nụ cười của em vậy, cho anh mời em ly cà phê nhé? 77416c16  
+> **Lan:** [2/4] Cà phê thì em nhận, còn lời khen này anh có viết unit test chưa mà tự tin thế? Nhớ chọn quán có bánh ngon để em dễ duyệt lời mời nhé 77416c16  
+> **Minh:** [3/4] Dạ, em chưa viết unit test ạ, em chỉ thấy code chạy ngon thôi, hihi. Quán có bánh ngon thì em chọn, anh cứ hẹn giờ nhé 77416c16  
+
+What held: both panes launched and were identified; the version pin and the Codex login link and status held after the run; turns 1–3 were sent with their delivery-report sentences, recorded alternating and linked at depths 0, 1, 2; both sessions' transcripts (Lan's rollout as developer messages) hold the other's frame; two bindings only. What did not: turn 1 (sent with `--wake`) reached Lan at a `Stop` hook, not at a `post-tool-use` after her first wait; Lan replied `[2/4]`, then wrote her final `MINH:` line and ended her turn instead of running step 4 (her second wait); Minh's `[3/4]` (a reply, so no wake) stayed `recorded` with 0 offers, because an idle Codex at its prompt fires no hook, and a `Stop` claims only wake mail. Lan's hook log has 4 `Stop` calls and 2 `post-tool-use` calls in all. The harness's 180 s stall rule released Minh's second wait; Minh then ended his turn too. The owner asked to stop the scene, and the plan owner closed both panes with `herdr pane close`; Terminal Control's `inspect` reads both slots `pane: gone`, and no demo CLI process is left. Times from Minh's start: registrations at 3.5 s and 12.9 s, messages at 15.8, 29.0 and 32.8 s.
+
+### Findings of the interactive scenes
+
+1. **Codex 0.161.0 in interactive mode ended its turn instead of running the scripted waits** (twice: before its first wait, so turn 1 arrived at its `Stop`, and after `[2/4]`, skipping step 4). In print mode (D2) the same prompt shape ran every step.
+2. **An idle interactive recipient needs the wake channel.** Once a session sits at its prompt, mail waits until something starts its turn; a reply (no wake) is not even claimed at the next `Stop`, only at the next tool call. The wake channel (the Claude scoped socket, `codex queue`) belongs to a later rung (spec §14; owner question 1 option c was outside V4).
+3. Interactive Claude Code 2.1.308 and Codex 0.161.0 started without any first-run screen under the harness's isolation (seeded Claude state and `skipDangerousModePermissionPrompt`; Codex with its workspace trusted in `config.toml`).
+
+Live spend of the interactive scenes: 4 invocations (Claude 3, Codex 1). V4 total: 18 (phase 2 5, phase 8 5, phase 9 8), within the plan owner's budget.

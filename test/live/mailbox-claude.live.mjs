@@ -1029,6 +1029,8 @@ async function paneStarter(ctx) {
     tc.label({ key, display: { label: names[role] } });
     ctx.panes.keys[role] = { key, paneId: allocated.paneId ?? allocated.slot?.paneId ?? null };
     if (ctx.panes.keys[role].paneId) ctx.panes.keys[role].observed = observePane(herdrEnv, ctx.panes.keys[role].paneId);
+    // Where to look, written as soon as each pane exists, before its CLI starts.
+    writeJson(path.join(ctx.dir, 'panes.json'), { group, workspace: ctx.panes.workspace, labels: names, keys: ctx.panes.keys });
     const pairs = Object.entries(env).map(([k, v]) => `${k}=${v}`);
     if (!ctx.dry) writeJson(path.join(ctx.dir, `spawned-${role}.json`), { role, cli, at: new Date().toISOString(), version, key });
     const launched = tc.launch({ key, launchSpec: { command: '/usr/bin/env', args: ['-i', ...pairs, bin, ...cliArgs], cwd: ctx.ws[role], env: {}, expect: { argv0: bin, command: bin, args: cliArgs } } });
