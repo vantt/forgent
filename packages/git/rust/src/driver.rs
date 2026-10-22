@@ -415,41 +415,9 @@ impl GitDriver {
     /// Disk-only authority check, kept before every checkout child. Git config
     /// and storage probes belong to the operation, not topology discovery.
     pub(crate) fn resolve_topology(&self, path: &Path, trusted_main: &Path) -> Result<ResolveRepo> {
-        let mut main = fs::canonicalize(trusted_main).map_err(io)?;
         let path = fs::canonicalize(path).map_err(io)?;
-        // Callers may supply a cwd beneath a checkout. Locate only on disk;
-        // never let Git or GIT_* environment select topology authority.
-        while !main.join(".git").exists()
-            && !(main.join("HEAD").is_file() && main.join("objects").is_dir())
-        {
-            if !main.pop() {
-                return Ok(ResolveRepo::NotARepository);
-            }
-        }
-        // A linked cwd supplies only a discovery hint. Trust comes from the
-        // main .git directory and reciprocal registered gitdir/backlink.
-        let main = if main.join(".git").is_file() {
-            let hint = fs::read(main.join(".git")).map_err(io)?;
-            let hint = line(&hint)?
-                .strip_prefix("gitdir: ")
-                .ok_or_else(|| refusal("untrusted-worktree"))?;
-            let admin = fs::canonicalize(main.join(hint)).map_err(io)?;
-            let common_hint = fs::read(admin.join("commondir"))
-                .map_err(|_| refusal("trusted-main-gitfile-unsupported"))?;
-            let common = fs::canonicalize(admin.join(line(&common_hint)?)).map_err(io)?;
-            let backlink = fs::read(admin.join("gitdir")).map_err(io)?;
-            if common.file_name() != Some(std::ffi::OsStr::new(".git"))
-                || admin.parent() != Some(common.join("worktrees").as_path())
-                || Path::new(line(&backlink)?) != main.join(".git")
-            {
-                return Err(refusal("untrusted-worktree"));
-            }
-            common
-                .parent()
-                .ok_or_else(|| refusal("untrusted-worktree"))?
-                .to_owned()
-        } else {
-            main
+        let Some(main) = main_checkout_root(trusted_main)? else {
+            return Ok(ResolveRepo::NotARepository);
         };
         let common = if main.join(".git").is_dir() {
             let dir = main.join(".git");
@@ -1575,6 +1543,50 @@ fn text_path(path: &Path) -> Result<String> {
         .map(str::to_owned)
         .ok_or_else(|| refusal("non-utf8-authority-path"))
 }
+/// The main checkout of the repository holding `start` (or the repository
+/// directory of a bare one), read from disk only: it walks up from `start`
+/// to the first `.git` (or bare layout) and, for a linked worktree's `.git`
+/// file, follows `gitdir:` to the worktree's admin directory, its
+/// `commondir` and its `gitdir` back-link, which must name each other. No
+/// subprocess, no state root, no lock, no write. `None` outside a
+/// repository. [`GitDriver`]'s topology check starts from it.
+pub fn main_checkout_root(start: &Path) -> Result<Option<PathBuf>> {
+    let mut main = fs::canonicalize(start).map_err(io)?;
+    // Callers may supply a cwd beneath a checkout. Locate only on disk;
+    // never let Git or GIT_* environment select topology authority.
+    while !main.join(".git").exists()
+        && !(main.join("HEAD").is_file() && main.join("objects").is_dir())
+    {
+        if !main.pop() {
+            return Ok(None);
+        }
+    }
+    if !main.join(".git").is_file() {
+        return Ok(Some(main));
+    }
+    // A linked cwd supplies only a discovery hint. Trust comes from the
+    // main .git directory and reciprocal registered gitdir/backlink.
+    let hint = fs::read(main.join(".git")).map_err(io)?;
+    let hint = line(&hint)?
+        .strip_prefix("gitdir: ")
+        .ok_or_else(|| refusal("untrusted-worktree"))?;
+    let admin = fs::canonicalize(main.join(hint)).map_err(io)?;
+    let common_hint = fs::read(admin.join("commondir"))
+        .map_err(|_| refusal("trusted-main-gitfile-unsupported"))?;
+    let common = fs::canonicalize(admin.join(line(&common_hint)?)).map_err(io)?;
+    let backlink = fs::read(admin.join("gitdir")).map_err(io)?;
+    if common.file_name() != Some(std::ffi::OsStr::new(".git"))
+        || admin.parent() != Some(common.join("worktrees").as_path())
+        || Path::new(line(&backlink)?) != main.join(".git")
+    {
+        return Err(refusal("untrusted-worktree"));
+    }
+    common
+        .parent()
+        .map(|p| Some(p.to_owned()))
+        .ok_or_else(|| refusal("untrusted-worktree"))
+}
+
 fn line(bytes: &[u8]) -> Result<&str> {
     let bytes = bytes.strip_suffix(b"\n").unwrap_or(bytes);
     std::str::from_utf8(bytes).map_err(|_| refusal("git-protocol-invalid-utf8"))
