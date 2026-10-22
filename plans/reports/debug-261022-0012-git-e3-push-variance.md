@@ -39,6 +39,10 @@ Fast mode p95 is 145-147 ms against the 150 ms budget (about 3% headroom); slow 
 
 `scripts/git/e3-bench.mjs`: ScopedCommit is judged `passed` by p95 <= 250 ms and Land by p95 <= 1.6 s (`budgetP95Ms` in the row); `p95Ratio` is still printed. Census regenerated (`mutation-census.v1.json`), `test/git/e3-census.test.mjs` green. Commit f1c76f063.
 
+## Owner decision 2026-10-22: judge by disk state
+
+Option 2 chosen. `e3-bench.mjs` now runs a plain 4 KiB write+fsync probe (p50 of 200) before and after the push row; the round is `fsync-fast` only if both probes are within 1.2 x the lowest probe the process has seen (the floor, so no host number is hardcoded; 1.2 sits between 1 and the observed 1.44 ratio). The 150 ms and 250 ms budgets apply only to fsync-fast rounds; a slow round reports p95, `p95OverBudget` and the probes with verdict `not-judged: fsync-slow`. Limit: a process whose probes are all slow has a slow floor and is judged as fast; rerun when push p95 is high and the probe reads above the usual 5.2 ms. Budget table updated in `e3-budgets.md`; classification and verdict covered in `test/git/e3-census.test.mjs`.
+
 ## Open questions
 
 - What flips the device between 5.2 and 7.5 ms? Candidates: NVMe APST (`default_ps_max_latency_us` is 100000 here, so deep states are allowed), controller thermal/SLC-cache state (temps read 43.9 / 53.9 C when I looked, not logged per round), or another session's writes. Not tested; needs root `nvme smart-log` or a temperature log next to the probe.
