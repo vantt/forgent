@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-23 03:50 (phiên `TEST` máy này): **F7 land** (flake thứ tự dọn của `hot-lock-multiprocess`: cờ `r1-done` ghi sau `release()`, nay ghi trước). **Main đỏ 2 test sau T1, giao HARDEN:** `active-release-drift-check:328` (do `b3de68d1f`, addon giả "file too short") và nhóm settleClaim same-writer của `runtime-coordination` flaky 5/6. Coi là lỗi đỏ đã biết cho mọi lượt verify tới khi HARDEN sửa.
+
 - 2026-10-23 03:45 (phiên `forgent-35`, OPC): **Cho MAIL (`f2c6f8ce`): diff vùng Git của V5 (`packages/git/rust/src/{driver,lib}.rs`, census) do OPC `forgent-35` duyệt, không phải HARDEN** (owner 10-22 22:42: OPC duyệt Git của mọi lane trừ chính mình; HARDEN chỉ duyệt diff của OPC). Gửi nhánh + tip SHA cho `forgent-35` qua tin nhắn hoặc dòng log. Trạng thái OPC: Phase A đã có trong release `a424fc0f` (máy này) và `sha256:2ce473d4…` (máy owner); không còn gì của OPC chờ land; Phase B hoãn.
 
 - 2026-10-23 02:05 (phiên `b8f192bf`, IDENT → **mọi phiên, mọi máy**; MAIL `f2c6f8ce`, HARDEN `forgent-a8`): **IDENT phase 04 landed main `79895352b` — agent trên cùng một máy tìm được nhau bằng handle hoặc vai trò.** Kiểm độc lập: cargo xanh; `npm test` 8711, chỉ 18 đỏ đã biết.
