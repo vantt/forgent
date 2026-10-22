@@ -1402,50 +1402,19 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
 
 static TRANSFER_ID: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
 impl<F: FileSystem> PublicationPort<'_, F> {
-    fn remote_url(&self, repo: &RepoHandle, remote: &str) -> Result<(String, String)> {
+    fn remote_url(&self, repo: &RepoHandle, remote: &str) -> Result<(String, &'static str)> {
         let grant = self
             .remote
             .as_ref()
             .ok_or_else(|| err("remote-authority-required"))?;
-        if remote != grant.name
-            || remote.is_empty()
-            || !remote
-                .bytes()
-                .all(|b| b.is_ascii_alphanumeric() || b"_-".contains(&b))
-        {
+        if remote != grant.name {
             return Err(err("remote-not-granted"));
         }
-        let bytes = self.call(repo, &["remote", "get-url", "--", remote], &[])?;
-        let url = text(&bytes)?.trim_end_matches('\n');
-        if url != grant.pinned_url
-            || crate::remote::url_has_credentials_or_controls(url)
-            || url.starts_with('-')
-        {
-            return Err(err("remote-url-not-pinned-or-credentials-present"));
-        }
-        let scheme = if url.starts_with('/') || url.starts_with("file://") {
-            "file"
-        } else if url.starts_with("https://") {
-            "https"
-        } else if url.starts_with("ssh://") {
-            "ssh"
-        } else {
-            return Err(err("remote-protocol-not-supported"));
-        };
-        Ok((url.into(), scheme.into()))
+        self.authority.validate(repo)?;
+        self.driver.remote_target(repo, grant)
     }
     fn remote_call(&self, repo: &RepoHandle, scheme: &str, args: &[String]) -> Result<Output> {
-        let mut argv = vec![
-            "-c".into(),
-            "protocol.allow=never".into(),
-            "-c".into(),
-            format!("protocol.{scheme}.allow=always"),
-            "-c".into(),
-            "core.sshCommand=ssh -oBatchMode=yes".into(),
-            "-c".into(),
-            "core.askPass=".into(),
-        ];
-        argv.extend_from_slice(args);
+        let argv = crate::remote::transfer_argv(scheme, args);
         self.raw(
             repo,
             &argv.iter().map(String::as_str).collect::<Vec<_>>(),
@@ -1557,7 +1526,7 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         }
         let advertised = self.remote_call(
             repo,
-            &scheme,
+            scheme,
             &[
                 "ls-remote".into(),
                 "--refs".into(),
@@ -1630,7 +1599,7 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             args.push(url);
             args.extend(mappings.iter().map(|m| m.1.as_str().into()));
             if !mappings.is_empty() {
-                let out = self.remote_call(repo, &scheme, &args)?;
+                let out = self.remote_call(repo, scheme, &args)?;
                 if !out.success {
                     return Err(out.error("remote-fetch-failed-outcome-recorded-pending"));
                 }
@@ -1685,7 +1654,7 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         let spec = format!("{}:{}", local.as_str(), refs[0].1.as_str());
         let advertised = self.remote_call(
             repo,
-            &scheme,
+            scheme,
             &[
                 "ls-remote".into(),
                 "--refs".into(),
@@ -1729,7 +1698,7 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             self.point("before-push")?;
             let output = self.remote_call(
                 repo,
-                &scheme,
+                scheme,
                 &[
                     "push".into(),
                     "--atomic".into(),

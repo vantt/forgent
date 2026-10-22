@@ -225,7 +225,7 @@ fn a_repository_whose_origin_is_in_scp_form_claims_a_counter_number_through_that
     let (_serial, log) = serial();
     let f = Fixture::new();
     f.set_origin(&f.scp_origin());
-    let home = f.driver.sequence_home(&f.repo);
+    let home = f.driver.sequence_home(&f.repo).unwrap();
     assert!(matches!(home, SequenceHome::Remote(_)), "{home:?}");
 
     let claimed = match f
@@ -383,7 +383,7 @@ fn a_push_the_remote_refuses_for_another_reason_keeps_that_refusal() {
     let tree = git(&origin, &["hash-object", "-t", "tree", "-w", "/dev/null"]);
     let first = git(&origin, &["-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit-tree", &tree, "-m", "1"]);
     git(&origin, &["update-ref", "refs/fgos/seq/d-adr", &first]);
-    let home = f.driver.sequence_home(&f.repo);
+    let home = f.driver.sequence_home(&f.repo).unwrap();
     let tip = f
         .driver
         .sequence_tip(&f.repo, &home, "d-adr")

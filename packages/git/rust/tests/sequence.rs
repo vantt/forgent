@@ -81,7 +81,7 @@ fn claimed(push: SequencePush) -> Oid {
 fn a_repository_without_a_remote_keeps_its_counter_in_its_own_ref() {
     let f = Fixture::new();
     let repo = f.clone_named("alone", false);
-    let home = f.driver.sequence_home(&repo);
+    let home = f.driver.sequence_home(&repo).unwrap();
     assert!(matches!(home, SequenceHome::Local));
     assert_eq!(f.driver.sequence_tip(&repo, &home, "d-adr").unwrap(), None);
 
@@ -129,7 +129,7 @@ fn a_remote_counter_accepts_one_of_two_claims_made_from_the_same_tip() {
     let f = Fixture::new();
     let a = f.clone_named("a", true);
     let b = f.clone_named("b", true);
-    let (home_a, home_b) = (f.driver.sequence_home(&a), f.driver.sequence_home(&b));
+    let (home_a, home_b) = (f.driver.sequence_home(&a).unwrap(), f.driver.sequence_home(&b).unwrap());
     assert!(matches!(home_a, SequenceHome::Remote(_)));
 
     let first = claimed(
@@ -188,7 +188,7 @@ fn a_remote_counter_accepts_one_of_two_claims_made_from_the_same_tip() {
 fn an_unreachable_remote_is_a_failure_never_a_stale_answer() {
     let f = Fixture::new();
     let repo = f.clone_named("a", true);
-    let home = f.driver.sequence_home(&repo);
+    let home = f.driver.sequence_home(&repo).unwrap();
     fs::remove_dir_all(f.root.join("origin.git")).unwrap();
     assert!(f.driver.sequence_tip(&repo, &home, "d-adr").is_err());
     assert!(f
@@ -198,10 +198,23 @@ fn an_unreachable_remote_is_a_failure_never_a_stale_answer() {
 }
 
 #[test]
+fn an_origin_that_cannot_be_used_is_a_refusal_not_a_local_counter() {
+    // No other case proves it: an unreadable or unsupported origin used to read as "no origin",
+    // and the claim went to a counter on this machine alone.
+    let f = Fixture::new();
+    let repo = f.clone_named("a", true);
+    git(&f.root.join("a"), &["config", "remote.origin.url", "git://example.invalid/r"]);
+    let refused = f.driver.sequence_home(&repo).expect_err("an unsupported origin");
+    assert!(refused.cause.contains("remote-protocol-not-supported"), "{}", refused.cause);
+    git(&f.root.join("a"), &["config", "--unset", "remote.origin.url"]);
+    assert!(matches!(f.driver.sequence_home(&repo).unwrap(), SequenceHome::Local));
+}
+
+#[test]
 fn a_claimant_that_is_not_a_plain_name_is_refused() {
     let f = Fixture::new();
     let repo = f.clone_named("alone", false);
-    let home = f.driver.sequence_home(&repo);
+    let home = f.driver.sequence_home(&repo).unwrap();
     for bad in ["", "two words", "a=b", &"x".repeat(65)] {
         assert!(
             f.driver
@@ -216,7 +229,7 @@ fn a_claimant_that_is_not_a_plain_name_is_refused() {
 fn a_kind_that_is_not_a_slug_is_refused_before_any_ref_is_touched() {
     let f = Fixture::new();
     let repo = f.clone_named("alone", false);
-    let home = f.driver.sequence_home(&repo);
+    let home = f.driver.sequence_home(&repo).unwrap();
     assert!(f
         .driver
         .sequence_push(&repo, &home, "../heads/trunk", None, 1, "claim-a")

@@ -64,15 +64,20 @@ fn failure_text(cause: impl Into<String>) -> OperationError {
 
 impl GitDriver {
     /// Where this repository's counters live: its `origin` when it has one,
-    /// else the repository itself.
-    pub fn sequence_home(&self, repo: &RepoHandle) -> SequenceHome {
-        match Inspect::remote_url(self, repo, REMOTE) {
-            Ok(url) => SequenceHome::Remote(RemoteGrant {
-                name: REMOTE.into(),
-                pinned_url: url,
-            }),
-            Err(_) => SequenceHome::Local,
+    /// else the repository itself. An origin that cannot be read, or whose
+    /// transport is not supported, is a refusal here, before any claim:
+    /// it is never mistaken for "no origin".
+    pub fn sequence_home(&self, repo: &RepoHandle) -> Result<SequenceHome> {
+        let key = format!("remote.{REMOTE}.url");
+        if crate::driver::config_facts(self, repo, &key)?.is_empty() {
+            return Ok(SequenceHome::Local);
         }
+        let grant = RemoteGrant {
+            name: REMOTE.into(),
+            pinned_url: Inspect::remote_url(self, repo, REMOTE)?,
+        };
+        self.remote_target(repo, &grant)?;
+        Ok(SequenceHome::Remote(grant))
     }
 
     /// The counter of `kind`: `None` while nobody claimed a number.
@@ -86,7 +91,7 @@ impl GitDriver {
         let oid = match home {
             SequenceHome::Local => self.local_tip(repo, &name)?,
             SequenceHome::Remote(grant) => {
-                let (url, scheme) = self.transfer_url(repo, grant)?;
+                let (url, scheme) = self.remote_target(repo, grant)?;
                 self.remote_tip(repo, &url, scheme, &name)?
             }
         };
@@ -100,7 +105,7 @@ impl GitDriver {
                 )
                 .is_err()
             {
-                let (url, scheme) = self.transfer_url(repo, grant)?;
+                let (url, scheme) = self.remote_target(repo, grant)?;
                 self.fetch_commit(repo, &url, scheme, &oid)?;
             }
         }
@@ -154,7 +159,7 @@ impl GitDriver {
             }
             SequenceHome::Remote(grant) => {
                 self.require_floor()?;
-                let (url, scheme) = self.transfer_url(repo, grant)?;
+                let (url, scheme) = self.remote_target(repo, grant)?;
                 let lease = format!(
                     "--force-with-lease={}:{}",
                     name.as_str(),

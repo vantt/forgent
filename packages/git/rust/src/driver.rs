@@ -1756,12 +1756,20 @@ fn redact(bytes: &[u8]) -> Vec<u8> {
     String::from_utf8_lossy(bytes)
         .split_inclusive(char::is_whitespace)
         .map(|part| {
-            if let Some(scheme) = part.find("://") {
-                let start = scheme + 3;
+            if let Some(scheme_end) = part.find("://") {
+                let scheme = part[..scheme_end]
+                    .rsplit(|c: char| !(c.is_ascii_alphanumeric() || "+-.".contains(c)))
+                    .next()
+                    .unwrap_or("");
+                let start = scheme_end + 3;
                 let end = part[start..].find('/').map_or(part.len(), |i| start + i);
                 let mut result = part.to_owned();
+                // An ssh account name is not a secret; keeping it makes the display form
+                // the raw form, so a pinned URL binds the account.
                 if let Some(at) = part[start..end].rfind('@') {
-                    result.replace_range(start..start + at, "[redacted]");
+                    if crate::remote::userinfo_is_credential(scheme, &part[start..start + at]) {
+                        result.replace_range(start..start + at, "[redacted]");
+                    }
                 }
                 if let Some(q) = result.find('?') {
                     result.truncate(q);
