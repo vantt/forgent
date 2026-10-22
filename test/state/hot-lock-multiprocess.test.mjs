@@ -14,7 +14,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { hotPaths, readHotRecord, withStateTx } from '../../src/state/hot-lock.mjs';
-import { resolveWriterIdentity, IDENTITY_ENV_KEYS } from '../../src/util/session-identity.mjs';
+import { resolveWriterIdentity } from '../../src/util/session-identity.mjs';
+import { IDENTITY_ENV_KEYS } from '../helpers/identity-env.mjs';
 import { uniqueTmpTag } from '../../src/util/unique-tmp-tag.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
@@ -233,8 +234,8 @@ test('fast path: an uncontended acquire and release costs at most twice the raw 
   const f = { fgosDir: path.join(dir0, '.fgos'), cleanup: () => fs.rmSync(dir0, { recursive: true, force: true }) };
   fs.mkdirSync(f.fgosDir, { recursive: true });
   try {
-    resolveWriterIdentity(f.fgosDir); // prime the identity cache once, outside the timings
-    withStateTx(f.fgosDir, () => {}); // creates the locks directory the raw steps share
+    const { id: writer } = resolveWriterIdentity(f.fgosDir); // the identity is read once, outside the timings: the door costs the same in both sides' callers
+    withStateTx(f.fgosDir, () => {}, { prefetched: { writer } }); // creates the locks directory the raw steps share
     const { dir } = hotPaths(f.fgosDir);
     const rawRecord = path.join(dir, 'bench-raw.hot');
     const recordBytes = JSON.stringify({ v: 1, pid: process.pid, startTime: '1234567890', bootId: 'b'.repeat(36), writer: 'w'.repeat(40), at: new Date().toISOString() });
@@ -247,7 +248,7 @@ test('fast path: an uncontended acquire and release costs at most twice the raw 
       fs.unlinkSync(rawTmp);
       fs.unlinkSync(rawRecord);
     };
-    const runNow = () => withStateTx(f.fgosDir, () => {});
+    const runNow = () => withStateTx(f.fgosDir, () => {}, { prefetched: { writer } });
 
     const p50 = (samples) => samples.sort((a, b) => a - b)[Math.floor(samples.length / 2)];
     const time = (run) => {

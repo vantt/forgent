@@ -12,7 +12,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
-import { IDENTITY_ENV_KEYS } from '../../src/util/session-identity.mjs';
+import { IDENTITY_ENV_KEYS } from '../helpers/identity-env.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const { bin: HOST_BIN } = resolveActiveHostBin({ fgosDir: path.join(root, '.fgos') });

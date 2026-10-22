@@ -1889,7 +1889,7 @@ export async function executeAssignment(assignment, opts = {}) {
 
       // The attempt's writer id is a pure function of its id, so a resume of the attempt sees the same one.
       // `parentWriterId` is the controller's own, so a writer can be traced from the agent back to it.
-      const attemptWriterId = mintAttemptWriterId(launchCommandId, { bin: attemptHost.hostBin });
+      const attemptWriterId = mintAttemptWriterId(launchCommandId);
       let parentWriterId = null;
       try { parentWriterId = String(resolveWriterIdentity(fgosDir).id); } catch { /* no controller identity: the lineage stays empty */ }
       const attemptIdentity = { writerId: attemptWriterId, parentWriterId };

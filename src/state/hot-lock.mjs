@@ -24,7 +24,6 @@ import path from 'node:path';
 import { judge, selfRecord as doorSelfRecord } from '../runner/dispatch/process-identity.mjs';
 import { acquireSync, createLockScope } from '../holder-lock/index.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
-import { noteLockHeld, noteLockReleased } from '../util/state-lock-held.mjs';
 import { HotLockError, hotLockDepth, enterHotLock } from '../holder-lock/hot-guard.mjs';
 export { HotLockError, hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
@@ -322,7 +321,6 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
   const writer = prefetched.writer ?? resolveWriterIdentity(fgosDir).id;
   const paths = acquireRecord(fgosDir, resource, recordOfSelf(writer));
   const leaveHotLock = enterHotLock();
-  noteLockHeld();
   const { tx, revoke } = createTx(fgosDir, { ...prefetched, writer });
   let result;
   try {
@@ -330,11 +328,7 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
   } finally {
     revoke();
     leaveHotLock();
-    try {
-      releaseRecord(paths, resource);
-    } finally {
-      noteLockReleased();
-    }
+    releaseRecord(paths, resource);
   }
   if (result && typeof result.then === 'function') {
     result.then(undefined, () => {});
