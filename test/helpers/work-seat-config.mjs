@@ -3,10 +3,9 @@
 // the crate as a pin, so a config with a default executor needs no pool. Only a config with no executor at all
 // has nothing to pin and no `prefer`, so `bindable` gives it the families its executors serve as the tier list.
 
-import { withDefaultExecutor } from '../../src/runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, withDefaultExecutor } from '../../src/runner/dispatch/config.mjs';
 import { deriveProviderFamily } from '../../src/runner/dispatch/resolve.mjs';
 
-const TIERS = ['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier'];
 
 export function bindable(input) {
   return poolOf(input, true);
@@ -29,7 +28,7 @@ function poolOf(input, expanded) {
   const base = expanded ? loaded : config;
   if (input.executor) return base; // the default executor is the pin
   const families = [...new Set(Object.entries(loaded.executors ?? {}).filter(([, entry]) => entry?.kind !== 'tool').map(([id, entry]) => entry?.providerModel ?? deriveProviderFamily(entry, entry?.command ?? id)))];
-  return { ...base, tierFallback: Object.fromEntries(TIERS.map((tier) => [tier, families])) };
+  return { ...base, tierFallback: Object.fromEntries(MODEL_POLICY_TIERS.map((tier) => [tier, families])) };
 }
 
 /** `executeAssignment` with the runner config made bindable, for fixtures that state the minimum. */
