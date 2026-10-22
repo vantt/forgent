@@ -116,7 +116,7 @@ Hai luồng cùng sửa một file thì **luồng land sau rebase hoặc merge m
 |---|---|
 | `src/setup/registrations.mjs`, `CHANGELOG.md`, `docs/specs/runner.md` | 4.4a P04, 4.3-R P09, 6.5, MP-A, 6.2 |
 | `packages/holder-lock/contracts/lock-registry.v1.json`, `src/holder-lock/fences.mjs` | 4.4a P00/P04, 4.3-R P00/P09 |
-| `bin/fgos.mjs` (cờ `--lock` của `lock-status`, 6 dòng), `apps/fgos/src/main.rs` (xoá nhánh `identity mint-attempt`), `packages/holder-lock/contracts/lock-registry*.json` | HARDEN T1 (phase 2, 3, 6), DOC (dòng `documentation-cutover`, D8), T9 |
+| `apps/fgos/src/main.rs` (xoá nhánh `identity mint-attempt`), `packages/holder-lock/contracts/lock-registry*.json` | HARDEN T1 (phase 2, 3, 6), DOC (dòng `documentation-cutover`, D8), T9 |
 | `src/verbs/events/migrate.mjs` (nhận `checkStopped`/`workspaceListing` khi xoá `fences.mjs`), `src/setup/holder-lock-checks.mjs` (`checkLockFences`) | HARDEN T1 (sửa, H18), GIT/ES (review migrate.mjs; row thay `git-fence-missing` phải lên main trước, H16) |
 | `bin/fgos.mjs` | 4.3-R P07, 6.2, COOK |
 | `src/runner/claim-port.mjs` | 4.3-R P04r (chỉ chuyển lock), 4.3-S P04 (trần + thu hẹp) |
