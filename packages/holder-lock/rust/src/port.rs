@@ -317,32 +317,18 @@ impl BorrowedHandle<'static> {
     /// # Safety
     /// `fd` must come from an acquired holder-lock handle, and that owner must
     /// remain borrowed until the synchronous operation and all copies end.
-    /// On Linux `reach_floor_ticks` must be an actual boot-tick observation
-    /// taken before the owner opened this fresh description, never at handover.
-    /// `protected_roots` must name every live sibling borrow domain; the caller
-    /// must prevent new borrows while a drain's root snapshot is active.
+    /// `since` is the mark the owner took before it locked this description,
+    /// never one taken at handover: older fork copies would then fall outside
+    /// every borrowed drain. `protected_roots` must name every live sibling
+    /// borrow domain; the caller must prevent new borrows while a drain's root
+    /// snapshot is active.
     pub unsafe fn from_acquired_description(
         fd: std::os::fd::RawFd,
         resource: Resource,
         kill_wait_ms: u64,
-        reach_floor_ticks: Option<u64>,
+        since: Option<fgos_process::facts::CreationMark>,
         protected_roots: Vec<u32>,
     ) -> Result<Self, BorrowError> {
-        // The Node bridge retains the real observation taken before opening
-        // this acquired description. Never substitute a handover-time floor:
-        // older fork copies would then fall outside every borrowed drain.
-        #[cfg(target_os = "linux")]
-        let floor = {
-            let ticks = reach_floor_ticks.ok_or_else(|| BorrowError::InvalidSpec("lock-reach-history-missing".into()))?;
-            let now = fgos_process::facts::creation_mark().ok_or_else(|| BorrowError::InvalidSpec("lock-reach-clock-unreadable".into()))?;
-            if ticks > now.ticks { return Err(BorrowError::InvalidSpec("lock-reach-floor-invalid".into())); }
-            // A cross-process observation has no trustworthy Instant or young
-            // PID-allocation window. Retain its actual boot ticks and disable
-            // that optimization; at is unused when last_pid is None.
-            Some(fgos_process::facts::CreationMark { ticks, last_pid: None, at: now.at })
-        };
-        #[cfg(not(target_os = "linux"))]
-        let floor = { let _ = reach_floor_ticks; None };
         use std::os::fd::{BorrowedFd, FromRawFd, IntoRawFd};
         let file = unsafe { BorrowedFd::borrow_raw(fd) }
             .try_clone_to_owned()
@@ -355,7 +341,7 @@ impl BorrowedHandle<'static> {
             mode: Mode::Ex,
             kill_wait_ms,
             terminate_grace_ms: 3000,
-            since: std::sync::Mutex::new((floor, floor)),
+            since: std::sync::Mutex::new((since, since)),
         };
         let loan = Self {
             handle,
@@ -1503,7 +1489,7 @@ mod proof_tests {
     use super::*;
 
     #[test]
-    fn ffi_handover_retains_the_acquisition_floor_and_refuses_missing_history() {
+    fn ffi_handover_retains_the_marks_the_owner_took_before_it_locked() {
         use std::os::fd::AsRawFd;
         let path = std::env::temp_dir().join(format!("fgos-ffi-reach-{}", std::process::id()));
         let resource = Resource::new("proof", &path);
@@ -1512,18 +1498,42 @@ mod proof_tests {
             Acquire::Acquired(h) => h,
             other => panic!("{other:?}"),
         };
-        let missing = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 2000, None, vec![]) };
-        assert!(matches!(missing, Err(BorrowError::InvalidSpec(ref s)) if s == "lock-reach-history-missing"));
-        let future = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 2000, Some(u64::MAX), vec![]) };
-        assert!(matches!(future, Err(BorrowError::InvalidSpec(ref s)) if s == "lock-reach-floor-invalid"));
-        let loan = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 2000, Some(floor.ticks), vec![]) }.unwrap();
-        assert_eq!(loan.as_ref().since().unwrap().ticks, floor.ticks);
-        assert_eq!(loan.as_ref().since().unwrap().last_pid, None);
+        let loan = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 2000, owner.since(), vec![]) }.unwrap();
+        // The mark a lock carries is the full creation mark, never one rebuilt at handover.
+        let carried = loan.as_ref().since().unwrap();
+        assert!(carried.ticks >= floor.ticks);
+        assert_eq!(carried, owner.since().unwrap());
+        assert!(carried.last_pid.is_some());
         validate_quiescent(loan.as_ref()).unwrap();
         drop(loan);
         assert_eq!(probe(&resource).unwrap(), Probe::Held);
         drop(owner);
         assert_eq!(probe(&resource).unwrap(), Probe::Free);
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn the_guarantee_of_a_local_directory_names_the_flock_driver_and_a_usable_exclusion() {
+        let g = guarantee(&std::env::temp_dir());
+        assert_eq!(g.driver, "flock");
+        assert!(g.usable(), "{g:?}");
+        assert_eq!(g.to_json()["holders"], "kernel");
+    }
+
+    #[test]
+    fn a_handover_over_a_description_that_is_not_the_holders_is_refused_by_name() {
+        use std::os::fd::AsRawFd;
+        let (path, resource, file, mut lock) = node_lock("loan-mismatch");
+        // A second description of the same file is a sibling: it can neither hold the lock nor be lent as the holder's.
+        let sibling = open_lock_file(&path).unwrap();
+        let refused = unsafe { BorrowedHandle::from_acquired_description(sibling.as_raw_fd(), resource.clone(), 2000, lock.since(), vec![]) };
+        assert_eq!(refused.unwrap_err().to_string(), "lock-resource-replaced");
+        // The holder's own description is accepted and its marks travel with it.
+        let loan = unsafe { BorrowedHandle::from_acquired_description(file.as_raw_fd(), resource, 2000, lock.since(), vec![]) }.unwrap();
+        assert_eq!(loan.as_ref().since(), lock.since());
+        drop(loan);
+        drop(file);
+        assert_eq!(release_description(&mut lock), Release::Released { killed: 0 });
         std::fs::remove_file(path).unwrap();
     }
 
@@ -1541,7 +1551,7 @@ mod proof_tests {
         let mut child = spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), owner.file())]).unwrap();
         // Cross a real clock tick: a handover-time floor would miss this copy.
         std::thread::sleep(Duration::from_millis(30));
-        let loan = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 25, Some(floor.ticks), vec![]) }.unwrap();
+        let loan = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 25, Some(floor), vec![]) }.unwrap();
         let result = validate_quiescent(loan.as_ref());
         child.kill().unwrap();
         child.wait().unwrap();
