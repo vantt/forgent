@@ -7,6 +7,7 @@
 //! vectors: `packages/identity/contracts/`.
 
 pub mod attempt;
+pub mod cli_dirs;
 #[cfg(feature = "provider")]
 pub mod directory;
 pub mod errors;
