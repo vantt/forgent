@@ -20,7 +20,7 @@ import {
   performCatchUp,
   MergeError,
 } from '../../src/runner/merge.mjs';
-import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
+import { DEFAULT_INVARIANT_CHECK_COMMANDS, writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 // detectTrunk moved to runner/worktree.mjs (tsk-49i D1) — its cases stay in
 // this file, next to the merge behavior that resolves a target through it.
 import { branchNameFor, detectTrunk } from '../../src/runner/worktree.mjs';
@@ -1673,15 +1673,19 @@ test('a green repo-invariant check lets the merge land', async () => {
   assert.equal(fs.existsSync(path.join(repoRoot, 'produced.txt')), true);
 });
 
-// Backward compatibility: every repo that never opted in must behave exactly
-// as it did before this gate existed.
-test('no invariantChecks config means no invariant check runs at merge', async () => {
-  const repoRoot = initRepo();
-  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+// A project that never names an invariant command lands: both with no
+// section at all and with the section `fgos setup` writes by default, so a
+// fresh project is never handed a command that fails where its files are not.
+test('no invariant command, absent or the setup default, means no invariant check runs at merge', async () => {
+  for (const setupDefault of [false, true]) {
+    const repoRoot = initRepo();
+    makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+    if (setupDefault) configureInvariantChecks(repoRoot, DEFAULT_INVARIANT_CHECK_COMMANDS);
 
-  const result = await landItem(repoRoot, makeItem({ verify: 'true' }));
+    const result = await landItem(repoRoot, makeItem({ verify: 'true' }));
 
-  assert.equal(result.outcome, 'merged');
+    assert.equal(result.outcome, 'merged', `setup default written: ${setupDefault}`);
+  }
 });
 
 // D5, the skip direction. `verify: 'exit 1'` and a failing invariant command

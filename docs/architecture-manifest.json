@@ -212,6 +212,7 @@
     "src/util/host-bin.mjs": "infra",
     "src/convention/convention-client.mjs": "infra",
     "src/convention/definition-names.mjs": "domain",
+    "src/convention/identifier-rules.mjs": "domain",
     "src/convention/seat-id.mjs": "domain",
     "src/observe/friction-client.mjs": "infra",
     "src/intake/classify.mjs": "use-case",

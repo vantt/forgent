@@ -1041,7 +1041,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'identity',
     invoke: 'fgos identity',
-    description: 'Read-only: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). Single authority: the Rust crate fgos-session-identity (docs/platform/session-identity/spec.md).',
+    description: 'Read-only: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). Single authority: the Rust crate fgos-identity (docs/platform/identity/spec.md).',
     parameters: {
       type: 'object',
       properties: {

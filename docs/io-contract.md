@@ -30,10 +30,10 @@ Mỗi lần ghi mang thêm một trường danh tính người/tiến-trình g�
   `unresolved` (không nguồn nào xác nhận được — `id` vẫn là
   pid của chính tiến trình gọi, KHÔNG rỗng, KHÔNG vắng khoá; chỉ nhãn
   `source` nói giá trị chưa kiểm chứng được). Luật đầy đủ (thứ tự biến env,
-  giới hạn đã biết) chỉ nằm ở [spec Session Identity](platform/session-identity/spec.md);
-  nguồn duy nhất là crate Rust `fgos-session-identity`.
+  giới hạn đã biết) chỉ nằm ở [spec Session Identity](platform/identity/spec.md);
+  nguồn duy nhất là crate Rust `fgos-identity`.
 
-**Writer id của một lần chạy agent (attempt).** Một agent do `fgos run` khởi động ghi dưới id riêng của attempt đó, không phải id của controller đã khởi động nó: `writer.id` = `att-<attemptId>`, tính xác định từ attempt id (một resume ra đúng id cũ). Id được đặt vào `FGOS_SESSION_ID` của agent ở cả hai cách khởi động (headless và pane); biến `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID` và `FGOS_PARENT_WRITER_ID` của cha bị gỡ trước khi agent chạy, và `FGOS_PARENT_WRITER_ID` được đặt lại bằng writer id của controller để lần theo dòng dõi (agent này do lần chạy nào sinh ra). Với `source` thì id đi theo luật env thường (`env` hoặc `registry`). Giới hạn đã biết: lệnh do codex chạy dưới daemon dùng chung chỉ thấy id của attempt khi codex được khởi động có tuỳ chọn `shell_environment_policy.set` (adapter pane tự thêm); nếu không, lệnh đó ghi dưới `CODEX_THREAD_ID`. Chi tiết: [spec Session Identity §5a và giới hạn](platform/session-identity/spec.md), cách đặt: [spec Run Supervisor](platform/run-supervisor/spec.md).
+**Writer id của một lần chạy agent (attempt).** Một agent do `fgos run` khởi động ghi dưới id riêng của attempt đó, không phải id của controller đã khởi động nó: `writer.id` = `att-<attemptId>`, tính xác định từ attempt id (một resume ra đúng id cũ). Id được đặt vào `FGOS_SESSION_ID` của agent ở cả hai cách khởi động (headless và pane); biến `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID` và `FGOS_PARENT_WRITER_ID` của cha bị gỡ trước khi agent chạy, và `FGOS_PARENT_WRITER_ID` được đặt lại bằng writer id của controller để lần theo dòng dõi (agent này do lần chạy nào sinh ra). Với `source` thì id đi theo luật env thường (`env` hoặc `registry`). Giới hạn đã biết: lệnh do codex chạy dưới daemon dùng chung chỉ thấy id của attempt khi codex được khởi động có tuỳ chọn `shell_environment_policy.set` (adapter pane tự thêm); nếu không, lệnh đó ghi dưới `CODEX_THREAD_ID`. Chi tiết: [spec Session Identity §5a và giới hạn](platform/identity/spec.md), cách đặt: [spec Run Supervisor](platform/run-supervisor/spec.md).
 
 **Đây là quy thuộc, không phải xác thực** (D1): CLI local không xác thực
 được ai đang gọi nó — ai chạy được `fgos` thì đã ghi thẳng vào `.fgos/`
