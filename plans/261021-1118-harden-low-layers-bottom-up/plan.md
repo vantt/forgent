@@ -185,7 +185,7 @@ Per layer:
 7. **T0 landing:** when T0 closes, the second machine self-lands in a quiet window (GIT/ES told first); the owner machine follows a guide at a time the owner picks on receipt.
 8. **Hand-offs must be recorded by the receiving lane in its own plan** (owner: "dặn các luồng nhận gì thì nhớ ghi và cập nhật plan của nó, không được xót"). The ledger below tracks each one until the receiver confirms.
 
-2026-10-22 08:50, owner, T1 ask 1 ([arbitration](../reports/council-261022-0245-harden-t1-arbitration.md) §6): "1a 2a 3a 5a 4a".
+2026-10-22 08:50, owner, T1 ask 1 ([arbitration](../reports/council-261022-0245-harden-t1-arbitration.md) §6): "1a 2a 3a 4a 5a".
 9. **T1 target shapes approved as written** (arbitration §2): the in-process `holderLock` door on Linux/macOS with the red-team's constraints (handed-over release, full creation mark, tuple holders); Windows keeps `lock-hold`; identity door; fences (Node part only, H16) deleted; doctor 9 → 5.
 10. **The checkout channel `node bin/fgos.mjs` is unsupported for process, lock and identity verbs.** AGENTS.md's Legacy-Node boundary text says so and points to the dev door; the `state-root` route and Node's route fallback go. The git hook asks the activated host (arbitration D2).
 11. **HL-F1:** the hot mutex fast-path test uses an absolute bound from the same run (`withStateTx` p50 ≤ 2 × the raw link/unlink quartet); TEST applies it (H21).
