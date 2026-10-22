@@ -10,6 +10,7 @@ pub mod attempt;
 pub mod errors;
 pub mod launcher;
 pub mod machine;
+pub mod mint;
 pub mod proc_tree;
 #[cfg(feature = "provider")]
 pub mod project;
@@ -23,7 +24,10 @@ pub mod text;
 pub use attempt::{mint_attempt_writer_id, InvalidAttemptId, ATTEMPT_PREFIX, MAX_ATTEMPT_ID_LENGTH};
 pub use launcher::{scrub_and_set, EmptyWriterId};
 pub use errors::Error;
+pub use mint::{random, Kind, RandomKind, SequenceKind, KIND_NAMES, RANDOM_CHARS};
 pub use proc_tree::{os_process_tree, ProcStat, ProcessTree};
+#[cfg(feature = "provider")]
+pub use mint::{claim_counter, claim_sequence, release_sequence, Claim, MAX_CLAIM_ATTEMPTS};
 #[cfg(feature = "provider")]
 pub use project::{project_info, project_init, ProjectInfo, ProjectMinted};
 #[cfg(feature = "provider")]

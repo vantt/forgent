@@ -119,7 +119,8 @@ pub fn native_operation_id(route_operation: &str, args: &[OsString]) -> Result<S
 
 /// `fgos identity [--pid <n>] [--fgos-dir <dir>] [--json]`, `fgos identity
 /// machine [--alias <name>] [--json]`, `fgos identity project [--init|--new]
-/// [--handle <name>] [--json]`. `--dir` is accepted and ignored on
+/// [--handle <name>] [--json]`, `fgos identity mint <kind> [--release <number>]
+/// [--json]`. `--dir` is accepted and ignored on
 /// every verb, because the shell integration appends it.
 fn project_identity_request(
     args: &[OsString],
@@ -143,6 +144,10 @@ fn project_identity_request(
             fgos_identity::Verb::Project(fgos_identity::ProjectAction::Read),
             &["--init", "--new", "--handle", "--dir"],
         ),
+        Some("mint") => (
+            fgos_identity::Verb::Mint { kind: String::new(), release: None },
+            &["--release", "--dir"],
+        ),
         Some(other) => {
             return Err(format!(
                 "unknown identity subcommand '{other}'. Available: {}",
@@ -154,6 +159,18 @@ fn project_identity_request(
         verb,
         ..Default::default()
     };
+    // `mint <kind>`: the kind is the one positional argument.
+    if let fgos_identity::Verb::Mint { kind, .. } = &mut request.verb {
+        let name = args
+            .get(index)
+            .map(|value| value.to_string_lossy().into_owned())
+            .filter(|value| !value.starts_with('-'))
+            .ok_or_else(|| {
+                format!("mint requires an id kind. Available: {}", fgos_identity::KIND_NAMES.join(", "))
+            })?;
+        index += 1;
+        *kind = name;
+    }
     // `Some(fork)` once `--init` (false) or `--new` (true) was given.
     let mut mint: Option<bool> = None;
     let mut handle: Option<String> = None;
@@ -200,6 +217,16 @@ fn project_identity_request(
                     .filter(|pid| *pid > 0)
                     .ok_or_else(|| format!("--pid must be a positive integer, got '{flag_value}'"))?;
                 request.pid = Some(pid);
+            }
+            "--release" => {
+                let number = flag_value
+                    .parse::<u64>()
+                    .ok()
+                    .filter(|number| *number > 0)
+                    .ok_or_else(|| format!("--release must be a positive number, got '{flag_value}'"))?;
+                if let fgos_identity::Verb::Mint { release, .. } = &mut request.verb {
+                    *release = Some(number);
+                }
             }
             "--handle" => {
                 if flag_value.is_empty() {
@@ -387,6 +414,24 @@ mod tests {
             operation(&["identity", "project", "--handle", "app", "--new"]),
             "identity.write"
         );
+        assert_eq!(operation(&["identity", "mint", "work", "--json"]), "identity.write");
+    }
+
+    #[test]
+    fn identity_mint_takes_a_kind_and_an_optional_release_number() {
+        let request = |args: &[&str]| {
+            let args: Vec<OsString> = args.iter().map(OsString::from).collect();
+            project_identity_request(&args)
+        };
+        let minted = request(&["identity", "mint", "d-adr", "--release", "73", "--json"]).unwrap();
+        assert_eq!(
+            minted.verb,
+            fgos_identity::Verb::Mint { kind: "d-adr".into(), release: Some(73) }
+        );
+        let message = request(&["identity", "mint", "--json"]).unwrap_err();
+        assert!(message.contains("requires an id kind") && message.contains("d-adr"), "{message}");
+        assert!(request(&["identity", "mint", "d-adr", "--release", "0"]).is_err());
+        assert!(request(&["identity", "machine", "--release", "3"]).is_err());
     }
 
     #[test]

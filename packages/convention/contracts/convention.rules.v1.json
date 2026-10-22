@@ -139,6 +139,22 @@
       "rest": "abcdefghijklmnopqrstuvwxyz234567",
       "maxLength": 4,
       "reserved": []
+    },
+    {
+      "id": "work-item-id",
+      "description": "A work item id, also a branch and directory segment: `tsk-<10 base32>` when minted by Identity (docs/platform/identity/spec.md, section 4a); child items append `-<n>`, and older ids of other lengths keep replaying. Only the character set and the 30-character bound are checked here.",
+      "first": "abcdefghijklmnopqrstuvwxyz",
+      "rest": "abcdefghijklmnopqrstuvwxyz0123456789-",
+      "maxLength": 30,
+      "reserved": []
+    },
+    {
+      "id": "backlog-id",
+      "description": "A new backlog row id: `p-<10 base32>` when minted by Identity (docs/platform/identity/spec.md, section 4a). Rows written earlier (`p-<8 hex>`, `STR27`, `wf-...`) keep their ids.",
+      "first": "abcdefghijklmnopqrstuvwxyz",
+      "rest": "abcdefghijklmnopqrstuvwxyz234567-",
+      "maxLength": 12,
+      "reserved": []
     }
   ],
   "definitionFiles": [
