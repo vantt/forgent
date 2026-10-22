@@ -1,5 +1,5 @@
 //! `fgos internal ...` through the real host binary: the routes that remain
-//! cold paths (the borrower test of the git hook, the Windows hold helper's
+//! cold paths (the borrower test and the shared try of the git hook, the Windows hold helper's
 //! refusal here, the protocol and usage rules, the quiesce scan, the borrow
 //! vectors and the state root). Every other lock operation runs in the
 //! caller's process through the addon's `holderLock` door and is proven by
@@ -11,7 +11,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Output, Stdio};
 use std::time::Duration;
 
-use fgos_holder_lock::{acquire, release, run_borrowed, Acquire, BorrowSpec, BorrowStdio, Mode, Release, Resource, Wait};
+use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowSpec, BorrowStdio, Mode, Probe, Release, Resource, Wait};
 use fgos_process::FdSlot;
 use serde_json::Value;
 
@@ -62,6 +62,31 @@ fn json_line(out: &Output) -> Value {
     let v: Value = serde_json::from_str(text.trim()).unwrap();
     assert_eq!(v["v"], v["protocol"]);
     v
+}
+
+#[test]
+fn shared_try_answers_free_or_held_on_the_handed_description_and_never_waits() {
+    let _serial = serial();
+    let dir = temp_dir("shared");
+    let res = Resource::new("shared", dir.join("shared.lock"));
+    let file = open_rw(&res.path);
+    let free = route_fd(&["lock-fd", "--protocol", "2", "--shared-try"], &file);
+    assert_eq!((free.status.code(), json_line(&free)["result"].clone()), (Some(0), Value::from("free")));
+    drop(file);
+    let owner = match acquire(&res, Mode::Ex, Wait::Try, 2000) {
+        Acquire::Acquired(h) => h,
+        other => panic!("{other:?}"),
+    };
+    let file = open_rw(&res.path);
+    let started = std::time::Instant::now();
+    let held = route_fd(&["lock-fd", "--protocol", "2", "--shared-try"], &file);
+    assert!(started.elapsed() < Duration::from_secs(2), "the shared try never waits");
+    let v = json_line(&held);
+    assert_eq!((held.status.code(), v["result"].as_str(), v["reason"].as_str()), (Some(10), Some("held"), Some("kernel-lock-held")));
+    drop(file);
+    assert_eq!(probe(&res).unwrap(), Probe::Held, "the try left the owner's lock alone");
+    assert!(matches!(release(owner), Release::Released { .. }));
+    let _ = fs::remove_dir_all(&dir);
 }
 
 #[test]
@@ -158,7 +183,7 @@ fn protocol_and_usage_errors_fail_closed() {
         let v = json_line(&out);
         assert_eq!((v["protocol"].clone(), v["code"].as_str()), (serde_json::json!(1), Some("host-version-mismatch")), "{args:?}");
     }
-    for args in [vec!["nope", "--protocol", "2"], vec!["lock-fd", "--protocol", "2"], vec!["lock-fd", "--protocol", "2", "--try"], vec!["lock-fd", "--protocol", "2", "--borrowed-check"], vec!["lock-fd", "--protocol", "2", "--bogus"], vec!["quiesce-scan", "--protocol", "1"]] {
+    for args in [vec!["nope", "--protocol", "2"], vec!["lock-fd", "--protocol", "2"], vec!["lock-fd", "--protocol", "2", "--try"], vec!["lock-fd", "--protocol", "2", "--borrowed-check"], vec!["lock-fd", "--protocol", "2", "--shared-try", "--borrowed-check", "/x"], vec!["lock-fd", "--protocol", "2", "--bogus"], vec!["quiesce-scan", "--protocol", "1"]] {
         let out = route(&args);
         assert_eq!(out.status.code(), Some(2), "{args:?}");
         assert_eq!(json_line(&out)["code"], "usage", "{args:?}");

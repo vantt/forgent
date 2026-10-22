@@ -1,12 +1,13 @@
 {
   "contract": { "id": "internal-route-lock-fd", "version": 1 },
   "command": "fgos internal lock-fd",
-  "description": "Cold-path helper for the git hook, which runs from a checkout and cannot reach the in-process door. Every other lock operation (acquire, try, wait, probe, guarantee, drain, clear-domain, predecessor state, holders) runs in the caller's process through the `holderLock` namespace of the combined addon. The helper only judges whether a descriptor a process inherited is the very description that holds a lock.",
+  "description": "Cold-path helper for the git hook, which runs from a checkout and cannot reach the in-process door. Every other lock operation (acquire, try, wait, probe, guarantee, drain, clear-domain, predecessor state, holders) runs in the caller's process through the `holderLock` namespace of the combined addon. The helper judges whether a descriptor a process inherited is the very description that holds a lock (`--borrowed-check`), and answers one non-blocking shared try on a description the caller hands over (`--shared-try`).",
   "argv": {
     "required": ["--protocol 2"],
     "mode": {
       "exactlyOne": [
-        { "flag": "--borrowed-check <path>", "meaning": "borrower test for hooks: fd 3 must have the same dev:ino as <path> and a non-blocking LOCK_EX on it must succeed (a description that already holds the lock succeeds; a sibling that opened the file itself fails). On Windows it takes no slot and uses FGOS_LOCK_JOB (holder-lock.port.v1.json borrowerCheck)" }
+        { "flag": "--borrowed-check <path>", "meaning": "borrower test for hooks: fd 3 must have the same dev:ino as <path> and a non-blocking LOCK_EX on it must succeed (a description that already holds the lock succeeds; a sibling that opened the file itself fails). On Windows it takes no slot and uses FGOS_LOCK_JOB (holder-lock.port.v1.json borrowerCheck)" },
+        { "flag": "--shared-try", "meaning": "one non-blocking LOCK_SH attempt on fd 3; result free or held; the caller closes fd 3 afterwards. It never waits and never obstructs a holder." }
       ]
     },
     "unknownFlag": "usage error, exit 2"
@@ -19,6 +20,8 @@
   "stdout": {
     "common": { "v": 2, "protocol": 2 },
     "results": {
+      "free": { "result": "free" },
+      "held": { "result": "held", "reason": "kernel-lock-held" },
       "borrower": { "result": "borrower" },
       "not-borrower": { "result": "not-borrower", "reason": { "enum": ["fd-missing", "inode-mismatch", "lock-not-held-by-description", "not-a-lock-file", "job-missing", "record-mismatch", "not-in-job", "holder-not-ancestor", "lock-not-held"] } },
       "unavailable": { "result": "unavailable", "reason": { "enum": ["unsupported-platform", "unsupported-filesystem", "io-error"] }, "detail": "string" },
@@ -26,10 +29,10 @@
     }
   },
   "exitCodes": {
-    "0": "borrower",
+    "0": "free | borrower",
     "2": "usage error (result error, code usage)",
     "3": "protocol mismatch (result error, code host-version-mismatch; --protocol absent or != 2)",
-    "10": "not-borrower",
+    "10": "held | not-borrower",
     "12": "unavailable",
     "70": "internal or io error (result error)"
   },

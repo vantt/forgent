@@ -89,6 +89,11 @@ fn error_as(protocol: u64, code: &str, message: &str, exit: i32) -> i32 {
     emit_as(protocol, Some("error"), json!({ "code": code, "message": message }), exit)
 }
 
+#[cfg(not(windows))]
+fn error(code: &str, message: &str, exit: i32) -> i32 {
+    error_as(PROTOCOL, code, message, exit)
+}
+
 fn usage_as(protocol: u64, message: &str) -> i32 {
     error_as(protocol, "usage", message, EXIT_USAGE)
 }
@@ -187,22 +192,32 @@ fn take_slot3() -> std::io::Result<File> {
     fgos_process::control::take_inherited(fgos_process::FdSlot(BORROW_SLOT))
 }
 
-/// `lock-fd --borrowed-check <path>`: the borrower test of a process that may
-/// have inherited a borrowed description (a git hook). Every other lock
-/// operation runs in the caller's process through the addon's `holderLock`.
+/// `lock-fd`: the two modes that keep a process boundary, because their caller
+/// is a process the door cannot reach (the git hook, run from a checkout).
+/// `--borrowed-check <path>` is the borrower test of a process that may have
+/// inherited a borrowed description; `--shared-try` is one non-blocking shared
+/// lock attempt on the description at fd 3, so it never waits and never
+/// obstructs a holder. Every other lock operation runs in the caller's process
+/// through the addon's `holderLock`.
 fn lock_fd(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--borrowed-check"], &[]) {
+    let flags = match Flags::parse(args, &["--borrowed-check"], &["--shared-try"]) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
-    let lock_path = match flags.one("--borrowed-check") {
-        Ok(Some(path)) if flags.items.len() == 1 => PathBuf::from(path),
-        _ => return usage("exactly one --borrowed-check <path>"),
-    };
+    if flags.items.len() != 1 {
+        return usage("exactly one of --borrowed-check <path>, --shared-try");
+    }
     let drv = driver::current();
     if !drv.supported() {
         return emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": drv.unsupported_detail() }), EXIT_UNAVAILABLE);
     }
+    if flags.has("--shared-try") {
+        return shared_try();
+    }
+    let lock_path = match flags.one("--borrowed-check") {
+        Ok(Some(path)) => PathBuf::from(path),
+        _ => return usage("--borrowed-check needs a path"),
+    };
     #[cfg(windows)]
     let answer = {
         let env = std::env::var(crate::LOCK_JOB_ENV).ok();
@@ -220,6 +235,29 @@ fn lock_fd(args: &[String]) -> i32 {
     match answer {
         BorrowedCheck::Borrower => emit(Some("borrower"), json!({}), EXIT_OK),
         BorrowedCheck::NotBorrower(reason) => emit(Some("not-borrower"), json!({ "reason": reason.as_str() }), EXIT_NEGATIVE),
+    }
+}
+
+#[cfg(windows)]
+fn shared_try() -> i32 {
+    emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": "--shared-try hands a descriptor to the route; Windows probes through the door" }), EXIT_UNAVAILABLE)
+}
+
+#[cfg(not(windows))]
+fn shared_try() -> i32 {
+    let file = match take_slot3() {
+        Ok(file) => file,
+        Err(err) => return error("io", &format!("fd 3 is not an open lock file: {err}"), EXIT_INTERNAL),
+    };
+    match driver::current().file_guarantee(&file) {
+        Ok(g) if !g.usable() => return emit(Some("unavailable"), json!({ "reason": "unsupported-filesystem", "detail": g.notes.join("; ") }), EXIT_UNAVAILABLE),
+        Ok(_) => {}
+        Err(err) => return emit(Some("unavailable"), json!({ "reason": "io-error", "detail": format!("fstatfs fd 3: {err}") }), EXIT_UNAVAILABLE),
+    }
+    match crate::port::lock_description(&file, Mode::Sh, Wait::Try) {
+        Ok(crate::port::DescriptionLock::Locked) => emit(Some("free"), json!({}), EXIT_OK),
+        Ok(_) => emit(Some("held"), json!({ "reason": "kernel-lock-held" }), EXIT_NEGATIVE),
+        Err(err) => error("io", &format!("flock fd 3: {err}"), EXIT_INTERNAL),
     }
 }
 
