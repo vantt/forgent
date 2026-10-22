@@ -14,7 +14,8 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
-import { acquire, acquireSync, probe, createLockScope, HolderLockError } from '../../src/holder-lock/index.mjs';
+import { acquire, acquireSync, probe, createLockScope, spawnWithLocks, HolderLockError } from '../../src/holder-lock/index.mjs';
+import { observe, signalByIdentity } from '../../src/runner/dispatch/process-identity.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const FACADE_URL = pathToFileURL(path.join(root, 'src', 'holder-lock', 'index.mjs')).href;
@@ -87,6 +88,42 @@ test('a lock acquired through the facade stays held after the helper exits and e
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
+});
+
+// boundary: process-level lock handover. The grandchild is the only process that
+// can prove the handed-over description outlives the parent's release.
+const HANDOVER_CHILD = `
+const { spawn } = require('node:child_process');
+const grandchild = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: ['ignore', 'ignore', 'ignore', 3] });
+require('node:fs').writeFileSync(process.argv[1], String(grandchild.pid));
+setInterval(() => {}, 1000);
+`;
+
+test('a lock handed to a spawned child stays held through the parent release while the child tree lives', { skip: NEEDS_HOST || LINUX_ONLY }, async (t) => {
+  const { dir, fgosDir } = makeProject();
+  fs.mkdirSync(dir, { recursive: true });
+  const pidFile = path.join(dir, 'grandchild.pid');
+  const tuples = [];
+  t.after(async () => {
+    for (const tuple of tuples) signalByIdentity(tuple, 'kill');
+    for (let i = 0; i < 100 && tuples.some((tuple) => observe(tuple.pid).kind === 'live'); i += 1) await new Promise((r) => setTimeout(r, 50));
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+  const taken = acquireSync(createLockScope('owner'), LOCK, { fgosDir });
+  assert.equal(taken.result, 'acquired');
+  const child = spawnWithLocks([taken.handle], { command: process.execPath, args: ['-e', HANDOVER_CHILD, pidFile], env: childEnv({}) });
+  tuples.push(observe(child.pid));
+  for (let i = 0; i < 200 && !fs.existsSync(pidFile); i += 1) await new Promise((r) => setTimeout(r, 25));
+  assert.ok(fs.existsSync(pidFile), 'the child started its grandchild');
+  const grandchildPid = Number(fs.readFileSync(pidFile, 'utf8'));
+  tuples.push(observe(grandchildPid));
+  assert.equal(tuples[1].kind, 'live');
+
+  assert.equal(taken.handle.release(), true);
+  await new Promise((r) => setTimeout(r, 300));
+
+  assert.equal(observe(grandchildPid).kind, 'live', 'the grandchild outlives the parent release');
+  assert.deepEqual(probe(LOCK, { fgosDir }), { result: 'held' });
 });
 
 test('a bounded wait on a held lock ends as timeout, closes its description and holds nothing', { skip: NEEDS_HOST || LINUX_ONLY }, () => {
