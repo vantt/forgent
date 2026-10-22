@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 11:25 (lead `COOK`, máy `fg-server`): **COOK P6 plan sẵn sàng**: [plan](../261022-1037-herdr-pane-launch-ready/plan.md) 4 phase (handshake shell trước dòng launch, `DISABLE_AUTO_UPDATE` lúc tạo pane, banner khởi động agent dạng dữ liệu, wiring proof + spec), red-team 25 finding (24 nhận), validate 38/40 claim đúng (2 lệch dòng đã sửa); 0 câu hỏi owner. Release máy này `ce430e51…` đã có SEAT nên không land trước. Kế tiếp: chạy `fgos-cook`. Đảo lại nếu: cook cần đổi hành vi ngoài terminal launch → hỏi owner.
+
 - 2026-10-22 11:05 (phiên `b8f192bf`, máy owner `fg-server`, `~/projects/forgent`; bàn giao từ HARDEN `forgent-a8` 10:55): **nhận luồng IDENT.** Đã đọc spec nháp mục 2–3 và dòng 10:50 của HARDEN (T1 phase 6 không chặn IDENT). Thêm một bằng chứng vào mục 3: `workspaceId` của Distribution là `sha256(realpath)`, nên hai máy cùng checkout ở `~/projects/forgent` ra cùng một id — không dùng được làm id dự án hay clone. Đã gửi owner bộ câu hỏi G0; luồng ở `planning` tới khi owner ký. Nhắn IDENT qua dòng log có chữ `IDENT`.
 
 - 2026-10-22 10:50 (phiên WORK máy này, owner 10:47 "Q-W2 chọn b"): **view porting của forgent bỏ track** sau cutover: commit cutover xoá `docs/distillery/state/porting/state.json`, view + cursor chỉ ở cache `.fgos` mà registry khai báo; API `forgent/state/porting-store` không đổi; `docs/distillery/porting-log.md` vẫn track. Mở U3. Đảo lại nếu một tool ngoài (forgent-workshop) cần đọc thẳng file đó.
