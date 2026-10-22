@@ -141,13 +141,13 @@ Run control is not a kind: its ledger and CAS stay as they are, with no garbage 
 
 `<eventOpenRoot>` is the resolved Git common directory plus `fgos/events`; Event Store owns its two repo mutexes, `event-seal` (58) and `event-append` (70), at `<eventOpenRoot>/locks/<name>.lock`. Both have no legacy shape/path and fence `none`. Only Rust resolves this template; Node refuses these rows with `lock-not-node-owned`. Append is released before Git calls; seal is never taken inside the Work gate.
 
-One row per lock: `name`, `kind`, `scope` (`repo`, `machine`, `run`), `rank`, `v3Path`, `v1Shape` (`file-link`, `file-wx`, `ledger-dir`, `file-by-cwd`), `v1Path`, `fence` (`tombstone`, `blocking-generation`, `none`), `owner` (the track that cuts it over: `4.2`, `4.3`, `4.4`, `6.2`, `event-store`), and notes. A row owned by this track must carry a fence, a legacy shape, a legacy path and a new path.
+One row per lock: `name`, `kind`, `scope` (`repo`, `machine`, `run`), `rank`, `v3Path`, `v1Shape` (`file-link`, `file-wx`, `ledger-dir`, `file-by-cwd`), `v1Path`, `fence` (`tombstone`, `blocking-generation`, `none`), `owner` (the track that cuts it over: `4.2`, `4.3`, `4.4`, `6.2`, `event-store`, `documentation`), and notes. A row owned by this track must carry a fence, a legacy shape, a legacy path and a new path.
 
 Ranks (a scope may only take a lock of a higher rank than every lock it holds):
 
 | Rank | Locks | Kind |
 |---|---|---|
-| 10 | `runner`, `gateway` | lease |
+| 10 | `runner`, `gateway`, `documentation-cutover` | lease |
 | 15 | `attempt` | lease |
 | 20 | `merge-slot` | mutex |
 | 30 | `dispatch-cwd` | lease |
@@ -172,6 +172,12 @@ Locks cut over by the Rust-callers track (registry owner `4.4`), all leaves of r
 | `observe` | repo | `<fgosDir>/locks/observe.lock` | `.fgos/observe/.lock` | Observe store (`fgos metrics`, `fgos friction`) |
 
 Git adds `repo-config`, a repo mutex at rank 80, `<fgosDir>/locks/repo-config.lock`, with no legacy path. It serializes the local fetch-mapping writer; Git's native `config.lock` also excludes ordinary Git config writers.
+
+| Lock | Kind / scope | Rank | New path | Legacy shape / path | Fence | Owner | Access |
+|---|---|---|---|---|---|---|---|
+| `documentation-cutover` | lease / repo | 10 | `<fgosDir>/locks/documentation-cutover.lock` | null / null | `none` | `documentation` | Public acquire API only; no private holder-lock route. |
+
+For this row, `<fgosDir>` is always the main checkout's `.fgos`, including calls from linked worktrees. The kernel handle serializes transitions only. The committed sidecar carries the persistent freeze described in section 19.
 
 The observe lock waits at most 5 s, has no TTL, and the shard snapshot is written under it. The activation and install locks are held by `fgctl` through the crate it links; a holder that is killed leaves the lock free at once. Until the main-checkout lock is cut over, `fgctl` checks the main checkout with `probe` (shared, non-blocking, never held) plus the v1 read, and reads a directory at `.fgos/main-checkout.lock` (a tombstone) as "moved".
 
@@ -369,7 +375,42 @@ The dispatch-cwd key includes the real cwd's device, inode and nanosecond birth 
 
 Until Git phase 03 owns removal/recovery, preserve the refused checkout and use a fresh worktree. To recover that same checkout manually: stop all dispatchers for it, identify the exact lock path in the refusal, inspect its `.predecessor.json` with `fgos internal lock-fd --predecessor-state <lock-path>`, fence the recorded producer and every possible descendant (including escaped sessions), and verify no writer remains. Only under that quiescence may an operator archive/remove that **predecessor record**; retain the lock file itself. An empty group or a free kernel lock alone does not authorize this action. Unprovable process membership means keep the record and use the replacement tree. Do not automate record deletion by age or PID liveness.
 
+### Documentation-cutover write lease
+
+The lease freezes documentation writes across processes without a TTL. Its authority is the committed `plans/documentation-cutover-lease.json` blob on `refs/heads/main`. Working-tree copies are not authority. A held sidecar keeps refusing non-holders after process death or loss of the kernel lock resource.
+
+| Command | Result |
+|---|---|
+| `fgos docs-lease acquire [--worktree <path>]` | Select a registered holder checkout in this repository, create its random token, record main's base commit and scope digests, and commit the held sidecar. Without `--worktree`, use the caller's checkout root. A held lease refuses another acquire, including by its holder. |
+| `fgos docs-lease status [--json]` | Report state and, while held, age, holder worktree, token hash, scope digests and kernel-lock probe. Corrupt authority is reported as held/corrupt. |
+| `fgos docs-lease release` | Authenticate the caller checkout's token, commit released state with `releaseScopeDigests` and `drift`, then remove that checkout's token. Drift is reported and does not prevent release. |
+| `fgos docs-lease abandon --owner-confirmed --reason "<reason>"` | Commit owner-confirmed abandoned state with a non-empty written reason. This is the only repair door for a corrupt committed sidecar. Token possession is not required. |
+
+Each successful transition makes one sidecar-only ScopedCommit in main. It takes `documentation-cutover` (10), then `main-checkout` (50), in one LockScope, and releases both handles afterwards. Busy transition/main locks refuse. Main must be checked out on `refs/heads/main`; a moved baseline refuses as `base-moved` without an internal retry. Acquire validates repository membership, rejects a holder nested inside frozen scope, and records tree/blob OIDs at the pinned main baseline, including explicit absent roots. It does not run the cutover's worktree-cleanliness, unmerged-branch, inventory or rehearsal checks; the cutover operator owns those checks.
+
+The fixed scope is:
+
+- `docs/**`, including `docs/transitional-switchboard.md`;
+- root `AGENTS.md` and `CLAUDE.md`;
+- the [switchboard JSON](../../../plans/260925-documentation-authority-unification/transitional-switchboard.json);
+- `core/skills/**`, `.agents/skills/**` and `plugins/fgOS/skills/**`;
+- `plans/documentation-cutover-lease.json` itself.
+
+Other plan evidence and code/test roots are outside the freeze. The sidecar is transition evidence and is excluded from its own scope digest.
+
+Pre-commit refuses scoped non-holder commits in every worktree. Raw moves of main into frozen scope refuse even for holders; the [Git hook contract](../git/spec.md#7-hardened-git-backend-parsers-and-hook-contract) defines the sidecar-transition exception. Unit execution and Workflow start/resume/answer refuse all non-holder work, including read-only Units, before their effects. Admission uses the explicitly named caller checkout and is reused only within that operation. Workflow records its origin in `case.opened.payload.callerCheckout`; generated writer checkouts do not become holder identity. Detached children refresh admission. Seat binding and replay do not consult the lease. Runner Land (`landRunnerItem`) and Workflow Land authenticate their caller checkout before effects: scope-touching non-holder lands refuse, code-only lands proceed. Corrupt authority refuses execution and Land regardless of footprint.
+
+The persistent token is the mode-0600, ignored `.fgos/documentation-cutover.token` file in the holder checkout root. Gates hash the token read from the declared checkout. The sidecar stores its hash; argv, environment, Unit/assignment records and refusal messages do not carry the token. Any process under the same OS user that can read that file can act as holder, including at `landRunnerItem`. This protects against accidents, not deliberate bypass. `--owner-confirmed` is an explicit owner assertion in this single-owner repository, not proof of a human or of holder death.
+
+`git clean -fdX` deletes the ignored token. Losing it does not reopen the freeze; owner abandon is the recovery door. For release by a linked holder, the door temporarily lends its authenticated token to main's token path under main-50 so the commit hooks can check it. Normal success or failure restores main's previous bytes or removes that copy. A crash or SIGKILL can leave the copy in main. **Required follow-up:** doctor and acquire must report a stray main-checkout token when main is not the holder worktree; current code does not diagnose it. Do not treat main as an authorized holder on that basis.
+
+The `documentation-cutover-lease` doctor check diagnoses wiring, committed state and the kernel lock resource; a held lease is a failing check with age. See the [doctor registry contract](../packaging-distribution/contracts/setup-doctor-registry.md#3-doctor-contract) for applicability. Release drift values are diagnostic evidence only. Cutover must recompute digests directly from Git and must never trust sidecar `drift` or `releaseScopeDigests` as authority.
+
+Implementation: [lease module](../../../src/runner/documentation-cutover-lease.mjs). Owning proofs: [lease transitions](../../../test/runner/documentation-cutover-lease.test.mjs), [hook boundaries](../../../test/e2e/documentation-cutover-lease-hooks.test.mjs), [execution admission](../../../test/runner/execution/run-case-admission.test.mjs), [Workflow admission](../../../test/workflow/case-admission-port.test.mjs), [runner Land](../../../test/runner/merge-land.test.mjs) and [Workflow integration](../../../test/workflow/units-runner.test.mjs).
+
 ## 20. Lịch sử quyết định
+
+- **2026-10-22 — D8, hardening lane:** Register `documentation-cutover` as a rank-10 repo lease, owner `documentation`, fence `none`, no legacy path, public acquire only; the main-ref sidecar owns persistent freeze and the kernel lock serializes transitions (sections 7 and 19).
 
 - **2026-10-19 — Release settle supersedes same-day full scans on admission and borrow return, and qualifies §1's no-pid wording.** Coordinator initially selected table-first, recipient-until-release, and no `#[must_use]`. Kernel verification disproved the negative one-read proof: 256 real flocks, a 1 MiB request, first read 4,045 bytes/76 records and a second read 4,050 bytes. Coordinator then selected table-first positive detection plus the inode-checked shared-probe fallback, accepting its brief Try-contention window (§5). Exclusive Linux `release` and `Drop` share that settle; borrows/admission retain one lagged `Since` pass and refuse missing creation marks rather than using a full scan. Full descriptor scans remain only for uncertain release/leaks and Node's unknown-history drain. Unreadable facts never imply clearance. The component reuses process identities, fdinfo parsing and a shared kill/wait loop; no persistent pid ownership or kept duplicate. See [counsel](../../../plans/reports/counsel-261019-0204-holder-lock-release-settle.md) and [implementation evidence](../../../plans/reports/phase-lead-261019-0204-git-perf-release-settle.md).
 

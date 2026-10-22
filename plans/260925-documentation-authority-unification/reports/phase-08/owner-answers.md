@@ -1952,3 +1952,43 @@ The benchmark creates a temporary main-branch fixture, warms 10 calls, then time
 - Writes are confined to the expanded code/test list and this existing delivery record. Existing helpers alone stage ignored native test artifacts; all manual scratch/baseline/logs are under `/tmp/fgos-work/`. No secrets env file, real lease, Work lifecycle verb, Git staging/commit/ref write or manual `.fgos` mutation was used on this repository. The runner owns committing.
 - `CHANGELOG.md` needs the Lead's separately authorized user-visible release note; it was not edited outside this code slice and is listed in the result's `needsWrites`. No additional product feature is proposed or implemented.
 - Markdown preview: `timeout 20s mdview open /home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md` exited **1** (`attempt to write a readonly database`). No preview URL was produced; log: `/tmp/fgos-work/slice2-rework/mdview.log`.
+
+
+## L12-110 — Documentation lease contracts and pending token diagnostic (Doer, 2026-10-22)
+
+### Supplied Lead rulings
+
+Recorded from `step-06b-docs-brief.md`, not a new owner decision or code delivery:
+
+1. **L-1, code follow-up:** doctor and acquire must report a stray holder-token copy left in the main checkout when main is not the holder worktree. The current linked-holder release lends the authenticated token to main under main-50 and restores/removes it in `finally`. SIGKILL/power loss can leave that copy. `checkDocumentationCutoverLeaseDoctor` currently checks wiring, main-ref state and lock-resource existence only; acquire currently does not inspect/report main's token. This docs-only turn records the gap and does not claim it fixed.
+2. **Holder trust boundary:** the same OS user who can read the token file can act as holder. This explicitly applies to `landRunnerItem` as well as the other admission gates. The lease prevents accidents, not a deliberate same-user bypass. A main-50 borrower alone is not holder proof.
+
+### Documentation delivered
+
+- `docs/platform/holder-lock/spec.md` section 7 adds the rank-10 `documentation-cutover` row (lease/repo, fence none, owner documentation, null legacy fields, public acquire API only). Section 19 owns the complete maintainer contract: commands, fixed scope, committed-main authority, transition locks/ScopedCommit, admission doors, token custody, abandon/repair, drift, token-loss and crash limits. Section 20 records the dated D8 hardening-lane decision.
+- `docs/platform/git/spec.md` section 7 places the lease guard before the at-home exemption and records the prepared/main shell filter, shared NUL-safe policy, legal borrowed sidecar edges, release-token proof, owner repair, raw-main refusal and fail-closed errors. It names both runner and Workflow Land gates for hook-disabled typed operations. Section 18 records the dated hardening decision.
+- `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` adds `documentation-cutover-lease` in alphabetical order in the registered check inventory and records pass/fail/not-applicable behavior. It explicitly does not claim token inspection or an automatic fix.
+- `CHANGELOG.md` adds one Unreleased entry covering verbs, hooks, doctor and execution/Land refusal.
+
+### Code versus earlier design
+
+Read design sections 3/6, L12-104 through L12-109 and the current lease/hook/CLI/registration/execution/Workflow/Land sources. Current code and the later rulings take precedence over the historical design:
+
+- The sidecar is the plan-independent `plans/documentation-cutover-lease.json` committed on main, not a report-local or working-tree authority. Kernel handles serialize transitions only, in rank order 10 → 50; no TTL, callback lifetime or session identity controls the persistent freeze. Acquire by an existing holder refuses rather than renewing.
+- Acquire validates the registered holder checkout and records pinned-main tree/blob OIDs, including absent roots. It does not enumerate dirty scoped worktrees or unmerged branches, compare a reviewed inventory, or run ratchet/rehearsal gates. Those remain cutover-operator obligations; no synthetic cleanliness evidence is claimed. It also does not itself check hook wiring, although doctor diagnoses that wiring.
+- Release reports drift and still commits released state. It does not leave the lease held on drift or run the verification suite. The sidecar is excluded from its own digest. Phase 9 must independently recompute digests from Git and never trust `drift` or `releaseScopeDigests` as authority; the hooks authenticate transitions, not digest truth.
+- Current scope adds the sidecar itself. The docs switchboard is already included under `docs/**`; the exact JSON switchboard remains a required frozen path, linked from the product contract without introducing a plan label in its prose. Other plan evidence stays outside scope.
+- Current execution admission is at Unit and Workflow start/resume/answer doors, before effects, once per operation; `bind()`/dry seat choice/replay no longer consult the lease. Holder identity is the explicitly named checkout's token, never an ambient session id or token passed through env/argv/Unit records. Workflow keeps its recorded origin across generated writer checkouts. Both runner and Workflow Land authenticate at their own effect doors; code-only Land remains allowed. Corrupt authority refuses even code-only/no-op Land.
+- Raw main ref moves into frozen scope refuse for holders too. Only sidecar-only, direct-parent, main-50-borrowed legal transitions are admitted by the hook. Release additionally needs the committing checkout's token. Explicit owner-confirmed abandon with a reason is deliberately available without a holder token or a holder-death test, including corrupt-sidecar repair; a busy kernel transition lock still refuses.
+- The sh hook fast path avoids Node only for non-prepared phases or transactions without main. Main updates still depend on policy imports. The pre-commit free-state fast path skips path diffing. No separate per-writer API or direct-file-edit gate is asserted by these docs.
+- Doctor is not applicable outside Git, without these repository hooks or without main. It does not inspect a linked holder's token; the stray-main-token diagnostic remains the L-1 code follow-up above.
+
+### Verification
+
+- `node scripts/check-doc-constitution.mjs --no-ledger --check-placement --promotion`: **exit 0**. Vocabulary/constitution consistent; 618 placement files, 617 matched, zero leftovers/ambiguities/evidence-without-index and one recorded exception. Promotion reports 169 canonical documents, 160 complete, one headerless (`docs/platform/git/spec.md`) and eight headered with missing metadata. These are report-only existing metadata gaps; this turn does not change the document headers. `--no-ledger` deliberately omits the unrelated historical claim-ledger scan; the checker has no touched-path CLI selector.
+- `node scripts/check-legacy-docs-ratchet.mjs`: **exit 0**, clean (997 legacy files, 28 accounted edits, three accounted new files).
+- Inline Python check over the four touched product documents: **exit 0**. One H1 per document; added local Markdown file links resolve; the new doctor ID exists in `src/setup/registrations.mjs` and appears once, alphabetically between its inventory neighbors. This is static documentation verification, not a runtime doctor or behavioral test.
+- `git diff --check`: **exit 0**. Final changed-path inspection contains only the four product documents and this existing report.
+- `timeout 20s mdview open /home/vantt/projects/forgentX-phase00-documentation-authority-unification/docs/platform/holder-lock/spec.md`: **exit 1**, `attempt to write a readonly database` (SQLite error 8). No preview URL was produced. MDView MCP is not exposed; the available CLI fallback was attempted once.
+
+No runtime tests were run for this documentation-only change, and no whole-suite or independent-review claim is made. No code/test/skill/baseline writes, fgOS CLI, Git writes, secrets reads or workspace `.fgos` access were used. The required outbox acknowledgement/report/result are the assignment-path exception. The runner owns the commit. The L-1 source follow-up is recorded, not required as an out-of-scope write to complete this docs turn.
