@@ -88,6 +88,21 @@ test('the door refuses a symlinked addon and a value that is not JSON, and write
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 
+test('the door canonicalises the shared vectors to their exact bytes and still refuses every value JSON would silently change', () => {
+  const vectors = JSON.parse(fs.readFileSync(path.join(root, 'packages/canonical-json/contracts/vectors/canonical.v1.json'), 'utf8'));
+  let checked = 0;
+  for (const { input, rawInput, canonical: expected } of vectors) {
+    // A raw text that JSON.stringify would not give back (-0, 1.0, 1e20) is outside what a stringified value can carry.
+    if (rawInput !== undefined && JSON.stringify(JSON.parse(rawInput)) !== rawInput) continue;
+    assert.equal(canonicalJson(JSON.parse(rawInput ?? JSON.stringify(input))), expected);
+    checked += 1;
+  }
+  assert.ok(checked >= 10, `only ${checked} vectors checked`);
+  // JSON.stringify would turn each of these into null or drop it; the door names them instead.
+  // eslint-disable-next-line no-sparse-arrays
+  for (const bad of [[1, undefined], [1, , 2], NaN, 10n, () => 1, { a: [NaN] }, [Infinity]]) assert.throws(() => canonicalJson(bad), { code: 'canonical-json-not-json' });
+});
+
 test('real append and read run in a hot section without a child process; Git refuses there', () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-store-'));
   const repo = path.join(temp, 'repo');
