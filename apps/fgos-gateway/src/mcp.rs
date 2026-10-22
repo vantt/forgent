@@ -78,18 +78,16 @@ impl Operation {
 /// the fields `search` actually needs (path, HTTP method, operationId,
 /// summary) — the full spec is still reachable verbatim via `/contract` for
 /// anything deeper.
-fn extract_operations(doc: &serde_yaml::Value) -> Vec<Operation> {
+fn extract_operations(doc: &serde_json::Value) -> Vec<Operation> {
     const HTTP_METHODS: &[&str] = &["get", "post", "put", "patch", "delete"];
     let mut ops = Vec::new();
-    let Some(paths) = doc.get("paths").and_then(|v| v.as_mapping()) else {
+    let Some(paths) = doc.get("paths").and_then(|v| v.as_object()) else {
         return ops;
     };
-    for (path_key, path_item) in paths {
-        let Some(path_str) = path_key.as_str() else { continue };
-        let Some(methods) = path_item.as_mapping() else { continue };
-        for (method_key, op_value) in methods {
-            let Some(method_str) = method_key.as_str() else { continue };
-            if !HTTP_METHODS.contains(&method_str) {
+    for (path_str, path_item) in paths {
+        let Some(methods) = path_item.as_object() else { continue };
+        for (method_str, op_value) in methods {
+            if !HTTP_METHODS.contains(&method_str.as_str()) {
                 continue;
             }
             let operation_id = op_value
@@ -128,7 +126,8 @@ async fn search_contract(root: &std::path::Path, query: Option<String>) -> Resul
     let raw = tokio::fs::read_to_string(&contract_path)
         .await
         .map_err(|err| format!("could not read the OpenAPI contract at {}: {err}", contract_path.display()))?;
-    let doc: serde_yaml::Value = serde_yaml::from_str(&raw)
+    let doc = fgos_yaml_doc::parse(raw.as_bytes(), fgos_yaml_doc::Profile::Tool, &contract_path.display().to_string())
+        .and_then(|doc| doc.to_json())
         .map_err(|err| format!("could not parse {} as YAML: {err}", contract_path.display()))?;
     let all_ops = extract_operations(&doc);
     let query_lower = query.unwrap_or_default().trim().to_lowercase();
