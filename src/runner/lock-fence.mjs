@@ -42,7 +42,7 @@ export function parseLockParams(raw) {
 export function lockParamsFor({ fgosDir, params = {}, scope }) {
   const filled = { ...params };
   if (filled.fgosDir === undefined) filled.fgosDir = fgosDir;
-  if (filled.lockRoot === undefined && scope === 'machine') filled.lockRoot = resolveLockRoot({ fgosDir });
+  if (filled.lockRoot === undefined && scope === 'machine') filled.lockRoot = resolveLockRoot();
   return filled;
 }
 

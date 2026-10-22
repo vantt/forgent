@@ -46,7 +46,7 @@ test('the journal row fails with git-fence-missing when a Git WAL has lost the c
     const fence = path.join(repo, '.fgos/locks/activation.lock');
     fs.mkdirSync(fence, { recursive: true });
     fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
-    const { stateRoot } = resolveStateRoot({ fgosDir: path.join(repo, '.fgos') });
+    const { stateRoot } = resolveStateRoot();
     loadNativeAddon(options).initializeGitWal(stateRoot, repo, repo);
     assert.equal(checkGit(repo, 'git-operation-journal', options).passed, true);
     fs.rmSync(fence, { recursive: true });

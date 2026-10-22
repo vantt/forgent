@@ -98,7 +98,7 @@ export function collectLockStatus({ fgosDir }) {
   const params = { fgosDir };
   let machineParams = params;
   try {
-    machineParams = { fgosDir, lockRoot: resolveLockRoot({ fgosDir }) };
+    machineParams = { fgosDir, lockRoot: resolveLockRoot() };
   } catch (err) {
     if (!(err instanceof HolderLockError)) throw err;
   }

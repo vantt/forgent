@@ -1802,7 +1802,7 @@ export async function executeAssignment(assignment, opts = {}) {
     // The main checkout as it is before the agent starts: what is dirty outside the workspace afterwards
     // and was not before is reported on the result.
     const strayWatch = supervised ? watchWritesOutsideWorkspace({ repoRoot: root, cwd }) : null;
-    const attemptStepEnv = supervised ? attemptStepEnvOf(fgosDir) : null;
+    const attemptStepEnv = supervised ? attemptStepEnvOf() : null;
     if (supervised) {
       attemptLocks = acquireAttemptLocks({
         executorId, capability: compiledPlan.capability,

@@ -119,7 +119,7 @@ export function detectHerdrPresent(env = process.env) {
  */
 export function resolveGitRoots(cwd = process.cwd(), { allowNoRepository = false } = {}) {
   try {
-    const result = createGitInspect({stateRoot:resolveStateRoot({fgosDir:path.join(cwd,'.fgos')}).stateRoot,
+    const result = createGitInspect({stateRoot:resolveStateRoot().stateRoot,
       repoPath:cwd,trustedMain:cwd}).resolveRepo();
     // A read-only caller may work in a directory that is no repository: Inspect's typed answer is
     // `notARepository`, and the directory is its own project root.

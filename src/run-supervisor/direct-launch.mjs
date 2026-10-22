@@ -139,13 +139,13 @@ function boottimeAfter(afterMs) {
 }
 
 /** The environment of every step and of the supervisor: nothing but what the Node payload reads. */
-export function attemptStepEnv({ fgosDir, env = process.env } = {}) {
+export function attemptStepEnv({ env = process.env } = {}) {
   const out = {};
   for (const name of ENV_ALLOW) if (typeof env[name] === 'string') out[name] = env[name];
   for (const [name, value] of Object.entries(env)) {
     if (name.startsWith('FGOS_') && typeof value === 'string' && name !== 'FGOS_LOCK_FD' && name !== 'FGOS_LOCK_JOB' && name !== 'FGOS_RUST_HOST_RECURSION_GUARD') out[name] = value;
   }
-  out.FGOS_STATE_ROOT = resolveStateRoot({ env, fgosDir }).stateRoot;
+  out.FGOS_STATE_ROOT = resolveStateRoot({ env }).stateRoot;
   return out;
 }
 
