@@ -136,6 +136,7 @@ Tên tier sai trong config là lỗi load. Việc hạ tier duy nhất từng x�
 - Cửa (ranh admission hoặc invocation) tính một `raiseAuthorized` đáng tin; crate không bao giờ đọc `override.origin`. Quyền mặc định là agent. Cùng cổng này điều khiển `acceptDependence` (trước đợt `bind.mjs:385` tin `origin === 'human-cli'`).
 - Trước đợt `human-cli` là chuỗi tự khai: `bin/fgos.mjs:2851` gán cho mọi override không có origin; `:2862/:2878/:2889` tổng hợp cho `--effort`, `--timeout`, `--account`; `src/workflow/unit-handoff.mjs:198` tổng hợp trong handoff workflow.
 - **Đợt đầu:** không cửa nào chứng thực được con người cho `fgos run` trực tiếp (mục 13), nên `raiseAuthorized` là false ở mọi cửa. Tier chỉ tăng qua config project đã commit (khoá tier, `maxTier`) hoặc khuyến nghị workflow. `fgos run --tier`/`--override` nâng tier bị từ chối `tier-escalation-unauthorized`; `--effort`, `--timeout`, `--account` vẫn chạy vì không phải nâng tier.
+- `--capability` và `--persona` trên `fgos run "<prompt>"` là khai báo của chính unit (như cùng khoá trong file `--unit`), không phải nâng tier: tier của capability hay persona đó đã nằm trong config project đã commit nên được nhận. Chỉ `--tier`/`--override` nâng tier bị từ chối.
 - **Mục sau:** nâng qua consent gate của workflow, trả lời bằng `fgos workflow answer --approve`, digest subject của nó phủ ghế và tier xin.
 
 ## 6. Cấu hình
@@ -434,6 +435,7 @@ Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker 
 - **Điều kiện đảo:** mục 14.
 - **Ranh giới:** đã đổi cùng đợt: hàng Execution Core của [component-boundary](../platform/component-boundary.md) không còn quyền chọn ghế; Seat Binding có hàng riêng.
 - **Bằng chứng:** mục 13; bản nháp, báo cáo hội đồng, inventory và nghiên cứu ladder ở mục 16.
+- **Cập nhật 2026-10-22 (SEAT lead):** `--capability`/`--persona` gõ ở cửa `fgos run "<prompt>"` không còn bị coi là nâng tier; cơ chế selector của cửa (crate chỉ giữ persona do override gọi tên) bị xoá. Lý do: mục 5.5 chỉ gọi tên `--tier`/`--override`; tier của `docs:write` = flagship là config đã commit; công thức docs đã duyệt `fgos run "<prompt>" --capability docs:write` bị từ chối `tier-escalation-unauthorized`; phân biệt gõ ở cửa với khai trong file unit không bảo vệ điều gì. Điều kiện đảo: owner muốn giá trị gõ ở cửa bị coi là nâng tier.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
 ## 16. Pointers

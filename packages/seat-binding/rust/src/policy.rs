@@ -188,53 +188,17 @@ fn apply_cap(tier: Tier, source: &str, max: &Option<(Tier, String)>) -> Capped {
     }
 }
 
-/// Which door-chosen selectors alone raise the tier above the no-selector resolution.
-fn raising_selectors(config: &Config, ask: &Ask, baseline: Tier) -> Vec<&'static str> {
-    let s = &ask.selectors;
-    let tier_with = |capability: Option<&String>, seat: Option<&String>, persona: Option<&String>| {
-        let capability = capability.unwrap_or(&ask.capability);
-        let resolved = resolve_tier(
-            config,
-            capability,
-            seat.unwrap_or(&ask.seat),
-            persona.or(ask.persona.as_ref()).map(String::as_str),
-            ask.role,
-            ask.workflow.as_ref(),
-        );
-        apply_cap(resolved.tier, &resolved.source, &resolve_max(config, capability)).tier
-    };
-    let mut named = Vec::new();
-    if s.capability.is_some() && tier_with(s.capability.as_ref(), None, None) > baseline {
-        named.push("capability");
-    }
-    if s.seat.is_some() && tier_with(None, s.seat.as_ref(), None) > baseline {
-        named.push("seat");
-    }
-    if s.persona.is_some() && tier_with(None, None, s.persona.as_ref()) > baseline {
-        named.push("persona");
-    }
-    if named.is_empty() {
-        // Only the combination raises it.
-        for (present, name) in [(s.capability.is_some(), "capability"), (s.seat.is_some(), "seat"), (s.persona.is_some(), "persona")] {
-            if present {
-                named.push(name);
-            }
-        }
-    }
-    named
-}
-
 pub fn policy(ask: &Ask, config: &Config) -> Result<Policy, Refusal> {
     validate(config)?;
 
-    let capability = ask.selectors.capability.as_deref().unwrap_or(&ask.capability);
-    let seat = ask.selectors.seat.as_deref().unwrap_or(&ask.seat);
+    let capability = ask.capability.as_str();
+    let seat = ask.seat.as_str();
     let persona = ask.selectors.persona.as_deref().or(ask.persona.as_deref());
 
     let resolved = resolve_tier(config, capability, seat, persona, ask.role, ask.workflow.as_ref());
     let max = resolve_max(config, capability);
 
-    // A door-chosen selector that lifts the tier above the no-selector answer is a raise.
+    // A persona an override names that lifts the tier above the answer without it is a raise.
     let mut raised_by = None;
     if !ask.selectors.is_empty() {
         let base = resolve_tier(
@@ -248,12 +212,11 @@ pub fn policy(ask: &Ask, config: &Config) -> Result<Policy, Refusal> {
         let without = apply_cap(base.tier, &base.source, &resolve_max(config, &ask.capability)).tier;
         let with = apply_cap(resolved.tier, &resolved.source, &max).tier;
         if with > without {
-            let names = raising_selectors(config, ask, without).join("+");
             if !ask.raise_authorized {
                 return Err(Refusal::new(
                     "tier-escalation-unauthorized",
                     format!(
-                        "{}/{}: the {names} the door chose resolves to {} where the workflow's own seat resolves to {}; only an authorized door may raise a tier",
+                        "{}/{}: the persona the door chose resolves to {} where the workflow's own seat resolves to {}; only an authorized door may raise a tier",
                         ask.label.as_deref().unwrap_or(&ask.capability),
                         ask.seat,
                         with.name(),
@@ -261,7 +224,7 @@ pub fn policy(ask: &Ask, config: &Config) -> Result<Policy, Refusal> {
                     ),
                 ));
             }
-            raised_by = Some(format!("selector:{names}"));
+            raised_by = Some("selector:persona".to_string());
         }
     }
 
