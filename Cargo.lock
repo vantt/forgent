@@ -381,6 +381,14 @@ name = "fgos-write-scope"
 version = "0.2.0"
 
 [[package]]
+name = "fgos-yaml-doc"
+version = "0.2.0"
+dependencies = [
+ "serde_json",
+ "sha2",
+]
+
+[[package]]
 name = "filetime"
 version = "0.2.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"

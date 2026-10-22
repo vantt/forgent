@@ -1,0 +1,600 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "block-one-line",
+      "why": "spec section 6: a line is written as # plus the text",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "why this value"
+      },
+      "expect": {
+        "lines": [
+          "# why this value"
+        ]
+      }
+    },
+    {
+      "id": "block-lf",
+      "why": "spec section 6: a line feed starts a new comment line",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "one\ntwo"
+      },
+      "expect": {
+        "lines": [
+          "# one",
+          "# two"
+        ]
+      }
+    },
+    {
+      "id": "block-injection-lf",
+      "why": "spec section 6: text can never become a key or a value",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "x\nevil: 1"
+      },
+      "expect": {
+        "lines": [
+          "# x",
+          "# evil: 1"
+        ]
+      }
+    },
+    {
+      "id": "block-cr",
+      "why": "spec section 6: a carriage return is a line break",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "one\rtwo"
+      },
+      "expect": {
+        "lines": [
+          "# one",
+          "# two"
+        ]
+      }
+    },
+    {
+      "id": "block-crlf",
+      "why": "spec section 6: CRLF is one line break",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "one\r\ntwo"
+      },
+      "expect": {
+        "lines": [
+          "# one",
+          "# two"
+        ]
+      }
+    },
+    {
+      "id": "block-nel",
+      "why": "spec section 6: U+0085 is a line break",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "onetwo"
+      },
+      "expect": {
+        "lines": [
+          "# one",
+          "# two"
+        ]
+      }
+    },
+    {
+      "id": "block-line-separator",
+      "why": "spec section 6: U+2028 is a line break",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "one two"
+      },
+      "expect": {
+        "lines": [
+          "# one",
+          "# two"
+        ]
+      }
+    },
+    {
+      "id": "block-paragraph-separator",
+      "why": "spec section 6: U+2029 is a line break",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "one two"
+      },
+      "expect": {
+        "lines": [
+          "# one",
+          "# two"
+        ]
+      }
+    },
+    {
+      "id": "block-mixed-breaks",
+      "why": "spec section 6: every break kind in one text",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "a\nb\rc\r\nde f g"
+      },
+      "expect": {
+        "lines": [
+          "# a",
+          "# b",
+          "# c",
+          "# d",
+          "# e",
+          "# f",
+          "# g"
+        ]
+      }
+    },
+    {
+      "id": "block-control-removed",
+      "why": "spec section 6: control characters other than tab are removed (NUL, ESC, DEL, C1)",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "a\u0000b\u001bcde"
+      },
+      "expect": {
+        "lines": [
+          "# abcde"
+        ]
+      }
+    },
+    {
+      "id": "block-tab-kept",
+      "why": "spec section 6: a tab is kept",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "a\tb"
+      },
+      "expect": {
+        "lines": [
+          "# a\tb"
+        ]
+      }
+    },
+    {
+      "id": "block-empty-text",
+      "why": "an empty text is one empty comment line, written without a trailing space",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": ""
+      },
+      "expect": {
+        "lines": [
+          "#"
+        ]
+      }
+    },
+    {
+      "id": "block-empty-middle-line",
+      "why": "an empty line inside the text is written as a bare #",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "a\n\nb"
+      },
+      "expect": {
+        "lines": [
+          "# a",
+          "#",
+          "# b"
+        ]
+      }
+    },
+    {
+      "id": "block-trailing-break",
+      "why": "a trailing break leaves a final empty comment line",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "a\n"
+      },
+      "expect": {
+        "lines": [
+          "# a",
+          "#"
+        ]
+      }
+    },
+    {
+      "id": "block-only-controls",
+      "why": "a line of only removed characters is an empty comment line",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "\u0001\u0002"
+      },
+      "expect": {
+        "lines": [
+          "#"
+        ]
+      }
+    },
+    {
+      "id": "block-leading-spaces-kept",
+      "why": "spaces inside the text are kept",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "  indented"
+      },
+      "expect": {
+        "lines": [
+          "#   indented"
+        ]
+      }
+    },
+    {
+      "id": "block-hash-prefix-kept",
+      "why": "a leading hash in the text is text, not a second comment marker",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "# @fgos:why"
+      },
+      "expect": {
+        "lines": [
+          "# # @fgos:why"
+        ]
+      }
+    },
+    {
+      "id": "block-unicode-kept",
+      "why": "ordinary non-ASCII text is kept",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "lý do: giá trị"
+      },
+      "expect": {
+        "lines": [
+          "# lý do: giá trị"
+        ]
+      }
+    },
+    {
+      "id": "block-refuses-bidi-override",
+      "why": "comment text with a right-to-left override is refused (same rule as values under strict-config)",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "safe ‮ hidden"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "bidi-control",
+          "line": 1,
+          "column": 6
+        }
+      }
+    },
+    {
+      "id": "block-refuses-bidi-isolate",
+      "why": "comment text with an isolate control is refused, with the position on its own line",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "ok\nfine⁦x"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "bidi-control",
+          "line": 2,
+          "column": 5
+        }
+      }
+    },
+    {
+      "id": "block-refuses-zero-width-space",
+      "why": "comment text with a zero-width space is refused",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "a​b"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "zero-width",
+          "line": 1,
+          "column": 2
+        }
+      }
+    },
+    {
+      "id": "block-refuses-zero-width-joiner",
+      "why": "comment text with a zero-width joiner is refused",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "a‍b"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "zero-width",
+          "line": 1,
+          "column": 2
+        }
+      }
+    },
+    {
+      "id": "block-refuses-feff-inside",
+      "why": "comment text with U+FEFF is refused",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "a﻿b"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "zero-width",
+          "line": 1,
+          "column": 2
+        }
+      }
+    },
+    {
+      "id": "block-refuses-bidi-at-range-end",
+      "why": "the last bidi control U+2069 is refused",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "block",
+      "input": {
+        "text": "⁩"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "bidi-control",
+          "line": 1,
+          "column": 1
+        }
+      }
+    },
+    {
+      "id": "inline-text",
+      "why": "an inline comment is one comment token",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "inline",
+      "input": {
+        "text": "why"
+      },
+      "expect": {
+        "line": "# why"
+      }
+    },
+    {
+      "id": "inline-empty",
+      "why": "an empty inline comment is a bare #",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "inline",
+      "input": {
+        "text": ""
+      },
+      "expect": {
+        "line": "#"
+      }
+    },
+    {
+      "id": "inline-control-removed",
+      "why": "control characters are removed from an inline comment, tab kept",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "inline",
+      "input": {
+        "text": "a\u0000b\tc"
+      },
+      "expect": {
+        "line": "# ab\tc"
+      }
+    },
+    {
+      "id": "inline-refuses-lf",
+      "why": "spec section 6: an inline comment is one line, a line feed is refused",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "inline",
+      "input": {
+        "text": "a\nb"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "inline-comment-multiline",
+          "line": 1,
+          "column": 2
+        }
+      }
+    },
+    {
+      "id": "inline-refuses-cr",
+      "why": "a carriage return is refused in an inline comment",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "inline",
+      "input": {
+        "text": "a\rb"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "inline-comment-multiline",
+          "line": 1,
+          "column": 2
+        }
+      }
+    },
+    {
+      "id": "inline-refuses-nel",
+      "why": "U+0085 is refused in an inline comment",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "inline",
+      "input": {
+        "text": "ab"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "inline-comment-multiline",
+          "line": 1,
+          "column": 2
+        }
+      }
+    },
+    {
+      "id": "inline-refuses-line-separator",
+      "why": "U+2028 is refused in an inline comment",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "inline",
+      "input": {
+        "text": "a b"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "inline-comment-multiline",
+          "line": 1,
+          "column": 2
+        }
+      }
+    },
+    {
+      "id": "inline-refuses-bidi",
+      "why": "an inline comment with a bidi control is refused",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "inline",
+      "input": {
+        "text": "a‪b"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "bidi-control",
+          "line": 1,
+          "column": 2
+        }
+      }
+    },
+    {
+      "id": "inline-refuses-zero-width",
+      "why": "an inline comment with a zero-width space is refused",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "kind": "inline",
+      "input": {
+        "text": "a​b"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "zero-width",
+          "line": 1,
+          "column": 2
+        }
+      }
+    }
+  ]
+}

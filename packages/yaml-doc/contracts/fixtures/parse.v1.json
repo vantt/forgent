@@ -1,0 +1,1764 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "plain-values",
+      "why": "old test: mappings, sequences and scalars parse to plain values",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "a: 1",
+          "b: [x, y]",
+          "c:",
+          "  - d: true",
+          "  - null",
+          "e: 1.5",
+          "f: \"q\""
+        ]
+      },
+      "expect": {
+        "value": {
+          "a": 1,
+          "b": [
+            "x",
+            "y"
+          ],
+          "c": [
+            {
+              "d": true
+            },
+            null
+          ],
+          "e": 1.5,
+          "f": "q"
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "plain-scalar-root",
+      "why": "old test: a plain scalar document is its string",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "plain text"
+      },
+      "expect": {
+        "value": "plain text"
+      },
+      "old": true
+    },
+    {
+      "id": "integer-root",
+      "why": "old test: an integer document is an integer",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "42"
+      },
+      "expect": {
+        "value": 42
+      },
+      "old": true
+    },
+    {
+      "id": "syntax-error-position",
+      "why": "old test: malformed input names line and column (the position is a parser property; the chosen parser may move the column, recorded in its upgrade record)",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "text": "a: [1,\nb: }"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "syntax-error",
+          "line": 2,
+          "column": 1
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "null-empty",
+      "why": "old test: empty input is null (spec section 4, zero documents)",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "expect": {
+        "value": null
+      },
+      "old": true
+    },
+    {
+      "id": "null-whitespace",
+      "why": "old test: whitespace-only input is null (spec section 4, zero documents)",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "   \n\t\n"
+      },
+      "expect": {
+        "value": null
+      },
+      "old": true
+    },
+    {
+      "id": "null-comment-only",
+      "why": "old test: comment-only input is null (spec section 4, zero documents)",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "# only a comment\n"
+      },
+      "expect": {
+        "value": null
+      },
+      "old": true
+    },
+    {
+      "id": "null-two-comments",
+      "why": "old test: two comments with a blank line is null (spec section 4, zero documents)",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "# one\n\n# two\n"
+      },
+      "expect": {
+        "value": null
+      },
+      "old": true
+    },
+    {
+      "id": "null-bare-marker",
+      "why": "old test: a bare document marker is null (spec section 4, zero documents)",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "---\n"
+      },
+      "expect": {
+        "value": null
+      },
+      "old": true
+    },
+    {
+      "id": "null-marker-comment",
+      "why": "old test: a document marker with a comment is null (spec section 4, zero documents)",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "--- # note\n"
+      },
+      "expect": {
+        "value": null
+      },
+      "old": true
+    },
+    {
+      "id": "null-tilde",
+      "why": "old test: a tilde is null (spec section 4, zero documents)",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "~"
+      },
+      "expect": {
+        "value": null
+      },
+      "old": true
+    },
+    {
+      "id": "multi-doc-2",
+      "why": "old test: two documents are refused at the start of the second (spec section 4)",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a: 1\n---\nb: 2\n"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "multiple-documents",
+          "line": 2,
+          "column": 1
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "multi-doc-3",
+      "why": "old test: three documents are refused at the start of the second",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a: 1\n---\nb: 2\n---\nc: 3\n"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "multiple-documents",
+          "line": 2,
+          "column": 1
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "dup-key-plain",
+      "why": "old test: a duplicate key is refused at the second occurrence",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a: 1\na: 2\n"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "duplicate-key",
+          "line": 2,
+          "column": 1
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "dup-key-quoted-vs-plain",
+      "why": "spec section 3: key identity is the resolved value, a double-quoted key equals a plain one",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "a: 1",
+          "\"a\": 2"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "duplicate-key",
+          "line": 2,
+          "column": 1
+        }
+      }
+    },
+    {
+      "id": "dup-key-single-quoted",
+      "why": "spec section 3: a single-quoted key equals a plain one",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "a: 1",
+          "'a': 2"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "duplicate-key",
+          "line": 2,
+          "column": 1
+        }
+      }
+    },
+    {
+      "id": "dup-key-escaped",
+      "why": "spec section 3: an escaped key resolving to the same string is a duplicate",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "a: 1",
+          "\"\\x61\": 2"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "duplicate-key",
+          "line": 2,
+          "column": 1
+        }
+      }
+    },
+    {
+      "id": "dup-key-nested",
+      "why": "spec section 4: duplicates are judged inside one mapping at any depth",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "x:",
+          "  k: 1",
+          "  k: 2"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "duplicate-key",
+          "line": 3,
+          "column": 3
+        }
+      }
+    },
+    {
+      "id": "core-yes-no-on-off",
+      "why": "old test: yes/no/on/off are strings, only true and false are booleans",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "a: yes",
+          "b: no",
+          "c: on",
+          "d: off",
+          "e: true",
+          "f: false"
+        ]
+      },
+      "expect": {
+        "value": {
+          "a": "yes",
+          "b": "no",
+          "c": "on",
+          "d": "off",
+          "e": true,
+          "f": false
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "core-dates-strings",
+      "why": "old test: unquoted ISO dates and timestamps stay strings",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "day: 2026-10-16",
+          "stamp: 2026-10-16T01:02:03Z"
+        ]
+      },
+      "expect": {
+        "value": {
+          "day": "2026-10-16",
+          "stamp": "2026-10-16T01:02:03Z"
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "merge-key-ordinary",
+      "why": "old test: << is an ordinary key under tool, never a merge",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "base: &b {x: 1}",
+          "d:",
+          "  <<: *b",
+          "  y: 2"
+        ]
+      },
+      "expect": {
+        "value": {
+          "base": {
+            "x": 1
+          },
+          "d": {
+            "<<": {
+              "x": 1
+            },
+            "y": 2
+          }
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "merge-key-refused",
+      "why": "spec section 4: << is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "d:",
+          "  <<: 1"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "merge-key-refused",
+          "line": 2,
+          "column": 3
+        }
+      }
+    },
+    {
+      "id": "tag-binary",
+      "why": "old test: !!binary is refused under tool as a tag outside the core schema",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "text": "a: !!binary aGk="
+      },
+      "expect": {
+        "refusal": {
+          "rule": "unknown-tag",
+          "line": 1,
+          "column": 4
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "tag-custom",
+      "why": "old test: a custom tag is refused under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "text": "a: !foo bar"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "unknown-tag",
+          "line": 1,
+          "column": 4
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "tag-core-str-allowed",
+      "why": "spec section 4: a core-schema tag is allowed under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "text": "a: !!str 1"
+      },
+      "expect": {
+        "value": {
+          "a": "1"
+        }
+      }
+    },
+    {
+      "id": "tag-core-str-refused",
+      "why": "spec section 4: every explicit tag is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "a: !!str 1"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "tag-refused",
+          "line": 1,
+          "column": 4
+        }
+      }
+    },
+    {
+      "id": "anchor-refused-strict",
+      "why": "spec section 4: anchors are refused under strict-config, at the anchor",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "base: &b {x: 1}"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "anchor-refused",
+          "line": 1,
+          "column": 7
+        }
+      }
+    },
+    {
+      "id": "alias-flat-over-100",
+      "why": "old test: more than 100 alias tokens are refused at the 101st (spec section 4 limits)",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "prefix": "base: &a [x]\nlist: [*a",
+          "unit": ", *a",
+          "count": 120,
+          "suffix": "]\n"
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "alias-limit",
+          "line": 2,
+          "column": 408
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "alias-nested-16x10",
+      "why": "old test: nested aliases pass the alias limit on line 12, where the 101st alias starts",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "a: &a [x, x, x, x, x, x, x, x, x, x]",
+          "b: &b [*a, *a, *a, *a, *a, *a, *a, *a, *a, *a]",
+          "c: &c [*b, *b, *b, *b, *b, *b, *b, *b, *b, *b]",
+          "d: &d [*c, *c, *c, *c, *c, *c, *c, *c, *c, *c]",
+          "e: &e [*d, *d, *d, *d, *d, *d, *d, *d, *d, *d]",
+          "f: &f [*e, *e, *e, *e, *e, *e, *e, *e, *e, *e]",
+          "g: &g [*f, *f, *f, *f, *f, *f, *f, *f, *f, *f]",
+          "h: &h [*g, *g, *g, *g, *g, *g, *g, *g, *g, *g]",
+          "i: &i [*h, *h, *h, *h, *h, *h, *h, *h, *h, *h]",
+          "j: &j [*i, *i, *i, *i, *i, *i, *i, *i, *i, *i]",
+          "k: &k [*j, *j, *j, *j, *j, *j, *j, *j, *j, *j]",
+          "l: &l [*k, *k, *k, *k, *k, *k, *k, *k, *k, *k]",
+          "m: &m [*l, *l, *l, *l, *l, *l, *l, *l, *l, *l]",
+          "n: &n [*m, *m, *m, *m, *m, *m, *m, *m, *m, *m]",
+          "o: &o [*n, *n, *n, *n, *n, *n, *n, *n, *n, *n]",
+          "p: &p [*o, *o, *o, *o, *o, *o, *o, *o, *o, *o]"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "alias-limit",
+          "line": 12,
+          "column": 8
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "alias-within-limit",
+      "why": "old test: aliases within the limit resolve",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "base: &a [x]",
+          "list: [*a, *a, *a]"
+        ]
+      },
+      "expect": {
+        "value": {
+          "base": [
+            "x"
+          ],
+          "list": [
+            [
+              "x"
+            ],
+            [
+              "x"
+            ],
+            [
+              "x"
+            ]
+          ]
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "alias-self-map",
+      "why": "old test: a self-referencing map is an endless expansion refused at the node bound, without hanging",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "text": "a: &a {b: *a}"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "node-limit"
+        }
+      },
+      "old": true,
+      "max_millis": 2000
+    },
+    {
+      "id": "alias-self-seq",
+      "why": "old test: a self-referencing sequence is refused at the node bound",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "text": "&a [*a]"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "node-limit"
+        }
+      },
+      "old": true,
+      "max_millis": 2000
+    },
+    {
+      "id": "alias-nested-value-budget",
+      "why": "old test: 81 aliases stay under the alias limit but expand past the node bound, refused quickly",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "l0: &l0 [x, x, x, x, x, x, x, x, x]",
+          "l1: &l1 [*l0, *l0, *l0, *l0, *l0, *l0, *l0, *l0, *l0]",
+          "l2: &l2 [*l1, *l1, *l1, *l1, *l1, *l1, *l1, *l1, *l1]",
+          "l3: &l3 [*l2, *l2, *l2, *l2, *l2, *l2, *l2, *l2, *l2]",
+          "l4: &l4 [*l3, *l3, *l3, *l3, *l3, *l3, *l3, *l3, *l3]",
+          "l5: &l5 [*l4, *l4, *l4, *l4, *l4, *l4, *l4, *l4, *l4]",
+          "l6: &l6 [*l5, *l5, *l5, *l5, *l5, *l5, *l5, *l5, *l5]",
+          "l7: &l7 [*l6, *l6, *l6, *l6, *l6, *l6, *l6, *l6, *l6]",
+          "l8: &l8 [*l7, *l7, *l7, *l7, *l7, *l7, *l7, *l7, *l7]",
+          "l9: &l9 [*l8, *l8, *l8, *l8, *l8, *l8, *l8, *l8, *l8]"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "node-limit"
+        }
+      },
+      "old": true,
+      "max_millis": 2000
+    },
+    {
+      "id": "flat-10000-items",
+      "why": "old test: a large flat document under the node budget parses (about 50 000 nodes, decision on node counting)",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "prefix": "items:\n",
+          "unit": "  - id: {i}\n    tags: [a, b]",
+          "separator": "\n",
+          "count": 10000,
+          "suffix": "\n"
+        }
+      },
+      "expect": {
+        "checks": [
+          {
+            "path": "items",
+            "length": 10000
+          }
+        ]
+      },
+      "old": true
+    },
+    {
+      "id": "flat-over-budget",
+      "why": "spec section 8: a document past 100 000 nodes is refused (25 000 items cost about 125 000)",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "prefix": "items:\n",
+          "unit": "  - id: {i}\n    tags: [a, b]",
+          "separator": "\n",
+          "count": 25000,
+          "suffix": "\n"
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "node-limit"
+        }
+      }
+    },
+    {
+      "id": "proto-keys-tool",
+      "why": "old test: __proto__ and constructor.prototype keys stay in the value under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "__proto__: {polluted: 1}",
+          "nested:",
+          "  __proto__: {deep: 2}",
+          "constructor:",
+          "  prototype: {viaCtor: 3}"
+        ]
+      },
+      "expect": {
+        "value": {
+          "__proto__": {
+            "polluted": 1
+          },
+          "nested": {
+            "__proto__": {
+              "deep": 2
+            }
+          },
+          "constructor": {
+            "prototype": {
+              "viaCtor": 3
+            }
+          }
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "proto-keys-strict",
+      "why": "spec section 4: constructor is refused under strict-config at the first such key",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "constructor:",
+          "  prototype: 1"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "prototype-key",
+          "line": 1,
+          "column": 1
+        }
+      }
+    },
+    {
+      "id": "proto-key-nested-strict",
+      "why": "spec section 4: a prototype key is refused at any depth",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "a:",
+          "  __proto__: 1"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "prototype-key",
+          "line": 2,
+          "column": 3
+        }
+      }
+    },
+    {
+      "id": "indent-nested",
+      "why": "old test: indented block mappings",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "a:",
+          "  b:",
+          "    c: 1",
+          "  d: 2"
+        ]
+      },
+      "expect": {
+        "value": {
+          "a": {
+            "b": {
+              "c": 1
+            },
+            "d": 2
+          }
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "blockscalar-blank-literal",
+      "why": "old test: a literal block scalar holding only blank lines is empty",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "top:",
+          "  k: |",
+          "        ",
+          "next: 1"
+        ]
+      },
+      "expect": {
+        "value": {
+          "top": {
+            "k": ""
+          },
+          "next": 1
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "blockscalar-blank-folded",
+      "why": "old test: a folded block scalar holding only blank lines is empty",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "top:",
+          "  k: >",
+          "        ",
+          "next: 1"
+        ]
+      },
+      "expect": {
+        "value": {
+          "top": {
+            "k": ""
+          },
+          "next": 1
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "blockscalar-blank-nested",
+      "why": "old test: a nested literal block scalar holding only blank lines is empty",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "a:",
+          "  b: |",
+          "      ",
+          "  c: 1"
+        ]
+      },
+      "expect": {
+        "value": {
+          "a": {
+            "b": "",
+            "c": 1
+          }
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "anchored-keys",
+      "why": "old test: anchored keys keep reading as one block mapping under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "&k1 a: 1",
+          "&k2 b: 2"
+        ]
+      },
+      "expect": {
+        "value": {
+          "a": 1,
+          "b": 2
+        }
+      },
+      "old": true
+    },
+    {
+      "id": "null-values",
+      "why": "spec section 3: an empty value and a tilde are null",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "a:",
+          "b: ~"
+        ]
+      },
+      "expect": {
+        "value": {
+          "a": null,
+          "b": null
+        }
+      }
+    },
+    {
+      "id": "sequence-root",
+      "why": "spec section 3: a sequence document",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "- a",
+          "- b"
+        ]
+      },
+      "expect": {
+        "value": [
+          "a",
+          "b"
+        ]
+      }
+    },
+    {
+      "id": "quoted-escapes",
+      "why": "spec section 3: double-quoted escapes resolve",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a: \"line\\nbreak\\ttab\"\n"
+      },
+      "expect": {
+        "value": {
+          "a": "line\nbreak\ttab"
+        }
+      }
+    },
+    {
+      "id": "block-literal-folded",
+      "why": "spec section 3: block scalars keep their line structure",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "lit: |",
+          "  one",
+          "  two",
+          "fold: >-",
+          "  one",
+          "  two"
+        ]
+      },
+      "expect": {
+        "value": {
+          "lit": "one\ntwo\n",
+          "fold": "one two"
+        }
+      }
+    },
+    {
+      "id": "json-text-input",
+      "why": "spec section 4: JSON text is valid input to both profiles",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "{\"a\": 1, \"b\": [true, null, \"x\"]}"
+      },
+      "expect": {
+        "value": {
+          "a": 1,
+          "b": [
+            true,
+            null,
+            "x"
+          ]
+        }
+      }
+    },
+    {
+      "id": "complex-key-seq",
+      "why": "spec section 4: a sequence key is refused",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "? [a, b]",
+          ": 1"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "complex-key",
+          "line": 1,
+          "column": 3
+        }
+      }
+    },
+    {
+      "id": "complex-key-map",
+      "why": "spec section 4: a mapping key is refused",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "? {a: 1}",
+          ": 1"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "complex-key",
+          "line": 1,
+          "column": 3
+        }
+      }
+    },
+    {
+      "id": "non-string-keys-tool",
+      "why": "spec section 4: scalar keys are stringified under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "1: a",
+          "true: b",
+          "null: c"
+        ]
+      },
+      "expect": {
+        "value": {
+          "1": "a",
+          "true": "b",
+          "null": "c"
+        }
+      }
+    },
+    {
+      "id": "non-string-key-int-strict",
+      "why": "spec section 4: an integer key is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "1: a"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "non-string-key",
+          "line": 1,
+          "column": 1
+        }
+      }
+    },
+    {
+      "id": "non-string-key-bool-strict",
+      "why": "spec section 4: a boolean key is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "true: b"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "non-string-key",
+          "line": 1,
+          "column": 1
+        }
+      }
+    },
+    {
+      "id": "non-string-key-null-strict",
+      "why": "spec section 4: a null key is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "null: c"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "non-string-key",
+          "line": 1,
+          "column": 1
+        }
+      }
+    },
+    {
+      "id": "quoted-digit-key-strict",
+      "why": "spec section 4: a quoted digit key is a string and is allowed under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "\"1\": a"
+        ]
+      },
+      "expect": {
+        "value": {
+          "1": "a"
+        }
+      }
+    },
+    {
+      "id": "nan-strict",
+      "why": "spec section 4: .nan is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "a: .nan"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "non-finite-number",
+          "line": 1,
+          "column": 4
+        }
+      }
+    },
+    {
+      "id": "inf-strict",
+      "why": "spec section 4: .inf is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "a: .inf"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "non-finite-number",
+          "line": 1,
+          "column": 4
+        }
+      }
+    },
+    {
+      "id": "neg-inf-strict",
+      "why": "spec section 4: -.inf is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "a: -.inf"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "non-finite-number",
+          "line": 1,
+          "column": 4
+        }
+      }
+    },
+    {
+      "id": "neg-zero-strict",
+      "why": "spec section 4: -0 is refused under strict-config (number-out-of-range: it reads differently in Rust and Node)",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "a: -0"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "number-out-of-range",
+          "line": 1,
+          "column": 4
+        }
+      }
+    },
+    {
+      "id": "int-over-safe-strict",
+      "why": "spec section 4: an integer past 2^53-1 is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "a: 9007199254740992"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "number-out-of-range",
+          "line": 1,
+          "column": 4
+        }
+      }
+    },
+    {
+      "id": "int-below-safe-strict",
+      "why": "spec section 4: an integer below -(2^53-1) is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "a: -9007199254740992"
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "number-out-of-range",
+          "line": 1,
+          "column": 4
+        }
+      }
+    },
+    {
+      "id": "int-at-safe-strict",
+      "why": "spec section 4: 2^53-1 and its negative are allowed under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "lines": [
+          "a: 9007199254740991",
+          "b: -9007199254740991"
+        ]
+      },
+      "expect": {
+        "value": {
+          "a": 9007199254740991,
+          "b": -9007199254740991
+        }
+      }
+    },
+    {
+      "id": "numbers-edge-tool",
+      "why": "spec section 4: edge numbers are allowed under tool; the value keeps an integer exact, a float for the rest, -0 keeps its sign (the Node facade converts to doubles as today)",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "nan: .nan",
+          "inf: .inf",
+          "ninf: -.inf",
+          "nzero: -0",
+          "big: 9007199254740993"
+        ]
+      },
+      "expect": {
+        "value": {
+          "nan": {
+            "$float": "nan"
+          },
+          "inf": {
+            "$float": "inf"
+          },
+          "ninf": {
+            "$float": "-inf"
+          },
+          "nzero": {
+            "$float": "-0"
+          },
+          "big": 9007199254740992
+        }
+      }
+    },
+    {
+      "id": "bidi-value-strict",
+      "why": "spec section 4: a bidi control in a value is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "a: x‮y\n"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "bidi-control",
+          "line": 1,
+          "column": 5
+        }
+      }
+    },
+    {
+      "id": "bidi-isolate-value-strict",
+      "why": "spec section 4: an isolate control in a value is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "a: x⁦y\n"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "bidi-control",
+          "line": 1,
+          "column": 5
+        }
+      }
+    },
+    {
+      "id": "bidi-key-strict",
+      "why": "spec section 4: a bidi control in a key is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "‮a: 1\n"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "bidi-control",
+          "line": 1,
+          "column": 1
+        }
+      }
+    },
+    {
+      "id": "bidi-key-tool",
+      "why": "spec section 4: a bidi control in a key is refused under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "text": "a⁦b: 1\n"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "bidi-control",
+          "line": 1,
+          "column": 2
+        }
+      }
+    },
+    {
+      "id": "bidi-value-tool",
+      "why": "spec section 4: a bidi control in a value is allowed under tool (today's contract)",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "text": "a: x‮y\n"
+      },
+      "expect": {
+        "value": {
+          "a": "x‮y"
+        }
+      }
+    },
+    {
+      "id": "zero-width-value-strict",
+      "why": "spec section 4: a zero-width space in a value is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "a: x​z\n"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "zero-width",
+          "line": 1,
+          "column": 5
+        }
+      }
+    },
+    {
+      "id": "zero-width-key-tool",
+      "why": "spec section 4: a zero-width joiner in a key is refused under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "text": "k‍z: 1\n"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "zero-width",
+          "line": 1,
+          "column": 2
+        }
+      }
+    },
+    {
+      "id": "zero-width-value-tool",
+      "why": "spec section 4: a zero-width space in a value is allowed under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "text": "a: x​z\n"
+      },
+      "expect": {
+        "value": {
+          "a": "x​z"
+        }
+      }
+    },
+    {
+      "id": "feff-inside-value-strict",
+      "why": "spec section 4: U+FEFF inside text is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "text": "a: x﻿y\n"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "zero-width",
+          "line": 1,
+          "column": 5
+        }
+      }
+    },
+    {
+      "id": "feff-inside-key-tool",
+      "why": "spec section 4: U+FEFF inside a key is refused under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "text": "a﻿b: 1\n"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "zero-width",
+          "line": 1,
+          "column": 2
+        }
+      }
+    },
+    {
+      "id": "bom-first-accepted",
+      "why": "a leading byte-order mark is an encoding mark, accepted in both profiles",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "﻿a: 1\n"
+      },
+      "expect": {
+        "value": {
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "scalar-at-limit-strict",
+      "why": "spec section 8: a 64 KiB scalar parses under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "generate": {
+          "prefix": "a: \"",
+          "unit": "x",
+          "count": 65536,
+          "suffix": "\"\n"
+        }
+      },
+      "expect": {
+        "checks": [
+          {
+            "path": "a",
+            "string_bytes": 65536
+          }
+        ]
+      }
+    },
+    {
+      "id": "scalar-over-limit-strict",
+      "why": "spec section 8: a scalar one byte past 64 KiB is refused under strict-config",
+      "profiles": [
+        "strict-config"
+      ],
+      "input": {
+        "generate": {
+          "prefix": "a: \"",
+          "unit": "x",
+          "count": 65537,
+          "suffix": "\"\n"
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "scalar-too-large",
+          "line": 1,
+          "column": 4
+        }
+      }
+    },
+    {
+      "id": "scalar-at-limit-tool",
+      "why": "spec section 8: a 1 MiB scalar parses under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "prefix": "a: \"",
+          "unit": "x",
+          "count": 1048576,
+          "suffix": "\"\n"
+        }
+      },
+      "expect": {
+        "checks": [
+          {
+            "path": "a",
+            "string_bytes": 1048576
+          }
+        ]
+      }
+    },
+    {
+      "id": "scalar-over-limit-tool",
+      "why": "spec section 8: a scalar one byte past 1 MiB is refused under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "prefix": "a: \"",
+          "unit": "x",
+          "count": 1048577,
+          "suffix": "\"\n"
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "scalar-too-large",
+          "line": 1,
+          "column": 4
+        }
+      }
+    },
+    {
+      "id": "key-at-limit",
+      "why": "spec section 8: a 1 KiB key parses",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "unit": "k",
+          "count": 1024,
+          "suffix": ": 1\n"
+        }
+      },
+      "expect": {
+        "checks": [
+          {
+            "path": "",
+            "length": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "key-over-limit",
+      "why": "spec section 8: a key one byte past 1 KiB is refused",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "unit": "k",
+          "count": 1025,
+          "suffix": ": 1\n"
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "key-too-large",
+          "line": 1,
+          "column": 1
+        }
+      }
+    },
+    {
+      "id": "nodes-at-limit",
+      "why": "spec section 8: exactly 100 000 nodes parse (root mapping, the sequence and 99 998 items)",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "prefix": "items:\n",
+          "unit": "  - 1",
+          "separator": "\n",
+          "count": 99998,
+          "suffix": "\n"
+        }
+      },
+      "expect": {
+        "checks": [
+          {
+            "path": "items",
+            "length": 99998
+          }
+        ]
+      }
+    },
+    {
+      "id": "nodes-over-limit",
+      "why": "spec section 8: one node past 100 000 is refused",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "generate": {
+          "prefix": "items:\n",
+          "unit": "  - 1",
+          "separator": "\n",
+          "count": 99999,
+          "suffix": "\n"
+        }
+      },
+      "expect": {
+        "refusal": {
+          "rule": "node-limit"
+        }
+      }
+    },
+    {
+      "id": "expanded-at-limit",
+      "why": "spec section 8: an alias expansion totalling exactly 16 MiB parses under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "parts": [
+          {
+            "text": "a: &a \""
+          },
+          {
+            "generate": {
+              "unit": "x",
+              "count": 1048576
+            }
+          },
+          {
+            "text": "\"\nb: ["
+          },
+          {
+            "generate": {
+              "unit": "*a",
+              "separator": ", ",
+              "count": 15
+            }
+          },
+          {
+            "text": "]\n"
+          }
+        ]
+      },
+      "expect": {
+        "checks": [
+          {
+            "path": "b",
+            "length": 15
+          }
+        ]
+      }
+    },
+    {
+      "id": "expanded-over-limit",
+      "why": "spec section 8: an alias expansion one scalar past 16 MiB is refused under tool",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "parts": [
+          {
+            "text": "a: &a \""
+          },
+          {
+            "generate": {
+              "unit": "x",
+              "count": 1048576
+            }
+          },
+          {
+            "text": "\"\nb: ["
+          },
+          {
+            "generate": {
+              "unit": "*a",
+              "separator": ", ",
+              "count": 16
+            }
+          },
+          {
+            "text": "]\n"
+          }
+        ]
+      },
+      "expect": {
+        "refusal": {
+          "rule": "expanded-too-large"
+        }
+      }
+    }
+  ]
+}

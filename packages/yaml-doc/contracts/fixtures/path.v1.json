@@ -1,0 +1,648 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "path-simple",
+      "why": "spec section 3: keys join with a dot",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a.b.c"
+      },
+      "expect": {
+        "segments": [
+          "a",
+          "b",
+          "c"
+        ]
+      }
+    },
+    {
+      "id": "path-empty-is-root",
+      "why": "the empty text is the empty path, the document root",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "expect": {
+        "segments": []
+      }
+    },
+    {
+      "id": "path-colon-key",
+      "why": "spec section 3: a key such as code:implement needs no escape",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "code:implement"
+      },
+      "expect": {
+        "segments": [
+          "code:implement"
+        ]
+      }
+    },
+    {
+      "id": "path-colon-key-nested",
+      "why": "a colon key in the middle of a path",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "workflows.code:implement.persona"
+      },
+      "expect": {
+        "segments": [
+          "workflows",
+          "code:implement",
+          "persona"
+        ]
+      }
+    },
+    {
+      "id": "path-space-key",
+      "why": "a space in a key needs no escape",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "my key.x"
+      },
+      "expect": {
+        "segments": [
+          "my key",
+          "x"
+        ]
+      }
+    },
+    {
+      "id": "path-unicode-key",
+      "why": "a non-ASCII key is bare",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "khóa.giá"
+      },
+      "expect": {
+        "segments": [
+          "khóa",
+          "giá"
+        ]
+      }
+    },
+    {
+      "id": "path-bracket-quoted-dot",
+      "why": "spec section 3: a key with a dot is bracket-quoted",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "[\"a.b\"]"
+      },
+      "expect": {
+        "segments": [
+          "a.b"
+        ]
+      }
+    },
+    {
+      "id": "path-bracket-quoted-mid",
+      "why": "a bracket-quoted key between plain keys",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "x[\"a.b\"].y"
+      },
+      "expect": {
+        "segments": [
+          "x",
+          "a.b",
+          "y"
+        ]
+      }
+    },
+    {
+      "id": "path-index",
+      "why": "a numeric bracket is an index",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "items[0].name"
+      },
+      "expect": {
+        "segments": [
+          "items",
+          0,
+          "name"
+        ]
+      }
+    },
+    {
+      "id": "path-index-root",
+      "why": "an index as the first segment",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "[0]"
+      },
+      "expect": {
+        "segments": [
+          0
+        ]
+      }
+    },
+    {
+      "id": "path-index-chain",
+      "why": "consecutive indexes",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a[0][1]"
+      },
+      "expect": {
+        "segments": [
+          "a",
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "id": "path-numeric-key-is-key",
+      "why": "a bare number is a key, only brackets make an index",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a.0"
+      },
+      "expect": {
+        "segments": [
+          "a",
+          "0"
+        ]
+      }
+    },
+    {
+      "id": "path-quoted-numeric-key",
+      "why": "a quoted number is a key, written bare when it needs no quoting",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "[\"0\"]"
+      },
+      "expect": {
+        "segments": [
+          "0"
+        ],
+        "canonical": "0"
+      }
+    },
+    {
+      "id": "path-escaped-dot",
+      "why": "a backslash escapes the next character; format prefers bracket quoting",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a\\.b"
+      },
+      "expect": {
+        "segments": [
+          "a.b"
+        ],
+        "canonical": "[\"a.b\"]"
+      }
+    },
+    {
+      "id": "path-escaped-backslash",
+      "why": "an escaped backslash is a key character",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a\\\\b"
+      },
+      "expect": {
+        "segments": [
+          "a\\b"
+        ],
+        "canonical": "[\"a\\\\b\"]"
+      }
+    },
+    {
+      "id": "path-escaped-bracket-close",
+      "why": "a closing bracket in a key needs an escape",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a\\]b"
+      },
+      "expect": {
+        "segments": [
+          "a]b"
+        ],
+        "canonical": "[\"a]b\"]"
+      }
+    },
+    {
+      "id": "path-escaped-open-bracket",
+      "why": "an opening bracket in a key needs an escape",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a\\[0\\]"
+      },
+      "expect": {
+        "segments": [
+          "a[0]"
+        ],
+        "canonical": "[\"a[0]\"]"
+      }
+    },
+    {
+      "id": "path-quote-char-key",
+      "why": "a double quote inside a bracket-quoted key is escaped",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "k[\"a\\\"b\"]"
+      },
+      "expect": {
+        "segments": [
+          "k",
+          "a\"b"
+        ]
+      }
+    },
+    {
+      "id": "path-apostrophe-key",
+      "why": "a key with an apostrophe is bracket-quoted",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "[\"it's\"]"
+      },
+      "expect": {
+        "segments": [
+          "it's"
+        ]
+      }
+    },
+    {
+      "id": "path-empty-key",
+      "why": "an empty key is bracket-quoted",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a[\"\"].b"
+      },
+      "expect": {
+        "segments": [
+          "a",
+          "",
+          "b"
+        ]
+      }
+    },
+    {
+      "id": "path-quoted-key-then-key",
+      "why": "a plain key after a bracket-quoted key",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "[\"a.b\"].c"
+      },
+      "expect": {
+        "segments": [
+          "a.b",
+          "c"
+        ]
+      }
+    },
+    {
+      "id": "path-quoted-key-unneeded",
+      "why": "a bracket-quoted key that needs no quoting formats bare",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "[\"a\"].b"
+      },
+      "expect": {
+        "segments": [
+          "a",
+          "b"
+        ],
+        "canonical": "a.b"
+      }
+    },
+    {
+      "id": "path-prototype-key",
+      "why": "a prototype name is an ordinary key to the path grammar",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "__proto__.constructor"
+      },
+      "expect": {
+        "segments": [
+          "__proto__",
+          "constructor"
+        ]
+      }
+    },
+    {
+      "id": "path-refuses-empty-segment",
+      "why": "two dots are an empty segment",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a..b"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-path",
+          "line": 1,
+          "column": 3
+        }
+      }
+    },
+    {
+      "id": "path-refuses-leading-dot",
+      "why": "a leading dot is an empty segment",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ".a"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-path",
+          "line": 1,
+          "column": 1
+        }
+      }
+    },
+    {
+      "id": "path-refuses-trailing-dot",
+      "why": "a trailing dot ends the path with no key",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a."
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-path",
+          "line": 1,
+          "column": 3
+        }
+      }
+    },
+    {
+      "id": "path-refuses-dot-before-bracket",
+      "why": "a bracket segment takes no dot before it",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a.[0]"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-path",
+          "line": 1,
+          "column": 3
+        }
+      }
+    },
+    {
+      "id": "path-refuses-open-bracket",
+      "why": "an unclosed bracket",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a["
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-path",
+          "line": 1,
+          "column": 3
+        }
+      }
+    },
+    {
+      "id": "path-refuses-bare-word-in-bracket",
+      "why": "a bracket holds an index or a quoted key",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a[x]"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-path",
+          "line": 1,
+          "column": 3
+        }
+      }
+    },
+    {
+      "id": "path-refuses-leading-zero-index",
+      "why": "an index has no leading zero",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a[01]"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-path",
+          "line": 1,
+          "column": 3
+        }
+      }
+    },
+    {
+      "id": "path-refuses-negative-index",
+      "why": "an index is not negative",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a[-1]"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-path",
+          "line": 1,
+          "column": 3
+        }
+      }
+    },
+    {
+      "id": "path-refuses-huge-index",
+      "why": "an index that does not fit is refused",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a[99999999999999999999]"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-path",
+          "line": 1,
+          "column": 3
+        }
+      }
+    },
+    {
+      "id": "path-refuses-unclosed-quote",
+      "why": "a bracket-quoted key must close",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a[\"x\""
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-path",
+          "line": 1,
+          "column": 6
+        }
+      }
+    },
+    {
+      "id": "path-refuses-text-after-bracket",
+      "why": "a key after a bracket needs a dot",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a[\"x\"]b"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-path",
+          "line": 1,
+          "column": 7
+        }
+      }
+    },
+    {
+      "id": "path-refuses-trailing-backslash",
+      "why": "a backslash needs a character to escape",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a\\"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-path",
+          "line": 1,
+          "column": 3
+        }
+      }
+    },
+    {
+      "id": "path-refuses-bare-quote",
+      "why": "a double quote in a bare key needs an escape or brackets",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a\"b"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-path",
+          "line": 1,
+          "column": 2
+        }
+      }
+    },
+    {
+      "id": "path-refuses-bare-close-bracket",
+      "why": "a closing bracket in a bare key needs an escape",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": "a]b"
+      },
+      "expect": {
+        "refusal": {
+          "rule": "invalid-path",
+          "line": 1,
+          "column": 2
+        }
+      }
+    }
+  ]
+}

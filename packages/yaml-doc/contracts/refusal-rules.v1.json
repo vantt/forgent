@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "duplicate-key",
+      "meaning": "Two keys in one mapping resolve to the same string."
+    },
+    {
+      "id": "tag-refused",
+      "meaning": "strict-config: an explicit tag is present."
+    },
+    {
+      "id": "unknown-tag",
+      "meaning": "tool: a tag outside the core schema, !!binary included."
+    },
+    {
+      "id": "anchor-refused",
+      "meaning": "strict-config: an anchor is present."
+    },
+    {
+      "id": "alias-refused",
+      "meaning": "strict-config: an alias is present."
+    },
+    {
+      "id": "alias-limit",
+      "meaning": "tool: more alias tokens than the profile allows."
+    },
+    {
+      "id": "merge-key-refused",
+      "meaning": "strict-config: a << key is present."
+    },
+    {
+      "id": "multiple-documents",
+      "meaning": "More than one document in the input."
+    },
+    {
+      "id": "complex-key",
+      "meaning": "A key that is a collection, not a scalar."
+    },
+    {
+      "id": "non-string-key",
+      "meaning": "strict-config: a key that resolves to a non-string."
+    },
+    {
+      "id": "prototype-key",
+      "meaning": "strict-config: __proto__, constructor or prototype used as a key."
+    },
+    {
+      "id": "bidi-control",
+      "meaning": "A bidirectional control character in text that must not hide content."
+    },
+    {
+      "id": "zero-width",
+      "meaning": "A zero-width character (U+200B-U+200D, U+FEFF inside text)."
+    },
+    {
+      "id": "number-out-of-range",
+      "meaning": "strict-config: an integer past +-(2^53-1) or -0."
+    },
+    {
+      "id": "non-finite-number",
+      "meaning": "strict-config: .nan, .inf or -.inf."
+    },
+    {
+      "id": "input-too-large",
+      "meaning": "The input is over the byte bound."
+    },
+    {
+      "id": "invalid-utf8",
+      "meaning": "The input is not UTF-8."
+    },
+    {
+      "id": "depth-exceeded",
+      "meaning": "Nesting is past the depth bound."
+    },
+    {
+      "id": "node-limit",
+      "meaning": "The tree has more nodes than the bound, after alias expansion."
+    },
+    {
+      "id": "scalar-too-large",
+      "meaning": "One scalar is over the byte bound."
+    },
+    {
+      "id": "key-too-large",
+      "meaning": "One key is over the byte bound."
+    },
+    {
+      "id": "expanded-too-large",
+      "meaning": "tool: bytes after alias expansion are over the bound."
+    },
+    {
+      "id": "syntax-error",
+      "meaning": "The text is not valid YAML."
+    },
+    {
+      "id": "comment-would-be-lost",
+      "meaning": "A removal would drop a comment block or inline comment and was not acknowledged."
+    },
+    {
+      "id": "inline-comment-multiline",
+      "meaning": "An inline comment text holds a line break."
+    },
+    {
+      "id": "edit-changed-meaning",
+      "meaning": "The re-parse of an edit result means something other than the intended change."
+    },
+    {
+      "id": "path-not-found",
+      "meaning": "An edit addresses a path that does not exist or cannot be created."
+    },
+    {
+      "id": "inline-comment-unplaceable",
+      "meaning": "The node has no line where a trailing comment can sit."
+    },
+    {
+      "id": "merge-type-mismatch",
+      "meaning": "Layers hold values of different kinds at a deep merge path."
+    },
+    {
+      "id": "invalid-path",
+      "meaning": "A path text does not follow the path text form."
+    },
+    {
+      "id": "yaml-internal-error",
+      "meaning": "A panic caught at the public boundary."
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "profiles": [
+    "strict-config",
+    "tool"
+  ],
+  "rows": {
+    "duplicate-key": {
+      "strict-config": {
+        "action": "refuse",
+        "rule": "duplicate-key"
+      },
+      "tool": {
+        "action": "refuse",
+        "rule": "duplicate-key"
+      }
+    },
+    "tags": {
+      "strict-config": {
+        "action": "refuse",
+        "rule": "tag-refused"
+      },
+      "tool": {
+        "action": "refuse-outside-core",
+        "rule": "unknown-tag"
+      }
+    },
+    "yes-no-on-off": {
+      "strict-config": {
+        "action": "string"
+      },
+      "tool": {
+        "action": "string"
+      }
+    },
+    "anchors-aliases": {
+      "strict-config": {
+        "action": "refuse",
+        "rule": "anchor-refused"
+      },
+      "tool": {
+        "action": "allow-bounded",
+        "rule": "alias-limit"
+      }
+    },
+    "merge-key": {
+      "strict-config": {
+        "action": "refuse",
+        "rule": "merge-key-refused"
+      },
+      "tool": {
+        "action": "allow"
+      }
+    },
+    "multiple-documents": {
+      "strict-config": {
+        "action": "refuse",
+        "rule": "multiple-documents"
+      },
+      "tool": {
+        "action": "refuse",
+        "rule": "multiple-documents"
+      }
+    },
+    "zero-documents": {
+      "strict-config": {
+        "action": "null"
+      },
+      "tool": {
+        "action": "null"
+      }
+    },
+    "complex-keys": {
+      "strict-config": {
+        "action": "refuse",
+        "rule": "complex-key"
+      },
+      "tool": {
+        "action": "refuse",
+        "rule": "complex-key"
+      }
+    },
+    "non-string-keys": {
+      "strict-config": {
+        "action": "refuse",
+        "rule": "non-string-key"
+      },
+      "tool": {
+        "action": "stringify"
+      }
+    },
+    "prototype-keys": {
+      "strict-config": {
+        "action": "refuse",
+        "rule": "prototype-key"
+      },
+      "tool": {
+        "action": "allow"
+      }
+    },
+    "bidi-controls": {
+      "strict-config": {
+        "action": "refuse",
+        "rule": "bidi-control"
+      },
+      "tool": {
+        "action": "refuse-keys-only",
+        "rule": "bidi-control"
+      }
+    },
+    "zero-width": {
+      "strict-config": {
+        "action": "refuse",
+        "rule": "zero-width"
+      },
+      "tool": {
+        "action": "refuse-keys-only",
+        "rule": "zero-width"
+      }
+    },
+    "numbers-edge": {
+      "strict-config": {
+        "action": "refuse",
+        "rule": "number-out-of-range"
+      },
+      "tool": {
+        "action": "allow"
+      }
+    },
+    "timestamps": {
+      "strict-config": {
+        "action": "string"
+      },
+      "tool": {
+        "action": "string"
+      }
+    },
+    "limits": {
+      "strict-config": {
+        "action": "bounded"
+      },
+      "tool": {
+        "action": "bounded"
+      }
+    }
+  }
+}
