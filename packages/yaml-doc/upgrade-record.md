@@ -289,7 +289,7 @@ Vendoring layouts (spec section 9; sizes are the exact `cargo vendor` output of 
 
 ## 12. Sign-off and later fields
 
-- Owner sign-off:
+- Owner sign-off: option A (`saphyr-parser` 0.2.2 with `arraydeque` 0.5.1, vendored under `packages/yaml-doc/third-party/`), owner 2026-10-22 18:02 ("ok chọn A"); condition: the remaining source of `saphyr-parser` (`scanner.rs`, `parser.rs`) and `arraydeque` is read before the dependency is added, and anything unusual reopens this gate; a fuzz finding in the parser also reopens it.
 - Integrity hash: filled when the chosen crate is vendored
 - Fuzz result: filled when the fuzz targets have run
 
