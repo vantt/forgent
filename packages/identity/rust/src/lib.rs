@@ -22,7 +22,7 @@ pub mod resolve;
 pub mod session;
 pub mod text;
 
-pub use attempt::{mint_attempt_writer_id, InvalidAttemptId, ATTEMPT_PREFIX, MAX_ATTEMPT_ID_LENGTH};
+pub use attempt::{is_attempt_writer_id, mint_attempt_writer_id, InvalidAttemptId, ATTEMPT_PREFIX, MAX_ATTEMPT_ID_LENGTH};
 pub use launcher::{scrub_and_set, EmptyWriterId};
 pub use errors::Error;
 pub use mint::{random, Kind, RandomKind, SequenceKind, KIND_NAMES, RANDOM_CHARS};

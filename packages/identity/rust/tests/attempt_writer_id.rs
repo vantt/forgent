@@ -3,7 +3,7 @@
 //! resolves as an env id; every invalid case is refused by the mint.
 
 use fgos_identity::{
-    env_identity, mint_attempt_writer_id, scrub_and_set, Source, WriterId, ATTEMPT_PREFIX, MAX_ATTEMPT_ID_LENGTH, MAX_ID_LENGTH,
+    env_identity, is_attempt_writer_id, mint_attempt_writer_id, scrub_and_set, Source, WriterId, ATTEMPT_PREFIX, MAX_ATTEMPT_ID_LENGTH, MAX_ID_LENGTH,
 };
 use std::collections::BTreeMap;
 use serde_json::Value;
@@ -58,6 +58,15 @@ fn every_vector_case_reproduces_and_valid_ids_resolve_as_env_ids() {
         let resolved = env_identity(&env, None).unwrap_or_else(|| panic!("{name}: rule refused the id"));
         assert_eq!(resolved.source, Source::Env, "{name}");
         assert_eq!(resolved.id, WriterId::Session(id), "{name}");
+    }
+}
+
+#[test]
+fn an_attempt_writer_id_is_recognised_by_its_prefix_and_nothing_else_is() {
+    let minted = mint_attempt_writer_id("asgn-demo_01").unwrap();
+    assert!(is_attempt_writer_id(&minted));
+    for other in ["", "att", "ATT-x", "xatt-x", "claude-2b", "pid-0123456789ab", " att-x"] {
+        assert!(!is_attempt_writer_id(other), "{other:?} is not an attempt writer id");
     }
 }
 

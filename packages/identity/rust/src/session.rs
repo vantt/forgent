@@ -49,7 +49,7 @@ pub fn cli_of(env_var: &str, local_id: &str) -> &'static str {
     match env_var {
         "CLAUDE_CODE_SESSION_ID" => "claude",
         "CODEX_THREAD_ID" => "codex",
-        _ if local_id.starts_with(crate::attempt::ATTEMPT_PREFIX) => "worker",
+        _ if crate::attempt::is_attempt_writer_id(local_id) => "worker",
         _ => "fgos",
     }
 }
