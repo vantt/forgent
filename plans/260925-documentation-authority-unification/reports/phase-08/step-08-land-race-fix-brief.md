@@ -1,0 +1,15 @@
+# Step 8 fix: a land admitted before the lease must not publish scoped paths after it (Doer brief, code slice)
+
+Status: Lead brief (code slice under L12-92: plan branch only, no main landing, no real lease on this repo).
+
+You are Doer for Phase 8 of plan 260925-documentation-authority-unification. Closure review B (`review-a38-step-08-closure-B.md`, this directory) reproduced a race: `src/runner/merge.mjs:866` checks the lease once before the land; a docs-only branch passes no target to `port.prepare` (`:919`), the native Land chooses its target after taking the merge-slot lock (`land.rs:427`), acquiring the lease never takes that lock, and Land runs hooks-off — so a non-holder's land admitted just before acquire publishes `docs/…` onto main while the lease is held. The workflow merge door (`src/workflow/runner.mjs:615`) has the same gap. Repro copied to `closure-repro/land-lease-race.mjs` (adapt paths).
+
+Lead ruling L12-123 (record in owner-answers.md, Lead under A42):
+1. **Fix in code, both doors:** the lease admission must hold for the exact target and base the Land publishes onto. Always pass the admitted target (and expected base where the port supports it) to `port.prepare`, and re-check the lease against the target/base the Land actually picked inside the prepared operation (before publish); a mismatch or a newly held lease refuses the land with the existing named reason. Reuse the existing gate; no second mechanism; no Git-owned Rust change (if one is unavoidable, stop and report).
+2. **One owning test per door** reproducing the race timing (lease acquired between admission and publish → refused, main unchanged), plus the existing land tests stay green.
+3. **Lows:** registry note for rank 10 lists `documentation-cutover`; the git spec hook ordering lists the first guard; correct the scorecard's Land count to the real number of tests in `test/runner/merge-land.test.mjs` at HEAD.
+Do NOT rerun the rehearsal (the Lead schedules it after this fix).
+
+Writable (exact): src/runner/merge.mjs, src/workflow/runner.mjs, test/runner/merge-land.test.mjs, test/workflow/units-runner.test.mjs, packages/holder-lock/contracts/lock-registry.v1.json, docs/platform/git/spec.md, packages/git/contracts/mutation-census.v1.json, plans/260925-documentation-authority-unification/reports/phase-08/**. Never a git write in this repo (temp repos fine), never the fgos CLI against this repo, never this repo's .fgos/ (beyond existing test-helper staging) or secrets. Tests: single files with `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=<releasePath>/bin/fgos node --test <file>` where releasePath is the `releasePath` field of /home/vantt/projects/forgentX/.fgos/installation/activation.json (read only that field); NEVER scripts/run-tests.mjs or npm test. Run the touched test files plus the lease test files and run-case-admission; report new failures against the pre-turn HEAD. Record L12-123 with commands and exit codes.
+
+Final message: first line a conventional commit subject (at most 100 characters, no plan ids, phase or finding labels), then a short Vietnamese summary (anh/em).
