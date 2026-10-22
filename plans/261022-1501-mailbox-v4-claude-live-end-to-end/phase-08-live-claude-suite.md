@@ -1,7 +1,7 @@
 ---
 phase: 8
 title: "Live Claude Code suite"
-status: pending
+status: done, with failed checks reported
 depends_on: [2, 3, 7]
 live_calls: 4
 ---
@@ -105,3 +105,16 @@ The report, backed by each case's `result.json`. The phase is done when every ca
 - The model ignores the script (extra tool, missing FINAL line): the check fails as "not observed"; no re-run without the controller.
 - Rate limit or login expiry mid-case: the case fails; the controller decides about a re-run.
 - L3 spends the most tokens of the rung: plan decision 14.
+
+## Done on the branch (implementation lead, 2026-10-22)
+
+- `check` passed before any spend (versions, preflight, release build, wrapper-wins in `zsh -ic`, dry run of all four cases against the stub CLI). Live: L1, L2, L3a, L3b each ran exactly once, 4 `claude -p` invocations, none re-run. Report: `plans/reports/research-261022-1825-mailbox-v4-live-suite.md`.
+- L1 **failed** (not re-run): Claude Code 2.1.308 blocks `sleep 25; fgos mailbox inbox` as a Bash command, and its shell snapshot still defines the owner's `fgos` function despite the empty `ZDOTDIR`; registration and the hook detector were observed, mid-step, stop gate, `send` and `inbox` were not. L2 passed (the malformed Stop entry is skipped with a stderr warning, the detector says "Stop hook did not run", the mail stays `recorded`). L3a: every `additionalContext` from 14,010 bytes up is moved to a file with a 2 KB preview. L3b: every Stop `reason` up to 896,700 bytes reached the model whole.
+
+### Deviations
+
+- `demo D1|D2` is not in the harness yet; it belongs to phase 9, which waits for the controller.
+- The machine-wide heavy-gate check reads each process's own argv (`cargo test`, `npm test`, `node …/run-tests.mjs`): `pgrep -f` matched shells whose text only mentions those commands. A dry run checks memory only, since it starts no model.
+- A dry run's stub keeps its own `HOME` (`<case>/home`), where it writes its session file and transcript, instead of writing a fake session file into the owner's `~/.claude/sessions`; everything else is the real example, record, wrapper and log. The stub waits 3 s per model turn, the window a real model's answer gives the harness.
+- The full size `S` computed from the contracts is 896,700 bytes (the plan estimated about 820 KB).
+- The wrapper-wins check passed but did not predict Claude Code's own snapshot (finding 1 of the report); a re-run of L1 needs a changed design, which is the controller's decision.
