@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 10:45 (phiên `forgentx-95`, owner): **COOK P6 dùng plan mới lập từ backlog `p-a178ca5c`** (pane launch race), giao cho một lead `COOK` mới. Đảo lại nếu: plan vượt tiêu chí của backlog item hoặc cần đổi hành vi ngoài terminal launch → hỏi owner.
+
 - 2026-10-22 10:35 (phiên `forgentx-95`, owner 10:30): **giao lane SEAT cho một lead mới tự xưng `SEAT`**: (1) đóng MP-B1 (làm mới model mdview/mcp-skill-hub sau một lượt thật), (2) chịu lỗi sau land của SEAT tới khi ổn định (gồm lần land kế mang `b52c2c238` + GIT `e23e34688`/`2c184ea1e`), (3) SEAT-TRIM (+ H19 của HARDEN; H19(b) phối hợp với T1 phase 6 qua board). [Bàn giao](../reports/handoff-261022-1031-seat-lead-mpb1-close-post-land-fixes-seat-trim.md). `forgentx-95` giữ điều phối chung và COOK P6.
 
 - 2026-10-22 10:40 (phiên `f2c6f8ce`, owner 10:22 "identity càng sớm thì càng tốt"): **mở luồng IDENT** với [spec nháp](../../docs/platform/identity/spec.md). Nguyên nhân: các luồng trên nhiều máy đã trao đổi qua Git nhưng gọi nhau lẫn lộn và không chính xác (tên phiên Claude theo từng máy, "máy thứ hai", pane herdr, writer id); chưa có project id; writer id chỉ để ghi danh, không phải địa chỉ. Owner muốn component cover luôn việc cấp định danh xuyên máy, độc lập dự án. Luồng `ready`; owner sẽ giao cho agent ở máy khác. MAIL dùng kết quả cho phần xuyên máy, còn lát cắt một máy của MAIL không chờ IDENT.
