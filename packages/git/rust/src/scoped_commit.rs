@@ -27,6 +27,14 @@ pub struct CommitRequest {
     pub message: String,
     pub cutover_grant: Option<CutoverGrant>,
 }
+/// Observation-only view of a request persisted in the WAL. Requests written
+/// by earlier releases may carry fields that new requests refuse (the retired
+/// `legacyEvents` declaration); recovery needs only the message, so it reads
+/// that and ignores the rest instead of failing to reconcile a retained attempt.
+#[derive(Deserialize)]
+struct StoredCommitRequest {
+    message: String,
+}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct CheckpointRequest {
@@ -470,7 +478,7 @@ impl GitDriver {
             OperationKind::ScopedCommit(payload) => {
                 let baseline: CommitBaseline =
                     serde_json::from_str(&payload.baseline).map_err(failure)?;
-                let request: CommitRequest =
+                let request: StoredCommitRequest =
                     serde_json::from_str(&payload.request).map_err(failure)?;
                 (
                     baseline.reference,

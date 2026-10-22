@@ -427,6 +427,51 @@ test('a deliberate shrink of a non-log .fgos file such as config.json is not ref
   assert.equal(result.status, 0, result.stderr);
 });
 
+test('a shrunk .fgos jsonl log whose name git quotes (non-ASCII) is refused like any other', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+  fs.mkdirSync(path.join(mainRoot, '.fgos', 'events'), { recursive: true });
+  const shard = '.fgos/events/shard-\u00e9.jsonl';
+  fs.writeFileSync(path.join(mainRoot, shard), 'line1\nline2\nline3\n');
+  execFileSync('git', ['add', shard], { cwd: mainRoot });
+  assert.equal(commitStaged(mainRoot, 'add quoted-name shard').status, 0);
+
+  fs.writeFileSync(path.join(mainRoot, shard), 'line1\n');
+  execFileSync('git', ['add', shard], { cwd: mainRoot });
+  const result = commitStaged(mainRoot, 'shrink quoted-name shard');
+
+  assert.notEqual(result.status, 0, 'a shrunk log must be refused whatever its file name');
+  assert.match(result.stderr, /line count is lower than HEAD/);
+});
+
+test('a commit is refused, not treated as fence-absent, when HEAD tree cannot be read', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\nline2\n');
+  assert.equal(commitStaged(mainRoot, 'add log').status, 0);
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\nline2\nline3\n');
+  const tree = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], { cwd: mainRoot, encoding: 'utf8' }).trim();
+  const objects = execFileSync('git', ['rev-parse', '--git-path', 'objects'], { cwd: mainRoot, encoding: 'utf8' }).trim();
+  fs.rmSync(path.join(mainRoot, objects, tree.slice(0, 2), tree.slice(2)));
+
+  const result = commitStaged(mainRoot, 'commit over an unreadable HEAD tree');
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /could not read HEAD's tree to look for the event fence/);
+});
+
+test('a first commit in a repository with no HEAD yet is not refused as an unreadable fence', () => {
+  const root = mkTempDir('fgos-unborn-fence-');
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: root });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: root });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: root });
+  installHook(root, { absolute: true });
+  fs.writeFileSync(path.join(root, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: root });
+
+  const result = commitStaged(root, 'first commit');
+
+  assert.doesNotMatch(result.stderr, /could not read HEAD's tree/);
+});
+
 test('once the event fence file exists the shrink guard is off, because the logs are retired', () => {
   const { mainRoot } = initSharedAbsoluteHooksPathFixture();
   commitEventLog(mainRoot, 'events.jsonl', 'line1\nline2\nline3\nline4\n');

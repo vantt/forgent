@@ -25,7 +25,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 import { checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
 import { runLockRouteSync, ROUTE_CALL_TIMEOUT_MS } from '../src/holder-lock/driver.mjs';
@@ -305,7 +305,15 @@ function eventFenceExists(cwd) {
   // A directory is legacy Work; only the indexed/HEAD regular-file fence counts.
   const index = execFileSync('git', ['ls-files', '-s', '--', '.fgos/events'], { cwd, encoding: 'utf8' });
   let head = '';
-  try { head = execFileSync('git', ['ls-tree', 'HEAD', '--', '.fgos/events'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }); } catch {}
+  try {
+    head = execFileSync('git', ['ls-tree', 'HEAD', '--', '.fgos/events'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+  } catch (err) {
+    // Only an unborn HEAD (no commit yet) means "no fence in HEAD"; any other failure leaves the fence state unknown.
+    const unborn = spawnSync('git', ['rev-parse', '--verify', '--quiet', 'HEAD'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    if (unborn.status !== 1 || unborn.stdout.trim() !== '') {
+      throw Object.assign(new Error(`commit refused: could not read HEAD's tree to look for the event fence (${String(err?.message ?? err).split('\n')[0]}) -- refusing to commit (fail-closed).`), { refusal: true });
+    }
+  }
   return [index, head].some(text => text.split('\n').some(line => /^100(?:644|755) /.test(line) && line.split('\t')[1] === '.fgos/events'));
 }
 
@@ -341,12 +349,12 @@ function stagedEventLogShrinkRefusal(committingToplevel) {
 
   let output;
   try {
-    output = execFileSync('git', ['diff', '--cached', '--name-only', '--diff-filter=M'], { cwd: committingToplevel, encoding: 'utf8' });
+    output = execFileSync('git', ['diff', '--cached', '--name-only', '--diff-filter=M', '-z'], { cwd: committingToplevel, encoding: 'utf8' });
   } catch (err) {
     return `commit refused: could not run "git diff --cached" to check staged modifications under ".fgos/" (${err.message}) -- refusing to commit (fail-closed).`;
   }
   // Only append-only logs are guarded: a config or state file is edited on purpose and may lose lines.
-  const logs = output.split('\n').filter((p) => p.startsWith('.fgos/') && p.endsWith('.jsonl'));
+  const logs = output.split('\0').filter((p) => p.startsWith('.fgos/') && p.endsWith('.jsonl'));
 
   const shrunk = [];
   for (const p of logs) {
@@ -592,4 +600,10 @@ async function main() {
   process.exit(0);
 }
 
-await main();
+try {
+  await main();
+} catch (err) {
+  if (!err?.refusal) throw err;
+  console.error(err.message);
+  process.exitCode = 1;
+}

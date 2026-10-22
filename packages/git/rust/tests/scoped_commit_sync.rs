@@ -422,9 +422,18 @@ fn baseline_only_cutover_commits_the_event_fence() {
 
 /// Construct real durable interruption states under the fixture's held custody.
 fn interrupted(f: &Fixture, id: &str, phase: u8, sync: bool) -> wal::Chain {
-    interrupted_resources(f, id, phase, sync, false)
+    interrupted_resources(f, id, phase, sync, false, None)
 }
-fn interrupted_resources(f: &Fixture, id: &str, phase: u8, sync: bool, legacy: bool) -> wal::Chain {
+/// `stored_request` replaces the serialized request the intent persists, to
+/// reproduce what an earlier release wrote.
+fn interrupted_resources(
+    f: &Fixture,
+    id: &str,
+    phase: u8,
+    sync: bool,
+    legacy: bool,
+    stored_request: Option<String>,
+) -> wal::Chain {
     use wal::*;
     struct Held<'a>(&'a Handle);
     impl PublicationAuthority for Held<'_> {
@@ -462,7 +471,7 @@ fn interrupted_resources(f: &Fixture, id: &str, phase: u8, sync: bool, legacy: b
         OperationKind::ScopedCommit(Box::new(ScopedCommitIntent {
             worktree: baseline.worktree.clone(),
             baseline: serde_json::to_string(&baseline).unwrap(),
-            request: serde_json::to_string(&request).unwrap(),
+            request: stored_request.unwrap_or_else(|| serde_json::to_string(&request).unwrap()),
             paths: vec!["a".into()],
             tree,
             cutover_grant: None,
@@ -602,6 +611,35 @@ fn explicit_recovery_observes_signed_commit_or_closes_unknown_without_replaying(
             matches!(outcome, wal::Outcome::CommitRejected { .. })
         });
         assert_eq!(head, git(&f.tree, &["rev-parse", "HEAD"]));
+        fresh_commit(&f, "fresh");
+    }
+}
+#[test]
+fn recovery_reconciles_an_attempt_stored_with_the_retired_legacy_events_field() {
+    for committed in [false, true] {
+        let f = Fixture::new();
+        // Exactly what the previous release persisted for an event-file commit.
+        let stored = serde_json::json!({
+            "writes": ["a"],
+            "message": "interrupted",
+            "cutoverGrant": null,
+            "legacyEvents": { "exactPaths": [".fgos/events/shard.jsonl"] },
+        })
+        .to_string();
+        assert!(serde_json::from_str::<CommitRequest>(&stored).is_err());
+        interrupted_resources(&f, "interrupted", 2, false, false, Some(stored));
+        if committed {
+            git(&f.tree, &["commit", "-qm", "interrupted"]);
+        }
+        let outcome = f
+            .driver
+            .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted")
+            .unwrap();
+        assert!(if committed {
+            matches!(outcome, wal::Outcome::Commit { .. })
+        } else {
+            matches!(outcome, wal::Outcome::CommitRejected { .. })
+        });
         fresh_commit(&f, "fresh");
     }
 }
@@ -787,7 +825,7 @@ fn legacy_chains_from_a_dead_checkout_are_abandoned_without_replay() {
     use std::os::unix::fs::MetadataExt;
     for (phase, residue) in [(0, false), (2, false), (0, true), (2, true)] {
         let mut f = Fixture::new();
-        interrupted_resources(&f, "dead", phase, false, true);
+        interrupted_resources(&f, "dead", phase, false, true, None);
         drop(f.lease.take());
         git(
             &f.main,
