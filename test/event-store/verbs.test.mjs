@@ -54,8 +54,16 @@ test('config merges project over global and validates integer boundaries; the Wo
   assert.throws(() => readEventStoreConfig(f.repo, f.ctx.globalConfigPath), /event-store-config/);
   fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), '{}');
   for (const eventStore of [{ seal: { intervalSec: 0 } }, { sync: { intervalSec: -1 } }, { rebuild: { maxAttempts: 1.5 } }, { remote: '../bad' }]) assert.throws(() => eventStoreConfig({ eventStore }), /event-store-config/);
-  assert.deepEqual(await rebuildStoreUseCase(f.ctx), { rebuilt: [{ consumer: 'work', result: { work: {}, decisions: [] } }, { consumer: 'porting', result: { porting: {} } }] });
+  const { rebuilt } = await rebuildStoreUseCase(f.ctx);
+  // A summary, never the view: the size of each collection, the view's revision, and what its cache covers.
+  assert.deepEqual(rebuilt.map(({ consumer, counts }) => ({ consumer, counts })), [{ consumer: 'work', counts: { work: 0, decisions: 0 } }, { consumer: 'porting', counts: { porting: 0 } }]);
+  for (const entry of rebuilt) {
+    assert.deepEqual(Object.keys(entry).sort(), ['consumer', 'counts', 'cover', 'revision']);
+    assert.match(entry.revision, /^[0-9a-f]{64}$/);
+    assert.deepEqual(Object.keys(entry.cover).sort(), ['covered', 'deferred', 'streams']);
+  }
   const cache = JSON.parse(fs.readFileSync(path.join(f.repo, '.fgos/cache/state.json')));
+  assert.equal(rebuilt[0].revision, cache.revision, 'the reported revision is the one the consumer installed');
   assert.deepEqual(cache.work, {});
   assert.equal(typeof cache.revision, 'string');
   assert.equal('snapshot' in cache, false);
@@ -89,11 +97,11 @@ test('rebuild resolves shipped consumer contracts, preserves caches until consum
   fs.mkdirSync(path.join(f.repo, '.fgos/cache'));
   for (const entry of entries) {
     fs.writeFileSync(path.join(f.repo, entry.cachePath), 'stale');
-    fs.writeFileSync(path.join(payload, entry.rebuildModule), `import fs from 'node:fs'; export function rebuildFromStore(ctx) { const cache=${JSON.stringify(path.join(f.repo, entry.cachePath))}; if (fs.readFileSync(cache,'utf8') !== 'stale') throw new Error('old cache lost'); const events=ctx.store.read({streams:['project']},ctx.heldRanks).sequence; fs.writeFileSync(cache,JSON.stringify(events)); return {count:events.length,maxAttempts:ctx.maxAttempts}; }`);
+    fs.writeFileSync(path.join(payload, entry.rebuildModule), `import fs from 'node:fs'; export function rebuildFromStore(ctx) { const cache=${JSON.stringify(path.join(f.repo, entry.cachePath))}; if (fs.readFileSync(cache,'utf8') !== 'stale') throw new Error('old cache lost'); const events=ctx.store.read({streams:['project']},ctx.heldRanks).sequence; fs.writeFileSync(cache,JSON.stringify(events)); return {events,maxAttempts:ctx.maxAttempts}; }`);
   }
   const url = pathToFileURL(path.join(payload, 'src/verbs/events/rebuild.mjs')).href;
   const result = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', `const {rebuildStoreUseCase}=await import(${JSON.stringify(url)}); console.log(JSON.stringify(await rebuildStoreUseCase(${JSON.stringify(f.ctx)})));`], { encoding: 'utf8' }));
-  assert.deepEqual(result.rebuilt.map(e => e.result), [{ count: 1, maxAttempts: 5 }, { count: 1, maxAttempts: 5 }]);
+  assert.deepEqual(result.rebuilt.map(e => [e.consumer, e.counts, e.cover]), [['first', { events: 1 }, null], ['second', { events: 1 }, null]], 'a cache without a cursor reports no cover');
   for (const entry of entries) assert.equal(JSON.parse(fs.readFileSync(path.join(f.repo, entry.cachePath)))[0].payload.id, 'one');
 });
 

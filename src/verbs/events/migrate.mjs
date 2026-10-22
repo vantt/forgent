@@ -1,4 +1,4 @@
-// Dormant until phase 09. No Git subprocesses: Inspect/Publication/ScopedCommit
+// No Git subprocesses: Inspect/Publication/ScopedCommit
 // remain the only Git doors. Q5(a): reviewed code lands before this commit.
 import fs from 'node:fs';
 import path from 'node:path';

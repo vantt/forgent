@@ -39,8 +39,8 @@ const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 // child spawned via run() below always agreed with every OTHER run()-spawned
 // child in the same test (they all inherit the same process.env), but
 // whether a spawned child agreed with a fixture that writes IN-PROCESS (e.g.
-// moveToDurableDoingForTest below, which calls resolveWriterLogPath/
-// appendEvent directly, no subprocess involved) depended on the invoking
+// moveToDurableDoingForTest below, which appends through the Work gate
+// directly, no subprocess involved) depended on the invoking
 // shell: under an agent session, both sides read the identical
 // CLAUDE_CODE_SESSION_ID string and collapsed onto ONE shared writer log
 // (an in-process write landing in the same per-writer sequence a later

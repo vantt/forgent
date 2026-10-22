@@ -4,18 +4,17 @@
 // picked up through checks.mjs's own re-exported DOCTOR_CHECKS without this
 // test (or any other new module) touching checks.mjs itself.
 import '../helpers/process-tmp-root.mjs';
+import { EVENT_STORE_DEFAULTS } from '../../src/event-store/index.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { execFileSync } from 'node:child_process';
 import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT, findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainWorkflowOperationsCoverage } from '../../src/setup/registrations.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
-import { recordMainCheckoutGuardWarning } from '../../src/state/main-checkout-guard-warnings.mjs';
 
 
 const EXPECTED_RUNNER_DEFAULT = {
@@ -604,39 +603,6 @@ test('agent-type-names-unique doctor check reports a workspace definition with t
   }
 });
 
-test('guard-warnings-surface: main-checkout-guard-warnings doctor check passes when no warnings exist and fails when warnings exist', () => {
-  const dir = mkTempDir();
-
-  // 1. Not in a git checkout
-  const entry = DOCTOR_CHECKS.find((c) => c.id === 'main-checkout-guard-warnings');
-  assert.ok(entry, 'main-checkout-guard-warnings check must be registered');
-  const nonGitResult = entry.check(dir);
-  assert.equal(nonGitResult.passed, true);
-  assert.match(nonGitResult.message, /not inside a git checkout/);
-
-  // 2. Fresh checkout (no warnings recorded)
-  const gitDir = mkTempDir();
-  execFileSync('git', ['init'], { cwd: gitDir });
-  const freshResult = entry.check(gitDir);
-  assert.equal(freshResult.passed, true);
-  assert.match(freshResult.message, /no main checkout guard warnings recorded/);
-
-  // 3. Warnings recorded
-  recordMainCheckoutGuardWarning(gitDir, {
-    reason: 'regressed',
-    message: 'current tip seq 22816 is lower than last recorded mark 22850',
-    mark: 22850,
-  });
-
-  const warnedResult = entry.check(gitDir);
-  assert.equal(warnedResult.passed, false);
-  assert.match(warnedResult.message, /1 main checkout guard warning\(s\) recorded/);
-  assert.match(warnedResult.message, /regressed: current tip seq 22816 is lower than last recorded mark 22850/);
-});
-
-
-
-
 // --- workflow step operations validation (Step 02 / D19) ---
 // These fixtures state a workflow's operations as `operationMap`/`skillMap` keyed by step; the check
 // reads Workflow definitions (`steps[].operations`, `steps[].skill`), so they are lifted into that shape.
@@ -1116,9 +1082,10 @@ test('doctor check runner-patterns-config passes with defaults or warns when mis
   assert.match(invalidRes.message, /not cumulative/);
 });
 
-test('Event Store remote defaults to origin and setup preserves an explicit remote', () => {
-  const entry = CONFIG_DEFAULT_REGISTRATIONS.find(r => r.key === 'eventStore');
-  assert.deepEqual(entry.shape, { remote: 'origin' });
+test('Event Store has one registered config default, remote origin, and setup preserves an explicit remote', () => {
+  const entries = CONFIG_DEFAULT_REGISTRATIONS.filter(r => r.key === 'eventStore');
+  assert.deepEqual(entries.map(r => r.shape), [EVENT_STORE_DEFAULTS]);
+  assert.equal(EVENT_STORE_DEFAULTS.remote, 'origin');
   const temp = mkTempDir();
   try {
     fs.mkdirSync(path.join(temp, '.fgos'));

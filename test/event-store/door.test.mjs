@@ -228,22 +228,15 @@ export function readerFindings(sources) {
   }
   return stableFindings(sites, 'retired-event');
 }
-// Each remaining site goes with the code that owns it: the `repair` verb and the event-log re-exports go
-// with the removals that follow the Work cutover.
-const dormantReaderFindings = {
-  "bin/fgos.mjs: repairTruncatedLastLine: retired-event": 1,
-  "src/state/events.mjs: import readEvents: retired-event": 1,
-  "src/state/events.mjs: import readEventsFromByte: retired-event": 1,
-  "src/state/replay.mjs: import readEvents: retired-event": 1,
-  "src/state/replay.mjs: import readEventsFromByte: retired-event": 1
-};
+// Every reader of the retired event files is gone from product code; a new one is a finding, not debt to declare.
+const dormantReaderFindings = {};
 
-test('dormant reader census retains declared sites and rejects additions or stale debt',()=>{
+test('no product file reads the retired event files or imports a reader of them',()=>{
   const files=execFileSync('rg',['--files','src','bin','scripts','packages','apps'],{encoding:'utf8'}).trim().split('\n')
     .filter(f=>/\.(?:mjs|js|rs)$/.test(f)&&!/(?:^|\/)(?:test|tests|examples)\//.test(f));
   const sources=Object.fromEntries(files.map(f=>[f,fs.readFileSync(f,'utf8')]));
   assert.deepEqual(readerFindings(sources),dormantReaderFindings,
-    'reader debt is site-specific, including legacy owner files');
+    'a reader of the retired event files appeared in product code');
 });
 
 test('dormant identity ignores unrelated edits but detects a new reader inside a legacy owner',()=>{

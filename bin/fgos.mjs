@@ -31,7 +31,7 @@ import readline from 'node:readline';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
-import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, OUTCOME_EXIT_CODES, categoryOf, exitCodeForOutcome, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, OUTCOME_EXIT_CODES, categoryOf, exitCodeForOutcome, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
@@ -43,7 +43,7 @@ import { findAuthoritativeMatch, findDuplicateAuthoritativeClaims } from '../src
 import { checkVerifyForC4 } from '../src/intake/verify-pattern-check.mjs';
 import { parseFrontmatter } from '../src/report/frontmatter.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromExecutors } from '../src/state/tool-registry.mjs';
-import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
+import { EventLogError } from '../src/state/event-log.mjs';
 import { foldEvents } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
@@ -131,6 +131,7 @@ import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-re
 import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, createDoctorRun, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
+import { fixEventStoreMachineId, fixEventStoreLockDirs } from '../src/setup/event-store-fixes.mjs';
 import { convertProjectConfigFile, ladderCommentLines } from '../src/setup/seat-binding-conversion.mjs';
 import { createSeatBindingClient } from '../src/seat-binding/client.mjs';
 import { discoverWorkflows } from '../src/workflow/loader.mjs';
@@ -287,23 +288,17 @@ function excludeIronLawEvidence(files, id) {
 // `events.jsonl` (plus its own timestamped backups) and
 // `entropy-history.jsonl` -- never a policy or generated file.
 //
-// Tầng A/T2 (TA-D2/TA-D11): the same append-only stream now also lands in
-// per-writer files under `.fgos/events/<writer-id>-<openTs>.jsonl` instead
-// of always landing in baseline-0 -- same noise, same reasoning, just a
-// different physical path; a compacted baseline under `.fgos/events/`
-// (`baseline-<ts>.jsonl`, T6) and its own manifest sidecar under
-// `.fgos/events/archive/` are equally append-only lifecycle output, never
-// an item's own declared footprint.
-//
-// The warnings log (`main-checkout-guard-warnings.jsonl`) is the same kind of
-// append-only, no-item-owns-it output -- never an item's own declared
-// footprint.
+// Legacy tracked event files (the single `events.jsonl` and its per-writer and
+// archive siblings) stay exempt for as long as a checkout still carries them
+// before `fgos events migrate`: they are the same append-only lifecycle output,
+// never an item's own declared footprint. New events live in the Event Store's
+// refs and never appear in a diff.
 // `.fgos/logs/` (phase-01, plans/260825-0842-fgos-logs-dir-bucketing):
-// entropy/changelog-nag/approve-fault/invocation-fault/guard-warnings all
-// moved under this gitignored bucket -- kept here too since this regex is
-// evaluated against whatever path list a caller hands it, not only
-// `git diff --name-only` (which would never surface an ignored path).
-const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|logs\/.*|locks\/.*|observe\/.*|main-checkout-guard-warnings\..*)$/;
+// entropy, changelog-nag, approve-fault and invocation-fault logs live under
+// this gitignored bucket -- kept here too since this regex is evaluated against
+// whatever path list a caller hands it, not only `git diff --name-only` (which
+// would never surface an ignored path).
+const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|logs\/.*|locks\/.*|observe\/.*)$/;
 function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
 }
@@ -1055,6 +1050,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     case 'init': {
+      // `init` is the first step of setup, and the store cannot open without a machine id and its locks directory,
+      // which setup creates. Create them here through the same fixes (idempotent: an existing id is kept, and a
+      // clone's own `fgos.machineId` still wins).
+      fixEventStoreMachineId(path.dirname(dir));
+      fixEventStoreLockDirs(path.dirname(dir));
       initStore(dir);
       // D4: detection/manifest writing must never fail init — a permissions
       // quirk or unexpected error here still leaves `.fgos/` initialized.
@@ -2959,20 +2959,33 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
 
 
-    case 'rebuild': {
-      const view = rebuild(dir);
-      return { workCount: Object.keys(view.work).length, decisionCount: view.decisions.length };
+    // `events sync|status|export|migrate` and `rebuild` are the Event Store's verbs; each use case owns its
+    // own validation and refusals. The Event Store is Linux-only, so every one of them refuses elsewhere.
+    case 'events': {
+      const sub = positional[0];
+      const ctx = { cwd: path.dirname(dir), trustedMain: path.dirname(getMainFgosDir(dir)) };
+      if (sub === 'sync') {
+        const { syncUseCase } = await import('../src/verbs/events/sync.mjs');
+        return syncUseCase(ctx, { remote: flags.remote, noPush: flags['no-push'] });
+      }
+      if (sub === 'status') {
+        const { statusUseCase } = await import('../src/verbs/events/status.mjs');
+        return statusUseCase(ctx, { remote: flags.remote });
+      }
+      if (sub === 'export') {
+        const { exportUseCase } = await import('../src/verbs/events/export.mjs');
+        return exportUseCase(ctx, { out: flags.out, format: flags.format, stream: flags.stream, since: flags.since });
+      }
+      if (sub === 'migrate') {
+        const { migrateUseCase } = await import('../src/verbs/events/migrate.mjs');
+        return migrateUseCase({ ...ctx, writer: String(resolveWriterIdentity(dir).id) }, { baseline: flags.baseline, check: flags.check });
+      }
+      throw new StoreError('validation', 'events requires sync|status|export|migrate');
     }
 
-    // Operator-invoked repair (per readEvents' fail-closed 'corrupt-log'
-    // halt, events.mjs): scoped ONLY to the common crash-mid-append shape —
-    // a truncated final line, every other line already parses. Any other
-    // corruption shape still refuses (events.mjs's own guarantee, unchanged
-    // here). Backs up the original log before truncating, then re-validates.
-    case 'repair': {
-      const logPath = path.join(dir, 'events.jsonl');
-      const { backupPath, droppedLine, eventCount } = repairTruncatedLastLine(logPath);
-      return { logPath, backupPath, eventCount, droppedLine };
+    case 'rebuild': {
+      const { rebuildStoreUseCase } = await import('../src/verbs/events/rebuild.mjs');
+      return rebuildStoreUseCase({ cwd: path.dirname(dir), trustedMain: path.dirname(getMainFgosDir(dir)) });
     }
 
     // Rollup view theo bộ (P24, request-class per D1: a pure read — never
@@ -4507,7 +4520,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|lock|lock-status|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|events|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|lock|lock-status|main-checkout-reset> ...`);
   }
 }
 
@@ -4810,14 +4823,16 @@ const STORE_MISSING_WARNING_VERBS = new Set([
 
 // Verbs that open the Event Store without being `requiresExistingStore` or a store-missing-warning read: they carry
 // the opportunistic seal and publish triggers of spec §16 at their start and end.
-const EVENT_STORE_LIFECYCLE_VERBS = new Set(['init', 'doctor', 'setup', 'rebuild', 'decision-index', 'docs-index', 'knowledge']);
+const EVENT_STORE_LIFECYCLE_VERBS = new Set(['init', 'doctor', 'setup', 'rebuild', 'events', 'decision-index', 'docs-index', 'knowledge']);
 // The verbs that run Land (a `merge` sub-verb only when it lands), and so the only ones that can leave a retained
 // candidate behind. Their end trigger releases the candidates whose result Work has recorded: the sweep reads
 // Land's whole operation journal, a cost a land already dwarfs and every other command would pay for nothing.
 function landsWork(verb, positional) {
   return verb === 'approve' || verb === 'sync-root' || verb === 'promote-to-component' || (verb === 'merge' && positional[0] === 'next');
 }
-function opensEventStore(entry, verb) {
+function opensEventStore(entry, verb, positional) {
+  // `events migrate` imports the tracked history under its own quiesce check: no trigger may open the store around it.
+  if (verb === 'events' && positional[0] === 'migrate') return false;
   return !!(entry?.requiresExistingStore || STORE_MISSING_WARNING_VERBS.has(verb) || EVENT_STORE_LIFECYCLE_VERBS.has(verb));
 }
 
@@ -4853,6 +4868,8 @@ function opensEventStore(entry, verb) {
 //        `status` only reads it.
 //      - `knowledge`: `attest` mutates, `status` only reads (`rebuild` +
 //        filtering, no write call).
+//      - `events`: `sync` and `migrate` mutate, `status` and `export` read.
+//      - `rebuild`: every invocation replaces the consumer caches.
 //      - `coordination`: `run`/`launch-master-loop` dispatch and can close
 //        a session; `show`/`chain` are explicitly commented "never appends
 //        an event" in their own case block.
@@ -4876,10 +4893,9 @@ function opensEventStore(entry, verb) {
 //    `uninstall`.
 // 4. Deliberately NOT guarded, not the shared-truth hazard this guard
 //    exists for -- each writes only a local, per-checkout, gitignored
-//    artifact by design, never a shared event: `rebuild` (regenerates the
-//    local `state.json` cache FROM the local event log -- no new event),
-//    `tool` (both `check`, which writes only `.fgos/`'s local status
-//    overlay per its own case-block comment, and `query`, pure read).
+//    artifact by design, never a shared event: `tool` (both `check`, which
+//    writes only `.fgos/`'s local status overlay per its own case-block
+//    comment, and `query`, pure read).
 // 5. Deliberately NOT guarded, not an `.fgos` event-log operation at all --
 //    `preflight` resolves its own root independently via `git rev-parse
 //    --show-toplevel` against `--dir`-or-cwd, never through `dir`/`state.json`.
@@ -4906,7 +4922,7 @@ function opensEventStore(entry, verb) {
 const MUTATING_ONLY_VERBS = new Set([
   'submit', 'take', 'pick', 'move', 'edit', 'ask', 'answer', 'gate-approve', 'reject',
   'add', 'discover', 'plan', 'retrospective', 'cleanup', 'compound', 'resolve-park-reason',
-  'handoff', 'handoff-return', 'decision', 'report', 'topic', 'doc', 'repair',
+  'handoff', 'handoff-return', 'decision', 'report', 'topic', 'doc',
 ]);
 
 const MUTATING_SUBCOMMAND_PREDICATES = {
@@ -4915,6 +4931,11 @@ const MUTATING_SUBCOMMAND_PREDICATES = {
   gateway: (positional) => ['start', 'stop'].includes(positional[0]),
   lock: (positional) => positional[0] === 'fence',
   knowledge: (positional) => positional[0] === 'attest',
+  // `events sync` publishes the checkout's event refs and `events migrate` imports and fences the tracked history;
+  // `events status` and `events export` only read.
+  events: (positional) => ['sync', 'migrate'].includes(positional[0]),
+  // Rebuild replaces every consumer's cache in the shared store root, so a disconnected snapshot must not run it.
+  rebuild: () => true,
   coordination: (positional, flags) => [
     'run', 'close', 'launch-master-loop', 'start', 'operation', 'authorize-and-dispatch',
     'fan-out', 'contribution', 'human-turn', 'disposition', 'specialist-authorize',
@@ -5124,12 +5145,12 @@ async function main() {
     // tsk-4fu-2: a verb registered `requiresExistingStore: true`
     // (command-registry.mjs) reads/writes through this `dir` — refuse
     // before ever reaching its handler when `.fgos/` isn't there yet,
-    // instead of letting `appendEventCore`'s own `mkdirSync` silently
-    // create a fresh, empty one (the worktree phantom-store hazard this
-    // item closes). `init` is deliberately never in that set — it is the
-    // one legitimate door that creates `.fgos/` — but gets the opposite
-    // check: refuse when `cwd` is a linked worktree, the one remaining
-    // path that could recreate a live `.fgos/` there and defeat ADR0020.
+    // instead of letting a write create a fresh, empty one (the worktree
+    // phantom-store hazard this item closes). `init` is deliberately never
+    // in that set — it is the one legitimate door that creates `.fgos/` —
+    // but gets the opposite check: refuse when `cwd` is a linked worktree,
+    // the one remaining path that could recreate a live `.fgos/` there and
+    // defeat ADR0020.
     const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
     if (entry?.nativeOnly) {
       process.stderr.write(`fgos: "${verb}" chỉ có ở Rust host.\n`);
@@ -5209,7 +5230,7 @@ async function main() {
     // comes from `runVerb` unchanged.
     faultClass = entry ? null : 'unknown-verb';
     // The main checkout is resolved (it runs git) only for a verb that opens the store; the other verbs never pay for it.
-    if (opensEventStore(entry, verb)) {
+    if (opensEventStore(entry, verb, positional)) {
       eventStoreLifecycle = { trustedMain: path.dirname(getMainFgosDir(dir)), dispatched: currentDispatchDepth() > 0 };
       sweepsLand = landsWork(verb, positional);
       // `init` creates the store, so only its end trigger has anything to maintain.

@@ -277,23 +277,23 @@ test('return: a .fgos/* change bundled into the item\'s own commit (git add -A s
   assert.deepEqual(data.footprintDiffHits, [], 'a .fgos/* change bundled into the item\'s own commit must never be flagged');
 });
 
-// The warnings log (main-checkout-guard-warnings.jsonl) is the same kind of
+// A diagnostic log under the `.fgos/logs/` bucket (invocation-faults.jsonl) is the same kind of
 // no-item-owns-it noise as events.jsonl itself -- an item bundling it alongside
 // its own real work must never be flagged either. The test force-adds it
 // because the fixture's .gitignore excludes the .fgos/logs/ bucket: a plain
 // `git add -A` would never stage it, and the test would pass without ever
 // exercising FGOS_NOISE_ONLY_PATHS. A checkout whose .gitignore predates the
 // exclusion can still commit the file alongside real work.
-test('return: a .fgos/logs/main-checkout-guard-warnings.jsonl change bundled into the item\'s own commit is exempt from footprintDiffHits, same as events.jsonl', () => {
+test('return: a .fgos/logs/invocation-faults.jsonl change bundled into the item\'s own commit is exempt from footprintDiffHits, same as events.jsonl', () => {
   const cwd = initGitCwdFast();
   execFileSync('git', ['add', '-A'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'bootstrap .fgos/'], { cwd });
-  const id = 'pull-return-guard-files-exempt';
+  const id = 'pull-return-logs-exempt';
   assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'light', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['take', '--id', id]).status, 0);
   fs.mkdirSync(path.join(cwd, '.fgos', 'logs'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'logs', 'main-checkout-guard-warnings.jsonl'), '{"kind":"truncation-break"}\n');
-  execFileSync('git', ['add', '-f', '.fgos/logs/main-checkout-guard-warnings.jsonl'], { cwd });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'logs', 'invocation-faults.jsonl'), '{"kind":"probe"}\n');
+  execFileSync('git', ['add', '-f', '.fgos/logs/invocation-faults.jsonl'], { cwd });
   commitFile(cwd, 'proof.txt');
 
   const result = run(cwd, ['return', id]);
@@ -303,7 +303,7 @@ test('return: a .fgos/logs/main-checkout-guard-warnings.jsonl change bundled int
   assert.deepEqual(
     data.footprintDiffHits,
     [],
-    'the warnings-log file must never be flagged, same as events.jsonl',
+    'a diagnostic log file must never be flagged, same as events.jsonl',
   );
 });
 

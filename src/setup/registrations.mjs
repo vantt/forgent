@@ -124,9 +124,11 @@ import {
 } from '../config/shared-config-file.mjs';
 import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
-import { readMainCheckoutGuardWarnings } from '../state/main-checkout-guard-warnings.mjs';
 import { computeKnowledgeProjection } from '../report/knowledge-projection.mjs';
 import { prepareWorkStore } from '../state/work-event-store.mjs';
+import { EVENT_STORE_DEFAULTS } from '../event-store/index.mjs';
+import { eventStoreDoctor } from './event-store-checks.mjs';
+import { fixEventStoreMachineId, fixEventStoreRefspec, fixEventStoreLockDirs } from './event-store-fixes.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { resolveDocPath } from '../report/knowledge-resolver.mjs';
 import { isLiveDocLifecycle } from '../state/knowledge-registry.mjs';
@@ -1919,32 +1921,6 @@ registerCheck({
   description: "every item whose status says its work was handed over has its fgw/<id> branch reachable from the trunk (tsk-1l9)",
   check: (cwd, run) => checkDeliveredNotOnTrunk(cwd, run),
 });
-
-// main-checkout-guard-warnings (tsk-1vc-3 D6, docs/history/tsk-1vc-silent-eventlog-loss-detection/CONTEXT.md):
-// surfaces recordMainCheckoutGuardWarning's write-only output (main-checkout-guard-warnings.jsonl)
-// to fgos doctor.
-function checkMainCheckoutGuardWarnings(cwd) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  if (mainCheckout === null) {
-    return { passed: true, message: 'not inside a git checkout — nothing to check' };
-  }
-  const warnings = readMainCheckoutGuardWarnings(mainCheckout);
-  if (warnings.length === 0) {
-    return { passed: true, message: 'no main checkout guard warnings recorded' };
-  }
-  const latest = warnings[warnings.length - 1];
-  return {
-    passed: false,
-    message: `${warnings.length} main checkout guard warning(s) recorded — latest: [${latest.ts}] ${latest.reason}: ${latest.message}`,
-  };
-}
-
-registerCheck({
-  id: 'main-checkout-guard-warnings',
-  description: 'main checkout eventlog guard warnings log has no recorded regression or truncation warnings (D6)',
-  check: (cwd) => checkMainCheckoutGuardWarnings(cwd),
-});
-
 
 // docs/history/global-project-config-awareness/CONTEXT.md D1: reports which
 // config level is currently active (project always wins when present) and
@@ -6184,7 +6160,16 @@ registerCheck({
   check: (cwd) => checkObserveRunCoverage(cwd),
 });
 
-registerConfigDefault({ id: 'event-store', key: 'eventStore', shape: { remote: 'origin' } });
+// Event Store: one config default, three setup fixes and ten doctor rows. A doctor run builds one `eventStoreDoctor`
+// (its lazy store snapshot is read at most once) and every row asks it; a row called without a run gets a private one.
+registerConfigDefault({ id: 'event-store', key: 'eventStore', shape: EVENT_STORE_DEFAULTS });
+registerFix({ id: 'event-store-machine-id', fix: cwd => fixEventStoreMachineId(cwd) });
+registerFix({ id: 'event-store-refspec', fix: cwd => fixEventStoreRefspec(cwd) });
+registerFix({ id: 'event-store-lock-dirs', fix: cwd => fixEventStoreLockDirs(cwd) });
+for (const name of ['git-version', 'open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'sync', 'native-addon', 'legacy-layout', 'orphan-branches']) {
+  const id = `event-store-${name}`;
+  registerCheck({ id, description: `Event Store ${name}`, check: (cwd, run = createDoctorRun()) => run.once(`event-store-doctor:${cwd}`, () => eventStoreDoctor(cwd))(id) });
+}
 
 // Git and Event Store share one addon ABI admission row.
 for (const id of ['git-worktree-recovery', 'git-component-compatible', 'git-transport-config', 'git-trust-topology', 'git-operation-journal', 'git-native-locks', 'git-publication-refspecs', 'git-durability-capability']) {

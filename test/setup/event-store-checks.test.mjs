@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fixture, append } from '../event-store/phase07-fixture.mjs';
 import { checkEventStore, eventStoreSetupContext, eventStoreDoctor } from '../../src/setup/event-store-checks.mjs';
 import { fixEventStoreRefspec } from '../../src/setup/event-store-fixes.mjs';
+import { DOCTOR_CHECKS, FIX_REGISTRATIONS, createDoctorRun } from '../../src/setup/registrations.mjs';
 
 test('doctor pass bodies are read-only in a real repo; no implicit repair of corrupt logs', t => {
   const f = fixture(t); append(f.store, [{}]);
@@ -106,6 +107,20 @@ test('one doctor invocation reuses its status snapshot; a new invocation observe
   fs.writeFileSync(path.join(f.repo, '.git/fgos/events/project/integrity.json'), JSON.stringify({ code: 'event-store-ref-moved' }));
   assert.equal(check('event-store-integrity').passed, true);
   assert.equal(eventStoreDoctor(f.repo, f.ctx)('event-store-integrity').passed, false);
+});
+
+test('the ten Event Store rows and three fixes are registered and every row of a run shares one doctor', t => {
+  const rows = DOCTOR_CHECKS.filter(({ id }) => id.startsWith('event-store-'));
+  assert.deepEqual(rows.map(({ id }) => id).sort(), ['git-version', 'open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'sync', 'native-addon', 'legacy-layout', 'orphan-branches'].map(name => `event-store-${name}`).sort());
+  assert.deepEqual(FIX_REGISTRATIONS.filter(({ id }) => id.startsWith('event-store-')).map(({ id }) => id).sort(), ['event-store-lock-dirs', 'event-store-machine-id', 'event-store-refspec']);
+  const f = fixture(t);
+  const run = createDoctorRun();
+  const keys = [];
+  const once = run.once;
+  run.once = (key, compute) => { keys.push(key); return once(key, compute); };
+  for (const row of rows) assert.equal(typeof row.check(f.repo, run).passed, 'boolean', row.id);
+  assert.deepEqual([...new Set(keys)], [`event-store-doctor:${f.repo}`], 'one eventStoreDoctor per run');
+  assert.equal(keys.length, rows.length);
 });
 
 test('sync warns for real unpublished project events', t => {

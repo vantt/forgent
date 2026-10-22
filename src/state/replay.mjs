@@ -1,25 +1,21 @@
 // replay.mjs — fold the event log into the current state view (per D3: the
 // view is always rebuildable from the log, never the truth itself).
 //
-// PURE: no fs import for writing, no Date.now() anywhere in the fold logic —
-// every timestamp in the resulting view comes from the event's own `ts`
-// field. `rebuildView` reads the log through `readEvents` (events.mjs), the
-// one read path shared with the rest of the state layer; it does not write.
+// PURE: no fs, no Date.now() anywhere in the fold logic — every timestamp in
+// the resulting view comes from the event's own `ts` field. Reading events is
+// the Event Store's job (src/event-store); this module only folds an ordered
+// array a consumer hands it.
 //
-// Deterministic: folding the same ordered event array (or rebuilding from
-// the same log) twice always yields deep-equal views.
+// Deterministic: folding the same ordered event array twice always yields
+// deep-equal views.
 
-import fs from 'node:fs';
-import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { readEvents, readLastLineBefore, readEventsFromByte } from './event-log.mjs';
 import { DEFAULTS } from './work.mjs';
 import { getDomain, resolveWorkflow, stepForPhase } from './domain-registry.mjs';
 import { resolveStepAlias } from '../workflow/steps.mjs';
 import { applyKnowledgeEvent } from './knowledge-registry.mjs';
-import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 
-// tsk-49e: every top-level key applyEvent ever writes to `view` is either an
+// Shape version of the folded view. A cached view stamped with another version is refolded, never trusted.
 export const VIEW_SCHEMA_VERSION = 6;
 
 // Containers are copied for incremental replay. Work handlers mutate item
@@ -58,7 +54,7 @@ function foldLegacyStage(target, item) {
 }
 
 /**
- * Fold an ordered array of events (as returned by `readEvents`) into a state
+ * Fold an ordered array of events (as the Event Store reader returns them) into a state
  * view: `{ work: { [id]: workItem }, decisions: [...] }`. Unknown event
  * types are ignored rather than rejected, so the log can grow new event
  * types over time without breaking replay of older logs.
@@ -71,11 +67,11 @@ function foldLegacyStage(target, item) {
  * fold into a view shaped the same way. This module declares no default of
  * its own.
  *
- * `seedView` (tsk-49e, optional): when supplied, folding starts from a
+ * `seedView` (optional): when supplied, folding starts from a
  * shallow clone of it (`cloneTopLevel`, above) instead of an empty view —
  * `events` is then expected to be only the events NOT already folded into
- * `seedView`, e.g. the incremental-snapshot read path in `rebuildView`
- * below. Omitting it is byte-identical to every pre-tsk-49e caller.
+ * `seedView`, e.g. an incremental refold from a cursor. Omitting it folds
+ * from an empty view.
  */
 export function foldEvents(events, seedView) {
   const view = seedView ? cloneTopLevel(seedView) : { work: {}, decisions: [] };
@@ -591,7 +587,7 @@ function applyEvent(view, event) {
       const raw = event.payload ?? {};
       const id = raw.id;
       // tsk-397 D16 renamed the coding roleGraph's 'human-advisor' role to
-      // 'advisor'. events.jsonl is append-only and already carries real
+      // 'advisor'. The event history is append-only and already carries real
       // pre-rename 'human-advisor' handoffs (e.g. seq 18440, tsk-1yf) --
       // without this normalization, replay reconstructs a `holder` value
       // the new vocabulary rejects (WorkValidationError on any later write
@@ -776,81 +772,15 @@ function applyEvent(view, event) {
     // tsk-in1-1 D1: `tool.register`/`tool.remove` retired — a tool provider
     // is now declared directly in `runner.executors.<id>` (config-edited,
     // never event-sourced). Historical events of either type already in
-    // `.fgos/events.jsonl` fall through to `default` below and are skipped,
+    // the store fall through to `default` below and are skipped,
     // same forward-compatible "unknown type, not an error" treatment any
     // other retired event type gets.
     default:
       // Forward-compatible: an event type this view does not (yet) know how
-      // to fold is skipped, not an error — readEvents already guarantees
-      // every line parsed as valid JSON.
+      // to fold is skipped, not an error — the reader already guarantees
+      // every event parsed as valid JSON.
       break;
   }
-}
-
-// tsk-49e: state.json's own sibling `snapshot` field (written by
-// store.mjs's refreshView) — {size, mtimeMs, lastLine} as of the last
-// successful full read. Returns the persisted view directly (zero bytes of
-// `logPath` read) when the log is byte-for-byte unchanged since that
-// snapshot; folds only the NEW bytes onto it when the log has safely grown
-// past it (verified via readLastLineBefore); returns null (falls back to a
-// full read) on any doubt at all — a wrong-in-doubt design that can only
-// ever cost a slower call, never a wrong view. See docs/history/
-// tsk-49e-incremental-read-snapshot/RESEARCH.md for why mtime+size (not a
-// content hash of the whole prefix) is the right signal here, and why the
-// last-line fingerprint is proven safe against all 3 known log-rewrite
-// paths (repairTruncatedLastLine, fixEventsJsonlContiguity --fix, git's own
-// merge=union driver).
-function tryIncrementalRebuild(logPath) {
-  const viewPath = resolveFgosFile(path.dirname(logPath), FGOS_FILE.STATE);
-  let persisted;
-  try {
-    persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));
-  } catch {
-    return null;
-  }
-  if (!persisted || typeof persisted !== 'object') return null;
-  if (persisted.viewSchemaVersion !== VIEW_SCHEMA_VERSION) return null;
-  const snap = persisted.snapshot;
-  if (!snap || typeof snap.size !== 'number' || typeof snap.mtimeMs !== 'number' || typeof snap.lastLine !== 'string') return null;
-
-  let stat;
-  try {
-    stat = fs.statSync(logPath);
-  } catch {
-    return null;
-  }
-
-  // Destructured only to exclude these two sibling fields (revision/
-  // snapshot) from the returned view shape -- everything else in
-  // `persisted` IS the real view, per writeView's own "additive sibling
-  // field, never folded back" pattern (see viewRevision's own doc comment).
-  const { revision, snapshot, viewSchemaVersion, ...savedView } = persisted;
-
-  if (stat.mtimeMs === snap.mtimeMs && stat.size === snap.size) {
-    return savedView; // untouched since the snapshot -- zero-read shortcut
-  }
-  if (stat.size <= snap.size) return null; // shrank, or same-size-different-mtime rewrite -- never safe to trust the prefix
-
-  const stillThere = readLastLineBefore(logPath, snap.size) === snap.lastLine;
-  if (!stillThere) return null; // prefix was rewritten (or the check itself failed) -- fall back, never guess
-
-  const newEvents = readEventsFromByte(logPath, snap.size);
-  return foldEvents(newEvents, savedView);
-}
-
-/**
- * Read every event from `logPath` (via `readEvents`) and fold it into a
- * fresh state view. This is the `fgos rebuild` primitive: rebuilding twice
- * from the same log must produce deep-equal views (D3 determinism) —
- * including via the tsk-49e snapshot fast path above, which is why that
- * path is tried FIRST here but always falls back to this exact full-read
- * shape on any doubt, never a partial or best-effort result.
- */
-export function rebuildView(logPath) {
-  const fast = tryIncrementalRebuild(logPath);
-  if (fast) return fast;
-  const events = readEvents(logPath);
-  return foldEvents(events);
 }
 
 /**
@@ -859,11 +789,11 @@ export function rebuildView(logPath) {
  * sha256 hex digest of `JSON.stringify(view)` — so a consumer can tell "did
  * the folded state change?" without re-folding the log or diffing the view.
  *
- * PURE and deterministic by the same guarantee `rebuildView` gives: the view
+ * PURE and deterministic by the same guarantee `foldEvents` gives: the view
  * carries no `Date.now()`/wall-clock value (every timestamp comes from an
- * event's own `ts`), so the same log always hashes to the same revision. The
+ * event's own `ts`), so the same events always hash to the same revision. The
  * caller passes the folded view itself — this function never re-folds. It is
- * computed over the view EXACTLY as `rebuildView` returns it, so it must be
+ * computed over the view EXACTLY as `foldEvents` returns it, so it must be
  * called on that pure shape (the on-disk `state.json` stamps this hash as a
  * sibling field; it is never folded back into the view a rebuild returns).
  */

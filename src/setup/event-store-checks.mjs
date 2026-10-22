@@ -1,4 +1,4 @@
-// Dormant check bodies; registration is the phase 09 cutover's responsibility.
+// Event Store doctor row bodies; src/setup/registrations.mjs registers each row through one eventStoreDoctor per run.
 import fs from 'node:fs';
 import { eventStoreFacts, eventStoreAddonAvailable, readEventStoreConfig, prepareStore } from '../event-store/index.mjs';
 

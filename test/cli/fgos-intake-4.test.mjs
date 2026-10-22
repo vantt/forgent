@@ -91,7 +91,7 @@ import {
 
 // tsk-4fu-2: requiresExistingStore guard (command-registry.mjs) — a
 // state-write verb no longer silently auto-vivifies `.fgos/` via
-// appendEventCore's own mkdirSync when it's missing; it refuses instead.
+// creating a store itself when it's missing; it refuses instead.
 
 // --- `fgos ask`/`fgos answer` (async-human-gate-3): the human-gate round-trip ---
 //

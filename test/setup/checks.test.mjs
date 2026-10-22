@@ -14,6 +14,7 @@
 // mỗi file dưới ~30s) tsk-3um/tsk-67g đã áp dụng.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
+import { EVENT_STORE_DEFAULTS } from '../../src/event-store/index.mjs';
 import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 import {
   DEFAULT_CLEANUP_LEAF_TTL_DAYS,
@@ -99,6 +100,16 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'domain-workflow-operations-coverage',
       'delivered-not-on-trunk',
       'enduser-docs-index-stale',
+      'event-store-git-version',
+      'event-store-integrity',
+      'event-store-legacy-layout',
+      'event-store-machine-id',
+      'event-store-native-addon',
+      'event-store-open-root',
+      'event-store-orphan-branches',
+      'event-store-refspec',
+      'event-store-sync',
+      'event-store-unsealed',
       'invariant-checks-configured',
       'worktree-setup-configured',
       'writer-identity-resolvable',
@@ -141,7 +152,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'agy-sub-homes-configured',
       'bwrap-available',
       'curl-available',
-      'main-checkout-guard-warnings',
       'no-stuck-merge-abort',
       'coordination-protocol-fixtures-valid',
       'coordination-example-requests-valid',
@@ -1017,7 +1027,7 @@ test('config-not-stale passes when the existing config already has every default
       worktreeSetup: { commands: [] },
       workerSlots: { ceiling: null },
       lock: { predecessorKillWaitMs: 2000 },
-      eventStore: { remote: 'origin' },
+      eventStore: EVENT_STORE_DEFAULTS,
       terminal: DEFAULT_TERMINAL_CONFIG,
       gateway: { port: 4170, token: null },
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },

@@ -29,7 +29,7 @@ import {
   StoreError,
   categoryOf,
 } from '../../state/store.mjs';
-import { EventLogError } from '../../state/events.mjs';
+import { EventLogError } from '../../state/event-log.mjs';
 import { resolveRoot, isResolvedStatus } from '../../state/frontier.mjs';
 import { driftStatus } from '../../state/drift-status.mjs';
 import {
@@ -92,7 +92,7 @@ function moveDeliveredOrRecordFault(dir, id, phase, testForceLockTimeoutId, { me
     return { event, error: null, diagnosticLog: null };
   } catch (err) {
     // Only an EventLogError (the write itself failing — e.g.
-    // 'lock-timeout', src/state/events.mjs) is the class of failure
+    // 'lock-timeout', src/state/event-log.mjs) is the class of failure
     // this guard exists for. A StoreError from transitionWork's own
     // precondition/CAS check (e.g. a missing-evidence acceptance
     // clause) is a legitimate refusal that must keep propagating

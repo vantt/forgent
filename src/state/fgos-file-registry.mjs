@@ -24,7 +24,6 @@ export const FGOS_FILE = {
   PORTING_STATE: 'portingState',
   TOOL_STATUS: 'toolStatus',
   APPROVE_FAULT_LOG: 'approveFaultLog',
-  MAIN_CHECKOUT_GUARD_WARNINGS: 'mainCheckoutGuardWarnings',
   INVOCATION_FAULTS: 'invocationFaults',
   COORDINATION_SCHEMA_FAULTS: 'coordinationSchemaFaults',
   CLAIMS_DIR: 'claimsDir',
@@ -36,7 +35,6 @@ const FGOS_FILE_RESOLVERS = {
   [FGOS_FILE.PORTING_STATE]: (fgosDir) => path.join(fgosDir, 'cache', 'porting-state.json'),
   [FGOS_FILE.TOOL_STATUS]: (fgosDir) => path.join(fgosDir, 'runtime', 'tool-status.local.json'),
   [FGOS_FILE.APPROVE_FAULT_LOG]: (fgosDir) => path.join(fgosDir, 'logs', 'approve-post-success-faults.jsonl'),
-  [FGOS_FILE.MAIN_CHECKOUT_GUARD_WARNINGS]: (fgosDir) => path.join(fgosDir, 'logs', 'main-checkout-guard-warnings.jsonl'),
   [FGOS_FILE.INVOCATION_FAULTS]: (fgosDir) => path.join(fgosDir, 'logs', 'invocation-faults.jsonl'),
   [FGOS_FILE.COORDINATION_SCHEMA_FAULTS]: (fgosDir) => path.join(fgosDir, 'logs', 'coordination-schema-faults.jsonl'),
   [FGOS_FILE.CLAIMS_DIR]: (fgosDir) => path.join(fgosDir, 'runtime', 'claims'),
@@ -54,17 +52,4 @@ export function resolveFgosFile(fgosDir, kind) {
   const resolver = FGOS_FILE_RESOLVERS[kind];
   if (!resolver) throw new Error(`resolveFgosFile: unknown kind "${kind}"`);
   return resolver(fgosDir);
-}
-
-/**
- * Accepts either an already-resolved `.fgos` dir OR its parent (repo root)
- * and returns the `.fgos` dir either way -- a pure basename check, never
- * git, for the small number of callers that legitimately receive both
- * shapes from their own two call sites (main-checkout-guard-warnings.mjs).
- * Not a substitute for `resolveFgosDir`/`resolveMainCheckoutRoot`
- * (`src/runner/paths.mjs`): those actually FIND `.fgos` from a cwd via
- * git; this only disambiguates a value the caller already has in hand.
- */
-export function normalizeFgosDir(dir) {
-  return path.basename(dir) === '.fgos' ? dir : path.join(dir, '.fgos');
 }

@@ -16,7 +16,7 @@ import { transitionStep } from './step-fsm.mjs';
 import { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
 import { getDomain, statusCategoryFor, parkReasonForStatus, roleGraphFor, effectiveStep, stepForPhase } from './domain-registry.mjs';
 import { evaluateHandoff } from './handoff.mjs';
-import { EventLogError } from './events.mjs';
+import { EventLogError } from './event-log.mjs';
 import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
@@ -39,7 +39,7 @@ export class StoreError extends Error {
 
 /**
  * The one category -> exit-code map (R4). Values 2-5 unchanged from the
- * prior duplicate in bin/fgos.mjs. 'lock-timeout' (events.mjs), 'session-fail'
+ * prior duplicate in bin/fgos.mjs. 'lock-timeout' (event-log.mjs), 'session-fail'
  * (session.mjs) and 'merge-fail' (merge.mjs) are distinct-on-purpose
  * categories that were previously unmapped here, so any error carrying them
  * fell through categoryOf's undefined-exitCode path and was treated as an

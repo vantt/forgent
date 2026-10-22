@@ -33,7 +33,6 @@ import {
   editWork,
   endSession,
   envelopeData,
-  eventLines,
   execFileSync,
   fileURLToPath,
   fs,
@@ -138,6 +137,18 @@ test('init creates .fgos/ with a rebuilt (empty) view and no tracked event file,
   assert.match(view.revision, /^[0-9a-f]{64}$/);
 });
 
+test('init on a repository that setup never touched creates the machine id and the store locks directory itself', () => {
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-init-fresh-'));
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
+  const stateRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-init-fresh-state-'));
+  fs.chmodSync(stateRoot, 0o700);
+  const result = run(cwd, ['init'], { FGOS_STATE_ROOT: stateRoot });
+  assert.equal(result.status, 0, result.stderr);
+  assert.ok(fs.existsSync(path.join(stateRoot, 'machine-id')), 'init mints the machine id setup would have minted');
+  assert.ok(fs.statSync(path.join(cwd, '.git/fgos/events/locks')).isDirectory(), 'init creates the locks directory setup would have created');
+  assert.equal(run(cwd, ['init'], { FGOS_STATE_ROOT: stateRoot }).status, 0, 'a second init keeps what the first made');
+});
+
 test('init in a git repo with zero commits reports gitHeadless: true', () => {
   const cwd = initHeadlessGitCwd();
   const result = run(cwd, ['init']);
@@ -231,6 +242,13 @@ test('rebuild reconstructs state.json from the log alone after the view file is 
   assert.equal(result.status, 0);
   assert.deepEqual(foldedView(cwd), before);
   assert.ok(rawPersistedView(cwd).cursor, 'the rebuilt view carries the cursor it was folded to');
+  // The answer is a per-consumer summary, never the views themselves.
+  const { rebuilt } = envelopeData(result.stdout);
+  assert.deepEqual(rebuilt.map((entry) => entry.consumer), ['work', 'porting']);
+  assert.equal(rebuilt[0].counts.work, 2);
+  assert.equal(rebuilt[0].counts.decisions, 0);
+  assert.equal(rebuilt[0].revision, before.revision);
+  assert.equal(result.stdout.includes('"title"'), false, 'no item of the view is printed');
 });
 
 test('rebuild reconstructs state.json from the log alone when the view file still exists but is stale (not deleted)', () => {
@@ -257,34 +275,6 @@ test('rebuild reconstructs state.json from the log alone when the view file stil
   assert.equal(result.status, 0);
   assert.deepEqual(foldedView(cwd), freshFromLog);
   assert.ok(rawPersistedView(cwd).cursor, 'the rebuilt view carries the cursor it was folded to');
-});
-
-test('repair fixes a truncated final line via the real CLI, log becomes readable and usable again', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'before-truncation');
-  const before = eventLines(cwd).length;
-  fs.appendFileSync(logPath(cwd), '{"seq":99,"partial', 'utf8');
-
-  const repaired = run(cwd, ['repair']);
-  assert.equal(repaired.status, 0);
-  assert.equal(eventLines(cwd).length, before);
-
-  const list = run(cwd, ['list']);
-  assert.equal(list.status, 0);
-  assert.ok(envelopeData(list.stdout).work['before-truncation']);
-});
-
-test('repair refuses mid-file corruption via the real CLI (valid, corrupt, valid), exit 5, log left untouched', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'a');
-  addOk(cwd, 'b');
-  const [firstLine, secondLine] = eventLines(cwd);
-  fs.writeFileSync(logPath(cwd), `${firstLine}\nnot json either\n${secondLine}\n`, 'utf8');
-  const before = fs.readFileSync(logPath(cwd), 'utf8');
-
-  const result = run(cwd, ['repair']);
-  assert.equal(result.status, 5);
-  assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), before);
 });
 
 test('init with no other harness present still writes .fgos/coexistence.json with an empty detected_harnesses', () => {

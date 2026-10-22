@@ -226,6 +226,25 @@ test('disconnected-worktree guard: "knowledge attest" is refused, "knowledge sta
   }
 });
 
+test('disconnected-worktree guard: "events sync"/"events migrate" and "rebuild" are refused, "events status"/"events export" are unaffected', () => {
+  const main = initGitCwdMainWithCommittedFgos();
+  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-events');
+  try {
+    for (const args of [['events', 'sync'], ['events', 'migrate'], ['rebuild']]) {
+      const result = run(wt, args);
+      assert.equal(result.status, 4, `${args.join(' ')}: ${result.stderr}`);
+      assert.match(result.stderr, /disconnected snapshot/);
+    }
+    // The read verbs reach their own handlers, which answer for their own reasons (here: a store that is not
+    // set up for the Event Store), never this guard's message.
+    for (const args of [['events', 'status'], ['events', 'export', '--out', 'export-dir']]) {
+      assert.doesNotMatch(run(wt, args).stderr, /disconnected snapshot/, args.join(' '));
+    }
+  } finally {
+    execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
+  }
+});
+
 test('disconnected-worktree guard: "coordination run"/"coordination launch-master-loop" are refused, "coordination show"/"coordination chain" are unaffected', () => {
   const main = initGitCwdMainWithCommittedFgos();
   const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-coordination');

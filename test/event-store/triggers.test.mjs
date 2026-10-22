@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { maintainEventStore } from '../../src/event-store/maintenance.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
@@ -103,4 +103,32 @@ test('a CLI verb that opens the store runs both triggers on maintenance facts an
   assert.equal(JSON.parse(out).contract, 'fgos.v1');
   const calls = fs.readFileSync(spy, 'utf8').trim().split('\n');
   assert.deepEqual(calls, ['maintenance', 'maintenance'], 'one fact read at the start and one at the end, nothing else');
+});
+
+test('`events status` runs through the CLI under both triggers, and `events migrate` opens the store through none', (t) => {
+  const { temp, repo, dir } = workRepo(t);
+  const spy = path.join(temp, 'native-calls.log');
+  const preload = path.join(temp, 'spy.mjs');
+  const root = path.resolve(import.meta.dirname, '../..');
+  fs.writeFileSync(preload, `
+    import fs from 'node:fs';
+    import { loadNativeAddon } from ${JSON.stringify(path.join(root, 'src/git/native.mjs'))};
+    const proto = loadNativeAddon().EventStore.prototype;
+    const original = proto.maintenance;
+    proto.maintenance = function (...args) { fs.appendFileSync(${JSON.stringify(spy)}, 'maintenance\\n'); return original.apply(this, args); };
+  `);
+  const cli = (args) => {
+    fs.rmSync(spy, { force: true });
+    const result = spawnSync(process.execPath, ['--import', preload, path.join(root, 'bin/fgos.mjs'), ...args, '--dir', dir], {
+      cwd: repo, encoding: 'utf8', env: { ...process.env, FGOS_DISPATCH_DEPTH: '1' },
+    });
+    return { ...result, calls: fs.existsSync(spy) ? fs.readFileSync(spy, 'utf8').trim().split('\n') : [] };
+  };
+  const status = cli(['events', 'status']);
+  assert.equal(status.status, 0, status.stderr);
+  assert.equal(JSON.parse(status.stdout).data.remote, 'origin');
+  assert.deepEqual(status.calls, ['maintenance', 'maintenance'], 'the verb opens the store: one trigger at each end');
+  // Whatever migrate answers in a fixture with nothing to import, no trigger opened the store around it.
+  assert.deepEqual(cli(['events', 'migrate', '--check']).calls, []);
+  assert.match(cli(['events', 'nonsense']).stderr, /events requires sync\|status\|export\|migrate/);
 });

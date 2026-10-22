@@ -45,19 +45,9 @@ function tmpDir() {
 // direct, honest way to get there, the same technique `addLegacyWork`
 // above already uses for a different since-tightened rule.
 function moveToDurableDoingForTest(dir, id, from = 'todo') {
-  // Must land in the CURRENT writer identity's own open file under
-  // .fgos/events/ (TA-D2/TA-D11) via resolveWriterLogPath — never the
-  // frozen baseline events.jsonl (TA-D12), and never a hardcoded path that
-  // could collide with a DIFFERENT writer's file, which would both violate
-  // "each writer identity gets its own file" and, if the earlier write
-  // lands in the same millisecond, tie-break to the wrong file-sort order
-  // (TA-D7) and sort this work.move BEFORE the work.add it must follow.
+  // Appends the claim move through the Work gate, as the current writer identity.
   appendWorkEvent(dir, { type: 'work.move', payload: { id, from, to: 'doing' } }, dir);
-  // Force a fresh rebuild right away — closes a real timestamp-granularity
-  // race where a subsequent moveWork's own CAS read (currentView's T4
-  // incremental fast path, mtime-based staleness detection) could still
-  // see the pre-append state.json snapshot when this append and the
-  // preceding addWork/addSampleWork land within the same mtime bucket.
+  // Refresh the cached view right away so the next moveWork reads the state this append produced.
   rebuild(dir);
 }
 

@@ -5,6 +5,7 @@
 // import/helper đổi cho khớp phần nào file này thật sự dùng.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
+import { EVENT_STORE_DEFAULTS } from '../../src/event-store/index.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 import {
@@ -227,7 +228,7 @@ test('config-not-stale passes when the existing config already has every default
       gateway: { port: 4170, token: null },
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
       docRegistry: DEFAULT_DOC_REGISTRY_SETTINGS,
-      eventStore: { remote: 'origin' },
+      eventStore: EVENT_STORE_DEFAULTS,
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);

@@ -29,7 +29,7 @@ const stagedHosts = [];
 after(() => { for (const dir of stagedHosts) fs.rmSync(dir, { recursive: true, force: true }); });
 const UNIX = process.platform !== 'win32';
 const STORE_URL = new URL('../../src/state/store.mjs', import.meta.url).href;
-const EVENTS_URL = new URL('../../src/state/events.mjs', import.meta.url).href;
+
 const HOT_LOCK_URL = new URL('../../src/state/hot-lock.mjs', import.meta.url).href;
 const CLAIMS_URL = new URL('../../src/state/runtime-coordination.mjs', import.meta.url).href;
 const CLAIM_PORT_URL = new URL('../../src/runner/claim-port.mjs', import.meta.url).href;
@@ -92,7 +92,6 @@ function childEnv({ wrapper, manifestPath }, extra = {}) {
 
 const WRITE_PATHS = `
 const store = await import(${JSON.stringify(STORE_URL)});
-const events = await import(${JSON.stringify(EVENTS_URL)});
 const claims = await import(${JSON.stringify(CLAIMS_URL)});
 const claimPort = await import(${JSON.stringify(CLAIM_PORT_URL)});
 const porting = await import(${JSON.stringify(PORTING_URL)});

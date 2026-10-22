@@ -1,4 +1,4 @@
-// Dormant setup fixes. Git RepositoryConfig remains the sole Git config writer.
+// Event Store setup fixes, registered in src/setup/registrations.mjs. Git RepositoryConfig remains the sole Git config writer.
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';

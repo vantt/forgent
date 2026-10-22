@@ -9,7 +9,6 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { withStateTx, hotPaths, readHotRecord, HotLockError } from '../../src/state/hot-lock.mjs';
-import { readEvents } from '../../src/state/events.mjs';
 
 function fixture() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-hot-tx-'));
