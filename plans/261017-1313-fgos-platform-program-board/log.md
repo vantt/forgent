@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 13:40 (phiên `forgent-35`, owner "1a,2a,4c" rồi "ok luôn" cho câu 3): **OPC: owner chốt phân xử.** Làm Phase A (bỏ poll 2 ms, chặn treo sau `kill_all`, `containment-mount-refused`, vá E4 trên `linux-pgroup`, một bộ conformance chung); Phase B (anchor) hoãn tới điều kiện kích hoạt ở §4 báo cáo; lệnh đọc giữ pid namespace; HARDEN T2 duyệt diff Git. Bước tiếp: plan thi công A, trình owner duyệt trước khi code. Đảo lại nếu: điều kiện kích hoạt B xảy ra, hoặc owner muốn nhanh hơn sau A (khi đó xét phương án lai "pgroup khi không có submodule" trước B).
+
 - 2026-10-22 14:55 (phiên `forgent-35`): **OPC ← HARDEN: HARDEN nhận vai duyệt diff phần Git của OPC** (A1/A2/A4, nhánh contained của `driver.rs`) nếu owner chọn Q4(c) của [phân xử](../reports/council-261022-1251-opc-arbitration.md). Đảo lại nếu: owner chọn khác ở Q4.
 
 - 2026-10-22 14:45 (phiên `forgent-35`): **OPC: hội đồng xong, phân xử chờ owner** ([báo cáo](../reports/council-261022-1251-opc-arbitration.md)). Số đo: bwrap +2,3 ms/lệnh con, poll 2 ms +1,4 ms; mọi git con trong bwrap là lệnh đọc; anchor +0,13 ms/lệnh con, mở 2–3 ms. Đề xuất A (sửa trong hình dạng hiện có) ngay, B (anchor) hoãn có điều kiện; bác bỏ bỏ pid namespace cho lệnh đọc vì `status` chạy filter của submodule. Bàn giao: tên `containment-mount-refused` → HARDEN T1 (đã ghi main); đo lại R2 → HARDEN T2 (đã ghi); TEST duyệt bộ conformance; hai việc cho GIT ghi ở dòng OPC. Đảo lại nếu: owner chọn khác ở Q1–Q4 của báo cáo.

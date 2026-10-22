@@ -119,6 +119,8 @@ A1 and A2 move the contained branch in `packages/git/rust/src/driver.rs` and nee
 
 ## 8. Questions for the owner
 
+**Owner answers, 2026-10-22 13:30–13:40:** Q1 (a) Phase A1–A5; Q2 (a) defer B with the §4 trigger; Q3 (a) reads keep kernel containment (after the trade-off of (b) and the hybrid "pgroup only without submodules" was explained; hybrid noted as the better next step than B if more speed is wanted after A); Q4 (c) HARDEN T2 (`forgent-a8`) reviews OPC's Git-area diffs.
+
 **Q1. Phase A: approve?**
 - **Chuyện gì:** five corrections in today's shape: the poll, a hang, R3 naming, the E4 gap on pgroup, and one conformance suite.
 - **Nguyên nhân:** measured (E2) and verified defects (E6, E7, E8).
