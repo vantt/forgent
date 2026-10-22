@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "0bf1f3edae95567423645d422988d35d825335b5e7ab108cfa7a874550d1ccbf",
+  "payloadDigest": "12b562975d338baeb9ca037a64e52dd570f632a78c0ec78bdd77a9588bbc30ae",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
