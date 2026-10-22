@@ -79,7 +79,6 @@
   "parameters": {
     "killWaitMs": {
       "default": 2000,
-      "config": "lock.predecessorKillWaitMs",
       "meaning": "only bounds the wait for processes that were already terminated to be signaled"
     }
   },

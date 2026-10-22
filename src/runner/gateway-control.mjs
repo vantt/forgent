@@ -92,7 +92,7 @@ function signalGateway(entry, signal) {
  * where holders cannot be listed. Diagnostic only, for the timeout message. */
 function lockHolderPid(name, params) {
   const holders = lockHolders(name, params);
-  return holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
+  return holders.kind === 'list' && holders.holders.length > 0 ? holders.holders[0].pid : null;
 }
 
 /** Blocking exclusive acquire of the `gateway` kernel lock. Waits until it

@@ -80,7 +80,7 @@ Rust chỉ sở hữu policy tĩnh của ghế; Execution Core Node giữ placem
 | flagship | phán đoán, thiết kế, phê bình | kết quả là một ý kiến hay một thiết kế? | review, red-team, thiết kế giải pháp, synthesis của panel |
 | frontier | quyết định đắt nhất | khó đảo, đắt nếu sai? | khoá kiến trúc, synthesis cuối của hội đồng quan trọng |
 
-Bảng là một hằng trong crate cạnh từ vựng tier (`TIER_STRENGTH`). `fgos setup` ghi nó thành khoá `"$comment"` cạnh `modelPolicies`, `tierFallback`, `maxTier`; loader bỏ qua `$comment` ở mọi cấp; doctor báo `$comment` khác nguồn; `explain` in định nghĩa tier của ghế. `$comment` bị gỡ trước khi validate và trước hash config ngữ nghĩa.
+Bảng là một file hợp đồng chung `packages/seat-binding/contracts/seat-binding.tier-ladder.v1.json` (tên tier, độ mạnh, định nghĩa); crate nhúng nó lúc build (`tier.rs`), loader config Node đọc cùng file đó cho `MODEL_POLICY_TIERS`, nên hai bên không thể lệch. `fgos setup` ghi nó thành khoá `"$comment"` cạnh `modelPolicies`, `tierFallback`, `maxTier`; loader bỏ qua `$comment` ở mọi cấp; doctor báo `$comment` khác nguồn; `explain` in định nghĩa tier của ghế. `$comment` bị gỡ trước khi validate và trước hash config ngữ nghĩa.
 
 ### 5.2 Rigor tách khỏi tier
 
@@ -136,6 +136,7 @@ Tên tier sai trong config là lỗi load. Việc hạ tier duy nhất từng x�
 - Cửa (ranh admission hoặc invocation) tính một `raiseAuthorized` đáng tin; crate không bao giờ đọc `override.origin`. Quyền mặc định là agent. Cùng cổng này điều khiển `acceptDependence` (trước đợt `bind.mjs:385` tin `origin === 'human-cli'`).
 - Trước đợt `human-cli` là chuỗi tự khai: `bin/fgos.mjs:2851` gán cho mọi override không có origin; `:2862/:2878/:2889` tổng hợp cho `--effort`, `--timeout`, `--account`; `src/workflow/unit-handoff.mjs:198` tổng hợp trong handoff workflow.
 - **Đợt đầu:** không cửa nào chứng thực được con người cho `fgos run` trực tiếp (mục 13), nên `raiseAuthorized` là false ở mọi cửa. Tier chỉ tăng qua config project đã commit (khoá tier, `maxTier`) hoặc khuyến nghị workflow. `fgos run --tier`/`--override` nâng tier bị từ chối `tier-escalation-unauthorized`; `--effort`, `--timeout`, `--account` vẫn chạy vì không phải nâng tier.
+- `--capability` và `--persona` trên `fgos run "<prompt>"` là khai báo của chính unit (như cùng khoá trong file `--unit`), không phải nâng tier: tier của capability hay persona đó đã nằm trong config project đã commit nên được nhận. Chỉ `--tier`/`--override` nâng tier bị từ chối.
 - **Mục sau:** nâng qua consent gate của workflow, trả lời bằng `fgos workflow answer --approve`, digest subject của nó phủ ghế và tier xin.
 
 ## 6. Cấu hình
@@ -397,7 +398,7 @@ Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker 
 Đây là bằng chứng hiện hành tại HEAD lúc duyệt (trước đợt triển khai), không phải hợp đồng; trạng thái sau triển khai ở mục 16 và 17. Bản đầy đủ: [bản nháp hợp nhất](../../plans/reports/spec-draft-261020-2028-seat-binding-component-consolidated.md) mục 11.
 
 - **Effort theo CLI** (`REASONING_EFFORT_CONTROLS`, `provider-adapter.mjs:255-261`): claude `--effort` (low…max, xhigh); codex không có flag, qua `-c model_reasoning_effort=<v>` và adapter ánh xạ `max` → `xhigh`; pi `--thinking` và omp `--thinking=` (off…max); mọi CLI đã cấu hình render đủ `low, medium, high, max`. agy cài sẵn nhưng chưa cấu hình; grok chưa có ánh xạ; gemini chưa cài.
-- **Không có đầu vào chứng thực con người** cho `fgos run` trực tiếp: `bin/fgos.mjs:2851`, `:2862`, `:2878`, `:2889`, `unit-handoff.mjs:198` tự gán `human-cli`, `bind.mjs:385` tin nó; Session Identity chỉ cho biết phiên nào ghi (`docs/platform/session-identity/spec.md:52`). Cửa mạnh nhất hiện có là consent gate của workflow (`case-verbs.mjs:167-184, 222-233`, `case-runtime.mjs:176-209`, `case-admission.mjs:153-160`); bản ghi của nó không mang identity người trả lời (`case-runtime.mjs:193`) nên tin theo quy ước.
+- **Không có đầu vào chứng thực con người** cho `fgos run` trực tiếp: `bin/fgos.mjs:2851`, `:2862`, `:2878`, `:2889`, `unit-handoff.mjs:198` tự gán `human-cli`, `bind.mjs:385` tin nó; Session Identity chỉ cho biết phiên nào ghi (`docs/platform/identity/spec.md:52`). Cửa mạnh nhất hiện có là consent gate của workflow (`case-verbs.mjs:167-184, 222-233`, `case-runtime.mjs:176-209`, `case-admission.mjs:153-160`); bản ghi của nó không mang identity người trả lời (`case-runtime.mjs:193`) nên tin theo quy ước.
 - **Herdr và `confinement: required`:** thoả lúc bind (`confinement/policies.mjs:682-701, 717-744`; `codex-herdr` và `claude-herdr-bwrap` khai `backend: bwrap`); confinement authority vẫn ghi `herdr-partial-maturity` và IPC host nằm ngoài phạm vi (`confinement/authority.mjs:424-468`).
 - **Một executor mỗi family:** doctor `executor-family-unique` có thật (`src/setup/registrations.mjs:1473`).
 - **Đã đo khi triển khai (2026-10-21):** exec cost của facade Shape S trên host release, config 22 KB, một ghế: p50 3.71 ms, p95 4.23 ms; ngân sách (hai lần p95 của `identity`, 5.02 ms) đạt. Host debug của dev door không đạt (p95 6.76 ms): ngân sách tính trên host đã kích hoạt. Ba ghế panel một vòng: 3 exec, p50 11.5 ms, p95 15.5 ms. Seat Binding không exec dưới provider lock (test exec-budget). Số đo ở báo cáo phase 04 và 08.
@@ -434,6 +435,7 @@ Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker 
 - **Điều kiện đảo:** mục 14.
 - **Ranh giới:** đã đổi cùng đợt: hàng Execution Core của [component-boundary](../platform/component-boundary.md) không còn quyền chọn ghế; Seat Binding có hàng riêng.
 - **Bằng chứng:** mục 13; bản nháp, báo cáo hội đồng, inventory và nghiên cứu ladder ở mục 16.
+- **Cập nhật 2026-10-22 (SEAT lead):** `--capability`/`--persona` gõ ở cửa `fgos run "<prompt>"` không còn bị coi là nâng tier; cơ chế selector của cửa (crate chỉ giữ persona do override gọi tên) bị xoá. Lý do: mục 5.5 chỉ gọi tên `--tier`/`--override`; tier của `docs:write` = flagship là config đã commit; công thức docs đã duyệt `fgos run "<prompt>" --capability docs:write` bị từ chối `tier-escalation-unauthorized`; phân biệt gõ ở cửa với khai trong file unit không bảo vệ điều gì. Điều kiện đảo: owner muốn giá trị gõ ở cửa bị coi là nâng tier.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
 ## 16. Pointers
@@ -441,9 +443,9 @@ Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker 
 - Nguồn đã duyệt: [bản nháp hợp nhất rev 2](../../plans/reports/spec-draft-261020-2028-seat-binding-component-consolidated.md); lịch sử so sánh: [bản nháp đầu](../../plans/reports/spec-draft-261020-1017-seat-binding-component.md), [tổng hợp hội đồng](../../plans/reports/council-261020-1547-seat-binding-spec-review.md), [inventory nhu cầu và cơ chế](../../plans/reports/research-261020-0955-seat-binding-needs-and-mechanisms-inventory.md), [ladder tier theo family](../../plans/reports/research-261020-1339-model-family-tier-ladders.md). Chúng là record trạng thái, không phải hợp đồng; hợp đồng là spec này.
 - Spec chủ liên quan: [runner.md](runner.md) (Execution Core, `bind()`, các RUL bị supersede một phần), [workflow.md](workflow.md) (khai ghế tường minh, admission, trần launch).
 - Ranh giới component: [../platform/component-boundary.md](../platform/component-boundary.md).
-- Session Identity (mẫu route nội bộ cho facade): [../platform/session-identity/spec.md](../platform/session-identity/spec.md).
+- Session Identity (mẫu route nội bộ cho facade): [../platform/identity/spec.md](../platform/identity/spec.md).
 - Triển khai (con trỏ, logic nằm ở mã và ở spec này):
-  - Crate `fgos-seat-binding`: `packages/seat-binding/rust` (hai stage thuần, `tier.rs` là hằng ladder), vector vàng `packages/seat-binding/contracts/seat-binding.golden.v1.json`.
+  - Crate `fgos-seat-binding`: `packages/seat-binding/rust` (hai stage thuần, `tier.rs` đọc file ladder chung), vector vàng `packages/seat-binding/contracts/seat-binding.golden.v1.json`.
   - Route host `fgos internal seat-binding bind|ladder --protocol 1` (`apps/fgos/src/main.rs`); client Node `src/seat-binding/client.mjs` (fail closed, host kích hoạt trong release đã kích hoạt, từ chối khi đang giữ state lock).
   - Facade `src/runner/execution/bind.mjs` (`bind`, `explainSeat`; chỉ thu `launchView`, `accountView`), resolver ghế `seat-resolver.mjs`, ledger `seat-ledger.mjs`, đường đọc legacy `legacy-seat-read.mjs`, `dry-bind.mjs`.
   - Lease `acquireNamedAccountLease` và `auditLeaseReceipt` trong `src/runner/dispatch/provider-capacity.mjs`; mã lỗi `provider-capacity-lease-conflict` (`run-result.mjs`).

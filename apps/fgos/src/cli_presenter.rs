@@ -79,6 +79,10 @@ pub fn present_error(err: &ProviderError) -> i32 {
 pub fn present_outcome(outcome: &ProviderOutcome) -> i32 {
     match outcome {
         ProviderOutcome::Completed { output, .. } => {
+            if let Some(refusal) = output.downcast_ref::<fgos_identity::Refusal>() {
+                eprintln!("fgos: error: {} [{}]", refusal.detail, refusal.reason);
+                return fgos_identity::Refusal::EXIT;
+            }
             let formatted =
                 if let Some(show) = output.downcast_ref::<fgos_distribution::BuildShowOutcome>() {
                     if let Some(runtime) = &show.runtime {

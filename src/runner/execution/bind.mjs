@@ -18,7 +18,7 @@ import { MODEL_POLICY_TIERS, RunnerConfigError, assertReasoningEffort, assertRun
 import { credentialSourceForCli, credentialStoreOf, providerAccountInventory, readAccountStates } from '../dispatch/provider-capacity.mjs';
 import { parseTierCell } from '../dispatch/tier-cell.mjs';
 import { legacyStateKey } from '../dispatch/llm-accounts.mjs';
-import { DEFAULT_RUN_CAPABILITY, PRODUCER_POSTURE, capabilityEntriesOf, effectiveRigorOf } from './seat-resolver.mjs';
+import { PRODUCER_POSTURE, capabilityEntriesOf, effectiveRigorOf } from './seat-resolver.mjs';
 import { seatBinding } from './seat-policy.mjs';
 
 export const BIND_CONTRACT_VERSION = 'v1alpha1';
@@ -68,8 +68,8 @@ export function getProviderFamily(runnerConfig, executorId) {
 /**
  * The persona that sits a seat, and where it came from: an override's, else the seat's own, the
  * unit's, the locked one, the capability's default (its exact entry, then its prefix entry).
- * `base` is the same chain without the persona a door selected, which is what the tier is judged
- * against before the selection (a persona a door picks that lifts the tier is a raise).
+ * `base` is the same chain without the persona an override named, which is what the tier is judged
+ * against before the selection (an override persona that lifts the tier is a raise).
  */
 function resolvePersona({ ask, unit, matchingOverride, capEntries }) {
   const { persona: seatPersona = null, lockedPersona = null } = ask ?? {};
@@ -88,7 +88,7 @@ function resolvePersona({ ask, unit, matchingOverride, capEntries }) {
     if (capDefault) return { persona: capDefault.entry.persona, source: `capability:${capDefault.key}` };
     return { persona: null, source: 'none' };
   };
-  const selected = ask?.selectors?.persona ?? matchingOverride?.persona ?? null;
+  const selected = matchingOverride?.persona ?? null;
   const chosen = matchingOverride?.persona
     ? { persona: matchingOverride.persona, source: overrideSource(matchingOverride) }
     : chain(null);
@@ -244,6 +244,13 @@ function crateOverrideOf(override) {
   return Object.keys(out).length > 0 ? out : undefined;
 }
 
+/** The session lead that may run a seat inline: a lead is in the session and the seat's posture allows it. */
+function inlineLeadOf(seatPosture, session, runnerConfig) {
+  if (!seatPosture.inlineAllowed || session.headless || !(session.hasNativeAgent || session.provider)) return undefined;
+  const executor = session.provider ?? 'lead';
+  return { executor, family: getProviderFamily(runnerConfig, executor) };
+}
+
 /**
  * Everything the crate is asked for one seat. Throws RunnerConfigError for an override no seat could take
  * (an unknown tier or effort name); returns `{ refused }` for a persona conflict.
@@ -282,12 +289,7 @@ function requestOf(ask, ctx, walk) {
   const persona = resolvePersona({ ask, unit, matchingOverride, capEntries: capabilityEntriesOf(runnerConfig, unit?.capability) });
   if (persona.refused) return { refused: persona.refused };
 
-  const doorSelectors = ask?.selectors ?? {};
-  const selectors = {
-    ...(persona.selected ? { persona: persona.selected } : {}),
-    ...(doorSelectors.seat ? { seat: doorSelectors.seat } : {}),
-    ...(doorSelectors.capability ? { capability: doorSelectors.capability } : {}),
-  };
+  const selectors = persona.selected ? { persona: persona.selected } : {};
   // Only roles that do the unit's work are asked for its skills; a checker or panel seat reads the result.
   const requiredSkills = !seatPosture.forceOutOfProcess && Array.isArray(unit?.skills) ? unit.skills : [];
   // A hard `independentOf` names executors (or seats not bound yet): the crate compares provider families.
@@ -300,9 +302,9 @@ function requestOf(ask, ctx, walk) {
     const at = peers.findIndex((known) => known.seat === entry.seat);
     if (at >= 0) peers[at] = entry; else peers.push(entry);
   }
+  const inlineLead = inlineLeadOf(seatPosture, session, runnerConfig);
   const crateAsk = {
-    // A door that names the capability changes it: the ask carries what the door would have run without it.
-    capability: selectors.capability ? DEFAULT_RUN_CAPABILITY : unit?.capability,
+    capability: unit?.capability,
     seat,
     role,
     ...(persona.base ? { persona: persona.base } : {}),
@@ -316,10 +318,11 @@ function requestOf(ask, ctx, walk) {
     independence: { hard, hardCheckers: [], soft: peers.map((peer) => peer.seat) },
     requiredSkills,
     unitPrefer: unitPreferOf(unit?.prefer),
+    ...(inlineLead ? { inlineLead } : {}),
   };
   const launchView = launchViewOf(runnerConfig, session);
   return {
-    persona, matchingOverride, posture, isReadOnlyPosture, requiredSkills, launchView,
+    persona, matchingOverride, posture, isReadOnlyPosture, launchView,
     request: {
       ask: crateAsk,
       runnerConfig,
@@ -392,40 +395,18 @@ function fallbackFrom(previous, binding, { reason, rotation, detail, runnerConfi
 }
 
 function bindingOf({ out, prep, ask, ctx, walk }) {
-  const { unit, seat = 'producer', posture: seatPosture = PRODUCER_POSTURE, blind = false } = ask ?? {};
+  const { unit, seat = 'producer', posture: seatPosture = PRODUCER_POSTURE } = ask ?? {};
   const { runnerConfig = {}, session = {} } = ctx ?? {};
-  const { persona: personaChoice, matchingOverride, posture, isReadOnlyPosture, requiredSkills, launchView } = prep;
+  const { persona: personaChoice, matchingOverride, posture, isReadOnlyPosture, launchView } = prep;
   const executors = executorsOf(runnerConfig);
   const { policy, ranked } = out;
   // Stage 1 refused (a tier no cell serves, a raise no door may make): there is nothing to rank.
   if (!ranked) return { refused: refusalOf(out.refusal, { session, unit }) };
 
-  let cand = ranked.candidates[0];
-  let inlineFallback = false;
-  if (!cand) {
-    // The session lead runs a seat that may run inline only when the unit configured no candidate at all.
-    const unconfigured = out.refusal?.reason === 'no-candidate' && (out.refusal.configured ?? 0) === 0;
-    const isLeadPresent = !session.headless && (session.hasNativeAgent || session.provider);
-    if (unconfigured && seatPosture.inlineAllowed && isLeadPresent && !blind && requiredSkills.length === 0) {
-      inlineFallback = true;
-      const leadId = session.provider ?? 'lead';
-      cand = {
-        executor: leadId,
-        family: getProviderFamily(runnerConfig, leadId),
-        invocation: null,
-        model: null,
-        modelSource: 'no-model-needed',
-        effort: null,
-        effortSource: 'invocation-default',
-        pool: null,
-        mechanism: 'inline',
-        source: 'session-lead-inline',
-        pinned: false,
-      };
-    } else {
-      return { refused: refusalOf(out.refusal ?? { reason: 'no-candidate', detail: 'no candidate' }, { session, unit }) };
-    }
-  }
+  const cand = ranked.candidates[0];
+  if (!cand) return { refused: refusalOf(out.refusal ?? { reason: 'no-candidate', detail: 'no candidate' }, { session, unit }) };
+  // The crate seats the session lead inline when the seat has no candidate configured; nothing launches then.
+  const inlineFallback = cand.mechanism === 'inline';
 
   let timeout;
   try {
@@ -533,7 +514,7 @@ function decide(ask, ctx, walk) {
  *
  * @param {object} ask unit, seat, role, posture, persona, overrides, independentOf (executors or seats the
  *   seat must differ from), preferIndependentOf ([{ seat, executor }] it should differ from), blind,
- *   workflowTier, selectors, raiseAuthorized
+ *   workflowTier, raiseAuthorized
  * @param {object} ctx { runnerConfig, session }
  * @param {object} [options]
  * @param {object} [options.walk] where the seat stands after a failure

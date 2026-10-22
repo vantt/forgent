@@ -18,6 +18,7 @@ pub mod platform;
 
 pub use platform::ProcessPlatform;
 
+use std::time::Duration;
 use facts::{ProcTuple, Verdict};
 
 /// A process id as the OS numbers it. Never a raw `pid_t`: the drivers cast
@@ -159,10 +160,12 @@ impl DomainWatch {
         }
     }
 
-    /// End every process of the domain at once. For `linux-gate` this is
-    /// SIGKILL sent to the gate by identity; a gate that is already gone
-    /// counts as done.
-    pub fn kill_all(&mut self) -> KillOutcome {
+    /// End every process of the domain at once, waiting at most `within` for
+    /// the domain to be empty (`linux-pgroup`, `macos-tree`). For `linux-gate`
+    /// this is SIGKILL sent to the gate by identity and returns at once; a gate
+    /// that is already gone counts as done. `windows-job` terminates the job
+    /// at once. The caller owns the bound; `DEFAULT_EMPTY_WAIT` is the usual one.
+    pub fn kill_all(&mut self, within: Duration) -> KillOutcome {
         match &mut self.inner {
             #[cfg(windows)]
             Watch::Job(view) => view.kill_all(),
@@ -174,8 +177,8 @@ impl DomainWatch {
                     KillOutcome::Refused
                 }
             }
-            Watch::Direct(Domain::LinuxPgroup(leader)) => containment::pgroup_kill(leader),
-            Watch::Direct(Domain::MacosTree(root)) => containment::tree_kill(root),
+            Watch::Direct(Domain::LinuxPgroup(leader)) => containment::pgroup_kill(leader, within),
+            Watch::Direct(Domain::MacosTree(root)) => containment::tree_kill(root, within),
             Watch::Direct(_) => KillOutcome::Refused,
         }
     }
@@ -208,5 +211,14 @@ pub fn domain_is_empty(domain: &Domain) -> DomainState {
 
 /// One-shot [`DomainWatch::kill_all`].
 pub fn domain_kill_all(domain: &Domain) -> KillOutcome {
-    domain_watch(domain).kill_all()
+    let outcome = domain_watch(domain).kill_all(containment::DEFAULT_EMPTY_WAIT);
+    // Answer after the namespace is torn down, as the other drivers answer
+    // after their domain is empty. Watch callers with their own bound (the
+    // predecessor rule) keep the immediate return of `DomainWatch::kill_all`.
+    if let (KillOutcome::Ok, Domain::LinuxGate(gate)) = (&outcome, domain) {
+        if cfg!(target_os = "linux") && gate.start_time != containment::EXITED_GATE {
+            containment::wait_dead(gate);
+        }
+    }
+    outcome
 }

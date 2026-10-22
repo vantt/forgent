@@ -2,10 +2,10 @@
 use crate::{
     envelope::Scope,
     errors::{invalid, Error},
-    identity::valid_machine_id,
     layout::StreamId,
 };
 use fgos_git::RefName;
+use fgos_identity::machine::valid_machine_id;
 pub fn own_ref(machine: &str, stream: &StreamId) -> Result<RefName, Error> {
     if !valid_machine_id(machine) {
         return Err(invalid("invalid ref machine"));

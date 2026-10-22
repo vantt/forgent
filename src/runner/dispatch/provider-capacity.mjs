@@ -11,7 +11,6 @@ import { deriveLegacyInventory } from './llm-accounts.mjs';
 import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
 import { resolveHolderLiveness, selfRecord } from './process-identity.mjs';
 import { acquire, acquireSync, createLockScope, lockHolders, resolveLock, resolveLockRoot, runBorrowed } from '../../holder-lock/index.mjs';
-import { noteLockHeld, noteLockReleased } from '../../util/state-lock-held.mjs';
 
 export const PROVIDER_CAPACITY_STATE_CONTRACT = 'provider-capacity-state.v1';
 export const PROVIDER_CAPACITY_SELECTION_CONTRACT = 'provider-capacity-selection.v1';
@@ -394,7 +393,7 @@ function lockParams(extra = {}) {
 
 function firstHolderPid(name, params) {
   const holders = lockHolders(name, params);
-  return holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
+  return holders.kind === 'list' && holders.holders.length > 0 ? holders.holders[0].pid : null;
 }
 
 // The lock's own answers that mean "not yours yet" become the caller-facing ProviderCapacityLockError:
@@ -424,12 +423,9 @@ export function withProviderStateLock(fn, { waitMs = 30_000 } = {}) {
     throw err;
   }
   if (res.result !== 'acquired') throw busy();
-  // While the lock is held a host exec waits: the Seat Binding client and the writer identity refuse to run.
-  noteLockHeld();
   try {
     return fn();
   } finally {
-    noteLockReleased();
     res.handle.release();
   }
 }

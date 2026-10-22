@@ -27,9 +27,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
-import { probe, lockHolders, checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
+import { checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
+import { runLockRouteSync, ROUTE_CALL_TIMEOUT_MS } from '../src/holder-lock/driver.mjs';
 import { readBeacon, judgeBeacon, writeBeacon, DEFAULT_BEACON_WINDOW_MS } from '../src/runner/main-checkout-activity.mjs';
-import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -105,6 +105,23 @@ function resolveTtlMs() {
   return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : DEFAULT_BEACON_WINDOW_MS;
 }
 
+// The hook is a cold client of the activated host: the lock and the writer
+// identity are answered by native routes of the binary `resolveActiveHostBin`
+// finds (`fgos internal lock-fd --shared-try`, `fgos identity`), never by lock
+// code loaded from this checkout (the in-process door refuses there).
+const HOST_CALL_TIMEOUT_MS = 20_000;
+
+function identityData(bin, args, cwd) {
+  const env = { ...process.env };
+  delete env.FGOS_INVOCATION_RECORD_PATH;
+  const stdout = execFileSync(bin, args, {
+    env, cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: HOST_CALL_TIMEOUT_MS, killSignal: 'SIGKILL', maxBuffer: 1024 * 1024, windowsHide: true,
+  });
+  const envelope = JSON.parse(stdout);
+  if (envelope?.contract !== 'fgos.v1' || envelope.data === null || typeof envelope.data !== 'object') throw new Error(`${bin} ${args[0]} printed an unexpected answer: ${stdout.slice(0, 200)}`);
+  return envelope.data;
+}
+
 // mainLockVerdict: what the main-checkout mutex says about this commit,
 // read once and never waiting (git already holds index.lock while this hook
 // runs, and a land takes the mutex before git's index.lock, so waiting here
@@ -112,12 +129,19 @@ function resolveTtlMs() {
 //   - 'borrower': fgOS's own commit. git inherited the holder's description
 //     at slot 3 (FGOS_LOCK_FD names it) and the host confirms it is the very
 //     description holding the lock. A sibling that merely shares the env but
-//     opened the lock file itself is not a borrower.
+//     opened the lock file itself is not a borrower. Asked before the probe:
+//     a borrowed commit runs while the holder holds the lock, so the probe
+//     alone would refuse it.
 //   - 'held': another process holds the mutex: refuse.
 //   - 'free': nobody holds it: an ordinary commit.
-// Without a usable host binary no fgOS writer can hold the mutex either, so
-// the commit proceeds with a warning; any other failure refuses (fail-closed).
-function mainLockVerdict(fgosDir) {
+// The probe is `fgos internal lock-fd --shared-try` on a fresh description of
+// the lock file: one non-blocking shared try, so it never waits on the lock
+// and never obstructs a holder; it is a native route (a process boundary the
+// hook cannot cross in process), a millisecond, not a Node start. Without a
+// host binary no fgOS process can hold the mutex either (every holder runs
+// inside a release), so the commit proceeds with a warning; any other failure
+// refuses (fail-closed).
+function mainLockVerdict(fgosDir, bin) {
   const lockPath = resolveLock('main-checkout', { fgosDir }).v3Path;
   if (process.env[LOCK_FD_ENV]) {
     try {
@@ -126,18 +150,25 @@ function mainLockVerdict(fgosDir) {
       // A stale variable (slot 3 not open) or an unusable host: not a borrower; the probe below decides.
     }
   }
+  if (!bin) {
+    process.stderr.write('warning: the main-checkout lock could not be checked (no fgos host binary found); continuing.\n');
+    return { kind: 'free' };
+  }
+  let fd;
   try {
-    return { kind: probe('main-checkout', { fgosDir }).result };
+    fd = fs.openSync(lockPath, fs.constants.O_RDWR);
   } catch (err) {
-    if (err?.code === 'lock-driver-unavailable') {
-      // No host binary can answer, but the kernel still lists who holds the
-      // lock file: refuse when somebody does, continue only when nobody does.
-      const holders = lockHolders('main-checkout', { fgosDir });
-      if (holders.kind === 'list' && holders.pids.length > 0) return { kind: 'held' };
-      process.stderr.write(`warning: the main-checkout lock could not be checked (${err.message}); continuing.\n`);
-      return { kind: 'free' };
-    }
+    // A lock file that does not exist was never taken: nobody holds it.
+    return err?.code === 'ENOENT' ? { kind: 'free' } : { kind: 'error', message: err?.message ?? String(err) };
+  }
+  try {
+    const { result, detail } = runLockRouteSync({ bin, args: ['--shared-try'], fd, timeoutMs: ROUTE_CALL_TIMEOUT_MS });
+    if (result === 'free' || result === 'held') return { kind: result };
+    return { kind: 'error', message: `the lock route answered ${JSON.stringify(result)}${detail ? `: ${detail}` : ''}` };
+  } catch (err) {
     return { kind: 'error', message: err?.message ?? String(err) };
+  } finally {
+    fs.closeSync(fd);
   }
 }
 
@@ -443,7 +474,8 @@ async function main() {
   }
 
   const fgosDir = path.join(repoRoot, '.fgos');
-  const lockVerdict = mainLockVerdict(fgosDir);
+  const { bin: hostBin, tried } = resolveActiveHostBin({ fgosDir });
+  const lockVerdict = mainLockVerdict(fgosDir, hostBin);
   if (lockVerdict.kind === 'borrower') {
     // fgOS's own commit under the mutex it holds: it neither checks nor
     // writes the activity beacon.
@@ -465,11 +497,16 @@ async function main() {
   // fails open. This file never takes the main-checkout mutex, so a
   // commit never blocks a claim, land or `fgctl init`.
   let writer;
+  if (!hostBin) {
+    refuse(`commit refused: cannot resolve the writer identity (host-missing): no fgos host binary found (tried: ${tried.join('; ')}); run through the \`fgos\` command of an activated workspace, or set FGOS_HOST_BIN to a host binary`);
+    return;
+  }
   try {
-    writer = resolveWriterIdentity(fgosDir);
+    const { id, source } = identityData(hostBin, ['identity', '--json', '--pid', String(process.pid), '--fgos-dir', fgosDir], repoRoot);
+    if (typeof source !== 'string' || (typeof id !== 'string' && !Number.isInteger(id))) throw new Error(`${hostBin} identity printed an unexpected answer`);
+    writer = { id, source };
   } catch (err) {
-    if (err?.name !== 'WriterIdentityError') throw err;
-    refuse(`commit refused: cannot resolve the writer identity (${err.code}): ${err.message}`);
+    refuse(`commit refused: cannot resolve the writer identity (host-error): ${hostBin} identity failed: ${String(err?.stderr ?? err?.message ?? err).trim().slice(0, 500)}`);
     return;
   }
   const now = Date.now();

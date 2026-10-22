@@ -69,7 +69,7 @@ const answers = new Map();
 /**
  * Stage 1 for one seat.
  *
- * @param {object} ask the crate's ask (capability, seat, role, persona, workflow, selectors, raiseAuthorized,
+ * @param {object} ask the crate's ask (capability, seat, role, persona, workflow, selectors (the persona an override names), raiseAuthorized,
  *   override, posture, effectiveRigor, label)
  * @param {object} runnerConfig the merged runner section
  * @returns {{policy: object}|{refused: {reason: string, detail: string, config?: string}}} a refusal is a decision

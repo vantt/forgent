@@ -88,6 +88,7 @@ test('runBorrowed hands the description to git only, kills what the hook left be
   const fgosDir = path.join(dir, '.fgos');
   const repo = path.join(dir, 'repo');
   let bystander = null;
+  const holderPids = () => lockHolders(LOCK, { fgosDir }).holders.map((h) => h.pid);
   try {
     initRepo(repo);
     assert.ok(looseObjectCount(repo) > 0, 'the fixture has loose objects for gc.auto=1 to act on');
@@ -149,7 +150,7 @@ fs.writeFileSync(process.env.HOOK_RESULT, JSON.stringify(result));
     assert.ok(Number.isInteger(leftoverPid) && leftoverPid > 0, 'the hook recorded its background process');
     assert.equal(borrowed.leftoversKilled, 1, 'exactly the hook\'s background process was killed (no gc daemon ran)');
     assert.ok(pidGone(leftoverPid), `background process ${leftoverPid} survived runBorrowed`);
-    assert.deepEqual(lockHolders(LOCK, { fgosDir }), { kind: 'list', pids: [process.pid] }, 'only the holder keeps the description');
+    assert.deepEqual(holderPids(), [process.pid], 'only the holder keeps the description');
     assert.equal(pidGone(bystander.pid), false, 'a process that only opened the lock file was killed by the sweep');
 
     // A sibling with the same env that opens the file itself is not a borrower.
@@ -167,7 +168,7 @@ process.stdout.write(JSON.stringify(result));
     assert.deepEqual(probe(LOCK, { fgosDir }), { result: 'held' }, 'the owner still holds');
     handle.release();
     assert.deepEqual(probe(LOCK, { fgosDir }), { result: 'free' }, 'free the moment git and the owner have closed');
-    assert.deepEqual(lockHolders(LOCK, { fgosDir }), { kind: 'list', pids: [] });
+    assert.deepEqual(holderPids(), []);
     assert.match(git(repo, ['log', '--oneline', '-1']), /borrowed commit/);
   } finally {
     bystander?.kill('SIGKILL');
@@ -178,6 +179,7 @@ process.stdout.write(JSON.stringify(result));
 test('runBorrowed prepends the gc guards to git only, refuses a released handle, and release waits for an async borrow', { skip: SKIP }, async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'holder-lock-borrow-async-'));
   const fgosDir = path.join(dir, '.fgos');
+  const holderPids = () => lockHolders(LOCK, { fgosDir }).holders.map((h) => h.pid);
   try {
     const scope = createLockScope('owner');
     const { handle } = acquireSync(scope, LOCK, { fgosDir });
@@ -201,7 +203,7 @@ test('runBorrowed prepends the gc guards to git only, refuses a released handle,
     const settled = await child.borrowed;
     assert.equal(settled.exit, 0);
     assert.equal(settled.leftoversKilled, 0);
-    assert.equal(handle.release(), true);
+    assert.equal(handle.release().settled, 'released');
     assert.throws(() => runBorrowed(handle, { command: 'true' }), (err) => err.code === 'lock-handle-released');
     assert.deepEqual(probe(LOCK, { fgosDir }), { result: 'free' });
   } finally {

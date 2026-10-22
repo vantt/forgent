@@ -16,7 +16,8 @@ import {
   SEAT_BINDING_TIMEOUT_MS,
 } from '../../src/seat-binding/client.mjs';
 import { golden, caseInput } from './golden-cases.helper.mjs';
-import { noteLockHeld, noteLockReleased } from '../../src/util/state-lock-held.mjs';
+import { MODEL_POLICY_TIERS } from '../../src/runner/dispatch/config.mjs';
+import { enterHotLock } from '../../src/holder-lock/hot-guard.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const HOST_BIN = process.env.FGOS_HOST_BIN;
@@ -53,9 +54,10 @@ test('a refused seat comes back as a result carrying its refusal, not as an exce
   assert.ok(out.hostVersion);
 });
 
-test('the tier ladder comes from the host, six tiers weakest first', () => {
+test('the tier ladder the host answers is the one the Node config loader reads, six tiers weakest first', () => {
   const ladder = createSeatBindingClient({ hostBin: HOST_BIN }).tierLadder();
-  assert.deepEqual(ladder.vocabulary, ['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier']);
+  assert.deepEqual(ladder.vocabulary, MODEL_POLICY_TIERS);
+  assert.equal(MODEL_POLICY_TIERS.length, 6);
   assert.ok(ladder.hostVersion);
 });
 
@@ -67,6 +69,8 @@ test('a host that does not know the route throws host-version-mismatch', () => {
   const old = script('old-host.sh', `echo 'fgos: unknown verb "internal". Usage: fgos <command> [args...]' >&2\nexit 4`);
   expectCode(() => createSeatBindingClient({ hostBin: old }).tierLadder(), 'host-version-mismatch');
   expectCode(() => createSeatBindingClient({ hostBin: old }).bindSeat(golden.base), 'host-version-mismatch');
+  // A request larger than the pipe buffer: the old host exits unread, so writing it fails with EPIPE.
+  expectCode(() => createSeatBindingClient({ hostBin: old }).bindSeat({ ...golden.base, padding: 'x'.repeat(1 << 20) }), 'host-version-mismatch');
 });
 
 test('a host speaking another protocol throws host-version-mismatch', () => {
@@ -111,15 +115,15 @@ test('no host in reach throws seat-binding-no-host-binary naming where it looked
   }
 });
 
-test('a process holding a state lock never execs the host: seat-binding-in-lock', () => {
+test('a process inside the hot mutex never execs the host: seat-binding-in-lock', () => {
   const marker = path.join(scratch, 'exec-marker');
   const host = script('marker-host.sh', `touch '${marker}'\nexit 1`);
-  noteLockHeld();
+  const leaveHotLock = enterHotLock();
   try {
     expectCode(() => createSeatBindingClient({ hostBin: host }).tierLadder(), 'seat-binding-in-lock');
     expectCode(() => createSeatBindingClient({ hostBin: host }).bindSeat(golden.base), 'seat-binding-in-lock');
   } finally {
-    noteLockReleased();
+    leaveHotLock();
   }
   assert.equal(fs.existsSync(marker), false);
 });

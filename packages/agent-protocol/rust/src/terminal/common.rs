@@ -6,6 +6,8 @@
 /// A brief that never landed is worth re-sending a couple of times; one that
 /// never lands twice is a broken transport, not a slow one.
 pub const MAX_RESENDS: u32 = 2;
+/// Key presses spent on a start banner in one wait for the prompt.
+pub const MAX_BANNER_PRESSES: u32 = 2;
 /// An agent UI draws its prompt box before its startup work has finished
 /// taking input: settle time after the prompt first looks ready.
 pub const PROMPT_SETTLE_MS: u64 = 1500;

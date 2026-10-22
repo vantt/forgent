@@ -12,6 +12,8 @@ thiserror.workspace = true
 fgos-git = { path = "../../git/rust" }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
 fgos-durable-file = { path = "../../durable-file/rust" }
+# Library only: the host provider would drag the host runtime into the event log.
+fgos-identity = { path = "../../identity/rust", default-features = false }
 
 [build-dependencies]
 serde_json.workspace = true

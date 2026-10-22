@@ -506,6 +506,234 @@
       },
       "message": "Reply with the single word ok. Do not use any tools.",
       "source": "real mid-turn screen recorded 2026-10-18 from agy on herdr (state working, rule esc_cancel_footer_working)"
+    },
+    {
+      "name": "a-start-banner-is-dismissed-with-esc-and-the-wait-ends-ready-on-the-screen-under-it",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "start-banner"
+          },
+          {
+            "at": 300,
+            "file": "ready"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "ready",
+        "readiness": "ready",
+        "sentKeys": [
+          "esc"
+        ]
+      },
+      "source": "start-banner screen synthesized from the backlog description of agy's banner (no real capture exists; marker wording to be replaced by a real capture); detector verdict copied from the recorded ready screen"
+    },
+    {
+      "name": "a-banner-that-never-goes-away-is-pressed-at-most-twice-and-nothing-is-typed",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "start-banner"
+          },
+          {
+            "at": 1000,
+            "screen": "agy\n\n\n      ▄▀▀▄        Antigravity CLI 1.4.2\n     ▀▀▀▀▀▀       user@example.com (Google AI Pro)\n    ▀▀▀▀▀▀▀▀      Gemini 3.8 Flash (Medium)\n   ▄▀▀    ▀▀▄     /work/project\n  ▄▀▀      ▀▀▄\n\n\n ┃ Meet Gemini 4 Argon\n ┃ A new model is available. Pick it any time in /model.\n ┃ esc to dismiss\n  (1)\n"
+          },
+          {
+            "at": 2000,
+            "screen": "agy\n\n\n      ▄▀▀▄        Antigravity CLI 1.4.2\n     ▀▀▀▀▀▀       user@example.com (Google AI Pro)\n    ▀▀▀▀▀▀▀▀      Gemini 3.8 Flash (Medium)\n   ▄▀▀    ▀▀▄     /work/project\n  ▄▀▀      ▀▀▄\n\n\n ┃ Meet Gemini 4 Argon\n ┃ A new model is available. Pick it any time in /model.\n ┃ esc to dismiss\n  (2)\n"
+          },
+          {
+            "at": 3000,
+            "screen": "agy\n\n\n      ▄▀▀▄        Antigravity CLI 1.4.2\n     ▀▀▀▀▀▀       user@example.com (Google AI Pro)\n    ▀▀▀▀▀▀▀▀      Gemini 3.8 Flash (Medium)\n   ▄▀▀    ▀▀▄     /work/project\n  ▄▀▀      ▀▀▄\n\n\n ┃ Meet Gemini 4 Argon\n ┃ A new model is available. Pick it any time in /model.\n ┃ esc to dismiss\n  (3)\n"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "delivery-unknown",
+        "readiness": "not-ready",
+        "sentKeys": [
+          "esc",
+          "esc"
+        ]
+      },
+      "source": "start-banner screen synthesized from the backlog description of agy's banner (no real capture exists; marker wording to be replaced by a real capture); detector verdict copied from the recorded ready screen",
+      "readyMs": 6000
+    },
+    {
+      "name": "a-stale-frame-right-after-a-press-does-not-trigger-a-second-press",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "start-banner"
+          },
+          {
+            "at": 1400,
+            "file": "ready"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "ready",
+        "readiness": "ready",
+        "sentKeys": [
+          "esc"
+        ]
+      },
+      "source": "start-banner screen synthesized from the backlog description of agy's banner (no real capture exists; marker wording to be replaced by a real capture); detector verdict copied from the recorded ready screen"
+    },
+    {
+      "name": "a-banner-shown-while-the-detector-reports-working-is-still-dismissed",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "start-banner",
+            "inspection": {
+              "state": "working",
+              "visibleWorking": true
+            }
+          },
+          {
+            "at": 300,
+            "file": "ready",
+            "inspection": {
+              "state": "idle",
+              "visibleWorking": false
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "ready",
+        "readiness": "ready",
+        "sentKeys": [
+          "esc"
+        ]
+      },
+      "source": "start-banner screen synthesized from the backlog description of agy's banner (no real capture exists; marker wording to be replaced by a real capture); detector verdict copied from the recorded ready screen"
+    },
+    {
+      "name": "a-banner-shown-with-no-detector-verdict-is-still-dismissed",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "start-banner",
+            "inspection": {
+              "state": null
+            }
+          },
+          {
+            "at": 300,
+            "file": "ready",
+            "inspection": {
+              "state": null
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "ready",
+        "readiness": "no-detector",
+        "sentKeys": [
+          "esc"
+        ]
+      },
+      "source": "start-banner screen synthesized from the backlog description of agy's banner (no real capture exists; marker wording to be replaced by a real capture); detector verdict copied from the recorded ready screen"
+    },
+    {
+      "name": "a-banner-on-the-same-screen-as-the-trust-dialog-is-blocked-and-no-key-is-pressed",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "trust-dialog",
+            "screen": "Accessing workspace:\n\n/tmp/claude-1000/-home-vantt-projects-forgentX--claude-worktrees-tm-p04/4cfd083d-fa66-4c45-94d2-e2af16990f78/scratchpad/cap/agy\n\nDo you trust the contents of this project?\n\nAntigravity CLI requires permission to read, edit, and execute files here.\n\n> Yes, I trust this folder\n  No, exit\n\n  ↑/↓ Navigate · enter Confirm\n                                                                                                                                                                                                                                                                                                                                      Gemini 3.8 Flash · medium\n\n Meet Gemini 4 Argon\n"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "blocked",
+        "reason": "trust-dialog",
+        "readiness": "blocked",
+        "sentKeys": []
+      },
+      "source": "start-banner screen synthesized from the backlog description of agy's banner (no real capture exists; marker wording to be replaced by a real capture); detector verdict copied from the recorded ready screen"
+    },
+    {
+      "name": "a-banner-that-appears-after-the-first-idle-verdict-still-blocks-a-ready-verdict",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": true,
+              "visibleWorking": false,
+              "matchedRule": "idle_prompt"
+            }
+          },
+          {
+            "at": 1000,
+            "file": "start-banner"
+          },
+          {
+            "at": 2300,
+            "file": "ready",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": true,
+              "visibleWorking": false,
+              "matchedRule": "idle_prompt"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "ready",
+        "readiness": "ready",
+        "sentKeys": [
+          "esc"
+        ]
+      },
+      "source": "start-banner screen synthesized from the backlog description of agy's banner (no real capture exists; marker wording to be replaced by a real capture); detector verdict copied from the recorded ready screen"
+    },
+    {
+      "name": "the-ready-screen-with-the-esc-to-dismiss-footer-sends-no-key",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": true,
+              "visibleWorking": false,
+              "matchedRule": "idle_prompt"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "ready",
+        "readiness": "ready",
+        "sentKeys": []
+      },
+      "source": "real ready screen; matched-rule verdict added to model a CLI whose detector has a rule"
     }
   ]
 }

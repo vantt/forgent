@@ -10,6 +10,8 @@ net_size: "Node 0 / Rust 0 / tests 0"
 
 # Phase 07 — Close
 
+> **Merge rule for `packages/process/rust/src/containment/linux.rs` (OPC, 2026-10-22 19:05):** OPC carries T1's bwrap stderr capture on `opc/phase-a` (`ae3b3fa78` test, `14381b0f0` the linux.rs hunk from `fc0cceec5`) with one reshape: `refusal_line` gets its own doc above `end_failed_spawn`'s untouched doc. When T1 merges main after OPC lands, **take OPC's version of those lines** (and OPC's A3 classification on top). Confirm `a_refused_mount_is_named_in_the_containment_error` still passes. OPC's A3 is on main (`579852c4b`, `508e55ef6`): keep `select`'s let-else/if-let shape around `bwrap_path` — a nested `match` there makes the one-door census report 2 extra `unresolved-binary` sites ("? bwrap"); after the merge the census must show only the 5 CFG sites.
+
 ## Context
 
 Parent plan [per-layer loop](../261021-1118-harden-low-layers-bottom-up/plan.md#the-per-layer-loop) steps 6–9, owner decisions 1 and 7 (stop-everything landing; the second machine self-lands in a quiet window after telling GIT/ES and TEST; the owner machine follows a guide at a time the owner picks), [plan.md](plan.md) D-T1-9 (the fence precondition) and Rollback. The [T1 baseline](../reports/research-261022-0138-harden-t1-baseline.md) is the "before" table. The [SEAT landing report](../reports/landing-261022-0904-harden-seat-release-this-machine.md) is the procedure template for this machine.

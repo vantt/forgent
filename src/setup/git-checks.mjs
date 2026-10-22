@@ -20,7 +20,9 @@ const advisoryWorktreeReasons = new Set(['dirty-or-stale-checkout-preserved', 'l
 function context(cwd, loaderOptions) {
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
   const config = mergeWithGlobalConfig(readSharedConfig(root));
-  return { root, remote: config.eventStore?.remote ?? 'origin', stateRoot: resolveStateRoot({ fgosDir: path.join(root, '.fgos') }).stateRoot, native: loadNativeAddon(loaderOptions) };
+  // The addon first: a channel without one reports `addon not shipped` before the door-backed state root is asked.
+  const native = loadNativeAddon(loaderOptions);
+  return { root, remote: config.eventStore?.remote ?? 'origin', stateRoot: resolveStateRoot().stateRoot, native };
 }
 export function checkGit(cwd, kind, loaderOptions) {
   try {

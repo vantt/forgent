@@ -17,7 +17,7 @@ export function gitContext({ worktree, repoRoot, custody, loaderOptions, writer 
 }
 function options(ctx) {
   const fgosDir = path.join(ctx.repoRoot, '.fgos');
-  return { stateRoot: resolveStateRoot({ fgosDir }).stateRoot, repoPath: ctx.worktree,
+  return { stateRoot: resolveStateRoot().stateRoot, repoPath: ctx.worktree,
     trustedMain: ctx.repoRoot, writer: ctx.writer ?? gitWriter(fgosDir) };
 }
 const held = ctx => ctx.custody ? [ctx.custody] : [];

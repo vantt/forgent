@@ -21,8 +21,6 @@ import { spawn as spawnAsync, spawnSync, execFileSync } from 'node:child_process
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { acquireFullSuiteQueue, QUEUE_HELD_ENV } from './lib/full-suite-queue.mjs';
-import { PROTOCOL as LOCK_ROUTE_PROTOCOL } from '../src/holder-lock/protocol.mjs';
-import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 import { configEntries, repositoryDirs } from './lib/git-dir-layout.mjs';
 
 export { REPO_ROOT };
@@ -554,58 +552,37 @@ export function runTests({
 }
 
 /**
- * The CLI door's queue: the full-suite queue is a kernel lock and needs the
- * host binary. When none resolves (no FGOS_HOST_BIN, no activation above the
- * checkout: a fresh clone, CI), build one first and export it on this
- * process's env, where the lock driver looks. When one resolves, nothing is
- * built before the queue: a build here, outside the queue, could replace the
- * binary a queued run in another worktree sharing the cargo target is using.
- * The one exception is a resolved host that does not speak this checkout's
- * lock protocol (`host-version-mismatch`): a built one replaces it.
+ * The CLI door's queue. The full-suite queue is a kernel lock taken through the
+ * in-process door of the native addon, and this process runs from a checkout,
+ * whose door loads only through the one staged manifest: so the checkout's addon
+ * and host are staged (one cargo build per run, here, never per selected file)
+ * and exported on this process's env before the lock is asked for. Staging
+ * outside the queue is safe: it builds into this run's own CARGO_TARGET_DIR (cargo
+ * serializes a shared one) and publishes into this checkout's own staging directory
+ * by atomic rename, so a run queued in another worktree never executes bytes
+ * replaced under it. What stays inside the queue is the heavy work: the release
+ * artifacts and the suite itself.
  */
-export function queueWithHostBin(options, {
-  resolve = () => resolveActiveHostBin().bin,
-  speaksLockProtocol = hostSpeaksLockProtocol,
-  ensure = ensureHostBin,
+export function queueAfterStaging(options, {
+  stage = () => ensureGitAddon(process.env, REPO_ROOT),
   queue = acquireFullSuiteQueue,
-  log = (msg) => console.error(msg),
+  artifacts = () => ensureReleaseArtifacts(process.env, REPO_ROOT),
 } = {}) {
-  const host = resolve();
-  // A host that refuses this checkout's lock protocol (an activation older than a branch that
-  // bumped it) can never serve the queue; a host that does not resolve at all is built the same way.
-  if (!host || !speaksLockProtocol(host)) {
-    try {
-      const hostBin = ensure(process.env, REPO_ROOT);
-      if (hostBin) process.env.FGOS_HOST_BIN = hostBin;
-    } catch (err) {
-      log(`run-tests: warning: failed to ensure host binary: ${err.message}`);
-    }
+  stage();
+  const release = queue(options);
+  try {
+    artifacts();
+    return release;
+  } catch (err) {
+    release();
+    throw err;
   }
-  return queue(options);
-}
-
-/** Whether `hostBin` answers the lock routes at the protocol this checkout's driver speaks. */
-export function hostSpeaksLockProtocol(hostBin) {
-  const answer = spawnSync(hostBin, ['internal', 'state-root', '--protocol', String(LOCK_ROUTE_PROTOCOL)], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 10_000 });
-  try { return JSON.parse(answer.stdout.trim().split('\n').pop()).protocol === LOCK_ROUTE_PROTOCOL; } catch { return false; }
 }
 
 if (isMainModule(import.meta.url)) {
   const { status, message, files, wallSeconds } = runTests({
     forwardedArgs: process.argv.slice(2),
-    queue(options) {
-      const release = queueWithHostBin(options);
-      try {
-        const host = ensureHostBin(process.env, REPO_ROOT);
-        process.env.FGOS_HOST_BIN = host;
-        ensureGitAddon(process.env, REPO_ROOT);
-        ensureReleaseArtifacts(process.env, REPO_ROOT);
-        return release;
-      } catch (err) {
-        release();
-        throw err;
-      }
-    },
+    queue: (options) => queueAfterStaging(options),
   });
   if (message) console.error(message);
   let reportStatus = 0;

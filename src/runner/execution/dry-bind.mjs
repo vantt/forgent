@@ -18,12 +18,11 @@ import { workflowTierOf } from './seat-resolver.mjs';
  * @param {object} [options]
  * @param {object} [options.session] bind() session context. Defaults to a headless session.
  * @param {Array} [options.overrides] Overrides bind() reads, as a unit run would pass them. Defaults to none.
- * @param {object} [options.selectors] What the calling door chose (persona, seat, capability), as a unit run would pass it.
  * @param {boolean} [options.raiseAuthorized] Whether the calling door may raise a tier. Defaults to false.
  * @param {string} [options.workflowId] The workflow the unit belongs to, to name where a seat's recommended tier was declared.
  * @returns {Promise<{ outcome: string, seats: Array<{ seat: string, role: string, executor?: string, invocation?: string|null, tier?: string, loweredFrom?: { from: string, fromSource: string, reason: string }, account?: { provider: string, id: string }, sharesFamilyWith?: string[], refused?: { reason: string, detail: string } }> }>}
  */
-export async function simulateUnitBindings(unit, runnerConfig, { session = {}, overrides = [], selectors, raiseAuthorized = false, workflowId } = {}) {
+export async function simulateUnitBindings(unit, runnerConfig, { session = {}, overrides = [], raiseAuthorized = false, workflowId } = {}) {
   const ledger = createSeatLedger();
   const seats = [];
   const runRole = async ({ seat, unit: seatUnit, independentOf = [], preferIndependentOf = [], batch }) => {
@@ -37,7 +36,6 @@ export async function simulateUnitBindings(unit, runnerConfig, { session = {}, o
           posture: seat.posture,
           ...(seat.persona ? { persona: seat.persona } : {}),
           ...(workflowTier ? { workflowTier } : {}),
-          ...(selectors && Object.values(selectors).some((v) => v) ? { selectors } : {}),
           raiseAuthorized: raiseAuthorized === true,
           readOnly: seat.posture.readOnly,
           independentOf: ledger.resolve(independentOf),

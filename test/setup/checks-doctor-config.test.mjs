@@ -223,7 +223,6 @@ test('config-not-stale passes when the existing config already has every default
       invariantChecks: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },
       worktreeSetup: { commands: [] },
       workerSlots: { ceiling: null },
-      lock: { predecessorKillWaitMs: 2000 },
       terminal: DEFAULT_TERMINAL_CONFIG,
       gateway: { port: 4170, token: null },
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },

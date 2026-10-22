@@ -92,11 +92,17 @@ Rust `fgos` is the standard door for every verb. `bin/fgos.mjs` is the
 `components.legacyNode.root` and exec'd by the Rust host at
 `components.legacyNode.entry` — never relocated or renamed in the source tree.
 The host resolves it only through those manifest fields, never PATH, cwd or
-hardcoded locations outside the manifest. Global npm `bin.fgos` and fallback
-`node bin/fgos.mjs` are compatibility channels calling this entry directly;
-every state write resolves the writer identity through the Rust host
-(`docs/platform/session-identity/spec.md`), so these channels write only
-inside an activated project or with `FGOS_HOST_BIN` set to a host binary.
+hardcoded locations outside the manifest. Global npm `bin.fgos` and
+`node bin/fgos.mjs` call this entry directly but are unsupported for the
+process, lock and identity verbs: the in-process door loads only the addon of
+the activated release whose payload is running, so from a checkout those verbs
+refuse by name (`process-door-not-shipped`, `lock-driver-unavailable` with
+reason `addon-not-shipped`, `host-missing`). Run working-tree code through
+`npm run fgos:dev -- <verb>` instead. Every state write resolves the writer
+identity through the Rust host (`docs/platform/identity/spec.md`), so these
+channels write only inside an activated project or with `FGOS_HOST_BIN` set to
+a host binary. The git hook is a cold client of the activated host and is
+unaffected.
 
 Plain `fgos` runs the activated release recorded in
 `.fgos/installation/activation.json`, not newly edited `bin/` or `src/` bytes.

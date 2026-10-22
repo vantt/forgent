@@ -34,7 +34,6 @@
         },
         "killWaitMs": {
           "default": 2000,
-          "config": "lock.predecessorKillWaitMs",
           "meaning": "upper bound on waiting for a predecessor domain that was already killed to be signaled; never a wait-for-drain"
         }
       },

@@ -2,6 +2,7 @@ import { bindable } from '../helpers/work-seat-config.mjs';
 import '../helpers/process-tmp-root.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
+import { committedConfigDir, committedRunnerConfig } from '../helpers/committed-config.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -929,10 +930,9 @@ test('the committed .fgos/config.json runner section declares the consolidated g
 });
 
 // Synthetic cfg, not committedRunnerConfig() (tsk-1cn): committedRunnerConfig()
-// resolves against the MAIN CHECKOUT's own committed HEAD (see its own
-// docstring above) -- a feature branch's own .fgos/config.json edit is
-// invisible to it until merge, so a test asserting a branch's own change
-// through that helper would fail here and only start passing post-merge.
+// reads the committed HEAD, so a branch's own .fgos/config.json edit is
+// invisible to it until committed, and a test asserting that change through
+// the helper would fail until then.
 // This mirrors the entry actually added to runner.executors.claude.
 function claudeExecutorCfg() {
   return {
@@ -1215,38 +1215,6 @@ test('loadRunnerConfig rejects a "executors.<id>.invocations[]" entry with "via"
   );
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
-
-/** Read the committed `.fgos/config.json`'s `runner` section directly
- * (never through `loadRunnerConfigFromDir`, which also merges in
- * `~/.fgos/config.json` -- these tests assert the REPO's own committed
- * content, not whatever a given test machine's global config adds).
- *
- * Reads via `git show HEAD:...`, NEVER `fs.readFileSync` off the working
- * tree (tsk-5tm-6 fix, found by a real-dispatch review pass): a working-tree
- * read only proves whatever happens to be sitting on THIS machine's disk --
- * a contributor with an uncommitted edit to `.fgos/config.json` (or a stale
- * one from before a revert) would make these tests pass while the repo's
- * actual git history disagrees, exactly the gap that let D9's own
- * `modelPolicies`/`agy.providerModel` config change ship as an uncommitted
- * local edit with this test suite green the entire time.
- *
- * Known remaining scope limit (found in the same review pass): `HEAD`
- * resolves inside `resolveMainCheckoutRoot`'s directory -- the ONE shared
- * main checkout every `fgos <verb>` call and worktree resolves against
- * (ADR0020) -- so this reads whichever branch the MAIN CHECKOUT currently
- * has checked out (typically `main`), never this test file's own branch's
- * HEAD when run from inside a feature worktree. These tests prove "the
- * config the main checkout currently has committed is well-formed," not
- * "this branch's own `.fgos/config.json` change (if any) is correct" --
- * a feature branch that touches `.fgos/config.json` still needs its own
- * independent proof (e.g. a real merge/catchup dry-run) that its content
- * agrees with what will actually land, since these tests cannot see it. */
-function committedRunnerConfig() {
-  const worktreeRoot = path.resolve(import.meta.dirname, '..', '..');
-  const raw = execFileSync('git', ['show', 'HEAD:.fgos/config.json'], { cwd: worktreeRoot, encoding: 'utf8' });
-  const parsed = JSON.parse(raw);
-  return parsed.runner;
-}
 
 test('the committed .fgos/config.json runner section loads and is well-formed', () => {
   const cfg = committedRunnerConfig();
@@ -1903,7 +1871,7 @@ test('resolveExecutorCommand substitutes {prompt} and {model} per array element'
 });
 
 test('codex\'s cli-bypass invocation consumes model placeholder in invocation args: analytical assignment resolves model from policy into argv', () => {
-  const cfg = loadRunnerConfigFromDir(process.cwd());
+  const cfg = loadRunnerConfigFromDir(committedConfigDir());
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',

@@ -77,7 +77,7 @@
       "idleMs": "integer >= 1 or null; the supervisor stops the agent after this long without activity (agent-protocol activity source)",
       "hardCeiling": { "bootId": "string", "boottimeNs": "integer, absolute CLOCK_BOOTTIME nanoseconds" },
       "gateKillGraceMs": "integer >= 0, SIGTERM -> SIGKILL grace used by the gate and by kill_all; source config dispatch.gateKillGraceMs (default 10000)",
-      "killWaitMs": "integer >= 1, optional; the bound kill_all waits for the domain to be provably empty (config lock.predecessorKillWaitMs); absent means 5000",
+      "killWaitMs": "integer >= 1, optional; the bound kill_all waits for the domain to be provably empty (the holder lock's fixed 2000 ms kill wait unless the caller passes another); absent means 5000",
       "rule": "deadlines are absolute; a later start, an adopt or a resume never extends them. A bootId that differs from the current boot means every process of the attempt is already dead"
     },
     "agentProtocol": {
@@ -86,7 +86,7 @@
     },
     "slot": "object {key, groupKey}; present exactly when mode is terminal. key: terminal-control key, equal to attemptId. groupKey: the Node client's serialization group for allocate (a string the controller chooses); the supervisor never allocates, it only addresses the slot by key",
     "terminal": "object {socketPath, exitCommand, orphanSettleMs}; present exactly when mode is terminal. socketPath: absolute AF_UNIX path of the GO socket under the runtime socket dir (mode 0700, owner is the user, name is a hash of attemptId, at most 107 bytes). exitCommand: string typed into the pane after the agent protocol reports completed, or null to use the CLI adapter's own exit command. orphanSettleMs: integer >= 0, the extra wait the gate gives the outbox after it saw a result while the supervisor is gone (orphan branch)",
-    "identity": "object {writerId, parentWriterId}; both modes. writerId: the attempt's writer id, equal to mint_attempt_writer_id(attemptId) (packages/session-identity/contracts/attempt-writer-id.v1.json); the gate exports it as FGOS_SESSION_ID. parentWriterId: writer id of the controller that wrote the envelope, exported as FGOS_PARENT_WRITER_ID, or null when the controller has none",
+    "identity": "object {writerId, parentWriterId}; both modes. writerId: the attempt's writer id, equal to mint_attempt_writer_id(attemptId) (packages/identity/contracts/attempt-writer-id.v1.json); the gate exports it as FGOS_SESSION_ID. parentWriterId: writer id of the controller that wrote the envelope, exported as FGOS_PARENT_WRITER_ID, or null when the controller has none",
     "steps": {
       "type": "array, run in order after the receipt; see step-receipt.v1.json. A terminal envelope ends with the release-slot builtin item; a direct envelope never carries it",
       "builtinItem": {

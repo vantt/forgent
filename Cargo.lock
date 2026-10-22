@@ -130,12 +130,12 @@ dependencies = [
  "fgos-distribution",
  "fgos-holder-lock",
  "fgos-host-runtime",
+ "fgos-identity",
  "fgos-observe",
  "fgos-process",
  "fgos-run-result",
  "fgos-run-supervisor",
  "fgos-seat-binding",
- "fgos-session-identity",
  "fgos-terminal-control",
  "fgos-work-state",
  "libc",
@@ -210,6 +210,7 @@ dependencies = [
  "fgos-durable-file",
  "fgos-git",
  "fgos-holder-lock",
+ "fgos-identity",
  "serde",
  "serde_json",
  "sha2",
@@ -253,6 +254,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-identity"
+version = "0.2.0"
+dependencies = [
+ "fgos-convention",
+ "fgos-durable-file",
+ "fgos-git",
+ "fgos-holder-lock",
+ "fgos-host-runtime",
+ "fgos-process",
+ "libc",
+ "serde",
+ "serde_json",
+ "sha2",
+]
+
+[[package]]
 name = "fgos-node-addon"
 version = "0.2.0"
 dependencies = [
@@ -261,6 +278,7 @@ dependencies = [
  "fgos-event-store",
  "fgos-git",
  "fgos-holder-lock",
+ "fgos-identity",
  "fgos-process",
  "fgos-write-scope",
  "libc",
@@ -279,7 +297,7 @@ dependencies = [
  "fgos-git",
  "fgos-holder-lock",
  "fgos-host-runtime",
- "fgos-session-identity",
+ "fgos-identity",
  "libc",
  "serde",
  "serde_json",
@@ -338,16 +356,6 @@ dependencies = [
 name = "fgos-secrets"
 version = "0.2.0"
 dependencies = [
- "libc",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "fgos-session-identity"
-version = "0.2.0"
-dependencies = [
- "fgos-host-runtime",
  "libc",
  "serde",
  "serde_json",

@@ -27,7 +27,7 @@ async function withRepoLock(scope, name, params, label, fn, { waitMs } = {}) {
   const res = await acquire(scope, name, params, { waitMs });
   if (res.result !== 'acquired') {
     const holders = lockHolders(name, params);
-    const pids = holders.kind === 'list' ? holders.pids : [];
+    const pids = holders.kind === 'list' ? holders.holders.map((h) => h.pid) : [];
     throw new HolderLockError(
       'lock-held',
       `${label} is held by another process${pids.length ? ` (pid ${pids.join(', ')})` : ''}${res.result === 'timeout' ? ` after waiting ${res.waitedMs} ms` : ''}`,
@@ -68,7 +68,7 @@ export function withWorktreeAdmin(scope, fgosDir, fn, { waitMs } = {}) {
 
 function lockHeldError(res, label, fgosDir) {
   const holders = lockHolders(WORKTREE_ADMIN, { fgosDir });
-  const pids = holders.kind === 'list' ? holders.pids : [];
+  const pids = holders.kind === 'list' ? holders.holders.map((h) => h.pid) : [];
   return new HolderLockError(
     'lock-held',
     `${label} is held by another process${pids.length ? ` (pid ${pids.join(', ')})` : ''}${res.result === 'timeout' ? ` after waiting ${res.waitedMs} ms` : ''}`,

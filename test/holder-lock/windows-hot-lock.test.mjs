@@ -12,7 +12,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
-import { IDENTITY_ENV_KEYS } from '../../src/util/session-identity.mjs';
+import { IDENTITY_ENV_KEYS } from '../helpers/identity-env.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const { bin: HOST_BIN } = resolveActiveHostBin({ fgosDir: path.join(root, '.fgos') });
@@ -128,6 +128,71 @@ test('a live holder is never reclaimed, and a second process times out instead',
     const finished = await holder.done;
     assert.equal(finished.code, 0, finished.stderr);
   } finally {
+    f.cleanup();
+  }
+});
+
+// A process that opens `file` with no sharing, which is what makes another process's read or unlink of it fail
+// with a sharing violation. It retries until the file exists, then keeps the handle for `seconds`.
+function holdOpenWithoutSharing(file, seconds) {
+  const script = `$p = ${JSON.stringify(file).replace(/"/g, "'")}; $h = $null;`
+    + ' while (-not $h) { try { $h = [System.IO.File]::Open($p, "Open", "Read", "None") } catch { Start-Sleep -Milliseconds 5 } };'
+    + ` Start-Sleep -Seconds ${seconds}; $h.Close()`;
+  return spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], { stdio: 'ignore' });
+}
+
+test('a record another process holds open is waited on to the timeout, named, and never spun on or reclaimed', { skip: SKIP }, async () => {
+  const f = fixture();
+  let holder;
+  try {
+    const record = path.join(f.fgosDir, 'locks', 'state.hot');
+    fs.mkdirSync(path.dirname(record), { recursive: true });
+    fs.writeFileSync(record, JSON.stringify({ v: 1, pid: 1 }));
+    holder = holdOpenWithoutSharing(record, 9);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const started = Date.now();
+    const run = runChild(`
+      const { withStateTx } = await import(${JSON.stringify(HOT_LOCK_URL)});
+      try {
+        withStateTx(process.argv[1], () => 'entered', { prefetched: { writer: ${WRITER} } });
+        console.log('ENTERED');
+      } catch (err) {
+        console.log(JSON.stringify({ code: err.code, message: err.message }));
+      }
+    `, [f.fgosDir]);
+    const result = await run.done;
+    const answer = JSON.parse(result.stdout.trim());
+    assert.equal(answer.code, 'hot-lock-timeout');
+    assert.match(answer.message, /open by another process/);
+    assert.match(answer.message, /fgos lock fence state/);
+    assert.ok(Date.now() - started >= 4500, 'waited out the timeout');
+  } finally {
+    holder?.kill();
+    f.cleanup();
+  }
+});
+
+test('a release whose unlink stays sharing-blocked keeps the committed result and leaves the record', { skip: SKIP }, async () => {
+  const f = fixture();
+  let holder;
+  try {
+    const record = path.join(f.fgosDir, 'locks', 'state.hot');
+    holder = holdOpenWithoutSharing(record, 6);
+    const run = runChild(`
+      const { withStateTx } = await import(${JSON.stringify(HOT_LOCK_URL)});
+      const answer = { kept: withStateTx(process.argv[1], () => {
+        // the record is linked; wait until the other process has it open without sharing
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1500);
+        return 'committed';
+      }, { prefetched: { writer: ${WRITER} } }) };
+      console.log(JSON.stringify(answer));
+    `, [f.fgosDir]);
+    const result = await run.done;
+    const answer = JSON.parse(result.stdout.trim());
+    assert.equal(answer.kept, 'committed');
+    assert.ok(fs.existsSync(record), 'the record stays');
+  } finally {
+    holder?.kill();
     f.cleanup();
   }
 });

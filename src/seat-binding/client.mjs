@@ -15,7 +15,7 @@
 
 import { spawnSync } from 'node:child_process';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
-import { stateLockHeld } from '../util/state-lock-held.mjs';
+import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { OWN_PAYLOAD_ROOT, releasePayloadRoot, realpathOrNull } from '../run-supervisor/payload-root.mjs';
 import { routeEnv } from '../holder-lock/driver.mjs';
 
@@ -58,7 +58,9 @@ function interpret({ status, signal, stdout, stderr, error }, bin, op) {
   if (error && error.code === 'ETIMEDOUT') {
     throw new SeatBindingError('seat-binding-route-timeout', `${bin} seat-binding ${op} did not answer in time and was killed`);
   }
-  if (error) {
+  // EPIPE: the host ran and exited before reading the request (an older host refuses the verb at once);
+  // its exit status and stderr still say why, so they are read below like any other answer.
+  if (error && error.code !== 'EPIPE') {
     throw new SeatBindingError('seat-binding-route-bad-output', `${bin} seat-binding ${op} failed to run: ${error.message}`);
   }
   const text = String(stdout ?? '').trim();
@@ -116,10 +118,10 @@ export function createSeatBindingClient({ hostBin, cwd, fgosDir, payloadRoot, ti
   };
 
   const call = (op, body) => {
-    if (stateLockHeld()) {
+    if (hotLockDepth() > 0) {
       throw new SeatBindingError(
         'seat-binding-in-lock',
-        'a seat binding would exec the host while the state lock is held; bind before taking the lock',
+        'a seat binding would exec the host while the hot mutex is held; bind before taking the lock',
       );
     }
     const hostPath = bin();

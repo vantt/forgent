@@ -37,7 +37,7 @@ fn test_observe_dependency_boundary() {
     internal_fgos_deps.sort_unstable();
     assert_eq!(
         internal_fgos_deps,
-        vec!["fgos-git", "fgos-holder-lock", "fgos-host-runtime", "fgos-session-identity"],
+        vec!["fgos-git", "fgos-holder-lock", "fgos-host-runtime", "fgos-identity"],
         "fgos-observe must not depend on domain/substrate crates directly"
     );
 }

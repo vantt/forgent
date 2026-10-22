@@ -276,20 +276,16 @@ pub struct WorkflowTier {
     pub source: String,
 }
 
-/// Values a door chose; each replaces the workflow-declared value of the same name.
+/// The persona an override names for the seat; it replaces the persona the seat would resolve without it.
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct Selectors {
     #[serde(default)]
     pub persona: Option<String>,
-    #[serde(default)]
-    pub seat: Option<String>,
-    #[serde(default)]
-    pub capability: Option<String>,
 }
 
 impl Selectors {
     pub fn is_empty(&self) -> bool {
-        self.persona.is_none() && self.seat.is_none() && self.capability.is_none()
+        self.persona.is_none()
     }
 }
 
@@ -371,6 +367,18 @@ pub struct Ask {
     /// every filter applies to both alike, and a bare executor id covers every entry of that executor.
     #[serde(default)]
     pub unit_prefer: Vec<Prefer>,
+    /// The session lead that may run this seat inline: present only when the seat's posture allows it
+    /// and a lead is in the session. `rank` falls back to it when the seat has no candidate configured.
+    #[serde(default)]
+    pub inline_lead: Option<InlineLead>,
+}
+
+/// The lead that runs a seat inline: its executor id and provider family.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InlineLead {
+    pub executor: String,
+    pub family: String,
 }
 
 // ------------------------------------------------------------- machine facts
@@ -387,6 +395,8 @@ pub enum ExecutorKind {
 pub enum Mechanism {
     OutOfProcess,
     InProcess,
+    /// The session lead runs the seat itself; only the unconfigured-seat fallback of `rank` yields it.
+    Inline,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -553,7 +563,7 @@ pub struct Policy {
     pub tier: Tier,
     /// The config path, `workflow:<id>/<unit>/<seat>`, `override`, or the `maxTier` line when it lowered the tier.
     pub tier_source: String,
-    /// Names the selector that raised the tier when a door chose one.
+    /// Names the persona selector that raised the tier when an authorized door chose one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub raised_by: Option<String>,
     /// The workflow's recommendation when the chosen tier is not it.

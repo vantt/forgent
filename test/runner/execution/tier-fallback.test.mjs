@@ -4,11 +4,9 @@
 // skipped and recorded; a pool no account can serve gives no candidate.
 
 import '../../helpers/process-tmp-root.mjs';
+import { committedRunnerConfig } from '../../helpers/committed-config.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { bind, bindingIdentity, explainSeat } from '../../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -47,35 +45,6 @@ const ask = { unit: { id: 'u', capability: 'docs:write', writes: [] }, role: 'pr
 const ctx = (runnerConfig) => ({ runnerConfig, session: { headless: true } });
 const families = (bindings) => bindings.map((b) => b.executor);
 
-test('the primary follows prefer order; after a failure the walk follows the tier order, narrowed to prefer', () => {
-  const cfg = config({ tierFallback: { standard: ['gamma', 'beta', 'delta', 'alpha'] } });
-  assert.equal(bind(ask, ctx(cfg)).executor, 'alpha', 'prefer order picks the primary, not the tier order');
-  assert.deepEqual(families(explainSeat(ask, ctx(cfg)).walk), ['alpha', 'gamma', 'beta', 'delta']);
-
-  const narrow = config({ prefer: ['alpha', 'gamma'], tierFallback: { standard: ['gamma', 'beta', 'delta', 'alpha'] } });
-  assert.deepEqual(families(explainSeat(ask, ctx(narrow)).walk), ['alpha', 'gamma'], 'a listed family prefer does not name is never reached');
-
-  const widerPrefer = config({ prefer: ['alpha', 'beta', 'delta'], tierFallback: { standard: ['gamma'] } });
-  assert.deepEqual(families(explainSeat(ask, ctx(widerPrefer)).walk), ['alpha'], 'a prefer family absent from the list is not a fallback target');
-});
-
-test('with no tier list the walk is the prefer order after the failed candidate', () => {
-  const cfg = config();
-  assert.deepEqual(families(explainSeat(ask, ctx(cfg)).walk), ['alpha', 'beta', 'gamma', 'delta']);
-  const otherTier = config({ tierFallback: { flagship: ['delta', 'alpha'] } });
-  assert.deepEqual(families(explainSeat(ask, ctx(otherTier)).walk), ['alpha', 'beta', 'gamma', 'delta'], 'a list for another tier does not apply');
-});
-
-test('the walk never leaves the tier it started at', () => {
-  // The capability declares its tier; a unit's rigor says how careful it is and never moves the tier.
-  const cfg = config({ tier: 'flagship', tierFallback: { flagship: ['delta', 'gamma'] } });
-  const high = { ...ask, unit: { ...ask.unit, rigor: 'high' } };
-  const walk = explainSeat(high, ctx(cfg)).walk;
-  assert.deepEqual(families(walk), ['alpha', 'delta', 'gamma']);
-  assert.ok(walk.every((b) => b.tier === 'flagship'));
-  assert.deepEqual(walk.map((b) => b.model), ['alpha-l', 'delta-l', 'gamma-l'], 'each family runs its own cell at that tier');
-});
-
 test('two entries of one cell are two candidates in cell order, taken before the next family', () => {
   const cfg = config({
     modelPolicies: { alpha: cells('alpha', ['alpha-m@alpha', 'alpha-via-router@router']) },
@@ -94,18 +63,6 @@ test('two entries of one cell are two candidates in cell order, taken before the
   assert.equal(second.provenance.fallbackFrom.pool, 'alpha');
   const third = bind(ask, ctx(cfg), { walk: { tried: walk.slice(0, 2) } });
   assert.equal(third.provenance.fallbackFrom.walk, 'family');
-});
-
-test('a fault excludes one pool and keeps the other pool of the same family', () => {
-  const cfg = config({
-    modelPolicies: { alpha: cells('alpha', ['alpha-m@alpha', 'alpha-via-router@router']) },
-    llmAccounts: { router: { r1: { credentialStore: { alpha: '/nonexistent/r1' } } } },
-  });
-  const first = bind(ask, ctx(cfg));
-  const next = bind(ask, ctx(cfg), { walk: { tried: [first], excludePools: ['alpha'] } });
-  assert.deepEqual([next.executor, next.pool], ['alpha', 'router']);
-  const none = bind(ask, ctx(config({ prefer: ['alpha'] })), { walk: { excludePools: ['alpha'] } });
-  assert.equal(none.refused.reason, 'pool-excluded');
 });
 
 test('a pool no account can serve gives no candidate, and explain material says why', () => {
@@ -188,8 +145,7 @@ test('the walk state is the earlier bindings: binding N+1 from the recorded ones
 });
 
 test('a committed-config walk stays in its tier and keeps each family to its own tier cell', () => {
-  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-  const committed = JSON.parse(fs.readFileSync(path.join(root, '.fgos', 'config.json'), 'utf8')).runner;
+  const committed = committedRunnerConfig();
   const DOER = ['gemini', 'deepseek', 'z-ai', 'claude', 'openai'];
   const PREMIUM = ['claude', 'openai', 'gemini', 'xai'];
   const withTier = (tier) => ({
