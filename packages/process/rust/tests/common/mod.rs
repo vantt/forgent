@@ -186,6 +186,7 @@ pub fn run_helper_role() {
 
 /// How many processes have `pattern` in their command line (`pgrep -f`).
 #[cfg(unix)]
+#[allow(dead_code)] // used by the conformance binary only
 pub fn running(pattern: &str) -> usize {
     let out = std::process::Command::new("pgrep").args(["-f", pattern]).output().expect("pgrep");
     String::from_utf8_lossy(&out.stdout).lines().count()
@@ -193,6 +194,7 @@ pub fn running(pattern: &str) -> usize {
 
 /// Ends every process with `pattern` in its command line.
 #[cfg(unix)]
+#[allow(dead_code)] // used by the conformance binary only
 pub fn end_all(pattern: &str) {
     let _ = std::process::Command::new("pkill").args(["-KILL", "-f", pattern]).status();
 }

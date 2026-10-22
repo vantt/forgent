@@ -287,17 +287,11 @@ pub struct LinuxPgroup {
 }
 
 impl LinuxPgroup {
-    pub const fn new() -> Self {
-        Self { selected_because: None }
-    }
-
     pub fn with_reason(reason: impl Into<String>) -> Self {
         Self { selected_because: Some(reason.into()) }
     }
 }
 
-#[allow(non_upper_case_globals)]
-pub const LinuxPgroup: LinuxPgroup = LinuxPgroup::new();
 
 impl ContainmentDriver for LinuxPgroup {
     fn name(&self) -> &'static str {

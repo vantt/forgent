@@ -287,7 +287,7 @@ macro_rules! conformance_suite {
 }
 
 #[cfg(target_os = "linux")]
-conformance_suite!(linux_pgroup, Some(Box::new(fgos_process::containment::LinuxPgroup) as Box<dyn ContainmentDriver>), LINUX_PGROUP_PROPS);
+conformance_suite!(linux_pgroup, Some(Box::new(fgos_process::containment::LinuxPgroup::default()) as Box<dyn ContainmentDriver>), LINUX_PGROUP_PROPS);
 #[cfg(target_os = "linux")]
 conformance_suite!(bwrap_pidns, common::require_bwrap().map(|b| Box::new(fgos_process::containment::BwrapPidns::new(b)) as Box<dyn ContainmentDriver>), BWRAP_PIDNS_PROPS);
 #[cfg(target_os = "macos")]
