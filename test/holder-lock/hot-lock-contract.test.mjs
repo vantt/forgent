@@ -45,7 +45,7 @@ test('the critical section forbids children and nesting, and names every error t
   assert.ok(hot.criticalSection.forbidden.some((rule) => /again in the same process/.test(rule)));
   assert.deepEqual(
     Object.keys(hot.errors).sort(),
-    ['exec-under-hot-lock', 'hot-lock-release-stuck', 'hot-lock-reentry', 'hot-lock-timeout', 'lock-record-unreadable', 'state-tx-async', 'state-tx-revoked'],
+    ['exec-under-hot-lock', 'hot-lock-reentry', 'hot-lock-release-stuck', 'hot-lock-timeout', 'lock-record-unreadable', 'state-tx-async', 'state-tx-revoked'],
   );
   assert.equal(hot.wait.timeoutMs, 5000);
 });
