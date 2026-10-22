@@ -7,6 +7,7 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 08:15 (forgent-f8, TEST): **phase 3 xong và một test hỏng thật trên main.** Phase 3 lên main: runner `9128de017`, cli `5fc400e26`, exec `b9e354f15`; baseline 8058 `test()` calls; `worktree-admin-multiprocess` còn 8 tiến trình × 5 vòng theo owner (W2, trả 20 khi HARDEN R2 land), `8cc8aa4d5`. **Hỏng trên main `3b4f4c2e0`, cả khi chạy riêng:** `test/runner/assignment-dispatch.test.mjs` "decideExecutorCli resolves dispatch plan for an assignment" → `runner config … executors.claude "kind" must be one of agent/tool, got: undefined`; fixture config thiếu `kind`, nhiều khả năng từ merge SEAT `46613f277` (dispatch hỏi Seat Binding). Cần chủ lane SEAT xem: sửa fixture hay hành vi. Không phải TEST tự sửa vì chưa rõ ý định.
 - 2026-10-22 07:58 (GIT/ES điều phối): bench E3 chấm push theo trạng thái ổ (main 4428f2a90); với luật owner chọn, **mọi hàng E3 đều đạt** ([kiểm chứng](../reports/verification-261022-0005-git-e3-clean-rerun.md)). Owner có thể đổi CPU về powersave.
 
 - 2026-10-22 07:55 (GIT/ES điều phối): E3 push: nguyên nhân là fsync NVMe hai mức (5,2 / 7,5 ms), không phải code; owner chọn chấm theo trạng thái ổ (bench đang sửa). Nhận H16 (dòng doctor `git-fence-missing` trước khi T1 xoá `lock-fences`; lead đang làm) và giao H18 lại cho HARDEN (dời hàm cạnh migrate.mjs trong commit xoá fence, GIT duyệt).
