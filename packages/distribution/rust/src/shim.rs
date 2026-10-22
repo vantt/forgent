@@ -13,19 +13,46 @@ use std::path::{Path, PathBuf};
 const ENTRY_FGOS: &str = "fgos";
 const ENTRY_FGOS_RUNNER: &str = "fgos-runner";
 
-/// The `sh` launcher for `entry` (`fgos` or `fgos-runner`).
+/// The `sh` launcher for `entry` (`fgos` or `fgos-runner`). It runs on every
+/// fgOS call, agent hooks included, so it starts no helper program: the
+/// activation file is read with shell builtins only (no `dirname`, `sed`,
+/// `head` or `tr`), and the shell `exec`s the entry. Reading rules: the first
+/// line of the form `"<key>": "<value>"` (spaces around the colon, trailing
+/// commas and a trailing carriage return allowed) gives the value; carriage
+/// returns inside it are dropped, and in `releasePath` every backslash becomes
+/// a slash and repeated slashes collapse.
 fn sh_body(entry: &str) -> String {
-    format!(
+    let body = format!(
         r#"#!/bin/sh
 # fgOS workspace stable shim -- written by fgctl. Do not hand-edit; run
 # `fgctl repair` to regenerate it.
 set -eu
-self_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+case $0 in */*) self_dir=${{0%/*}} ;; *) self_dir=. ;; esac
 activation="$self_dir/../activation.json"
 [ -f "$activation" ] || {{ echo "fgos: no active runtime -- run fgctl init" >&2; exit 3; }}
-status=$(sed -n 's/^[[:space:]]*"status"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r')
+cr='CR'
+# value KEY LINE: sets $value from a line `"KEY": "VALUE"`; false otherwise.
+value() {{
+  v=${{2%"$cr"}}
+  v=${{v#"${{v%%[![:space:]]*}}"}}
+  case $v in "\"$1\""*) v=${{v#"\"$1\""}} ;; *) return 1 ;; esac
+  v=${{v#"${{v%%[![:space:]]*}}"}}
+  case $v in :*) v=${{v#:}} ;; *) return 1 ;; esac
+  v=${{v#"${{v%%[![:space:]]*}}"}}
+  case $v in \"*) v=${{v#\"}} ;; *) return 1 ;; esac
+  while :; do case $v in *,) v=${{v%,}} ;; *) break ;; esac; done
+  case $v in *\") v=${{v%\"}} ;; *) return 1 ;; esac
+  while :; do case $v in *"$cr"*) v=${{v%%"$cr"*}}${{v#*"$cr"}} ;; *) break ;; esac; done
+  value=$v
+}}
+status= release_path= found_status= found_path=
+while IFS= read -r line || [ -n "$line" ]; do
+  if [ -z "$found_status" ] && value status "$line"; then status=$value; found_status=1; fi
+  if [ -z "$found_path" ] && value releasePath "$line"; then release_path=$value; found_path=1; fi
+done < "$activation"
 [ "$status" = "ready" ] || {{ echo "fgos: active runtime is not ready ($status) -- run fgctl repair" >&2; exit 3; }}
-release_path=$(sed -n 's/^[[:space:]]*"releasePath"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r' | tr '\\' '/' | tr -s '/')
+while :; do case $release_path in *\\*) release_path=${{release_path%%\\*}}/${{release_path#*\\}} ;; *) break ;; esac; done
+while :; do case $release_path in *//*) release_path=${{release_path%%//*}}/${{release_path#*//}} ;; *) break ;; esac; done
 [ -n "$release_path" ] || {{ echo "fgos: activation.json missing releasePath -- run fgctl repair" >&2; exit 3; }}
 entry="$release_path/bin/{entry}"
 if [ ! -x "$entry" ] && [ -x "${{entry}}.exe" ]; then
@@ -34,7 +61,10 @@ fi
 [ -x "$entry" ] || {{ echo "fgos: active release entry not found: $entry -- run fgctl repair" >&2; exit 3; }}
 exec "$entry" "$@"
 "#
-    )
+    );
+    // A literal carriage return: the only way a POSIX shell names one
+    // without running a program.
+    body.replacen("cr='CR'", "cr='\r'", 1)
 }
 
 /// The `.cmd` launcher. `target` is the release-relative Windows file it runs
@@ -327,6 +357,123 @@ mod tests {
         write_workspace_shims(&dir).unwrap();
         check_workspace_shims(&dir, true).unwrap();
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// A workspace with the `fgos` sh shim, an `activation.json` of `text`,
+    /// and a release entry that prints its arguments.
+    #[cfg(unix)]
+    fn shim_scene(tag: &str, text: &str) -> (std::path::PathBuf, std::path::PathBuf) {
+        use std::os::unix::fs::PermissionsExt;
+        let root = std::env::temp_dir().join(format!(
+            "fgctl-shim-run-{tag}-{}-{}",
+            std::process::id(),
+            crate::store::now_millis()
+        ));
+        let bin = root.join("installation").join("bin");
+        write_workspace_shims(&bin).unwrap();
+        let release = root.join("release");
+        std::fs::create_dir_all(release.join("bin")).unwrap();
+        let entry = release.join("bin").join("fgos");
+        std::fs::write(&entry, "#!/bin/sh\necho \"ran $0 $*\"\n").unwrap();
+        std::fs::set_permissions(&entry, std::fs::Permissions::from_mode(0o755)).unwrap();
+        let text = text.replace("RELEASE", release.to_str().unwrap());
+        std::fs::write(root.join("installation").join("activation.json"), text).unwrap();
+        (root, bin.join("fgos"))
+    }
+
+    #[cfg(unix)]
+    fn run_shim(shim: &Path, path_var: &str) -> std::process::Output {
+        std::process::Command::new(shim)
+            .args(["hook", "mailbox"])
+            .env_clear()
+            .env("PATH", path_var)
+            .output()
+            .unwrap()
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn the_sh_shim_reads_activation_and_execs_the_entry_with_only_shell_builtins() {
+        let pretty = "{\n  \"status\": \"ready\",\n  \"releasePath\": \"RELEASE\",\n  \"shimVersion\": \"1\"\n}\n";
+        let path = std::env::var("PATH").unwrap_or_default();
+        for (tag, text, path_var) in [
+            ("pretty", pretty.to_string(), path.as_str()),
+            // No helper program is run: an empty PATH still reaches the entry.
+            ("no-path", pretty.to_string(), ""),
+            ("crlf", pretty.replace('\n', "\r\n"), path.as_str()),
+            (
+                "messy",
+                "{\n\"status\"  :   \"ready\",,\n   \"releasePath\":\"RELEASE\"\n,\"status\": \"later\"\n}".to_string(),
+                path.as_str(),
+            ),
+        ] {
+            let (root, shim) = shim_scene(tag, &text);
+            let out = run_shim(&shim, path_var);
+            let stdout = String::from_utf8_lossy(&out.stdout);
+            assert_eq!(out.status.code(), Some(0), "{tag}: {out:?}");
+            assert!(stdout.starts_with("ran ") && stdout.trim_end().ends_with("/release/bin/fgos hook mailbox"), "{tag}: {stdout}");
+            let _ = std::fs::remove_dir_all(&root);
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn the_sh_shim_normalises_the_release_path_and_refuses_what_it_cannot_run() {
+        let path = std::env::var("PATH").unwrap_or_default();
+        // Backslashes become slashes and repeated slashes collapse.
+        let (root, shim) = shim_scene(
+            "slashes",
+            "{\n  \"status\": \"ready\",\n  \"releasePath\": \"RELEASE\"\n}\n",
+        );
+        let activation = root.join("installation").join("activation.json");
+        let text = std::fs::read_to_string(&activation).unwrap();
+        let release = root.join("release").to_str().unwrap().to_string();
+        let messy = release
+            .replacen('/', "//", 1)
+            .replace("/release", "\\\\release");
+        std::fs::write(&activation, text.replace(&release, &messy)).unwrap();
+        let out = run_shim(&shim, &path);
+        assert_eq!(out.status.code(), Some(0), "{out:?}");
+        assert!(String::from_utf8_lossy(&out.stdout).contains(&format!("ran {release}/bin/fgos")));
+        let _ = std::fs::remove_dir_all(&root);
+
+        for (tag, text, words) in [
+            (
+                "not-ready",
+                "{\n  \"status\": \"staging\",\n  \"releasePath\": \"RELEASE\"\n}\n",
+                "not ready (staging)",
+            ),
+            (
+                "no-status",
+                "{\n  \"releasePath\": \"RELEASE\"\n}\n",
+                "not ready ()",
+            ),
+            (
+                "no-path",
+                "{\n  \"status\": \"ready\"\n}\n",
+                "missing releasePath",
+            ),
+            (
+                "no-entry",
+                "{\n  \"status\": \"ready\",\n  \"releasePath\": \"/nonexistent/release\"\n}\n",
+                "active release entry not found: /nonexistent/release/bin/fgos",
+            ),
+        ] {
+            let (root, shim) = shim_scene(tag, text);
+            let out = run_shim(&shim, &path);
+            assert_eq!(out.status.code(), Some(3), "{tag}");
+            assert!(
+                String::from_utf8_lossy(&out.stderr).contains(words),
+                "{tag}: {out:?}"
+            );
+            let _ = std::fs::remove_dir_all(&root);
+        }
+        let (root, shim) = shim_scene("absent", "");
+        std::fs::remove_file(root.join("installation").join("activation.json")).unwrap();
+        let out = run_shim(&shim, &path);
+        assert_eq!(out.status.code(), Some(3));
+        assert!(String::from_utf8_lossy(&out.stderr).contains("no active runtime"));
+        let _ = std::fs::remove_dir_all(&root);
     }
 
     #[cfg(unix)]
