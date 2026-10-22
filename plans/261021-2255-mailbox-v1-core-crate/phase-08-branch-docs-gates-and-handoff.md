@@ -1,7 +1,7 @@
 ---
 phase: 8
 title: "Branch docs, full gates, hand-off"
-status: pending
+status: done
 priority: P2
 effort: "3h"
 dependencies: [7]
@@ -48,3 +48,19 @@ Leave V1 provable by a stranger on the branch: the spec and the two indexes say 
 
 - Merge conflicts on `Cargo.toml`, `Cargo.lock` and the mutation census at each sync: resolve on the branch, regenerate the census and the lock, rerun the proof.
 - A gate red on main for reasons outside the mailbox: reported, not fixed here (RUL11: separate item).
+
+## Implementation notes (2026-10-22)
+
+- Docs on the branch: spec header (implementation status, source, last reviewed), §5.1.1 (exact key before key prefix; the `unregistered_…` label; writer-key bound), §5.3 (order of checks 0-10, the shared `unregistered` sender, lifetime caps for heads only, two-tier counters), §5.5 (corrected reply command; the chosen escape), §6.4 (`last_drain_at` and `schema_version` rules; a V5 note that `resolve_workspace_root` exists, leaving the old sentence for V5 to correct as the plan says), §12 (the three Q1 keys, the limits contract, config-merge registration at V5), §17 (owner decisions Q1-Q3 of 2026-10-21; V1 implementation decisions by the planning lead (agent); the review fixes by the controller as plan owner (agent)). `docs/specs/reading-map.md` and `docs/platform/component-boundary.md` name the crate on this branch. No CHANGELOG line, no doctor check (V7).
+- Deviations:
+  - **Formatting gate scoped to the crate** (controller decision, 2026-10-21): the gate is `cargo fmt -p fgos-mailbox-core -- --check`, not `cargo fmt --all -- --check`. Main already fails the workspace check in 175 files outside `packages/mailbox` (phase 1 baseline); they belong to other lanes and are tracked as item `tsk-hls`.
+  - Owner questions Q1-Q3 were answered before this phase, so they go to §17 as owner decisions, not to §16 as open items.
+  - The code-review step (step 5) is left to the controller, which runs an independent final review of the whole crate.
+- Gates (run twice: on main `57cb8ca68`, then again after the final merge of main `9670da5ff`, same results):
+  - crate: fmt clean, clippy clean, `cargo test -p fgos-mailbox-core --locked` 78 passed, 0 failed; `cargo tree` shows serde only.
+  - `cargo clippy --locked --workspace --all-targets -- -D warnings`: exit 0.
+  - `cargo test --workspace --locked`: exit 0; 1321 passed, 0 failed, 11 ignored.
+  - `npm test`: exit 1; 8709 tests, 8595 passed, 18 failed, 31 skipped, 65 todo; plus two suite-level errors (a leaked `fgos-direct-repo-*` temp dir from `test/run-supervisor/support/direct-harness.mjs`, and `.fgos/runtime/git-addon/<id>/manifest.json` modified).
+    - 17 failures (`test/rust-host/fgctl-upgrade.test.mjs` 15, `test/rust-host/fgctl-init-download-sources.test.mjs` 2) also fail on main: the same files run in the main checkout at `180ed62fd` failed 23 of 48, a superset of the branch's 17.
+    - The 18th, `test/scripts/run-test-canary.test.mjs` "wrapper overhead … median under 250ms", is a timing bound (265 ms measured under the full suite's load); it passes on the branch when run alone.
+    - The two suite-level leaks come from run-supervisor and git-addon tests; the branch changes no Node, JavaScript or test file outside the Rust crate, so they are not caused by it. They were not reproduced on main (that needs a full suite run in the owner's main checkout).
