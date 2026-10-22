@@ -11,8 +11,8 @@ Starting points (proposals only): the DC baseline in Git spec §19 E3 row (warm 
 | `writeBlob`, existing object | p95 | ≤ 10 ms |
 | `compareAndSwap`, no-op (ref already at next; WAL read only) | p95 | ≤ 15 ms |
 | `compareAndSwap`, changing ref (Intent, pin, prepared, TargetAttempt, CAS, read-back, all fsyncs, receipt) | p95 / p99 | ≤ 150 ms / ≤ 250 ms (was ≤ 60 / ≤ 120; amended 2026-10-19) |
-| Local transport push, one ref, no new objects | p95 | ≤ 150 ms |
-| Local transport push, one ref, with objects | p95 | ≤ 250 ms |
+| Local transport push, one ref, no new objects | p95 | ≤ 150 ms, judged when the host's plain fsync probe is in its fast mode; slow-mode rounds are reported, not judged (owner 2026-10-22) |
+| Local transport push, one ref, with objects | p95 | ≤ 250 ms, judged when the host's plain fsync probe is in its fast mode; slow-mode rounds are reported, not judged (owner 2026-10-22) |
 | Full typed operation: ScopedCommit in a linked worktree | p95 | ≤ 250 ms on the owner's host class (ext4 NVMe, the measurement condition below); the ratio to today's `commitUnitWork` on the same fixture is reported, not budgeted (was ≤ 1.5 ×; amended 2026-10-21) |
 | Full typed operation: Land (prepare + publish, verify excluded) | p95 | ≤ 1.6 s on the owner's host class (ext4 NVMe, the measurement condition below); the ratio to today's merge path on the same fixture is reported, not budgeted (was ≤ 1.2 ×; amended 2026-10-20) |
 | Git subprocess count per typed operation | count | reported; no budget |
