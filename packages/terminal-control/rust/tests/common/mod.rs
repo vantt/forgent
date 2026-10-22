@@ -31,10 +31,11 @@ pub struct MemPane {
     pub screen_reads: usize,
     pub last_nonce: String,
     pub on_launch_foreground: Option<ProcessInfo>,
+    pub env: Vec<(String, String)>,
 }
 
 impl MemPane {
-    pub fn new(pane_id: &str, tab: String, rect: Rect, info: ProcessInfo) -> Self {
+    pub fn new(pane_id: &str, tab: String, rect: Rect, info: ProcessInfo, env: Vec<(String, String)>) -> Self {
         MemPane {
             tab,
             rect,
@@ -45,6 +46,7 @@ impl MemPane {
             screen_reads: 0,
             last_nonce: String::new(),
             on_launch_foreground: None,
+            env,
         }
     }
 
@@ -179,6 +181,10 @@ impl MemDriver {
     pub fn tab_of(&self, pane: &str) -> String {
         self.panes.borrow()[pane].tab.clone()
     }
+    pub fn env_of(&self, pane: &str) -> Option<Vec<(String, String)>> {
+        self.panes.borrow().get(pane).map(|p| p.env.clone())
+    }
+
 
     fn current(&self) -> ServerIncarnation {
         ServerIncarnation {
@@ -192,7 +198,7 @@ impl MemDriver {
     }
 }
 
-fn bare(shell: u32) -> ProcessInfo {
+pub fn bare(shell: u32) -> ProcessInfo {
     ProcessInfo {
         shell_pid: shell,
         foreground_pgid: shell,
@@ -217,9 +223,15 @@ impl TerminalDriver for MemDriver {
     fn tab_create(&self, label: &str, cwd: Option<&str>, env: &[(String, String)]) -> DriverResult<CreatedPane> {
         let tab = self.id("t");
         let pane = self.id("p");
-        self.log.borrow_mut().push(format!("tab.create {label} cwd={} env={} -> {tab}/{pane}", cwd.unwrap_or("-"), env.len()));
+        let caller_env_count = env.iter().filter(|(k, _)| k != "DISABLE_AUTO_UPDATE").count();
+        self.log.borrow_mut().push(format!(
+            "tab.create {label} cwd={} env={} pairs={:?} -> {tab}/{pane}",
+            cwd.unwrap_or("-"),
+            caller_env_count,
+            env
+        ));
         self.tabs.borrow_mut().push((tab.clone(), label.to_string()));
-        self.panes.borrow_mut().insert(pane.clone(), MemPane::new(&pane, tab.clone(), self.area, bare(900)));
+        self.panes.borrow_mut().insert(pane.clone(), MemPane::new(&pane, tab.clone(), self.area, bare(900), env.to_vec()));
         Ok(CreatedPane { tab_id: tab, pane_id: pane })
     }
     fn pane_split(&self, anchor: &str, direction: Direction, ratio: f64, cwd: Option<&str>, env: &[(String, String)]) -> DriverResult<CreatedPane> {
@@ -239,8 +251,14 @@ impl TerminalDriver for MemDriver {
         let tab = a.tab.clone();
         drop(panes);
         let pane = self.id("p");
-        self.log.borrow_mut().push(format!("pane.split {anchor} {direction:?} {ratio} cwd={} env={} -> {pane}", cwd.unwrap_or("-"), env.len()));
-        self.panes.borrow_mut().insert(pane.clone(), MemPane::new(&pane, tab.clone(), new_rect, bare(901)));
+        let caller_env_count = env.iter().filter(|(k, _)| k != "DISABLE_AUTO_UPDATE").count();
+        self.log.borrow_mut().push(format!(
+            "pane.split {anchor} {direction:?} {ratio} cwd={} env={} pairs={:?} -> {pane}",
+            cwd.unwrap_or("-"),
+            caller_env_count,
+            env
+        ));
+        self.panes.borrow_mut().insert(pane.clone(), MemPane::new(&pane, tab.clone(), new_rect, bare(901), env.to_vec()));
         Ok(CreatedPane { tab_id: tab, pane_id: pane })
     }
     fn pane_close(&self, pane: &str, expected: &ServerIncarnation) -> DriverResult<CloseOutcome> {

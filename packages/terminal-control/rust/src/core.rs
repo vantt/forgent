@@ -871,8 +871,18 @@ impl<'a> Core<'a> {
     }
 }
 
+/// Builds the environment variable pairs for panes created by the core (`tab_create` and `pane_split`).
+/// Merges `DISABLE_AUTO_UPDATE=true` by default to prevent shells using oh-my-zsh from blocking
+/// on auto-update prompts at pane launch.
+///
+/// Invariant: only `DISABLE_AUTO_UPDATE` is set, never `DISABLE_UPDATE_PROMPT` (which causes oh-my-zsh
+/// to update the user's install silently without asking). Caller-provided values win.
 fn env_pairs(request: &AllocateRequest) -> Vec<(String, String)> {
-    request.env.iter().map(|(k, v)| (k.clone(), v.clone())).collect()
+    let mut pairs: Vec<(String, String)> = request.env.iter().map(|(k, v)| (k.clone(), v.clone())).collect();
+    if !request.env.contains_key("DISABLE_AUTO_UPDATE") {
+        pairs.push(("DISABLE_AUTO_UPDATE".to_string(), "true".to_string()));
+    }
+    pairs
 }
 
 /// The shell line a launch types into the pane: change directory, set the

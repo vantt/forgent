@@ -564,3 +564,69 @@ fn a_vanished_pane_ends_the_handshake_at_once_with_unknown() {
     let out = core.launch("a", &launch_spec());
     assert!(matches!(&out, Err(Refusal::Unknown { reason }) if reason.contains("pane is gone")), "{out:?}");
 }
+
+#[test]
+fn a_created_pane_gets_the_quiet_env() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("quiet-env-created"));
+    let req1 = request("pane-tab", "group-1");
+    let slot1 = core.allocate(&req1).unwrap().slot;
+
+    let env1 = driver.env_of(&slot1.pane_id).expect("env recorded for created tab pane");
+    assert!(
+        env1.contains(&("DISABLE_AUTO_UPDATE".to_string(), "true".to_string())),
+        "created tab pane must receive DISABLE_AUTO_UPDATE=true, got {env1:?}"
+    );
+
+    let req2 = request("pane-split", "group-1");
+    let slot2 = core.allocate(&req2).unwrap().slot;
+    let env2 = driver.env_of(&slot2.pane_id).expect("env recorded for created split pane");
+    assert!(
+        env2.contains(&("DISABLE_AUTO_UPDATE".to_string(), "true".to_string())),
+        "created split pane must receive DISABLE_AUTO_UPDATE=true, got {env2:?}"
+    );
+}
+
+#[test]
+fn a_caller_value_for_the_same_key_wins() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("quiet-env-caller-wins"));
+    let mut req = request("pane-override", "group-1");
+    req.env.insert("DISABLE_AUTO_UPDATE".into(), "false".into());
+    let slot = core.allocate(&req).unwrap().slot;
+
+    let env = driver.env_of(&slot.pane_id).expect("env recorded for created pane");
+    assert!(
+        env.contains(&("DISABLE_AUTO_UPDATE".to_string(), "false".to_string())),
+        "caller-provided DISABLE_AUTO_UPDATE must win, got {env:?}"
+    );
+    assert!(
+        !env.contains(&("DISABLE_AUTO_UPDATE".to_string(), "true".to_string())),
+        "default DISABLE_AUTO_UPDATE=true must not be added when caller provides it, got {env:?}"
+    );
+}
+
+#[test]
+fn an_attached_pane_is_created_with_no_env() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("attached-no-env"));
+    let tab = "t-existing".to_string();
+    let pane = "p-existing".to_string();
+    driver.tabs.borrow_mut().push((tab.clone(), "ext".into()));
+    driver.panes.borrow_mut().insert(
+        pane.clone(),
+        MemPane::new(&pane, tab, driver.area, bare(500), vec![]),
+    );
+
+    let tab_creates_before = driver.calls("tab.create").len();
+    let splits_before = driver.calls("pane.split").len();
+
+    let attached = core.attach("attached-key", &pane, None, None).unwrap();
+    assert_eq!(attached.origin, Origin::Attached);
+    assert_eq!(attached.slot.pane_id, pane);
+
+    assert_eq!(driver.calls("tab.create").len(), tab_creates_before);
+    assert_eq!(driver.calls("pane.split").len(), splits_before);
+    let env = driver.env_of(&pane).expect("pane exists");
+    assert!(env.is_empty(), "attached pane must have no env injected, got {env:?}");
+}
