@@ -144,6 +144,7 @@ impl ContainmentDriver for WindowsJobDriver {
             driver: "windows-job",
             level: GuaranteeLevel::Kernel,
             escapes: vec!["processes created outside the job by a service or COM server on the agent's request"],
+            selected_because: None,
         }
     }
 }

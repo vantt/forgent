@@ -2,27 +2,64 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "identity.write.request",
   "title": "Identity write request v1",
-  "description": "`fgos identity machine --alias <name>`: replaces <stateRoot>/machine-alias atomically. The alias must follow the Convention machine-handle kind. It changes the handle only, never the machine id, and needs a machine id to exist.",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["alias"],
-  "properties": {
-    "alias": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,39}$" }
-  },
+  "description": "Two writes. `fgos identity machine --alias <name>` replaces <stateRoot>/machine-alias atomically; the alias must follow the Convention machine-handle kind, changes the handle only, never the machine id, and needs a machine id to exist. `fgos identity project --init|--new [--handle <name>]` writes .fgos/project.json of the main checkout: `--init` mints once and refuses when the file exists (project-id-exists), in a linked worktree (linked-worktree) or when the remote default branch, as last fetched, already tracks the file (project-id-on-remote); `--new` replaces the id on purpose (a fork split) and skips the last two checks. The handle follows the Convention project-handle kind and defaults to the slug of the folder name. Nothing else ever writes the file.",
+  "oneOf": [
+    {
+      "type": "object",
+      "description": "machine alias",
+      "additionalProperties": false,
+      "required": ["alias"],
+      "properties": {
+        "alias": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,39}$" }
+      }
+    },
+    {
+      "type": "object",
+      "description": "project mint",
+      "additionalProperties": false,
+      "required": ["mint"],
+      "properties": {
+        "mint": { "enum": ["init", "new"] },
+        "handle": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,39}$" }
+      }
+    }
+  ],
   "definitions": {
     "outcome": {
       "$id": "identity.write.outcome",
       "title": "Identity write outcome v1",
-      "description": "The machine as `identity.read` prints it, after the write.",
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "handle", "alias"],
-      "properties": {
-        "id": { "type": "string" },
-        "handle": { "type": "string" },
-        "alias": { "type": "string" }
-      },
-      "x-refusals": ["invalid-alias", "machine-id-missing", "machine-id-unreadable", "alias-write-failed"]
+      "description": "The machine as `identity.read` prints it after an alias write, or the project minted with where it went and the command that commits it.",
+      "oneOf": [
+        {
+          "type": "object",
+          "description": "machine",
+          "additionalProperties": false,
+          "required": ["id", "handle", "alias"],
+          "properties": {
+            "id": { "type": "string" },
+            "handle": { "type": "string" },
+            "alias": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "description": "project",
+          "additionalProperties": false,
+          "required": ["id", "handle", "createdAt", "file", "commit"],
+          "properties": {
+            "id": { "type": "string", "pattern": "^[0-9a-f]{32}$" },
+            "handle": { "type": "string" },
+            "createdAt": { "type": "string" },
+            "file": { "const": ".fgos/project.json" },
+            "commit": { "type": "string", "description": "The command that commits the new file by pathspec." }
+          }
+        }
+      ],
+      "x-refusals": [
+        "invalid-alias", "machine-id-missing", "machine-id-unreadable", "alias-write-failed",
+        "project-id-exists", "project-id-on-remote", "linked-worktree", "invalid-handle", "project-write-failed",
+        "not-a-repository", "git-read-failed", "project-root-unreadable", "no-working-directory"
+      ]
     }
   }
 }

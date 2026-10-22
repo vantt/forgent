@@ -259,6 +259,7 @@ version = "0.2.0"
 dependencies = [
  "fgos-convention",
  "fgos-durable-file",
+ "fgos-git",
  "fgos-holder-lock",
  "fgos-host-runtime",
  "fgos-process",

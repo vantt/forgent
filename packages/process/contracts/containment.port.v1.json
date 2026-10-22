@@ -25,7 +25,13 @@
         }
       },
       "output": "hostTuple of the root process (linux-gate: the gate as pid 1 of the new namespace, read from bwrap --info-fd child-pid); the domain id is now complete",
-      "errors": { "enum": ["spawn-failed", "namespace-unavailable", "invalid-bwrap-prefix", "driver-unavailable", "io"] }
+      "errors": {
+        "enum": ["spawn-failed", "namespace-unavailable", "invalid-bwrap-prefix", "driver-unavailable", "io"],
+        "namespaceUnavailableCauses": [
+          "containment-mount-refused: <line> (bwrap failed to remount a host mount)",
+          "bwrap ended without reporting a gate pid: <line> (generic early exit)"
+        ]
+      }
     },
     "is_empty": {
       "input": { "domain": "domain" },
@@ -50,7 +56,12 @@
       }
     },
     "guarantee": {
-      "output": { "driver": "string", "level": { "enum": ["kernel", "best-effort", "unsupported"] }, "escapes": "string[], named escape routes reported by doctor" },
+      "output": {
+        "driver": "string",
+        "level": { "enum": ["kernel", "best-effort", "unsupported"] },
+        "escapes": "string[], named escape routes reported by doctor",
+        "selectedBecause": "string | null, optional reason why the driver was selected (Linux best-effort: bwrap-not-found, containment-mount-refused: <line>, user-namespace-refused: <line>)"
+      },
       "drivers": {
         "linux-gate": { "level": "kernel", "escapes": ["processes created by a daemon outside the namespace on the agent's request (herdr, systemd, docker)"] },
         "linux-pgroup": { "level": "best-effort", "escapes": ["setsid descendants leave the process group", "daemons outside the domain", "a group scan after the leader died can meet a reused pgid"] },

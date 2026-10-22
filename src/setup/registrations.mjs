@@ -145,7 +145,7 @@ import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from 
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
-import { checkIdentityMachineId, fixIdentityMachineId } from './identity-checks.mjs';
+import { checkIdentityMachineId, checkIdentityProjectId, fixIdentityMachineId } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations, fixTerminalDir } from './terminal-control-checks.mjs';
 import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
@@ -6285,6 +6285,12 @@ registerCheck({
   check: (cwd) => checkIdentityMachineId(cwd),
 });
 registerFix({ id: 'identity-machine-id', fix: (cwd) => fixIdentityMachineId(cwd) });
+
+registerCheck({
+  id: 'identity-project-id',
+  description: 'this repository carries one project id in the tracked file .fgos/project.json, the same in every clone; absent only warns, and there is no fix: run `fgos identity project --init` once on one machine, commit, pull elsewhere',
+  check: (cwd) => checkIdentityProjectId(cwd),
+});
 
 /**
  * The host Seat Binding would run (the same resolution the client uses:

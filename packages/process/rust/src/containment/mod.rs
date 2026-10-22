@@ -156,6 +156,7 @@ pub struct Guarantee {
     pub driver: &'static str,
     pub level: GuaranteeLevel,
     pub escapes: Vec<&'static str>,
+    pub selected_because: Option<String>,
 }
 
 /// Port errors. `name()` is the stable name the contract and the callers use.

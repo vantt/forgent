@@ -417,6 +417,14 @@
         "help",
         "json"
       ],
+      "project": [
+        "dir",
+        "handle",
+        "help",
+        "init",
+        "json",
+        "new"
+      ],
       "session": [
         "dir",
         "fgos-dir",

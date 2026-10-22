@@ -118,7 +118,8 @@ pub fn native_operation_id(route_operation: &str, args: &[OsString]) -> Result<S
 }
 
 /// `fgos identity [--pid <n>] [--fgos-dir <dir>] [--json]`, `fgos identity
-/// machine [--alias <name>] [--json]`. `--dir` is accepted and ignored on
+/// machine [--alias <name>] [--json]`, `fgos identity project [--init|--new]
+/// [--handle <name>] [--json]`. `--dir` is accepted and ignored on
 /// every verb, because the shell integration appends it.
 fn project_identity_request(
     args: &[OsString],
@@ -138,6 +139,10 @@ fn project_identity_request(
             fgos_identity::Verb::Session,
             &["--pid", "--fgos-dir", "--dir"],
         ),
+        Some("project") => (
+            fgos_identity::Verb::Project(fgos_identity::ProjectAction::Read),
+            &["--init", "--new", "--handle", "--dir"],
+        ),
         Some(other) => {
             return Err(format!(
                 "unknown identity subcommand '{other}'. Available: {}",
@@ -149,10 +154,22 @@ fn project_identity_request(
         verb,
         ..Default::default()
     };
+    // `Some(fork)` once `--init` (false) or `--new` (true) was given.
+    let mut mint: Option<bool> = None;
+    let mut handle: Option<String> = None;
     while index < args.len() {
         let value = args[index].to_string_lossy().into_owned();
         index += 1;
         if value == "--json" {
+            continue;
+        }
+        if value == "--init" || value == "--new" {
+            if !allowed.contains(&value.as_str()) {
+                return Err(format!("unknown identity option '{value}'"));
+            }
+            if mint.replace(value == "--new").is_some() {
+                return Err("--init and --new are exclusive and each given once".into());
+            }
             continue;
         }
         let (flag, inline_value) = value
@@ -184,6 +201,12 @@ fn project_identity_request(
                     .ok_or_else(|| format!("--pid must be a positive integer, got '{flag_value}'"))?;
                 request.pid = Some(pid);
             }
+            "--handle" => {
+                if flag_value.is_empty() {
+                    return Err("--handle requires a value".into());
+                }
+                handle = Some(flag_value);
+            }
             "--alias" => {
                 if flag_value.is_empty() {
                     return Err("--alias requires a value".into());
@@ -199,6 +222,14 @@ fn project_identity_request(
                 request.fgos_dir = Some(std::path::PathBuf::from(flag_value));
             }
         }
+    }
+    if matches!(request.verb, fgos_identity::Verb::Project(_)) {
+        request.verb = fgos_identity::Verb::Project(match (mint, handle) {
+            (None, None) => fgos_identity::ProjectAction::Read,
+            (None, Some(_)) => return Err("--handle needs --init or --new".into()),
+            (Some(false), handle) => fgos_identity::ProjectAction::Init { handle },
+            (Some(true), handle) => fgos_identity::ProjectAction::New { handle },
+        });
     }
     Ok(request)
 }
@@ -350,6 +381,12 @@ mod tests {
             .map(OsString::from)
             .collect();
         assert!(native_operation_id("identity.writer", &args).is_err());
+        assert_eq!(operation(&["identity", "project", "--json"]), "identity.read");
+        assert_eq!(operation(&["identity", "project", "--init"]), "identity.write");
+        assert_eq!(
+            operation(&["identity", "project", "--handle", "app", "--new"]),
+            "identity.write"
+        );
     }
 
     #[test]

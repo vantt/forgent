@@ -12,11 +12,11 @@ use common::{scratch, spec, wait_for};
 fn containment_pgroup_grace_snapshot_keeps_a_setsid_child_of_a_leader_that_ends_on_sigterm() {
     let _ = common::require_bwrap;
     let dir = scratch("grace");
-    let driver = LinuxPgroup;
+    let driver = LinuxPgroup::default();
     let mut domain = driver.create("attempt-grace").unwrap();
     // The leader ends on SIGTERM; its setsid child ignores it.
     let script = r#"setsid sh -c 'trap "" TERM; echo $$ > "$1/child.pid"; while :; do sleep 1; done' sh "$1" & wait"#;
-    let mut spawned = driver.spawn_in(&mut domain, spec(&["sh", "-c", script, "sh", &dir.display().to_string()])).unwrap();
+    let mut spawned = driver.spawn_in(&mut domain, spec(["sh", "-c", script, "sh", &dir.display().to_string()])).unwrap();
     let child: u32 = wait_for(&dir.join("child.pid")).trim().parse().unwrap();
     assert_eq!(driver.is_empty(&mut domain), DomainState::NotEmpty);
     assert_eq!(driver.kill_all(&mut domain, 300), KillOutcome::Ok);
@@ -42,9 +42,9 @@ fn is_subreaper() -> bool {
 fn spawn_in_never_makes_the_caller_a_subreaper() {
     if std::env::var_os("FGOS_TEST_SUBREAPER_PROBE").is_some() {
         assert!(!is_subreaper(), "a fresh test process starts as no subreaper");
-        let driver = LinuxPgroup;
+        let driver = LinuxPgroup::default();
         let mut domain = driver.create("attempt-subreaper").unwrap();
-        let mut spawned = driver.spawn_in(&mut domain, spec(&["sleep", "600"])).unwrap();
+        let mut spawned = driver.spawn_in(&mut domain, spec(["sleep", "600"])).unwrap();
         let after = is_subreaper();
         let record = domain.domain().unwrap().clone();
         assert_eq!(domain_kill_all(&record), KillOutcome::Ok);
