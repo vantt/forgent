@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "53b17c5d044af7dc8b6d5063debfb6e0b68836b6bd9449259652a8ff8e81306b",
+  "payloadDigest": "9dc9ef93693d6538d3d1e808b07b1965270a9894b62f038a705d01b6eaffe7cb",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -64,7 +64,7 @@
     ".agents/skills/fgos-researching/SKILL.md": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
     ".agents/skills/fgos-routing/SKILL.md": "8a215975394d282772c768e69a0767aabbf1a2ca30e0fe7959252f7fcdba3a8e",
     ".agents/skills/fgos-run/SKILL.md": "03546387e1980b232ef90159c93aa8b7e6f7da787f71980d284fceea855bdc11",
-    ".githooks/pre-commit": "418a1c5f9969b3a9a1f2e13a77e2a7fe60e5ddb93e78bc2b25e47a70e9ea29f4",
+    ".githooks/pre-commit": "3d548da4628bda7a2e87fc90994fa9b9c2abb59da3924513da5c2fb99a612529",
     "apps/fgctl/src/main.rs": "3f59cfc17cfd6c8268d15dcbeb0649b8cead1d18c387c7b20e14ce55ab26b9ff",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "bfea8f7ae0cf3efc8ca60adba26fa645613ccf1b1196dc2d220b69562401b8c6",
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c8a6cb7619d9578e02479069fbb0f43a5206583b53a7c6d65373d285d69ca331",
@@ -91,7 +91,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
     "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
     "bin/fgos-runner.mjs": "dca3d8b530f20aaf8d9d8d424f12ec1c5d9670812566ab4d6c51583f3bb7b573",
-    "bin/fgos.mjs": "cf16abd1644fb6e51974bb71653add639f781a4313340521392724e871e42d7e",
+    "bin/fgos.mjs": "494b025ce5369c8ed4981fb3dbe390e21666ba7330cc52fe76bbf13c844810d1",
     "core/skills/_shared/ak-cook-worker-contract.md": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
     "core/skills/_shared/capability-catalog.md": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -288,7 +288,7 @@
     "packages/git/node-addon/src/git/refs.rs": "d1e1413d7a99cd3d9422927e188ee1a68dbb34ad38df9dec09e3e2d5f6cfcb0b",
     "packages/git/node-addon/src/git/remote.rs": "fac13d0b12aa97cbe0b2abb9b95a042f9ae8f840f440ab7435375fbc7cc30d87",
     "packages/git/node-addon/src/git/restore.rs": "aae7895522db76e1bf0092d5b5b84baea215a8868956d24ed84774b2cc6cd323",
-    "packages/git/node-addon/src/git/scoped_commit.rs": "daf55ab59289ea8cf48d33c2ad99f14816bba55264fb59b803a2fa51dc625500",
+    "packages/git/node-addon/src/git/scoped_commit.rs": "47cd9acce62141ac23e185f537a6b638241cd9a9d669765d7066bcbec215f255",
     "packages/git/node-addon/src/git/sync.rs": "a541edc814725b495011e78e0647062bf7567669d0247a12c05d6f265a38f05a",
     "packages/git/node-addon/src/git/worktree.rs": "4d15190574dcba294db6214c818039ef754fce829a415ba204a43acf10678c30",
     "packages/git/node-addon/src/git/write_scope.rs": "657f168ae337fac9315cd39fc8681bc069c16b5ff7ce2dd607dfef39dc9ce5ee",
@@ -298,10 +298,10 @@
     "packages/git/node-addon/src/session_identity.rs": "dd6e0c3dce078ab053aa9407f4b1394b0562e87aa9a8b45015c893626675ca78",
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
     "packages/git/rust/src/driver.rs": "8cf69968d10f4ee48276e83cb2357844890ec9fb8748c830c8fbfae5c9980ab0",
-    "packages/git/rust/src/grant.rs": "d4f47e49d85994778dc093098b47584e3f73c3cec5f501af82a1c5cd787446f2",
+    "packages/git/rust/src/grant.rs": "5de9925630a6b146acb703ec4b4c4969c80daac1c48dc0e2880e8333d3f1a208",
     "packages/git/rust/src/inspect.rs": "64abeda97e9455664051ac7a304a5d3152a5fde88338d95f141b1b77e1196e1c",
     "packages/git/rust/src/land.rs": "5b585935c49567bdaff1c7577689c81b4b98f0a0cad24cdf1b248adb32fe2234",
-    "packages/git/rust/src/lib.rs": "05fd3a939365b517860eb781c28db2c5c70a7101225740fb3f2cd1e0107788ae",
+    "packages/git/rust/src/lib.rs": "828fe7f9d81979d14fcdcf0fc85e59994bde681deecc6ba5b38dff3c4d64c2fb",
     "packages/git/rust/src/native_lock.rs": "a90c68aba9a82cc3154815e47edba2230edbd9b641675c5da0eabf2ce6c17beb",
     "packages/git/rust/src/objects.rs": "ba519abbf01327819f9f2fb5cf42f05633e108cc6741e26e00b289f54b064b9c",
     "packages/git/rust/src/publication.rs": "c6770e7aba51fc241dba13db524ea38fdef934d5454b5c1544dec9a1032ff239",
@@ -310,7 +310,7 @@
     "packages/git/rust/src/remote.rs": "5d4be338ec334daf9270869bfd7ae7a392a74a80636666206a9e0744734873e4",
     "packages/git/rust/src/repository_config.rs": "fee7b1369e589ad300f19174d8464b3eaef005b49d77d39b98b2be0c3ae58b2e",
     "packages/git/rust/src/restore.rs": "83be51119cf4ca3611fc04bcbef1c6a789ddd81dc370f60f28a4b8980d5c88d5",
-    "packages/git/rust/src/scoped_commit.rs": "651f66174e1212e2667314a9e0e5768b1e5fb946f70239b1edd5bb061917e739",
+    "packages/git/rust/src/scoped_commit.rs": "089ce741f99f61fc2dbf22766d42949e97c6e3525f0a4c01029f1fdfe735ba88",
     "packages/git/rust/src/sync.rs": "103096ec5cc98194be1acb9987e9cd71d0edc5f0a885ccd1929f31f0bff73f4e",
     "packages/git/rust/src/wal.rs": "d795a14faac0bcfea6d76c4cde6edadc0f82cc292353cbf974037aba42bb54ae",
     "packages/git/rust/src/worktree.rs": "7cb972be0cde38a9df3726ecf84fe13d7e0b3e0a65f3ba525a48253042aa0beb",
@@ -321,11 +321,11 @@
     "packages/git/rust/tests/land.rs": "2579e5af13402be3ad2e24eb10bc883383c072ab5feab3eb54b4f50d138bf98e",
     "packages/git/rust/tests/land_crash_matrix.rs": "3e63d7c4cd185a08e0acf3c99be37c66a2baf3f730683df2acb4c075e78a7ded",
     "packages/git/rust/tests/publication.rs": "5a9b429be6b3335ea0d126e6da505959088199a6f9fe743bf8e286f696ba1798",
-    "packages/git/rust/tests/recovery_matrix.rs": "f10897d2701702f185370b1e83c0b526bd2bf1c8c4f72cb91445bd8331731c5c",
+    "packages/git/rust/tests/recovery_matrix.rs": "c0f7988102d00b400576c4899e17f1966a47e5f955a8bfd6f5dda8b5dd659160",
     "packages/git/rust/tests/refs_remote.rs": "4965eaea84acdcfee9d30cefcc46ffc06026c68f47f95f6b9ecd6b5812ce64a5",
     "packages/git/rust/tests/repository_config.rs": "da1b379e0b3e4cd1ee53de499462673720c1a84234054ff7f030b94c66c68758",
     "packages/git/rust/tests/safe_restore.rs": "ad8c5d0dabd9e7076a4d26fb706523fd293ce713bcc805b21600e5ee4a56f7e5",
-    "packages/git/rust/tests/scoped_commit_sync.rs": "70afc54504d532f507352a6d24c1d144428d8c608c490a0ba442a927efb29d3c",
+    "packages/git/rust/tests/scoped_commit_sync.rs": "25dacc60f755684f8bad764b11048ec32537556a03008525d9b8788d9a9fcfe2",
     "packages/git/rust/tests/support/land.rs": "46bec8c0928eb4b53d6db71204661638b626b6dfe199d39f4890444c1b14ac07",
     "packages/git/rust/tests/support/signing.rs": "a083733ad39ab4d35f12a600b5cd90ac08c53ae35686ce66f22147b933bf634c",
     "packages/git/rust/tests/worktree.rs": "3eb8248c732e4f9ec4b53304b4aee768720497c9ffed168ac10711d5cd9078e9",
@@ -552,11 +552,11 @@
     "packages/terminal-control/rust/tests/herdr_driver_live.rs": "3d2f2bc0b66db1fb4cccab5098256835782985ed7b901822f85cc6f459503534",
     "packages/terminal-control/rust/tests/policy_fixtures.rs": "88909d80eca0f638b71a33c02d9b8c6f0346c378776a2885afcc9fd2e26c2f9f",
     "packages/terminal-control/rust/tests/store_publish.rs": "7ba66079f7e59ccbc86582b96b5cecd05a0bbc6569ab99f8eaee2faa31e0de87",
-    "packages/work-state/rust/src/legacy_friction.rs": "4fc646bb8bac02b8670ff8a2c5eb40bbd3d52c7d80c6b3c1e79aaa68423e512e",
-    "packages/work-state/rust/src/lib.rs": "11f49bcb01e30b7ad8d466114292e0b4efe5ccbb03ca3100e18b72bbad687ffb",
-    "packages/work-state/rust/src/work_source.rs": "0222f9d33ca3db5200588ed6662530218cb9717f0a9ed322a5d58a54536b94dd",
-    "scripts/backfill-status-category.mjs": "559976e36826b535131e2638e024186a051182339b8012b89b857efa4422582f",
-    "scripts/backfill-unit-summaries.mjs": "a11d12e63191bc31bf7a27b2c7279ac5ea8403730045dbbaa8f8ce2738b275e5",
+    "packages/work-state/rust/src/event_reader.rs": "3b018ba342d798e59ec748f8cf4d452e79d3a1b4b7c38081b9c7b3155fa39a51",
+    "packages/work-state/rust/src/legacy_friction.rs": "e4ba455ec43b3340dca4c9583728eb5fcbacf594f58ee99d045d2366187ca3a9",
+    "packages/work-state/rust/src/lib.rs": "439f5861e946ee9880c6137d54e8285b44c6ba02c41c19eb720bf293c9196c51",
+    "packages/work-state/rust/src/work_source.rs": "6f50af247209fd8e6ff6b30a2a5f66e7e1506748f1d7a4d8a5b5962ca37ed063",
+    "scripts/backfill-unit-summaries.mjs": "f42d32b5f9dd889a7a16f1debe8d564eb2dccecae02fd39e80a705cd99ecbc04",
     "scripts/build-domain-registry.mjs": "ad239f74764832366c3c3bd43c674012904a78944bd6d6b9d2c8eb481c1a62c0",
     "scripts/build-rust-distribution.mjs": "6c5b170c97f1529e54e40489fb8dab522eeafe50f502b30e81687cf69c469200",
     "scripts/build-skill-wrappers.mjs": "ca8b0121333b29830a35553e7360f14c19254d0a157cb5f79c217ad749038242",
@@ -571,12 +571,11 @@
     "scripts/ci-external-consumer.sh": "d097aeeacae5d35e7e2163e8d4fcc859df69efe57c05c22ca940e83beb6ab954",
     "scripts/decision-question-hook.mjs": "5f4d242754bea6fa460288e790a4354d6780d847305ef3779c4547137d6872d1",
     "scripts/dispatch-decide-hook.mjs": "c3385557ec6c469ea6709d30dcbcd704a1a74d1c7f5011109bfc0f999dec08af",
-    "scripts/event-store/forge-probe.sh": "ded9901fbe85905bcb51610754943f449737ef91fc11b02dcba6936102dd22c8",
+    "scripts/event-store/forge-probe.sh": "9a0e3a46191ba9a7f1c582927760ec48c6aed5cbc2a613e5c35d77cc75a27a84",
     "scripts/event-store/power-loss-driver.mjs": "f7f88a6d9e80fe17027d7d6981c04f544d4b49e6629e46b0cfbdcbdeac75a7a3",
     "scripts/event-store/power-loss.sh": "f0023c1352dc57b85aba68c844d5abc28e8967a9a892c557d80b77434b9b2136",
     "scripts/event-store/store-increment-worker.mjs": "677424f7dae51f0566c9eb61cd96171347084ef2d93f5da1fc8133cea2f5af2a",
     "scripts/event-store/v-spawn-bench.mjs": "a9f2da47d5410ef6baef1200d9d5261c2bf3fed24cfe7450ce4d6913712a1890",
-    "scripts/events-jsonl-truncation-guard.mjs": "772467fc1de75f0ecb39efecd08b607bb593c4f0b38b3586c82e2c4a4f710654",
     "scripts/explain-command-route.mjs": "db546d74676a1c91c3309241dcb618dc438fbae79448f4e2253319657dbbee24",
     "scripts/export-command-selectors.mjs": "8ef578e5f5c2bfbe350a941b5d3896b0684c4030958505f941365e3f6456cdbd",
     "scripts/fgos-session-start-hook.mjs": "6ec944bb42698570cb5cb860d24bde1229d884f968ce0f6771c05b9c11a93af6",
@@ -584,7 +583,7 @@
     "scripts/git-addon.mjs": "67532c2006d74a97cbc40814e82882da1de5d48b5d072670444489e2ed963d71",
     "scripts/git/e1-power-cut.mjs": "58e093cefe327fc2d7c2dd791185a02c68ee596925d0adb3b9a544abe5d18458",
     "scripts/git/e1-power-cut.sh": "be0500b7f99580694cf1ca7418c17ddf6bd70583f3a06686aaab923118e2d1fa",
-    "scripts/git/e3-bench.mjs": "8a71b44d68256de1695838acd499542f616e53f287cd7ce59108cd1638991294",
+    "scripts/git/e3-bench.mjs": "f6872324db293e49fca1e320938f5e19ceb8cbe892672e036967197c41e5ce20",
     "scripts/git/p-release-checks.sh": "08bb9b3c32e7915b27f645f7aa68d42cba0dbddd2a7dc9adc45d43a75b4d0056",
     "scripts/git/p-space-resource.mjs": "31e12327e2782a769a341cb6819f7e1e24d63e78de732c1ad210e430433aad06",
     "scripts/git/p-space.sh": "ab11ec0d8fc8c5a0c32f0dcc1aa08d26c39356db710a4e395513f87af78decd3",
@@ -608,22 +607,19 @@
     "scripts/lib/test-git-config-guard.mjs": "e9bc333d889985d94b847fd80fbfed7e6dcfa1e9b2ffffc97a14e7be326153d1",
     "scripts/measure-coordination-baseline.mjs": "b890da1963fd4ee50ac84cd53e5e9b45aa7ce37a92d51c6a633bdb2374ec6a7a",
     "scripts/measure-p08-performance.mjs": "2ab686e2e3f880f584a2f9278a6bbb27a49d71effcdb65215f1cbd3865099e3e",
-    "scripts/measure-verify-cost.mjs": "76c5bc7fe1894af9eb5c7bf6de2177797bfb3ff4ff05b0826c3c7c6e765e5895",
-    "scripts/migrate-actor-to-role.mjs": "c7cbf743d674d30e02cbd92046a76c30d375994292fead5c89d9445065b0ae36",
-    "scripts/migrate-status-proposed-to-awaiting-approval.mjs": "3c68423a369856864d8d675596c45328a78b410f76c715af07684738f9ab4ca5",
-    "scripts/migration-proof-2a.mjs": "c8097ce5bb23d816e31280eaafdb56a2b8ccc3fc3e13c763375255ef46705c80",
+    "scripts/measure-verify-cost.mjs": "97768198548908742f0687b069fbe77dfc35839a88e4906f3813afbdd5918abc",
     "scripts/next-doc-id.mjs": "7e88c69cf6c78b4cce5240d3fcc34a1182fc963933435827a58974df5458bc9d",
     "scripts/package-release-assets.mjs": "088b9a0ad108920363ba5b4f540fb0c93b45b2960990981ab4e7558cff5fc59e",
     "scripts/prepare-release.mjs": "f896378a498bd154408b5116a7172e0c3c3f8c73ffd2ccee7a4930200d9e8ade",
-    "scripts/probe-storytelling-material.mjs": "c697fb57bee9fd1e4d2464edd31312e41e9f661e540b159f86d7573ff83e9b5c",
+    "scripts/probe-storytelling-material.mjs": "b2991c1c14879193953d901e9122a9e511136a91907949643b7f1af008590df4",
     "scripts/project-agents.mjs": "d8ee4167562589fa0c728847571e86bb1c8a487fef3fbb471c843e67d86063ec",
-    "scripts/regenerate-observe-fixtures.mjs": "07c5b42795e22c36d75363e2265cf59b6f6244d63f7413d9dacf9fe0e3071631",
+    "scripts/regenerate-observe-fixtures.mjs": "b80f784ce57b673c421406f94ba2e3e9aa888f6c0c961264e0849b9b99438a8f",
     "scripts/run-rust-dev-host.mjs": "e10af7fa8c280ecb62cbde50e8d2e2160e1135b2bdd20c02867d0f0351ba641b",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "9495f5fe973cfcd2b4367c8092dddf58c0dce818acbc3fda13eb4ecad2acfc53",
-    "scripts/stress-test-files.mjs": "c3ccd385982e8e1865b54e02abef044ae3e85a4547f34c9efd2fcbcc66d37240",
+    "scripts/run-tests.mjs": "72208e3b33efd3007f72c0f3dbee86fa44f069064d326d6b0d27da7e5f65ed58",
+    "scripts/stress-test-files.mjs": "1c9298587bae21b5971c2e1eba5effd3c2a0c85ba94372936fa5e0c1d70d4f4e",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
-    "scripts/test-proof-inventory.mjs": "61a54de2d57888dadb31138db836c569d5663046f4f835bf63061b43cbb77a35",
+    "scripts/test-proof-inventory.mjs": "3d5277c7d4894c4945ba9829b2fce3127add921e25988a9b1145ad4d50a6f72c",
     "scripts/test-select-compare.mjs": "45ec5c8f1b192430431127a06133376cd5e5d2a50f8e6865472c1ae341ae1329",
     "scripts/test-select-coverage-map.mjs": "b313d02cce6c8fa7f03dae8acdfd14a37b8f3a04b330ae9b2c144d0287b08e85",
     "scripts/test-select-mutate.mjs": "49cb3f6157c175d56539cf2c4f3f637a8225395c30750627bb80dbfa736d21ec",
@@ -632,24 +628,25 @@
     "scripts/test-select-run-plan.mjs": "94789b3167a55ee33a18ea3a3abd4ac87fa1c06601356d6ae0fe9f864fa49984",
     "scripts/test-select.mjs": "8f10398be7ebbd1c782e005218925b84f6757b554b67b827f0d42e0a5686dd8b",
     "scripts/test-timing.mjs": "9b9dd13f78f4aaeaf60d43909e3224c465a4e34270032bf9845c23529bc243c1",
-    "scripts/verify-fanout-overlap.mjs": "3f96381f4ea858b09f8103987f83d712a368ebaf9f8297ef223a7190f1d29fd6",
+    "scripts/verify-fanout-overlap.mjs": "b74a0ac9f350c5d62a47f3e3bf0896e9d142e5cbba15284527383d1b529ea435",
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
     "src/cli/approve-fault-log.mjs": "e362c6b4a676839f6010c08d1df648f5973c2d9ec7a13acf97e40f93b57b42ab",
-    "src/cli/command-registry.mjs": "bdce5a2ab5a89934c6f1694bc7768cb9cc527e2764888f01bd62036b1a9b4c16",
+    "src/cli/command-registry.mjs": "6d5998f669a0b9311a0608e22403dc91b29cae28e5e43c570c0e39aaf39a6376",
     "src/cli/deprecation.mjs": "45e7d11ad8681fc89e4c99f4ef53b7c93a477f6b5fdd6708eddcf0b579dd3985",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/invocation-fault-log.mjs": "c36b79eb7fa658c6c685d1dc99204ddf9de96b29e10eb5d03f82141cf9ab2fa9",
     "src/cli/version.mjs": "ccccc691aa2e9a844d7724cf38da60fe05b7cac96134e01e825ef2392a353146",
     "src/config/global-config.mjs": "128596fa9a107741cb126d67c9932ae91b8430d4bed5abaa64f16c72af59815d",
-    "src/config/shared-config-file.mjs": "2e246923425c3ad8ecebcb1d9ad529c762ce5c22a2259e3a50aedcae4fc9fe0d",
+    "src/config/shared-config-file.mjs": "10ad0358069092140f6e2f3eadb53a5f1a3887379b7236de4959a874aecd71b9",
     "src/convention/convention-client.mjs": "b1b4a89e4f28f0c67a7e62f0b1f5ac760fff238b5a84dd9e01634f7b517b60da",
     "src/convention/definition-names.mjs": "f845b39591111b910bea842945a32c37287cafdd53fb08fc3cd2b64767294678",
     "src/convention/identifier-rules.mjs": "f3b0fed979b522c53be7c6b756b49425723121a587fe056b1bf616deef81b615",
     "src/convention/seat-id.mjs": "034caeb689c869e09acc0a3cd748757742c3f36b2eb331ddd0302515c25b0f83",
-    "src/event-store/config.mjs": "1fb91ecac937bae541d93e91ec5b4b24bb0d547ad4981f61930f11c36f423835",
+    "src/event-store/config.mjs": "cd3df6b9838173283e0e160cd155a467f1d6743ea7a3fb00925fd0ebc16b1a5c",
     "src/event-store/consumers.mjs": "211dee946e024e09b138f938293d641f2be1fff624e14e2f505d5bcd3344bd74",
     "src/event-store/index.mjs": "138c73140a65e29fe55a08b003ae107b8aec217ba3a96daf4587fc2c1f15ae24",
+    "src/event-store/maintenance.mjs": "3818efb7fdcfdbf0df5990a805cfe6d2f2dcf424c7e152df7739d63b85aa21e2",
     "src/event-store/native.mjs": "1f5d92d553b9d66babb0a2e2683d178dbbc1eff76146804ba69ac64d89c1e718",
     "src/evolve/iron-law.mjs": "c3dce0c23705a8fd1ec463a782fba000ee67f21889f47e7ff350043f7a7ff8d7",
     "src/git/config.mjs": "18bdab21173350229a189c2b815351f26031389f356a2879befd46960bf26a95",
@@ -673,7 +670,7 @@
     "src/holder-lock/native-handover.mjs": "b47be97633ed606fa6ab304d2ee3e47ff46675c86ec225e0d06ee5d1f6d7d56e",
     "src/holder-lock/protocol.mjs": "3d7aae8f95347dc438430a7a7984927943f9cbc43eb95ea1312414496a412c7c",
     "src/holder-lock/registry.mjs": "0894e75c7cc6beebad96ca56288b637ec74dd7d704be836f376b36bdd3154247",
-    "src/holder-lock/state-root.mjs": "5d2e7120f9f8a21088a03c4354f614631e0479c19dd5c5b6e886825878abda8b",
+    "src/holder-lock/state-root.mjs": "32e20fe0ba65c796b9af5f91646a4ff0f84ad5fade0e4d7d8beaed014d82ba04",
     "src/install/coexist.mjs": "099cfd22d3f84d221507697bfb0c84f336e4c85305433117e2390ebaad632a03",
     "src/intake/classify.mjs": "e12aeddcc50ede2c469f21a8c71ad32401f23cdad3eead7f164bc11c7dcde7f1",
     "src/intake/discovery.mjs": "6da596afa6d305cd8431a7f79659c04449bfe7ecd793bc5600fd11cd2cff9c1b",
@@ -687,7 +684,7 @@
     "src/report/capability-plan-lint.mjs": "7649ad794e0171be44317557be7c10a8d558299e031d41bd28c36a746e0b5aff",
     "src/report/context-render.mjs": "21f0d004ecc62a6be3d059f2c4911dd9dd9fcd3c646d348625e8277efb750fdb",
     "src/report/decision-index.mjs": "5ad753196470debd2f502b3c00994c1d75a9ed0c576c5cf8188eb8600f0a09a2",
-    "src/report/enduser-index-generate.mjs": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+    "src/report/enduser-index-generate.mjs": "770d3cbb5e2732e2822e7fc823ed4c178599255835e85d936ee0c421c9320938",
     "src/report/enduser-index.mjs": "373da334b9cd862b2c3a0fbf4fffb3fe010f244872702dbfceb25eada5c5e650",
     "src/report/frontmatter.mjs": "bd3032562a173541285f241d5b05818717b0dc53c086be4075f880e861ecd7da",
     "src/report/item-trace.mjs": "bb91d0d9635d0794ed9a979cc4fa6721d26db18905637d465be8ce6d831e7155",
@@ -711,10 +708,10 @@
     "src/runner/agent-definitions.mjs": "c171c5812dad6312f8538b0abda0bf7c9b392847fbe8d7a9ef75bebc44c62434",
     "src/runner/agent-listing.mjs": "8c6bfd84c26fb939cc22bf511c7e5a328d7cfa91bb9c2ba0574b94f6d48b6c4d",
     "src/runner/agent-roster.mjs": "bddc69ef02c932c8a05d8486a29c02c4188a3cb7e31f8706cf3ce360cc42ed31",
-    "src/runner/anti-loop.mjs": "d996232d9518a8fcf6f7017f781716f513eb3c0c9f80e17741b9507bda48ae49",
-    "src/runner/attestation-guard.mjs": "efbd469199ce339e9298df842270de509875a2ae1d907d091f8a28674ffc3e54",
+    "src/runner/anti-loop.mjs": "feab88887c5951617d6f551d26ad27e07470a020100f9ac5cfd61399cad8d4b8",
+    "src/runner/attestation-guard.mjs": "a7fcde36b4580892f22f160fb4331bcdddfa483554c726b6d606f8e8707b35b4",
     "src/runner/claim-liveness.mjs": "81343f229916449e5ec0b4531cb3d9414a90b6b75c738e9fc10586f8adbee567",
-    "src/runner/claim-port.mjs": "4c86f2ac4a5a85a6c3487e05f0fed08f93e3e769be6008dc5332a8d9d0ab2da7",
+    "src/runner/claim-port.mjs": "7cf3a6a1e37d6bd0e7143fd7dfdc54f4eea79df26ab084d7759384df986f60f3",
     "src/runner/dispatch.mjs": "f73b4e52e2ef668d899cd43487597399d07de71e8bb3b8dfd2c3df9223ae5f86",
     "src/runner/dispatch/adapters.mjs": "e49e8fb792c06ef628c7039d24571467a2a8c079756e98d0ac87abc75298050b",
     "src/runner/dispatch/agent-result-claim-contract.mjs": "6de1dfce1581cb914d56bbc5591362379f7f808e5db4e03f80ede09b51754855",
@@ -811,29 +808,28 @@
     "src/runner/execution/unit.mjs": "9b04463a79c9698dcf63c8f44e85027348688f6421a07f3fe185adc796bb6a02",
     "src/runner/fanout-batch.mjs": "e9eb05055909f74e30d07941caa2909ae06714dae61ee6995cf9595505bb3cdb",
     "src/runner/frozen-judge.mjs": "96265fab86a2a57ae4b191c83a864a4f285942f2c35318fbdae435a832bb75ed",
-    "src/runner/gateway-control.mjs": "50ecbcedfea9b3f37e8d45a712210d86d7caf0e19fabdd29ea222aa5194ec37b",
+    "src/runner/gateway-control.mjs": "4b20e7298c6a6b97998f273a2c006d020affa495bd6857a1ff0204a503c6c840",
     "src/runner/github-adapter.mjs": "162d7b2064b9b311ea88afba25567601420626743dff6b72b0aba78f42220c00",
     "src/runner/goal-check.mjs": "f21520e58727a016945c052c2b04f72ec9120192c4cdfaaaf34526ea0bb090e0",
     "src/runner/iron-law-gate.mjs": "37e253ef40240e535e6587d41b393e6ddecc7cb174104760d0f48ba168203d43",
     "src/runner/lock-fence.mjs": "e128397527edce60462e4337ed2253383808747ef5f12dd19a8a4e35a12eaa5f",
     "src/runner/lock-status.mjs": "fc33d73f4e3fe2b65e6a1bdefaed2b59870a54edac15936c20f9681773910bcc",
     "src/runner/lock-wait.mjs": "833e0a3bf2d71d66358d4f230c7325ebedcba34444cdaa60324a4e4be2140301",
-    "src/runner/loop.mjs": "fa7676c6803545c5b9c62dc99400d1374fe7b8940d451a929708b54cd3fedc7b",
+    "src/runner/loop.mjs": "fe3781f22854cf26e9aec2892858e5270e3737ddcded63df87a0a5032684932d",
     "src/runner/main-checkout-activity.mjs": "84cd9b95e28c0c1004322b6edba0d2b4b45f9445eddc30613abd53314f13c071",
     "src/runner/main-checkout-reset-guard.mjs": "446d216c411dd5f59d512b5baf52b3a46eeb8ae03320f1d40be85e9447072d0c",
-    "src/runner/main-fgos-checkpoint.mjs": "9ad033aaf03324cda92d6b96cc68e8c52514f4c225d3a55e3c2ed9820f25b847",
-    "src/runner/merge.mjs": "e473a4b7e64f33179a05931d6d590c47850be01701df6b04c2b4a6d0a1525373",
+    "src/runner/merge.mjs": "7d2362ac6d13d348ccb9f9a8fd301ff90f5ba9db6545128ae2e9cdabacaa95c3",
     "src/runner/operation-capability.mjs": "6683b7da84274722aa5d464ccc8ec9d9e34b110f779e8ea5b6f6c1d0b3c820f5",
     "src/runner/operation-choice.mjs": "866b8b61bea02f3250d9d89cf826109065e35c899b64faad0cfddc524614277e",
-    "src/runner/paths.mjs": "bfbb13456f940e02d77b5ad8515b015ec6c1f8a83ee6015086138eeaed96339f",
+    "src/runner/paths.mjs": "1c20a7dab2f568b281f4b6eb5aff0a4465ab492cb16f5665c2b6d1d19c4a5ea7",
     "src/runner/promote-engine.mjs": "b8ad77d7c24b211189e6ca42df658303328eb6c24c77b6b2e8026d986279089b",
     "src/runner/promote-preflight.mjs": "26db2c2670fc445a4c170af18880ead88e13c4ff1545846b5c8cf760fbd34e54",
     "src/runner/prompt-templates.mjs": "fd027de3376fbdfe654f2a2b8599a384d88f9b5383a0161b0b9df7bca9de39b9",
     "src/runner/recovery.mjs": "9457be6fbac75013e4273ebd5bb08a981552b5dda594ef34437d56c3d563aa1a",
-    "src/runner/repo-locks.mjs": "0f4c25c5bcb711d64a74b1c72b27b7db4e18dfe9cefbfa794f320e3c3dc1770b",
+    "src/runner/repo-locks.mjs": "439ef63a376d8cf49e0ab8a3dc7bce9cc3a942d76ad28c6e3001106bdb733eb2",
     "src/runner/rigor.mjs": "f85eabe784dd24de1e2431f16cccecd6634da8a6ca6be128dc9a87a3c91258c0",
     "src/runner/root-affinity.mjs": "0e074df4c61d29f60a2ce43fb62830ec2a2eaebe0e1998fec0cbacb4cd15e871",
-    "src/runner/session.mjs": "b1e73bd2e8413d5c55c425a01355c9b5947a10b3d3d1a445b034b63e3461e368",
+    "src/runner/session.mjs": "d5e2d86891bb34bf9d4b3708cd0c9908da81da612ea1a5796ff883c95453acaa",
     "src/runner/work-compat.mjs": "a804010f1992b05a28e07e11681c06919b1bc4a72fd1ab3e77bd2590bb020d25",
     "src/runner/work-dispatch.mjs": "802ceef2ed993908ab4a37d53273f0ad59e2500bbf64352f90ddbf6c8d429483",
     "src/runner/worker-log.mjs": "b33f235b50765aff48b4dfd5ad15ea09fccacea4b7ea4ca52dc4df8dd3226ba1",
@@ -846,14 +842,14 @@
     "src/setup/ansi.mjs": "02c0e971ac01c71fb7db8d6506debd3c35d55feedceeb93eac7843b83fa0d430",
     "src/setup/bin-discovery.mjs": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5",
     "src/setup/blind-steps-proven-pools.mjs": "d4f7875c55bac7eaf7cad6e70317a48e7ae120d90fb58931c9258a1a478ab0bb",
-    "src/setup/checks.mjs": "b5280315dd8712ff69e6e2f85a2db87d9e0ddd21c828bfb648d63bfb4e1bfaa4",
+    "src/setup/checks.mjs": "2f3c4acc846e49d15fe2f9006e87a58215a7be559020304968cdb182cfaa75cd",
     "src/setup/claude-code-hooks.mjs": "d9f4cdbe8c4cec4cb3ea7c67798d24b49e3c86a0d97a041b202dec8def2332fe",
     "src/setup/config-merge.mjs": "2780e5fb05bb3a10aecff0f21eca4394738489960c2dbd9d86dff9f6c74cc176",
-    "src/setup/event-store-checks.mjs": "2af5215a4933ea47638121c0997e8684fe9afb5eb6a616bf8bab8757cd24f645",
-    "src/setup/event-store-fixes.mjs": "4f3a95add8dee1f08c1dd2d38fdb0cf7b5ee7101909faf965c0b2e6ebdaa142e",
+    "src/setup/event-store-checks.mjs": "4a5b9cdf563d720e7d34fdc11cb2df115e61e550df0c0afb8f624299d689de60",
+    "src/setup/event-store-fixes.mjs": "f377e0684d0f595be8d1699022e2d4978f3d7a66c39328af0e28625543369c6b",
     "src/setup/executor-posture-coverage.mjs": "b9bb0adc2d173321342aaede10d6e767f221d9194f197bee5f8dcb23901843c4",
     "src/setup/executor-profile-warnings.mjs": "7edcf8b4ddb7030651b4607e364b7a2e4a78e9166c967893c25880a949ea37be",
-    "src/setup/git-checks.mjs": "e0f1f610370eb0422798ef9292b74d6e1dfd786ed6eb92f872a762f27df5ad36",
+    "src/setup/git-checks.mjs": "296d88b4647e2b6215676532ef2f8a7807cbd5c96e67f49276fdddfdad05b957",
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
     "src/setup/holder-lock-checks.mjs": "7a4676d00e63d3f47508d1d081d2941a794f30de18931dfce871ed9e396f923d",
     "src/setup/identity-checks.mjs": "780fe8e248f9e26c1d658618d8a2f1764f4aa71898d1a06323e4a20f3eb3ae42",
@@ -862,7 +858,7 @@
     "src/setup/instruction-registry.mjs": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
     "src/setup/model-pool-checks.mjs": "4c115569d3644a395a09b0f6ea1d87205c791b18ccae021becd31a78bb360c6f",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "2d27f0a54efe32461557ce0960f85da70068edef774e22bb7c1bba93afe74b6d",
+    "src/setup/registrations.mjs": "e5e10f4d8d7f9ea4cdafbc7761f8f4f5f6b506494504bde481e8f2409be2b2ad",
     "src/setup/run-supervisor-checks.mjs": "02ac1daf6c996d7dcf974675a1874fbc3a956c519ccea7678220b236c91668e8",
     "src/setup/seat-binding-checks.mjs": "b1efc2d1711dc21203c6482bf47ff4dfa7f8aa6f49b0d88a99a1479319a5f36f",
     "src/setup/seat-binding-conversion.mjs": "9f1b782a5a4a9059ad82fda27b79c6cc5ffaf057f6f1347e79ae5d74b49c00a1",
@@ -874,6 +870,7 @@
     "src/state/awaiting-context.mjs": "dda0f698b6b0cad343fdc39738f98e19975463ff4e1457a3d9390dd0b36576ea",
     "src/state/cleanup-harness.mjs": "95f39a0712c2a921cfc92c83e4dfaf7f3e6e2da074d5ed77dca3bc3a5f3a0e9a",
     "src/state/cleanup-pool.mjs": "46ce8b7bbd04d3da091cd9cb6a905c7d9149019028698587009b81d7d9444927",
+    "src/state/consumer-event-gate.mjs": "b412246d9533243edac6d460547f48f2af0403d84ab7ef1a8deea254a636782b",
     "src/state/cursor.mjs": "c6b015bad57c66dd7e5654ab4753b0d87c9ff653328dc2c6be59beedd6e37c50",
     "src/state/decision-question.mjs": "163b7b307e55ba29065de64cb9bfc48aeb5e5f1d3eda0687e38b37fca02babce",
     "src/state/dep-graph.mjs": "75f51cf42ac18bd405651145ee188ea5abee47f6161e72f3a75475f9694fa2fb",
@@ -881,35 +878,31 @@
     "src/state/domain-registry.mjs": "afbac9ca5e143a188a44648d0910e7108a1bace06d378bcd46289ccb53aede51",
     "src/state/drift-status.mjs": "06f3f9c4e100043af574a11e4cf967281e49c960b77a5477ca024b816611fd65",
     "src/state/envelope.mjs": "faf5419c15516ea0a3c2862a149708ce3df17cca40101dae71bf99eeaf93868e",
-    "src/state/event-log.mjs": "48c1a19e68d1bb2b6260c0740880f55911cb2c9c4c46607b878b261f6d741fa3",
-    "src/state/events-compaction.mjs": "c7d412962166229dd671f06d98aaee7349b9f091a7c4018869171b384fbe3447",
-    "src/state/events-jsonl-truncation-guard.mjs": "93bb6efa390d3e8a58b84399dc90c0b50298c96d6bc4876620deb37d08068965",
-    "src/state/events.mjs": "32de79321db43ec33ebe6c0b88b17f7df75d75ed41a680202b2d481faf9f799d",
-    "src/state/fgos-file-registry.mjs": "917764c062d297227d969a3349e7d0a76dc721c3a97d0241f04c4af5ce5bd3e9",
+    "src/state/event-log.mjs": "5bab741c9c18ebe2f50b2059b166263d7d4ab524dc6a8e8d2c70c2707bfe5f5b",
+    "src/state/fgos-file-registry.mjs": "e76414c84daa3350327b4b4b570997b47fb042cf523c935edf848e0a14c79a10",
     "src/state/frontier.mjs": "dca56e29f4928eb025fb2bf085c75a7d1969d59b3b645754b3dc6b44e3db47d7",
     "src/state/gate-bypass.mjs": "723e40beb662fb094a4ee832fa0755cfc554d01c7623cf411eeda1092e9247b8",
     "src/state/graph-harness.mjs": "6d93e939f7d13ec8f24957eca8b02bc66aad00573c4369175bcb426915ac789b",
     "src/state/graph-metrics.mjs": "ce0c9112f0a22ae408a442773fc91628eb225ef103bc9024a16ce926c1f0f167",
     "src/state/handoff.mjs": "352dbce5f607f2ad478bf0119fbf875bf640142f3438a745ebcead4804dd4d38",
-    "src/state/hot-lock.mjs": "fabd7425e2845dfe7f588a3b46a41bad06727b128bdb84280147223bb546951c",
+    "src/state/hot-lock.mjs": "07d161a478451545ad32cac959cd2d7c6f6f21bd4382ef9a34532a413c1ba48d",
     "src/state/impact.mjs": "5baf4a1efb7cb4e7b7b8c307e16a9671b925efe103246515b49f29710a8ddb4c",
     "src/state/knowledge-registry.mjs": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
-    "src/state/legacy-event-git-adapter.mjs": "8b65b55aacf9a3b321e51847e4c5f8c4829c0d2fd6f5de2ad52046c0ac1bf7e9",
-    "src/state/main-checkout-guard-warnings.mjs": "7075e5a06ee1664c953880fded940832c46533ccefda4a81801dd0c03584ab64",
     "src/state/plan-pool.mjs": "20c667909048853fa2dddf239b27467c29dbe8551cd7c90fef88c241143483ad",
-    "src/state/porting-store.mjs": "ee409980f27d11a0b67c55ae18b2510fa98183103035a4c9202737e0dc90d519",
+    "src/state/porting-store.mjs": "b5069c780287cf0d239d4522144ece0a1248c78163d51de20f2940735274a7e2",
     "src/state/porting.mjs": "4191acd3af3ca878dd7ae10bab67d859d545ca870722b3276cd39aeba9d173f3",
     "src/state/postland-drift.mjs": "66bba6e35a60cfa81a7b430a51a816f142b0cc3e9307d7c7b421be111152299b",
     "src/state/priority-formula.mjs": "5a1767b93f0155567472eb059899aa993a147ecc0e0aaf75dafe8e93da72d6fe",
-    "src/state/replay.mjs": "258dd5a97b47007efba895b45cac5fb000695cab25d6e4e68cb2925f99463032",
+    "src/state/replay.mjs": "0c35bfdc99adb47121aad04350971ca2916b58951306244ce528f6711e255260",
     "src/state/retro-pool.mjs": "bed4fe7e4a09ee49d3ae019e30dc21b73bc00bbbc8a20be3eec4cdf6352140ae",
     "src/state/retrospective-doors.mjs": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3",
-    "src/state/runtime-coordination.mjs": "e2f560c6871fbaa7cf0346fa3fd96825260527649112e7c8949c4d68aea6d800",
+    "src/state/runtime-coordination.mjs": "e546b13c02a8ae1c903fe5a0bb0974dcc41f85526a82111b8d82f0c925bb8ca5",
     "src/state/status-fsm.mjs": "6853485189d2e25e6ee2a5997d11f0b2ae4e608cf5ed6332df010b2e703b76b0",
     "src/state/step-fsm.mjs": "bf1e935a355d2fbb7b8a5f0927138dea21b21c6226fe5a442c22bd1875445625",
-    "src/state/store.mjs": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343",
-    "src/state/tool-registry.mjs": "9a84242aeb83fe6e53822ef67f146ed383f1670e81ed4fb4c76f75d1ca5c0cc0",
-    "src/state/work.mjs": "ae5f1599cf36963602efd1e8b13ee2ac883997ea747cd99877364d0162c05059",
+    "src/state/store.mjs": "029b0d5da59fd6c4ce373e3faa97b911b77880febbabd70f0ab729fd855073c0",
+    "src/state/tool-registry.mjs": "04adcb5dd417ae49a7f5e823665b8b9c763aa05bc505d86ef7ef61d6a099af2a",
+    "src/state/work-event-store.mjs": "6d952ce26a0888658648edfafcd6ba128f83bcedc5b25055dace61ff17efe1a8",
+    "src/state/work.mjs": "6c19dd633b78002149550bab47592fa9ce759a2a0fad340f9b868c2555e7d9f0",
     "src/state/worker-slots.mjs": "bc37bb0d995fe7339925c209c4e79232bdc5e3c079668f89c8f52313312dbf95",
     "src/terminal-control/client.mjs": "344249684fa950cf6caf984b1d9ae9f9a21b1c542bcf7110d3a7edd351d9076f",
     "src/terminal-control/config.mjs": "7160cced361f72be8a8c33baf7769bca8d8e6f24295fdae141695a64061c9341",
@@ -932,20 +925,20 @@
     "src/verbs/dispatch/show-run.mjs": "6ed836d83f8fc71863fc2ce04115b7d0d63f2fb1f42e8bccabc94b812cb179c9",
     "src/verbs/dispatch/watch.mjs": "e82fb8d94c5d76bc64b006bab2742e777f50785a4c4b12c91f15723864e457a3",
     "src/verbs/events/context.mjs": "5a47ea5bc1a590619f137cef40455898d99595e6bb8ba5a2b6d75570b101557b",
-    "src/verbs/events/export.mjs": "3c163c4704f7a2054af09c4af5e69c0f3394f880319b890e8337dc2049b9f50d",
-    "src/verbs/events/migrate.mjs": "a386b37d767a9e1a7b138b9d6ba5d41828e085723be6dffbd7957d2cadf229d5",
+    "src/verbs/events/export.mjs": "b1af8d42892ffcfccf6521e6cebec5f0507289b18be9c1283f1514f9f00ce3e2",
+    "src/verbs/events/migrate.mjs": "3e93e2fba81ee570a3229c0515c494d50e80ef828d3180c9c702e2c18b580500",
     "src/verbs/events/parity.mjs": "6431bfc150b5876ec83bf6ff63023aeee9fe3c0b33d2e8ed54114b443e088ed7",
-    "src/verbs/events/rebuild.mjs": "d60b26c628b4375b9ab4b0cb59feebd4b16cbae53cc339b549868663246c7cfa",
+    "src/verbs/events/rebuild.mjs": "4e6f58a44c3546b7b30249e430c2bef861bd451dc14c0afe497c48508228d08d",
     "src/verbs/events/status.mjs": "6fb73280f473c45dc2de55c1ad4514235a0f5e9563ebf7e2801d7b4c072ffc6f",
     "src/verbs/events/sync.mjs": "d83b18e084460987b49d3c811c18851368d217efb2d2f354cb675231692030f8",
-    "src/verbs/merge/approve.mjs": "17e31ab88a2e358f3cda75501e36ff470f9243734c73bb1325c79e516e455195",
+    "src/verbs/merge/approve.mjs": "7c6bfb0e04289beffb5c1d00e5d3221ca561af132c78f35262bd4874712641a7",
     "src/verbs/merge/catchup.mjs": "3c73bf052a078cbe1ef40a271c32e7772da918637abf7cd2bbb7065dbd2be245",
     "src/verbs/merge/iron-law-level.mjs": "28037a676ec6f8533c2c8b0bcd66be0ec8dff1acfca0d656de7c5baa02043b73",
     "src/verbs/merge/merge.mjs": "0a453f93896685a77cf5494ff5d2f6f8106ff638e1b17079a368801fdb064f89",
-    "src/verbs/merge/promote-to-component.mjs": "da6e9b2efd3c5bdde96e04114b69e6d8b34511e88453bb91b505ca8d2ccfaa85",
+    "src/verbs/merge/promote-to-component.mjs": "a629276f91deb40437e46e52f3c241762620b06ed62e6a1e87510b5356af94aa",
     "src/verbs/merge/reject.mjs": "04fc387317e04a787917ea12a447a217928a1410e3439b422e76cf46638af7e6",
     "src/verbs/merge/review.mjs": "538e8087eed7befd51b7ef78a93d1b12fa13f0fff260ec40e50e7f8e019ac49a",
-    "src/verbs/merge/sync-root.mjs": "c5e4e309c77ff490b1cf53b92f53c250b835cab6c41f1456c4facd0195df1ba1",
+    "src/verbs/merge/sync-root.mjs": "830cfbc215e2c7d4e6407920dc5b59a0ae2017c4cabd45883645ad790f0e9164",
     "src/verbs/state/edit.mjs": "734029f844bf8eb4b9c50ff7698c59dda48bd2a6b3ec3ffe8b601f0a31571223",
     "src/verbs/state/move.mjs": "cf664d41737edd1a6a7eab5d7b9cce83e7fe407dda3d31560ab3beb97c048c39",
     "src/verbs/state/read.mjs": "a49ff63f71318e7b6066059078273a6c224ad7ec10c8790f25fabd13cae5cd93",
@@ -973,35 +966,35 @@
     "src/workflow/seat-providers.mjs": "ae535e2b6da7beae4ac08f695df65306f139c13ba49dc2e6217e549923f23a81",
     "src/workflow/seats.mjs": "4b46062e29ded955b94206fc1e336d2829f9e50cb67d799686c05b3c7e64d836",
     "src/workflow/steps.mjs": "d2878353f7e697d05b97da41c9e0b092f3dea6dbfc7591b7a746b34248dd09e7",
-    "src/workflow/store.mjs": "1ffea57e5d5afb57f8558107d253d80982e780ea7649d5e950cb1874e2f90da7",
+    "src/workflow/store.mjs": "1467c183e81159f791b9db4e99e7bff2d72e568205085348eb76bf711af1eb4f",
     "src/workflow/unit-handoff.mjs": "6dfe2fd3402bb3f484e20def7caa8f55cf92cddfd565c90d0a543b838c1f17d9",
     "src/workflow/units-source.mjs": "63fa30666c4ba9edb5174c47042a08b02007ff1bb34e95df918956029a7e37c3"
   },
   "sites": [
     {
       "path": "bin/fgos.mjs",
-      "line": 3477,
+      "line": 3484,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? readSharedConfig(dir)[key]",
       "family": "unresolved-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3621,
+      "line": 3628,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? readSharedConfig(dir)[key]",
       "family": "unresolved-binary"
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 1217,
+      "line": 1216,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? elements of section.commands",
       "family": "unresolved-binary"
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 1247,
+      "line": 1246,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? elements of section.commands",
       "family": "unresolved-binary"
@@ -1066,7 +1059,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:515"
+        ".githooks/pre-commit:443"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1080,7 +1073,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:521"
+        ".githooks/pre-commit:449"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1094,7 +1087,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:521"
+        ".githooks/pre-commit:449"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1108,7 +1101,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:542"
+        ".githooks/pre-commit:470"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1122,7 +1115,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:542"
+        ".githooks/pre-commit:470"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1136,7 +1129,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:542"
+        ".githooks/pre-commit:470"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1145,68 +1138,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 317,
+      "line": 305,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:548"
-      ],
-      "class": "hook-read-context",
-      "verbs": [
-        "symbolic-ref read"
-      ]
-    },
-    {
-      "path": ".githooks/pre-commit",
-      "line": 329,
-      "spawn": "execFileSync",
-      "binary": "git",
-      "family": "spawn",
-      "callers": [
-        ".githooks/pre-commit:548"
-      ],
-      "class": "hook-read-context",
-      "verbs": [
-        "diff"
-      ]
-    },
-    {
-      "path": ".githooks/pre-commit",
-      "line": 358,
-      "spawn": "execFileSync",
-      "binary": "git",
-      "family": "spawn",
-      "callers": [
-        ".githooks/pre-commit:548"
-      ],
-      "class": "hook-read-context",
-      "verbs": [
-        "show"
-      ]
-    },
-    {
-      "path": ".githooks/pre-commit",
-      "line": 359,
-      "spawn": "execFileSync",
-      "binary": "git",
-      "family": "spawn",
-      "callers": [
-        ".githooks/pre-commit:548"
-      ],
-      "class": "hook-read-context",
-      "verbs": [
-        "show"
-      ]
-    },
-    {
-      "path": ".githooks/pre-commit",
-      "line": 377,
-      "spawn": "execFileSync",
-      "binary": "git",
-      "family": "spawn",
-      "callers": [
-        ".githooks/pre-commit:503"
+        ".githooks/pre-commit:431"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1215,12 +1152,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 379,
+      "line": 307,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:503"
+        ".githooks/pre-commit:431"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1229,12 +1166,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 381,
+      "line": 309,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:503"
+        ".githooks/pre-commit:431"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1243,12 +1180,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 408,
+      "line": 336,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:509"
+        ".githooks/pre-commit:437"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1257,12 +1194,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 416,
+      "line": 344,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:509"
+        ".githooks/pre-commit:437"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1271,12 +1208,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 426,
+      "line": 354,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:509"
+        ".githooks/pre-commit:437"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1285,12 +1222,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 439,
+      "line": 367,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:509"
+        ".githooks/pre-commit:437"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1299,12 +1236,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 455,
+      "line": 383,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:533"
+        ".githooks/pre-commit:461"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1313,12 +1250,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 493,
+      "line": 421,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:516"
+        ".githooks/pre-commit:444"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1327,19 +1264,19 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 497,
+      "line": 425,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 507,
+      "line": 435,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:617"
+        ".githooks/pre-commit:534"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1348,14 +1285,14 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 561,
+      "line": 478,
       "spawn": "mainLockVerdict -> .githooks/pre-commit:165",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 588,
+      "line": 505,
       "spawn": "identityData -> .githooks/pre-commit:117",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
@@ -1904,14 +1841,14 @@
     },
     {
       "path": "packages/git/rust/tests/recovery_matrix.rs",
-      "line": 487,
+      "line": 486,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/git/rust/tests/recovery_matrix.rs",
-      "line": 502,
+      "line": 501,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2326,6 +2263,13 @@
       "class": "configured-binary"
     },
     {
+      "path": "packages/work-state/rust/src/event_reader.rs",
+      "line": 91,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
       "path": "scripts/event-store/power-loss-driver.mjs",
       "line": 25,
       "spawn": "loadNativeAddon -> src/git/native.mjs:16",
@@ -2425,92 +2369,92 @@
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 522,
+      "line": 524,
       "spawn": "checkoutInspect -> scripts/git/e3-bench.mjs:48",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 524,
+      "line": 526,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 526,
+      "line": 528,
       "spawn": "typedOperationRows -> scripts/git/e3-bench.mjs:298",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 540,
+      "line": 542,
       "spawn": "createGitPublication -> src/git/index.mjs:9",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 557,
+      "line": 559,
       "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 661,
+      "line": 663,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 701,
+      "line": 703,
       "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 714,
+      "line": 716,
       "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 732,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:805",
+      "line": 734,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:807",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 732,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:775",
+      "line": 734,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:777",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 830,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:805",
+      "line": 832,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:807",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 845,
+      "line": 847,
       "spawn": "createGitPublication -> src/git/index.mjs:9",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 860,
-      "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:830",
+      "line": 862,
+      "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:832",
       "binary": "(command-line arguments)",
       "class": "configured-binary"
     },
@@ -2557,25 +2501,9 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        "scripts/git/e3-bench.mjs:443"
+        "scripts/git/e3-bench.mjs:445"
       ],
       "class": "sandbox-door"
-    },
-    {
-      "path": "src/event-store/native.mjs",
-      "line": 175,
-      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
-      "binary": "param loaderOptions",
-      "class": "uncalled-wrapper",
-      "function": "decodeLegacyFiles"
-    },
-    {
-      "path": "src/event-store/native.mjs",
-      "line": 181,
-      "spawn": "loadNativeAddon -> src/git/native.mjs:16",
-      "binary": "param loaderOptions",
-      "class": "uncalled-wrapper",
-      "function": "branchKey"
     },
     {
       "path": "src/git/index.mjs",
@@ -2782,14 +2710,6 @@
       "class": "configured-binary"
     },
     {
-      "path": "src/setup/event-store-checks.mjs",
-      "line": 32,
-      "spawn": "checkEventStore -> src/setup/event-store-checks.mjs:56",
-      "binary": "param options",
-      "class": "uncalled-wrapper",
-      "function": "eventStoreDoctor"
-    },
-    {
       "path": "src/setup/holder-lock-checks.mjs",
       "line": 147,
       "spawn": "spawnSync",
@@ -2805,84 +2725,84 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3028,
+      "line": 2877,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3042,
+      "line": 2891,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3096,
+      "line": 2945,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3108,
+      "line": 2957,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 4392,
+      "line": 4223,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5535,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1547",
+      "line": 5366,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1593",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5582,
+      "line": 5413,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:595",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5623,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1547",
+      "line": 5454,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1593",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5630,
+      "line": 5461,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:518",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6015,
+      "line": 5822,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6266,
+      "line": 6073,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:55",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6311,
+      "line": 6118,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:128",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
@@ -2930,75 +2850,11 @@
       "class": "configured-binary"
     },
     {
-      "path": "src/verbs/events/export.mjs",
-      "line": 14,
-      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "exportUseCase"
-    },
-    {
       "path": "src/verbs/events/migrate.mjs",
-      "line": 147,
-      "spawn": "scanWorkspace -> src/verbs/events/migrate.mjs:103",
+      "line": 159,
+      "spawn": "scanWorkspace -> src/verbs/events/migrate.mjs:115",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
-    },
-    {
-      "path": "src/verbs/events/migrate.mjs",
-      "line": 161,
-      "spawn": "eventStoreFacts -> src/event-store/native.mjs:153",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "migrateUseCase"
-    },
-    {
-      "path": "src/verbs/events/migrate.mjs",
-      "line": 163,
-      "spawn": "checkStopped -> src/verbs/events/migrate.mjs:147",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "migrateUseCase"
-    },
-    {
-      "path": "src/verbs/events/migrate.mjs",
-      "line": 166,
-      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "migrateUseCase"
-    },
-    {
-      "path": "src/verbs/events/migrate.mjs",
-      "line": 188,
-      "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "migrateUseCase"
-    },
-    {
-      "path": "src/verbs/events/rebuild.mjs",
-      "line": 8,
-      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "rebuildStoreUseCase"
-    },
-    {
-      "path": "src/verbs/events/status.mjs",
-      "line": 3,
-      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "statusUseCase"
-    },
-    {
-      "path": "src/verbs/events/sync.mjs",
-      "line": 3,
-      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "syncUseCase"
     }
   ]
 }
