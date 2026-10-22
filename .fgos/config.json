@@ -754,7 +754,10 @@
         },
         "tier": "flagship",
         "prefer": [
-          "openai",
+          {
+            "executor": "openai",
+            "invocation": "codex-herdr"
+          },
           "claude"
         ]
       },

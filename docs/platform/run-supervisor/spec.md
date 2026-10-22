@@ -16,7 +16,7 @@ Related:
 - docs/platform/holder-lock/spec.md
 - docs/platform/agent-protocol/spec.md
 - docs/platform/terminal-control/spec.md
-- docs/platform/session-identity/spec.md
+- docs/platform/identity/spec.md
 - docs/platform/component-boundary.md
 - docs/specs/runner.md
 - docs/specs/distribution.md
@@ -363,5 +363,5 @@ The check for orphaned confinement resources skips attempt homes (marker version
 | runner decision | [runner.md](../../specs/runner.md) |
 | plans | [direct mode](../../../plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md), [terminal mode](../../../plans/261016-1351-terminal-mode-and-launcher-identity/plan.md) |
 | terminal-control | [terminal-control/spec.md](../terminal-control/spec.md) |
-| identity | [session-identity/spec.md](../session-identity/spec.md) |
+| identity | [identity/spec.md](../identity/spec.md) |
 | design and evidence | [design r6](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md) |

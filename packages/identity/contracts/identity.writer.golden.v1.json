@@ -1,5 +1,5 @@
 {
-  "contract": "session-identity.golden.v1",
+  "contract": "identity.writer.golden.v1",
   "notes": "envCases: expected null means no usable env id, so the process-tree rule decides. registry.kind: none (no fgosDir passed), absent (no sessions.json), rows (a JSON array of those rows), raw (the file holds exactly that text). treeCases: a pid missing from processes cannot be read; tty 0 means no controlling tty.",
   "envCases": [
     {

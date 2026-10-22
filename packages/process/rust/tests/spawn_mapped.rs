@@ -115,13 +115,17 @@ fn a_slot_below_three_is_refused() {
 
 #[test]
 fn path_lookup_skips_directories_uses_child_cwd_and_runs_scripts_without_shebang() {
-    use std::os::unix::fs::PermissionsExt;
     let dir = temp_dir("path");
     fs::create_dir_all(dir.join("first/probe")).unwrap();
     fs::create_dir(dir.join("second")).unwrap();
     let script = dir.join("second/probe");
-    fs::write(&script, "printf 'script:%s' \"$1\"\n").unwrap();
-    fs::set_permissions(&script, fs::Permissions::from_mode(0o700)).unwrap();
+    // A file this process writes stays open for writing in any child another test thread forks
+    // meanwhile, and exec of it then fails with ETXTBSY. `install` writes the executed copy in its
+    // own process, so no fork here ever holds it open.
+    let staging = dir.join("probe.src");
+    fs::write(&staging, "printf 'script:%s' \"$1\"\n").unwrap();
+    let installed = std::process::Command::new("install").arg("-m").arg("700").arg(&staging).arg(&script).status().unwrap();
+    assert!(installed.success());
     let mut req = request("unused");
     req.argv = vec!["probe".into(), "arg".into()];
     req.cwd = Some(dir.clone());

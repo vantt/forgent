@@ -242,7 +242,7 @@ const FORBIDDEN_SESSION_FIELDS = new Set(['coordinationId', 'sessionId', 'thread
 const EVIDENCE_REQUIRED_VALUES = new Set(['reported', 'verified']);
 
 // The id charset and length of the session identity contract
-// (packages/session-identity/contracts/session-identity.resolve.v1.json
+// (packages/identity/contracts/identity.writer.v1.json
 // x-idPattern / x-maxIdLength; a test keeps the two equal). This is a
 // format-only floor against garbage caller.writerId values -- NOT a real
 // identity check, and this module deliberately never calls

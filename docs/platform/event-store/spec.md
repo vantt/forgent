@@ -16,7 +16,7 @@ Supersedes: L3 clauses 1 and 4 in docs/platform-foundations.md (D-ID ae461c8b, s
 Related:
 - docs/platform-foundations.md (L3, L7, L10)
 - docs/platform/holder-lock/spec.md
-- docs/platform/session-identity/spec.md
+- docs/platform/identity/spec.md
 - docs/platform/component-boundary.md
 - docs/platform/git/spec.md (Publication port, section 4; combined addon, owner decision Q1)
 - plans/261016-1306-main-checkout-single-door-hot-lock/plan.md (4.3-S)
@@ -497,7 +497,7 @@ Doctor (`event-store-unsealed`): passes when nothing unsealed is older than twic
 
 ## 17. Node to Rust route and latency budget
 
-**Route** (owner decision 2026-10-17 15:13; packaging amended by Git G0 owner decision Q1, 2026-10-17): the route is an N-API addon, loaded by the Node payload. It is the one combined N-API addon that links both `fgos-event-store` and `fgos-git` and exports both facades (`docs/platform/git/spec.md` section 4), so a Node process holds one in-process instance of each crate; a second, separate addon load of either crate in the same process fails closed. Seal and sync reach the Git Publication port through this same load. The combination changes packaging only, not the route rule below. The owner granted no exception to the exec guard of plan 4.3 P01, under which any `child_process` call inside a hot critical section throws `exec-under-hot-lock` (`plans/261016-1306-main-checkout-single-door-hot-lock/phase-01-hot-lock-core.md:19`). So `read` and `append` run inside the Work gate with no spawn. Session Identity follows the same rule (`docs/platform/session-identity/spec.md` section 5).
+**Route** (owner decision 2026-10-17 15:13; packaging amended by Git G0 owner decision Q1, 2026-10-17): the route is an N-API addon, loaded by the Node payload. It is the one combined N-API addon that links both `fgos-event-store` and `fgos-git` and exports both facades (`docs/platform/git/spec.md` section 4), so a Node process holds one in-process instance of each crate; a second, separate addon load of either crate in the same process fails closed. Seal and sync reach the Git Publication port through this same load. The combination changes packaging only, not the route rule below. The owner granted no exception to the exec guard of plan 4.3 P01, under which any `child_process` call inside a hot critical section throws `exec-under-hot-lock` (`plans/261016-1306-main-checkout-single-door-hot-lock/phase-01-hot-lock-core.md:19`). So `read` and `append` run inside the Work gate with no spawn. Session Identity follows the same rule (`docs/platform/identity/spec.md` section 5).
 
 - The per-call host facade (`fgos internal event-store ...` per call, like `lock-fd`) is excluded, because it spawns inside the gate.
 - A persistent pipe to a running host is not available, because no host runs on the plain CLI path and no daemon is dedicated to Event Store.
