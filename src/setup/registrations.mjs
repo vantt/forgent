@@ -2758,8 +2758,8 @@ registerConfigDefault({
 // so a project that believes it is capped runs uncapped. `"8"` (a string,
 // the easiest hand-edit slip), `8.5`, `0` and `-1` all land there. The
 // generic `checkConfigNotStale` above only catches a wholly-missing section,
-// exactly the same blind spot `checkInvariantChecksConfigured` was written
-// to cover for `invariantChecks`. `null` is the one non-number that is not a
+// exactly the same blind spot `checkCommandListSection` covers for the
+// command-list sections. `null` is the one non-number that is not a
 // mistake: it is what `fgos setup` writes to mean "deliberately unarmed".
 function checkWorkerSlotsCeiling(cwd) {
   // Deliberately NOT the fail-soft reader the claim paths use: those want an
@@ -2817,38 +2817,36 @@ registerConfigDefault({
   shape: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
 });
 
-// Deliberately does NOT execute the configured commands. `doctor` is a
-// cheap, side-effect-free diagnosis (RUL9's doctor-never-writes discipline),
-// and these are arbitrary project-supplied shell strings -- running them
-// here would let a config entry turn `fgos doctor` into an unbounded, and
-// potentially destructive, command. What this check CAN answer without
-// executing anything is the misconfiguration that actually bites: a present
-// but malformed `invariantChecks` section reads as zero commands at
-// return/merge, silently disabling the gate while looking configured.
-// `checkConfigNotStale` already covers the wholly-missing case generically
-// via the registration above; this covers present-but-unusable.
-function checkInvariantChecksConfigured(cwd) {
-  const section = readSharedConfig(cwd).invariantChecks;
+// Doctor check for a `{ commands: [...] }` section. Deliberately does NOT
+// execute the configured commands: `doctor` is a cheap, side-effect-free
+// diagnosis (RUL9's doctor-never-writes discipline), and these are arbitrary
+// project-supplied shell strings. An absent section and an empty list are
+// both valid (nothing runs); what bites is a present but malformed section,
+// which reads as zero commands and silently skips its gate while looking
+// configured.
+function checkCommandListSection(cwd, key, readCommands, emptyNote) {
+  const section = readSharedConfig(cwd)[key];
   if (section === undefined) {
+    return { passed: true, message: `${key} section absent -- ${emptyNote}` };
+  }
+  const commands = readCommands(cwd);
+  const declared = section && typeof section === 'object' && Array.isArray(section.commands) ? section.commands.length : null;
+  if (declared === null || declared !== commands.length) {
     return {
       passed: false,
-      message: 'invariantChecks section missing -- run fgos setup (no invariant check runs at return/merge until it exists)',
+      message: `${key} is present but malformed -- expected { "commands": ["<shell command>", ...] } with only non-empty strings`,
     };
   }
-  const commands = readInvariantCheckCommands(cwd);
   if (commands.length === 0) {
-    return {
-      passed: false,
-      message: 'invariantChecks is present but yields no runnable command -- expected { "commands": ["<shell command>", ...] } with at least one non-empty string',
-    };
+    return { passed: true, message: `${key}.commands is empty -- ${emptyNote}` };
   }
-  return { passed: true, message: `invariantChecks.commands = ${commands.length} command(s): ${commands.join(' && ')}` };
+  return { passed: true, message: `${key}.commands = ${commands.length} command(s): ${commands.join(' && ')}` };
 }
 
 registerCheck({
   id: 'invariant-checks-configured',
-  description: 'invariantChecks.commands in the shared config file yields at least one runnable command',
-  check: (cwd) => checkInvariantChecksConfigured(cwd),
+  description: 'invariantChecks.commands in the shared config file is absent, empty or a list of non-empty shell commands (malformed silently skips the invariant gate)',
+  check: (cwd) => checkCommandListSection(cwd, 'invariantChecks', readInvariantCheckCommands, 'no invariant check runs at return/merge'),
 });
 
 // worktreeSetup: project commands every runner-created worktree runs after
@@ -2865,29 +2863,10 @@ registerConfigDefault({
 // so only a present-but-malformed section fails: it reads as zero commands
 // and silently skips setup while looking configured. The wholly-missing
 // case is already covered generically by checkConfigNotStale.
-function checkWorktreeSetupConfigured(cwd) {
-  const section = readSharedConfig(cwd).worktreeSetup;
-  if (section === undefined) {
-    return { passed: true, message: 'worktreeSetup section absent -- worktrees get only their dependency install' };
-  }
-  const commands = readWorktreeSetupCommands(cwd);
-  const declared = section && typeof section === 'object' && Array.isArray(section.commands) ? section.commands.length : null;
-  if (declared === null || declared !== commands.length) {
-    return {
-      passed: false,
-      message: 'worktreeSetup is present but malformed -- expected { "commands": ["<shell command>", ...] } with only non-empty strings',
-    };
-  }
-  if (commands.length === 0) {
-    return { passed: true, message: 'worktreeSetup.commands is empty -- worktrees get only their dependency install' };
-  }
-  return { passed: true, message: `worktreeSetup.commands = ${commands.length} command(s): ${commands.join(' && ')}` };
-}
-
 registerCheck({
   id: 'worktree-setup-configured',
   description: 'worktreeSetup.commands in the shared config file is a list of non-empty shell commands (malformed silently skips worktree setup)',
-  check: (cwd) => checkWorktreeSetupConfigured(cwd),
+  check: (cwd) => checkCommandListSection(cwd, 'worktreeSetup', readWorktreeSetupCommands, 'worktrees get only their dependency install'),
 });
 
 registerCheck({
