@@ -217,6 +217,8 @@ Two questions remain where the plan or spec leaves a real choice.
   - (b) Untrack it. The `migrate` grant commit deletes it, and the view plus cursor live only in the `.fgos` cache that the registry declares. The API is unchanged, and the human-readable `docs/distillery/porting-log.md` stays tracked. Gain: no derived file in git, matching Work's `state.json`. Harm: anyone reading the raw file must use the API or the log. Cost: about 20 lines plus a CHANGELOG line.
 - **Recommendation:** (b). It is the same rule as Work's view (L3: truth in the log, the database is a view) and removes the cross-machine conflict. The human-readable log covers reading.
 - **Scope of the answer:** forgent's porting view location and the U3/U10 grant-commit contents only. The `forgent/state/porting-store` API stays.
+- **Answered 2026-10-22 10:47: (b).** The owner chose to untrack the view. U3 writes the view and cursor only to the registry-declared `.fgos` cache, and the U10 grant commit deletes `docs/distillery/state/porting/state.json`.
+- **Q-W1 superseded 2026-10-22:** ES 11 retires the npm install channel (M10), so no npm addon is needed; U9 records item 9 with a dated note.
 
 The board does not need these answers before U0-U2. Q-W2 blocks U3. Q-W1 blocks only the U9 item 9 row.
 
