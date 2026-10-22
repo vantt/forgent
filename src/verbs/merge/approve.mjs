@@ -36,6 +36,7 @@ import {
   classifySource,
   landRunnerItem,
   acknowledgeLand,
+  landAcknowledgement,
   isAlreadyMerged,
   performCatchUp,
   buildOwnFileSet,
@@ -123,8 +124,8 @@ function releaseLand(repoRoot, id, landSettlement, acknowledgement, state) {
 
 function moveBlockedOrConflict(dir, { id, reason, role = 'system' }, { repoRoot, landSettlement } = {}) {
   try {
-    const { event } = moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role });
-    releaseLand(repoRoot, id, landSettlement, `work-blocked:${id}:${event.seq}`, 'blocked');
+    const { event } = moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role, ...(landSettlement ? { landOperationIds: [landSettlement.operationId] } : {}) });
+    releaseLand(repoRoot, id, landSettlement, landAcknowledgement(event), 'blocked');
     return null;
   } catch (err) {
     if (categoryOf(err) === 'conflict') {
@@ -663,7 +664,7 @@ export async function approveUseCase(
             promotion: result.promotion,
           };
         }
-        releaseLand(repoRoot, id, result.landSettlement, `work-delivered:${id}:${moveResult.event.seq}`, 'delivered');
+        releaseLand(repoRoot, id, result.landSettlement, landAcknowledgement(moveResult.event), 'delivered');
         return {
           id,
           mode: 'merge',
@@ -860,7 +861,7 @@ export async function approveUseCase(
         promotion: result.promotion,
       };
     }
-    releaseLand(repoRoot, id, result.landSettlement, `work-delivered:${id}:${moveResult.event.seq}`, 'delivered');
+    releaseLand(repoRoot, id, result.landSettlement, landAcknowledgement(moveResult.event), 'delivered');
     return {
       id,
       mode: 'merge',

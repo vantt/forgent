@@ -83,7 +83,7 @@ import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFa
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
 import { normalizePath } from '../src/util/normalize-path.mjs';
 import { collectOutcomeEntry } from '../src/report/item-trace.mjs';
-import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, buildOwnFileSet } from '../src/runner/merge.mjs';
+import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, buildOwnFileSet, releaseRecordedLand } from '../src/runner/merge.mjs';
 import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
 import { rejectUseCase } from '../src/verbs/merge/reject.mjs';
@@ -4819,6 +4819,12 @@ const STORE_MISSING_WARNING_VERBS = new Set([
 // Verbs that open the Event Store without being `requiresExistingStore` or a store-missing-warning read: they carry
 // the opportunistic seal and publish triggers of spec §16 at their start and end.
 const EVENT_STORE_LIFECYCLE_VERBS = new Set(['init', 'doctor', 'setup', 'rebuild', 'decision-index', 'docs-index', 'knowledge']);
+// The verbs that run Land (a `merge` sub-verb only when it lands), and so the only ones that can leave a retained
+// candidate behind. Their end trigger releases the candidates whose result Work has recorded: the sweep reads
+// Land's whole operation journal, a cost a land already dwarfs and every other command would pay for nothing.
+function landsWork(verb, positional) {
+  return verb === 'approve' || verb === 'sync-root' || verb === 'promote-to-component' || (verb === 'merge' && positional[0] === 'next');
+}
 function opensEventStore(entry, verb) {
   return !!(entry?.requiresExistingStore || STORE_MISSING_WARNING_VERBS.has(verb) || EVENT_STORE_LIFECYCLE_VERBS.has(verb));
 }
@@ -5106,6 +5112,7 @@ async function main() {
   let dir;
   // Set once the verb is known to open the Event Store: the facts both lifecycle triggers need (spec §16).
   let eventStoreLifecycle = null;
+  let sweepsLand = false;
   try {
     const { flags, positional } = parseArgs(rest);
 
@@ -5212,6 +5219,7 @@ async function main() {
     // The main checkout is resolved (it runs git) only for a verb that opens the store; the other verbs never pay for it.
     if (opensEventStore(entry, verb)) {
       eventStoreLifecycle = { trustedMain: path.dirname(getMainFgosDir(dir)), dispatched: currentDispatchDepth() > 0 };
+      sweepsLand = landsWork(verb, positional);
       // `init` creates the store, so only its end trigger has anything to maintain.
       if (verb !== 'init') maintainEventStore(path.dirname(dir), eventStoreLifecycle);
     }
@@ -5274,7 +5282,13 @@ async function main() {
   } finally {
     // The end trigger runs after the verb's answer is written, on success and on refusal alike. Only a session that is
     // not a dispatched worker publishes (D13); sealing is always safe.
-    if (eventStoreLifecycle) maintainEventStore(path.dirname(dir), { ...eventStoreLifecycle, end: true });
+    if (eventStoreLifecycle) {
+      maintainEventStore(path.dirname(dir), { ...eventStoreLifecycle, end: true });
+      // A dispatched worker never releases: only the clone owner's own session does (D13).
+      if (sweepsLand && !eventStoreLifecycle.dispatched) {
+        for (const warning of releaseRecordedLand(eventStoreLifecycle.trustedMain).warnings) process.stderr.write(`fgos: warning: Land candidate release: ${warning}\n`);
+      }
+    }
   }
 }
 

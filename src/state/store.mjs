@@ -607,8 +607,13 @@ function sameLandSettlement(recorded, wanted) {
   return LAND_SETTLEMENT_KEYS.every(key => recorded?.[key] === wanted[key]);
 }
 
-function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askSource, approved, mergedSha, mergedInto, landSettlement } = {}, planSnapshot = null) {
+function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askSource, approved, mergedSha, mergedInto, landSettlement, landOperationIds } = {}, planSnapshot = null) {
   const result = withStateAndRefresh(dir, (tx) => {
+  if (landOperationIds !== undefined
+    && (to !== 'blocked' || !Array.isArray(landOperationIds) || !landOperationIds.length
+      || !landOperationIds.every(operationId => typeof operationId === 'string' && operationId.length > 0))) {
+    throw new StoreError('validation', 'only a move to "blocked" records Land operation ids, as a non-empty list of operation ids.');
+  }
   if (landSettlement !== undefined) {
     if (to !== 'delivered' || !landSettlement || landSettlement.settlementKind !== 'delivered'
       || !['repoIdentity', 'operationId'].every(key => typeof landSettlement[key] === 'string' && landSettlement[key].length > 0)) {
@@ -728,6 +733,9 @@ function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, 
     rawEvent.payload.mergedInto = mergedInto;
   }
   if (landSettlement !== undefined) rawEvent.payload.landSettlement = landSettlement;
+  // The Land operations whose unpublished result this block records, so a later sweep can find the event that
+  // acknowledges them (a delivery names its operation through `landSettlement`).
+  if (landOperationIds !== undefined) rawEvent.payload.landOperationIds = landOperationIds;
   // Claim-trigger marker (claim-lock §7, additive, NOT `claimRole`): who/what
   // dispatched this claim (e.g. `'herdr'`) — audit-only, never a safety
   // mechanism (claimRole/loop.mjs's reclaim-guard are unaffected). Stamped
