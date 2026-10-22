@@ -90,7 +90,7 @@ impl MailboxState {
         }
     }
 
-    /// Runs checks 0-10 for an attempt already counted.
+    /// Runs checks 0-11 for an attempt already counted.
     pub(crate) fn admit(
         &self,
         req: &SendRequest<'_>,
@@ -101,11 +101,12 @@ impl MailboxState {
     ) -> Result<Admitted, Refusal> {
         check_sender_key(&req.from, limits)?;
         let recipient = self.resolve(&req.to)?;
+        check_not_self(&req.from, &recipient.key)?;
         self.check_reply_hint(req, from_generation, &recipient.key)?;
         check_size(req, limits)?;
         self.check_budget(account, limits)?;
         self.check_lifetime(&req.from, from_generation, limits)?;
-        let parent = self.derived_parent(&recipient.key, &req.from, from_generation);
+        let parent = self.derived_parent(&recipient.key, &req.from, from_generation, now, limits);
         let depth = parent
             .and_then(|i| self.messages.get(i))
             .map_or(0, |h| h.depth.saturating_add(1));
@@ -122,7 +123,7 @@ impl MailboxState {
         })
     }
 
-    /// Check 3: a hint must name a message the recipient offered to the
+    /// Check 4: a hint must name a message the recipient offered to the
     /// sender's current generation. Notices live in their own lane and are
     /// never searched; a sender with no head was offered nothing.
     fn check_reply_hint(
@@ -146,7 +147,7 @@ impl MailboxState {
         }
     }
 
-    /// Check 5: attempts inside the rolling window, this one included.
+    /// Check 6: attempts inside the rolling window, this one included.
     fn check_budget(&self, account: &Account, limits: &Limits) -> Result<(), Refusal> {
         let attempts = self.budget.get(account).map_or(0, VecDeque::len);
         if attempts > limits.session.budget as usize {
@@ -158,7 +159,7 @@ impl MailboxState {
         Ok(())
     }
 
-    /// Check 6: a registered sender's attempts over its generation's life.
+    /// Check 7: a registered sender's attempts over its generation's life.
     /// A sender with no head is exempt (owner question Q3, provisional).
     fn check_lifetime(
         &self,
@@ -184,26 +185,32 @@ impl MailboxState {
 
     /// The parent of a send from `from` to `to` (spec §5.4): the most
     /// recently offered, unanswered message from `to` to `from`'s current
-    /// generation. A new process of the sender inherits no chain.
+    /// generation, offered no longer than `loop.windowSec` ago. A new
+    /// process of the sender inherits no chain, and an old offer starts a
+    /// new topic instead of extending a capped chain.
     fn derived_parent(
         &self,
         to: &WriterKey,
         from: &WriterKey,
         from_generation: Option<Generation>,
+        now: Timestamp,
+        limits: &Limits,
     ) -> Option<usize> {
         self.messages
             .iter()
             .enumerate()
             .filter(|(_, h)| offered_to(h, to, from, from_generation) && !h.answered)
             .filter_map(|(i, h)| match h.state {
-                MessageState::Offered { at } => Some((at, i)),
+                MessageState::Offered { at } if !now.is_past(at, limits.loop_guard.window_sec) => {
+                    Some((at, i))
+                }
                 _ => None,
             })
             .max()
             .map(|(_, i)| i)
     }
 
-    /// Check 8: messages from this account to `to` inside the loop window.
+    /// Check 9: messages from this account to `to` inside the loop window.
     fn check_loop(
         &self,
         account: &Account,
@@ -227,7 +234,7 @@ impl MailboxState {
         Ok(())
     }
 
-    /// Check 9: pending mail to the recipient's current generation.
+    /// Check 10: pending mail to the recipient's current generation.
     fn check_queue(
         &self,
         to: &WriterKey,
@@ -247,7 +254,7 @@ impl MailboxState {
         Ok(())
     }
 
-    /// Check 10: this account's share of that queue.
+    /// Check 11: this account's share of that queue.
     fn check_share(
         &self,
         account: &Account,
@@ -280,7 +287,15 @@ fn check_sender_key(from: &WriterKey, limits: &Limits) -> Result<(), Refusal> {
     Ok(())
 }
 
-/// Check 4: the body's size in UTF-8 bytes.
+/// Check 3: a head does not mail itself.
+fn check_not_self(from: &WriterKey, to: &WriterKey) -> Result<(), Refusal> {
+    if from == to {
+        return Err(Refusal::SelfSend);
+    }
+    Ok(())
+}
+
+/// Check 5: the body's size in UTF-8 bytes.
 fn check_size(req: &SendRequest<'_>, limits: &Limits) -> Result<(), Refusal> {
     if req.body.len() as u64 > limits.max_body_bytes {
         return Err(Refusal::TooLarge {
@@ -290,7 +305,7 @@ fn check_size(req: &SendRequest<'_>, limits: &Limits) -> Result<(), Refusal> {
     Ok(())
 }
 
-/// Check 7: the derived chain depth.
+/// Check 8: the derived chain depth.
 fn check_depth(depth: u32, limits: &Limits) -> Result<(), Refusal> {
     if depth > limits.chain.max_depth {
         return Err(Refusal::TooDeep {

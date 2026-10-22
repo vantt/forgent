@@ -443,6 +443,69 @@ fn a_depth_capped_chain_does_not_block_a_new_process_of_its_sender() {
     assert_eq!(code(&fresh), "recorded");
 }
 
+/// Owner decision M2 (2026-10-22, option A): a message offered longer
+/// ago than the loop window is no longer a parent, so the side the depth
+/// cap stopped can open a new topic; a parent offered within the window
+/// still counts.
+#[test]
+fn a_depth_capped_side_can_write_again_once_its_parent_was_offered_longer_ago_than_the_loop_window()
+{
+    let mut pair = Pair::new(t(0));
+    let max_depth = pair.limits.chain.max_depth;
+    let window = pair.limits.loop_guard.window_sec;
+    let mut now = t(0);
+    let (mut from, mut to) = ("a", B_NAME);
+    for _ in 0..=max_depth {
+        now = now.plus_secs(1);
+        pair.deliver(from, now);
+        pair.try_send(plain(from, to, "hop"), now).unwrap();
+        (from, to) = if from == "a" {
+            ("b", A_NAME)
+        } else {
+            ("a", B_NAME)
+        };
+    }
+    now = now.plus_secs(1);
+    pair.deliver(from, now);
+    let offered_at = now;
+
+    let at_window = pair.try_send(plain(from, to, "same topic"), offered_at.plus_secs(window));
+    assert_eq!(code(&at_window), "too-deep");
+    let fresh = pair
+        .try_send(
+            plain(from, to, "a new topic"),
+            offered_at.plus_secs(window + 1),
+        )
+        .unwrap();
+
+    assert_eq!(fresh.depth, 0);
+    assert_eq!(fresh.reply_to, None);
+}
+
+/// Owner decision on a head sending to itself (2026-10-22, option B): it is
+/// refused as `self`. As for every refusal, the attempt still counts toward
+/// the budget and the lifetime cap (spec §5.3); nothing else changes.
+#[test]
+fn a_head_sending_to_its_own_name_is_refused_as_self_and_changes_only_the_counts() {
+    let mut pair = Pair::new(t(0));
+    let before = serde_json::to_value(&pair.state).unwrap();
+
+    let refused = pair.try_send(plain("a", A_NAME, "a note to myself"), t(0));
+
+    assert!(matches!(refused, Err(Refusal::SelfSend)), "{refused:?}");
+    assert_eq!(code(&refused), "self");
+    assert_eq!(pair.state.counters().total(CounterReason::SelfSend), 1);
+    let mut after = serde_json::to_value(&pair.state).unwrap();
+    for counted in ["counters", "budget", "lifetime"] {
+        assert_ne!(
+            after[counted], before[counted],
+            "{counted} records the attempt"
+        );
+        after[counted] = before[counted].clone();
+    }
+    assert_eq!(after, before);
+}
+
 #[test]
 fn a_head_keyed_unregistered_keeps_its_own_account_apart_from_senders_with_no_head() {
     let mut pair = Pair::new(t(0));
@@ -486,7 +549,10 @@ fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
     for (expected, later) in [
         ("sender-key-too-long", "group"),
         ("group", "unknown-name"),
+        // `self` is judged on the resolved name, so it can never fail
+        // together with `unknown-name`; this pair spans it.
         ("unknown-name", "reply-to-not-offered"),
+        ("self", "reply-to-not-offered"),
         ("reply-to-not-offered", "too-large"),
         ("too-large", "session-budget"),
         ("session-budget", "lifetime-cap"),
@@ -506,6 +572,7 @@ fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
                 // "x,y" also names nobody, so a group stays unknown too.
                 "unknown-name" if to.contains(',') => {}
                 "unknown-name" => to = "nobody".to_string(),
+                "self" => to = A_NAME.to_string(),
                 "reply-to-not-offered" => hint = Some(not_offered.clone()),
                 "too-large" => too_large(&mut pair),
                 "session-budget" => no_budget(&mut pair),
@@ -525,5 +592,5 @@ fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
         assert_eq!(code(&result), expected, "{expected} before {later}");
         checked.push(expected);
     }
-    assert_eq!(checked.len(), 10);
+    assert_eq!(checked.len(), 11);
 }

@@ -64,6 +64,8 @@ pub enum Refusal {
     AmbiguousName {
         candidates: Vec<ShortName>,
     },
+    /// The name resolves to the sender's own key.
+    SelfSend,
     ReplyToNotOffered,
     TooLarge {
         max_bytes: u64,
@@ -106,6 +108,7 @@ impl Refusal {
             Self::Group => CounterReason::Group,
             Self::UnknownName { .. } => CounterReason::UnknownName,
             Self::AmbiguousName { .. } => CounterReason::AmbiguousName,
+            Self::SelfSend => CounterReason::SelfSend,
             Self::ReplyToNotOffered => CounterReason::ReplyToNotOffered,
             Self::TooLarge { .. } => CounterReason::TooLarge,
             Self::SessionBudget { .. } => CounterReason::SessionBudget,
