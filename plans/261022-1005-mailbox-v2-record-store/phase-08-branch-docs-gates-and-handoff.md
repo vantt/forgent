@@ -61,7 +61,7 @@ Run under the coordinator's memory limits: one heavy gate at a time, `CARGO_BUIL
 | `cargo fmt --all -- --check` | fails only outside `packages/mailbox`, in files this branch does not touch (workspace drift, item `tsk-hls`) |
 | `npm test` (branch) | 8853 tests, 8739 passed, 18 failed: `fgctl-upgrade` 15, `fgctl-init-download-sources` 2, `dispatch` 1 |
 | `npm test` on a clean `origin/main` worktree (sibling directory, same limits) | 8847 tests, 8733 passed, 18 failed: the same 18 titles. With C-locale sorted lists, there is no title that fails only on the branch and none that fails only on main |
-| `node scripts/git-one-door-scan.mjs --check` (the census behind doctor's `git-mutation-one-door`, which compares an activated release; this branch is never activated) | exit 0, 0 undeclared sites |
+| `node scripts/git-one-door-scan.mjs --check` (the census behind doctor's `git-mutation-one-door`, which compares an activated release; this branch is never activated) | exit 0, 0 undeclared sites on the tree with main `1aca9e83e`. After the last merge (main `9e487b3d9`) it exits 1 with 5 undeclared sites (`unresolved-binary` in `bin/fgos.mjs`, `src/runner/merge.mjs`, `src/runner/worktree.mjs`). A clean `origin/main` worktree gives the same 5 and the same exit 1, and main's own board records them (`9e487b3d9`), so the failure is inherited and none of the sites is in a branch file. The census was regenerated: it lists every branch file |
 | `fgos convention check --dir . -- <48 files this rung added or changed>` | 0 violations |
 
 A first attempt at the main comparison, from a worktree under the session scratch directory in `/tmp`, was discarded: its run lost its own test helpers mid-run (`ERR_MODULE_NOT_FOUND`), and its 382 failures were caused by the location, not by main. Both temporary worktrees were removed.
@@ -75,4 +75,9 @@ A first attempt at the main comparison, from a worktree under the session scratc
 - The `.fgos` directory is a parameter.
 - `LockScope::seeded(vec![])` checks no rank against locks the caller holds: V5 must take the mailbox lock with nothing else held, or seed the scope.
 - Owner questions: Q1 answered B (one-day retention, applied); Q2 answered B (dead names skipped, applied). None open.
+
+### Final merge (main `9e487b3d9`; Node-only changes since `1aca9e83e`)
+
+- `npm test -- --test-concurrency=4` on the final tree: 8850 tests, 8736 passed, 18 failed. The 18 titles are exactly those that fail on clean main, compared above.
+- The Rust gates are unaffected, because main changed no Rust file since they ran.
 
