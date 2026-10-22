@@ -964,6 +964,20 @@ impl GitDriver {
         }
         Ok(false)
     }
+    /// Whether the repository has a submodule: a `.gitmodules` file in the
+    /// worktree, or a non-empty `<common git dir>/modules` directory.
+    fn has_submodules(repo: &RepoHandle) -> bool {
+        if repo
+            .work_tree()
+            .is_some_and(|w| w.join(".gitmodules").is_file())
+        {
+            return true;
+        }
+        match fs::read_dir(repo.common_dir().join("modules")) {
+            Ok(mut entries) => entries.next().is_some(),
+            Err(_) => false,
+        }
+    }
 
     #[allow(clippy::too_many_arguments)]
     fn invoke_context(
@@ -1168,6 +1182,16 @@ impl GitDriver {
         if !input.is_empty() && policy != Policy::Inspect {
             return Err(refusal("git-input-requires-borrow"));
         }
+        let watch_token = (self.containment.guarantee().level
+            == containment::GuaranteeLevel::BestEffort
+            && args.first() != Some(&"config")
+            && repo.is_some_and(|r| {
+                self.user_code_may_run(r, policy).unwrap_or(true) || Self::has_submodules(r)
+            }))
+        .then(containment::watch_token);
+        if let Some(token) = &watch_token {
+            env.0.insert(containment::WATCH_ENV.into(), token.clone());
+        }
         let (stdin_r, mut stdin_w) = std::io::pipe().map_err(io)?;
         let (stdout_r, stdout_w) = std::io::pipe().map_err(io)?;
         let (stderr_r, stderr_w) = std::io::pipe().map_err(io)?;
@@ -1265,6 +1289,13 @@ impl GitDriver {
         }
         if overflow.load(Ordering::Relaxed) {
             return Err(refusal("git-output-limit"));
+        }
+        if status.success() {
+            if let Some(token) = &watch_token {
+                if !containment::environment_marked(containment::WATCH_ENV, token).is_empty() {
+                    return Err(refusal("containment-unproven"));
+                }
+            }
         }
         Ok(Output {
             stdout,
@@ -3237,6 +3268,91 @@ mod tests {
             .unwrap();
         assert_eq!(err.cause, "containment-unproven");
         assert!(start.elapsed() < Duration::from_secs(3), "took {:?}", start.elapsed());
+    }
+    #[test]
+    #[cfg(target_os = "linux")]
+    fn submodule_filter_escapee_reported_as_containment_unproven_on_best_effort_containment() {
+        let state = Temp::new();
+        let super_dir = Temp::new();
+        let sub_src = Temp::new();
+
+        git(&super_dir.0, &["init", "-q", "-b", "main"]);
+        git(&super_dir.0, &["config", "user.name", "Test"]);
+        git(&super_dir.0, &["config", "user.email", "test@test.local"]);
+        fs::write(super_dir.0.join("README"), "init").unwrap();
+        git(&super_dir.0, &["add", "README"]);
+        git(&super_dir.0, &["commit", "-q", "-m", "init"]);
+
+        git(&sub_src.0, &["init", "-q", "-b", "main"]);
+        git(&sub_src.0, &["config", "user.name", "Test"]);
+        git(&sub_src.0, &["config", "user.email", "test@test.local"]);
+        fs::write(sub_src.0.join("tracked"), "sub content").unwrap();
+        fs::write(sub_src.0.join(".gitattributes"), "tracked filter=x\n").unwrap();
+        git(&sub_src.0, &["add", "tracked", ".gitattributes"]);
+        git(&sub_src.0, &["commit", "-q", "-m", "sub init"]);
+
+        git(
+            &super_dir.0,
+            &[
+                "-c",
+                "protocol.file.allow=always",
+                "submodule",
+                "add",
+                sub_src.0.to_str().unwrap(),
+                "sub",
+            ],
+        );
+        git(&super_dir.0, &["commit", "-q", "-m", "add submodule"]);
+
+        let sub_dir = super_dir.0.join("sub");
+        let script = sub_dir.join("filter.sh");
+        let pid_file = sub_dir.join("survivor.pid");
+        fs::write(
+            &script,
+            format!(
+                "#!/bin/sh\n(setsid sh -c 'echo $$ > \"{}\"; exec sleep 30' </dev/null >/dev/null 2>&1 &)\ncat\n",
+                pid_file.display()
+            ),
+        )
+        .unwrap();
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&script, fs::Permissions::from_mode(0o755)).unwrap();
+        }
+        git(&sub_dir, &["config", "filter.x.clean", script.to_str().unwrap()]);
+
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        driver.containment = Box::new(fgos_process::containment::LinuxPgroup);
+        let repo = resolve(&driver, &super_dir.0);
+
+        let err = driver
+            .status(
+                &repo,
+                crate::inspect::Untracked::All,
+                crate::inspect::Submodules::Configured,
+                crate::inspect::Ignored::Excluded,
+                None,
+                100,
+            )
+            .unwrap_err();
+        assert_eq!(err.cause, "containment-unproven");
+
+        if let Ok(pid_text) = fs::read_to_string(&pid_file) {
+            if let Ok(pid) = pid_text.trim().parse::<u32>() {
+                // SAFETY: terminating background process started by this test.
+                unsafe { libc::kill(pid as libc::pid_t, libc::SIGKILL) };
+            }
+        }
+
+        let mut samples = Vec::with_capacity(50);
+        for _ in 0..50 {
+            let start = Instant::now();
+            let _ = fgos_process::containment::environment_marked("FGOS_BENCH_MARK", "none");
+            samples.push(start.elapsed());
+        }
+        samples.sort();
+        let median = samples[25];
+        assert!(median < Duration::from_millis(5), "scan cost median exceeded 5ms: {:?}", median);
     }
 }
 

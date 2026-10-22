@@ -499,7 +499,7 @@ pub struct BorrowOutcome {
 /// Environment marker of a watched borrow: unique per run, inherited by every
 /// descendant of the child.
 #[cfg(unix)]
-const WATCH_ENV: &str = "FGOS_BORROW_WATCH";
+use fgos_process::containment::{watch_token, WATCH_ENV};
 
 /// Explicit I/O and execution bound for [`run_borrowed_io`].
 #[derive(Debug, Clone)]
@@ -998,7 +998,7 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watc
     let drv = driver::current();
     let mut explicit = spec.clone();
     explicit.stdio = BorrowStdio::Null;
-    let watch_token = format!("{}-{}", std::process::id(), std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.as_nanos()));
+    let watch_token = watch_token();
     if watch {
         explicit.env.insert(WATCH_ENV.to_string(), watch_token.clone());
     }
