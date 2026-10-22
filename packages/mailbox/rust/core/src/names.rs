@@ -105,44 +105,67 @@ impl MailboxState {
         self.resolve_skipping(query, &BTreeSet::new())
     }
 
-    /// [`MailboxState::resolve`] over every binding but those of `skipped`,
-    /// which then neither match nor appear as candidates.
+    /// [`MailboxState::resolve`] with the bindings of `skipped` (heads the
+    /// store judged dead) taken out of the prefix steps and the candidates.
+    /// An exact match still names its own head: an exact short name or key
+    /// of a skipped head is refused as unknown and never passed on to a
+    /// live head it happens to prefix.
     pub(crate) fn resolve_skipping(
         &self,
         query: &str,
         skipped: &BTreeSet<WriterKey>,
     ) -> Result<&Binding, ResolveRefusal> {
         let live = || self.bindings().filter(|b| !skipped.contains(&b.key));
+        let unknown = || ResolveRefusal::Unknown {
+            candidates: names_of(live()),
+        };
         if query
             .chars()
             .any(|c| c == ',' || c == '*' || c.is_whitespace())
         {
             return Err(ResolveRefusal::Group);
         }
-        if !query.is_empty() {
-            if let Some(exact) = live().find(|b| b.name.as_str() == query) {
-                return Ok(exact);
-            }
-            let steps: [&dyn Fn(&Binding) -> bool; 3] = [
-                &|b| b.name.as_str().starts_with(query),
-                &|b| b.key.as_str() == query,
-                &|b| b.key.as_str().starts_with(query),
-            ];
-            for matches in steps {
-                let found: Vec<&Binding> = live().filter(|b| matches(b)).collect();
-                match found.as_slice() {
-                    [] => continue,
-                    [one] => return Ok(one),
-                    many => {
-                        return Err(ResolveRefusal::Ambiguous {
-                            candidates: names_of(many.iter().copied()),
-                        })
+        if query.is_empty() {
+            return Err(unknown());
+        }
+        let steps: [(Match, &dyn Fn(&Binding) -> bool); 4] = [
+            (Match::Exact, &|b| b.name.as_str() == query),
+            (Match::Prefix, &|b| b.name.as_str().starts_with(query)),
+            (Match::Exact, &|b| b.key.as_str() == query),
+            (Match::Prefix, &|b| b.key.as_str().starts_with(query)),
+        ];
+        for (kind, matches) in steps {
+            match kind {
+                Match::Exact => {
+                    if let Some(exact) = self.bindings().find(|b| matches(b)) {
+                        if skipped.contains(&exact.key) {
+                            return Err(unknown());
+                        }
+                        return Ok(exact);
+                    }
+                }
+                Match::Prefix => {
+                    let found: Vec<&Binding> = live().filter(|b| matches(b)).collect();
+                    match found.as_slice() {
+                        [] => {}
+                        [one] => return Ok(one),
+                        many => {
+                            return Err(ResolveRefusal::Ambiguous {
+                                candidates: names_of(many.iter().copied()),
+                            })
+                        }
                     }
                 }
             }
         }
-        Err(ResolveRefusal::Unknown {
-            candidates: names_of(live()),
-        })
+        Err(unknown())
     }
+}
+
+/// How a resolution step matches: an exact name or key names one head
+/// whatever its judgement; a prefix matches only heads not skipped.
+#[derive(Clone, Copy)]
+enum Match {
+    Exact,
+    Prefix,
 }

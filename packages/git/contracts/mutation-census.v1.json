@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "bb91fcf40881760a447a00d43fd770615de650e2fbc63c345c02984f7a0af6db",
+  "payloadDigest": "15dc1497c71c80d0d43e85aa8baff31e80052f84bdc4544b25be8a8f71137fa7",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -387,7 +387,7 @@
     "packages/mailbox/rust/core/src/ids.rs": "b9787cc8682b5b71f0cb4b64b04dc3b24fdee3c38102fbbff5d283253cafba55",
     "packages/mailbox/rust/core/src/lib.rs": "50b505a0d6114dc5ffeb9d7d470190aec94673b581719bb703a32ddbb94f71cd",
     "packages/mailbox/rust/core/src/limits.rs": "da44b53751ee76dab4f39dd736d478566159f3efcd1285d684c974b25088e6dd",
-    "packages/mailbox/rust/core/src/names.rs": "fc403c73471f3dc46c4069af041818bedced23d9611262c1f06eb2467d91fc61",
+    "packages/mailbox/rust/core/src/names.rs": "2d031feae891daadcec4d366272c70f279e8df7274db2f6cab0a0063471efeb1",
     "packages/mailbox/rust/core/src/notices.rs": "d39dcbb220b900987221cf5ca8471de38b2728573b4581d6e6c980a52367532c",
     "packages/mailbox/rust/core/src/policy.rs": "41f41fcbec6b45fc2c7bba1123680f3b0e2750fa78388998599b3483c9925a59",
     "packages/mailbox/rust/core/src/registry.rs": "e039dc6f1d72321f6e46156e08a9fc008b7d924d01ceb3787ce79d3c48fbb421",
@@ -401,7 +401,7 @@
     "packages/mailbox/rust/core/tests/delivery.rs": "6df92e3cff8221c2168d965ff14811494504aa4b03d63353ace0cefbb3c724b3",
     "packages/mailbox/rust/core/tests/frame.rs": "aa7e1c300378d2847544c2b826fad56867eaf446c5902929080c482fb3c4911c",
     "packages/mailbox/rust/core/tests/limits_contract.rs": "4e95cbbfd7d3746fdbb8c1833bf57243022dfd3de6b5824bf2839c6c0031db6a",
-    "packages/mailbox/rust/core/tests/names.rs": "41e3ff38f1b3d6a5b5b2ecee20fcf9581c2485cb7514e23e5b2f4af1122cf034",
+    "packages/mailbox/rust/core/tests/names.rs": "2ba76412acbc32049422874071ede9631e793de26db78efc40805c3a29624269",
     "packages/mailbox/rust/core/tests/policies.rs": "2fd4fa2cf0dd09769d80bd30a128d7ea4d7758e658e687046d52673355fb3617",
     "packages/mailbox/rust/core/tests/registry.rs": "c14b55c9447d6c1b37c7db6e2f56faa9288805210ed3f53950d871a4f3132fbf",
     "packages/mailbox/rust/core/tests/scripted_pair.rs": "d514f95028b4d612160fa01129a95815022e6155c42a13bf66784dcd8dd4b086",

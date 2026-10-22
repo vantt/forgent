@@ -16,30 +16,79 @@ fn candidate_names(refusal: &ResolveRefusal) -> Vec<String> {
     }
 }
 
+/// An id source that always draws `0x9c5`, so a colliding head that wanted
+/// the suffix `9c` is named `…-9c5`, a name the first head's exact name
+/// prefixes.
+struct Draws9c5;
+
+impl fgos_mailbox_core::IdSource for Draws9c5 {
+    fn next_u64(&mut self) -> u64 {
+        0x9c5
+    }
+}
+
+/// An exact short name names that head and no other: it wins over a longer
+/// name it prefixes, and when the store judged that head dead the name is
+/// refused, never passed on to the live head it prefixes (owner decision Q2
+/// option B applies to prefixes and candidates only). The same holds for
+/// an exact writer key.
 #[test]
 fn exact_short_name_wins_over_a_longer_name_it_prefixes() {
     let limits = spec_limits();
     let mut ids = SeqIds::default();
     let mut state = MailboxState::new();
-    register_new(
+    let exact = register_new(
         &mut state,
         request("k1", "codex", Some("9c"), "h1"),
         t(1),
         &limits,
         &mut ids,
     );
-    // A second head that wants the same two characters gets three.
-    let longer = register_new(
+    // A second head that wants the same two characters gets three, here
+    // drawn so that the first head's name prefixes it.
+    let longer = match state
+        .register(
+            request("k2", "codex", Some("9c"), "h2"),
+            None,
+            t(1),
+            &limits,
+            &mut Draws9c5,
+        )
+        .unwrap()
+    {
+        fgos_mailbox_core::Registered::Created { name, .. } => name.as_str().to_string(),
+        other => panic!("{other:?}"),
+    };
+    assert_eq!(exact, "forgent-codex-9c");
+    assert_eq!(longer, "forgent-codex-9c5");
+    // A live head whose key the first head's key prefixes.
+    register_new(
         &mut state,
-        request("k2", "codex", Some("9c"), "h2"),
+        request("k10", "claude", Some("2b"), "h3"),
         t(1),
         &limits,
         &mut ids,
     );
-    assert_eq!(longer.len(), "forgent-codex-9c".len() + 1);
 
     let found = state.resolve("forgent-codex-9c").unwrap();
     assert_eq!(found.key.as_str(), "k1");
+
+    let send = |state: &mut MailboxState, to: &str, ids: &mut SeqIds| {
+        let mut req = plain("sender", to, "for the dead head only");
+        req.dead_keys = [key("k1")].into_iter().collect();
+        state.send(req, t(2), &limits, ids)
+    };
+    let to_dead_name = send(&mut state, &exact, &mut ids);
+    assert!(
+        matches!(to_dead_name, Err(Refusal::UnknownName { .. })),
+        "the exact name of a dead head went to {to_dead_name:?}"
+    );
+    let to_dead_key = send(&mut state, "k1", &mut ids);
+    assert!(
+        matches!(to_dead_key, Err(Refusal::UnknownName { .. })),
+        "the exact key of a dead head went to {to_dead_key:?}"
+    );
+    assert_eq!(state.messages().count(), 0);
 }
 
 #[test]
