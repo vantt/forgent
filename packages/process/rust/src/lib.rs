@@ -160,9 +160,8 @@ impl DomainWatch {
     }
 
     /// End every process of the domain at once. For `linux-gate` this is
-    /// SIGKILL sent to the gate by identity, then a bounded wait while the
-    /// kernel tears the namespace down, as the other drivers wait for empty;
-    /// a gate that is already gone counts as done.
+    /// SIGKILL sent to the gate by identity; a gate that is already gone
+    /// counts as done.
     pub fn kill_all(&mut self) -> KillOutcome {
         match &mut self.inner {
             #[cfg(windows)]
@@ -170,7 +169,6 @@ impl DomainWatch {
             Watch::Direct(Domain::LinuxGate(gate)) if cfg!(target_os = "linux") && gate.start_time == containment::EXITED_GATE => KillOutcome::Ok,
             Watch::Direct(Domain::LinuxGate(gate)) if cfg!(target_os = "linux") => {
                 if signal_settled(&control::signal_by_identity(gate, control::Signal::Kill)) {
-                    containment::wait_dead(gate);
                     KillOutcome::Ok
                 } else {
                     KillOutcome::Refused
@@ -210,5 +208,14 @@ pub fn domain_is_empty(domain: &Domain) -> DomainState {
 
 /// One-shot [`DomainWatch::kill_all`].
 pub fn domain_kill_all(domain: &Domain) -> KillOutcome {
-    domain_watch(domain).kill_all()
+    let outcome = domain_watch(domain).kill_all();
+    // Answer after the namespace is torn down, as the other drivers answer
+    // after their domain is empty. Watch callers with their own bound (the
+    // predecessor rule) keep the immediate return of `DomainWatch::kill_all`.
+    if let (KillOutcome::Ok, Domain::LinuxGate(gate)) = (&outcome, domain) {
+        if cfg!(target_os = "linux") && gate.start_time != containment::EXITED_GATE {
+            containment::wait_dead(gate);
+        }
+    }
+    outcome
 }
