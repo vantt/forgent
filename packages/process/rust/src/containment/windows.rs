@@ -123,7 +123,7 @@ impl ContainmentDriver for WindowsJobDriver {
             return crate::domain_kill_all(&record);
         };
         // Windows has no polite stop for a process tree: the job ends at once.
-        if hold.job.terminate().is_err() && hold.watch.get_or_insert_with(|| domain_watch(&record)).kill_all() != KillOutcome::Ok {
+        if hold.job.terminate().is_err() && hold.watch.get_or_insert_with(|| domain_watch(&record)).kill_all(super::DEFAULT_EMPTY_WAIT) != KillOutcome::Ok {
             return KillOutcome::Refused;
         }
         let watch = hold.watch.get_or_insert_with(|| domain_watch(&record));
