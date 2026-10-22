@@ -28,7 +28,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
-import { resolveLogsDir } from './paths.mjs';
+import { resolveLogsDir, resolveMainCheckoutRoot } from './paths.mjs';
 import { observe, judge, signalByIdentity } from './dispatch/process-identity.mjs';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
 import { replaceDurably } from '../native/door.mjs';
@@ -358,7 +358,8 @@ export function stopGateway(fgosDir) {
   } finally {
     lock.release();
     // Shutdown seals what is still open (spec §16), outside the gateway lock.
-    maintainEventStore(path.dirname(fgosDir), { shutdown: true });
+    const root = path.dirname(fgosDir);
+    maintainEventStore(root, { trustedMain: resolveMainCheckoutRoot(root) ?? root, shutdown: true });
   }
 }
 
