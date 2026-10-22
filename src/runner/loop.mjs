@@ -65,9 +65,8 @@ import {
   recordFriction,
   categoryOf,
   EXIT_CODES,
-  resolveWriterLogPath,
 } from '../state/store.mjs';
-import { readClaims } from '../state/runtime-coordination.mjs';
+import { readClaims, withMainState } from '../state/runtime-coordination.mjs';
 import { DEFAULTS, truncateTitle } from '../state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, domainSteps, stepForPhase, classificationVocabulary } from '../state/domain-registry.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
@@ -82,7 +81,6 @@ import {
 import { bind } from './execution/bind.mjs';
 import { workUnitFor } from './work-dispatch.mjs';
 import { spawnWorker, workUnitIdFor } from './work-dispatch.mjs';
-import { appendEvent } from '../state/events.mjs';
 import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
 import { checkoutPathForBranch, compareCommits, branchExists, resolveRefSha, deleteBranchRef, resetDispatchWorktree, createDispatchWorktree, removeDispatchWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
@@ -991,16 +989,11 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       clearResume(dir, item.id);
       lastWorkerOutput = worker.stdout ?? ''; // wgi-8: terminal-outcome discovery source (success/verify-miss)
       log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model}, unit run ${worker.unitRunId})`);
-      // Executor-aware dispatch announce/audit (D8, tsk-62v): one line to
-      // stderr/logs, plus one event appended to this writer's own open
-      // file under `.fgos/events/` (`resolveWriterLogPath`, TA-D2/TA-D12)
-      // — never straight to the frozen baseline `events.jsonl`. `replay.mjs`
-      // ignores unknown event types by design, so this audit-only entry
-      // never participates in the FSM view. Queued through the same
-      // `queue.enqueue()` every other write at this call site uses.
+      // Audit through the same Work gate, cursor and staged append as every
+      // mutation; the runner queue serializes this caller's writes.
       log(`fgos-runner: ${worker.executorId} — ${worker.provider} — ${worker.model}`);
       await queue.enqueue(async () => {
-        appendEvent(resolveWriterLogPath(dir), {
+        withMainState(dir, tx => tx.append({
           type: 'executor.dispatch',
           payload: {
             id: item.id,
@@ -1017,7 +1010,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
             // The Unit run that carries this dispatch's binding, logs and result.
             unitRunId: worker.unitRunId,
           },
-        }, dir);
+        }));
       });
       // The runner committed the worker's file changes inside the Unit run, so
       // goal-check judges the committed branch.

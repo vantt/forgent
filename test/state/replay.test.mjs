@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { appendEvent } from '../../src/state/events.mjs';
+import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 import { foldEvents, rebuildView, viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir } from '../../src/state/replay.mjs';
 import { initStore, addWork, moveWork } from '../../src/state/store.mjs';
 import { repairTruncatedLastLine } from '../../src/state/events.mjs';

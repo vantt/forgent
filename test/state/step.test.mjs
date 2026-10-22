@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -16,7 +17,7 @@ function work(workflowStep, overrides = {}) {
 // dedicated store test for them, same precedent as awaiting.test.mjs for
 // putInAwaiting/answerAwaiting.
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-step-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-step-')));
 }
 
 function addSampleWork(dir, overrides = {}) {

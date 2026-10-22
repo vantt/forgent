@@ -3,6 +3,7 @@
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import {
   ADD_BAD_FLAG_CASES,
   EDIT_BAD_FLAG_CASES,
@@ -123,11 +124,11 @@ test('gate-bypass from a .fgos/-less linked worktree with no --dir warns on stde
   assert.equal(envelopeData(wtResult.stdout).level, 'off', 'the .fgos/-less empty-store default, never silently trusted as the real policy');
 });
 
-test('init creates .fgos/ with an empty log and a rebuilt (empty) view, exit 0', () => {
+test('init creates .fgos/ with a rebuilt (empty) view and no tracked event file, exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['init']);
   assert.equal(result.status, 0);
-  assert.ok(fs.existsSync(logPath(cwd)));
+  assert.equal(fs.existsSync(logPath(cwd)), false, 'events live in the Event Store, not a tracked file');
   const view = rawPersistedView(cwd);
   assert.deepEqual(view.work, {});
   assert.deepEqual(view.decisions, []);
@@ -162,8 +163,9 @@ test('init inside a linked worktree is refused, exit 4 (ADR0020: worktrees never
   assert.ok(!fs.existsSync(path.join(wt, '.fgos')), 'the refused init must not create .fgos/ in the worktree');
 });
 
-test('init on a fresh directory that is not a linked worktree still succeeds, exit 0', () => {
+test('init on a fresh checkout that is not a linked worktree still succeeds, exit 0', () => {
   const cwd = rawTmpCwd();
+  initializeWorkRepository(cwd);
   const result = run(cwd, ['init']);
   assert.equal(result.status, 0);
   assert.ok(fs.existsSync(path.join(cwd, '.fgos')));

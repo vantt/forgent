@@ -104,28 +104,22 @@ test.todo('edit use case changes only the targeted field, every other field unch
 // through). `logPath(cwd)` (TA-D12's baseline-0) must never gain a single
 // byte across add/edit/move/edit again: every event this whole sequence
 // produces belongs under `.fgos/events/` instead.
-test('a full add -> edit -> move -> edit CLI lifecycle never appends to the frozen events.jsonl baseline -- every event lands under .fgos/events/', () => {
+test('a full add -> edit -> move -> edit CLI lifecycle lands every event in the Event Store and writes no tracked event file', () => {
   const cwd = tmpCwdFromTemplate();
-  const baselineBefore = fs.readFileSync(logPath(cwd), 'utf8');
-  assert.equal(baselineBefore, '', 'tmpCwdFromTemplate(): baseline should start empty (init writes no events, just an empty file)');
+  assert.deepEqual(eventLines(cwd), [], 'tmpCwdFromTemplate(): the store should start empty');
 
   assert.equal(addOk(cwd, 'tsk-write-path-guard').status, 0);
   assert.equal(run(cwd, ['edit', 'tsk-write-path-guard', '--verify', 'echo first']).status, 0);
   // tsk-40m: blocked stands in for the retired todo->doing edge -- this
-  // test only cares that a work.move event lands in the shard, not which
+  // test only cares that a work.move event lands in the store, not which
   // status it targets.
   assert.equal(run(cwd, ['move', 'tsk-write-path-guard', '--to', 'blocked']).status, 0);
   assert.equal(run(cwd, ['edit', 'tsk-write-path-guard', '--verify', 'echo second']).status, 0);
 
-  const baselineAfter = fs.readFileSync(logPath(cwd), 'utf8');
-  assert.equal(baselineAfter, '', 'the frozen events.jsonl baseline must stay byte-identical (empty) -- every event above belongs in a per-writer shard, never here');
-
-  const eventsDir = path.join(cwd, '.fgos', 'events');
-  const shardFiles = fs.readdirSync(eventsDir).filter((name) => name.endsWith('.jsonl'));
-  assert.equal(shardFiles.length, 1, 'exactly one writer, one open shard file');
-  const shardLines = fs.readFileSync(path.join(eventsDir, shardFiles[0]), 'utf8').split('\n').filter(Boolean);
-  const shardTypes = shardLines.map((line) => JSON.parse(line).type);
-  assert.deepEqual(shardTypes, ['work.add', 'work.edit', 'work.move', 'work.edit'], 'the whole lifecycle landed in the shard, in order, none of it in the baseline');
+  const types = eventLines(cwd).map((line) => JSON.parse(line).type);
+  assert.deepEqual(types, ['work.add', 'work.edit', 'work.move', 'work.edit'], 'the whole lifecycle landed in the store, in order');
+  assert.equal(fs.existsSync(logPath(cwd)), false, 'no frozen events.jsonl baseline is written');
+  assert.equal(fs.existsSync(path.join(cwd, '.fgos', 'events')), false, 'no per-writer shard directory is written');
 });
 
 test('edit on an unknown id is rejected as validation, exit 4, no event written', () => {

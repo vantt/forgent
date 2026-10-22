@@ -241,7 +241,7 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
   // claim write are one `state` transaction: no other durable write or claim
   // can land between the read and the claim file being written.
   const runtimeClaim = withMainState(dir, (tx) => {
-    const freshDurableView = foldEvents(readRawEvents(dir));
+    const freshDurableView = tx.view;
     const freshStatus = freshDurableView.work[id]?.status;
     if (freshStatus !== expectedStatus) {
       throw new ClaimError(
@@ -252,7 +252,7 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
     const freshRevision = getItemDurableRevision(freshDurableView, id);
 
     if (!isPotentialStaleClaimReclaim) {
-      const room = hasWorkerSlotRoom(buildEffectiveView(freshDurableView, readClaims(dir)), { ceiling, excludeId: id });
+      const room = hasWorkerSlotRoom(buildEffectiveView(freshDurableView, readClaims(dir, tx)), { ceiling, excludeId: id });
       if (!room.allowed) {
         throw new ClaimError(
           'worker-slot-ceiling',

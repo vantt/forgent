@@ -30,7 +30,7 @@ import {
 } from '../../../src/setup/registrations.mjs';
 import { DEFAULT_INVARIANT_CHECK_COMMANDS } from '../../../src/config/shared-config-file.mjs';
 import { initStore, addWork } from '../../../src/state/store.mjs';
-import { appendEvent } from '../../../src/state/events.mjs';
+import { appendEvent } from '../../helpers/legacy-event-fixture.mjs';
 
 const __dirname = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');

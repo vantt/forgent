@@ -1,15 +1,8 @@
-// events.mjs — append-only event log with its cross-process write lock
-// (truth per D3, ≡ changeset per R3).
+// events.mjs — legacy event-file reading plus the locked truncated-line repair.
 //
-// Reading, parsing and the unlocked append core live in event-log.mjs (kernel)
-// and are re-exported here so every existing import keeps working. This file
-// adds the locked half: the hot mutex comes from hot-lock.mjs, which also
-// installs the child-process guard when it loads, so any entry point that can
-// write the log gets the guard.
-//
-// The lock is the `state` hot mutex (`.fgos/locks/state.hot`) for the log
-// under `.fgos/`, and `porting-events` for the porting store's log. A critical
-// section is synchronous and may not start a child process.
+// Reading and parsing live in event-log.mjs (kernel) and are re-exported here.
+// New events are appended only through the Event Store consumer gate; this file
+// keeps no append path.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,7 +13,6 @@ import {
   readLastLineBefore,
   readEventsFromByte,
   parsesAsJson,
-  appendEventCore,
 } from './event-log.mjs';
 import { withStateTx } from './hot-lock.mjs';
 
@@ -104,41 +96,4 @@ export function lockOfLog(logPath, fgosDir) {
   const porting = path.basename(parent) === 'porting';
   const root = porting && fgosDir === parent ? path.dirname(parent) : fgosDir;
   return { root, resource: porting ? 'porting-events' : 'state' };
-}
-
-/**
- * Append exactly one event to `logPath` as a single JSON line: `{ seq, ts,
- * type, payload, v, src, h }`. `seq` is derived from the current last event
- * (1 if the log is empty/absent) — never supplied by the caller, so events
- * cannot be reordered or double-numbered within one file (per-file only,
- * TA-D1: cross-file identity is `h`, not `seq`). `ts` is set here, always
- * ISO-8601 UTC. `v` is always the current `SCHEMA_VERSION` (per D7c) — every
- * event this module writes from now on carries it; there is no way to append
- * an event without one. `src` is the writer id from `resolveWriterIdentity`
- * (TA-D9). `h` is a 16-hex SHA-256 of the line content up to and including
- * `src` (TA-D1/TA-D9) — the event's content-addressed, order-independent
- * identity, used downstream for cross-file dedupe. A log line written before
- * this field existed has no `h`/`src` and still reads back exactly as
- * written (D7a: never rewritten, never migrated in place).
- *
- * Reads the existing log first (via readEvents), so appending onto an
- * already-corrupt log fails loudly with the same 'corrupt-log' category
- * rather than silently continuing on top of unknown state.
- *
- * The read-seq/compute/append sequence runs under `withStateTx` (released
- * in a finally on every exit path), so two concurrent processes never both
- * read the same last seq and write a duplicate.
- *
- * SCOPE: called bare like this, it closes ONLY the duplicate/out-of-order seq
- * race at the append itself — a caller with its own precondition read ahead
- * of the append (store.mjs's addWork existing-id check, moveWork's
- * expectedStatus compare-and-swap, editWork, moveStep) needs that read
- * inside the SAME held lock to avoid acting on a precondition that's already
- * gone stale; those callers use `withStateTx` + `tx.append`
- * directly instead of this function, so their whole read-check-append
- * sequence is one critical section.
- */
-export function appendEvent(logPath, opts, fgosDir) {
-  const { root, resource } = lockOfLog(logPath, fgosDir ?? path.dirname(logPath));
-  return withStateTx(root, (tx) => tx.append(logPath, opts), { resource });
 }

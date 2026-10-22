@@ -1,3 +1,4 @@
+import '../helpers/process-tmp-root.mjs';
 // The guard catches the three places that started a child process inside the
 // old events lock: `currentHead` in a claim, `getMainFgosDir` in
 // `acquireClaim`, `assertPlanEvidence` in `moveWork`. The code of those places
@@ -10,7 +11,6 @@
 // spy outside the guard records every execFileSync made at critical-section
 // depth, with its stack.
 
-import '../helpers/process-tmp-root.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -37,7 +37,7 @@ before(() => {
     return;
   }
   // The lock under test, and the files that must agree with it (the lock-held counter and the identity guard that reads it), from this checkout.
-  for (const file of ['src/state/hot-lock.mjs', 'src/state/event-log.mjs', 'src/state/events.mjs', 'src/util/state-lock-held.mjs', 'src/util/session-identity.mjs', 'packages/holder-lock/contracts/lock-registry.v1.json']) {
+  for (const file of ['src/state/hot-lock.mjs', 'src/util/state-lock-held.mjs', 'src/util/session-identity.mjs', 'packages/holder-lock/contracts/lock-registry.v1.json']) {
     fs.copyFileSync(path.join(ROOT, file), path.join(tree, file));
   }
   // The lock door the hot lock calls through, whole, so its modules agree with each other.
@@ -47,8 +47,10 @@ before(() => {
   fs.writeFileSync(path.join(tree, 'src/runner/dispatch/process-identity.mjs'), `export * from ${JSON.stringify(pathToFileURL(path.join(ROOT, 'src/runner/dispatch/process-identity.mjs')).href)};\n`);
   // The baseline callers still use the pre-cutover names; give them to the
   // copied events module as thin wrappers over the real hot lock.
-  fs.appendFileSync(path.join(tree, 'src/state/events.mjs'), `
-export { appendEventCore as appendEventLocked };
+  const oldEvents = path.join(tree, 'src/state/events.mjs');
+  fs.writeFileSync(oldEvents, fs.readFileSync(oldEvents, 'utf8').replace('export function withEventsLock(', 'function withLegacyEventsLock('));
+  fs.appendFileSync(oldEvents, `
+import { withStateTx } from './hot-lock.mjs';
 export function withEventsLock(logPath, fn, fgosDir = path.dirname(logPath)) {
   const parent = path.dirname(logPath);
   const porting = path.basename(parent) === 'porting';
@@ -57,7 +59,7 @@ export function withEventsLock(logPath, fn, fgosDir = path.dirname(logPath)) {
 }
 `);
   // The baseline files that note a held lock import the counter from the identity module; it now lives in its own.
-  for (const file of ['src/state/runtime-coordination.mjs']) {
+  for (const file of ['src/state/runtime-coordination.mjs', 'src/state/events.mjs']) {
     const full = path.join(tree, file);
     fs.writeFileSync(full, fs.readFileSync(full, 'utf8').replace(
       "import { noteLockHeld, noteLockReleased, resolveWriterIdentity } from '../util/session-identity.mjs';",
@@ -74,8 +76,6 @@ after(() => {
 const SCRIPT = `
 import childProcess from 'node:child_process';
 import nodeModule from 'node:module';
-import fs from 'node:fs';
-import path from 'node:path';
 const tree = process.argv[1];
 const repo = process.argv[2];
 const mod = (rel) => import(path.join(tree, rel));

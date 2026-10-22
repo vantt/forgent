@@ -28,7 +28,6 @@ import { noteLockHeld, noteLockReleased } from '../util/state-lock-held.mjs';
 import { HotLockError, hotLockDepth, enterHotLock } from '../holder-lock/hot-guard.mjs';
 export { HotLockError, hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
-import { appendEventCore } from './event-log.mjs';
 
 const RESOURCES = Object.freeze(['state', 'porting-events']);
 const WAIT_TIMEOUT_MS = 5000;
@@ -225,12 +224,17 @@ function underDir(fgosDir, target) {
   return rel !== '' && !rel.startsWith('..') && !path.isAbsolute(rel);
 }
 
-function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eventStore = null, extraRoots = [] } = {}) {
+function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eventStore = null, extraRoots = [], readRoots = [], stageEffects = false, commitEvents = null, afterApply = null } = {}) {
   let live = true;
   const roots = [fgosDir, ...extraRoots];
-  const guard = (target) => {
+  const effects = [];
+  const events = [];
+  const stagedFiles = stageEffects ? new Map() : null;
+  let staging = stageEffects;
+  const effect = (apply) => { if (staging) effects.push(apply); else return apply(); };
+  const guard = (target, reading = false) => {
     if (!live) throw new HotLockError('state-tx-revoked', 'the state transaction was used after its callback returned');
-    if (target !== undefined && !roots.some((root) => underDir(root, target))) {
+    if (target !== undefined && ![...roots, ...(reading ? readRoots : [])].some((root) => underDir(root, target))) {
       throw new HotLockError('state-tx-path-outside', `"${target}" is not under ${fgosDir}; a state transaction touches only its own .fgos`);
     }
   };
@@ -240,16 +244,14 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
     eventStore,
     head,
     writer,
-    /** Append one event; same seq/hash derivation as the plain append. */
-    append(logPath, opts) {
-      guard(logPath);
-      return appendEventCore(logPath, opts, fgosDir, tx);
-    },
-    /** One already-built log line (the primitive `append` writes through). */
-    appendLine(logPath, line) {
-      guard(logPath);
-      fs.mkdirSync(path.dirname(logPath), { recursive: true });
-      fs.appendFileSync(logPath, line, 'utf8');
+    /** Only a prepared consumer gate may acknowledge typed events. */
+    append(opts) {
+      guard();
+      if (!staging || !commitEvents) throw new HotLockError('state-tx-consumer-required', 'append requires a prepared consumer gate');
+      if (typeof opts?.type !== 'string' || !opts.type.trim()) throw new HotLockError('validation', 'event type is required');
+      const event = { type: opts.type.trim(), payload: structuredClone(opts.payload ?? null), ts: new Date().toISOString() };
+      events.push(event);
+      return event;
     },
     writeJson(target, value) {
       tx.writeText(target, `${JSON.stringify(value, null, 2)}\n`);
@@ -257,15 +259,46 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
     /** Replace `target` with `text` atomically (temp file, then rename). */
     writeText(target, text) {
       guard(target);
-      fs.mkdirSync(path.dirname(target), { recursive: true });
-      const tmp = `${target}.tmp-${uniqueTmpTag()}`;
-      fs.writeFileSync(tmp, text, 'utf8');
-      fs.renameSync(tmp, target);
+      if (staging) stagedFiles.set(path.resolve(target), String(text));
+      effect(() => {
+        fs.mkdirSync(path.dirname(target), { recursive: true });
+        const tmp = `${target}.tmp-${uniqueTmpTag()}`;
+        fs.writeFileSync(tmp, text, 'utf8');
+        fs.renameSync(tmp, target);
+      });
+    },
+    readText(target) {
+      guard(target, true);
+      const key = path.resolve(target);
+      if (staging && stagedFiles.has(key)) {
+        const text = stagedFiles.get(key);
+        if (text === null) throw Object.assign(new Error(`ENOENT: ${target}`), { code: 'ENOENT' });
+        return text;
+      }
+      return fs.readFileSync(target, 'utf8');
+    },
+    exists(target) {
+      guard(target);
+      const key = path.resolve(target);
+      return staging && stagedFiles.has(key) ? stagedFiles.get(key) !== null : fs.existsSync(target);
+    },
+    list(target) {
+      guard(path.join(target, '.'));
+      let names;
+      try { names = new Set(fs.readdirSync(target)); }
+      catch (error) { if (error.code !== 'ENOENT') throw error; names = new Set(); }
+      if (staging) for (const [file, text] of stagedFiles) {
+        if (path.dirname(file) === path.resolve(target)) {
+          if (text === null) names.delete(path.basename(file));
+          else names.add(path.basename(file));
+        }
+      }
+      return [...names].sort();
     },
     readJson(target) {
-      guard(target);
+      guard(target, true);
       try {
-        return JSON.parse(fs.readFileSync(target, 'utf8'));
+        return JSON.parse(tx.readText(target));
       } catch (err) {
         if (err.code === 'ENOENT') return null;
         throw err;
@@ -275,21 +308,41 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
     rename(from, to) {
       guard(from);
       guard(to);
-      fs.mkdirSync(path.dirname(to), { recursive: true });
-      fs.renameSync(from, to);
+      if (staging) {
+        const text = tx.readText(from);
+        stagedFiles.set(path.resolve(from), null);
+        stagedFiles.set(path.resolve(to), text);
+      }
+      effect(() => {
+        fs.mkdirSync(path.dirname(to), { recursive: true });
+        fs.renameSync(from, to);
+      });
     },
     unlink(target) {
       guard(target);
-      try {
-        fs.unlinkSync(target);
-        return true;
-      } catch (err) {
-        if (err.code === 'ENOENT') return false;
-        throw err;
-      }
+      const existed = staging ? tx.exists(target) : undefined;
+      if (staging) stagedFiles.set(path.resolve(target), null);
+      const removed = effect(() => {
+        try { fs.unlinkSync(target); return true; }
+        catch (err) { if (err.code !== 'ENOENT') throw err; return false; }
+      });
+      return staging ? existed : removed;
     },
   };
-  return { tx, revoke: () => { live = false; } };
+  return {
+    tx,
+    commit() {
+      // A refusal leaves every effect unapplied. Only the consumer knows how
+      // to acknowledge its staged event batch; the mutex owns effect ordering.
+      if (stageEffects) {
+        commitEvents?.(tx, events);
+        staging = false;
+        for (const apply of effects) apply();
+        afterApply?.(tx);
+      }
+    },
+    revoke: () => { live = false; },
+  };
 }
 
 /**
@@ -301,6 +354,7 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
  * caller did not pass it. A reentrant call throws `hot-lock-reentry` at once.
  * `prefetched.extraRoots` lists further directories the transaction may write
  * under (a log directory that is not the lock's own `.fgos`).
+ * `prefetched.readRoots` grants only reads, e.g. already-resolved Git refs.
  */
 export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} } = {}) {
   assertResource(resource);
@@ -311,10 +365,15 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
   const paths = acquireRecord(fgosDir, resource, recordOfSelf(writer, fgosDir));
   const leaveHotLock = enterHotLock();
   noteLockHeld();
-  const { tx, revoke } = createTx(fgosDir, { ...prefetched, writer });
+  const { tx, commit, revoke } = createTx(fgosDir, { ...prefetched, writer });
   let result;
   try {
     result = fn(tx);
+    if (result && typeof result.then === 'function') {
+      result.then(undefined, () => {});
+      throw new HotLockError('state-tx-async', `${resource}: the transaction callback must be synchronous`);
+    }
+    commit();
   } finally {
     revoke();
     leaveHotLock();
@@ -323,10 +382,6 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
     } finally {
       noteLockReleased();
     }
-  }
-  if (result && typeof result.then === 'function') {
-    result.then(undefined, () => {});
-    throw new HotLockError('state-tx-async', `${resource}: the transaction callback returned a promise; it must be synchronous (the lock is already released)`);
   }
   return result;
 }

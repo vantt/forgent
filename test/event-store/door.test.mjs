@@ -249,7 +249,6 @@ const dormantReaderFindings = {
   "src/state/porting-store.mjs: import readEvents: retired-event": 1,
   "src/state/replay.mjs: import readEvents: retired-event": 1,
   "src/state/replay.mjs: import readEventsFromByte: retired-event": 1,
-  "src/state/store.mjs: import readAllEventsFromDir: retired-event": 1,
   "src/verbs/events/migrate.mjs: import readAllEventsFromDir: retired-event": 1
 };
 

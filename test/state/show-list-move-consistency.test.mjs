@@ -1,9 +1,10 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // test/state/show-list-move-consistency.test.mjs — tsk-38i:
 // Read-path consistency regression guard between show, list, and move's precondition read.
 // Asserts that listWork (used by show and list) and rebuildViewFromDir (used by moveWork's precondition)
 // report identical stage and status for an item during and immediately following an approve-like state transition.
 
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -18,12 +19,12 @@ import {
   currentEffectiveView,
   rebuild,
 } from '../../src/state/store.mjs';
-import { rebuildViewFromDir } from '../../src/state/replay.mjs';
+
 import { getDomain, effectiveStep } from '../../src/state/domain-registry.mjs';
 import { acquireClaim, releaseClaim } from '../../src/state/runtime-coordination.mjs';
 
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-show-list-move-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-show-list-move-')));
 }
 
 function getShowRead(dir, id) {
@@ -51,7 +52,7 @@ function getListRead(dir, id) {
 }
 
 function getMovePreconditionRead(dir, id) {
-  const durableView = rebuildViewFromDir(dir);
+  const durableView = rebuild(dir);
   const item = durableView.work[id];
   if (!item) return null;
   const domain = getDomain(item.domain);

@@ -25,6 +25,7 @@
     "docs/explanation",
     "docs/enduser-docs-index.json",
     "packages/event-store/contracts",
+    "packages/work-state/contracts/event-streams.v1.json",
     "packages/git/contracts/mutation-census.v1.json"
   ],
   "scripts": {

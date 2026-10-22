@@ -9,8 +9,9 @@ import { execFileSync } from 'node:child_process';
 import { resolvePlan, resolveCallerPlanVerdict, resolveContentRoot, findUncoveredLockedDecisions } from '../../src/intake/plan.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents, recordGateApprove, addDecision } from '../../src/state/store.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
+import { appendWorkEvent } from '../helpers/work-event-fixture.mjs';
 import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { createWorktree } from '../../src/runner/worktree.mjs';
 
 // tsk-1x3 D1/D9/D16 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
@@ -89,7 +90,7 @@ function mkTempDir() {
 }
 
 function tmpStoreDir() {
-  return mkNativeTempDir('fgos-resolve-decompose-');
+  return initializeWorkRepository(mkNativeTempDir('fgos-resolve-decompose-'));
 }
 
 function sampleWork(overrides = {}) {
@@ -498,13 +499,12 @@ test('resolvePlan on a caller-supplied pass-through verdict preserves claim (doi
 // the same observability decision discovery.mjs's rough pass does when
 // work.risk is present but not a real RISK_DISCOUNTS key. `addWork` now
 // enforces risk as an enum (tsk-5wz), so this shape only exists as legacy
-// data -- appendEvent bypasses the write door to plant one, same technique
+// data -- appendWorkEvent bypasses the write door to plant one, same technique
 // discovery.test.mjs uses for its own legacy-shape fixtures.
 test('resolvePlan logs a decision when work.risk is present but unrecognized, never for a recognized value', () => {
   const storeDir = tmpStoreDir();
-  const logPath = path.join(storeDir, 'events.jsonl');
-  appendEvent(logPath, { type: 'work.add', payload: { ...sampleWork(), id: 'item-unrecognized', risk: 'medium' } });
-  appendEvent(logPath, { type: 'work.add', payload: { ...sampleWork(), id: 'item-recognized', risk: 'heavy' } });
+  appendWorkEvent(storeDir, { type: 'work.add', payload: { ...sampleWork(), id: 'item-unrecognized', risk: 'medium' } });
+  appendWorkEvent(storeDir, { type: 'work.add', payload: { ...sampleWork(), id: 'item-recognized', risk: 'heavy' } });
 
   resolvePlan(storeDir, 'item-unrecognized', cfg, 'session', { verdict: 'pass-through' });
   resolvePlan(storeDir, 'item-recognized', cfg, 'session', { verdict: 'pass-through' });
@@ -1621,9 +1621,9 @@ test('resolvePlan caller-supplied decompose verdict: an uncovered locked-decisio
   const storeDir = tmpStoreDir();
   const { docsRef } = mkContextFixture(storeDir, '## Locked decisions\n\nD1: placeholder — filled below.\n');
   const fixtureRelPath = `${docsRef}.mjs`;
-  fs.writeFileSync(path.join(storeDir, fixtureRelPath), '// fixture\n');
+  fs.writeFileSync(path.join(path.dirname(storeDir), fixtureRelPath), '// fixture\n');
   fs.writeFileSync(
-    path.join(storeDir, docsRef, 'CONTEXT.md'),
+    path.join(path.dirname(storeDir), docsRef, 'CONTEXT.md'),
     `## Locked decisions\n\nD1: canonical output lives at \`${fixtureRelPath}\`.\n`,
   );
   addWork(storeDir, sampleWork({ docsRef }));
@@ -1651,9 +1651,9 @@ test('resolvePlan caller-supplied decompose verdict: a child footprint that cove
   const storeDir = tmpStoreDir();
   const { docsRef } = mkContextFixture(storeDir, '## Locked decisions\n\nD1: placeholder — filled below.\n');
   const fixtureRelPath = `${docsRef}.mjs`;
-  fs.writeFileSync(path.join(storeDir, fixtureRelPath), '// fixture\n');
+  fs.writeFileSync(path.join(path.dirname(storeDir), fixtureRelPath), '// fixture\n');
   fs.writeFileSync(
-    path.join(storeDir, docsRef, 'CONTEXT.md'),
+    path.join(path.dirname(storeDir), docsRef, 'CONTEXT.md'),
     `## Locked decisions\n\nD1: canonical output lives at \`${fixtureRelPath}\`.\n`,
   );
   addWork(storeDir, sampleWork({ docsRef }));

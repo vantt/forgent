@@ -1,3 +1,6 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
+import { appendWorkEvent } from '../helpers/work-event-fixture.mjs';
 // test/state/store.test.mjs — câu-6 tự động (Phase 3 S3-closeout (c)):
 // moveWork composes a learning record MECHANICALLY the moment an item
 // reaches `done` via EITHER entry door (doing->done, awaiting-approval->done — both
@@ -10,7 +13,6 @@
 // exact composed learning content is cheaper directly against moveWork's
 // returned `view` than round-tripping through the CLI's stdout formatting.
 
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -18,8 +20,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fork, execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { initStore, addWork, editWork, moveWork, moveStep, addOutcome, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, rebuild, resolveWriterLogPath, StoreError, assertPlanEvidence } from '../../src/state/store.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
+import { initStore, addWork, editWork, moveWork, moveStep, addOutcome, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, rebuild, StoreError, assertPlanEvidence } from '../../src/state/store.mjs';
+import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/util/session-identity.mjs";
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
@@ -30,7 +32,7 @@ const STORE_MJS = pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '..
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-store-learning-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-store-learning-')));
 }
 
 // tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`/
@@ -50,7 +52,7 @@ function moveToDurableDoingForTest(dir, id, from = 'todo') {
   // "each writer identity gets its own file" and, if the earlier write
   // lands in the same millisecond, tie-break to the wrong file-sort order
   // (TA-D7) and sort this work.move BEFORE the work.add it must follow.
-  appendEvent(resolveWriterLogPath(dir), { type: 'work.move', payload: { id, from, to: 'doing' } }, dir);
+  appendWorkEvent(dir, { type: 'work.move', payload: { id, from, to: 'doing' } }, dir);
   // Force a fresh rebuild right away — closes a real timestamp-granularity
   // race where a subsequent moveWork's own CAS read (currentView's T4
   // incremental fast path, mtime-based staleness detection) could still
@@ -293,23 +295,11 @@ test('the learning record rides the SAME work.move event that closes the item �
   moveWork(dir, { id: 'learn-rebuild', to: 'retrospective', expectedStatus: 'delivered' });
   moveWork(dir, { id: 'learn-rebuild', to: 'cleanup', expectedStatus: 'retrospective' });
 
-  // Tầng A/T2: writes now land in the ONE open per-writer file under
-  // .fgos/events/ (TA-D2/TA-D11), not the frozen events.jsonl baseline.
-  const eventsDir = path.join(dir, 'events');
-  const filesBefore = fs.readdirSync(eventsDir).sort();
-  assert.equal(filesBefore.length, 1, 'exactly one writer, one open file');
-  const logPath = path.join(eventsDir, filesBefore[0]);
-  const eventsBefore = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean).length;
-
-  const { event } = moveWork(dir, { id: 'learn-rebuild', to: 'done', expectedStatus: 'cleanup', role: 'human' });
-
-  const filesAfter = fs.readdirSync(eventsDir).sort();
-  assert.deepEqual(filesAfter, filesBefore, 'no new file appears — the learning record rides the same writer-file append that already happens');
-
-  const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
-  assert.equal(lines.length, eventsBefore + 1, 'exactly ONE event appended for the close — not two');
-  const types = lines.map((l) => JSON.parse(l).type);
-  assert.deepEqual(types, ['work.add', 'work.move', 'work.move', 'work.move', 'work.move', 'work.move']);
+  const eventsBefore = readRawEvents(dir).length;
+  const { event } = moveWork(dir, { id: 'learn-rebuild', to: 'done', expectedStatus: 'cleanup' });
+  const events = readRawEvents(dir);
+  assert.equal(events.length, eventsBefore + 1, 'exactly ONE event appended for the close');
+  assert.deepEqual(events.map(e => e.type), ['work.add', 'work.move', 'work.move', 'work.move', 'work.move', 'work.move']);
   assert.equal(event.type, 'work.move');
   assert.ok(event.payload.learning, 'the returned move event itself carries the learning field');
 
@@ -325,7 +315,7 @@ test('the learning record rides the SAME work.move event that closes the item �
 // a CAS precondition (moveWork's expectedStatus) must still see the OTHER
 // writer's prior event when it reads "current state" — proving the merged
 // multi-file view, not just the append side, is correct.
-test('two interleaved writer identities each write to their own file under .fgos/events/, and CAS still sees across both', () => {
+test('two interleaved writer identities share one origin stream and CAS sees both', () => {
   const dir = tmpDir();
   const savedSessionId = process.env.FGOS_SESSION_ID;
   try {
@@ -351,11 +341,7 @@ test('two interleaved writer identities each write to their own file under .fgos
     // state" sees writer-b's move, which lives in a DIFFERENT file.
     moveWork(dir, { id: 'interleave-1', to: 'delivered', expectedStatus: 'doing', role: 'human' });
 
-    const eventsDir = path.join(dir, 'events');
-    const files = fs.readdirSync(eventsDir).filter((f) => f.endsWith('.jsonl'));
-    assert.equal(files.length, 2, 'two distinct writer identities produce two distinct files');
-    assert.ok(files.some((f) => f.startsWith('writer-a-')));
-    assert.ok(files.some((f) => f.startsWith('writer-b-')));
+    assert.equal(fs.existsSync(path.join(dir, 'events')), false);
 
     const view = listWork(dir);
     assert.equal(view.work['interleave-1'].status, 'delivered');
@@ -364,7 +350,7 @@ test('two interleaved writer identities each write to their own file under .fgos
     assert.deepEqual(
       rawEvents.map((e) => e.type),
       ['work.add', 'work.move', 'work.move'],
-      'readRawEvents merges both writer files in total order',
+      'readRawEvents preserves the origin stream order',
     );
   } finally {
     if (savedSessionId === undefined) delete process.env.FGOS_SESSION_ID;
@@ -876,25 +862,24 @@ test('writeView writes state.json via a temp-file-then-rename, never a direct wr
 });
 
 // tsk-37d: writeView must stringify the view object only once per write
-test('writeView serializes view content only once per mutation (tsk-37d)', () => {
+test('cache installation serializes the new view only once per mutation', () => {
   const dir = tmpDir();
+  initStore(dir);
   let viewStringifyCount = 0;
   const originalStringify = JSON.stringify;
   JSON.stringify = function patchedStringify(obj, ...args) {
-    if (obj && typeof obj === 'object' && obj !== null && typeof obj.work === 'object') {
+    if (obj && typeof obj === 'object' && obj !== null && typeof obj.work === 'object' && obj.work['single-stringify-check']) {
       viewStringifyCount += 1;
     }
     return originalStringify.call(this, obj, ...args);
   };
   try {
-    initStore(dir);
     addSampleWork(dir, 'single-stringify-check');
   } finally {
     JSON.stringify = originalStringify;
   }
-  // initStore (1 write) + addSampleWork (1 write) = 2 writes.
-  // For each write, the view object must be stringified exactly once.
-  assert.equal(viewStringifyCount, 2, 'the full view object must be stringified exactly once per state write');
+  // Authentication may serialize the old cache; installation serializes its new content once.
+  assert.equal(viewStringifyCount, 1, 'the new view must be stringified exactly once for installation');
 });
 
 // --- str73-done-flip-cos-check cell 2: per-clause CoS done-gate ------------
@@ -985,6 +970,7 @@ test('moveWork re-reads fresh state on retry: editing in the missing evidence af
 
 function gitBackedDir(prefix) {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  initializeWorkRepository(repoRoot);
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
@@ -1270,8 +1256,7 @@ test('recordGateApprove rejects a missing id, an unrecognized gate, an unrecogni
 // existed, or before this schema/log started validating at all (replay
 // itself never calls validateWorkShape, per work.mjs's own doc comment).
 function addLegacyWork(dir, id, overrides = {}) {
-  const logPath = path.join(dir, 'events.jsonl');
-  appendEvent(logPath, {
+  appendWorkEvent(dir, {
     type: 'work.add',
     payload: {
       id,

@@ -77,7 +77,7 @@ test('disconnected-worktree guard: refuses a MUTATING_ONLY_VERBS verb from an ad
   try {
     // sanity: this is genuinely the bug shape, not the already-handled
     // ADR0020-stripped ENOENT case.
-    assert.ok(fs.existsSync(path.join(wt, '.fgos', 'events.jsonl')), 'ad-hoc worktree really carries a checked-out .fgos copy');
+    assert.ok(fs.existsSync(path.join(wt, '.fgos', 'coexistence.json')), 'ad-hoc worktree really carries a checked-out .fgos copy');
     assert.equal(fs.lstatSync(path.join(wt, '.fgos')).isSymbolicLink(), false, 'not a session symlink either');
 
     const result = run(wt, ['submit', 'a task from a disconnected worktree', '--async']);

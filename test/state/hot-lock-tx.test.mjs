@@ -1,8 +1,8 @@
+import '../helpers/process-tmp-root.mjs';
 // The state transaction: confined paths, revocation, async refusal, reentry,
 // and the record the fast path writes. Real files in a temp .fgos; no host
 // binary is needed because nothing here has to clean a dead holder.
 
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -39,26 +39,18 @@ test('the record is the full process tuple while held, and the file is gone afte
   }
 });
 
-test('append through the transaction writes the event; a stale tx writes nothing', async () => {
+test('bare transactions refuse appends without a consumer and revoke every write after release', async () => {
   const f = fixture();
   try {
-    const log = path.join(f.fgosDir, 'events.jsonl');
     let kept;
-    withStateTx(f.fgosDir, (tx) => {
-      tx.append(log, { type: 'first', payload: { n: 1 } });
+    withStateTx(f.fgosDir, tx => {
+      assert.throws(() => tx.append({ type: 'work.add' }), { code: 'state-tx-consumer-required' });
       kept = tx;
     }, { prefetched: writer });
-    assert.equal(readEvents(log).length, 1);
-
-    // The continuation runs after the lock was released and may not write.
-    await new Promise((resolve) => setTimeout(resolve, 5));
-    assert.throws(() => kept.append(log, { type: 'late' }), (err) => err.code === 'state-tx-revoked');
-    assert.throws(() => kept.writeJson(path.join(f.fgosDir, 'late.json'), {}), (err) => err.code === 'state-tx-revoked');
-    assert.equal(readEvents(log).length, 1);
+    assert.throws(() => kept.append({ type: 'work.add' }), { code: 'state-tx-revoked' });
+    assert.throws(() => kept.writeJson(path.join(f.fgosDir, 'late.json'), {}), { code: 'state-tx-revoked' });
     assert.equal(fs.existsSync(path.join(f.fgosDir, 'late.json')), false);
-  } finally {
-    f.cleanup();
-  }
+  } finally { f.cleanup(); }
 });
 
 test('the transaction refuses paths outside its .fgos and passes prefetched facts through', () => {
@@ -130,4 +122,19 @@ test('a thrown callback releases the lock and rethrows its own error', () => {
   } finally {
     f.cleanup();
   }
+});
+
+test('prefetched read roots allow gated reference reads without granting writes', () => {
+  const f = fixture();
+  const refs = path.join(f.dir, 'refs');
+  fs.mkdirSync(refs);
+  const head = path.join(refs, 'head');
+  fs.writeFileSync(head, 'branch-tip');
+  try {
+    withStateTx(f.fgosDir, tx => {
+      assert.equal(tx.readText(head), 'branch-tip');
+      assert.throws(() => tx.writeText(head, 'changed'), { code: 'state-tx-path-outside' });
+      assert.throws(() => tx.unlink(head), { code: 'state-tx-path-outside' });
+    }, { prefetched: { readRoots: [refs] } });
+  } finally { fs.rmSync(f.dir, { recursive: true, force: true }); }
 });

@@ -260,7 +260,8 @@ test('lock-status: nothing held -- every row is free, main checkout included, an
     assert.ok(['free', 'not-node-owned'].includes(row.status), `${row.name} should be free, got ${row.status}`);
     assert.ok(['repo', 'machine'].includes(row.scope), `${row.name} scope ${row.scope} is not reported`);
   }
-  assert.equal(fs.existsSync(path.join(cwd, '.fgos', 'locks')), false, 'a status read creates nothing');
+  // The fixture's activation fence is the only entry; a status read creates nothing beside it.
+  assert.deepEqual(fs.readdirSync(path.join(cwd, '.fgos', 'locks')), ['activation.lock'], 'a status read creates nothing');
   assert.equal(data.beacon.status, 'none');
 });
 
