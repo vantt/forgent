@@ -41,6 +41,8 @@ net_size: "Node −5 / Rust −22 / tests −320 (estimate)"
 
 ### R3 / RT-M11 (containment)
 
+- **Error name (OPC council, 2026-10-22 13:20):** `containment-mount-refused`, carried as the cause under the existing port error `namespace-unavailable` ("namespace-unavailable: containment-mount-refused: <bwrap stderr line>"); no silent per-operation fallback to `linux-pgroup`. Use this name; the contract adds it as a cause, not a new port error.
+
 - `packages/process/rust/src/containment/linux.rs:127-143`: `spawn_in` changes nothing on the success path (bwrap's fd 2 is the gate's fd 2 for its whole life, so a pipe there would make the gate die with EPIPE or block at 64 KiB; red-team failure F1, security F2, assume F4). When `read_child_pid` ends with 0 bytes (`:428-430`), `end_failed_spawn` runs one **diagnostic re-run on the failure path only**: the same `bwrap` prefix with `--` `/bin/true`, stdin/stdout null, stderr captured (bounded, 4 KiB, 2 s), the pattern of `pidns_usable` (`:44-62`), and returns `NamespaceUnavailable(format!("bwrap ended without reporting a gate pid: {first non-empty stderr line}"))`; a re-run that prints nothing keeps today's sentence. A mount that cannot be remounted is persistent, so the re-run sees the same refusal (R3's evidence: every `--dev-bind / /` failed while the snapshot was mounted). ≈ 15 lines. The contract's `escapes`/driver text does not change; `packages/process/contracts/containment.port.v1.json` gains nothing. Owning proof: phase 1's `containment_bwrap.rs` case (the fixture `bwrap` prints the line on every invocation). The error reaches the Git driver (`packages/git/rust/src/driver.rs:1172-1195`) unchanged in shape.
 
 ### The Lows
