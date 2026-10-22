@@ -185,6 +185,13 @@ Per layer:
 7. **T0 landing:** when T0 closes, the second machine self-lands in a quiet window (GIT/ES told first); the owner machine follows a guide at a time the owner picks on receipt.
 8. **Hand-offs must be recorded by the receiving lane in its own plan** (owner: "dặn các luồng nhận gì thì nhớ ghi và cập nhật plan của nó, không được xót"). The ledger below tracks each one until the receiver confirms.
 
+2026-10-22 08:50, owner, T1 ask 1 ([arbitration](../reports/council-261022-0245-harden-t1-arbitration.md) §6): "1a 2a 3a 5a 4a".
+9. **T1 target shapes approved as written** (arbitration §2): the in-process `holderLock` door on Linux/macOS with the red-team's constraints (handed-over release, full creation mark, tuple holders); Windows keeps `lock-hold`; identity door; fences (Node part only, H16) deleted; doctor 9 → 5.
+10. **The checkout channel `node bin/fgos.mjs` is unsupported for process, lock and identity verbs.** AGENTS.md's Legacy-Node boundary text says so and points to the dev door; the `state-root` route and Node's route fallback go. The git hook asks the activated host (arbitration D2).
+11. **HL-F1:** the hot mutex fast-path test uses an absolute bound from the same run (`withStateTx` p50 ≤ 2 × the raw link/unlink quartet); TEST applies it (H21).
+12. **`lock.predecessorKillWaitMs` is deleted** (key, doctor line, setup merge, tests; CHANGELOG line); one bound, the 2000 ms default, everywhere.
+13. **Write-once self record for the hot mutex** goes to WORK as an idea for its store rewrite, not into T1 (H22).
+
 ## Hand-off ledger (items HARDEN gave to other lanes)
 
 A row closes only when the receiving lane has written the item into its own plan and said where. HARDEN re-checks open rows at every layer close.
@@ -207,6 +214,8 @@ A row closes only when the receiving lane has written the item into its own plan
 | H18 | `src/verbs/events/migrate.mjs` gains `checkStopped`/`workspaceListing` beside it when T1 deletes `fences.mjs` | T1 [arbitration](../reports/council-261022-0245-harden-t1-arbitration.md) D4 | **HARDEN T1 owns the move** (GIT/ES 10-22 ~07:50: L10, it belongs in the fence deletion commit); GIT/ES reviews the `src/verbs/events/migrate.mjs` diff before it lands; board shared-file row |
 | H19 | SEAT review at its landing: `src/convention/{seat-id,definition-names}.mjs` evaluate convention rules in Node; SEAT's `src/util/state-lock-held.mjs` is a third depth counter | T1 [arbitration](../reports/council-261022-0245-harden-t1-arbitration.md) §5 | SEAT, then T1 phase 6 |
 | H20 | `src/runner/lock-wait.mjs` is a default behind a module plus a 53-line test (simplicity S-E8) | T1 [arbitration](../reports/council-261022-0245-harden-t1-arbitration.md) §3 rejected list | T5, [phase-06](phase-06-t5-execution-core-dispatch-seat-run-result.md) |
+| H21 | HL-F1: replace the 1.10 ratio bound in `test/state/hot-lock-multiprocess.test.mjs:249` with the absolute bound of owner decision 11 | T1 [arbitration](../reports/council-261022-0245-harden-t1-arbitration.md) Q3 | TEST (`forgent-f8`), in its timing-test batch |
+| H22 | Write-once self record for the hot mutex (≈ 40% off the fast path; a crash leaves `.hot.self-*` files that `lock-holders` would sweep) as an idea for WORK's store rewrite | T1 [arbitration](../reports/council-261022-0245-harden-t1-arbitration.md) Q5, owner decision 13 | WORK (held lane; recorded in its board row) |
 | H9 | host-runtime T9 list: `providers/external_process/**`, production `EchoProvider`/`test.fixture.echo`, tautological admission gate, empty `RouterPolicy`, `command-routes-drift` spawn cost | arbitration §2, §5 | HARDEN phase 07 (T9 handoff) | [phase 07](phase-07-closing-and-handoff.md) inputs | recorded here |
 | H10 | Doctor per-row timing in `fgos doctor --json` (owner 2b) | arbitration §6 | HARDEN phase 07 (T9) | [phase 07](phase-07-closing-and-handoff.md) inputs | recorded here |
 | H11 | Release-manifest canonical-JSON producer/verifier pair (if the corpus proof does not pass in T0) | arbitration §2 | HARDEN phase 07 (Packaging) | [phase 07](phase-07-closing-and-handoff.md) inputs | recorded here |
