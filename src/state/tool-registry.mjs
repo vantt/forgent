@@ -16,7 +16,7 @@
 // docs/history/tool-registry-capability-port/CONTEXT.md's pinned
 // "registered vs present" term): `tool check`'s result is a fact about
 // *this machine*, not a team decision, so it never goes through
-// `.fgos/events.jsonl` — it lives in one local, gitignored file beside it,
+// the Work history — it lives in one local, gitignored file in `.fgos/`,
 // the same "separate local facade outside the single write door" shape
 // store.mjs's own header comment describes for `worker-log.mjs`.
 

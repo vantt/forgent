@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "39ab3bb10e4270898fda70ad3c8536c6c076025544f6478e213b2f124b00cd02",
+  "payloadDigest": "5f86c4d4a9544c8ad955787ed4a422fa00d7d9350d3d60054ae43e963e7e3a4a",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -700,7 +700,7 @@
     "src/runner/agent-definitions.mjs": "c171c5812dad6312f8538b0abda0bf7c9b392847fbe8d7a9ef75bebc44c62434",
     "src/runner/agent-listing.mjs": "8c6bfd84c26fb939cc22bf511c7e5a328d7cfa91bb9c2ba0574b94f6d48b6c4d",
     "src/runner/agent-roster.mjs": "bddc69ef02c932c8a05d8486a29c02c4188a3cb7e31f8706cf3ce360cc42ed31",
-    "src/runner/anti-loop.mjs": "d996232d9518a8fcf6f7017f781716f513eb3c0c9f80e17741b9507bda48ae49",
+    "src/runner/anti-loop.mjs": "feab88887c5951617d6f551d26ad27e07470a020100f9ac5cfd61399cad8d4b8",
     "src/runner/attestation-guard.mjs": "a7fcde36b4580892f22f160fb4331bcdddfa483554c726b6d606f8e8707b35b4",
     "src/runner/claim-liveness.mjs": "81343f229916449e5ec0b4531cb3d9414a90b6b75c738e9fc10586f8adbee567",
     "src/runner/claim-port.mjs": "1100f7f6d3490562be65522aa2760dec1e6bb9b69e3afc39ce79c1f222acb522",
@@ -898,7 +898,7 @@
     "src/state/status-fsm.mjs": "6853485189d2e25e6ee2a5997d11f0b2ae4e608cf5ed6332df010b2e703b76b0",
     "src/state/step-fsm.mjs": "bf1e935a355d2fbb7b8a5f0927138dea21b21c6226fe5a442c22bd1875445625",
     "src/state/store.mjs": "3b8020af0ca07dbb6d722c0f4ee88d106fbdb98aa6da4d6058d8329880db1b0a",
-    "src/state/tool-registry.mjs": "9a84242aeb83fe6e53822ef67f146ed383f1670e81ed4fb4c76f75d1ca5c0cc0",
+    "src/state/tool-registry.mjs": "04adcb5dd417ae49a7f5e823665b8b9c763aa05bc505d86ef7ef61d6a099af2a",
     "src/state/work-event-store.mjs": "6d952ce26a0888658648edfafcd6ba128f83bcedc5b25055dace61ff17efe1a8",
     "src/state/work.mjs": "ae5f1599cf36963602efd1e8b13ee2ac883997ea747cd99877364d0162c05059",
     "src/state/worker-slots.mjs": "bc37bb0d995fe7339925c209c4e79232bdc5e3c079668f89c8f52313312dbf95",
