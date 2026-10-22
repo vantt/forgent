@@ -1,28 +1,20 @@
 //! `bwrap-pidns` against real bwrap, real namespaces and real processes.
 #![cfg(target_os = "linux")]
 
-use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::thread::sleep;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use fgos_process::containment::{select, BwrapPidns, ContainmentDriver, GuaranteeLevel, SelectEnv, SpawnSpec, StartMode};
 use fgos_process::control::{signal_by_identity, Signal};
 use fgos_process::facts::{self, ProcTuple};
-use fgos_process::{Domain, DomainState, KillOutcome, ProcId};
-
+use fgos_process::{Domain, KillOutcome, ProcId};
 
 mod common;
+use common::{scratch, wait_for};
 const HELPER_ENV: &str = "FGOS_CONTAINMENT_HELPER_MODE";
-
-fn scratch(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!("fgos-containment-{name}-{}", std::process::id()));
-    let _ = fs::remove_dir_all(&dir);
-    fs::create_dir_all(&dir).unwrap();
-    dir
-}
 
 fn fixture(name: &str) -> String {
     format!("{}/tests/fixtures/{name}", env!("CARGO_MANIFEST_DIR"))
@@ -35,39 +27,14 @@ fn lines(path: &Path) -> usize {
 fn bwrap_driver(_test: &str) -> Option<Box<dyn ContainmentDriver>> {
     common::require_bwrap()?;
     let driver = select(&SelectEnv::default()).expect("select");
-    if driver.name() == "bwrap-pidns" {
-        return Some(driver);
-    }
-    None
+    (driver.name() == "bwrap-pidns").then_some(driver)
 }
 
 fn spec(argv: &[&str], mode: StartMode) -> SpawnSpec {
-    SpawnSpec {
-        argv: argv.iter().map(|a| a.to_string()).collect(),
-        bwrap_prefix: None,
-        fd_map: Vec::new(),
-        env: BTreeMap::from([("PATH".to_string(), "/usr/bin:/bin".to_string())]),
-        cwd: std::env::temp_dir(),
-        stdin: None,
-        stdout: None,
-        stderr: None,
-        mode,
-    }
+    let mut s = common::spec(argv);
+    s.mode = mode;
+    s
 }
-
-fn wait_for(path: &Path) -> String {
-    let start = Instant::now();
-    loop {
-        if let Ok(text) = fs::read_to_string(path) {
-            if !text.trim().is_empty() {
-                return text;
-            }
-        }
-        assert!(start.elapsed() < Duration::from_secs(10), "{} never written", path.display());
-        sleep(Duration::from_millis(10));
-    }
-}
-
 
 fn identity(pid: u32) -> ProcTuple {
     facts::identity_of(ProcId(pid)).expect("live process")
@@ -92,7 +59,6 @@ fn containment_gate_is_pid_1_inside_and_its_host_pid_matches_nspid() {
     assert_eq!(driver.kill_all(&mut domain, 0), KillOutcome::Ok);
     spawned.child.wait().unwrap();
 }
-
 
 /// A cooperative terminal gate: arm the same primitive as the production gate
 /// before exec, retaining PID 1 and its death signal across the exec.
@@ -198,9 +164,7 @@ fn containment_direct_refuses_die_with_parent_by_name() {
 
 #[test]
 fn containment_select_prefers_bwrap_pidns_when_user_namespaces_work() {
-    if common::require_bwrap().is_none() {
-        return;
-    }
+    let Some(_) = common::require_bwrap() else { return };
     let driver = select(&SelectEnv::default()).unwrap();
     assert_eq!(driver.name(), "bwrap-pidns");
     let guarantee = driver.guarantee();
@@ -210,4 +174,3 @@ fn containment_select_prefers_bwrap_pidns_when_user_namespaces_work() {
     let none = select(&SelectEnv { bwrap: Some("/nonexistent/bwrap".into()) }).unwrap();
     assert_eq!(none.name(), "linux-pgroup");
 }
-

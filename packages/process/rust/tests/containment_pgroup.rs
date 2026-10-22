@@ -1,53 +1,16 @@
 //! `linux-pgroup` against real process trees.
 #![cfg(target_os = "linux")]
 
-use std::collections::BTreeMap;
-use std::fs;
-use std::path::{Path, PathBuf};
-use std::thread::sleep;
-use std::time::{Duration, Instant};
-
-use fgos_process::containment::{ContainmentDriver, LinuxPgroup, SpawnSpec, StartMode};
+use fgos_process::containment::{ContainmentDriver, LinuxPgroup};
 use fgos_process::facts::{self, Observed};
 use fgos_process::{domain_kill_all, DomainState, KillOutcome, ProcId};
 
-fn scratch(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!("fgos-pgroup-{name}-{}", std::process::id()));
-    let _ = fs::remove_dir_all(&dir);
-    fs::create_dir_all(&dir).unwrap();
-    dir
-}
-
-fn spec(argv: &[&str]) -> SpawnSpec {
-    SpawnSpec {
-        argv: argv.iter().map(|a| a.to_string()).collect(),
-        bwrap_prefix: None,
-        fd_map: Vec::new(),
-        env: BTreeMap::from([("PATH".to_string(), "/usr/bin:/bin".to_string())]),
-        cwd: std::env::temp_dir(),
-        stdin: None,
-        stdout: None,
-        stderr: None,
-        mode: StartMode::Direct,
-    }
-}
-
-fn wait_for(path: &Path) -> String {
-    let start = Instant::now();
-    loop {
-        if let Ok(text) = fs::read_to_string(path) {
-            if !text.trim().is_empty() {
-                return text;
-            }
-        }
-        assert!(start.elapsed() < Duration::from_secs(10), "{} never written", path.display());
-        sleep(Duration::from_millis(10));
-    }
-}
-
+mod common;
+use common::{scratch, spec, wait_for};
 
 #[test]
 fn containment_pgroup_grace_snapshot_keeps_a_setsid_child_of_a_leader_that_ends_on_sigterm() {
+    let _ = common::require_bwrap;
     let dir = scratch("grace");
     let driver = LinuxPgroup;
     let mut domain = driver.create("attempt-grace").unwrap();
@@ -61,7 +24,6 @@ fn containment_pgroup_grace_snapshot_keeps_a_setsid_child_of_a_leader_that_ends_
     assert!(!matches!(facts::observe(ProcId(child)), Observed::Live { .. }));
     let _ = spawned.child.wait();
 }
-
 
 fn is_subreaper() -> bool {
     let mut flag: libc::c_int = -1;
