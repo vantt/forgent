@@ -1,7 +1,7 @@
 ---
 title: "OPC Phase A: containment fixes inside today's shape"
 description: "Remove the 2 ms poll, bound the post-kill wait, name the mount refusal, watch pgroup escapees of contained children, and one conformance suite for every containment driver."
-status: pending
+status: in-progress
 priority: P2
 effort: 2d
 branch: opc/phase-a

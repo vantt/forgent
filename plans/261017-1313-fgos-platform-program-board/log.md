@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 14:00 (phiên `forgent-35`, owner "ok duyệt"): **OPC: owner duyệt plan Phase A** ([plan](../261022-1335-opc-phase-a-containment-fixes/plan.md)); thi công trên nhánh `opc/phase-a`. Phase 00 xin khoảng yên tĩnh của TEST và HARDEN.
+
 - 2026-10-22 13:55 (phiên `forgent-35`): **OPC: plan thi công Phase A** ([plan](../261022-1335-opc-phase-a-containment-fixes/plan.md)), 6 phase: đo nền gồm thời gian suite và số git chạy trong bwrap của suite (owner hỏi về tốc độ test); A1+A2 nhánh contained `driver.rs` (HARDEN duyệt); A3 sau HARDEN T1 phase 4; A4 watch trên `linux-pgroup` khi repo có submodule; A5 bộ conformance (TEST duyệt); đo lại, E1/E4, docs, land. Chờ owner duyệt plan trước khi code.
 
 - 2026-10-22 13:40 (phiên `forgent-35`, owner "1a,2a,4c" rồi "ok luôn" cho câu 3): **OPC: owner chốt phân xử.** Làm Phase A (bỏ poll 2 ms, chặn treo sau `kill_all`, `containment-mount-refused`, vá E4 trên `linux-pgroup`, một bộ conformance chung); Phase B (anchor) hoãn tới điều kiện kích hoạt ở §4 báo cáo; lệnh đọc giữ pid namespace; HARDEN T2 duyệt diff Git. Bước tiếp: plan thi công A, trình owner duyệt trước khi code. Đảo lại nếu: điều kiện kích hoạt B xảy ra, hoặc owner muốn nhanh hơn sau A (khi đó xét phương án lai "pgroup khi không có submodule" trước B).
