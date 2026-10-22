@@ -292,7 +292,7 @@ pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<L
         return Err(Refusal {
             reason: "directory-full",
             detail: format!(
-                "the session directory holds {MAX_ENTRIES} entries; run `fgos identity list --prune` to drop the ones not proven alive"
+                "the session directory holds {MAX_ENTRIES} entries; run `fgos identity list --prune` to drop the dead ones (an entry whose liveness is unknown is never removed automatically)"
             ),
         });
     }
@@ -392,13 +392,14 @@ fn join(names: &[String]) -> String {
 }
 
 /// The sessions the machine knows that are not dead, oldest registration
-/// first; only those of `project_id` when given. With `prune`, entries not
-/// proven alive (dead, or unknown) are removed first.
+/// first; only those of `project_id` when given. With `prune`, entries
+/// proven dead are removed first, the rule of the prune on every write; an
+/// entry of unknown liveness may be a live session and is never removed.
 pub fn list(root: &Path, project_id: Option<&str>, prune: bool, judge: Judge) -> Result<Sessions, Refusal> {
     let Scan { rows, .. } = scan(root, judge)?;
     let (rows, pruned) = sweep(root, rows, |row| {
         if prune {
-            row.verdict != Verdict::Alive
+            row.verdict == Verdict::Dead
         } else {
             false
         }

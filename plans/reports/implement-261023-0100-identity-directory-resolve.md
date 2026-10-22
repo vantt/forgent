@@ -23,7 +23,7 @@ Decisions, all inside the phase frame:
 
 - **Handle collision is settled by the file name, no lock.** The file name derives from the handle, so two sessions with one handle contend for one name and the atomic create-once picks the winner; the loser re-reads and is refused `handle-in-use` with both full ids. Proven by an 8-thread race test (exactly one wins).
 - **Liveness** is the `fgos_process::facts::Record` of the highest terminal-holding ancestor (`terminal_head`), through `identity_of`. No terminal ancestor: no record, `liveness: unknown` (resolves, never proven dead). Dead entries are removed on every write; reads only filter.
-- **`list --prune`** removes every entry not proven alive (dead or unknown). The plan only said the cap message names `list --prune`; this is its definition. A file of another format version is never touched, and counts toward the cap.
+- **`list --prune`** removes only entries proven dead, the same rule as the prune on every write (coordinator ruling): an `unknown` entry (no terminal ancestor, e.g. a headless agent) may be live and is kept and listed with its liveness. A file of another format version is never touched, and counts toward the cap.
 - **Refusal codes** `ambiguous` and `not-found` match the mailbox; the candidates travel in the refusal detail (exit 65, stderr `[code] detail`, like every other identity refusal).
 - `--machine` of the spec's `list [--project] [--machine]` is left for the shared directory (I4): locally every entry is this machine's. Spec text says so.
 - Re-registering the same session refreshes its entry, keeps the first `registeredAt` and unions the roles.

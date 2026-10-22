@@ -1049,12 +1049,12 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos identity resolve claude-4f2a@fg-server --json', 'fgos identity resolve lead:MAIL'],
       },
       list: {
-        description: 'The sessions registered on this machine that are not dead: {sessions, pruned}, oldest registration first. `--project` keeps the sessions of this repository\'s project id. `--prune` first removes every entry not proven alive (dead, or unknown), which is also the way out of [directory-full] (512 entries).',
+        description: 'The sessions registered on this machine that are not dead: {sessions, pruned}, oldest registration first. `--project` keeps the sessions of this repository\'s project id. `--prune` first removes the entries proven dead (the rule of every write); an entry whose liveness is `unknown` (no terminal ancestor) may be a live session and is kept, shown with its liveness.',
         parameters: {
           type: 'object',
           properties: {
             project: { type: 'boolean', description: 'Only the sessions of this repository\'s project id.' },
-            prune: { type: 'boolean', description: 'Remove every entry not proven alive before listing.' },
+            prune: { type: 'boolean', description: 'Remove the entries proven dead before listing (the rule of every write); an entry of unknown liveness is kept and shown.' },
           },
           required: [],
         },

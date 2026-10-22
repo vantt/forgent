@@ -123,7 +123,7 @@ fn a_dead_session_is_never_resolved_and_the_next_write_removes_it() {
 }
 
 #[test]
-fn a_session_without_a_terminal_ancestor_is_unknown_and_only_prune_drops_it() {
+fn a_session_without_a_terminal_ancestor_is_unknown_and_prune_never_removes_it() {
     let root = state_root();
     let alive = judge(&[]);
     directory::register(&root, entry("aaaa", None, &[]), false, &alive).unwrap();
@@ -133,10 +133,14 @@ fn a_session_without_a_terminal_ancestor_is_unknown_and_only_prune_drops_it() {
     assert_eq!(before.sessions.iter().map(|s| s.liveness).collect::<Vec<_>>(), ["unknown", "alive"]);
     assert_eq!(directory::resolve(&root, "claude-aaaa@fg", &alive).unwrap().liveness, "unknown");
 
-    let after = directory::list(&root, None, true, &alive).unwrap();
-    assert_eq!(after.pruned, 1);
-    assert_eq!(after.sessions.len(), 1);
-    assert_eq!(after.sessions[0].handle, "claude-bbbb@fg");
+    let nothing_dead = directory::list(&root, None, true, &alive).unwrap();
+    assert_eq!(nothing_dead.pruned, 0, "unknown may be a live headless agent");
+    assert_eq!(nothing_dead.sessions.len(), 2);
+
+    let one_dead = directory::list(&root, None, true, &judge(&[20])).unwrap();
+    assert_eq!(one_dead.pruned, 1);
+    assert_eq!(one_dead.sessions.iter().map(|s| s.handle.as_str()).collect::<Vec<_>>(), ["claude-aaaa@fg"]);
+    assert_eq!(files(&root), 1);
 }
 
 #[test]
@@ -237,15 +241,17 @@ fn a_full_directory_refuses_a_new_entry_and_prune_is_the_way_out() {
     let root = state_root();
     let alive = judge(&[]);
     for n in 0..MAX_ENTRIES {
-        directory::register(&root, entry(&format!("s{n}"), None, &[]), false, &alive).unwrap();
+        directory::register(&root, entry(&format!("s{n}"), Some(1_000 + n as u32), &[]), false, &alive).unwrap();
     }
     let refused = directory::register(&root, entry("extra", Some(1), &[]), false, &alive).unwrap_err();
     assert_eq!(refused.reason, "directory-full");
     assert!(refused.detail.contains("list --prune"));
     // A session already in the directory still refreshes.
-    directory::register(&root, entry("s0", None, &[]), false, &alive).unwrap();
+    directory::register(&root, entry("s0", Some(1_000), &[]), false, &alive).unwrap();
 
-    assert_eq!(directory::list(&root, None, true, &alive).unwrap().pruned, MAX_ENTRIES);
+    // Every head dies: prune empties the directory and a new session fits.
+    let all_dead = |_: &Record| Verdict::Dead;
+    assert_eq!(directory::list(&root, None, true, &all_dead).unwrap().pruned, MAX_ENTRIES);
     directory::register(&root, entry("extra", Some(1), &[]), false, &alive).unwrap();
 }
 
