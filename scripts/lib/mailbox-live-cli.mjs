@@ -210,3 +210,55 @@ export function claudeHomeIntact({ home, claudeDir }) {
   const stat = fs.lstatSync(link, { throwIfNoEntry: false });
   return Boolean(stat?.isSymbolicLink() && fs.readlinkSync(link) === claudeDir);
 }
+
+/** Available memory in whole GB, from /proc/meminfo. */
+export function memAvailableGb() {
+  const line = fs.readFileSync('/proc/meminfo', 'utf8').split('\n').find((l) => l.startsWith('MemAvailable:'));
+  return Math.floor(Number(line.split(/\s+/)[1]) / 1024 / 1024);
+}
+
+/** Pids of running heavy gates, by their own argv (never a shell whose text
+ * merely mentions one): `cargo test`, `npm test`, `node …/run-tests.mjs`. */
+export function heavyGates() {
+  const pids = [];
+  for (const entry of fs.readdirSync('/proc')) {
+    if (!/^\d+$/.test(entry)) continue;
+    let argv;
+    try {
+      argv = fs.readFileSync(`/proc/${entry}/cmdline`, 'utf8').split('\0').filter(Boolean);
+    } catch {
+      continue;
+    }
+    const tool = path.basename(argv[0] ?? '');
+    const gate = (tool === 'cargo' && argv[1] === 'test')
+      || (tool === 'npm' && argv[1] === 'test')
+      || (tool === 'node' && argv.some((a) => a.endsWith('scripts/run-tests.mjs')));
+    if (gate) pids.push(entry);
+  }
+  return pids;
+}
+
+/** Memory and the heavy-gate processes (the memory rule): refused below
+ * `minFreeGb` available, and, for a run that starts a real CLI, while a cargo
+ * test or npm test runs on this machine. A dry run starts no model, so other
+ * sessions' gates do not hold it back. */
+export function resourceProblem({ dry = false, minFreeGb }) {
+  const free = memAvailableGb();
+  if (free < minFreeGb) return `only ${free} GB available, need ${minFreeGb}`;
+  if (dry) return null;
+  const busy = heavyGates();
+  if (busy.length) return `heavy gate running: ${busy.join(', ')}`;
+  return null;
+}
+
+/** The first `x.y.z` in a version line, or null. */
+export function semver(text) {
+  return /\d+\.\d+\.\d+/.exec(text || '')?.[0] ?? null;
+}
+
+/** Null when `cli` `version` is listed in the adapters contract under `contractsDir`. */
+export function versionProblem(cli, version, contractsDir) {
+  const tested = JSON.parse(fs.readFileSync(path.join(contractsDir, 'adapters.v1.json'), 'utf8')).testedAgainst;
+  const listed = tested.some((t) => t.cli === cli && t.version === version);
+  return listed ? null : `${cli} ${version ?? '(unreadable)'} is not in testedAgainst`;
+}

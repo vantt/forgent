@@ -93,56 +93,13 @@ const nonce = () => crypto.randomBytes(4).toString('hex');
 
 // ---------------------------------------------------------------- guards
 
-function memAvailableGb() {
-  const line = fs.readFileSync('/proc/meminfo', 'utf8').split('\n').find((l) => l.startsWith('MemAvailable:'));
-  return Math.floor(Number(line.split(/\s+/)[1]) / 1024 / 1024);
-}
+/** The resource rule of this suite (scripts/lib/mailbox-live-cli.mjs). */
+const resourceProblem = ({ dry = false } = {}) => live.resourceProblem({ dry, minFreeGb: MIN_FREE_GB });
 
-/** Memory and the heavy-gate processes (the memory rule): refused below 8 GB
- * available, and, for a run that starts a real CLI, while a cargo test or npm
- * test runs on this machine. A dry run starts no model, so other sessions'
- * gates do not hold it back. */
-function resourceProblem({ dry = false } = {}) {
-  const free = memAvailableGb();
-  if (free < MIN_FREE_GB) return `only ${free} GB available, need ${MIN_FREE_GB}`;
-  if (dry) return null;
-  const busy = heavyGates();
-  if (busy.length) return `heavy gate running: ${busy.join(', ')}`;
-  return null;
-}
-
-/** Pids of running heavy gates, by their own argv (never a shell whose text
- * merely mentions one): `cargo test`, `npm test`, `node …/run-tests.mjs`. */
-function heavyGates() {
-  const pids = [];
-  for (const entry of fs.readdirSync('/proc')) {
-    if (!/^\d+$/.test(entry)) continue;
-    let argv;
-    try {
-      argv = fs.readFileSync(`/proc/${entry}/cmdline`, 'utf8').split('\0').filter(Boolean);
-    } catch {
-      continue;
-    }
-    const tool = path.basename(argv[0] ?? '');
-    const gate = (tool === 'cargo' && argv[1] === 'test')
-      || (tool === 'npm' && argv[1] === 'test')
-      || (tool === 'node' && argv.some((a) => a.endsWith('scripts/run-tests.mjs')));
-    if (gate) pids.push(entry);
-  }
-  return pids;
-}
-
-function testedVersions() {
-  return readJson(path.join(CONTRACTS, 'adapters.v1.json')).testedAgainst;
-}
-
-function semver(text) {
-  return /\d+\.\d+\.\d+/.exec(text || '')?.[0] ?? null;
-}
+const { semver } = live;
 
 function versionProblem(cli, version) {
-  const listed = testedVersions().some((t) => t.cli === cli && t.version === version);
-  return listed ? null : `${cli} ${version ?? '(unreadable)'} is not in testedAgainst`;
+  return live.versionProblem(cli, version, CONTRACTS);
 }
 
 function cargoTargetDir() {

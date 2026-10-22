@@ -51,6 +51,18 @@
  *       Deletes <base>/<cli>/ (raw calls, the codex home with its rollouts).
  *       It refuses while a set-aside auth.json.rotated exists there (see
  *       scripts/lib/codex-auth-guard.mjs).
+ *   run <claude|codex> <probe|probe-pane|ladder> [--dry]
+ *       The measurement modes of the product hook door (see "probes" below):
+ *       process facts of the hook and of a tool process, the hook's cwd
+ *       after a tool `cd`, and the largest PostToolUse context injected
+ *       inline. `--dry` runs against the stub CLI under <base>-dry/.
+ *   summarize <cli> <probe mode> [--dry]
+ *       Writes and prints summary.json: per hook call and per tool dump the
+ *       facts the report tables read, and for ladder the per-step verdict.
+ *   clean-probe <cli> <probe mode> [--dry]
+ *       Deletes one probe run directory, with clean's auth refusal.
+ *   probe-hook | probe-sibling | probe-tool | stub
+ *       The probe hooks, the tool dump and the dry runs' CLI.
  *
  * Where: <base> is ${TMPDIR:-/tmp}/fgos-work/mailbox-v3-record, outside every
  * git checkout, so the repository's own hook files (.claude/settings.json,
@@ -777,18 +789,595 @@ function cmdClean(cli) {
   process.stdout.write(`removed ${dir}\n`);
 }
 
+// ---------------------------------------------------------------- probes (process facts, context ladder)
+
+/**
+ * The probe modes measure what the product hook entry decides on, through
+ * the command string the product installer writes: the hook is an
+ * executable at `<ws>/.fgos/installation/bin/fgos`, so the CLI spawns it
+ * exactly as it spawns the project shim.
+ *
+ *   probe       one hook per event (PostToolUse plain, Stop guarded), and a
+ *               prompt that dumps a tool process's ancestry, `cd`s into
+ *               ws/elsewhere and dumps again: hook vs tool facts, and the
+ *               hook's cwd after the tool's `cd`.
+ *   probe-pane  probe in an interactive Claude Code in a herdr pane opened
+ *               through Terminal Control (claude only).
+ *   ladder      a PostToolUse hook that prints, per step `echo step<n>`, a
+ *               context of LADDER[n] bytes (step 8 in 3-byte characters);
+ *               steps 11-14 repeat the four largest sizes while a sibling
+ *               hook prints a fixed 2,048-byte context.
+ *
+ * `--dry` runs the same layout against the stub CLI (`stub <cli>`) under
+ * <base>-dry/, with no model and no account. A real run writes spawned.json
+ * before the CLI starts and refuses a run directory that has one.
+ */
+const PROBE_MODES = ['probe', 'probe-pane', 'ladder'];
+const DRY_BASE = `${BASE}-dry`;
+const PROBE_MIN_FREE_GB = 8;
+const CONTRACTS = path.join(REPO_ROOT, 'packages', 'mailbox', 'contracts');
+const CLI_BIN = { claude: path.join(os.homedir(), '.local', 'bin', 'claude'), codex: path.join(os.homedir(), '.local', 'bin', 'codex') };
+/** Bytes of each ladder step's context; steps 11-14 repeat the four largest with the sibling. */
+const LADDER = [2048, 4096, 6144, 8192, 9216, 10240, 11264, 12288, 13312, 14009, 11264, 12288, 13312, 14009];
+const LADDER_UTF8_STEP = 8;
+const SIBLING_BYTES = 2048;
+const SIBLING_FROM_STEP = 11;
+/** A herdr session of its own for the dry pane run, never the owner's. */
+const DRY_HERDR_SESSION = 'mbx-dry';
+const PANE_WAIT_MS = 300_000;
+
+/** `<prefix>START<n>X ` + filler + ` <prefix>END<n>X`, exactly `bytes` long. */
+function sizedText(prefix, n, bytes, wide) {
+  const head = `${prefix}START${n}X `;
+  const tail = ` ${prefix}END${n}X`;
+  const room = bytes - Buffer.byteLength(head + tail);
+  const filler = wide
+    ? '漢'.repeat(Math.floor(room / 3)) + 'a'.repeat(room % 3)
+    : 'ladder filler text '.repeat(Math.ceil(room / 19)).slice(0, room);
+  const text = head + filler + tail;
+  if (Buffer.byteLength(text) !== bytes) throw new Error(`sized text ${prefix}${n} is ${Buffer.byteLength(text)} bytes, not ${bytes}`);
+  return text;
+}
+
+function probeRunDir(cli, mode, dry) {
+  return path.join(dry ? DRY_BASE : BASE, cli, mode);
+}
+
+function fdKind(pid, fd) {
+  try {
+    const target = fs.readlinkSync(`/proc/${pid}/fd/${fd}`);
+    if (target.startsWith('pipe:')) return 'pipe';
+    if (target.startsWith('socket:')) return 'socket';
+    if (target === '/dev/null') return 'null';
+    if (/^\/dev\/(pts\/\d+|tty\w*)$/.test(target)) return 'tty';
+    return 'file';
+  } catch {
+    return null;
+  }
+}
+
+/** One process's facts: what fgos_process::facts reads, plus fds and cwd. */
+function procEntry(pid) {
+  // fields[0] is field 3 (state): 4 ppid, 5 pgrp, 6 session, 7 tty_nr, 22 starttime.
+  const fields = statFields(pid);
+  const read = (fn) => {
+    try {
+      return fn();
+    } catch {
+      return null;
+    }
+  };
+  return {
+    pid,
+    ppid: Number(fields[1]),
+    pgrp: Number(fields[2]),
+    session: Number(fields[3]),
+    ttyNr: Number(fields[4]),
+    starttime: fields[19],
+    comm: read(() => fs.readFileSync(`/proc/${pid}/comm`, 'utf8').trim()),
+    exe: read(() => fs.readlinkSync(`/proc/${pid}/exe`)),
+    cmdline: read(() => fs.readFileSync(`/proc/${pid}/cmdline`, 'utf8').split('\0').filter(Boolean).slice(0, 12).map((a) => (a.length > 160 ? `${a.slice(0, 160)}…` : a))),
+    cwd: read(() => fs.readlinkSync(`/proc/${pid}/cwd`)),
+    fds: { 0: fdKind(pid, 0), 1: fdKind(pid, 1), 2: fdKind(pid, 2) },
+  };
+}
+
+/** The calling process and up to 6 ancestors, with what the entry sees of its environment. */
+function probeFacts() {
+  const chain = [];
+  let pid = process.pid;
+  for (let level = 0; level < 7 && pid > 1; level += 1) {
+    let entry;
+    try {
+      entry = procEntry(pid);
+    } catch {
+      break;
+    }
+    chain.push(entry);
+    pid = entry.ppid;
+  }
+  return {
+    at: new Date().toISOString(),
+    cwd: process.cwd(),
+    claudeProjectDir: process.env.CLAUDE_PROJECT_DIR ?? null,
+    binShRealpath: fs.realpathSync('/bin/sh'),
+    idVarsSet: ID_VARS.filter((name) => process.env[name] !== undefined),
+    envNames: Object.keys(process.env).sort(),
+    chain,
+  };
+}
+
+/** The next free number of a sequence of marker files `<dir>/<n>.<ext>`. */
+function nextSeq(dir, ext) {
+  fs.mkdirSync(dir, { recursive: true });
+  for (let n = 1; ; n += 1) {
+    try {
+      fs.closeSync(fs.openSync(path.join(dir, `${n}.${ext}`), 'wx'));
+      return n;
+    } catch (error) {
+      if (error.code !== 'EEXIST') throw error;
+    }
+  }
+}
+
+function stepOf(payload) {
+  const command = payload?.tool_input?.command;
+  const text = Array.isArray(command) ? command.join(' ') : String(command ?? '');
+  const m = /\bstep(\d+)\b/.exec(text);
+  return m ? Number(m[1]) : null;
+}
+
+function contextShape(event, text) {
+  return { hookSpecificOutput: { hookEventName: event, additionalContext: text } };
+}
+
+/** The probe hook: `<ws>/.fgos/installation/bin/fgos hook mailbox --cli <c> --event <e>`. */
+function cmdProbeHook(runDir, argv) {
+  try {
+    const input = readStdin();
+    const event = argv[argv.indexOf('--event') + 1] === 'stop' ? 'Stop' : 'PostToolUse';
+    const calls = path.join(runDir, 'calls');
+    const n = nextSeq(calls, 'seq');
+    fs.writeFileSync(path.join(calls, `${n}-${event}.json`), input);
+    writeJson(path.join(calls, `${n}-${event}.argv.json`), argv);
+    writeJson(path.join(calls, `${n}-${event}.proc.json`), probeFacts());
+    const meta = readJson(path.join(runDir, 'mode.json'));
+    if (meta.mode !== 'ladder' || event !== 'PostToolUse') return;
+    const step = stepOf(JSON.parse(input.toString('utf8') || '{}'));
+    if (!step || step > LADDER.length) return;
+    const text = sizedText('L5', step, LADDER[step - 1], step === LADDER_UTF8_STEP);
+    writeJson(path.join(calls, `${n}-ladder.json`), { step, bytes: LADDER[step - 1] });
+    process.stdout.write(JSON.stringify(contextShape('PostToolUse', text)));
+  } catch (error) {
+    try {
+      fs.appendFileSync(path.join(runDir, 'hook-errors.txt'), `${error.stack}\n`);
+    } catch {
+      // nothing left to report to; the hook still exits 0
+    }
+  } finally {
+    process.exitCode = 0;
+  }
+}
+
+/** The ladder's sibling PostToolUse hook: a fixed context from step 11 on. */
+function cmdProbeSibling(runDir) {
+  try {
+    const input = readStdin();
+    const step = stepOf(JSON.parse(input.toString('utf8') || '{}'));
+    if (!step || step < SIBLING_FROM_STEP) return;
+    writeJson(path.join(runDir, 'calls', `sibling-${step}.json`), { step, bytes: SIBLING_BYTES });
+    process.stdout.write(JSON.stringify(contextShape('PostToolUse', sizedText('SIB', step, SIBLING_BYTES, false))));
+  } catch (error) {
+    try {
+      fs.appendFileSync(path.join(runDir, 'hook-errors.txt'), `sibling: ${error.stack}\n`);
+    } catch {
+      // nothing left to report to
+    }
+  } finally {
+    process.exitCode = 0;
+  }
+}
+
+/** The tool-side dump: `node <run>/dump-ancestry.mjs`. */
+function cmdProbeTool(runDir) {
+  const n = nextSeq(path.join(runDir, 'tool'), 'seq');
+  writeJson(path.join(runDir, 'tool', `${n}.proc.json`), probeFacts());
+  process.stdout.write(`dumped ${n}\n`);
+}
+
+/** An executable that runs one subcommand of this script with `runDir`, in the same process. */
+function writeEntry(file, subcommand, runDir) {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  const url = new URL(`file://${SCRIPT}`).href;
+  fs.writeFileSync(file, `#!/usr/bin/env node
+// Probe fixture of scripts/record-mailbox-hook-fixtures.mjs, never a product door.
+process.argv = [process.argv[0], ${JSON.stringify(SCRIPT)}, ${JSON.stringify(subcommand)}, ${JSON.stringify(runDir)}, ...process.argv.slice(2)];
+import(${JSON.stringify(url)});
+`, { mode: 0o755 });
+}
+
+/** The two command forms plan decision 14 names: plain (quoted path) and guarded. */
+function productCommand(cli, event, ws, guarded) {
+  const shim = path.join(ws, '.fgos', 'installation', 'bin', 'fgos');
+  const args = `hook mailbox --cli ${cli} --event ${event}`;
+  if (cli === 'claude') {
+    return guarded
+      ? `S="\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" ${args} || true`
+      : `"\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos" ${args}`;
+  }
+  const quoted = `'${shim.replace(/'/g, `'\\''`)}'`;
+  return guarded ? `S=${quoted}; [ -x "$S" ] || exit 0; "$S" ${args} || true` : `${quoted} ${args}`;
+}
+
+function probePrompt(mode, runDir, ws) {
+  if (mode === 'ladder') {
+    const steps = LADDER.map((_, i) => `${i + 1}. Run the shell command: \`echo step${i + 1}\``).join('\n');
+    return `This is a test of hook context sizes. Do exactly these steps, one shell tool call per step, in order, and nothing else. Never combine two steps in one call.
+${steps}
+The additional context you receive after a step is filler; do not act on it. After step ${LADDER.length}, answer with the single word done.`;
+  }
+  const dump = `node '${path.join(runDir, 'dump-ancestry.mjs')}'`;
+  const text = `This is a test of hook process facts. Do exactly these steps, one shell tool call per step, in order, and nothing else.
+1. Run the shell command: \`${dump}\`
+2. Run the shell command: \`cd '${path.join(ws, 'elsewhere')}'\`
+3. Run the shell command: \`${dump}\`
+4. Run the shell command: \`true\`
+Then answer with the single word done.`;
+  return mode === 'probe-pane' ? `${text.replace(/\n+/g, ' ')} After that, wait for the user.` : text;
+}
+
+function probeSettings(cli, mode, runDir, ws) {
+  const entry = (command) => ({ type: 'command', command, timeout: 30 });
+  const post = [entry(productCommand(cli, 'post-tool-use', ws, false))];
+  const sibling = `'${path.join(runDir, 'sibling')}'`;
+  if (mode === 'ladder') post.push(entry(sibling));
+  if (cli === 'claude') {
+    const hooks = { PostToolUse: [{ matcher: '*', hooks: post }] };
+    if (mode !== 'ladder') hooks.Stop = [{ hooks: [entry(productCommand(cli, 'stop', ws, true))] }];
+    return { hooks, ...(mode === 'probe-pane' ? { skipDangerousModePermissionPrompt: true } : {}) };
+  }
+  const hooks = { PostToolUse: [{ hooks: post }] };
+  if (mode !== 'ladder') hooks.Stop = [{ hooks: [entry(productCommand(cli, 'stop', ws, true))] }];
+  return hooks;
+}
+
+/** Lays out a probe run: ws (the project, with the hook at the shim path), home, zdot. */
+function layOutProbe(cli, mode, dry) {
+  if (!PROBE_MODES.includes(mode)) die(`unknown probe mode ${mode}`);
+  if (mode === 'probe-pane' && cli !== 'claude') die('probe-pane applies to claude only');
+  if (!['claude', 'codex'].includes(cli)) die(`probe modes take claude or codex, not ${cli}`);
+  const runDir = probeRunDir(cli, mode, dry);
+  if (fs.existsSync(path.join(runDir, 'spawned.json'))) die(`${runDir} already spawned a CLI; a re-run needs the controller`);
+  const refused = removeRunDir(runDir);
+  if (refused) die(refused, 3);
+  const ws = path.join(runDir, 'ws');
+  fs.mkdirSync(path.join(ws, 'elsewhere'), { recursive: true });
+  live.assertOutsideCheckout(ws);
+  writeEntry(path.join(ws, '.fgos', 'installation', 'bin', 'fgos'), 'probe-hook', runDir);
+  writeEntry(path.join(runDir, 'sibling'), 'probe-sibling', runDir);
+  writeEntry(path.join(runDir, 'dump-ancestry.mjs'), 'probe-tool', runDir);
+  const home = path.join(runDir, 'home');
+  if (dry || cli === 'codex') fs.mkdirSync(home, { recursive: true });
+  else live.makeClaudeHome({ home, claudeDir: path.join(os.homedir(), '.claude') });
+  const prompt = probePrompt(mode, runDir, ws);
+  writeJson(path.join(runDir, 'mode.json'), { cli, mode, dry, ladder: mode === 'ladder' ? LADDER : null, ladderUtf8Step: LADDER_UTF8_STEP, siblingBytes: SIBLING_BYTES, siblingFromStep: SIBLING_FROM_STEP });
+  return { runDir, ws, home, prompt };
+}
+
+function probeEnvAndArgs(cli, mode, { runDir, ws, home, prompt }, dry) {
+  const settings = probeSettings(cli, mode, runDir, ws);
+  const extra = { HOME: home };
+  let args;
+  if (cli === 'claude') {
+    const file = path.join(runDir, 'settings.json');
+    writeJson(file, settings);
+    args = live.claudeArgs({ settings: file, prompt, print: mode !== 'probe-pane' });
+  } else {
+    const codexHome = path.join(runDir, 'codex-home');
+    const accountAuth = dry ? path.join(runDir, 'stub-auth.json') : codexAccountAuth();
+    if (dry) fs.writeFileSync(accountAuth, '{}\n');
+    live.makeCodexHome({ home: codexHome, accountAuth, ws, hooks: settings });
+    extra.CODEX_HOME = codexHome;
+    args = live.codexArgs({ ws, prompt });
+  }
+  const env = live.cliEnv({ zdotdir: path.join(runDir, 'zdot'), extra });
+  return { env, args };
+}
+
+/** Refuses a real run on low memory, a running heavy gate or an untested version. */
+function realRunProblem(cli, env) {
+  const version = live.semver(live.cliVersion(CLI_BIN[cli], env));
+  return live.resourceProblem({ minFreeGb: PROBE_MIN_FREE_GB }) ?? live.versionProblem(cli, version, CONTRACTS);
+}
+
+async function cmdProbe(cli, mode, flags) {
+  const dry = flags.includes('--dry');
+  const laid = layOutProbe(cli, mode, dry);
+  const { runDir, ws } = laid;
+  const { env, args } = probeEnvAndArgs(cli, mode, laid, dry);
+  if (!dry) live.hookPreflight(cli, env.HOME);
+  if (!dry && cli === 'claude' && mode === 'probe-pane') {
+    live.seedClaudeState({ home: env.HOME, version: live.semver(live.cliVersion(CLI_BIN.claude, env)), trusted: [ws] });
+  }
+  const codexHome = env.CODEX_HOME;
+  if (!dry && cli === 'codex') {
+    const before = live.codexAuthState({ home: codexHome, accountAuth: codexAccountAuth(), env });
+    if (!(before.isLink && before.loggedIn)) die(`the ${ACCOUNT} codex login is not usable before the run (link ${before.isLink}, logged in ${before.loggedIn})`, 3);
+  }
+  const before = dry ? 'stub' : live.cliVersion(CLI_BIN[cli], env);
+  if (!dry) {
+    const problem = realRunProblem(cli, env);
+    if (problem) die(problem, 3);
+    writeJson(path.join(runDir, 'spawned.json'), { cli, mode, at: new Date().toISOString(), version: before });
+  }
+  const startedAt = new Date().toISOString();
+  const result = mode === 'probe-pane'
+    ? await runInPane({ runDir, ws, env, args, dry })
+    : runPrint({ cli, ws, env, args, dry });
+  const after = dry ? 'stub' : live.cliVersion(CLI_BIN[cli], env);
+  writeJson(path.join(runDir, 'versions.json'), { before, after });
+  writeJson(path.join(runDir, 'run.json'), {
+    cli, mode, dry, startedAt, ...result,
+    command: [cli, ...args.map((a) => (a.length > 200 ? '<prompt>' : a))].join(' '),
+    inheritedVars: live.INHERITED_VARS,
+  });
+  const calls = fs.existsSync(path.join(runDir, 'calls')) ? fs.readdirSync(path.join(runDir, 'calls')).filter((f) => f.endsWith('.proc.json')).length : 0;
+  process.stdout.write(`${cli} ${mode}${dry ? ' (dry)' : ''}: exit ${result.exit}; versions ${before} -> ${after}; ${calls} hook calls; ${runDir}\n`);
+  if (!dry && before !== after) die(`the ${cli} version changed during the run (${before} -> ${after})`, 3);
+  if (!dry && cli === 'claude' && !live.claudeHomeIntact({ home: env.HOME, claudeDir: path.join(os.homedir(), '.claude') })) die('the run HOME no longer links ~/.claude', 3);
+  if (!dry && cli === 'codex') {
+    const authAfter = live.codexAuthState({ home: codexHome, accountAuth: codexAccountAuth(), env });
+    const refused = authRefusalAfterRun({ link: path.join(codexHome, 'auth.json'), ...authAfter, account: ACCOUNT });
+    if (refused) die(refused, 3);
+  }
+}
+
+function runPrint({ cli, ws, env, args, dry }) {
+  const command = dry ? [process.execPath, SCRIPT, 'stub', cli, ...args] : [CLI_BIN[cli], ...args];
+  const child = spawnSync('timeout', ['300', ...command], { cwd: ws, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 64 * 1024 * 1024 });
+  fs.writeFileSync(path.join(path.dirname(ws), 'output.txt'), `${child.stdout || ''}\n--- stderr ---\n${child.stderr || ''}`);
+  return { exit: child.status };
+}
+
+/** The installed host of the main checkout: Terminal Control's internal route is reached through it. */
+function installedHost() {
+  const common = spawnSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: REPO_ROOT, encoding: 'utf8' }).stdout.trim();
+  const host = path.join(path.dirname(common), '.fgos', 'installation', 'bin', 'fgos');
+  if (!fs.existsSync(host)) die(`no installed host at ${host}`);
+  return host;
+}
+
+/**
+ * An interactive Claude Code in a herdr pane allocated through Terminal
+ * Control, launched as `env -i <allowlisted env> claude …` so the pane
+ * shell's environment never reaches it. The run ends when a Stop call is
+ * recorded (or after PANE_WAIT_MS); the pane is then closed.
+ */
+async function runInPane({ runDir, ws, env, args, dry }) {
+  process.env.FGOS_HOST_BIN = installedHost();
+  const { createTerminalControl } = await import('../src/terminal-control/client.mjs');
+  let herdrEnv = {};
+  if (dry) {
+    const { ensureWorkerSession } = await import('../src/runner/dispatch/worker-session-boot.mjs');
+    const session = await ensureWorkerSession(DRY_HERDR_SESSION, { callerEnv: process.env });
+    herdrEnv = { HERDR_SESSION: session.env.HERDR_SESSION, HERDR_SOCKET_PATH: session.env.HERDR_SOCKET_PATH };
+  }
+  const tc = createTerminalControl({ hostBin: process.env.FGOS_HOST_BIN, ...(dry ? { env: herdrEnv } : {}) });
+  const group = `mbx-probe${dry ? '-dry' : ''}`;
+  const key = `${group}-p2`;
+  const bin = dry ? process.execPath : CLI_BIN.claude;
+  const cliArgs = dry ? [SCRIPT, 'stub', 'claude', '--interactive', ...args] : args;
+  const allocated = tc.allocate({ key, groupKey: group, display: { label: 'mailbox probe P2 (Claude interactive)', role: 'probe', agent: 'claude' }, cwd: ws });
+  if (allocated.result !== 'slot') die(`allocate ${key}: ${JSON.stringify(allocated)}`, 3);
+  const pairs = Object.entries(env).map(([k, v]) => `${k}=${v}`);
+  const launched = tc.launch({ key, launchSpec: { command: '/usr/bin/env', args: ['-i', ...pairs, bin, ...cliArgs], cwd: ws, env: {}, expect: { argv0: bin, command: bin, args: cliArgs } } });
+  const startedMs = Date.now();
+  let stopSeen = false;
+  if (launched.result === 'launched') {
+    const calls = path.join(runDir, 'calls');
+    while (Date.now() - startedMs < PANE_WAIT_MS) {
+      stopSeen = fs.existsSync(calls) && fs.readdirSync(calls).some((f) => /-Stop\.proc\.json$/.test(f));
+      if (stopSeen) break;
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+  }
+  const released = tc.release({ key, disposition: 'close' }).result;
+  if (dry) spawnSync('herdr', ['--session', DRY_HERDR_SESSION, 'server', 'stop'], { env: { ...process.env, ...herdrEnv }, stdio: 'ignore' });
+  return { exit: stopSeen ? 0 : null, pane: { key, paneId: allocated.paneId ?? allocated.slot?.paneId ?? null, launch: launched.result, released, stopSeen, waitedMs: Date.now() - startedMs } };
+}
+
+/**
+ * The dry runs' CLI: everything real except the model. It runs the prompt's
+ * numbered shell commands in zsh (Claude Code keeps a `cd`; Codex starts each
+ * in the session directory), fires the configured hooks through `sh -c` with
+ * payloads in the recorded field names, and writes what they print where
+ * the CLI keeps its model input: a Claude transcript under $HOME/.claude or
+ * a Codex rollout under $CODEX_HOME.
+ */
+function cmdStub(cli, rawArgv) {
+  const interactive = rawArgv.includes('--interactive');
+  const argv = rawArgv.filter((a) => a !== '--interactive');
+  const prompt = argv[argv.length - 1];
+  const session = crypto.randomUUID();
+  const ws = process.cwd();
+  let settings;
+  let transcript;
+  let record;
+  if (cli === 'claude') {
+    settings = readJson(argv[argv.indexOf('--settings') + 1]).hooks;
+    const dir = path.join(process.env.HOME, '.claude', 'projects', 'stub');
+    fs.mkdirSync(dir, { recursive: true });
+    transcript = path.join(dir, `${session}.jsonl`);
+    record = (text) => fs.appendFileSync(transcript, `${JSON.stringify({ type: 'attachment', attachment: { type: 'hook_additional_context', content: [text], hookEvent: 'PostToolUse' } })}\n`);
+  } else {
+    settings = readJson(path.join(process.env.CODEX_HOME, 'hooks.json')).hooks;
+    const dir = path.join(process.env.CODEX_HOME, 'sessions', 'stub');
+    fs.mkdirSync(dir, { recursive: true });
+    transcript = path.join(dir, `rollout-${session}.jsonl`);
+    record = (text) => fs.appendFileSync(transcript, `${JSON.stringify({ type: 'response_item', payload: { type: 'message', role: 'developer', content: [{ type: 'input_text', text }] } })}\n`);
+  }
+  const hookEnv = { ...process.env, ...(cli === 'claude' ? { CLAUDE_PROJECT_DIR: ws } : {}) };
+  const toolEnv = { ...process.env, [cli === 'claude' ? 'CLAUDE_CODE_SESSION_ID' : 'CODEX_THREAD_ID']: session };
+  const fire = (event, payload) => (settings[event] ?? [])
+    .filter((group) => !group.matcher || group.matcher === '*' || new RegExp(group.matcher).test(payload.tool_name))
+    .flatMap((group) => group.hooks)
+    .map((hook) => spawnSync('sh', ['-c', hook.command], { input: JSON.stringify(payload), env: hookEnv, cwd: ws, encoding: 'utf8', timeout: 30_000 }).stdout);
+  let cwd = ws;
+  const commands = [...prompt.matchAll(/Run the shell command: `([^`]+)`/g)].map((m) => m[1]);
+  commands.forEach((command, i) => {
+    const cd = /^cd '(.+)'$/.exec(command);
+    if (cd && cli === 'claude') cwd = cd[1];
+    else if (!cd) spawnSync('zsh', ['-c', command], { cwd, env: toolEnv, stdio: 'ignore' });
+    const payload = { session_id: session, transcript_path: transcript, cwd: ws, hook_event_name: 'PostToolUse', tool_name: 'Bash', tool_input: { command }, tool_use_id: `stub-${i}` };
+    for (const out of fire('PostToolUse', payload)) {
+      try {
+        const text = JSON.parse(out).hookSpecificOutput?.additionalContext;
+        if (text) record(text);
+      } catch {
+        // a hook that printed nothing
+      }
+    }
+  });
+  fire('Stop', { session_id: session, transcript_path: transcript, cwd: ws, hook_event_name: 'Stop', stop_hook_active: false });
+  process.stdout.write('done\n');
+  if (interactive) {
+    setInterval(() => {}, 1 << 30);
+    for (const signal of ['SIGTERM', 'SIGHUP']) process.on(signal, () => process.exit(0));
+  }
+}
+
+/** Where a run's model input lives: the Claude transcript or the Codex rollout of its first call. */
+function modelInputFile(runDir) {
+  const calls = path.join(runDir, 'calls');
+  const first = fs.readdirSync(calls).filter((f) => /^\d+-PostToolUse\.json$/.test(f)).sort((a, b) => parseInt(a, 10) - parseInt(b, 10))[0];
+  return first ? readJson(path.join(calls, first)).transcript_path : null;
+}
+
+/**
+ * Per ladder step: `inline` when one model-input record holds the whole
+ * text (both markers and the exact byte length between them), `moved` when
+ * a record names the step's start marker but not the whole text (Claude's
+ * persisted-output block, or a Codex truncation), `absent` otherwise. The
+ * sibling's text is judged the same way.
+ */
+function ladderVerdict(runDir, cli) {
+  const file = modelInputFile(runDir);
+  if (!file || !fs.existsSync(file)) return { file, steps: [] };
+  const texts = [];
+  for (const line of fs.readFileSync(file, 'utf8').split('\n').filter(Boolean)) {
+    let r;
+    try {
+      r = JSON.parse(line);
+    } catch {
+      continue;
+    }
+    if (cli === 'claude' && r.type === 'attachment' && r.attachment?.type === 'hook_additional_context') {
+      texts.push({ text: (r.attachment.content ?? []).join('\n'), persisted: JSON.stringify(r).includes('persisted-output') });
+    }
+    if (cli === 'codex' && r.type === 'response_item' && r.payload?.type === 'message') {
+      for (const c of r.payload.content ?? []) if (c.text) texts.push({ text: c.text, role: r.payload.role, persisted: c.text.includes('persisted-output') });
+    }
+  }
+  const judge = (prefix, n, bytes, wide) => {
+    const whole = sizedText(prefix, n, bytes, wide);
+    const hit = texts.find((t) => t.text.includes(whole));
+    if (hit) return { verdict: 'inline', role: hit.role ?? null };
+    const part = texts.find((t) => t.text.includes(`${prefix}START${n}X`));
+    if (part) return { verdict: 'moved', persisted: part.persisted, role: part.role ?? null, recordBytes: Buffer.byteLength(part.text), endMarker: part.text.includes(`${prefix}END${n}X`) };
+    return { verdict: 'absent' };
+  };
+  const steps = LADDER.map((bytes, i) => {
+    const n = i + 1;
+    return {
+      step: n,
+      bytes,
+      wide: n === LADDER_UTF8_STEP,
+      hookRan: fs.readdirSync(path.join(runDir, 'calls')).some((f) => f.endsWith('-ladder.json') && readJson(path.join(runDir, 'calls', f)).step === n),
+      ...judge('L5', n, bytes, n === LADDER_UTF8_STEP),
+      ...(n >= SIBLING_FROM_STEP ? { sibling: judge('SIB', n, SIBLING_BYTES, false).verdict } : {}),
+    };
+  });
+  return { file, steps };
+}
+
+/** The compact facts of one process entry, for the summary. */
+function compact(entry) {
+  if (!entry) return null;
+  return { comm: entry.comm, exe: entry.exe, argv0: entry.cmdline?.[0] ?? null, ttyNr: entry.ttyNr, session: entry.session, pgrp: entry.pgrp, fds: entry.fds };
+}
+
+/** `summarize <cli> <mode> [--dry]`: the run's facts as the report tables read them. */
+function cmdSummarize(cli, mode, flags) {
+  const runDir = probeRunDir(cli, mode, flags.includes('--dry'));
+  const calls = path.join(runDir, 'calls');
+  const hookCalls = fs.existsSync(calls)
+    ? fs.readdirSync(calls).map((f) => /^(\d+)-(Stop|PostToolUse)\.proc\.json$/.exec(f)).filter(Boolean).sort((a, b) => a[1] - b[1]).map((m) => {
+      const facts = readJson(path.join(calls, m[0]));
+      const payload = (() => {
+        try {
+          return readJson(path.join(calls, `${m[1]}-${m[2]}.json`));
+        } catch {
+          return null;
+        }
+      })();
+      return {
+        n: Number(m[1]), event: m[2], tool: payload?.tool_input?.command ?? null, payloadCwd: payload?.cwd ?? null,
+        cwd: facts.cwd, claudeProjectDir: facts.claudeProjectDir, idVarsSet: facts.idVarsSet, binShRealpath: facts.binShRealpath,
+        self: compact(facts.chain[0]), parent: compact(facts.chain[1]), grandparent: compact(facts.chain[2]), greatGrandparent: compact(facts.chain[3]),
+      };
+    })
+    : [];
+  const toolDir = path.join(runDir, 'tool');
+  const tools = fs.existsSync(toolDir)
+    ? fs.readdirSync(toolDir).filter((f) => f.endsWith('.proc.json')).sort((a, b) => parseInt(a, 10) - parseInt(b, 10)).map((f) => {
+      const facts = readJson(path.join(toolDir, f));
+      return { n: parseInt(f, 10), cwd: facts.cwd, claudeProjectDir: facts.claudeProjectDir, idVarsSet: facts.idVarsSet, chain: facts.chain.map(compact) };
+    })
+    : [];
+  const summary = { cli, mode, run: readJson(path.join(runDir, 'run.json')), versions: readJson(path.join(runDir, 'versions.json')), hookCalls, tools, ...(mode === 'ladder' ? { ladder: ladderVerdict(runDir, cli) } : {}) };
+  writeJson(path.join(runDir, 'summary.json'), summary);
+  process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
+}
+
+/** Removes one probe run directory (refused while a set-aside auth file exists). */
+function cmdCleanProbe(cli, mode, flags) {
+  const dir = probeRunDir(cli, mode, flags.includes('--dry'));
+  const refused = removeRunDir(dir);
+  if (refused) die(refused, 3);
+  process.stdout.write(`removed ${dir}\n`);
+}
+
 const [command, ...rest] = process.argv.slice(2);
 try {
-  main();
+  await main();
 } catch (error) {
   if (error instanceof live.LiveCliError) die(error.message, error.code);
   throw error;
 }
 
-function main() {
+async function main() {
   switch (command) {
     case 'run':
-      cmdRun(rest[0], rest[1], rest.slice(2));
+      if (PROBE_MODES.includes(rest[1])) await cmdProbe(rest[0], rest[1], rest.slice(2));
+      else cmdRun(rest[0], rest[1], rest.slice(2));
+      break;
+    case 'probe-hook':
+      cmdProbeHook(rest[0], rest.slice(1));
+      break;
+    case 'probe-sibling':
+      cmdProbeSibling(rest[0]);
+      break;
+    case 'probe-tool':
+      cmdProbeTool(rest[0]);
+      break;
+    case 'stub':
+      cmdStub(rest[0], rest.slice(1));
+      break;
+    case 'summarize':
+      cmdSummarize(rest[0], rest[1], rest.slice(2));
+      break;
+    case 'clean-probe':
+      cmdCleanProbe(rest[0], rest[1], rest.slice(2));
       break;
     case 'hook':
       cmdHook(rest[0], rest[1], rest[2]);
@@ -806,6 +1395,6 @@ function main() {
       cmdClean(rest[0]);
       break;
     default:
-      die('usage: run <cli> <mode> [--fallback] [--agent-head] [--account <name>] | hook <cli> <event> <runDir> | check <cli> accept | redact <cli> | redact-agent-head <cli> | clean <cli>');
+      die('usage: run <cli> <mode> [--fallback] [--agent-head] [--account <name>] | run <claude|codex> <probe|probe-pane|ladder> [--dry] | summarize <cli> <probe mode> [--dry] | clean-probe <cli> <probe mode> [--dry] | hook <cli> <event> <runDir> | check <cli> accept | redact <cli> | redact-agent-head <cli> | clean <cli>');
   }
 }
