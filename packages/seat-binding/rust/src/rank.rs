@@ -135,6 +135,10 @@ pub fn rank(
             format!("{}: no candidate executor for capability \"{}\" role \"{}\"", label(policy), ask.capability, ask.role.name()),
         ));
     }
+    if let Some(lead) = inline_lead_for(policy, &run) {
+        run.survivors.push(lead);
+        run.refusal = None;
+    }
     Ranked {
         candidates: run.survivors,
         skipped: run.skipped,
@@ -144,6 +148,33 @@ pub fn rank(
         fallback_families: run.fallback_families,
         refusal: run.refusal,
     }
+}
+
+/// The session lead runs a seat inline only when the seat configured no candidate at all, is not blind
+/// and needs no skill; a seat whose candidates were all filtered out is refused, never run inline.
+fn inline_lead_for(policy: &Policy, run: &Run) -> Option<Candidate> {
+    let ask = &policy.ask;
+    let lead = ask.inline_lead.as_ref()?;
+    let unconfigured = run.survivors.is_empty()
+        && run.refusal.as_ref().is_some_and(|r| r.reason == "no-candidate" && r.configured == 0);
+    if !unconfigured || ask.posture.blind || !ask.required_skills.is_empty() {
+        return None;
+    }
+    Some(Candidate {
+        executor: lead.executor.clone(),
+        family: lead.family.clone(),
+        invocation: None,
+        model: None,
+        model_source: "no-model-needed".to_string(),
+        effort: None,
+        effort_source: "invocation-default".to_string(),
+        pool: None,
+        accounts: Vec::new(),
+        account: None,
+        mechanism: Mechanism::Inline,
+        source: "session-lead-inline".to_string(),
+        pinned: false,
+    })
 }
 
 fn run_bases(

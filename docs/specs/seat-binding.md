@@ -80,7 +80,7 @@ Rust chỉ sở hữu policy tĩnh của ghế; Execution Core Node giữ placem
 | flagship | phán đoán, thiết kế, phê bình | kết quả là một ý kiến hay một thiết kế? | review, red-team, thiết kế giải pháp, synthesis của panel |
 | frontier | quyết định đắt nhất | khó đảo, đắt nếu sai? | khoá kiến trúc, synthesis cuối của hội đồng quan trọng |
 
-Bảng là một hằng trong crate cạnh từ vựng tier (`TIER_STRENGTH`). `fgos setup` ghi nó thành khoá `"$comment"` cạnh `modelPolicies`, `tierFallback`, `maxTier`; loader bỏ qua `$comment` ở mọi cấp; doctor báo `$comment` khác nguồn; `explain` in định nghĩa tier của ghế. `$comment` bị gỡ trước khi validate và trước hash config ngữ nghĩa.
+Bảng là một file hợp đồng chung `packages/seat-binding/contracts/seat-binding.tier-ladder.v1.json` (tên tier, độ mạnh, định nghĩa); crate nhúng nó lúc build (`tier.rs`), loader config Node đọc cùng file đó cho `MODEL_POLICY_TIERS`, nên hai bên không thể lệch. `fgos setup` ghi nó thành khoá `"$comment"` cạnh `modelPolicies`, `tierFallback`, `maxTier`; loader bỏ qua `$comment` ở mọi cấp; doctor báo `$comment` khác nguồn; `explain` in định nghĩa tier của ghế. `$comment` bị gỡ trước khi validate và trước hash config ngữ nghĩa.
 
 ### 5.2 Rigor tách khỏi tier
 
@@ -443,7 +443,7 @@ Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker 
 - Ranh giới component: [../platform/component-boundary.md](../platform/component-boundary.md).
 - Session Identity (mẫu route nội bộ cho facade): [../platform/identity/spec.md](../platform/identity/spec.md).
 - Triển khai (con trỏ, logic nằm ở mã và ở spec này):
-  - Crate `fgos-seat-binding`: `packages/seat-binding/rust` (hai stage thuần, `tier.rs` là hằng ladder), vector vàng `packages/seat-binding/contracts/seat-binding.golden.v1.json`.
+  - Crate `fgos-seat-binding`: `packages/seat-binding/rust` (hai stage thuần, `tier.rs` đọc file ladder chung), vector vàng `packages/seat-binding/contracts/seat-binding.golden.v1.json`.
   - Route host `fgos internal seat-binding bind|ladder --protocol 1` (`apps/fgos/src/main.rs`); client Node `src/seat-binding/client.mjs` (fail closed, host kích hoạt trong release đã kích hoạt, từ chối khi đang giữ state lock).
   - Facade `src/runner/execution/bind.mjs` (`bind`, `explainSeat`; chỉ thu `launchView`, `accountView`), resolver ghế `seat-resolver.mjs`, ledger `seat-ledger.mjs`, đường đọc legacy `legacy-seat-read.mjs`, `dry-bind.mjs`.
   - Lease `acquireNamedAccountLease` và `auditLeaseReceipt` trong `src/runner/dispatch/provider-capacity.mjs`; mã lỗi `provider-capacity-lease-conflict` (`run-result.mjs`).
