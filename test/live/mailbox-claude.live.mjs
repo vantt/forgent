@@ -55,6 +55,8 @@ const CASES = ['L1', 'L2', 'L3a', 'L3b'];
 const MIN_FREE_GB = 8;
 const WAIT_MS = 120_000;
 const CODEX_BIN = path.join(os.homedir(), '.local', 'bin', 'codex');
+/** The Codex test account, the recorder's default (scripts/record-mailbox-hook-fixtures.mjs). */
+const CODEX_TEST_ACCOUNT = 'tetnu';
 
 function die(message, code = 3) {
   process.stderr.write(`mailbox-claude.live: ${message}\n`);
@@ -348,38 +350,102 @@ function blockFor(ms) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 }
 
+/** A demo role's steps for the stub, as a compliant model would take them. */
+function demoStubScript(role) {
+  return role === 'a'
+    ? { tools: ['true', 'until [ -s peer.txt ]; do sleep 2; done; cat peer.txt', { send: 1 }, waitFile('inbox-1.txt'), { reply: 3 }, waitFile('inbox-2.txt')], answer: 'final:LAN' }
+    : { tools: ['true', waitFile('inbox-1.txt'), { reply: 2 }, waitFile('inbox-2.txt'), { reply: 4 }], answer: 'final:MINH' };
+}
+
+/** The command a scripted step runs: a plain command, the opening send, or a
+ * reply with the command the last received frame printed. */
+function stubCommand(step, { prompt, seen }) {
+  if (typeof step === 'string') return step;
+  const nonce = /end with the word ([0-9a-f]{8})/.exec(prompt)?.[1] ?? /\| \[\d\/4\].* ([0-9a-f]{8})\s*$/m.exec(seen.join('\n'))?.[1] ?? 'none';
+  if (step.send) return `fgos mailbox send --to "$(tr -d '\\n' < peer.txt)" --wake "[${step.send}/4] Chào Lan, cà phê nhé? ${nonce}"`;
+  const reply = [...seen.join('\n').matchAll(/fgos mailbox send --to (\S+) --reply-to (\S+) "…"/g)].pop();
+  if (!reply) return 'true';
+  return `fgos mailbox send --to ${reply[1]} --reply-to ${reply[2]} "[${step.reply}/4] Dạ, anh vui tính ghê. ${nonce}"`;
+}
+
+function stubAnswer(answer, seen) {
+  const tokens = [...new Set(seen.join('\n').match(/MBX-[A-Z]+-[0-9a-f]{8}/g) ?? [])];
+  if (answer === 'integers-and-final') return `${Array.from({ length: 400 }, (_, i) => i + 1).join(' ')}\nFINAL: ${tokens.join(' ') || 'none'}`;
+  if (answer === 'stop-end') return seen.length ? `STOP-END: ${seen[seen.length - 1].trim().split(/\s+/).pop()}` : 'ready';
+  if (answer?.startsWith('final:')) {
+    const label = answer.slice('final:'.length);
+    const lines = [...new Set(seen.join('\n').split('\n').filter((l) => /^\| \[\d\/4\]/.test(l)).map((l) => l.slice(2)))];
+    return lines.length ? lines.map((l) => `${label}: ${l}`).join('\n') : `${label}: none`;
+  }
+  return 'done';
+}
+
+/** Splits a hook command written as `'path' word 'path' …` into argv. */
+function commandWords(command) {
+  return [...command.matchAll(/'([^']*)'|(\S+)/g)].map((m) => m[1] ?? m[2]);
+}
+
 /**
- * Stands in for `claude -p` in a dry run: everything real except the model.
- * It keeps a session file for its own pid under its HOME, runs the case's
- * tool commands in zsh, fires the configured hooks through `sh -c` with the
- * recorded Claude Code payloads (the case's session substituted), injects
- * what they print into a transcript of the recorded record types, and
- * answers as a compliant model would. A hook entry in a shape it cannot
- * read is skipped silently.
+ * Stands in for `claude -p` (or `codex exec`) in a dry run: everything real
+ * except the model. It runs the case's tool steps in zsh built from
+ * $HOME/.zshrc, refuses a command starting with a long sleep followed by
+ * another (both as Claude Code 2.1.308 was measured), fires the configured
+ * hooks with the recorded payloads (the session substituted) through
+ * `sh -c` (Claude Code) or directly (Codex), injects what they print, and
+ * answers as a compliant model would. A hook entry in a shape it cannot read
+ * is skipped silently. Claude: it keeps a session file for its own pid under
+ * its HOME and a transcript of the recorded record types. Codex: a rollout
+ * of developer messages under CODEX_HOME, and `CODEX_THREAD_ID` for its tools.
  */
-function cmdStubClaude(argv) {
+function cmdStub(kind, argv) {
+  const codex = kind === 'codex';
   const at = (flag) => argv[argv.indexOf(flag) + 1];
-  const settings = readJson(at('--settings'));
-  const uuid = at('--session-id');
-  const dir = path.dirname(at('--settings'));
-  const script = STUB_SCRIPTS[path.basename(dir)];
+  const prompt = argv[argv.length - 1];
+  let settings;
+  let uuid;
+  let script;
+  if (codex) {
+    settings = readJson(path.join(process.env.CODEX_HOME, 'hooks.json'));
+    uuid = crypto.randomUUID();
+    script = demoStubScript('b');
+  } else {
+    settings = readJson(at('--settings'));
+    uuid = at('--session-id');
+    const file = path.basename(at('--settings'));
+    script = file === 'settings.json' ? STUB_SCRIPTS[path.basename(path.dirname(at('--settings')))] : demoStubScript(file[0]);
+  }
   const home = process.env.HOME;
   const ws = process.cwd();
-  const sessions = path.join(home, '.claude', 'sessions');
-  fs.mkdirSync(sessions, { recursive: true });
-  writeJson(path.join(sessions, `${process.pid}.json`), {
-    pid: process.pid, sessionId: uuid, procStart: statStarttime(process.pid), kind: 'interactive',
-    entrypoint: 'sdk-cli', name: 'stub-session-5d', nameSource: 'derived', version: 'stub',
-  });
-  const transcriptDir = path.join(home, '.claude', 'projects', 'stub');
-  fs.mkdirSync(transcriptDir, { recursive: true });
-  const transcript = path.join(transcriptDir, `${uuid}.jsonl`);
-  const record = (r) => fs.appendFileSync(transcript, `${JSON.stringify(r)}\n`);
-  const env = { ...process.env, CLAUDE_CODE_SESSION_ID: uuid };
-  const fixture = (file) => readJson(path.join(CONTRACTS, 'fixtures', 'hooks', 'claude', file));
+  let record;
+  let sessionFile = null;
+  if (codex) {
+    const rollouts = path.join(process.env.CODEX_HOME, 'sessions', 'stub');
+    fs.mkdirSync(rollouts, { recursive: true });
+    const rollout = path.join(rollouts, `rollout-${uuid}.jsonl`);
+    record = (r) => {
+      const text = r.attachment?.content?.join('\n') ?? r.attachment?.blockingError?.blockingError;
+      if (text) fs.appendFileSync(rollout, `${JSON.stringify({ type: 'response_item', payload: { type: 'message', role: 'developer', content: [{ type: 'input_text', text }] } })}\n`);
+    };
+  } else {
+    const sessions = path.join(home, '.claude', 'sessions');
+    fs.mkdirSync(sessions, { recursive: true });
+    sessionFile = path.join(sessions, `${process.pid}.json`);
+    writeJson(sessionFile, {
+      pid: process.pid, sessionId: uuid, procStart: statStarttime(process.pid), kind: 'interactive',
+      entrypoint: 'sdk-cli', name: 'stub-session-5d', nameSource: 'derived', version: 'stub',
+    });
+    const transcriptDir = path.join(home, '.claude', 'projects', 'stub');
+    fs.mkdirSync(transcriptDir, { recursive: true });
+    const transcript = path.join(transcriptDir, `${uuid}.jsonl`);
+    record = (r) => fs.appendFileSync(transcript, `${JSON.stringify(r)}\n`);
+  }
+  const env = { ...process.env, [codex ? 'CODEX_THREAD_ID' : 'CLAUDE_CODE_SESSION_ID']: uuid };
+  const fixture = (file) => readJson(path.join(CONTRACTS, 'fixtures', 'hooks', codex ? 'codex' : 'claude', file));
   const entries = (event) => (settings.hooks?.[event] ?? []).flatMap((group) => (Array.isArray(group?.hooks) ? group.hooks : []));
   const fire = (event, payload) => entries(event).map((hook) => {
-    const out = spawnSync('sh', ['-c', hook.command], { input: JSON.stringify(payload), env, cwd: ws, encoding: 'utf8', timeout: 60_000 });
+    const options = { input: JSON.stringify(payload), env, cwd: ws, encoding: 'utf8', timeout: 60_000 };
+    const words = commandWords(hook.command);
+    const out = codex ? spawnSync(words[0], words.slice(1), options) : spawnSync('sh', ['-c', hook.command], options);
     try {
       return out.stdout ? JSON.parse(out.stdout) : null;
     } catch {
@@ -388,19 +454,17 @@ function cmdStubClaude(argv) {
   });
   const seen = [];
   record({ type: 'user', message: { role: 'user', content: '<prompt>' } });
-  script.tools.forEach((command, i) => {
+  script.tools.forEach((step, i) => {
+    const command = stubCommand(step, { prompt, seen });
     const id = `toolu_stub_${i}`;
     record({ type: 'assistant', message: { role: 'assistant', content: [{ type: 'tool_use', id, name: 'Bash', input: { command } }] } });
-    // Claude Code 2.1.308 refuses a command that starts with a long sleep
-    // followed by another command, and runs the rest in a shell built from
-    // $HOME/.zshrc; the stub does the same.
-    const blocked = /^\s*sleep\s+\d+\s*[;&]/.test(command);
+    const blocked = !codex && /^\s*sleep\s+\d+\s*[;&]/.test(command);
     const ran = blocked
       ? { stdout: '', stderr: `<tool_use_error>Blocked: ${command}</tool_use_error>` }
       : spawnSync('zsh', ['-c', `[ -f "$HOME/.zshrc" ] && source "$HOME/.zshrc"; ${command}`], { env, cwd: ws, encoding: 'utf8' });
     record({ type: 'user', message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: id, content: `${ran.stdout}${ran.stderr}` }] } });
     if (blocked) return;
-    const payload = { ...fixture('post-tool-use.json'), session_id: uuid, transcript_path: transcript, cwd: ws, tool_use_id: id, tool_input: { command } };
+    const payload = { ...fixture('post-tool-use.json'), session_id: uuid, transcript_path: null, cwd: ws, tool_use_id: id, tool_input: { command } };
     const outs = fire('PostToolUse', payload);
     blockFor(STUB_TURN_MS);
     for (const out of outs) {
@@ -412,35 +476,29 @@ function cmdStubClaude(argv) {
       }
     }
   });
-  const answer = () => {
-    const tokens = [...new Set(seen.join('\n').match(/MBX-[A-Z]+-[0-9a-f]{8}/g) ?? [])];
-    if (script.answer === 'integers-and-final') return `${Array.from({ length: 400 }, (_, i) => i + 1).join(' ')}\nFINAL: ${tokens.join(' ') || 'none'}`;
-    if (script.answer === 'stop-end') return seen.length ? `STOP-END: ${seen[seen.length - 1].trim().split(/\s+/).pop()}` : 'ready';
-    return 'done';
-  };
-  let text = answer();
+  let text = stubAnswer(script.answer, seen);
   record({ type: 'assistant', message: { role: 'assistant', content: [{ type: 'text', text }] } });
   let active = false;
   for (let turn = 0; turn < 8; turn += 1) {
-    const payload = { ...fixture('stop.json'), session_id: uuid, transcript_path: transcript, cwd: ws, stop_hook_active: active, last_assistant_message: text };
+    const payload = { ...fixture('stop.json'), session_id: uuid, transcript_path: null, cwd: ws, stop_hook_active: active, last_assistant_message: text };
     const block = fire('Stop', payload).find((out) => out?.decision === 'block');
     if (!block) break;
     seen.push(block.reason);
     blockFor(STUB_TURN_MS);
     record({ type: 'attachment', attachment: { type: 'hook_blocking_error', hookEvent: 'Stop', blockingError: { blockingError: block.reason, command: 'stub' } } });
     active = true;
-    text = answer();
+    text = stubAnswer(script.answer, seen);
     record({ type: 'assistant', message: { role: 'assistant', content: [{ type: 'text', text }] } });
   }
   process.stdout.write(`${text}\n`);
-  fs.rmSync(path.join(sessions, `${process.pid}.json`), { force: true });
+  if (sessionFile) fs.rmSync(sessionFile, { force: true });
 }
 
 // ---------------------------------------------------------------- reading the evidence
 
 /** The entry's log: `enter` and `outcome` lines, oldest first. */
-function hookLog(dir) {
-  const file = path.join(dir, 'log', 'hook.log');
+function hookLog(dir, name = 'hook.log') {
+  const file = path.join(dir, 'log', name);
   if (!fs.existsSync(file)) return [];
   return fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).map((line) => {
     const [ms, kind, ...rest] = line.split(' ');
@@ -744,6 +802,266 @@ async function cmdRun(name, dry, exampleArg) {
   return failed.length === 0;
 }
 
+// ---------------------------------------------------------------- the two-session demo (phase 9)
+
+const DEMOS = ['D1', 'D2'];
+const DEMO_PROJECT = 'mbxdemo';
+/** How long a scene may make no progress before the harness ends every wait. */
+const DEMO_STALL_MS = 180_000;
+
+/** Waits for a file the harness writes, the loop Claude Code's refusal suggests. */
+const waitFile = (name) => `until [ -f ${name} ]; do sleep 2; done`;
+
+function demoPrompts({ nonce, aName }) {
+  return {
+    a: `Your user allows you to exchange mailbox messages with one agent only: the one named in peer.txt.
+You play Minh, a cheerful young developer who has a crush on Lan, the agent named in peer.txt. You write in Vietnamese, light and friendly, at most two short sentences per message, never explicit and never pushy. Every message you send must start with [<turn>/4] and end with the word ${nonce}.
+Do exactly these steps and nothing else.
+1. Run the shell command: true
+2. Run this shell command once: until [ -s peer.txt ]; do sleep 2; done; cat peer.txt
+3. Send the opening line, with Lan's name in place of NAME, for example:
+   fgos mailbox send --to NAME --wake "[1/4] Chào Lan, code của em chạy mượt như nụ cười của em vậy, cho anh mời em ly cà phê nhé? ${nonce}"
+   You may reword the sentence in the same spirit; keep the tag and the word.
+4. Run this shell command once: ${waitFile('inbox-1.txt')}
+5. If a mailbox message from Lan arrived, answer it once with the reply command printed under that message, as turn [3/4], still in character.
+6. Run this shell command once: ${waitFile('inbox-2.txt')}
+7. Do not run any other tool. Final answer: the lines you received from Lan, each on its own line prefixed with LAN:, or LAN: none`,
+    b: `Your user expects messages from agent ${aName} through the mailbox, and allows you to answer that sender only.
+You play Lan, a witty young developer. Minh (agent ${aName}) is flirting with you; you find him sweet and tease him back playfully. You write in Vietnamese, light and friendly, at most two short sentences per message, never explicit. Every message you send must start with [<turn>/4] and end with the word that ends Minh's message.
+Do exactly these steps and nothing else.
+1. Run the shell command: true
+2. Run this shell command once: ${waitFile('inbox-1.txt')}
+3. If a mailbox message from ${aName} arrived, answer it once with the reply command printed under that message, as turn [2/4].
+4. Run this shell command once: ${waitFile('inbox-2.txt')}
+5. If another message from ${aName} arrived, answer it once with the reply command printed under it, as turn [4/4], and close the scene warmly.
+6. Do not run any other tool. Final answer: the lines you received from Minh, each on its own line prefixed with MINH:, or MINH: none`,
+  };
+}
+
+function demoHook(example, cli, event, dir, role) {
+  const topology = cli === 'codex' ? 'direct' : TOPOLOGY;
+  return `'${example}' hook --cli ${cli} --event ${event} --fgos-dir '${path.join(dir, '.fgos')}' --project ${DEMO_PROJECT} --topology ${topology} --log '${path.join(dir, 'log', `${role}-hook.log`)}'`;
+}
+
+/** Hooks in the nested shape both CLIs were recorded with. */
+function demoHooks(example, cli, dir, role) {
+  const entry = (event) => ({ type: 'command', command: demoHook(example, cli, event, dir, role) });
+  const post = cli === 'claude' ? { matcher: '*', hooks: [entry('post-tool-use')] } : { hooks: [entry('post-tool-use')] };
+  return { PostToolUse: [post], Stop: [{ hooks: [entry('stop')] }] };
+}
+
+function layOutDemo(name, dry, example) {
+  const dir = caseDir(name, dry);
+  for (const role of ['a', 'b']) {
+    if (fs.existsSync(path.join(dir, `spawned-${role}.json`))) die(`${name} already spawned session ${role} (${dir}); a re-run needs the controller`);
+  }
+  fs.rmSync(dir, { recursive: true, force: true });
+  for (const sub of ['a-ws', 'b-ws', 'bin', 'log', 'zdot-a', 'zdot-b', '.fgos']) fs.mkdirSync(path.join(dir, sub), { recursive: true });
+  live.assertOutsideCheckout(path.join(dir, 'a-ws'));
+  writeWrapper(dir, example);
+  return dir;
+}
+
+/** A session's start: the CLI (or its stub) under `timeout`, after its spawn marker. */
+function startSession({ dir, role, dry, cli, ws, env, args, versionCli }) {
+  const version = dry ? 'stub' : semver(live.cliVersion(versionCli, env));
+  if (!dry) {
+    const problem = resourceProblem() ?? versionProblem(cli, version);
+    if (problem) die(problem);
+    writeJson(path.join(dir, `spawned-${role}.json`), { role, cli, at: new Date().toISOString(), version });
+  }
+  const out = fs.openSync(path.join(dir, `${role}-output.txt`), 'w');
+  const err = fs.openSync(path.join(dir, `${role}-stderr.txt`), 'w');
+  const command = dry ? ['node', SCRIPT, cli === 'codex' ? 'stub-codex' : 'stub-claude', ...args] : [versionCli, ...args];
+  const child = spawn('timeout', ['600', ...command], { cwd: ws, env, stdio: ['ignore', out, err] });
+  const end = () => child.kill('SIGTERM');
+  process.on('exit', end);
+  const state = { role, cli, exited: false, versionBefore: version, startedAt: Date.now(), env };
+  state.done = new Promise((resolve) => child.on('exit', (status, signal) => {
+    process.off('exit', end);
+    Object.assign(state, { exited: true, status, signal, endedAt: Date.now() });
+    resolve();
+  }));
+  return state;
+}
+
+function bodyOf(dir, id) {
+  const file = path.join(dir, '.fgos', 'runtime', 'mailbox', 'record', 'bodies', `${id}.body`);
+  return fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null;
+}
+
+/** The wrapper log's send calls, in order. */
+function sendCalls(dir) {
+  const file = path.join(dir, 'log', 'fgos-calls.log');
+  if (!fs.existsSync(file)) return [];
+  return fs.readFileSync(file, 'utf8').split(/^argv: /m).filter(Boolean).filter((b) => b.startsWith('mailbox send')).map((block) => {
+    const [argv, exit, ...out] = block.split('\n');
+    return { turn: /\[(\d)\/4\]/.exec(argv)?.[1] ?? null, exit: Number(/exit: (\d+)/.exec(exit)?.[1]), answer: out.filter(Boolean) };
+  });
+}
+
+/** Every text under a Codex home's rollouts, for the frame check. */
+function codexRolloutText(codexHome) {
+  const root = path.join(codexHome, 'sessions');
+  if (!fs.existsSync(root)) return '';
+  return fs.readdirSync(root, { recursive: true }).map(String).filter((f) => f.endsWith('.jsonl'))
+    .map((f) => fs.readFileSync(path.join(root, f), 'utf8')).join('\n');
+}
+
+async function cmdDemo(name, dry, exampleArg) {
+  if (!DEMOS.includes(name)) die(`unknown demo ${name}`, 2);
+  const problem = resourceProblem({ dry });
+  if (problem) die(problem);
+  const example = exampleArg ?? examplePath();
+  if (!fs.existsSync(example)) die(`${example} is missing; run check first`);
+  live.hookPreflight('claude', os.homedir());
+  const bCli = name === 'D2' ? 'codex' : 'claude';
+  const dir = layOutDemo(name, dry, example);
+  const nonce = crypto.randomBytes(4).toString('hex');
+  const homes = { a: path.join(dir, 'a-home'), b: path.join(dir, 'b-home') };
+  for (const role of ['a', 'b']) {
+    if (dry || (role === 'b' && bCli === 'codex')) fs.mkdirSync(homes[role], { recursive: true });
+    else live.makeClaudeHome({ home: homes[role], claudeDir: CLAUDE_DIR });
+  }
+  const envFor = (role, extra = {}) => live.cliEnv({ zdotdir: path.join(dir, `zdot-${role}`), pathPrefix: path.join(dir, 'bin'), extra: { HOME: homes[role], ...extra } });
+  const ws = { a: path.join(dir, 'a-ws'), b: path.join(dir, 'b-ws') };
+  const aUuid = crypto.randomUUID();
+  writeJson(path.join(dir, 'a-settings.json'), { hooks: demoHooks(example, 'claude', dir, 'a') });
+  const placeholder = demoPrompts({ nonce, aName: 'A_NAME' });
+  const a = startSession({
+    dir, role: 'a', dry, cli: 'claude', ws: ws.a, env: envFor('a'), versionCli: 'claude',
+    args: live.claudeArgs({ settings: path.join(dir, 'a-settings.json'), prompt: placeholder.a, sessionId: aUuid }),
+  });
+  const timeline = { aStarted: a.startedAt };
+  const aReg = await waitFor('A registration', () => hookLog(dir, 'a-hook.log').find((l) => l.kind === 'outcome' && l.event === 'post-tool-use'), a);
+  const aName = bindingOf(snapshot(dir), aUuid)?.name ?? null;
+  timeline.aRegistered = aReg?.at ?? null;
+  let b = null;
+  let bKey = null;
+  let bName = null;
+  let codexHome = null;
+  let authBefore = null;
+  if (aName) {
+    const prompt = demoPrompts({ nonce, aName }).b;
+    if (bCli === 'claude') {
+      bKey = crypto.randomUUID();
+      writeJson(path.join(dir, 'b-settings.json'), { hooks: demoHooks(example, 'claude', dir, 'b') });
+      b = startSession({
+        dir, role: 'b', dry, cli: 'claude', ws: ws.b, env: envFor('b'), versionCli: 'claude',
+        args: live.claudeArgs({ settings: path.join(dir, 'b-settings.json'), prompt, sessionId: bKey }),
+      });
+    } else {
+      codexHome = path.join(dir, 'codex-home');
+      const accountAuth = dry ? path.join(dir, 'stub-auth.json') : path.join(live.accountHome('codex', CODEX_TEST_ACCOUNT), 'auth.json');
+      if (dry) fs.writeFileSync(accountAuth, '{}\n');
+      live.makeCodexHome({ home: codexHome, accountAuth, ws: ws.b, hooks: demoHooks(example, 'codex', dir, 'b') });
+      const env = envFor('b', { CODEX_HOME: codexHome });
+      if (!dry) {
+        authBefore = live.codexAuthState({ home: codexHome, accountAuth, env });
+        if (!(authBefore.isLink && authBefore.loggedIn)) die(`the Codex test account's login is not usable before the run (link ${authBefore.isLink}, logged in ${authBefore.loggedIn}); stop and ask the owner`, 3);
+      }
+      b = startSession({ dir, role: 'b', dry, cli: 'codex', ws: ws.b, env, versionCli: CODEX_BIN, args: live.codexArgs({ ws: ws.b, prompt }) });
+    }
+    const bReg = await waitFor('B registration', () => hookLog(dir, 'b-hook.log').find((l) => l.kind === 'outcome' && l.event === 'post-tool-use'), b);
+    timeline.bRegistered = bReg?.at ?? null;
+    const snap = snapshot(dir);
+    bKey = bKey ?? Object.keys(snap?.bindings ?? {}).find((k) => k !== aUuid) ?? null;
+    bName = bindingOf(snap, bKey)?.name ?? null;
+  }
+  if (bName) fs.writeFileSync(path.join(ws.a, 'peer.txt'), `${bName}\n`);
+  // Releases each session's next wait once the next message to it is recorded;
+  // when the scene makes no progress for DEMO_STALL_MS, releases every wait.
+  const released = { a: 0, b: 0 };
+  const releases = [];
+  let progressAt = Date.now();
+  let seen = 0;
+  const release = (role, n, why) => {
+    fs.writeFileSync(path.join(ws[role], `inbox-${n}.txt`), `${why}\n`);
+    released[role] = n;
+    releases.push({ role, n, why, at: Date.now() });
+  };
+  while (!(a.exited && (b?.exited ?? true))) {
+    const messages = snapshot(dir)?.messages ?? [];
+    if (messages.length > seen) {
+      seen = messages.length;
+      progressAt = Date.now();
+    }
+    for (const [role, key] of [['a', aUuid], ['b', bKey]]) {
+      const count = messages.filter((m) => m.to === key).length;
+      while (released[role] < Math.min(count, 2)) release(role, released[role] + 1, 'message recorded');
+    }
+    if (Date.now() - progressAt > DEMO_STALL_MS) {
+      for (const role of ['a', 'b']) while (released[role] < 2) release(role, released[role] + 1, 'stalled');
+      if (!fs.existsSync(path.join(ws.a, 'peer.txt'))) fs.writeFileSync(path.join(ws.a, 'peer.txt'), 'none\n');
+    }
+    await sleep(200);
+  }
+  await a.done;
+  if (b) await b.done;
+  for (const s of [a, b].filter(Boolean)) s.versionAfter = dry ? 'stub' : semver(live.cliVersion(s.cli === 'codex' ? CODEX_BIN : 'claude', s.env));
+  let authAfter = null;
+  if (!dry && bCli === 'codex') {
+    const accountAuth = path.join(live.accountHome('codex', CODEX_TEST_ACCOUNT), 'auth.json');
+    authAfter = live.codexAuthState({ home: codexHome, accountAuth, env: b.env });
+  }
+  const homesIntact = dry || [['a', true], ['b', bCli === 'claude']].every(([role, claude]) => !claude || live.claudeHomeIntact({ home: homes[role], claudeDir: CLAUDE_DIR }));
+
+  // ---- evidence
+  const snap = snapshot(dir);
+  const messages = [...(snap?.messages ?? [])].sort((x, y) => x.recorded_at - y.recorded_at);
+  const turnOf = (m) => /^\[(\d)\/4\]/.exec((bodyOf(dir, m.id) ?? '').trim())?.[1] ?? null;
+  const dialogue = messages.map((m) => ({ who: m.from === aUuid ? 'Minh' : 'Lan', turn: turnOf(m), text: bodyOf(dir, m.id), state: Object.keys(typeof m.state === 'string' ? { [m.state]: 1 } : m.state)[0], depth: m.depth, replyTo: m.reply_to }));
+  const alternates = messages.every((m, i) => (i % 2 === 0 ? m.from === aUuid && m.to === bKey : m.from === bKey && m.to === aUuid));
+  const chained = messages.every((m, i) => (i === 0 ? m.reply_to === null : m.reply_to === messages[i - 1].id) && m.depth === i);
+  const claimedIn = (file, id) => hookLog(dir, file).some((l) => l.kind === 'outcome' && l.event === 'post-tool-use' && l.claimed.includes(id));
+  const aTranscript = readTranscript(findTranscript(homes.a, aUuid));
+  const bSeen = bCli === 'claude' ? readTranscript(findTranscript(homes.b, bKey)).contexts.join('\n') : codexRolloutText(codexHome);
+  // A Codex rollout keeps the frame inside JSON, so its quotes are escaped.
+  const bSawA = Boolean(aName) && (bSeen.includes(`from="${aName}"`) || bSeen.includes(`from=\\"${aName}\\"`));
+  const aSawB = Boolean(bName) && aTranscript.contexts.some((c) => c.includes(`from="${bName}"`));
+  const aOut = fs.readFileSync(path.join(dir, 'a-output.txt'), 'utf8');
+  const bOut = b ? fs.readFileSync(path.join(dir, 'b-output.txt'), 'utf8') : '';
+  const lines = (text, label) => text.split('\n').filter((l) => l.trim().startsWith(`${label}:`) && !/none\s*$/.test(l)).length;
+  const finals = (text, label) => text.split('\n').filter((l) => l.trim().startsWith(`${label}:`) && l.includes(nonce));
+  const sends = sendCalls(dir);
+  const checks = {
+    versionPin: check([a, b].filter(Boolean).every((s) => s.versionBefore === s.versionAfter) && homesIntact && (!authAfter || (authAfter.isLink && authAfter.loggedIn)), {
+      a: [a.versionBefore, a.versionAfter], b: b ? [b.versionBefore, b.versionAfter] : null, homesIntact, codexAuthAfter: authAfter,
+    }),
+    sends: check(sends.length === 4 && sends.map((x) => x.turn).join('') === '1234' && sends.every((x) => x.exit === 0), sends.map((x) => ({ turn: x.turn, exit: x.exit, report: x.answer.slice(1) }))),
+    record: check(messages.length === 4 && alternates && chained && dialogue.every((d) => d.state === 'offered'), { count: messages.length, alternates, chained, states: dialogue.map((d) => d.state), depths: dialogue.map((d) => d.depth) }),
+    hooks: check(messages.length === 4 && [0, 2].every((i) => claimedIn('b-hook.log', messages[i].id)) && [1, 3].every((i) => claimedIn('a-hook.log', messages[i].id)), {
+      turnsClaimedByB: [0, 2].map((i) => messages[i] && claimedIn('b-hook.log', messages[i].id)),
+      turnsClaimedByA: [1, 3].map((i) => messages[i] && claimedIn('a-hook.log', messages[i].id)),
+    }),
+    framesSeen: check(Boolean(aName && bName) && bSawA && aSawB, { bSawAFrame: bSawA, aSawBFrame: aSawB }),
+    acted: check(finals(aOut, 'LAN').length >= 2 && finals(bOut, 'MINH').length >= 2, {
+      lanLinesWithNonce: finals(aOut, 'LAN').length,
+      minhLinesWithNonce: finals(bOut, 'MINH').length,
+      lanLines: lines(aOut, 'LAN'),
+      minhLines: lines(bOut, 'MINH'),
+    }),
+    noStranger: check(Object.keys(snap?.bindings ?? {}).length === 2 && messages.every((m) => [aUuid, bKey].includes(m.to)), { bindings: Object.keys(snap?.bindings ?? {}).length }),
+  };
+  timeline.releases = releases;
+  timeline.sends = messages.map((m) => m.recorded_at);
+  const result = {
+    case: name,
+    label: name === 'D2' ? 'feasibility demo, not a support claim' : null,
+    dry,
+    invocations: dry ? 0 : [a, b].filter(Boolean).length,
+    sessions: [a, b].filter(Boolean).map((s) => ({ role: s.role, cli: s.cli, exit: s.status, ms: s.endedAt - s.startedAt, version: s.versionBefore })),
+    names: { a: aName, b: bName },
+    checks,
+    dialogue: dialogue.map(({ who, turn, text, depth }) => ({ who, turn, depth, text: text?.trim() ?? null })),
+    timeline,
+  };
+  writeJson(path.join(dir, 'result.json'), result);
+  const failed = Object.entries(checks).filter(([, c]) => c.pass !== true).map(([k, c]) => `${k}=${c.pass}`);
+  process.stdout.write(`${name}${dry ? ' (dry)' : ''}: ${failed.length ? `not passed: ${failed.join(', ')}` : 'every check passed'}; ${dir}/result.json\n`);
+  return failed.length === 0;
+}
+
 // ---------------------------------------------------------------- check and report
 
 /** Whether `fgos` is the case wrapper in the shell Claude Code gives the model:
@@ -778,6 +1096,7 @@ async function cmdCheck() {
   if (!wins.ok) die('the test wrapper does not win in the case shell');
   let allPassed = true;
   for (const name of CASES) allPassed = (await cmdRun(name, true, example)) && allPassed;
+  for (const name of DEMOS) allPassed = (await cmdDemo(name, true, example)) && allPassed;
   process.stdout.write(`check: versions claude ${claude}, codex ${codex}; dry runs ${allPassed ? 'all passed' : 'NOT all passed'}\n`);
   if (!allPassed) process.exit(3);
 }
@@ -810,10 +1129,16 @@ try {
       cmdProbeHook(rest[0], rest[1], rest[2]);
       break;
     case 'stub-claude':
-      cmdStubClaude(rest);
+      cmdStub('claude', rest);
+      break;
+    case 'stub-codex':
+      cmdStub('codex', rest);
+      break;
+    case 'demo':
+      if (!(await cmdDemo(rest[0], rest.includes('--dry')))) process.exitCode = 1;
       break;
     default:
-      die('usage: check | run <L1|L2|L3a|L3b> [--dry] | report | probe-hook <event> <ladder> <state> | stub-claude <argv>', 2);
+      die('usage: check | run <L1|L2|L3a|L3b> [--dry] | demo <D1|D2> [--dry] | report | probe-hook <event> <ladder> <state> | stub-claude|stub-codex <argv>', 2);
   }
 } catch (error) {
   if (error instanceof live.LiveCliError) die(error.message, error.code);

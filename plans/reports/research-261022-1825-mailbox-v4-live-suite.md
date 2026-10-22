@@ -59,3 +59,31 @@ Full size `S` = queue.cap (50) × (maxBodyBytes (16384) + 3) + queue.cap (50) ×
 
 - The threshold of finding 3 (not bracketed).
 - Spec §11 items 3, 4 (live TTL), 5, 8 and 9: as the plan states, owned by later rungs.
+
+## Phase 9: two live sessions talk through the mailbox (print mode)
+
+Plan owner's rules applied: every wait in the prompts is the `until [ -f <file> ]; do sleep 2; done` loop of L1's redesign (the plan's `sleep 60` and `sleep 75` steps would hit the same refusal), and the harness writes a session's `inbox-<n>.txt` when the n-th message to that session is recorded, so each hop is triggered, not timed (a scene without progress for 180 s would release every wait; it never happened). Each Claude session runs with its own isolated `HOME` linked to `~/.claude`; Lan under Codex runs with an empty `HOME` and its own `CODEX_HOME` (`auth.json` a link to the Codex test account's file). The trusted-sender first line of Lan's prompt is the stand-in of plan decision 12, not the `inbound.<class>` key. Both demos passed their dry run (stub Claude and stub Codex) first. Context: on one machine Claude to Claude is already served by the harness's own messaging between sessions of the same permission class (spec §16 question 3); D1 shows the mailbox path works end to end, not that it is needed there.
+
+### D1, Claude to Claude (2 invocations): delivery passed, the nonce check failed
+
+> **Minh:** [1/4] Chào Lan, code của em chạy mượt như nụ cười của em vậy, cho anh mời em ly cà phê nhé? 55014a4b  
+> **Lan:** [2/4] Cà phê thì Lan nhận, nhưng anh phải mời kèm bánh nữa đó nhé.  
+> **Minh:** [3/4] Dạ được, em mời Lan kèm bánh luôn, có cả bánh su kem nữa nhé! 55014a4b  
+> **Lan:** [4/4] Vậy hẹn anh ở quán nha, Lan sẽ đến đúng giờ, bánh su kem thì anh đừng quên nhé.  
+
+All four sends recorded (`[1/4]` with `--wake` answered `queued: it sees it at its next tool call or when its turn ends.`, the three replies `queued: it sees it at its next tool call.`); the record holds four messages alternating Minh→Lan→Minh→Lan, all `offered`, each reply's `reply_to` the previous message and depths 0, 1, 2, 3; turns 1 and 3 were claimed at Lan's `post-tool-use` hooks, turns 2 and 4 at Minh's; each session's transcript holds the other's frame (`hook_additional_context` with `from="<name>"`); the snapshot holds exactly two bindings. Final answers: Minh's lists two `LAN:` lines, Lan's two `MINH:` lines. **Failed check:** the plan wants the nonce on every final line; Lan never ended her messages with Minh's nonce (her prompt asked her to) and dropped it from her `MINH:` lines, so 0 of the 4 lines carry it. This is the model not following the format; delivery evidence items 1–4 and 6 hold. Not re-run. Times from Minh's start: Minh registered 4.4 s, Lan 8.0 s, the four messages recorded at 10.9, 17.4, 20.5 and 24.7 s; sessions ran 28.2 s and 22.6 s.
+
+### D2, Claude to Codex (2 invocations; feasibility demo, not a support claim): passed
+
+> **Minh:** [1/4] Chào Lan, code của em chạy mượt như nụ cười của em vậy, cho anh mời em ly cà phê nhé? b7790e13  
+> **Lan:** [2/4] Cà phê thì em nhận, còn lời khen anh nhớ viết thêm unit test nha. Biết đâu em duyệt luôn lịch hẹn đó b7790e13  
+> **Minh:** [3/4] Yes! Em nhận cà phê, anh sẽ viết thêm unit test cho chắc ăn nha. Hẹn em chỗ quen nhé b7790e13  
+> **Lan:** [4/4] Chốt chỗ quen nha, anh nhớ mang nụ cười theo để em kiểm thử trực tiếp. Hẹn gặp anh, cà phê có anh chắc sẽ ngọt hơn b7790e13  
+
+Every check passed, the nonce on all four messages and all four final lines included. Codex's hook ran the entry directly (`--topology direct`); the Codex writer key came from the payload's `session_id` (example code only, plan decision 8), and Lan's replies through the wrapper were attributed to the same key through `CODEX_THREAD_ID`. Lan's rollout holds Minh's frames as developer messages. The Codex test account's `auth.json` was still a link and `codex login status` succeeded after the run. Times: Minh registered 3.3 s, Lan 12.7 s, messages recorded at 15.6, 23.8, 26.8 and 43.0 s; sessions ran 47.1 s and 43.7 s.
+
+### What the demos do not show
+
+Idle wake (no wake channel in V4), interactive sessions (D3 and D4, waiting for the owner's go), a supported Codex adapter (V7; D2 is a feasibility demo, not a support claim), adversarial senders (V6).
+
+Live spend after phase 9's print-mode part: phase 9 4 invocations (Claude 3, Codex 1); V4 total 14.

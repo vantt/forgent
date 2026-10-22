@@ -1,7 +1,7 @@
 ---
 phase: 9
 title: "Feasibility demo: two real CLI sessions talk through the mailbox"
-status: pending
+status: in progress (D1, D2 done; D3, D4 wait for the owner's go)
 depends_on: [8]
 live_calls: 8
 ---
@@ -108,3 +108,15 @@ D1 and D2 `result.json` and the report. D1 must pass for the phase to pass; a D2
 
 - Codex's tool environment may not keep `PATH` (phase 8's `check` proves the wrapper wins in a zsh started with the case environment; Codex's own shell is checked only by D2 itself) (then `fgos` is not found in B's reply step): the case reports the cause from Codex's rollout; no re-run without the controller. Codex's shell tool may return a long `sleep` early and poll; that only adds checkpoints.
 - Codex acted on in-task read-only peer requests in only 3 of 20 print-mode runs without a trusted-sender line (spec §5.5); with the line, 20 of 20 (S0). A Codex B that does not answer is a finding about the stand-in line, not about delivery: evidence items 1–4 still show delivery.
+
+## Done on the branch, print-mode part (implementation lead, 2026-10-22)
+
+- `demo D1|D2` added to `test/live/mailbox-claude.live.mjs` with a stub Claude and a stub Codex; `check` dry-runs both. D1 ran once (2 Claude invocations), D2 once (1 Claude, 1 Codex). Results appended to `plans/reports/research-261022-1825-mailbox-v4-live-suite.md`.
+- **D1:** delivery passed (four linked messages at depths 0–3, all `offered`, each claimed at the receiver's `post-tool-use`, frames in both transcripts, two bindings only); the nonce check failed because Lan omitted the nonce. Not re-run.
+- **D2 (feasibility demo, not a support claim):** every check passed; Codex login intact after the run.
+
+### Deviations
+
+- Every wait is the `until [ -f <file> ]; do sleep 2; done` loop (plan owner's decision 1): the `sleep 60` / `sleep 75` steps and the `while … sleep 2` peer loop were replaced. The harness writes `inbox-<n>.txt` into a session's workspace when the n-th message to it is recorded, so each hop is triggered by the record, not by a timing estimate; a scene with no new message for 180 s would release every wait (it never did).
+- Claude sessions run with the isolated `HOME` of L1's redesign; Lan under Codex runs with an empty `HOME`, so no owner rc file reaches its shell.
+- The `acted` check keeps the plan's rule (the nonce on each final line) and also records the line counts without the nonce.
