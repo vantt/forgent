@@ -134,6 +134,15 @@ impl GitDriver {
         let commit = self.new_counter_commit(repo, number, claimant)?;
         match home {
             SequenceHome::Local => {
+                // The commit is durable before the ref can name it, and the ref
+                // before a number is reported: a power cut must not roll the
+                // counter back to a number already handed out.
+                crate::objects::sync_loose_objects(
+                    repo.common_dir(),
+                    std::slice::from_ref(&commit),
+                    false,
+                )
+                .map_err(|e| failure_text(e.to_string()))?;
                 let old = expected.map_or_else(
                     || "0".repeat(commit.as_str().len()),
                     |o| o.as_str().to_owned(),
@@ -141,6 +150,8 @@ impl GitDriver {
                 let out = self.run_local(
                     repo,
                     &[
+                        "-c",
+                        "core.fsync=all",
                         "update-ref",
                         "--no-deref",
                         name.as_str(),
@@ -149,6 +160,7 @@ impl GitDriver {
                     ],
                 )?;
                 if out.success {
+                    crate::refs::sync_refs(repo, &name)?;
                     return Ok(SequencePush::Claimed(commit));
                 }
                 // A refused swap is a counter that moved; anything else is a fault.
@@ -321,6 +333,8 @@ impl GitDriver {
                 "user.email=fgos@localhost",
                 "-c",
                 "commit.gpgsign=false",
+                "-c",
+                "core.fsync=all",
                 "commit-tree",
                 tree,
                 "-m",
