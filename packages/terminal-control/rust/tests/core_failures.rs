@@ -161,7 +161,8 @@ fn a_close_across_an_incarnation_change_is_kept_unknown() {
 }
 
 #[test]
-fn retain_closes_only_past_until_on_the_same_incarnation() {
+fn a_scan_reports_an_expired_retained_pane_with_its_pane_id_and_closes_nothing() {
+    // Doctor's scan only observes: a person closes the pane, so the finding must say which one.
     let driver = MemDriver::new(352, 69);
     let root = state_dir("retain");
     let now = Cell::new(1_000u64);
@@ -177,7 +178,13 @@ fn retain_closes_only_past_until_on_the_same_incarnation() {
     now.set(6_000);
     let findings = core.reconcile_scan(0).unwrap();
     assert_eq!(findings[0].kind, FindingKind::RetainExpired);
-    assert!(!driver.panes.borrow().contains_key(&slot.pane_id));
+    assert!(
+        findings[0].detail.contains(&slot.pane_id),
+        "the finding names the pane to close: {:?}",
+        findings[0].detail
+    );
+    assert!(driver.calls("pane.close").is_empty(), "a scan never closes");
+    assert!(driver.panes.borrow().contains_key(&slot.pane_id));
 }
 
 #[test]
@@ -295,6 +302,53 @@ fn immediate_close_with_a_foreign_foreground_is_kept_without_a_release_marker() 
     driver.set_foreground(&slot.pane_id, 900, vec![ForegroundProcess { pid: 900, argv: vec!["bash".into()] }], 900);
     assert!(matches!(core.release("a", Disposition::Close, None).unwrap(), ReleaseOutcome::Released { disposition: Disposition::Close }));
     assert!(!driver.panes.borrow().contains_key(&slot.pane_id));
+}
+
+#[test]
+fn a_pane_whose_foreground_process_only_shares_a_pid_with_the_launched_one_is_kept() {
+    // The cases above use foreign pids that were never launched. Here the foreground entry carries
+    // the launched command's pid, but the launched process is gone: a pid alone does not make the
+    // process in front the one this core started.
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("close-pid-reuse"));
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    let mut child = spawn_sleeper();
+    driver.set_launch_foreground(
+        &slot.pane_id,
+        900,
+        vec![
+            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
+            ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] },
+        ],
+        child.id(),
+    );
+    let out = core.launch("a", &launch_spec()).unwrap();
+    assert!(matches!(out, LaunchOutcome::Launched(_)), "{out:?}");
+    let stranger = child.id();
+    child.kill().unwrap();
+    child.wait().unwrap();
+    driver.set_foreground(
+        &slot.pane_id,
+        900,
+        vec![ForegroundProcess { pid: stranger, argv: vec!["vim".into()] }],
+        stranger,
+    );
+    let released = core.release("a", Disposition::Close, None).unwrap();
+    assert!(matches!(released, ReleaseOutcome::KeptUnknown { .. }), "{released:?}");
+    assert!(driver.panes.borrow().contains_key(&slot.pane_id));
+}
+
+#[test]
+fn an_empty_foreground_list_proves_no_ownership() {
+    // A pane whose foreground cannot be listed shows no process of ours: closing it on the strength
+    // of "every listed process is ours" would close on no evidence at all.
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("close-empty-foreground"));
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    driver.set_foreground(&slot.pane_id, 900, vec![], 900);
+    let released = core.release("a", Disposition::Close, None).unwrap();
+    assert!(matches!(released, ReleaseOutcome::KeptUnknown { .. }), "{released:?}");
+    assert!(driver.panes.borrow().contains_key(&slot.pane_id));
 }
 
 #[test]

@@ -210,12 +210,19 @@ fn commands_do_not_inherit_the_callers_descriptors() {
     assert_eq!(unsafe { libc::pipe(pipe.as_mut_ptr()) }, 0);
     // High, inheritable copies: low numbers collide with the shell's own script fd.
     // SAFETY: F_DUPFD on the open pipe ends; the originals are closed right after.
-    let fds = unsafe { [libc::fcntl(pipe[0], libc::F_DUPFD, 200), libc::fcntl(pipe[1], libc::F_DUPFD, 200)] };
+    // One of them sits above 2048: no caller descriptor reaches herdr, whatever its number.
+    let fds = unsafe {
+        [
+            libc::fcntl(pipe[0], libc::F_DUPFD, 200),
+            libc::fcntl(pipe[1], libc::F_DUPFD, 200),
+            libc::fcntl(pipe[1], libc::F_DUPFD, 2048),
+        ]
+    };
     unsafe {
         libc::close(pipe[0]);
         libc::close(pipe[1]);
     }
-    assert!(fds[0] >= 200 && fds[1] >= 200);
+    assert!(fds[0] >= 200 && fds[1] >= 200 && fds[2] >= 2048, "descriptor limit too low for this test: {fds:?}");
     let dir = scratch("fds");
     let dump = dir.join("fds");
     let fake = Fake::new("fds").env("FAKE_HERDR_FDS", &dump.to_string_lossy());
@@ -226,8 +233,10 @@ fn commands_do_not_inherit_the_callers_descriptors() {
     unsafe {
         libc::close(fds[0]);
         libc::close(fds[1]);
+        libc::close(fds[2]);
     }
-    assert!(!open.contains(&fds[0]) && !open.contains(&fds[1]), "leaked {fds:?} into {open:?}");
+    let leaked: Vec<_> = fds.iter().filter(|fd| open.contains(fd)).collect();
+    assert!(leaked.is_empty(), "leaked {leaked:?} into {open:?}");
     let _ = std::fs::remove_dir_all(&dir);
 }
 

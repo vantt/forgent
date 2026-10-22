@@ -175,7 +175,7 @@ mod install_mapping_tests {
         }
     }
     #[test]
-    fn errors_before_install_propagate_and_errors_after_install_keep_the_outcome() {
+    fn errors_before_install_propagate_and_errors_after_install_keep_the_outcome_unless_the_parent_sync_failed() {
         let dir = std::env::temp_dir().join(format!(
             "fgos-terminal-control-mapping-{}-{}",
             std::process::id(),
@@ -191,7 +191,6 @@ mod install_mapping_tests {
             "file-fsync",
             "name-installed",
             "temp-removed",
-            "parent-fsync",
         ] {
             let name = step;
             let result = install_result(fgos_durable_file::install_with(
@@ -215,6 +214,19 @@ mod install_mapping_tests {
                 .unwrap());
             }
         }
+        // A marker whose parent directory sync failed is visible but not proven durable: the caller
+        // must not be told plain success, and the installed file stays as the evidence.
+        let result = install_result(fgos_durable_file::install_with(
+            &dir,
+            "parent-fsync",
+            b"original",
+            &FailAt("parent-fsync"),
+        ));
+        assert!(
+            result.is_err(),
+            "a marker whose durability is unproven was reported as {result:?}"
+        );
+        assert_eq!(std::fs::read(dir.join("parent-fsync")).unwrap(), b"original");
         std::fs::remove_dir_all(dir).unwrap();
     }
 }
