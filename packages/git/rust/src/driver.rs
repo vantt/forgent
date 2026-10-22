@@ -1184,6 +1184,8 @@ impl GitDriver {
         }
         let watch_token = (self.containment.guarantee().level
             == containment::GuaranteeLevel::BestEffort
+            // Reading the configuration runs no user code, and it is itself how
+            // the predicate below learns the configuration.
             && args.first() != Some(&"config")
             && repo.is_some_and(|r| {
                 self.user_code_may_run(r, policy).unwrap_or(true) || Self::has_submodules(r)
@@ -3334,7 +3336,7 @@ mod tests {
         fs::write(
             &script,
             format!(
-                "#!/bin/sh\n(setsid sh -c 'echo $$ > \"{}\"; exec sleep 30' </dev/null >/dev/null 2>&1 &)\ncat\n",
+                "#!/bin/sh\n(setsid sh -c 'echo $$ > \"{}\"; exec sleep 5' </dev/null >/dev/null 2>&1 &)\ncat\n",
                 pid_file.display()
             ),
         )
