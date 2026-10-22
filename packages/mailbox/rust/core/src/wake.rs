@@ -56,21 +56,14 @@ pub struct Exchange {
 pub struct WakeLifetimeKey(String);
 
 impl WakeLifetimeKey {
-    /// Whether this count belongs to `key` as sender (in `generation`, or in
-    /// any if `None`) or, when `as_recipient`, names it as recipient.
-    pub(crate) fn involves(
-        &self,
-        key: &WriterKey,
-        generation: Option<Generation>,
-        as_recipient: bool,
-    ) -> bool {
-        let Some((sender, recipient)) = self.0.split_once('|') else {
+    /// Whether this count belongs to `key` as its sender, in `generation`
+    /// or in any if `None`. A count toward `key` belongs to its sender.
+    pub(crate) fn is_from(&self, key: &WriterKey, generation: Option<Generation>) -> bool {
+        let Some((sender, _)) = self.0.split_once('|') else {
             return false;
         };
         let (from, from_generation) = sender.split_once('@').unwrap_or((sender, ""));
-        let sends = from == key.as_str()
-            && generation.is_none_or(|g| from_generation == g.get().to_string());
-        sends || (as_recipient && recipient == key.as_str())
+        from == key.as_str() && generation.is_none_or(|g| from_generation == g.get().to_string())
     }
 
     fn new(from: &WriterKey, generation: Generation, to: &WriterKey) -> Self {

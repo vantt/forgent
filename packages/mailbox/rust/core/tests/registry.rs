@@ -481,6 +481,20 @@ fn forgetting_a_key_removes_every_record_of_it_and_a_later_registration_starts_c
     // cap; the unread one expires into a notice and a notice mark for a.
     pair.send_wake("a", common::B_NAME, t(1));
     pair.deliver("b", t(1));
+    // b's effective wakes toward a are b's own count, never reset.
+    pair.send_wake("b", common::A_NAME, t(1));
+    pair.deliver("a", t(1));
+    let peers_count = |pair: &common::Pair| {
+        serde_json::to_value(&pair.state).unwrap()["wake_lifetime"]
+            .as_object()
+            .unwrap()
+            .iter()
+            .filter(|(k, _)| k.starts_with("b@"))
+            .map(|(k, v)| (k.clone(), v.clone()))
+            .collect::<Vec<_>>()
+    };
+    let peers_before = peers_count(&pair);
+    assert_eq!(peers_before.len(), 1);
     send(&mut pair, "unread", t(2)).unwrap();
     pair.limits.session.lifetime_cap = 2;
     assert_eq!(send(&mut pair, "capped", t(3)), Err("lifetime-cap"));
@@ -496,11 +510,25 @@ fn forgetting_a_key_removes_every_record_of_it_and_a_later_registration_starts_c
     assert!(pair.state.forget_key(&key("a")));
 
     assert!(pair.state.binding(&key("a")).is_none());
-    assert!(
-        keyed_records(&pair.state).iter().all(|(_, n)| *n == 0),
-        "{:?}",
-        keyed_records(&pair.state)
-    );
+    // Every record of a is gone; b's own records stay, and so does b's
+    // wake lifetime count toward a, as a takeover keeps it.
+    let snapshot = serde_json::to_value(&pair.state).unwrap();
+    let names_a = |k: &str| k.split(['|', '@']).any(|part| part == "a");
+    for map in ["lifetime", "exchanges", "budget", "notice_last"] {
+        let left: Vec<&String> = snapshot[map]
+            .as_object()
+            .unwrap()
+            .keys()
+            .filter(|k| names_a(k))
+            .collect();
+        assert!(left.is_empty(), "{map} keeps {left:?}");
+    }
+    assert_eq!(peers_count(&pair), peers_before);
+    assert!(snapshot["wake_lifetime"]
+        .as_object()
+        .unwrap()
+        .keys()
+        .all(|k| k.starts_with("b@")));
     assert_eq!(pair.state.notices().count(), 0);
     assert!(pair
         .state
@@ -522,6 +550,11 @@ fn forgetting_a_key_removes_every_record_of_it_and_a_later_registration_starts_c
         matches!(outcome, Registered::Created { generation, .. } if generation == Generation::FIRST)
     );
     assert_eq!(send(&mut pair, "from a fresh process", now), Ok(()));
+    assert_eq!(
+        peers_count(&pair),
+        peers_before,
+        "a key that registers again does not reset what b spent on it"
+    );
 }
 
 #[test]
