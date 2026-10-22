@@ -79,7 +79,7 @@ Rules:
 - **Local directory.** Each machine keeps the sessions registered on it: full id, short handle, CLI, project id, clone, start time, liveness (from process facts), role aliases.
 - **Shared directory.** A machine publishes the entries of its projects through the Event Store, on its own `refs/fgos/events/<machine-id>`, as a registered identity event type. Another machine sees them after its next fetch. This reuses Event Store transport (its section 14); it adds no server and no daemon.
 - **Freshness.** A remote entry is as fresh as the last fetch (Event Store sync interval). The resolver reports the age of what it read. It never claims that a remote session is alive.
-- **Verbs (proposed).** `fgos identity` keeps its current answer and adds the machine id, project id and session full id. New: `fgos identity resolve <handle>` and `fgos identity list [--project] [--machine]`.
+- **Verbs (owner-approved 2026-10-22).** Each identity has its own read: `fgos identity machine`, `fgos identity project`, `fgos identity session`, each with `--json`, returning the full id, the handle, the source the id was read from, and aliases. The crate exports the same reads (`machine()`, `project(repo)`, `session()`) so Node, through the addon, and Rust call them in process. Bare `fgos identity` keeps its current answer (the writer id) and adds the three ids, so doctor, the pre-commit hook and people change nothing. Resolution: `fgos identity resolve <handle>` returns exactly one full id or fails with "ambiguous" or "not found" and the candidates; `fgos identity list [--project] [--machine]` lists what the directory knows, with the age of remote entries.
 
 ## 6. Consumers
 
@@ -125,3 +125,4 @@ Rules:
   4. A session handle is `<cli>-<chars>@<machine-handle>`; the machine handle is generated from the machine id and can carry a human alias; role aliases such as `lead:IDENT` resolve to the session holding the role. Both shapes are Convention kinds.
   5. The I5 authenticity mechanism is decided at the close of I4, with evidence of which signing keys the machines really have; G0 does not cover I5.
   6. From the landing of I3, new board rows and log lines name agents and machines by handle; old log lines stay as history; the IDENT lead rewrites the "ai làm" column of live rows once when I3 lands.
+- 2026-10-22 — Owner approves the read surface of section 5: one read per identity (machine, project, session) plus `resolve` and `list`; bare `fgos identity` keeps its answer.
