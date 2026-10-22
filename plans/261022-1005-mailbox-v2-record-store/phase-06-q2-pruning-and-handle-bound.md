@@ -89,3 +89,6 @@ It replaces the provisional default (a) and planned test 7 ("a dead binding stay
   - Killed (core): the dead keys not skipped in resolution; the handle bound off by one in either direction.
   - Survived: ignoring notices in the "named" rule. It is equivalent under the contract values: a notice is about a refused message whose header names the same two keys and is kept 7 days, longer than any notice lives (at most `record.ttlSec`). The check stays because the owner's rule names notices.
 
+## Later change
+
+Review fixes H1, L1, L2, L3 (2026-10-22): exact names of dead heads are refused, not passed on; the prune's notice clause is removed and its last-drain clause proven; pruning keeps other heads' wake counts; a send judges liveness once. See phase 8, "Review fixes".

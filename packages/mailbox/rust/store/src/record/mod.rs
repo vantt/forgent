@@ -13,6 +13,10 @@
 //! the record delete every file there that no snapshot names.
 //!
 //! It runs inside the hook, which must never panic.
+//!
+//! Only this module takes the `mailbox` lock. The holder-lock registry row
+//! uses a `<fgosDir>` template that Node's facade could fill, so this is a
+//! rule of use, not a refusal: no Node code takes `mailbox`.
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 pub mod bodies;
 mod os_ids;

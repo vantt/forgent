@@ -81,3 +81,6 @@ None (main unchanged since `487f58426` at the start of this phase).
 - Mutants against `record_bodies`: 13 tried, 12 killed. They covered `body-exists`, the send-only sweep, the sweep's regular-file rule, the directory identity, the body length, the body cap, the body directory check, the body install, and the snapshot read reused by the bodies. The survivor is counting every header as referenced instead of only those with `body_kept`. It is equivalent under the contract values, because the header horizon equals the body retention, so no header exists with `body_kept == false`.
 - After the test-isolation fix, the phase 2 mutants were rerun: the same 6 are killed, each by the test named for its behaviour.
 
+## Later change
+
+Review fix M1 (2026-10-22): the trust check now covers every directory from `.fgos` down, with modes, and the sweep lists through the checked descriptor; see phase 8, "Review fixes".

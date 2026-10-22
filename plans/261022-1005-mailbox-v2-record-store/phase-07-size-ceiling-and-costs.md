@@ -142,3 +142,6 @@ The record's own no-mail hold is now under 50 ms p95 in every week population me
 
 The third run's load average was 5 to 15 (other sessions), which made the write rows noisier; the report's third section has every row.
 
+## Later change
+
+Review fixes M2, L5 (2026-10-22): the snapshot read is capped at a size derived from the contract (`snapshot_byte_cap`), the header ceiling is exact and defined once on `Limits`, and its count proof is in the core. See phase 8, "Review fixes".
