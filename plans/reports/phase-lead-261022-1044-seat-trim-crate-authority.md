@@ -42,6 +42,11 @@ Recommendation: A for now, and give `SEAT_ROLES` the same shared-file treatment 
 
 `findMatchingOverride` cannot move without moving more. The match result is needed by Node BEFORE the crate is asked: `resolvePersona` reads `matchingOverride.persona` (and the locked-persona refusal), the persona picks the tier taste, and timeout, account pin and provenance source all read the matched override afterwards. Moving the match into the crate either duplicates it (Node must still match to build the ask) or forces persona resolution into the crate too, which spec §3 and the resolver review row keep on the Node side ("acceptable while persona and rigor stay on the Node side"). The crate already owns what an override DOES (tier, executor pin, effort, account, run-wide drop). I stopped here. If you want it, the honest move is persona resolution plus override matching together, a larger change.
 
+## Decisions recorded (SEAT lead)
+
+- Fork 1 resolved as A: keep the Node load gate, fed by the shared tier contract. Reason: it fails fast at every door with key paths, checks things the crate never sees, and needs no exec. Reverse when an in-process native door exists on every channel.
+- Fork 2 resolved as: keep override matching in Node. Reason: persona resolution needs the matched override before the ask. Reverse when persona resolution moves into the crate.
+
 ## Verification so far (no land-done yet)
 
 - `cargo test -p fgos-seat-binding` with own target dir: 13 passed (golden incl. 5 new cases, determinism, replay round trip, tier tests).
@@ -54,6 +59,4 @@ Recommendation: A for now, and give `SEAT_ROLES` the same shared-file treatment 
 
 ## Open questions
 
-1. Fork 1: A, B or C?
-2. Fork 2: leave override matching in Node (recommended) or take persona resolution into the crate as its own item?
-3. Compile risk: `TierDefinition` fields are now `String` (crate public type); only the crate and the host's route call it, `cargo test -p` is green, workspace build is pending.
+1. Compile risk: `TierDefinition` fields are now `String` (crate public type); only the crate and the host's route call it, `cargo test -p` is green, workspace build is pending.
