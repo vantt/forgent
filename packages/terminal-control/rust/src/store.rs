@@ -141,22 +141,43 @@ fn publish_once<T: Serialize>(dir: &Path, name: &str, value: &T) -> io::Result<b
     install_result(fgos_durable_file::install_once_with_mode(dir, name, &serde_json::to_vec(value)?, 0o666))
 }
 
+/// The file was installed under its final name but the parent directory sync failed, so the
+/// install is visible and not proven durable. It travels inside an `io::Error`; the caller
+/// downcasts it ([`InstallUnproven::of`]) to name the cause and keep the installed fact.
+#[derive(Debug)]
+pub struct InstallUnproven {
+    pub installed: fgos_durable_file::Installed,
+    pub source: io::Error,
+}
+
+impl InstallUnproven {
+    pub fn of(error: &io::Error) -> Option<&InstallUnproven> {
+        error.get_ref().and_then(|inner| inner.downcast_ref::<InstallUnproven>())
+    }
+}
+
+impl std::fmt::Display for InstallUnproven {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "installed ({:?}) but the parent directory sync failed: {}", self.installed, self.source)
+    }
+}
+
+impl std::error::Error for InstallUnproven {}
+
 fn install_result(result: Result<fgos_durable_file::Installed, fgos_durable_file::InstallError>) -> io::Result<bool> {
     let installed = match result {
         Ok(installed) => installed,
-        Err(error) => {
-            // The old store ignored cleanup errors and did not sync the parent.
-            // Preserve its result once the final name exists.
-            match error.installed {
-                Some(installed) => {
-                    if let Some(temp) = error.temporary {
-                        let _ = fs::remove_file(temp);
-                    }
-                    installed
+        Err(error) => match error.installed {
+            // Cleanup errors after the name exists do not change what was installed.
+            Some(installed) if error.step != "parent-fsync" => {
+                if let Some(temp) = error.temporary {
+                    let _ = fs::remove_file(temp);
                 }
-                None => return Err(error.source),
+                installed
             }
-        }
+            Some(installed) => return Err(io::Error::other(InstallUnproven { installed, source: error.source })),
+            None => return Err(error.source),
+        },
     };
     Ok(installed == fgos_durable_file::Installed::Created)
 }
@@ -222,10 +243,9 @@ mod install_mapping_tests {
             b"original",
             &FailAt("parent-fsync"),
         ));
-        assert!(
-            result.is_err(),
-            "a marker whose durability is unproven was reported as {result:?}"
-        );
+        let error = result.expect_err("a marker whose durability is unproven was reported as success");
+        let unproven = InstallUnproven::of(&error).expect("the error names the unproven install");
+        assert_eq!(unproven.installed, fgos_durable_file::Installed::Created);
         assert_eq!(std::fs::read(dir.join("parent-fsync")).unwrap(), b"original");
         std::fs::remove_dir_all(dir).unwrap();
     }

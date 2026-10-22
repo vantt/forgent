@@ -71,7 +71,10 @@ fn unknown(reason: impl Into<String>) -> Refusal {
 }
 
 fn store_err(e: std::io::Error) -> Refusal {
-    unknown(format!("allocation store: {e}"))
+    match crate::store::InstallUnproven::of(&e) {
+        Some(unproven) => unknown(format!("allocation-install-unproven: {unproven}")),
+        None => unknown(format!("allocation store: {e}")),
+    }
 }
 
 fn shell_quote(s: &str) -> String {
