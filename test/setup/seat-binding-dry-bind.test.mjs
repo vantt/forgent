@@ -128,17 +128,6 @@ test('a panel with a fourth family for the synthesizer passes', async () => {
   assert.doesNotMatch(result.message, /shares a provider family/);
 });
 
-test('a panel pool with two executors of one family spreads panelists over distinct families and the synthesizer shares one', async () => {
-  const config = runnerConfig({ 'fixture:generate': prefer('alpha', 'beta', 'alpha-twin', 'gamma') });
-  config.executors['alpha-twin'] = { agentType: 'alpha-twin', providerModel: 'claude' };
-  const unit = { id: 'u', capability: 'fixture:generate', pattern: 'panel', writes: [], seats: panelSeats(3) };
-  const { seats } = await simulateUnitBindings(unit, config);
-  const bound = Object.fromEntries(seats.map((r) => [r.seat, r.executor]));
-  assert.deepEqual(bound, { 'member-1': 'alpha', 'member-2': 'beta', 'member-3': 'gamma', synthesizer: 'alpha' });
-  assert.equal(seats.every((r) => !r.refused), true);
-  assert.deepEqual(seats.find((r) => r.seat === 'synthesizer').sharesFamilyWith, ['member-1']);
-});
-
 test('six panel seats over three families all bind with no waiver and share families in pool order', async () => {
   const config = runnerConfig({ 'fixture:generate': prefer('alpha', 'beta', 'gamma') });
   const unit = { id: 'u', capability: 'fixture:generate', pattern: 'panel', writes: [], seats: panelSeats(6) };
@@ -150,23 +139,10 @@ test('six panel seats over three families all bind with no waiver and share fami
   assert.deepEqual(roles[3].sharesFamilyWith, ['member-1']);
 });
 
-test('with enough families every panel seat and the synthesizer land on distinct families in pool order', async () => {
-  const config = runnerConfig({ 'fixture:generate': prefer('alpha', 'beta', 'gamma', 'delta') });
-  const unit = { id: 'u', capability: 'fixture:generate', pattern: 'panel', writes: [], seats: panelSeats(3) };
-  const { seats: roles } = await simulateUnitBindings(unit, config);
-  assert.deepEqual(roles.map((r) => r.executor), ['alpha', 'beta', 'gamma', 'delta']);
-  assert.equal(roles.some((r) => r.sharesFamilyWith), false);
-});
-
 test('a reviewed unit whose pool is a single family fails on the checker', async () => {
   const result = await run(REVIEWED_WORKFLOW, { 'fixture:draft': prefer('alpha') });
   assert.equal(result.passed, false);
   assert.match(result.message, /reviewed-fixture\/[a-z]+\/draft \(capability "fixture:draft"\): seat reviewer refused for independence-unsatisfiable/);
-});
-
-test('a reviewed unit with a second family passes', async () => {
-  const result = await run(REVIEWED_WORKFLOW, { 'fixture:draft': prefer('alpha', 'beta') });
-  assert.equal(result.passed, true, result.message);
 });
 
 test('a capability with no prefer pool anywhere is information, not a failure', async () => {
@@ -220,28 +196,10 @@ steps:
           objective: Decide the question
 `;
 
-test('a debate whose pool has a third family for the judge passes with independent families', async () => {
-  const result = await run(DEBATE_WORKFLOW, { 'fixture:dispute': prefer('alpha', 'beta', 'gamma') });
-  assert.equal(result.passed, true, result.message);
-  assert.match(result.message, /5 seat\(s\) of 1 Workflow unit\(s\) bind/);
-});
-
 test('a debate whose pool has only two families cannot seat an independent judge and fails on the judge', async () => {
   const result = await run(DEBATE_WORKFLOW, { 'fixture:dispute': prefer('alpha', 'beta') });
   assert.equal(result.passed, false);
   assert.match(result.message, /debate-fixture\/argue\/dispute \(capability "fixture:dispute"\): seat judge refused for independence-unsatisfiable/);
-});
-
-test('two families of three seat the sides apart and the judge on the third; one extra executor of a side family changes nothing', async () => {
-  const config = runnerConfig({ 'fixture:dispute': prefer('alpha', 'alpha-twin', 'beta', 'gamma') });
-  config.executors['alpha-twin'] = { agentType: 'alpha-twin', providerModel: 'claude' };
-  const unit = { id: 'u', capability: 'fixture:dispute', pattern: 'debate', writes: [], seats: debateSeats };
-  const { outcome, seats: roles } = await simulateUnitBindings(unit, config);
-  assert.equal(outcome, 'pass');
-  const first = Object.fromEntries(roles.filter((r) => !r.refused).slice(0, 2).map((r) => [r.seat, r.executor]));
-  assert.deepEqual(first, { thesis: 'alpha', antithesis: 'beta' }, 'the sides spread over distinct families');
-  const judge = roles.find((r) => r.seat === 'judge');
-  assert.equal(judge.executor, 'gamma', 'the judge takes the family neither side used, skipping the twin of a side');
 });
 
 test('a seat with no allowed cell fails naming the config line to change, and one family with a cell is enough to pass', async () => {

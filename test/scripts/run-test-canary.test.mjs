@@ -288,12 +288,12 @@ test('spawn always receives argv as a literal array, never a shell command strin
 
 // --- performance acceptance ---------------------------------------------
 
-test('the wrapper starts no process of its own besides one host-binary check per phase, so its overhead never grows with the suite', () => {
+test('once this process has proved the host, the canary wrapper starts no process of its own, so its overhead never grows with the suite', () => {
   const root = tmpFixtureRoot();
   const f = write(root, 'a.test.mjs');
   write(root, 'unrelated.test.mjs');
   const call = () => runCanary({ rawArgs: [f], testRoot: root, cwd: root, spawn: () => ({ status: 0 }), stdio: 'ignore' });
-  call(); // the first call may build the host; count a warm one
+  call(); // the first call proves the host (one check for both phases); count a warm one
   // runCanary imports these functions as bindings; patching the built-in and syncing reaches them.
   const names = ['spawnSync', 'execFileSync', 'execSync', 'spawn', 'execFile', 'exec', 'fork'];
   const original = Object.fromEntries(names.map((name) => [name, childProcess[name]]));
@@ -311,11 +311,9 @@ test('the wrapper starts no process of its own besides one host-binary check per
     Object.assign(childProcess, original);
     syncBuiltinESMExports();
   }
-  // Each phase asks for the host once: `<host> version` when FGOS_HOST_BIN names one, else cargo's
-  // version and no-op build. Anything else here is work the wrapper took on, whatever its time.
-  const hostCheck = /^(fgos(\.exe)? version|cargo (--version|build -p))/;
-  assert.deepEqual(started.filter((entry) => !hostCheck.test(entry)), [], `the wrapper started: ${started.join('; ')}`);
-  assert.ok(started.length <= 4, `at most two host-check processes per phase, got ${started.length}: ${started.join('; ')}`);
+  // The host check is proved once per process and both phases reuse it; anything started here is
+  // work the wrapper took on, whatever its time.
+  assert.deepEqual(started, [], `the wrapper started: ${started.join('; ')}`);
 });
 
 test('a failing canary demonstrably returns before a full-suite run would even start (full spawn never called)', () => {
