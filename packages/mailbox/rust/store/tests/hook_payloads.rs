@@ -7,7 +7,11 @@
 //! drained; the rest must stay quiet.
 mod common;
 
-use common::{files, fixture, hook_limits, limits, vector_input, vectors, SeqIds, ADAPTERS};
+use common::{
+    contracts_dir, files, fixture, hook_limits, limits, vector_input, vectors, SeqIds, ADAPTERS,
+    ADAPTERS_CONTRACT,
+};
+use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::hook::{
     begin, finish, render_reply, Adapter, Begun, Claimed, HeadFacts, HookCall, HookEvent,
     QuietReason,
@@ -29,7 +33,10 @@ fn t(secs: u64) -> Timestamp {
 }
 
 fn tested() -> Vec<Adapter> {
-    ADAPTERS.into_iter().filter(|a| a.is_tested()).collect()
+    ADAPTERS
+        .into_iter()
+        .filter(|a| TestedClis::embedded().contains(*a))
+        .collect()
 }
 
 /// The writer key session identity derives from recorded id variables, if
@@ -61,6 +68,7 @@ struct Drain {
     ids: SeqIds,
     writer: WriterKey,
     head: HeadFacts,
+    tested: TestedClis,
     now: u64,
 }
 
@@ -77,6 +85,7 @@ impl Drain {
                 own_suffix: Some("2b".to_string()),
                 handle: None,
             },
+            tested: TestedClis::embedded().clone(),
             now: 100,
         }
     }
@@ -86,13 +95,23 @@ impl Drain {
         t(self.now)
     }
 
-    /// One hook call with the recorded payload `file`.
+    /// One of the head's own hook calls with the recorded payload `file`.
+    /// The fixtures come from separate recording runs, each with its own
+    /// session, so the payload's `session_id` is set to this head's writer
+    /// key, as the head's own events carry it.
     fn hook(&mut self, event: HookEvent, file: &str) -> Begun {
-        let stdin = serde_json::to_vec(&fixture(self.adapter, file)).unwrap();
+        let mut payload = fixture(self.adapter, file);
+        if payload.get("session_id").is_some() {
+            payload["session_id"] = Value::from(self.writer.as_str());
+        }
+        let stdin = serde_json::to_vec(&payload).unwrap();
         self.hook_bytes(event, &stdin)
     }
 
+    /// One hook call with exactly these bytes. Every call checks that the
+    /// result's `state_changed` says whether the snapshot changed.
     fn hook_bytes(&mut self, event: HookEvent, stdin: &[u8]) -> Begun {
+        let before = self.state.clone();
         let now = self.tick();
         let call = HookCall {
             adapter: self.adapter,
@@ -102,14 +121,21 @@ impl Drain {
             project: PROJECT,
             head: self.head.clone(),
         };
-        begin(
+        let begun = begin(
             &mut self.state,
             &call,
             now,
             &limits(),
             &hook_limits(),
+            &self.tested,
             &mut self.ids,
-        )
+        );
+        assert_eq!(
+            begun.state_changed(),
+            self.state != before,
+            "state_changed is wrong for {begun:?}"
+        );
+        begun
     }
 
     fn name(&self) -> String {
@@ -187,8 +213,19 @@ impl Drain {
     }
 }
 
-fn quiet(reason: QuietReason) -> Begun {
-    Begun::Quiet { reason }
+/// A quiet result with `reason`, whatever it did to the state (each call's
+/// `state_changed` is checked by the harness).
+#[derive(Debug)]
+struct Quiet(QuietReason);
+
+fn quiet(reason: QuietReason) -> Quiet {
+    Quiet(reason)
+}
+
+impl PartialEq<Quiet> for Begun {
+    fn eq(&self, other: &Quiet) -> bool {
+        matches!(self, Begun::Quiet { reason, .. } if *reason == other.0)
+    }
 }
 
 fn take(begun: Begun) -> Claimed {
@@ -266,6 +303,11 @@ fn a_recorded_post_tool_use_offers_pending_mail_in_the_shape_the_cli_injected() 
             accepted(adapter, files::ACCEPTED_POST_TOOL_USE, &frames)
         );
         assert!(frames.contains("| hello from a peer"));
+        assert_eq!(
+            drain.stop_blocks(),
+            0,
+            "only a Stop delivery counts as a Stop block"
+        );
         assert!(matches!(drain.state_of(&id), MessageState::Offered { .. }));
     }
 }
@@ -514,45 +556,85 @@ fn the_writer_key_the_hook_derives_equals_the_one_its_tool_sees() {
 }
 
 #[test]
-fn the_codex_thread_handle_is_taken_only_when_it_is_the_writer() {
+fn the_codex_thread_becomes_the_binding_handle() {
     let drain = Drain::registered(Adapter::Codex);
     let binding = drain.state.binding(&drain.writer).unwrap();
     assert_eq!(binding.handle.as_deref(), Some(drain.writer.as_str()));
-
-    let mut other = Drain::new(Adapter::Codex);
-    other.writer = WriterKey::new("a-sender-with-its-own-fgos-session-id").unwrap();
-    other.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
-    let binding = other.state.binding(&other.writer).unwrap();
-    assert_eq!(binding.handle, None);
 }
 
 #[test]
-fn a_cli_that_is_not_tested_is_never_drained() {
-    for adapter in ADAPTERS.into_iter().filter(|a| !a.is_tested()) {
-        let mut drain = Drain {
-            writer: WriterKey::new(format!("{}-head", adapter.word())).unwrap(),
-            ..Drain::new(Adapter::Claude)
+fn a_payload_naming_another_session_changes_nothing_and_the_head_keeps_its_name() {
+    for adapter in tested() {
+        let mut drain = Drain::registered(adapter);
+        drain.add_peer("peer");
+        let id = drain.send("peer", "for the head only", false);
+        let name = drain.name();
+        let head_payload = {
+            let mut payload = fixture(adapter, files::POST_TOOL_USE);
+            payload["session_id"] = Value::from(drain.writer.as_str());
+            serde_json::to_vec(&payload).unwrap()
         };
-        drain.adapter = adapter;
-        for vector in vectors(adapter, "parse") {
-            if vector["expect"]["unparsed"].is_string() {
-                continue;
-            }
-            let event = common::event(&vector["event"]);
-            let begun = drain.hook_bytes(event, &vector_input(adapter, &vector));
-            let subordinate = vector["expect"]["subordinate"] == true;
-            let expected = if subordinate {
-                QuietReason::Subordinate
-            } else {
-                QuietReason::Untested
-            };
-            assert_eq!(
-                begun,
-                quiet(expected),
-                "{} {}",
-                adapter.word(),
-                vector["name"]
-            );
+        let before = drain.state.clone();
+        let real = drain.writer.clone();
+
+        // Another writer key from the same head process, with the head's
+        // own payload: the payload names the head's session, not this key.
+        drain.writer = WriterKey::new("forged-key").unwrap();
+        let begun = drain.hook_bytes(HookEvent::PostToolUse, &head_payload);
+
+        assert_eq!(begun, quiet(QuietReason::WriterMismatch));
+        assert_eq!(drain.state, before);
+        drain.writer = real;
+        assert_eq!(drain.name(), name);
+        let claimed = take(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
+        assert_eq!(claimed.items[0].id, id);
+    }
+}
+
+#[test]
+fn a_head_started_as_an_agent_is_registered_and_drained() {
+    let mut drain = Drain::new(Adapter::Claude);
+    assert_eq!(
+        drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE_AGENT_HEAD),
+        quiet(QuietReason::NothingEligible)
+    );
+    drain.add_peer("peer");
+    let id = drain.send("peer", "for an agent head", true);
+    let claimed = take(drain.hook(HookEvent::Stop, files::STOP_AGENT_HEAD));
+    assert_eq!(claimed.items[0].id, id);
+}
+
+#[test]
+fn the_state_changed_flag_says_when_the_snapshot_must_be_written() {
+    for adapter in tested() {
+        let mut drain = Drain::new(adapter);
+        let first = drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
+        assert!(first.state_changed(), "the first hook registers the head");
+        let again = drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
+        assert_eq!(again, quiet(QuietReason::NothingEligible));
+        assert!(
+            !again.state_changed(),
+            "a registered head with no mail writes nothing"
+        );
+    }
+}
+
+#[test]
+fn a_cli_missing_from_the_tested_list_is_quiet_and_changes_nothing() {
+    for adapter in tested() {
+        let text = std::fs::read_to_string(contracts_dir().join(ADAPTERS_CONTRACT)).unwrap();
+        let mut contract: Value = serde_json::from_str(&text).unwrap();
+        contract["testedAgainst"]
+            .as_array_mut()
+            .unwrap()
+            .retain(|entry| entry["cli"] != adapter.word());
+        let mut drain = Drain::new(adapter);
+        drain.tested = TestedClis::from_contract(&contract.to_string());
+        for (event, file) in [
+            (HookEvent::PostToolUse, files::POST_TOOL_USE),
+            (HookEvent::Stop, files::STOP),
+        ] {
+            assert_eq!(drain.hook(event, file), quiet(QuietReason::Untested));
             assert_eq!(drain.state, MailboxState::new());
         }
     }

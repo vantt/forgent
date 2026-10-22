@@ -29,7 +29,7 @@ pub(super) fn parse(event: HookEvent, object: &Map<String, Value>) -> Result<Pay
         event,
         subordinate: true,
         first_stop,
-        thread: None,
+        session: None,
     })
 }
 

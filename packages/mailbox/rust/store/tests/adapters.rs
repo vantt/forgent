@@ -16,7 +16,7 @@ fn expected(vector: &Value) -> Result<Payload, Unparsed> {
             event: event(&vector["event"]),
             subordinate: expect["subordinate"].as_bool().unwrap(),
             first_stop: expect["firstStop"].as_bool(),
-            thread: expect["thread"].as_str().map(String::from),
+            session: expect["session"].as_str().map(String::from),
         }),
     }
 }

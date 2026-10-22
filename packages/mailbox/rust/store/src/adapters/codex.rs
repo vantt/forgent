@@ -4,7 +4,7 @@
 //! thread id: the id `codex queue --thread` takes and the
 //! `CODEX_THREAD_ID` the head's tool processes see. The hook process itself
 //! sees no session-identity variable.
-use super::{has_subagent_marker, parse_named, Shape};
+use super::{parse_named, session_id, Shape};
 use crate::hook::{HookEvent, Payload, Unparsed};
 use serde_json::{Map, Value};
 
@@ -17,16 +17,13 @@ pub(super) fn parse(event: HookEvent, object: &Map<String, Value>) -> Result<Pay
             .map(|active| !active),
         HookEvent::PostToolUse => None,
     };
-    let thread = object
-        .get("session_id")
-        .and_then(Value::as_str)
-        .filter(|id| !id.is_empty())
-        .map(String::from);
     Ok(Payload {
         event,
-        subordinate: has_subagent_marker(object),
+        // Both keys were recorded on a subagent's event; a Codex head that
+        // carries either was not measured, so either marks a subagent.
+        subordinate: object.contains_key("agent_id") || object.contains_key("agent_type"),
         first_stop,
-        thread,
+        session: session_id(object),
     })
 }
 

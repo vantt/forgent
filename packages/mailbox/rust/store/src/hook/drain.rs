@@ -18,12 +18,19 @@
 //!
 //! The shell also reads stdin with a cap, resolves the writer key through
 //! session identity, finds the head process with the CLI's head finder, and
-//! never passes a runner attempt's writer id (V5). The drain reads and
-//! writes no file: the record directory comes from the storage-root owner
+//! never passes a runner attempt's writer id (V5). The drain opens no
+//! mailbox file: the record directory comes from the storage-root owner
 //! (`resolve_workspace_root`) to the shell, and the bodies arrive through
-//! the `bodies` lookup.
+//! the `bodies` lookup. It is not pure: when the stored head is not the
+//! registering one, [`begin`] asks the process-facts judge, which reads the
+//! operating system's process table (`/proc`, the boot id, the host name).
+//!
+//! The caller check of step 1 must compare the calling process against the
+//! head's process record from process facts, not its parent pid alone:
+//! `bash -c '… fgos hook mailbox …'` execs its last command, so a tool
+//! process's entry can have the head CLI as its parent pid (V5).
 use super::{Adapter, HookEvent, HookLimits};
-use crate::adapters::Shape;
+use crate::adapters::{Shape, TestedClis};
 use crate::head::{head_text, is_complete, judge_stored};
 use fgos_mailbox_core::{
     render, AttemptToken, Checkpoint, ClaimedItem, Finished, Generation, IdSource, Limits,
@@ -65,6 +72,9 @@ pub enum QuietReason {
     /// The CLI is not listed as tested in the adapters contract, or has no
     /// recorded output shape for this event.
     Untested,
+    /// The payload names a session other than the writer key the caller
+    /// resolved: the event is not this writer's own.
+    WriterMismatch,
     /// The head record names no process (no pid or no start time).
     HeadUnknown,
     Registration(RegisterRefusal),
@@ -104,8 +114,26 @@ impl Claimed {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Begun {
-    Quiet { reason: QuietReason },
+    /// Nothing to print. `state_changed` tells the shell whether the
+    /// snapshot must be written (a registration, a Stop-count change, or a
+    /// drain that found mail pending).
+    Quiet {
+        reason: QuietReason,
+        state_changed: bool,
+    },
+    /// A claim to render, write and finish; a claim always changes the
+    /// snapshot.
     Claimed(Claimed),
+}
+
+impl Begun {
+    /// Whether `begin` changed the snapshot, so the shell must write it.
+    pub fn state_changed(&self) -> bool {
+        match self {
+            Self::Quiet { state_changed, .. } => *state_changed,
+            Self::Claimed(_) => true,
+        }
+    }
 }
 
 /// What the shell writes to stdout; empty when quiet.
@@ -114,19 +142,25 @@ pub struct HookReply {
     pub stdout: String,
 }
 
+/// A quiet result that changed nothing.
 fn quiet(reason: QuietReason) -> Begun {
-    Begun::Quiet { reason }
+    Begun::Quiet {
+        reason,
+        state_changed: false,
+    }
 }
 
 /// Under mutex hold 1: parse, skip what is not the head's, register the
-/// head, apply the Stop rule and claim. Every quiet reason before the claim
-/// leaves the snapshot as it was.
+/// head, apply the Stop rule and claim. Every quiet reason before the
+/// registration leaves the snapshot as it was; the result says whether
+/// anything changed. `tested` is the adapters contract's tested list.
 pub fn begin(
     state: &mut MailboxState,
     call: &HookCall<'_>,
     now: Timestamp,
     limits: &Limits,
     hook: &HookLimits,
+    tested: &TestedClis,
     ids: &mut dyn IdSource,
 ) -> Begun {
     let payload = match call.adapter.parse(call.event, call.stdin) {
@@ -140,60 +174,72 @@ pub fn begin(
     let (Some(shape), Some(cli), true) = (
         call.adapter.shape(call.event),
         call.adapter.cli(),
-        call.adapter.is_tested(),
+        tested.contains(call.adapter),
     ) else {
         return quiet(QuietReason::Untested);
     };
+    if payload
+        .session
+        .as_deref()
+        .is_some_and(|session| session != call.writer.as_str())
+    {
+        return quiet(QuietReason::WriterMismatch);
+    }
     if !is_complete(&call.head.record) {
         return quiet(QuietReason::HeadUnknown);
     }
     let judged = state
         .binding(&call.writer)
         .map(|binding| judge_stored(binding, &call.head.record));
+    // The payload's session is the writer itself here, so for a CLI whose
+    // session id is its native thread handle (Codex) it is the handle.
+    let session_handle = payload
+        .session
+        .clone()
+        .filter(|_| call.adapter.session_is_handle());
     let request = RegisterRequest {
         key: call.writer.clone(),
         cli,
         project: call.project.to_string(),
         own_suffix: call.head.own_suffix.clone(),
         head: head_text(&call.head.record),
-        // A thread handle from the payload is taken only when it is the
-        // writer itself, so a forged payload cannot plant a handle.
-        handle: call.head.handle.clone().or_else(|| {
-            payload
-                .thread
-                .clone()
-                .filter(|thread| thread == call.writer.as_str())
-        }),
+        handle: call.head.handle.clone().or(session_handle),
     };
-    let generation = match state.register(request, judged, now, limits, ids) {
-        Ok(
-            Registered::Created { generation, .. }
-            | Registered::Refreshed { generation, .. }
-            | Registered::Replaced { generation, .. },
-        ) => generation,
+    let (generation, mut changed) = match state.register(request, judged, now, limits, ids) {
+        Ok(Registered::Refreshed { generation, .. }) => (generation, false),
+        Ok(Registered::Created { generation, .. } | Registered::Replaced { generation, .. }) => {
+            (generation, true)
+        }
         Err(refusal) => return quiet(QuietReason::Registration(refusal)),
     };
     let key = &call.writer;
     let checkpoint = match call.event {
         HookEvent::Stop => {
             if payload.first_stop == Some(true) {
-                state.note_stop(key, generation, false);
+                changed |= state.note_stop(key, generation, false);
             }
             let blocks = state.binding(key).map_or(0, |b| b.stop_blocks);
             if blocks >= hook.stop_block.max {
-                state.note_stop(key, generation, false);
-                return quiet(QuietReason::StopBlockCap);
+                changed |= state.note_stop(key, generation, false);
+                return Begun::Quiet {
+                    reason: QuietReason::StopBlockCap,
+                    state_changed: changed,
+                };
             }
             Checkpoint::Stop
         }
         HookEvent::PostToolUse => Checkpoint::Step,
     };
     let claim = state.claim(key, generation, checkpoint, now, limits, ids);
+    changed |= claim.changed;
     let Some(token) = claim.token else {
         if checkpoint == Checkpoint::Stop {
-            state.note_stop(key, generation, false);
+            changed |= state.note_stop(key, generation, false);
         }
-        return quiet(QuietReason::NothingEligible);
+        return Begun::Quiet {
+            reason: QuietReason::NothingEligible,
+            state_changed: changed,
+        };
     };
     Begun::Claimed(Claimed {
         items: claim.items,

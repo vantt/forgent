@@ -2,11 +2,13 @@
 //! and the adapters contract that names the CLI versions they were recorded
 //! on. The redaction guard here is independent of the recorder's code
 //! (scripts/record-mailbox-hook-fixtures.mjs): it reads the committed files
-//! only.
+//! only. It is an allowlist: every string value must have an allowed shape.
+//! Only the recorder's own prose (`source`, `note`) is free text, and it is
+//! searched for forbidden values instead.
 //!
 //! Account names the guard refuses, the keys of the owner's
-//! `CODEX_ACCOUNTS` and `AGY_ACCOUNTS` tables: fgovn, tetnu, tetcu72,
-//! mucdong.
+//! `CODEX_ACCOUNTS` and `AGY_ACCOUNTS` tables and their stems: fgovn, tetnu,
+//! tetcu72, tetcu, mucdong.
 mod common;
 
 use common::{contracts_dir, files, hook_fixtures_dir, ADAPTERS_CONTRACT};
@@ -14,7 +16,7 @@ use serde_json::Value;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-const ACCOUNT_NAMES: [&str; 4] = ["fgovn", "tetnu", "tetcu72", "mucdong"];
+const ACCOUNT_NAMES: [&str; 5] = ["fgovn", "tetnu", "tetcu72", "tetcu", "mucdong"];
 
 /// The CLIs of the first slice (spec §1).
 const FIRST_SLICE: [&str; 3] = ["claude", "codex", "agy"];
@@ -174,54 +176,247 @@ fn foreign_homes(text: &str) -> Vec<String> {
         .collect()
 }
 
-#[test]
-fn fixtures_hold_no_secret_or_personal_value() {
-    let user_names: Vec<String> = ["USER", "LOGNAME"]
+/// Path roots a fixture path may start with: the recorder's placeholders.
+const PATH_ROOTS: [&str; 3] = ["/run-dir/", "/repo/", "/home/user/"];
+
+/// The values each payload key may hold as written by the CLI, when it is
+/// not a placeholder, a path, `<redacted>`, `{{TEXT}}` or empty.
+const PAYLOAD_LITERALS: &[(&str, &[&str])] = &[
+    ("hook_event_name", &["Stop", "PostToolUse", "SubagentStart", "SubagentStop"]),
+    ("hookEventName", &["PostToolUse"]),
+    ("tool_name", &["Bash"]),
+    ("name", &["run_command"]),
+    ("permission_mode", &["bypassPermissions"]),
+    ("level", &["low", "medium", "high"]),
+    ("decision", &["block"]),
+    ("stdout", &["mailbox-fixture", "mailbox-subagent"]),
+    ("last_assistant_message", &["done"]),
+    (
+        "command",
+        &[
+            "env | grep -E '^(CODEX_THREAD_ID|CLAUDE_CODE_SESSION_ID|FGOS_SESSION_ID)=' > tool-env.txt; echo mailbox-fixture",
+            "env | grep -E '^(CODEX_THREAD_ID|CLAUDE_CODE_SESSION_ID|FGOS_SESSION_ID)=' > sub-env.txt; echo mailbox-subagent",
+        ],
+    ),
+];
+
+/// Keys of `vectors.json` entries whose values are the test author's
+/// kebab-case words.
+const VECTOR_WORD_KEYS: [&str; 7] = [
+    "name",
+    "kind",
+    "event",
+    "unparsed",
+    "cli",
+    "source",
+    "agent_type",
+];
+
+/// Keys holding the recorder's own prose.
+const PROSE_KEYS: [&str; 2] = ["source", "note"];
+
+fn is_placeholder(value: &str) -> bool {
+    value.len() == PLACEHOLDER_PREFIX.len() + 12
+        && value.starts_with(PLACEHOLDER_PREFIX)
+        && value[PLACEHOLDER_PREFIX.len()..]
+            .chars()
+            .all(|c| c.is_ascii_digit())
+}
+
+/// A path under a placeholder root whose segments are file-name words.
+fn is_fixture_path(value: &str) -> bool {
+    PATH_ROOTS.iter().any(|root| value.starts_with(root))
+        && value.split('/').skip(1).all(|segment| {
+            !segment.is_empty()
+                && segment
+                    .chars()
+                    .all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-'))
+        })
+}
+
+fn is_kebab_word(value: &str) -> bool {
+    !value.is_empty()
+        && value.len() <= 64
+        && value.split('-').all(|part| {
+            !part.is_empty()
+                && part
+                    .chars()
+                    .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit())
+        })
+}
+
+/// Whether one string value of a fixture has an allowed shape. `key` is
+/// the key holding it (an array element takes its array's key); `in_vectors`
+/// says the file is a `vectors.json`.
+fn allowed(key: &str, value: &str, in_vectors: bool) -> bool {
+    let generic = value.is_empty()
+        || value == "<redacted>"
+        || value == "{{TEXT}}"
+        || is_placeholder(value)
+        || is_fixture_path(value);
+    let literal = PAYLOAD_LITERALS.iter().any(|(k, values)| {
+        (*k == key || (*k == "command" && key == "CommandLine")) && values.contains(&value)
+    });
+    let vector_word = in_vectors
+        && (VECTOR_WORD_KEYS.contains(&key) && is_kebab_word(value)
+            || key == "file"
+                && value.ends_with(".json")
+                && is_kebab_word(&value[..value.len() - 5])
+            || key == "text" && value == "not json");
+    generic || literal || vector_word
+}
+
+/// Every string value of `doc` without an allowed shape, as `key = value`;
+/// prose values go to `prose` instead.
+fn disallowed_values(doc: &Value, in_vectors: bool, prose: &mut Vec<String>) -> Vec<String> {
+    fn walk(
+        node: &Value,
+        key: &str,
+        depth: usize,
+        in_vectors: bool,
+        prose: &mut Vec<String>,
+        out: &mut Vec<String>,
+    ) {
+        match node {
+            Value::Object(map) => {
+                for (k, v) in map {
+                    walk(v, k, depth + 1, in_vectors, prose, out);
+                }
+            }
+            Value::Array(items) => items
+                .iter()
+                .for_each(|v| walk(v, key, depth, in_vectors, prose, out)),
+            Value::String(text) => {
+                // The recorder's prose sits at the top of its document.
+                if depth == 1 && PROSE_KEYS.contains(&key) {
+                    prose.push(text.clone());
+                } else if !allowed(key, text, in_vectors) {
+                    out.push(format!("{key} = {text}"));
+                }
+            }
+            _ => {}
+        }
+    }
+    let mut out = Vec::new();
+    walk(doc, "", 0, in_vectors, prose, &mut out);
+    out
+}
+
+/// The machine's host name, read at test time like the user name.
+fn host_name() -> Option<String> {
+    fs::read_to_string("/etc/hostname")
+        .ok()
+        .map(|h| h.trim().to_string())
+        .filter(|h| !h.is_empty())
+}
+
+/// Forbidden values in free text: the OS user and host names, account
+/// names, user homes other than `/home/user`, macOS and root homes,
+/// non-placeholder UUIDs, credential prefixes, JWTs, long base64 or hex
+/// runs and e-mail addresses.
+fn forbidden_in(text: &str) -> Vec<String> {
+    let mut found = Vec::new();
+    let machine: Vec<String> = ["USER", "LOGNAME"]
         .iter()
         .filter_map(|v| std::env::var(v).ok())
+        .chain(host_name())
         .filter(|name| !name.is_empty() && name != "user")
         .collect();
+    for name in &machine {
+        if text.contains(name.as_str()) {
+            found.push(format!("machine name {name}"));
+        }
+    }
+    for name in ACCOUNT_NAMES {
+        if text.contains(name) {
+            found.push(format!("account name {name}"));
+        }
+    }
+    for home in foreign_homes(text) {
+        found.push(format!("home /home/{home}"));
+    }
+    for root in ["/Users/", "/root/"] {
+        if text.contains(root) {
+            found.push(format!("home {root}"));
+        }
+    }
+    for uuid in uuids(text) {
+        if !uuid.starts_with(PLACEHOLDER_PREFIX) {
+            found.push(format!("uuid {uuid}"));
+        }
+    }
+    for prefix in TOKEN_PREFIXES {
+        if occurs_as_word_start(text, prefix) {
+            found.push(format!("credential prefix {prefix}"));
+        }
+    }
+    if has_jwt(text) {
+        found.push("jwt".to_string());
+    }
+    found.extend(
+        secret_runs(text)
+            .into_iter()
+            .map(|run| format!("long run {run}")),
+    );
+    if has_email(text) {
+        found.push("e-mail".to_string());
+    }
+    found
+}
+
+/// Everything the guard refuses in one fixture file's text.
+fn guard(text: &str, in_vectors: bool) -> Vec<String> {
+    let doc: Value = match serde_json::from_str(text) {
+        Ok(doc) => doc,
+        Err(e) => return vec![format!("not valid JSON: {e}")],
+    };
+    let mut prose = Vec::new();
+    let mut found = disallowed_values(&doc, in_vectors, &mut prose);
+    found.extend(forbidden_in(text));
+    found.extend(prose.iter().flat_map(|p| forbidden_in(p)));
+    found
+}
+
+#[test]
+fn fixtures_hold_no_secret_or_personal_value() {
     let files = fixture_files();
     assert!(!files.is_empty(), "no hook fixture is committed");
     for file in files {
-        let shown = file.display();
         let text = fs::read_to_string(&file).unwrap();
-        serde_json::from_str::<Value>(&text)
-            .unwrap_or_else(|e| panic!("{shown} is not valid JSON: {e}"));
-        for name in &user_names {
-            assert!(
-                !text.contains(name.as_str()),
-                "{shown} holds the OS user name"
-            );
-        }
-        for name in ACCOUNT_NAMES {
-            assert!(!text.contains(name), "{shown} holds an account name");
-        }
+        let in_vectors = file.file_name().is_some_and(|n| n == files::VECTORS);
         assert_eq!(
-            foreign_homes(&text),
+            guard(&text, in_vectors),
             Vec::<String>::new(),
-            "{shown} holds a home directory other than /home/user"
+            "{}",
+            file.display()
         );
-        for uuid in uuids(&text) {
-            assert!(
-                uuid.starts_with(PLACEHOLDER_PREFIX),
-                "{shown} holds a UUID outside the placeholder family: {uuid}"
-            );
-        }
-        for prefix in TOKEN_PREFIXES {
-            assert!(
-                !occurs_as_word_start(&text, prefix),
-                "{shown} holds a credential prefix {prefix}"
-            );
-        }
-        assert!(!has_jwt(&text), "{shown} holds a JWT");
-        assert_eq!(
-            secret_runs(&text),
-            Vec::<String>::new(),
-            "{shown} holds a long base64 or hex run"
-        );
-        assert!(!has_email(&text), "{shown} holds an e-mail address");
     }
+}
+
+#[test]
+fn the_guard_refuses_planted_personal_values() {
+    let planted = [
+        "/Users/someone/projects/forgent",
+        "/root/.claude/projects/x.jsonl",
+        "Jane Doe at example org",
+        "someone-thinkpad",
+        "aB3dE5fG7hJ9kL1mN3pQ5rS7tU9vW1xY3zA5bC7dE9fG1hJ3kL5mN7pQ9r_-x",
+    ];
+    for value in planted {
+        let payload = serde_json::json!({ "cwd": value, "hook_event_name": "Stop" }).to_string();
+        assert_ne!(
+            guard(&payload, false),
+            Vec::<String>::new(),
+            "{value} passed the payload guard"
+        );
+    }
+    let prose = serde_json::json!({ "source": "recorded under /Users/someone/x", "vectors": [] })
+        .to_string();
+    assert_ne!(
+        guard(&prose, true),
+        Vec::<String>::new(),
+        "a macOS home passed the prose guard"
+    );
 }
 
 #[test]

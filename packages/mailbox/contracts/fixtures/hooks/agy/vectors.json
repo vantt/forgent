@@ -11,7 +11,7 @@
       "expect": {
         "subordinate": true,
         "firstStop": true,
-        "thread": null
+        "session": null
       }
     },
     {
@@ -23,7 +23,7 @@
       "expect": {
         "subordinate": true,
         "firstStop": false,
-        "thread": null
+        "session": null
       }
     },
     {
@@ -35,7 +35,7 @@
       "expect": {
         "subordinate": true,
         "firstStop": null,
-        "thread": null
+        "session": null
       }
     },
     {
@@ -47,7 +47,7 @@
       "expect": {
         "subordinate": true,
         "firstStop": null,
-        "thread": null
+        "session": null
       }
     },
     {
@@ -59,7 +59,7 @@
       "expect": {
         "subordinate": true,
         "firstStop": true,
-        "thread": null
+        "session": null
       }
     },
     {

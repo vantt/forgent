@@ -72,3 +72,20 @@ fn an_unreadable_or_incomplete_head_is_never_the_same_head() {
         "a record without a start time is no head"
     );
 }
+
+#[test]
+fn a_head_whose_record_loses_a_field_in_its_text_form_is_still_the_same_head() {
+    for boot_id in ["", "unknown-boot"] {
+        let mut own = own_record();
+        own.boot_id = Some(boot_id.to_string());
+        assert_ne!(
+            Record::from_json(&serde_json::from_str(&head_text(&own)).unwrap()),
+            own,
+            "the text form drops the {boot_id:?} boot id"
+        );
+
+        let judged = judge_stored(&binding_with_head(head_text(&own)), &own);
+
+        assert!(judged.same_head, "boot id {boot_id:?}");
+    }
+}

@@ -1,6 +1,9 @@
 //! Claude Code: payloads recorded on 2.1.307
-//! (`contracts/fixtures/hooks/claude/`).
-use super::{has_subagent_marker, parse_named, Shape};
+//! (`contracts/fixtures/hooks/claude/`). A subagent's event carries
+//! `agent_id`; a head session started with `--agent` carries `agent_type`
+//! alone on its own events (recorded), so only `agent_id`, whatever its
+//! value, marks a subagent.
+use super::{parse_named, session_id, Shape};
 use crate::hook::{HookEvent, Payload, Unparsed};
 use serde_json::{Map, Value};
 
@@ -15,9 +18,9 @@ pub(super) fn parse(event: HookEvent, object: &Map<String, Value>) -> Result<Pay
     };
     Ok(Payload {
         event,
-        subordinate: has_subagent_marker(object),
+        subordinate: object.contains_key("agent_id"),
         first_stop,
-        thread: None,
+        session: session_id(object),
     })
 }
 

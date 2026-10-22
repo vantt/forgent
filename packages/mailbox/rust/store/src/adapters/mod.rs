@@ -61,33 +61,44 @@ impl Adapter {
             Self::Agy => agy::shape(event),
         }
     }
+}
 
-    /// Whether the adapters contract lists this CLI under `testedAgainst`.
-    /// Only a tested CLI is drained; a deferred one is quiet.
-    pub fn is_tested(self) -> bool {
-        tested_clis().iter().any(|cli| cli == self.word())
+/// The CLIs an adapters contract lists under `testedAgainst`. Only a tested
+/// CLI is drained; a deferred one is quiet.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TestedClis(Vec<String>);
+
+impl TestedClis {
+    /// The list of an adapters contract's text; an unreadable contract
+    /// lists nothing, so every CLI stays quiet.
+    pub fn from_contract(text: &str) -> Self {
+        let contract: Value = serde_json::from_str(text).unwrap_or(Value::Null);
+        Self(
+            contract["testedAgainst"]
+                .as_array()
+                .map(|entries| {
+                    entries
+                        .iter()
+                        .filter_map(|entry| entry["cli"].as_str().map(String::from))
+                        .collect()
+                })
+                .unwrap_or_default(),
+        )
+    }
+
+    /// The list of the adapters contract this crate was built with.
+    pub fn embedded() -> &'static Self {
+        static TESTED: OnceLock<TestedClis> = OnceLock::new();
+        TESTED.get_or_init(|| Self::from_contract(ADAPTERS_CONTRACT))
+    }
+
+    pub fn contains(&self, adapter: Adapter) -> bool {
+        self.0.iter().any(|cli| cli == adapter.word())
     }
 }
 
-fn tested_clis() -> &'static [String] {
-    static TESTED: OnceLock<Vec<String>> = OnceLock::new();
-    TESTED.get_or_init(|| {
-        let contract: Value = serde_json::from_str(ADAPTERS_CONTRACT).unwrap_or(Value::Null);
-        contract["testedAgainst"]
-            .as_array()
-            .map(|entries| {
-                entries
-                    .iter()
-                    .filter_map(|entry| entry["cli"].as_str().map(String::from))
-                    .collect()
-            })
-            .unwrap_or_default()
-    })
-}
-
-/// The Claude Code and Codex payload rules, which share field names:
-/// `hook_event_name` names the event, and the key `agent_id` or
-/// `agent_type`, whatever its value, marks a subagent's event.
+/// The Claude Code and Codex payload rule: `hook_event_name` names the
+/// event.
 fn parse_named(event: HookEvent, object: &Map<String, Value>) -> Result<(), Unparsed> {
     let expected = match event {
         HookEvent::Stop => "Stop",
@@ -99,6 +110,11 @@ fn parse_named(event: HookEvent, object: &Map<String, Value>) -> Result<(), Unpa
     Ok(())
 }
 
-fn has_subagent_marker(object: &Map<String, Value>) -> bool {
-    object.contains_key("agent_id") || object.contains_key("agent_type")
+/// The payload's `session_id`, when it is a non-empty string.
+fn session_id(object: &Map<String, Value>) -> Option<String> {
+    object
+        .get("session_id")
+        .and_then(Value::as_str)
+        .filter(|id| !id.is_empty())
+        .map(String::from)
 }

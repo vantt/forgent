@@ -31,6 +31,8 @@ pub mod files {
     pub const STOP_CONTINUED: &str = "stop-continued.json";
     pub const POST_TOOL_USE: &str = "post-tool-use.json";
     pub const POST_TOOL_USE_SUBAGENT: &str = "post-tool-use-subagent.json";
+    pub const STOP_AGENT_HEAD: &str = "stop-agent-head.json";
+    pub const POST_TOOL_USE_AGENT_HEAD: &str = "post-tool-use-agent-head.json";
     pub const ACCEPTED_STOP: &str = "accepted-stop.json";
     pub const ACCEPTED_POST_TOOL_USE: &str = "accepted-post-tool-use.json";
     pub const ENV: &str = "env.json";

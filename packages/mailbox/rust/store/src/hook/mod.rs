@@ -50,6 +50,12 @@ impl Adapter {
         }
     }
 
+    /// Whether this CLI's session id is also its native thread handle
+    /// (Codex: the id `codex queue --thread` takes).
+    pub const fn session_is_handle(self) -> bool {
+        matches!(self, Self::Codex)
+    }
+
     /// The core's CLI value of [`Adapter::word`].
     pub fn cli(self) -> Option<Cli> {
         Cli::new(self.word()).ok()
@@ -66,8 +72,9 @@ pub struct Payload {
     /// At a Stop, whether it is the first Stop of its turn; `None` at
     /// `PostToolUse` or when the payload does not say.
     pub first_stop: Option<bool>,
-    /// The native thread handle the payload carries (Codex's thread id).
-    pub thread: Option<String>,
+    /// The session the payload names (`session_id`), when the CLI names
+    /// one; the drain stays quiet when it is not the caller's writer key.
+    pub session: Option<String>,
 }
 
 /// Why a payload gives no facts.

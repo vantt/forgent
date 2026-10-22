@@ -1,5 +1,7 @@
 //! The registering head against the stored one (spec §5.1): the mailbox
-//! compares no pid or start time itself. The binding keeps the head's
+//! compares no pid or start time itself. Judging a stored head that is not
+//! the registering one reads the operating system's process table through
+//! process facts. The binding keeps the head's
 //! process record as opaque text, and liveness comes from the process-facts
 //! judge.
 use fgos_mailbox_core::{Binding, Liveness, StoredHead};
@@ -23,8 +25,12 @@ pub fn judge_stored(stored: &Binding, registering: &Record) -> StoredHead {
     let stored_record = serde_json::from_str(&stored.head)
         .map(|value| Record::from_json(&value))
         .unwrap_or_default();
+    // Compare the registering record as the binding would keep it, so a
+    // field its text form drops (an empty or unknown boot id) cannot make
+    // the head conflict with itself.
+    let registering = Record::from_json(&registering.to_json());
     let same_head =
-        is_complete(registering) && is_complete(&stored_record) && stored_record == *registering;
+        is_complete(&registering) && is_complete(&stored_record) && stored_record == registering;
     let liveness = if same_head {
         // The registering record is the running head itself.
         Liveness::Alive
