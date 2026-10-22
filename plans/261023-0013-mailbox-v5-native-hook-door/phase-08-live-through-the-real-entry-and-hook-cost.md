@@ -125,3 +125,4 @@ The same shim and host, the recorded `post-tool-use.json` fixture as stdin, and 
 - Deviation: the five runs used a byte copy of the main checkout's shim; since `dc8e92240` the suite lays out this branch's generated shim.
 - Deviation: the installer's `PreToolUse` rows were removed in each case (they need the legacy-node payload, which the private release does not stage).
 - Report: `plans/reports/research-261023-0345-mailbox-v5-live-suite-and-hook-cost.md`.
+- Authorization (plan owner (agent), 2026-10-23, after the report): three more live runs, T1 and T2 with the builtins-only shim and C1 with the fixed harness. The V5 ceiling is now 15 (12 + 3). Same rules: dry run first, benign content only, every guard on, no retries, memory and quiet-window check before each. If a CLI's p95 stays above 50 ms, the remaining dominant cost is named and that CLI closes DONE_WITH_CONCERNS; no further optimisation without asking.
