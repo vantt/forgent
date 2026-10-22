@@ -563,7 +563,7 @@ Each item is deleted in the cutover change (section 18), with every consumer mov
 | Tracked stale view and backups | `.fgos/state.json`, two `events.jsonl.backup-*` | Views are never tracked; backups are not truth |
 | Event duty of the `.fgos` checkpoint adapter | plan 4.3 P03 `checkpointMainFgos` | No event file needs a checkpoint; the adapter stays null for events |
 
-Not removed here: stripping `.fgos` from worktrees and the general `fgos-write-rejected` guard. Other tracked `.fgos` files (config, distribution, docs index) still exist; an inventory of their consumers decides as a separate item (council: P1, synthesizer, critic). `getMainFgosDir` (`src/state/runtime-coordination.mjs:14`) stays for cache, claims and locks; it is no longer on the event path.
+Not removed here: stripping `.fgos` from worktrees and the general `fgos-write-rejected` guard. Other tracked `.fgos` files (config, distribution, docs index) still exist, and `.fgos/project.json` (the Identity component's project id, tracked on purpose so every clone reads the same id; it passes the strip rules unchanged and is never an event file); an inventory of their consumers decides as a separate item (council: P1, synthesizer, critic). `getMainFgosDir` (`src/state/runtime-coordination.mjs:14`) stays for cache, claims and locks; it is no longer on the event path.
 
 ## 20. Relations to other work
 
