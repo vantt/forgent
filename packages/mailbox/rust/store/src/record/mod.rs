@@ -618,7 +618,7 @@ struct TrustedDirs {
 
 /// Opens `path` without following a symlink and without blocking, and
 /// refuses anything but a regular file before a byte is read.
-fn open_regular(path: &Path) -> io::Result<File> {
+pub(crate) fn open_regular(path: &Path) -> io::Result<File> {
     let file = OpenOptions::new()
         .read(true)
         .custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK)

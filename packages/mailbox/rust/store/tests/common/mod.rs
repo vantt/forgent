@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 #[cfg(unix)]
+pub mod ancestry;
+#[cfg(unix)]
 pub mod record;
 #[path = "../../../core/tests/common/support.rs"]
 mod support;

@@ -5,6 +5,8 @@
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod agy;
 mod claude;
+#[cfg(unix)]
+pub mod claude_head;
 mod codex;
 
 use crate::hook::{Adapter, HookEvent, Payload, Unparsed};

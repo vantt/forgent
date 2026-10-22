@@ -89,3 +89,54 @@ fn a_head_whose_record_loses_a_field_in_its_text_form_is_still_the_same_head() {
         assert!(judged.same_head, "boot id {boot_id:?}");
     }
 }
+
+#[test]
+fn the_caller_check_accepts_only_the_same_complete_record_at_the_topologys_head_position() {
+    use fgos_mailbox::head::{caller_is_head, Ancestry, Topology};
+    let head = own_record();
+    let under = |parent: Record, comm: &str, grandparent: Option<Record>| Ancestry {
+        parent,
+        parent_comm: comm.to_string(),
+        grandparent,
+    };
+
+    assert!(caller_is_head(
+        &under(head.clone(), "claude", None),
+        Topology::Direct,
+        &head
+    ));
+    assert!(caller_is_head(
+        &under(Record::default(), "sh", Some(head.clone())),
+        Topology::OneShellHop,
+        &head
+    ));
+
+    let reused = Record {
+        start_time: Some(format!("{}0", head.start_time.clone().unwrap())),
+        ..head.clone()
+    };
+    assert!(
+        !caller_is_head(&under(reused, "claude", None), Topology::Direct, &head),
+        "the same pid with another start time is another process"
+    );
+    let incomplete = Record {
+        start_time: None,
+        ..head.clone()
+    };
+    assert!(
+        !caller_is_head(
+            &under(incomplete.clone(), "claude", None),
+            Topology::Direct,
+            &incomplete
+        ),
+        "an incomplete record never stands for a head"
+    );
+    let other = Record {
+        pid: Some(fgos_process::ProcId(head.pid.unwrap().0 + 1)),
+        ..head.clone()
+    };
+    assert!(
+        !caller_is_head(&under(other, "claude", None), Topology::Direct, &head),
+        "a different parent is not the head"
+    );
+}
