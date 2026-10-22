@@ -99,3 +99,19 @@ Independent review: `reports/code-review-v2.md`. It found H1 (blocks the rung), 
 
 A consequence of M2 that the owner should know (also in spec §17): a project whose registered heads together keep more headers than one saturated shared sender within a day reads as too large, so its hook stays quiet until headers retire. The measured 100-head population (7.8 MB) is over the cap; 10 heads (1.6 MB) is under it.
 
+## Snapshot size held at write time (plan owner (agent), 2026-10-22)
+
+The coordinator decided this after the review fixes: a hook that goes quiet for a whole day (the read-time cap) is worse than an explicit refusal.
+
+- **Write cap** `snapshot_write_cap` (the former `snapshot_byte_cap`, 2,439,360 bytes): a send that would leave the snapshot past it returns `RecordError::RecordFull` (`record-full`) before the commit point. Nothing is written, and the shell tells the sender the mailbox is full.
+- **Not counted:** the core's refusal counters live in the snapshot, so counting the refusal would be the very write the full mailbox refuses.
+- **Other holds:** drains, finishes and registrations are never refused for size. Only a send adds a header. A claim moves headers in flight, which is larger; a finish makes them offered, which is smaller; the sweep may refuse a header with one notice and one mark.
+- **Read cap** `snapshot_read_cap` = write cap + `(write cap / smallest header) × (largest header − smallest header + largest notice + largest mark)` = 16,071,965 bytes at the current values. It is the guard against a file someone else wrote.
+- **Residual:** a registration adds a binding, which the read cap does not bound.
+- **Tests** (`tests/record_ceiling.rs` :: `a_full_record_refuses_sends_and_keeps_draining`):
+  - 100 heads with maximal keys fill the record just under the write cap, using core calls.
+  - Sends through `Record::send` are then refused as `record-full`, with the bytes on disk unchanged.
+  - Drains, finishes and a registration still write and take the record past the write cap, but stay under the read cap and readable.
+  - The at-cap and cap + 1 read test now uses the read cap.
+- **Mutants:** 4 of 4 killed: the write cap unchecked; the write cap applied to every hold; the read at the write cap; the read cap without its growth term.
+

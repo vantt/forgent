@@ -327,17 +327,16 @@ fn an_unreadable_snapshot_is_refused_and_never_overwritten() {
     assert_eq!(snapshot_bytes(&fgos.paths()), cut);
 }
 
-/// The snapshot is read only up to a cap derived from the limits contract
-/// (`record::snapshot_byte_cap`: the shared sender's header ceiling times
-/// the largest header the contract allows). A larger snapshot is not
-/// parsed, refused with its own code and never overwritten; one at the cap
-/// reads.
+/// The snapshot is read only up to the read cap derived from the limits
+/// contract (`record::snapshot_read_cap`). A larger snapshot, which only a
+/// writer other than the record can produce, is not parsed, refused with
+/// its own code and never overwritten; one at the cap reads.
 #[test]
 fn a_snapshot_larger_than_the_contract_cap_is_never_parsed() {
     let fgos = TempFgos::new("snapshot-cap");
     let whole = registered(&fgos);
     let limits = common::limits();
-    let cap = fgos_mailbox::record::snapshot_byte_cap(&limits) as usize;
+    let cap = fgos_mailbox::record::snapshot_read_cap(&limits) as usize;
     assert!(whole.len() < cap);
     let padded = |len: usize| {
         let mut bytes = whole.clone();
