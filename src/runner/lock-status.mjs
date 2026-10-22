@@ -88,14 +88,13 @@ function reportParametricRow(entry, params) {
 }
 
 /**
- * collectLockStatus({ fgosDir, names }) -> { mainCheckout, locks }
+ * collectLockStatus({ fgosDir }) -> { mainCheckout, locks }
  *
- * `locks` has one row per repo- or machine-scoped registry row (only the rows
- * named in `names` when it is given, so a caller that asks about one lock
- * probes one lock); `mainCheckout` is the main-checkout row's
- * `{ outcome, holders, guarantee }` for callers that only care about that one lock.
+ * `locks` has one row per repo- or machine-scoped registry row; `mainCheckout`
+ * is the main-checkout row's `{ outcome, holders, guarantee }` for callers
+ * that only care about that one lock.
  */
-export function collectLockStatus({ fgosDir, names }) {
+export function collectLockStatus({ fgosDir }) {
   const params = { fgosDir };
   let machineParams = params;
   try {
@@ -106,7 +105,7 @@ export function collectLockStatus({ fgosDir, names }) {
   const locks = [];
   for (const { name } of loadLockRegistry().locks) {
     const entry = lockEntry(name);
-    if (!REPORTED_SCOPES.has(entry.scope) || (names && !names.includes(name))) continue;
+    if (!REPORTED_SCOPES.has(entry.scope)) continue;
     const known = entry.scope === 'machine' ? machineParams : params;
     if (typeof entry.v3Path !== 'string') {
       locks.push({ name, kind: entry.kind, scope: entry.scope, rank: entry.rank, status: 'not-node-owned', owner: entry.owner });
