@@ -56,3 +56,21 @@ Added 2 cases (config: acknowledged-only-after-sync, unknown-when-sync-fails; bo
 - CF09: reading review only; check `sequence.rs` Local branch order (object sync, update-ref fsync, sync_refs, Claimed).
 - IDENT told: mint calls this code; CF08 changes which refusals surface (hook/policy now `sequence-unreachable` with git's reason instead of retry). Needs a board line from the big lead.
 - Unresolved: the CF08 spelling set is git 2.53.0 evidence; floor-version spellings not probed.
+
+## OPC round: CF09 changes (new commits)
+
+| Commit | Subject | Git area |
+|---|---|---|
+| `443e93dcc` | fix(git): every durable git write forces a flushing fsync method | yes |
+| `26e5f496c` | test(git): a local claim forces a flushing method despite writeout-only config | yes |
+| `31af4a247` | chore(git): regenerate the mutation census | no |
+
+- **P1 (fsyncMethod).** `lib.rs::durable_args` is the one helper: it prepends `-c core.fsync=all -c core.fsyncMethod=fsync`. All 17 sites (sequence 2, land 3, remote 2, refs 6, sync 1, publication 3, scoped_commit 1) moved onto it in the same commit; the `-c` override beats repo and global config, so no refusal. `rg -n 'core.fsync=all' packages/git/rust/src` now shows: `lib.rs:601` (the helper) plus three comment lines (`remote.rs:602`, `publication.rs:1155`, `publication.rs:1499`). `core.fsync=loose-object` in `scoped_commit.rs` (add/write-tree) is a different setting and unchanged.
+- **Sync of bytes.** The counter commit's loose object now syncs with `sync_files=true`; the loose ref file is opened and `sync_all`'d before the directory chain (`sync_ref_file`; packed or reftable refs have no such file). No new seam.
+- **Proof.** `sequence.rs` test `a_local_claim_asks_git_to_flush_even_when_the_repository_configures_writeout_only`: a `git` wrapper that logs argv is put first on PATH once before any driver exists (the driver reads git from a process-wide cell); repo config sets `core.fsyncMethod=writeout-only`; asserts the `commit-tree` and `update-ref` calls carry both settings, the claim succeeds, and the ref equals the claimed oid. The wrapper stays on PATH for the rest of the test binary; the other cases pass through it.
+- **Results.** sequence 7 pass; land_crash_matrix 15 pass (2 ignored); recovery_matrix all pass; publication 32 pass / 2 red (phase 5); refs_remote 17; worktree 9; repository_config 10; ssh_transport 6; `--lib` 69 pass / 1 red (phase 5 layout cause); `fgos-identity` all pass; clippy clean.
+
+## OPC notes recorded
+
+- `compaction_suffix` (`wal.rs:1610-1617`) and `compact_inner` still count or refuse temporaries. They are out of this phase: the CF06 change covers `inspect`, `has_intent` and the per-operation byte count in `scan`, not every WAL reader.
+- The CF05 negative case injects its failure at the `config-synced` checkpoint, not as a real fsync EIO.
