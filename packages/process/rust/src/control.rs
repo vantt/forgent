@@ -25,6 +25,25 @@ pub fn arm_parent_death_signal() -> io::Result<()> {
     Ok(())
 }
 
+/// A descriptor that becomes readable when child `pid` exits (Linux pidfd).
+/// `None` where the kernel has none; callers then poll in short steps.
+#[cfg(unix)]
+pub fn exit_descriptor(pid: u32) -> Option<std::os::fd::OwnedFd> {
+    #[cfg(target_os = "linux")]
+    {
+        use std::os::fd::FromRawFd;
+        // SAFETY: pidfd_open takes a pid and flags; the result is owned below.
+        let fd = unsafe { libc::syscall(libc::SYS_pidfd_open, pid as libc::pid_t, 0 as libc::c_uint) };
+        // SAFETY: a non-negative result is a new descriptor owned by nobody else.
+        (fd >= 0).then(|| unsafe { std::os::fd::OwnedFd::from_raw_fd(fd as libc::c_int) })
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = pid;
+        None
+    }
+}
+
 /// The signals this crate sends.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Signal {

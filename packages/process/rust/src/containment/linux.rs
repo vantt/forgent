@@ -317,12 +317,28 @@ fn tuple_of(pid: ProcId) -> Option<ProcTuple> {
     read_stat(pid.0).ok().map(|stat| tuple_from(pid.0, &stat))
 }
 
+/// Whether the kernel knows no process with this pid.
+fn pid_unknown(pid: u32) -> bool {
+    // SAFETY: signal 0 only checks that the pid exists; nothing is sent.
+    unsafe { libc::kill(pid as libc::pid_t, 0) != 0 && io::Error::last_os_error().raw_os_error() == Some(libc::ESRCH) }
+}
+
 /// Every live descendant of `root` by parent links, and every live process in
 /// the group `pgid` (when `pgid` is given). The tree is walked only while
 /// `root` is still the recorded leader: a dead leader's pid may name anyone.
 /// A process that vanishes mid-listing is gone; one whose `stat` cannot be
 /// read is counted, never dropped.
 fn members(root: u32, walk_tree: bool, pgid: Option<u32>) -> Result<Members, Unlistable> {
+    members_with(root, walk_tree, pgid, read_stat, pid_unknown)
+}
+
+fn members_with(
+    root: u32,
+    walk_tree: bool,
+    pgid: Option<u32>,
+    read_stat_fn: impl Fn(u32) -> io::Result<facts::Stat>,
+    pid_unknown: impl Fn(u32) -> bool,
+) -> Result<Members, Unlistable> {
     let mut unreadable = 0;
     let mut rows = Vec::new();
     for entry in fs::read_dir("/proc").map_err(|_| Unlistable)? {
@@ -333,10 +349,14 @@ fn members(root: u32, walk_tree: bool, pgid: Option<u32>) -> Result<Members, Unl
         let Some(pid) = entry.file_name().to_str().and_then(|name| name.parse::<u32>().ok()) else {
             continue;
         };
-        match read_stat(pid) {
+        match read_stat_fn(pid) {
             Ok(stat) if !stat.is_gone() => rows.push((pid, stat)),
             Ok(_) => {}
-            Err(err) if err.kind() == io::ErrorKind::NotFound => {}
+            // A process that exits while its `stat` is read answers ESRCH, or
+            // a truncated row; either is gone once the kernel no longer knows
+            // the pid. A reused pid stays unreadable, never gone.
+            Err(err) if err.kind() == io::ErrorKind::NotFound || err.raw_os_error() == Some(libc::ESRCH) => {}
+            Err(err) if err.kind() == io::ErrorKind::InvalidData && pid_unknown(pid) => {}
             Err(_) => unreadable += 1,
         }
     }
@@ -493,5 +513,17 @@ mod tests {
         assert_eq!(parse_child_pid(br#"{"child-pid": 4242}"#), Some(4242));
         assert_eq!(parse_child_pid(br#"{"child-pid": 42"#), None);
         assert_eq!(parse_child_pid(br#"{"other": 1}"#), None);
+    }
+
+    #[test]
+    fn members_treats_stat_esrch_error_as_vanished_process() {
+        let esrch = members_with(1, false, None, |_| Err(io::Error::from_raw_os_error(libc::ESRCH)), |_| false).ok().expect("proc listing");
+        assert_eq!(esrch.unreadable, 0, "ESRCH: the process vanished mid-read");
+        let me = std::process::id();
+        let cut = |pid: u32| if pid == me { Err(io::Error::from(io::ErrorKind::InvalidData)) } else { read_stat(pid) };
+        let gone = members_with(1, false, None, cut, |pid| pid == me).ok().expect("proc listing");
+        assert_eq!(gone.unreadable, 0, "a cut row of a pid the kernel no longer knows is gone");
+        let live = members_with(1, false, None, cut, |_| false).ok().expect("proc listing");
+        assert_eq!(live.unreadable, 1, "a cut row of a live pid stays unreadable");
     }
 }
