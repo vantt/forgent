@@ -26,36 +26,50 @@ struct Props {
     fast_iterations: u32,
 }
 
-const fn props(
-    name: &'static str,
-    level: GuaranteeLevel,
-    escapes: &'static [&'static str],
-    df: bool,
-    term_kills: bool,
-    term_phase: bool,
-    leader_ends: bool,
-    fast: u32,
-) -> Props {
-    Props {
-        name,
-        level,
-        escapes,
-        double_fork_escapee_survives: df,
-        term_without_handler_kills: term_kills,
-        term_phase,
-        leader_exit_ends_domain: leader_ends,
-        fast_iterations: fast,
-    }
-}
-
 #[cfg(target_os = "linux")]
-const LINUX_PGROUP_PROPS: Props = props("linux-pgroup", GuaranteeLevel::BestEffort, &["setsid", "reused pgid", "daemons"], true, true, true, false, 100);
+const LINUX_PGROUP_PROPS: Props = Props {
+    name: "linux-pgroup",
+    level: GuaranteeLevel::BestEffort,
+    escapes: &["setsid", "reused pgid", "daemons"],
+    double_fork_escapee_survives: true,
+    term_without_handler_kills: true,
+    term_phase: true,
+    leader_exit_ends_domain: false,
+    fast_iterations: 100,
+};
 #[cfg(target_os = "linux")]
-const BWRAP_PIDNS_PROPS: Props = props("bwrap-pidns", GuaranteeLevel::Kernel, &["herdr", "systemd", "docker"], false, false, true, true, 100);
+const BWRAP_PIDNS_PROPS: Props = Props {
+    name: "bwrap-pidns",
+    level: GuaranteeLevel::Kernel,
+    escapes: &["herdr", "systemd", "docker"],
+    double_fork_escapee_survives: false,
+    term_without_handler_kills: false,
+    term_phase: true,
+    leader_exit_ends_domain: true,
+    fast_iterations: 100,
+};
 #[cfg(target_os = "macos")]
-const MACOS_TREE_PROPS: Props = props("macos-tree", GuaranteeLevel::BestEffort, &["double fork", "reused pgid", "launchd"], true, true, true, false, 100);
+const MACOS_TREE_PROPS: Props = Props {
+    name: "macos-tree",
+    level: GuaranteeLevel::BestEffort,
+    escapes: &["double fork", "reused pgid", "launchd"],
+    double_fork_escapee_survives: true,
+    term_without_handler_kills: true,
+    term_phase: true,
+    leader_exit_ends_domain: false,
+    fast_iterations: 100,
+};
 #[cfg(windows)]
-const WINDOWS_JOB_PROPS: Props = props("windows-job", GuaranteeLevel::Kernel, &["service", "COM server"], false, true, false, false, 20);
+const WINDOWS_JOB_PROPS: Props = Props {
+    name: "windows-job",
+    level: GuaranteeLevel::Kernel,
+    escapes: &["service", "COM server"],
+    double_fork_escapee_survives: false,
+    term_without_handler_kills: true,
+    term_phase: false,
+    leader_exit_ends_domain: false,
+    fast_iterations: 20,
+};
 
 enum Workload<'a> {
     Tree(&'a Path),

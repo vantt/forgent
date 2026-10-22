@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "be1de6971e366ca86eb0ed3ac0c21bdfc9f897413fb582f52eb030c2f056bbfe",
+  "payloadDigest": "833ed307def11fec050f9ddf51e382e815f65d0b5d0165f644f7db57bd1298f3",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -295,7 +295,7 @@
     "packages/git/node-addon/src/lib.rs": "3facd144a66f0a0cba95acbc2d92c8d6bb0da914cf1c6ffe857ce92b3c70feff",
     "packages/git/node-addon/src/process.rs": "34662e53ebd098088e58bbbea03e34b9347326ff2c761e05453b502ea4e2e713",
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
-    "packages/git/rust/src/driver.rs": "d158e363082a89a4fb98e4e893ab5bc6f659bc295b940cd046d0a2215b898aaa",
+    "packages/git/rust/src/driver.rs": "8cf69968d10f4ee48276e83cb2357844890ec9fb8748c830c8fbfae5c9980ab0",
     "packages/git/rust/src/grant.rs": "d4f47e49d85994778dc093098b47584e3f73c3cec5f501af82a1c5cd787446f2",
     "packages/git/rust/src/inspect.rs": "64abeda97e9455664051ac7a304a5d3152a5fde88338d95f141b1b77e1196e1c",
     "packages/git/rust/src/land.rs": "5b585935c49567bdaff1c7577689c81b4b98f0a0cad24cdf1b248adb32fe2234",
@@ -424,11 +424,11 @@
     "packages/observe/rust/tests/fixture_test.rs": "1eadd8be1d535b05899e299f6a7a3a4d9a718d9311502e881b76a78f30985677",
     "packages/observe/rust/tests/harness_protocols_test.rs": "6dbd5029eddedc023ac9862b7cce8fb1da97a85440362f2d8bf35e6641f5dac2",
     "packages/observe/rust/tests/store_lock_multiprocess.rs": "d6b92d856d2dd22fd3679154f9f517a17a2333e91d3077ffab7d5b872c8c9bdb",
-    "packages/process/rust/src/containment/linux.rs": "89a09b5b75666246821c65fc75948ac8acafa1d1a3d8b16a37fae80f2d04c2bb",
-    "packages/process/rust/src/containment/macos.rs": "ae4a4a7599e446b795f1e361654f15b3acda90449e00531394f67644b23494a9",
-    "packages/process/rust/src/containment/mod.rs": "28620f2f8ecfc8db9728dabd5d136393dd456cf172049f76e5d1e9f1cc805e9c",
+    "packages/process/rust/src/containment/linux.rs": "d68cc79d5d496b67581ea28dd49726174a5844bb2b7253baadcf8646fa742c50",
+    "packages/process/rust/src/containment/macos.rs": "d3bce89828277f9df405659aa08cb7a5d0eee58f7a43a7f30769ab403adfffb0",
+    "packages/process/rust/src/containment/mod.rs": "7be8c55ecff6ad4d0ca321e3dad74e1932ba95d2e6c443ff538586d5e122a564",
     "packages/process/rust/src/containment/pgroup.rs": "70eae45ba0ea30ddd05210a2910fc1627e28f2dcdf95b5f6db55e191ac8ec0fd",
-    "packages/process/rust/src/containment/windows.rs": "8c94f9ed9492ca95ecf36ab0030f2fc6dec1086505ca95d19dd33c9f6d2c3618",
+    "packages/process/rust/src/containment/windows.rs": "6e4e85e4d0887a2b6b617c6e969ed274a0c9d987762550c8d65a9b016cdd3f15",
     "packages/process/rust/src/control.rs": "37359bbc02a2091492ef67eff85b7977619d555ed96ee0134b0edc25c70f099d",
     "packages/process/rust/src/facts.rs": "d721931085cc34964b5585cb0648eb59b15dfe8e1657182a2f246b7f0f674c10",
     "packages/process/rust/src/lib.rs": "22787e2b9058e737aea22d39da0fdc83d0afee4d108ee76d97842a4d6b6cc11e",
@@ -439,13 +439,14 @@
     "packages/process/rust/src/platform/windows.rs": "b0230ed4e6a61a6a112f2d3201d69234a97b376c2cf2620851f2c90f644d18d6",
     "packages/process/rust/src/platform/windows_job.rs": "0b4c5b1d99cf6764b23efbddcab454357eb963965b2ca2dbe8f9cd2591fca3bc",
     "packages/process/rust/src/platform/windows_spawn.rs": "ac4c098d7fb0249c83354d87b4ba772746af7dfadd16e3014c0c359470516e45",
-    "packages/process/rust/tests/common/mod.rs": "c70adaf14e2c12007fd4a1700fd5831e74fac3347bdcd53333656e91c77bdbf0",
-    "packages/process/rust/tests/containment_bwrap.rs": "28eebe0845b51919ea03cd55092edd12b05c107e5e4342cb51582d070340f29b",
-    "packages/process/rust/tests/containment_conformance.rs": "d8e4bad882a45181a00b59326fe7289c5d9bc3beb53f37d9890431f61f47ee40",
-    "packages/process/rust/tests/containment_pgroup.rs": "1f9c3a14c4d3224dce633426a2774540238ac79676fe3bbdfbc55172953e61b6",
+    "packages/process/rust/tests/common/mod.rs": "3a0c2408c0deaf460878f525d042b9b80a0fe331adf0e859da144420dccac21d",
+    "packages/process/rust/tests/containment_bwrap.rs": "86a0624b9014b9cc4ad649e0fdeffd74cb61f5ad2a3ae167f1826b6261532404",
+    "packages/process/rust/tests/containment_conformance.rs": "36aeb98817964c3fe68e84c7bc3cbc5cc1f48c900d524fa555efd44e8de098b8",
+    "packages/process/rust/tests/containment_pgroup.rs": "e45a7509c9afd3a5761b08e620256a0ef9c0ed02192afee37caae6a2f099407c",
     "packages/process/rust/tests/containment_spawn_timeout.rs": "1900436844e33dee6b67f9956288308af9b1234004f4fbf83f51a257d2b59441",
     "packages/process/rust/tests/containment_windows.rs": "60697768127720a89242bdd076bde39861c5c8593f14df9062d08b29f490442a",
     "packages/process/rust/tests/file_users.rs": "6dfa7e15e0641b32ca730e0c9fdb0c1f3deca30e4f3c2bd3db056d107085aca6",
+    "packages/process/rust/tests/fixtures/bwrap-refuses-mount.sh": "adf8eef228f013772c2d738949ca4e2e02df4450fa86855799a5ce3e29caf4ce",
     "packages/process/rust/tests/fixtures/bwrap-without-info-fd.sh": "111366f74ac4efc4497524d5181754ad8e4c50837bf4caa26777ff1f3bc6a69c",
     "packages/process/rust/tests/fixtures/heartbeat-grandchild.sh": "71c6568f2f95b3e59883ddbd45e1527bead193017594b6b2f0dc767ab4d9fd22",
     "packages/process/rust/tests/holders_multiprocess.rs": "1113e38c9f04cfcde575d9ac59502ab02ad4ebe72fe7524bf4d407d7b348c70f",
@@ -472,11 +473,11 @@
     "packages/run-supervisor/rust/src/go_pipe.rs": "c9acb88b7ebc79ca08187eb0b1b7e0ce700b6b225da4aa8547e62cf685fc7b46",
     "packages/run-supervisor/rust/src/lib.rs": "0e23de96a451f96352d8395ed1a3745dd1154c9046006d0ef835fc58ae9486e9",
     "packages/run-supervisor/rust/src/publish.rs": "c6abb1a9808d9d0774307279a37630c020165fc0e7a6a7e0e20e54a817219f3c",
-    "packages/run-supervisor/rust/src/route.rs": "fdac6b485591ca182afc2cf3110761b5597354b078aa8ea3d2ead4335ac37d01",
+    "packages/run-supervisor/rust/src/route.rs": "c730f674e45859867eaae0e856c24aec5d9bf82f79ea0ff88ae1f8bcc44b603a",
     "packages/run-supervisor/rust/src/steps.rs": "55892a633e62ff2605b98f4afc57f281704a35e912edc63550206d93e03295ae",
     "packages/run-supervisor/rust/src/supervise.rs": "1eaee62f4709ac7b135302ed40068905fb50f5ba42d845228fa84d9407d091de",
     "packages/run-supervisor/rust/src/supervise/terminal.rs": "1ccf2b2c8c15e53d4194a9ab17bc50ebc5ffe1ef2ae5ffca1fbb6da8da6bf1af",
-    "packages/run-supervisor/rust/src/supervise/unix.rs": "90da8b30403bdb2ab47ab2f26665adcd70ee89758c8cedac43e6a563a119d408",
+    "packages/run-supervisor/rust/src/supervise/unix.rs": "8c78fc161b8c15612857378033754fb6b130a27ed2954216534139b5ccb61778",
     "packages/run-supervisor/rust/src/supervise/windows.rs": "e2b04b6d2499d769206aa1c8121eada6ab248351e25ad81ab90befa7c81d7205",
     "packages/run-supervisor/rust/src/terminal_slot.rs": "b09fd96ee9467a19310bce33bc13ba98423e07f9cee6c280840c0fb439bc8279",
     "packages/run-supervisor/rust/tests/adopt_concurrency.rs": "3b91e8508642d7a18429a0ce1e43569c42a9e9be882eaa99caa325e1e3fb1938",
@@ -860,7 +861,7 @@
     "src/setup/model-pool-checks.mjs": "4c115569d3644a395a09b0f6ea1d87205c791b18ccae021becd31a78bb360c6f",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
     "src/setup/registrations.mjs": "c05c82f4c7239c6fafb09f863e6f84b9e392728f029eed0e712123236baa3362",
-    "src/setup/run-supervisor-checks.mjs": "93789ede921ca39d33fa7883fd8ae0daff5b6c120581534446c761b5e2fa0a06",
+    "src/setup/run-supervisor-checks.mjs": "09f595a17e473204fcc090e1b4665ca4d7990831de69afc8ff04f28b6bfc4e6a",
     "src/setup/seat-binding-checks.mjs": "b1efc2d1711dc21203c6482bf47ff4dfa7f8aa6f49b0d88a99a1479319a5f36f",
     "src/setup/seat-binding-conversion.mjs": "9f1b782a5a4a9059ad82fda27b79c6cc5ffaf057f6f1347e79ae5d74b49c00a1",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
@@ -988,6 +989,20 @@
       "line": 3621,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? readSharedConfig(dir)[key]",
+      "family": "unresolved-binary"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 34,
+      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:56",
+      "binary": "? bwrap",
+      "family": "unresolved-binary"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 35,
+      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:238",
+      "binary": "? bwrap",
       "family": "unresolved-binary"
     },
     {
@@ -2090,54 +2105,6 @@
       "class": "rust-test"
     },
     {
-      "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 51,
-      "spawn": "Command::new",
-      "binary": "/bin/bwrap",
-      "class": "argv-runner",
-      "resolvedAt": "packages/process/rust/src/containment/linux.rs:29"
-    },
-    {
-      "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 51,
-      "spawn": "Command::new",
-      "binary": "/usr/bin/bwrap",
-      "class": "argv-runner",
-      "resolvedAt": "packages/process/rust/src/containment/linux.rs:29"
-    },
-    {
-      "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 51,
-      "spawn": "Command::new",
-      "binary": "/usr/local/bin/bwrap",
-      "class": "argv-runner",
-      "resolvedAt": "packages/process/rust/src/containment/linux.rs:29"
-    },
-    {
-      "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 129,
-      "spawn": "Command::new",
-      "binary": "/bin/bwrap",
-      "class": "argv-runner",
-      "resolvedAt": "packages/process/rust/src/containment/linux.rs:30"
-    },
-    {
-      "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 129,
-      "spawn": "Command::new",
-      "binary": "/usr/bin/bwrap",
-      "class": "argv-runner",
-      "resolvedAt": "packages/process/rust/src/containment/linux.rs:30"
-    },
-    {
-      "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 129,
-      "spawn": "Command::new",
-      "binary": "/usr/local/bin/bwrap",
-      "class": "argv-runner",
-      "resolvedAt": "packages/process/rust/src/containment/linux.rs:30"
-    },
-    {
       "path": "packages/process/rust/tests/containment_bwrap.rs",
       "line": 70,
       "spawn": "Command::new",
@@ -2168,14 +2135,14 @@
     {
       "path": "packages/run-supervisor/rust/src/supervise.rs",
       "line": 415,
-      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:129",
+      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:238",
       "binary": "(parsed configuration (envelope[\"containment\"][\"bwrapPrefix\"].as_array().and_then(|))",
       "class": "configured-binary"
     },
     {
       "path": "packages/run-supervisor/rust/src/supervise/unix.rs",
       "line": 184,
-      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:129",
+      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:238",
       "binary": "(parsed configuration (envelope[\"containment\"][\"bwrapPrefix\"].as_array().map(|items))",
       "class": "configured-binary"
     },
