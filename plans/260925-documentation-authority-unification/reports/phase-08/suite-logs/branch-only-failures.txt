@@ -1,0 +1,18 @@
+✖ 8 processes adding worktrees for 5 rounds leave every worktree registered and intact
+✖ a holder workflow admits its writing unit using its origin, with one sidecar read for execution
+✖ all COMMAND_REGISTRY selectors appear exactly once in generated output
+✖ dead vocabulary guard: the fgos gateway and the herdr-dashboard plugin never go by their retired names
+✖ direct audit rejects a symlink output before reading the corpus
+✖ documentation lease admission refuses non-holder runs before writes and lets its holder reach a worker attempt
+✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json
+✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json
+✖ drift detection: clean committed file passes --check silently
+✖ fgos --help --json through the host is the whole manifest, byte-identical to the Node payload
+✖ R4: Doctor checks rust host packaging checks are registered and report the current target posture
+✖ R4 drift guard: checkVectors() reports clean on committed files
+✖ R4 drift guard: CLI --check exits 0 silently
+✖ R4 drift guard: committed envelope vectors match in-memory regeneration byte-for-byte
+✖ runner liveness retains current decision assertions with complete-record consumer evidence
+✖ the next advance of a run whose ledger ends in an unfinished line repairs it before reading
+✖ the real switchboard routes every promoted and candidate area entry point
+✖ the Rust command takes the lock right after a Node holder is killed

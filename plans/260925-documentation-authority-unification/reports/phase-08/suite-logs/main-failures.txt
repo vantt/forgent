@@ -1,0 +1,393 @@
+✖ 1. a controller killed with SIGKILL after the binding leaves an agent that finishes and an attempt that settles by itself
+✖ 1. controller killed after the binding: --resume takes the settled result, runs the agent once and commits the writes
+✖ 1. SIGINT after the binding: cancel request, receipt cancelled, the resume line, exit 130 within the wait
+✖ 2. a controller that gets SIGINT asks the supervisor to cancel, waits for the receipt, prints the resume line and exits 130
+✖ 2. a second SIGINT within 100 ms ends the controller at once and the attempt still ends cancelled
+✖ 2b. SIGTERM does the same and exits 143
+✖ 2. --resume while the attempt still runs is refused by name and changes nothing
+✖ 3. a supervisor killed midway: the agent runs to its end and the next fgos run settles it from gate-exit and the outbox
+✖ 3. controller dead before the supervisor started: --resume launches a new attempt that supersedes the abandoned one
+✖ 3. SIGTERM exits 143
+✖ 4. the runner commit failed after the settle: --resume commits again and never spawns the agent
+✖ 5. a signal while an attempt is handed over waits for its binding, then cancels it and names the unit
+✖ a blind panel synthesizer reads its panelists' reports as copies in its own directory
+✖ a blind unit reads its unit-run and gate-answer inputs as copies in its own directory, and cannot read the sources
+✖ a blind unit runs confined with its peers' run state hidden; the same unit unblind reads it
+✖ a blind unit whose input cannot be copied is refused with the reason, before anything launches
+✖ a blind unit with anonymized inputs gets neutral names in its own directory
+✖ a blind worker cannot read a peer, a gate answer, a peer home, a peer process or the herdr socket; unblind it still reaches files but not processes
+✖ a caller runnerConfig decides which executor runs the driver operation
+✖ --account pins provider account on every unit of the workflow run, kept for resume
+✖ a ceiling of two lets the fallback launch exactly once more
+✖ a commit-only resume whose in-scope work is gone fails as work-missing instead of passing empty
+✖ a conductor case moves past its entry milestone on what its own settle records, with no achieved written by hand
+✖ a conflicted file the worker turned into a directory refuses the conclusion and leaves no staging of the runner behind
+✖ a controller carrying case A launches a worker admitted into case B: the worker sees B only; a standalone launch sees none
+✖ a dead login in one pool leaves the other pool of the same family eligible, and a quota hit quarantines only that account
+✖ a dead login moves the seat to another account of the same provider, not to another provider
+✖ a debate side keeps in its rebuttal the candidate its first round ended on, so a primary that failed is not bound again
+✖ ADR-006 R5: executeDriverOperationChoice validate-plan onAdvance dispatch derives a decompose verdictPayload from plan.md's own committed "## Split" section
+✖ ADR-006 R5: executeDriverOperationChoice validate-plan onAdvance dispatch resolves verdictPayload undefined when plan.md never reaches a "## Split" section — never fabricates a verdict from silence
+✖ a failed runner commit keeps the checkout: retries and the next dispatch resume the same Unit run and only commit, never spawning the agent again
+✖ a failing unit verify becomes findings that carry its exit status and output
+✖ a fallback runs along a chain of three candidates, one pane each
+✖ a .fgos conflict keeps the branch side and never reaches the worker, through the real hook on a fgw/* branch
+✖ a fgos-discovered block with no description takes its own title, and one with an out-of-vocabulary or absent kind or risk takes the derived one — each item created instead of dropped
+✖ a file already dirty before the launch that the seat changed again also stops the retry
+✖ a file dirty in scope before launch is not committed and is recorded as preExistingInScope
+✖ a file outside the scope is found by its real name, so a non-ASCII name inside the scope passes
+✖ a frame given at start only narrows the guide's defaults
+✖ after a producer round passes, the runner commits what the worker wrote, with the agent summary as message
+✖ a human gate answer reaches the units of the gated step and of every step that depends on it, as a context ref
+✖ a lease that cannot take the account the bind named rebinds the seat: the failed pool is skipped, no walk step and no launch is spent
+✖ a limit screen moves the role to the next candidate in a new pane and closes the captured stopped pane
+✖ a loop worker runs as a Unit run: the run records the item, the runner commits, and the dispatch event and worker log name the run
+✖ a mutating operation runs in the item worktree and only the runner commits
+✖ a mutating operation whose runner commit fails never lets the driver proceed
+✖ an adapter failure removes the home
+✖ a named persona lands on its own seat only, mixed with a lens and an installed persona, in a consumer workspace; a resume after the file is edited uses the text pinned at start
+✖ an answer kept as a file by the detached door is folded in by the next proposer
+✖ an answer that arrives while a proposer holds advance reaches the ledger before the proposer acts on it, and approval of a changed artifact asks again
+✖ an edit no approval covers is still refused: only the exact approved bytes are accepted, nothing else
+✖ a nested `fgos run --writes` from a confined worker is refused as nested-write-from-confined-worker
+✖ a nested wave consumes the parent frame and an unknown remainder refuses the next write
+✖ an executor governance blocks is passed over for the next candidate, and the event records that one
+✖ an expertise gate reads the packet file a producer wrote beside its prose report, judged against the settlement time the run recorded
+✖ an index someone else staged in the worktree refuses the launch before the worker spawns: worktree-fail, then the retry starts clean
+✖ an integrate step that would land a unit with out-of-scope writes fails and says so
+✖ an item whose capability has no executor pool parks as no-executor with what to configure, and the runner keeps serving other items
+✖ anonymizeInputs hands a later unit neutral copies and a brief that names no step, unit, run or role
+✖ anonymizeInputs hands the role a copy under a neutral name, keeps the mapping in unit.json, and a resume reuses it
+✖ an out-of-scope file left uncommitted on a writer does not hold back the clean writer built on its branch
+✖ an overshooting batch lands soft: the member the ceiling gate refuses is left for a later poll, and the drain-run neither halts nor exits non-zero
+✖ anti-loop: a human reject (with reason) resets the runner gate — visits BEFORE it no longer count toward the cap
+✖ anti-loop: an item at MAX_VISITS is parked todo -> blocked and truly leaves the frontier — the next item runs in the same pass
+✖ a panel makes one seat-binding exec per seat, one per walk step and one per lease conflict, none under a lock
+✖ a panel seat that rotated keeps its role and the unit passes
+✖ a panel seat that walked to another provider lands on a family its siblings did not use
+✖ a panel Unit is admitted under a ceiling of its planned seats times the fallback allowance, and settles the launches it used
+✖ a panel with enough provider families lands every seat on its own family, the synthesizer on one no panelist used, and only the synthesizer is told to read the panelist reports
+✖ a panel with fewer provider families than members runs anyway: seats share families in pool order and the summary says so
+✖ a pinned account on a reviewed unit pins the seat of its provider; the checker of another provider binds freely
+✖ a pinned account runs, even when the lease would rank another account first
+✖ a pinned writing seat that changed the worktree before its limit reports the changed paths, not only the pin
+✖ a Playbook case that ran to a pass closes itself by the rules of close; failed, parked and conductor cases stay open
+✖ approve, edit the approved report, re-park, re-approve: the next step runs on the new content and passes
+✖ a pre-commit hook refusing the conclusion of a conflicted merge is hook-refused, keeps the merge, and the resume only commits once the hook lets it
+✖ a preset or plan writer that builds on two writers keeps starting from HEAD; only a units file is refused
+✖ a producer writing in and out of scope gets only the in-scope file committed and still passes
+✖ a proposer killed while its Unit runs leaves the reservation in place; the next proposer takes the same Unit run and the same reservation
+✖ a provider limit on a pinned account ends the seat: no rotation, no other executor
+✖ a provider limit on the first candidate moves the worker to the next candidate of the pool, and the event records the executor that really ran
+✖ a provider whose login just failed is not picked again by the walk, even through another executor of it
+✖ a provider with one account goes straight to the next provider
+✖ a quarantined pinned account is refused before any unit run exists, and a resume of a run pinned to it too
+✖ architecture-advisory: bounded findings reach synthesis/gate; transport failure blocks; the registered reopen keeps the findings through explanation and owner close
+✖ a reading seat that used up an account, a pool and a family walks pool accounts, the next entry, then the next family
+✖ a read-only seat of a writing unit still rotates: its sandbox kept the worktree as it was
+✖ a read-only Unit that names a case is admitted without writes
+✖ a read-only Unit that names no case needs no port
+✖ a read-only validate-plan result that shows a correlated change in its checkout does not advance Work
+✖ a real run carries the configured kill grace and the lock kill wait in its envelope and keeps the secrets in the side file only
+✖ a resumed declared unit keeps its stored pattern, never the caller pattern
+✖ a resumed unit keeps the run timeout it started with; an override passed to the resume does not change it
+✖ a resumed unit recorded before bindings carried a pool restarts its walk at the primary without a crash
+✖ a resumed unit recorded before write scopes existed hands its own writes to the assignment
+✖ a resumed workflow continues the unit run its dead controller started and dispatches no settled seat again
+✖ a resume takes a new baseline: work a person kept after a partial-writes stop does not stop the next rotation
+✖ a reviewed execution error publishes its summary only after the dispatched sibling result exists
+✖ a reviewed run at rigor high puts the producer and both checkers on three provider families
+✖ a reviewed run at rigor high refuses the checker that no unused family can serve
+✖ a reviewed run at rigor standard lets two checkers share a family, as before
+✖ a reviewed run never lets the producer family also check its own work; the reviewer is told to review and handed the producer's report
+✖ a reviewed run with a single provider family refuses the checker instead of self-reviewing
+✖ a reviewed run with no verify command passes but says it verified nothing; the code-change preset pins none
+✖ a round stopped on its own partial writes keeps its checkout, and the item's next dispatch resumes that same Unit run over them
+✖ a run edited on disk after it started keeps the guide it started with
+✖ a running unit whose recorded worktree is gone starts a fresh Unit run instead of failing the workflow
+✖ a run uses the confined invocation that was approved, not the executor first cli invocation
+✖ a solo run needs no verify and does not claim to have skipped one
+✖ a standalone writing run goes on only when the port answers unbound, and never admits
+✖ a step after a panel step is handed the report of every panelist and of the synthesizer
+✖ a stored result with only the legacy planContentHash, in the flat layout, is still found and checked
+✖ a unit persona defined in the workspace tier reaches the prompt as text pinned when the unit run starts
+✖ a unit-preferred executor that hits its usage limit walks on to the capability pool
+✖ a unit-run input reaches the roles as the absolute path of that role's report, resolved once into unit.json; a resume refuses a record from a newer release
+✖ a unit-run: ref from item data never becomes a unit input through choice.contextRefs
+✖ a units file runs through startWorkflow, and a unit's prefer and persona reach the Unit it runs
+✖ a unit's skills in a units file reach bind(), and a pool that cannot provide them refuses the unit
+✖ a unit's timeoutMs in a units file reaches the Unit and its dispatch and wins over workflow start --timeout; one out of range is refused
+✖ a unit's verify in a units file reaches the Unit and runs in its worktree
+✖ a unit template persona and params reach the binding and the per-role objective
+✖ a unit template that declares inputs gets only those steps, and its own seat's result of a same-seat step
+✖ a Unit that names a case is admitted before custody and the unit directory, linked in unit.json, settled once after custody is released
+✖ a unit that wrote outside its writes ends findings and its branch is not integrated
+✖ a Unit the frame has no room for is refused by name and ends its step
+✖ a unit verify command runs in the worktree after the producing round and a zero exit passes
+✖ a unit with an objective and a clean sync gets the merge commit first, then the worker commit
+✖ a usage limit is recognised without an account lease and walks to the next provider
+✖ a usage limit on a headless round moves the seat to another account of the same provider
+✖ Authority Door: required mode with bwrap backend assesses, prepares, executes, cleans up, and records attestation
+✖ a verify command that outlives runner.timeoutMs fails the verify with the timeout named, never hangs
+✖ a verify declared on the capability is used when the unit names none
+✖ a Work driver step with writes in an unbound claim worktree runs as before; the same worktree owned by a case is refused
+✖ a worker claim the runner refuses after the worker ran is a failed attempt of that item, never a halt of the whole runner
+✖ a worker output repeating the identical fgos-discovered block twice creates exactly one item, while a genuinely distinct block in the same output still creates its own (idempotency check does not over-match)
+✖ a worker round that fails after writing files is a failed attempt: goal-check never judges its uncommitted files, so a branch holding an old commit is not proposed
+✖ a worker that fails over a conflicted merge leaves the merge for the resume, which runs the worker again
+✖ a worker that passes with markers left gets no commit; fixing them and resuming commits only
+✖ a workspace definition replaces the installed one of the same name whole
+✖ a write into the main checkout during the round reaches the loop log as a stray-write warning, and the round still settles
+✖ a writer whose base writer has no branch fails instead of starting from HEAD
+✖ a writing dispatch of a conductor case runs, settles once, and a disjoint one runs while another is still reserved
+✖ a writing seat passes the mutating gate on a walk that skipped a provider with a dead login
+✖ a writing seat passes the mutating gate on its account-rotation retry
+✖ a writing seat that changed the worktree before a provider limit stops instead of running again
+✖ a writing seat that used up an account, a pool and a family walks pool accounts, the next entry, then the next family
+✖ a writing unit's verify child borrows the custody lease while it runs
+✖ a writing unit that builds on one writing unit starts from that unit's branch; status lists both branches
+✖ a writing unit that builds on two writing units is refused at start, before any run exists
+✖ a writing unit whose first candidate hits a limit is committed through the mutating gate from the fallback
+✖ a writing unit with its own prefer passes the mutating gate, also on a walk out of it
+✖ a writing unit without a sync whose worker only rewrites a file already dirty in scope still has no evidence
+✖ bin/fgos-runner.mjs run from a SUBDIRECTORY of another repo operates on that repo (root from cwd, never __dirname)
+✖ bounded drain-run: three independent ready items under maxRoots=2 dispatch across two waves (refill) — all reach proposed, then the run terminates
+✖ breaker inert under default config: same goal-check miss with no breakerThreshold override parks the item instead of tripping the breaker (phase2-p1-breaker-inert-fix)
+✖ breaker trip: a goal-check miss at threshold parks the item and halts the run — worktree gone, branch kept (halt path teardown)
+✖ business-discussion: bounded findings reach synthesis/gate; transport failure blocks
+✖ business-discussion completes in a directory that is not a repository
+✖ business-discussion completes on a detached HEAD without origin/HEAD and moves no ref
+✖ Cell 6.1 happy path: driver consumes READY+reported and feeds the existing planning edge through engine verbs only
+✖ Cell 6.1 happy path: run evidence is complete and the verdict artifact is a worker artifact, never a control-plane file
+✖ Cell 6.1 happy path: runOnce dispatches planning.validate-plan to a fake executor and stores a done/reported RunResult
+✖ Cell 6.2 failed stop: malformed agent-result.json fails closed and leaves Work untouched
+✖ Cell 6.2 no-evidence stop: an executor that writes nothing leaves Work untouched
+✖ Cell 6.2 read-back tamper: a deleted agent-report.md is never consumed cross-pass
+✖ Cell 6.2 read-back tamper: a schema-broken agentClaim in the stored result.json is never consumed cross-pass
+✖ Cell 6.2 red-team: string-only evidenceRefs without a companion report never classify reported nor advance Work
+✖ Cell 6.2 staleness: an mtime-hidden plan.md edit is still caught by the recorded plan content hash
+✖ Cell 6.2 staleness: plan.md edited after settle is never consumed cross-pass — validate-plan re-dispatches and Work stays put
+✖ cell fan-out-parallel-9: a leaf whose root branch already carries a planted commit forks its own worktree from that root tip, not from main
+✖ cell fan-out-parallel-9: a root-less item is unaffected (byte-for-byte regression) — its worktree still forks fresh from main, exactly as before this cell
+✖ cell fan-out-parallel-9: a root whose own branch already carries a planted commit (simulating an earlier merged leaf) reuses it via the existing branch-reuse path — proves the mechanism, not a real leaf-to-root merge
+✖ Cell P01.2: a child spec without a cited D-ID in plan.md's own split JSON block is rejected on the Assignment/runner path too (same gate as the caller-verdict CLI path)
+✖ Cell P01.2: reviewer READY on an item whose plan.md declares split children materializes children through resolvePlan and moves the root to executing
+✖ Cleanup: adapter failure and timeout/cancel clean up temporary resources in finally block
+✖ CLI: fgos workflow start and status for discussion workflows
+✖ CLI workflow start accepts --timeout and --account, while resume refuses them
+✖ close: refused while a consent gate is parked or a closure milestone went stale; allowed otherwise; keeps the binding of a live attempt
+✖ coding/feature implement-item: done reviewer findings cause one revision then fail the step
+✖ coding/feature validate-plan: done reviewer findings cause one revision then fail the step
+✖ concurrent createSession from real separate OS processes never loses a registry entry
+✖ concurrent dev consumers with distinct Cargo targets keep independent verified artifacts
+✖ concurrent resumes give exactly one proposer, and a run recorded before cases existed is opened by it
+✖ confinement-probe-freshness reports probe results through the real probe harness
+✖ conflicted paths enter the write scope and the brief; the runner finishes the merge after the worker resolves them
+✖ cross-repo workflows reject plain context paths before recording a run, but consume state-root unit reports
+✖ declared and pinInputs come back from unit.json on resume, never from the caller
+✖ dev door runs the real Node consumer from INIT_CWD with absolute Cargo output
+✖ dev door runs the real Node consumer from INIT_CWD with relative Cargo output
+✖ direct: no-binding: --resume takes the attempt through adopt to the unit summary, the agent runs once
+✖ doctor reports blind-read through the real probe
+✖ domain-aware discovered-from addWork inherits parent domain+stage
+✖ download: a committed pin beats "latest" (no network when nothing explicit is given)
+✖ download: fgctl upgrade downloads the target release, verifies SHA256SUMS, and records the tag in the pin so a teammate can init from it
+✖ driver loop routes done review findings with REJECT to fix-verify-red instead of blocking
+✖ driver loop runOnce: a confined validate-plan worker cannot modify the dirty-before plan.md and Work does not advance
+✖ driver loop runOnce: executing review-item with APPROVED verdict and passing goal-check verify advances to awaiting-approval (Finding P1 & P2 fix)
+✖ driver loop runOnce: executing review-item with APPROVED verdict but failing goal-check verify refuses awaiting-approval and routes to fix (Finding P1 & P2 fix)
+✖ driver loop runOnce: executing scout-blast-radius with failed or no-evidence result settles item to blocked and DOES NOT fall through to implement-item (Finding P2 fix)
+✖ driver loop runOnce: validate-plan failed keeps Work in planning without advancing stage
+✖ driver loop runOnce: validate-plan no-evidence keeps Work in planning without advancing stage
+✖ driver loop runOnce: validate-plan reported READY advances Work from planning to executing
+✖ driver loop runOnce: validate-plan with READY ignores reviewer verdictPayload "decompose" and does not create children (Finding 1 fix)
+✖ driver loop runOnce: validate-plan with READY ignores reviewer verdictPayload "need-human" and does not park item (Finding 1 fix)
+✖ driver loop runOnce: validate-plan with READY WITH CONSTRAINTS and worker self-claim alone STOPS in planning (Finding P2 fix)
+✖ e2e crash-idempotency: runner killed mid-round (after doing, before the worker settled) -> nothing was committed, the item log keeps the Unit run id, and a later --once reaps the item to a defined state, keeping the killed round's uncommitted checkout
+✖ e2e full journey: item1 (no deps) -> awaiting-approval with a worker commit on fgw/, item2 (dep on item1) stays closed while item1 is only proposed, second --once dispatches nothing
+✖ e2e pr-gate (a) runner item full loop: add -> runner dispatch -> awaiting-approval, review shows the branch diff, approve merges + verifies -> done with settlement role human, câu-6 learning present, and the branch/worktree are cleaned up
+✖ e2e pr-gate (b) conflict: approving a runner item whose branch conflicts with a diverged main aborts the merge cleanly -> blocked (reason merge-conflict), main left byte-for-byte intact
+✖ e2e runner commit: a worker that only edits files gets its work committed by the runner before goal-check -> awaiting-approval with exactly one commit whose subject is the Result summary
+✖ e2e runner --once prints a trailing fgos.v1 envelope: the last stdout line parses as fgos.v1 with the real dispatched outcome
+✖ e2e self-improve loop full contract (D1-D17): friction w/ heavy keyword -> friction rank/show (read-only) -> fgos submit -> runner dispatch -> review -> approve refuses without --acknowledge-iron-law -> approve --acknowledge-iron-law succeeds -> done
+✖ e2e stage-clarify+stage-decompose (a) clear+pass-through: --once safely no-ops on a fresh clarify item (D16); explicit discover/decompose --verdict calls advance it to executing, then --once dispatches it
+✖ e2e stage-decompose (b) complex item: an explicit decompose --verdict decompose --children writes 2 children (real parent+deps+verify); the root is frontier-blocked until both children reach done, then it lots frontier and runs its OWN verify -> awaiting-approval
+✖ e2e synthetic domain: add --domain synthetic (no --stage) dispatches through the real runner side by side with a plain coding item, both reaching done via the identical dispatch.mjs code path, zero cross-effect
+✖ each role of a panel gets its own seat's earlier report as own-previous, blind or not, and not the other seats'; a seat the earlier run did not have is refused by name
+✖ --effort becomes a reasoningEffort override on every unit, with no origin that claims a person typed it, kept in the run for resume
+✖ every candidate at its provider limit parks the item as provider-limit and keeps the runner alive
+✖ every playbook and a units wave run in the order of the committed baseline
+✖ every Unit is admitted before it runs and settled after it, with the proposer's own advance hold
+✖ executing.scout-blast-radius that tries to write the repository is refused by its sandbox and stops driver execution
+✖ F2c composed: a schema-valid NOT READY -> READY flip in the stored result.json is never consumed cross-pass
+✖ F2d(c) composed: a result.json-only tamper cannot relocate evidence to a planted report — validate-plan re-dispatches
+✖ F2d composed: a phantom future run dir with a recomputed plan hash is never consumed — validate-plan re-dispatches
+✖ F5 anti-wedge: honest re-plan then re-dispatch then consume keeps the normal cycle healthy
+✖ failing tests:
+✖ fanout batch: a failing runner commit returns the item blocked, never left claimed
+✖ fanout batch: a worker that only edits files is committed by its Unit run, so return advances the item
+✖ fanout batch: a Work item's rigor and risk never raise the tier its Unit run binds, and the door authorizes no raise
+✖ fanout batch: in one batch a passing item reaches awaiting-approval and a failing one returns blocked, each with its own Unit run
+✖ fanout batch runs from its own node entry: `node src/runner/fanout-batch.mjs "<ids>"` prints the same result JSON
+✖ fanout batch: the batch runs its candidates concurrently -- each worker sees the other's Unit run before it finishes
+✖ fgctl init writes the sh and cmd launchers; verify names a missing one and repair rewrites it
+✖ fgos plan on a standard plan without caller verdict advances Work to executing after READY validation
+✖ fgos run --capability and --persona are the unit's own declarations: a committed tier above the default binds, as in a unit file
+✖ fgos run executes read-only unit from file
+✖ fgos run exits with code 0 on pass while emitting valid json envelope
+✖ fgos run exits with code 11 on execution-failure via real CLI
+✖ fgos run keeps --timeout: it raises no tier
+✖ fgos run --override with a tier at or below the resolved tier still runs, at that tier
+✖ fgos run "<prompt>" builds a read-only unit from the prompt and runs it
+✖ fgos run "<prompt>" makes an ascii id of bounded length from any prompt
+✖ fgos run "<prompt>" --timeout gives the run its own time, kept in unit.json and handed to the dispatch
+✖ fgos run "<prompt>" turns --input and --verify into the unit's inputs and verify
+✖ fgos run "<prompt>" turns --provider, --persona and --rigor into the unit
+✖ fgos run "<prompt>" with both --provider and an --override executor: the override pins
+✖ fgos run "<prompt>" without --input or --verify leaves both off the unit
+✖ fgos run "<prompt>" --writes from a linked worktree records the write scope
+✖ fgos run with an effort override renders it into the CLI the bound executor spawns
+✖ fgos run with herdr present runs a confined read-only unit in a pane: the gate is inside the sandbox, the socket is bound in, the agent has a pid namespace of its own
+✖ fgos workflow start --units <file> --effort runs the units and reports the write branches
+✖ Finding 1 fix: non-tiny/non-small plan where validate-plan returns READY and verdict is decompose creates children and advances Work
+✖ Finding 1 fix: non-tiny/non-small plan where validate-plan returns READY and verdict is pass-through advances Work
+✖ Finding 1 regression test: Assignment-backed validate-plan with returned children or verdictPayload cannot create child Work
+✖ Finding 1 regression test: valid validate-plan NOT READY RunResult causes next driver action to be shape-plan
+✖ Fix Step 06 cli-spawn cwd selection for planning.validate-plan: runs assignment in worktree root when plan.md exists only in worktree
+✖ full cycle: the driver runs validate-plan through runUnit and the next pass finds the verdict itself; an edited plan is not consumed
+✖ group-cognition debate step: a pool of two families cannot seat an independent judge and is refused by name
+✖ group-cognition debate step: both sides argue, answer each other, and an independent judge rules for the synthesis
+✖ H10/D2: the production scenario (a required capability with no executor-level confinement.backend, e.g. advise/code:review/code:debug) dispatches successfully via the defaulted 'bwrap' backend, never refuses for lack of an explicit backendId
+✖ H9: the assignment/Run-owned launch door attests outcome:'enforced' on a genuinely prepared+successful required dispatch (P06 evidence regression)
+✖ holder-lock gate: a git that leaves a background gc while it borrows a lock passes upgrade and repair, and the escaped gc is ended with nothing left holding a lock
+✖ human consent gate: answering without --approve leaves gate parked with clarification note, and answering with --approve releases it
+✖ human input gate (mode: input): answering without --approve releases the gate directly
+✖ idleTimeoutMs kills a worker that went silent well before the hard cap; unset, only the hard cap applies; output resets it
+✖ integration: a real mutant (m-edit-1) is applied and classified inside a real detached git worktree
+✖ live log: the item log names the Unit run and its stdout log before the worker settles, and the terminal block carries the full stdout
+✖ live log: two items dispatched in the same parallel wave never interleave into each other's log file
+✖ markers longer than seven characters (conflict-marker-size) are still found
+✖ marketing/content-publish: bounded findings reach synthesis/gate; transport failure blocks
+✖ mutating producer findings preserve dirty work and never create a runner commit
+✖ no workerSlots ceiling configured leaves the drain-run exactly as it was — occupancy is not a ceiling on its own
+✖ P1 fix (defect-class sweep): a retry on a root item whose branch already carries a planted commit preserves that pre-existing content while still discarding only its own failed first-attempt commit
+✖ P1 fix: retry resets to this item's own dispatch baseline, not HEAD — a differently-committing retry never carries the first (failed) attempt's commit forward
+✖ P4a composed: a planted pinned-dir report and result.json field edits cannot forge a READY verdict — Work stays untouched
+✖ P7: Repair failure when rollback previous release is missing refuses with clear message
+✖ P7: Upgrade candidate local tail failure leaves workspace in diagnosable state with ready-degraded transaction
+✖ P7: Upgrade candidate preflight failure refuses upgrade and leaves existing activation untouched
+✖ panel members run on different provider families; when they take every family the synthesizer still runs, on the least used one
+✖ plan.md only in the item worktree, validate-plan read from the state root: the digest matches by rel and the verdict is consumed
+✖ producer expertise gate parks clearly on malformed packets and remains answerable across resume
+✖ R1 Case 8: prepared claims mismatch plan refuses with confinement-plan-mismatch and 0 adapter calls
+✖ R1, R2, R3, R6: A -> B upgrade then repair round-trips reported digest with zero work-state changes
+✖ R1, R6: Upgrade candidate whose stateSchemas.read omits workspace current schema is refused before publish
+✖ R1, R6: Upgrade candidate whose stateSchemas.write omits workspace current schema is refused before publish
+✖ R3: Repair when previousArtifactDigest is null re-verifies active release and heals broken capsule
+✖ R4, R5, R6: Corrupting one byte in active release triggers quarantine and status reflects quarantined: true
+✖ R5: Node-against-Node passes all coverage-floor cases
+✖ R7: probe 1 (run-output writable) passes on valid sandbox and fails on red falsifier
+✖ R7: probe 2 (host-write denied) passes on valid sandbox and fails on red falsifier
+✖ R7: probe 3 (workspace writable ONLY) passes on valid sandbox and fails on red falsifiers
+✖ R7: probe 4 (other runDir denied) passes on valid sandbox and fails on red falsifier
+✖ R7: probe 5 (private home isolated) passes on valid sandbox and fails on red falsifier
+✖ R7: probe 6 (no inherited writable fd / MED-1 fix) passes with fd closer and fails without it
+✖ R7: probe 7 (executor credentials read-only) passes on valid sandbox and fails on red falsifier
+✖ R7: runAllConfinementProbes runs all 8 probes and succeeds on Linux
+✖ R8: checkConfinementProbeFreshness in doctor passes on Linux with working bwrap
+✖ R8: live bwrap dispatch executes through Confinement Authority when bwrap is available (FGOS_LIVE_BWRAP_TESTS=0 to opt out)
+✖ read-only posture: repo writes are blocked, the run outbox stays writable
+✖ real concurrency: two independent ready items dispatched in ONE runOnce run at the same moment (each worker sees the other one running) and both reach proposed with a consistent event log
+✖ Red-team LOW: same-digest upgrade is idempotent (no new activationId, no self-referential previousArtifactDigest)
+✖ Red-team MEDIUM: a "falsely ready" binding (release moved but status never updated) self-heals via init --from
+✖ Red-team MEDIUM: repair of a tampered active release (no previousArtifactDigest) quarantines it, not just refuses
+✖ registered advisory parks on producer expertise and closes only after the owner answers
+✖ reported READY allows existing planning edge path
+✖ resume after a foreign index appeared mid-round only commits: the producer is not spawned again
+✖ resume after committed-set-mismatch refuses while the commit is on the branch
+✖ resume keeps the effort the run started with
+✖ resume settles a pending runner record after the native commit completed
+✖ resume uses the persona text pinned at start after the file is deleted
+✖ reviewed findings acceptance proceeds while default and execution failure stop
+✖ Reviewer M1: a quarantined workspace recovers via fgctl init --from (documented door), status returns to ready
+✖ Reviewer M2: upgrading away from a quarantined activation chains previousArtifactDigest past it, not to the moved digest
+✖ rigor: each Work source reaches the unit as a rigor demand, is never lowered, and never moves the tier
+✖ rotation stops after the accounts the provider has, then the walk leaves the provider; the unit's run timeout rides every attempt
+✖ runner: executes business-discussion workflow up to approval gate and advances to finish
+✖ runner: executes delphi workflow end-to-end
+✖ runner: executes group-cognition workflow end-to-end
+✖ runner: executes nominal-group workflow with human gate
+✖ runner: executes workflow with parallel steps and parks at human gate
+✖ runner sweep: a "triage" fixture-domain item at its own Clarify-mapped stage no longer halts the whole tick — an unrelated coding item in the same sweep still dispatches
+✖ runOnce: an item already advanced to planning (via an explicit prior discover call, the only live path left post-tsk-5mj) still gets swept to executing and dispatched in the SAME runOnce pass; the clarify-pass settlement recorded at that prior call reads role "session"
+✖ runOnce clarify+decompose sweeps never touch a synthetic-domain item with no Clarify/Divide-mapped stage — it dispatches straight through instead of being wrongly swept
+✖ runOnce decompose sweep still fires normally for a coding-domain item advanced to planning (no behavior change for coding)
+✖ runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> awaiting-approval, branch kept, worktree gone, runner is the only .fgos writer and stamps role "runner" on every move it writes
+✖ runOnce logs the "<executorId> — <provider> — <model>" announce line and appends a matching executor.dispatch audit event
+✖ runOnce's executor.dispatch audit event records the REAL spawned command even when a executor declares a different provider label (tsk-33w D9: the audit must not lie when the two diverge)
+✖ runUnit records the write scope widened by generatedPaths and hands it to the assignment
+✖ runUnit runs solo read-only unit end-to-end
+✖ runWatch threads the SAME breaker instance into every cycle: misses accumulate ACROSS cycles past what one dispatch alone could reach (cross-cycle sharing)
+✖ S10: a re-dispatched item re-emitting a block it already captured on a prior dispatch creates no additional item
+✖ S10: a worker output with more than DISCOVERY_CAP (20) fgos-discovered blocks creates exactly 20 items, surplus skipped, dispatch outcome unaffected
+✖ S11: a discovery block title with embedded newlines cannot forge extra log lines (sanitized in the idempotent-skip log), and a very long title is clamped in the log and bounded in the stored item
+✖ S3a composed: a single runtime.exitCode flip cannot erase a settle-classified failed run — Work stays untouched
+✖ six seats on a pool with fewer provider families start without a waiver and report the shared families
+✖ spawnWorker: a round that fails after writing files is worker-failed and commits nothing; one that fails clean returns commit "none" for goal-check
+✖ spawnWorker: a worker printing past the output budget is killed, and what it printed before is kept
+✖ spawnWorker binds the default tier whatever rigor the work item declares: rigor never moves the tier
+✖ spawnWorker binds the tier its capability declares; the capability rigor only says how careful the unit is
+✖ spawnWorker does not hand the Rust host recursion guard to the worker, and keeps the rest of the environment
+✖ spawnWorker passes an executor's own resolved env to the worker, never into the host
+✖ spawnWorker prints one "fgos: dispatch ..." line naming the unit run, executor, transport, model, tier and outcome
+✖ spawnWorker reports the template its prompt was rendered from, for the executing step and for discovery
+✖ spawnWorker result names what really ran: executor, provider, command, and the attested worktree commit and branch
+✖ spawnWorker runs the item worker as a Unit run in its worktree: tier -> model, the objective is the worker prompt, and the run is named
+✖ spawnWorker: the runner commits what the worker left (commit "runner"); a worker that changes nothing leaves commit "none"
+✖ spawnWorker threads a dispatch depth of 1 into a fresh worker, and refuses at the cap without starting one (classified park)
+✖ spawnWorker throws worker-spawn-fail when the configured command does not exist
+✖ spawnWorker throws worker-timeout past the time budget and keeps what the worker printed before the kill
+✖ state-conflict: a racing write under the runner's claim makes its own CAS fail -> cleanup, clean halt, exit 3
+✖ Step 06 executing.review-item reject routes to fix operation without lifecycle movement
+✖ Step 06 executing.scout-blast-radius report with fake executor stores all assignment/run/result files and does not mutate Work
+✖ Step 06 executing-stage scout-blast-radius operation choice runs through runOnce loop safely without mutating Work
+✖ Step 06 governance-blocked or failed executor returns a stop without advancing Work
+✖ Step 06 planning.validate-plan failed stops safely and does not advance Work
+✖ Step 06 planning.validate-plan no-evidence stops safely and does not advance Work
+✖ Step 06 planning.validate-plan runs as Work-attached Assignment and stores assignment/run/result files
+✖ the attestation records the override, the effective hostRead and the hidden roots it resolved
+✖ the blind-read probe passes on the real argv and fails when the masks are left out
+✖ the discovery sweep still runs normally when the lane has room
+✖ the fanout command the fgos-fanout skill teaches runs as written: node src/runner/fanout-batch.mjs "<ids>" --has-live-task-access
+✖ the outbox a blind worker writes lands on the host and its brief is left as it was
+✖ the owner request and earlier step output reach each unit objective
+✖ the probe set grows by one for a blind dispatch and keeps its own fingerprint and cache entry
+✖ the process GROUP is killed on timeout: a grandchild the worker itself started does not survive
+✖ the same approval stands while its artifact is untouched, and the publish Unit is admitted
+✖ the seat-launch ceiling stops the fallback chain: a provider limit stays one and the seat says why
+✖ the walker never takes another operation of the same item for the validate-plan verdict
+✖ the write gate asks the same port before the commit, and a refusal commits nothing
+✖ --timeout gives every unit of the workflow run its own timeoutMs, kept for resume
+✖ tsk-30v: DISCOVERY DISPATCH sweep advances discovery -> planning on a clear verdict, skipping exploring, carrying the worker's proposed verify onto the item
+✖ tsk-40m code-review finding (blocker): a claim reclaimed by a DIFFERENT actor mid-dispatch is never silently settled by the runner's own stale claimId -- CAS conflict, clean halt, exit 3
+✖ tsk-4v6/tsk-30v: DISCOVERY DISPATCH sweep advances the item to exploring AND parks it on an unclear verdict, matching the interactive driver path
+✖ two checkers whose leases conflict at once rebind one after the other and each still differs from the producer and from the other checker
+✖ two-tier cap: a root with three ready leaves dispatches maxLeavesPerRoot per wave, refills the rest, all leaves reach proposed under one shared root owner
+✖ unsealed thresholds 599, 601 and 3601 seconds
+✖ validate-plan failed does not move Work
+✖ validate-plan no-evidence does not move Work
+✖ validate-plan NOT READY with done findings returns to planning without advancing or blocking Work
+✖ verify-miss: worker commits the wrong thing -> retry once, then park to blocked (never proposed)
+✖ verify passes but the worker changed nothing -> no commit, classified verify-miss, parked after retries
+✖ wgi-8: a malformed fgos-discovered block is skipped (fail-safe) — the dispatch still proposes and no item is created
+✖ wgi-8: a worker fgos-discovered block makes the RUNNER create a new item stamped discoveredFrom = the dispatched item (the worker never writes)
+✖ wgi-8: even a TIMED-OUT worker (output on the err.stdout path) has its fgos-discovered report captured exactly once at the terminal outcome, no duplicate across the retry
+✖ when every account and every candidate is used up the seat and the unit fail
+✖ with no candidate left a limit stays a structured provider-limit outcome and opens no second pane
+✖ worker-spawn-fail: nonexistent executor -> retry per matrix, then park to blocked
+✖ workflow and unit CLI options reach the actually dispatched prompts and drive settled stance behavior
+✖ workflow resume preserves an unknown custody predecessor and redispatches in a fresh worktree
+✖ workflow root context refs persist and reach only root Units across resume
+✖ workflow start --seats through the real CLI stores the expanded definition and provenance, seats the lenses and reaches downstream units
+✖ workflow with two units on different providers pins account only on matching unit and both run
+✖ workspace-write producer writes in its worktree only; the reviewer is read-only
