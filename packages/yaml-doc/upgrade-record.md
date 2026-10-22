@@ -1,6 +1,6 @@
 # fgos-yaml-doc parser upgrade record
 
-Status: parser evaluation complete, **waiting for owner sign-off**. No parser dependency has been added to the repository.
+Status: **option A signed by the owner (2026-10-22 18:02); `saphyr-parser` 0.2.2 and `arraydeque` 0.5.1 are vendored and in use by the parse phase.** The fuzz result is still open (section 12).
 
 - Evaluated: 2026-10-22 (Asia/Saigon), toolchain `cargo 1.97.1`, Linux x86_64.
 - Scope: choose the one parser crate under `fgos-yaml-doc` (spec `docs/platform/yaml-document/spec.md` sections 5, 8, 9).
@@ -315,9 +315,25 @@ Vendoring layouts (spec section 9; sizes are the exact `cargo vendor` output of 
 ## 12. Sign-off and later fields
 
 - Owner sign-off: option A (`saphyr-parser` 0.2.2 with `arraydeque` 0.5.1, vendored under `packages/yaml-doc/third-party/`), owner 2026-10-22 18:02 ("ok chọn A"); condition: the remaining source of `saphyr-parser` (`scanner.rs`, `parser.rs`) and `arraydeque` is read before the dependency is added, and anything unusual reopens this gate; a fuzz finding in the parser also reopens it.
-- Integrity hash: filled when the chosen crate is vendored
+- Integrity hash (2026-10-22). Each crate was unpacked from the `.crate` whose sha256 equals the checksum of section 2 (the files of the unpacked directory equal the registry copy except cargo's own `.cargo-ok` marker, which is not committed). The digest of a tree is the sha256 of its manifest, one line `<sha256 of the file>  <path>` per file, paths relative to the crate directory with `/`, sorted by byte order. `tests/third_party_integrity.rs` recomputes both lines and fails on a changed, added or removed file or an unrecorded crate:
+  - `packages/yaml-doc/third-party/saphyr-parser-0.2.2`: tree-sha256 `3fdca3956bf5884ec07233922326c8c14286b867913eb697452fa6fd2960ebff` (39 files)
+  - `packages/yaml-doc/third-party/arraydeque-0.5.1`: tree-sha256 `b7617ece535c8fbf8c47bd38bfaadf31fa8860d27956a3f9a98632d3077a1a12` (12 files)
 - Fuzz result: filled when the fuzz targets have run
 
 ## 13. Reproduction
 
 Scratch project: `.fgos/runtime/tmp/yaml-eval/` (own `[workspace]`, `.cargo/config.toml` sets the output directory to `out/`). Bins: `eval` (4.1), `rt` (4.2), `parity` (4.3), `gate` (3.3), `cmt` (3.3), `cprobe` (5.2), `msgs` (5.3), `adv` with `adv.py` (6.4), `pre` (6.4), `perf` (6.6); `unsafe_scan.py` (6.1); `gen_config.py` turns `.fgos/config.json` into the YAML used as the real-config input; `deny-<candidate>/` hold the scratch locks for 6.5 and the `cargo vendor` runs for 9. Versions are pinned in `Cargo.toml` with `=`. Commands: `cargo build --jobs 4 --release --bins`, then run each binary from the scratch directory.
+
+## 12.1 Wiring, adapter and parse runner (2026-10-22)
+
+- Layout (a): `packages/yaml-doc/third-party/<crate>-<version>/` plus `[patch.crates-io]` path entries and an `exclude` of `packages/yaml-doc/third-party` in the root `Cargo.toml` (path crates under the workspace directory would otherwise become members). The dependency line of `fgos-yaml-doc` is `saphyr-parser = "=0.2.2"`. The `Cargo.lock` diff is the two new packages, `saphyr-parser` with edges to `arraydeque` and `thiserror`, and the edge from `fgos-yaml-doc`; `thiserror` stays at 2.0.20 (the workspace pin, which `saphyr-parser`'s `^2.0.20` accepts). The patched crates carry no registry checksum in the lock: the tree digest above is their pin. `cargo tree -p fgos-yaml-doc` shows exactly `saphyr-parser`, `arraydeque`, `thiserror`, `thiserror-impl`, `proc-macro2`, `quote`, `syn`, `unicode-ident`, `serde_json`, `sha2` and their existing dependencies. A consumer outside the root workspace (`apps/fgos-gateway` has its own lock) needs the same `[patch.crates-io]` lines; that belongs to the consumer move.
+- The vendored `arraydeque` 0.5.1 emits three `mismatched_lifetime_syntaxes` warnings on rustc 1.97 (lines 1291, 1317, 1497). They are in the unmodified third-party source and are not promoted by the crate's `-D warnings` run.
+- Adapter: `src/backend.rs` is the only file that names the parser. It pulls `next_event()` into an arena tree (nothing recursive), and derives spans with the rules of section 3.2 plus what the parse fixtures showed. Deviations from the evaluation scratch code, each pinned by a fixture:
+  - rule 3 (block scalar start) read the line directly before the content; with blank lines between header and content that is the blank line. The header is now read back over blank lines (`spans-literal-block-scalar`), and a header-only scalar at the end of the input is recognized by its start (`spans-block-scalar-at-end-of-input`, `spans-empty-block-scalar`).
+  - rule 6 (tag and anchor start) is implemented: a backward word scan over blanks, line breaks and comments (`anchor-line-with-comment-strict`, `tag-after-anchor-tool`); the four refusal positions of section 4.1 are exact.
+  - an empty mapping value sits right after the `:` of its key (`spans-empty-values`, `spans-flow-collections-with-comments`).
+  - **parser defect corrected**: a block scalar with a header and no content at the end of the input is read by `saphyr-parser` as one line break (`k: |` then end of input gives `"\n"`); YAML and the old door read it as empty. The adapter clears it (`blockscalar-empty-at-end-*`, `blockscalar-empty-keep-*`); a 120-case matrix of headers and trailing blank lines, mid-document and at the end, agrees with the old door on all 120.
+  - an implicit key longer than the parser's 1 024-character reach is a parser syntax error; the adapter reports it as `key-too-large` (`key-over-limit`, `key-over-limit-quoted`). The key bound counts bytes, so 513 two-byte characters pass the parser and are refused by the walk (`key-over-limit-multibyte`).
+- Parse runner `tests/golden_parse.rs`: every parse fixture under the profiles it names, including the 33 limit and rule cases the evaluation did not run per candidate, the position cases, `spans` and `revision`. Result: green.
+- Differential against the old door (`parseYaml`, tool profile, scratch, not committed): the 56 tracked YAML files and scratch files give 55 identical canonical JSON values and 1 file both refuse at the same position (2:31); the 215 fixture inputs up to 300 kB give 165 identical, 35 refused by both and 15 different on purpose (hidden characters in keys, key and depth bounds, invalid UTF-8, `-0` kept as a float).
+- Mutation run (scratch, not committed): about 78 000 parses of mutated fixtures and repo files under both profiles in a debug build, no panic reached the guard. This is not the fuzz run; it does not replace it.

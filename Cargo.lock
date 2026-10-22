@@ -18,6 +18,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "arraydeque"
+version = "0.5.1"
+
+[[package]]
 name = "bitflags"
 version = "2.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -384,6 +388,7 @@ version = "0.2.0"
 name = "fgos-yaml-doc"
 version = "0.2.0"
 dependencies = [
+ "saphyr-parser",
  "serde_json",
  "sha2",
 ]
@@ -629,6 +634,14 @@ name = "ryu-js"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd29631678d6fb0903b69223673e122c32e9ae559d0960a38d574695ebc0ea15"
+
+[[package]]
+name = "saphyr-parser"
+version = "0.2.2"
+dependencies = [
+ "arraydeque",
+ "thiserror",
+]
 
 [[package]]
 name = "semver"

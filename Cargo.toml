@@ -30,6 +30,9 @@ exclude = [
     "herdr-dashboard",
     "apps/fgos-gateway",
     "upstreams",
+    # Vendored third-party crates (upgrade record: packages/yaml-doc/upgrade-record.md). Path crates
+    # under the workspace directory would otherwise become members and be swept into --workspace runs.
+    "packages/yaml-doc/third-party",
 ]
 resolver = "2"
 
@@ -54,3 +57,9 @@ windows-sys = { version = "=0.61.2", features = [
     "Win32_System_Diagnostics_ToolHelp",
     "Win32_System_RemoteDesktop",
 ] }
+
+# The YAML parser and its one transitive crate, read and vendored (spec docs/platform/yaml-document/spec.md
+# section 9). The committed bytes are pinned by tests/third_party_integrity.rs in fgos-yaml-doc.
+[patch.crates-io]
+saphyr-parser = { path = "packages/yaml-doc/third-party/saphyr-parser-0.2.2" }
+arraydeque = { path = "packages/yaml-doc/third-party/arraydeque-0.5.1" }
