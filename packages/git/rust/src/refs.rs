@@ -395,7 +395,8 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
     Ok(())
 }
 /// Releases the pin of every finished chain of one operation family beyond the
-/// `RECENT_TERMINAL` most recently changed, then compacts it, under the
+/// `RECENT_TERMINAL` most recently changed (at most `COMPACT_PER_PASS`, oldest
+/// first), then compacts it, under the
 /// caller's live `worktree-admin` scope. An older chain that stopped between
 /// its outcome and its pin release is finished here. A chain that cannot be
 /// finished stays retained for the next pass, and its cause is returned.
@@ -418,7 +419,9 @@ pub(crate) fn compact_finished<F: wal::FileSystem>(
         .map(|c| (wal.last_change(&c.last().operation_id), c))
         .collect();
     finished.sort_by_key(|(changed, _)| std::cmp::Reverse(*changed));
-    for (_, chain) in finished.into_iter().skip(wal::RECENT_TERMINAL) {
+    // Newest first above, so the eligible tail reversed is oldest first.
+    let eligible = finished.into_iter().skip(wal::RECENT_TERMINAL).rev().take(wal::COMPACT_PER_PASS);
+    for (_, chain) in eligible {
         let id = chain.last().operation_id.clone();
         let result = (|| {
             release_pin(driver, repo, scope.handle("worktree-admin").ok_or_else(|| failure("worktree-admin-missing"))?, wal, &chain)?;

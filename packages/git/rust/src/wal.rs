@@ -1785,6 +1785,10 @@ impl<F: FileSystem> Wal<F> {
 /// just-finished id still replays with its full receipt.
 pub const RECENT_TERMINAL: usize = 4;
 
+/// Finished chains one compaction pass finishes, oldest first, so the first
+/// operation after an upgrade pays about 0.4 s instead of the whole backlog.
+pub const COMPACT_PER_PASS: usize = 8;
+
 /// Compact terminal receipt. Keys are short to maintain the ≤512-byte bound
 /// even for SHA-256 refs. Request/resource/authority bindings remain immutable.
 #[derive(Debug, Clone, Serialize, Deserialize)]

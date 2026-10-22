@@ -714,6 +714,47 @@ fn finished_worktree_operations_beyond_the_recent_few_leave_no_record_directory(
     }
     // The newest few stay whole.
     assert!(wal.inspect(&format!("many-{}", wal::RECENT_TERMINAL + 2)).is_ok());
+
+    // A backlog of finished chains (as left before compaction existed) drains at most
+    // COMPACT_PER_PASS per pass, oldest first, and stays readable until compacted.
+    let scope = f.scope();
+    for n in 0..wal::COMPACT_PER_PASS + wal::RECENT_TERMINAL + 2 {
+        let id = format!("late-{n}");
+        f.attempt(
+            &scope,
+            &id,
+            OperationKind::WorktreeCreate {
+                path: f.root.join(&id).to_str().unwrap().into(),
+                registration: id.clone().into(),
+                branch: None,
+                session_id: None,
+            },
+        );
+        let chain = wal.inspect(&id).unwrap();
+        wal.append(
+            &chain,
+            Phase::Outcome(wal::Outcome::Worktree {
+                completed: false,
+                details: vec![],
+            }),
+        )
+        .unwrap();
+    }
+    drop(scope);
+    let backlog = wal.retained(1000).unwrap().len();
+    f.create_numbered(100);
+    // The new operation is one more finished chain; exactly COMPACT_PER_PASS left.
+    assert_eq!(wal.retained(1000).unwrap().len(), backlog + 1 - wal::COMPACT_PER_PASS);
+    let compacted = |wal: &Wal<_>| (0..wal::COMPACT_PER_PASS + wal::RECENT_TERMINAL + 2)
+        .filter(|n| wal.compacted(&format!("late-{n}")).unwrap().is_some())
+        .count();
+    assert!(wal.inspect("late-11").is_ok(), "a chain beyond the cap stays readable");
+    f.create_numbered(101);
+    f.create_numbered(102);
+    assert_eq!(wal.retained(1000).unwrap().len(), wal::RECENT_TERMINAL);
+    // Later passes drained the rest; only the newest few chains stay whole.
+    assert!(compacted(&wal) > wal::COMPACT_PER_PASS);
+    assert!(wal.compacted("late-0").unwrap().is_some() && wal.compacted("late-11").unwrap().is_some());
 }
 
 #[test]
