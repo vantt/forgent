@@ -11,6 +11,13 @@ import { prepareActivatedGitFixture } from '../helpers/run-unit-with-port.mjs';
 
 const execGit = (cwd, args) => execFileSync('git', args, { cwd, encoding: 'utf8' });
 
+// Work events need the store's machine id before the first addWork. The activation fence stays untracked, as in
+// production, so the fixture's `git add .fgos` never commits it.
+function activateWorkFixture(cwd) {
+  prepareActivatedGitFixture(cwd);
+  fs.appendFileSync(path.join(cwd, '.git', 'info', 'exclude'), '.fgos/locks/\n');
+}
+
 function addTestWork(dir, id, extra = {}) {
   return addWork(dir, {
     id,
@@ -36,6 +43,7 @@ test('approve gate: aborts cleanly on test failure without modifying main', asyn
   
   const fgosDir = path.join(cwd, '.fgos');
   fs.mkdirSync(fgosDir);
+  activateWorkFixture(cwd);
   
   addTestWork(fgosDir, 'tsk-test', { status: 'awaiting-approval' });
   execGit(cwd, ['add', '.fgos']);
@@ -323,6 +331,7 @@ async function approvableRootRepo(id, { verify = 'true' } = {}) {
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   const fgosDir = path.join(cwd, '.fgos');
   fs.mkdirSync(fgosDir);
+  activateWorkFixture(cwd);
   addTestWork(fgosDir, id, { status: 'awaiting-approval', verify });
   execGit(cwd, ['add', '.fgos']);
   execGit(cwd, ['commit', '-m', 'add work']);
@@ -464,6 +473,7 @@ test('approve lands a leaf on its root branch through Land, with the delivery se
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   const fgosDir = path.join(cwd, '.fgos');
   fs.mkdirSync(fgosDir);
+  activateWorkFixture(cwd);
   addTestWork(fgosDir, 'tsk-root', { status: 'todo', verify: 'true' });
   addTestWork(fgosDir, 'tsk-leaf', { status: 'awaiting-approval', verify: 'test -f leaf.txt', parent: 'tsk-root' });
   execGit(cwd, ['add', '.fgos']);
@@ -534,6 +544,7 @@ test('promote-to-component releases every member\'s Land candidate, merged or re
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   const fgosDir = path.join(cwd, '.fgos');
   fs.mkdirSync(fgosDir);
+  activateWorkFixture(cwd);
   addTestWork(fgosDir, 'ptc-green', { status: 'awaiting-approval', verify: 'true' });
   addTestWork(fgosDir, 'ptc-red', { status: 'awaiting-approval', verify: 'false', deps: ['ptc-green'] });
   execGit(cwd, ['add', '.fgos']);
