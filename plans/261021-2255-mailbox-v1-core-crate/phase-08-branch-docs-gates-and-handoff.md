@@ -64,3 +64,10 @@ Leave V1 provable by a stranger on the branch: the spec and the two indexes say 
     - 17 failures (`test/rust-host/fgctl-upgrade.test.mjs` 15, `test/rust-host/fgctl-init-download-sources.test.mjs` 2) also fail on main: the same files run in the main checkout at `180ed62fd` failed 23 of 48, a superset of the branch's 17.
     - The 18th, `test/scripts/run-test-canary.test.mjs` "wrapper overhead … median under 250ms", is a timing bound (265 ms measured under the full suite's load); it passes on the branch when run alone.
     - The two suite-level leaks come from run-supervisor and git-addon tests; the branch changes no Node, JavaScript or test file outside the Rust crate, so they are not caused by it. They were not reproduced on main (that needs a full suite run in the owner's main checkout).
+- Final gate run, after the last merge of main `30053b8a3` (merge `4772a01f6`; `Cargo.toml` kept both new members, `packages/mailbox/rust/core` and `packages/seat-binding/rust`; `Cargo.lock` and the census regenerated):
+  - crate: fmt clean, clippy clean, 78 passed, 0 failed; `cargo tree` serde only. Workspace clippy exit 0.
+  - `cargo test --workspace --locked`: exit 0; 1335 passed, 0 failed, 11 ignored.
+  - `npm test`: exit 1; 8848 tests, 8731 passed, 21 failed, 31 skipped, 65 todo; one suite-level error (a leaked `fgos-direct-repo-*` temp dir).
+    - 19 failures also fail on main `30053b8a3` (a detached scratch worktree at that commit, outside the repository, removed afterwards): the 17 fgctl ones, `test/runner/assignment-dispatch.test.mjs` "decideExecutorCli resolves dispatch plan for an assignment" and `test/runner/dispatch.test.mjs` "codex's cli-bypass invocation …"; main fails 114 of 424 in those six files.
+    - Two fail only under the full suite's load and pass alone on the branch and on main: the canary "wrapper overhead … under 250ms" (265 ms measured) and `test/seat-binding/route-doctor-check.test.mjs` "the row fails on a host that has no seat-binding route" (`spawnSync … EPIPE` from its fake host).
+    - The branch changes no Node, JavaScript or test file; none of these failures is caused by it.
