@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { withStateTx, hotPaths, readHotRecord, reclaimDeadHolder, HotLockError } from '../../src/state/hot-lock.mjs';
+import { withStateTx, hotPaths, readHotRecord, reclaimDeadHolder, clearHotRecord, HotLockError } from '../../src/state/hot-lock.mjs';
 import { observe, selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
 import { readEvents } from '../../src/state/events.mjs';
 
@@ -164,6 +164,24 @@ test('a record that changed after it was judged dead is never reclaimed', async 
     fs.writeFileSync(file, live);
     assert.equal(reclaimDeadHolder(f.fgosDir, 'state', observed), 'changed');
     assert.equal(fs.readFileSync(file, 'utf8'), live, 'the live holder keeps its record');
+  } finally {
+    f.cleanup();
+  }
+});
+
+test('clearing a record removes only the bytes the person saw', () => {
+  const f = fixture();
+  try {
+    const file = recordFile(f);
+    const seen = '{"v":1,"pid":';
+    fs.writeFileSync(file, seen);
+    assert.equal(clearHotRecord(f.fgosDir, 'state', seen), true);
+    assert.equal(fs.existsSync(file), false);
+
+    const arrived = '{"v":1,"pid":99';
+    fs.writeFileSync(file, arrived);
+    assert.equal(clearHotRecord(f.fgosDir, 'state', seen), false);
+    assert.equal(fs.readFileSync(file, 'utf8'), arrived, 'the record that arrived since stays');
   } finally {
     f.cleanup();
   }
