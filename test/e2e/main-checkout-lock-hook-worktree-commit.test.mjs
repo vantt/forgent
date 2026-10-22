@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { installHook, HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 // tsk-sir -- reproduces the bug this item was filed against: a real linked
 // worktree's `git commit` gets refused by the SAME main-checkout.lock a
@@ -417,12 +418,11 @@ test('tsk-1i3: a commit on main branch staging a .fgos/*.jsonl modification with
 
 test('tsk-1i3: a deliberate shrink of a non-log .fgos file such as config.json is not refused; only append-only logs are line-count guarded', () => {
   const { mainRoot } = initSharedAbsoluteHooksPathFixture();
-  const configPath = path.join(mainRoot, '.fgos', 'config.json');
-  fs.writeFileSync(configPath, '{\n  "a": 1,\n  "b": 2,\n  "c": 3\n}\n');
+  writeRawProjectConfig(mainRoot, '{\n  "a": 1,\n  "b": 2,\n  "c": 3\n}\n');
   execFileSync('git', ['add', '.fgos/config.json'], { cwd: mainRoot });
   execFileSync('git', ['commit', '-q', '-m', 'add multi-line config.json'], { cwd: mainRoot });
 
-  fs.writeFileSync(configPath, '{\n  "a": 1\n}\n');
+  writeRawProjectConfig(mainRoot, '{\n  "a": 1\n}\n');
   execFileSync('git', ['add', '.fgos/config.json'], { cwd: mainRoot });
 
   const result = spawnSync('git', ['commit', '-q', '-m', 'removed config entries'], { cwd: mainRoot, encoding: 'utf8' });

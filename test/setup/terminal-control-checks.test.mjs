@@ -26,6 +26,7 @@ import {
 } from '../../src/terminal-control/config.mjs';
 import { READY_TIMEOUT_MS } from '../../src/runner/dispatch/herdr-deadlines.mjs';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, ensureSharedConfigDefaults } from '../../src/setup/registrations.mjs';
+import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const HOST_BIN = process.env.FGOS_HOST_BIN;
@@ -62,7 +63,7 @@ after(() => {
 function workspace(name, terminal) {
   const root = path.join(scratch, name);
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
-  if (terminal !== undefined) fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({ terminal }));
+  if (terminal !== undefined) writeProjectConfig(root, { terminal });
   return root;
 }
 
@@ -139,7 +140,7 @@ test('terminal-config reports every broken setting in one message', () => {
 
 test('terminal-config fails by name on a config file that does not parse', () => {
   const root = workspace('broken');
-  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), '{ not json');
+  writeRawProjectConfig(root, '{ not json');
   const r = configCheck(root);
   assert.equal(r.passed, false);
   assert.match(r.message, /terminal\.\* unreadable/);
@@ -317,7 +318,7 @@ test('terminalRouteConfig carries only explicitly set values, so the Rust core o
 
 test('an unreadable config gives the route no settings and no retain time instead of stopping a dispatch', () => {
   const root = workspace('route-broken');
-  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), '{ not json');
+  writeRawProjectConfig(root, '{ not json');
   assert.deepEqual(terminalRouteConfig(root, { globalConfigPath: noGlobal }), {});
   assert.equal(retainFailedPaneMsOf(root, { globalConfigPath: noGlobal }), null);
 });

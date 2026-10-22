@@ -48,6 +48,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { getDomain, DOMAINS, skillForStep, domainSteps } from '../../src/state/domain-registry.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -300,7 +301,7 @@ test('e2e: work.add/work.edit --domain-fields round-trips for a fixture-marketin
 test('e2e: a fixture-marketing item runs the real take -> return -> delivered -> retrospective -> compound -> cleanup chain, reaching done identically to coding — the four tail-segment moves stamp NO statusCategory, exactly like coding', () => {
   const repoRoot = initTempRepo();
   assert.equal(fgos(repoRoot, ['init']).status, 0);
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ cleanup: { ttlDays: 0 } }));
+  writeProjectConfig(repoRoot, { cleanup: { ttlDays: 0 } });
 
   add(repoRoot, 'fx-life', { domain: DOMAIN, verify: 'true' });
 

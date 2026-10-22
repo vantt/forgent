@@ -11,6 +11,7 @@ import { runOpportunisticMainCheckoutChecks } from '../../src/state/events-jsonl
 import { checkpointMainFgos } from '../../src/runner/main-fgos-checkpoint.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { git, mkTempDir, initRepo, installHook, initRepoWithHook, commitAsSession, commitCount, sessionEnv, HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // Borrowing the main-checkout mutex through real git and the real
 // pre-commit hook: fgOS's own commit passes as a borrower, anybody else is
@@ -32,7 +33,7 @@ function makeCheckpointDue(repoRoot) {
   activateGitFixture(repoRoot);
   const fgosDir = path.join(repoRoot, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ checkpoint: { fallbackIntervalSec: 0 } }));
+  writeProjectConfig(repoRoot, { checkpoint: { fallbackIntervalSec: 0 } });
   fs.writeFileSync(path.join(fgosDir, 'events.jsonl'), '{"seq":1}\n{"seq":2}\n');
   return fgosDir;
 }

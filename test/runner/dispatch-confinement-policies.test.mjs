@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { projectConfigPath, writeProjectConfig } from '../helpers/config-fixture.mjs';
 import {
   loadRunnerConfig,
   loadRunnerConfigFromDir,
@@ -33,14 +34,14 @@ import {
 
 function mkTempConfig(runnerObj) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-test-'));
-  const file = path.join(dir, 'config.json');
-  fs.writeFileSync(file, JSON.stringify({
+  const file = projectConfigPath(dir);
+  writeProjectConfig(dir, {
     executor: { command: 'node', args: ['{prompt}'] },
     modelPolicies: { node: { standard: 'sonnet' } },
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 60000,
     ...runnerObj,
-  }, null, 2));
+  });
   return { dir, file };
 }
 

@@ -13,6 +13,7 @@ import { startWorkflow, resumeWorkflow, statusWorkflow, validateWorkflow, readWo
 import { resolveLock } from '../../src/holder-lock/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 if (!process.env.XDG_STATE_HOME) {
@@ -76,7 +77,7 @@ function setupRepo({ effortCli = false } = {}) {
     fs.writeFileSync(command, `#!${process.execPath}\n${WORKER}`, { mode: 0o755 });
     args = ['{prompt}'];
   }
-  fs.writeFileSync(path.join(tmp, '.fgos', 'config.json'), JSON.stringify({
+  writeProjectConfig(tmp, {
     runner: {
       defaultExecutor: 'test-node',
       defaults: { tier: 'standard' },
@@ -95,7 +96,7 @@ function setupRepo({ effortCli = false } = {}) {
       capabilities: { 'docs:write': { prefer: [{ executor: 'test-node' }], rigor: 'standard' } },
       patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' }, reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'] } } },
     },
-  }, null, 2));
+  });
   return tmp;
 }
 
@@ -118,7 +119,7 @@ function useTwoFamilies(tmp) {
   }
   cfg.runner.defaultExecutor = 'alpha';
   cfg.runner.capabilities['docs:write'].prefer = [{ executor: 'alpha' }, { executor: 'beta' }];
-  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  writeProjectConfig(tmp, cfg);
 }
 
 function unitsFile(tmp, units) {
@@ -447,7 +448,7 @@ test('--account pins provider account on every unit of the workflow run, kept fo
   const fakeHome = makeFixtureDir('fgos-home-');
   fixtures.push(fakeHome);
   fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(fakeHome, '.fgos', 'config.json'), JSON.stringify({
+  writeGlobalConfig(fakeHome, {
     runner: {
       providers: {
         node: {
@@ -457,7 +458,7 @@ test('--account pins provider account on every unit of the workflow run, kept fo
         },
       },
     },
-  }, null, 2));
+  });
   const prevHome = process.env.HOME;
   process.env.HOME = fakeHome;
   try {
@@ -514,7 +515,7 @@ test('workflow with two units on different providers pins account only on matchi
   fixtures.push(fakeHome);
   fs.writeFileSync(path.join(tmp, 'login'), 'token\n');
   fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(fakeHome, '.fgos', 'config.json'), JSON.stringify({
+  writeGlobalConfig(fakeHome, {
     runner: {
       providers: {
         alpha: {
@@ -524,7 +525,7 @@ test('workflow with two units on different providers pins account only on matchi
         },
       },
     },
-  }, null, 2));
+  });
 
   const cfgPath = path.join(tmp, '.fgos', 'config.json');
   const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
@@ -544,7 +545,7 @@ test('workflow with two units on different providers pins account only on matchi
     'cap-alpha': { prefer: [{ executor: 'alpha' }], rigor: 'standard' },
     'cap-beta': { prefer: [{ executor: 'beta' }], rigor: 'standard' },
   };
-  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  writeProjectConfig(tmp, cfg);
 
   const prevHome = process.env.HOME;
   process.env.HOME = fakeHome;
@@ -583,7 +584,7 @@ test('CLI workflow start accepts --timeout and --account, while resume refuses t
   fs.writeFileSync(path.join(tmp, 'login'), 'token\n');
   fixtures.push(fakeHome);
   fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(fakeHome, '.fgos', 'config.json'), JSON.stringify({
+  writeGlobalConfig(fakeHome, {
     runner: {
       providers: {
         node: {
@@ -593,7 +594,7 @@ test('CLI workflow start accepts --timeout and --account, while resume refuses t
         },
       },
     },
-  }, null, 2));
+  });
 
   const file = unitsFile(tmp, [
     { id: 'w-u', objective: 'Read', capability: 'docs:write' },
@@ -682,7 +683,7 @@ test('a unit\'s skills in a units file reach bind(), and a pool that cannot prov
   const cfgPath = path.join(tmp, '.fgos', 'config.json');
   const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
   cfg.runner.executors['test-node'].supports = { skills: ['docs-seeker'] };
-  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  writeProjectConfig(tmp, cfg);
   const served = await startWorkflow({ unitsPath: file, ...opts(tmp) });
   assert.equal(served.status, 'completed', JSON.stringify(served.steps));
   assert.deepEqual(unitRecordOf(tmp, served.steps['needs-skill'].units['needs-skill'].unitRunId).unit.skills, ['docs-seeker']);

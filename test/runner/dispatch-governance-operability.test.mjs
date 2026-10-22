@@ -16,6 +16,7 @@ import {
 } from '../../src/runner/dispatch/config.mjs';
 import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { bindableExecute } from '../helpers/work-seat-config.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { showRunUseCase, readRunSnapshot } from '../../src/verbs/dispatch/show-run.mjs';
@@ -79,9 +80,7 @@ test('governance-blocked versus unregistered result shape across public CLI and 
   spawnSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
   const fgosDir = path.join(tmp, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
-  fs.writeFileSync(
-    path.join(fgosDir, 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(tmp, {
       runner: {
         patterns: { seatBinding: { schema: 1 } },
         governance: {
@@ -97,8 +96,7 @@ test('governance-blocked versus unregistered result shape across public CLI and 
           },
         },
       },
-    }),
-  );
+    });
 
   const govCli = runFgos(['dispatch', 'decide', 'blocked-worker', '--dir', tmp]);
   assert.equal(govCli.status, 0, govCli.stderr);

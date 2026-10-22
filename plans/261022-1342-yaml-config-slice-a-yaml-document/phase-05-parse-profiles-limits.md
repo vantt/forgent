@@ -59,3 +59,7 @@ Not re-proved here: pre-scan behaviours (phase 03's runner). The `golden_parse` 
 ## Rollback
 
 Revert this phase's commits: removes the dependency, the committed third-party tree, the root `exclude`/`[patch]` lines and the runner. Nothing consumes the crate yet (phase 08 comes after), so no consumer breaks.
+
+## Note added 2026-10-22 (coordinator)
+
+The refused invisible set also covers U+200E, U+200F (directional marks), U+061C (Arabic letter mark) and U+2060 (word joiner), for values, keys and comment text alike: they hide text in a diff the same way as the listed bidi and zero-width characters. Add them to the profile rule and the comment guard in one change, with fixtures, and extend the spec lists in sections 4 and 6 with one dated line in its decision history.

@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
+import { writeProjectConfig, writeGlobalConfig, writeRawProjectConfig, globalConfigPath as globalConfigFile } from '../helpers/config-fixture.mjs';
 
 // Every machine lock of this file lives under a private state root; children inherit it.
 process.env.FGOS_STATE_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-holder-lock-checks-state-root-'));
@@ -94,32 +95,34 @@ async function holdWithFlock(file, env) {
 
 test('lock-predecessor-kill-wait: absent passes with the default, valid values name their source', () => {
   const root = workspace('kill-wait');
-  const globalConfigPath = path.join(scratch, 'kill-wait-home', '.fgos', 'config.json');
+  const globalHome = path.join(scratch, 'kill-wait-home');
+  const globalConfigPath = globalConfigFile(globalHome);
   let res = checkLockPredecessorKillWait(root, { globalConfigPath });
   assert.deepEqual(res, { passed: true, message: 'lock.predecessorKillWaitMs = 2000 (default)' });
 
-  writeConfig(globalConfigPath, { lock: { predecessorKillWaitMs: 750 } });
+  writeGlobalConfig(globalHome, { lock: { predecessorKillWaitMs: 750 } });
   res = checkLockPredecessorKillWait(root, { globalConfigPath });
   assert.deepEqual(res, { passed: true, message: 'lock.predecessorKillWaitMs = 750 (global)' });
 
-  writeConfig(path.join(root, '.fgos', 'config.json'), { lock: { predecessorKillWaitMs: 500 } });
+  writeProjectConfig(root, { lock: { predecessorKillWaitMs: 500 } });
   res = checkLockPredecessorKillWait(root, { globalConfigPath });
   assert.deepEqual(res, { passed: true, message: 'lock.predecessorKillWaitMs = 500 (project)' }, 'project overrides global');
 
-  writeConfig(path.join(root, '.fgos', 'config.json'), { lock: { predecessorKillWaitMs: MAX_KILL_WAIT_MS } });
+  writeProjectConfig(root, { lock: { predecessorKillWaitMs: MAX_KILL_WAIT_MS } });
   assert.equal(checkLockPredecessorKillWait(root, { globalConfigPath }).passed, true, 'the upper bound itself is accepted');
 });
 
 test('lock-predecessor-kill-wait: negative, string, fractional and over-the-bound values fail by name', () => {
   const root = workspace('kill-wait-bad');
-  const globalConfigPath = path.join(scratch, 'kill-wait-bad-home', '.fgos', 'config.json');
+  const globalHome = path.join(scratch, 'kill-wait-bad-home');
+  const globalConfigPath = globalConfigFile(globalHome);
   for (const value of [-5, 0, '2000', 1.5, MAX_KILL_WAIT_MS + 1]) {
-    writeConfig(path.join(root, '.fgos', 'config.json'), { lock: { predecessorKillWaitMs: value } });
+    writeProjectConfig(root, { lock: { predecessorKillWaitMs: value } });
     const res = checkLockPredecessorKillWait(root, { globalConfigPath });
     assert.equal(res.passed, false, `value ${JSON.stringify(value)}`);
     assert.match(res.message, /^lock\.predecessorKillWaitMs = .* \(project\) must be an integer from 1 to 60000$/);
   }
-  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), '{ not json');
+  writeRawProjectConfig(root, '{ not json');
   const res = checkLockPredecessorKillWait(root, { globalConfigPath });
   assert.equal(res.passed, false);
   assert.match(res.message, /unreadable: cannot parse shared config/);

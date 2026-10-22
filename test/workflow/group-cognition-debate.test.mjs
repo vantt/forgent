@@ -6,6 +6,7 @@ import path from 'node:path';
 import { loadWorkflow, startWorkflow } from '../../src/workflow/index.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -32,7 +33,7 @@ function limitFamilies(root, count) {
   const file = path.join(root, '.fgos', 'config.json');
   const cfg = JSON.parse(fs.readFileSync(file, 'utf8'));
   for (const capability of Object.values(cfg.runner.capabilities)) capability.prefer = capability.prefer.slice(0, count);
-  fs.writeFileSync(file, JSON.stringify(cfg));
+  writeProjectConfig(root, cfg);
 }
 
 const debateUnit = (state) => state.steps['dialectical-inquiry'].units['dialectical-critique'];

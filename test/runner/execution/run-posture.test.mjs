@@ -18,6 +18,7 @@ seedFileLocalBwrapRegistry();
 
 // Confined runs mount a private tmpfs over /tmp, so fixtures live outside it.
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
+import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
 
 const fixtureDirs = [];
 const fixtureDir = (prefix) => {
@@ -118,7 +119,7 @@ function setupProbeRepo(executorNames) {
     },
   };
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify(cfg, null, 2));
+  writeProjectConfig(repoRoot, cfg);
   return { repoRoot, worktreeDir };
 }
 
@@ -180,7 +181,7 @@ test('a run uses the confined invocation that was approved, not the executor fir
     { id: 'cli-plain', via: 'cli', adapter: 'cli-spawn', command: alpha.command, args: [failScript, '{prompt}'] },
     confined,
   ];
-  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  writeProjectConfig(repoRoot, cfg);
 
   const res = await runUnit({
     unitData: { id: 'u-two', objective: 'Inspect the docs', capability: 'docs:write', writes: [], pattern: 'solo' },

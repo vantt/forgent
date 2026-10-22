@@ -21,6 +21,7 @@ import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { renderBrief, briefPaths } from '../../src/runner/dispatch/brief.mjs';
 import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { bindable, bindableExecute, bindableFile } from '../helpers/work-seat-config.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 
 function mkTempDir() {
@@ -449,7 +450,7 @@ test('PRODUCTION-DOOR FIXTURE: executeAssignment persists effective-execution-co
 
   const fgosDir = path.join(tempDir, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify(bindableFile(runnerCfg), null, 2));
+  writeProjectConfig(tempDir, bindableFile(runnerCfg));
 
   // Write a mock script that acts as the executor CLI:
   // It verifies effective-execution-contract.json ALREADY exists when it runs,

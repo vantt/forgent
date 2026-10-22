@@ -4,6 +4,7 @@
 import '../helpers/process-tmp-root.mjs';
 import { assert, checkById, fs, mkTemp, path, withHome } from './helpers/setup-checks-harness.mjs';
 import { test } from 'node:test';
+import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 function agent(providerModel, command = providerModel) {
   return { kind: 'agent', providerModel, command, args: ['{prompt}'], invocations: [{ id: `${command}-cli`, via: 'cli', adapter: 'cli-spawn', command, args: ['{prompt}'] }] };
@@ -15,7 +16,7 @@ function runCheck(id, runner, globalRunner, setup) {
   const home = mkTemp('model-pool-check-home-');
   try {
     fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
+    writeProjectConfig(dir, {
       runner: {
         executor: { command: 'claude', args: ['{prompt}'] },
         timeoutMs: 5000,
@@ -24,11 +25,11 @@ function runCheck(id, runner, globalRunner, setup) {
         modelPolicies: { claude: { standard: 'sonnet' } },
         ...runner,
       },
-    }));
+    });
     setup?.(dir);
     if (globalRunner) {
       fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-      fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: globalRunner }));
+      writeGlobalConfig(home, { runner: globalRunner });
     }
     return withHome(home, () => checkById(id).check(dir));
   } finally {

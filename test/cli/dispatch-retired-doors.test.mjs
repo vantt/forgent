@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { initStore, addWork } from '../../src/state/store.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // `dispatch execute` (prompt, --contract, --assignment) and `dispatch log` are gone: one task
 // runs through `fgos run`, planned work through a Workflow. Calling a removed door is a
@@ -44,7 +45,7 @@ function eventLines(fgosDir) {
 }
 
 function writeConfig(fgosDir) {
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({
+  writeProjectConfig(path.dirname(fgosDir), {
     runner: {
       patterns: { seatBinding: { schema: 1 } },
       executor: { command: 'claude', args: ['{prompt}'] },
@@ -56,7 +57,7 @@ function writeConfig(fgosDir) {
       modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 5000,
     },
-  }));
+  });
 }
 
 test('fgos dispatch execute <agent executor> is a validation error pointing at fgos run --provider, and spawns nothing', () => {

@@ -41,6 +41,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -309,9 +310,7 @@ if (prompt.includes('# Context-discovery')) {
 `,
   );
   fs.mkdirSync(path.join(fx, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(fx, '.fgos', 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(fx, {
       runner: {
         executor: { command: process.execPath, args: [executorPath, '{prompt}', '--model', '{model}'] },
         modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
@@ -319,8 +318,7 @@ if (prompt.includes('# Context-discovery')) {
         timeoutMs: 15000,
         parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
       },
-    }),
-  );
+    });
 
   // Snapshot AFTER init and the runner-config write (both are real, intended
   // fgos-territory / project-file writes that predate the round under test)

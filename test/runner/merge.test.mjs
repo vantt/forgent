@@ -29,6 +29,7 @@ import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.m
 import { createLockScope, probe } from '../../src/holder-lock/index.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { withMainCheckout, withWorktreeAdmin } from '../../src/runner/repo-locks.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // Every test here creates its own disposable git repo (mirrors
 // worktree.test.mjs's own initTempRepo) — never this repo's own checkout.
@@ -401,7 +402,7 @@ test('landRunnerItem commits due .fgos event files through the checkpoint before
 
   const fgosDir = path.join(repoRoot, '.fgos');
   fs.mkdirSync(path.join(fgosDir, 'events'), { recursive: true });
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ checkpoint: { fallbackIntervalSec: 0 } }));
+  writeProjectConfig(repoRoot, { checkpoint: { fallbackIntervalSec: 0 } });
   fs.writeFileSync(path.join(fgosDir, 'events.jsonl'), '{"seq":1}\n');
   const shardRel = '.fgos/events/writer-a-20260101T000000Z.jsonl';
   fs.writeFileSync(path.join(repoRoot, shardRel), '{"id":"e1"}\n');

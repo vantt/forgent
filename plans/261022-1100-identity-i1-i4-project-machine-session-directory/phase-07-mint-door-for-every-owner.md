@@ -30,9 +30,9 @@ Every id that travels between machines comes from one door in Identity (spec sec
 - Safety net: doctor check `identity-ids-unique` scans the tracked id registries (`docs/backlog.md`, work-item records, `docs/decisions/`, `D-ADR` headings in `docs/specs/*.md` and `docs/platform-foundations.md`) and fails on a duplicate.
 - Docs: the how-to for writing a decision and for adding a backlog row says to run `fgos identity mint`; `core/skills/_shared/` fragments that tell agents to "read the highest number and add one" change in the same commit and the skills are rebuilt (`npm run build:skills`).
 
-## Questions for the owner at the start of this phase (decision-question template)
-- The Work item id length change (`tsk-<10>` instead of 3-8 characters): ids become longer to type. The format rule is unchanged, so this is a frame check, not a contract change.
-- Where agents learn to call `fgos identity mint`: `core/instructions/` (always loaded) or only the skills that write decisions and backlog rows.
+## Owner answers (2026-10-22 13:40, "1a 2a")
+- New Work item ids are `tsk-<10 base32>` (50 bits); existing ids stay.
+- One rule line goes into `core/instructions/` (always loaded, every CLI): agents get every id that travels between machines from `fgos identity mint <kind>` and never count one by hand. Coordinated with INS on the board; edited at the source, blocks regenerated.
 
 ## Files
 - Create: `packages/identity/rust/src/mint.rs`, `tests/mint.rs`, `test/identity/mint-door.test.mjs` (wiring only).

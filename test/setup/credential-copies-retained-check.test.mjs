@@ -7,6 +7,7 @@ import path from 'node:path';
 
 import { checkCredentialCopiesRetained, fixCredentialCopiesRetained, checkConfinementOrphanedResourcesReaped, DOCTOR_CHECKS } from '../../src/setup/registrations.mjs';
 import { extendOwnershipMarker, writeOwnershipMarker, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
+import { writeGlobalConfig, writeRawGlobalConfig } from '../helpers/config-fixture.mjs';
 
 // Every default path of the code under test (the provider runtime directory, the global config, the backend
 // registry) is under HOME. A throwaway HOME for the whole file means a call that forgets to name its own
@@ -512,7 +513,7 @@ test('the registered check reads the global inventory even from a directory with
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cred-doctor-home-'));
   try {
     fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: { providers: { openai: { accounts: { acct: perCliCodexOnly } } } } }));
+    writeGlobalConfig(home, { runner: { providers: { openai: { accounts: { acct: perCliCodexOnly } } } } });
     // The inventory names "openai" accounts under their normalized provider family, as the runtime does.
     const pending = path.join(home, '.fgos', 'runtime', 'provider-capacity', 'account-locks', 'openai-codex', 'acct', 'pending', `${String(Date.now() - 3 * 24 * HOUR).padStart(15, '0')}-abcd`);
     fs.mkdirSync(pending, { recursive: true });
@@ -540,7 +541,7 @@ test('the registered check fails with the reason when the global config cannot b
     const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cred-doctor-home-'));
     try {
       fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-      fs.writeFileSync(path.join(home, '.fgos', 'config.json'), content);
+      writeRawGlobalConfig(home, content);
       const pending = path.join(home, '.fgos', 'runtime', 'provider-capacity', 'account-locks', 'openai', 'acct', 'pending', `${String(Date.now() - 60 * 1000).padStart(15, '0')}-abcd`);
       fs.mkdirSync(pending, { recursive: true });
       const entry = DOCTOR_CHECKS.find((c) => c.id === 'credential-copies-retained');
