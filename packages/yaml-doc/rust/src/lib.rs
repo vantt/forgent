@@ -2,16 +2,17 @@
 //! Contract: `docs/platform/yaml-document/spec.md`; golden fixtures: `packages/yaml-doc/contracts/`.
 #![forbid(unsafe_code)]
 
-pub mod backend;
+mod backend;
 pub mod comment;
 pub mod document;
 pub mod edit;
-pub mod expand;
+mod expand;
 pub mod guard;
 pub mod merge;
 pub mod model;
 pub mod path;
 pub mod prescan;
-pub mod profile;
+mod profile;
 
+pub use document::{parse, Document, NodeSpans};
 pub use model::{rule, Limits, Profile, Refusal, Segment, Span, Value};

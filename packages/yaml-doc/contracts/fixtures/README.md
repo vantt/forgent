@@ -10,7 +10,7 @@ Each file belongs to exactly one runner test. A case that two runners could run 
 
 | File | Owning test | Content |
 |---|---|---|
-| `parse.v1.json` | the parse runner (lands with the parser adapter) | profiles, limits, alias expansion, key identity |
+| `parse.v1.json` | `tests/golden_parse.rs` | profiles, limits, alias expansion, key identity, error positions, byte revision, node spans |
 | `prescan.v1.json` | `tests/golden_prescan.rs` | byte bound, UTF-8, flow and block depth before any parser recurses |
 | `path.v1.json` | `tests/golden_path.rs` | path text form |
 | `comment.v1.json` | `tests/golden_comment.rs` | comment injection guard |
@@ -52,6 +52,7 @@ A generator may claim its size so the claim is checked: `min_bytes`, or `size` o
 | File | Success form |
 |---|---|
 | parse | `{"value": ...}`, or `{"checks": [{"path": "<path text>", "length": n}]}` (`"string_bytes": n` for a string) for values too large to write out |
+| parse, optional extras | `"spans": [{"path", "value", "key"?, "line"?, "column"?}]` next to `value`: the source text the node's value (and key) occupies, and where the value starts; `"revision": "<sha256 hex>"` next to `value` |
 | prescan | `{"ok": true}` |
 | path | `{"segments": [...]}` (a string is a key, a number an index), plus `"canonical"` when the written form differs from the input |
 | comment | `{"lines": [...]}` for kind `block`, `{"line": "..."}` for kind `inline` |

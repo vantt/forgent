@@ -245,7 +245,24 @@ fn every_fixture_case_is_well_formed() {
                 "parse" => {
                     resolve_input(&case["input"]);
                     if !refused {
-                        expect_form(&name, expect, &[&["value"], &["checks"]]);
+                        expect_form(
+                            &name,
+                            expect,
+                            &[
+                                &["value"],
+                                &["checks"],
+                                &["value", "spans"],
+                                &["value", "revision"],
+                            ],
+                        );
+                    }
+                    for span in expect["spans"].as_array().into_iter().flatten() {
+                        parse_path(span["path"].as_str().expect("span path"))
+                            .unwrap_or_else(|e| panic!("{name}: {e}"));
+                        assert!(
+                            span["value"].is_string(),
+                            "{name}: a span entry names the source text of its value"
+                        );
                     }
                     for check in expect["checks"].as_array().into_iter().flatten() {
                         parse_path(check["path"].as_str().expect("check path"))

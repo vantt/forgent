@@ -4,8 +4,9 @@
 //! - Every line break (LF, CR, CRLF, U+0085, U+2028, U+2029) starts a new comment line, so text can
 //!   never end the comment token and become a key or a value.
 //! - Control characters other than tab are removed.
-//! - Bidirectional controls (U+202A-U+202E, U+2066-U+2069) and zero-width characters
-//!   (U+200B-U+200D, U+FEFF) are refused, the same rule values get in `strict-config`. Refusing
+//! - Bidirectional controls (U+202A-U+202E, U+2066-U+2069, the directional marks U+200E and
+//!   U+200F, the Arabic letter mark U+061C) and zero-width characters (U+200B-U+200D, the word
+//!   joiner U+2060, U+FEFF) are refused, the same rule values get in `strict-config`. Refusing
 //!   rather than stripping keeps the text the caller supplied and the text written the same
 //!   words, so a hidden-text attempt surfaces to the caller instead of being rewritten quietly.
 //! - An empty line is written as `#` (no trailing space).
@@ -36,16 +37,48 @@ fn split_lines(text: &str) -> Vec<&str> {
     lines
 }
 
-fn check_hidden(line: &str, line_no: usize) -> Result<(), Refusal> {
-    for (index, ch) in line.chars().enumerate() {
-        let rule = match ch {
-            '\u{202A}'..='\u{202E}' | '\u{2066}'..='\u{2069}' => rule::BIDI_CONTROL,
-            '\u{200B}'..='\u{200D}' | '\u{FEFF}' => rule::ZERO_WIDTH,
-            _ => continue,
-        };
-        return Err(Refusal::new(rule).at(line_no as u32, index as u32 + 1));
+/// The characters that hide text in a diff. The one list shared by comment text and, through the
+/// profile rows, by keys and values of a parsed document.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Hidden {
+    /// Bidirectional controls and marks: they reorder how a line reads.
+    Bidi,
+    /// Zero-width characters: they take no room.
+    ZeroWidth,
+}
+
+impl Hidden {
+    pub(crate) fn of(ch: char) -> Option<Hidden> {
+        match ch {
+            '\u{202A}'..='\u{202E}'
+            | '\u{2066}'..='\u{2069}'
+            | '\u{200E}'
+            | '\u{200F}'
+            | '\u{061C}' => Some(Hidden::Bidi),
+            '\u{200B}'..='\u{200D}' | '\u{2060}' | '\u{FEFF}' => Some(Hidden::ZeroWidth),
+            _ => None,
+        }
     }
-    Ok(())
+
+    pub(crate) fn rule(self) -> &'static str {
+        match self {
+            Hidden::Bidi => rule::BIDI_CONTROL,
+            Hidden::ZeroWidth => rule::ZERO_WIDTH,
+        }
+    }
+}
+
+fn check_hidden(line: &str, line_no: usize) -> Result<(), Refusal> {
+    match line
+        .chars()
+        .enumerate()
+        .find_map(|(index, ch)| Hidden::of(ch).map(|hidden| (index, hidden)))
+    {
+        Some((index, hidden)) => {
+            Err(Refusal::new(hidden.rule()).at(line_no as u32, index as u32 + 1))
+        }
+        None => Ok(()),
+    }
 }
 
 fn render(line: &str) -> String {

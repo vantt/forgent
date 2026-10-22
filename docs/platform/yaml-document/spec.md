@@ -70,7 +70,7 @@ A caller picks one profile per parse. Both are enforced by this component on the
 | Complex (non-scalar) keys | refused | refused (new rule: not pinned by today's tests; added as a fixture) |
 | Keys that resolve to a non-string (`1`, `true`, `null`) | refused (after conversion they would collide with `"1"`, `"true"`) | stringified, as today |
 | Keys `__proto__`, `constructor`, `prototype` at any depth | refused; no config key needs them | allowed; the Node facade makes them own properties (section 10) |
-| Bidi controls (U+202A–U+202E, U+2066–U+2069) and zero-width characters (U+200B–U+200D, U+FEFF inside text) | refused in keys and values, so a diff cannot hide what a command value runs | refused in keys |
+| Bidi controls (U+202A–U+202E, U+2066–U+2069, U+200E, U+200F, U+061C) and zero-width characters (U+200B–U+200D, U+2060, U+FEFF inside text) | refused in keys and values, so a diff cannot hide what a command value runs | refused in keys |
 | Integers outside ±(2^53 − 1), `.nan`, `.inf`, `-.inf`, `-0` | refused; Rust and Node would read different values, and `NaN` passes range checks | allowed, converted as today |
 | Timestamps | strings | strings (today's contract) |
 | Limits | size, depth and node count bounds named in the contract file | same, plus alias expansion bounded at 100 aliases and the expanded-node bound of `test/util/yaml.test.mjs` |
@@ -108,7 +108,7 @@ Injection guard, applied to every comment this component writes:
 
 - each line is written as `# ` plus the text; a line break in the text starts a new comment line and never ends the comment token, so text can never become a key or value (the spike's `noyalib` refused `"x\nevil: 1"` in an inline comment; this component makes that a rule for every adapter);
 - control characters other than tab are removed; carriage return, U+0085, U+2028 and U+2029 are treated as line breaks, because some editors and YAML tools render them as one;
-- bidi controls (U+202A–U+202E, U+2066–U+2069) and zero-width characters (U+200B–U+200D, U+FEFF) in comment text are refused, the same rule values get in `strict-config` (section 4), so a diff cannot hide what a note says; refused rather than stripped, so the text the caller supplied and the text written stay the same words;
+- bidi controls (U+202A–U+202E, U+2066–U+2069, U+200E, U+200F, U+061C) and zero-width characters (U+200B–U+200D, U+2060, U+FEFF) in comment text are refused, the same rule values get in `strict-config` (section 4), so a diff cannot hide what a note says; refused rather than stripped, so the text the caller supplied and the text written stay the same words;
 - whether a caller's text may span lines at all, and which line prefixes it may not start with, is the caller's rule (Config allows neither for reasons, Config spec section 7);
 - an inline comment is one line; text with a line break is refused there.
 
@@ -214,3 +214,4 @@ Node reaches the component through the one combined native addon, as it already 
 - **2026-10-22: writer shape A (surgical edit).** The spike showed byte-identical round trips with two candidates, so a deterministic re-render is not needed as a floor. The panel's rule stands: no B-then-A two-step plan.
 - **2026-10-22: signed.** The owner reviewed and signed this spec as a whole, together with the Config spec.
 - **2026-10-22: owner chose I2.** Comment text the component writes gets the same bidi and zero-width rule as values (section 6).
+- **2026-10-22: the refused invisible set widens.** The directional marks U+200E and U+200F, the Arabic letter mark U+061C and the word joiner U+2060 hide text in a diff like the listed characters; they join the set for values, keys and comment text alike (sections 4 and 6).
