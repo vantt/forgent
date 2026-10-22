@@ -73,15 +73,14 @@ import {
   releaseRunControl,
   settleRunControl,
   isRunControlCurrent,
-  isProcessAlive,
   readMarker,
   publishMarkerOnce,
   fsyncFileBestEffort,
   fsyncDirBestEffort,
   buildRunControlHolder,
   inspectRunControl,
-  resolveHolderLiveness,
 } from './run-lock.mjs';
+import { resolveHolderLiveness } from './process-identity.mjs';
 import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError, agentArgsWithoutPrompt } from './transport.mjs';
 import {
   acquireAttemptLocks,
@@ -895,7 +894,7 @@ function admitRunAttempt(
             const pidMatch = /^\.staging-[^-]+-(\d+)-/.exec(name);
             if (pidMatch) {
               const stagedPid = parseInt(pidMatch[1], 10);
-              if (isProcessAlive(stagedPid)) {
+              if (resolveHolderLiveness({ pid: stagedPid }) !== 'dead') {
                 continue;
               }
             }
