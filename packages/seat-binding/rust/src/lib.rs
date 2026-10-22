@@ -23,7 +23,7 @@ pub use explain::explain;
 pub use model::*;
 pub use policy::policy;
 pub use rank::rank;
-pub use tier::{ladder, Effort, Ladder, Rigor, Tier, TierDefinition, TIER_LADDER};
+pub use tier::{ladder, tier_ladder, Effort, Ladder, Rigor, Tier, TierDefinition};
 
 /// Stage 1 then stage 2, with the explanation of the same result.
 pub fn bind(input: &BindInput) -> BindOutput {

@@ -58,7 +58,9 @@ function interpret({ status, signal, stdout, stderr, error }, bin, op) {
   if (error && error.code === 'ETIMEDOUT') {
     throw new SeatBindingError('seat-binding-route-timeout', `${bin} seat-binding ${op} did not answer in time and was killed`);
   }
-  if (error) {
+  // EPIPE: the host ran and exited before reading the request (an older host refuses the verb at once);
+  // its exit status and stderr still say why, so they are read below like any other answer.
+  if (error && error.code !== 'EPIPE') {
     throw new SeatBindingError('seat-binding-route-bad-output', `${bin} seat-binding ${op} failed to run: ${error.message}`);
   }
   const text = String(stdout ?? '').trim();

@@ -4,25 +4,7 @@
 // packages/convention/contracts/convention.rules.v1.json); the Rust crate reads the same entries and both run the
 // same golden vectors. Leaf module: imports nothing from the runner.
 
-import fs from 'node:fs';
-
-const RULES_URL = new URL('../../packages/convention/contracts/convention.rules.v1.json', import.meta.url);
-
-let contract = null;
-
-// Read on first use, so a process that never looks at a definition does not need the contract file.
-function contractRules() {
-  contract ??= JSON.parse(fs.readFileSync(RULES_URL, 'utf8'));
-  return contract;
-}
-
-function definitionNameOk(identifierId, name) {
-  const identifier = contractRules().identifiers?.find((r) => r.id === identifierId);
-  if (!identifier) throw new Error(`convention.rules.v1.json has no "${identifierId}" identifier rule`);
-  const chars = [...name];
-  return chars.length > 0 && chars.length <= identifier.maxLength && identifier.first.includes(chars[0])
-    && chars.slice(1).every((c) => identifier.rest.includes(c)) && !(identifier.reserved ?? []).includes(name);
-}
+import { contractRules, identifierProblem } from './identifier-rules.mjs';
 
 function definitionFileRule(id) {
   const found = contractRules().definitionFiles?.find((r) => r.id === id);
@@ -41,12 +23,12 @@ export function definitionNameOf(ruleId, fileName) {
   const rule = definitionFileRule(ruleId);
   if (typeof fileName !== 'string' || !fileName.startsWith(rule.prefix) || !fileName.endsWith(rule.suffix)) return null;
   const name = fileName.slice(rule.prefix.length, fileName.length - rule.suffix.length);
-  return definitionNameOk(rule.nameIdentifier, name) ? name : null;
+  return identifierProblem(rule.nameIdentifier, name) === null ? name : null;
 }
 
 /** The file name a definition of `name` has under the rule; throws when `name` is not a valid name for it. */
 export function definitionFileName(ruleId, name) {
   const rule = definitionFileRule(ruleId);
-  if (typeof name !== 'string' || !definitionNameOk(rule.nameIdentifier, name)) throw new TypeError(`${JSON.stringify(name)} is not a valid ${rule.nameIdentifier}`);
+  if (identifierProblem(rule.nameIdentifier, name) !== null) throw new TypeError(`${JSON.stringify(name)} is not a valid ${rule.nameIdentifier}`);
   return `${rule.prefix}${name}${rule.suffix}`;
 }

@@ -655,9 +655,11 @@ export const CLAUDE_CLI_COMMANDS = Object.freeze(['claude']);
  * `cfg.modelPolicies.<providerModel>` tier vocabulary (tsk-5tm-5 D9,
  * model-tier vocabulary migration 2026-09-17) — deliberately its OWN
  * 6-value cross-provider equivalence vocab (`plans/260916-account-rotator/
- * design.md`'s "Tier vocabulary").
+ * design.md`'s "Tier vocabulary"). The names, weakest first, come from the Seat Binding contract file the
+ * Rust crate embeds, so the two sides cannot drift.
  */
-export const MODEL_POLICY_TIERS = Object.freeze(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier']);
+const TIER_LADDER_URL = new URL('../../../packages/seat-binding/contracts/seat-binding.tier-ladder.v1.json', import.meta.url);
+export const MODEL_POLICY_TIERS = Object.freeze(JSON.parse(fs.readFileSync(TIER_LADDER_URL, 'utf8')).tiers.map((tier) => tier.name));
 
 /**
  * `executors.<id>.invocations[].via` vocabulary (tsk-5tm-4 D11, widened
