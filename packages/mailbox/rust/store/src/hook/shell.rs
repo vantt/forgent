@@ -4,7 +4,7 @@
 //! and process table into [`run`] and exits 0 whatever it returns; it
 //! calls [`silence_panics`] and [`arm_budget`] from its `main` only.
 //!
-//! The order: read stdin with a cap; resolve the writer and the head;
+//! The order: read stdin with a cap (a larger payload skips the drain); resolve the writer and the head;
 //! read the ancestry again and check that the caller is that head; hold 1
 //! runs `begin` and reads each claimed message's size; the bodies are
 //! read outside the lock and rendered; stdout is written and flushed; only
@@ -115,8 +115,12 @@ impl WriteGate {
 /// Why a call printed nothing.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Quiet {
-    /// The drain's own reason (a payload over the read cap is `Malformed`).
+    /// The drain's own reason.
     Drain(QuietReason),
+    /// The stdin payload is larger than `mailbox.hook.maxReadBytes`: the
+    /// drain is skipped, nothing is read further and the mail stays
+    /// pending; the entry logs this reason.
+    OverReadCap,
     /// The entry's ancestry could not be read.
     NoAncestry,
     /// The resolver found no head.
@@ -164,9 +168,15 @@ fn quiet(reason: Quiet) -> ShellOutcome {
 fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -> ShellOutcome {
     let cap = input.hook.hook.max_read_bytes;
     let mut payload = Vec::new();
-    let read = stdin.take(cap.saturating_add(1)).read_to_end(&mut payload);
-    if read.is_err() || payload.len() as u64 > cap {
+    if stdin
+        .take(cap.saturating_add(1))
+        .read_to_end(&mut payload)
+        .is_err()
+    {
         return quiet(Quiet::Drain(QuietReason::Malformed));
+    }
+    if payload.len() as u64 > cap {
+        return quiet(Quiet::OverReadCap);
     }
     let Some(ancestry) = (input.ancestry)() else {
         return quiet(Quiet::NoAncestry);

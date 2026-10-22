@@ -168,6 +168,20 @@ fn the_entry_exits_zero_and_prints_nothing_on_malformed_stdin() {
 }
 
 #[test]
+fn a_payload_over_the_read_cap_exits_zero_prints_nothing_and_logs_the_skipped_drain() {
+    let setup = Setup::new("entry-over-cap");
+    let mut stdin = setup.payload();
+    stdin.resize(hook_limits().hook.max_read_bytes as usize + 1, b' ');
+
+    let out = setup.hook(&stdin, Stdio::piped(), &[]);
+
+    assert!(out.status.success(), "{}", out.status);
+    assert!(out.stdout.is_empty() && out.stderr.is_empty());
+    let log = std::fs::read_to_string(setup.log()).unwrap();
+    assert!(log.contains("quiet: Some(OverReadCap)"), "{log}");
+}
+
+#[test]
 fn the_entry_exits_zero_on_a_failed_stdout_write_and_leaves_the_claim_unfinished() {
     let setup = Setup::new("entry-full");
     let id = setup.pending_message();

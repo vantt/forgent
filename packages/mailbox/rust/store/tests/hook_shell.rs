@@ -270,7 +270,8 @@ fn a_failed_stdout_write_never_finishes_and_the_message_is_offered_again_after_i
 }
 
 #[test]
-fn a_payload_one_byte_over_the_read_cap_is_quiet_and_leaves_the_snapshot_unwritten() {
+fn a_payload_one_byte_over_the_read_cap_skips_the_drain_with_its_own_reason_and_leaves_the_snapshot_unwritten(
+) {
     let fgos = TempFgos::new("shell-cap");
     let record = fgos.record();
     let head = Head::spawn();
@@ -282,7 +283,7 @@ fn a_payload_one_byte_over_the_read_cap_is_quiet_and_leaves_the_snapshot_unwritt
     let mut out = Vec::new();
     let outcome = call(&record, &head, head.ancestry(), &stdin, &mut out, T0);
 
-    assert_eq!(outcome.quiet, Some(Quiet::Drain(QuietReason::Malformed)));
+    assert_eq!(outcome.quiet, Some(Quiet::OverReadCap));
     assert!(out.is_empty());
     assert!(!fgos.paths().snapshot().exists());
 }
