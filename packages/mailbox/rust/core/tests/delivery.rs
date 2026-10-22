@@ -56,6 +56,7 @@ fn claim_then_finish_with_the_same_token_and_generation_offers_the_message() {
 
     assert_eq!(finished.offered, vec![id.clone()]);
     assert!(finished.ignored.is_empty());
+    assert!(finished.changed, "the store must write an offer");
     assert_eq!(
         pair.state.message(&id).unwrap().state,
         MessageState::Offered { at: t(111) }
@@ -79,6 +80,7 @@ fn a_finish_with_a_wrong_token_is_ignored_and_changes_nothing() {
     assert!(finished.offered.is_empty());
     assert!(finished.ignored.is_empty());
     assert_eq!(pair.state, before);
+    assert!(!finished.changed, "nothing for the store to write");
 }
 
 #[test]

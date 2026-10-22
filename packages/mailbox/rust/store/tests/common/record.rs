@@ -1,7 +1,7 @@
 //! Record test support: a temporary `.fgos` directory per test, the core
 //! calls the record tests share, and the runner for child processes. Every
 //! mailbox path comes from `Paths`; this file names none of them.
-use fgos_mailbox::record::{Paths, Record, Wait};
+use fgos_mailbox::record::{Paths, Record, Reported, Wait};
 use fgos_mailbox_core::{
     Cli, IdSource, Limits, MailboxState, RegisterRequest, Registered, SendRequest, Timestamp,
     WriterKey,
@@ -70,8 +70,11 @@ impl Drop for TempFgos {
 /// The installed state, read through a hold that changes nothing.
 pub fn read_state(record: &Record) -> MailboxState {
     record
-        .hold(Wait::Try, T0, &super::limits(), |state, _| state.clone())
+        .hold(Wait::Try, T0, &super::limits(), |state, _| {
+            Reported::unchanged(state.clone())
+        })
         .unwrap()
+        .value
         .value
 }
 

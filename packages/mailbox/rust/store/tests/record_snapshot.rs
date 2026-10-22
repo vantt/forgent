@@ -6,8 +6,12 @@ mod common;
 
 use common::record::{self as rec, TempFgos, T0};
 use fgos_holder_lock::LockScope;
-use fgos_mailbox::record::{OsIds, Paths, RecordError, Step, Wait};
-use fgos_mailbox_core::{Checkpoint, CounterReason, Generation, IdSource, MailboxState, Refusal};
+use fgos_mailbox::hook::{Begun, QuietReason};
+use fgos_mailbox::record::{OsIds, Paths, RecordError, Reported, Step, Wait};
+use fgos_mailbox_core::{
+    AttemptToken, Checkpoint, CounterReason, Generation, IdSource, Liveness, MailboxState, Refusal,
+    RegisterRequest, Registered, StoredHead,
+};
 use std::collections::BTreeSet;
 use std::os::unix::fs::{MetadataExt, PermissionsExt};
 use std::time::Duration;
@@ -45,7 +49,7 @@ fn registered(fgos: &TempFgos) -> Vec<u8> {
     let limits = common::limits();
     fgos.record()
         .hold(Wait::Try, T0, &common::limits(), |state, ids| {
-            rec::register(state, "head-a", T0, &limits, ids);
+            rec::register(state, "head-a", T0, &limits, ids)
         })
         .unwrap();
     snapshot_bytes(&fgos.paths())
@@ -84,43 +88,171 @@ fn a_first_hold_on_an_empty_record_creates_the_snapshot_through_the_mailbox_lock
     assert!(lock_is_free(&fgos.paths()), "the hold released the lock");
 }
 
+/// The hold decides to write from the core's own answer, never by encoding
+/// the state to compare it: an unchanged hold neither encodes nor writes,
+/// and a changed one writes even when its bytes would be equal.
 #[test]
-fn a_hold_whose_closure_changes_nothing_installs_nothing() {
-    let fgos = TempFgos::new("no-change");
-    // On an empty record the comparison is against the empty state.
+fn a_hold_writes_exactly_when_its_change_reports_one() {
+    let fgos = TempFgos::new("change-report");
     let held = fgos
         .record()
         .hold(Wait::Try, T0, &common::limits(), |state, _| {
-            state.bindings().count()
+            Reported::unchanged(state.bindings().count())
         })
         .unwrap();
     assert!(!held.wrote);
-    assert!(!fgos.paths().snapshot().exists());
+    assert!(
+        !fgos.paths().snapshot().exists(),
+        "an empty record stays empty"
+    );
 
     registered(&fgos);
     let limits = common::limits();
     let before = std::fs::metadata(fgos.paths().snapshot()).unwrap();
     let held = fgos
         .record()
-        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
-            state
-                .claim(
-                    &rec::key("head-a"),
-                    Generation::FIRST,
-                    Checkpoint::Step,
-                    T0,
-                    &limits,
-                    ids,
-                )
-                .items
-                .len()
+        .hold(Wait::Try, T0, &limits, |state, ids| {
+            state.claim(
+                &rec::key("head-a"),
+                Generation::FIRST,
+                Checkpoint::Step,
+                T0,
+                &limits,
+                ids,
+            )
         })
         .unwrap();
-    assert_eq!(held.value, 0, "the closure's value is returned");
+    assert!(
+        held.value.items.is_empty(),
+        "the closure's value is returned"
+    );
     assert!(!held.wrote);
     let after = std::fs::metadata(fgos.paths().snapshot()).unwrap();
     assert_eq!(after.ino(), before.ino());
     assert_eq!(after.modified().unwrap(), before.modified().unwrap());
+
+    let held = fgos
+        .record()
+        .hold(Wait::Try, T0, &limits, |_, _| Reported::changing(()))
+        .unwrap();
+    assert!(held.wrote);
+    let rewritten = std::fs::metadata(fgos.paths().snapshot()).unwrap();
+    assert_ne!(
+        rewritten.ino(),
+        before.ino(),
+        "a reported change is installed"
+    );
+}
+
+/// Each core answer leads to a write exactly when it changed the state:
+/// the same head again, a refused registration, a finish that matched no
+/// claim and a quiet drain that changed nothing write nothing; a finish of
+/// a real claim and a quiet drain that changed the state write.
+#[test]
+fn each_core_answer_writes_exactly_when_it_changed_the_state() {
+    let fgos = TempFgos::new("core-answers");
+    registered(&fgos);
+    let record = fgos.record();
+    let limits = common::limits();
+    let wrote = |held: bool, what: &str, expected: bool| {
+        assert_eq!(held, expected, "{what}");
+    };
+
+    let same_head = StoredHead {
+        same_head: true,
+        liveness: Liveness::Alive,
+    };
+    let held = record
+        .hold(Wait::Try, T0, &limits, |state, ids| {
+            let req = RegisterRequest {
+                head: "head-of-head-a".to_string(),
+                ..rec::register_request("head-a", &rec::own_head_record())
+            };
+            state.register(req, Some(same_head), T0, &limits, ids)
+        })
+        .unwrap();
+    assert!(matches!(held.value, Ok(Registered::Refreshed { .. })));
+    wrote(held.wrote, "the same head again", false);
+
+    let too_long = "k".repeat(limits.frame.max_header_chars as usize + 1);
+    let held = record
+        .hold(Wait::Try, T0, &limits, |state, ids| {
+            state.register(
+                rec::register_request(&too_long, &rec::own_head_record()),
+                None,
+                T0,
+                &limits,
+                ids,
+            )
+        })
+        .unwrap();
+    assert!(held.value.is_err());
+    wrote(held.wrote, "a refused registration", false);
+
+    let held = record
+        .hold(Wait::Try, T0, &limits, |state, _| {
+            state.finish(
+                &rec::key("head-a"),
+                Generation::FIRST,
+                &AttemptToken::from_text("no-such-claim"),
+                T0,
+            )
+        })
+        .unwrap();
+    wrote(held.wrote, "a finish that matched no claim", false);
+
+    for (state_changed, expected) in [(false, false), (true, true)] {
+        let held = record
+            .hold(Wait::Try, T0, &limits, |_, _| Begun::Quiet {
+                reason: QuietReason::NothingEligible,
+                state_changed,
+            })
+            .unwrap();
+        wrote(
+            held.wrote,
+            &format!("a quiet drain, state_changed {state_changed}"),
+            expected,
+        );
+    }
+
+    let to = rec::read_state(&record)
+        .binding(&rec::key("head-a"))
+        .unwrap()
+        .name
+        .as_str()
+        .to_string();
+    record
+        .send(
+            rec::send_req("cli-sender", &to, "hi"),
+            Wait::Try,
+            T0,
+            &limits,
+        )
+        .unwrap();
+    let claim = record
+        .hold(Wait::Try, T0, &limits, |state, ids| {
+            state.claim(
+                &rec::key("head-a"),
+                Generation::FIRST,
+                Checkpoint::Step,
+                T0,
+                &limits,
+                ids,
+            )
+        })
+        .unwrap()
+        .value;
+    let held = record
+        .hold(Wait::Try, T0, &limits, |state, _| {
+            state.finish(
+                &rec::key("head-a"),
+                Generation::FIRST,
+                &claim.token.unwrap(),
+                T0,
+            )
+        })
+        .unwrap();
+    wrote(held.wrote, "a finish of a real claim", true);
 }
 
 #[test]
@@ -221,7 +353,7 @@ fn a_snapshot_that_is_a_fifo_never_blocks_the_hold() {
     let err = rec::within(Duration::from_secs(10), move || {
         record
             .hold(Wait::Try, T0, &common::limits(), |state, _| {
-                state.bindings().count()
+                Reported::unchanged(state.bindings().count())
             })
             .unwrap_err()
     });

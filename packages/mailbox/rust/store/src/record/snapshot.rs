@@ -5,20 +5,18 @@ use fgos_durable_file::{replace_durably_observed, ReplacePoint};
 use fgos_mailbox_core::{MailboxState, SnapshotVersion};
 use std::io::{self, Read};
 
-/// The installed snapshot's bytes and state. A missing snapshot reads as
-/// the empty state, with the bytes that state encodes to, so a hold that
-/// changes nothing on an empty record creates no file.
+/// The installed snapshot's state; a missing snapshot reads as the empty
+/// state.
 ///
 /// The file is opened without following a symlink and without blocking,
 /// and must be a regular file before a byte is read: a planted symlink or
 /// FIFO is refused, never followed and never waited on.
-pub(super) fn read(paths: &Paths) -> Result<(Vec<u8>, MailboxState), RecordError> {
+pub(super) fn read(paths: &Paths) -> Result<MailboxState, RecordError> {
     let unreadable = |detail: String| RecordError::SnapshotUnreadable { detail };
     let mut file = match open_regular(&paths.snapshot()) {
         Ok(file) => file,
         Err(e) if e.kind() == io::ErrorKind::NotFound => {
-            let state = MailboxState::new();
-            return Ok((encode(&state)?, state));
+            return Ok(MailboxState::new());
         }
         Err(e) => return Err(unreadable(e.to_string())),
     };
@@ -29,7 +27,7 @@ pub(super) fn read(paths: &Paths) -> Result<(Vec<u8>, MailboxState), RecordError
         serde_json::from_slice(&bytes).map_err(|e| unreadable(e.to_string()))?;
     version.check().map_err(RecordError::SnapshotVersion)?;
     let state = serde_json::from_slice(&bytes).map_err(|e| unreadable(e.to_string()))?;
-    Ok((bytes, state))
+    Ok(state)
 }
 
 /// The bytes a snapshot of `state` is installed as.

@@ -9,7 +9,7 @@ mod common;
 
 use common::record::{self as rec, TempFgos, T0};
 use fgos_mailbox::head::judge_stored;
-use fgos_mailbox::record::{Record, RecordError, Step, Wait};
+use fgos_mailbox::record::{Record, RecordError, Reported, Step, Wait};
 use fgos_mailbox_core::{Checkpoint, Generation, MailboxState, Registered, SendRequest};
 use std::collections::BTreeSet;
 use std::process::Child;
@@ -175,11 +175,14 @@ fn heads(record: &Record, keys: &[&str]) -> Vec<String> {
     let limits = common::limits();
     record
         .hold(Wait::Try, T0, &common::limits(), |state, ids| {
-            keys.iter()
-                .map(|k| rec::name_of(&rec::register(state, k, T0, &limits, ids)))
-                .collect()
+            Reported::changing(
+                keys.iter()
+                    .map(|k| rec::name_of(&rec::register(state, k, T0, &limits, ids)))
+                    .collect(),
+            )
         })
         .unwrap()
+        .value
         .value
 }
 

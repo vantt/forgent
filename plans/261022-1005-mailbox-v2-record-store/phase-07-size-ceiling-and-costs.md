@@ -96,3 +96,34 @@ None (main `636df9d87`).
 - `cargo build --release -p fgos-mailbox --example mailbox-record-cost` builds; the run exited 0.
 - Report: `plans/reports/research-261022-1145-mailbox-v2-record-costs.md`.
 
+## Plan decision 3 reversed (plan owner (agent), 2026-10-22, after this phase's first run)
+
+The first run showed the no-write byte comparison, which re-encodes the whole state, to be about half of a no-mail hold at a week of headers.
+
+- Core: `Finished` gains `changed`, set when any item carried the token. The owning proofs are the core's finish tests, extended: `claim_then_finish_…` (changed) and `a_finish_with_a_wrong_token_…` (not changed).
+- Store: the hold's closure returns a `ReportsChange`, implemented for these results:
+  - `Claim` (`changed`) and `Finished` (`changed`);
+  - `Registered` (not `Refreshed`) and `Result<Registered, RegisterRefusal>` (refusals change nothing);
+  - `Result<SendOutcome, Refusal>` (always: the attempt is counted);
+  - the drain's `Begun` (`state_changed`);
+  - `Reported<T>` (`changing`/`unchanged`), for a closure that runs several core operations.
+- An unchanged hold returns before any encode or comparison. No path without a core flag remains, so the byte comparison is gone.
+- `snapshot::read` returns the state only.
+- Tests:
+  - phase 2's test 2 is rewritten as `a_hold_writes_exactly_when_its_change_reports_one`. A reported change is written even when the bytes would be equal, which the old comparison could not do.
+  - new: `each_core_answer_writes_exactly_when_it_changed_the_state` (same head again, refused registration, unmatched finish and quiet unchanged drain write nothing; real finish and quiet changed drain write).
+- Mutants: 9 tried, 9 killed. Store, run against `record_snapshot`: always write, `Refreshed` written, refused registration written, `Finished` always / never written, `Begun` always / never written. Core: `Finished.changed` always true. Never write was killed by the whole store suite.
+- Order of work: the implementation came before the new test cases. The mutants are their proof.
+- Recorded in branch spec §17 and §6.4, and in `plan.md` decision 3.
+
+## Re-run (after the reversal)
+
+| No-mail claim hold, p50 / p95 | Before | After |
+|---|---|---|
+| week-one | 29.95 / 42.53 | 22.63 / 36.83 |
+| week-grid 10 heads | 38.28 / 49.46 | 17.18 / 36.01 |
+| week-grid 100 heads | 58.02 / 64.15 | 44.11 / 49.68 |
+| if `bodyRetentionSec` = 86400 (measurement only) | | 2.17 / 2.20 |
+
+The record's own no-mail hold is now under 50 ms p95 in every week population measured; the host's own cost per call still comes on top. The added example row, `week-one-1d`, changes no contract value. The report's re-run section has every row.
+

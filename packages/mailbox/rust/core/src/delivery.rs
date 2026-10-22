@@ -224,6 +224,9 @@ pub struct Finished {
     /// Still in flight with this token but claimed or finished by a
     /// generation that is no longer current; left unchanged.
     pub ignored: Vec<MessageId>,
+    /// Whether the finish changed the state, so the store must write it:
+    /// true when any item carried this token.
+    pub changed: bool,
 }
 
 /// One pending message as `inbox` shows it.
@@ -520,6 +523,7 @@ impl MailboxState {
         let mut finished = Finished {
             offered: Vec::new(),
             ignored: Vec::new(),
+            changed: false,
         };
         let at = self.last_now.max(now);
         let mut touched = false;
@@ -567,6 +571,7 @@ impl MailboxState {
         if touched {
             self.last_now = at;
         }
+        finished.changed = touched;
         finished
     }
 

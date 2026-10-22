@@ -10,7 +10,7 @@ mod common;
 
 use common::record::{self as rec, TempFgos, T0};
 use fgos_holder_lock::LockScope;
-use fgos_mailbox::record::{Paths, Record, RecordError, Step, Wait};
+use fgos_mailbox::record::{Paths, Record, RecordError, Reported, Step, Wait};
 use fgos_mailbox_core::{Limits, MailboxState};
 use std::collections::BTreeSet;
 use std::path::Path;
@@ -97,9 +97,12 @@ fn set_up(fgos: &TempFgos, limits: &Limits) -> (Record, String) {
     let to = record
         .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             rec::register(state, "head-a", T0, limits, ids);
-            rec::name_of(&rec::register(state, "head-b", T0, limits, ids))
+            Reported::changing(rec::name_of(&rec::register(
+                state, "head-b", T0, limits, ids,
+            )))
         })
         .unwrap()
+        .value
         .value;
     record
         .send(rec::send_req("head-a", &to, "first"), Wait::Try, T0, limits)

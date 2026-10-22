@@ -1,5 +1,7 @@
 # Mailbox V2: what a record hold costs, against S0 and the 50 ms hook target
 
+Two runs on the same day: the first with the no-write rule decided by re-encoding the state, the second after that rule was replaced by the core's change report. The verdict below is the first run's; the re-run section updates it.
+
 Plan: [`plans/261022-1005-mailbox-v2-record-store/phase-07-size-ceiling-and-costs.md`](../261022-1005-mailbox-v2-record-store/phase-07-size-ceiling-and-costs.md). Baseline: [S0 H3](research-261020-1612-mailbox-s0-hook-and-record-costs.md) §3. Branch `mailbox/v1-v3`. The example and this report are committed together, so the example's source at that commit is the one measured.
 
 ## Verdict
@@ -11,6 +13,29 @@ Plan: [`plans/261022-1005-mailbox-v2-record-store/phase-07-size-ceiling-and-cost
 - Plus 100 such heads (39,940 headers, 13.8 MB): p50 58.0 ms, p95 64.2 ms. That is over 50 ms.
 - 50 ms is the target for the whole hook. The host's own cost per call (S0: p95 6.5 ms for a native verb called directly, 11.3 ms through the shim) comes on top of these record-only numbers. Read with it, even the one-sender week is at or over the target.
 - No lever was picked (coordinator instruction). The provisional default of Q1 (a) stands, and the numbers are added to Q1 in the plan.
+
+## Re-run after the hold stopped re-encoding (same day, same machine)
+
+The plan owner (agent) reversed plan decision 3 after the first run. A hold now writes exactly when the core reports a change, and an unchanged hold neither encodes nor compares. Same command, load 1.5 to 1.6. Rows of the first run are kept below for comparison.
+
+| No-mail claim hold | Before p50 / p95 / max | After p50 / p95 / max | Read p50 after | Headers, bytes |
+|---|---|---|---|---|
+| week-one (one sender's steady week) | 29.95 / 42.53 / 46.56 | **22.63 / 36.83 / 40.80** | 14.62 | 20,140, 6,988,646 |
+| week-grid, 10 heads at lifetime cap | 38.28 / 49.46 / 51.43 | **17.18 / 36.01 / 41.28** | 13.49 | 21,940, 7,609,695 |
+| week-grid, 100 heads at lifetime cap | 58.02 / 64.15 / 64.56 | **44.11 / 49.68 / 51.98** | 29.47 | 39,940, 13,824,249 |
+| **if `bodyRetentionSec` = 86400** (the Q1 recommendation, measured only; the contract value is unchanged): week-one | | **2.17 / 2.20 / 2.21** | 1.81 | 2,880, 1,000,540 |
+| (same shorter retention) week-one send | | 8.14 / 29.33 / 39.04 | 2.03 | 2,880, 1,000,540 |
+| s0-one | 0.11 / 0.13 / 0.50 | 0.29 / 0.46 / 0.50 | 0.13 | 50 |
+| s0-hundred | 5.07 / 5.31 / 5.62 | 4.24 / 4.32 / 4.36 | 3.59 | 5,000 |
+
+Reading:
+- **The read of the record alone is now under 50 ms p95 in every week population measured**, though at 100 heads with no margin (49.7 ms).
+- The read and parse of the whole snapshot is now the floor: about 14 ms at 7 MB and 29 ms at 14 MB.
+- What remains after the read ("after", p50 3 to 15 ms) is mostly freeing the parsed state and releasing the lock. That is an inference: no encode runs on this path any more.
+- The host's own cost per call (S0: p95 6.5 to 11.3 ms) still comes on top.
+- A one-day header horizon (the recommendation sent to the owner) cuts the steady week to 2,880 headers and 1.0 MB, and the no-mail hold to 2.2 ms.
+- Writes are unchanged by the reversal, as expected: they still encode once. Week-one send is p50 53.5 ms, claim+finish 86.0 ms.
+- The contended row showed no tail this time (max 0.20 ms against 338.58 ms in the first run). The background sender's interleaving differs between runs, so the first run's tail stands as the observed bound and the hook's 100 ms wait cap is still what limits it.
 
 ## Machine and method
 

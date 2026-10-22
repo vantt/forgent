@@ -96,3 +96,6 @@ None: no commit on `packages/holder-lock`, `packages/durable-file`, `packages/pr
   - `ids.failed()`: the plan states this branch is reviewed, not tested, because forcing it needs a test switch.
 - The path-literal search is empty.
 
+## Later change
+
+Plan decision 3 (byte equality decides the write) was reversed after phase 7: the hold now writes exactly when the core reports a change. Test 2 became `a_hold_writes_exactly_when_its_change_reports_one`; see phase 7.

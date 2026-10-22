@@ -28,8 +28,8 @@ pub use paths::Paths;
 use fgos_durable_file::sync_directory;
 use fgos_holder_lock::{Acquire, LockScope, ScopeError};
 use fgos_mailbox_core::{
-    IdSource, Limits, MailboxState, MessageId, Refusal, SendOutcome, SendRequest,
-    SnapshotVersionError, Timestamp,
+    Claim, Finished, IdSource, Limits, MailboxState, MessageId, Refusal, RegisterRefusal,
+    Registered, SendOutcome, SendRequest, SnapshotVersionError, Timestamp,
 };
 use std::fmt;
 use std::fs::{File, OpenOptions};
@@ -45,7 +45,7 @@ pub enum Step {
     Locked,
     /// The snapshot was read and parsed.
     Read,
-    /// The core ran and the new snapshot differs from the one read.
+    /// The core ran and reported a change; the new snapshot is encoded.
     Mutated,
     /// A send's body is installed and its directory synced.
     BodyInstalled,
@@ -66,6 +66,85 @@ pub enum Step {
 pub struct Warning {
     pub step: Step,
     pub detail: String,
+}
+
+/// Whether a hold's change altered the state, from the core's own answer,
+/// so the hold writes exactly when the core says so and never encodes the
+/// state just to compare it. A closure that runs several core operations
+/// returns a [`Reported`] built from their answers.
+pub trait ReportsChange {
+    fn changed(&self) -> bool;
+}
+
+/// A closure's value with the change its core operations reported.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Reported<T> {
+    pub value: T,
+    pub changed: bool,
+}
+
+impl<T> Reported<T> {
+    /// A value whose operations changed the state.
+    pub fn changing(value: T) -> Self {
+        Self {
+            value,
+            changed: true,
+        }
+    }
+
+    /// A value whose operations changed nothing.
+    pub fn unchanged(value: T) -> Self {
+        Self {
+            value,
+            changed: false,
+        }
+    }
+}
+
+impl<T> ReportsChange for Reported<T> {
+    fn changed(&self) -> bool {
+        self.changed
+    }
+}
+
+impl ReportsChange for Claim {
+    fn changed(&self) -> bool {
+        self.changed
+    }
+}
+
+impl ReportsChange for Finished {
+    fn changed(&self) -> bool {
+        self.changed
+    }
+}
+
+/// A new binding or a takeover changes the state; the same head again
+/// does not.
+impl ReportsChange for Registered {
+    fn changed(&self) -> bool {
+        !matches!(self, Registered::Refreshed { .. })
+    }
+}
+
+/// Every refused registration returns before any change.
+impl ReportsChange for Result<Registered, RegisterRefusal> {
+    fn changed(&self) -> bool {
+        self.as_ref().is_ok_and(ReportsChange::changed)
+    }
+}
+
+/// A send always changes the state: the attempt is counted, refused or not.
+impl ReportsChange for Result<SendOutcome, Refusal> {
+    fn changed(&self) -> bool {
+        true
+    }
+}
+
+impl ReportsChange for crate::hook::Begun {
+    fn changed(&self) -> bool {
+        self.state_changed()
+    }
 }
 
 /// The result of a hold that reached its end or its commit point.
@@ -224,10 +303,12 @@ impl Record {
     }
 
     /// One hold: `mutate` runs on the installed state with a fresh id
-    /// source, and the new state is installed only when it differs. `now`
-    /// and `limits` are the ones `mutate` uses; a hold that writes also
-    /// retires dead bindings by them (owner decision Q2).
-    pub fn hold<R>(
+    /// source, and the new state is installed only when `mutate`'s result
+    /// reports a change (the core's own answer, [`ReportsChange`]); an
+    /// unchanged hold neither encodes nor writes. `now` and `limits` are
+    /// the ones `mutate` uses; a hold that writes also retires dead
+    /// bindings by them (owner decision Q2).
+    pub fn hold<R: ReportsChange>(
         &self,
         wait: Wait,
         now: Timestamp,
@@ -240,7 +321,7 @@ impl Record {
     /// [`Record::hold`] with `observe` called at each [`Step`] reached. An
     /// observer error stops the hold there, exactly as a failure of that
     /// step would: an error before [`Step::Renamed`], a warning from it on.
-    pub fn hold_observed<R>(
+    pub fn hold_observed<R: ReportsChange>(
         &self,
         wait: Wait,
         now: Timestamp,
@@ -324,7 +405,7 @@ impl Record {
 
     /// The one write path of every hold. `mutate` returns its value and,
     /// for an accepted send, the body to install before the snapshot.
-    fn run<'b, R>(
+    fn run<'b, R: ReportsChange>(
         &self,
         wait: Wait,
         now: Timestamp,
@@ -345,7 +426,7 @@ impl Record {
             .map_err(RecordError::from_scope)?;
         before_commit(&mut observe, Step::Locked)?;
         let dirs = self.check_dirs()?;
-        let (old, mut state) = snapshot::read(&self.paths)?;
+        let mut state = snapshot::read(&self.paths)?;
         before_commit(&mut observe, Step::Read)?;
         let kept_before = bodies::referenced(&state);
         let mut ids = OsIds::open().map_err(|_| RecordError::Ids)?;
@@ -353,8 +434,7 @@ impl Record {
         if ids.failed() {
             return Err(RecordError::Ids);
         }
-        let mut new = snapshot::encode(&state)?;
-        if new == old {
+        if !value.changed() {
             return Ok(Held {
                 value,
                 wrote: false,
@@ -362,9 +442,8 @@ impl Record {
                 collected: Collected::default(),
             });
         }
-        if !prune::prune(&mut state, now, limits).is_empty() {
-            new = snapshot::encode(&state)?;
-        }
+        prune::prune(&mut state, now, limits);
+        let new = snapshot::encode(&state)?;
         before_commit(&mut observe, Step::Mutated)?;
         if let Some((id, text)) = body {
             bodies::install(&self.paths, &id, text.as_bytes())?;

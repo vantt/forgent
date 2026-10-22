@@ -8,7 +8,7 @@
 mod common;
 
 use common::record::{self as rec, TempFgos, T0};
-use fgos_mailbox::record::{Record, Wait};
+use fgos_mailbox::record::{Record, Reported, Wait};
 use fgos_mailbox_core::{Checkpoint, Generation, Limits, Refusal, Registered, Timestamp};
 
 const DEAD: &str = "dead-head";
@@ -19,13 +19,14 @@ fn dead_binding(record: &Record, limits: &Limits) -> String {
     let dead = rec::dead_head_record();
     record
         .hold(Wait::Try, T0, limits, |state, ids| {
-            rec::name_of(
+            Reported::changing(rec::name_of(
                 &state
                     .register(rec::register_request(DEAD, &dead), None, T0, limits, ids)
                     .unwrap(),
-            )
+            ))
         })
         .unwrap()
+        .value
         .value
 }
 
@@ -111,7 +112,7 @@ fn a_dead_binding_still_named_by_a_header_is_kept_until_the_header_retires() {
     dead_binding(&record, &limits);
     let peer = record
         .hold(Wait::Try, T0, &limits, |state, ids| {
-            rec::name_of(
+            Reported::changing(rec::name_of(
                 &state
                     .register(
                         rec::register_request("peer", &rec::own_head_record()),
@@ -121,9 +122,10 @@ fn a_dead_binding_still_named_by_a_header_is_kept_until_the_header_retires() {
                         ids,
                     )
                     .unwrap(),
-            )
+            ))
         })
         .unwrap()
+        .value
         .value;
     // The dead head's last message, sent while it lived, delivered.
     record

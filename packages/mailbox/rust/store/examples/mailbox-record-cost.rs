@@ -18,7 +18,7 @@
 #[path = "../../core/tests/common/support.rs"]
 mod support;
 
-use fgos_mailbox::record::{Paths, Record, Step, Wait};
+use fgos_mailbox::record::{Paths, Record, Reported, Step, Wait};
 use fgos_mailbox_core::{
     Checkpoint, Cli, Generation, IdSource, Limits, MailboxState, RegisterRequest, SendRequest,
     Timestamp, WriterKey,
@@ -337,6 +337,7 @@ impl Bench {
         parent: &Path,
         scenario: &str,
         build: &dyn Fn(&mut MailboxState, &mut dyn IdSource, &Limits) -> Population,
+        limits: Limits,
     ) -> Self {
         let nanos = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -349,10 +350,12 @@ impl Bench {
         std::fs::create_dir(&root).unwrap();
         std::fs::create_dir(root.join("fgos")).unwrap();
         let record = Record::open(root.join("fgos")).unwrap();
-        let limits = limits();
         let pop = record
-            .hold(WAIT, T0, &limits, |state, ids| build(state, ids, &limits))
+            .hold(WAIT, T0, &limits, |state, ids| {
+                Reported::changing(build(state, ids, &limits))
+            })
             .unwrap()
+            .value
             .value;
         let baseline = std::fs::read(record.paths().snapshot()).unwrap();
         Self {
@@ -481,7 +484,13 @@ impl Bench {
         timed(|obs| {
             self.record
                 .hold_observed(WAIT, now, &self.limits, obs, |state, ids| {
-                    register(state, "newcomer", "head-of-newcomer".into(), now, ids)
+                    Reported::changing(register(
+                        state,
+                        "newcomer",
+                        "head-of-newcomer".into(),
+                        now,
+                        ids,
+                    ))
                 })
                 .unwrap();
         })
@@ -570,24 +579,37 @@ fn main() {
     println!("| scenario and hold | headers | snapshot bytes | p50 ms | p95 ms | max ms | p50 per step (ms) | load |");
     println!("|---|---|---|---|---|---|---|---|");
     if run("s0-one") {
-        let b = Bench::new(&parent, "s0-one", &s0_one);
+        let b = Bench::new(&parent, "s0-one", &s0_one, limits());
         b.measure("s0-one send", Bench::send);
         b.measure("s0-one no-mail claim", Bench::no_mail_claim);
     }
     if run("s0-hundred") {
-        let b = Bench::new(&parent, "s0-hundred", &s0_hundred);
+        let b = Bench::new(&parent, "s0-hundred", &s0_hundred, limits());
         b.measure("s0-hundred send", Bench::send);
         b.measure("s0-hundred no-mail claim", Bench::no_mail_claim);
     }
     if run("week-one") {
-        let b = Bench::new(&parent, "week-one", &week_one);
+        let b = Bench::new(&parent, "week-one", &week_one, limits());
         b.measure("week-one send", Bench::send);
         b.measure("week-one no-mail claim", Bench::no_mail_claim);
         b.measure("week-one claim+finish", Bench::claim_finish);
     }
+    if run("week-one-1d") {
+        // Not a policy: the owner question Q1 recommendation measured, the
+        // contract value unchanged. The body retention set to the record
+        // TTL makes the header horizon one day.
+        let mut short = limits();
+        short.record.body_retention_sec = short.record.ttl_sec;
+        let b = Bench::new(&parent, "week-one-1d", &week_one, short);
+        b.measure(
+            "if bodyRetentionSec = 86400: week-one no-mail claim",
+            Bench::no_mail_claim,
+        );
+        b.measure("if bodyRetentionSec = 86400: week-one send", Bench::send);
+    }
     if run("week-grid") {
         for heads in [1, 10, 100] {
-            let b = Bench::new(&parent, "week-grid", &week_grid(heads));
+            let b = Bench::new(&parent, "week-grid", &week_grid(heads), limits());
             b.measure(
                 &format!("week-grid {heads} heads no-mail claim"),
                 Bench::no_mail_claim,
@@ -595,13 +617,13 @@ fn main() {
         }
     }
     if run("dead-bindings") {
-        let b = Bench::new(&parent, "dead-bindings", &dead_bindings);
+        let b = Bench::new(&parent, "dead-bindings", &dead_bindings, limits());
         b.measure("dead-bindings registering", Bench::registering);
         b.measure("dead-bindings claim+finish", Bench::claim_finish);
         b.measure("dead-bindings send", Bench::send);
     }
     if run("contended") {
-        let b = Bench::new(&parent, "contended", &s0_one);
+        let b = Bench::new(&parent, "contended", &s0_one, limits());
         let mut other = Command::new(std::env::current_exe().unwrap())
             .arg(b.paths().fgos_dir())
             .arg(BACKGROUND)

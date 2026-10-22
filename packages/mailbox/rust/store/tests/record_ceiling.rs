@@ -7,7 +7,7 @@
 mod common;
 
 use common::record::{self as rec, TempFgos, T0};
-use fgos_mailbox::record::Wait;
+use fgos_mailbox::record::{Reported, Wait};
 use fgos_mailbox_core::{Checkpoint, Generation, Limits};
 
 /// `max(loop.windowSec, record.ttlSec, record.bodyRetentionSec)`: how long
@@ -84,10 +84,10 @@ fn one_saturated_sender_stops_growing_at_the_derived_header_ceiling() {
                 }
                 counts.push(state.messages().count());
             }
-            (counts, state.clone())
+            Reported::changing((counts, state.clone()))
         })
         .unwrap();
-    let (counts, built) = held.value;
+    let (counts, built) = held.value.value;
 
     let most = *counts.iter().max().unwrap();
     assert!(most <= ceiling, "{most} headers > ceiling {ceiling}");
