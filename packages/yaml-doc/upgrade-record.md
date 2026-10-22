@@ -1,6 +1,6 @@
 # fgos-yaml-doc parser upgrade record
 
-Status: **option A signed by the owner (2026-10-22 18:02); `saphyr-parser` 0.2.2 and `arraydeque` 0.5.1 are vendored and in use by the parse phase.** The fuzz result is still open (section 12).
+Status: **option A signed by the owner (2026-10-22 18:02); `saphyr-parser` 0.2.2 and `arraydeque` 0.5.1 are vendored and in use by the parse phase.** The fuzz result is recorded in section 12.
 
 - Evaluated: 2026-10-22 (Asia/Saigon), toolchain `cargo 1.97.1`, Linux x86_64.
 - Scope: choose the one parser crate under `fgos-yaml-doc` (spec `docs/platform/yaml-document/spec.md` sections 5, 8, 9).
@@ -318,7 +318,11 @@ Vendoring layouts (spec section 9; sizes are the exact `cargo vendor` output of 
 - Integrity hash (2026-10-22). Each crate was unpacked from the `.crate` whose sha256 equals the checksum of section 2 (the files of the unpacked directory equal the registry copy except cargo's own `.cargo-ok` marker, which is not committed). The digest of a tree is the sha256 of its manifest, one line `<sha256 of the file>  <path>` per file, paths relative to the crate directory with `/`, sorted by byte order. `tests/third_party_integrity.rs` recomputes both lines and fails on a changed, added or removed file or an unrecorded crate:
   - `packages/yaml-doc/third-party/saphyr-parser-0.2.2`: tree-sha256 `3fdca3956bf5884ec07233922326c8c14286b867913eb697452fa6fd2960ebff` (39 files)
   - `packages/yaml-doc/third-party/arraydeque-0.5.1`: tree-sha256 `b7617ece535c8fbf8c47bd38bfaadf31fa8860d27956a3f9a98632d3077a1a12` (12 files)
-- Fuzz result: filled when the fuzz targets have run
+- Fuzz result (2026-10-22, local run, `rust/fuzz/`, nightly `rustc 1.101.0-nightly (1a2c4797e 2026-10-21)`, `cargo-fuzz 0.13.2`, libFuzzer, `-max_total_time=600 -rss_limit_mb=2048 -timeout=10 -jobs=1`, seeded from the golden fixtures): no crash, hang or out-of-memory in any target; nothing found in the vendored parser, so the owner's sign-off above stands unchanged.
+  - `parse`: 1 run of 601 s, 2 425 511 executions, 5 363 coverage points, 25 375 features, peak 854 MB.
+  - `edit_reparse`: 1 run of 601 s, 3 648 236 executions, 7 475 coverage points, 34 932 features, peak 873 MB. An earlier run stopped on a crash that was the target's own check (`NaN != NaN` on a `.nan` value in the `tool` profile); the target now compares with a NaN-aware equality, the reproducer passes, no crate code changed and no fixture was needed.
+  - `merge`: 1 run of 601 s, 9 684 017 executions, 686 coverage points, 3 610 features, peak 568 MB. An earlier 20 s smoke run stopped on a wrong model in the target (leaves inside a taken-whole sequence have their own origin, as the merge fixtures say); the target was corrected, the crate was right.
+  - Rerun on every parser upgrade (`rust/fuzz/README.md`); a finding in the parser reopens the sign-off.
 
 ## 13. Reproduction
 

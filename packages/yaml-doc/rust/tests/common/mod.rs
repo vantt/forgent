@@ -7,8 +7,15 @@ use fgos_yaml_doc::path::{format_path, parse_path};
 use fgos_yaml_doc::{CommentLoss, Document, Position, Profile, Refusal, Segment, Value};
 use serde_json::Value as Json;
 
+/// `packages/yaml-doc/contracts`, found from the manifest directory of the crate or of the fuzz
+/// crate below it (which includes this module to seed its corpus).
 pub fn contracts_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../contracts")
+    let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    manifest
+        .ancestors()
+        .map(|dir| dir.join("contracts"))
+        .find(|dir| dir.join("limits.v1.json").is_file())
+        .unwrap_or_else(|| panic!("no contracts directory above {}", manifest.display()))
 }
 
 pub fn read_json(relative: &str) -> Json {
