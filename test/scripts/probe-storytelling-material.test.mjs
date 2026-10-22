@@ -12,6 +12,8 @@ import {
   formatReport,
   BOILERPLATE_RATIONALES,
 } from "../../scripts/probe-storytelling-material.mjs";
+import { initializeWorkRepository } from "../helpers/work-store-release.mjs";
+import { initStore, addWork, addDecision } from "../../src/state/store.mjs";
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -44,13 +46,6 @@ function fixtureEvents() {
     { seq: 17, ts: "2026-01-01T00:00:16.000Z", type: "decision", payload: { id: "tsk-m13", text: "D1", rationale: "dung thu vien X thay vi Y vi Y khong ho tro streaming" }, v: 2 },
     { seq: 18, ts: "2026-01-01T00:00:17.000Z", type: "decision", payload: { id: "tsk-n14", text: "D1", rationale: "dung thu vien X thay vi Y vi Y khong ho tro streaming" }, v: 2 },
   ];
-}
-
-function writeFixture(dir) {
-  const logPath = path.join(dir, "events.jsonl");
-  const raw = `${fixtureEvents().map((e) => JSON.stringify(e)).join("\n")}\n`;
-  fs.writeFileSync(logPath, raw, "utf8");
-  return logPath;
 }
 
 test("gatherAskVista keeps only work.move events with a non-empty ask", () => {
@@ -111,19 +106,23 @@ test("formatReport is grouped, readable text — not a flat unstructured stream"
   assert.match(report, /After filtering: 2 singleton rationales remain/);
 });
 
-test("CLI reads a real events.jsonl via --log and prints both vistas, optionally writing --report", () => {
+test("CLI reads the Work history of a store via --dir and prints both vistas, optionally writing --report", () => {
   const dir = mkTempDir("probe-storytelling-material-");
-  const logPath = writeFixture(dir);
+  const fgosDir = initializeWorkRepository(dir);
+  initStore(fgosDir);
+  addWork(fgosDir, { id: "tsk-a1", title: "a", kind: "feature", risk: "light", verify: "true", status: "todo", deps: [], refs: [] });
+  addDecision(fgosDir, { id: "tsk-a1", text: "D1", source: "test", rationale: "dung thu vien X thay vi Y vi Y khong ho tro streaming" });
   const reportPath = path.join(dir, "report.md");
 
   const stdout = execFileSync(
     process.execPath,
-    [path.join(process.cwd(), "scripts/probe-storytelling-material.mjs"), "--log", logPath, "--report", reportPath],
-    { encoding: "utf8" },
+    [path.join(process.cwd(), "scripts/probe-storytelling-material.mjs"), "--dir", fgosDir, "--report", reportPath],
+    { encoding: "utf8", env: process.env },
   );
 
-  assert.match(stdout, /Vista \(a\): ask\/question events \(2 total\)/);
-  assert.match(stdout, /After filtering: 2 singleton rationales remain/);
+  assert.match(stdout, /Vista \(a\): ask\/question events \(0 total\)/);
+  assert.match(stdout, /Before filtering: 1 decision events/);
+  assert.match(stdout, /After filtering: 1 singleton rationales remain/);
   assert.ok(fs.existsSync(reportPath), "--report must write the report file");
   const reportContents = fs.readFileSync(reportPath, "utf8");
   assert.equal(`${reportContents}\n`, stdout, "the written report and stdout must be the same text");

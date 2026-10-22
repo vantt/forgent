@@ -44,7 +44,7 @@ import { checkVerifyForC4 } from '../src/intake/verify-pattern-check.mjs';
 import { parseFrontmatter } from '../src/report/frontmatter.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromExecutors } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
-import { rebuildViewFromDir } from '../src/state/replay.mjs';
+import { foldEvents } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir, loadRunnerConfigFromDir, RunnerConfigError, runDispatchCli, runDoorHint, DispatchError } from '../src/runner/dispatch.mjs';
@@ -128,7 +128,7 @@ import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
-import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
+import { DOCTOR_CHECKS, createDoctorRun, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
 import { convertProjectConfigFile, ladderCommentLines } from '../src/setup/seat-binding-conversion.mjs';
 import { createSeatBindingClient } from '../src/seat-binding/client.mjs';
 import { discoverWorkflows } from '../src/workflow/loader.mjs';
@@ -1605,7 +1605,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const role = positional[2] ?? flags.role;
         const docPath = flags['doc-path'];
 
-        const view = rebuild(dir);
+        const view = listWork(dir);
 
         let targetDoc = null;
         if (topicId && role) {
@@ -1689,7 +1689,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         throw new StoreError('validation', 'knowledge requires a subcommand (status, attest).');
       }
       if (sub === 'status') {
-        const view = rebuild(dir);
+        const view = listWork(dir);
         const topics = view.topics ?? {};
         const docs = view.docs ?? {};
         const activeTopics = Object.values(topics).filter((t) => t.status === 'active').length;
@@ -1715,7 +1715,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         };
       } else if (sub === 'attest') {
         const docPath = requireField(flags['doc-path'] ?? positional[1], 'knowledge attest requires --doc-path');
-        const view = rebuild(dir);
+        const view = listWork(dir);
         const resolved = resolveDocPath(view, docPath);
 
         const repoRoot = path.dirname(dir);
@@ -1771,7 +1771,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     case 'doc-registry': {
-      const view = rebuild(dir);
+      const view = listWork(dir);
       const { jsonContent, mdContent } = computeKnowledgeProjection(view);
       const root = path.dirname(dir);
       const mdPath = path.join(root, 'docs/doc-registry.md');
@@ -1828,7 +1828,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // the registry never heard of.
         const sharedConfig = readSharedConfigOrEmpty(repoRoot);
         if (sharedConfig?.docRegistry?.enforce === true) {
-          const registryView = rebuild(dir);
+          const registryView = listWork(dir);
           const resolved = resolveDocPath(registryView, docPath);
           if (Array.isArray(resolved)) {
             throw new StoreError('validation', `compound: --doc-path "${docPath}" resolves ambiguously to ${resolved.length} docs (${resolved.map((d) => d.docId).join(', ')}) (docRegistry.enforce is on) — fail-closed rather than guess which one to tag.`);
@@ -4239,8 +4239,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const fixed = flags.fix ? runFixes(repoRoot) : undefined;
       // A check may return its result directly or as a promise (one drives promise-based runner code).
       const checks = [];
+      // Rows of one run share what they read once (the Work view).
+      const run = createDoctorRun();
       for (const { id, description, check } of DOCTOR_CHECKS) {
-        const { passed, message } = await check(repoRoot);
+        const { passed, message } = await check(repoRoot, run);
         checks.push({ id, description, passed, message });
       }
       return fixed === undefined ? { checks } : { fixed, checks };
@@ -4251,7 +4253,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
       const claim = readClaim(dir, id);
       if (!claim) return { released: false, reason: 'no-claim' };
-      const durableView = rebuildViewFromDir(dir);
+      const durableView = foldEvents(readRawEvents(dir));
       const durableStatus = durableView.work[id]?.status;
       // Operator recovery: the claim may belong to another (often dead)
       // session, so both release paths name their reason through the admin

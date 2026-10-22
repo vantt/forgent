@@ -1,0 +1,2 @@
+{"seq":1,"ts":"2026-09-29T08:00:00.000Z","type":"work.add","payload":{"description":"Add versioned contracts and golden fixtures for observe component.","id":"tsk-golden-1","kind":"task","risk":"standard","title":"Implement observe contracts","verify":"npm test"},"v":2}
+{"seq":2,"ts":"2026-09-29T08:10:00.000Z","type":"work.move","payload":{"actor":"human","from":"blocked","id":"tsk-golden-1","to":"done"},"v":2}

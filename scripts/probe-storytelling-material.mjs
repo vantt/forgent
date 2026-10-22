@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // probe-storytelling-material.mjs — tsk-1hy: phép thử đọc-thuần gom + lọc
-// chất liệu kể chuyện từ .fgos/events.jsonl thật, để biết vỉa đó có thật
+// chất liệu kể chuyện từ lịch sử Work thật (qua cửa Event Store), để biết vỉa đó có thật
 // sự dùng được không trước khi cam kết bất kỳ kiến trúc nào
 // (docs/history/storytelling-material-probe/CONTEXT.md D1-D9). Là phép
 // thử, không phải tính năng — read-only: không ghi .fgos/, không thêm
@@ -9,12 +9,12 @@
 // Gom hai vỉa độc lập (D3):
 //   (a) event mang question/ask — work.move có payload.ask.
 //   (b) decision có rationale xuất hiện đúng MỘT lần, sau khi loại bỏ
-//       năm khuôn mẫu đã đo thật từ .fgos/events.jsonl (D4).
+//       năm khuôn mẫu đã đo thật từ lịch sử Work (D4).
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { mainCheckoutRoot } from './lib/git-ports.mjs';
-import { readEvents } from '../src/state/events.mjs';
+import { readRawEvents } from '../src/state/store.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 // Log mặc định đọc từ main checkout (Inspect `trustedMainRoot`, giống
@@ -23,7 +23,7 @@ import { isMainModule } from './lib/is-main-module.mjs';
 // của item này (ADR0020: worktree không có `.fgos/` riêng).
 
 // Bốn khuôn mẫu văn bản đã đo thật (CONTEXT.md D4, đọc trực tiếp từ
-// `.fgos/events.jsonl` ngày 2026-08-09) — literal exact match, không suy
+// lịch sử Work ngày 2026-08-09) — literal exact match, không suy
 // đoán. Khuôn mẫu thứ năm ("rỗng") không phải một chuỗi mà là rationale
 // hoàn toàn vắng mặt trên event — xử lý riêng trong gatherDecisionVista.
 export const BOILERPLATE_RATIONALES = [
@@ -164,12 +164,12 @@ export function formatReport({ logPath, totalEvents, askVista, decisionVista }) 
 
 function main() {
   const args = process.argv.slice(2);
-  const logIdx = args.indexOf('--log');
-  const logPath = logIdx >= 0 ? args[logIdx + 1] : path.join(mainCheckoutRoot(), '.fgos', 'events.jsonl');
+  const dirIdx = args.indexOf('--dir');
+  const logPath = dirIdx >= 0 ? args[dirIdx + 1] : path.join(mainCheckoutRoot(), '.fgos');
   const reportIdx = args.indexOf('--report');
   const reportPath = reportIdx >= 0 ? args[reportIdx + 1] : null;
 
-  const rawEvents = readEvents(logPath);
+  const rawEvents = readRawEvents(logPath);
   const askVista = gatherAskVista(rawEvents);
   const decisionVista = gatherDecisionVista(rawEvents);
   const report = formatReport({ logPath, totalEvents: rawEvents.length, askVista, decisionVista });

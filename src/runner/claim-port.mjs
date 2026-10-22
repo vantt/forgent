@@ -118,9 +118,7 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
     throw err;
   }
 
-  // Tầng A (T2/T3): events now live under baseline-0 (.fgos/events.jsonl)
-  // PLUS every per-writer file under .fgos/events/ -- readRawEvents(dir)
-  // is the one door that reads all of it, merged/deduped (TA-D7/TA-D13).
+  // readRawEvents(dir) is the one door that reads the whole Work history, through the Event Store facade.
   const rawEvents = readRawEvents(dir);
   const durableView = foldEvents(rawEvents);
   const claims = readClaims(dir);

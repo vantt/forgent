@@ -129,7 +129,8 @@ import { advanceEventsJsonlTruncationGuard, DEFAULT_CHECKPOINT_FALLBACK_INTERVAL
 import { verifyCompactionCandidate } from '../state/events-compaction.mjs';
 import { readMainCheckoutGuardWarnings } from '../state/main-checkout-guard-warnings.mjs';
 import { computeKnowledgeProjection } from '../report/knowledge-projection.mjs';
-import { rebuild } from '../state/store.mjs';
+import { prepareWorkStore } from '../state/work-event-store.mjs';
+import { foldEvents } from '../state/replay.mjs';
 import { resolveDocPath } from '../report/knowledge-resolver.mjs';
 import { isLiveDocLifecycle } from '../state/knowledge-registry.mjs';
 import { findDuplicateAuthoritativeClaims } from '../report/authoritative-match.mjs';
@@ -185,7 +186,51 @@ export function registerCheck({ id, description, check }) {
   if (typeof check !== 'function') {
     throw new Error(`registerCheck("${id}") requires a check function`);
   }
-  DOCTOR_CHECKS.push({ id, description, check });
+  // A check that throws (an unreadable store, a refused clone) fails its own row; it never stops the rest of the run.
+  DOCTOR_CHECKS.push({ id, description, check(cwd, run) {
+    const failed = error => ({ passed: false, message: error.message });
+    try {
+      const result = check(cwd, run);
+      return result && typeof result.then === 'function' ? result.catch(failed) : result;
+    } catch (error) { return failed(error); }
+  } });
+}
+
+/**
+ * One doctor run. Rows that need the same expensive fact (the Work view) ask the run for it: the first row
+ * computes it, the rest reuse it, and a failure is remembered too, so a store that cannot be read is tried once.
+ * A row called without a run (a test, a one-off) gets a private one and shares nothing.
+ */
+export function createDoctorRun() {
+  const facts = new Map();
+  return {
+    once(key, compute) {
+      if (!facts.has(key)) {
+        try { facts.set(key, { value: compute() }); } catch (error) { facts.set(key, { error }); }
+      }
+      const fact = facts.get(key);
+      if (fact.error) throw fact.error;
+      return fact.value;
+    },
+  };
+}
+
+/**
+ * The Work view a doctor row judges, read through the Event Store facade once per run, or null when this project
+ * has no Work store to read (no `.fgos`, or not a Git repository). Any other failure (a refused clone, damaged
+ * history) throws and fails the rows that asked.
+ */
+function doctorWorkView(root, run = createDoctorRun()) {
+  return run.once(`work-view:${root}`, () => {
+    const fgosDir = path.join(root, '.fgos');
+    if (!fs.existsSync(fgosDir)) return null;
+    try {
+      return listWork(fgosDir);
+    } catch (error) {
+      if (error.code === 'event-store-no-repository') return null;
+      throw error;
+    }
+  });
 }
 
 /**
@@ -243,8 +288,10 @@ export function registerFix({ id, fix }) {
  */
 export function runFixes(cwd) {
   return FIX_REGISTRATIONS.map(({ id, fix }) => {
-    const { changed, message } = fix(cwd);
-    return { id, changed, message };
+    try {
+      const { changed, message } = fix(cwd);
+      return { id, changed, message };
+    } catch (error) { return { id, changed: false, message: error.message }; }
   });
 }
 
@@ -1624,12 +1671,12 @@ registerCheck({
 // for one caller.
 const COMPLETED_ROOT_STATUSES = new Set(['delivered', 'retrospective', 'cleanup', 'done']);
 
-function checkRootDrift(cwd) {
+function checkRootDrift(cwd, run) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const view = doctorWorkView(mainCheckout, run) ?? foldEvents([]);
   const drift = driftStatus(mainCheckout, view, { trunk: detectTrunk(mainCheckout) });
 
   const describe = ([id, status]) =>
@@ -1675,12 +1722,12 @@ function checkRootDrift(cwd) {
   };
 }
 
-function checkLeafNotifyDrift(cwd) {
+function checkLeafNotifyDrift(cwd, run) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const view = doctorWorkView(mainCheckout, run) ?? foldEvents([]);
   const drift = postLandDrift(mainCheckout, view, { trunk: detectTrunk(mainCheckout) });
   const entries = Object.entries(drift);
   if (entries.length === 0) {
@@ -1707,12 +1754,12 @@ function checkLeafNotifyDrift(cwd) {
 // closed definition frontier.mjs already exports) — a resolved item's
 // stale classification no longer feeds any live gate or formula, so
 // flagging it here would just be noise.
-function checkWorkClassificationVocabulary(cwd) {
+function checkWorkClassificationVocabulary(cwd, run) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const view = doctorWorkView(mainCheckout, run) ?? foldEvents([]);
   const violations = [];
   for (const item of Object.values(view.work)) {
     if (isResolvedStatus(item)) continue;
@@ -1737,7 +1784,7 @@ function checkWorkClassificationVocabulary(cwd) {
 registerCheck({
   id: 'work-classification-vocabulary',
   description: "every open item's risk/kind matches its domain's declared classification vocabulary (tsk-6ax)",
-  check: (cwd) => checkWorkClassificationVocabulary(cwd),
+  check: (cwd, run) => checkWorkClassificationVocabulary(cwd, run),
 });
 
 // tsk-64h: the step-axis sibling of the risk/kind check above, and the
@@ -1755,12 +1802,12 @@ registerCheck({
 // out-of-vocabulary for being absent. OPEN items only (`!isResolvedStatus`,
 // the one shared open/closed definition), same reasoning as the check
 // above: a resolved item's step no longer routes anything.
-function checkWorkStepVocabulary(cwd) {
+function checkWorkStepVocabulary(cwd, run) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const view = doctorWorkView(mainCheckout, run) ?? foldEvents([]);
   const violations = [];
   for (const item of Object.values(view.work)) {
     if (isResolvedStatus(item)) continue;
@@ -1783,7 +1830,7 @@ function checkWorkStepVocabulary(cwd) {
 registerCheck({
   id: 'work-step-vocabulary',
   description: "every open item sits at a step its own domain's Workflow still registers — no item stranded on a retired step (tsk-64h)",
-  check: (cwd) => checkWorkStepVocabulary(cwd),
+  check: (cwd, run) => checkWorkStepVocabulary(cwd, run),
 });
 
 export function checkDomainWorkflowOperationsCoverage(cwd, root = FGOS_INSTALL_ROOT) {
@@ -1809,13 +1856,13 @@ registerCheck({
 registerCheck({
   id: 'root-drift',
   description: 'every fgw/<root> branch is in sync with its real target — no unsynced drift left over from a leaf merge (tsk-3bn)',
-  check: (cwd) => checkRootDrift(cwd),
+  check: (cwd, run) => checkRootDrift(cwd, run),
 });
 
 registerCheck({
   id: 'leaf-notify-drift',
   description: 'every live session branch has no post-land drift against its target (tsk-1el)',
-  check: (cwd) => checkLeafNotifyDrift(cwd),
+  check: (cwd, run) => checkLeafNotifyDrift(cwd, run),
 });
 
 // tsk-1l9: the LEAF-inclusive sibling of root-drift above. `root-drift` only
@@ -1835,12 +1882,12 @@ registerCheck({
 // flagged, since the branch is often cleaned up after a genuine merge; so is
 // a branch whose every commit already has a patch-equivalent on trunk, which
 // carried its content in by some other route and is only a stale ref.
-function checkDeliveredNotOnTrunk(cwd) {
+function checkDeliveredNotOnTrunk(cwd, run) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const view = doctorWorkView(mainCheckout, run) ?? foldEvents([]);
   const stranded = unmergedDeliveries(mainCheckout, view, { trunk: detectTrunk(mainCheckout) });
   const entries = Object.entries(stranded);
   if (entries.length === 0) {
@@ -1873,7 +1920,7 @@ function checkDeliveredNotOnTrunk(cwd) {
 registerCheck({
   id: 'delivered-not-on-trunk',
   description: "every item whose status says its work was handed over has its fgw/<id> branch reachable from the trunk (tsk-1l9)",
-  check: (cwd) => checkDeliveredNotOnTrunk(cwd),
+  check: (cwd, run) => checkDeliveredNotOnTrunk(cwd, run),
 });
 
 // events-jsonl-not-truncated (tsk-cgg, docs/history/events-jsonl-git-
@@ -3738,17 +3785,15 @@ function docRegistryAdopted(root) {
   return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));
 }
 
-function checkDocRegistryStale(cwd) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  const root = mainCheckout ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {
-    return { passed: true, message: 'knowledge registry check skipped -- no events log' };
-  }
+function checkDocRegistryStale(cwd, run) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
   if (!docRegistryAdopted(root)) {
     return { passed: true, message: 'not applicable -- no doc registry in this project (run fgos doc-registry to adopt)' };
   }
-  const view = rebuild(fgosDir);
+  const view = doctorWorkView(root, run);
+  if (view === null) {
+    return { passed: true, message: 'knowledge registry check skipped -- no Work store' };
+  }
   const { jsonContent, mdContent } = computeKnowledgeProjection(view);
   const mdPath = path.join(root, 'docs/doc-registry.md');
   const jsonPath = path.join(root, 'docs/doc-registry.json');
@@ -3764,21 +3809,13 @@ function checkDocRegistryStale(cwd) {
 function fixDocRegistryStale(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   const root = mainCheckout ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {
-    return { changed: false, message: 'skipped -- no events log' };
-  }
   if (!docRegistryAdopted(root)) {
     return { changed: false, message: 'skipped -- no doc registry in this project (run fgos doc-registry to adopt)' };
   }
-  let view;
-  try {
-    view = rebuild(fgosDir);
-  } catch (err) {
-    if (err instanceof StoreError || err.code === 'ENOENT') {
-      return { changed: false, message: `skipped -- ${err.message}` };
-    }
-    throw err;
+  // A fix reads the store itself: it must not act on a view an earlier row of this run read before the fixes ran.
+  const view = doctorWorkView(root);
+  if (view === null) {
+    return { changed: false, message: 'skipped -- no Work store' };
   }
   const { jsonContent, mdContent } = computeKnowledgeProjection(view);
   const mdPath = path.join(root, 'docs/doc-registry.md');
@@ -3800,11 +3837,10 @@ function fixDocRegistryStale(cwd) {
 // same file's own resolver) is an alias that resolves AMBIGUOUSLY: two or
 // more non-retired docs claiming the identical alias string, or an alias
 // that collides with a DIFFERENT doc's own currentPath.
-function checkDocAliasBroken(cwd) {
+function checkDocAliasBroken(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
-  const view = rebuild(fgosDir);
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
   const docs = Object.values(view.docs || {}).filter((d) => d.docLifecycle !== 'retired');
   const aliasOwners = new Map();
   for (const doc of docs) {
@@ -3826,11 +3862,10 @@ function checkDocAliasBroken(cwd) {
   return { passed: false, message: `found ${broken.length} broken doc aliases: ${broken.join('; ')}` };
 }
 
-function checkDocActiveDuplicate(cwd) {
+function checkDocActiveDuplicate(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
-  const view = rebuild(fgosDir);
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
   const counts = {};
   for (const doc of Object.values(view.docs || {})) {
     if (doc.docLifecycle === 'active') {
@@ -3873,11 +3908,10 @@ function checkDocNearDuplicate(cwd) {
   return { passed: false, message: `found ${groups.length} near-duplicate claim groups: ${groups.map((g) => g.map((c) => c.path).join(' ~ ')).join('; ')}` };
 }
 
-function checkDocProvisionalAged(cwd) {
+function checkDocProvisionalAged(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
-  const view = rebuild(fgosDir);
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
   const now = Date.now();
   const maxAgeMs = 7 * 24 * 60 * 60 * 1000;
   const aged = [];
@@ -3890,11 +3924,10 @@ function checkDocProvisionalAged(cwd) {
   return { passed: false, message: `provisional docs aged >7 days: ${aged.join(', ')}` };
 }
 
-function checkDocTopicOversized(cwd) {
+function checkDocTopicOversized(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
-  const view = rebuild(fgosDir);
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
   const shared = readSharedConfig(cwd);
   const maxDocs = shared.docRegistry?.topicMaxDocs ?? 10;
   const oversized = [];
@@ -3906,11 +3939,10 @@ function checkDocTopicOversized(cwd) {
   return { passed: false, message: `oversized topics: ${oversized.join(', ')}` };
 }
 
-function checkDocRoleUnderused(cwd) {
+function checkDocRoleUnderused(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
-  const view = rebuild(fgosDir);
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
   const roleCounts = {};
   for (const doc of Object.values(view.docs || {})) {
     roleCounts[doc.role] = (roleCounts[doc.role] || 0) + 1;
@@ -3925,12 +3957,11 @@ function checkDocRoleUnderused(cwd) {
 // (resolver, migration, doc-alias-broken) treats as ground truth; if the
 // file isn't actually committed there, every one of those checks is
 // silently trusting a path that doesn't exist.
-function checkDocCurrentPathMissing(cwd) {
+function checkDocCurrentPathMissing(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
   if (!fs.existsSync(path.join(root, '.git'))) return { passed: true, message: 'skipped (not a git checkout)' };
-  const view = rebuild(fgosDir);
   const missing = [];
   let head = null;
   try { head = commitAt(root, 'HEAD'); } catch { /* no commit: every live path is missing at HEAD */ }
@@ -3957,11 +3988,10 @@ function looksLikeDocPath(value) {
   return typeof value === 'string' && value.startsWith('docs/') && value.endsWith('.md');
 }
 
-function checkDocSourceUnreachable(cwd) {
+function checkDocSourceUnreachable(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
-  const view = rebuild(fgosDir);
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
   const unreachable = [];
   for (const doc of Object.values(view.docs || {})) {
     if (!isLiveDocLifecycle(doc.docLifecycle)) continue;
@@ -3995,11 +4025,10 @@ function checkDocSourceUnreachable(cwd) {
 //      on disk at its original oldPath (not migrated yet), or reachable
 //      through the live registry (properly migrated with an alias) -- never
 //      neither, which would mean a source was physically lost mid-migration.
-function checkDocSourceConservation(cwd) {
+function checkDocSourceConservation(cwd, run) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
-  const view = rebuild(fgosDir);
+  const view = doctorWorkView(root, run);
+  if (view === null) return { passed: true, message: 'skipped' };
   const problems = [];
 
   const outcomes = view.outcomes || {};
@@ -5927,41 +5956,17 @@ export function checkObserveFrictionMigrated(cwd) {
     return { passed: true, message: 'no .fgos directory present' };
   }
 
-  // 1. Scan legacy work.friction records in .fgos/events.jsonl and .fgos/events/*.jsonl
-  const legacyFrictions = [];
-  const filesToScan = [];
-  const baselineEvents = path.join(fgosDir, 'events.jsonl');
-  if (fs.existsSync(baselineEvents)) {
-    filesToScan.push({ src: 'events.jsonl', path: baselineEvents });
-  }
-  const eventsDir = path.join(fgosDir, 'events');
-  if (fs.existsSync(eventsDir) && fs.statSync(eventsDir).isDirectory()) {
-    try {
-      const entries = fs.readdirSync(eventsDir);
-      for (const entry of entries) {
-        if (entry.endsWith('.jsonl')) {
-          filesToScan.push({ src: `events/${entry}`, path: path.join(eventsDir, entry) });
-        }
-      }
-    } catch {}
-  }
-
-  for (const { src, path: filePath } of filesToScan) {
-    try {
-      const content = fs.readFileSync(filePath, 'utf8');
-      const lines = content.split('\n');
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-        try {
-          const ev = JSON.parse(trimmed);
-          if (ev.type === 'work.friction') {
-            const seq = typeof ev.seq === 'number' ? ev.seq : 0;
-            legacyFrictions.push({ src, seq });
-          }
-        } catch {}
-      }
-    } catch {}
+  // 1. Legacy work.friction records: the Event Store reader keeps every legacy record with the file it came from,
+  // so records written by the current store are never mistaken for historical migration candidates.
+  let legacyFrictions;
+  try {
+    legacyFrictions = prepareWorkStore(fgosDir, fgosDir).store.read({ streams: ['project'] }, []).legacy
+      .filter(record => record.event.type === 'work.friction')
+      // The migration cursor names the file relative to .fgos, as the Rust migrator records it.
+      .map(record => ({ src: record.provenance.file.replace(/^\.fgos\//, ''), seq: record.event.seq ?? 0 }));
+  } catch (error) {
+    if (error.code !== 'event-store-no-repository') throw error;
+    legacyFrictions = [];
   }
 
   if (legacyFrictions.length === 0) {

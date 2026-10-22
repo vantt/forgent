@@ -369,6 +369,9 @@ dependencies = [
 name = "fgos-work-state"
 version = "0.2.0"
 dependencies = [
+ "fgos-event-store",
+ "fgos-git",
+ "fgos-holder-lock",
  "fgos-host-runtime",
  "fgos-observe",
  "serde",
