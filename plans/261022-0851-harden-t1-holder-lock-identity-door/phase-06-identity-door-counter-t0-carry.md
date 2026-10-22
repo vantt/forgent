@@ -10,6 +10,8 @@ net_size: "Node −215 / Rust +7 / tests −320 (estimate)"
 
 # Phase 06 — Identity door, one counter, T0 carry list
 
+> **Rename on main (IDENT, `9fdaac9ba`, 2026-10-22 14:18):** `packages/session-identity` is now `packages/identity`, crate `fgos-session-identity` is `fgos-identity`, the operation id `session-identity.resolve` is `identity.writer` (policy id `identity.read`), and the Session Identity spec is merged into §7a of `docs/platform/identity/spec.md`. The verb `fgos identity` and its `{id, source}` answer are unchanged. This phase uses the new names; the integration branch merges main before this phase starts (census, `Cargo.lock` and the touched specs are regenerated or resolved there), and the IDENT lane is told before the door export lands.
+
 ## Context
 
 [plan.md](plan.md) Facts ("Identity", "T0 carry list") and D-T1-7; arbitration §2.2 (identity shape), §3 rows S-3, S-E10 (with the red-team's test-owner correction: `facts.rs:562-581`, not `linux.rs`), S-E6 (one counter), H19 second half (SEAT's `state-lock-held.mjs` is the third counter), H21/H22 not here. T0's [phase 7](../261021-1547-harden-t0-process-facts-door/phase-07-post-seat-carry-list.md) is folded in as the last section (that file now points here).
