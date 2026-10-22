@@ -7,6 +7,7 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 13:50 (phiên WORK máy này): **U1 xong trên nhánh `work/es-cutover` `65b30d11f`** (lõi cổng ghi Work, addon chỉ qua một cửa, cache đọc dùng lại sau append và seal; census 0 undeclared). `test/state`+`event-store`+`cli`+`intake`: 26 hỏng / 2690, main 0; đều thuộc U3 (porting), U6 (compaction), U7 (snapshot replay). Chưa đụng `packages/git`, `src/git`, `src/holder-lock`, hook. Một lần chạy nhầm cả `test/` ~7 phút lúc 12:55–13:02 (đã dừng, dọn, script giờ từ chối danh sách rỗng) — xin lỗi TEST/HARDEN. Tiếp: U2 (H1 ba máy).
 - 2026-10-22 14:00 (phiên `forgent-35`, owner "ok duyệt"): **OPC: owner duyệt plan Phase A** ([plan](../261022-1335-opc-phase-a-containment-fixes/plan.md)); thi công trên nhánh `opc/phase-a`. Phase 00 xin khoảng yên tĩnh của TEST và HARDEN.
 
 - 2026-10-22 13:55 (phiên `forgent-35`): **OPC: plan thi công Phase A** ([plan](../261022-1335-opc-phase-a-containment-fixes/plan.md)), 6 phase: đo nền gồm thời gian suite và số git chạy trong bwrap của suite (owner hỏi về tốc độ test); A1+A2 nhánh contained `driver.rs` (HARDEN duyệt); A3 sau HARDEN T1 phase 4; A4 watch trên `linux-pgroup` khi repo có submodule; A5 bộ conformance (TEST duyệt); đo lại, E1/E4, docs, land. Chờ owner duyệt plan trước khi code.
