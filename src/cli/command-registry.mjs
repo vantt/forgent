@@ -1008,7 +1008,7 @@ export const COMMAND_REGISTRY = [
           },
           required: [],
         },
-        examples: ['fgos identity', 'fgos identity --pid 4242 --fgos-dir .fgos'],
+        examples: ['fgos identity writer', 'fgos identity writer --pid 4242 --fgos-dir .fgos'],
       },
       machine: {
         description: 'This machine: {id, handle, alias}. The id is minted once per machine by `fgos doctor --fix`; the handle is the alias when one is set, else the id without its suffix. Exit 65 [machine-id-missing] when no id was minted yet.',
