@@ -8,9 +8,9 @@ pub mod shell;
 
 pub use drain::{
     begin, finish, render_reply, Begun, Claimed, FinishTicket, HeadFacts, HookCall, HookReply,
-    QuietReason,
+    PointerOnly, QuietReason,
 };
-pub use limits::{HookCallLimits, HookLimits, StopBlockLimits};
+pub use limits::{BreakerLimits, HookCallLimits, HookLimits, StopBlockLimits};
 
 use fgos_mailbox_core::Cli;
 

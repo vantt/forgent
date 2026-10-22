@@ -634,8 +634,12 @@ fn a_cli_missing_from_the_tested_list_is_quiet_and_changes_nothing() {
             .as_array_mut()
             .unwrap()
             .retain(|entry| entry["cli"] != adapter.word());
+        contract["hookFacts"]
+            .as_object_mut()
+            .unwrap()
+            .remove(adapter.word());
         let mut drain = Drain::new(adapter);
-        drain.tested = TestedClis::from_contract(&contract.to_string());
+        drain.tested = TestedClis::from_contract(&contract.to_string()).unwrap();
         for (event, file) in [
             (HookEvent::PostToolUse, files::POST_TOOL_USE),
             (HookEvent::Stop, files::STOP),
@@ -643,5 +647,138 @@ fn a_cli_missing_from_the_tested_list_is_quiet_and_changes_nothing() {
             assert_eq!(drain.hook(event, file), quiet(QuietReason::Untested));
             assert_eq!(drain.state, MailboxState::new());
         }
+    }
+}
+
+/// The `additionalContext` text of a `PostToolUse` reply, in the shape the
+/// CLI injects.
+fn context_of(stdout: &str) -> String {
+    let out: Value = serde_json::from_str(stdout).unwrap();
+    out["hookSpecificOutput"]["additionalContext"]
+        .as_str()
+        .unwrap()
+        .to_string()
+}
+
+fn step_bound(adapter: Adapter) -> u64 {
+    TestedClis::embedded()
+        .facts(adapter)
+        .and_then(|facts| facts.post_tool_use_max_bytes)
+        .expect("every drained CLI has a measured step bound")
+}
+
+#[test]
+fn a_step_drain_takes_what_fits_its_cli_bound_and_ends_with_the_pointer_for_the_rest() {
+    for adapter in tested() {
+        let bound = step_bound(adapter);
+        let mut drain = Drain::registered(adapter);
+        drain.add_peer("peer");
+        // Its worst case alone is far over any bound: 5 + 2 bytes a body byte.
+        let big_body = "x".repeat(bound as usize);
+        let big = drain.send("peer", &big_body, false);
+        let small = drain.send("peer", "small and later", false);
+
+        let claimed = take(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
+        assert_eq!(
+            claimed
+                .items
+                .iter()
+                .map(|i| i.id.clone())
+                .collect::<Vec<_>>(),
+            vec![small.clone()]
+        );
+        assert_eq!(claimed.too_large, 1);
+        let stdout = drain.deliver(&claimed);
+
+        let context = context_of(&stdout);
+        assert!(
+            context.len() as u64 <= bound,
+            "{adapter:?}: {} > {bound}",
+            context.len()
+        );
+        assert!(context.contains("| small and later"));
+        assert!(
+            context.ends_with(&fgos_mailbox_core::too_large_pointer(1)),
+            "{adapter:?}: the reply ends with the pointer line"
+        );
+        assert!(matches!(
+            drain.state_of(&small),
+            MessageState::Offered { .. }
+        ));
+        assert_eq!(drain.state_of(&big), MessageState::Recorded);
+    }
+}
+
+#[test]
+fn a_step_drain_with_only_too_large_mail_prints_the_pointer_alone_and_finishes_nothing() {
+    for adapter in tested() {
+        let bound = step_bound(adapter);
+        let mut drain = Drain::registered(adapter);
+        drain.add_peer("peer");
+        let big = drain.send("peer", &"x".repeat(bound as usize), false);
+
+        let begun = drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
+        let Begun::Pointer(pointer) = begun else {
+            panic!("{adapter:?}: expected the pointer alone, got {begun:?}");
+        };
+        assert_eq!(pointer.too_large, 1);
+        let stdout = pointer.reply().stdout;
+        assert_eq!(
+            serde_json::from_str::<Value>(&stdout).unwrap(),
+            accepted(
+                adapter,
+                files::ACCEPTED_POST_TOOL_USE,
+                &fgos_mailbox_core::too_large_pointer(1)
+            )
+        );
+        let header = drain.state.message(&big).unwrap();
+        assert_eq!(header.state, MessageState::Recorded);
+        assert_eq!(header.offers, 0);
+    }
+}
+
+#[test]
+fn a_too_large_wake_message_is_still_taken_by_a_stop_drain() {
+    for adapter in tested() {
+        let bound = step_bound(adapter);
+        let mut drain = Drain::registered(adapter);
+        drain.add_peer("peer");
+        let big = drain.send("peer", &"x".repeat(bound as usize), true);
+
+        let claimed = take(drain.hook(HookEvent::Stop, files::STOP));
+        assert_eq!(
+            claimed
+                .items
+                .iter()
+                .map(|i| i.id.clone())
+                .collect::<Vec<_>>(),
+            vec![big]
+        );
+        assert_eq!(claimed.too_large, 0);
+    }
+}
+
+#[test]
+fn a_cli_without_a_measured_step_bound_drains_nothing_at_post_tool_use_and_keeps_its_mail() {
+    for adapter in tested() {
+        let text = std::fs::read_to_string(contracts_dir().join(ADAPTERS_CONTRACT)).unwrap();
+        let mut contract: Value = serde_json::from_str(&text).unwrap();
+        contract["hookFacts"][adapter.word()]["postToolUseContextMaxBytes"] = Value::Null;
+        let mut drain = Drain::new(adapter);
+        drain.tested = TestedClis::from_contract(&contract.to_string()).unwrap();
+        let first = drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE);
+        assert_eq!(first, quiet(QuietReason::NoStepBound));
+        assert!(
+            first.state_changed(),
+            "the first hook still registers the head"
+        );
+        drain.add_peer("peer");
+        let id = drain.send("peer", "waits for stop", false);
+
+        assert_eq!(
+            drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE),
+            quiet(QuietReason::NoStepBound)
+        );
+        assert_eq!(drain.state_of(&id), MessageState::Recorded);
     }
 }

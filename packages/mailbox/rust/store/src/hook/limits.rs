@@ -34,4 +34,14 @@ pub struct HookCallLimits {
     /// The largest foreign JSON document the hook reads, in bytes: its stdin
     /// payload and the CLI's own session file.
     pub max_read_bytes: u64,
+    pub breaker: BreakerLimits,
+}
+
+/// The circuit breaker (spec §4.1): after `failures` consecutive counted
+/// failures, hook calls skip the drain for `pause_sec`.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct BreakerLimits {
+    pub failures: u32,
+    pub pause_sec: u64,
 }

@@ -222,7 +222,7 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
                         .map(|h| (item.id.clone(), h.body_bytes))
                 })
                 .collect(),
-            Begun::Quiet { .. } => BTreeMap::new(),
+            Begun::Quiet { .. } | Begun::Pointer(_) => BTreeMap::new(),
         };
         let changed = begun.state_changed();
         Reported {
@@ -249,6 +249,11 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
             outcome.quiet = Some(Quiet::Drain(reason));
             return outcome;
         }
+        Begun::Pointer(pointer) => {
+            // Nothing was claimed, so nothing is finished.
+            outcome.stdout_written = write_reply(&input.gate, stdout, &pointer.reply().stdout);
+            return outcome;
+        }
         Begun::Claimed(claimed) => claimed,
     };
     outcome.claimed = claimed.items.iter().map(|item| item.id.clone()).collect();
@@ -264,15 +269,7 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
         .collect();
     let reply = render_reply(&claimed, &|id| bodies.get(id).cloned(), input.limits);
 
-    if !input.gate.begin_write() {
-        // The budget passed: the watchdog is ending the process.
-        return outcome;
-    }
-    if stdout
-        .write_all(reply.stdout.as_bytes())
-        .and_then(|()| stdout.flush())
-        .is_err()
-    {
+    if !write_reply(&input.gate, stdout, &reply.stdout) {
         return outcome;
     }
     outcome.stdout_written = true;
@@ -292,6 +289,17 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
         Err(error) => outcome.warnings.push(format!("finish: {error}")),
     }
     outcome
+}
+
+/// Writes and flushes `text` once the gate moved from idle to writing;
+/// `false` when the watchdog got there first (the budget passed and the
+/// process is ending) or the write failed.
+fn write_reply(gate: &WriteGate, stdout: &mut dyn Write, text: &str) -> bool {
+    gate.begin_write()
+        && stdout
+            .write_all(text.as_bytes())
+            .and_then(|()| stdout.flush())
+            .is_ok()
 }
 
 fn record_code(error: &RecordError) -> &'static str {

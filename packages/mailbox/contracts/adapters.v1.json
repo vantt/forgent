@@ -3,7 +3,8 @@
     "id": "mailbox-adapters",
     "version": 1
   },
-  "description": "The CLI versions each mailbox hook adapter is proven against (docs/platform/agent-mailbox/spec.md §4.1, spelled testedAgainst here). A version is listed only when its Stop and PostToolUse payloads and the output shapes the CLI injected were recorded on it; the fixtures live under fixtures/hooks/<cli>/. A CLI of the first slice that could not be proven is listed under deferred with its reason, never left out silently.",
+  "description": "The CLI versions each mailbox hook adapter is proven against (docs/platform/agent-mailbox/spec.md §4.1, spelled testedAgainst here), and the measured hook facts of each drained CLI (hookFacts). A version is listed only when its Stop and PostToolUse payloads and the output shapes the CLI injected were recorded on it; the fixtures live under fixtures/hooks/<cli>/. hookFacts are per CLI, not per version: hookTopology (direct: the CLI starts the hook itself; one-shell-hop: through one shell that does not exec it), hookShell (the path the CLI invokes for the hook command, checked against the hop parent's executable and argv[0]; null for direct), headExecutables (exe basenames accepted at the direct head position) and postToolUseContextMaxBytes (the bound of a PostToolUse drain's output; null means no PostToolUse drain). measuredOn names the versions the facts were measured on; re-recording a new version re-measures them. A CLI of the first slice that could not be proven is listed under deferred with its reason, never left out silently.",
+  "source": "hookFacts: plans/reports/research-261023-0148-mailbox-v5-measurements.md tables (b), (c), (d), (e) and (f); the bound applies plan decision 6's margin rule for a threshold not shown to be per hook (half the largest inline ladder step, 9,216 bytes, in both CLIs)",
   "testedAgainst": [
     {
       "cli": "claude",
@@ -18,6 +19,34 @@
       "version": "0.161.0"
     }
   ],
+  "hookFacts": {
+    "claude": {
+      "measuredOn": {
+        "versions": [
+          "2.1.308"
+        ],
+        "platform": "linux"
+      },
+      "hookTopology": "one-shell-hop",
+      "hookShell": "/bin/sh",
+      "headExecutables": [],
+      "postToolUseContextMaxBytes": 4608
+    },
+    "codex": {
+      "measuredOn": {
+        "versions": [
+          "0.161.0"
+        ],
+        "platform": "linux"
+      },
+      "hookTopology": "direct",
+      "hookShell": null,
+      "headExecutables": [
+        "codex"
+      ],
+      "postToolUseContextMaxBytes": 4608
+    }
+  },
   "deferred": [
     {
       "cli": "agy",

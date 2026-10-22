@@ -33,8 +33,9 @@ use super::{Adapter, HookEvent, HookLimits};
 use crate::adapters::{Shape, TestedClis};
 use crate::head::{head_text, is_complete, judge_stored};
 use fgos_mailbox_core::{
-    render, AttemptToken, Checkpoint, ClaimedItem, Finished, Generation, IdSource, Limits,
-    MailboxState, MessageId, RegisterRefusal, RegisterRequest, Registered, Timestamp, WriterKey,
+    render, too_large_pointer, AttemptToken, Checkpoint, ClaimedItem, Finished, Generation,
+    IdSource, Limits, MailboxState, MessageId, RegisterRefusal, RegisterRequest, Registered,
+    Timestamp, WriterKey, FRAME_SEPARATOR,
 };
 use fgos_process::facts::Record;
 
@@ -80,6 +81,10 @@ pub enum QuietReason {
     Registration(RegisterRefusal),
     NothingEligible,
     StopBlockCap,
+    /// A `PostToolUse` call of a CLI whose adapter has no measured output
+    /// bound: nothing is claimed at a step; its mail waits for Stop or
+    /// `inbox --claim`.
+    NoStepBound,
 }
 
 /// What `finish` needs; only `begin` builds one.
@@ -102,8 +107,28 @@ impl FinishTicket {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Claimed {
     pub items: Vec<ClaimedItem>,
+    /// Items left recorded because each is too large alone for the
+    /// channel; the reply then ends with the pointer line.
+    pub too_large: u32,
     shape: Shape,
     ticket: FinishTicket,
+}
+
+/// A step drain that found only items too large for its channel: the
+/// shell writes the pointer line alone and finishes nothing.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PointerOnly {
+    pub too_large: u32,
+    shape: Shape,
+}
+
+impl PointerOnly {
+    /// The pointer line in the CLI's output shape.
+    pub fn reply(&self) -> HookReply {
+        HookReply {
+            stdout: self.shape.render(&too_large_pointer(self.too_large)),
+        }
+    }
 }
 
 impl Claimed {
@@ -124,6 +149,9 @@ pub enum Begun {
     /// A claim to render, write and finish; a claim always changes the
     /// snapshot.
     Claimed(Claimed),
+    /// Only the pointer line to write; the drain stamped `last_drain_at`,
+    /// so the snapshot changed.
+    Pointer(PointerOnly),
 }
 
 impl Begun {
@@ -131,7 +159,7 @@ impl Begun {
     pub fn state_changed(&self) -> bool {
         match self {
             Self::Quiet { state_changed, .. } => *state_changed,
-            Self::Claimed(_) => true,
+            Self::Claimed(_) | Self::Pointer(_) => true,
         }
     }
 }
@@ -228,12 +256,29 @@ pub fn begin(
             }
             Checkpoint::Stop
         }
-        HookEvent::PostToolUse => Checkpoint::Step,
+        HookEvent::PostToolUse => match tested
+            .facts(call.adapter)
+            .and_then(|facts| facts.post_tool_use_max_bytes)
+        {
+            Some(bound) => Checkpoint::BoundedStep(bound),
+            None => {
+                return Begun::Quiet {
+                    reason: QuietReason::NoStepBound,
+                    state_changed: changed,
+                }
+            }
+        },
     };
     let claim = state.claim(key, generation, checkpoint, now, limits, ids);
     changed |= claim.changed;
     let Some(token) = claim.token else {
-        if checkpoint == Checkpoint::Stop {
+        if claim.too_large > 0 {
+            return Begun::Pointer(PointerOnly {
+                too_large: claim.too_large,
+                shape,
+            });
+        }
+        if checkpoint.is_stop() {
             changed |= state.note_stop(key, generation, false);
         }
         return Begun::Quiet {
@@ -243,31 +288,36 @@ pub fn begin(
     };
     Begun::Claimed(Claimed {
         items: claim.items,
+        too_large: claim.too_large,
         shape,
         ticket: FinishTicket {
             key: key.clone(),
             generation,
             token,
-            stop_block: checkpoint == Checkpoint::Stop,
+            stop_block: checkpoint.is_stop(),
         },
     })
 }
 
 /// Outside the mutex: every claimed item's frame, joined by one blank line,
-/// in the output shape the CLI was recorded injecting. A body the store
-/// could not read gets the contract's body-missing line.
+/// then the pointer line when items were left as too large, in the output
+/// shape the CLI was recorded injecting. A body the store could not read
+/// gets the contract's body-missing line.
 pub fn render_reply(
     claimed: &Claimed,
     bodies: &dyn Fn(&MessageId) -> Option<String>,
     limits: &Limits,
 ) -> HookReply {
-    let frames: Vec<String> = claimed
+    let mut parts: Vec<String> = claimed
         .items
         .iter()
         .map(|item| render(item, bodies(&item.id).as_deref(), limits))
         .collect();
+    if claimed.too_large > 0 {
+        parts.push(too_large_pointer(claimed.too_large));
+    }
     HookReply {
-        stdout: claimed.shape.render(&frames.join("\n\n")),
+        stdout: claimed.shape.render(&parts.join(FRAME_SEPARATOR)),
     }
 }
 

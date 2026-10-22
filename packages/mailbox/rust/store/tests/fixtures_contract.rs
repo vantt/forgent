@@ -461,3 +461,111 @@ fn every_cli_of_the_first_slice_is_tested_or_deferred_with_a_reason() {
         );
     }
 }
+
+fn limits_keys() -> Vec<Value> {
+    let text = fs::read_to_string(contracts_dir().join("limits.v1.json")).unwrap();
+    let contract: Value = serde_json::from_str(&text).unwrap();
+    contract["keys"].as_array().unwrap().clone()
+}
+
+#[test]
+fn every_drained_cli_names_its_hook_topology_shell_head_executables_and_output_bound() {
+    use fgos_mailbox::adapters::TestedClis;
+    use fgos_mailbox::head::Topology;
+    use fgos_mailbox::hook::Adapter;
+    let text = fs::read_to_string(contracts_dir().join(ADAPTERS_CONTRACT)).unwrap();
+    let tested = TestedClis::from_contract(&text).expect("the adapters contract parses");
+    assert_eq!(
+        &tested,
+        TestedClis::embedded(),
+        "the embedded contract is this file"
+    );
+    for adapter in [Adapter::Claude, Adapter::Codex] {
+        assert!(tested.contains(adapter));
+        let facts = tested.facts(adapter).expect("a drained CLI has hookFacts");
+        assert!(facts.post_tool_use_max_bytes.is_some_and(|b| b > 0));
+    }
+    // The accepted hop shells and head executables, pinned (review M3, M4):
+    // a change to either is a change to the caller check.
+    let claude = tested.facts(Adapter::Claude).unwrap();
+    assert_eq!(claude.topology, Topology::OneShellHop);
+    assert_eq!(claude.hook_shell.as_deref(), Some(Path::new("/bin/sh")));
+    let codex = tested.facts(Adapter::Codex).unwrap();
+    assert_eq!(codex.topology, Topology::Direct);
+    assert_eq!(codex.hook_shell, None);
+    assert_eq!(codex.head_executables, vec!["codex".to_string()]);
+    assert!(!tested.contains(Adapter::Agy) && tested.facts(Adapter::Agy).is_none());
+}
+
+#[test]
+fn the_adapters_contract_refuses_missing_or_inconsistent_hook_facts() {
+    use fgos_mailbox::adapters::TestedClis;
+    let text = fs::read_to_string(contracts_dir().join(ADAPTERS_CONTRACT)).unwrap();
+    let base: Value = serde_json::from_str(&text).unwrap();
+    let refused = |label: &str, change: &dyn Fn(&mut Value)| {
+        let mut contract = base.clone();
+        change(&mut contract);
+        assert!(
+            TestedClis::from_contract(&contract.to_string()).is_err(),
+            "{label} was accepted"
+        );
+    };
+    refused("a tested CLI without hookFacts", &|c| {
+        c["hookFacts"].as_object_mut().unwrap().remove("codex");
+    });
+    refused("hookFacts of a CLI that is not tested", &|c| {
+        c["hookFacts"]["agy"] = c["hookFacts"]["codex"].clone();
+        c["hookFacts"]["agy"]["measuredOn"]["versions"] = serde_json::json!([]);
+    });
+    refused("a measuredOn version not under testedAgainst", &|c| {
+        c["hookFacts"]["codex"]["measuredOn"]["versions"] = serde_json::json!(["9.9.9"]);
+    });
+    refused("a direct entry without head executables", &|c| {
+        c["hookFacts"]["codex"]["headExecutables"] = serde_json::json!([]);
+    });
+    refused("a direct entry with a hook shell", &|c| {
+        c["hookFacts"]["codex"]["hookShell"] = Value::from("/bin/sh");
+    });
+    refused("a one-shell-hop entry with a relative hook shell", &|c| {
+        c["hookFacts"]["claude"]["hookShell"] = Value::from("sh");
+    });
+    refused("a one-shell-hop entry without a hook shell", &|c| {
+        c["hookFacts"]["claude"]["hookShell"] = Value::Null;
+    });
+    refused("an unknown topology", &|c| {
+        c["hookFacts"]["claude"]["hookTopology"] = Value::from("two-shell-hop");
+    });
+    refused("an unknown field", &|c| {
+        c["hookFacts"]["claude"]["hookShells"] = serde_json::json!(["/bin/sh"]);
+    });
+}
+
+#[test]
+fn the_limits_contract_holds_the_breaker_and_p95_keys_with_their_sources() {
+    let keys = limits_keys();
+    let key = |name: &str| {
+        keys.iter()
+            .find(|k| k["key"] == name)
+            .unwrap_or_else(|| panic!("{name} missing"))
+            .clone()
+    };
+    for (name, reader, default, source) in [
+        ("mailbox.hook.breaker.failures", "hook", 3, "spec §12"),
+        ("mailbox.hook.breaker.pauseSec", "hook", 60, "spec §12"),
+        (
+            "mailbox.hook.p95TargetMs",
+            "harness",
+            50,
+            "owner decision 2026-10-20",
+        ),
+    ] {
+        let entry = key(name);
+        assert_eq!(entry["reader"], reader, "{name}");
+        assert_eq!(entry["default"], default, "{name}");
+        assert!(entry["source"].as_str().unwrap().contains(source), "{name}");
+        assert!(
+            entry["status"].as_str().is_some_and(|s| !s.is_empty()),
+            "{name}"
+        );
+    }
+}

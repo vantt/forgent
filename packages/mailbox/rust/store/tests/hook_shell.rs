@@ -455,3 +455,49 @@ fn the_budget_watchdog_waits_for_a_started_write_and_exits_otherwise() {
         "the watchdog did not end it"
     );
 }
+
+#[test]
+fn a_shell_whose_step_drain_finds_only_too_large_mail_writes_the_pointer_and_finishes_nothing() {
+    let fgos = TempFgos::new("shell-pointer");
+    let record = fgos.record();
+    let head = Head::spawn();
+    let (stdin, writer) = payload(files::POST_TOOL_USE);
+    call(&record, &head, head.ancestry(), &stdin, &mut Vec::new(), T0);
+    let name = read_state(&record)
+        .binding(&writer)
+        .unwrap()
+        .name
+        .to_string();
+    let bound = TestedClis::embedded()
+        .facts(Adapter::Claude)
+        .and_then(|f| f.post_tool_use_max_bytes)
+        .unwrap();
+    let body = "x".repeat(bound as usize);
+    let id = record
+        .send(
+            send_req("sender-without-head", &name, &body),
+            Wait::Try,
+            T0,
+            &limits(),
+        )
+        .unwrap()
+        .value
+        .unwrap()
+        .id;
+
+    let mut stdout = Vec::new();
+    let outcome = call(&record, &head, head.ancestry(), &stdin, &mut stdout, T0);
+
+    assert!(outcome.stdout_written);
+    assert!(
+        !outcome.finished,
+        "nothing was claimed, so nothing is finished"
+    );
+    assert!(outcome.claimed.is_empty());
+    let out: serde_json::Value = serde_json::from_slice(&stdout).unwrap();
+    assert_eq!(
+        out["hookSpecificOutput"]["additionalContext"],
+        fgos_mailbox_core::too_large_pointer(1)
+    );
+    assert_eq!(state_of(&record, &id), MessageState::Recorded);
+}
