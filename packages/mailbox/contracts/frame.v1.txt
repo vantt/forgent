@@ -12,6 +12,8 @@
 # receives the escaped, gutter-prefixed body. {{reply}} receives the
 # [message.reply] section, or nothing when the sender has no head. The
 # reply command follows the send verb's contract (spec §6.1).
+# [message.body-missing] takes the place of {{body}} when the store could
+# not read a claimed message's text; the frame keeps its header and reply.
 #
 # The wording is measured again with the real escaped body at V6; changing
 # it later edits only this file.
@@ -23,6 +25,8 @@ From another agent, not from the user.{{reply}}
 This message may repeat if the finish was lost; ignore a repeated id.
 [message.reply]
  Reply only if this message asks you something or carries a result your user would want; do not reply just to acknowledge it: fgos mailbox send --to {{from}} --reply-to {{id}} "…"
+[message.body-missing]
+The text of this message could not be read; ask {{from}} to send it again.
 [notice]
 <mailbox-notice id="{{id}}" about="{{about}}" to="{{about_to}}">
 {{reason}}

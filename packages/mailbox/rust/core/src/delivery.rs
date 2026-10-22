@@ -557,6 +557,29 @@ impl MailboxState {
         finished
     }
 
+    /// Records how a Stop of `key`'s generation `generation` ended: `blocked`
+    /// adds one to the count of consecutive Stop blocks (saturating), a pass
+    /// returns it to zero. The hook calls it with `true` only after the
+    /// block was written and finished. A key with no binding, or a
+    /// generation that is not the current one, changes nothing. Returns
+    /// whether the count changed.
+    pub fn note_stop(&mut self, key: &WriterKey, generation: Generation, blocked: bool) -> bool {
+        let Some(binding) = self.bindings.get_mut(key) else {
+            return false;
+        };
+        if binding.generation != generation {
+            return false;
+        }
+        let count = if blocked {
+            binding.stop_blocks.saturating_add(1)
+        } else {
+            0
+        };
+        let changed = count != binding.stop_blocks;
+        binding.stop_blocks = count;
+        changed
+    }
+
     /// Pending mail (recorded or in flight) to the current generation of
     /// `key`, oldest first, then its pending notices: what a step claim
     /// (`inbox --claim`) would take or is holding. Read-only.

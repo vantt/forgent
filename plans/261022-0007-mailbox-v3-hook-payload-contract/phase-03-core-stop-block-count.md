@@ -70,6 +70,8 @@ V1's final review changed the core API this phase was written against:
 - **Schema version stays 1.** V1 retired `Header.kind` without a bump because no version-1 snapshot was ever persisted and V2 is not built (spec §17, 2026-10-22). The same holds for `Binding.stop_blocks`: nothing outside tests ever wrote a snapshot. `stop_blocks` is a required field and `Binding` denies unknown fields, so a snapshot written before this change is refused at deserialization rather than misread. The acceptance line "a version-1 snapshot is refused as `UnsupportedOlder`" is therefore retired; the round-trip test carries the new field. V2 freezes version 1 when it first persists.
 - **`register` order.** V1 added `drop_generation_records` on the `Dead` takeover and the key alphabet check in `WriterKey::new`. The new order is: key length, judgement mismatch, same head (no mutation), `Alive` → `Conflict`, `Unknown` → `Deferred`, and only then `sweep` and create or replace. The takeover also resets `stop_blocks` to 0.
 - **Test keys** follow the writer-key alphabet `[A-Za-z0-9._-]` (V1 L3).
+- **Body-missing line placement.** The line is contract text, so it takes the place of `{{body}}` without the body gutter; its only filled value is `{{from}}`, escaped like every header value. Its wording: "The text of this message could not be read; ask {{from}} to send it again."
+- **Result.** `cargo test --locked -p fgos-mailbox-core`: 92 passed (87 after phase 1, plus the three `stop_blocks` tests, the conflict-or-deferred test and the body-missing frame test; the same-head test was rewritten in place and the clock test retargeted).
 
 ## Acceptance criteria
 

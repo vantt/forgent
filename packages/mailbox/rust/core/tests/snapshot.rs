@@ -105,6 +105,9 @@ fn populated_state() -> MailboxState {
         Some(offered)
     );
 
+    // k2's Stop claim above was a block that its shell wrote and finished.
+    assert!(state.note_stop(&k2, Generation::FIRST, true));
+
     // Exchanges and wake lifetime counts are filled by the sends above.
     let snapshot = serde_json::to_value(&state).unwrap();
     assert!(!snapshot["exchanges"].as_object().unwrap().is_empty());

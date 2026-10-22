@@ -41,10 +41,15 @@ pub struct Binding {
     /// The head's native channel (socket, thread id), opaque text.
     pub handle: Option<String>,
     pub registered_at: Timestamp,
+    /// When this head was registered or took the key over; a registration
+    /// by the same head writes nothing.
     pub last_seen: Timestamp,
     /// The last drain of this generation that found mail pending (spec
     /// §6.4, §9 signal 9); a drain of an empty address does not write.
     pub last_drain_at: Option<Timestamp>,
+    /// Consecutive Stop blocks of this generation that were written and
+    /// finished; the hook owns the bound (spec §6.1, §12 `stopBlock.max`).
+    pub stop_blocks: u32,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -117,6 +122,10 @@ impl std::error::Error for RegisterRefusal {}
 impl MailboxState {
     /// Registers a head (spec §5.1). The store reads `binding(&req.key)`,
     /// judges it, and passes the judgement as `judged`.
+    ///
+    /// Only a creation or a takeover writes: the same head again, and every
+    /// refusal, return before the sweep and leave the state as it was, so a
+    /// hook of a registered head with no mail writes nothing.
     pub fn register(
         &mut self,
         req: RegisterRequest,
@@ -128,44 +137,52 @@ impl MailboxState {
         if req.key.as_str().chars().count() > limits.frame.max_header_chars as usize {
             return Err(RegisterRefusal::KeyTooLong);
         }
-        if self.bindings.contains_key(&req.key) != judged.is_some() {
-            return Err(RegisterRefusal::JudgementMismatch);
-        }
+        let takeover = match (self.bindings.get(&req.key), judged) {
+            (None, None) => None,
+            (Some(binding), Some(judged)) => {
+                if judged.same_head {
+                    return Ok(Registered::Refreshed {
+                        name: binding.name.clone(),
+                        generation: binding.generation,
+                    });
+                }
+                match judged.liveness {
+                    Liveness::Alive => return Err(RegisterRefusal::Conflict),
+                    Liveness::Unknown => return Err(RegisterRefusal::Deferred),
+                    Liveness::Dead => Some(
+                        binding
+                            .generation
+                            .next()
+                            .ok_or(RegisterRefusal::GenerationExhausted)?,
+                    ),
+                }
+            }
+            _ => return Err(RegisterRefusal::JudgementMismatch),
+        };
         self.sweep(now, limits, ids);
         let now = self.last_now;
-        let Some(judged) = judged else {
+        let Some(generation) = takeover else {
             return self.create(req, now, limits, ids);
         };
+        // The sweep never removes a binding, so the judged one is still here.
         let binding = self
             .bindings
             .get_mut(&req.key)
             .ok_or(RegisterRefusal::JudgementMismatch)?;
-        if judged.same_head {
-            binding.last_seen = now;
-            return Ok(Registered::Refreshed {
-                name: binding.name.clone(),
-                generation: binding.generation,
-            });
-        }
-        match judged.liveness {
-            Liveness::Alive => Err(RegisterRefusal::Conflict),
-            Liveness::Unknown => Err(RegisterRefusal::Deferred),
-            Liveness::Dead => {
-                let old = binding.generation;
-                binding.generation = old.next().ok_or(RegisterRefusal::GenerationExhausted)?;
-                binding.last_drain_at = None;
-                binding.head = req.head;
-                binding.handle = req.handle;
-                binding.registered_at = now;
-                binding.last_seen = now;
-                let replaced = Registered::Replaced {
-                    name: binding.name.clone(),
-                    generation: binding.generation,
-                };
-                self.drop_generation_records(&req.key, old);
-                Ok(replaced)
-            }
-        }
+        let old = binding.generation;
+        binding.generation = generation;
+        binding.last_drain_at = None;
+        binding.stop_blocks = 0;
+        binding.head = req.head;
+        binding.handle = req.handle;
+        binding.registered_at = now;
+        binding.last_seen = now;
+        let replaced = Registered::Replaced {
+            name: binding.name.clone(),
+            generation,
+        };
+        self.drop_generation_records(&req.key, old);
+        Ok(replaced)
     }
 
     fn create(
@@ -194,6 +211,7 @@ impl MailboxState {
             registered_at: now,
             last_seen: now,
             last_drain_at: None,
+            stop_blocks: 0,
         };
         self.bindings.insert(req.key, binding);
         Ok(Registered::Created {

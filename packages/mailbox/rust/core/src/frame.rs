@@ -175,16 +175,23 @@ fn escape_body(body: &str) -> String {
 }
 
 /// The frame of one claimed item: a message wrapped with its body (read
-/// from the store), or a notice in its own tag. A notice has no body, so
-/// `body` is not read for one.
-pub fn render(item: &ClaimedItem, body: &str, limits: &Limits) -> String {
+/// from the store), or a notice in its own tag. A message whose body the
+/// store could not read (`None`) gets the contract's body-missing line in
+/// place of the body, and keeps its header and reply line. A notice has no
+/// body, so `body` is not read for one.
+pub fn render(item: &ClaimedItem, body: Option<&str>, limits: &Limits) -> String {
     match &item.what {
         ClaimedWhat::Mail(from) => render_message(item, from, body, limits),
         ClaimedWhat::Notice(facts) => render_notice(item, facts, limits),
     }
 }
 
-fn render_message(item: &ClaimedItem, sender: &MailFrom, body: &str, limits: &Limits) -> String {
+fn render_message(
+    item: &ClaimedItem,
+    sender: &MailFrom,
+    body: Option<&str>,
+    limits: &Limits,
+) -> String {
     let from = escape_header(&sender.label, limits);
     let id = escape_header(item.id.as_str(), limits);
     let agent = escape_header(sender.cli.as_ref().map_or(NO_AGENT, |c| c.as_str()), limits);
@@ -194,7 +201,10 @@ fn render_message(item: &ClaimedItem, sender: &MailFrom, body: &str, limits: &Li
     } else {
         String::new()
     };
-    let body = escape_body(body);
+    let body = match body {
+        Some(text) => escape_body(text),
+        None => fill(section("message.body-missing"), &[("from", &from)]),
+    };
     fill(
         section("message"),
         &[

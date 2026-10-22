@@ -1,6 +1,8 @@
 mod common;
 
-use common::{key, other_head, register_new, request, same_head, spec_limits, t, SeqIds};
+use common::{
+    key, other_head, register_new, request, same_head, spec_limits, t, Pair, SeqIds, B_NAME,
+};
 use fgos_mailbox_core::{Generation, Liveness, MailboxState, RegisterRefusal, Registered};
 
 fn is_lower_hex(text: &str) -> bool {
@@ -39,17 +41,18 @@ fn no_binding_creates_generation_1_with_a_project_cli_2hex_name() {
 }
 
 #[test]
-fn registering_the_same_head_again_refreshes_last_seen_and_does_not_bump() {
+fn registering_the_same_head_again_changes_nothing_and_does_not_bump() {
     let limits = spec_limits();
     let mut ids = SeqIds::default();
     let mut state = MailboxState::new();
-    let name = register_new(
+    register_new(
         &mut state,
         request("k", "codex", None, "head-a"),
         t(100),
         &limits,
         &mut ids,
     );
+    let before = state.clone();
 
     let outcome = state
         .register(
@@ -64,11 +67,33 @@ fn registering_the_same_head_again_refreshes_last_seen_and_does_not_bump() {
     assert!(
         matches!(outcome, Registered::Refreshed { generation, .. } if generation == Generation::FIRST)
     );
-    let binding = state.binding(&key("k")).unwrap();
-    assert_eq!(binding.generation, Generation::FIRST);
-    assert_eq!(binding.name.as_str(), name);
-    assert_eq!(binding.registered_at, t(100));
-    assert_eq!(binding.last_seen, t(200));
+    assert_eq!(state, before);
+}
+
+#[test]
+fn a_conflicting_or_deferred_registration_changes_nothing_not_even_the_clock() {
+    let limits = spec_limits();
+    let mut pair = Pair::new(t(0));
+    pair.send("a", B_NAME, "held", t(0));
+    let claim = pair.claim("b", Generation::FIRST, t(1));
+    assert!(claim.token.is_some(), "the message is in flight");
+    let past_deadline = Pair::after(t(1), limits.in_flight_ttl_sec);
+    let before = pair.state.clone();
+
+    for (liveness, refusal) in [
+        (Liveness::Alive, RegisterRefusal::Conflict),
+        (Liveness::Unknown, RegisterRefusal::Deferred),
+    ] {
+        let refused = pair.state.register(
+            request("b", "codex", None, "another-head"),
+            other_head(liveness),
+            past_deadline,
+            &limits,
+            &mut pair.ids,
+        );
+        assert_eq!(refused, Err(refusal));
+        assert_eq!(pair.state, before, "{liveness:?} changed the state");
+    }
 }
 
 #[test]
@@ -287,15 +312,17 @@ fn a_clock_that_steps_back_is_treated_as_the_last_time_seen() {
 
     state
         .register(
-            request("k", "codex", None, "head-a"),
-            same_head(),
+            request("k", "codex", None, "head-b"),
+            other_head(Liveness::Dead),
             t(10),
             &limits,
             &mut ids,
         )
         .unwrap();
 
-    assert_eq!(state.binding(&key("k")).unwrap().last_seen, t(1000));
+    let binding = state.binding(&key("k")).unwrap();
+    assert_eq!(binding.last_seen, t(1000));
+    assert_eq!(binding.registered_at, t(1000));
     assert_eq!(state.last_now(), t(1000));
 }
 
