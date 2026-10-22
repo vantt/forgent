@@ -21,6 +21,7 @@ export const SUPPORTED_AGENTS = ['claude', 'codex', 'agy', 'omp', 'pi'];
 export const HOOK_KINDS = {
   DISPATCH: 'dispatch-decide',
   DECISION: 'decision-question',
+  MAILBOX: 'mailbox',
 };
 
 function readJsonSafe(filePath) {
@@ -50,350 +51,228 @@ function shimCommand(repoRoot, args) {
   return `'${shim}' ${args}`;
 }
 
-/** Whether a hook command is the given fgOS hook kind, judged by the arguments after the shim path
- * (the project path itself may contain a kind's name). Assumes a POSIX shell runs the command. */
-function commandIsKind(command, kind) {
-  return typeof command === 'string' && new RegExp(`\\bhook ${kind}( --format=agy)?\\s*$`).test(command);
+/** The shim path forms an fgOS hook command starts with: single-quoted absolute (the codex and agy
+ * form, `'\''` escapes inside), the Claude Code project variable form, or an older bare path. */
+const SHIM_PREFIX = String.raw`(?:'(?:[^']|'\\'')*\/\.fgos\/installation\/bin\/fgos'|"\$\{CLAUDE_PROJECT_DIR\}\/\.fgos\/installation\/bin\/fgos"|(?:[^\s'"]*\/)?\.fgos\/installation\/bin\/fgos)`;
+
+/** Whether `command` runs the project shim's `hook <kind>` with exactly this row's arguments (agy
+ * format, mailbox `--cli`/`--event`), judged from the start of the command, so a user hook that only
+ * mentions our arguments (`bash -c '…; echo hook mailbox …'`) or a wrapper with another prefix never
+ * reads as ours. Assumes a POSIX shell runs the command. */
+function commandIsKind(command, row) {
+  if (typeof command !== 'string') return false;
+  const args = `hook ${row.kind}${row.args ? ` ${row.args}` : ''}`.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`^${SHIM_PREFIX} ${args}(?: --format=agy)?\\s*$`).test(command);
 }
 
-export function isShimRunnable(repoRoot) {
+export function isShimRunnable(repoRoot, { mailboxCli = null } = {}) {
   const shim = getProjectShimPath(repoRoot);
   if (!existsSync(shim)) return { runnable: false, reason: 'shim-missing' };
-  try {
-    // Probe the way an agent calls the hook: from a fresh process, not as a
-    // child of the host that runs doctor. The host's recursion guard would
-    // otherwise make the nested shim refuse and every probe read as broken.
-    const env = { ...process.env };
-    delete env.FGOS_RUST_HOST_RECURSION_GUARD;
-    const res = spawnSync(shim, ['hook', 'dispatch-decide'], {
-      input: '{}',
-      timeout: 3000,
-      env,
-    });
-    if (res.status === 0) return { runnable: true, reason: null };
-    return { runnable: false, reason: `exit-${res.status}` };
-  } catch (err) {
-    return { runnable: false, reason: err.message };
+  // Probe the way an agent calls the hook: from a fresh process, not as a
+  // child of the host that runs doctor. The host's recursion guard would
+  // otherwise make the nested shim refuse and every probe read as broken.
+  const env = { ...process.env };
+  delete env.FGOS_RUST_HOST_RECURSION_GUARD;
+  const probes = [{ kind: HOOK_KINDS.DISPATCH, args: ['hook', 'dispatch-decide'], quietStdout: false }];
+  // The mailbox kind with benign input: `{}` is no payload of any CLI, so the hook stays quiet, opens
+  // no record and writes nothing; it must exit 0 with nothing on stdout.
+  if (mailboxCli) probes.push({ kind: `${HOOK_KINDS.MAILBOX} (${mailboxCli})`, args: ['hook', 'mailbox', '--cli', mailboxCli, '--event', 'post-tool-use'], quietStdout: true });
+  for (const probe of probes) {
+    try {
+      const res = spawnSync(shim, probe.args, { input: '{}', timeout: 3000, env, cwd: repoRoot });
+      if (res.status !== 0) return { runnable: false, reason: `${probe.kind}: exit-${res.status}` };
+      if (probe.quietStdout && res.stdout?.length) return { runnable: false, reason: `${probe.kind}: printed on stdout` };
+    } catch (err) {
+      return { runnable: false, reason: `${probe.kind}: ${err.message}` };
+    }
   }
+  return { runnable: true, reason: null };
 }
 
 // ---------------------------------------------------------------------------
-// 1. Claude Code (.claude/settings.json)
+// 1-3. The hook table: Claude Code, Codex CLI and AGY (JSON hook files)
 // ---------------------------------------------------------------------------
 
-const CLAUDE_HOOKS = [
-  {
-    kind: HOOK_KINDS.DISPATCH,
-    matcher: 'Agent|Task',
-    canonicalCommand: '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos" hook dispatch-decide',
-    legacyMarkers: ['dispatch-decide-hook.mjs'],
-  },
-  {
-    kind: HOOK_KINDS.DECISION,
-    matcher: 'AskUserQuestion',
-    canonicalCommand: '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos" hook decision-question',
-    legacyMarkers: ['decision-question-hook.mjs'],
-  },
+const CLAUDE_SHIM = '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"';
+
+/**
+ * Every fgOS hook a JSON hook file carries, one row per (cli, kind, event): the file, where the row
+ * lives (`hooks.<Event>` entries, or an agy named group), its matcher (null: the entry has none), and
+ * its command. The installers and checks of these three CLIs read only this table (spec §7.1).
+ * `legacyMarkers` name older fgOS commands an install migrates in place.
+ */
+const hookRows = (repoRoot) => [
+  { cli: 'claude', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', matcher: 'Agent|Task', command: `${CLAUDE_SHIM} hook dispatch-decide`, legacyMarkers: ['dispatch-decide-hook.mjs'] },
+  { cli: 'claude', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', matcher: 'AskUserQuestion', command: `${CLAUDE_SHIM} hook decision-question`, legacyMarkers: ['decision-question-hook.mjs'] },
+  { cli: 'codex', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', matcher: '.*', command: shimCommand(repoRoot, 'hook dispatch-decide') },
+  { cli: 'codex', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', matcher: 'RequestUserInput|ask.*', command: shimCommand(repoRoot, 'hook decision-question') },
+  { cli: 'agy', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', group: 'fgos-dispatch-guard', matcher: '.*', command: shimCommand(repoRoot, 'hook dispatch-decide --format=agy'), timeout: 10 },
+  { cli: 'agy', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', group: 'fgos-decision-guard', matcher: 'ask.*|AskUserQuestion', command: shimCommand(repoRoot, 'hook decision-question --format=agy'), timeout: 10 },
 ];
 
-function isClaudeOwnedHook(commandStr, hookSpec) {
-  if (typeof commandStr !== 'string') return false;
-  if (commandStr === hookSpec.canonicalCommand) return true;
-  return hookSpec.legacyMarkers.some((marker) => commandStr.includes(marker));
+const HOOK_FILES = {
+  claude: { file: path.join('.claude', 'settings.json'), label: '.claude/settings.json', name: 'Claude Code', optional: false },
+  codex: { file: path.join('.codex', 'hooks.json'), label: '.codex/hooks.json', name: 'Codex CLI', optional: true, dir: '.codex' },
+  agy: { file: path.join('.agents', 'hooks.json'), label: '.agents/hooks.json', name: 'AGY', optional: true, dir: '.agents' },
+};
+
+function rowsOf(repoRoot, cli) {
+  return hookRows(repoRoot).filter((row) => row.cli === cli);
+}
+
+/** Whether a hook object is this row's: its exact command, an older fgOS command (legacy marker),
+ * or the shim running exactly this row's kind and arguments. */
+function isOwnedHook(hook, row) {
+  const command = hook?.command;
+  if (typeof command !== 'string') return false;
+  if (command === row.command) return true;
+  if ((row.legacyMarkers ?? []).some((marker) => command.includes(marker))) return true;
+  return commandIsKind(command, row);
+}
+
+function hookObject(row) {
+  return { type: 'command', command: row.command, ...(row.timeout ? { timeout: row.timeout } : {}) };
+}
+
+function entryFor(row) {
+  return { ...(row.matcher !== null ? { matcher: row.matcher } : {}), hooks: [hookObject(row)] };
+}
+
+const sameMatcher = (entry, row) => (row.matcher === null ? entry?.matcher === undefined : entry?.matcher === row.matcher);
+
+/** Puts one nested row into `hooks.<Event>`. Only our hook object is replaced, never the entry it
+ * sits in, so a user hook beside it stays; an entry in another shape (no `hooks` array) is left as it
+ * is. Returns whether anything changed. */
+function installNestedRow(hooks, row) {
+  const entries = Array.isArray(hooks[row.event]) ? hooks[row.event] : [];
+  hooks[row.event] = entries;
+  const wanted = hookObject(row);
+  const at = entries.findIndex((e) => Array.isArray(e?.hooks) && e.hooks.some((h) => isOwnedHook(h, row)));
+  if (at >= 0) {
+    const entry = entries[at];
+    const index = entry.hooks.findIndex((h) => isOwnedHook(h, row));
+    if (sameMatcher(entry, row)) {
+      if (JSON.stringify(entry.hooks[index]) === JSON.stringify(wanted)) return false;
+      entry.hooks[index] = wanted;
+      return true;
+    }
+    entry.hooks.splice(index, 1);
+    if (entry.hooks.length === 0) {
+      entries[at] = entryFor(row);
+      return true;
+    }
+  }
+  entries.push(entryFor(row));
+  return true;
+}
+
+/** Puts one agy row into its named group, as agy reads them. */
+function installGroupRow(config, row) {
+  const existing = config[row.group];
+  const isMatching =
+    existing &&
+    existing.enabled !== false &&
+    Array.isArray(existing[row.event]) &&
+    existing[row.event].some((g) => g?.matcher === row.matcher && g?.hooks?.some((h) => h?.command === row.command));
+  if (isMatching) return false;
+  config[row.group] = { enabled: true, [row.event]: [{ matcher: row.matcher, hooks: [hookObject(row)] }] };
+  return true;
+}
+
+function installRows(repoRoot, cli) {
+  const spec = HOOK_FILES[cli];
+  const filePath = path.join(repoRoot, spec.file);
+  const config = readJsonSafe(filePath);
+  if (config === null) return { wired: false, skippedExisting: 'malformed' };
+  let changed = false;
+  for (const row of rowsOf(repoRoot, cli)) {
+    if (row.group) {
+      changed = installGroupRow(config, row) || changed;
+    } else {
+      config.hooks = config.hooks && typeof config.hooks === 'object' ? config.hooks : {};
+      changed = installNestedRow(config.hooks, row) || changed;
+    }
+  }
+  if (changed) writeJsonPretty(filePath, config);
+  return { wired: true, skippedExisting: null };
+}
+
+/** Whether a row is in its file in the shape the CLI reads. */
+function rowPresent(config, row) {
+  if (row.group) {
+    const group = config[row.group];
+    return Boolean(group && group.enabled !== false && Array.isArray(group[row.event]) &&
+      group[row.event].some((g) => g?.matcher === row.matcher && g?.hooks?.some((h) => h?.command === row.command)));
+  }
+  const entries = config?.hooks?.[row.event];
+  return Array.isArray(entries) && entries.some((e) => sameMatcher(e, row) && Array.isArray(e?.hooks) &&
+    e.hooks.some((h) => h?.type === 'command' && h?.command === row.command));
+}
+
+/** Whether a row's command sits in its event in a shape the CLI does not read (a flat hook object
+ * instead of an entry with a `hooks` array): such a hook never runs. */
+function rowInWrongShape(config, row) {
+  const entries = row.group ? config?.[row.group]?.[row.event] : config?.hooks?.[row.event];
+  return Array.isArray(entries) && entries.some((e) => !Array.isArray(e?.hooks) && e?.command === row.command);
+}
+
+function checkRows(cwd, cli) {
+  const spec = HOOK_FILES[cli];
+  const filePath = path.join(cwd, spec.file);
+  if (spec.optional && !existsSync(path.join(cwd, spec.dir)) && !existsSync(filePath)) {
+    return { passed: true, message: `${spec.name} hooks not required (no ${spec.dir}/ directory)` };
+  }
+  const config = readJsonSafe(filePath);
+  if (config === null) return { passed: false, message: `${spec.label} exists but is malformed JSON` };
+  const rows = rowsOf(cwd, cli);
+  const missing = rows.filter((row) => !rowPresent(config, row));
+  if (missing.length > 0) {
+    const names = missing.map((row) => (row.group ?? (row.args ? `${row.kind} ${row.event}` : row.kind)));
+    const shape = missing.filter((row) => rowInWrongShape(config, row)).map((row) => `${row.kind} ${row.event}`);
+    const wrongShape = shape.length ? ` (in a shape ${spec.name} does not read: ${shape.join(', ')})` : '';
+    return { passed: false, message: `${spec.label} missing canonical hook(s): ${[...new Set(names)].join(', ')}${wrongShape} — run fgos doctor --fix` };
+  }
+  const mailboxCli = rows.some((row) => row.kind === HOOK_KINDS.MAILBOX) ? cli : null;
+  const probe = isShimRunnable(cwd, { mailboxCli });
+  if (!probe.runnable) {
+    return { passed: false, message: `${spec.name} hooks wired but local shim not runnable (${probe.reason})` };
+  }
+  return { passed: true, message: `${spec.name} hooks wired and verified runnable` };
 }
 
 export function installClaudeHook(repoRoot) {
-  const settingsPath = path.join(repoRoot, '.claude', 'settings.json');
-  const settings = readJsonSafe(settingsPath);
-  if (settings === null) return { wired: false, skippedExisting: 'malformed' };
-
-  settings.hooks = settings.hooks && typeof settings.hooks === 'object' ? settings.hooks : {};
-  let preToolUse = Array.isArray(settings.hooks.PreToolUse) ? settings.hooks.PreToolUse : [];
-
-  let changed = false;
-
-  for (const hookSpec of CLAUDE_HOOKS) {
-    let foundIndex = -1;
-    for (let i = 0; i < preToolUse.length; i++) {
-      const entry = preToolUse[i];
-      if (entry && Array.isArray(entry.hooks) && entry.hooks.some((h) => isClaudeOwnedHook(h?.command, hookSpec))) {
-        foundIndex = i;
-        break;
-      }
-    }
-
-    if (foundIndex >= 0) {
-      // Migrate / canonicalize existing owned entry
-      const existing = preToolUse[foundIndex];
-      const needsUpdate =
-        existing.matcher !== hookSpec.matcher ||
-        !existing.hooks.some((h) => h?.command === hookSpec.canonicalCommand);
-
-      if (needsUpdate) {
-        preToolUse[foundIndex] = {
-          matcher: hookSpec.matcher,
-          hooks: [{ type: 'command', command: hookSpec.canonicalCommand }],
-        };
-        changed = true;
-      }
-    } else {
-      // Append missing
-      preToolUse.push({
-        matcher: hookSpec.matcher,
-        hooks: [{ type: 'command', command: hookSpec.canonicalCommand }],
-      });
-      changed = true;
-    }
-  }
-
-  if (changed) {
-    settings.hooks.PreToolUse = preToolUse;
-    writeJsonPretty(settingsPath, settings);
-  }
-  return { wired: true, skippedExisting: null };
+  return installRows(repoRoot, 'claude');
 }
 
+/** Whether every Claude Code `PreToolUse` guard is present, in its canonical or an older fgOS form. */
 export function isClaudeHookConfigured(cwd) {
-  const settingsPath = path.join(cwd, '.claude', 'settings.json');
-  const settings = readJsonSafe(settingsPath);
+  const settings = readJsonSafe(path.join(cwd, '.claude', 'settings.json'));
   if (settings === null) return false;
   const preToolUse = settings?.hooks?.PreToolUse;
   if (!Array.isArray(preToolUse)) return false;
-  return CLAUDE_HOOKS.every((hookSpec) =>
-    preToolUse.some(
-      (entry) =>
-        entry?.matcher === hookSpec.matcher &&
-        Array.isArray(entry?.hooks) &&
-        entry.hooks.some(
-          (h) =>
-            h?.type === 'command' &&
-            (h?.command === hookSpec.canonicalCommand || isClaudeOwnedHook(h?.command, hookSpec)),
-        ),
-    ),
-  );
+  return rowsOf(cwd, 'claude').filter((row) => row.event === 'PreToolUse').every((row) =>
+    preToolUse.some((entry) => entry?.matcher === row.matcher && Array.isArray(entry?.hooks) &&
+      entry.hooks.some((h) => h?.type === 'command' && isOwnedHook(h, row))));
 }
 
 export function checkClaudeHook(cwd) {
-  const settingsPath = path.join(cwd, '.claude', 'settings.json');
-  const settings = readJsonSafe(settingsPath);
-  if (settings === null) {
-    return { passed: false, message: '.claude/settings.json exists but is malformed JSON' };
-  }
-  const preToolUse = settings?.hooks?.PreToolUse;
-  if (!Array.isArray(preToolUse)) {
-    return { passed: false, message: '.claude/settings.json has no PreToolUse hooks registered — run fgos doctor --fix' };
-  }
-
-  const missing = [];
-  for (const hookSpec of CLAUDE_HOOKS) {
-    const hasCanonical = preToolUse.some(
-      (entry) =>
-        entry?.matcher === hookSpec.matcher &&
-        Array.isArray(entry?.hooks) &&
-        entry.hooks.some((h) => h?.type === 'command' && h?.command === hookSpec.canonicalCommand),
-    );
-    if (!hasCanonical) {
-      missing.push(hookSpec.kind);
-    }
-  }
-
-  if (missing.length > 0) {
-    return { passed: false, message: `.claude/settings.json missing canonical hook(s): ${missing.join(', ')} — run fgos doctor --fix` };
-  }
-
-  // Runnable probe
-  const probe = isShimRunnable(cwd);
-  if (!probe.runnable) {
-    return { passed: false, message: `Claude Code hooks wired but local shim not runnable (${probe.reason})` };
-  }
-
-  return { passed: true, message: 'Claude Code hooks wired and verified runnable' };
+  return checkRows(cwd, 'claude');
 }
 
-// ---------------------------------------------------------------------------
-// 2. Codex CLI (.codex/hooks.json)
-// ---------------------------------------------------------------------------
-
-const codexHooks = (repoRoot) => [
-  {
-    kind: HOOK_KINDS.DISPATCH,
-    matcher: '.*',
-    canonicalCommand: shimCommand(repoRoot, 'hook dispatch-decide'),
-  },
-  {
-    kind: HOOK_KINDS.DECISION,
-    matcher: 'RequestUserInput|ask.*',
-    canonicalCommand: shimCommand(repoRoot, 'hook decision-question'),
-  },
-];
-
 export function installCodexHook(repoRoot) {
-  const hooksPath = path.join(repoRoot, '.codex', 'hooks.json');
-  const config = readJsonSafe(hooksPath);
-  if (config === null) return { wired: false, skippedExisting: 'malformed' };
-
-  config.hooks = config.hooks && typeof config.hooks === 'object' ? config.hooks : {};
-  let preToolUse = Array.isArray(config.hooks.PreToolUse) ? config.hooks.PreToolUse : [];
-
-  let changed = false;
-  for (const hookSpec of codexHooks(repoRoot)) {
-    const idx = preToolUse.findIndex(
-      (e) => Array.isArray(e?.hooks) && e.hooks.some((h) => commandIsKind(h?.command, hookSpec.kind)),
-    );
-    if (idx >= 0) {
-      if (
-        preToolUse[idx].matcher !== hookSpec.matcher ||
-        !preToolUse[idx].hooks.some((h) => h?.command === hookSpec.canonicalCommand)
-      ) {
-        preToolUse[idx] = {
-          matcher: hookSpec.matcher,
-          hooks: [{ type: 'command', command: hookSpec.canonicalCommand }],
-        };
-        changed = true;
-      }
-    } else {
-      preToolUse.push({
-        matcher: hookSpec.matcher,
-        hooks: [{ type: 'command', command: hookSpec.canonicalCommand }],
-      });
-      changed = true;
-    }
-  }
-
-  if (changed) {
-    config.hooks.PreToolUse = preToolUse;
-    writeJsonPretty(hooksPath, config);
-  }
-
-  return { wired: true, skippedExisting: null };
+  return installRows(repoRoot, 'codex');
 }
 
 export function checkCodexHook(cwd) {
-  const codexDir = path.join(cwd, '.codex');
-  const hooksPath = path.join(codexDir, 'hooks.json');
-  if (!existsSync(codexDir) && !existsSync(hooksPath)) {
-    return { passed: true, message: 'Codex CLI hooks not required (no .codex/ directory)' };
-  }
-
-  const config = readJsonSafe(hooksPath);
-  if (config === null) {
-    return { passed: false, message: '.codex/hooks.json exists but is malformed JSON' };
-  }
-  const preToolUse = config?.hooks?.PreToolUse;
-  if (!Array.isArray(preToolUse)) {
-    return { passed: false, message: '.codex/hooks.json has no PreToolUse hooks registered — run fgos doctor --fix' };
-  }
-
-  const missing = [];
-  for (const hookSpec of codexHooks(cwd)) {
-    const ok = preToolUse.some(
-      (e) =>
-        e?.matcher === hookSpec.matcher &&
-        Array.isArray(e?.hooks) &&
-        e.hooks.some((h) => h?.type === 'command' && h?.command === hookSpec.canonicalCommand),
-    );
-    if (!ok) missing.push(hookSpec.kind);
-  }
-
-  if (missing.length > 0) {
-    return { passed: false, message: `.codex/hooks.json missing canonical hook(s): ${missing.join(', ')} — run fgos doctor --fix` };
-  }
-
-  const probe = isShimRunnable(cwd);
-  if (!probe.runnable) {
-    return { passed: false, message: `Codex hooks configured but local shim not runnable (${probe.reason})` };
-  }
-
-  return { passed: true, message: 'Codex CLI hooks wired and verified runnable' };
+  return checkRows(cwd, 'codex');
 }
 
-// ---------------------------------------------------------------------------
-// 3. AGY (.agents/hooks.json)
-// ---------------------------------------------------------------------------
-
-const agyGroups = (repoRoot) => ({
-  'fgos-dispatch-guard': {
-    matcher: '.*',
-    command: shimCommand(repoRoot, 'hook dispatch-decide --format=agy'),
-  },
-  'fgos-decision-guard': {
-    matcher: 'ask.*|AskUserQuestion',
-    command: shimCommand(repoRoot, 'hook decision-question --format=agy'),
-  },
-});
-
 export function installAgyHook(repoRoot) {
-  const hooksPath = path.join(repoRoot, '.agents', 'hooks.json');
-  const config = readJsonSafe(hooksPath);
-  if (config === null) return { wired: false, skippedExisting: 'malformed' };
-
-  let changed = false;
-  for (const [groupName, spec] of Object.entries(agyGroups(repoRoot))) {
-    const existing = config[groupName];
-    const isMatching =
-      existing &&
-      existing.enabled !== false &&
-      Array.isArray(existing.PreToolUse) &&
-      existing.PreToolUse.some(
-        (g) => g?.matcher === spec.matcher && g?.hooks?.some((h) => h?.command === spec.command),
-      );
-
-    if (!isMatching) {
-      config[groupName] = {
-        enabled: true,
-        PreToolUse: [
-          {
-            matcher: spec.matcher,
-            hooks: [{ type: 'command', command: spec.command, timeout: 10 }],
-          },
-        ],
-      };
-      changed = true;
-    }
-  }
-
-  if (changed) {
-    writeJsonPretty(hooksPath, config);
-  }
-
-  return { wired: true, skippedExisting: null };
+  return installRows(repoRoot, 'agy');
 }
 
 export function checkAgyHook(cwd) {
-  const agyDir = path.join(cwd, '.agents');
-  const hooksPath = path.join(agyDir, 'hooks.json');
-  if (!existsSync(agyDir) && !existsSync(hooksPath)) {
-    return { passed: true, message: 'AGY hooks not required (no .agents/ directory)' };
-  }
-
-  const config = readJsonSafe(hooksPath);
-  if (config === null) {
-    return { passed: false, message: '.agents/hooks.json exists but is malformed JSON' };
-  }
-
-  const missing = [];
-  for (const [groupName, spec] of Object.entries(agyGroups(cwd))) {
-    const group = config[groupName];
-    const ok =
-      group &&
-      group.enabled !== false &&
-      Array.isArray(group.PreToolUse) &&
-      group.PreToolUse.some(
-        (g) => g?.matcher === spec.matcher && g?.hooks?.some((h) => h?.command === spec.command),
-      );
-    if (!ok) missing.push(groupName);
-  }
-
-  if (missing.length > 0) {
-    return { passed: false, message: `.agents/hooks.json missing canonical group(s): ${missing.join(', ')} — run fgos doctor --fix` };
-  }
-
-  const probe = isShimRunnable(cwd);
-  if (!probe.runnable) {
-    return { passed: false, message: `AGY hooks configured but local shim not runnable (${probe.reason})` };
-  }
-
-  return { passed: true, message: 'AGY hooks wired and verified runnable' };
+  return checkRows(cwd, 'agy');
 }
 
 // ---------------------------------------------------------------------------
