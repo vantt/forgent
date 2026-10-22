@@ -51,7 +51,7 @@ The receiving session calls itself **SEAT**. It is a **lead**: it plans, splits 
 - **Configs:**
   - mdview and mcp-skill-hub were converted by `fgos setup` on 10-22 (backups `.fgos/config.json.pre-seat-binding-*`; the old release needs those, the new one refuses them).
   - MP-B1 06 backups are in `.fgos/runtime/config-backup-261022-0900/` in each workspace.
-- **Idle lead available:** `seat-p09-lead`, who knows the SEAT code; worktrees under `.claude/worktrees/seat-*`. Reuse it or start fresh leads.
+- **No lead carries over:** `seat-p09-lead` was stopped and every `.claude/worktrees/seat-*` worktree was removed (all merged) when `forgentx-95` closed on 10-22 10:45. Start fresh leads in new worktrees.
 
 ## Rules that bind you
 
