@@ -25,6 +25,7 @@ import { sweepAttempts } from '../run-supervisor/sweep.mjs';
 import { findLegacyStuck, judgeLegacyHolders, sweepLegacy } from '../run-supervisor/legacy-sweep.mjs';
 import { GATE_KILL_GRACE_KEY, resolveGateKillGrace, gateKillGraceProblem, CANCEL_WAIT_KEY, resolveCancelWait, cancelWaitProblem } from '../run-supervisor/gate-kill-grace.mjs';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
+import { fgosDirFromRoot } from '../runner/paths.mjs';
 import { deriveUnitState, unitDirOfAssignment } from '../runner/execution/unit-state.mjs';
 
 const ROUTES = ['supervise', 'gate', 'adopt', 'attempt-step'];
@@ -43,8 +44,7 @@ function listed(items) {
   return items.length > MAX_LISTED ? `${head}; and ${items.length - MAX_LISTED} more` : head;
 }
 
-const fgosDirOf = (repoRoot) => path.join(path.resolve(repoRoot), '.fgos');
-const assignmentsRootOf = (repoRoot) => path.join(fgosDirOf(repoRoot), 'assignments');
+const assignmentsRootOf = (repoRoot) => path.join(fgosDirFromRoot(repoRoot), 'assignments');
 
 /** `fgos internal <route> --protocol 1 --probe`: the parsed answer line, or `{ error }` saying why not. */
 function probeRoute(bin, route) {
@@ -71,7 +71,7 @@ function probeRoute(bin, route) {
 function resolveBin(repoRoot, override) {
   if (override) return { bin: override };
   try {
-    return { bin: hostBin({ fgosDir: fgosDirOf(repoRoot) }) };
+    return { bin: hostBin({ fgosDir: fgosDirFromRoot(repoRoot) }) };
   } catch (err) {
     return { error: err.message };
   }
@@ -387,7 +387,7 @@ export function fixLegacyAttemptsStuck(repoRoot, { door, ...judgeOptions }) {
  * unit is judged by `deriveUnitState` over the adopt probe.
  */
 export function checkUnitsAwaitingResume(repoRoot, { bin: binOverride } = {}) {
-  const fgosDir = fgosDirOf(repoRoot);
+  const fgosDir = fgosDirFromRoot(repoRoot);
   const unitDirs = new Set();
   for (const { assignmentId } of listAssignmentRuns(fgosDir)) {
     const unitDir = unitDirOfAssignment(fgosDir, assignmentId);

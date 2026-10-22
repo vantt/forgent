@@ -217,9 +217,13 @@ impl LockDriver for FlockDriver {
     }
 
     fn end_leftovers(&self, file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>, protected_roots: &[u32]) -> Result<u32, Leftovers> {
-        if cfg!(target_os = "linux") {
+        #[cfg(target_os = "linux")]
+        {
             end_listed_holders(file, child_pid, kill_wait, since, protected_roots)
-        } else {
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            let _ = (file, since, protected_roots);
             end_process_group(child_pid, kill_wait)
         }
     }
@@ -227,6 +231,7 @@ impl LockDriver for FlockDriver {
 
 /// Linux: only the borrow group and descendants may be killed. Foreign
 /// direct pre-exec children of the owner are waited; escaped holders are killed.
+#[cfg(target_os = "linux")]
 fn end_listed_holders(file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>, protected_roots: &[u32]) -> Result<u32, Leftovers> {
     drain_description(file, Some(child_pid), std::process::id(), kill_wait, Reach::of(since)?, protected_roots)
 }
@@ -480,7 +485,6 @@ pub(crate) fn drain_description(
             match &tree {
                 Some(tree) => domain.extend(tree.0.keys().copied().filter(|pid| tree.in_borrow_domain(*pid, root))),
                 None => {
-                    domain.extend(group_members(root as libc::pid_t));
                     if let Ok(entries) = std::fs::read_dir("/proc") {
                         domain.extend(
                             entries
@@ -569,6 +573,7 @@ fn in_domain(mut pid: u32, root: u32, relation: impl Fn(u32) -> Option<(u32, u32
 /// macOS: the borrowing child ran in its own process group; kill the group
 /// and wait until no member but the unreaped child itself is left (the
 /// caller reaps it afterwards, so the group id cannot be reused meanwhile).
+#[cfg(not(target_os = "linux"))]
 fn end_process_group(child_pid: u32, kill_wait: Duration) -> Result<u32, Leftovers> {
     let pgid = child_pid as libc::pid_t;
     // SAFETY: killpg only targets the child's own group; the unreaped child
@@ -606,23 +611,4 @@ fn group_members(pgid: libc::pid_t) -> Vec<u32> {
         }
         pids.resize(pids.len() * 2, 0);
     }
-}
-
-/// Pids in process group `pgid` (scanned from /proc where there is no
-/// group listing call).
-#[cfg(not(target_os = "macos"))]
-fn group_members(pgid: libc::pid_t) -> Vec<u32> {
-    let Ok(entries) = std::fs::read_dir("/proc") else {
-        return Vec::new();
-    };
-    entries
-        .flatten()
-        .filter_map(|e| e.file_name().to_str()?.parse::<u32>().ok())
-        .filter(|pid| {
-            std::fs::read_to_string(format!("/proc/{pid}/stat"))
-                .ok()
-                .and_then(|stat| stat[stat.rfind(')')? + 1..].split_whitespace().nth(2)?.parse::<libc::pid_t>().ok())
-                == Some(pgid)
-        })
-        .collect()
 }
