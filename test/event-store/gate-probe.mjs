@@ -39,5 +39,5 @@ try {
     assert.equal(result.ack.lastSeq, recovering ? 2 : 1);
     assert.equal(store.readInGate(result.ack.origin, 'project', 0).events.length, recovering ? 2 : 1);
     fs.writeSync(2, 'ES_GATE_END\n');
-  }, { prefetched: { writer: 'gate-writer', eventStore: store } });
+  }, { prefetched: { writer: 'gate-writer' } });
 } finally { fs.rmSync(temp, { recursive: true, force: true }); }

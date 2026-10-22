@@ -138,3 +138,44 @@ test('prefetched read roots allow gated reference reads without granting writes'
     }, { prefetched: { readRoots: [refs] } });
   } finally { fs.rmSync(f.dir, { recursive: true, force: true }); }
 });
+
+test('a transaction exposes no door to the event store, so only the consumer gate acknowledges events', () => {
+  const f = fixture();
+  try {
+    withStateTx(f.fgosDir, tx => {
+      assert.equal('eventStore' in tx, false);
+    }, { prefetched: { ...writer, eventStore: { append() { throw new Error('must stay unreachable'); } } } });
+  } finally { f.cleanup(); }
+});
+
+test('in-transaction exists and list read granted read roots, and list names files only like a read without a transaction', () => {
+  const f = fixture();
+  const refs = path.join(f.dir, 'refs');
+  const heads = path.join(refs, 'heads');
+  fs.mkdirSync(path.join(heads, 'nested'), { recursive: true });
+  fs.writeFileSync(path.join(heads, 'one.json'), '{}');
+  try {
+    withStateTx(f.fgosDir, tx => {
+      assert.equal(tx.exists(path.join(heads, 'one.json')), true);
+      assert.deepEqual(tx.list(heads), ['one.json']);
+      assert.throws(() => tx.list(path.join(f.dir, 'elsewhere')), { code: 'state-tx-path-outside' });
+      const claims = path.join(f.fgosDir, 'claims');
+      fs.mkdirSync(path.join(claims, 'subdir'), { recursive: true });
+      tx.writeText(path.join(claims, 'a.json'), '{}');
+      assert.deepEqual(tx.list(claims), ['a.json']);
+    }, { prefetched: { ...writer, readRoots: [refs] } });
+  } finally { f.cleanup(); }
+});
+
+test('a record that cannot be released never replaces the callback result or its error', () => {
+  const f = fixture();
+  const { record } = hotPaths(f.fgosDir);
+  // A directory in place of the record file makes the final unlink fail with a non-retryable error.
+  const breakRelease = () => { fs.unlinkSync(record); fs.mkdirSync(record); };
+  try {
+    assert.equal(withStateTx(f.fgosDir, () => { breakRelease(); return 'committed'; }, { prefetched: writer }), 'committed');
+    fs.rmSync(record, { recursive: true });
+    const boom = new RangeError('callback failed');
+    assert.throws(() => withStateTx(f.fgosDir, () => { breakRelease(); throw boom; }, { prefetched: writer }), error => error === boom && !!error.releaseFailure);
+  } finally { f.cleanup(); }
+});

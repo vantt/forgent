@@ -4,6 +4,9 @@ import { performance } from 'node:perf_hooks';
 import { readEventStoreConfig } from '../event-store/index.mjs';
 import { withStateTx, hotLockDepth, HotLockError } from './hot-lock.mjs';
 const refusal = code => Object.assign(new Error(code), { code });
+// Attempts an ordinary mutation spends re-reading after a foreign event or a seq recovery. It is its own budget:
+// the rebuild budget (`eventStore.rebuild.maxAttempts`) belongs to installing a rebuilt cache.
+const MUTATION_ATTEMPTS = 5;
 
 function advance(cursor, events) {
   const next = { ...cursor, cover: { ...cursor.cover } };
@@ -27,8 +30,8 @@ export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config,
   const { stream, resource, readState, fold, persist, prepareEvents, lifecycle } = policy;
   if (hotLockDepth() > 0) throw new HotLockError('hot-lock-reentry', 'Work cannot open a nested state transaction');
   if (!store) throw new TypeError('a prepared consumer store is required');
-  config ??= readEventStoreConfig(path.dirname(dir));
-  const attempts = config.rebuild.maxAttempts;
+  config ??= readEventStoreConfig(path.dirname(mainFgosDir));
+  const attempts = rebuild ? config.rebuild.maxAttempts : MUTATION_ATTEMPTS;
   const extraRoots = path.resolve(mainFgosDir) === path.resolve(dir) ? [] : [dir];
   let recoveryAttempted = false;
   for (let attempt = 0; attempt < attempts; attempt += 1) {
@@ -55,11 +58,13 @@ export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config,
         tx.tail = tail;
         return fn(tx);
       }, { resource, prefetched: {
-        mainFgosDir, writer, extraRoots, readRoots, eventStore: store, stageEffects: true,
+        mainFgosDir, writer, extraRoots, readRoots, stageEffects: true,
         commitEvents(tx, events) {
           if (!events.length) return;
           measure('prepareEvents', () => prepareEvents?.(tx, events));
           const appended = measure('append', () => store.append(stream, events.map(event => ({ eventType: event.type, schemaVersion: 1, payload: event.payload, ts: event.ts })), tx.cursor.cover, String(writer), [...heldRanks, 60]));
+          // From here the batch is durable. The mutex turns any later failure into an acknowledged-effects error.
+          tx.acked = appended.events;
           for (let i = 0; i < events.length; i += 1) Object.assign(events[i], appended.events[i]);
           tx.view = measure('fold', () => fold(appended.events, tx.view));
           tx.cursor = advance(tx.cursor, appended.events);
@@ -87,5 +92,5 @@ export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config,
       throw error;
     }
   }
-  throw refusal('event-store-rebuild-busy');
+  throw refusal(rebuild ? 'event-store-rebuild-busy' : 'event-store-catch-up-busy');
 }

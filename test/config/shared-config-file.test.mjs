@@ -10,6 +10,7 @@ import {
   readSharedConfig,
   writeSharedConfig,
   readInvariantCheckCommands,
+  readSharedConfigOrEmpty,
 } from '../../src/config/shared-config-file.mjs';
 
 function mkTempDir() {
@@ -38,6 +39,16 @@ test('readSharedConfig throws a clear error on invalid JSON in the shared file',
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), '{ not valid json');
   assert.throws(() => readSharedConfig(dir), /cannot parse shared config/);
+});
+
+test('readSharedConfigOrEmpty degrades only a half-typed file to {}, and still reports a file it cannot read', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), '{ not valid json');
+  assert.deepEqual(readSharedConfigOrEmpty(dir), {});
+  fs.rmSync(path.join(dir, '.fgos', 'config.json'));
+  fs.mkdirSync(path.join(dir, '.fgos', 'config.json'));
+  assert.throws(() => readSharedConfigOrEmpty(dir), { code: 'EISDIR' });
 });
 
 test('writeSharedConfig creates .fgos/ when missing and writes pretty JSON', () => {

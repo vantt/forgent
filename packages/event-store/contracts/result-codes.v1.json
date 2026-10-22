@@ -6,6 +6,8 @@
     "event-store-no-repository",
     "event-store-order-cycle",
     "event-store-rebuild-busy",
+    "event-store-catch-up-busy",
+    "event-store-acked-effects-incomplete",
     "event-store-ref-moved",
     "event-store-seal-mismatch",
     "event-store-seal-under-state",

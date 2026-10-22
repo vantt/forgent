@@ -20,7 +20,7 @@ import { applyKnowledgeEvent } from './knowledge-registry.mjs';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 
 // tsk-49e: every top-level key applyEvent ever writes to `view` is either an
-export const VIEW_SCHEMA_VERSION = 5;
+export const VIEW_SCHEMA_VERSION = 6;
 
 // Containers are copied for incremental replay. Work handlers mutate item
 // fields, so clone those items as well to keep the caller's seed immutable.
@@ -83,6 +83,10 @@ export function foldEvents(events, seedView) {
     const condition = event.payload?.precondition;
     const before = view.work[event.payload?.id];
     const beforeStatus = before?.status;
+    // Whether another clone's event came earlier in this order. Registered here, before the
+    // precondition is judged, so the answer covers exactly the events that precede this one.
+    const foreignHistory = !!view.origins?.some(origin => origin !== event.origin);
+    if (event.origin && !view.origins?.includes(event.origin)) (view.origins ??= []).push(event.origin);
     if (condition && event.origin && event.h) {
       const id = event.payload.id;
       const item = view.work[id];
@@ -91,15 +95,19 @@ export function foldEvents(events, seedView) {
       else if (condition.expectedStatus !== undefined && item?.status !== condition.expectedStatus) reason = 'expected-status';
       else if (condition.capacity && Object.values(view.work).filter(w => w.status === condition.capacity.status).length >= condition.capacity.max) reason = 'capacity';
       if (reason) {
+        // On one clone every acknowledged precondition holds again at replay, so a failure there is a
+        // local bug and stops the fold. Once another clone's events are in the history, the same order
+        // can differ from the one the writer decided on (a late event sorts earlier and flips which
+        // concurrent write applies), so the failure is a recorded conflict on every clone, never a throw.
+        if (!foreignHistory) {
+          throw Object.assign(new Error('work-replay-precondition: causal precondition failed'), { code: 'work-replay-precondition' });
+        }
         const against = reason === 'capacity'
           ? Object.keys(view.work).sort().filter(key => view.work[key].status === condition.capacity.status)
             .map(key => view.preconditionHeads?.[key]?.status).find(head => head && head.origin !== event.origin && (event.seen?.[`${head.origin}:${head.stream}`] ?? 0) < head.seq)
           : view.preconditionHeads?.[id]?.[reason === 'existence' ? 'existence' : 'status'];
-        if (!against || against.origin === event.origin || (event.seen?.[`${against.origin}:${against.stream}`] ?? 0) >= against.seq) {
-          throw Object.assign(new Error('work-replay-precondition: causal precondition failed'), { code: 'work-replay-precondition' });
-        }
         view.conflicts ??= [];
-        view.conflicts.push({ h: event.h, origin: event.origin, reason, against: against.h });
+        view.conflicts.push({ h: event.h, origin: event.origin, reason, against: against?.h ?? null });
         continue;
       }
     }
@@ -116,6 +124,12 @@ export function foldEvents(events, seedView) {
     }
   }
   return view;
+}
+
+// A write-time precondition decides whether the event applies; it is not part of the record it leaves behind.
+function withoutPrecondition(payload) {
+  const { precondition, ...record } = payload ?? {};
+  return record;
 }
 
 function applyEvent(view, event) {
@@ -477,7 +491,7 @@ function applyEvent(view, event) {
         if (!view.outcomes) {
           view.outcomes = {};
         }
-        view.outcomes[id] = { ...view.outcomes[id], ...event.payload };
+        view.outcomes[id] = { ...view.outcomes[id], ...withoutPrecondition(event.payload) };
       }
       break;
     }
@@ -639,7 +653,7 @@ function applyEvent(view, event) {
         }
         view.discovery[id] = [
           ...(view.discovery[id] ?? []),
-          { ...event.payload, ts: event.ts },
+          { ...withoutPrecondition(event.payload), ts: event.ts },
         ];
       }
       break;
@@ -720,7 +734,7 @@ function applyEvent(view, event) {
         }
         view.parkResolutions[id] = [
           ...(view.parkResolutions[id] ?? []),
-          { ...event.payload, ts: event.ts },
+          { ...withoutPrecondition(event.payload), ts: event.ts },
         ];
       }
       break;

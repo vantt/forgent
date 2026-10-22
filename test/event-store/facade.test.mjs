@@ -64,13 +64,12 @@ test('seal-like operations require held ranks and reject ranks 58 and 80 before 
 test('prefetched store survives a hot transaction while every Git route refuses by name', { skip: process.platform !== 'linux' }, t => {
   const { store, hot } = fixture(t);
   withStateTx(hot, tx => {
-    assert.equal(tx.eventStore, store);
     const result = store.append('project', [event], {}, 'fixture', [60]);
     assert.equal(store.readInGate(result.ack.origin, 'project', 0).events.length, 1);
     for (const invoke of [() => store.seal('project', []), () => store.sealIfDue('project', 60, []), () => store.sealAll(['project'], []), () => store.read({ streams: ['project'] }, []), () => store.sync({}, []), () => store.status([]), () => store.unpublishedSummary('origin', [])]) {
       assert.throws(invoke, { code: 'event-store-seal-under-state' });
     }
-  }, { prefetched: { writer: 'fixture', eventStore: store } });
+  }, { prefetched: { writer: 'fixture' } });
 });
 
 test('preparation caches resolution, honors Git machine config, and rejects non-repositories', { skip: process.platform !== 'linux' }, t => {
@@ -166,7 +165,7 @@ test('hot-section release is one-shot and nested sections preserve the process g
 test('ownOrigin is explicitly absent until the first local append', t => {
   const { store, hot } = fixture(t);
   assert.equal(store.ownOrigin, null);
-  withStateTx(hot, () => store.append('project', [event], {}, 'fixture', [60]), { prefetched: { writer: 'fixture', eventStore: store } });
+  withStateTx(hot, () => store.append('project', [event], {}, 'fixture', [60]), { prefetched: { writer: 'fixture' } });
   assert.equal(typeof store.ownOrigin, 'string');
   assert.ok(store.ownOrigin.length > 0);
 });

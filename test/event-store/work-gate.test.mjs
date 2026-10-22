@@ -321,3 +321,79 @@ test('staged file reads observe unlink, write and rename before acknowledgement'
   assert.equal(fs.existsSync(first), false);
   assert.deepEqual(JSON.parse(fs.readFileSync(moved)), { next: true });
 });
+
+test('an effect or cache failure after the batch is acknowledged is its own error, carries the acknowledged events and is never retried', t => {
+  for (const failing of ['effect', 'cache']) {
+    const f = workFixture(t);
+    const blocker = path.join(f.hot, 'runtime/blocker');
+    fs.mkdirSync(path.dirname(blocker), { recursive: true });
+    fs.writeFileSync(blocker, 'a file where a directory is needed');
+    let calls = 0;
+    let error;
+    try {
+      f.run(tx => {
+        calls += 1;
+        tx.append({ type: 'work.add', payload: { id: 'one', title: 'one' } });
+        if (failing === 'effect') tx.writeText(path.join(blocker, 'effect'), 'cannot be written');
+        // A directory where the cache file goes makes the cache write fail after the append.
+        else fs.mkdirSync(f.cache, { recursive: true });
+      });
+    } catch (caught) { error = caught; }
+    assert.equal(error?.code, 'event-store-acked-effects-incomplete', failing);
+    assert.equal(calls, 1, `${failing}: the callback is not retried`);
+    assert.deepEqual(error.ackedEvents.map(event => [event.type, event.seq]), [['work.add', 1]]);
+    assert.match(error.ackedEvents[0].h, /^[a-f0-9]{64}$/);
+    assert.ok(error.cause, 'the original failure rides along');
+    assert.equal(readWorkState(f.store).view.work.one.title, 'one', `${failing}: the batch is durable`);
+  }
+});
+
+test('an ordinary mutation that keeps losing the catch-up race spends its own budget and ends with its own code', t => {
+  const f = workFixture(t);
+  let preparations = 0;
+  assert.throws(() => f.run(() => assert.fail('no attempt may reach the callback'), { beforeGate() {
+    preparations += 1;
+    f.append('work.add', { id: `racing-${preparations}`, title: 'outside' });
+    f.store.seal('project', []);
+  } }), { code: 'event-store-catch-up-busy' });
+  assert.ok(preparations > config.rebuild.maxAttempts, 'the rebuild budget is not the mutation budget');
+});
+
+test('staged events record existence on every Work event and the expected status only on events that move status', t => {
+  const f = workFixture(t);
+  f.run(tx => {
+    tx.append({ type: 'work.add', payload: { id: 'one', title: 'one', status: 'todo' } });
+    tx.append({ type: 'work.move', payload: { id: 'one', from: 'todo', to: 'doing' } });
+    tx.append({ type: 'work.move', payload: { id: 'one', from: 'doing', to: 'done' } });
+    tx.append({ type: 'work.edit', payload: { id: 'one', patch: { title: 'two' } } });
+    tx.append({ type: 'work.outcome', payload: { id: 'one', actual: { ok: true } } });
+    tx.append({ type: 'work.discovery', payload: { id: 'discovery-1', clear: true } });
+    tx.append({ type: 'work.edit', payload: { id: 'ghost', patch: { title: 'nobody' } } });
+  });
+  const seen = readWorkState(f.store).events.map(event => [event.type, event.payload.precondition]);
+  assert.deepEqual(seen, [
+    ['work.add', { exists: false }],
+    ['work.move', { exists: true, expectedStatus: 'todo' }],
+    ['work.move', { exists: true, expectedStatus: 'doing' }],
+    ['work.edit', { exists: true }],
+    ['work.outcome', { exists: true }],
+    ['work.discovery', undefined],
+    ['work.edit', { exists: false }],
+  ]);
+  assert.equal(/"precondition"\s*:/.test(JSON.stringify(cache(f))), false, 'no precondition leaks into the saved view');
+});
+
+test('the gate reads its configuration from the trusted main root, not from the linked worktree', t => {
+  const f = workFixture(t);
+  fs.writeFileSync(path.join(f.hot, 'config.json'), JSON.stringify({ eventStore: { rebuild: { maxAttempts: 2 } } }));
+  const linked = path.join(f.temp, 'linked/.fgos');
+  fs.mkdirSync(linked, { recursive: true });
+  fs.writeFileSync(path.join(linked, 'config.json'), JSON.stringify({ eventStore: { rebuild: { maxAttempts: 4 } } }));
+  f.run(tx => tx.append({ type: 'work.add', payload: { id: 'one', title: 'one' } }));
+  let attempts = 0;
+  assert.throws(() => withWorkState(linked, f.hot, 'work-test', () => {}, { store: f.store, rebuild: true, beforeGate() {
+    attempts += 1;
+    f.run(tx => tx.append({ type: 'work.attempt', payload: { id: 'one', result: 'racing' } }));
+  } }), { code: 'event-store-rebuild-busy' });
+  assert.equal(attempts, 2);
+});

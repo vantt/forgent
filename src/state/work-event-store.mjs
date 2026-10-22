@@ -23,7 +23,7 @@ function readStore(store, request, heldRanks) {
 }
 
 export function prepareWorkStore(dir, mainFgosDir) {
-  const config = readEventStoreConfig(path.dirname(dir));
+  const config = readEventStoreConfig(path.dirname(mainFgosDir));
   const store = prepareStore(path.dirname(dir), { trustedMain: path.dirname(mainFgosDir), config: { eventStore: config } });
   return { store, config };
 }
@@ -83,14 +83,21 @@ export function withWorkState(dir, mainFgosDir, writer, fn, options = {}) {
     readState: (store, { heldRanks, rebuild }) => readWorkState(store, { heldRanks,
       ...(rebuild ? {} : { cachePath: resolveFgosFile(mainFgosDir, FGOS_FILE.STATE) }) }),
     prepareEvents(tx, events) {
-      let decided = structuredClone(tx.view);
+      // Each event records what its writer saw. Existence rides every Work event so a record for a vanished
+      // item cannot apply; the status an item must still hold rides only the events that move it, so a
+      // concurrent status change never drops an edit, an attempt or an outcome.
+      const decided = new Map();
       for (const event of events) {
         const id = event.payload?.id;
-        if (event.type.startsWith('work.') && id) {
-          const item = decided.work[id];
-          event.payload.precondition = { ...event.payload.precondition, exists: !!item, ...(item ? { expectedStatus: item.status } : {}) };
-        }
-        decided = foldEvents([event], decided);
+        if (!event.type.startsWith('work.') || !id || event.type === 'work.discovery') continue;
+        const current = decided.get(id) ?? { exists: !!tx.view.work[id], status: tx.view.work[id]?.status };
+        const movesStatus = event.type === 'work.move' || event.type === 'work.step' || event.type === 'work.stage';
+        const { expectedStatus, ...condition } = event.payload.precondition ?? {};
+        event.payload.precondition = { ...condition, exists: current.exists,
+          ...(movesStatus && current.exists ? { expectedStatus: current.status } : {}) };
+        if (event.type === 'work.add') decided.set(id, { exists: true, status: event.payload.status });
+        else if (event.type === 'work.move' && current.exists) decided.set(id, { ...current, status: event.payload.to });
+        else decided.set(id, current);
       }
     },
   } });

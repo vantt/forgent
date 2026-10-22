@@ -224,7 +224,7 @@ function underDir(fgosDir, target) {
   return rel !== '' && !rel.startsWith('..') && !path.isAbsolute(rel);
 }
 
-function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eventStore = null, extraRoots = [], readRoots = [], stageEffects = false, commitEvents = null, afterApply = null } = {}) {
+function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, extraRoots = [], readRoots = [], stageEffects = false, commitEvents = null, afterApply = null } = {}) {
   let live = true;
   const roots = [fgosDir, ...extraRoots];
   const effects = [];
@@ -241,7 +241,6 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
   const tx = {
     fgosDir: path.resolve(fgosDir),
     mainFgosDir,
-    eventStore,
     head,
     writer,
     /** Only a prepared consumer gate may acknowledge typed events. */
@@ -278,15 +277,17 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
       return fs.readFileSync(target, 'utf8');
     },
     exists(target) {
-      guard(target);
+      guard(target, true);
       const key = path.resolve(target);
       return staging && stagedFiles.has(key) ? stagedFiles.get(key) !== null : fs.existsSync(target);
     },
+    /** The files directly inside `target`, as a read without a transaction would list them (never subdirectories). */
     list(target) {
-      guard(path.join(target, '.'));
+      guard(path.join(target, '.'), true);
       let names;
-      try { names = new Set(fs.readdirSync(target)); }
-      catch (error) { if (error.code !== 'ENOENT') throw error; names = new Set(); }
+      try {
+        names = new Set(fs.readdirSync(target, { withFileTypes: true }).filter(entry => entry.isFile()).map(entry => entry.name));
+      } catch (error) { if (error.code !== 'ENOENT') throw error; names = new Set(); }
       if (staging) for (const [file, text] of stagedFiles) {
         if (path.dirname(file) === path.resolve(target)) {
           if (text === null) names.delete(path.basename(file));
@@ -334,11 +335,19 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
     commit() {
       // A refusal leaves every effect unapplied. Only the consumer knows how
       // to acknowledge its staged event batch; the mutex owns effect ordering.
-      if (stageEffects) {
+      if (!stageEffects) return;
+      try {
         commitEvents?.(tx, events);
         staging = false;
         for (const apply of effects) apply();
         afterApply?.(tx);
+      } catch (cause) {
+        // Once the consumer has acknowledged the batch, it is durable: a failing effect or cache write must
+        // not look like a refused mutation, because a caller that retries would append the events twice.
+        if (!tx.acked) throw cause;
+        throw new HotLockError('event-store-acked-effects-incomplete',
+          `the events were acknowledged but a later effect failed: ${cause?.message ?? cause}; do not retry the mutation`,
+          { ackedEvents: tx.acked, cause });
       }
     },
     revoke: () => { live = false; },
@@ -367,6 +376,7 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
   noteLockHeld();
   const { tx, commit, revoke } = createTx(fgosDir, { ...prefetched, writer });
   let result;
+  let failure;
   try {
     result = fn(tx);
     if (result && typeof result.then === 'function') {
@@ -374,11 +384,18 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
       throw new HotLockError('state-tx-async', `${resource}: the transaction callback must be synchronous`);
     }
     commit();
+  } catch (error) {
+    failure = { error };
+    throw error;
   } finally {
     revoke();
     leaveHotLock();
     try {
       releaseRecord(paths);
+    } catch (releaseError) {
+      // A record that could not be removed must not replace the callback's own error, nor turn a
+      // committed result into a failure; the next acquirer meets the stale record and reports it.
+      if (typeof failure?.error === 'object' && failure.error !== null) failure.error.releaseFailure ??= releaseError;
     } finally {
       noteLockReleased();
     }
