@@ -48,8 +48,11 @@
       },
       "results": ["launched", "not-started", "unsupported", "unknown"],
       "effects": [
-        "writes marker launch-requested before the driver runs anything",
+        "requires pane.run, read.screen and process.info for plain launch; activity.state and process.info for activity launch",
+        "plain launch types probe commands to prove shell execution before the marker is written",
+        "writes marker launch-requested after the ready-shell handshake succeeds, before typing the launch line",
         "writes marker launched{identity} after the root process of the pane command is identified (argv checked like verifyForegroundProcessArgv)",
+        "returns not-started if launch was already requested, if pane foreground is not the shell, if pane shell did not become ready in time, or if the launched root process was not identified in time",
         "never launches into a slot that already has launch-requested"
       ]
     },

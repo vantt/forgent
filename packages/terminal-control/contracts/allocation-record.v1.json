@@ -29,7 +29,7 @@
     "origin": { "enum": ["allocated", "attached"] }
   },
   "markers": {
-    "launch-requested": { "v": 1, "key": "key", "at": "epoch ms", "rule": "written before the driver runs anything in the pane" },
+    "launch-requested": { "v": 1, "key": "key", "at": "epoch ms", "rule": "written after the ready-shell handshake, immediately before the launch line is typed" },
     "launched": { "v": 1, "key": "key", "at": "epoch ms", "identity": { "pid": "integer", "startTime": "string", "bootId": "string", "pgid": "integer" } },
     "released": { "v": 1, "key": "key", "at": "epoch ms", "disposition": { "enum": ["close", "retain"] }, "until": "retain only: epoch ms or null", "outcome": { "enum": ["closed", "retained", "kept-unknown", "unlinked"] } }
   },

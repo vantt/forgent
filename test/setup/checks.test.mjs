@@ -98,6 +98,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'invariant-checks-configured',
       'worktree-setup-configured',
       'writer-identity-resolvable',
+      'identity-machine-id',
       'seat-binding-route',
       'seat-binding-config',
       'seat-binding-drain',

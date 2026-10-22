@@ -23,11 +23,29 @@ mod windows;
 
 #[cfg(target_os = "linux")]
 pub use linux::{environment_marked, BwrapPidns, LinuxPgroup};
+#[cfg(not(target_os = "linux"))]
+pub fn environment_marked(_name: &str, _value: &str) -> Vec<u32> {
+    Vec::new()
+}
 #[cfg(target_os = "macos")]
 pub use macos::MacosTree;
 #[cfg(windows)]
 pub use windows::WindowsJobDriver;
 
+/// Environment marker of a watched run: unique per run, inherited by every
+/// descendant of the child.
+pub const WATCH_ENV: &str = "FGOS_BORROW_WATCH";
+
+/// Unique token for a watched run, inherited by child descendants.
+pub fn watch_token() -> String {
+    format!(
+        "{}-{}",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map_or(0, |d| d.as_nanos())
+    )
+}
 /// How the attempt is started. `Direct` must outlive its supervisor; a
 /// `Terminal` attempt dies with the process that spawned it. With bwrap
 /// `--as-pid-1`, the gate must call `control::arm_parent_death_signal` before
@@ -245,6 +263,11 @@ pub(crate) fn pgroup_state(leader: &ProcTuple) -> DomainState {
         let _ = leader;
         DomainState::Unknown
     }
+}
+
+/// Wait, within the default empty wait, until `gate` is judged dead.
+pub(crate) fn wait_dead(gate: &ProcTuple) {
+    pgroup::wait_until(DEFAULT_EMPTY_WAIT, || crate::facts::judge_here(&gate.to_record()) == crate::facts::Verdict::Dead);
 }
 
 /// End a `linux-pgroup` domain judged from its record alone.

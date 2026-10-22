@@ -109,7 +109,8 @@ Readiness: once section 26 is signed, this spec is the contract for starting imp
 |---|---|
 | The envelope v4, canonical serialization and event hash; the v3 legacy reading rule | What an event means; reducers and views of each domain |
 | The stream registry: type, scope, `sealOnWrite`, schema version | Which domain owns which type (the consumer registers it) |
-| The machine id and the store id (section 5) | Writer identity (Session Identity) |
+| The store id (section 5) | Writer identity (Session Identity) |
+| The machine id (section 5): minting, reading and the one validity check | Identity (`packages/identity/rust`); Event Store depends on the crate without its host provider |
 | Open logs: location, append, batch framing, `fsync`, recovery of uncommitted batches, per-stream sequence and its high-water mark | Business preconditions and the Work critical section (the consumer, under its own gate) |
 | Sealing: rotation, git object layout, compare-and-swap ref update (through the Git component's Publication port), receipt, recovery | Locks as a mechanism (holder-lock); Event Store only declares its two lock rows |
 | Reading: the reader protocol, verification, dedupe, deterministic order, cursors | Claims, leases, worker slots (runtime) |
@@ -151,7 +152,7 @@ Rank order today (`docs/platform/holder-lock/spec.md:114-126`): `main-checkout` 
 
 | Identity | Meaning | Source |
 |---|---|---|
-| Machine id | Names the published ref `refs/fgos/events/<machine-id>` | 1. repository-local git config `fgos.machineId` (per clone, never tracked); 2. `<stateRoot>/machine-id`, minted once by the setup fix as `<hostname-slug>-<6 random base32>`. Format `^[a-z0-9][a-z0-9-]{1,62}$`. `stateRoot` is holder-lock's (`docs/platform/holder-lock/spec.md:168-178`), so a process with another state root is another machine, as holder-lock already defines |
+| Machine id | Names the published ref `refs/fgos/events/<machine-id>` | 1. repository-local git config `fgos.machineId` (per clone, never tracked); 2. `<stateRoot>/machine-id`, minted once by the Identity component (`fgos doctor --fix`, fix `identity-machine-id`) as `<hostname-slug>-<6 random base32>`. Format `^[a-z0-9][a-z0-9-]{1,62}$`, checked in one place, `fgos_identity::machine::valid_machine_id`; Event Store reads it through that crate and keeps only this ref-name rule (the per-clone override) and its own error codes. `stateRoot` is holder-lock's (`docs/platform/holder-lock/spec.md:168-178`), so a process with another state root is another machine, as holder-lock already defines |
 | Store id (`origin`) | Ordering identity of one open root; one per clone | Minted at first append, random 128-bit, written once to `<eventOpenRoot>/store.json` with the machine id at creation. Moving the clone moves the file, so the store keeps its id |
 | Stream | One sequence space inside a store: `project`, `local`, or `branch:<branch-key>` | Scope of the registered type; branch key below |
 | Project consumer stream (clarification, 2026-10-20) | `project:<name>`: a `project`-scope sequence space of its own for one consumer, for example `project:porting` (plan D9; Work keeps `project`). It has its own `seq` and open log but is sealed onto the same `refs/fgos/events/<machine-id>` and shared exactly like `project`. `<name>` follows the branch-key slug grammar | Declared by the consumer's registry entry; no protocol change |

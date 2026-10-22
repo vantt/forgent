@@ -44,6 +44,8 @@ pub struct CoreConfig {
     pub allocation_grace_ms: u64,
     /// How long `launch` waits to see the launched root process.
     pub launch_identify_timeout_ms: u64,
+    /// How long `launch` waits for the pane's shell to prove it executes commands.
+    pub shell_ready_timeout_ms: u64,
 }
 
 pub struct Core<'a> {
@@ -52,6 +54,13 @@ pub struct Core<'a> {
     config: CoreConfig,
     now_ms: Box<dyn Fn() -> u64 + 'a>,
 }
+
+/// Probes typed to one pane before the handshake gives up.
+const MAX_PROBES: usize = 3;
+/// Longest the handshake waits whatever the config says (keeps the deadline arithmetic far from overflow).
+const MAX_SHELL_WAIT: Duration = Duration::from_secs(3600);
+const MIN_PROBE_BACKOFF: Duration = Duration::from_millis(10);
+const SHELL_POLL: Duration = Duration::from_millis(100);
 
 fn wall_clock_ms() -> u64 {
     SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as u64).unwrap_or(0)
@@ -67,6 +76,35 @@ fn store_err(e: std::io::Error) -> Refusal {
 
 fn shell_quote(s: &str) -> String {
     format!("'{}'", s.replace('\'', "'\\''"))
+}
+
+/// Reads a 128-bit hex nonce from /dev/urandom, failing closed if unavailable.
+/// Kept local: the only existing reader is crate-private in event-store, a heavy crate (git, hashing) that this leaf must not depend on.
+/// Never uses a time-derived nonce so old tokens in scrollback cannot satisfy the handshake.
+fn random_nonce() -> Result<String, LaunchOutcome> {
+    use std::fs::File;
+    use std::io::Read;
+    let mut bytes = [0u8; 16];
+    let mut file = File::open("/dev/urandom").map_err(|e| LaunchOutcome::NotStarted {
+        reason: format!("cannot read /dev/urandom for probe nonce: {e}"),
+    })?;
+    file.read_exact(&mut bytes).map_err(|e| LaunchOutcome::NotStarted {
+        reason: format!("cannot read /dev/urandom for probe nonce: {e}"),
+    })?;
+    let mut s = String::with_capacity(32);
+    for b in bytes {
+        use std::fmt::Write;
+        let _ = write!(s, "{b:02x}");
+    }
+    Ok(s)
+}
+
+fn sleep_poll(step: Duration, deadline: Instant) {
+    let now = Instant::now();
+    if now < deadline {
+        let rem = deadline - now;
+        std::thread::sleep(step.min(rem));
+    }
 }
 
 /// A group pane that is alive right now, with its record.
@@ -394,10 +432,27 @@ impl<'a> Core<'a> {
         }
         match &spec.activity {
             Some(_) => self.need("activity.state")?,
-            None => self.need("pane.run")?,
+            None => {
+                self.need("pane.run")?;
+                self.need("read.screen")?;
+            }
         }
         self.need("process.info")?;
         let line = launch_line(spec)?;
+
+        if store.has_marker(key, MarkerKind::LaunchRequested) {
+            return Ok(LaunchOutcome::NotStarted { reason: "launch was already requested for this slot".into() });
+        }
+
+        if spec.activity.is_none() {
+            if let Some(not_started) = self.wait_for_shell(&record.pane_id)? {
+                return Ok(not_started);
+            }
+            let info = self.driver.process_info(&record.pane_id)?;
+            if !identity::is_bare_shell(&info) {
+                return Ok(LaunchOutcome::NotStarted { reason: "pane foreground is not the shell".into() });
+            }
+        }
 
         let requested = LaunchRequestedMarker { v: VERSION, key: key.to_string(), at: self.now() };
         if !store.publish_marker(key, MarkerKind::LaunchRequested, &requested).map_err(store_err)? {
@@ -421,6 +476,71 @@ impl<'a> Core<'a> {
         let launched = LaunchedMarker { v: VERSION, key: key.to_string(), at: self.now(), identity: identity.clone() };
         store.publish_marker(key, MarkerKind::Launched, &launched).map_err(store_err)?;
         Ok(LaunchOutcome::Launched(identity))
+    }
+
+    fn wait_for_shell(&self, pane: &str) -> Result<Option<LaunchOutcome>, Refusal> {
+        let timeout = Duration::from_millis(self.config.shell_ready_timeout_ms).min(MAX_SHELL_WAIT);
+        let deadline = Instant::now() + timeout;
+        // A swallowed first key leaves no evidence a shell prints, so the next probe is typed after
+        // a fixed backoff, never sooner than a poll step.
+        let backoff = (timeout / 3).max(MIN_PROBE_BACKOFF);
+        let poll_step = SHELL_POLL.min(backoff);
+        let mut nonces: Vec<String> = Vec::new();
+        let mut last_probe_at: Option<Instant> = None;
+        let mut saw_process_info = false;
+
+        loop {
+            match self.driver.process_info(pane) {
+                Err(_) => {
+                    if let Ok(PaneLiveness::Gone) = self.driver.pane_liveness(pane) {
+                        return Err(unknown("pane is gone"));
+                    }
+                }
+                Ok(info) => {
+                    saw_process_info = true;
+                    if identity::is_bare_shell(&info) {
+                        let due = match last_probe_at {
+                            None => true,
+                            Some(at) => nonces.len() < MAX_PROBES && at.elapsed() >= backoff,
+                        };
+                        if due {
+                            let nonce = match random_nonce() {
+                                Ok(n) => n,
+                                Err(not_started) => return Ok(Some(not_started)),
+                            };
+                            self.driver.pane_run(pane, &format!("printf '%s%s\\n' fgos-ok- {nonce}"))?;
+                            nonces.push(nonce);
+                            last_probe_at = Some(Instant::now());
+                        }
+                        let screen = match self.driver.read_screen(pane, Some(40), Some("recent-unwrapped")) {
+                            Ok(s) => s,
+                            Err(_) => {
+                                if let Ok(PaneLiveness::Gone) = self.driver.pane_liveness(pane) {
+                                    return Err(unknown("pane is gone"));
+                                }
+                                String::new()
+                            }
+                        };
+                        if nonces.iter().any(|n| screen.contains(&format!("fgos-ok-{n}"))) {
+                            return Ok(None);
+                        }
+                    }
+                }
+            }
+            if Instant::now() >= deadline {
+                break;
+            }
+            sleep_poll(poll_step, deadline);
+        }
+
+        let reason = if !nonces.is_empty() {
+            "pane shell did not become ready in time"
+        } else if saw_process_info {
+            "pane foreground is not the shell"
+        } else {
+            "pane process info could not be read"
+        };
+        Ok(Some(LaunchOutcome::NotStarted { reason: reason.into() }))
     }
 
     fn identify_root(&self, pane: &str, spec: &LaunchSpec) -> Option<ProcessIdentity> {
@@ -719,8 +839,18 @@ impl<'a> Core<'a> {
     }
 }
 
+/// Builds the environment variable pairs for panes created by the core (`tab_create` and `pane_split`).
+/// Merges `DISABLE_AUTO_UPDATE=true` by default to prevent shells using oh-my-zsh from blocking
+/// on auto-update prompts at pane launch.
+///
+/// Invariant: only `DISABLE_AUTO_UPDATE` is set, never `DISABLE_UPDATE_PROMPT` (which causes oh-my-zsh
+/// to update the user's install silently without asking). Caller-provided values win.
 fn env_pairs(request: &AllocateRequest) -> Vec<(String, String)> {
-    request.env.iter().map(|(k, v)| (k.clone(), v.clone())).collect()
+    let mut pairs: Vec<(String, String)> = request.env.iter().map(|(k, v)| (k.clone(), v.clone())).collect();
+    if !request.env.contains_key("DISABLE_AUTO_UPDATE") {
+        pairs.push(("DISABLE_AUTO_UPDATE".to_string(), "true".to_string()));
+    }
+    pairs
 }
 
 /// The shell line a launch types into the pane: change directory, set the

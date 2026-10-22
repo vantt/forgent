@@ -1,10 +1,10 @@
 //! Canonical protocol records. Hashes include the single framing newline.
 use crate::{
     errors::Error,
-    identity::valid_machine_id,
     validation::{lowercase_hex, valid_object_id, valid_store_id},
 };
 use fgos_canonical_json::canonical_line;
+use fgos_identity::machine::valid_machine_id;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
