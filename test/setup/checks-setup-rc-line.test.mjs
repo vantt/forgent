@@ -59,8 +59,9 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   // profile leaves a `source` line that outlives the directory.
   const copyRoot = mkTemp('checks-nongit-copy-');
   const repoRoot = path.resolve(__dirname, '../..');
-  // The parts of the npm package `setup` reads; the tier ladder contract loads with the runner config.
-  for (const entry of ['bin', 'src', 'scripts', 'domains', 'packages/seat-binding/contracts', 'package.json']) {
+  // The parts of the npm package `setup` reads; the tier ladder contract loads with the runner config,
+  // the mailbox limits contract with the mailbox config section.
+  for (const entry of ['bin', 'src', 'scripts', 'domains', 'packages/seat-binding/contracts', 'packages/mailbox/contracts/limits.v1.json', 'package.json']) {
     fs.cpSync(path.join(repoRoot, entry), path.join(copyRoot, entry), { recursive: true });
   }
   assert.equal(fs.existsSync(path.join(copyRoot, '.git')), false);

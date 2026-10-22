@@ -13,6 +13,7 @@
 // tách sang checks-doctor-config.test.mjs cạnh đó -- cùng D2 (chẻ cơ học,
 // mỗi file dưới ~30s) tsk-3um/tsk-67g đã áp dụng.
 import '../helpers/process-tmp-root.mjs';
+import { mailboxConfigShape } from '../../src/setup/mailbox-limits.mjs';
 import { test } from 'node:test';
 import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 import {
@@ -884,6 +885,7 @@ test('config-not-stale passes when the existing config already has every default
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
       docRegistry: { enforce: false },
       checkpoint: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
+      mailbox: mailboxConfigShape(),
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);
