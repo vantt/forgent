@@ -108,6 +108,7 @@ Injection guard, applied to every comment this component writes:
 
 - each line is written as `# ` plus the text; a line break in the text starts a new comment line and never ends the comment token, so text can never become a key or value (the spike's `noyalib` refused `"x\nevil: 1"` in an inline comment; this component makes that a rule for every adapter);
 - control characters other than tab are removed; carriage return, U+0085, U+2028 and U+2029 are treated as line breaks, because some editors and YAML tools render them as one;
+- bidi controls (U+202A–U+202E, U+2066–U+2069) and zero-width characters (U+200B–U+200D, U+FEFF) in comment text are refused, the same rule values get in `strict-config` (section 4), so a diff cannot hide what a note says; refused rather than stripped, so the text the caller supplied and the text written stay the same words;
 - whether a caller's text may span lines at all, and which line prefixes it may not start with, is the caller's rule (Config allows neither for reasons, Config spec section 7);
 - an inline comment is one line; text with a line break is refused there.
 
@@ -212,3 +213,4 @@ Node reaches the component through the one combined native addon, as it already 
 - **2026-10-22: security review folded in** (`plans/reports/security-review-261022-0021-yaml-config-specs.md`): key identity on resolved values, string-only keys and no prototype keys in `strict-config`, bidi and zero-width characters refused, numeric edge values refused, named bounds checked before the parser recurses, expanded-bytes bound, no value in errors, define-semantics objects and panic capture at the addon boundary, and a supply-chain rule that adds source review, fuzzing and vendoring to the fixture gate.
 - **2026-10-22: writer shape A (surgical edit).** The spike showed byte-identical round trips with two candidates, so a deterministic re-render is not needed as a floor. The panel's rule stands: no B-then-A two-step plan.
 - **2026-10-22: signed.** The owner reviewed and signed this spec as a whole, together with the Config spec.
+- **2026-10-22: owner chose I2.** Comment text the component writes gets the same bidi and zero-width rule as values (section 6).
