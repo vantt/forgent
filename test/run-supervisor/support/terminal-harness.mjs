@@ -15,24 +15,6 @@ export const FAKE_HERDR = path.resolve('packages/run-supervisor/rust/tests/fixtu
 const AGENT = path.resolve('test/run-supervisor/fixtures/terminal-agent.mjs');
 const CONTROLLER = path.resolve('test/run-supervisor/fixtures/terminal-controller.mjs');
 
-if (!process.env.FGOS_ACTIVE_MANIFEST_PATH) {
-  try {
-    const addonDir = path.resolve('.fgos/runtime/git-addon');
-    const [first] = fs.readdirSync(addonDir);
-    if (first) {
-      const manifest = path.join(addonDir, first, 'manifest.json');
-      const stagedHost = path.join(addonDir, first, process.platform === 'win32' ? 'fgos.exe' : 'fgos');
-      if (fs.existsSync(manifest) && fs.existsSync(stagedHost)) {
-        process.env.FGOS_ACTIVE_MANIFEST_PATH = manifest;
-        process.env.FGOS_ACTIVE_RELEASE_PATH = process.cwd();
-        process.env.FGOS_HOST_BIN = stagedHost;
-      }
-    }
-  } catch {}
-}
-if (!process.env.XDG_STATE_HOME) {
-  process.env.XDG_STATE_HOME = path.join(os.tmpdir(), 'fgos-test-xdg-state');
-}
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms).unref());
 
 export async function waitUntil(predicate, { timeoutMs = 60_000, intervalMs = 20, what = 'condition' } = {}) {
@@ -58,28 +40,12 @@ const VERDICTS = {
 function sharedEnv(project) {
   const env = { ...process.env };
   for (const name of ['CLAUDE_CODE_SESSION_ID', 'CODEX_THREAD_ID', 'FGOS_SESSION_ID', 'HERDR_PANE_ID', 'HERDR_TAB_ID', 'HERDR_WORKSPACE_ID', 'HERDR_SESSION']) delete env[name];
-  if (!env.FGOS_ACTIVE_MANIFEST_PATH) {
-    try {
-      const addonDir = path.resolve('.fgos/runtime/git-addon');
-      const [first] = fs.readdirSync(addonDir);
-      if (first) {
-        const manifest = path.join(addonDir, first, 'manifest.json');
-        const stagedHost = path.join(addonDir, first, process.platform === 'win32' ? 'fgos.exe' : 'fgos');
-        if (fs.existsSync(manifest) && fs.existsSync(stagedHost)) {
-          env.FGOS_ACTIVE_MANIFEST_PATH = manifest;
-          env.FGOS_ACTIVE_RELEASE_PATH = process.cwd();
-          env.FGOS_HOST_BIN = stagedHost;
-        }
-      }
-    } catch {}
-  }
   return {
     ...env,
     FGOS_HERDR_BIN: project.herdrBin,
     HERDR_SOCKET_PATH: project.herdrSocket,
     FGOS_STATE_ROOT: project.stateRoot,
     TERMINAL_AGENT_DIR: project.agentDir,
-    ...(process.env.XDG_STATE_HOME ? {} : { XDG_STATE_HOME: path.join(project.scratch, 'xdg-state') }),
     ...(project.registryPath ? { FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH: project.registryPath } : {}),
   };
 }

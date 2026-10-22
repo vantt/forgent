@@ -349,7 +349,7 @@ const MODES = {
     make: terminalCtx,
     attempts: ({ project }) => project.attemptDirs(),
     // A confined agent's own notes go with its private home; each agent launch is one `pane run` (excluding handshake probes).
-    agentStarts: ({ project }) => (project.paneRuns ? project.paneRuns().length : project.callsStarting('pane run').filter((c) => !c.includes("printf '%s%s\\n' fgos-ok-")).length),
+    agentStarts: ({ project }) => project.paneRuns().length,
     paneCloses: ({ project }) => project.callsStarting('pane close').length,
     startResume: ({ project }) => startTerminalResume(project, unitRunIdOf(project)),
     adoptEnv: ({ project }) => ({ ...project.env(), HERDR_ENV: '1' }),
