@@ -241,11 +241,7 @@ function nativeFlagProjection(cmd) {
   const sorted = (set) => [...set].sort();
   if (cmd.subcommands) {
     const subcommand_flags = {};
-    // A positional parameter is never a flag: the host's gate must refuse `--body`.
-    for (const sub of Object.keys(cmd.subcommands).sort()) {
-      const positional = new Set(cmd.subcommands[sub].parameters?.positional ?? []);
-      subcommand_flags[sub] = sorted(acceptedFlags(cmd, [sub])).filter((name) => !positional.has(name));
-    }
+    for (const sub of Object.keys(cmd.subcommands).sort()) subcommand_flags[sub] = sorted(acceptedFlags(cmd, [sub]));
     return { subcommand_flags };
   }
   return { accepted_flags: sorted(acceptedFlags(cmd)) };

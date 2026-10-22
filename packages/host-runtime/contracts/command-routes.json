@@ -132,12 +132,14 @@
         "all",
         "dir",
         "help",
-        "json"
+        "json",
+        "paths"
       ],
       "classify": [
         "dir",
         "help",
-        "json"
+        "json",
+        "path"
       ],
       "name": [
         "at",
@@ -309,7 +311,8 @@
       "show": [
         "dir",
         "help",
-        "json"
+        "json",
+        "subject"
       ]
     }
   },
@@ -428,6 +431,7 @@
         "dir",
         "help",
         "json",
+        "kind",
         "release"
       ],
       "project": [
@@ -441,7 +445,8 @@
       "resolve": [
         "dir",
         "help",
-        "json"
+        "json",
+        "query"
       ],
       "session": [
         "dir",
@@ -524,6 +529,7 @@
         "json"
       ],
       "send": [
+        "body",
         "dir",
         "help",
         "json",
@@ -562,12 +568,14 @@
     "subcommands": true,
     "subcommand_flags": {
       "case": [
+        "action",
         "dir",
         "harness",
         "help",
         "interventions",
         "items",
         "json",
+        "name",
         "note",
         "open",
         "sessions",
@@ -593,6 +601,7 @@
         "json"
       ],
       "eval": [
+        "action",
         "dir",
         "harness",
         "help",
