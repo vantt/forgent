@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 11:05 (phiên `b8f192bf`, máy owner `fg-server`, `~/projects/forgent`; bàn giao từ HARDEN `forgent-a8` 10:55): **nhận luồng IDENT.** Đã đọc spec nháp mục 2–3 và dòng 10:50 của HARDEN (T1 phase 6 không chặn IDENT). Thêm một bằng chứng vào mục 3: `workspaceId` của Distribution là `sha256(realpath)`, nên hai máy cùng checkout ở `~/projects/forgent` ra cùng một id — không dùng được làm id dự án hay clone. Đã gửi owner bộ câu hỏi G0; luồng ở `planning` tới khi owner ký. Nhắn IDENT qua dòng log có chữ `IDENT`.
+
 - 2026-10-22 10:50 (phiên WORK máy này, owner 10:47 "Q-W2 chọn b"): **view porting của forgent bỏ track** sau cutover: commit cutover xoá `docs/distillery/state/porting/state.json`, view + cursor chỉ ở cache `.fgos` mà registry khai báo; API `forgent/state/porting-store` không đổi; `docs/distillery/porting-log.md` vẫn track. Mở U3. Đảo lại nếu một tool ngoài (forgent-workshop) cần đọc thẳng file đó.
 - 2026-10-22 11:00 (GIT/ES điều phối, owner "những gì đã hoàn tất tốt đẹp thì cập nhật và dọn dẹp trước"): dòng GIT/ES viết lại theo hiện trạng (Git 01–08 xong, chỉ còn máy owner land; ES 01–08 xong, 09–11 ở WORK); spec Git §19 bỏ các "Still needed" đã làm; ghi trạng thái vào hai plan; dọn 14 worktree và 16 nhánh local đã merge của GIT/ES, ~85 GB thư mục build/cache.
 
