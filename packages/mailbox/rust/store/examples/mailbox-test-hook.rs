@@ -244,7 +244,7 @@ fn hook(flags: &Flags) -> i32 {
         adapter,
         event,
         project,
-        record: &record,
+        fgos_dir: &fgos_dir,
         limits: &limits,
         hook: &hook_limits,
         tested: TestedClis::embedded(),

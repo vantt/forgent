@@ -18,11 +18,12 @@ use super::{
 };
 use crate::adapters::TestedClis;
 use crate::head::{caller_is_head, Ancestry, NoHead};
-use crate::record::{Record, RecordError, Reported, Wait};
+use crate::record::{Paths, Record, RecordError, Reported, Wait};
 use fgos_mailbox_core::{Limits, MessageId, Timestamp, WriterKey};
 use std::collections::BTreeMap;
 use std::io::{Read, Write};
 use std::panic::{catch_unwind, AssertUnwindSafe};
+use std::path::Path;
 use std::sync::atomic::{AtomicU8, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
@@ -45,7 +46,11 @@ pub struct ShellInput<'a> {
     pub event: HookEvent,
     /// The main checkout's folder name.
     pub project: &'a str,
-    pub record: &'a Record,
+    /// The `.fgos` directory of the record. The record is opened (and its
+    /// directories created) only after the payload parsed, the resolver
+    /// found the head and the caller check passed, so a malformed or foreign
+    /// call creates nothing and takes no lock.
+    pub fgos_dir: &'a Path,
     pub limits: &'a Limits,
     pub hook: &'a HookLimits,
     pub tested: &'a TestedClis,
@@ -159,8 +164,9 @@ pub struct ShellOutcome {
 /// The circuit breaker is read first: while it is open the call answers
 /// quiet before reading stdin. After the call, the outcome is counted.
 pub fn run(input: ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -> ShellOutcome {
+    let paths = Paths::new(input.fgos_dir);
     let breaker = catch_unwind(AssertUnwindSafe(|| {
-        Breaker::load(input.record, &input.hook.hook.breaker)
+        Breaker::load(&paths, &input.hook.hook.breaker)
     }))
     .ok();
     if breaker
@@ -221,6 +227,10 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
     if !again.is_some_and(|a| caller_is_head(&a, facts, &resolved.head.record)) {
         return quiet(Quiet::NotTheHead);
     }
+    let record = match Record::open(input.fgos_dir) {
+        Ok(record) => record,
+        Err(error) => return quiet(Quiet::Record(record_code(&error))),
+    };
 
     let wait = Wait::Ms(input.hook.hook.lock_wait_ms);
     let call = HookCall {
@@ -232,7 +242,7 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
         head: resolved.head,
     };
     let now = (input.clock)();
-    let held = input.record.hold(wait, now, input.limits, |state, ids| {
+    let held = record.hold(wait, now, input.limits, |state, ids| {
         let begun = begin(
             state,
             &call,
@@ -281,7 +291,7 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
     outcome.claimed = claimed.items.iter().map(|item| item.id.clone()).collect();
     let emitted = emit_and_finish(
         &Emit {
-            record: input.record,
+            record: &record,
             wait,
             limits: input.limits,
             clock: input.clock,

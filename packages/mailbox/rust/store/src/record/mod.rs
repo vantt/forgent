@@ -345,20 +345,6 @@ impl Record {
         &self.paths
     }
 
-    /// The directory a file written without the mailbox lock lives in
-    /// (`runtime/mailbox/`), after the chain from `.fgos` down to it passed
-    /// the same trust check a hold applies; `None` when it did not.
-    pub(crate) fn trusted_mailbox_dir(&self) -> Option<PathBuf> {
-        let mailbox = self.paths.mailbox_dir();
-        for (dir, creator) in self.paths.chain() {
-            check_dir(&dir, creator).ok()?;
-            if dir == mailbox {
-                return Some(mailbox);
-            }
-        }
-        None
-    }
-
     /// One hold: `mutate` runs on the installed state with a fresh id
     /// source, and the new state is installed only when `mutate`'s result
     /// reports a change (the core's own answer, [`ReportsChange`]); an
@@ -631,6 +617,21 @@ struct DirId {
 struct TrustedDirs {
     record: DirId,
     bodies: DirId,
+}
+
+/// The directory a file written without the mailbox lock lives in
+/// (`runtime/mailbox/`) under `paths`, after the chain from `.fgos` down to
+/// it passed the same trust check a hold applies; `None` when it did not or
+/// does not exist. Creates nothing.
+pub(crate) fn trusted_mailbox_dir(paths: &Paths) -> Option<PathBuf> {
+    let mailbox = paths.mailbox_dir();
+    for (dir, creator) in paths.chain() {
+        check_dir(&dir, creator).ok()?;
+        if dir == mailbox {
+            return Some(mailbox);
+        }
+    }
+    None
 }
 
 /// Opens `path` without following a symlink and without blocking, and

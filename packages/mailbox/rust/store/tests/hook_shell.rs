@@ -105,7 +105,7 @@ fn gated_call(
         adapter: Adapter::Claude,
         event: HookEvent::PostToolUse,
         project: "forgent",
-        record,
+        fgos_dir: record.paths().fgos_dir(),
         limits: &limits,
         hook: &hook,
         tested: TestedClis::embedded(),
@@ -533,7 +533,7 @@ fn call_as(
         adapter: Adapter::Claude,
         event: HookEvent::PostToolUse,
         project: "forgent",
-        record,
+        fgos_dir: record.paths().fgos_dir(),
         limits: &limits,
         hook: &hook,
         tested: TestedClis::embedded(),
@@ -617,7 +617,7 @@ fn the_breaker_opens_after_the_configured_counted_failures_and_answers_quiet_bef
         adapter: Adapter::Claude,
         event: HookEvent::PostToolUse,
         project: "forgent",
-        record: &record,
+        fgos_dir: record.paths().fgos_dir(),
         limits: &limits,
         hook: &hook,
         tested: TestedClis::embedded(),
@@ -700,10 +700,10 @@ fn lock_contention_config_errors_budget_exits_and_benign_quiets_never_count() {
                 quiet: Some(quiet.clone()),
                 ..ShellOutcome::default()
             };
-            Breaker::load(&record, &limits).after(&outcome, T0);
+            Breaker::load(record.paths(), &limits).after(&outcome, T0);
         }
         assert!(
-            !Breaker::load(&record, &limits).is_open(T0),
+            !Breaker::load(record.paths(), &limits).is_open(T0),
             "{quiet:?} counted"
         );
     }
@@ -716,10 +716,10 @@ fn lock_contention_config_errors_budget_exits_and_benign_quiets_never_count() {
         ..ShellOutcome::default()
     };
     for _ in 0..limits.failures {
-        Breaker::load(&record, &limits).after(&panicked, T0);
+        Breaker::load(record.paths(), &limits).after(&panicked, T0);
     }
     assert!(
-        Breaker::load(&record, &limits).is_open(T0),
+        Breaker::load(record.paths(), &limits).is_open(T0),
         "a caught panic counts"
     );
 }
@@ -740,19 +740,19 @@ fn a_planted_future_open_time_cannot_extend_the_pause() {
 
     plant_breaker(&fgos, &at(now + 3_600_000));
     assert!(
-        !Breaker::load(&record, &limits).is_open(T0),
+        !Breaker::load(record.paths(), &limits).is_open(T0),
         "an hour ahead reads as closed"
     );
     plant_breaker(&fgos, &at(now + 2_000));
     assert!(
-        Breaker::load(&record, &limits).is_open(T0),
+        Breaker::load(record.paths(), &limits).is_open(T0),
         "within the clock skew it counts"
     );
     plant_breaker(&fgos, &at(now - 1_000));
-    assert!(Breaker::load(&record, &limits).is_open(T0));
+    assert!(Breaker::load(record.paths(), &limits).is_open(T0));
     plant_breaker(&fgos, &at(now - limits.pause_sec * 1000));
     assert!(
-        !Breaker::load(&record, &limits).is_open(T0),
+        !Breaker::load(record.paths(), &limits).is_open(T0),
         "the pause has passed"
     );
 }
@@ -769,7 +769,7 @@ fn a_corrupt_symlinked_or_oversized_breaker_file_reads_as_closed() {
     );
     plant_breaker(&fgos, &open);
     assert!(
-        Breaker::load(&record, &limits).is_open(T0),
+        Breaker::load(record.paths(), &limits).is_open(T0),
         "the planted state is open"
     );
 
@@ -780,14 +780,17 @@ fn a_corrupt_symlinked_or_oversized_breaker_file_reads_as_closed() {
         format!("{open}{}", " ".repeat(5000)),
     ] {
         plant_breaker(&fgos, &text);
-        assert!(!Breaker::load(&record, &limits).is_open(T0), "{text:.40}");
+        assert!(
+            !Breaker::load(record.paths(), &limits).is_open(T0),
+            "{text:.40}"
+        );
     }
     std::fs::remove_file(fgos.paths().breaker()).unwrap();
     let elsewhere = fgos.scratch().join("breaker-elsewhere.json");
     std::fs::write(&elsewhere, &open).unwrap();
     std::os::unix::fs::symlink(&elsewhere, fgos.paths().breaker()).unwrap();
     assert!(
-        !Breaker::load(&record, &limits).is_open(T0),
+        !Breaker::load(record.paths(), &limits).is_open(T0),
         "a symlink is never followed"
     );
 }
@@ -809,14 +812,14 @@ fn the_breaker_is_never_read_or_written_under_an_untrusted_directory() {
     std::fs::set_permissions(&runtime, std::fs::Permissions::from_mode(mode | 0o002)).unwrap();
 
     assert!(
-        !Breaker::load(&record, &limits).is_open(T0),
+        !Breaker::load(record.paths(), &limits).is_open(T0),
         "an untrusted chain reads as closed"
     );
     let panicked = ShellOutcome {
         panicked: true,
         ..ShellOutcome::default()
     };
-    Breaker::load(&record, &limits).after(&panicked, T0);
+    Breaker::load(record.paths(), &limits).after(&panicked, T0);
     std::fs::set_permissions(&runtime, std::fs::Permissions::from_mode(mode)).unwrap();
     assert_eq!(
         std::fs::read_to_string(fgos.paths().breaker()).unwrap(),
@@ -915,7 +918,7 @@ fn a_codex_entry_whose_environment_names_another_session_than_its_payload_is_qui
         adapter: Adapter::Codex,
         event: HookEvent::PostToolUse,
         project: "forgent",
-        record: &record,
+        fgos_dir: record.paths().fgos_dir(),
         limits: &limits,
         hook: &hook,
         tested: TestedClis::embedded(),
@@ -932,4 +935,40 @@ fn a_codex_entry_whose_environment_names_another_session_than_its_payload_is_qui
         Some(Quiet::NoHead(fgos_mailbox::head::NoHead::WriterMismatch))
     );
     assert!(out.is_empty() && !fgos.paths().snapshot().exists());
+}
+
+#[test]
+fn a_malformed_payload_never_opens_or_creates_the_record() {
+    let fgos = TempFgos::new("shell-lazy-open");
+    let head = Head::spawn();
+    let paths = fgos.paths();
+    let limits = limits();
+    let hook = hook_limits();
+    let clock = || T0;
+    let ancestry = || Some(head.ancestry());
+    let resolve = |_: &[u8], _: &Ancestry| -> Result<Resolved, fgos_mailbox::head::NoHead> {
+        Err(fgos_mailbox::head::NoHead::NoWriter)
+    };
+    for stdin in [&b"not json"[..], b"{}"] {
+        let input = ShellInput {
+            adapter: Adapter::Claude,
+            event: HookEvent::PostToolUse,
+            project: "forgent",
+            fgos_dir: paths.fgos_dir(),
+            limits: &limits,
+            hook: &hook,
+            tested: TestedClis::embedded(),
+            clock: &clock,
+            ancestry: &ancestry,
+            resolve: &resolve,
+            gate: WriteGate::new(),
+        };
+        let outcome = run(input, &mut &stdin[..], &mut Vec::new());
+        assert!(outcome.quiet.is_some());
+    }
+    assert!(
+        !paths.mailbox_dir().exists(),
+        "nothing under runtime/mailbox was created"
+    );
+    assert!(!fgos.fgos_dir().join("runtime").exists());
 }
