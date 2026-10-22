@@ -46,7 +46,7 @@ pub use names::ResolveRefusal;
 pub use notices::{Notice, NoticeMark, NoticeState};
 pub use policy::LifetimeKey;
 pub use registry::{Binding, Liveness, RegisterRefusal, RegisterRequest, Registered, StoredHead};
-pub use report::{delivery_report, inbox_text, refusal_text};
+pub use report::{delivery_report, inbox_text, record_error_text, refusal_text};
 pub use state::{MailboxState, SnapshotVersion, SnapshotVersionError, SNAPSHOT_SCHEMA_VERSION};
 pub use time::Timestamp;
 pub use wake::{Exchange, ExchangeKey, WakeDrop, WakeLifetimeKey};

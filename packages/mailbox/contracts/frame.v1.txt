@@ -12,9 +12,12 @@
 #
 # Placeholders: {{from}} {{agent}} {{id}} {{attempt}} {{body}} {{reply}}
 # {{about}} {{about_to}} {{reason}} {{to}} {{code}} {{limit}} {{candidates}}
-# {{kind}} {{from_label}} {{state}} {{offers}}. Every inserted value but
-# {{body}}, {{reply}}, {{reason}} and {{limit}} goes through the header
-# escape. {{limit}} is a refusal's own fields as name=value pairs, in field
+# {{kind}} {{from_label}} {{state}} {{offers}}. Every value taken from the
+# record or a caller ({{from}} {{agent}} {{id}} {{about}} {{about_to}}
+# {{to}} {{from_label}} {{candidates}}) goes through the header escape.
+# The others are fixed by the code and inserted as they are: the words
+# {{code}}, {{kind}} and {{state}}, the numbers {{attempt}} and {{offers}},
+# and {{limit}}, a refusal's own fields as name=value pairs, in field
 # order. {{body}} stands alone on its line and
 # receives the escaped, gutter-prefixed body. {{reply}} receives the
 # [message.reply] section, or nothing when the sender has no head. The
@@ -62,6 +65,8 @@ Refused: too-large ({{limit}}). Send a path or link instead.
 Refused: {{code}}. Candidates: {{candidates}}.
 [refusal.argument]
 Refused: {{code}}.
+[record.error]
+Not done: the mailbox record failed ({{code}}) and nothing was changed. Try once more later; do not loop.
 [inbox.empty]
 No pending mail.
 [inbox.line]

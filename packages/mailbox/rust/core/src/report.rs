@@ -1,8 +1,9 @@
 //! What a sender and an `inbox` caller read (spec §5.3, §6.1, §6.2): the
 //! delivery report of a recorded send, the text of a refused one, and the
-//! read-only inbox listing. Every sentence comes from the frame contract
-//! and is filled by the frame's one filler; every inserted value except a
-//! refusal's own numbers goes through the frame's header escape.
+//! read-only inbox listing, and the answer when the record itself failed.
+//! Every sentence comes from the frame contract and is filled by the
+//! frame's one filler; every value taken from the record goes through the
+//! frame's header escape.
 use crate::delivery::{MessageView, Refusal, SendOutcome};
 use crate::envelope::Kind;
 use crate::frame::{escape_header, fill, section};
@@ -82,6 +83,13 @@ pub fn refusal_text(refusal: &Refusal, limits: &Limits) -> String {
             ("candidates", &candidates),
         ],
     )
+}
+
+/// The answer when the record itself failed, so a hold changed nothing: a
+/// `send` that was not recorded, an `inbox` that could not be read. `code`
+/// is the record error's own fixed word (`lock-busy`, `snapshot-newer`, …).
+pub fn record_error_text(code: &str) -> String {
+    fill(section("record.error"), &[("code", code)])
 }
 
 /// A refusal's own fields as `name=value` pairs in field order; empty for

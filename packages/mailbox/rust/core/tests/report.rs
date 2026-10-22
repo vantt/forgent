@@ -2,8 +2,8 @@ mod common;
 
 use common::{spec_limits, t};
 use fgos_mailbox_core::{
-    delivery_report, inbox_text, refusal_text, Generation, Kind, MessageId, MessageView, Refusal,
-    SendOutcome, ShortName, WakeDrop,
+    delivery_report, inbox_text, record_error_text, refusal_text, Generation, Kind, MessageId,
+    MessageView, Refusal, SendOutcome, ShortName, WakeDrop,
 };
 use serde_json::json;
 
@@ -190,5 +190,13 @@ fn an_inbox_listing_has_one_line_per_pending_item_with_its_state_and_says_no_pen
     assert_eq!(
         inbox_text(None, &limits),
         "This session has no mailbox address yet; it gets one at its first hook."
+    );
+}
+
+#[test]
+fn a_record_error_reads_as_contract_text_that_names_the_code_and_says_not_to_loop() {
+    assert_eq!(
+        record_error_text("lock-busy"),
+        "Not done: the mailbox record failed (lock-busy) and nothing was changed. Try once more later; do not loop."
     );
 }

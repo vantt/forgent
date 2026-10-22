@@ -32,7 +32,7 @@ use fgos_mailbox::hook::shell::{self, Resolved, ShellInput, WriteGate};
 use fgos_mailbox::hook::{Adapter, HeadFacts, HookEvent, HookLimits};
 use fgos_mailbox::record::{Record, Wait};
 use fgos_mailbox::verbs;
-use fgos_mailbox_core::{Limits, MessageId, SendRequest, Timestamp, WriterKey};
+use fgos_mailbox_core::{record_error_text, Limits, MessageId, SendRequest, Timestamp, WriterKey};
 use std::collections::BTreeMap;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
@@ -315,10 +315,18 @@ fn hook(flags: &Flags) -> i32 {
     0
 }
 
-fn open(flags: &Flags) -> Option<(Record, PathBuf)> {
-    let fgos_dir = PathBuf::from(flags.get("--fgos-dir")?);
-    let record = Record::open(&fgos_dir).ok()?;
-    Some((record, fgos_dir))
+/// The record under `--fgos-dir`, or the status to exit with: 2 when the
+/// flag is missing, 1 after printing the record-error text when the record
+/// cannot be opened.
+fn open(flags: &Flags) -> Result<(Record, PathBuf), i32> {
+    let fgos_dir = PathBuf::from(flags.get("--fgos-dir").ok_or(2)?);
+    match Record::open(&fgos_dir) {
+        Ok(record) => Ok((record, fgos_dir)),
+        Err(error) => {
+            let _ = writeln!(io::stdout().lock(), "{}", record_error_text(error.code()));
+            Err(1)
+        }
+    }
 }
 
 /// The caller's identity: attribution only (spec §5.1). A caller with no
@@ -331,8 +339,9 @@ fn send(flags: &Flags) -> i32 {
     let ([body], Some(to)) = (flags.free.as_slice(), flags.get("--to")) else {
         return 2;
     };
-    let Some((record, fgos_dir)) = open(flags) else {
-        return 1;
+    let (record, fgos_dir) = match open(flags) {
+        Ok(opened) => opened,
+        Err(status) => return status,
     };
     let Some(from) = caller(&fgos_dir) else {
         return 1;
@@ -365,8 +374,9 @@ fn inbox(flags: &Flags) -> i32 {
     if !flags.free.is_empty() {
         return 2;
     }
-    let Some((record, fgos_dir)) = open(flags) else {
-        return 1;
+    let (record, fgos_dir) = match open(flags) {
+        Ok(opened) => opened,
+        Err(status) => return status,
     };
     let Some(key) = caller(&fgos_dir) else {
         return 1;
@@ -383,8 +393,8 @@ fn inbox(flags: &Flags) -> i32 {
             let _ = writeln!(io::stdout().lock(), "{text}");
             0
         }
-        Err(code) => {
-            let _ = writeln!(io::stdout().lock(), "{code}");
+        Err(text) => {
+            let _ = writeln!(io::stdout().lock(), "{text}");
             1
         }
     }

@@ -6,6 +6,7 @@ use common::limits;
 use common::record::{key, name_of, register, send_req, TempFgos, T0};
 use fgos_mailbox::record::{Reported, Wait};
 use fgos_mailbox::verbs::{inbox, send};
+use fgos_mailbox_core::record_error_text;
 
 /// A record holding one registered head; returns its name.
 fn with_head(fgos: &TempFgos, writer: &str) -> String {
@@ -91,5 +92,31 @@ fn inbox_lists_pending_mail_with_its_state_and_never_writes_the_snapshot() {
     assert_eq!(
         inbox(&fgos.record(), &key("no-binding"), Wait::Try, T0, &limits()).unwrap(),
         "This session has no mailbox address yet; it gets one at its first hook."
+    );
+}
+
+#[test]
+fn a_send_and_an_inbox_whose_record_failed_answer_with_the_record_error_text() {
+    let fgos = TempFgos::new("verb-record-error");
+    let name = with_head(&fgos, "head-a");
+    let snapshot = fgos.paths().snapshot();
+    let mut value: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(&snapshot).unwrap()).unwrap();
+    value["schema_version"] = 2.into();
+    std::fs::write(&snapshot, serde_json::to_vec(&value).unwrap()).unwrap();
+    let expected = record_error_text("snapshot-newer");
+
+    let answer = send(
+        &fgos.record(),
+        send_req("sender-x", &name, "hi"),
+        Wait::Try,
+        T0,
+        &limits(),
+    );
+    assert!(!answer.recorded);
+    assert_eq!(answer.text, expected);
+    assert_eq!(
+        inbox(&fgos.record(), &key("head-a"), Wait::Try, T0, &limits()),
+        Err(expected)
     );
 }

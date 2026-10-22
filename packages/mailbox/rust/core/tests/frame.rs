@@ -341,6 +341,7 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
         ("refusal.too-large", &["{{limit}}"][..]),
         ("refusal.name", &["{{code}}", "{{candidates}}"][..]),
         ("refusal.argument", &["{{code}}"][..]),
+        ("record.error", &["{{code}}", "do not loop"][..]),
         ("inbox.empty", &[][..]),
         (
             "inbox.line",
