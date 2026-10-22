@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Runner and Workflow Land now recheck documentation lease admission through publication, refusing a non-holder when a lease is acquired after initial admission.
+
 - Documentation: the documentation-cutover lease table now matches the fence-free holder-lock registry row shape.
 
 - Documentation routes for local writer identity now point to Identity; its candidate header retains the writer-attribution scope of section 7a.

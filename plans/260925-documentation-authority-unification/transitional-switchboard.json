@@ -1212,7 +1212,7 @@
       "fileClasses": [
         "maintained-authority"
       ],
-      "entryPoint": "docs/platform/identity/spec.md#7a-local-session-writer-id",
+      "entryPoint": "docs/platform/identity/spec.md",
       "currentRoutes": [
         {
           "route": "docs/platform/identity/spec.md",

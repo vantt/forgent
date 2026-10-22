@@ -86,20 +86,25 @@ The authority is **L12-124**, not a new Doer deferral. `step-07-readiness.json:p
 8. **Non-behavioral census joins:** all **1,126** fixture/comment/history/caller-scalar sites have stable original site ids and owner. Confirm grade-record REJECT custody or original owning proof **before flip**, not Phase 9's post-flip search. Current static traces do not certify ignored/external/live `.fgos` inputs; two external locator parks remain outside the original Step 5 denominator.
 9. **Non-dependencies and bounded history:** A/B landing and C naming correction from L12-118 remain; L12-91 rule-management writes occur after cutover, never block it. Earlier RUL10/P8-DOC-GAP-01/02/03, two non-retiring dead links and pathless locators retain their source-specific obligations. Export v2 is delivered, not requested again. C F8 pruning metadata below authorizes no deletion.
 
-### Lead suite and closure proof — pending, not reassigned after close
+### Lead suite and closure proof — measured red; suite-fix follow-up blocked
 
-**Only Lead** fills actual suite results from an isolated clone and exact baseline comparison. No suite/test command below was run in this records turn.
+Lead's two isolated-clone results below are supplied by `step-08-suite-fix-brief.md`, not rerun by the Doer. **L12-125** in [owner answers](owner-answers.md) records the local complete-file checks at input HEAD `1bd5df87fa3367b03500c5fedf2290b77e159276` plus the uncommitted artifact/record fixes. No full suite, cargo suite or clean committed-byte acceptance is claimed for those changed bytes.
 
 | Command/proof | Tree / exit / failures | Ownership and attribution |
 |---|---|---|
-| `env -u CLAUDE_CODE_SESSION_ID npm test` | Exact isolated branch commit **pending** / **pending** / **pending** | Lead; exact failing names, matching main tree/environment, measured reruns for flaky/environment attribution |
-| Matching main baseline / `cargo test --workspace` when required by Lead proof frame | Exact main/branch commits **pending** | No old lease-slice failures or historical main results recycled as current green |
-| Both embedded ownership/audit/check recipes and `test/scripts/doc-rationale-reproduction.test.mjs` after actual-pair accounting | Clean committed author/accounting pair **pending** | Both A/B/H/I and reproduction owning proof must pass. Author-time check A on uncommitted bytes is not clean committed acceptance |
-| Full `check-doc-candidate-status.test.mjs` and `check-doc-constitution.test.mjs` | **pending** | Both complete files, no filtered assertions; they write Git fixtures, outside this records turn |
+| `env -u CLAUDE_CODE_SESSION_ID npm test` — isolated branch | **9f49695c7 / 1 / 406 failures of 9,317 tests** (Lead-supplied) | 18 unique branch-only titles: A=11 branch-caused, B=3 proposed clone artifacts, C=3 proposed flakes, D=1 authorized GAP-05 red. Full per-title grouping/proof/limits in L12-125; B/C hypotheses are not all verified |
+| Same isolated main baseline | **9c7edde30 / 1 / 392 failures of 8,668 tests** (Lead-supplied) | Exact failure lists in `suite-logs/`; 18 title differences are not the arithmetic count delta of 14. Raw Lead logs unavailable in this sandbox. No current-tree full-suite green inferred |
+| `cargo test --workspace` when required by Lead proof frame | **not run** | Still owed if required; no historical result substituted |
+| Both embedded ownership/audit/check recipes and `test/scripts/doc-rationale-reproduction.test.mjs` after actual-pair accounting | **Local before: exit 1, 6/8; clean committed pair pending** | Symlink-output case passes. Both recipes expose 22 identical real missing report pairs; historical lease code pairs already have exact exceptions. Scope stop precedes accounting; no check/baseline changed, no future commit pre-accounted |
+| Full `check-doc-candidate-status.test.mjs` and `check-doc-constitution.test.mjs` | **Candidate: exit 0, 11/11 after entryPoint fix; constitution not run** | Both complete files still owed on final committed bytes. Candidate was 10/11 before, no test edits |
+| Command-route and envelope generators / owning files | **Both --check exit 0; command-routes 14/14 and envelope-contract 21/21, exit 0** | Reused existing generators, only command-routes.json and envelope/version.json rewritten; missing docs-lease fixed |
+| Full help-routes and release-tree proofs | **Help: exit 1, 0/5 before-hook; release-tree not run** | Missing compiled `target/release/libfgos_node_addon.so` prevented host-help comparison. No separate committed help-manifest golden identified; comparison uses the live registry and scratch staged release |
+| Runner liveness owning proof | **exit 1 after registry refresh; blocked on owning-test scope** | Existing generator preserves all old claim ids and refreshes current source population; section 54 now names a different heading, original protected decision 0020 moved to 55. Needs authorized `test/scripts/doc-runner-liveness.test.mjs` correction preserving all protected anchors/evidence/non-retirement cases; not a registry-only repair |
+| B admission checks / C three isolated flake reruns | **not reached before mandatory scope stop** | No environment/flake hypothesis declared proven without a run |
 | Full `check-legacy-docs-ratchet.test.mjs` and `check-decision-citation-drift.test.mjs` | **pending** | Explicitly named from C stop table; no baseline/allowlist/check weakening |
 | Fresh independent rebuilt-handoff closure review | **pending** | Lead starts one A38 review of final source pin, matrix, all gates, scorecard and actual-pair evidence |
 
-Any unexplained red other than the narrowly allowed GAP-05 stops close. L12-14/L12-124 waive neither frozen B nor reproduction checks. Later cutover authorization remains a separate owner decision.
+Any unexplained red other than the narrowly allowed GAP-05 stops close. L12-14/L12-124 waive neither frozen B nor reproduction checks. **L12-125 is blocked partial repair, not suite acceptance**: the exact remaining write is outside this Unit's test scope; Lead owns scope extension, remaining checks, last actual-pair accounting and clean committed-byte replay. Later cutover authorization remains a separate owner decision.
 
 ### Step 7 r3 Low observations — historical, not new acceptance
 

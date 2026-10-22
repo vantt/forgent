@@ -2456,3 +2456,57 @@ Other checks:
 **Proof and handback.** Two actual `--final --pin` runs produce all five outputs and stdout byte-identically: **7,475,179 bytes**, below 8,000,000. `step-07-final-determinism.json` holds hashes; `step-08-handoff-rebuild-verification.json` records **25 passing author conservation/binding/receipt checks**, not an independent verdict or runtime suite. SC1/readiness remain false; full suite, targeted complete Git-fixture/reproduction/ratchet/citation tests, actual runner-pair clean acceptance and one fresh Lead-started independent closure review remain pre-close obligations. Pair accounting is performed last through the two existing manifest exception arrays; receipt `step-08-handoff-rebuild-pair-accounting.json`. This turn's future runner commit is not pre-accounted.
 
 No product/docs/tests/skills/baseline mutation, fgOS CLI, repository Git write, live `.fgos`/secret access, npm/cargo suite, service or preview server. Only authorized records/reproduction-accounting files change; scratch is `/tmp/fgos-work/handoff-rebuild`. Runner owns commit; Lead owns acceptance/preview and subsequent actual-commit accounting. `needsWrites: []` for this bounded records rebuild; all later product work remains explicitly owned/gated rather than attempted here.
+
+## L12-125 — Suite artifact repairs; stop on out-of-scope positional liveness assertions
+
+**Authority/status.** Supplied `step-08-suite-fix-brief.md` plus the continuation's explicit permission for `reports/phase-06/working-identity-registry.json`. Input HEAD: `1bd5df87fa3367b03500c5fedf2290b77e159276`. **Partial delivery, blocked, not suite acceptance or closure.** No new owner decision, cutover, main landing or test weakening. The brief requires stopping if another file is needed; `test/scripts/doc-runner-liveness.test.mjs` now needs an authorized update and was not edited.
+
+**Repairs completed.** Reused `scripts/export-command-selectors.mjs` to add the missing `docs-lease` route (79 → 80 selectors). Reused `generateEnvelopeVectors()` from `test/rust-host/generate-vectors.mjs` to rewrite only `test/rust-host/vectors/envelope/version.json`; no other vector or corpus file written. Both generator `--check` modes now exit 0. Changed the local-writer switchboard entryPoint to the Identity document path without its fragment: the classifier routes files, and section 7a scope remains in the existing area name/summary. Complete candidate-status test now passes 11/11. Added the previously owed one-sentence L12-123 Land-race Unreleased note.
+
+**Registry and remaining blocker.** The single-source carry generator correctly refused edited/new `data-dictionary` content (exit 1). Its existing repo-wide carry generator succeeded against HEAD, preserving all **100,044** prior claim ids across active/gap/retired populations. The permitted registry file is rewritten in its existing compact JSON format: 91,734 → 93,220 active units; runner 497 → 517. Native carry records 107 edited-kept, 1,667 added, 124 new gaps and 57 removed-pending-disposition units; these are not semantic approvals or approved retirements. No scanner, ledger approval or source document changed.
+
+After that authentication repair, the unchanged liveness test reaches its next assertion and fails on **section 54**. At registry's former source pin `1b3302680be9ba9559d431cbef4c83cacca91216`, section 54 was decision **0020**; at current HEAD it is **0019's Hệ quả**, and decision 0020 is section **55**. All 31 required old section anchors still exist, but their listed numeric positions have shifted by one; additional headings also exist. Current sections total 176 versus 168 at that former pin. The correct follow-up preserves each protected anchor, complete-record consumer evidence, and non-retirement assertions in the owning test instead of treating arbitrary old ordinal positions as identity. A registry-only edit cannot change the scanner's heading order. **needsWrites: `test/scripts/doc-runner-liveness.test.mjs`**. Do not fabricate a consumer, alter classification logic, remove a case, or change docs to manufacture green.
+
+### Attribution of the Lead's 18 branch-only failure titles
+
+The Lead's isolated-clone runs are supplied evidence, not rerun here: branch **9f49695c7**, 9,317 tests / 406 failures; main **9c7edde30**, 8,668 / 392; both red. The unique-title difference is 18, not the arithmetic failure-count difference of 14. Lists remain in `suite-logs/{branch,main,branch-only}-failures.txt`; raw `/tmp/fgos-work/{p8-suite2,main-suite}.log` were unavailable in this sandbox.
+
+| Class / branch-only titles | Count | Actual local proof / remaining duty |
+|---|---:|---|
+| A: COMMAND_REGISTRY coverage; routes clean `--check` | 2 | Fixed; complete command-routes file 14/14, exit 0 |
+| A: envelope byte regeneration; `checkVectors()` clean; vector CLI `--check` | 3 | Fixed; complete envelope-contract file 21/21, exit 0 |
+| A: host help manifest equality; release-tree R4 doctor posture | 2 | Not certified fixed. Help file stops in before-hook: missing `target/release/libfgos_node_addon.so` (0/5, exit 1). Release-tree not run before scope stop |
+| A: round5 and sync4d ownership recipes | 2 | Reproduced: 6/8 overall, exit 1; both checks enumerate the same 22 real unaccounted HEAD-ancestor report pairs. B/H/I pass. Historical lease/verifier code pairs already have exact exceptions, as did `scripts/check-evidence-relocation.mjs`; historicalOffenders alone is diagnostic, not A's failing predicate. No checker/baseline change or broad code allowlist |
+| A: real switchboard entry points | 1 | Fixed; complete candidate-status file 11/11, exit 0 |
+| A: runner decision liveness | 1 | Registry prerequisite fixed; stale positional assertion remains red, exit 1; out-of-scope owning test required |
+| B: direct audit rejects symlink output | 1 | Passes locally in full reproduction file, no code change |
+| B: run-case lease admission; holder Workflow writing unit | 2 | Lead clone-location hypothesis remains **unverified**; not run before stop |
+| C: eight-process worktrees; unfinished ledger line; Rust lock after Node death | 3 | Lead load-flake hypothesis remains **unverified**; isolated reruns not reached before stop |
+| D: dead-vocabulary guard | 1 | Lead-authorized GAP-05 red retained; not rerun |
+| **Total** | **18** | **A=11, B=3, C=3, D=1; not a claim all 18 are resolved** |
+
+No separate committed help-manifest artifact was identified: `help-routes.test.mjs` compares the live Node command manifest with a scratch staged release built by `buildRustDistribution`; the route descriptor is `packages/host-runtime/contracts/command-routes.json`. Missing compiled build inputs prevented reaching that comparison. Do not invent or hand-edit a help golden.
+
+### Commands and exit codes
+
+Only `releasePath` was read from the specifically authorized activation file, selecting `/home/vantt/.local/state/fgos/releases/sha256:2ce473d4e0e9cda5131a660559399719a7b2318b490b11766321047c57f7b326`. Every Node command below used `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN="$RELEASE/bin/fgos"`, from this linked worktree. Tests were single complete files, never filtered. Command argv, durations and complete logs are under `/tmp/fgos-work/suite-fix-evidence/commands.jsonl` and adjacent label `.log` files (scratch, not durable committed evidence).
+
+| Command (after the environment prefix) | Before → after exit | Counts / note |
+|---|---|---|
+| `node scripts/export-command-selectors.mjs --check` | 1 → 0 | Missing docs-lease → no drift |
+| `node test/rust-host/generate-vectors.mjs --check` | 1 → 0 | Version-only drift → clean |
+| `node --test test/scripts/doc-runner-liveness.test.mjs` | 1 → 1 | Registry equality failure → section-54 assertion failure |
+| `node --test test/scripts/check-doc-candidate-status.test.mjs` | 1 → 0 | 10/11 → 11/11 |
+| `node --test test/rust-host/help-routes.test.mjs` | 1 → not rerun | 0/5; missing compiled addon before-hook |
+| `node --test test/scripts/doc-rationale-reproduction.test.mjs` | 1 → not rerun | 6/8; symlink case passes; 22 missing real committed pairs in each recipe |
+| `node --test test/rust-host/command-routes.test.mjs` | not run → 0 | 14/14 |
+| `node --test test/rust-host/envelope-contract.test.mjs` | not run → 0 | 21/21 |
+| `node scripts/export-command-selectors.mjs` | 0 | Existing generation door |
+| `node --input-type=module -e 'import fs from "node:fs"; import {generateEnvelopeVectors} from "./test/rust-host/generate-vectors.mjs"; fs.writeFileSync("test/rust-host/vectors/envelope/version.json",JSON.stringify(generateEnvelopeVectors().get("version.json"),null,2)+"\n");'` | 0 | Existing generator, only authorized vector written |
+| `node scripts/generate-doc-inventory.mjs --carry-forward-identity-registry --identity-registry plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json --commit HEAD --source-path docs/specs/runner.md --json-out /tmp/fgos-work/suite-fix-evidence/runner-registry.json` | 1 | Correctly refuses non-unique/new source units |
+| Same carry command without `--source-path`, output `/tmp/fgos-work/suite-fix-evidence/current-registry.json` | 0 | Generated output copied byte-for-byte to explicitly permitted registry |
+| `git diff --check` | 0 | Prior to reporting edits; final check repeated in handback |
+
+Prior-art inspection used the existing generator/carry functions and historical exception arrays (including evidence-verifier and lease exact pairs); no replacement mechanism was designed. Impact-analysis **degraded/unqueried** under no-fgOS-CLI/no-GitNexus-MCP boundary; no product symbol edited. No fgOS CLI, npm/cargo suite, repository Git write, manual `.fgos` mutation, secret read, service or preview invocation. Markdown preview stays with Lead.
+
+**Pair accounting last / handoff.** Stopped before the remaining accounting step because of the explicit scope rule. Neither reproduction exceptions nor the allowlist was edited; their 22 actual missing pairs remain owed, as do exact admission of this authorized artifact/CHANGELOG working slice and the future runner commit's separate L12-11 accounting. No future id guessed, no clean committed-byte acceptance claimed. Lead must extend the owning-test scope, finish the approved A/B/C checks/accounting, and replay on the actual clean author/accounting pair. Phase 8 stays open.
