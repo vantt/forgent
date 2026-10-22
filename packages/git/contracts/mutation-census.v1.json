@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e7d639bbbcaaffb238a7b7a206c421c91609e385fd526d5b024dc5d382cf5173",
+  "payloadDigest": "1719362044ff43a8039ea709410f61ecb8e1f840170c1ec9a8f902f4fddf3e8d",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -421,6 +421,7 @@
     "packages/mailbox/rust/core/tests/sweep.rs": "677bc5f71aba71bc82c75866e20e54d0eb12ead1dadcc484c9f7b8ad58ba2fef",
     "packages/mailbox/rust/core/tests/wake.rs": "a4460aa55dde049c7a9e232c6ee1569f54b842bfcac322451aaf6e4ad5270ad2",
     "packages/mailbox/rust/store/examples/mailbox-record-cost.rs": "b1d2e9df79ea305a96781e112eb62d99a1d326e60b4118663543e0a76562af28",
+    "packages/mailbox/rust/store/examples/mailbox-test-hook.rs": "9537670aeb9bec8dd192ca3954bd09eb582b216dbe68a3c094702093c4d108d6",
     "packages/mailbox/rust/store/src/adapters/agy.rs": "2ca9d10a744245a4b233e26f64b96d6fde27de92394e60d9332b1a830979f9fe",
     "packages/mailbox/rust/store/src/adapters/claude.rs": "9c70057d8d54d673d0c652bcd07e4376dbe1726ed3a5f6644d018537671bdf88",
     "packages/mailbox/rust/store/src/adapters/claude_head.rs": "0c8bb02ada6e0d23842d9a1bfb5ace2f413adecbab8470e2960c2dba5ae67120",
@@ -456,6 +457,7 @@
     "packages/mailbox/rust/store/tests/record_crash.rs": "7cea9afb1f5cc1acd4c5340b9902308699d74cb8cb35d4a2520773f4fae81fab",
     "packages/mailbox/rust/store/tests/record_prune.rs": "72ae0203f2840ed402c12e0fa84f720d3443d0f36382af8896822de670fbd4ba",
     "packages/mailbox/rust/store/tests/record_snapshot.rs": "ba79b1ba7d3d6407da85a8f64ecccfdada448ba520b46082253605204e23b603",
+    "packages/mailbox/rust/store/tests/test_hook_entry.rs": "006f44d3fe1746d6cd984d1aa0ca9edfa36d1890bf02389504aaed4c5891c058",
     "packages/mailbox/rust/store/tests/verbs.rs": "7d028641c4f57b4bbd89cfbbc73bb9dbc2fb28577f03bd827c4b89170d085b4f",
     "packages/observe/rust/src/case_journal.rs": "cde5b3da1389ced2c58ffc486ed5bda893e22fd8fdcbc706e1247d5f4cdc315d",
     "packages/observe/rust/src/contract.rs": "6c768d1908c4363045e30ec11a6ad9ffa0aea59d391d3e6c04701b8128ac4cfb",
@@ -2117,6 +2119,13 @@
       "line": 36,
       "spawn": "Command::new",
       "binary": "? program of spawn",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/mailbox/rust/store/tests/test_hook_entry.rs",
+      "line": 98,
+      "spawn": "Command::new",
+      "binary": "? program of command",
       "class": "rust-test"
     },
     {
