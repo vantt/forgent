@@ -30,13 +30,13 @@ const INFO_TIMEOUT: Duration = Duration::from_secs(10);
 /// The driver for this machine: `bwrap-pidns` when bwrap can make a pid
 /// namespace, else `linux-pgroup`.
 pub(crate) fn select(env: &SelectEnv) -> Box<dyn ContainmentDriver> {
-    match bwrap_path(env) {
-        Some(bwrap) => match pidns_usable(&bwrap) {
-            Ok(()) => Box::new(BwrapPidns { bwrap }),
-            Err(reason) => Box::new(LinuxPgroup::with_reason(reason)),
-        },
-        None => Box::new(LinuxPgroup::with_reason("bwrap-not-found")),
+    let Some(bwrap) = bwrap_path(env) else {
+        return Box::new(LinuxPgroup::with_reason("bwrap-not-found"));
+    };
+    if let Err(reason) = pidns_usable(&bwrap) {
+        return Box::new(LinuxPgroup::with_reason(reason));
     }
+    Box::new(BwrapPidns { bwrap })
 }
 
 fn bwrap_path(env: &SelectEnv) -> Option<PathBuf> {
