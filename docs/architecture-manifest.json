@@ -223,6 +223,7 @@
     "src/setup/git-hooks.mjs": "infra",
     "src/setup/claude-code-hooks.mjs": "infra",
     "src/setup/agent-hooks.mjs": "infra",
+    "src/setup/mailbox-limits.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",
     "src/setup/holder-lock-checks.mjs": "infra",
     "src/setup/git-checks.mjs": "infra",

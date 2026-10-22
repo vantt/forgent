@@ -144,6 +144,7 @@ for (const sub of ['execute', 'log', 'fanout-batch']) {
 
 test('the legacy payload answers hook mailbox quietly with exit 0', () => {
   const { root } = mkStore();
+  // boundary: the quiet answer is the legacy payload's own exit status and stdout, seen by the CLI that runs the hook line
   const out = spawnSync(process.execPath, [FGOS, 'hook', 'mailbox', '--cli', 'claude', '--event', 'stop'], {
     cwd: root,
     encoding: 'utf8',
