@@ -5,6 +5,7 @@ mod git;
 pub use git::{close_git_loan, ensure_git_fetch_mapping, git_fetch_mappings, initialize_git_wal, inspect_git, inspect_git_worktree_recovery, mint_git_loan, prepare_git_driver_directories, take_git_handover};
 mod single_load;
 pub mod process;
+pub mod holder_lock;
 pub mod durable_file;
 pub mod canonical_json;
 use napi::{Error, Result};
@@ -33,7 +34,7 @@ pub fn versions() -> Result<Value> {
                 "addon": env!("CARGO_PKG_VERSION"), "git": fgos_git::VERSION, "eventStore": env!("CARGO_PKG_VERSION"), "napi": 8, "contracts": contracts,
                 "process": process::contract_version().map_err(|e| e.to_string())?,
                 // The crates carry the workspace version; the canonical vectors are the `canonical.v1` file.
-                "durableFile": env!("CARGO_PKG_VERSION"), "canonicalJson": 1,
+                "durableFile": env!("CARGO_PKG_VERSION"), "canonicalJson": 1, "holderLock": 1,
             }))
         })
         .clone()
