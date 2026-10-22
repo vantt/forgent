@@ -28,7 +28,7 @@ Golden file: `packages/seat-binding/contracts/seat-binding.golden.v1.json`, run 
 | dry-bind.test: debate with a third family passes | 5 | golden "debate judge is hard independent of both sides" |
 | dry-bind.test: two families of three seat sides apart, judge on third | 11 | golden "debate sides default to standard and spread softly", "debate judge is hard independent"; loop wiring kept by "six panel seats..." |
 
-Totals: bind.test -95 +3 (net -92... see diff), tier-fallback -37, dry-bind -37 (git diff --stat: 3 files, 3 insertions, 186 deletions).
+Totals (git diff --stat): bind.test -95 +3, tier-fallback -41, dry-bind -42; 3 insertions, 186 deletions.
 
 ## Kept although the review listed them
 
