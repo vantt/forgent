@@ -255,7 +255,12 @@ export function leaseAdmission(ctx = {}) {
     allowed: false, holder: false, reason: 'documentation-cutover-lease',
     message: 'documentation cutover lease is held; caller checkout must belong to the gated repository',
   };
-  const holder = hashHolderToken(readTokenFromWorktree(checkoutFacts(caller).worktreeRoot)) === lease.sidecar.holderTokenHash;
+  const callerRoot = checkoutFacts(caller).worktreeRoot;
+  if (callerRoot === mainRoot && hasStrayMainToken(mainRoot, lease)) return {
+    allowed: false, holder: false, reason: 'stray-main-token',
+    message: 'documentation-cutover token exists in main, but main is not the recorded holder checkout',
+  };
+  const holder = hashHolderToken(readTokenFromWorktree(callerRoot)) === lease.sidecar.holderTokenHash;
   if (holder || (ctx.paths && !intersectsScope(ctx.paths))) return { allowed: true, holder };
   return { allowed: false, holder: false, reason: 'documentation-cutover-lease', message: 'documentation cutover lease is held; non-holder operations are refused' };
 }

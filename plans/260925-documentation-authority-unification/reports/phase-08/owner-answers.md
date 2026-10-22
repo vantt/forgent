@@ -2125,3 +2125,54 @@ L12-11 handback: the task-1 reporter yielded **102 exact unaccounted commit/path
 Continuation replay after the authorized pilot rebinds again finds **zero unaccounted pairs / 4,005 accounted pairs in each manifest**; no further insertion was needed at unchanged HEAD. Both original single insertions are independently reconstructed against HEAD byte-for-byte, proving that all other manifest bytes remain unchanged. Both ownership recipes now report exactly the same **three inherited setup/doctor drifts**, with zero pilot drift; B remains true and H has zero findings. The full audit exits 1 for these named inherited drifts, authorized uncommitted bytes and the reading-map I route awaiting the runner commit; this is not a green global ownership claim. `needsWrites: []`.
 
 Final continuation verification: Step 5 full checker exits **0**, regenerating the non-failing **405-entry** HEAD-drift list at the same input HEAD (1,481 files / 7,223 references / 39,876 tuples / zero failures). All 374 retirement-catalog file digests still match final bytes; the two changed pilot occurrence witnesses are explicitly retained in the catalog and before-row proof. Authorized delivery is complete; independent changed-binding review, the three inherited setup/doctor carries and the future runner-commit accounting stay in Lead custody.
+
+## L12-113 — Stray main token is not admission proof (Lead under A42; Doer code delivery)
+
+### Ruling, scope and delivery
+
+Read `step-06b-o1-brief.md` and `review-a38-step-06b-final.md` completely. The supplied ruling closes O1 in the shared `leaseAdmission` gate only; O2 (recorded Workflow origin decides, not the later answerer's checkout) and O3 (`process.cwd()` fallback without `repoRoot`) remain unchanged for the next docs turn. No new owner ruling is asserted here.
+
+`src/runner/documentation-cutover-lease.mjs` now canonicalizes the caller checkout once and reuses `hasStrayMainToken`: while authority is held, a main-checkout caller with a token but a different recorded holder checkout is refused with `allowed: false`, `holder: false`, reason `stray-main-token`. The check precedes token-hash admission and the out-of-scope paths exception. It does not delete the token or mutate authority. A linked holder is unaffected. Corrupt/free authority and the repository-membership check keep their prior order and semantics. No release, hook, caller, config, dependency or doctor-registration mechanism changed.
+
+Prior art: `git log -S'hasStrayMainToken' -- src/runner/documentation-cutover-lease.mjs` identifies `2fbf9f018`, which added the shared doctor/acquire predicate but left admission accepting the copied token. The recent lease history also includes `83a331410` (hooks/recovery) and `8b20f5185` (ScopedCommit transitions). This change extends that existing gate/predicate rather than adding a parallel holder mechanism.
+
+Owning proof: `test/runner/documentation-cutover-lease.test.mjs`, **a stray main token never grants admission while the linked holder can still release**. The older stray-token test owns doctor/acquire diagnosis, not admission. The new test acquires through production ScopedCommit, copies the real token to fixture main to model interrupted lending, and verifies main root/default/subdirectory/symlink callers refuse with and without scoped/code-only/empty paths; refusal does not leak the token, move main or remove its file. The real holder's subdirectory remains admitted and production release commits released state and deletes the holder token. Boundary files remain unchanged; no second copy of these cases was added there.
+
+**Brief discrepancy — do not claim automatic residue cleanup:** the brief says holder release “removes the copy”, but the existing release `finally` deliberately restores *previous main bytes*. With a stray token already present, holder release succeeds and removes the holder's own token, but preserves the pre-existing main residue. The prior review explicitly reported this same behavior under L-1, and the current holder-lock spec states it. Changing release would contradict the brief's “one contained change in the gate” restriction; this delivery therefore leaves release unchanged. The owning test asserts that actual preservation, then explicitly removes the fixture residue as an operator action. Automatic deletion of pre-existing main residue is **not delivered** and needs a clarified Lead ruling if intended; no extra write scope is needed for that separate source change.
+
+### Verification commands and exit codes
+
+Only the three permitted test files ran; no suite runner, npm/cargo command, archive or checker sweep ran. Every Node invocation used exactly this prefix (the literal host path is recorded to avoid a freshness implication):
+
+```sh
+H=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos
+export TMPDIR=/tmp/fgos-work/lease-admission-o1
+# The scratch directory was created before the first run.
+env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN="$H" node --test test/runner/documentation-cutover-lease.test.mjs
+env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN="$H" node --test test/e2e/documentation-cutover-lease-hooks.test.mjs
+env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN="$H" node --test test/runner/merge-land.test.mjs
+```
+
+| Run | Exit | Result / scratch log |
+| --- | --- | --- |
+| Lease test, new test before production edit | 1 | 12 passed / 3 failed; new test reproduces O1 (`true !== false`), plus two unrelated initial host guarantee/identity timeouts; `before.log` |
+| Lease test, after production edit | 0 | 15 passed / 0 failed; `after.log` |
+| Hook e2e, after edit | 0 | 31 passed / 0 failed; `hooks.log` |
+| Merge Land, initial inherited state root | 1 | 0 passed / 19 failed; `git-floor-probe-failed: git-driver-io: Read-only file system`; `land.log` |
+| Merge Land, writable scratch state root | 0 | 19 passed / 0 failed; `land-rerun.log` |
+
+For the final Merge Land rerun, the exact command was:
+
+```sh
+TMPDIR=/tmp/fgos-work/lease-admission-o1 \
+FGOS_STATE_ROOT=/tmp/fgos-work/lease-admission-o1/state \
+FGOS_TEST_FIXTURE_ROOT=/tmp/fgos-work/lease-admission-o1/fixtures \
+env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos \
+node --test test/runner/merge-land.test.mjs
+```
+
+Scratch state/fixtures directories were created first, state mode 0700. These are existing test/runtime root settings, not bypasses or new production settings. All logs are under `/tmp/fgos-work/lease-admission-o1/`; they are local scratch evidence, not committed proof. The red/green admission result is real, but the initial red run was not otherwise clean; no stronger baseline claim is made.
+
+Impact-analysis evidence is **degraded**: the assignment forbids fgOS CLI and checker sweeps, and no impact MCP tool is exposed. No capability query, index refresh or detect-changes is claimed. The inherited upstream consumers remain execution admission (Unit/Workflow), runner Land and Workflow Land; the fix stays in their existing shared predicate. Final read-only `git diff`/`git status --short` inspection confirmed only the two allowed source/test files before this report append. No Git writes ran in this repository; fixture Git writes belong to the permitted tests. No real lease was acquired on this repository, no secrets env file or workspace `.fgos` contents were read directly, and no lifecycle verbs ran. Existing test addon staging is test-owned. Runner owns the eventual commit.
+
+Deferred docs/CHANGELOG follow-up: describe `stray-main-token` refusal in the admission contract and Unreleased; retain O2/O3 and the actual release-residue preservation limit. No docs, skills, baselines, other code or other tests were edited. No full-suite-green, independent review, main landing or cutover claim is made. Markdown preview was not launched under this turn's constrained machine-IO brief; no preview URL is available. `needsWrites: []`.

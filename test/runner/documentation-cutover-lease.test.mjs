@@ -241,6 +241,37 @@ test('doctor and acquire report a stray main token without deleting it or changi
   assert.match(doctor(f.repoRoot).message, /possible interrupted release/);
 });
 
+// Doctor/acquire own diagnosis above; this owns admission after interrupted
+// release lending, using production transitions rather than a forged sidecar.
+test('a stray main token never grants admission while the linked holder can still release', t => {
+  const f = fixture(t); const holder = f.worktree();
+  const acquired = acquire({ repoRoot: holder });
+  const token = fs.readFileSync(acquired.tokenPath);
+  f.put(DEFAULT_TOKEN_FILE, token);
+  const head = f.git(['rev-parse', 'main']);
+  const alias = path.join(f.temp, 'main-alias'); fs.symlinkSync(f.repoRoot, alias, 'dir');
+  for (const caller of [undefined, f.repoRoot, path.join(f.repoRoot, 'docs'), path.join(alias, 'docs')]) {
+    for (const paths of [undefined, ['docs/new.md'], ['src/code'], []]) {
+      const refused = leaseAdmission({ repoRoot: f.repoRoot, worktreePath: caller, paths });
+      assert.equal(refused.allowed, false); assert.equal(refused.holder, false);
+      assert.equal(refused.reason, 'stray-main-token');
+      assert.ok(!JSON.stringify(refused).includes(token.toString().trim()));
+    }
+  }
+  assert.deepEqual(leaseAdmission({ repoRoot: f.repoRoot, worktreePath: path.join(holder, 'docs') }), { allowed: true, holder: true });
+  assert.equal(f.git(['rev-parse', 'main']), head);
+  assert.deepEqual(fs.readFileSync(path.join(f.repoRoot, DEFAULT_TOKEN_FILE)), token);
+  const released = release({ repoRoot: holder });
+  assert.equal(released.result, 'released');
+  assert.equal(readSidecarFromMain(f.repoRoot).state, 'released');
+  assert.equal(fs.existsSync(acquired.tokenPath), false);
+  // Release preserves pre-existing main bytes; residue removal remains an
+  // explicit operator action, not an admission-side mutation.
+  assert.deepEqual(fs.readFileSync(path.join(f.repoRoot, DEFAULT_TOKEN_FILE)), token);
+  fs.rmSync(path.join(f.repoRoot, DEFAULT_TOKEN_FILE));
+  assert.deepEqual(leaseAdmission({ repoRoot: f.repoRoot }), { allowed: true });
+});
+
 test('two production acquire processes have exactly one winner across twenty trials', async t => {
   for (let trial = 0; trial < 20; trial++) {
     const f = fixture(t);
