@@ -204,6 +204,7 @@
     "src/util/session-identity.mjs": "kernel",
     "src/util/state-lock-held.mjs": "kernel",
     "src/util/host-bin-path.mjs": "kernel",
+    "src/util/identity-mint.mjs": "kernel",
     "src/util/unique-tmp-tag.mjs": "kernel",
     "src/util/yaml.mjs": "kernel",
     "src/util/third-party/js-yaml.mjs": "kernel",

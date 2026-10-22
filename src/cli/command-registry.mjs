@@ -995,8 +995,8 @@ export const COMMAND_REGISTRY = [
   },
   withSubcommands({
     name: 'identity',
-    invoke: 'fgos identity [writer|machine|session|project]',
-    description: 'Read-only unless --alias, --init or --new: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle and its alias; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
+    invoke: 'fgos identity [writer|machine|session|project|mint]',
+    description: 'Read-only unless --alias, --init, --new or `mint`: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle and its alias; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree; `mint <kind>` gives a new id that travels between machines. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
     subcommands: {
       writer: {
         description: 'Which writer the calling process is, as {id, source}. Same as bare `fgos identity`; the hook path reads it.',
@@ -1046,8 +1046,21 @@ export const COMMAND_REGISTRY = [
         },
         examples: ['fgos identity project --json', 'fgos identity project --init', 'fgos identity project --init --handle forgent'],
       },
+      mint: {
+        description: 'A new id that travels between machines (docs/platform/identity/spec.md, section 4a). `work` gives `tsk-<10 base32>` and `backlog` gives `p-<10 base32>`, random and written nowhere. `d-adr` gives the next `D-ADR####` and `decision-file` the next `####`, claimed from the counter ref `refs/fgos/seq/<kind>` on the project\'s origin (the repository\'s own ref without one) so two machines never get the same number; run it in the repository. Prints {kind, id, number?}. A claim needs the network: exit 65 [sequence-unreachable] claims nothing, [sequence-contended] after 5 refused claims in a row. `--release <number>` gives a sequence number back, only while it is still the counter\'s tip.',
+        parameters: {
+          type: 'object',
+          properties: {
+            kind: { type: 'string', description: 'The id kind (positional).', enum: ['work', 'backlog', 'd-adr', 'decision-file'] },
+            release: { type: 'number', description: 'Give this sequence number back instead of claiming one (d-adr and decision-file only).' },
+          },
+          positional: ['kind'],
+          required: ['kind'],
+        },
+        examples: ['fgos identity mint work --json', 'fgos identity mint d-adr --json', 'fgos identity mint d-adr --release 73'],
+      },
     },
-    examples: ['fgos identity', 'fgos identity machine --json', 'fgos identity session --json', 'fgos identity project --json'],
+    examples: ['fgos identity', 'fgos identity machine --json', 'fgos identity session --json', 'fgos identity project --json', 'fgos identity mint work --json'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,
