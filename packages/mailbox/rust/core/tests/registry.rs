@@ -256,7 +256,7 @@ fn a_claude_head_keeps_its_own_two_characters_a_colliding_head_gets_three_hex_ch
         let key_text = format!("k-invalid-{i}");
         let name = register_new(
             &mut state,
-            request(&key_text, "claude", Some(invalid), "h"),
+            request(&key_text, "claude", Some(invalid), &format!("h-{key_text}")),
             t(100),
             &limits,
             &mut ids,
@@ -484,4 +484,50 @@ fn forgetting_a_key_removes_every_record_of_it_and_a_later_registration_starts_c
         matches!(outcome, Registered::Created { generation, .. } if generation == Generation::FIRST)
     );
     assert_eq!(send(&mut pair, "from a fresh process", now), Ok(()));
+}
+
+#[test]
+fn a_second_key_from_the_same_head_takes_its_binding_over_at_a_new_generation_and_never_sees_the_old_mail(
+) {
+    let limits = spec_limits();
+    let mut pair = Pair::new(t(0));
+    // b's head started a new session in the same process: same head text,
+    // a new writer key.
+    pair.send("a", B_NAME, "for the old context", t(1));
+    pair.state.note_stop(&key("b"), Generation::FIRST, true);
+    let old_name = pair.state.binding(&key("b")).unwrap().name.clone();
+
+    let outcome = pair
+        .state
+        .register(
+            request("b2", "codex", None, "head-b"),
+            None,
+            t(2),
+            &limits,
+            &mut pair.ids,
+        )
+        .unwrap();
+
+    let Registered::Replaced { name, generation } = outcome else {
+        panic!("expected a takeover, got {outcome:?}");
+    };
+    assert_eq!(generation, Generation::FIRST.next().unwrap());
+    assert_ne!(name, old_name, "the new key has its own name");
+    assert!(
+        pair.state.binding(&key("b")).is_none(),
+        "one binding per head"
+    );
+    let binding = pair.state.binding(&key("b2")).unwrap();
+    assert_eq!(binding.generation, generation);
+    assert_eq!(binding.stop_blocks, 0);
+    assert_eq!(
+        pair.state.bindings().filter(|b| b.head == "head-b").count(),
+        1
+    );
+
+    let claim = pair.claim("b2", generation, t(3));
+    assert!(
+        claim.items.is_empty(),
+        "the old context's mail is never shown"
+    );
 }

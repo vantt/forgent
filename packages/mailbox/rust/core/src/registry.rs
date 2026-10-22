@@ -138,7 +138,19 @@ impl MailboxState {
             return Err(RegisterRefusal::KeyTooLong);
         }
         let takeover = match (self.bindings.get(&req.key), judged) {
-            (None, None) => None,
+            // A new key whose head already holds another key's binding: the
+            // head started a new session inside the same process (spec §5.1,
+            // one binding per head), so the new key takes that binding over.
+            (None, None) => match self.bindings.values().find(|b| b.head == req.head) {
+                None => Takeover::Create,
+                Some(held) => Takeover::FromKey {
+                    old_key: held.key.clone(),
+                    generation: held
+                        .generation
+                        .next()
+                        .ok_or(RegisterRefusal::GenerationExhausted)?,
+                },
+            },
             (Some(binding), Some(judged)) => {
                 if judged.same_head {
                     return Ok(Registered::Refreshed {
@@ -149,7 +161,7 @@ impl MailboxState {
                 match judged.liveness {
                     Liveness::Alive => return Err(RegisterRefusal::Conflict),
                     Liveness::Unknown => return Err(RegisterRefusal::Deferred),
-                    Liveness::Dead => Some(
+                    Liveness::Dead => Takeover::Replace(
                         binding
                             .generation
                             .next()
@@ -161,8 +173,22 @@ impl MailboxState {
         };
         self.sweep(now, limits, ids);
         let now = self.last_now;
-        let Some(generation) = takeover else {
-            return self.create(req, now, limits, ids);
+        let generation = match takeover {
+            Takeover::Create => {
+                let (name, generation) = self.create(req, Generation::FIRST, now, limits, ids)?;
+                return Ok(Registered::Created { name, generation });
+            }
+            Takeover::FromKey {
+                old_key,
+                generation,
+            } => {
+                let (name, generation) = self.create(req, generation, now, limits, ids)?;
+                if let Some(old) = self.bindings.remove(&old_key) {
+                    self.drop_generation_records(&old_key, old.generation);
+                }
+                return Ok(Registered::Replaced { name, generation });
+            }
+            Takeover::Replace(generation) => generation,
         };
         // The sweep never removes a binding, so the judged one is still here.
         let binding = self
@@ -185,13 +211,15 @@ impl MailboxState {
         Ok(replaced)
     }
 
+    /// Adds the binding of a key that has none, at `generation`.
     fn create(
         &mut self,
         req: RegisterRequest,
+        generation: Generation,
         now: Timestamp,
         limits: &Limits,
         ids: &mut dyn IdSource,
-    ) -> Result<Registered, RegisterRefusal> {
+    ) -> Result<(ShortName, Generation), RegisterRefusal> {
         let name = names::allocate(
             self,
             &req.project,
@@ -205,7 +233,7 @@ impl MailboxState {
             key: req.key.clone(),
             name: name.clone(),
             cli: req.cli,
-            generation: Generation::FIRST,
+            generation,
             head: req.head,
             handle: req.handle,
             registered_at: now,
@@ -214,9 +242,19 @@ impl MailboxState {
             stop_blocks: 0,
         };
         self.bindings.insert(req.key, binding);
-        Ok(Registered::Created {
-            name,
-            generation: Generation::FIRST,
-        })
+        Ok((name, generation))
     }
+}
+
+/// What a registration that writes does with the bindings.
+enum Takeover {
+    Create,
+    /// The registering head holds `old_key`'s binding: the new key takes it
+    /// over at `generation`.
+    FromKey {
+        old_key: WriterKey,
+        generation: Generation,
+    },
+    /// The key's own stored head is dead.
+    Replace(Generation),
 }
