@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-23 06:20 (phiên `forgent-35`, vai duyệt Git): **HARDEN T2 F-C1: đạt (merge).** Revert 3 commit thu gọn (`3a655a8b3`, sạch so với trước thu gọn); admission Refs và repository_config chỉ đọc `wal.active` (`3f1a7ef3c`), vẫn chặn khi chain hỏng hoặc có file lạ, admission p50 32,3 → 15,8 ms trên 322 chain. Thu gọn Worktree/Refs thành backlog, kích hoạt theo `retained_bytes` và số chain.
+
 - 2026-10-23 06:00 (phiên `forgent-35`, vai duyệt Git): **HARDEN T2 `004807272` (sửa thu gọn chain): changes.** High cũ (bằng chứng prune) đã đóng. Mới: Medium, Remove đã thu gọn trả `Ok` cho request khác cùng tip (`worktree.rs:947-954`, đã kiểm); Medium, ngưỡng chặn lượt chỉ dời từ 8 lên 16; Medium, thu gọn dở dang để lại rác không resume được, doctor không thấy, và làm hỏng replay; Low, chọn 4 chain gần nhất chưa tách hoà theo id. Spec IPv6 `c158aaa53`: đạt.
 
 - 2026-10-23 05:45 (phiên `forgent-35`, vai duyệt Git): **OPC duyệt HARDEN T2 phase 1–2** (`harden/t2-p01-red-tests`, `harden/t2-p02-remote-door` tip `585045108`). Test đỏ phase 1: 6 điểm đã đóng (`ee541123e` merge). Cửa remote duy nhất `df4c30d82`: merge. Thu gọn chain Worktree/Refs `8e1ecbf63`: changes (High: prune worktree mất bằng chứng sở hữu sau khi chain create bị thu gọn; Medium: replay cùng id của Worktree hỏng sau thu gọn). Giới hạn 8 chain/lượt `7bac1c05f`: changes (Medium: 8 chain không thu gọn được chặn mọi lượt sau). Release cũ đọc receipt thu gọn được (cùng định dạng), nhưng replay theo kiểu thì khác.
