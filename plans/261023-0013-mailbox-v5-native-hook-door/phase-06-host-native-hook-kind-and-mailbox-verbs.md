@@ -166,3 +166,8 @@ cargo clippy --locked -p fgos -p fgos-mailbox -p fgos-git --all-targets -- -D wa
 ## Notes
 
 - Plan owner decision 3 (2026-10-23): the hook entry is quiet when `HOME` is unset, before it resolves anything (the Git component's relative state root is `tsk-43x4`, not fixed here; the hook path never touches that state root).
+- Commits: `bd9b6343f` (Git: `main_checkout_root`, alone, for GIT/HARDEN review), `3f853e4eb` (store: lazy record open, breaker on paths), `4cde1feee` (host routes, verbs, registry, legacy fallback, tests), `8cbe26710` (example and `tests/test_hook_entry.rs` retired; owners named in the body).
+- Gate: `cargo test -p fgos -p fgos-mailbox -p fgos-host-runtime` 308 passed; `cargo test -p fgos-git` 272 passed; the five node files 208 passed; clippy clean; `export-command-selectors.mjs --check` clean.
+- Mutants: Git 3 of 3 killed; host 9 killed, 1 equivalent (`already_written` in the presenter: the claim's text is always empty).
+- Smoke through `npm run fgos:dev` from a scratch repository: `mailbox inbox` printed the `[inbox.no-address]` line, exit 0; `mailbox send --to nobody hi` printed `Refused: unknown-name. Candidates: none.`, exit 1; `hook mailbox --cli claude --event post-tool-use` with `{}` printed nothing, exit 0.
+- Deviations: the hook arms the budget watchdog after the config load (so `hook.budgetMs` from the project config applies; the steps before it are bounded disk reads); `--dir` is accepted and ignored by `mailbox`, as the registry's global flags and `identity` do; the body is positional only; the `mailbox` selector uses `subcommands: true` and `NATIVE_SUBCOMMANDS`.
