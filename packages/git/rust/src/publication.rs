@@ -454,15 +454,13 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
     fn object_write(&self, repo: &RepoHandle, kind: &str, bytes: &[u8]) -> Result<Oid> {
         let out = self.call(
             repo,
-            &[
-                "-c",
-                "core.fsync=all",
+            &durable_args(&[
                 "hash-object",
                 "-w",
                 "--stdin",
                 "-t",
                 kind,
-            ],
+            ]),
             bytes,
         )?;
         let oid = self.oid(repo, &out)?;
@@ -524,29 +522,25 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         match next {
             ExpectedTip::Absent => self.raw(
                 repo,
-                &[
-                    "-c",
-                    "core.fsync=all",
+                &durable_args(&[
                     "update-ref",
                     "--no-deref",
                     "-d",
                     name,
                     old,
-                ],
+                ]),
                 &[],
                 false,
             ),
             ExpectedTip::Oid(o) => self.raw(
                 repo,
-                &[
-                    "-c",
-                    "core.fsync=all",
+                &durable_args(&[
                     "update-ref",
                     "--no-deref",
                     name,
                     o.as_str(),
                     old,
-                ],
+                ]),
                 &[],
                 false,
             ),
@@ -1584,18 +1578,17 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             self.point("before-fetch")?;
             // Download exact advertised objects without a ref destination. Mirror
             // installation below uses single-ref no-dereference exact-old CAS.
-            let mut args: Vec<String> = [
-                "-c",
-                "core.fsync=all",
+            let mut args: Vec<String> = durable_args(&[
                 "fetch",
                 "--no-write-fetch-head",
                 "--no-tags",
                 "--no-recurse-submodules",
                 "--no-auto-maintenance",
                 "--",
-            ]
+            ])
+            .into_iter()
             .map(str::to_owned)
-            .to_vec();
+            .collect();
             args.push(url);
             args.extend(mappings.iter().map(|m| m.1.as_str().into()));
             if !mappings.is_empty() {

@@ -873,15 +873,13 @@ impl GitDriver {
         let cas = self.land_call(
             repo,
             &scope,
-            &[
-                "-c",
-                "core.fsync=all",
+            &durable_args(&[
                 "update-ref",
                 "--no-deref",
                 &req.destination,
                 &c.candidate,
                 &req.target,
-            ],
+            ]),
             &[],
         )?;
         filesystem.checkpoint("land-after-cas").map_err(failure)?;
@@ -1409,15 +1407,13 @@ impl GitDriver {
                 self.land_text(
                     repo,
                     &scope,
-                    &[
-                        "-c",
-                        "core.fsync=all",
+                    &durable_args(&[
                         "update-ref",
                         "--no-deref",
                         pin.as_str(),
                         &c.candidate,
                         &c.target,
-                    ],
+                    ]),
                     &[],
                 )?;
                 crate::refs::sync_refs(repo, &pin)?;
@@ -1679,15 +1675,13 @@ impl GitDriver {
                         self.land_text(
                             repo,
                             &scope,
-                            &[
-                                "-c",
-                                "core.fsync=all",
+                            &durable_args(&[
                                 "update-ref",
                                 "--no-deref",
                                 "-d",
                                 pin.as_str(),
                                 oid,
-                            ],
+                            ]),
                             &[],
                         )?;
                         if crate::refs::direct(self, repo, &pin)? != ExpectedTip::Absent {

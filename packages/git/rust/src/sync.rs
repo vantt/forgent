@@ -955,15 +955,13 @@ impl GitDriver {
         let out = self.checkout_call(
             repo,
             scope,
-            &[
-                "-c",
-                "core.fsync=all",
+            &durable_args(&[
                 "commit",
                 "-q",
                 "--cleanup=verbatim",
                 "-F",
                 "-",
-            ],
+            ]),
             message.as_bytes(),
             true,
         )?;

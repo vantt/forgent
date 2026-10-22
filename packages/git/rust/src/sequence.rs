@@ -140,7 +140,7 @@ impl GitDriver {
                 crate::objects::sync_loose_objects(
                     repo.common_dir(),
                     std::slice::from_ref(&commit),
-                    false,
+                    true,
                 )
                 .map_err(|e| failure_text(e.to_string()))?;
                 let old = expected.map_or_else(
@@ -149,17 +149,16 @@ impl GitDriver {
                 );
                 let out = self.run_local(
                     repo,
-                    &[
-                        "-c",
-                        "core.fsync=all",
+                    &durable_args(&[
                         "update-ref",
                         "--no-deref",
                         name.as_str(),
                         commit.as_str(),
                         &old,
-                    ],
+                    ]),
                 )?;
                 if out.success {
+                    sync_ref_file(repo, &name)?;
                     crate::refs::sync_refs(repo, &name)?;
                     return Ok(SequencePush::Claimed(commit));
                 }
@@ -326,25 +325,33 @@ impl GitDriver {
         let message = number.to_string();
         let out = self.run_local(
             repo,
-            &[
+            &durable_args(&[
                 "-c",
                 &format!("user.name={claimant}"),
                 "-c",
                 "user.email=fgos@localhost",
                 "-c",
                 "commit.gpgsign=false",
-                "-c",
-                "core.fsync=all",
                 "commit-tree",
                 tree,
                 "-m",
                 &message,
-            ],
+            ]),
         )?;
         if !out.success {
             return Err(out.error("sequence-commit-failed"));
         }
         parse_oid(repo, &out.stdout)
+    }
+}
+
+/// The loose ref file's bytes, before its directories: a packed or reftable
+/// ref has no such file and is flushed by git itself.
+fn sync_ref_file(repo: &RepoHandle, name: &RefName) -> Result<()> {
+    match std::fs::File::open(repo.common_dir().join(name.as_str())) {
+        Ok(file) => file.sync_all().map_err(|e| failure_text(e.to_string())),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(e) => Err(failure_text(e.to_string())),
     }
 }
 

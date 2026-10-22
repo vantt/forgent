@@ -1531,17 +1531,15 @@ impl GitDriver {
             let out = self.checkout_call(
                 repo,
                 scope,
-                &[
+                &durable_args(&[
                     "-c",
                     &context,
-                    "-c",
-                    "core.fsync=all",
                     "commit",
                     "-q",
                     "--cleanup=verbatim",
                     "-F",
                     "-",
-                ],
+                ]),
                 request.message.as_bytes(),
                 true,
             )?;

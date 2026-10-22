@@ -593,3 +593,12 @@ mod grant;
 mod native_lock;
 pub use native_lock::{NativeLockArtifact, NativeLockReport};
 pub use repository_config::HooksReport;
+
+/// The one place a git mutation asks for flushed bytes. `-c` beats repository
+/// and global configuration, so a `core.fsyncMethod=writeout-only` setting
+/// cannot turn a durable write into one that never reaches stable storage.
+pub(crate) fn durable_args<'a>(args: &[&'a str]) -> Vec<&'a str> {
+    let mut all = vec!["-c", "core.fsync=all", "-c", "core.fsyncMethod=fsync"];
+    all.extend_from_slice(args);
+    all
+}
