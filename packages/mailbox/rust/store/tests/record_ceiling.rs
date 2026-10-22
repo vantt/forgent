@@ -1,72 +1,51 @@
-//! The per-identity header ceiling (spec §14 V2 row, "the size ceiling"):
-//! the shared sender with no head, the one identity no lifetime cap brakes
-//! (owner decision Q3), stops growing at a ceiling derived from the limits
-//! contract alone. That refused sends never grow the snapshot is owned by
-//! the core's bounded-counter test, not repeated here.
+//! The record at its contract ceiling (spec §14 V2 row, "the size
+//! ceiling"): the shared sender's full ceiling population, with every
+//! writer key at its maximum length, is installed and read back under the
+//! snapshot cap derived from the same contract. The header count itself is
+//! owned by the core's `one_saturated_sender_stops_growing_at_the_derived_header_ceiling`.
 #![cfg(unix)]
 mod common;
 
 use common::record::{self as rec, TempFgos, T0};
-use fgos_mailbox::record::{Reported, Wait};
-use fgos_mailbox_core::{Checkpoint, Generation, Limits};
-
-/// `max(loop.windowSec, record.ttlSec, record.bodyRetentionSec)`: how long
-/// a settled header is kept.
-fn header_horizon(limits: &Limits) -> u64 {
-    limits
-        .loop_guard
-        .window_sec
-        .max(limits.record.ttl_sec)
-        .max(limits.record.body_retention_sec)
-}
-
-/// `session.budget x ceil(K / human.fallbackWindowSec) + session.budget`.
-fn sender_ceiling(limits: &Limits) -> usize {
-    let budget = limits.session.budget as usize;
-    let windows = header_horizon(limits).div_ceil(limits.human.fallback_window_sec) as usize;
-    budget * windows + budget
-}
+use fgos_mailbox::record::{snapshot_byte_cap, Reported, Wait};
+use fgos_mailbox_core::{Checkpoint, Generation};
 
 #[test]
-fn one_saturated_sender_stops_growing_at_the_derived_header_ceiling() {
+fn the_shared_senders_full_ceiling_population_reads_under_the_snapshot_cap() {
     let fgos = TempFgos::new("ceiling");
     let record = fgos.record();
     let limits = common::limits();
-    let budget = limits.session.budget;
-    // Two recipients alternately, so neither the loop guard nor the
-    // sender's share of one queue refuses within a window.
-    assert!(budget.div_ceil(2) < limits.loop_guard.max_per_window);
-    assert!(budget.div_ceil(2) <= limits.queue.per_sender);
-    // A window starts once the last one is fully past: both the budget and
-    // the loop guard count an attempt until more than their window passed.
-    assert_eq!(
-        limits.loop_guard.window_sec,
-        limits.human.fallback_window_sec
-    );
+    let long = |first: char| {
+        let mut key = first.to_string();
+        key.push_str(&"k".repeat(limits.frame.max_header_chars as usize - 1));
+        key
+    };
+    let (one, two, sender) = (long('a'), long('b'), long('s'));
     let step = limits.human.fallback_window_sec + 1;
-    let windows = header_horizon(&limits).div_ceil(limits.human.fallback_window_sec) + 2;
-    let ceiling = sender_ceiling(&limits);
+    let windows = limits
+        .header_horizon_sec()
+        .div_ceil(limits.human.fallback_window_sec)
+        + 2;
 
-    let held = record
+    let built = record
         .hold(Wait::Try, T0, &limits, |state, ids| {
             let names = [
-                rec::name_of(&rec::register(state, "recipient-one", T0, &limits, ids)),
-                rec::name_of(&rec::register(state, "recipient-two", T0, &limits, ids)),
+                rec::name_of(&rec::register(state, &one, T0, &limits, ids)),
+                rec::name_of(&rec::register(state, &two, T0, &limits, ids)),
             ];
-            let mut counts = Vec::new();
             for window in 0..windows {
                 let now = T0.plus_secs(window * step);
-                for i in 0..budget as usize {
+                for i in 0..limits.session.budget as usize {
                     state
                         .send(
-                            rec::send_req("cli-sender", &names[i % 2], "m"),
+                            rec::send_req(&sender, &names[i % 2], "m"),
                             now,
                             &limits,
                             ids,
                         )
                         .unwrap();
                 }
-                for recipient in ["recipient-one", "recipient-two"] {
+                for recipient in [&one, &two] {
                     let claim = state.claim(
                         &rec::key(recipient),
                         Generation::FIRST,
@@ -82,16 +61,23 @@ fn one_saturated_sender_stops_growing_at_the_derived_header_ceiling() {
                         now,
                     );
                 }
-                counts.push(state.messages().count());
             }
-            Reported::changing((counts, state.clone()))
+            Reported::changing(state.clone())
         })
-        .unwrap();
-    let (counts, built) = held.value.value;
+        .unwrap()
+        .value
+        .value;
 
-    let most = *counts.iter().max().unwrap();
-    assert!(most <= ceiling, "{most} headers > ceiling {ceiling}");
-    let last = &counts[counts.len() - 2..];
-    assert_eq!(last[0], last[1], "not steady at the end: {last:?}");
+    assert_eq!(
+        built.messages().count() as u64,
+        limits.sender_header_ceiling(),
+        "the population is the full ceiling's steady state"
+    );
+    let size = std::fs::metadata(fgos.paths().snapshot()).unwrap().len();
+    assert!(
+        size <= snapshot_byte_cap(&limits),
+        "{size} > cap {}",
+        snapshot_byte_cap(&limits)
+    );
     assert_eq!(rec::read_state(&record), built);
 }

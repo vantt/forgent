@@ -25,6 +25,29 @@ pub struct Limits {
     pub frame: FrameLimits,
 }
 
+impl Limits {
+    /// How long a settled header is kept: the longest window that may still
+    /// read it, `max(loop.windowSec, record.ttlSec, record.bodyRetentionSec)`.
+    pub fn header_horizon_sec(&self) -> u64 {
+        self.loop_guard
+            .window_sec
+            .max(self.record.ttl_sec)
+            .max(self.record.body_retention_sec)
+    }
+
+    /// The most headers the shared sender with no head (the one identity no
+    /// lifetime cap brakes, owner decision Q3) can leave within the header
+    /// horizon: `session.budget` per budget window, over the windows the
+    /// horizon spans. A window opens only once the last one is more than
+    /// `human.fallbackWindowSec` past, so no further window straddles it.
+    pub fn sender_header_ceiling(&self) -> u64 {
+        let windows = self
+            .header_horizon_sec()
+            .div_ceil(self.human.fallback_window_sec.max(1));
+        u64::from(self.session.budget).saturating_mul(windows)
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct ChainLimits {

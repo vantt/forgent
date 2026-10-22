@@ -343,3 +343,49 @@ fn inbox_lists_pending_notices_as_notices_like_the_claim_that_would_take_them() 
     assert_eq!(views[0].id, pair.state.notices().next().unwrap().id);
     assert!(!views[0].in_flight);
 }
+
+/// The shared sender with no head, the one identity no lifetime cap brakes
+/// (owner decision Q3), at its session budget for a whole header horizon,
+/// reaches `Limits::sender_header_ceiling`, derived from the limits
+/// contract alone, and stops growing there. That refused sends never grow the snapshot is
+/// owned by the bounded-counter test.
+#[test]
+fn one_saturated_sender_stops_growing_at_the_derived_header_ceiling() {
+    let mut pair = Pair::new(t(0));
+    let limits = pair.limits.clone();
+    let budget = limits.session.budget;
+    // Two recipients alternately, so neither the loop guard nor the
+    // sender's share of one queue refuses within a window.
+    assert!(budget.div_ceil(2) < limits.loop_guard.max_per_window);
+    assert!(budget.div_ceil(2) <= limits.queue.per_sender);
+    // A window starts once the last one is fully past: the budget and the
+    // loop guard count an attempt until more than their window passed.
+    assert_eq!(
+        limits.loop_guard.window_sec,
+        limits.human.fallback_window_sec
+    );
+    let step = limits.human.fallback_window_sec + 1;
+    let windows = limits
+        .header_horizon_sec()
+        .div_ceil(limits.human.fallback_window_sec)
+        + 2;
+    let ceiling = limits.sender_header_ceiling() as usize;
+
+    let mut counts = Vec::new();
+    for window in 0..windows {
+        let now = t(window * step);
+        for i in 0..budget as usize {
+            let to = [common::A_NAME, B_NAME][i % 2];
+            pair.try_send(common::plain("cli-sender", to, "m"), now)
+                .unwrap();
+        }
+        pair.deliver("a", now);
+        pair.deliver("b", now);
+        counts.push(pair.state.messages().count());
+    }
+
+    let most = *counts.iter().max().unwrap();
+    assert_eq!(most, ceiling, "the ceiling is reached and never passed");
+    let last = &counts[counts.len() - 2..];
+    assert_eq!(last[0], last[1], "not steady at the end: {last:?}");
+}

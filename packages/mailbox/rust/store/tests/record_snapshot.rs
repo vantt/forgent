@@ -327,6 +327,41 @@ fn an_unreadable_snapshot_is_refused_and_never_overwritten() {
     assert_eq!(snapshot_bytes(&fgos.paths()), cut);
 }
 
+/// The snapshot is read only up to a cap derived from the limits contract
+/// (`record::snapshot_byte_cap`: the shared sender's header ceiling times
+/// the largest header the contract allows). A larger snapshot is not
+/// parsed, refused with its own code and never overwritten; one at the cap
+/// reads.
+#[test]
+fn a_snapshot_larger_than_the_contract_cap_is_never_parsed() {
+    let fgos = TempFgos::new("snapshot-cap");
+    let whole = registered(&fgos);
+    let limits = common::limits();
+    let cap = fgos_mailbox::record::snapshot_byte_cap(&limits) as usize;
+    assert!(whole.len() < cap);
+    let padded = |len: usize| {
+        let mut bytes = whole.clone();
+        bytes.resize(len, b' ');
+        bytes
+    };
+    let record = fgos.record();
+
+    std::fs::write(fgos.paths().snapshot(), padded(cap)).unwrap();
+    assert!(rec::read_state(&record)
+        .binding(&rec::key("head-a"))
+        .is_some());
+
+    let over = padded(cap + 1);
+    std::fs::write(fgos.paths().snapshot(), &over).unwrap();
+    let err = record
+        .hold(Wait::Try, T0, &limits, |state, ids| {
+            rec::register(state, "head-b", T0, &limits, ids)
+        })
+        .unwrap_err();
+    assert_eq!(err.code(), "snapshot-too-large");
+    assert_eq!(snapshot_bytes(&fgos.paths()), over);
+}
+
 #[test]
 fn a_snapshot_that_is_a_symlink_is_never_followed() {
     let fgos = TempFgos::new("symlink-snapshot");

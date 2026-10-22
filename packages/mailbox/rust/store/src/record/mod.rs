@@ -25,6 +25,7 @@ pub use fgos_holder_lock::Wait;
 pub use os_ids::OsIds;
 use paths::Creator;
 pub use paths::Paths;
+pub use snapshot::snapshot_byte_cap;
 
 use fgos_durable_file::sync_directory;
 use fgos_holder_lock::{Acquire, LockScope, ScopeError};
@@ -187,6 +188,12 @@ pub enum RecordError {
     /// The snapshot is of another version; it is neither used nor
     /// overwritten.
     SnapshotVersion(SnapshotVersionError),
+    /// The snapshot is larger than the cap derived from the limits contract
+    /// (`snapshot_byte_cap`); it is not parsed and never overwritten.
+    SnapshotTooLarge {
+        bytes: u64,
+        cap: u64,
+    },
     /// The snapshot is not a readable regular file of this shape; it is
     /// never overwritten, because that would reset caps that are never
     /// reset.
@@ -224,6 +231,7 @@ impl RecordError {
             Self::LockRegistry { .. } => "lock-registry",
             Self::SnapshotVersion(e) => e.code(),
             Self::SnapshotUnreadable { .. } => "snapshot-unreadable",
+            Self::SnapshotTooLarge { .. } => "snapshot-too-large",
             Self::Ids => "ids-unavailable",
             Self::BodyExists { .. } => "body-exists",
             Self::RecordDirUntrusted { .. } => "record-dir-untrusted",
@@ -270,6 +278,7 @@ impl fmt::Display for RecordError {
             | Self::LockRegistry { detail }
             | Self::SnapshotUnreadable { detail } => write!(f, ": {detail}"),
             Self::SnapshotVersion(e) => write!(f, ": {e}"),
+            Self::SnapshotTooLarge { bytes, cap } => write!(f, ": {bytes} bytes, cap {cap}"),
             Self::BodyExists { id } => write!(f, ": {id}"),
             Self::RecordDirUntrusted { path, detail } => {
                 write!(f, ": {}: {detail}", path.display())
@@ -441,7 +450,7 @@ impl Record {
             .map_err(RecordError::from_scope)?;
         before_commit(&mut observe, Step::Locked)?;
         let dirs = self.check_dirs()?;
-        let mut state = snapshot::read(&self.paths)?;
+        let mut state = snapshot::read(&self.paths, snapshot_byte_cap(limits))?;
         before_commit(&mut observe, Step::Read)?;
         let kept_before = bodies::referenced(&state);
         let mut ids = OsIds::open().map_err(|_| RecordError::Ids)?;

@@ -107,11 +107,7 @@ impl MailboxState {
     /// body retention, and its header after the longest window that may
     /// still read it; a body is never kept without its header.
     fn retire_settled_messages(&mut self, now: Timestamp, limits: &Limits) {
-        let header_keep = limits
-            .loop_guard
-            .window_sec
-            .max(limits.record.ttl_sec)
-            .max(limits.record.body_retention_sec);
+        let header_keep = limits.header_horizon_sec();
         let settled = |state: &MessageState| {
             matches!(
                 state,
