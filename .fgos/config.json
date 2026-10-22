@@ -65,7 +65,8 @@
         "serves": {
           "outputKind": "change",
           "mutates": true
-        }
+        },
+        "tier": "advanced"
       },
       "review": {
         "description": "Independent read-only review of a non-code artifact (docs, design, spec, config) before merge/decision -- distinct from code:review (I19, core/skills/_shared/capability-catalog.md).",
@@ -92,7 +93,8 @@
             "executor": "glm"
           },
           "claude"
-        ]
+        ],
+        "tier": "advanced"
       },
       "code:implement": {
         "description": "Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)",
@@ -274,10 +276,10 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "claude"
           },
           {
-            "executor": "claude"
+            "executor": "deepseek"
           }
         ],
         "rigor": "high",
@@ -313,9 +315,6 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
-          },
-          {
             "executor": "gemini"
           },
           {
@@ -323,6 +322,9 @@
           },
           {
             "executor": "claude"
+          },
+          {
+            "executor": "deepseek"
           }
         ],
         "rigor": "high",
@@ -330,7 +332,11 @@
         "maxTier": "frontier",
         "seats": {
           "producer": {
-            "tier": "frontier"
+            "tier": "frontier",
+            "prefer": [
+              "openai",
+              "claude"
+            ]
           }
         }
       },
@@ -344,13 +350,13 @@
             "executor": "gemini"
           },
           {
-            "executor": "deepseek"
-          },
-          {
             "executor": "xai"
           },
           {
             "executor": "openai"
+          },
+          {
+            "executor": "deepseek"
           }
         ],
         "rigor": "critical",
@@ -636,6 +642,9 @@
           }
         ]
       },
+      "coding:*": {
+        "tier": "advanced"
+      },
       "coding:discover": {
         "prefer": [
           {
@@ -742,7 +751,12 @@
           "outputKind": "change",
           "domain": "docs",
           "mutates": true
-        }
+        },
+        "tier": "flagship",
+        "prefer": [
+          "openai",
+          "claude"
+        ]
       },
       "code:*": {
         "roles": {
@@ -751,7 +765,8 @@
               "xai"
             ]
           }
-        }
+        },
+        "tier": "advanced"
       },
       "marketing:*": {
         "roles": {
@@ -1313,21 +1328,39 @@
         "standard": "sonnet",
         "advanced": "sonnet",
         "flagship": "opus",
-        "frontier": "fable"
+        "frontier": "fable",
+        "mini": {
+          "model": "haiku",
+          "effort": "high"
+        }
       },
       "gemini": {
         "nano": "gemini-3.8-flash-low",
         "standard": "gemini-3.8-flash-medium",
         "advanced": "gemini-3.8-flash-high",
         "flagship": "gemini-4-argon-high",
-        "frontier": "gemini-4-argon-high"
+        "frontier": "gemini-4-argon-high",
+        "mini": "gemini-3.8-flash-low"
       },
       "openai": {
-        "nano": "gpt-5.6-luna",
+        "nano": {
+          "model": "gpt-6-luna",
+          "effort": "low"
+        },
         "standard": "gpt-5.6-terra",
-        "advanced": "gpt-5.6-sol",
-        "flagship": "gpt-6.1-sol",
-        "frontier": "gpt-6-astra"
+        "advanced": {
+          "model": "gpt-6.1-sol",
+          "effort": "medium"
+        },
+        "flagship": {
+          "model": "gpt-6.1-sol",
+          "effort": "high"
+        },
+        "frontier": "gpt-6-astra",
+        "mini": {
+          "model": "gpt-6-luna",
+          "effort": "high"
+        }
       },
       "z-ai": {
         "nano": [
@@ -1340,14 +1373,19 @@
         ],
         "advanced": "z-ai/glm-5.3@openrouter",
         "flagship": "z-ai/glm-5.3@openrouter",
-        "frontier": "z-ai/glm-5.3@openrouter"
+        "frontier": "z-ai/glm-5.3@openrouter",
+        "mini": [
+          "thehive/zai-org/glm-5.3-flash@thehive",
+          "z-ai/glm-5.3-flash@openrouter"
+        ]
       },
       "xai": {
         "nano": "grok-4.3",
         "standard": "grok-4.3",
         "advanced": "grok-4.5",
-        "flagship": "grok-4.6",
-        "frontier": "grok-4.6"
+        "flagship": "grok-4.7",
+        "frontier": "grok-4.7",
+        "mini": "grok-4.3"
       },
       "deepseek": {
         "nano": [
@@ -1360,7 +1398,11 @@
         ],
         "advanced": "deepseek/deepseek-v4-pro@openrouter",
         "flagship": "deepseek/deepseek-v4-pro@openrouter",
-        "frontier": "deepseek/deepseek-v4-pro@openrouter"
+        "frontier": "deepseek/deepseek-v4-pro@openrouter",
+        "mini": [
+          "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive",
+          "deepseek/deepseek-v4.1-flash@openrouter"
+        ]
       }
     },
     "maxTier": "flagship",
