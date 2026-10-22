@@ -17,7 +17,7 @@ Worktree `/home/vantt/projects/forgent-worktrees/identity-p07`, branch `ident/p0
 | Mint door: `mint::{random, claim_sequence, claim_counter, release_sequence}`, kinds `work`, `backlog`, `d-adr`, `decision-file`; `random_bytes` in `text.rs` | `packages/identity/rust/src/mint.rs`, `tests/mint.rs` |
 | Verb `fgos identity mint <kind> [--release <n>] [--json]` (operation `identity.write`), contract, projector, CLI registry, regenerated `command-routes.json` | `provider.rs`, `apps/fgos/src/cli_projector.rs`, `identity.write.v1.json`, `src/cli/command-registry.mjs` |
 | Convention identifier kinds `work-item-id` and `backlog-id` (rules + golden) | `packages/convention/contracts/` |
-| Node facade (verb spawn, refuses while a state lock is held via `stateLockHeld()`), callers moved: `fgos submit`, `fgos add` without `--id`, runner discovered work, `promote-to-component` | `src/util/identity-mint.mjs`, `bin/fgos.mjs`, `src/runner/loop.mjs`, `src/verbs/merge/promote-to-component.mjs` |
+| Node facade: in-process `sessionIdentity.mintRandom('work')` through `nativeDoor()` (addon export in `packages/git/node-addon/src/session_identity.rs`; no exec, no lock rule), callers moved: `fgos submit`, `fgos add` without `--id`, runner discovered work, `promote-to-component` | `src/util/identity-mint.mjs`, `bin/fgos.mjs`, `src/runner/loop.mjs`, `src/verbs/merge/promote-to-component.mjs` |
 | Deleted (L10): `generateId` and its hash helpers; `nextFreeDecisionId`, `renumberDecisionText` and the whole decision-index collision self-resolve in `src/runner/merge.mjs` (`classifyDecisionIndexText`, `rebuildDecisionIndex`, `splitConflictSegments`, `treePaths`, `selfResolved` result field) | `src/intake/classify.mjs`, `src/runner/merge.mjs` |
 | Doctor check `identity-ids-unique` | `src/setup/identity-checks.mjs`, `registrations.mjs` |
 | One always-loaded rule `core/instructions/id-minting.md`; AGENTS.md block and `.fgos/instructions/effective/repo.json` regenerated with `materializeInstructionProjection` | |
@@ -35,7 +35,7 @@ A claim commit built from the same tip, number and second is byte-identical, so 
 - `--release <n>` added to the verb so the "push back" rule of 4a is reachable by agents; it is the only consumer of `release_sequence`.
 - Convention kinds only check character set and length (the identifier rule schema has no prefix field); prefix and length live in the crate, and the crate test checks minted ids against the Convention kinds. Project id stays minted by `identity project`.
 - `identity-ids-unique` reads the checkout it runs in (tracked docs), not the main checkout. It does not scan work item records: the store already refuses a duplicate `add`. A `D-ADR` heading repeated in two specs counts as one decision while the short title in parentheses is the same (D-ADR0070 sits in workflow.md and runner.md).
-- Id minting never runs in a state lock: the facade throws `identity-in-lock` through `stateLockHeld()`; all four callers mint before `addWork`.
+- After HARDEN T1 phase 6 (main `62c74e001`) deleted `state-lock-held.mjs`, Node mints random work ids in process through the addon; the exec path, lock guard and error mapping are gone. Sequence kinds stay CLI-only. No capability bump was needed: the door's ABI check already requires `sessionIdentity`, and the new function lives in that namespace. Retired tests: the lock-refusal and host-missing tests of the exec path (behaviour removed); `test/identity/mint-door.test.mjs` keeps the in-process wiring test and the verb wiring test, `mint.rs` owns the id rules.
 
 ## Proof
 
@@ -66,3 +66,7 @@ test live_forge_two_machines_race_a_probe_counter ... ok
 - Plan phase status and the program board row were not changed (no landing).
 - Pre-existing `autostash` stash in the shared repo dates from Oct 21; not mine.
 - Rust files I did not format-clean (`apps/fgos/src/cli_projector.rs`, `provider.rs`, others) were already off `rustfmt`; only my four new files are formatted.
+
+## After the merge of main (HEAD 4d247c834)
+
+`cargo test --workspace --no-fail-fast`: green (rc 0), including `test_legacy_exec_invocation_record_sink` and `test_one_node_child_process_spy` (the earlier failure had the same cause as the npm one: the stale exec path). Full `npm test`: 8711 tests, 19 red = the 17 fgctl, codex `cli-bypass`, and `Data Dictionary #7` (merge resolution had dropped `runner-coordination-orgPolicy-shape` from the doctor-check list in `setup-doctor-registry.md`; restored, `test/setup/registrations.test.mjs` green after the fix).
