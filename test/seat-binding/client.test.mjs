@@ -16,6 +16,7 @@ import {
   SEAT_BINDING_TIMEOUT_MS,
 } from '../../src/seat-binding/client.mjs';
 import { golden, caseInput } from './golden-cases.helper.mjs';
+import { MODEL_POLICY_TIERS } from '../../src/runner/dispatch/config.mjs';
 import { noteLockHeld, noteLockReleased } from '../../src/util/state-lock-held.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -53,9 +54,10 @@ test('a refused seat comes back as a result carrying its refusal, not as an exce
   assert.ok(out.hostVersion);
 });
 
-test('the tier ladder comes from the host, six tiers weakest first', () => {
+test('the tier ladder the host answers is the one the Node config loader reads, six tiers weakest first', () => {
   const ladder = createSeatBindingClient({ hostBin: HOST_BIN }).tierLadder();
-  assert.deepEqual(ladder.vocabulary, ['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier']);
+  assert.deepEqual(ladder.vocabulary, MODEL_POLICY_TIERS);
+  assert.equal(MODEL_POLICY_TIERS.length, 6);
   assert.ok(ladder.hostVersion);
 });
 
