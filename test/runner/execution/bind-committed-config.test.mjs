@@ -106,9 +106,9 @@ test('a Workflow capability with no prefer pool takes the families the tier list
   assert.equal(runnerConfig.capabilities['no-pool-declared'], undefined);
   const result = bind(ask(capability), { runnerConfig, session: headless });
   assert.ok(!result.refused, JSON.stringify(result.refused));
-  assert.equal(result.tier, 'standard');
-  assert.equal(result.provenance.executor.source, 'tierFallback.standard');
-  assert.equal(result.executor, 'gemini', 'the first family of tierFallback.standard that can serve the seat');
+  assert.equal(result.tier, 'advanced', 'the coding:* default tier');
+  assert.equal(result.provenance.executor.source, 'tierFallback.advanced');
+  assert.equal(result.executor, 'gemini', 'the first family of tierFallback.advanced that can serve the seat');
 });
 
 test('with no tier list either, a capability with no prefer pool is refused with a structured reason, never guessed', () => {
