@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 13:05 (phiên `forgent-35`, owner 12:50 giao OPC): **OPC mở hội đồng thiết kế containment theo thao tác** ([brief](../reports/council-261022-1251-opc-council-brief.md)), chỉ thiết kế. Bàn giao nhận: HARDEN T1 phase 4 (R3/RT-M11, `containment/linux.rs`) dùng tên lỗi mount-refused do OPC đặt; HARDEN T2 thiết kế R2 quanh port OPC, không sửa nhánh contained của `driver.rs` trước khi OPC được duyệt. Bàn giao hứa: gửi TEST kế hoạch bộ conformance. Đo đạc chỉ trong khoảng yên tĩnh TEST và HARDEN cho.
+
 - 2026-10-22 13:00 (GIT/ES điều phối, máy thứ hai): **phiên đóng theo owner.** Git 01–08 và ES 01–08 xong; WORK (ES 09–11) và OPC đã giao agent riêng; backlog GIT B1–B5 ghi ở dòng GIT. Việc chờ người nhận (owner giao): duyệt code Git (đang chờ 2 diff HARDEN T1 p02 và U6 của WORK), H15 sau khi máy owner land, theo dõi `three_clones`. Trạng thái chi tiết ở dòng GIT.
 
 - 2026-10-22 12:50 (GIT/ES điều phối, owner): **OPC mở**, giao một lead riêng chạy hội đồng thiết kế containment theo thao tác (prompt bàn giao do phiên GIT/ES viết; chỉ thiết kế, owner duyệt trước khi code). Năm mục còn lại vào backlog GIT B1–B5 (dòng GIT). Đã xoá 13 nhánh remote `git/*`, `es/*` đã merge (giữ `es/p09-cutover` cho WORK).
