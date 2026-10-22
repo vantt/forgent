@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Paths, id source and the snapshot hold"
-status: pending
+status: completed
 depends_on: [1]
 ---
 
@@ -73,4 +73,26 @@ The nine tests are green on a fresh main merge and the path literal search is em
 
 ## API drift
 
-(fill at phase start)
+None: no commit on `packages/holder-lock`, `packages/durable-file`, `packages/process`, `src/holder-lock` or `src/runner/dispatch/confinement` between `978fa28e7` and `487f58426`. The V3 API changes (`TestedClis` as a `begin` parameter, `state_changed` on drain results, `QuietReason::WriterMismatch`, `NameDoesNotFit` before the sweep) touch nothing the hold uses: the hold runs any closure and decides the write by byte equality, so `state_changed` is not needed by the store.
+
+## Deviations
+
+- `Record::hold(wait, mutate)` and `hold_observed(wait, observe, mutate)` take no `now` and `limits` yet: nothing in the hold reads them until phase 6's pruning. Phase 6 adds both parameters.
+- `lock-registry` also covers a failure to create the lock directory. `ScopeError::Registry` carries only a string for both, so the store cannot tell them apart without matching message text. Splitting them needs a typed error in holder-lock; that is recorded as an idea, not built.
+- `unsafe`: no shared leaf offers the current uid or `unlinkat`, which the plan's descriptor-based deletion needs. `lib.rs` goes from `forbid(unsafe_code)` to `deny`, and only `record/sys.rs` allows it, with one call per function (precedents: `packages/secrets/rust/src/file_source.rs:82`, `packages/git/rust/src/driver.rs`). Three crates now hold their own copy of `geteuid`; one shared leaf for it is recorded as an idea (RUL11), outside this lane.
+- The `record` module and its tests are `#[cfg(unix)]` (no-follow opens, uid, `unlinkat`).
+- `Paths::lock_params()` returns `Option` (`None` for a non-UTF-8 `.fgos` path, reported as `lock-registry`). `Paths::lock_name()` is public so a test can take the same lock without spelling it.
+- `Step::Collected` is observed in every writing hold from this phase on. Phase 3 adds the work behind it.
+- Test 2 also proves the empty-record case: a hold that changes nothing on an empty record creates no snapshot (the comparison is against the empty state's bytes). This is one behaviour with one test, not a tenth test.
+- Tests make a FIFO with the `mkfifo` command, so test code needs no `unsafe`.
+- The fixture was produced once by a throwaway test file that ran real holds (two heads, a message in each of the four states, a notice, counters, budget, lifetime, exchange, wake lifetime), reviewed by hand, committed, and the throwaway file deleted. The test also fails if a fixture field becomes empty or a message state is missing.
+
+## Proof
+
+- `cargo test -p fgos-mailbox -p fgos-mailbox-core`: 136 passed, 0 failed. `tests/record_snapshot.rs` holds 12 tests plus `child_entry`.
+- Mutants against `record_snapshot`: 9 tried, 6 killed (no-write rule, directory check, version pre-read, no-follow open, non-blocking open, commit point). 3 survived:
+  - owner check: proving it needs a directory of another uid, which needs root.
+  - regular-file check: for a FIFO or a directory, the read or the parse refuses anyway. The check keeps a hostile FIFO's bytes unread, as plan decision 6 requires.
+  - `ids.failed()`: the plan states this branch is reviewed, not tested, because forcing it needs a test switch.
+- The path-literal search is empty.
+

@@ -1,4 +1,6 @@
 #![allow(dead_code)]
+#[cfg(unix)]
+pub mod record;
 #[path = "../../../core/tests/common/support.rs"]
 mod support;
 // Each test file uses a part of the shared support.
@@ -14,6 +16,12 @@ pub const ADAPTERS: [Adapter; 3] = [Adapter::Claude, Adapter::Codex, Adapter::Ag
 /// The mailbox contracts directory; the one place the tests name it.
 pub fn contracts_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../contracts")
+}
+
+/// The frozen version-1 snapshot (spec §6.4: V2 freezes version 1 when it
+/// first writes one).
+pub fn snapshot_fixture() -> PathBuf {
+    contracts_dir().join("fixtures/record/snapshot.v1.json")
 }
 
 /// The adapters contract inside [`contracts_dir`].

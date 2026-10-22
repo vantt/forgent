@@ -256,9 +256,12 @@ dependencies = [
 name = "fgos-mailbox"
 version = "0.2.0"
 dependencies = [
+ "fgos-durable-file",
+ "fgos-holder-lock",
  "fgos-mailbox-core",
  "fgos-process",
  "fgos-session-identity",
+ "libc",
  "serde",
  "serde_json",
 ]
