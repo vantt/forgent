@@ -175,12 +175,21 @@ pub fn workspace_shims() -> Vec<WorkspaceShim> {
 }
 
 /// Writes every launcher into `bin_dir` (replacing what is there) and marks the
-/// `sh` ones executable.
+/// `sh` ones executable. Each file is replaced by rename through the durable
+/// file door, never rewritten in place: a shell already running the old shim
+/// (every agent hook call runs it) never reads a half-written one.
 pub fn write_workspace_shims(bin_dir: &Path) -> std::io::Result<()> {
     std::fs::create_dir_all(bin_dir)?;
     for shim in workspace_shims() {
         let path = bin_dir.join(shim.name);
-        std::fs::write(&path, &shim.body)?;
+        let mode = if shim.windows_shell { 0o644 } else { 0o755 };
+        fgos_durable_file::replace_durably_with_mode(
+            bin_dir,
+            shim.name,
+            shim.body.as_bytes(),
+            mode,
+        )
+        .map_err(std::io::Error::other)?;
         #[cfg(unix)]
         if !shim.windows_shell {
             use std::os::unix::fs::PermissionsExt;
@@ -354,8 +363,29 @@ mod tests {
             "{err}"
         );
 
+        // A rewrite replaces each file by rename, never in place: a shell
+        // already reading the old shim keeps reading the old bytes, and no
+        // temporary file is left beside the launchers.
+        let mut old = std::fs::File::open(dir.join("fgos.cmd")).unwrap();
         write_workspace_shims(&dir).unwrap();
         check_workspace_shims(&dir, true).unwrap();
+        let mut seen = String::new();
+        std::io::Read::read_to_string(&mut old, &mut seen).unwrap();
+        assert_eq!(
+            seen, "@echo hand-edited\r\n",
+            "the old file was not rewritten in place"
+        );
+        let mut names: Vec<String> = std::fs::read_dir(&dir)
+            .unwrap()
+            .map(|e| e.unwrap().file_name().to_string_lossy().into_owned())
+            .collect();
+        names.sort();
+        let mut wanted: Vec<String> = workspace_shims()
+            .iter()
+            .map(|s| s.name.to_string())
+            .collect();
+        wanted.sort();
+        assert_eq!(names, wanted);
         let _ = std::fs::remove_dir_all(&dir);
     }
 
