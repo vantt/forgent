@@ -1,0 +1,671 @@
+//! The mailbox's host routes as processes: the native `hook mailbox` kind
+//! (served before the composition root, other hook kinds still legacy) and
+//! the `mailbox send|inbox [--claim]` verbs. One wiring proof per path; the
+//! behaviours behind them are owned by the store's tests
+//! (`packages/mailbox/rust/store/tests/`).
+#![cfg(unix)]
+
+use std::fs;
+use std::io::Write;
+use std::path::{Path, PathBuf};
+use std::process::{Command, Output, Stdio};
+
+fn fgos_bin() -> PathBuf {
+    PathBuf::from(env!("CARGO_BIN_EXE_fgos"))
+}
+
+fn repo_root() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
+}
+
+/// The writer key the recorded Claude Code payloads name.
+const WRITER: &str = "00000000-0000-4000-8000-000000000001";
+
+fn git(dir: &Path, args: &[&str]) {
+    let out = Command::new("git")
+        .arg("-C")
+        .arg(dir)
+        .args(args)
+        .env("GIT_CONFIG_GLOBAL", "/dev/null")
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .output()
+        .unwrap();
+    assert!(out.status.success(), "git {args:?}: {out:?}");
+}
+
+/// A temporary tree: a main checkout `main/` with `.fgos`, a `HOME`, and a
+/// directory outside every repository.
+struct Scene {
+    root: PathBuf,
+}
+
+impl Scene {
+    fn new(tag: &str) -> Self {
+        let root = std::env::temp_dir().join(format!(
+            "fgos-mailbox-routes-{tag}-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(root.join("outside")).unwrap();
+        fs::create_dir_all(root.join("home/.claude/sessions")).unwrap();
+        git(&root, &["init", "-q", "--initial-branch=trunk", "main"]);
+        fs::create_dir_all(root.join("main/.fgos")).unwrap();
+        Self {
+            root: fs::canonicalize(root).unwrap(),
+        }
+    }
+
+    fn main(&self) -> PathBuf {
+        self.root.join("main")
+    }
+
+    fn home(&self) -> PathBuf {
+        self.root.join("home")
+    }
+
+    fn mailbox_dir(&self) -> PathBuf {
+        self.main().join(".fgos/runtime/mailbox")
+    }
+
+    /// A command with only the variables the mailbox reads, as `writer`.
+    fn command(&self, cwd: &Path, writer: Option<&str>) -> Command {
+        let mut command = Command::new(fgos_bin());
+        command
+            .current_dir(cwd)
+            .env_clear()
+            .env("HOME", self.home())
+            .env("PATH", std::env::var_os("PATH").unwrap_or_default());
+        if let Some(writer) = writer {
+            command.env("FGOS_SESSION_ID", writer);
+        }
+        command
+    }
+
+    /// `fgos <args>` from `cwd` as `writer`, with `stdin`.
+    fn run(&self, cwd: &Path, writer: Option<&str>, args: &[&str], stdin: &[u8]) -> Output {
+        let mut child = self
+            .command(cwd, writer)
+            .args(args)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        let _ = child.stdin.take().unwrap().write_all(stdin);
+        child.wait_with_output().unwrap()
+    }
+
+    /// The hook as Claude Code runs it: through `/bin/sh` (not exec'd), so
+    /// this test process is the head; its session file names it.
+    fn claude_hook(&self, event: &str, payload: &[u8]) -> Output {
+        let own = fgos_process::facts::self_identity().unwrap();
+        let pid = std::process::id();
+        let session = serde_json::json!({
+            "pid": pid,
+            "sessionId": WRITER,
+            "procStart": own.start_time,
+            "kind": "interactive",
+            "entrypoint": "sdk-cli",
+            "name": "routes-test-5c",
+            "nameSource": "derived",
+        });
+        fs::write(
+            self.home().join(format!(".claude/sessions/{pid}.json")),
+            session.to_string(),
+        )
+        .unwrap();
+        let mut child = Command::new("/bin/sh")
+            .args(["-c", "\"$0\" \"$@\"; :"])
+            .arg(fgos_bin())
+            .args(["hook", "mailbox", "--cli", "claude", "--event", event])
+            .current_dir(self.main())
+            .env_clear()
+            .env("HOME", self.home())
+            .env("PATH", std::env::var_os("PATH").unwrap_or_default())
+            .env("CLAUDE_CODE_SESSION_ID", WRITER)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        child.stdin.take().unwrap().write_all(payload).unwrap();
+        child.wait_with_output().unwrap()
+    }
+
+    /// The registered head's short name, from the snapshot.
+    fn head_name(&self) -> String {
+        let snapshot: serde_json::Value = serde_json::from_slice(
+            &fs::read(self.mailbox_dir().join("record/snapshot.json")).unwrap(),
+        )
+        .unwrap();
+        let bindings = snapshot["bindings"].as_object().unwrap();
+        bindings.values().next().unwrap()["name"]
+            .as_str()
+            .unwrap()
+            .to_string()
+    }
+
+    /// The state of every message in the snapshot.
+    fn message_states(&self) -> Vec<String> {
+        let snapshot: serde_json::Value = serde_json::from_slice(
+            &fs::read(self.mailbox_dir().join("record/snapshot.json")).unwrap(),
+        )
+        .unwrap();
+        snapshot["messages"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|m| {
+                m["state"]
+                    .as_str()
+                    .map(String::from)
+                    .or_else(|| {
+                        m["state"]
+                            .as_object()
+                            .and_then(|o| o.keys().next().cloned())
+                    })
+                    .unwrap()
+            })
+            .collect()
+    }
+}
+
+impl Drop for Scene {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.root);
+    }
+}
+
+/// The recorded Claude Code `PostToolUse` payload.
+fn post_tool_use() -> Vec<u8> {
+    fs::read(
+        repo_root().join("packages/mailbox/contracts/fixtures/hooks/claude/post-tool-use.json"),
+    )
+    .unwrap()
+}
+
+/// A spy `node` first on `PATH` that logs each start; returns its log.
+fn node_spy(dir: &Path) -> (String, PathBuf) {
+    use std::os::unix::fs::PermissionsExt;
+    let real =
+        String::from_utf8(Command::new("which").arg("node").output().unwrap().stdout).unwrap();
+    let log = dir.join("spy.log");
+    let spy = dir.join("node");
+    fs::create_dir_all(dir).unwrap();
+    fs::write(
+        &spy,
+        format!(
+            "#!/bin/sh\necho start >> '{}'\nexec '{}' \"$@\"\n",
+            log.display(),
+            real.trim()
+        ),
+    )
+    .unwrap();
+    fs::set_permissions(&spy, fs::Permissions::from_mode(0o755)).unwrap();
+    let path = format!(
+        "{}:{}",
+        dir.display(),
+        std::env::var("PATH").unwrap_or_default()
+    );
+    (path, log)
+}
+
+#[test]
+fn hook_mailbox_runs_natively_and_spawns_no_node() {
+    let scene = Scene::new("native");
+    let (path, log) = node_spy(&scene.root.join("spy"));
+    let out = scene
+        .command(&scene.main(), None)
+        .env("PATH", path)
+        .args([
+            "hook",
+            "mailbox",
+            "--cli",
+            "claude",
+            "--event",
+            "post-tool-use",
+        ])
+        .stdin(Stdio::null())
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(0));
+    assert!(out.stdout.is_empty() && out.stderr.is_empty(), "{out:?}");
+    assert!(!log.exists(), "no node child ran");
+}
+
+#[test]
+fn other_hook_kinds_still_reach_the_legacy_payload() {
+    let scene = Scene::new("legacy");
+    let (path, log) = node_spy(&scene.root.join("spy"));
+    let out = scene
+        .command(&scene.main(), None)
+        .env("PATH", path)
+        .env("FGOS_ACTIVE_RELEASE_PATH", repo_root())
+        .env("FGOS_ACTIVE_MANIFEST_PATH", dev_manifest(&scene.root))
+        .args(["hook", "decision-question"])
+        .stdin(Stdio::null())
+        .output()
+        .unwrap();
+    let starts = fs::read_to_string(&log).unwrap_or_default().lines().count();
+    assert_eq!(starts, 1, "the legacy payload ran once: {out:?}");
+
+    // A help request for the native kind is answered by legacy, which owns help.
+    let out = scene
+        .command(&scene.main(), None)
+        .env(
+            "PATH",
+            std::env::var("PATH")
+                .map(|p| format!("{}:{p}", scene.root.join("spy").display()))
+                .unwrap(),
+        )
+        .env("FGOS_ACTIVE_RELEASE_PATH", repo_root())
+        .env("FGOS_ACTIVE_MANIFEST_PATH", dev_manifest(&scene.root))
+        .args(["hook", "mailbox", "--help"])
+        .stdin(Stdio::null())
+        .output()
+        .unwrap();
+    let starts = fs::read_to_string(&log).unwrap_or_default().lines().count();
+    assert_eq!(starts, 2, "help reached the legacy payload: {out:?}");
+}
+
+/// A development manifest naming the checkout's legacy-node entry.
+fn dev_manifest(dir: &Path) -> PathBuf {
+    use sha2::{Digest, Sha256};
+    let digest = format!(
+        "sha256:{:x}",
+        Sha256::digest(fs::read(repo_root().join("bin/fgos.mjs")).unwrap())
+    );
+    let mut manifest = serde_json::json!({
+        "schemaVersion": 1,
+        "entries": { "fgos": "target/debug/fgos" },
+        "components": { "legacyNode": { "root": ".", "entry": "bin/fgos.mjs", "digest": digest } },
+        "requires": { "node": ">=18" },
+        "target": { "os": "linux", "arch": "x64" },
+        "stateSchemas": { "read": ["2"], "write": ["2"], "migrations": [] },
+        "files": [{ "path": "bin/fgos.mjs", "kind": "file", "digest": digest, "mode": "755", "class": "legacy-node" }],
+    });
+    let canonical = fgos_distribution::verify::to_canonical_json(&manifest);
+    manifest["artifactDigest"] =
+        serde_json::json!(format!("sha256:{:x}", Sha256::digest(canonical.as_bytes())));
+    let path = dir.join("manifest.json");
+    fs::write(&path, serde_json::to_string_pretty(&manifest).unwrap()).unwrap();
+    path
+}
+
+#[test]
+fn every_hook_mailbox_usage_error_exits_0_with_empty_stdout_and_stderr() {
+    let scene = Scene::new("usage");
+    let base = ["hook", "mailbox"];
+    let cases: &[&[&str]] = &[
+        &["--cli", "claude", "--event", "stop", "--x", "y"],
+        &["--cli", "claude"],
+        &["--cli", "agy", "--event", "stop"],
+        &["--cli", "claude", "--event", "pre-tool-use"],
+        &["--cli", "claude", "--event", "stop", "extra"],
+        &["--cli", "claude", "--cli", "codex", "--event", "stop"],
+        &["--cli"],
+    ];
+    for case in cases {
+        let args: Vec<&str> = base.iter().chain(case.iter()).copied().collect();
+        let out = scene.run(&scene.main(), Some(WRITER), &args, &post_tool_use());
+        assert_eq!(out.status.code(), Some(0), "{case:?}");
+        assert!(
+            out.stdout.is_empty() && out.stderr.is_empty(),
+            "{case:?}: {out:?}"
+        );
+    }
+    assert!(
+        !scene.mailbox_dir().exists(),
+        "no usage error touched the record"
+    );
+}
+
+#[test]
+fn hook_mailbox_outside_a_repository_or_without_dot_fgos_or_home_is_quiet_and_exits_0() {
+    let scene = Scene::new("quiet");
+    let hook = ["hook", "mailbox", "--cli", "claude", "--event", "stop"];
+    let outside = scene.root.join("outside");
+    let out = scene.run(&outside, Some(WRITER), &hook, &post_tool_use());
+    assert_eq!(out.status.code(), Some(0));
+    assert!(out.stdout.is_empty() && out.stderr.is_empty());
+
+    git(&scene.root, &["init", "-q", "bare-of-fgos"]);
+    let out = scene.run(
+        &scene.root.join("bare-of-fgos"),
+        Some(WRITER),
+        &hook,
+        &post_tool_use(),
+    );
+    assert_eq!(out.status.code(), Some(0));
+    assert!(out.stdout.is_empty() && out.stderr.is_empty());
+
+    // HOME unset: quiet before anything is resolved, so nothing is created
+    // relative to the cwd either (tsk-43x4).
+    let out = Command::new(fgos_bin())
+        .args(hook)
+        .current_dir(scene.main())
+        .env_clear()
+        .env("PATH", std::env::var_os("PATH").unwrap_or_default())
+        .env("FGOS_SESSION_ID", WRITER)
+        .stdin(Stdio::null())
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(0));
+    assert!(out.stdout.is_empty() && out.stderr.is_empty(), "{out:?}");
+    assert!(!scene.main().join(".local").exists());
+    assert!(!scene.mailbox_dir().exists());
+}
+
+#[test]
+fn hook_mailbox_and_the_verbs_use_the_main_checkouts_record_from_a_linked_worktree_a_subdirectory_and_claude_project_dir(
+) {
+    let scene = Scene::new("roots");
+    git(
+        &scene.main(),
+        &[
+            "-c",
+            "user.name=F",
+            "-c",
+            "user.email=f@example.invalid",
+            "commit",
+            "-q",
+            "--allow-empty",
+            "-m",
+            "first",
+        ],
+    );
+    git(&scene.main(), &["worktree", "add", "-q", "../linked"]);
+    let linked = scene.root.join("linked");
+    fs::create_dir_all(linked.join(".fgos")).unwrap();
+    fs::create_dir_all(linked.join("deep/er")).unwrap();
+    let send = ["mailbox", "send", "--to", "nobody", "hi"];
+
+    let out = scene.run(&linked.join("deep/er"), Some("sender-a"), &send, b"");
+    assert_eq!(out.status.code(), Some(1), "{out:?}");
+    assert!(
+        scene.mailbox_dir().join("record").is_dir(),
+        "the main checkout's record"
+    );
+    assert!(
+        !linked.join(".fgos/runtime").exists(),
+        "never the worktree's .fgos"
+    );
+
+    fs::remove_dir_all(scene.mailbox_dir()).unwrap();
+    let out = scene
+        .command(&scene.root.join("outside"), Some("sender-a"))
+        .env("CLAUDE_PROJECT_DIR", &linked)
+        .args(send)
+        .stdin(Stdio::null())
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(1), "{out:?}");
+    assert!(
+        scene.mailbox_dir().join("record").is_dir(),
+        "CLAUDE_PROJECT_DIR, not the cwd, chose the repository"
+    );
+}
+
+#[test]
+fn a_send_then_a_post_tool_use_hook_with_a_recorded_payload_delivers_and_finishes() {
+    let scene = Scene::new("deliver");
+    let first = scene.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(first.status.code(), Some(0));
+    assert!(
+        first.stdout.is_empty(),
+        "the first hook registers: {first:?}"
+    );
+    let name = scene.head_name();
+
+    let sent = scene.run(
+        &scene.main(),
+        Some("sender-a"),
+        &["mailbox", "send", "--to", &name, "hello from a peer"],
+        b"",
+    );
+    assert_eq!(sent.status.code(), Some(0), "{sent:?}");
+
+    let out = scene.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(out.status.code(), Some(0));
+    let reply: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    let context = reply["hookSpecificOutput"]["additionalContext"]
+        .as_str()
+        .unwrap();
+    assert!(context.contains("| hello from a peer"), "{context}");
+    assert_eq!(scene.message_states(), vec!["offered".to_string()]);
+}
+
+#[test]
+fn mailbox_send_inbox_and_inbox_claim_print_contract_text_and_exit_by_outcome() {
+    let scene = Scene::new("verbs");
+    let main = scene.main();
+    let no_address = "This session has no mailbox address yet; it gets one at its first hook.\n";
+    let out = scene.run(&main, Some(WRITER), &["mailbox", "inbox"], b"");
+    assert_eq!(
+        (
+            out.status.code(),
+            String::from_utf8_lossy(&out.stdout).into_owned()
+        ),
+        (Some(0), no_address.to_string())
+    );
+    let out = scene.run(&main, Some(WRITER), &["mailbox", "inbox", "--claim"], b"");
+    assert_eq!(
+        (
+            out.status.code(),
+            String::from_utf8_lossy(&out.stdout).into_owned()
+        ),
+        (Some(0), no_address.to_string())
+    );
+    let out = scene.run(
+        &main,
+        Some("sender-a"),
+        &["mailbox", "send", "--to", "nobody", "hi"],
+        b"",
+    );
+    assert_eq!(out.status.code(), Some(1));
+    assert!(
+        String::from_utf8_lossy(&out.stdout).starts_with("Refused: unknown-name."),
+        "{out:?}"
+    );
+    let out = scene.run(&main, Some("sender-a"), &["mailbox", "send", "hi"], b"");
+    assert_eq!(
+        out.status.code(),
+        Some(4),
+        "a send without --to is a usage error"
+    );
+    assert!(out.stdout.is_empty());
+    let out = scene.run(
+        &main,
+        Some("sender-a"),
+        &["mailbox", "send", "--bogus", "hi"],
+        b"",
+    );
+    assert_eq!(
+        out.status.code(),
+        Some(4),
+        "an unknown flag is a usage error"
+    );
+
+    scene.claude_hook("post-tool-use", &post_tool_use());
+    let name = scene.head_name();
+    let out = scene.run(
+        &main,
+        Some("sender-a"),
+        &[
+            "mailbox",
+            "send",
+            "--to",
+            &name,
+            "--",
+            "--looks like a flag",
+        ],
+        b"",
+    );
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    assert!(String::from_utf8_lossy(&out.stdout).starts_with("recorded "));
+    let listed = scene.run(&main, Some(WRITER), &["mailbox", "inbox"], b"");
+    assert!(
+        String::from_utf8_lossy(&listed.stdout).contains("state=recorded"),
+        "{listed:?}"
+    );
+}
+
+#[test]
+fn inbox_claim_writes_its_frames_once_and_finishes_only_after_the_write() {
+    let scene = Scene::new("claim");
+    let main = scene.main();
+    scene.claude_hook("post-tool-use", &post_tool_use());
+    let name = scene.head_name();
+    scene.run(
+        &main,
+        Some("sender-a"),
+        &["mailbox", "send", "--to", &name, "first"],
+        b"",
+    );
+
+    // A stdout whose reader is gone: the write fails and nothing finishes.
+    let mut child = scene
+        .command(&main, Some(WRITER))
+        .args(["mailbox", "inbox", "--claim"])
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap();
+    drop(child.stdout.take());
+    let status = child.wait().unwrap();
+    assert_eq!(status.code(), Some(1), "an unwritten claim is not done");
+    assert_eq!(scene.message_states(), vec!["in-flight".to_string()]);
+
+    // A fresh message is claimed, written once and finished.
+    scene.run(
+        &main,
+        Some("sender-a"),
+        &["mailbox", "send", "--to", &name, "second"],
+        b"",
+    );
+    let out = scene.run(&main, Some(WRITER), &["mailbox", "inbox", "--claim"], b"");
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    let text = String::from_utf8_lossy(&out.stdout);
+    assert_eq!(text.matches("| second").count(), 1, "{text}");
+    assert_eq!(
+        scene.message_states(),
+        vec!["in-flight".to_string(), "offered".to_string()]
+    );
+}
+
+#[test]
+fn json_flag_wraps_the_same_answer_in_the_envelope() {
+    let scene = Scene::new("json");
+    let out = scene.run(
+        &scene.main(),
+        Some("sender-a"),
+        &["mailbox", "send", "--to", "nobody", "hi", "--json"],
+        b"",
+    );
+    assert_eq!(out.status.code(), Some(1));
+    let envelope: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(envelope["contract"], "fgos.v1");
+    assert_eq!(envelope["data"]["recorded"], false);
+    assert!(envelope["data"]["text"]
+        .as_str()
+        .unwrap()
+        .starts_with("Refused: unknown-name."));
+    let out = scene.run(
+        &scene.main(),
+        Some(WRITER),
+        &["mailbox", "inbox", "--json"],
+        b"",
+    );
+    let envelope: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(
+        envelope["data"]["text"],
+        "This session has no mailbox address yet; it gets one at its first hook."
+    );
+}
+
+/// A copy of `/bin/sh` named `codex`: an executable whose file name is the
+/// one the adapters contract lists for Codex's head, standing at the direct
+/// head position (the entry is its child; `; :` keeps it from exec'ing).
+fn codex_like(dir: &Path) -> PathBuf {
+    let bin = dir.join("bin/codex");
+    if !bin.exists() {
+        fs::create_dir_all(bin.parent().unwrap()).unwrap();
+        // Copied by a child process, so no descriptor open for writing is
+        // inherited by a sibling test's fork (which would make the exec
+        // fail with "text file busy").
+        let status = Command::new("install")
+            .args(["-m", "755"])
+            .arg(fs::canonicalize("/bin/sh").unwrap())
+            .arg(&bin)
+            .status()
+            .unwrap();
+        assert!(status.success());
+    }
+    bin
+}
+
+/// The Codex hook through `codex_like` with `home` (or none).
+fn codex_hook(scene: &Scene, home: Option<&Path>) -> Output {
+    let mut payload: serde_json::Value = serde_json::from_slice(
+        &fs::read(
+            repo_root().join("packages/mailbox/contracts/fixtures/hooks/codex/post-tool-use.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    payload["session_id"] = serde_json::Value::from(WRITER);
+    let mut command = Command::new(codex_like(&scene.root));
+    command
+        .args(["-c", "\"$0\" \"$@\"; :"])
+        .arg(fgos_bin())
+        .args([
+            "hook",
+            "mailbox",
+            "--cli",
+            "codex",
+            "--event",
+            "post-tool-use",
+        ])
+        .current_dir(scene.main())
+        .env_clear()
+        .env("PATH", std::env::var_os("PATH").unwrap_or_default())
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    if let Some(home) = home {
+        command.env("HOME", home);
+    }
+    let mut child = command.spawn().unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(&serde_json::to_vec(&payload).unwrap())
+        .unwrap();
+    child.wait_with_output().unwrap()
+}
+
+#[test]
+fn a_codex_hook_registers_from_its_payload_only_when_home_is_set() {
+    let scene = Scene::new("codex-home");
+    let out = codex_hook(&scene, None);
+    assert_eq!(out.status.code(), Some(0));
+    assert!(out.stdout.is_empty() && out.stderr.is_empty(), "{out:?}");
+    assert!(
+        !scene.mailbox_dir().exists(),
+        "without HOME the hook resolves nothing"
+    );
+    assert!(!scene.main().join(".local").exists());
+
+    let out = codex_hook(&scene, Some(&scene.home()));
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    assert!(
+        scene.head_name().starts_with("main-codex"),
+        "{}",
+        scene.head_name()
+    );
+}

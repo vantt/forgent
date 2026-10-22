@@ -90,6 +90,34 @@ test('all COMMAND_REGISTRY selectors appear exactly once in generated output', (
   assert.equal(routes.convention.subcommands, true);
 });
 
+test('only the hook selector declares native_kinds and it lists exactly mailbox', () => {
+  const routes = JSON.parse(fs.readFileSync(DEFAULT_ROUTES_PATH, 'utf8'));
+  const declaring = Object.values(routes).filter((r) => r.native_kinds !== undefined).map((r) => r.selector);
+  assert.deepEqual(declaring, ['hook']);
+  assert.deepEqual(routes.hook.native_kinds, ['mailbox']);
+  assert.equal(routes.hook.route_kind, 'legacy-cli', 'every other hook kind still reaches the legacy payload');
+  assert.throws(
+    () => generateCommandRoutes({ annotations: { version: { route_kind: 'native', operation_id: 'distribution.build.show', owner_path: 'packages/distribution/rust', native_kinds: ['x'] } } }),
+    /native_kinds on selector "version" needs route_kind legacy-cli/,
+  );
+  assert.throws(
+    () => generateCommandRoutes({ annotations: { hook: { route_kind: 'legacy-cli', native_kinds: [] } } }),
+    /must be a non-empty array/,
+  );
+});
+
+test('the mailbox selector is native with send and inbox and its flags', () => {
+  const routes = JSON.parse(fs.readFileSync(DEFAULT_ROUTES_PATH, 'utf8'));
+  assert.equal(routes.mailbox.route_kind, 'native');
+  assert.equal(routes.mailbox.operation_id, 'mailbox.inbox');
+  assert.equal(routes.mailbox.owner_path, 'packages/mailbox/rust');
+  assert.equal(routes.mailbox.subcommands, true);
+  assert.deepEqual(routes.mailbox.subcommand_flags, {
+    inbox: ['claim', 'dir', 'help', 'json'],
+    send: ['body', 'dir', 'help', 'json', 'reply-to', 'to', 'wake'],
+  });
+});
+
 test('drift detection: clean committed file passes --check silently', () => {
   const check = checkCommandRoutes({
     routesPath: DEFAULT_ROUTES_PATH,

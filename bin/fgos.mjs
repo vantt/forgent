@@ -4919,22 +4919,27 @@ function isMutatingInvocation(verb, positional, flags) {
   return predicate ? predicate(positional, flags) : false;
 }
 
-const ALLOWED_HOOK_KINDS = new Set(['dispatch-decide', 'decision-question']);
+const ALLOWED_HOOK_KINDS = new Set(['dispatch-decide', 'decision-question', 'mailbox']);
 
 async function handleHook(rest) {
   const [kind, ...flags] = rest;
   if (!kind || kind === '--help' || kind === '-h') {
     process.stdout.write(
-      'Usage: fgos hook <dispatch-decide|decision-question> [--format=standard|agy]\n\n' +
+      'Usage: fgos hook <dispatch-decide|decision-question|mailbox> [--format=standard|agy] [--cli <claude|codex> --event <stop|post-tool-use>]\n\n' +
         'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi).\n',
     );
     process.exit(0);
   }
 
   if (!ALLOWED_HOOK_KINDS.has(kind)) {
-    process.stderr.write(`Error: Unknown hook kind "${kind}". Allowed kinds: dispatch-decide, decision-question\n`);
+    process.stderr.write(`Error: Unknown hook kind "${kind}". Allowed kinds: ${[...ALLOWED_HOOK_KINDS].join(', ')}\n`);
     process.exit(1);
   }
+
+  // The native Rust host serves `hook mailbox` before this payload runs.
+  // This channel (npm bin, `node bin/fgos.mjs`) has no mailbox, so the hook
+  // stays quiet and never blocks or fails the CLI that called it.
+  if (kind === 'mailbox') process.exit(0);
 
   let rawStdin = '';
   try {

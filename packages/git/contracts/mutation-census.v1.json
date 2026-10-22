@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7722e237595caeca70407ac8628dd97e7f35a931cf88231170251033041dc602",
+  "payloadDigest": "c1eb28181cc87bcd9570bbc10288803c102e48e3712074f4f3167297c64c3a3c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -76,22 +76,26 @@
     "apps/fgos-gateway/src/mcp.rs": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
     "apps/fgos-gateway/src/ports.rs": "f639e87f4a9119eedf765fa10de38dc0a68315a9482b041543a5f294ca0d1999",
     "apps/fgos-gateway/src/remote_invocation.rs": "b0f0ad004ce73d737c7e09b22e5e1d445db64abbca77425b4d282f4859b1388a",
-    "apps/fgos/src/cli_presenter.rs": "c124e14bbf4fe8aa2766fe1425cb92c5d74c53bc06cd898589494199e1b6f6f9",
-    "apps/fgos/src/cli_projector.rs": "3e7e75751b281466860cdb4f75ff418e56c9a61e1810d331cf0e5de418046048",
+    "apps/fgos/src/cli_presenter.rs": "796e56d400132198de5046bcaf24b330cb08bb335d32de154029681014ac973a",
+    "apps/fgos/src/cli_projector.rs": "087f78840e431e8b4d1d59cffa95944b213b8b3629bb7bc382497ec22bba568a",
     "apps/fgos/src/legacy_exec.rs": "6aa96ac09b3c577b03317d3b9292104c8af977b2890eb7e5ef45a13598770a22",
-    "apps/fgos/src/main.rs": "43320493c67ab2ae3880292abaad941dbc61e8470d9bcdb0d83c917eee983a2e",
+    "apps/fgos/src/main.rs": "d0a14fcdc1c80d54b5948b1bf8a6d6d9393902dd48fdaa24a880dc294d9371e4",
     "apps/fgos/src/wiring/friction_sources.rs": "dca5bc341cda23cc93b050e76de6851289b2a2e6be721bc6d669c4a498c1f440",
+    "apps/fgos/src/wiring/mailbox_hook.rs": "4055cd08726986cf6aa041a59a4bd6d58ba958ece8a9031c9d3825ae92c3cfd3",
+    "apps/fgos/src/wiring/mailbox_root.rs": "d371715c33a0c1c3bc8eb95b74a31bdf83dc5693fade1a58061ec26a75af2719",
+    "apps/fgos/src/wiring/mailbox_verbs.rs": "3210284682e983c70904545bc0a79078a2562945fb847d7a9bd21e2ac6f710fb",
     "apps/fgos/src/wiring/metrics_sources.rs": "92b08ef96478699952332d937ab2e4c121bcf48f671b648098190dc3abe120df",
-    "apps/fgos/src/wiring/mod.rs": "fe91da3081b555d716f8defadb72e9fe9ed81669e946b4017b0d87f28faa06d1",
+    "apps/fgos/src/wiring/mod.rs": "01004072bec392dd9783fe2817bebc3ba6e1787007df53dbeb9ef7c8045855ab",
     "apps/fgos/tests/cli_tests.rs": "24288ecddff803ce19e7e83fab928575c7537dfff3c0b9075e3d0a430209afd9",
     "apps/fgos/tests/internal_lock_routes.rs": "f0ed99bdebe74d6c54bfe8f2c4025e15bf4886a0ad3a50882251e861f92924d4",
+    "apps/fgos/tests/mailbox_routes.rs": "da6041623a483158da97bb82680b791f80d9cdc5372a50f1c5743d073176abb5",
     "apps/fgos/tests/windows_borrow.rs": "59258d09ea0b2420b7cecfe73fd9b67d61f83bb3a4d97feaa770aa6d26a05521",
     "apps/fgos/tests/windows_lock_hold_route.rs": "fe11272fb65d947366300770cd5765c1604c800eeac7f052fad57320db7e8530",
     "apps/fgos/tests/windows_predecessor_stress.rs": "0bf5b06644fdb212a693fb2a12979c8e3fb1c88800ae96a7494c00434e01c6c0",
     "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
     "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
     "bin/fgos-runner.mjs": "dca3d8b530f20aaf8d9d8d424f12ec1c5d9670812566ab4d6c51583f3bb7b573",
-    "bin/fgos.mjs": "6642186e1347d2c104c15b87c9d1e66953ea156502b69e9e6d611d6369970b23",
+    "bin/fgos.mjs": "791176cd5893fe5c38f976600f6db9ba6017bf5f3380c1cb7c01b181ebbd3fb3",
     "core/skills/_shared/ak-cook-worker-contract.md": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
     "core/skills/_shared/capability-catalog.md": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -362,7 +366,7 @@
     "packages/holder-lock/rust/tests/stress.rs": "b1e4875e967a853c9247db8ef8f7e31c7f37786ccec4682d377486503fd723df",
     "packages/holder-lock/rust/tests/windows_lockfileex.rs": "79e5688336e2a2968f72a65802e8cd722f2c614334e8494eeb2c2b452bfc4273",
     "packages/host-runtime/rust/src/authority_gate.rs": "ad3c0a21cc5b98ec3d8d321d0b700d1378a35fe3a8531b7ed32ccabbf2e4fe17",
-    "packages/host-runtime/rust/src/catalog.rs": "491024b5536b9fa2b91496159d18ff1b78cec8b816db9e86e35f9ffa84b492c4",
+    "packages/host-runtime/rust/src/catalog.rs": "b86ef63584909f12af1cf4c2ed37ebad2b387e6e1babb3c1d939363bc3c29f88",
     "packages/host-runtime/rust/src/civil_time.rs": "e8d9e38de59f98e49b42fc0916e48a6e99013323f7805a36a168e019087fd4cc",
     "packages/host-runtime/rust/src/contracts.rs": "da9000674648a399cd32f628213a8d16cd1ce220eacb4e4896d9fad05c0af5cf",
     "packages/host-runtime/rust/src/invocation_service.rs": "bd9602d7ae4849bb434d2fe92aaa098c28ce9225ab6ef30b61fbbdb1a197bd55",
@@ -663,7 +667,7 @@
     "scripts/event-store/v-spawn-bench.mjs": "a9f2da47d5410ef6baef1200d9d5261c2bf3fed24cfe7450ce4d6913712a1890",
     "scripts/events-jsonl-truncation-guard.mjs": "772467fc1de75f0ecb39efecd08b607bb593c4f0b38b3586c82e2c4a4f710654",
     "scripts/explain-command-route.mjs": "db546d74676a1c91c3309241dcb618dc438fbae79448f4e2253319657dbbee24",
-    "scripts/export-command-selectors.mjs": "8ef578e5f5c2bfbe350a941b5d3896b0684c4030958505f941365e3f6456cdbd",
+    "scripts/export-command-selectors.mjs": "928b7eb9dba1b505cfb5a7c74eec9f85d132aae7f7a48794945b5826603a1b38",
     "scripts/fgos-session-start-hook.mjs": "6ec944bb42698570cb5cb860d24bde1229d884f968ce0f6771c05b9c11a93af6",
     "scripts/fgos-shell-integration.sh": "89d74fd3352594dccc46c85174725a7095714ed436a599342ef87c78a60b732c",
     "scripts/git-addon.mjs": "67532c2006d74a97cbc40814e82882da1de5d48b5d072670444489e2ed963d71",
@@ -724,7 +728,7 @@
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
     "src/cli/approve-fault-log.mjs": "e362c6b4a676839f6010c08d1df648f5973c2d9ec7a13acf97e40f93b57b42ab",
-    "src/cli/command-registry.mjs": "953cd80ff924d861eceb87a2ad776e032afddcad78a39c44be4dfb904f0997fd",
+    "src/cli/command-registry.mjs": "cdeb566f79987188072e926f369341eaf0ead4177e7e67db1985322f82189749",
     "src/cli/deprecation.mjs": "45e7d11ad8681fc89e4c99f4ef53b7c93a477f6b5fdd6708eddcf0b579dd3985",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/invocation-fault-log.mjs": "c36b79eb7fa658c6c685d1dc99204ddf9de96b29e10eb5d03f82141cf9ab2fa9",
@@ -1079,13 +1083,6 @@
       "line": 3616,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? readSharedConfig(dir)[key]",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "packages/mailbox/rust/store/src/adapters/version.rs",
-      "line": 62,
-      "spawn": "Command::new <- packages/mailbox/rust/store/src/adapters/version.rs:62",
-      "binary": "? no construction of VersionSources.codex_program found",
       "family": "unresolved-binary"
     },
     {
@@ -1691,6 +1688,20 @@
       "class": "rust-test"
     },
     {
+      "path": "apps/fgos/tests/mailbox_routes.rs",
+      "line": 25,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/mailbox_routes.rs",
+      "line": 120,
+      "spawn": "Command::new",
+      "binary": "/bin/sh",
+      "class": "rust-test"
+    },
+    {
       "path": "apps/fgos/tests/windows_borrow.rs",
       "line": 104,
       "spawn": "Command::new",
@@ -2217,6 +2228,14 @@
       "spawn": "Command::new",
       "binary": "/usr/bin/git",
       "class": "rust-test"
+    },
+    {
+      "path": "packages/mailbox/rust/store/src/adapters/version.rs",
+      "line": 62,
+      "spawn": "Command::new",
+      "binary": "codex",
+      "class": "argv-runner",
+      "resolvedAt": "apps/fgos/src/wiring/mailbox_verbs.rs:276"
     },
     {
       "path": "packages/mailbox/rust/store/tests/ancestry.rs",

@@ -114,6 +114,39 @@ pub const CATALOG: &[OperationDescriptor] = &[
         allowed_host_kinds: &["cli", "remote"],
         streaming_mode: StreamingMode::None,
     },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("mailbox.send"),
+        owning_component_id: Cow::Borrowed("mailbox"),
+        request_contract: ContractRef::from_static("mailbox.send.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("mailbox.send.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("mailbox.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("mailbox.inbox"),
+        owning_component_id: Cow::Borrowed("mailbox"),
+        request_contract: ContractRef::from_static("mailbox.inbox.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("mailbox.inbox.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("mailbox.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("mailbox.inbox.claim"),
+        owning_component_id: Cow::Borrowed("mailbox"),
+        request_contract: ContractRef::from_static("mailbox.inbox.claim.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("mailbox.inbox.claim.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("mailbox.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
 ];
 
 #[cfg(test)]
@@ -122,7 +155,8 @@ mod tests {
 
     #[test]
     fn catalog_contains_required_operations() {
-        assert_eq!(CATALOG.len(), 9);
+        // Nine operations, plus the mailbox's send, inbox and inbox claim.
+        assert_eq!(CATALOG.len(), 12);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -133,6 +167,9 @@ mod tests {
         assert!(ids.contains(&"identity.writer"));
         assert!(ids.contains(&"identity.read"));
         assert!(ids.contains(&"identity.write"));
+        assert!(ids.contains(&"mailbox.send"));
+        assert!(ids.contains(&"mailbox.inbox"));
+        assert!(ids.contains(&"mailbox.inbox.claim"));
     }
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips

@@ -75,10 +75,39 @@ pub fn present_error(err: &ProviderError) -> i32 {
     }
 }
 
+/// A mailbox verb's answer: its contract text and a newline (nothing when
+/// the verb wrote its frames itself), or with `--json` the envelope; a
+/// warning line on stderr; the verb's own exit status.
+fn present_mailbox(answer: &crate::wiring::mailbox_verbs::MailboxAnswer) -> i32 {
+    if let Some(warning) = &answer.warning {
+        eprintln!("{warning}");
+    }
+    let out = if answer.json {
+        match wrap_envelope(&answer.data, None) {
+            Ok(text) => text,
+            Err(err) => {
+                eprintln!("fgos: error: {err}");
+                return 1;
+            }
+        }
+    } else if answer.already_written || answer.text.is_empty() {
+        String::new()
+    } else {
+        format!("{}\n", answer.text)
+    };
+    let _ = std::io::stdout().write_all(out.as_bytes());
+    answer.exit
+}
+
 /// Presents a successful provider outcome and returns the process exit code.
 pub fn present_outcome(outcome: &ProviderOutcome) -> i32 {
     match outcome {
         ProviderOutcome::Completed { output, .. } => {
+            if let Some(answer) =
+                output.downcast_ref::<crate::wiring::mailbox_verbs::MailboxAnswer>()
+            {
+                return present_mailbox(answer);
+            }
             if let Some(refusal) = output.downcast_ref::<fgos_identity::Refusal>() {
                 eprintln!("fgos: error: {} [{}]", refusal.detail, refusal.reason);
                 return fgos_identity::Refusal::EXIT;

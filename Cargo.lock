@@ -128,9 +128,12 @@ version = "0.2.0"
 dependencies = [
  "fgos-convention",
  "fgos-distribution",
+ "fgos-git",
  "fgos-holder-lock",
  "fgos-host-runtime",
  "fgos-identity",
+ "fgos-mailbox",
+ "fgos-mailbox-core",
  "fgos-observe",
  "fgos-process",
  "fgos-run-result",

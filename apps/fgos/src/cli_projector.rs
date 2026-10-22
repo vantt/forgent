@@ -94,6 +94,18 @@ pub fn project_cli_invocation(
             ContractRef::from_static("identity.write.request", "1.0.0"),
             Box::new(project_identity_request(args)?),
         ),
+        crate::wiring::mailbox_verbs::SEND_OPERATION_ID => (
+            ContractRef::from_static("mailbox.send.request", "1.0.0"),
+            Box::new(crate::wiring::mailbox_verbs::project_mailbox_request(args)),
+        ),
+        crate::wiring::mailbox_verbs::INBOX_OPERATION_ID => (
+            ContractRef::from_static("mailbox.inbox.request", "1.0.0"),
+            Box::new(crate::wiring::mailbox_verbs::project_mailbox_request(args)),
+        ),
+        crate::wiring::mailbox_verbs::INBOX_CLAIM_OPERATION_ID => (
+            ContractRef::from_static("mailbox.inbox.claim.request", "1.0.0"),
+            Box::new(crate::wiring::mailbox_verbs::project_mailbox_request(args)),
+        ),
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",
@@ -109,10 +121,17 @@ pub fn project_cli_invocation(
 
 /// The operation a native route runs for these arguments. A route names one
 /// operation; `identity` fans out over three (`identity.writer` bare,
-/// `identity.read`, `identity.write`) and the arguments decide which.
+/// `identity.read`, `identity.write`) and `mailbox` over three
+/// (`mailbox.send`, `mailbox.inbox`, `mailbox.inbox.claim` with `--claim`),
+/// and the arguments decide which.
 pub fn native_operation_id(route_operation: &str, args: &[OsString]) -> Result<String, String> {
     if route_operation == fgos_identity::IDENTITY_OPERATION_ID {
         return Ok(project_identity_request(args)?.operation_id().to_string());
+    }
+    if route_operation == crate::wiring::mailbox_verbs::INBOX_OPERATION_ID {
+        return Ok(crate::wiring::mailbox_verbs::project_mailbox_request(args)
+            .operation_id()
+            .to_string());
     }
     Ok(route_operation.to_string())
 }

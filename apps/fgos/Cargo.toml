@@ -15,6 +15,9 @@ fgos-holder-lock = { path = "../../packages/holder-lock/rust" }
 fgos-run-supervisor = { path = "../../packages/run-supervisor/rust" }
 fgos-terminal-control = { path = "../../packages/terminal-control/rust" }
 fgos-seat-binding = { path = "../../packages/seat-binding/rust" }
+fgos-git = { path = "../../packages/git/rust" }
+fgos-mailbox = { path = "../../packages/mailbox/rust/store" }
+fgos-mailbox-core = { path = "../../packages/mailbox/rust/core" }
 tokio = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order", "arbitrary_precision"] }

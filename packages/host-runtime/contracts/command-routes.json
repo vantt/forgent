@@ -400,6 +400,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "native_kinds": [
+      "mailbox"
     ]
   },
   "identity": {
@@ -508,6 +511,33 @@
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ]
+  },
+  "mailbox": {
+    "selector": "mailbox",
+    "route_kind": "native",
+    "operation_id": "mailbox.inbox",
+    "owner_path": "packages/mailbox/rust",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ],
+    "subcommands": true,
+    "subcommand_flags": {
+      "inbox": [
+        "claim",
+        "dir",
+        "help",
+        "json"
+      ],
+      "send": [
+        "body",
+        "dir",
+        "help",
+        "json",
+        "reply-to",
+        "to",
+        "wake"
+      ]
+    }
   },
   "main-checkout-reset": {
     "selector": "main-checkout-reset",
