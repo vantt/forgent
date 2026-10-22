@@ -2,8 +2,9 @@ mod common;
 
 use common::{spec_limits, t};
 use fgos_mailbox_core::{
-    delivery_report, inbox_text, record_error_text, refusal_text, Generation, Kind, MessageId,
-    MessageView, Refusal, SendOutcome, ShortName, VersionClause, WakeDrop,
+    delivery_report, inbox_text, record_error_text, record_unavailable_text, refusal_text,
+    Generation, Kind, MessageId, MessageView, Refusal, SendOutcome, ShortName, VersionClause,
+    WakeDrop,
 };
 use serde_json::json;
 
@@ -210,6 +211,16 @@ fn a_record_error_reads_as_contract_text_that_names_the_code_and_says_not_to_loo
         record_error_text("lock-busy"),
         "Not done: the mailbox record failed (lock-busy) and nothing was changed. Try once more later; do not loop."
     );
+}
+
+#[test]
+fn a_place_with_no_record_reads_as_a_permanent_condition_never_as_a_retry() {
+    let text = record_unavailable_text("unsupported-checkout");
+    assert_eq!(
+        text,
+        "Not done: there is no mailbox record here (unsupported-checkout), and trying again will not change that. Run it from inside the project's repository, or tell your user."
+    );
+    assert!(!text.contains("once more"));
 }
 
 #[test]

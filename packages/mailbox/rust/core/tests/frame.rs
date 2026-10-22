@@ -342,6 +342,7 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
         ("refusal.name", &["{{code}}", "{{candidates}}"][..]),
         ("refusal.argument", &["{{code}}"][..]),
         ("record.error", &["{{code}}", "do not loop"][..]),
+        ("record.unavailable", &["{{code}}", "will not change"][..]),
         ("inbox.empty", &[][..]),
         (
             "inbox.line",

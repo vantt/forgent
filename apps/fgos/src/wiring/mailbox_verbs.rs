@@ -21,7 +21,9 @@ use fgos_mailbox::adapters::version::VersionSources;
 use fgos_mailbox::limits::{load, read_project_config, Loaded};
 use fgos_mailbox::record::{Record, Wait};
 use fgos_mailbox::verbs;
-use fgos_mailbox_core::{record_error_text, MessageId, SendRequest, Timestamp, WriterKey};
+use fgos_mailbox_core::{
+    record_error_text, record_unavailable_text, MessageId, SendRequest, Timestamp, WriterKey,
+};
 use serde_json::{json, Value};
 use std::borrow::Cow;
 use std::ffi::OsString;
@@ -219,7 +221,14 @@ fn open(json: bool) -> Result<(PathBuf, Record, Loaded, Option<String>), Box<Mai
         std::env::var_os("CLAUDE_PROJECT_DIR").as_deref(),
         &cwd,
     )
-    .map_err(|e| failed(record_error_text(e.code()), json, None))?;
+    .map_err(|e| {
+        let text = if e.is_permanent() {
+            record_unavailable_text(e.code())
+        } else {
+            record_error_text(e.code())
+        };
+        failed(text, json, None)
+    })?;
     let defaults = load(None).map_err(|e| failed(format!("mailbox config: {e}"), json, None))?;
     let config = read_project_config(&fgos_dir, defaults.hook.hook.max_read_bytes)
         .map_err(|e| failed(format!("mailbox config: {e}"), json, None))?;

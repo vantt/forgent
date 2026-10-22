@@ -112,6 +112,13 @@ pub fn record_error_text(code: &str) -> String {
     fill(section("record.error"), &[("code", code)])
 }
 
+/// The answer for a place that has no mailbox record and will not get one
+/// by trying again (no repository, no `.fgos`, a checkout the main-checkout
+/// read does not support), from the frame contract.
+pub fn record_unavailable_text(code: &str) -> String {
+    fill(section("record.unavailable"), &[("code", code)])
+}
+
 /// A refusal's own fields as `name=value` pairs in field order; empty for
 /// a refusal with no number.
 fn limit_text(refusal: &Refusal) -> String {

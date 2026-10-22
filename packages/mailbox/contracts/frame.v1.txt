@@ -73,6 +73,8 @@ Refused: {{code}}. Candidates: {{candidates}}.
 Refused: {{code}}.
 [record.error]
 Not done: the mailbox record failed ({{code}}) and nothing was changed. Try once more later; do not loop.
+[record.unavailable]
+Not done: there is no mailbox record here ({{code}}), and trying again will not change that. Run it from inside the project's repository, or tell your user.
 [inbox.empty]
 No pending mail.
 [inbox.line]

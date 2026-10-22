@@ -18,8 +18,11 @@ pub enum RootError {
     NoRepository,
     /// The main checkout has no `.fgos` directory.
     NoFgosDir(PathBuf),
-    /// The repository could not be read (an untrusted worktree link, an
-    /// unreadable directory).
+    /// The checkout is one the main-checkout read refuses for good (a
+    /// submodule, a separate git directory, a worktree whose links do not
+    /// name each other), with the Git component's cause.
+    UnsupportedCheckout(String),
+    /// The repository could not be read (an unreadable directory).
     Unreadable(String),
 }
 
@@ -29,10 +32,19 @@ impl RootError {
         match self {
             Self::NoRepository => "no-repository",
             Self::NoFgosDir(_) => "no-fgos-dir",
+            Self::UnsupportedCheckout(_) => "unsupported-checkout",
             Self::Unreadable(_) => "repository-unreadable",
         }
     }
+
+    /// Whether trying again cannot change the answer.
+    pub fn is_permanent(&self) -> bool {
+        !matches!(self, Self::Unreadable(_))
+    }
 }
+
+/// The Git component's causes for a checkout it will not read as trusted.
+const UNSUPPORTED_CAUSES: [&str; 2] = ["untrusted-worktree", "trusted-main-gitfile-unsupported"];
 
 /// `<main checkout>/.fgos` for a process whose `CLAUDE_PROJECT_DIR` is
 /// `claude_project_dir` and whose cwd is `cwd`.
@@ -46,7 +58,13 @@ pub fn mailbox_fgos_dir(
         .filter(|dir| dir.is_dir())
         .unwrap_or(cwd);
     let main = fgos_git::main_checkout_root(start)
-        .map_err(|error| RootError::Unreadable(error.cause))?
+        .map_err(|error| {
+            if UNSUPPORTED_CAUSES.contains(&error.cause.as_str()) {
+                RootError::UnsupportedCheckout(error.cause)
+            } else {
+                RootError::Unreadable(error.cause)
+            }
+        })?
         .ok_or(RootError::NoRepository)?;
     let fgos_dir = main.join(".fgos");
     if fgos_dir.is_dir() {

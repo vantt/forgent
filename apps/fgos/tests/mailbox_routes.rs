@@ -410,6 +410,78 @@ fn hook_mailbox_and_the_verbs_use_the_main_checkouts_record_from_a_linked_worktr
 }
 
 #[test]
+fn the_verbs_name_a_place_with_no_record_as_permanent_and_a_relative_worktree_as_its_main_checkout()
+{
+    let scene = Scene::new("unavailable");
+    let commit = [
+        "-c",
+        "user.name=F",
+        "-c",
+        "user.email=f@example.invalid",
+        "commit",
+        "-q",
+        "--allow-empty",
+        "-m",
+        "first",
+    ];
+    git(&scene.main(), &commit);
+    let inbox = ["mailbox", "inbox"];
+    let permanent = |out: &Output, code: &str| {
+        let stdout = String::from_utf8_lossy(&out.stdout);
+        assert_eq!(out.status.code(), Some(1), "{out:?}");
+        assert!(stdout.contains(&format!("({code})")), "{stdout}");
+        assert!(
+            stdout.contains("trying again will not change that"),
+            "{stdout}"
+        );
+    };
+    permanent(
+        &scene.run(&scene.root.join("outside"), Some("a"), &inbox, b""),
+        "no-repository",
+    );
+
+    git(
+        &scene.root,
+        &["init", "-q", "--initial-branch=trunk", "child"],
+    );
+    git(&scene.root.join("child"), &commit);
+    git(
+        &scene.main(),
+        &[
+            "-c",
+            "protocol.file.allow=always",
+            "submodule",
+            "add",
+            "-q",
+            "../child",
+            "sub",
+        ],
+    );
+    permanent(
+        &scene.run(&scene.main().join("sub"), Some("a"), &inbox, b""),
+        "unsupported-checkout",
+    );
+
+    git(
+        &scene.main(),
+        &[
+            "-c",
+            "worktree.useRelativePaths=true",
+            "worktree",
+            "add",
+            "-q",
+            "../rel",
+        ],
+    );
+    let out = scene.run(&scene.root.join("rel"), Some("a"), &inbox, b"");
+    assert_eq!(
+        out.status.code(),
+        Some(0),
+        "a relative worktree reads its main checkout: {out:?}"
+    );
+}
+
+#[test]
 fn a_send_then_a_post_tool_use_hook_with_a_recorded_payload_delivers_and_finishes() {
     let scene = Scene::new("deliver");
     let first = scene.claude_hook("post-tool-use", &post_tool_use());
