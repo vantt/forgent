@@ -81,7 +81,7 @@ impl WorkSource {
         Self
     }
 
-    pub const VIEW_SCHEMA_VERSION: u64 = 6;
+    pub const VIEW_SCHEMA_VERSION: u64 = 7;
 
     /// Read raw state json from the Work cache `.fgos/cache/state.json`. The tracked `.fgos/state.json` view is
     /// retired and never read.
@@ -698,7 +698,7 @@ mod tests {
         fs::create_dir_all(&fgos_dir).unwrap();
 
         let state_json = r#"{
-            "viewSchemaVersion": 6,
+            "viewSchemaVersion": VIEW_SCHEMA_VERSION,
             "work": {
                 "tsk-1": { "id": "tsk-1", "status": "awaiting-approval", "workflowStep": "executing", "domain": "coding" },
                 "tsk-2": { "id": "tsk-2", "status": "doing", "workflowStep": "executing", "domain": "coding" },
@@ -711,7 +711,8 @@ mod tests {
             "settlements": {
                 "tsk-1": [ { "kind": "close", "ts": "2026-09-01T10:00:00Z" } ]
             }
-        }"#;
+        }"#
+        .replace("VIEW_SCHEMA_VERSION", &WorkSource::VIEW_SCHEMA_VERSION.to_string());
 
         fs::create_dir_all(fgos_dir.join("cache")).unwrap();
         fs::write(fgos_dir.join("cache").join("state.json"), state_json).unwrap();
@@ -754,7 +755,10 @@ mod tests {
         // the Work cache, so no reader may fall back to it.
         fs::write(
             fgos_dir.join("state.json"),
-            r#"{ "viewSchemaVersion": 6, "work": { "tsk-1": { "id": "tsk-1", "status": "doing" } } }"#,
+            format!(
+                r#"{{ "viewSchemaVersion": {}, "work": {{ "tsk-1": {{ "id": "tsk-1", "status": "doing" }} }} }}"#,
+                WorkSource::VIEW_SCHEMA_VERSION
+            ),
         )
         .unwrap();
 
