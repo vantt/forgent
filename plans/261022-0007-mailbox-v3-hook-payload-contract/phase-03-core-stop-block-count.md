@@ -62,6 +62,15 @@ This phase makes three small changes to `fgos-mailbox-core`. All three are neede
 4. Run `cargo clippy --locked -p fgos-mailbox-core --all-targets -- -D warnings`.
 5. Regenerate the census. Commit `feat(mailbox): count Stop blocks per head and keep same-head and refused registrations write-free`. Sync, run the proof, push.
 
+## Deviations (implementation lead, 2026-10-22, against V1 as closed at `35079dce3`)
+
+V1's final review changed the core API this phase was written against:
+
+- **One render door instead of a third entry point.** V1 replaced `render_message`/`render_notice` with one `render(item, body: &str, limits)` over `ClaimedItem { what: ClaimedWhat::Mail | Notice }` (review M6). Instead of adding `render_message_body_missing`, `render`'s body becomes `Option<&str>`: `None` renders the `[message.body-missing]` section in place of the gutter-prefixed body, which is exactly the shape M6 proposed. A notice ignores the body. The frame test is extended on that door. Phase 6 then calls `render(item, bodies(&item.id).as_deref(), limits)` for every item.
+- **Schema version stays 1.** V1 retired `Header.kind` without a bump because no version-1 snapshot was ever persisted and V2 is not built (spec §17, 2026-10-22). The same holds for `Binding.stop_blocks`: nothing outside tests ever wrote a snapshot. `stop_blocks` is a required field and `Binding` denies unknown fields, so a snapshot written before this change is refused at deserialization rather than misread. The acceptance line "a version-1 snapshot is refused as `UnsupportedOlder`" is therefore retired; the round-trip test carries the new field. V2 freezes version 1 when it first persists.
+- **`register` order.** V1 added `drop_generation_records` on the `Dead` takeover and the key alphabet check in `WriterKey::new`. The new order is: key length, judgement mismatch, same head (no mutation), `Alive` → `Conflict`, `Unknown` → `Deferred`, and only then `sweep` and create or replace. The takeover also resets `stop_blocks` to 0.
+- **Test keys** follow the writer-key alphabet `[A-Za-z0-9._-]` (V1 L3).
+
 ## Acceptance criteria
 
 - The new, rewritten and retargeted tests are green.

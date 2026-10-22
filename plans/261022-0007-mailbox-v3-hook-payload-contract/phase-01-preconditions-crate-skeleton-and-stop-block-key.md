@@ -72,6 +72,13 @@ This phase sets up four things:
 6. Regenerate the census with `node scripts/git-one-door-scan.mjs --write-census`. Commit `feat(mailbox): add the fgos-mailbox crate and the Stop-block limit`, together with `Cargo.lock` and the census.
 7. At the end of the phase: sync, run the proof again, push.
 
+## Deviations (implementation lead, 2026-10-22, against V1 as closed at `35079dce3`)
+
+- **Precondition 1.** V1's `plan.md` front matter still reads `pending`; the controller's brief confirms V1 closed at `35079dce3` after its final review (`plans/261021-2255-mailbox-v1-core-crate/reports/code-review-final-v1.md`). Taken as the controller's confirmation.
+- **Baseline count.** The V1 final-review fixes raised `cargo test -p fgos-mailbox-core` from 78 to **86**. "V1's count plus one" means 87.
+- **Module layout.** `HookLimits` lives in `src/hook/limits.rs` behind `src/hook/mod.rs`, which re-exports it; the `hook` module grows in phase 6.
+- **Support re-exports.** Each `tests/common/mod.rs` re-exports only what its crate's tests use (`LIMITS_CONTRACT` is used by `limits_contract()` alone), so no `unused_imports` allowance is needed.
+
 ## Acceptance criteria
 
 - `cargo test --locked -p fgos-mailbox` is green, and `cargo test --locked -p fgos-mailbox-core` is green with V1's count plus one.

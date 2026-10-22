@@ -134,6 +134,11 @@ Each per-CLI case is one loop over the three CLIs' vectors, not three copies. Ea
 6. Regenerate the census. Commit `feat(mailbox): drain recorded hook payloads into each CLI's injected output`.
 7. Sync, then run **the rung proof**: `cargo test --locked -p fgos-mailbox` and `cargo test --locked -p fgos-mailbox-core`, both green on a fresh merge. Push.
 
+## Deviations (implementation lead, 2026-10-22, recorded at phase 1)
+
+- **Rendering.** Every claimed item is rendered through the core's single `render(item, body: Option<&str>, limits)` (phase 3 deviation): `bodies(&item.id)` is passed as is, and `None` gives the body-missing frame. There is no `render_message`, `render_notice` or `render_message_body_missing`.
+- **Shared accounts.** The core now writes the shared senders as `~unregistered` and `~unresolved`, outside the writer-key alphabet; the drain needs no change for it.
+
 ## Acceptance criteria
 
 - `cargo test --locked -p fgos-mailbox --test hook_payloads` is green for Claude, Codex and agy.
