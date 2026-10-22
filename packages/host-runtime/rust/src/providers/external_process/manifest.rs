@@ -173,8 +173,11 @@ pub struct ExternalManifest {
 impl ExternalManifest {
     /// Parses a YAML string and validates all fields against base directory rules.
     pub fn from_yaml_str(yaml: &str, base_dir: Option<&Path>) -> Result<Self, ManifestError> {
-        let mut manifest: Self =
-            serde_yaml::from_str(yaml).map_err(|e| ManifestError::MalformedYaml(e.to_string()))?;
+        let json = fgos_yaml_doc::parse(yaml.as_bytes(), fgos_yaml_doc::Profile::Tool, "<manifest>")
+            .and_then(|doc| doc.to_json())
+            .map_err(|e| ManifestError::MalformedYaml(e.to_string()))?;
+        let mut manifest: Self = serde_json::from_value(json)
+            .map_err(|e| ManifestError::MalformedYaml(e.to_string()))?;
 
         // Calculate SHA-256 digest of the manifest string
         let mut hasher = Sha256::new();
