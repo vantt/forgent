@@ -3031,6 +3031,156 @@
           "reason": "account-pin-no-inventory"
         }
       }
+    },
+    {
+      "name": "a seat with no candidate configured is run inline by the session lead",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer",
+          "inlineLead": {
+            "executor": "claude",
+            "family": "claude"
+          }
+        },
+        "config": {
+          "tierFallback": {
+            "standard": null
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "family": "claude",
+              "invocation": null,
+              "model": null,
+              "modelSource": "no-model-needed",
+              "effort": null,
+              "effortSource": "invocation-default",
+              "pool": null,
+              "mechanism": "inline",
+              "source": "session-lead-inline",
+              "pinned": false
+            }
+          ]
+        }
+      },
+      "explainContains": [
+        "-> claude default @ standard"
+      ]
+    },
+    {
+      "name": "a blind seat is never run inline by the lead",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer",
+          "inlineLead": {
+            "executor": "claude",
+            "family": "claude"
+          },
+          "posture": {
+            "blind": true
+          }
+        },
+        "config": {
+          "tierFallback": {
+            "standard": null
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "no-candidate",
+          "configured": 0
+        }
+      }
+    },
+    {
+      "name": "a seat that needs a skill is never run inline by the lead",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer",
+          "inlineLead": {
+            "executor": "claude",
+            "family": "claude"
+          },
+          "requiredSkills": [
+            "review"
+          ]
+        },
+        "config": {
+          "tierFallback": {
+            "standard": null
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "no-candidate",
+          "configured": 0
+        }
+      }
+    },
+    {
+      "name": "a seat whose configured candidates were all filtered is refused, not run inline",
+      "patch": {
+        "ask": {
+          "inlineLead": {
+            "executor": "claude",
+            "family": "claude"
+          }
+        },
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "prefer": [
+                "ghost"
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "unknown-executor",
+          "configured": 1
+        }
+      }
+    },
+    {
+      "name": "a seat with a configured candidate binds it and leaves the lead aside",
+      "patch": {
+        "ask": {
+          "inlineLead": {
+            "executor": "claude",
+            "family": "claude"
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "model": "opus",
+              "mechanism": "out-of-process"
+            }
+          ]
+        }
+      }
     }
   ]
 }
