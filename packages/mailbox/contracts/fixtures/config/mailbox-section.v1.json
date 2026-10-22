@@ -49,7 +49,6 @@
     "breaker": {
       "failures": 3,
       "pauseSec": 60
-    },
-    "p95TargetMs": 50
+    }
   }
 }

@@ -57,6 +57,7 @@ import {
   installPiHook,
 } from './agent-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
+import { mailboxConfigShape } from './mailbox-limits.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import {
   readWorkflowDefinitionFiles,
@@ -2354,6 +2355,19 @@ export const PI_EXECUTOR_DEFAULT = Object.freeze({
     },
   ],
   providerModel: 'openai',
+});
+
+// The agent mailbox's limits (docs/platform/agent-mailbox/spec.md §12): the
+// size, budget, loop, queue, wake, offer, notice, frame and hook keys the
+// mailbox reads from the `mailbox` section of the project's .fgos/config.json.
+// Each value is its starting value from packages/mailbox/contracts/limits.v1.json,
+// unmeasured placeholders unless that contract says otherwise; the Rust loader
+// reads only the project file and takes any key missing there from the same
+// contract, so a value here matters only when someone changes it.
+registerConfigDefault({
+  id: 'mailbox',
+  key: 'mailbox',
+  shape: mailboxConfigShape(),
 });
 
 registerConfigDefault({

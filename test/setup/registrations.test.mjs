@@ -1226,3 +1226,21 @@ test('Event Store remote defaults to origin and setup preserves an explicit remo
     assert.equal(JSON.parse(fs.readFileSync(path.join(temp, '.fgos/config.json'))).eventStore.remote, 'upstream');
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
+
+test('every mailbox limits key registers one config default with its contract value', () => {
+  const contract = JSON.parse(fs.readFileSync(new URL('../../packages/mailbox/contracts/limits.v1.json', import.meta.url), 'utf8'));
+  const entries = CONFIG_DEFAULT_REGISTRATIONS.filter((c) => c.key === 'mailbox');
+  assert.equal(entries.length, 1, 'one mailbox section');
+  const at = (shape, dotted) => dotted.split('.').slice(1).reduce((node, part) => node?.[part], shape);
+  for (const key of contract.keys) {
+    const value = at(entries[0].shape, key.key);
+    if (key.reader === 'harness') assert.equal(value, undefined, `${key.key} is measured, never configured`);
+    else assert.equal(value, key.default, key.key);
+  }
+});
+
+test('the registered mailbox section equals the committed fixture the rust loader reads', () => {
+  const fixture = JSON.parse(fs.readFileSync(new URL('../../packages/mailbox/contracts/fixtures/config/mailbox-section.v1.json', import.meta.url), 'utf8'));
+  const entry = CONFIG_DEFAULT_REGISTRATIONS.find((c) => c.key === 'mailbox');
+  assert.deepEqual(entry.shape, fixture);
+});
