@@ -111,11 +111,12 @@ function cliWithNativeSpy(t) {
     const call = addon.GitRecovery.prototype.call;
     addon.GitRecovery.prototype.call = function (method, ...args) { if (method === 'listRetainedLand') log(method); return call.call(this, method, ...args); };
   `);
-  return (args, { dispatched = true } = {}) => {
+  // The Land verbs derive the repository from the cwd; the read verbs take the store directory.
+  return (args, { dispatched = true, storeDir = true } = {}) => {
     fs.rmSync(spy, { force: true });
     const env = { ...process.env };
     if (dispatched) env.FGOS_DISPATCH_DEPTH = '1'; else delete env.FGOS_DISPATCH_DEPTH;
-    const result = spawnSync(process.execPath, ['--import', preload, path.join(root, 'bin/fgos.mjs'), ...args, '--dir', dir], { cwd: repo, encoding: 'utf8', env });
+    const result = spawnSync(process.execPath, ['--import', preload, path.join(root, 'bin/fgos.mjs'), ...args, ...(storeDir ? ['--dir', dir] : [])], { cwd: repo, encoding: 'utf8', env });
     return { ...result, calls: fs.existsSync(spy) ? fs.readFileSync(spy, 'utf8').trim().split('\n') : [] };
   };
 }
@@ -136,7 +137,7 @@ test('a CLI verb that opens the store runs both triggers on maintenance facts, a
 
 test('only a Land verb in a non-dispatched session sweeps retained Land candidates, at the end of the command', (t) => {
   const cli = cliWithNativeSpy(t);
-  const sweeps = (args, options) => cli(args, options).calls.filter((call) => call === 'listRetainedLand').length;
+  const sweeps = (args, options) => cli(args, { ...options, storeDir: false }).calls.filter((call) => call === 'listRetainedLand').length;
   // A refusal still ends the command, so the sweep is proven without building a landable item.
   for (const args of [['approve', 'tsk-absent'], ['sync-root', 'tsk-absent'], ['promote-to-component', 'tsk-a,tsk-b'], ['merge', 'next']]) {
     assert.equal(sweeps(args, { dispatched: false }), 1, `${args[0]} sweeps once at its end`);
