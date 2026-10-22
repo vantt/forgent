@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "identity.write.request",
+  "title": "Identity write request v1",
+  "description": "`fgos identity machine --alias <name>`: replaces <stateRoot>/machine-alias atomically. The alias must follow the Convention machine-handle kind. It changes the handle only, never the machine id, and needs a machine id to exist.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["alias"],
+  "properties": {
+    "alias": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,39}$" }
+  },
+  "definitions": {
+    "outcome": {
+      "$id": "identity.write.outcome",
+      "title": "Identity write outcome v1",
+      "description": "The machine as `identity.read` prints it, after the write.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "handle", "alias"],
+      "properties": {
+        "id": { "type": "string" },
+        "handle": { "type": "string" },
+        "alias": { "type": "string" }
+      },
+      "x-refusals": ["invalid-alias", "machine-id-missing", "machine-id-unreadable", "alias-write-failed"]
+    }
+  }
+}

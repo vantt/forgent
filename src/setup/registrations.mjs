@@ -145,6 +145,7 @@ import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from 
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
+import { checkIdentityMachineId, fixIdentityMachineId } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations, fixTerminalDir } from './terminal-control-checks.mjs';
 import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkLockFences, fixLockFences, checkLockPredecessorKillWait, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
@@ -6302,6 +6303,13 @@ registerCheck({
   description: 'the writer identity resolves through the Rust host, both for the running host and for the activation a plain git commit hook uses',
   check: (cwd) => checkWriterIdentityResolvable(cwd),
 });
+
+registerCheck({
+  id: 'identity-machine-id',
+  description: 'this machine has an id minted by the Identity component (the base of every machine and session handle); absent only warns, `fgos doctor --fix` mints it',
+  check: (cwd) => checkIdentityMachineId(cwd),
+});
+registerFix({ id: 'identity-machine-id', fix: (cwd) => fixIdentityMachineId(cwd) });
 
 /**
  * The host Seat Binding would run (the same resolution the client uses:

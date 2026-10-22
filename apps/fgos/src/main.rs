@@ -109,6 +109,8 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     fgos_observe::OBSERVE_FRICTION_DESCRIPTOR,
     fgos_convention::CONVENTION_DESCRIPTOR,
     fgos_identity::IDENTITY_DESCRIPTOR,
+    fgos_identity::IDENTITY_READ_DESCRIPTOR,
+    fgos_identity::IDENTITY_WRITE_DESCRIPTOR,
 ];
 
 static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
@@ -245,7 +247,15 @@ fn main() {
         ),
     ));
     service.register_provider(Arc::new(fgos_convention::ConventionProvider::new()));
-    service.register_provider(Arc::new(fgos_identity::IdentityProvider::new()));
+    for descriptor in [
+        fgos_identity::IDENTITY_DESCRIPTOR,
+        fgos_identity::IDENTITY_READ_DESCRIPTOR,
+        fgos_identity::IDENTITY_WRITE_DESCRIPTOR,
+    ] {
+        service.register_provider(Arc::new(fgos_identity::IdentityProvider::for_descriptor(
+            descriptor,
+        )));
+    }
     let tracker = service.tracker();
 
     // Help is answered by the legacy-node payload, which owns the verb
@@ -270,11 +280,6 @@ fn main() {
             legacy_exec::execute_legacy_cli(selector, &tracker, cli_args);
         }
         "native" => {
-            let op_id_str = route
-                .operation_id
-                .as_deref()
-                .unwrap_or("distribution.build.show");
-
             if route.subcommands == Some(true) {
                 let (name, available) = NATIVE_SUBCOMMANDS
                     .iter()
@@ -320,6 +325,17 @@ fn main() {
                 eprintln!("{message}");
                 std::process::exit(4);
             }
+
+            let route_operation = route
+                .operation_id
+                .as_deref()
+                .unwrap_or("distribution.build.show");
+            let op_id_owned = cli_projector::native_operation_id(route_operation, cli_args)
+                .unwrap_or_else(|err| {
+                    eprintln!("fgos: error: {}", err);
+                    std::process::exit(1);
+                });
+            let op_id_str = op_id_owned.as_str();
 
             // Only the invocations that take a payload on stdin read it, and
             // they read it to EOF. Every other native verb never touches

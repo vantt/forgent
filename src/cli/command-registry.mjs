@@ -993,26 +993,55 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
-  {
+  withSubcommands({
     name: 'identity',
-    invoke: 'fgos identity',
-    description: 'Read-only: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). Single authority: the Rust crate fgos-identity (docs/platform/identity/spec.md).',
-    parameters: {
-      type: 'object',
-      properties: {
-        pid: { type: 'number', description: 'The process asking. Defaults to the process that started fgos.' },
-        'fgos-dir': { type: 'string', description: 'The .fgos directory whose sessions.json may confirm an env id. Absent skips that confirmation.' },
+    invoke: 'fgos identity [writer|machine|session]',
+    description: 'Read-only unless --alias: who this process and this machine are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle and its alias; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`). Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
+    subcommands: {
+      writer: {
+        description: 'Which writer the calling process is, as {id, source}. Same as bare `fgos identity`; the hook path reads it.',
+        parameters: {
+          type: 'object',
+          properties: {
+            pid: { type: 'number', description: 'The process asking. Defaults to the process that started fgos.' },
+            'fgos-dir': { type: 'string', description: 'The .fgos directory whose sessions.json may confirm an env id. Absent skips that confirmation.' },
+          },
+          required: [],
+        },
+        examples: ['fgos identity', 'fgos identity --pid 4242 --fgos-dir .fgos'],
       },
-      required: [],
+      machine: {
+        description: 'This machine: {id, handle, alias}. The id is minted once per machine by `fgos doctor --fix`; the handle is the alias when one is set, else the id without its suffix. Exit 65 [machine-id-missing] when no id was minted yet.',
+        parameters: {
+          type: 'object',
+          properties: {
+            alias: { type: 'string', description: 'Set the machine alias (a lowercase handle of at most 40 characters). Changes the handle only, never the id.' },
+          },
+          required: [],
+        },
+        examples: ['fgos identity machine --json', 'fgos identity machine --alias fg-server'],
+      },
+      session: {
+        description: 'This session: {id, handle}. The id is <machine-id>/<local id>; the handle is <cli>-<4 characters>@<machine-handle> and never changes for the same session, so it can be pasted on the board. Exit 65 [machine-id-missing] without a machine id, [unresolved] when the caller cannot be told from any other.',
+        parameters: {
+          type: 'object',
+          properties: {
+            pid: { type: 'number', description: 'The process asking. Defaults to the process that started fgos.' },
+            'fgos-dir': { type: 'string', description: 'The .fgos directory whose sessions.json may confirm an env id. Absent skips that confirmation.' },
+          },
+          required: [],
+        },
+        examples: ['fgos identity session --json'],
+      },
     },
-    examples: ['fgos identity', 'fgos identity --pid 4242 --fgos-dir .fgos'],
+    examples: ['fgos identity', 'fgos identity machine --json', 'fgos identity session --json'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
     nativeOnly: true,
-  },
+  }),
   {
     name: 'gate-check',
     invoke: 'fgos gate-check',
