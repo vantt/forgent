@@ -154,7 +154,7 @@ There is one implementation: the Rust crate `fgos-identity`. Observe calls it in
 
 No step counts hops, so wrapper layers between a caller and its terminal never change the answer. Other unix systems skip step 2 (session id from `getsid`).
 
-The rule lives in `packages/identity/rust/src/resolve.rs`; the OS is read only through the `ProcessTree` port (`proc_tree.rs`). The vectors in `identity.writer.golden.v1.json` are run by cargo and, for the env cases, by the Node facade through the real binary.
+The rule lives in `packages/identity/rust/src/resolve.rs`; the OS is read only through the `ProcessTree` port (`proc_tree.rs`), whose Linux driver reads `/proc/<pid>/stat` through `fgos_process::facts::relation_of`, the one parser. The vectors in `identity.writer.golden.v1.json` are run by cargo and, for the env cases, by the Node facade through the door.
 
 ### L4. Verb and contract
 
@@ -162,20 +162,17 @@ The rule lives in `packages/identity/rust/src/resolve.rs`; the OS is read only t
 
 ### L5. Node facade
 
-`resolveWriterIdentity(fgosDir)`:
+The facade has four exports and decides nothing about the id. `resolveWriterIdentity(fgosDir)` and `mintAttemptWriterId(attemptId)` call the combined addon's `sessionIdentity` namespace (`resolve`, `mintAttempt`) through `src/native/door.mjs`, in process: no exec, no cache (the rule is a pure function of the env, the process tree and the registry file, so two calls in one process agree), no refusal under a hot mutex, because nothing is spawned. The Node process is the caller, so the rule's own pid is right.
 
-- Finds the host binary by `src/util/host-bin-path.mjs`: `FGOS_HOST_BIN`, then the activation next to `fgosDir`, then the nearest activation above the cwd. The activation rule is the fgctl shim's (`<releasePath>/bin/fgos`, executable, inside the release).
-- Runs `fgos identity --pid <own pid>` directly (no shim, no `invokeHost`), with a 2000 ms kill deadline; the child is killed and reaped before the facade returns.
-- Caches per process: `pid`/`unresolved` answers by the session env alone; `env`/`registry` answers by session env and fgos dir. Failures are never cached.
-- Never runs the binary while the process holds the `state` or `porting-events` hot mutex: `withStateTx` resolves the writer before locking, and `probeIdentity` refuses (`identity-in-lock`) while one is held.
+`probeIdentity(bin, fgosDir)` is the one exec that remains: doctor asks each candidate host binary `fgos identity --pid <own pid>` directly (2000 ms kill deadline; the child writes no invocation record), so a stale activation shows up by name.
 
-Errors (`WriterIdentityError`, category `precondition`, exit 2): `host-missing`, `host-version-mismatch` (the active release has no `identity` verb), `timeout`, `host-error`, `bad-output`, `identity-in-lock`. A verb that writes state fails before writing. `unresolved` is a valid answer and blocks nothing.
+Errors (`WriterIdentityError`, category `precondition`, exit 2): `host-missing` (the door cannot load; from a checkout it names `npm run fgos:dev`; the probe's binary cannot run), `host-version-mismatch` (probe only: the active release has no `identity` verb), `host-error` (probe only: the host failed, hung, or printed an unexpected answer), `invalid-attempt-id`. A verb that writes state fails before writing. `unresolved` is a valid answer and blocks nothing.
 
 ### L5a. Attempt writer id (launcher half)
 
-An agent run (attempt) writes under its own id: `mint_attempt_writer_id(attemptId)` = `att-<attemptId>`, a pure function so a resume gets the same id and the same env digest (`packages/identity/contracts/attempt-writer-id.v1.json`, vectors beside it). Node reaches it only through `fgos internal identity mint-attempt --attempt <id> --protocol 1` (facade `mintAttemptWriterId`; exit 65 / `invalid-attempt-id` for an unusable id); same lock rule as the resolver. The launcher applies `scrub_and_set(env, writerId, parentWriterId)`: it removes `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID` and any inherited `FGOS_PARENT_WRITER_ID`, overwrites `FGOS_SESSION_ID` (never empty, so an inherited empty value cannot reach the agent) and sets `FGOS_PARENT_WRITER_ID` to the controller's writer id. `workerBaseEnv` no longer passes any of the three session ids. Codex only carries a minted id through `-c shell_environment_policy.set={FGOS_SESSION_ID=...}`; the other CLIs inherit the env.
+An agent run (attempt) writes under its own id: `mint_attempt_writer_id(attemptId)` = `att-<attemptId>`, a pure function so a resume gets the same id and the same env digest (`packages/identity/contracts/attempt-writer-id.v1.json`, vectors beside it). Node reaches it through the door (`sessionIdentity.mintAttempt`, facade `mintAttemptWriterId`; `invalid-attempt-id` for an unusable id); the former `fgos internal identity mint-attempt` route is gone. The launcher applies `scrub_and_set(env, writerId, parentWriterId)`: it removes `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID` and any inherited `FGOS_PARENT_WRITER_ID`, overwrites `FGOS_SESSION_ID` (never empty, so an inherited empty value cannot reach the agent) and sets `FGOS_PARENT_WRITER_ID` to the controller's writer id. `workerBaseEnv` no longer passes any of the three session ids. Codex only carries a minted id through `-c shell_environment_policy.set={FGOS_SESSION_ID=...}`; the other CLIs inherit the env.
 
-Who mints and who scrubs. The controller asks the route once per attempt and writes the result into the envelope (`identity {writerId, parentWriterId}`, both launch modes, so a resume re-derives the same envelope digest). The **gate** applies it: it starts the agent with `env_clear` plus the envelope's environment plus `FGOS_SESSION_ID` and `FGOS_PARENT_WRITER_ID`, because a pane inherits the environment of the herdr server, which `--env` cannot clear. In a pane the gate keeps only the pane's own `TERM*` and `HERDR_*` variables, and the controller strips its own copies of those from the envelope and side file. Lineage is one step: `FGOS_PARENT_WRITER_ID` is the controller's writer id, so an observer can tie an agent's writes to the run that started it.
+Who mints and who scrubs. The controller mints once per attempt and writes the result into the envelope (`identity {writerId, parentWriterId}`, both launch modes, so a resume re-derives the same envelope digest). The **gate** applies it: it starts the agent with `env_clear` plus the envelope's environment plus `FGOS_SESSION_ID` and `FGOS_PARENT_WRITER_ID`, because a pane inherits the environment of the herdr server, which `--env` cannot clear. In a pane the gate keeps only the pane's own `TERM*` and `HERDR_*` variables, and the controller strips its own copies of those from the envelope and side file. Lineage is one step: `FGOS_PARENT_WRITER_ID` is the controller's writer id, so an observer can tie an agent's writes to the run that started it.
 
 ### L6. Known limits
 
@@ -189,7 +186,7 @@ Who mints and who scrubs. The controller asks the route once per attempt and wri
 - Env ids leak: a process started from a Codex shell carries `CODEX_THREAD_ID`, which now outranks `CLAUDE_CODE_SESSION_ID`.
 - `FGOS_HOST_BIN` is inherited: children use their parent's host binary.
 - A pane root pid can be reused after the pane closes.
-- The `/proc` reader here and the one in `packages/observe/rust/src/store_lock.rs` are two adapters; both move into the process-facts component when it exists.
+- The process-tree adapter reads through `fgos-process`. The `/proc` readers still outside it are the one in `packages/observe/rust/src/store_lock.rs` and the run supervisor's two `/proc/<pid>/stat` parsers.
 
 ### L7. Doctor
 
@@ -211,6 +208,8 @@ Who mints and who scrubs. The controller asks the route once per attempt and wri
 6. **Migration.** Should the board switch to handles as soon as I3 lands, and who rewrites existing rows?
 
 ## 10. Decision history
+
+- 2026-10-22 — The writer identity resolves in process: the combined addon gains `sessionIdentity.{resolve,mintAttempt}` over this crate, the Node facade drops its exec, caches and error classification (four exports, `host-error` kept for the doctor probe), `fgos internal identity mint-attempt` is deleted, and the process-tree adapter reads through `fgos-process`. The writer id rule and its values are unchanged (the golden vectors run unchanged). HARDEN T1 phase 6.
 
 - 2026-10-22 — Owner opens lane IDENT: "identity càng sớm càng tốt", to cover cross-machine identity minting independent of any project, because lanes on different machines already talk through Git and address each other loosely and inaccurately. Draft written by session `f2c6f8ce` (lane MAIL lead) from the inventory in section 3; the owner will assign another agent on another machine to take the lane.
 - 2026-10-22 11:05 — Lane taken by session `b8f192bf` on the owner machine `fg-server`, handed over by HARDEN `forgent-a8`. Added the path-derived workspace id to section 3. G0 questions sent to the owner.
