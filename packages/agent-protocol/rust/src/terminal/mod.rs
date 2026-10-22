@@ -334,11 +334,17 @@ impl Terminal {
             if let Some((banner, screen)) = self.start_banner_on(io) {
                 // One key per changed screen, so a stale frame after a press never earns a second.
                 if presses < MAX_BANNER_PRESSES && pressed_on.as_ref() != Some(&screen) {
-                    let _ = io.send(&SendInput {
-                        text: None,
-                        keys: Some(vec![banner.dismiss_key.to_string()]),
-                        submit: false,
-                    });
+                    // A refused key press leaves the banner up and nothing typed.
+                    if io
+                        .send(&SendInput {
+                            text: None,
+                            keys: Some(vec![banner.dismiss_key.to_string()]),
+                            submit: false,
+                        })
+                        .is_err()
+                    {
+                        return Readiness::NotReady;
+                    }
                     presses += 1;
                     // The banner screen is the baseline: the screen under it counts as the prompt drawing.
                     launch_screen = Some(screen.clone());
