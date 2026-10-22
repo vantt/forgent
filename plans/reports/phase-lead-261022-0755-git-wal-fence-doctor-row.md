@@ -120,3 +120,20 @@ T1 deletes.
 ## 4. Unresolved
 - Whether a pre-WAL `fgctl` remains on forgentX, mdview or mcp-skill-hub (owner machines, not inspectable here).
 - Owner call: adding the fence check to the three Land doors (section 1c).
+
+## 5. Follow-ups
+
+- Land doors: `prepare_land`, `publish_land` and `acknowledge_land` now call `wal::require_activation_fence` before
+  opening the WAL (`land.rs:384, 754, 1587`). One owning test, `land_doors_refuse_an_unfenced_workspace_without_writing_records`
+  (`packages/git/rust/tests/land.rs`), removes the fence and checks all three refuse `git-fence-missing`, the
+  prepared chain gains no record and a fresh id writes none. The spec names no Land door, so no spec edit.
+  `cargo test -p fgos-git -p fgos-distribution -p fgos-node-addon` green (56 result lines ok), clippy `-D warnings` clean,
+  census regenerated (0 undeclared).
+- The four npm failures, rerun through the suite's own env and host staging (`runSelectedTests`, host binary,
+  addon and release artifacts built per tree) on only the four owning files, on a detached `origin/main` worktree
+  (3b4f4c2e0) and on this branch: both give 95 tests, 94 pass, 1 fail, the same one:
+  `decideExecutorCli resolves dispatch plan for an assignment` with `RunnerConfigError ... executors.claude "kind"
+  must be one of agent/tool, got: undefined` (`test/runner/assignment-dispatch.test.mjs:309`). Pre-existing on main.
+  The other three (`two checkers whose leases conflict...`, `host-version-mismatch`, seat-binding route row) passed on
+  both trees; in the full run their errors were `spawnSync ... EPIPE` on a fake host script, a timing flake
+  under whole-suite load, not caused by this change.
