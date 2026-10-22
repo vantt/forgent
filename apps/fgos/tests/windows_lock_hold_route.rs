@@ -114,13 +114,11 @@ fn an_unknown_request_is_refused_by_name_and_probe_sees_held_and_free() {
     fs::write(work.join("req-1.json"), r#"{"op":"nope"}"#).unwrap();
     assert_eq!(wait_for(&work.join("result-1.json"), "result-1.json")["error"], "request-unknown");
 
-    let probe_out = Command::new(fgos()).args(["internal", "lock-fd", "--protocol", "2", "--probe"]).arg(&lock).stdin(Stdio::null()).output().unwrap();
-    assert_eq!(probe_out.status.code(), Some(10));
-    assert!(String::from_utf8_lossy(&probe_out.stdout).contains("\"result\":\"held\""));
+    // The probe is the crate's own (a fresh description and a shared try), the one the in-process door runs.
+    let resource = Resource::new("hold", &lock);
+    assert_eq!(probe(&resource).unwrap(), Probe::Held);
     helper.kill().unwrap();
     helper.wait().unwrap();
-    let free = Command::new(fgos()).args(["internal", "lock-fd", "--protocol", "2", "--probe"]).arg(&lock).stdin(Stdio::null()).output().unwrap();
-    assert_eq!(free.status.code(), Some(0));
-    assert!(String::from_utf8_lossy(&free.stdout).contains("\"result\":\"free\""));
+    assert_eq!(probe(&resource).unwrap(), Probe::Free);
     let _ = fs::remove_dir_all(&dir);
 }

@@ -19,14 +19,14 @@ const HOST_BIN = process.env.FGOS_HOST_BIN;
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-internal-routes-'));
 after(() => fs.rmSync(scratch, { recursive: true, force: true }));
 
-function host(args, { fd, env } = {}) {
+function host(args, { env } = {}) {
   assert.ok(HOST_BIN && fs.existsSync(HOST_BIN), `set FGOS_HOST_BIN to a host built from this checkout (npm test does): ${HOST_BIN}`);
   const childEnv = { ...process.env, ...env };
   delete childEnv.FGOS_LOCK_FD;
   return spawnSync(HOST_BIN, ['internal', ...args], {
     encoding: 'utf8',
     env: childEnv,
-    stdio: fd === undefined ? ['ignore', 'pipe', 'pipe'] : ['ignore', 'pipe', 'pipe', fd],
+    stdio: ['ignore', 'pipe', 'pipe'],
     timeout: 30000,
   });
 }
@@ -74,33 +74,6 @@ test('state-root answers the pinned root and its lock root', () => {
   assert.equal(parsed.stateRoot, path.join(scratch, 'state'));
   assert.equal(parsed.lockRoot, path.join(scratch, 'state', 'locks'));
   assert.equal(parsed.source, 'pinned');
-});
-
-test('lock-fd locks the caller\'s description at fd 3 and the lock outlives the helper', { skip: process.platform === 'win32' }, () => {
-  const lockPath = path.join(scratch, 'node.lock');
-  const mine = fs.openSync(lockPath, 'a+');
-  try {
-    const acquired = host(['lock-fd', '--protocol', '2', '--try'], { fd: mine });
-    assert.equal(acquired.status, 0, acquired.stderr);
-    assert.equal(line(acquired).result, 'acquired');
-    const other = fs.openSync(lockPath, 'a+');
-    try {
-      const held = host(['lock-fd', '--protocol', '2', '--try'], { fd: other });
-      assert.equal(held.status, 10);
-      assert.deepEqual(line(held), { v: 2, protocol: 2, result: 'held', reason: 'kernel-lock-held' });
-    } finally {
-      fs.closeSync(other);
-    }
-  } finally {
-    fs.closeSync(mine);
-  }
-  const again = fs.openSync(lockPath, 'a+');
-  try {
-    const free = host(['lock-fd', '--protocol', '2', '--try'], { fd: again });
-    assert.equal(line(free).result, 'acquired', 'closing the owner description released the lock');
-  } finally {
-    fs.closeSync(again);
-  }
 });
 
 test('the run supervisor routes fail closed on a protocol other than 1', () => {

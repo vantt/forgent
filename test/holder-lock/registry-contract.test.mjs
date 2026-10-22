@@ -264,13 +264,6 @@ test('the windows-job record carries every key of the domain shape', () => {
   assert.ok(views.keeperExit);
 });
 
-test('lock-fd adds the path probe and the read-only predecessor state', () => {
-  const flags = lockFdContract.argv.mode.exactlyOne.map((entry) => entry.flag.split(' ')[0]);
-  assert.ok(flags.includes('--probe'));
-  assert.ok(flags.includes('--predecessor-state'));
-  assert.deepEqual(lockFdContract.stdout.results.predecessor.state.enum, ['empty', 'not-empty', 'unknown', 'absent']);
-});
-
 test('lock-hold names its argv and every work-directory file', () => {
   assert.equal(lockHoldContract.command, 'fgos internal lock-hold');
   assert.deepEqual(lockHoldContract.argv.required, ['--protocol 2', '--path <lockFile>', '--mode ex|sh', '--work <dir>']);

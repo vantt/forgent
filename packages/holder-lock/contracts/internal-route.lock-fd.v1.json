@@ -1,74 +1,43 @@
 {
   "contract": { "id": "internal-route-lock-fd", "version": 1 },
   "command": "fgos internal lock-fd",
-  "description": "Cold-path helper for Node, which cannot call flock. Node opens the lock file (O_RDWR) and hands that fd in slot 3; the helper locks the inherited description and exits. The lock stays with the description Node owns. The helper is never the owner.",
+  "description": "Cold-path helper for the git hook, which runs from a checkout and cannot reach the in-process door. Every other lock operation (acquire, try, wait, probe, guarantee, drain, clear-domain, predecessor state, holders) runs in the caller's process through the `holderLock` namespace of the combined addon. The helper only judges whether a descriptor a process inherited is the very description that holds a lock.",
   "argv": {
     "required": ["--protocol 2"],
-    "predecessorKinds": "--predecessor-kinds <kind,kind>: on acquire reject other recorded kinds under the kernel lock before ordinary cleanup",
     "mode": {
       "exactlyOne": [
-        { "flag": "--try", "meaning": "one non-blocking LOCK_EX attempt on fd 3" },
-        { "flag": "--wait-ms N", "meaning": "LOCK_EX attempts until N milliseconds elapsed (N integer >= 1); the caller still kills the helper on its own deadline" },
-        { "flag": "--clear-domain <lockFile>", "meaning": "validate the held description at fd 3; observe the unchanged predecessor domain empty without killing, then clear its record" },
-        { "flag": "--shared-try", "meaning": "one non-blocking LOCK_SH attempt on fd 3; result free or held; the caller closes fd 3 afterwards" },
-        { "flag": "--borrowed-check <path>", "meaning": "borrower test for hooks: fd 3 must have the same dev:ino as <path> and a non-blocking LOCK_EX on it must succeed (a description that already holds the lock succeeds; a sibling that opened the file itself fails). On Windows it takes no slot and uses FGOS_LOCK_JOB (holder-lock.port.v1.json borrowerCheck)" },
-        { "flag": "--probe <lockFile>", "meaning": "path-based shared try, no fd needed (Node on Windows): result free or held; the shared lock is dropped at once" },
-        { "flag": "--predecessor-state <lockFile>", "meaning": "read-only: one pass of the contender view on the predecessor record next to <lockFile>; never kills; result predecessor" },
-        { "flag": "--drain-child <pid>", "meaning": "Linux: inherited fd 3 drain under the refined borrow rule; the helper parent is the holder, direct pre-exec children outside the borrow domain are waited, escapees are killed and verified" },
-        { "flag": "--guarantee <path>", "meaning": "no fd needed; print the guarantee of the directory <path> lives in" }
+        { "flag": "--borrowed-check <path>", "meaning": "borrower test for hooks: fd 3 must have the same dev:ino as <path> and a non-blocking LOCK_EX on it must succeed (a description that already holds the lock succeeds; a sibling that opened the file itself fails). On Windows it takes no slot and uses FGOS_LOCK_JOB (holder-lock.port.v1.json borrowerCheck)" }
       ]
     },
-    "optional": [
-      { "flag": "--kill-wait-ms N", "applies": ["--try", "--wait-ms", "--drain-child"], "default": 2000, "meaning": "predecessor kill wait; source lock.predecessorKillWaitMs" },
-      { "flag": "--protected-roots <comma-separated-pids|->", "applies": ["--drain-child"], "meaning": "Live sibling borrow roots from the owning Node handle: their groups and descendants are waited on, never killed. New borrows refuse during a drain snapshot." },
-      { "flag": "--reach-floor-ticks <decimal>", "applies": ["--drain-child"], "meaning": "Required actual guarantee observation retained before opening this description; missing or future floors refuse, never a full per-spawn scan." },
-      { "flag": "--predecessor <path>", "applies": ["--try", "--wait-ms"], "meaning": "predecessor record path; default <lock file>.predecessor.json derived from fd 3" }
-    ],
     "unknownFlag": "usage error, exit 2"
   },
   "fds": {
-    "in": "POSIX: fd 3 = the lock file description (inherited, O_RDWR). The helper sets FD_CLOEXEC on it before any other syscall. Windows: the path-based flags (--probe, --predecessor-state, --borrowed-check) read no slot.",
+    "in": "POSIX: fd 3 = the inherited description (O_RDWR). The helper sets FD_CLOEXEC on it before any other syscall. Windows: no slot is read.",
     "out": "stdout = one JSON line then newline; stderr = free text for humans, never parsed",
     "stdin": "unused, may be closed"
   },
   "stdout": {
     "common": { "v": 2, "protocol": 2 },
     "results": {
-      "drained": { "result": "drained", "leftoversKilled": "integer", "remaining": [] },
-      "not-drained": { "result": "not-drained", "leftoversKilled": "integer", "remaining": "pid array; description retained" },
-      "acquired": { "result": "acquired" },
-      "held": { "result": "held", "reason": { "enum": ["kernel-lock-held", "predecessor-domain-not-empty"] }, "domain": "predecessor domain record, only for predecessor-domain-not-empty" },
-      "timeout": { "result": "timeout", "waitedMs": "integer" },
-      "unavailable": { "result": "unavailable", "reason": { "enum": ["unsupported-platform", "unsupported-filesystem", "io-error"] }, "detail": "string" },
-      "free": { "result": "free" },
       "borrower": { "result": "borrower" },
       "not-borrower": { "result": "not-borrower", "reason": { "enum": ["fd-missing", "inode-mismatch", "lock-not-held-by-description", "not-a-lock-file", "job-missing", "record-mismatch", "not-in-job", "holder-not-ancestor", "lock-not-held"] } },
-      "predecessor": { "result": "predecessor", "state": { "enum": ["empty", "not-empty", "unknown", "absent"] }, "domain": "predecessor domain record, absent when state is absent", "reason": "string, present when state is not-empty or unknown (e.g. predecessor-other-session, no-judge-on-this-platform, record-unknown-shape, record-not-json, record-unreadable); record-unreadable adds detail, record-not-json names domain {raw: first 120 characters}" },
-      "guarantee": { "result": "guarantee", "guarantee": "guarantee object of holder-lock.port.v1.json", "reachFloorTicks": "decimal string or null: actual Linux boot-tick observation before the caller opens a fresh acquired description; null when unreadable or unsupported" },
+      "unavailable": { "result": "unavailable", "reason": { "enum": ["unsupported-platform", "unsupported-filesystem", "io-error"] }, "detail": "string" },
       "error": { "result": "error", "code": { "enum": ["host-version-mismatch", "usage", "io", "internal"] }, "message": "string" }
     }
   },
   "exitCodes": {
-    "0": "acquired | free | borrower | guarantee | predecessor",
+    "0": "borrower",
     "2": "usage error (result error, code usage)",
     "3": "protocol mismatch (result error, code host-version-mismatch; --protocol absent or != 2)",
-    "10": "held | not-borrower",
-    "11": "timeout",
+    "10": "not-borrower",
     "12": "unavailable",
     "70": "internal or io error (result error)"
   },
   "invariants": [
-    "after --try/--wait-ms with result acquired, the lock lives on the caller's description; helper exit must not release it",
-    "on held (kernel-lock-held), timeout and unavailable the helper never took a lock on the description",
-    "on held (predecessor-domain-not-empty) the kernel lock was taken on the caller's description before the predecessor rule ran; the helper cannot drop it without LOCK_UN, so the caller's close releases it",
-    "the helper never calls LOCK_UN",
+    "the helper never takes a lock that outlives it and never calls LOCK_UN",
     "the helper never leaves fd 3 open in a child it spawns (it spawns none)"
   ],
   "callerRules": {
-    "timeout": "wait with spawnSync and killSignal SIGKILL; when it returns the helper is dead and reaped; close the fd; the result is not-acquired unless the stdout line says acquired",
-    "afterAcquire": "check fstat(fd).ino == stat(path).ino; otherwise close and retry",
-    "release": "close(fd)",
-    "notAcquired": "close fd 3 on every result other than acquired (required for held predecessor-domain-not-empty, harmless otherwise); never retry on the same description",
     "resolution": "exec the binary named by FGOS_HOST_BIN or the activation, resolved once per process; never through a shim; never inside a hot lock"
   }
 }
