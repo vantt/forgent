@@ -17,6 +17,7 @@ that a test edits while it runs:
   closed.<pane>  written when that pane is closed; its commands then say pane_not_found
   unreadable     when present, `pane read`, `agent get` and `agent explain` fail as an unreachable server does
   no-process     when present, `pane process-info` reports only the pane's shell
+  shell-stuck    when present, the pane's shell never runs a typed command line: a probe prints nothing
   calls.log      every call, arguments joined by a tab (written here)
   sent.jsonl     what was typed at the pane: text, keys, prompt (written here)
   typescript.log everything the pane's command printed (written by `script`)
@@ -152,9 +153,10 @@ if (group, action) == ("pane", "get"):
 if (group, action) == ("pane", "run"):
     line = rest[1]
     if line.startswith("printf '%s%s\\n' fgos-ok-"):
-        res = subprocess.run(["sh", "-c", line], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        with open(path(f"probe.{TARGET}.txt"), "a") as f:
-            f.write(res.stdout)
+        if not os.path.exists(path("shell-stuck")):
+            res = subprocess.run(["sh", "-c", line], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            with open(path(f"probe.{TARGET}.txt"), "a") as f:
+                f.write(res.stdout)
         say({"type": "ok"})
     proc = subprocess.Popen(
         ["setsid", "script", "-qefc", line, path("typescript.log")],
