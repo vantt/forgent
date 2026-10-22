@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a38567882ff16ad557f61b77ca57b49bc2ca7a2d3222f0a3ee294b6171c846d0",
+  "payloadDigest": "97b93914835ff8ba4175e279a28d5fd645f64c88361800ca7e79398132b9a106",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -203,7 +203,7 @@
     "packages/distribution/rust/src/lock.rs": "e79b03663013f69e83f509bfa2745825ee3a796f979746e419241b54823094b0",
     "packages/distribution/rust/src/manifest.rs": "cc45d293313bf2de2b912293a52dc1f76214eb4c06b56b28f90ab52d640d274a",
     "packages/distribution/rust/src/shim.rs": "514621d5e1db91ec89b368d9644a28cd64eb8d797734c8b29ef9418ad559ab80",
-    "packages/distribution/rust/src/store.rs": "1ef04ef8c51a9830b614bab0d211d68a7facc3f7588458bb24f55bf2796f7c8a",
+    "packages/distribution/rust/src/store.rs": "7bd1e141a72e4db792ef9c2346872b3a79fb72e0978b47cbbad124a65217f2c6",
     "packages/distribution/rust/src/verify.rs": "45abf2dc964ec6fe1687d1cac3bc46654a6b32552ffe8d12d0f1c5753f42b800",
     "packages/distribution/rust/src/workspace.rs": "a1ed550bb846d8a256048134a8a631afa2801f78163ba6f39b73c4ecb19e1f3f",
     "packages/distribution/rust/tests/activation_lock_multiprocess.rs": "13b49506f7c45415429a6f1161577b9d33b3c819067777dfa0708332c1c96236",
@@ -451,7 +451,7 @@
     "packages/process/rust/tests/judge_vectors.rs": "b1633fd4092114d469cba250fbbb8f01724cc5e3a66d85e046b373ed259ef401",
     "packages/process/rust/tests/signal_identity.rs": "7048cb36bffbf0fe9700e4d27460416b908f8169b57843c6c79d69920cfa9c4e",
     "packages/process/rust/tests/spawn_fds_leak.rs": "c6fefe723951b53ad2704a174b6c430a74fabbaf6ba13f7e00ce8aab9dea585f",
-    "packages/process/rust/tests/spawn_mapped.rs": "659cb1f70d99b2f7592600485d575b0176ef7192e62d8036a75b70cb21564610",
+    "packages/process/rust/tests/spawn_mapped.rs": "599f081bfb3860ef6d94db2b9b45fd2b4046a0c16f1b10d571a0f639920f8581",
     "packages/process/rust/tests/windows_job_domain.rs": "ef43f9d374fb9254ea75dca253c0bd82c8eb3fee5e676d1d14d14da1657b54ba",
     "packages/process/rust/tests/windows_spawn.rs": "5c8eb632a466203a847a2f6f5a57b401ebda7906509bfc62aece0124fee77e54",
     "packages/run-result/rust/src/lib.rs": "daca8cfaf844a31c9841d731f821d5dbd555eb0aba1c8d53bcad27bf5d5f7f67",

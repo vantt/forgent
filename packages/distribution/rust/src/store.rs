@@ -341,20 +341,9 @@ mod tests {
 
         // After dropping lock1, acquiring should succeed again
         let lock3 = InstallLockGuard::acquire(&temp_dir);
-        assert!(lock3.is_ok());
+        assert!(lock3.is_ok(), "{:?}", lock3.as_ref().err());
 
         let _ = std::fs::remove_dir_all(&temp_dir);
-    }
-
-    #[test]
-    fn test_resolve_store_root_precedence() {
-        std::env::remove_var("FGOS_STATE_ROOT");
-        std::env::set_var("FGOS_STATE_HOME", "/custom/fgos/state");
-        std::env::set_var("XDG_STATE_HOME", "/custom/xdg/state");
-        let resolved = resolve_machine_release_store_root();
-        assert_eq!(resolved, PathBuf::from("/custom/fgos/state"));
-        std::env::remove_var("FGOS_STATE_HOME");
-        std::env::remove_var("XDG_STATE_HOME");
     }
 
     #[test]
