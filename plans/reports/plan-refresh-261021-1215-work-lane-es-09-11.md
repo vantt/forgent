@@ -222,7 +222,12 @@ Two questions remain where the plan or spec leaves a real choice.
 
 The board does not need these answers before U0-U2. Q-W2 blocks U3. Q-W1 blocks only the U9 item 9 row.
 
-## Unresolved
+## Owner decisions after the refresh (2026-10-22)
+
+- **M3 Land-candidate release, option (b), 16:46.** One release function next to `acknowledgeLand`, called from the end-of-command trigger only when `listRetainedLand` is non-empty. It releases a candidate only when a Work event records that Land operation id. The acknowledgement becomes the event hash instead of `work-decision:<id>:<seq>`, and all three Land paths (`approve`, `sync-root`, `promote-to-component`) record the operation id. Doctor `git-land-recovery` stays read-only. No `packages/git` change. Runs right after U5.
+- **Porting duplicate add, option (b), 16:46.** `porting.add` of an existing id no longer replaces the record or resets its status. Runs with the M3 unit.
+- **Feature list for the owner (not scheduled):** H22 (hot mutex writes its own record once per process); full porting cross-clone conflicts (preconditions plus recorded conflicts, as Work has).
+
 
 - [UNVERIFIED] Whether Git 07 requirement 5 (windows-x64 addon required) closed outside `manifest.rs`. That belongs to the Git/HARDEN lanes. WORK records the result at U9.
 - U10 requires the owner's hour, and the stop-everything slot order relative to HARDEN's layer landings.

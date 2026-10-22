@@ -3,14 +3,11 @@
 // state into has to be a private one, with the account's login provisioned by the provider account inventory.
 
 import '../helpers/process-tmp-root.mjs';
+import { committedRunnerConfig } from '../helpers/committed-config.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const runner = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'config.json'), 'utf8')).runner;
+const runner = committedRunnerConfig();
 const find = (executor, id) => runner.executors[executor].invocations.find((inv) => inv.id === id);
 
 const providers = [
