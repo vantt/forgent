@@ -123,12 +123,13 @@ export function hookPreflight(cli, home) {
 }
 
 /**
- * The print-mode Claude Code argv: only the `settings` file loads (the
- * workspace has no project settings), haiku, every permission skipped.
+ * The Claude Code argv, print mode unless `print` is false (an interactive
+ * session whose first message is `prompt`): only the `settings` file loads
+ * (the workspace has no project settings), haiku, every permission skipped.
  */
-export function claudeArgs({ settings, prompt, sessionId = null, extra = [] }) {
+export function claudeArgs({ settings, prompt, sessionId = null, extra = [], print = true }) {
   return [
-    '-p', '--model', 'haiku', '--dangerously-skip-permissions', '--setting-sources', 'project',
+    ...(print ? ['-p'] : []), '--model', 'haiku', '--dangerously-skip-permissions', '--setting-sources', 'project',
     '--settings', settings,
     ...(sessionId ? ['--session-id', sessionId] : []),
     ...extra,
@@ -149,10 +150,12 @@ export function makeCodexHome({ home, accountAuth, ws, hooks }) {
   fs.writeFileSync(path.join(home, 'hooks.json'), `${JSON.stringify({ hooks }, null, 2)}\n`);
 }
 
-/** The `codex exec` argv for workspace `ws`. */
-export function codexArgs({ ws, prompt }) {
-  return ['exec', '--dangerously-bypass-hook-trust', '--dangerously-bypass-approvals-and-sandbox',
-    '--skip-git-repo-check', '-C', ws, prompt];
+/** The `codex exec` argv for workspace `ws`, or with `print` false the
+ * interactive session whose first message is `prompt`. */
+export function codexArgs({ ws, prompt, print = true }) {
+  return print
+    ? ['exec', '--dangerously-bypass-hook-trust', '--dangerously-bypass-approvals-and-sandbox', '--skip-git-repo-check', '-C', ws, prompt]
+    : ['--dangerously-bypass-hook-trust', '--dangerously-bypass-approvals-and-sandbox', '-C', ws, prompt];
 }
 
 /**
@@ -180,6 +183,21 @@ export function makeClaudeHome({ home, claudeDir }) {
   const rc = ['.zshrc', '.bashrc', '.profile', '.zshenv', '.bash_profile'].filter((f) => fs.existsSync(path.join(home, f)));
   if (rc.length) throw new LiveCliError(`${home} holds shell rc files: ${rc.join(', ')}`);
   fs.symlinkSync(claudeDir, path.join(home, '.claude'));
+}
+
+/**
+ * The first-run state an interactive Claude Code session in a fresh run
+ * `HOME` would otherwise stop on: onboarding done, release notes seen, and
+ * the workspaces `trusted`. Only these keys; Claude Code adds its own.
+ */
+export function seedClaudeState({ home, version, trusted }) {
+  const projects = Object.fromEntries(trusted.map((dir) => [dir, { hasTrustDialogAccepted: true }]));
+  fs.writeFileSync(path.join(home, '.claude.json'), `${JSON.stringify({
+    hasCompletedOnboarding: true,
+    lastOnboardingVersion: version,
+    lastReleaseNotesSeen: version,
+    projects,
+  }, null, 2)}\n`, { mode: 0o600 });
 }
 
 /** Whether a run `HOME`'s `.claude` is still the symlink to `claudeDir`. */

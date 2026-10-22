@@ -64,7 +64,7 @@ Full size `S` = queue.cap (50) × (maxBodyBytes (16384) + 3) + queue.cap (50) ×
 
 Plan owner's rules applied: every wait in the prompts is the `until [ -f <file> ]; do sleep 2; done` loop of L1's redesign (the plan's `sleep 60` and `sleep 75` steps would hit the same refusal), and the harness writes a session's `inbox-<n>.txt` when the n-th message to that session is recorded, so each hop is triggered, not timed (a scene without progress for 180 s would release every wait; it never happened). Each Claude session runs with its own isolated `HOME` linked to `~/.claude`; Lan under Codex runs with an empty `HOME` and its own `CODEX_HOME` (`auth.json` a link to the Codex test account's file). The trusted-sender first line of Lan's prompt is the stand-in of plan decision 12, not the `inbound.<class>` key. Both demos passed their dry run (stub Claude and stub Codex) first. Context: on one machine Claude to Claude is already served by the harness's own messaging between sessions of the same permission class (spec §16 question 3); D1 shows the mailbox path works end to end, not that it is needed there.
 
-### D1, Claude to Claude (2 invocations): delivery passed, the nonce check failed
+### D1, Claude to Claude (2 invocations): passed for delivery (plan owner's decision); the nonce miss is a prompt-design finding
 
 > **Minh:** [1/4] Chào Lan, code của em chạy mượt như nụ cười của em vậy, cho anh mời em ly cà phê nhé? 55014a4b  
 > **Lan:** [2/4] Cà phê thì Lan nhận, nhưng anh phải mời kèm bánh nữa đó nhé.  
@@ -87,3 +87,5 @@ Every check passed, the nonce on all four messages and all four final lines incl
 Idle wake (no wake channel in V4), interactive sessions (D3 and D4, waiting for the owner's go), a supported Codex adapter (V7; D2 is a feasibility demo, not a support claim), adversarial senders (V6).
 
 Live spend after phase 9's print-mode part: phase 9 4 invocations (Claude 3, Codex 1); V4 total 14.
+
+Plan owner's decision after D1/D2: D1 counts as passed for delivery; Lan's prompt now names the nonce explicitly for every later scene. D3 and D4 (interactive panes) are prepared and dry-run in a separate herdr session; they wait for the owner's go.

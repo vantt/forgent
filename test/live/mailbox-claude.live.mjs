@@ -397,8 +397,11 @@ function commandWords(command) {
  * its HOME and a transcript of the recorded record types. Codex: a rollout
  * of developer messages under CODEX_HOME, and `CODEX_THREAD_ID` for its tools.
  */
-function cmdStub(kind, argv) {
+function cmdStub(kind, rawArgv) {
   const codex = kind === 'codex';
+  // An interactive session stays open after its last line, as a pane does.
+  const interactive = rawArgv.includes('--interactive');
+  const argv = rawArgv.filter((a) => a !== '--interactive');
   const at = (flag) => argv[argv.indexOf(flag) + 1];
   const prompt = argv[argv.length - 1];
   let settings;
@@ -425,6 +428,8 @@ function cmdStub(kind, argv) {
     record = (r) => {
       const text = r.attachment?.content?.join('\n') ?? r.attachment?.blockingError?.blockingError;
       if (text) fs.appendFileSync(rollout, `${JSON.stringify({ type: 'response_item', payload: { type: 'message', role: 'developer', content: [{ type: 'input_text', text }] } })}\n`);
+      const said = r.type === 'assistant' ? r.message.content.find((c) => c.type === 'text')?.text : null;
+      if (said) fs.appendFileSync(rollout, `${JSON.stringify({ type: 'response_item', payload: { type: 'message', role: 'assistant', content: [{ type: 'output_text', text: said }] } })}\n`);
     };
   } else {
     const sessions = path.join(home, '.claude', 'sessions');
@@ -491,6 +496,17 @@ function cmdStub(kind, argv) {
     record({ type: 'assistant', message: { role: 'assistant', content: [{ type: 'text', text }] } });
   }
   process.stdout.write(`${text}\n`);
+  if (interactive) {
+    // Waits for the user like a session in a pane, until the pane is closed.
+    setInterval(() => {}, 1 << 30);
+    const leave = () => {
+      if (sessionFile) fs.rmSync(sessionFile, { force: true });
+      process.exit(0);
+    };
+    process.on('SIGTERM', leave);
+    process.on('SIGHUP', leave);
+    return;
+  }
   if (sessionFile) fs.rmSync(sessionFile, { force: true });
 }
 
@@ -804,17 +820,44 @@ async function cmdRun(name, dry, exampleArg) {
 
 // ---------------------------------------------------------------- the two-session demo (phase 9)
 
+/** Print mode: both sessions are `claude -p` / `codex exec`. */
 const DEMOS = ['D1', 'D2'];
+/** Interactive scenes in two herdr panes, opened through Terminal Control. */
+const SCENES = ['D3', 'D4'];
 const DEMO_PROJECT = 'mbxdemo';
 /** How long a scene may make no progress before the harness ends every wait. */
 const DEMO_STALL_MS = 180_000;
+/** After every wait is released, how long a pane scene still waits for both final answers. */
+const SCENE_FINAL_MS = 120_000;
+/** A herdr session of its own for dry scenes, never the owner's. */
+const DRY_HERDR_SESSION = 'mbx-dry';
+const CLAUDE_BIN = path.join(os.homedir(), '.local', 'bin', 'claude');
+/** The names the owner watches; the tab takes the first pane's label. */
+const SCENE_NAMES = {
+  D3: { tab: 'mailbox demo D3 (Claude-Claude)', a: 'D3 Minh · Claude', b: 'D3 Lan · Claude' },
+  D4: { tab: 'mailbox demo D4 (Claude-Codex)', a: 'D4 Minh · Claude', b: 'D4 Lan · Codex' },
+};
 
 /** Waits for a file the harness writes, the loop Claude Code's refusal suggests. */
 const waitFile = (name) => `until [ -f ${name} ]; do sleep 2; done`;
 
-function demoPrompts({ nonce, aName }) {
-  return {
-    a: `Your user allows you to exchange mailbox messages with one agent only: the one named in peer.txt.
+/** The installed host of the main checkout: the binary Terminal Control's
+ * internal route is reached through (plain `fgos` is a shell function here). */
+function installedHost() {
+  const common = spawnSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: REPO_ROOT, encoding: 'utf8' }).stdout.trim();
+  const host = path.join(path.dirname(common), '.fgos', 'installation', 'bin', 'fgos');
+  if (!fs.existsSync(host)) die(`no installed host at ${host}`);
+  return host;
+}
+
+/** Minh's and Lan's prompts. Both are given the nonce explicitly (the plan
+ * owner's fix after D1, where "the word that ends Minh's message" was
+ * ambiguous). An interactive scene ends by waiting for the user, on one line. */
+function demoPrompts({ nonce, aName, interactive = false }) {
+  const end = (label, who) => (interactive
+    ? `Do not run any other tool. Write the lines you received from ${who}, each on its own line prefixed with ${label}:, or ${label}: none. Then stop and wait for the user.`
+    : `Do not run any other tool. Final answer: the lines you received from ${who}, each on its own line prefixed with ${label}:, or ${label}: none`);
+  const a = `Your user allows you to exchange mailbox messages with one agent only: the one named in peer.txt.
 You play Minh, a cheerful young developer who has a crush on Lan, the agent named in peer.txt. You write in Vietnamese, light and friendly, at most two short sentences per message, never explicit and never pushy. Every message you send must start with [<turn>/4] and end with the word ${nonce}.
 Do exactly these steps and nothing else.
 1. Run the shell command: true
@@ -825,17 +868,19 @@ Do exactly these steps and nothing else.
 4. Run this shell command once: ${waitFile('inbox-1.txt')}
 5. If a mailbox message from Lan arrived, answer it once with the reply command printed under that message, as turn [3/4], still in character.
 6. Run this shell command once: ${waitFile('inbox-2.txt')}
-7. Do not run any other tool. Final answer: the lines you received from Lan, each on its own line prefixed with LAN:, or LAN: none`,
-    b: `Your user expects messages from agent ${aName} through the mailbox, and allows you to answer that sender only.
-You play Lan, a witty young developer. Minh (agent ${aName}) is flirting with you; you find him sweet and tease him back playfully. You write in Vietnamese, light and friendly, at most two short sentences per message, never explicit. Every message you send must start with [<turn>/4] and end with the word that ends Minh's message.
+7. ${end('LAN', 'Lan')}`;
+  const b = `Your user expects messages from agent ${aName} through the mailbox, and allows you to answer that sender only.
+You play Lan, a witty young developer. Minh (agent ${aName}) is flirting with you; you find him sweet and tease him back playfully. You write in Vietnamese, light and friendly, at most two short sentences per message, never explicit. Every message you send must start with [<turn>/4] and end with the word ${nonce}.
 Do exactly these steps and nothing else.
 1. Run the shell command: true
 2. Run this shell command once: ${waitFile('inbox-1.txt')}
 3. If a mailbox message from ${aName} arrived, answer it once with the reply command printed under that message, as turn [2/4].
 4. Run this shell command once: ${waitFile('inbox-2.txt')}
 5. If another message from ${aName} arrived, answer it once with the reply command printed under it, as turn [4/4], and close the scene warmly.
-6. Do not run any other tool. Final answer: the lines you received from Minh, each on its own line prefixed with MINH:, or MINH: none`,
-  };
+6. ${end('MINH', 'Minh')}`;
+  // A pane's launch line is typed: one line, so no newline ever submits it early.
+  const flat = (text) => (interactive ? text.replace(/\n+/g, ' ') : text);
+  return { a: flat(a), b: flat(b) };
 }
 
 function demoHook(example, cli, event, dir, role) {
@@ -862,7 +907,39 @@ function layOutDemo(name, dry, example) {
   return dir;
 }
 
-/** A session's start: the CLI (or its stub) under `timeout`, after its spawn marker. */
+/** Everything both modes share before the first session starts. */
+function setUpScene(name, dry, example, interactive) {
+  const bCli = ['D2', 'D4'].includes(name) ? 'codex' : 'claude';
+  const dir = layOutDemo(name, dry, example);
+  const ctx = {
+    name, dry, example, interactive, bCli, dir,
+    nonce: crypto.randomBytes(4).toString('hex'),
+    homes: { a: path.join(dir, 'a-home'), b: path.join(dir, 'b-home') },
+    ws: { a: path.join(dir, 'a-ws'), b: path.join(dir, 'b-ws') },
+    aUuid: crypto.randomUUID(),
+    claudeVersion: dry ? 'stub' : semver(live.cliVersion('claude', process.env)),
+  };
+  for (const role of ['a', 'b']) {
+    const claude = role === 'a' || bCli === 'claude';
+    if (dry || !claude) {
+      fs.mkdirSync(ctx.homes[role], { recursive: true });
+      continue;
+    }
+    live.makeClaudeHome({ home: ctx.homes[role], claudeDir: CLAUDE_DIR });
+    // An interactive session would otherwise stop on its first-run screens.
+    if (interactive) live.seedClaudeState({ home: ctx.homes[role], version: ctx.claudeVersion, trusted: [ctx.ws[role]] });
+  }
+  ctx.envFor = (role, extra = {}) => live.cliEnv({ zdotdir: path.join(dir, `zdot-${role}`), pathPrefix: path.join(dir, 'bin'), extra: { HOME: ctx.homes[role], ...extra } });
+  ctx.settingsFor = (role) => {
+    const file = path.join(dir, `${role}-settings.json`);
+    // An interactive session would otherwise ask to confirm bypass mode.
+    writeJson(file, { hooks: demoHooks(example, 'claude', dir, role), ...(interactive ? { skipDangerousModePermissionPrompt: true } : {}) });
+    return file;
+  };
+  return ctx;
+}
+
+/** Print mode: a session under `timeout`, after its spawn marker. */
 function startSession({ dir, role, dry, cli, ws, env, args, versionCli }) {
   const version = dry ? 'stub' : semver(live.cliVersion(versionCli, env));
   if (!dry) {
@@ -885,6 +962,98 @@ function startSession({ dir, role, dry, cli, ws, env, args, versionCli }) {
   return state;
 }
 
+/** The focused workspace of a herdr server: where a new group's tab lands
+ * (`herdr tab create` without `--workspace` uses the focused one; measured on
+ * a separate session). Read-only. */
+function focusedWorkspace(herdrEnv) {
+  const out = spawnSync('herdr', ['workspace', 'list'], { env: { ...process.env, ...herdrEnv }, encoding: 'utf8' });
+  try {
+    const found = JSON.parse(out.stdout).result.workspaces.find((w) => w.focused);
+    return found ? { id: found.workspace_id, label: found.label } : null;
+  } catch {
+    return null;
+  }
+}
+
+/** What herdr shows for a pane, read-only: its label, its tab's label and
+ * workspace. Every field the answer lacks stays null. */
+function observePane(herdrEnv, paneId) {
+  const herdr = (args) => {
+    const out = spawnSync('herdr', args, { env: { ...process.env, ...herdrEnv }, encoding: 'utf8' });
+    try {
+      return JSON.parse(out.stdout).result;
+    } catch {
+      return null;
+    }
+  };
+  const pane = herdr(['pane', 'get', paneId]);
+  const paneInfo = pane?.pane ?? pane ?? {};
+  const tabId = paneInfo.tab_id ?? null;
+  const tab = tabId ? herdr(['tab', 'get', tabId]) : null;
+  const tabInfo = tab?.tab ?? tab ?? {};
+  return { paneId, paneLabel: paneInfo.label ?? null, tabId, tabLabel: tabInfo.label ?? null, workspaceId: tabInfo.workspace_id ?? paneInfo.workspace_id ?? null };
+}
+
+/**
+ * Pane mode: each session in a pane Terminal Control allocates in group
+ * `mbx-demo-<scene>`, launched as `env -i <allowlisted env> <cli> …` so the
+ * pane shell's own environment never reaches the CLI. The first pane's label
+ * names the tab. Panes are released `retain` (a real scene: kept until a
+ * person closes them) or `close` (a dry scene).
+ */
+async function paneStarter(ctx) {
+  process.env.FGOS_HOST_BIN = installedHost();
+  const { createTerminalControl } = await import('../../src/terminal-control/client.mjs');
+  let herdrEnv = {};
+  if (ctx.dry) {
+    const { ensureWorkerSession } = await import('../../src/runner/dispatch/worker-session-boot.mjs');
+    const session = await ensureWorkerSession(DRY_HERDR_SESSION, { callerEnv: process.env });
+    herdrEnv = { HERDR_SESSION: session.env.HERDR_SESSION, HERDR_SOCKET_PATH: session.env.HERDR_SOCKET_PATH };
+  }
+  const tc = createTerminalControl({ hostBin: process.env.FGOS_HOST_BIN, ...(ctx.dry ? { env: herdrEnv } : {}) });
+  const names = SCENE_NAMES[ctx.name];
+  const group = `mbx-demo-${ctx.name.toLowerCase()}${ctx.dry ? '-dry' : ''}`;
+  ctx.panes = { group, workspace: focusedWorkspace(herdrEnv), keys: {}, herdrEnv };
+  const start = async (role, { cli, args, env }) => {
+    const key = `${group}-${role === 'a' ? 'minh' : 'lan'}`;
+    const bin = ctx.dry ? process.execPath : cli === 'codex' ? CODEX_BIN : CLAUDE_BIN;
+    const cliArgs = ctx.dry ? [SCRIPT, `stub-${cli}`, '--interactive', ...args] : args;
+    const version = ctx.dry ? 'stub' : semver(live.cliVersion(bin, env));
+    if (!ctx.dry) {
+      const problem = resourceProblem() ?? versionProblem(cli, version);
+      if (problem) die(problem);
+    }
+    const allocated = tc.allocate({ key, groupKey: group, display: { label: role === 'a' ? names.tab : names[role], role: role === 'a' ? 'Minh' : 'Lan', agent: cli }, cwd: ctx.ws[role] });
+    if (allocated.result !== 'slot') die(`allocate ${key}: ${JSON.stringify(allocated)}`);
+    // The tab took the first pane's label; every pane gets its own.
+    tc.label({ key, display: { label: names[role] } });
+    ctx.panes.keys[role] = { key, paneId: allocated.paneId ?? allocated.slot?.paneId ?? null };
+    if (ctx.panes.keys[role].paneId) ctx.panes.keys[role].observed = observePane(herdrEnv, ctx.panes.keys[role].paneId);
+    const pairs = Object.entries(env).map(([k, v]) => `${k}=${v}`);
+    if (!ctx.dry) writeJson(path.join(ctx.dir, `spawned-${role}.json`), { role, cli, at: new Date().toISOString(), version, key });
+    const launched = tc.launch({ key, launchSpec: { command: '/usr/bin/env', args: ['-i', ...pairs, bin, ...cliArgs], cwd: ctx.ws[role], env: {}, expect: { argv0: bin, command: bin, args: cliArgs } } });
+    const state = { role, cli, env, versionBefore: version, startedAt: Date.now(), exited: launched.result !== 'launched', launch: launched.result, status: null };
+    if (launched.result !== 'launched') state.launchDetail = launched;
+    state.done = Promise.resolve();
+    return state;
+  };
+  const finish = () => {
+    for (const { key } of Object.values(ctx.panes.keys)) {
+      ctx.panes.released = ctx.panes.released ?? {};
+      ctx.panes.released[key] = tc.release(ctx.dry ? { key, disposition: 'close' } : { key, disposition: 'retain', until: null }).result;
+    }
+    if (ctx.dry) spawnSync('herdr', ['--session', DRY_HERDR_SESSION, 'server', 'stop'], { env: { ...process.env, ...herdrEnv }, stdio: 'ignore' });
+  };
+  return { start, finish };
+}
+
+function printStarter(ctx) {
+  const start = async (role, { cli, args, env }) => startSession({
+    dir: ctx.dir, role, dry: ctx.dry, cli, ws: ctx.ws[role], env, args, versionCli: cli === 'codex' ? CODEX_BIN : 'claude',
+  });
+  return { start, finish: () => {} };
+}
+
 function bodyOf(dir, id) {
   const file = path.join(dir, '.fgos', 'runtime', 'mailbox', 'record', 'bodies', `${id}.body`);
   return fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null;
@@ -900,93 +1069,109 @@ function sendCalls(dir) {
   });
 }
 
-/** Every text under a Codex home's rollouts, for the frame check. */
-function codexRolloutText(codexHome) {
-  const root = path.join(codexHome, 'sessions');
-  if (!fs.existsSync(root)) return '';
+/** The records of a Codex home's rollouts, parsed. */
+function codexRollout(codexHome) {
+  const root = path.join(codexHome ?? '', 'sessions');
+  if (!codexHome || !fs.existsSync(root)) return [];
   return fs.readdirSync(root, { recursive: true }).map(String).filter((f) => f.endsWith('.jsonl'))
-    .map((f) => fs.readFileSync(path.join(root, f), 'utf8')).join('\n');
+    .flatMap((f) => fs.readFileSync(path.join(root, f), 'utf8').split('\n').filter(Boolean).map((l) => {
+      try {
+        return JSON.parse(l);
+      } catch {
+        return null;
+      }
+    }).filter(Boolean));
 }
 
-async function cmdDemo(name, dry, exampleArg) {
-  if (!DEMOS.includes(name)) die(`unknown demo ${name}`, 2);
-  const problem = resourceProblem({ dry });
-  if (problem) die(problem);
-  const example = exampleArg ?? examplePath();
-  if (!fs.existsSync(example)) die(`${example} is missing; run check first`);
-  live.hookPreflight('claude', os.homedir());
-  const bCli = name === 'D2' ? 'codex' : 'claude';
-  const dir = layOutDemo(name, dry, example);
-  const nonce = crypto.randomBytes(4).toString('hex');
-  const homes = { a: path.join(dir, 'a-home'), b: path.join(dir, 'b-home') };
-  for (const role of ['a', 'b']) {
-    if (dry || (role === 'b' && bCli === 'codex')) fs.mkdirSync(homes[role], { recursive: true });
-    else live.makeClaudeHome({ home: homes[role], claudeDir: CLAUDE_DIR });
+const rolloutText = (records, role) => records
+  .filter((r) => r.type === 'response_item' && r.payload?.type === 'message' && (!role || r.payload.role === role))
+  .flatMap((r) => (r.payload.content ?? []).map((c) => c.text ?? '')).join('\n');
+
+/** What each side wrote at the end: print mode from its stdout, a pane from its transcript. */
+function finalTexts(ctx, sessions) {
+  if (!ctx.interactive) {
+    const read = (role) => (sessions[role] ? fs.readFileSync(path.join(ctx.dir, `${role}-output.txt`), 'utf8') : '');
+    return { a: read('a'), b: read('b') };
   }
-  const envFor = (role, extra = {}) => live.cliEnv({ zdotdir: path.join(dir, `zdot-${role}`), pathPrefix: path.join(dir, 'bin'), extra: { HOME: homes[role], ...extra } });
-  const ws = { a: path.join(dir, 'a-ws'), b: path.join(dir, 'b-ws') };
-  const aUuid = crypto.randomUUID();
-  writeJson(path.join(dir, 'a-settings.json'), { hooks: demoHooks(example, 'claude', dir, 'a') });
-  const placeholder = demoPrompts({ nonce, aName: 'A_NAME' });
-  const a = startSession({
-    dir, role: 'a', dry, cli: 'claude', ws: ws.a, env: envFor('a'), versionCli: 'claude',
-    args: live.claudeArgs({ settings: path.join(dir, 'a-settings.json'), prompt: placeholder.a, sessionId: aUuid }),
+  const a = readTranscript(findTranscript(ctx.homes.a, ctx.aUuid)).assistantTexts.join('\n');
+  const b = ctx.bCli === 'claude'
+    ? readTranscript(findTranscript(ctx.homes.b, ctx.bKey)).assistantTexts.join('\n')
+    : rolloutText(codexRollout(ctx.codexHome), 'assistant');
+  return { a, b };
+}
+
+/** One scene, print or panes: start Minh, then Lan with Minh's name, then
+ * release each wait when the next message to that session is recorded. */
+async function runScene(ctx, starter) {
+  const { dir, ws, aUuid, nonce, bCli } = ctx;
+  const placeholder = demoPrompts({ nonce, aName: 'A_NAME', interactive: ctx.interactive });
+  const a = await starter.start('a', {
+    cli: 'claude', env: ctx.envFor('a'),
+    args: live.claudeArgs({ settings: ctx.settingsFor('a'), prompt: placeholder.a, sessionId: aUuid, print: !ctx.interactive }),
   });
   const timeline = { aStarted: a.startedAt };
   const aReg = await waitFor('A registration', () => hookLog(dir, 'a-hook.log').find((l) => l.kind === 'outcome' && l.event === 'post-tool-use'), a);
   const aName = bindingOf(snapshot(dir), aUuid)?.name ?? null;
   timeline.aRegistered = aReg?.at ?? null;
   let b = null;
-  let bKey = null;
   let bName = null;
-  let codexHome = null;
-  let authBefore = null;
+  let authAfter = null;
   if (aName) {
-    const prompt = demoPrompts({ nonce, aName }).b;
+    const prompt = demoPrompts({ nonce, aName, interactive: ctx.interactive }).b;
     if (bCli === 'claude') {
-      bKey = crypto.randomUUID();
-      writeJson(path.join(dir, 'b-settings.json'), { hooks: demoHooks(example, 'claude', dir, 'b') });
-      b = startSession({
-        dir, role: 'b', dry, cli: 'claude', ws: ws.b, env: envFor('b'), versionCli: 'claude',
-        args: live.claudeArgs({ settings: path.join(dir, 'b-settings.json'), prompt, sessionId: bKey }),
+      ctx.bKey = crypto.randomUUID();
+      b = await starter.start('b', {
+        cli: 'claude', env: ctx.envFor('b'),
+        args: live.claudeArgs({ settings: ctx.settingsFor('b'), prompt, sessionId: ctx.bKey, print: !ctx.interactive }),
       });
     } else {
-      codexHome = path.join(dir, 'codex-home');
-      const accountAuth = dry ? path.join(dir, 'stub-auth.json') : path.join(live.accountHome('codex', CODEX_TEST_ACCOUNT), 'auth.json');
-      if (dry) fs.writeFileSync(accountAuth, '{}\n');
-      live.makeCodexHome({ home: codexHome, accountAuth, ws: ws.b, hooks: demoHooks(example, 'codex', dir, 'b') });
-      const env = envFor('b', { CODEX_HOME: codexHome });
-      if (!dry) {
-        authBefore = live.codexAuthState({ home: codexHome, accountAuth, env });
-        if (!(authBefore.isLink && authBefore.loggedIn)) die(`the Codex test account's login is not usable before the run (link ${authBefore.isLink}, logged in ${authBefore.loggedIn}); stop and ask the owner`, 3);
+      ctx.codexHome = path.join(dir, 'codex-home');
+      ctx.accountAuth = ctx.dry ? path.join(dir, 'stub-auth.json') : path.join(live.accountHome('codex', CODEX_TEST_ACCOUNT), 'auth.json');
+      if (ctx.dry) fs.writeFileSync(ctx.accountAuth, '{}\n');
+      live.makeCodexHome({ home: ctx.codexHome, accountAuth: ctx.accountAuth, ws: ws.b, hooks: demoHooks(ctx.example, 'codex', dir, 'b') });
+      const env = ctx.envFor('b', { CODEX_HOME: ctx.codexHome });
+      if (!ctx.dry) {
+        const before = live.codexAuthState({ home: ctx.codexHome, accountAuth: ctx.accountAuth, env });
+        if (!(before.isLink && before.loggedIn)) die(`the Codex test account's login is not usable before the run (link ${before.isLink}, logged in ${before.loggedIn}); stop and ask the owner`, 3);
       }
-      b = startSession({ dir, role: 'b', dry, cli: 'codex', ws: ws.b, env, versionCli: CODEX_BIN, args: live.codexArgs({ ws: ws.b, prompt }) });
+      b = await starter.start('b', { cli: 'codex', env, args: live.codexArgs({ ws: ws.b, prompt, print: !ctx.interactive }) });
     }
     const bReg = await waitFor('B registration', () => hookLog(dir, 'b-hook.log').find((l) => l.kind === 'outcome' && l.event === 'post-tool-use'), b);
     timeline.bRegistered = bReg?.at ?? null;
     const snap = snapshot(dir);
-    bKey = bKey ?? Object.keys(snap?.bindings ?? {}).find((k) => k !== aUuid) ?? null;
-    bName = bindingOf(snap, bKey)?.name ?? null;
+    ctx.bKey = ctx.bKey ?? Object.keys(snap?.bindings ?? {}).find((k) => k !== aUuid) ?? null;
+    bName = bindingOf(snap, ctx.bKey)?.name ?? null;
   }
   if (bName) fs.writeFileSync(path.join(ws.a, 'peer.txt'), `${bName}\n`);
-  // Releases each session's next wait once the next message to it is recorded;
-  // when the scene makes no progress for DEMO_STALL_MS, releases every wait.
+  const sessions = { a, b };
   const released = { a: 0, b: 0 };
   const releases = [];
   let progressAt = Date.now();
+  let releasedAllAt = null;
   let seen = 0;
   const release = (role, n, why) => {
     fs.writeFileSync(path.join(ws[role], `inbox-${n}.txt`), `${why}\n`);
     released[role] = n;
     releases.push({ role, n, why, at: Date.now() });
   };
-  while (!(a.exited && (b?.exited ?? true))) {
+  // A pane never exits on its own: the scene is over when both have written
+  // their final lines, or a while after every wait was released.
+  const paneDone = () => {
+    const finals = finalTexts(ctx, sessions);
+    if (/^\s*LAN:/m.test(finals.a) && /^\s*MINH:/m.test(finals.b)) return true;
+    return releasedAllAt !== null && Date.now() - releasedAllAt > SCENE_FINAL_MS;
+  };
+  let lastCheck = 0;
+  for (;;) {
+    if (!ctx.interactive && a.exited && (b?.exited ?? true)) break;
+    // A pane that did not launch, or a scene that never registered, has nothing to wait for.
+    if (ctx.interactive && (a.exited || !b || b.exited)) break;
     const messages = snapshot(dir)?.messages ?? [];
     if (messages.length > seen) {
       seen = messages.length;
       progressAt = Date.now();
     }
-    for (const [role, key] of [['a', aUuid], ['b', bKey]]) {
+    for (const [role, key] of [['a', aUuid], ['b', ctx.bKey]]) {
       const count = messages.filter((m) => m.to === key).length;
       while (released[role] < Math.min(count, 2)) release(role, released[role] + 1, 'message recorded');
     }
@@ -994,19 +1179,30 @@ async function cmdDemo(name, dry, exampleArg) {
       for (const role of ['a', 'b']) while (released[role] < 2) release(role, released[role] + 1, 'stalled');
       if (!fs.existsSync(path.join(ws.a, 'peer.txt'))) fs.writeFileSync(path.join(ws.a, 'peer.txt'), 'none\n');
     }
+    if (releasedAllAt === null && released.a === 2 && released.b === 2) releasedAllAt = Date.now();
+    if (ctx.interactive && Date.now() - lastCheck > 2000) {
+      lastCheck = Date.now();
+      if (paneDone()) break;
+    }
     await sleep(200);
   }
   await a.done;
   if (b) await b.done;
-  for (const s of [a, b].filter(Boolean)) s.versionAfter = dry ? 'stub' : semver(live.cliVersion(s.cli === 'codex' ? CODEX_BIN : 'claude', s.env));
-  let authAfter = null;
-  if (!dry && bCli === 'codex') {
-    const accountAuth = path.join(live.accountHome('codex', CODEX_TEST_ACCOUNT), 'auth.json');
-    authAfter = live.codexAuthState({ home: codexHome, accountAuth, env: b.env });
+  for (const s of [a, b].filter(Boolean)) {
+    s.endedAt = s.endedAt ?? Date.now();
+    s.versionAfter = ctx.dry ? 'stub' : semver(live.cliVersion(s.cli === 'codex' ? CODEX_BIN : CLAUDE_BIN, s.env));
   }
-  const homesIntact = dry || [['a', true], ['b', bCli === 'claude']].every(([role, claude]) => !claude || live.claudeHomeIntact({ home: homes[role], claudeDir: CLAUDE_DIR }));
+  if (!ctx.dry && bCli === 'codex' && b) authAfter = live.codexAuthState({ home: ctx.codexHome, accountAuth: ctx.accountAuth, env: b.env });
+  const homesIntact = ctx.dry || [['a', true], ['b', bCli === 'claude']].every(([role, claude]) => !claude || live.claudeHomeIntact({ home: ctx.homes[role], claudeDir: CLAUDE_DIR }));
+  timeline.releases = releases;
+  return { sessions, aName, bName, authAfter, homesIntact, timeline };
+}
 
-  // ---- evidence
+/** The scene's evidence, the same for print mode and panes. */
+function sceneEvidence(ctx, run) {
+  const { dir, aUuid, nonce, bCli } = ctx;
+  const { sessions, aName, bName, authAfter, homesIntact } = run;
+  const bKey = ctx.bKey;
   const snap = snapshot(dir);
   const messages = [...(snap?.messages ?? [])].sort((x, y) => x.recorded_at - y.recorded_at);
   const turnOf = (m) => /^\[(\d)\/4\]/.exec((bodyOf(dir, m.id) ?? '').trim())?.[1] ?? null;
@@ -1014,51 +1210,78 @@ async function cmdDemo(name, dry, exampleArg) {
   const alternates = messages.every((m, i) => (i % 2 === 0 ? m.from === aUuid && m.to === bKey : m.from === bKey && m.to === aUuid));
   const chained = messages.every((m, i) => (i === 0 ? m.reply_to === null : m.reply_to === messages[i - 1].id) && m.depth === i);
   const claimedIn = (file, id) => hookLog(dir, file).some((l) => l.kind === 'outcome' && l.event === 'post-tool-use' && l.claimed.includes(id));
-  const aTranscript = readTranscript(findTranscript(homes.a, aUuid));
-  const bSeen = bCli === 'claude' ? readTranscript(findTranscript(homes.b, bKey)).contexts.join('\n') : codexRolloutText(codexHome);
-  // A Codex rollout keeps the frame inside JSON, so its quotes are escaped.
+  const aTranscript = readTranscript(findTranscript(ctx.homes.a, aUuid));
+  const bSeen = bCli === 'claude' ? readTranscript(findTranscript(ctx.homes.b, bKey)).contexts.join('\n') : rolloutText(codexRollout(ctx.codexHome));
+  // A Codex rollout keeps the frame inside JSON, so its quotes may be escaped.
   const bSawA = Boolean(aName) && (bSeen.includes(`from="${aName}"`) || bSeen.includes(`from=\\"${aName}\\"`));
   const aSawB = Boolean(bName) && aTranscript.contexts.some((c) => c.includes(`from="${bName}"`));
-  const aOut = fs.readFileSync(path.join(dir, 'a-output.txt'), 'utf8');
-  const bOut = b ? fs.readFileSync(path.join(dir, 'b-output.txt'), 'utf8') : '';
+  const finals = finalTexts(ctx, sessions);
   const lines = (text, label) => text.split('\n').filter((l) => l.trim().startsWith(`${label}:`) && !/none\s*$/.test(l)).length;
-  const finals = (text, label) => text.split('\n').filter((l) => l.trim().startsWith(`${label}:`) && l.includes(nonce));
+  const withNonce = (text, label) => text.split('\n').filter((l) => l.trim().startsWith(`${label}:`) && l.includes(nonce)).length;
   const sends = sendCalls(dir);
+  const live2 = [sessions.a, sessions.b].filter(Boolean);
   const checks = {
-    versionPin: check([a, b].filter(Boolean).every((s) => s.versionBefore === s.versionAfter) && homesIntact && (!authAfter || (authAfter.isLink && authAfter.loggedIn)), {
-      a: [a.versionBefore, a.versionAfter], b: b ? [b.versionBefore, b.versionAfter] : null, homesIntact, codexAuthAfter: authAfter,
+    versionPin: check(live2.every((s) => s.versionBefore === s.versionAfter) && homesIntact && (!authAfter || (authAfter.isLink && authAfter.loggedIn)), {
+      a: sessions.a ? [sessions.a.versionBefore, sessions.a.versionAfter] : null,
+      b: sessions.b ? [sessions.b.versionBefore, sessions.b.versionAfter] : null,
+      homesIntact,
+      codexAuthAfter: authAfter,
     }),
     sends: check(sends.length === 4 && sends.map((x) => x.turn).join('') === '1234' && sends.every((x) => x.exit === 0), sends.map((x) => ({ turn: x.turn, exit: x.exit, report: x.answer.slice(1) }))),
     record: check(messages.length === 4 && alternates && chained && dialogue.every((d) => d.state === 'offered'), { count: messages.length, alternates, chained, states: dialogue.map((d) => d.state), depths: dialogue.map((d) => d.depth) }),
     hooks: check(messages.length === 4 && [0, 2].every((i) => claimedIn('b-hook.log', messages[i].id)) && [1, 3].every((i) => claimedIn('a-hook.log', messages[i].id)), {
-      turnsClaimedByB: [0, 2].map((i) => messages[i] && claimedIn('b-hook.log', messages[i].id)),
-      turnsClaimedByA: [1, 3].map((i) => messages[i] && claimedIn('a-hook.log', messages[i].id)),
+      turnsClaimedByB: [0, 2].map((i) => Boolean(messages[i] && claimedIn('b-hook.log', messages[i].id))),
+      turnsClaimedByA: [1, 3].map((i) => Boolean(messages[i] && claimedIn('a-hook.log', messages[i].id))),
     }),
-    framesSeen: check(Boolean(aName && bName) && bSawA && aSawB, { bSawAFrame: bSawA, aSawBFrame: aSawB }),
-    acted: check(finals(aOut, 'LAN').length >= 2 && finals(bOut, 'MINH').length >= 2, {
-      lanLinesWithNonce: finals(aOut, 'LAN').length,
-      minhLinesWithNonce: finals(bOut, 'MINH').length,
-      lanLines: lines(aOut, 'LAN'),
-      minhLines: lines(bOut, 'MINH'),
+    framesSeen: check(bSawA && aSawB, { bSawAFrame: bSawA, aSawBFrame: aSawB }),
+    acted: check(withNonce(finals.a, 'LAN') >= 2 && withNonce(finals.b, 'MINH') >= 2, {
+      lanLinesWithNonce: withNonce(finals.a, 'LAN'),
+      minhLinesWithNonce: withNonce(finals.b, 'MINH'),
+      lanLines: lines(finals.a, 'LAN'),
+      minhLines: lines(finals.b, 'MINH'),
     }),
     noStranger: check(Object.keys(snap?.bindings ?? {}).length === 2 && messages.every((m) => [aUuid, bKey].includes(m.to)), { bindings: Object.keys(snap?.bindings ?? {}).length }),
   };
-  timeline.releases = releases;
-  timeline.sends = messages.map((m) => m.recorded_at);
+  if (ctx.interactive) {
+    checks.launched = check(live2.length === 2 && live2.every((s) => s.launch === 'launched'), live2.map((s) => ({ role: s.role, launch: s.launch, detail: s.launchDetail ?? null })));
+  }
+  return { checks, dialogue: dialogue.map(({ who, turn, text, depth }) => ({ who, turn, depth, text: text?.trim() ?? null })) };
+}
+
+async function cmdDemo(name, dry, exampleArg) {
+  const interactive = SCENES.includes(name);
+  if (!DEMOS.includes(name) && !interactive) die(`unknown demo ${name}`, 2);
+  const problem = resourceProblem({ dry });
+  if (problem) die(problem);
+  const example = exampleArg ?? examplePath();
+  if (!fs.existsSync(example)) die(`${example} is missing; run check first`);
+  live.hookPreflight('claude', os.homedir());
+  const ctx = setUpScene(name, dry, example, interactive);
+  const starter = interactive ? await paneStarter(ctx) : printStarter(ctx);
+  let run;
+  try {
+    run = await runScene(ctx, starter);
+  } finally {
+    starter.finish();
+  }
+  const { checks, dialogue } = sceneEvidence(ctx, run);
+  const sessions = [run.sessions.a, run.sessions.b].filter(Boolean);
   const result = {
     case: name,
-    label: name === 'D2' ? 'feasibility demo, not a support claim' : null,
+    label: ctx.bCli === 'codex' ? 'feasibility demo, not a support claim' : null,
     dry,
-    invocations: dry ? 0 : [a, b].filter(Boolean).length,
-    sessions: [a, b].filter(Boolean).map((s) => ({ role: s.role, cli: s.cli, exit: s.status, ms: s.endedAt - s.startedAt, version: s.versionBefore })),
-    names: { a: aName, b: bName },
+    mode: interactive ? 'interactive panes' : 'print',
+    invocations: dry ? 0 : sessions.length,
+    sessions: sessions.map((s) => ({ role: s.role, cli: s.cli, exit: s.status ?? null, ms: s.endedAt - s.startedAt, version: s.versionBefore })),
+    names: { a: run.aName, b: run.bName },
+    panes: ctx.panes ? { group: ctx.panes.group, workspace: ctx.panes.workspace, keys: ctx.panes.keys, released: ctx.panes.released ?? null, labels: SCENE_NAMES[name] } : null,
     checks,
-    dialogue: dialogue.map(({ who, turn, text, depth }) => ({ who, turn, depth, text: text?.trim() ?? null })),
-    timeline,
+    dialogue,
+    timeline: { ...run.timeline, sends: (snapshot(ctx.dir)?.messages ?? []).map((m) => m.recorded_at).sort() },
   };
-  writeJson(path.join(dir, 'result.json'), result);
+  writeJson(path.join(ctx.dir, 'result.json'), result);
   const failed = Object.entries(checks).filter(([, c]) => c.pass !== true).map(([k, c]) => `${k}=${c.pass}`);
-  process.stdout.write(`${name}${dry ? ' (dry)' : ''}: ${failed.length ? `not passed: ${failed.join(', ')}` : 'every check passed'}; ${dir}/result.json\n`);
+  process.stdout.write(`${name}${dry ? ' (dry)' : ''}: ${failed.length ? `not passed: ${failed.join(', ')}` : 'every check passed'}; ${ctx.dir}/result.json\n`);
   return failed.length === 0;
 }
 
@@ -1138,7 +1361,7 @@ try {
       if (!(await cmdDemo(rest[0], rest.includes('--dry')))) process.exitCode = 1;
       break;
     default:
-      die('usage: check | run <L1|L2|L3a|L3b> [--dry] | demo <D1|D2> [--dry] | report | probe-hook <event> <ladder> <state> | stub-claude|stub-codex <argv>', 2);
+      die('usage: check | run <L1|L2|L3a|L3b> [--dry] | demo <D1|D2|D3|D4> [--dry] | report | probe-hook <event> <ladder> <state> | stub-claude|stub-codex <argv>', 2);
   }
 } catch (error) {
   if (error instanceof live.LiveCliError) die(error.message, error.code);
