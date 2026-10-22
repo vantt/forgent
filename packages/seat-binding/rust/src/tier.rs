@@ -1,7 +1,9 @@
-//! Tier vocabulary, strength order and the ladder definitions: one constant,
-//! the source of the `$comment` that `fgos setup` writes into the config.
+//! Tier vocabulary, strength order and the ladder definitions: one contract file,
+//! the source of the `$comment` that `fgos setup` writes into the config and of the
+//! tier names the Node config loader accepts.
 
 use serde::{Deserialize, Serialize};
+use std::sync::OnceLock;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -25,7 +27,7 @@ impl Tier {
     ];
 
     pub fn name(self) -> &'static str {
-        self.definition().name
+        self.definition().name.as_str()
     }
 
     /// 1 (nano) to 6 (frontier).
@@ -34,7 +36,7 @@ impl Tier {
     }
 
     pub fn definition(self) -> &'static TierDefinition {
-        &TIER_LADDER[self as usize]
+        &tier_ladder()[self as usize]
     }
 
     pub fn parse(text: &str) -> Option<Tier> {
@@ -42,61 +44,36 @@ impl Tier {
     }
 }
 
-#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct TierDefinition {
-    pub name: &'static str,
+    pub name: String,
     pub strength: u8,
-    pub work: &'static str,
-    pub self_check: &'static str,
-    pub examples: &'static str,
+    pub work: String,
+    pub self_check: String,
+    pub examples: String,
 }
 
-/// The ladder, weakest first. Strength and definitions live here and nowhere else.
-pub const TIER_LADDER: [TierDefinition; 6] = [
-    TierDefinition {
-        name: "nano",
-        strength: 1,
-        work: "cơ học, không suy luận",
-        self_check: "chỉ nhận ra hoặc biến đổi theo mẫu?",
-        examples: "classify, extract, format, route, vote",
-    },
-    TierDefinition {
-        name: "mini",
-        strength: 2,
-        work: "suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp",
-        self_check: "đủ thông tin, chỉ hiểu và tóm tắt?",
-        examples: "tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ",
-    },
-    TierDefinition {
-        name: "standard",
-        strength: 3,
-        work: "theo một kế hoạch có sẵn, nhiều bước",
-        self_check: "có kế hoạch và hướng dẫn chi tiết?",
-        examples: "code theo plan, viết test, refactor theo mô tả",
-    },
-    TierDefinition {
-        name: "advanced",
-        strength: 4,
-        work: "tự tìm đường, không có đáp án sẵn",
-        self_check: "phải điều tra và quyết cách làm?",
-        examples: "debug khó, code phức tạp, nhiều file không có plan",
-    },
-    TierDefinition {
-        name: "flagship",
-        strength: 5,
-        work: "phán đoán, thiết kế, phê bình",
-        self_check: "kết quả là một ý kiến hay một thiết kế?",
-        examples: "review, red-team, thiết kế giải pháp, synthesis của panel",
-    },
-    TierDefinition {
-        name: "frontier",
-        strength: 6,
-        work: "quyết định đắt nhất",
-        self_check: "khó đảo, đắt nếu sai?",
-        examples: "khoá kiến trúc, synthesis cuối của hội đồng quan trọng",
-    },
-];
+#[derive(Deserialize)]
+struct LadderFile {
+    tiers: Vec<TierDefinition>,
+}
+
+const LADDER_JSON: &str = include_str!("../../contracts/seat-binding.tier-ladder.v1.json");
+
+/// The ladder, weakest first. Names, strength and definitions live in the shared contract file
+/// `seat-binding.tier-ladder.v1.json` (the Node config loader reads the same file) and nowhere else.
+pub fn tier_ladder() -> &'static [TierDefinition] {
+    static LADDER: OnceLock<Vec<TierDefinition>> = OnceLock::new();
+    LADDER.get_or_init(|| {
+        let file: LadderFile = serde_json::from_str(LADDER_JSON).expect("the tier ladder contract parses");
+        assert_eq!(file.tiers.len(), Tier::ALL.len(), "the ladder contract lists every tier");
+        for (tier, definition) in Tier::ALL.iter().zip(&file.tiers) {
+            assert_eq!(definition.name, format!("{tier:?}").to_lowercase(), "the ladder contract is weakest first");
+        }
+        file.tiers
+    })
+}
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Ladder {
@@ -107,8 +84,8 @@ pub struct Ladder {
 /// The tier vocabulary and its definitions (the text behind `$comment` and `explain`).
 pub fn ladder() -> Ladder {
     Ladder {
-        vocabulary: TIER_LADDER.iter().map(|d| d.name).collect(),
-        definitions: TIER_LADDER.to_vec(),
+        vocabulary: tier_ladder().iter().map(|d| d.name.as_str()).collect(),
+        definitions: tier_ladder().to_vec(),
     }
 }
 

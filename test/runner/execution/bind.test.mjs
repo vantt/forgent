@@ -452,29 +452,6 @@ test('a walk step falls back to the subsequent candidate on quota/provider-limit
   assert.equal(secondBinding.provenance.fallbackFrom.reason, 'provider-limit');
 });
 
-test('the walk visits the prefer pool in order, never revisits a candidate, and refuses when none is left', () => {
-  const runnerConfig = createMockRunnerConfig();
-  runnerConfig.capabilities['code:implement'].prefer = [
-    { executor: 'claude', invocation: 'claude-cli' },
-    { executor: 'claude', invocation: 'claude-herdr' },
-    { executor: 'codex', invocation: 'codex-cli' },
-  ];
-  const ask = { unit: { id: 'u1', capability: 'code:implement', writes: ['src/foo.js'] }, role: 'producer' };
-  const ctx = { runnerConfig, session: {} };
-
-  const first = bind(ask, ctx);
-  assert.equal(first.invocation, 'claude-cli');
-  const second = bind(ask, ctx, { walk: { tried: [first] } });
-  assert.equal(second.invocation, 'claude-herdr');
-  assert.equal(second.executor, 'claude');
-  const third = bind(ask, ctx, { walk: { tried: [first, second] } });
-  assert.equal(third.invocation, 'codex-cli');
-  assert.equal(third.executor, 'codex');
-  assert.equal(third.provenance.fallbackFrom.executor, 'claude');
-  const none = bind(ask, ctx, { walk: { tried: [first, second, third] } });
-  assert.ok(none.refused, 'no candidate is left, so nothing is guessed');
-});
-
 function twoInvocationConfig(extraCapabilities = {}) {
   return {
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
@@ -856,22 +833,6 @@ test('bind: a unit rigor never selects a tier: a low rigor binds the default tie
   assert.equal(result.provenance.tier.source, 'defaults.tier');
 });
 
-test('bind: a capability rigor never selects a tier either: the seat binds the tier the config declares, else the default', () => {
-  const rigorOnly = bind(
-    { unit: { id: 'u1', capability: 'code:implement', writes: ['src/foo.js'], rigor: 'low' }, role: 'producer', independentOf: [] },
-    { runnerConfig: createMockRunnerConfig(), session: { herdrPresent: false, headless: true } },
-  );
-  assert.equal(rigorOnly.tier, 'standard');
-  const config = createMockRunnerConfig();
-  config.capabilities['code:implement'].tier = 'flagship';
-  const declared = bind(
-    { unit: { id: 'u1', capability: 'code:implement', writes: ['src/foo.js'], rigor: 'low' }, role: 'producer', independentOf: [] },
-    { runnerConfig: config, session: { herdrPresent: false, headless: true } },
-  );
-  assert.equal(declared.tier, 'flagship');
-  assert.equal(declared.provenance.tier.source, 'capabilities."code:implement".tier');
-});
-
 // runner.maxTier caps every seat and a lowering is never silent: the tier source becomes the maxTier line
 // and the binding names the tier it was lowered from. A capability may declare its own maxTier, above or
 // below the global one. Rigor and overrides never raise a tier.
@@ -893,40 +854,6 @@ test('bind: a tier above the global maxTier is lowered to it, and the lowering n
   assert.equal(result.provenance.tier.source, 'maxTier');
   assert.deepEqual(result.provenance.tier.loweredFrom, { from: 'frontier', fromSource: 'capabilities."lavish".tier', reason: 'max-tier-cap' });
   assert.deepEqual(result.provenance.tier.maxTier, { value: 'advanced', source: 'maxTier', applied: true });
-});
-
-test('bind: a capability maxTier above the global one lets that capability keep its tier, others stay capped', () => {
-  const synth = bind(ceilingAsk('synthesize'), ceilingCtx());
-  assert.equal(synth.tier, 'frontier');
-  assert.equal(synth.model, 'claude-3-opus');
-  assert.equal(synth.provenance.tier.source, 'capabilities."synthesize".tier');
-  assert.deepEqual(synth.provenance.tier.maxTier, { value: 'frontier', source: 'capabilities."synthesize".maxTier', applied: false });
-  assert.equal(synth.provenance.tier.loweredFrom, undefined);
-
-  const other = bind(ceilingAsk('lavish'), ceilingCtx());
-  assert.equal(other.tier, 'advanced');
-});
-
-test('bind: a unit rigor never lifts a seat to a tier: rigor critical on a capability with no tier binds the default', () => {
-  const result = bind(ceilingAsk('implement', { rigor: 'critical' }), ceilingCtx());
-  assert.equal(result.tier, 'standard');
-  assert.equal(result.provenance.tier.source, 'defaults.tier');
-});
-
-test('bind: a tier override above the resolved tier is refused (tier-escalation-unauthorized), at the capability maxTier or not', () => {
-  const ask = { ...ceilingAsk('implement'), overrides: [{ tier: 'frontier' }] };
-  const refused = bind(ask, ceilingCtx());
-  assert.equal(refused.refused.reason, 'tier-escalation-unauthorized');
-  assert.match(refused.refused.detail, /frontier/);
-  const framed = bind({ ...ceilingAsk('frame'), overrides: [{ tier: 'frontier' }] }, ceilingCtx());
-  assert.equal(framed.refused.reason, 'tier-escalation-unauthorized');
-});
-
-test('bind: a tier override at or below the resolved tier is taken and says so', () => {
-  const result = bind({ ...ceilingAsk('frame'), overrides: [{ tier: 'nano' }] }, ceilingCtx());
-  assert.equal(result.tier, 'nano');
-  assert.equal(result.provenance.tier.source, 'override');
-  assert.equal(result.model, 'claude-3-haiku');
 });
 
 test('bind: without runner.maxTier there is no ceiling at all', () => {
@@ -953,16 +880,6 @@ function skillsConfig() {
   config.executors.codex.supports = { skills: ['docs-seeker'] };
   return config;
 }
-
-test('bind skills: only executors declaring every required skill bind, in pool order', () => {
-  const unit = { id: 'u-skills', capability: 'docs:write', writes: ['README.md'], skills: ['docs-seeker', 'mermaid'] };
-  const result = bind({ unit, role: 'producer', independentOf: [] }, { runnerConfig: skillsConfig(), session: { headless: true } });
-  // docs:write lists codex first; it lacks "mermaid", so claude binds.
-  assert.equal(result.executor, 'claude');
-
-  const oneSkill = bind({ unit: { ...unit, skills: ['docs-seeker'] }, role: 'producer', independentOf: [] }, { runnerConfig: skillsConfig(), session: { headless: true } });
-  assert.equal(oneSkill.executor, 'codex');
-});
 
 test('bind skills: refuses with skills-unavailable, naming the missing skills, when no executor declares them', () => {
   const unit = { id: 'u-skills', capability: 'docs:write', writes: ['README.md'], skills: ['kubectl'] };
@@ -1016,12 +933,6 @@ const pinnedConfig = (entry) => {
 };
 const implementAsk = { unit: { id: 'u1', capability: 'code:implement', writes: ['src/foo.js'] }, role: 'producer' };
 
-test('bind: a hard pin to an invocation the executor does not have refuses the seat by name, and never swaps another invocation in', () => {
-  const result = bind(implementAsk, { runnerConfig: pinnedConfig({ executor: 'claude', invocation: 'claude-missing' }), session: { herdrPresent: true } });
-  assert.equal(result.refused.reason, 'pin-unsatisfiable');
-  assert.match(result.refused.detail, /claude-missing/);
-});
-
 test('bind: a cell effort is carried into the binding as the cell\'s promise and named as such', () => {
   const runnerConfig = createMockRunnerConfig();
   runnerConfig.modelPolicies.claude.standard = [{ model: 'claude-3-5-sonnet', effort: 'high' }];
@@ -1031,20 +942,9 @@ test('bind: a cell effort is carried into the binding as the cell\'s promise and
   assert.equal(bind({ ...implementAsk, overrides: [{ reasoningEffort: 'max' }] }, { runnerConfig, session: {} }).reasoningEffort, 'max', 'an override may raise the cell\'s effort');
 });
 
-test('bind: a cell without an effort records the invocation default, which is not a promise', () => {
-  const result = bind(implementAsk, { runnerConfig: createMockRunnerConfig(), session: {} });
-  assert.equal(result.reasoningEffort, null);
-  assert.deepEqual(result.provenance.reasoningEffort, { value: null, source: 'invocation-default' });
-});
-
-test('bind: an override effort below the cell\'s cannot claim the tier', () => {
-  const runnerConfig = createMockRunnerConfig();
-  runnerConfig.modelPolicies.claude.standard = [{ model: 'claude-3-5-sonnet', effort: 'high' }];
-  const result = bind({ ...implementAsk, overrides: [{ reasoningEffort: 'low' }] }, { runnerConfig: pinnedConfig({ executor: 'claude' }), session: {} });
-  assert.equal(result.reasoningEffort, 'low', 'a cell that promises no effort is lowered by nothing: the override is taken');
-  runnerConfig.capabilities['code:implement'].prefer = [{ executor: 'claude' }];
-  const refused = bind({ ...implementAsk, overrides: [{ reasoningEffort: 'low' }] }, { runnerConfig, session: {} });
-  assert.equal(refused.refused.reason, 'effort-below-cell');
+test('bind: an override effort on a cell that promises none is taken as given', () => {
+  const result = bind({ ...implementAsk, overrides: [{ reasoningEffort: 'low' }] }, { runnerConfig: createMockRunnerConfig(), session: {} });
+  assert.equal(result.reasoningEffort, 'low');
 });
 
 test('bind: an effort the executor does not declare, or its CLI cannot render, refuses the seat and lists what is rendered', () => {

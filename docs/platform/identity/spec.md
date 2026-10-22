@@ -8,9 +8,12 @@ Design status: G0 signed 2026-10-22 for rungs I1-I4; I5 (authenticity mechanism)
 Implementation status: Not started
 Canonical: Yes for rungs I1-I4 (G0 signed 2026-10-22, section 10)
 Owner: Identity component (proposed)
-Source: packages/session-identity/rust today (the one identity crate); renamed to packages/identity/rust after HARDEN T1 phase 6 lands
+Source: packages/identity/rust
+Contracts: packages/identity/contracts/
 Related:
-- docs/platform/session-identity/spec.md (writer id of a process; attribution, not authentication)
+- docs/io-contract.md (writer id recorded on every state write)
+- docs/specs/observe.md
+- plans/261015-2102-identity-resolver-rust-crate/plan.md (origin of the local-session resolver)
 - docs/platform/event-store/spec.md section 5 (machine id, store id) and section 14 (sharing through git)
 - docs/platform/agent-mailbox/spec.md section 5.1 (addresses) and section 15.2 (cross-machine delivery)
 - docs/platform/convention/spec.md (format rules for names and paths)
@@ -58,8 +61,8 @@ It also answers a sixth question for every other owner: **which id does this new
 |---|---|---|---|---|
 | Machine id | Event Store (`packages/event-store/rust/src/identity.rs`); minted by setup | `<hostname-slug>-<6 random base32>` in `<stateRoot>/machine-id`; overridable per clone by git config `fgos.machineId` | user level, not per project | Good form. Its owner is the event log, not an identity authority. The per-clone override means "machine id" can differ between clones on one machine |
 | Store id | Event Store | random 128-bit, `store.json` in the clone | one per clone | Fits as the clone id; no human short form |
-| Writer id | Session Identity (`packages/session-identity/rust`) | env id (`FGOS_SESSION_ID`, `CODEX_THREAD_ID`, `CLAUDE_CODE_SESSION_ID`), else a pid, else unresolved | one process tree on one machine | Not qualified by machine. Not an address. Known limits in its section 6 (shared subagent ids, Codex daemon, pid reuse) |
-| Attempt writer id | Session Identity (`att-<attemptId>`) | pure function of the attempt id | one runner attempt | Fits as the id of a runner worker; not addressable |
+| Writer id | Identity, local session (section 7a; `packages/identity/rust`) | env id (`FGOS_SESSION_ID`, `CODEX_THREAD_ID`, `CLAUDE_CODE_SESSION_ID`), else a pid, else unresolved | one process tree on one machine | Not qualified by machine. Not an address. Known limits in its section 6 (shared subagent ids, Codex daemon, pid reuse) |
+| Attempt writer id | Identity, local session (`att-<attemptId>`) | pure function of the attempt id | one runner attempt | Fits as the id of a runner worker; not addressable |
 | Mailbox address | Agent Mailbox (V1 core, branch `mailbox/v1-v3`) | `<project>-<cli>-<2 characters>`, generation per process | one project on one machine | Depends on the folder name; local only |
 | Workspace id | Distribution (`packages/distribution/rust/src/workspace.rs`) | first 16 hex of `sha256(realpath(workspace root))` | one checkout path on one machine | Derived from a path: two machines with the same checkout path (`~/projects/forgent` on both today) get the same id, and moving a folder changes it. Usable only as a local key, never as a project or clone id |
 | Project id | nobody | — | — | **Missing** |
@@ -122,6 +125,76 @@ Pushes and ref writes go through the Git component, like every other git mutatio
 | I4 | Shared directory through the Event Store; resolution across two machines | a session on machine A resolves a session on machine B after one fetch | I3, Event Store publication |
 | I5 | Sender authenticity: a per-machine signing key, a project's list of trusted machines, signed directory entries and messages | a forged entry is rejected | I4; owner decision on the key mechanism |
 
+## 7a. Local session (writer id)
+
+Merged from the former Session Identity spec on 2026-10-22 (one component, one authority). This section covers the question "which writer is this process, and how far can that id be trusted"; subsection numbers L1-L7 are local to it. Source: `packages/identity/rust`; contracts: `packages/identity/contracts/`.
+
+Session Identity answers one question for the calling process: which writer is it, and how far can that id be trusted. The answer is `{id, source}`, recorded as `writer` on every state write ([io-contract](../../io-contract.md)) and used to recognize a claim's owner.
+
+It is attribution, not authentication. Lock authority does not come from this id.
+
+### L2. Ownership boundary
+
+| Owns | Does not own |
+|---|---|
+| The order and validity rule for env session ids | Minting worker ids, scrubbing env, lineage (run supervisor) |
+| Confirming an env id against `<fgosDir>/sessions.json` (read only; an unreadable file means "not confirmed") | Writing `sessions.json` (`src/runner/session.mjs`) |
+| The process-tree rule: highest ancestor with a terminal, else session id, else caller pid | Liveness, start time, boot id (process facts) |
+| The read-only native verb `fgos identity` | Lock or claim-settle authority |
+| The contract and the shared vectors | Observe shard file names (Observe derives them from `{id, source}`) |
+
+There is one implementation: the Rust crate `fgos-identity`. Observe calls it in process. Node calls it through the facade `src/util/session-identity.mjs`, which decides nothing about the id.
+
+### L3. The rule
+
+1. **Env.** `FGOS_SESSION_ID`, then `CODEX_THREAD_ID`, then `CLAUDE_CODE_SESSION_ID`. A value counts when, trimmed, it is non-empty, at most 200 characters and matches `^[A-Za-z0-9._-]+$`; otherwise the next variable is tried. The first usable value is the id; `source` is `registry` when `sessions.json` lists it, else `env`.
+2. **Terminal root (Linux).** Walk from the caller (included) up through `/proc/<pid>/stat`. The id is the **highest** ancestor whose controlling terminal is set; `source: pid`.
+3. **Session.** No terminal anywhere above: the caller's session id; `source: pid`.
+4. **Unresolved.** Nothing readable (Windows, `/proc` hidden, caller gone): the caller's own pid; `source: unresolved`.
+
+No step counts hops, so wrapper layers between a caller and its terminal never change the answer. Other unix systems skip step 2 (session id from `getsid`).
+
+The rule lives in `packages/identity/rust/src/resolve.rs`; the OS is read only through the `ProcessTree` port (`proc_tree.rs`). The vectors in `identity.writer.golden.v1.json` are run by cargo and, for the env cases, by the Node facade through the real binary.
+
+### L4. Verb and contract
+
+`fgos identity [--pid <n>] [--fgos-dir <dir>]` — native route `identity.writer`, host kind `cli`, effect read, runs under `FGOS_RUST_HOST_RECURSION_GUARD`. `--pid` defaults to the process that started `fgos` (unix) or `fgos` itself (Windows). `--fgos-dir` absent skips registry confirmation. Bad options exit non-zero with no envelope. The answer is the standard `fgos.v1` envelope with `data = {id, source}`; `id` is a string for `registry`/`env` and a positive integer for `pid`/`unresolved`.
+
+### L5. Node facade
+
+`resolveWriterIdentity(fgosDir)`:
+
+- Finds the host binary by `src/util/host-bin-path.mjs`: `FGOS_HOST_BIN`, then the activation next to `fgosDir`, then the nearest activation above the cwd. The activation rule is the fgctl shim's (`<releasePath>/bin/fgos`, executable, inside the release).
+- Runs `fgos identity --pid <own pid>` directly (no shim, no `invokeHost`), with a 2000 ms kill deadline; the child is killed and reaped before the facade returns.
+- Caches per process: `pid`/`unresolved` answers by the session env alone; `env`/`registry` answers by session env and fgos dir. Failures are never cached.
+- Never runs the binary while the process holds the `state` or `porting-events` hot mutex: `withStateTx` resolves the writer before locking, and `probeIdentity` refuses (`identity-in-lock`) while one is held.
+
+Errors (`WriterIdentityError`, category `precondition`, exit 2): `host-missing`, `host-version-mismatch` (the active release has no `identity` verb), `timeout`, `host-error`, `bad-output`, `identity-in-lock`. A verb that writes state fails before writing. `unresolved` is a valid answer and blocks nothing.
+
+### L5a. Attempt writer id (launcher half)
+
+An agent run (attempt) writes under its own id: `mint_attempt_writer_id(attemptId)` = `att-<attemptId>`, a pure function so a resume gets the same id and the same env digest (`packages/identity/contracts/attempt-writer-id.v1.json`, vectors beside it). Node reaches it only through `fgos internal identity mint-attempt --attempt <id> --protocol 1` (facade `mintAttemptWriterId`; exit 65 / `invalid-attempt-id` for an unusable id); same lock rule as the resolver. The launcher applies `scrub_and_set(env, writerId, parentWriterId)`: it removes `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID` and any inherited `FGOS_PARENT_WRITER_ID`, overwrites `FGOS_SESSION_ID` (never empty, so an inherited empty value cannot reach the agent) and sets `FGOS_PARENT_WRITER_ID` to the controller's writer id. `workerBaseEnv` no longer passes any of the three session ids. Codex only carries a minted id through `-c shell_environment_policy.set={FGOS_SESSION_ID=...}`; the other CLIs inherit the env.
+
+Who mints and who scrubs. The controller asks the route once per attempt and writes the result into the envelope (`identity {writerId, parentWriterId}`, both launch modes, so a resume re-derives the same envelope digest). The **gate** applies it: it starts the agent with `env_clear` plus the envelope's environment plus `FGOS_SESSION_ID` and `FGOS_PARENT_WRITER_ID`, because a pane inherits the environment of the herdr server, which `--env` cannot clear. In a pane the gate keeps only the pane's own `TERM*` and `HERDR_*` variables, and the controller strips its own copies of those from the envelope and side file. Lineage is one step: `FGOS_PARENT_WRITER_ID` is the controller's writer id, so an observer can tie an agent's writes to the run that started it.
+
+### L6. Known limits
+
+- **Codex runs its shell commands under a shared daemon** (`codex app-server`). Measured on codex 0.163.0 in a pane: without the explicit setting a command run by codex sees no `FGOS_SESSION_ID` and a stale `HERDR_PANE_ID` of a closed pane, only its own `CODEX_THREAD_ID`, so its writes resolve to the thread id (different per pane). With `-c shell_environment_policy.set={FGOS_SESSION_ID="<id>"}` the command sees the attempt id. The terminal adapter passes the option, so the limit applies only to a codex started by hand or by an older release. claude, agy, pi and omp pass the variable through unchanged.
+
+- A terminal or IDE started from a shell without a new session: its terminals share the launching shell's id.
+- Subagents of one Claude session share `CLAUDE_CODE_SESSION_ID`.
+- Containers in different pid namespaces sharing one `.fgos` can collide on pid ids.
+- A self-hosted CI runner whose jobs share one session shares one id.
+- A `nohup` process outliving its pane falls to its session id.
+- Env ids leak: a process started from a Codex shell carries `CODEX_THREAD_ID`, which now outranks `CLAUDE_CODE_SESSION_ID`.
+- `FGOS_HOST_BIN` is inherited: children use their parent's host binary.
+- A pane root pid can be reused after the pane closes.
+- The `/proc` reader here and the one in `packages/observe/rust/src/store_lock.rs` are two adapters; both move into the process-facts component when it exists.
+
+### L7. Doctor
+
+`writer-identity-resolvable` asks both doors' binaries directly (no cache): the running host and the activation a plain `git commit` hook uses. An older activated release shows as `host-version-mismatch`.
+
 ## 8. Out of scope
 
 - Human user accounts and login. LLM provider accounts stay with the runner's `llmAccounts`.
@@ -142,14 +215,16 @@ Pushes and ref writes go through the Git component, like every other git mutatio
 - 2026-10-22 — Owner opens lane IDENT: "identity càng sớm càng tốt", to cover cross-machine identity minting independent of any project, because lanes on different machines already talk through Git and address each other loosely and inaccurately. Draft written by session `f2c6f8ce` (lane MAIL lead) from the inventory in section 3; the owner will assign another agent on another machine to take the lane.
 - 2026-10-22 11:05 — Lane taken by session `b8f192bf` on the owner machine `fg-server`, handed over by HARDEN `forgent-a8`. Added the path-derived workspace id to section 3. G0 questions sent to the owner.
 - 2026-10-22 — **G0 signed for rungs I1-I4.** The six questions of section 9 were sent as one batch in the decision-question template; the owner chose the recommendation on questions 3 and 4 and raised no objection to the lead's decisions on 1, 2, 5 and 6.
-  1. One authority for every identity. The `fgos-session-identity` crate stays where it is as this component's local-session resolver; no rename or package move until HARDEN T1 phase 6 lands. Reverse if one authority forces two copies of the resolver rule.
+  1. One authority for every identity. The `fgos-identity` crate stays where it is as this component's local-session resolver; no rename or package move until HARDEN T1 phase 6 lands. Reverse if one authority forces two copies of the resolver rule.
   2. The project id lives in a tracked file under the repository's `.fgos/`, because git config does not travel with a clone and a root commit is shared by forks and absent in an empty repository. The plan must show that the file passes the frozen `.fgos` strip rules (barrier F10) without changing them.
   3. A fork or copy keeps the project id; splitting is an explicit verb (`fgos identity project --new`). Doctor warns when two different remotes publish one project id. Automatic fork detection by remote URL was rejected: a remote change or a mirror would read as a fork.
   4. A session handle is `<cli>-<chars>@<machine-handle>`; the machine handle is generated from the machine id and can carry a human alias; role aliases such as `lead:IDENT` resolve to the session holding the role. Both shapes are Convention kinds.
   5. The I5 authenticity mechanism is decided at the close of I4, with evidence of which signing keys the machines really have; G0 does not cover I5.
   6. From the landing of I3, new board rows and log lines name agents and machines by handle; old log lines stay as history; the IDENT lead rewrites the "ai làm" column of live rows once when I3 lands.
 - 2026-10-22 — Owner approves the read surface of section 5: one read per identity (machine, project, session) plus `resolve` and `list`; bare `fgos identity` keeps its answer.
-- 2026-10-22 — **Decision 1 sharpened by the owner: one component, one authority, one crate** ("1 component thôi, đã cấp phát ở mọi mức độ rồi thì không cần 2 authority"). Identity grows inside the existing crate `packages/session-identity/rust`; no second crate is created. The writer-id rule becomes the local part of the session identity. Package, crate and spec are renamed to Identity in one change after HARDEN T1 phase 6 lands; until then the name stays to avoid colliding with T1. Reverse if the rename turns out to need an alias crate (it must not; L10).
+- 2026-10-22 — **Decision 1 sharpened by the owner: one component, one authority, one crate** ("1 component thôi, đã cấp phát ở mọi mức độ rồi thì không cần 2 authority"). Identity grows inside the existing crate `packages/identity/rust`; no second crate is created. The writer-id rule becomes the local part of the session identity. Package, crate and spec are renamed to Identity in one change after HARDEN T1 phase 6 lands; until then the name stays to avoid colliding with T1. Reverse if the rename turns out to need an alias crate (it must not; L10).
 - 2026-10-22 11:32 — **Owner chooses option A: Identity mints every kind of id**, participants (machine, project, clone, session) and artifacts (work items, decisions, backlog rows, run and claim ids), through one mint door; record owners keep their records and call the door. The component, crate and spec are renamed to Identity; the verb stays `fgos identity`. **Nothing is built until a cheap mechanism against cross-machine collisions is settled** (owner: "sẽ không làm cho tới khi xác định được cơ chế rẻ tiền để chống trùng xuyên máy"). The plan of 2026-10-22 is held until then.
 - 2026-10-22 13:08 — **Owner settles the anti-collision mechanism** (section 4a): random ids of 50 bits, machine-scoped ids, and one counter ref per sequence kind claimed by compare-and-swap push. The owner ruled that sequential ids keep their exact format (no temporary ids, suffixes or renumbering) and that garbage must stay minimal; per-number claim refs were rejected for leaving one ref per claim. The lane leaves `held`. Rename to Identity runs first, because no branch has edited the crate yet (checked 13:08 on every `origin/harden/*` branch). Reverse rule 3 if the forge ever accepts a stale lease.
+- 2026-10-15 — Writer identity moves from `src/util/session-identity.mjs` into this crate as the single authority; Observe's own copies (`shard.rs`, `friction.rs`) are removed; no Node fallback when the binary is missing. Env order adds `CODEX_THREAD_ID`; the 3-hop pid walk becomes "highest ancestor with a terminal, else session id". Evidence and reviews: [plan](../../../plans/261015-2102-identity-resolver-rust-crate/plan.md), [S6](../../../plans/reports/spike-s6-261015-1638-rust-identity-call-latency-pre-commit-hook.md), [S7](../../../plans/reports/spike-s7-261015-1859-human-opened-pane-identity-observation.md).
+- 2026-10-22 — The component is renamed in one commit before any new code: package `packages/session-identity` to `packages/identity`, crate `fgos-session-identity` to `fgos-identity`, operation id `session-identity.resolve` to `identity.writer` (not `identity.resolve`, which the `fgos identity resolve <handle>` read keeps for itself), contract files `identity.writer.v1.json` and `identity.writer.golden.v1.json`, and the former Session Identity spec is merged into section 7a. The Node facade `src/util/session-identity.mjs` and the doctor row `writer-identity-resolvable` keep their names. Supersedes the earlier note that the rename waits for HARDEN T1 phase 6.
 - 2026-10-22 13:40 — Owner answers the two questions of the mint rung: new Work item ids are `tsk-` plus 10 base32 characters (existing ids unchanged); one rule line in `core/instructions/` tells every agent to take ids that travel between machines from `fgos identity mint <kind>`.

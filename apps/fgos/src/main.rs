@@ -108,7 +108,7 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     fgos_observe::OBSERVE_METRICS_DESCRIPTOR,
     fgos_observe::OBSERVE_FRICTION_DESCRIPTOR,
     fgos_convention::CONVENTION_DESCRIPTOR,
-    fgos_session_identity::IDENTITY_DESCRIPTOR,
+    fgos_identity::IDENTITY_DESCRIPTOR,
 ];
 
 static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
@@ -168,10 +168,10 @@ fn main() {
             std::process::exit(fgos_terminal_control::route::main(&rest));
         }
         // `identity <op>`: the writer-id rules the Node payload must not copy
-        // (see `fgos_session_identity::route`).
+        // (see `fgos_identity::route`).
         if args.get(2).is_some_and(|a| a == "identity") {
             let rest: Vec<String> = args[3..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
-            std::process::exit(fgos_session_identity::route::main(&rest));
+            std::process::exit(fgos_identity::route::main(&rest));
         }
         // `seat-binding <op>`: the seat binding decision the Node payload must
         // not copy (see `fgos_seat_binding::route`).
@@ -245,7 +245,7 @@ fn main() {
         ),
     ));
     service.register_provider(Arc::new(fgos_convention::ConventionProvider::new()));
-    service.register_provider(Arc::new(fgos_session_identity::IdentityProvider::new()));
+    service.register_provider(Arc::new(fgos_identity::IdentityProvider::new()));
     let tracker = service.tracker();
 
     // Help is answered by the legacy-node payload, which owns the verb

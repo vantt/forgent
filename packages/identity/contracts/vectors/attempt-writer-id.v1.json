@@ -1,5 +1,5 @@
 {
-  "contract": { "id": "session-identity-attempt-writer-id-vectors", "version": 1 },
+  "contract": { "id": "identity-attempt-writer-id-vectors", "version": 1 },
   "description": "Cases for attempt-writer-id.v1.json: `attemptId` maps to `writerId`, or to `error` when invalid.",
   "cases": [
     { "name": "plain", "attemptId": "a1", "writerId": "att-a1" },

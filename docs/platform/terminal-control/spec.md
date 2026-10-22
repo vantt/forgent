@@ -14,7 +14,7 @@ Last reviewed: 2026-10-18
 Related:
 - docs/platform/run-supervisor/spec.md
 - docs/platform/component-boundary.md
-- docs/platform/session-identity/spec.md
+- docs/platform/identity/spec.md
 - plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md
 - plans/reports/architecture-council-261015-1508-terminal-control-session-identity-process-supervisor.md
 - plans/reports/implementation-261016-1352-terminal-control-herdr-measurements.md

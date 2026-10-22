@@ -4,9 +4,9 @@
 Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for reading, editing and merging YAML text while keeping every byte a caller did not change, comments included
-Design status: Draft. Directions accepted by the owner on 2026-10-22 (Node door, comment scope); not yet signed as a whole
+Design status: Signed by the owner on 2026-10-22 as a whole; amendments go through "Lịch sử quyết định"
 Implementation status: Not started
-Canonical: No (becomes canonical when signed)
+Canonical: Yes
 Owner: YAML Document component (proposed)
 Source (planned): packages/yaml-doc/rust (crate fgos-yaml-doc)
 Contracts (planned): packages/yaml-doc/contracts/
@@ -211,3 +211,4 @@ Node reaches the component through the one combined native addon, as it already 
 - **2026-10-22: Node door is the native addon.** Owner chose the native door over a JSON projection plus spawn. Measured afterwards: an N-API call costs about 12 µs, a spawn 3 to 40 ms.
 - **2026-10-22: security review folded in** (`plans/reports/security-review-261022-0021-yaml-config-specs.md`): key identity on resolved values, string-only keys and no prototype keys in `strict-config`, bidi and zero-width characters refused, numeric edge values refused, named bounds checked before the parser recurses, expanded-bytes bound, no value in errors, define-semantics objects and panic capture at the addon boundary, and a supply-chain rule that adds source review, fuzzing and vendoring to the fixture gate.
 - **2026-10-22: writer shape A (surgical edit).** The spike showed byte-identical round trips with two candidates, so a deterministic re-render is not needed as a floor. The panel's rule stands: no B-then-A two-step plan.
+- **2026-10-22: signed.** The owner reviewed and signed this spec as a whole, together with the Config spec.
