@@ -553,7 +553,10 @@ fn hook_facts_measured_on_another_platform_are_not_used_so_that_cli_is_quiet_as_
         tested.facts(Adapter::Claude).is_none(),
         "facts from another platform never drive the caller check here"
     );
-    assert!(tested.facts(Adapter::Codex).is_some(), "the other CLI is unchanged");
+    assert!(
+        tested.facts(Adapter::Codex).is_some(),
+        "the other CLI is unchanged"
+    );
 }
 
 #[test]
