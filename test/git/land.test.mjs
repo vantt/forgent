@@ -237,11 +237,17 @@ test('a Land waiting for admission keeps its process running, so a session close
   const f = fixture(); try {
     const first = f.port(); const { candidate: held } = await first.prepare({ operationId: 'in-process-holder', request: f.request });
     let ticks = 0; const ticker = setInterval(() => { ticks += 1; }, 20);
-    setTimeout(() => first.close(), 300);
+    // The holder is closed only from a timer, so the waiter being admitted after it proves the loop
+    // ran while the Land waited. Each lock retry still blocks the loop for a helper spawn, so the
+    // tick count shrinks with machine load; it goes back to at least 5 once the lock runs in process.
+    let closedAt = null;
+    setTimeout(() => { first.close(); closedAt = process.hrtime.bigint(); }, 300);
     try {
       const second = f.port(); const { candidate: c } = await second.prepare({ operationId: 'in-process-waiter', request: f.request, waitMs: 5000 });
+      const admittedAt = process.hrtime.bigint();
       assert.equal(c.target, held.target);
-      assert.ok(ticks >= 5, `the event loop ran while the Land waited (${ticks} ticks)`);
+      assert.ok(closedAt !== null && closedAt <= admittedAt, 'the timer closed the holder while the Land waited, before it was admitted');
+      assert.ok(ticks >= 1, `the event loop ran while the Land waited (${ticks} ticks)`);
       second.close();
     } finally { clearInterval(ticker); }
   } finally { f.close(); }
