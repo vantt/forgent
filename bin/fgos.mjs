@@ -2944,13 +2944,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         unitData,
         ...(portRoot ? { caseAdmission: createCaseAdmissionPort({ repoRoot: portRoot }) } : {}),
         ...(caseRef ? { caseRef } : {}),
-        // What this door chose, and that it may raise nothing: a persona or capability a person typed that
-        // lifts a seat's tier above what the seat resolves to without it is refused by name, and so is an
-        // override tier above the resolved one. No door of this release can attest a person.
-        selectors: buildsUnit ? {
-          ...(flags.capability !== undefined ? { capability: unitData.capability } : {}),
-          ...(flags.persona !== undefined ? { persona: unitData.persona } : {}),
-        } : {},
+        // No door of this release can attest a person, so an override tier above the resolved one, or an
+        // accepted dependence, is refused by name. A prompt-built unit's --capability and --persona are the
+        // unit's own declarations, like the same keys of a --unit file.
         raiseAuthorized: false,
         pattern,
         stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),

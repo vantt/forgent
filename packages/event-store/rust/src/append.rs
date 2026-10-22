@@ -3,12 +3,13 @@ use crate::{
     envelope::{line, sha256, valid_timestamp, BatchCommit, Envelope},
     errors::{invalid, io, Error, ErrorCode},
     fsio::{point, write_hwm, FileSystem, OsFileSystem, Point},
-    identity::{valid_machine_id, StoreIdentity},
+    identity::StoreIdentity,
     layout::{Layout, StreamId, StreamLayout},
     locks::{acquire_append, AppendGuard},
     open_read::{closed, decode, read_optional, segments},
     registry::Registry,
 };
+use fgos_identity::machine::valid_machine_id;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{

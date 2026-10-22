@@ -1460,26 +1460,7 @@
       }
     },
     {
-      "name": "a door-chosen capability selector that raises the tier is refused",
-      "patch": {
-        "ask": {
-          "capability": "misc:thing",
-          "seat": "x",
-          "role": "producer",
-          "selectors": {
-            "capability": "architecture:explain"
-          }
-        }
-      },
-      "expected": {
-        "ok": false,
-        "refusal": {
-          "reason": "tier-escalation-unauthorized"
-        }
-      }
-    },
-    {
-      "name": "a door-chosen persona selector that raises the tier is refused and named",
+      "name": "a persona an override names that raises the tier is refused",
       "patch": {
         "ask": {
           "capability": "misc:thing",
@@ -1512,7 +1493,7 @@
       }
     },
     {
-      "name": "an authorized door lets the selector raise and the tier source names it",
+      "name": "an authorized door lets the override persona raise and the tier source names it",
       "patch": {
         "ask": {
           "capability": "misc:thing",
@@ -1547,7 +1528,7 @@
       ]
     },
     {
-      "name": "a selector that does not raise the tier is accepted without authorization",
+      "name": "an override persona that does not raise the tier is accepted without authorization",
       "patch": {
         "ask": {
           "capability": "architecture:explain",
