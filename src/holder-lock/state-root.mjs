@@ -13,6 +13,18 @@ import { doorStateRoot } from './driver.mjs';
 export const STATE_ROOT_ENV = 'FGOS_STATE_ROOT';
 export const LOCKS_DIR = 'locks';
 
+// The only variables the Rust formula reads (state_root.rs `state_root_from`).
+const FORMULA_KEYS = ['FGOS_STATE_HOME', 'XDG_STATE_HOME', 'HOME', 'USERPROFILE'];
+let lastDoorAnswer = null;
+
+/** The door's answer for the formula's inputs in `env`, asked again only when one of them changes. */
+function doorRoot(env) {
+  const inputs = Object.fromEntries(FORMULA_KEYS.filter((key) => env[key] !== undefined).map((key) => [key, env[key]]));
+  const key = JSON.stringify(inputs);
+  if (lastDoorAnswer?.key !== key) lastDoorAnswer = { key, answer: doorStateRoot(inputs) };
+  return { ...lastDoorAnswer.answer };
+}
+
 function pinnedRoot(env) {
   const raw = env[STATE_ROOT_ENV];
   if (typeof raw !== 'string' || raw.trim() === '') return null;
@@ -28,7 +40,7 @@ function pinnedRoot(env) {
  * cannot be reached; the root is never guessed.
  */
 export function resolveStateRoot({ env = process.env } = {}) {
-  return pinnedRoot(env) ?? doorStateRoot(env);
+  return pinnedRoot(env) ?? doorRoot(env);
 }
 
 /** `<stateRoot>/locks` for the current process. */
