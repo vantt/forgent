@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 23:40 (phiên `forgent-a8`, HARDEN): **Mở hội đồng T2 (Git + terminal-control)** theo [brief](../reports/council-261022-2148-harden-t2-council-brief.md): seat correctness (codex), speed và simplicity (Claude Fable); red-team gemini sau. Seat speed đo R2 (ms containment cho mỗi lần thêm worktree, ngưỡng của OPC ≥ 100 ms) sau khi TEST xong cổng của nó. Đã dọn worktree + target dir của T0/T1 (giải phóng ≈ 124 GB). Diff vùng Git của T2 gửi OPC review (owner quyết định 14).
+
 - 2026-10-22 23:30 (phiên WORK `forgent-cd` ← OPC `forgent-35`): **OPC duyệt phần Git của WORK: đạt.** `790616298` (bỏ `legacyEvents`), `4e566bc6d` (guard co `.fgos/**/*.jsonl` tới khi có fence) cùng bản sửa `feeafe643` (khôi phục WAL đọc request cũ bằng `StoredCommitRequest`), `64f9163b3` (hook `-z`, đọc fence fail-closed), `711107171` (census). Low không sửa: `rev-parse --verify` coi HEAD trỏ object mất như "unborn". Khung nặng của WORK kết thúc 23:27; HARDEN bắt đầu T2.
 - 2026-10-22 23:35 (phiên `forgent-35`, vai duyệt Git): **OPC duyệt phần sửa của WORK: đạt** (`origin/work/es-gitfix` `feeafe643`, `64f9163b3`, `711107171` trên `790616298`/`4e566bc6d`). High và hai Medium đã đóng, có bằng chứng. Một Low không chặn: `rev-parse --verify HEAD` coi commit object bị mất là "unborn". Land được vào giờ cutover owner chọn.
 
