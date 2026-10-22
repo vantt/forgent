@@ -31,8 +31,9 @@ use fgos_durable_file::sync_directory;
 use fgos_holder_lock::{Acquire, LockScope, ScopeError};
 use fgos_mailbox_core::{
     Claim, Finished, IdSource, Limits, MailboxState, MessageId, Refusal, RegisterRefusal,
-    Registered, SendOutcome, SendRequest, SnapshotVersionError, Timestamp,
+    Registered, SendOutcome, SendRequest, SnapshotVersionError, Timestamp, WriterKey,
 };
+use std::collections::BTreeSet;
 use std::fmt;
 use std::fs::{File, OpenOptions};
 use std::io::{self, Read};
@@ -358,7 +359,7 @@ impl Record {
             now,
             limits,
             observe,
-            |state, ids| (mutate(state, ids), None),
+            |state, ids, _| (mutate(state, ids), None),
             Sweep::No,
         )
     }
@@ -393,9 +394,9 @@ impl Record {
             now,
             limits,
             observe,
-            |state, ids| {
+            |state, ids, dead| {
                 let req = SendRequest {
-                    dead_keys: prune::dead_keys(state),
+                    dead_keys: dead.cloned().unwrap_or_default(),
                     ..req
                 };
                 let sent = state.send(req, now, limits, ids);
@@ -435,7 +436,11 @@ impl Record {
         now: Timestamp,
         limits: &Limits,
         mut observe: impl FnMut(Step) -> io::Result<()>,
-        mutate: impl FnOnce(&mut MailboxState, &mut dyn IdSource) -> (R, Option<(MessageId, &'b str)>),
+        mutate: impl FnOnce(
+            &mut MailboxState,
+            &mut dyn IdSource,
+            Option<&BTreeSet<WriterKey>>,
+        ) -> (R, Option<(MessageId, &'b str)>),
         sweep: Sweep,
     ) -> Result<Held<R>, RecordError> {
         let params = self
@@ -454,7 +459,10 @@ impl Record {
         before_commit(&mut observe, Step::Read)?;
         let kept_before = bodies::referenced(&state);
         let mut ids = OsIds::open().map_err(|_| RecordError::Ids)?;
-        let (value, body) = mutate(&mut state, &mut ids);
+        // A send judges every stored head once, before the core runs: its
+        // name resolution and its prune both use this judgement.
+        let dead = (sweep == Sweep::Yes).then(|| prune::dead_keys(&state));
+        let (value, body) = mutate(&mut state, &mut ids, dead.as_ref());
         if ids.failed() {
             return Err(RecordError::Ids);
         }
@@ -466,7 +474,7 @@ impl Record {
                 collected: Collected::default(),
             });
         }
-        prune::prune(&mut state, now, limits);
+        prune::prune(&mut state, now, limits, dead.as_ref());
         let new = snapshot::encode(&state)?;
         before_commit(&mut observe, Step::Mutated)?;
         if let Some((id, text)) = body {

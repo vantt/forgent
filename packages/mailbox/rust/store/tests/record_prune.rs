@@ -183,6 +183,115 @@ fn a_dead_binding_still_named_by_a_header_is_kept_until_the_header_retires() {
     assert!(!has_binding(&record, DEAD));
 }
 
+/// Idle counts from the head's last drain, not only from its
+/// registration: a dead head that drained a notice less than a record TTL
+/// ago is kept after the header that named it retired, and pruned one
+/// record TTL after that drain.
+#[test]
+fn a_dead_binding_idle_since_its_last_drain_is_kept_until_a_record_ttl_after_it() {
+    let fgos = TempFgos::new("prune-drained");
+    let record = fgos.record();
+    let limits = common::limits();
+    let ttl = limits.record.ttl_sec;
+    dead_binding(&record, &limits);
+    let peer = record
+        .hold(Wait::Try, T0, &limits, |state, ids| {
+            Reported::changing(rec::name_of(&rec::register(
+                state, "peer", T0, &limits, ids,
+            )))
+        })
+        .unwrap()
+        .value
+        .value;
+    record
+        .send(
+            rec::send_req(DEAD, &peer, "never read"),
+            Wait::Try,
+            T0,
+            &limits,
+        )
+        .unwrap()
+        .value
+        .unwrap();
+    // The unread message is refused one record TTL later, with a notice to
+    // the dead head; the dead head's key drains that notice half a TTL on.
+    let refused_at = T0.plus_secs(ttl + 1);
+    writing_hold(&record, "other", refused_at, &limits);
+    let drained_at = refused_at.plus_secs(ttl / 2);
+    let drained = record
+        .hold(Wait::Try, drained_at, &limits, |state, ids| {
+            let claim = state.claim(
+                &rec::key(DEAD),
+                Generation::FIRST,
+                Checkpoint::Step,
+                drained_at,
+                &limits,
+                ids,
+            );
+            let token = claim.token.clone().unwrap();
+            let finished = state.finish(&rec::key(DEAD), Generation::FIRST, &token, drained_at);
+            Reported::changing(finished.offered.len())
+        })
+        .unwrap();
+    assert_eq!(drained.value.value, 1, "the notice was drained");
+
+    // The refused header retires one horizon after its refusal; the head
+    // drained less than a record TTL before that.
+    let after_header = refused_at.plus_secs(limits.header_horizon_sec() + 1);
+    writing_hold(&record, "another", after_header, &limits);
+    assert!(
+        has_binding(&record, DEAD),
+        "idle counts from the last drain"
+    );
+
+    writing_hold(&record, "a-third", drained_at.plus_secs(ttl + 1), &limits);
+    assert!(!has_binding(&record, DEAD));
+}
+
+/// A send prunes with the liveness it judged once for its own name
+/// resolution: the dead idle head is forgotten, the live idle one kept.
+#[test]
+fn a_send_prunes_with_the_judgement_it_made_for_its_names() {
+    let fgos = TempFgos::new("prune-send");
+    let record = fgos.record();
+    let limits = common::limits();
+    dead_binding(&record, &limits);
+    let own = rec::own_head_record();
+    let peer = record
+        .hold(Wait::Try, T0, &limits, |state, ids| {
+            state
+                .register(
+                    rec::register_request("live-head", &own),
+                    None,
+                    T0,
+                    &limits,
+                    ids,
+                )
+                .unwrap();
+            Reported::changing(rec::name_of(&rec::register(
+                state, "peer", T0, &limits, ids,
+            )))
+        })
+        .unwrap()
+        .value
+        .value;
+
+    let later = T0.plus_secs(limits.record.ttl_sec + 1);
+    record
+        .send(
+            rec::send_req("cli-sender", &peer, "hello"),
+            Wait::Try,
+            later,
+            &limits,
+        )
+        .unwrap()
+        .value
+        .unwrap();
+
+    assert!(!has_binding(&record, DEAD));
+    assert!(has_binding(&record, "live-head"));
+}
+
 #[test]
 fn a_dead_binding_not_yet_idle_is_kept() {
     let fgos = TempFgos::new("prune-recent");

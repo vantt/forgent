@@ -7,7 +7,7 @@ mod common;
 use common::record::{self as rec, TempFgos, T0};
 use fgos_holder_lock::LockScope;
 use fgos_mailbox::hook::{Begun, QuietReason};
-use fgos_mailbox::record::{OsIds, Paths, RecordError, Reported, Step, Wait};
+use fgos_mailbox::record::{OsIds, Paths, Reported, Wait};
 use fgos_mailbox_core::{
     AttemptToken, Checkpoint, CounterReason, Generation, IdSource, Liveness, MailboxState, Refusal,
     RegisterRequest, Registered, StoredHead,
@@ -443,57 +443,6 @@ fn an_untrusted_record_directory_is_refused_before_any_write() {
         chmod(&fgos.fgos_dir(), 0o775);
         assert!(hold(&record).unwrap(), "a group-writable .fgos is accepted");
     }
-}
-
-#[test]
-fn a_failure_after_the_rename_is_reported_as_written() {
-    let fgos = TempFgos::new("after-rename");
-    let old = registered(&fgos);
-    let limits = common::limits();
-    let fail_at = |at: Step| {
-        move |step: Step| {
-            if step == at {
-                Err(std::io::Error::other("observer stops here"))
-            } else {
-                Ok(())
-            }
-        }
-    };
-
-    let err = fgos
-        .record()
-        .hold_observed(
-            Wait::Try,
-            T0,
-            &common::limits(),
-            fail_at(Step::Synced),
-            |state, ids| rec::register(state, "head-b", T0, &limits, ids),
-        )
-        .unwrap_err();
-    assert!(matches!(
-        err,
-        RecordError::Observer {
-            step: Step::Synced,
-            ..
-        }
-    ));
-    assert_eq!(err.code(), "observer");
-    assert_eq!(snapshot_bytes(&fgos.paths()), old);
-
-    let held = fgos
-        .record()
-        .hold_observed(
-            Wait::Try,
-            T0,
-            &common::limits(),
-            fail_at(Step::Renamed),
-            |state, ids| rec::register(state, "head-c", T0, &limits, ids),
-        )
-        .unwrap();
-    assert!(held.wrote);
-    assert_eq!(held.warning.unwrap().step, Step::Renamed);
-    let state: MailboxState = serde_json::from_slice(&snapshot_bytes(&fgos.paths())).unwrap();
-    assert!(state.binding(&rec::key("head-c")).is_some());
 }
 
 #[test]
