@@ -192,7 +192,7 @@ test('a zombie holder counts as dead and its record is cleaned', { skip: !LINUX 
   }
 });
 
-test('a record that cannot be read or judged is never cleaned: the waiter times out and the bytes stay', async () => {
+test('a record that cannot be read or judged is never cleaned: the waiter times out as lock-record-unreadable, naming fgos lock fence, and the bytes stay', async () => {
   const cases = {
     garbage: '{"v":1,"pid":',
     noPid: JSON.stringify({ v: 1 }),
@@ -210,7 +210,7 @@ test('a record that cannot be read or judged is never cleaned: the waiter times 
           withStateTx(process.argv[1], () => 'entered', { prefetched: { writer: ${WRITER} } });
           console.log('ENTERED');
         } catch (err) {
-          console.log(JSON.stringify({ code: err.code, category: err.category, reason: err.reason ?? null }));
+          console.log(JSON.stringify({ code: err.code, category: err.category, reason: err.reason ?? null, message: err.message }));
         }
       `, [f.fgosDir]);
       const result = await run.done;
@@ -218,7 +218,8 @@ test('a record that cannot be read or judged is never cleaned: the waiter times 
       const answer = JSON.parse(result.stdout.trim());
       assert.equal(answer.code, 'hot-lock-timeout', name);
       assert.equal(answer.category, 'lock-timeout', name);
-      if (name !== 'unjudgeable') assert.equal(answer.reason, 'lock-record-unreadable', name);
+      assert.equal(answer.reason, 'lock-record-unreadable', name);
+      assert.match(answer.message, /fgos lock fence/, `${name}: the timeout names the way out`);
       assert.ok(Date.now() - started >= 4500, `${name}: waited out the timeout`);
       assert.equal(fs.readFileSync(file, 'utf8'), bytes, `${name}: record untouched`);
     } finally {
