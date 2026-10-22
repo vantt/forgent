@@ -239,6 +239,31 @@ Mechanical sweep over **every source line** of all five crates (not a substitute
 
 **Not done: a full line-by-line read of `noyalib` (55 k) and `yaml-rt-core` (24 k).** Neither is reviewable at the depth this record claims for A; this alone is a reason against B and C. For A the remaining unread parts are the logic of `scanner.rs` (2 728 lines) and `parser.rs` (1 359 lines), which contain no `unsafe`, no `std` and no I/O; a full read of those two files plus the 72 `arraydeque` sites is the follow-up the owner can ask for before the version is vendored.
 
+### 8.1 Read before vendoring (owner condition of 2026-10-22 18:02)
+
+Read by a person (me) on 2026-10-22 in the unpacked `.crate` files whose sha256 equals the checksums of section 2 (`saphyr-parser` `6c622058…d387`, `arraydeque` `7d902e3d…c236`).
+
+| File | Lines | How read |
+|---|---|---|
+| `saphyr-parser` `src/scanner.rs` | 2 728 | in full, top to bottom |
+| `saphyr-parser` `src/parser.rs` | 1 359 | in full, top to bottom |
+| `saphyr-parser` `src/lib.rs`, `src/debug.rs` | 52, 40 | in full (section 8) |
+| `saphyr-parser` `src/input.rs`, `src/input/str.rs`, `src/input/buffered.rs`, `src/char_traits.rs` | 493, 468, 126, 128 | `grep` of every `unsafe`, `unwrap`, `expect`, `assert`, `unreachable`, `static`, `std::`, `extern`, plus the functions the scanner calls on the string input (`skip`, `skip_n`, `raw_read_*`); not read line by line |
+| `arraydeque` `src/lib.rs` | 3 089 (2 451 before the test module) | the 1 222 non-comment, non-blank lines before the test module, in full: every `unsafe` block, the `Drain`, `Iter`, `IterMut`, `IntoIter` code; doc comments and the test module (638 lines) skipped |
+| `arraydeque` `src/behavior.rs`, `src/error.rs`, `src/range.rs` | 51, 29, 43 | in full |
+
+Findings, none of which changes the choice:
+
+- **`unsafe`**: `saphyr-parser` has none (`#![no_std]`, `alloc` only). `arraydeque` has the 72 sites of section 6.1, all in the `MaybeUninit` ring buffer (`get_unchecked`, `ptr::copy`, `ptr::read`, `from_raw_parts`) and two lifetime-extending `transmute` in `IterMut`. The only user is `saphyr-parser`'s `BufferedInput` (`input/buffered.rs`: `push_back`, `pop_front`, `drain`, `len`); this crate builds the parser on `StrInput` only, so no `arraydeque` code runs. It is still compiled and still vendored.
+- **I/O, global state, build, macros**: no file, network or process access in either crate; no `build.rs`; no proc-macro in either (the `thiserror` derive is a crate already in the workspace lock). Global state exists only behind the off-by-default feature `debug_prints` (`src/debug.rs`: `SAPHYR_DEBUG`, a `OnceLock`).
+- **Panics reachable from input** (all caught by the crate's panic guard, none read from a value): `parser.rs` 443 `expect`, 452 `pop_state` `unwrap`, 538 `assert_eq!` in `Parser::load_document`, `unreachable!` at 566, 651, 859, 868, 872, 882, 886, 901; `scanner.rs` 678 `assert!`, `unwrap` on the simple-key and indent stacks at 1554, 2490, 2495, 2625, 2665, 2677, and usize subtractions `sk.token_number - self.tokens_parsed` at 2513, 2522, 2609 (a debug-build panic if the bookkeeping ever drifts; wraps in a release build). The crate never calls `Parser::load` (the only user of the `assert_eq!`); it pulls events with `next_event()`.
+- **Recursion**: scanner and event state machine are iterative (explicit `Vec<State>` and indent stacks, bounded by memory). Recursion exists only in `Parser::load`, `load_node`, `load_mapping`, `load_sequence` (`parser.rs` 544 to 608), which the crate does not call. The scanner caps flow nesting at 255 (`flow_level: u8`, `checked_add`, error "recursion limit exceeded", `scanner.rs` 1542 to 1549); block nesting has no cap besides memory, which the crate's pre-scan bounds (depth 32 and 64).
+- **Hard-coded limit**: an implicit key may sit at most 1 024 characters from its `:` (`scanner.rs` 855). A longer key is a syntax error from the parser; the adapter reports it as `key-too-large` (the fixture `key-over-limit`).
+- **Error text**: `ScanError` Display carries one character of the source in one message (`scanner.rs` 778 to 781, "unexpected character"). The crate takes only line and column from a parser error and writes its own fixed text.
+- **Not unusual, noted**: a literal NUL ends the input early or is "found unprintable character" (`scanner.rs` 716 to 719); `Marker::index` is a character index although documented as bytes (section 3.1, already handled); `parser_process_directives` resets the tag map inside its loop (`parser.rs` 742), harmless here because every tag outside the core set is refused.
+
+Nothing found that should change the choice.
+
 ## 9. Swap cost, public API leakage, vendoring layout
 
 Scratch adapter size (non-blank lines): `yaml-rt` 55, `noyalib` 94 (driven through config and policies), `saphyr-parser` 98 plus 54 of derived span rules plus the shared walk. The shared tree type, profile walk, comment association and splicing are ours and do not change with the candidate. No parser type is in our public API in any option (the adapter returns our tree and spans); swapping is one adapter file plus the fixtures that must stay green.
