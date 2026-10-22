@@ -1,7 +1,7 @@
 ---
 title: "Mailbox V3: hook payload contract tests in crate fgos-mailbox"
 description: "Build rung V3 of the Agent Mailbox ladder: record real Stop and PostToolUse hook payloads from Claude Code, Codex and agy, redact them into fixtures, and prove the drain function against them (output shape each CLI accepted, fail-quiet, agent_id skip, generation registration, Stop-block bound) with cargo test -p fgos-mailbox, on branch mailbox/v1-v3 only."
-status: pending
+status: completed
 priority: P2
 effort: ~3d (7 phases, strictly sequential)
 branch: main (plan only); all code on branch mailbox/v1-v3 in linked worktree /home/vantt/projects/forgent-mailbox, never merged to main until the owner says feasibility is proven
@@ -81,13 +81,13 @@ Never use a bare `&`. Before reading a result, confirm the process exited and re
 
 | # | Phase | Proof | Status |
 |---|---|---|---|
-| 1 | [Preconditions, crate `fgos-mailbox` skeleton, Stop-block key, shared test support](phase-01-preconditions-crate-skeleton-and-stop-block-key.md) | crate builds; each contract key is owned by exactly one reader, and each reader's missing-key test is green | pending |
-| 2 | [Record the real payloads and the accepted outputs](phase-02-record-real-payloads-and-accepted-outputs.md) | fixtures and `adapters.v1.json` committed; redaction guard and fixture contract tests green | pending |
-| 3 | [Core: Stop-block count; same-head and refused registrations change nothing](phase-03-core-stop-block-count.md) | `cargo test -p fgos-mailbox-core` | pending |
-| 4 | [Head judgement over real processes](phase-04-head-judgement-over-real-processes.md) | round trip of the own record; unparseable or incomplete is never the same head | pending |
-| 5 | [Adapters: parse each CLI's payload, render each CLI's accepted output](phase-05-adapters-parse-and-render.md) | every fixture parses; the render equals the recorded accepted value | pending |
-| 6 | [The drain: begin, render_reply, finish](phase-06-drain-begin-emit-finish.md) | payload suite: shape, fail-quiet, `agent_id` skip, registration and generation, Stop-block bound, no write on the no-mail path | pending |
-| 7 | [Branch docs, full gates, review, hand-off](phase-07-branch-docs-gates-and-handoff.md) | workspace cargo gates and `npm test` green on the branch | pending |
+| 1 | [Preconditions, crate `fgos-mailbox` skeleton, Stop-block key, shared test support](phase-01-preconditions-crate-skeleton-and-stop-block-key.md) | crate builds; each contract key is owned by exactly one reader, and each reader's missing-key test is green | done (branch `mailbox/v1-v3`) |
+| 2 | [Record the real payloads and the accepted outputs](phase-02-record-real-payloads-and-accepted-outputs.md) | fixtures and `adapters.v1.json` committed; redaction guard and fixture contract tests green | done: Claude Code and Codex recorded and accepted; agy Stop only, drain deferred |
+| 3 | [Core: Stop-block count; same-head and refused registrations change nothing](phase-03-core-stop-block-count.md) | `cargo test -p fgos-mailbox-core` | done (branch `mailbox/v1-v3`) |
+| 4 | [Head judgement over real processes](phase-04-head-judgement-over-real-processes.md) | round trip of the own record; unparseable or incomplete is never the same head | done (branch `mailbox/v1-v3`) |
+| 5 | [Adapters: parse each CLI's payload, render each CLI's accepted output](phase-05-adapters-parse-and-render.md) | every fixture parses; the render equals the recorded accepted value | done (branch `mailbox/v1-v3`) |
+| 6 | [The drain: begin, render_reply, finish](phase-06-drain-begin-emit-finish.md) | payload suite: shape, fail-quiet, `agent_id` skip, registration and generation, Stop-block bound, no write on the no-mail path | done (branch `mailbox/v1-v3`) |
+| 7 | [Branch docs, full gates, review, hand-off](phase-07-branch-docs-gates-and-handoff.md) | workspace cargo gates and `npm test` green on the branch | done (branch `mailbox/v1-v3`) |
 
 The phases share `src/lib.rs`, `Cargo.toml` and the fixtures directory, so they run one after another. Phases 3 and 4 do not need phase 2's fixtures and may run while phase 2 waits on an account. Phases 5 and 6 need the fixtures.
 
