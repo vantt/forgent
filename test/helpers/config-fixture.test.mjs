@@ -18,11 +18,8 @@ import {
 
 const mkTemp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-config-fixture-'));
 
-// Known raw-write exceptions: tests that need a config file the helper's
-// object writers cannot express (exact bytes, a non-config file of the same
-// name, or a write through the product path under test) are listed here,
-// with the reason, and are the only test files the architecture guard allows
-// to write `config.json` outside this module. Currently none.
+// There is no list of tests allowed to write config.json by hand: byte-exact and malformed
+// content goes through the raw writers, and test/architecture.test.mjs fails any other write.
 
 test('a config written by the helper is read back equal by the product reader, for both scopes', () => {
   const value = { runner: { timeoutMs: 5000 }, nested: { list: [1, 'two', { three: 3 }] } };
