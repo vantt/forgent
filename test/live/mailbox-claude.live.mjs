@@ -22,6 +22,9 @@
  *       against a stub CLI. Exit 3 on any failure.
  *   run <L1|L2|L3a|L3b> [--dry]
  *       One case. `--dry` runs it against the stub under `<base>-dry/`.
+ *       Refused unless the example `check` built was built from the current
+ *       HEAD and is unchanged (`<base>/example-build.json`); the result
+ *       records that commit and the binary's hash. `demo` likewise.
  *   report
  *       Prints every case's result.json summary.
  *   probe-hook <event> <ladder file> <state file>      (L3's hook command)
@@ -153,6 +156,17 @@ function examplePath() {
   return path.join(cargoTargetDir(), 'release', 'examples', 'mailbox-test-hook');
 }
 
+/** Where `check` records which commit the example was built from. */
+const BUILD_FILE = path.join(BASE, 'example-build.json');
+
+function headCommit() {
+  const out = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' });
+  if (out.status !== 0) die('git rev-parse HEAD failed');
+  return out.stdout.trim();
+}
+
+const fileSha256 = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+
 function buildExample() {
   const out = spawnSync('cargo', ['build', '--release', '-p', 'fgos-mailbox', '--example', 'mailbox-test-hook'], {
     cwd: REPO_ROOT,
@@ -160,7 +174,25 @@ function buildExample() {
     stdio: ['ignore', 'inherit', 'inherit'],
   });
   if (out.status !== 0) die('the example did not build');
-  return examplePath();
+  const example = examplePath();
+  fs.mkdirSync(BASE, { recursive: true });
+  writeJson(BUILD_FILE, { commit: headCommit(), sha256: fileSha256(example), path: example, builtAt: new Date().toISOString() });
+  return example;
+}
+
+/**
+ * The example `check` built, refused unless it was built from the current HEAD and is still the
+ * same file, so a live spend never runs code older than the commit its report names. Returns the
+ * fingerprint every result records.
+ */
+function builtExample(example) {
+  if (!fs.existsSync(example)) die(`${example} is missing; run check first`);
+  if (!fs.existsSync(BUILD_FILE)) die(`${BUILD_FILE} is missing; run check first`);
+  const built = readJson(BUILD_FILE);
+  const head = headCommit();
+  if (built.commit !== head) die(`the example was built from ${built.commit}, HEAD is ${head}; run check again`);
+  if (built.path !== example || built.sha256 !== fileSha256(example)) die(`${example} changed since check built it; run check again`);
+  return { commit: built.commit, sha256: built.sha256 };
 }
 
 // ---------------------------------------------------------------- case layout
@@ -817,7 +849,7 @@ async function cmdRun(name, dry, exampleArg) {
   const problem = resourceProblem({ dry });
   if (problem) die(problem);
   const example = exampleArg ?? examplePath();
-  if (!fs.existsSync(example)) die(`${example} is missing; run check first`);
+  const build = builtExample(example);
   live.hookPreflight('claude', os.homedir());
   const dir = layOut(name, dry, example);
   const uuid = crypto.randomUUID();
@@ -831,6 +863,7 @@ async function cmdRun(name, dry, exampleArg) {
     invocations: dry ? 0 : 1,
     cli: { exit: cli.status, signal: cli.signal, versionBefore: cli.versionBefore, versionAfter: cli.versionAfter, ms: cli.endedAt - cli.startedAt },
     topology: TOPOLOGY,
+    example: build,
     ...rest,
   };
   writeJson(path.join(dir, 'result.json'), result);
@@ -1042,12 +1075,13 @@ async function paneStarter(ctx) {
     const bin = ctx.dry ? process.execPath : cli === 'codex' ? CODEX_BIN : CLAUDE_BIN;
     const cliArgs = ctx.dry ? [SCRIPT, `stub-${cli}`, '--interactive', ...args] : args;
     const version = ctx.dry ? 'stub' : semver(live.cliVersion(bin, env));
+    // A refusal throws, never exits, so the scene's `finish` still runs.
     if (!ctx.dry) {
       const problem = resourceProblem() ?? versionProblem(cli, version);
-      if (problem) die(problem);
+      if (problem) throw new live.LiveCliError(problem, 3);
     }
     const allocated = tc.allocate({ key, groupKey: group, display: { label: role === 'a' ? names.tab : names[role], role: role === 'a' ? 'Minh' : 'Lan', agent: cli }, cwd: ctx.ws[role] });
-    if (allocated.result !== 'slot') die(`allocate ${key}: ${JSON.stringify(allocated)}`);
+    if (allocated.result !== 'slot') throw new live.LiveCliError(`allocate ${key}: ${JSON.stringify(allocated)}`, 3);
     // The tab took the first pane's label; every pane gets its own.
     tc.label({ key, display: { label: names[role] } });
     ctx.panes.keys[role] = { key, paneId: allocated.paneId ?? allocated.slot?.paneId ?? null };
@@ -1157,7 +1191,7 @@ async function runScene(ctx, starter) {
       const env = ctx.envFor('b', { CODEX_HOME: ctx.codexHome });
       if (!ctx.dry) {
         const before = live.codexAuthState({ home: ctx.codexHome, accountAuth: ctx.accountAuth, env });
-        if (!(before.isLink && before.loggedIn)) die(`the Codex test account's login is not usable before the run (link ${before.isLink}, logged in ${before.loggedIn}); stop and ask the owner`, 3);
+        if (!(before.isLink && before.loggedIn)) throw new live.LiveCliError(`the Codex test account's login is not usable before the run (link ${before.isLink}, logged in ${before.loggedIn}); stop and ask the owner`, 3);
       }
       b = await starter.start('b', { cli: 'codex', env, args: live.codexArgs({ ws: ws.b, prompt, print: !ctx.interactive }) });
     }
@@ -1279,15 +1313,18 @@ async function cmdDemo(name, dry, exampleArg) {
   const problem = resourceProblem({ dry });
   if (problem) die(problem);
   const example = exampleArg ?? examplePath();
-  if (!fs.existsSync(example)) die(`${example} is missing; run check first`);
+  const build = builtExample(example);
   live.hookPreflight('claude', os.homedir());
   const ctx = setUpScene(name, dry, example, interactive);
-  const starter = interactive ? await paneStarter(ctx) : printStarter(ctx);
+  // `finish` releases the panes and stops the dry mode's own herdr server on every way out of
+  // the scene; nothing inside it exits the process.
+  let starter = null;
   let run;
   try {
+    starter = interactive ? await paneStarter(ctx) : printStarter(ctx);
     run = await runScene(ctx, starter);
   } finally {
-    starter.finish();
+    starter?.finish();
   }
   const { checks, dialogue } = sceneEvidence(ctx, run);
   const sessions = [run.sessions.a, run.sessions.b].filter(Boolean);
@@ -1296,6 +1333,7 @@ async function cmdDemo(name, dry, exampleArg) {
     label: ctx.bCli === 'codex' ? 'feasibility demo, not a support claim' : null,
     dry,
     mode: interactive ? 'interactive panes' : 'print',
+    example: build,
     invocations: dry ? 0 : sessions.length,
     sessions: sessions.map((s) => ({ role: s.role, cli: s.cli, exit: s.status ?? null, ms: s.endedAt - s.startedAt, version: s.versionBefore })),
     names: { a: run.aName, b: run.bName },
