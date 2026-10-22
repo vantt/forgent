@@ -16,7 +16,7 @@ import { resolveStepAlias } from '../workflow/steps.mjs';
 import { applyKnowledgeEvent } from './knowledge-registry.mjs';
 
 // Shape version of the folded view. A cached view stamped with another version is refolded, never trusted.
-export const VIEW_SCHEMA_VERSION = 6;
+export const VIEW_SCHEMA_VERSION = 7;
 
 // Containers are copied for incremental replay. Work handlers mutate item
 // fields, so clone those items as well to keep the caller's seed immutable.
@@ -79,10 +79,15 @@ export function foldEvents(events, seedView) {
     const condition = event.payload?.precondition;
     const before = view.work[event.payload?.id];
     const beforeStatus = before?.status;
-    // Whether another clone's event came earlier in this order. Registered here, before the
-    // precondition is judged, so the answer covers exactly the events that precede this one.
-    const foreignHistory = !!view.origins?.some(origin => origin !== event.origin);
-    if (event.origin && !view.origins?.includes(event.origin)) (view.origins ??= []).push(event.origin);
+    // Whether the writer had seen every event that precedes this one in the order: every other stream's
+    // highest earlier seq is covered by `seen`, and its own stream's earlier events are its causal
+    // predecessors. Judged before this event is registered, so it covers exactly the events before it.
+    const streamKey = event.origin && event.stream ? `${event.origin}:${event.stream}` : null;
+    const unseenEarlier = Object.entries(view.streamHeads ?? {}).some(([key, seq]) => key !== streamKey && (event.seen?.[key] ?? 0) < seq);
+    if (streamKey) {
+      view.streamHeads ??= {};
+      view.streamHeads[streamKey] = Math.max(view.streamHeads[streamKey] ?? 0, event.seq ?? 0);
+    }
     if (condition && event.origin && event.h) {
       const id = event.payload.id;
       const item = view.work[id];
@@ -91,11 +96,11 @@ export function foldEvents(events, seedView) {
       else if (condition.expectedStatus !== undefined && item?.status !== condition.expectedStatus) reason = 'expected-status';
       else if (condition.capacity && Object.values(view.work).filter(w => w.status === condition.capacity.status).length >= condition.capacity.max) reason = 'capacity';
       if (reason) {
-        // On one clone every acknowledged precondition holds again at replay, so a failure there is a
-        // local bug and stops the fold. Once another clone's events are in the history, the same order
-        // can differ from the one the writer decided on (a late event sorts earlier and flips which
-        // concurrent write applies), so the failure is a recorded conflict on every clone, never a throw.
-        if (!foreignHistory) {
+        // When the writer had seen everything that precedes this event, the events before it are exactly
+        // the view it decided on, so every acknowledged precondition holds again and a failure is a local
+        // bug that stops the fold. Otherwise an event the writer had not seen sorts earlier, flips which
+        // concurrent write applies, and the failure is a recorded conflict on every clone, never a throw.
+        if (!unseenEarlier) {
           throw Object.assign(new Error('work-replay-precondition: causal precondition failed'), { code: 'work-replay-precondition' });
         }
         const against = reason === 'capacity'
@@ -103,7 +108,7 @@ export function foldEvents(events, seedView) {
             .map(key => view.preconditionHeads?.[key]?.status).find(head => head && head.origin !== event.origin && (event.seen?.[`${head.origin}:${head.stream}`] ?? 0) < head.seq)
           : view.preconditionHeads?.[id]?.[reason === 'existence' ? 'existence' : 'status'];
         view.conflicts ??= [];
-        view.conflicts.push({ h: event.h, origin: event.origin, reason, against: against?.h ?? null });
+        view.conflicts.push({ h: event.h, id, origin: event.origin, reason, against: against?.h ?? null });
         continue;
       }
     }
@@ -120,6 +125,19 @@ export function foldEvents(events, seedView) {
     }
   }
   return view;
+}
+
+/** The events that took effect. The fold records an event whose precondition failed as a conflict and does not
+ * apply it, so it is not a durable record: idempotence lookups and Land releases read through here. */
+export function appliedEvents(events, view) {
+  if (!view.conflicts?.length) return events;
+  const conflicted = new Set(view.conflicts.map(conflict => conflict.h));
+  return events.filter(event => !conflicted.has(event.h));
+}
+
+/** The conflicts the fold recorded against item `id`. */
+export function conflictsFor(view, id) {
+  return (view.conflicts ?? []).filter(conflict => conflict.id === id);
 }
 
 // A write-time precondition decides whether the event applies; it is not part of the record it leaves behind.

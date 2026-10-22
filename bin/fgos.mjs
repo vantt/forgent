@@ -44,7 +44,7 @@ import { checkVerifyForC4 } from '../src/intake/verify-pattern-check.mjs';
 import { parseFrontmatter } from '../src/report/frontmatter.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromExecutors } from '../src/state/tool-registry.mjs';
 import { EventLogError } from '../src/state/event-log.mjs';
-import { foldEvents } from '../src/state/replay.mjs';
+import { foldEvents, conflictsFor } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir, loadRunnerConfigFromDir, RunnerConfigError, runDispatchCli, runDoorHint, DispatchError } from '../src/runner/dispatch.mjs';
@@ -451,11 +451,6 @@ function parseMergeClusterOptions(verb, flags, dir, extra = {}) {
     acknowledgeDrift: flags['acknowledge-drift'] === true,
     github: Boolean(flags.github),
     prNumber: flags.pr,
-    // Test-only failure seam (tsk-480 D3), same shape as FGOS_GH_COMMAND:
-    // an env var read only in the adapter, scoped to an exact item id so it
-    // can never affect any other item in the same process, inert unless a
-    // test explicitly sets it. Production code never sets this variable.
-    testForceLockTimeoutId: process.env.FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT ?? null,
     ...ghCommandOpts(),
     ...extra,
   };
@@ -2236,6 +2231,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         friction: null,
         settlement: collectSettlementData(rawView, id),
         learning: collectLearningData(rawView, id),
+        // Events recorded as conflicts: acknowledged on their machine, never applied to this view.
+        conflicts: conflictsFor(rawView, id),
       };
     }
 

@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
-import { viewRevision, foldEvents } from './replay.mjs';
+import { viewRevision, foldEvents, appliedEvents } from './replay.mjs';
 import { prepareWorkStore, readWorkState } from './work-event-store.mjs';
 import { hotLockDepth } from './hot-lock.mjs';
 import { readEventStoreConfig } from '../event-store/index.mjs';
@@ -890,7 +890,10 @@ function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, 
   return tx.append(rawEvent); // captures the real seq; rawEvent itself has none
   }, {
     readRoots: planSnapshot?.gitDir ? [planSnapshot.gitDir] : [],
-    ...(landSettlement === undefined ? {} : { beforeGate: candidate => ({ prior: candidate.events.find(event => event.type === 'work.move' && sameLandSettlement(event.payload?.landSettlement, landSettlement)) }) }),
+    // A conflicted delivery never took effect, so it is not a prior success to return on a retry.
+    ...(landSettlement === undefined ? {} : { beforeGate: candidate => ({
+      prior: appliedEvents(candidate.events, candidate.view).find(event => event.type === 'work.move' && sameLandSettlement(event.payload?.landSettlement, landSettlement)),
+    }) }),
   });
   if (answer) {
     try {
@@ -2037,6 +2040,18 @@ export function computedSchedule(dir, candidateIds) {
  */
 export function readRawEvents(dir, options) {
   return readAllEvents(dir, options);
+}
+
+/**
+ * Read-only: the events that took effect. A recorded conflict never applied to the view, so a
+ * consumer that treats an event as a durable record (the Land release sweep) reads through here.
+ * Same full read as `readRawEvents`, outside the Work mutex.
+ */
+export function readAppliedEvents(dir) {
+  if (hotLockDepth() > 0) throw new StoreError('event-store-full-read-under-state', 'full Work history read inside state gate');
+  const { store } = prepareWorkStore(dir, getMainFgosDir(dir));
+  const { events, view } = readWorkState(store, { cachePath: resolveFgosFile(getMainFgosDir(dir), FGOS_FILE.STATE) });
+  return appliedEvents(events, view);
 }
 
 /**

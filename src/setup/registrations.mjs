@@ -1831,6 +1831,29 @@ registerCheck({
   check: (cwd, run) => checkWorkStepVocabulary(cwd, run),
 });
 
+// Events acknowledged on one machine whose precondition a concurrent event from another machine made false are
+// recorded as conflicts and never applied. Nothing resolves them yet, so this row is how a person finds out; it
+// warns and never fails, because a recorded conflict is a finished fold and not a broken store.
+function checkWorkRecordedConflicts(cwd, run) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const conflicts = (doctorWorkView(mainCheckout, run) ?? foldEvents([])).conflicts ?? [];
+  if (conflicts.length === 0) return { passed: true, message: 'no recorded cross-machine conflicts in the Work view' };
+  const ids = [...new Set(conflicts.map((conflict) => conflict.id))].sort();
+  return {
+    passed: true,
+    message: `warning: ${conflicts.length} recorded cross-machine conflict(s) on ${ids.length} item(s): ${ids.join(', ')} — each is an acknowledged change that another machine's concurrent change kept from applying; \`fgos show <id>\` lists them`,
+  };
+}
+
+registerCheck({
+  id: 'work-recorded-conflicts',
+  description: 'the Work view holds no recorded cross-machine conflicts: acknowledged changes a concurrent change from another machine kept from applying (warns, never fails)',
+  check: (cwd, run) => checkWorkRecordedConflicts(cwd, run),
+});
+
 export function checkDomainWorkflowOperationsCoverage(cwd, root = FGOS_INSTALL_ROOT) {
   const problems = findWorkflowStageOperationProblems(cwd, DOMAINS, root);
   if (problems.length === 0) {

@@ -87,6 +87,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'herdr-web-dashboard-configured',
       'work-classification-vocabulary',
       'work-step-vocabulary',
+      'work-recorded-conflicts',
       'domain-workflow-operations-coverage',
       'delivered-not-on-trunk',
       'enduser-docs-index-stale',

@@ -315,6 +315,7 @@ Mostly relevant after the project has real work items.
 | `agent-type-names-unique` | Agent type names are globally unique | names the duplicate | you | Rename one |
 | `work-classification-vocabulary` | Open items' risk and kind match their domain's vocabulary | `N open item(s) outside their domain's classification` | you | Re-classify the named items |
 | `work-step-vocabulary` | No open item is stranded on a retired step | `2 open item(s) at a step their domain no longer registers` | you | Drain the named items; no verb relabels a live item's step |
+| `work-recorded-conflicts` | The Work view holds no recorded cross-machine conflicts | `warning: 1 recorded cross-machine conflict(s) on 1 item(s): build-cli` | you | Never fails. Run `fgos show <id>` to list the conflicts of an item: each is a change acknowledged on one machine that another machine's concurrent change kept from applying. Nothing resolves it automatically |
 | `domain-workflow-operations-coverage` | Every Workflow step operation resolves to valid task specs, roles, skills and legal edges | `15 workflow step operation problem(s): ...` | you | Same root as `task-specs-resolve` (the fgOS install, not the project); a failure means the installed release is inconsistent |
 | `root-drift` | No `fgw/<root>` branch is ahead of its target | `drifted root branch(es) need syncing: ... -- run fgos sync-root <root-id>` | you | `fgos sync-root <root-id>` |
 | `leaf-notify-drift` | No live session branch has post-land drift | names the branch | you | Rebase or resync the named branch |

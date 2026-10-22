@@ -45,7 +45,7 @@ import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goa
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from '../util/normalize-path.mjs';
 import { listSessions } from './session.mjs';
-import { listWork, readRawEvents } from '../state/store.mjs';
+import { listWork, readAppliedEvents } from '../state/store.mjs';
 import { prepareWorkStore } from '../state/work-event-store.mjs';
 import { branchKey } from '../event-store/index.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
@@ -1398,7 +1398,8 @@ const RETAINED_LAND_SCAN_BOUND = 10_000;
  * recorded, however late: a release that was deferred (busy merge slot or
  * main checkout) or a command that died between recording and releasing.
  * The Work event that recorded the operation (matched on its operation id)
- * supplies the acknowledgement; a candidate with no such event stays,
+ * supplies the acknowledgement, and only an event that took effect counts: a
+ * recorded conflict never applied, so it releases nothing; a candidate with no such event stays,
  * because the acknowledgement is never guessed. Nothing throws: what cannot
  * be listed, read or released comes back in `warnings`, and Land itself
  * keeps whatever it cannot prove safe to remove.
@@ -1416,13 +1417,13 @@ export function releaseRecordedLand(repoRoot) {
     const scan = createGitRecovery(gitPortOptions(repoRoot, { mutation: true })).listRetainedLand({ bound: RETAINED_LAND_SCAN_BOUND });
     candidates = scan.candidates;
     if (!scan.complete) warnings.push(`land-release-incomplete-scan: more than ${RETAINED_LAND_SCAN_BOUND} Land operations; some candidates were not looked at`);
+    if (candidates.length === 0) return { released, warnings };
   } catch (err) {
     return { released, warnings: [`land-release-skipped: ${err.message}`] };
   }
-  if (candidates.length === 0) return { released, warnings };
   const recordedBy = new Map();
   try {
-    for (const event of readRawEvents(path.join(repoRoot, '.fgos'))) {
+    for (const event of readAppliedEvents(path.join(repoRoot, '.fgos'))) {
       if (typeof event?.h !== 'string' || !event.h) continue;
       for (const operationId of settledLandOperations(event.payload)) if (!recordedBy.has(operationId)) recordedBy.set(operationId, event);
     }
