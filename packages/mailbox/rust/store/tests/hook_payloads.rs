@@ -333,6 +333,11 @@ fn a_recorded_stop_blocks_with_wake_mail_and_passes_without_it() {
         );
         assert_eq!(drain.state_of(&plain), MessageState::Recorded);
         assert_eq!(drain.stop_blocks(), 0, "a Stop that passes ends the run");
+        // Again with the count already at zero: the drain still swept and
+        // stamped the pending mail, and the harness checks it says so.
+        let again = drain.hook(HookEvent::Stop, files::STOP_CONTINUED);
+        assert_eq!(again, quiet(QuietReason::NothingEligible));
+        assert!(again.state_changed());
         let next = take(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
         assert_eq!(next.items[0].id, plain);
     }
