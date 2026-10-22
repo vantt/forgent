@@ -79,3 +79,12 @@ returns nothing (run on the final tree).
 - Regenerate after "resume builds": `packages/git/contracts/mutation-census.v1.json` (it lists `fences.mjs` and a `holder-lock-checks.mjs` spawn row, and `migrate.mjs` gains a `spawnSync` site), `test/suite-baseline.json`. Not touched.
 - Run: the eight one-file tests of phase-03, `cargo test -p fgos-event-store --test registry_rows`, `cargo test -p fgos-holder-lock --test scope_rank`, then `fgos doctor` on the dev host (no `lock-fences` row; `lock-holders` counts 19 locks).
 - Risk to look at first: the stub-host case and the `sleep` case in `migrate-cutover-grant.test.mjs` have never run; `workspace-only` scans may behave differently from what I assumed for `sleep` (the old fence test used the unscoped host).
+
+## Verification after the build window (all on 51e36b06b plus the follow-up commit)
+
+- One-file runs, all green: `migrate-cutover-grant` 8/8 (the linked-worktree case needed `trackedLegacy(f)` for an initial commit; fixed), `holder-lock-checks` 9/9, `git-checks` 4/4, `registry-contract` 19/19, `one-door` 3/3, `architecture` 29/29 (import graph with the new `migrate.mjs` imports), `fgos-lock-fence` 11/11, `checks` 110/110, `registrations` 60/60 (also covers `setup-doctor-registry.md`).
+- `cargo test -p fgos-event-store --test registry_rows` 1 passed; `cargo test -p fgos-holder-lock --test scope_rank` 5 passed.
+- Dev-host `fgos doctor`: no `lock-fences` row; `lock-holders` counts 19 locks (it warns about a predecessor record of another workspace's dispatch lock, unrelated).
+- Census regenerated with `node scripts/git-one-door-scan.mjs --root . --write-census` (0 undeclared sites); baseline with `node scripts/test-proof-inventory.mjs --write-baseline` (596 files, 8158 test() calls, 59 known clones). Both generated, not hand-edited.
+- CLI-call cost after: `fgos --help` 162 ms, `fgos list` 518 ms (median of 5, load 6.3). No before figure taken on this branch; nothing here touches the CLI start path.
+- `test/runner/lock-status.test.mjs` does not exist; not run.

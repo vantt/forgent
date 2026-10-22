@@ -158,7 +158,7 @@ test('checkStopped does not count a pid the caller declares as its own, and coun
 });
 
 test('checkStopped counts a process working in a linked worktree only when the caller lists that worktree', async t => {
-  const f = fixture(t, { machine: false });
+  const f = fixture(t, { machine: false }); trackedLegacy(f);
   const linked = path.join(f.temp, 'linked-listing');
   f.git('worktree', 'add', '-q', '--detach', linked);
   if (!hostScan(t, checkStopped({ workspaces: [{ root: f.repo, worktrees: [linked] }], hostBin: scopedHost }))) return;
