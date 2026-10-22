@@ -37,10 +37,9 @@ export function resolveIntegrationBranch(repoRoot, rootId) {
  * clean merge, returns `outcome: 'merged'` — `parent` is deliberately left
  * untouched; the caller (tsk-3gx-3) sets it only after seeing this outcome.
  *
- * Refuses to run from a linked worktree (mirrors `sync-root`'s own
- * `isMainWorktree` discipline) — Land creates and tears down its candidate
- * worktrees under `repoRoot`, which only makes sense from the main
- * checkout.
+ * `repoRoot` must be the main checkout (mirrors `sync-root`'s own
+ * `isMainWorktree` discipline). `opts.callerCheckout` names the caller
+ * independently, and may be a linked holder checkout.
  *
  * @returns {Promise<
  *   {id: string, outcome: 'skipped', reason: 'is-root'} |
@@ -74,6 +73,7 @@ export async function retargetMember(repoRoot, memberItem, rootId, opts = {}) {
   // merge and its verify.
   const result = await landRunnerItem(repoRoot, memberItem, {
     target: branchNameFor(rootId),
+    callerCheckout: opts.callerCheckout ?? repoRoot,
     ...(opts.timeoutMs ? { timeoutMs: opts.timeoutMs } : {}),
   });
 

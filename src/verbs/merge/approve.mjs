@@ -182,15 +182,15 @@ function landOperationFor(dir, repoRoot, view, id, destination) {
 }
 
 /**
- * @param {{dir: string, repoRoot: string}} ctx - `repoRoot` follows this
- *   verb's own `--trust-dir` policy, resolved by the adapter.
+ * @param {{dir: string, repoRoot: string, cwd?: string}} ctx - `repoRoot` follows this
+ *   verb's own `--trust-dir` policy; `cwd` remains the adapter's caller checkout.
  * @param {{id: string, resolveTimeoutMs: () => number|undefined, resolveWaitFlags: () => {noWait: boolean, waitMs: number|undefined},
  *   github: boolean, prNumber: string|undefined, ghCommand: string,
  *   acknowledgeIronLaw: boolean, acknowledgeDrift: boolean,
  *   testForceLockTimeoutId: string|null}} options
  */
 export async function approveUseCase(
-  { dir, repoRoot },
+  { dir, repoRoot, cwd = repoRoot },
   { id, resolveTimeoutMs, resolveWaitFlags, github, prNumber, ghCommand, acknowledgeIronLaw, acknowledgeDrift, testForceLockTimeoutId },
 ) {
   // Both resolved first, before any guard, and in this order — the exact
@@ -540,7 +540,7 @@ export async function approveUseCase(
           effectiveItem = { ...item, branchHeadAtReturn: catchupResult.catchupHead };
         }
         const operationId = landOperationFor(dir, repoRoot, view, id, `refs/heads/${rootBranch}`);
-        const result = await landRunnerItem(repoRoot, effectiveItem, { target: rootBranch, operationId, timeoutMs, ...lockWait });
+        const result = await landRunnerItem(repoRoot, effectiveItem, { target: rootBranch, operationId, timeoutMs, callerCheckout: cwd, ...lockWait });
 
         if (result.outcome === 'conflict') {
           const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-conflict', role: 'system' }, { repoRoot, landSettlement: result.landSettlement });
@@ -702,7 +702,7 @@ export async function approveUseCase(
     // publication, and waits on each (or fails fast under --no-wait) without
     // redoing the verify run.
     const operationId = landOperationFor(dir, repoRoot, view, id, `refs/heads/${detectTrunk(repoRoot)}`);
-    const result = await landRunnerItem(repoRoot, item, { operationId, timeoutMs, ownFileSet, ...lockWait });
+    const result = await landRunnerItem(repoRoot, item, { operationId, timeoutMs, ownFileSet, callerCheckout: cwd, ...lockWait });
 
     if (result.outcome === 'conflict') {
       const reason = hadChildren ? 'integration-drift' : 'merge-conflict';

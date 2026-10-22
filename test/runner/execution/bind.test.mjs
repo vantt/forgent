@@ -10,6 +10,8 @@ import { execFileSync } from 'node:child_process';
 import { ensureScriptAddon } from '../../../scripts/lib/git-ports.mjs';
 import { initFixtureRepo } from '../../helpers/git-fixture.mjs';
 import { acquireDocumentationCutoverLease } from '../../../src/runner/documentation-cutover-lease.mjs';
+import { checkExecutorPostureCoverage } from '../../../src/setup/executor-posture-coverage.mjs';
+import { checkSeatBindingDryBind } from '../../../src/setup/seat-binding-checks.mjs';
 import { bind, BIND_CONTRACT_VERSION } from '../../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 
@@ -17,9 +19,9 @@ import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.help
 seedFileLocalBwrapRegistry();
 ensureScriptAddon();
 
-// The lease module owns token/state cases; this proves bind's whole-call gate,
-// including the inline fallback, before it even reads the seat configuration.
-test('a held documentation lease refuses the entire bind call, while its holder and an absent lease bind normally', (t) => {
+// Execution-door tests own lease refusal. This replaces the retired bind gate
+// proof: doctor and replay only choose seats, independently of the process cwd.
+test('seat choice and doctor dry binds ignore a held documentation lease in every checkout', async (t) => {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'bind-lease-'));
   t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
   initFixtureRepo(repoRoot, { branch: 'main', ignore: '.fgos/\n' });
@@ -27,19 +29,28 @@ test('a held documentation lease refuses the entire bind call, while its holder 
   execFileSync('git', ['worktree', 'add', '-qb', 'holder', worktreePath], { cwd: repoRoot, stdio: 'ignore' });
   const ask = { unit: { id: 'read', capability: 'docs:write', writes: [] }, seat: 'producer', role: 'producer' };
   const runnerConfig = createMockRunnerConfig();
-  const ctx = { runnerConfig, session: { headless: true }, lease: { repoRoot, worktreePath } };
+  const ctx = { runnerConfig, session: { headless: true } };
   const free = bind(ask, ctx);
   assert.equal(free.refused, undefined);
+  const next = bind(ask, ctx, { walk: { tried: [free] } });
+  const workflows = path.join(repoRoot, 'core/workflows');
+  fs.mkdirSync(workflows, { recursive: true });
+  fs.writeFileSync(path.join(workflows, 'read.json'), JSON.stringify({ id: 'read', steps: [{ id: 'read', units: [{ id: 'read', template: ask.unit }] }] }));
+  const doctorOptions = { runnerConfig, session: ctx.session };
+  const dryOptions = { packageRoot: repoRoot, loadRunnerConfig: () => runnerConfig };
+  const before = [await checkExecutorPostureCoverage(repoRoot, doctorOptions), await checkSeatBindingDryBind(repoRoot, dryOptions)];
+  assert.ok(before.every(result => result.passed), JSON.stringify(before));
   acquireDocumentationCutoverLease({ repoRoot: worktreePath });
-  assert.deepEqual(bind(ask, ctx), free, 'the checkout token follows ctx, not the host cwd');
-  const before = fs.readdirSync(path.join(repoRoot, '.fgos')).sort();
-  const refused = bind(ask, {
-    runnerConfig: new Proxy({}, { get() { throw new Error('seat policy ran before lease admission'); } }),
-    session: { headless: false, hasNativeAgent: true },
-    lease: { repoRoot, worktreePath: repoRoot, paths: [] },
-  });
-  assert.equal(refused.refused?.reason, 'documentation-cutover-lease');
-  assert.deepEqual(fs.readdirSync(path.join(repoRoot, '.fgos')).sort(), before);
+  const cwd = process.cwd();
+  try {
+    for (const checkout of [repoRoot, worktreePath]) {
+      process.chdir(checkout);
+      assert.deepEqual(bind(ask, ctx), free);
+      assert.deepEqual(bind(ask, ctx, { walk: { tried: [free] } }), next);
+      assert.deepEqual(await checkExecutorPostureCoverage(repoRoot, doctorOptions), before[0]);
+      assert.deepEqual(await checkSeatBindingDryBind(repoRoot, dryOptions), before[1]);
+    }
+  } finally { process.chdir(cwd); }
 });
 
 function createMockRunnerConfig() {

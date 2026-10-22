@@ -10,6 +10,9 @@ import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { execFileSync } from 'node:child_process';
 
 import { startWorkflow, resumeWorkflow, statusWorkflow, validateWorkflow, readWorkflowEvents } from '../../src/workflow/index.mjs';
+import { acquireDocumentationCutoverLease, DEFAULT_SIDECAR_PATH } from '../../src/runner/documentation-cutover-lease.mjs';
+import { mergeWorkflowBranch } from '../../src/workflow/runner.mjs';
+import { loadNativeAddon } from '../../src/git/native.mjs';
 import { resolveLock } from '../../src/holder-lock/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
@@ -130,6 +133,65 @@ function unitsFile(tmp, units) {
 const unitRecordOf = (tmp, unitRunId) => JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
 const producerAssignment = (tmp, unitRunId) => JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, 'producer', '1', 'assignment.json'), 'utf8'));
 const opts = (tmp) => ({ repoRoot: tmp, cwd: tmp, worktree: tmp });
+
+// The ordinary writing-chain test owns worker completion. This boundary proof
+// observes admission/replay in a generated worktree whose token is absent.
+test('a holder workflow admits its writing unit using its origin, with one sidecar read for execution', async (t) => {
+  const tmp = setupRepo();
+  const holder = path.join(tmp, 'holder');
+  git(tmp, ['worktree', 'add', '-qb', 'holder', holder]);
+  acquireDocumentationCutoverLease({ repoRoot: holder });
+  const native = loadNativeAddon();
+  const call = native.GitInspect.prototype.call;
+  let reads = 0;
+  t.mock.method(native.GitInspect.prototype, 'call', function(method, args) {
+    if (method === 'pathsAtRevision' && args.paths?.some(p => Buffer.from(p).toString() === DEFAULT_SIDECAR_PATH)) reads++;
+    return call.call(this, method, args);
+  });
+  const workflow = validateWorkflow({ id: 'holder-write', steps: [
+    { id: 'write', units: [{ id: 'writer', template: { capability: 'docs:write', objective: 'WRITE:docs/a.md', writes: ['docs'] } }] },
+  ] });
+  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: holder });
+  const writing = state.steps.write.units.writer;
+  assert.ok(writing, JSON.stringify(state.steps));
+  assert.ok(writing.worktreePath && writing.worktreePath !== holder, JSON.stringify(writing));
+  assert.equal(fs.existsSync(path.join(writing.worktreePath, '.fgos/documentation-cutover.token')), false);
+  const record = unitRecordOf(tmp, writing.unitRunId);
+  assert.deepEqual(record.unit.writes, ['docs']);
+  assert.ok(writing.results[0].runResult.runId, 'reached a real assignment, not a lease refusal');
+  assert.doesNotMatch(JSON.stringify(writing.results), /documentation-cutover-lease|recomputed binding refused/);
+  assert.equal(reads, 1, 'start, writing unit and assignment replay share one admission');
+  assert.equal(readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId }).find(e => e.type === 'case.opened').payload.callerCheckout, holder);
+});
+
+// Runner Land tests cannot observe Workflow's independent Land door.
+test('workflow integration gates scoped branch paths before Land and admits a linked holder', async () => {
+  const tmp = setupRepo();
+  git(tmp, ['checkout', '-qb', 'incoming']);
+  fs.mkdirSync(path.join(tmp, 'docs'));
+  fs.writeFileSync(path.join(tmp, 'docs/new.md'), 'from workflow\n');
+  git(tmp, ['add', 'docs']); git(tmp, ['commit', '-qm', 'documentation']);
+  git(tmp, ['checkout', '-q', 'main']);
+  const holder = path.join(tmp, 'holder');
+  git(tmp, ['worktree', 'add', '-qb', 'holder', holder]);
+  acquireDocumentationCutoverLease({ repoRoot: holder });
+  const head = git(tmp, ['rev-parse', 'main']);
+  const operations = path.join(tmp, '.git/fgos/git/operations');
+  const before = fs.existsSync(operations) ? fs.readdirSync(operations).sort() : [];
+  await assert.rejects(() => mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: 'incoming', targetBranch: 'main', callerCheckout: tmp }), { code: 'documentation-cutover-lease' });
+  assert.equal(git(tmp, ['rev-parse', 'main']), head);
+  assert.deepEqual(fs.existsSync(operations) ? fs.readdirSync(operations).sort() : [], before);
+  assert.equal(fs.existsSync(path.join(tmp, '.fgos/runtime/git-candidates')), false);
+  const result = await mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: 'incoming', targetBranch: 'main', callerCheckout: holder });
+  assert.equal(result.merged, true);
+  assert.equal(git(tmp, ['show', 'main:docs/new.md']), 'from workflow');
+  // Even an already-integrated/no-op land must fail closed on corrupt authority.
+  fs.writeFileSync(path.join(tmp, DEFAULT_SIDECAR_PATH), '{broken');
+  git(tmp, ['add', DEFAULT_SIDECAR_PATH]); git(tmp, ['commit', '-qm', 'corrupt authority fixture']);
+  const afterLand = fs.readdirSync(operations).sort();
+  await assert.rejects(() => mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: 'incoming', targetBranch: 'main', callerCheckout: holder }), { code: 'documentation-cutover-lease-corrupt' });
+  assert.deepEqual(fs.readdirSync(operations).sort(), afterLand);
+});
 
 test('a units file runs through startWorkflow, and a unit\'s prefer and persona reach the Unit it runs', async () => {
   const tmp = setupRepo();

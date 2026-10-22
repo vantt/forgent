@@ -1131,8 +1131,18 @@ export async function landRunnerItem(repoRoot, item, {
   lockWaitMs = DEFAULT_LOCK_WAIT_MS,
   ownFileSet = null,
   operationId = crypto.randomUUID(),
+  callerCheckout = repoRoot,
 } = {}) {
   const destination = `refs/heads/${target}`;
+  // Authenticate the declared caller, not the destination checkout. Read once,
+  // before even Work's checkpoint can write; all later phases reuse this result.
+  let pinned = resolveRefSha(repoRoot, target);
+  const source = resolveRefSha(repoRoot, branch);
+  const inspect = inspectGit(repoRoot);
+  const base = inspect.compareCommits({ left: pinned, right: source }).mergeBase;
+  const landedFiles = diffPaths(inspect, base, source, { renames: false });
+  const admission = leaseAdmission({ repoRoot, worktreePath: callerCheckout, paths: landedFiles });
+  if (!admission.allowed) throw new MergeError(admission.message, { code: admission.reason, branch, targetRef: target });
   const fgosDir = path.join(repoRoot, '.fgos');
   const mergeSlot = ['merge-slot', { fgosDir, ref: encodeURIComponent(destination) }, `merge slot of "${destination}"`];
   const lockHeld = ([lock, params, label]) => {
@@ -1141,7 +1151,8 @@ export async function landRunnerItem(repoRoot, item, {
       branch, targetRef: target, code: 'lock-held', holders, lock,
     });
   };
-  // No-wait refuses a held slot before any read; Land's own try stays the decision.
+  // After read-only admission, no-wait refuses a held slot before any write;
+  // Land's own try stays the decision.
   if (lockWaitMs === 0 && probe(mergeSlot[0], mergeSlot[1]).result === 'held') throw lockHeld(mergeSlot);
   // Only a destination the main checkout holds involves its index at all.
   const onMain = checkedOutRef(repoRoot) === destination;
@@ -1160,18 +1171,10 @@ export async function landRunnerItem(repoRoot, item, {
       throw toMergeLockError(err, { branch });
     }
   }
-  // Trusted-side resolutions are bytes bound to the target they were read
-  // against; only then is that target pinned, otherwise Land pins its own.
-  const pinned = resolveRefSha(repoRoot, target);
-  const source = resolveRefSha(repoRoot, branch);
-  // Gate the actual explicit branch, not classifySource(item)'s conventional
-  // fgw/<id>. With rename detection off, both sides are delete/add paths;
-  // deletions and type changes are included too, before any Land WAL/candidate.
-  const inspect = inspectGit(repoRoot);
-  const base = inspect.compareCommits({ left: pinned, right: source }).mergeBase;
-  const landedFiles = diffPaths(inspect, base, source, { renames: false });
-  const admission = leaseAdmission({ repoRoot, paths: landedFiles });
-  if (!admission.allowed) throw new MergeError(admission.message, { code: admission.reason, branch, targetRef: target });
+  // Work's permitted state-only checkpoint may have advanced the target.
+  // Preserve trusted-file resolution against that post-checkpoint target;
+  // the admitted source paths are unchanged by the checkpoint.
+  pinned = resolveRefSha(repoRoot, target);
   const declared = declareLandFiles(repoRoot, item, pinned, source);
   if (declared.outcome) return { ...declared, branch };
   const { files, selfResolved } = declared;

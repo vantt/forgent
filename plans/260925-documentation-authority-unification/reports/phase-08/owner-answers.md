@@ -1824,3 +1824,131 @@ The original e2e development runs were red: the first shell/helper entry did not
 - Impact-analysis evidence is **degraded**, not asserted inactive: `fgos tool query --capability impact-analysis --status present` was attempted once because repository instructions require it; it exited **127** before a provider query (`no .fgos/installation found`). No bootstrap/retry/state operation followed. GitNexus MCP is not exposed. Caller/history searches and architecture tests are the available evidence; no graph blast-radius or `detect_changes` claim is made. The runner owns committing.
 - The authorized code slice is delivered; independent A38 review, Phase 9 drift recomputation, rehearsal, public documentation and main landing remain separate. `CHANGELOG.md` needs an authorized follow-up entry for the user-visible hook/doctor/repair fixes; it was not edited outside this slice and is listed in the result's `needsWrites`.
 - Preview attempted with `mdview open /home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md`: exit **1**, read-only database. No preview URL was produced.
+
+## L12-109 — Explicit caller checkout at execution and Land doors (Lead under A42; Doer delivery)
+
+### Supplied ruling and scope
+
+Recorded from `step-06b-slice2-rework-brief.md`, not a new owner decision or independent acceptance:
+
+1. Holder means **can read the token in the explicitly named caller checkout**. This is the accepted single-user, accident-prevention trust model, not protection against deliberate bypass. No ambient-cwd fallback belongs in seat choice.
+2. Admit at execution and Land doors before their effects, not in `bind()`: Unit run, Workflow start/resume/answer (including detached forms), runner Land and Workflow Land. Reuse the operation's admission across Units, seat walks and assignment replay.
+3. Store a Workflow's origin in its existing run record; generated `wf/` checkouts never become its holder identity. Later operations use the recorded origin. A holder Workflow can integrate onto main. This amends L12-108 item 7's runner-Land-only wording to include **both sanctioned Land doors**; raw ref moves remain refused.
+4. Runner Land takes a caller-checkout option. Approve, sync-root and promote pass the CLI's own checkout separately from the destination/main repository.
+5. Consult the sidecar once per operation and measure the no-lease cost; no per-attempt consultations.
+6. Corrupt authority keeps refusing execution and Land. The module's direct owner-abandon repair door stays outside `bind`/`runUnit`.
+7. Correct the stale root-resolution/reclamation comment.
+
+Input HEAD: `820385775a5dc626fabd3e6d494914f4fc9fe2eb`. The expanded assignment also authorizes `src/verbs/merge/promote-to-component.mjs` and `test/runner/promote-engine.test.mjs`; both are used. All named production paths exist at their supplied locations. No other code/test write was needed.
+
+Read the full brief/review, L12-107/108, reading map and relevant Workflow/Execution/Seat Binding contracts before editing. History search (`git log -S'leaseAdmission'` and caller-checkout/worktree `-G` searches) found the gates introduced by `e8c1df31c`, not an older origin/admission mechanism to restore. Reused the existing lease reader/token policy, Workflow ledger and `case.opened`, Inspect diffs, native Land and existing fixture/native staging doors. The review's `scratchpad/6b2-review/repro.mjs` and `edge.mjs` are absent from **both** this worktree and `/home/vantt/projects/forgentX`; read attempts returned ENOENT. The committed review's scenarios were reconstructed in the owning production-path tests below, not represented as runs of those missing scripts.
+
+### Implementation and decisions inside the ruling
+
+- `bind()` no longer imports or consults the documentation lease. Dry binding, doctor and assignment replay only choose seats. `assignment-runner.mjs` needs no edit: its existing replay already calls that now-pure boundary.
+- `admitDocumentationExecution` consolidates the execution-door check in `run.mjs`, requiring a declared checkout and catching **only** the lease module's typed `not-a-repository` answer. Other inspection errors and corrupt sidecars fail closed. Run calls it before sweep/config/reservation/custody/controller/unit creation. The entry passes its cwd and named worktree explicitly.
+- Workflow start admits before config, parent-frame charging, ledger/advance/spawn or generated worktrees. CLI `--seats` admits before its potentially config-writing preflight and passes that same result into start. Standalone dry seat choice has no lease gate. Foreground start passes the operation-local result through the proposer and every writing/recovery Unit; no credential or persistent grant is added to Unit/assignment state.
+- Origin is `case.opened.payload.callerCheckout` in the existing run's ledger, written by both start forms, not a second store or a change to guide/schema authority. Resume/answer read that record **before** acquiring advance, repairing a ledger tail, writing an answer round or spawning a child. Changing later `--worktree`/cwd cannot replace the recorded origin. A detached child is a **new operation**, so it refreshes admission before acting. A legacy/prepared-only run with no opened-origin record conservatively uses its main repository, not a later caller's token-bearing checkout; no retroactive privilege upgrade is inferred.
+- `landRunnerItem(..., {callerCheckout})` authenticates that checkout before its checkpoint, native Land port, candidate or WAL. The existing checkpoint may advance the target; trusted-file resolution is refreshed afterwards without another lease consultation. Approve's two call sites, sync-root and the complete promote use-case → engine → Land chain pass the CLI cwd independently of `repoRoot`. Existing `--trust-dir`/main-repository structural guards remain; this is not permission to treat a linked checkout as the Land destination.
+- `mergeWorkflowBranch` inspects the pinned branch's paged merge-base diff with `renames:false` and gates before native Land. Integrate passes the admitted **recorded origin**, not main or a generated writer checkout. Even an already-integrated/no-op branch refuses corrupt authority. There remain only two Land prepare doors in these sources; the other Land instances are recovery/acknowledgement only.
+- All admissions still call the existing lease module. No module/hook/helper/registry/baseline/skill/docs change, token transport, new configuration or infrastructure dependency was added. The operation-local result is a trusted **in-process** argument, never a saved authorization or new CLI bypass flag. Land is a separate effect door and refreshes authority once for each landing, even when its Workflow execution was admitted earlier.
+
+### Finding → owning proof
+
+“Closed” here means implemented with a passing production-path boundary proof on this branch, **not** independent acceptance or whole-suite green.
+
+| Review scenario | Owning production-path proof |
+| --- | --- |
+| Linked holder cannot land | `test/runner/merge-land.test.mjs`: `a held documentation lease permits a code-only land and its holder can land scoped files` now acquires **only in a linked holder**, lands through the main-root API with explicit caller, and verifies `main:docs/new.md`. It also keeps corrupt/code-only refusal. `test/runner/promote-engine.test.mjs`: `retargetMember carries a linked holder checkout to the shared Land door` proves the forwarding boundary and non-holder refusal. |
+| Workflow integrate bypass | `test/workflow/units-runner.test.mjs`: `workflow integration gates scoped branch paths before Land and admits a linked holder` proves unchanged main/WAL/candidate state on refusal, a real native holder land, and corrupt no-op refusal. `test/workflow/case-verbs.test.mjs`: `a holder workflow keeps its recorded checkout through resume, answer and integration from main` drives the actual integrate step after a main-cwd resume/answer; only the earlier settled writer output is seeded, not the integration. |
+| Cwd-dependent bind/doctor | `test/runner/execution/bind.test.mjs`: `seat choice and doctor dry binds ignore a held documentation lease in every checkout` compares real bind and walk results, `checkExecutorPostureCoverage` and `checkSeatBindingDryBind` before/after acquire and from main/holder cwd. The former whole-bind-refusal test is **retired because that behavior was removed**; execution-door tests now own refusal. |
+| Writing Unit replay from non-holder cwd | `test/runner/execution/run-case-admission.test.mjs`: existing documentation-admission test now uses a **writing** Unit and its real assignment/replay, main cwd, linked holder worktree, no replay lease refusal, one observed typed sidecar read, and corrupt refusal before another assignment exists. |
+| Holder Workflow writer; resume/answer side effects | `test/workflow/units-runner.test.mjs`: `a holder workflow admits its writing unit using its origin, with one sidecar read for execution` reaches a real writing assignment in a token-free generated checkout and observes **one** native sidecar read across start, Unit and replay. `test/workflow/case-verbs.test.mjs`: `workflow resume and answer refuse a non-holder origin before any ledger, runtime or branch writes` covers foreground/detached resume/answer, even when later calls name the holder; it compares all `.fgos` file bytes plus refs, worktree registrations and Git status after **each** refusal. |
+| Repeated consultations / stale comment | The two execution spies wrap and call through real `GitInspect.prototype.call`, counting only the sidecar's `pathsAtRevision`; no gate is mocked or skipped. Bind's held-lease walk proof covers later seat selection too. Root errors now stop before reclamation, as the corrected comment says. |
+
+The writing boundary proofs assert real assignment/replay reachability, **not successful fake-worker completion**. Existing standalone/chain tests own completion, and remain red in this sandbox as disclosed below. This does not claim the sandbox executed every worker successfully. The lease module's independent token/corruption/owner-repair matrix remains its existing owning proof; this slice preserves the direct repair routing in `bin/fgos.mjs` without going through execution.
+
+### Exact commands, exits and baseline comparison
+
+Scratch only: `/tmp/fgos-work/slice2-rework/`. No `npm test` or `scripts/run-tests.mjs`, Git write to this repository, real lease on this repository or fgOS CLI invocation against it was run.
+
+First, each file in the table was run separately with the brief's command:
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test "$file"
+```
+
+Prescribed exits: **1** for bind, run-case-admission, merge-land, promote-engine, case-admission-port, units-runner, case-verbs and run; **0** for architecture and setup/checks. Examples fail at the unchanged native Git floor probe with `Read-only file system`. Logs: `prescribed-test_*.log`.
+
+A baseline was extracted before product edits:
+
+```sh
+mkdir -p /tmp/fgos-work/slice2-rework/{baseline-tree,state,fixtures}
+chmod 700 /tmp/fgos-work/slice2-rework/state
+git archive HEAD | tar -x -C /tmp/fgos-work/slice2-rework/baseline-tree
+```
+
+Exit **0**; HEAD was the input hash above. The scratch `stage-baseline.mjs` calls the existing `ensureGitAddon`, copies the same verified production addon and host to their manifest-relative paths in that archive, and writes its normal `native-addon.json` descriptor. Staging exited **0**. No source/guard/assertion was replaced. Current-tree preload contains only:
+
+```js
+import { ensureGitAddon } from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/git-addon.mjs';
+ensureGitAddon();
+```
+
+Controlled complete-file command, **one Node invocation per table row**:
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID -u FGOS_DISPATCH_DEPTH \
+  FGOS_STATE_ROOT=/tmp/fgos-work/slice2-rework/state \
+  FGOS_TEST_FIXTURE_ROOT=/tmp/fgos-work/slice2-rework/fixtures \
+  TMPDIR=/tmp/fgos-work/slice2-rework \
+  FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos \
+  node --import /tmp/fgos-work/slice2-rework/preload.mjs --test "$file"
+```
+
+For the baseline, cwd was `/tmp/fgos-work/slice2-rework/baseline-tree`, with the **same environment and file arguments**, omitting `--import` because the archive has its package descriptor. This worker inherits `FGOS_DISPATCH_DEPTH=1`; the controlled command unsets it to represent the fixture's **host-side** caller, not a nested writing dispatch from inside a worker. Without that correction the real Workflow port correctly refuses `nested-write-from-confined-worker` before reaching the writer. No production switch, test-only code branch, refusal weakening or new environment variable was added. An initial controlled/inherited-depth baseline pass is also retained as `baseline-test_*.log`; the host-context comparison below reruns both sides consistently. Nested-worker negative tests still set and exercise depth themselves.
+
+| Exact `$file` | Input HEAD baseline pass / fail; exit | Final pass / fail; exit | Added failing test names |
+| --- | --- | --- | --- |
+| `test/runner/execution/bind.test.mjs` | 78 / 0; **0** | 78 / 0; **0** | none |
+| `test/runner/execution/run-case-admission.test.mjs` | 8 / 7; **1** | 8 / 7; **1** | none |
+| `test/runner/merge-land.test.mjs` | 18 / 0; **0** | 18 / 0; **0** | none |
+| `test/runner/promote-engine.test.mjs` | 9 / 0; **0** | 10 / 0; **0** | none |
+| `test/workflow/case-admission-port.test.mjs` | 12 / 0; **0** | 12 / 0; **0** | none |
+| `test/workflow/units-runner.test.mjs` | 3 / 20; **1** | 5 / 20; **1** | none |
+| `test/workflow/case-verbs.test.mjs` | 4 / 1; **1** | 6 / 1; **1** | none |
+| `test/runner/execution/run.test.mjs` | 50 / 32; **1** | 50 / 32; **1** | none |
+| `test/architecture.test.mjs` | 29 / 0; **0** | 29 / 0; **0** | none |
+| `test/setup/checks.test.mjs` | 103 / 7; **1** | 110 / 0; **0** | none |
+
+The seven archive-only setup failures concern resolving/sourcing the actual main-checkout shell integration script from an archive with no Git checkout. They are **not claimed as fixes by this slice**. Failed-name comparisons for the four still-red files are identical (7, 20, 1 and 32 failures); all comparisons have zero added names. `comparison.json`, `baseline-host-test_*.log`, `final-host-test_*.log` and the `*-exits.txt` files retain the comparison. This is **not a full-suite-green claim**.
+
+Final eight focused boundary proofs were each run with the controlled environment above, replacing the final arguments with:
+
+```sh
+node --import /tmp/fgos-work/slice2-rework/preload.mjs --test \
+  --test-name-pattern='doctor dry binds|documentation lease admission|held documentation lease|linked holder checkout|non-holder origin|recorded checkout|holder workflow|workflow integration gates' "$file"
+```
+
+Exact files: bind, run-case-admission, merge-land, promote-engine, case-verbs and units-runner from the table. Exits: **0, 0, 0, 0, 0, 0** respectively; **1, 1, 1, 1, 2, 2** selected tests pass. Logs: `new-proofs-test_*.log`. Initial development of the new Workflow writer proof exposed the inherited nested-worker context; the integrate-step fixture also initially omitted its writer's worktree in `unit.scheduled`, so the existing projection correctly carried no branch and integrated nothing. The fixture now records a real registered writer checkout; neither production path was weakened.
+
+### No-lease cost
+
+Exact benchmark command (exit **0**):
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID \
+  FGOS_STATE_ROOT=/tmp/fgos-work/slice2-rework/state TMPDIR=/tmp/fgos-work/slice2-rework \
+  FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos \
+  node --import /tmp/fgos-work/slice2-rework/preload.mjs /tmp/fgos-work/slice2-rework/bench.mjs
+```
+
+The benchmark creates a temporary main-branch fixture, warms 10 calls, then times 100 calls and counts actual typed sidecar reads by calling through native Inspect. Latest run (`bench-idle.log`): module median **36.07 ms**, p95 **59.65 ms**, mean **37.50 ms**; execution admission median **33.44 ms**, p95 **50.66 ms**, mean **33.47 ms**. Each measured batch performs **100 sidecar reads for 100 operations**. These are local sandbox timings, not a per-read speedup claim or a guarantee of the review machine's ~10 ms. The existing module's root/ref/blob inspection cost remains; this slice removes its multiplication in doctor, dry bind, seat walks and assignment replay. No cache, polling loop or module rewrite was introduced.
+
+### Handoff
+
+- `git diff --check` and Node syntax checks on changed execution/Workflow/Land/entry sources exited **0**. Final focused proofs are green; independent review and main landing remain separate.
+- Impact analysis is **degraded/unqueried**: GitNexus MCP is not exposed and this brief forbids fgOS CLI queries. Source/history/caller searches and the architecture test are the available evidence; no graph blast-radius or `detect_changes` claim is made. Directly affected boundaries are Unit admission, Workflow start/resume/answer/integrate, seat replay/doctor and runner Land callers.
+- Writes are confined to the expanded code/test list and this existing delivery record. Existing helpers alone stage ignored native test artifacts; all manual scratch/baseline/logs are under `/tmp/fgos-work/`. No secrets env file, real lease, Work lifecycle verb, Git staging/commit/ref write or manual `.fgos` mutation was used on this repository. The runner owns committing.
+- `CHANGELOG.md` needs the Lead's separately authorized user-visible release note; it was not edited outside this code slice and is listed in the result's `needsWrites`. No additional product feature is proposed or implemented.
+- Markdown preview: `timeout 20s mdview open /home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md` exited **1** (`attempt to write a readonly database`). No preview URL was produced; log: `/tmp/fgos-work/slice2-rework/mdview.log`.

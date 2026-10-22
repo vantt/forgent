@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { resolveIntegrationBranch, retargetMember } from '../../src/runner/promote-engine.mjs';
+import { acquireDocumentationCutoverLease } from '../../src/runner/documentation-cutover-lease.mjs';
 import { branchNameFor } from '../../src/runner/worktree.mjs';
 import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
@@ -78,6 +79,22 @@ test('retargetMember merges a clean member branch into the integration branch, r
 
   const rootFiles = git(repoRoot, ['ls-tree', '-r', '--name-only', 'fgw/root-x']);
   assert.match(rootFiles, /member-a\.txt/);
+});
+
+// Land's own test owns scope policy; this proves the promote engine forwards
+// its declared linked caller instead of silently authenticating main.
+test('retargetMember carries a linked holder checkout to the shared Land door', async () => {
+  const repoRoot = initRepo();
+  fs.mkdirSync(path.join(repoRoot, 'docs'));
+  makeBranchWithCommit(repoRoot, 'fgw/member-a', 'docs/member.md', 'member documentation\n');
+  resolveIntegrationBranch(repoRoot, 'root-x');
+  const holder = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-promote-holder-'));
+  git(repoRoot, ['worktree', 'add', '-b', 'holder', holder]);
+  acquireDocumentationCutoverLease({ repoRoot: holder });
+  await assert.rejects(() => retargetMember(repoRoot, makeItem('member-a'), 'root-x', { callerCheckout: repoRoot }), { code: 'documentation-cutover-lease' });
+  const result = await retargetMember(repoRoot, makeItem('member-a'), 'root-x', { callerCheckout: holder });
+  assert.equal(result.outcome, 'merged');
+  assert.equal(git(repoRoot, ['show', 'fgw/root-x:docs/member.md']), 'member documentation\n');
 });
 
 test('retargetMember bails without touching git when preflight reports unsafe (merge conflict)', async () => {

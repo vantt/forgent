@@ -21,7 +21,7 @@ import {
 } from './case-lock.mjs';
 import { drainCaseInbox, recordGateAnswerRound } from './case-runtime.mjs';
 import { closeCaseUnderHold, readCaseProjection } from './case-close.mjs';
-import { detachedResult, openCaseOnLedger, prepareWorkflowRun, refundIfNotOpened, spawnDetachedAdvance } from './case-start.mjs';
+import { admitRecordedWorkflow, detachedResult, openCaseOnLedger, prepareWorkflowRun, refundIfNotOpened, spawnDetachedAdvance } from './case-start.mjs';
 import { advanceWorkflowRun } from './runner.mjs';
 import { normalizeSeats } from './seats.mjs';
 import { seatProviders } from './seat-providers.mjs';
@@ -122,7 +122,7 @@ export function startWorkflowDetached(params = {}) {
  * @returns {Promise<object>} Projected workflow state
  */
 export async function startWorkflow(params = {}) {
-  const { workflowRunId, workflow, mainRoot, worktreePath, frame, request, parent } = prepareWorkflowRun(params);
+  const { workflowRunId, workflow, mainRoot, worktreePath, frame, request, parent, documentationAdmission } = prepareWorkflowRun(params);
 
   let opened = false;
   try {
@@ -130,7 +130,7 @@ export async function startWorkflow(params = {}) {
       openCaseOnLedger({ mainRoot, workflowRunId, workflow, frame, request, hold, worktreePath, parent });
       opened = true;
       if (workflow.guide.kind === 'guide') return conductorResult(mainRoot, workflowRunId);
-      return advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow, mainRoot, worktreePath, hold, onLog: params.onLog });
+      return advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow, mainRoot, worktreePath, hold, documentationAdmission, onLog: params.onLog });
     });
   } finally {
     refundIfNotOpened({ mainRoot, parent, opened });
@@ -222,12 +222,13 @@ const recordedByLiveProposer = (mainRoot, workflowRunId) => ({
 export async function answerWorkflow(workflowRunId, params = {}) {
   if (!workflowRunId) throw new RunnerConfigError('answerWorkflow requires workflowRunId');
   const { mainRoot, worktreePath } = rootsOf(workflowRunId, params, 'answerWorkflow');
+  const documentationAdmission = admitRecordedWorkflow({ mainRoot, workflowRunId });
   const hold = takeAndRecord(workflowRunId, params, mainRoot);
   if (hold === null) return recordedByLiveProposer(mainRoot, workflowRunId);
   try {
     const { state, projection } = readCase(mainRoot, workflowRunId);
     if (isConductor(projection)) return conductorResult(mainRoot, workflowRunId);
-    return await advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold });
+    return await advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold, documentationAdmission });
   } finally {
     hold.release();
   }
@@ -243,6 +244,7 @@ export async function answerWorkflow(workflowRunId, params = {}) {
 export function answerWorkflowDetached(workflowRunId, params = {}) {
   if (!workflowRunId) throw new RunnerConfigError('answerWorkflow requires workflowRunId');
   const { mainRoot, worktreePath } = rootsOf(workflowRunId, params, 'answerWorkflow');
+  admitRecordedWorkflow({ mainRoot, workflowRunId });
   const hold = takeAndRecord(workflowRunId, params, mainRoot);
   if (hold === null) return recordedByLiveProposer(mainRoot, workflowRunId);
   hold.release();
@@ -292,6 +294,7 @@ function heldConductor(mainRoot, workflowRunId) {
  */
 export async function resumeWorkflow(workflowRunId, options = {}) {
   const { mainRoot, worktreePath } = rootsOf(workflowRunId, options, 'resumeWorkflow');
+  const documentationAdmission = admitRecordedWorkflow({ mainRoot, workflowRunId });
   let hold = tryAcquireAdvanceLock(mainRoot, workflowRunId);
   if (hold === null) {
     if (heldConductor(mainRoot, workflowRunId)) return conductorResult(mainRoot, workflowRunId);
@@ -300,7 +303,7 @@ export async function resumeWorkflow(workflowRunId, options = {}) {
   try {
     const state = readResumeState(workflowRunId, mainRoot, options);
     if (isConductor(readCase(mainRoot, workflowRunId).projection)) return conductorResult(mainRoot, workflowRunId);
-    return await advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold });
+    return await advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold, documentationAdmission });
   } finally {
     hold.release();
   }
@@ -315,6 +318,7 @@ export async function resumeWorkflow(workflowRunId, options = {}) {
  */
 export function resumeWorkflowDetached(workflowRunId, options = {}) {
   const { mainRoot, worktreePath } = rootsOf(workflowRunId, options, 'resumeWorkflow');
+  admitRecordedWorkflow({ mainRoot, workflowRunId });
   // Holding the run while it is checked refuses when a live process is advancing it, and repairs an
   // unfinished last ledger line; the hold is released before the detached advance takes it.
   let conductor = false;

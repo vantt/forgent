@@ -30,11 +30,11 @@ import { ironLawForItem, ironLawRefusal } from '../../runner/iron-law-gate.mjs';
 import { readIronLawLevel, recordIronLawSkip, recordIronLawAcknowledge } from './iron-law-level.mjs';
 
 /**
- * @param {{dir: string, repoRoot: string}} ctx - `repoRoot` follows this
- *   verb's own `--trust-dir` policy, resolved by the adapter.
+ * @param {{dir: string, repoRoot: string, cwd?: string}} ctx - `repoRoot` follows this
+ *   verb's own `--trust-dir` policy; `cwd` remains the adapter's caller checkout.
  * @param {{id: string, resolveTimeoutMs: () => number|undefined, resolveWaitFlags: () => {noWait: boolean, waitMs: number|undefined}, acknowledgeIronLaw: boolean}} options
  */
-export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs, resolveWaitFlags, acknowledgeIronLaw }) {
+export async function syncRootUseCase({ dir, repoRoot, cwd = repoRoot }, { id, resolveTimeoutMs, resolveWaitFlags, acknowledgeIronLaw }) {
   const view = listWork(dir);
   const item = view.work[id];
   if (!item) {
@@ -127,7 +127,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
   };
 
   const runAndReport = async (itemOverride, ownFileSet = null) => {
-    const result = await landRunnerItem(repoRoot, itemOverride, { target: targetBranch, timeoutMs, ownFileSet, ...lockWait });
+    const result = await landRunnerItem(repoRoot, itemOverride, { target: targetBranch, timeoutMs, ownFileSet, callerCheckout: cwd, ...lockWait });
 
     if (result.outcome === 'conflict') {
       recordFriction(dir, {

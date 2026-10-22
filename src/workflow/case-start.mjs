@@ -12,7 +12,7 @@ import { normalizeContextRefs } from './definition.mjs';
 import { loadWorkflow, workflowPersonaScope } from './loader.mjs';
 import { createWorkflowRun, appendWorkflowEvent, readWorkflowEvents, projectWorkflowState } from './store.mjs';
 import { translateUnitsToWorkflow } from './units-source.mjs';
-import { snapshotRunnerConfig, resolveGitRoots, assertRepositoryForWrites, detectHerdrPresent } from '../runner/execution/run.mjs';
+import { snapshotRunnerConfig, resolveGitRoots, assertRepositoryForWrites, detectHerdrPresent, admitDocumentationExecution } from '../runner/execution/run.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { expandWorkflowSeats, normalizeSeats, personaNameOf, seatedPanelUnits } from './seats.mjs';
 import { digestContextRefs, digestText } from './ref-digests.mjs';
@@ -28,7 +28,6 @@ import { RIGOR_ORDER } from './case-projection.mjs';
 import { bindWorktree } from './case-bindings.mjs';
 import { nestedStartRefusal } from './case-admission-port.mjs';
 import { chargeNestedCase, refundNestedCase } from './case-frame.mjs';
-import { leaseAdmission } from '../runner/documentation-cutover-lease.mjs';
 
 const FRAME_COUNT_KEYS = Object.freeze(['dispatches', 'mutatingDispatches', 'fallbackPerSeat', 'deviationsBeforeAsk', 'seatLaunchesPerDispatch']);
 
@@ -91,6 +90,9 @@ export function openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide = wo
       frame,
       requestDigest: digestText(request ?? ''),
       openedAt: new Date().toISOString(),
+      // The caller checkout is origin, not a token or an admission grant.
+      // Every later operation reads it here, never from a generated wf/ checkout.
+      callerCheckout: worktreePath,
       ...(parent ? { parent: { caseId: parent.parentCaseId, reservationId: parent.reservationId } } : {}),
       ...(legacy ? { legacy: true } : {}),
     },
@@ -154,13 +156,6 @@ function resolveStart(params) {
   const roots = resolveGitRoots(cwd, { allowNoRepository: true });
   const mainRoot = params.repoRoot ? path.resolve(params.repoRoot) : roots.mainCheckoutRoot;
   const worktreePath = params.worktree ? path.resolve(params.worktree) : roots.worktreeRoot;
-  // Both prepareWorkflowRun and seat preflight resolve here, before config
-  // bootstrap, a parent frame charge, the ledger or a detached process exists.
-  const leaseRoots = params.worktree ? resolveGitRoots(worktreePath, { allowNoRepository: true }) : roots;
-  if (!leaseRoots.notARepository) {
-    const admission = leaseAdmission({ repoRoot: mainRoot, worktreePath });
-    if (!admission.allowed) throw new RunnerConfigError(admission.message, { code: admission.reason, phase: 'pre-admission' });
-  }
 
   let workflow;
   let workflowId;
@@ -225,6 +220,15 @@ function resolveStart(params) {
   return { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account };
 }
 
+/** Read the origin from this run's own record before a resume/answer takes
+ * advance or writes an answer. Pre-origin runs are anchored to main, never
+ * upgraded to holder by a later caller's --worktree or ambient cwd. */
+export function admitRecordedWorkflow({ mainRoot, workflowRunId }) {
+  const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
+  const callerCheckout = events.find((event) => event.type === 'case.opened')?.payload.callerCheckout ?? mainRoot;
+  return admitDocumentationExecution({ repoRoot: mainRoot, callerCheckout });
+}
+
 /**
  * Dry-bind a seated definition before anything is spent: every panel unit's seats and synthesizer are
  * bound against the pool exactly as a run would bind them, nothing is dispatched or written.
@@ -282,6 +286,7 @@ export function refundIfNotOpened({ mainRoot, parent, opened }) {
  */
 export function prepareWorkflowRun(params) {
   const { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account } = resolveStart(params);
+  const documentationAdmission = params.documentationAdmission ?? admitDocumentationExecution({ repoRoot: mainRoot, callerCheckout: worktreePath });
   // A frame flag that widens the guide's defaults refuses here, so it creates no run.
   const frame = resolveFrame(workflow.guide, params.frame);
   const liveConfig = ensureRunnerConfigForDir(mainRoot);
@@ -323,5 +328,5 @@ export function prepareWorkflowRun(params) {
   }
   const { workflowRunId, runDir } = created;
 
-  return { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request: params.request ?? null, parent };
+  return { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request: params.request ?? null, parent, documentationAdmission };
 }

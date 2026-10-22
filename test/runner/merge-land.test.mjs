@@ -56,10 +56,17 @@ test('a held documentation lease permits a code-only land and its holder can lan
       const holder = path.join(f.temp, 'holder');
       f.git('worktree', 'add', '-qb', 'holder', holder);
       if (holderCall) branchCommit(f, 'scoped', 'main', { 'docs/new.md': 'holder change\n' });
-      acquireDocumentationCutoverLease({ repoRoot: holderCall ? f.repo : holder });
-      const result = await landRunnerItem(f.repo, { id: 'source', verify: 'true' }, { branch: holderCall ? 'scoped' : 'source' });
+      acquireDocumentationCutoverLease({ repoRoot: holder });
+      const result = await landRunnerItem(f.repo, { id: 'source', verify: 'true' }, {
+        branch: holderCall ? 'scoped' : 'source', callerCheckout: holderCall ? holder : f.repo,
+      });
       assert.equal(result.outcome, 'merged', JSON.stringify(result));
       if (holderCall) assert.equal(f.git('show', 'main:docs/new.md'), 'holder change');
+      else {
+        fs.writeFileSync(path.join(f.repo, DEFAULT_SIDECAR_PATH), '{broken');
+        f.git('add', DEFAULT_SIDECAR_PATH); f.git('commit', '-qm', 'corrupt authority fixture');
+        await assert.rejects(() => landRunnerItem(f.repo, { id: 'source', verify: 'true' }, { branch: 'source', callerCheckout: holder }), { code: 'documentation-cutover-lease-corrupt' });
+      }
     } finally { f.close(); }
   }
 });

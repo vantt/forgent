@@ -2340,8 +2340,17 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           // --case <parentCaseId>: open this case or wave under a conductor case, charged to its frame.
           parentCase: flags.case === undefined ? undefined : requireField(flags.case, '--case requires the id of the parent case'),
           repoRoot: flags.dir,
+          cwd: process.cwd(),
           worktree: flags.worktree,
         };
+        // CLI seat preflight may bootstrap config. Admit the execution first,
+        // and hand that same result to start rather than reading twice.
+        if (startParams.seats !== undefined) {
+          const { admitDocumentationExecution } = await import('../src/runner/execution/run.mjs');
+          startParams.documentationAdmission = admitDocumentationExecution({
+            repoRoot: flags.dir, callerCheckout: flags.worktree ?? process.cwd(),
+          });
+        }
         // --seats: dry-bind the rebuilt definition first; a refusal creates no run, shared-family notes ride along.
         const seatsPreflight = startParams.seats === undefined ? undefined : await preflightWorkflowSeats(startParams);
         // Default: record the run, hand advancing to a detached process, return the run id.
@@ -2364,7 +2373,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const stepId = requireField(flags.step, 'workflow answer requires --step <stepId>');
         const answer = requireField(flags.answer, 'workflow answer requires --answer <text>');
         const approved = flags.approve === true || flags.approve === 'true';
-        const answerParams = { stepId, answer, approved, repoRoot: flags.dir, worktree: flags.worktree };
+        const answerParams = { stepId, answer, approved, repoRoot: flags.dir, cwd: process.cwd(), worktree: flags.worktree };
         const answerWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
         return attachDirWarning(foreground ? await answerWorkflow(workflowRunId, answerParams) : answerWorkflowDetached(workflowRunId, answerParams), answerWarning);
       }
@@ -2381,6 +2390,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // --seats on resume is only a consistency check: the run keeps the seats it started with.
         const resumeOptions = {
           repoRoot: flags.dir,
+          cwd: process.cwd(),
           worktree: flags.worktree,
           seats: flags.seats === undefined ? undefined : requireField(flags.seats, '--seats requires pipe-separated lenses').split('|'),
         };
@@ -2963,6 +2973,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         overrides,
         resumeUnitRunId,
         repoRoot,
+        cwd: process.cwd(),
+        callerCheckout: worktree ?? process.cwd(),
         worktree,
       }), runWarning);
     }
@@ -3717,7 +3729,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // omitted.
       const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
       return await approveUseCase(
-        { dir, repoRoot },
+        { dir, repoRoot, cwd: process.cwd() },
         parseMergeClusterOptions('approve', flags, dir, { id }),
       );
     }
@@ -3745,7 +3757,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // rather than getting the relaxed behavior silently. Byte-identical
       // to today when the flag is omitted.
       const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
-      return await syncRootUseCase({ dir, repoRoot }, parseMergeClusterOptions('sync-root', flags, dir, { id }));
+      return await syncRootUseCase({ dir, repoRoot, cwd: process.cwd() }, parseMergeClusterOptions('sync-root', flags, dir, { id }));
     }
 
     // tsk-3gx-3: Layer 2 action — takes N flat sibling item ids (D2: caller's
@@ -3783,7 +3795,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // that way is the only way this stays a pure move.
       const timeoutMs = flags.timeout !== undefined ? Number(flags.timeout) : undefined;
       return await promoteToComponentUseCase(
-        { dir, repoRoot },
+        { dir, repoRoot, cwd: process.cwd() },
         { ids, rootId: flags['root-id'], rootTitle: flags['root-title'], timeoutMs },
       );
     }

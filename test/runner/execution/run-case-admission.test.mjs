@@ -10,7 +10,8 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import { ensureScriptAddon } from '../../../scripts/lib/git-ports.mjs';
-import { acquireDocumentationCutoverLease } from '../../../src/runner/documentation-cutover-lease.mjs';
+import { acquireDocumentationCutoverLease, DEFAULT_SIDECAR_PATH } from '../../../src/runner/documentation-cutover-lease.mjs';
+import { loadNativeAddon } from '../../../src/git/native.mjs';
 import { runUnit } from '../../../src/runner/execution/run.mjs';
 import { runReviewed } from '../../../src/runner/execution/patterns/reviewed.mjs';
 import { seatLaunchesOf, CaseAdmissionRefusedError } from '../../../src/runner/execution/case-admission-port.mjs';
@@ -121,9 +122,9 @@ const WRITE_UNIT = { id: 'u-write', objective: 'WRITE:docs/a.md', capability: 'd
 
 // Existing admission tests prove the case port, not the documentation freeze.
 // A missing resume record also must not get far enough to acquire its control.
-// The existing read-only Unit test owns worker completion; this wiring proof
-// observes that the holder reaches the actual worker attempt with its binding.
-test('documentation lease admission refuses non-holder runs before writes and lets its holder reach a worker attempt', async () => {
+// The standalone writing test owns completion; this boundary proof reaches
+// assignment replay from a non-holder cwd with a holder's writing checkout.
+test('documentation lease admission refuses non-holder runs before writes and lets its holder reach a worker attempt', async (t) => {
   const { repoRoot, worktreeDir } = setup();
   acquireDocumentationCutoverLease({ repoRoot: worktreeDir });
   const port = recordingPort();
@@ -146,13 +147,28 @@ test('documentation lease admission refuses non-holder runs before writes and le
   assert.deepEqual(assignmentsOf(repoRoot), []);
   assert.deepEqual(fs.readdirSync(path.join(repoRoot, '.fgos')).sort(), before, 'no sweep or runtime directory');
   assert.equal(dispatchCwdHolder(path.join(repoRoot, '.fgos'), repoRoot), null);
+  const native = loadNativeAddon();
+  const call = native.GitInspect.prototype.call;
+  let reads = 0;
+  t.mock.method(native.GitInspect.prototype, 'call', function(method, args) {
+    if (method === 'pathsAtRevision' && args.paths?.some(p => Buffer.from(p).toString() === DEFAULT_SIDECAR_PATH)) reads++;
+    return call.call(this, method, args);
+  });
   const allowed = await runUnit({
-    unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
+    unitData: WRITE_UNIT, caseAdmission: port,
     repoRoot, cwd: repoRoot, worktree: worktreeDir,
   });
   assert.equal(allowed.results[0].refused, undefined);
   assert.equal(allowed.results[0].binding.executor, 'okay', 'ctx carries the holder checkout rather than the host cwd');
   assert.ok(allowed.results[0].runResult.runId, 'a real worker attempt was dispatched');
+  assert.doesNotMatch(JSON.stringify(allowed), /recomputed binding refused|documentation-cutover-lease/);
+  assert.deepEqual(unitJson(repoRoot, allowed.unitRunId).unit.writes, ['docs']);
+  assert.equal(reads, 1, 'binding, replay and attempts do not re-read documentation authority');
+  fs.writeFileSync(path.join(repoRoot, DEFAULT_SIDECAR_PATH), '{broken');
+  for (const args of [['add', DEFAULT_SIDECAR_PATH], ['commit', '-qm', 'corrupt authority fixture']]) execFileSync('git', args, { cwd: repoRoot, stdio: 'ignore' });
+  const assignments = assignmentsOf(repoRoot);
+  await assert.rejects(() => runUnit({ unitData: WRITE_UNIT, caseAdmission: port, repoRoot, cwd: repoRoot, worktree: worktreeDir }), { code: 'documentation-cutover-lease-corrupt' });
+  assert.deepEqual(assignmentsOf(repoRoot), assignments);
 });
 
 test('a writing Unit with no port is refused before anything exists, and so is a Unit that names a case', async () => {

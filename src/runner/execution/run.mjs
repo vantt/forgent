@@ -136,6 +136,25 @@ export function resolveGitRoots(cwd = process.cwd(), { allowNoRepository = false
   }
 }
 
+/** Admit once at an execution door, against its declared caller checkout.
+ * Workflow passes this operation-local result to its Units; it is never stored
+ * as a grant or reused by a later resume/answer operation. */
+export function admitDocumentationExecution({ repoRoot, callerCheckout }) {
+  if (!callerCheckout) throw new RunnerConfigError('execution admission requires callerCheckout');
+  const checkout = path.resolve(callerCheckout);
+  let admission;
+  try {
+    admission = leaseAdmission({ repoRoot, worktreePath: checkout });
+  } catch (error) {
+    // Only the module's typed non-repository answer permits read-only work
+    // outside Git; inspection errors and corrupt sidecars still fail closed.
+    if (error.code !== 'not-a-repository') throw error;
+    admission = { allowed: true };
+  }
+  if (!admission.allowed) throw new RunnerConfigError(admission.message, { code: admission.reason, phase: 'pre-admission' });
+  return { ...admission, callerCheckout: checkout };
+}
+
 /** A unit that writes or syncs needs a repository; a read-only one runs where roots say there is none. */
 export function assertRepositoryForWrites(roots, cwd, { writes = false } = {}) {
   if (roots?.notARepository && writes) {
@@ -465,6 +484,9 @@ async function assertDoorChoicesBeforeRun(unit, runnerConfig, options) {
  * @param {string} [options.cwd] Current working directory / worktree
  * @param {{ workflowDir?: string|null, owningDomain?: string|null }} [options.personaScope] Where the persona lookup starts for the workflow this unit belongs to (a case passes it); omitted, workspace and core only
  * @param {string} [options.worktree] Explicit worktree path
+ * @param {string} [options.callerCheckout] Caller checkout declared by the entry; defaults to worktree/cwd
+ * @param {object} [options.documentationAdmission] Trusted in-process admission from this Workflow operation,
+ *   not a persisted grant; every later resume/answer must obtain a new result
  * @param {object} [options.session] Session context { provider, tier, hasNativeAgent, herdrPresent, headless }
  * @param {object} [options.declared] Work step operation this unit runs: { workId, domain, workflow,
  *   stage, operation, operations } (operations are the step's operation objects). Stored in unit.json.
@@ -573,18 +595,20 @@ async function runUnitBody(options, scope) {
   // goes through, so it is also where the ones whose pane has since closed are
   // reclaimed. Best effort: a reap problem never blocks the run.
   const cwd = options.cwd ?? process.cwd();
-  // A directory that is no git checkout still gets its homes reclaimed; the run then refuses as before.
+  // Resolve first: only a typed notARepository answer permits read-only work
+  // outside Git. Other root failures stop before reclamation or any writes.
   const roots = resolveGitRoots(cwd, { allowNoRepository: true });
   const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots.mainCheckoutRoot;
   const worktreePath = options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot;
   // Check fresh and resumed runs before the sweep, config, case reservation,
   // custody or unit-control locks can write anything. No path filter on dispatch.
-  const lease = { repoRoot: mainRoot, worktreePath };
-  const leaseRoots = options.worktree ? resolveGitRoots(worktreePath, { allowNoRepository: true }) : roots;
-  if (!leaseRoots.notARepository) {
-    const admission = leaseAdmission(lease);
-    if (!admission.allowed) throw new RunnerConfigError(admission.message, { code: admission.reason, phase: 'pre-admission' });
-  }
+  // An in-process Workflow operation already admitted its recorded origin,
+  // before creating wf/ worktrees. Seat retries and assignment replay do not
+  // consult the sidecar again or reinterpret that origin as the unit checkout.
+  const documentationAdmission = options.documentationAdmission ?? admitDocumentationExecution({
+    repoRoot: mainRoot, callerCheckout: options.callerCheckout ?? worktreePath,
+  });
+  if (!documentationAdmission.allowed) throw new RunnerConfigError('documentation execution was not admitted');
   try {
     sweepAttempts({ assignmentsRoot: mainRoot ? path.join(mainRoot, '.fgos', 'assignments') : undefined });
   } catch { /* best effort */ }
@@ -1059,8 +1083,8 @@ async function runUnitBody(options, scope) {
       ...(unit.blind ? { blind: true } : {}),
     });
     const assignmentIdOf = (n) => (n === 0 ? `${unitRunId}/${seatId}/${round}` : `${unitRunId}/${seatId}/${round}-fb${n}`);
-    // The lease state is read for the attempt about to run (the account this assignment already holds ranks first).
-    const bindCtxFor = (n) => ({ runnerConfig, session, lease, accounts: { runtimeDir: options.providerCapacityRuntimeDir, assignmentId: assignmentIdOf(n) } });
+    // Account lease state is read for the next attempt (the account this assignment already holds ranks first).
+    const bindCtxFor = (n) => ({ runnerConfig, session, accounts: { runtimeDir: options.providerCapacityRuntimeDir, assignmentId: assignmentIdOf(n) } });
 
     const key = `${seatId}/${round}`;
     const recorded = unitRecord.bindings[key] ?? [];

@@ -17,10 +17,10 @@ import { resolveIntegrationBranch, retargetMember } from '../../runner/promote-e
 import { acknowledgeLand } from '../../runner/merge.mjs';
 
 /**
- * @param {{dir: string, repoRoot: string}} ctx
+ * @param {{dir: string, repoRoot: string, cwd?: string}} ctx `cwd` is the caller checkout, distinct from the Land repository
  * @param {{ids: string[], rootId: string|undefined, rootTitle: string|undefined, timeoutMs: number|undefined}} options
  */
-export async function promoteToComponentUseCase({ dir, repoRoot }, { ids, rootId: rootIdOption, rootTitle, timeoutMs }) {
+export async function promoteToComponentUseCase({ dir, repoRoot, cwd = repoRoot }, { ids, rootId: rootIdOption, rootTitle, timeoutMs }) {
   if (!isMainWorktree(repoRoot)) {
     throw new StoreError(
       'validation',
@@ -107,7 +107,7 @@ export async function promoteToComponentUseCase({ dir, repoRoot }, { ids, rootId
       continue;
     }
     const member = view.work[id];
-    const outcome = await retargetMember(repoRoot, member, rootId, timeoutMs ? { timeoutMs } : {});
+    const outcome = await retargetMember(repoRoot, member, rootId, { callerCheckout: cwd, ...(timeoutMs ? { timeoutMs } : {}) });
     if (outcome.outcome === 'merged') {
       // The real git merge already landed at this point — a rejection
       // here (e.g. a deps+parent graph cycle assertNoUnifiedCycle
