@@ -70,4 +70,4 @@ Real files in a temporary directory and real processes; no mock of process facts
 
 ## Deviations
 
-(filled by the implementation lead from phase 2's probe: which topology, whether `procStart` is compared)
+From phase 2's probe (`plans/reports/research-261022-1751-mailbox-v4-hook-process-probe.md`): Claude Code 2.1.308 under `claude -p` runs the hook through one `sh` (dash) whose parent is the `claude` head, so the live suite uses **topology B**; `procStart` equals `/proc/<pid>/stat` `starttime`, so the finder compares it and test 6 stays. Both topologies are still built and tested (the plan specifies both).

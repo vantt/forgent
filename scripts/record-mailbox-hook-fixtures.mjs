@@ -55,9 +55,10 @@
  * Where: <base> is ${TMPDIR:-/tmp}/fgos-work/mailbox-v3-record, outside every
  * git checkout, so a full-bypass agent cannot write the repository and the
  * repository's own hook files (.claude/settings.json, .agents/hooks.json)
- * never load. Each CLI is started with FGOS_SESSION_ID, CODEX_THREAD_ID,
- * CLAUDE_CODE_SESSION_ID and CLAUDECODE removed, so a recorded id variable is
- * one the CLI set itself.
+ * never load. Each CLI is started with the allowlisted environment of
+ * scripts/lib/mailbox-live-cli.mjs (no session-identity variable, an empty
+ * ZDOTDIR, auto-update off), so a recorded id variable is one the CLI set
+ * itself. The run guards live in that module, shared with the live suite.
  *
  * Exact commands (cwd <runDir>/ws, environment as above):
  *   claude: claude -p --model haiku --dangerously-skip-permissions
@@ -93,9 +94,10 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { spawnSync, execFileSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { isAuthLink, setAsideAuthFiles, setAsideReplacedAuth } from './lib/codex-auth-guard.mjs';
+import { setAsideAuthFiles, setAsideReplacedAuth } from './lib/codex-auth-guard.mjs';
+import * as live from './lib/mailbox-live-cli.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(SCRIPT), '..');
@@ -108,10 +110,7 @@ const ACCOUNT = (() => {
 })();
 const REDACTION_RULES_VERSION = 1;
 
-/** The session-identity variables (fgos-session-identity ENV_ORDER), plus
- * CLAUDECODE, removed from every CLI's environment. */
-const ID_VARS = ['FGOS_SESSION_ID', 'CODEX_THREAD_ID', 'CLAUDE_CODE_SESSION_ID'];
-const REMOVED_VARS = [...ID_VARS, 'CLAUDECODE'];
+const { ID_VARS, REMOVED_VARS } = live;
 
 /** The agent a `--agent-head` Claude Code run starts its head session as. */
 const AGENT_HEAD = 'mbx-head';
@@ -174,35 +173,12 @@ function writeJson(file, value) {
   fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
 }
 
-function zshValue(expr) {
-  return execFileSync('zsh', ['-ic', `print -r -- ${expr}`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-}
-
 function accountHome(cli) {
-  const table = cli === 'codex' ? 'CODEX_ACCOUNTS' : 'AGY_ACCOUNTS';
-  const home = zshValue(`\${${table}[${ACCOUNT}]}`);
-  if (!home || !fs.existsSync(home)) die(`${table}[${ACCOUNT}] does not name a directory`);
-  return home;
+  return live.accountHome(cli, ACCOUNT);
 }
 
 function accountNames() {
-  const names = new Set([ACCOUNT]);
-  for (const table of ['CODEX_ACCOUNTS', 'AGY_ACCOUNTS']) {
-    for (const name of zshValue(`\${(k)${table}}`).split(/\s+/)) if (name) names.add(name);
-  }
-  return [...names];
-}
-
-function cliVersion(cli) {
-  const out = spawnSync(cli, ['--version'], { encoding: 'utf8', env: cleanEnv() });
-  return (out.stdout || '').trim();
-}
-
-function cleanEnv(extra = {}) {
-  const env = { ...process.env, ...extra };
-  for (const name of REMOVED_VARS) delete env[name];
-  for (const name of REMOVED_VARS) if (name in env) die(`${name} is still set in the child environment`);
-  return env;
+  return live.accountNames(ACCOUNT);
 }
 
 function hookCommand(cli, event, runDir) {
@@ -211,29 +187,6 @@ function hookCommand(cli, event, runDir) {
 
 function hookEntry(cli, event, runDir) {
   return { type: 'command', command: hookCommand(cli, event, runDir), timeout: 30 };
-}
-
-/**
- * Refuses a run in which a hook file other than the recorder's own would
- * load: Claude Code's managed policy settings (which `--setting-sources`
- * cannot exclude) and agy's account-level hook files.
- */
-function hookPreflight(cli, env) {
-  if (cli === 'claude') {
-    for (const file of ['/etc/claude-code/managed-settings.json', '/Library/Application Support/ClaudeCode/managed-settings.json']) {
-      if (fs.existsSync(file) && /"hooks"/.test(fs.readFileSync(file, 'utf8'))) die(`${file} declares hooks that would fire during the run`);
-    }
-  }
-  if (cli === 'agy') {
-    const found = [path.join(env.HOME, '.agents', 'hooks.json')].filter((f) => fs.existsSync(f));
-    const gemini = path.join(env.HOME, '.gemini');
-    if (fs.existsSync(gemini)) {
-      for (const entry of fs.readdirSync(gemini, { recursive: true }).map(String)) {
-        if (path.basename(entry) === 'hooks.json') found.push(path.join(gemini, entry));
-      }
-    }
-    if (found.length) die(`account-level agy hook files would load: ${found.join(', ')}`);
-  }
 }
 
 /** After an agy run: its log must name exactly one loaded hooks file, the workspace's. */
@@ -246,9 +199,7 @@ function agyLoadedOneHookFile(runDir) {
 function setUp(cli, mode, runDir, agentHead) {
   const ws = path.join(runDir, 'ws');
   fs.mkdirSync(ws, { recursive: true });
-  for (let dir = ws; dir !== path.dirname(dir); dir = path.dirname(dir)) {
-    if (fs.existsSync(path.join(dir, '.git'))) die(`${ws} is inside a git checkout (${dir})`);
-  }
+  live.assertOutsideCheckout(ws);
   const args = [];
   const env = {};
   if (cli === 'claude') {
@@ -258,26 +209,19 @@ function setUp(cli, mode, runDir, agentHead) {
       hooks[event] = [event === 'PostToolUse' ? { matcher: '*', ...group } : group];
     }
     writeJson(path.join(runDir, 'settings.json'), { hooks });
-    args.push('-p', '--model', 'haiku', '--dangerously-skip-permissions', '--setting-sources', 'project',
-      '--settings', path.join(runDir, 'settings.json'));
-    if (agentHead) {
-      // A head session started with --agent: does its own event carry
-      // agent_type or agent_id?
-      args.push('--agents', JSON.stringify({ [AGENT_HEAD]: { description: 'Mailbox fixture head agent', prompt: 'Follow the user instruction exactly.' } }), '--agent', AGENT_HEAD);
-    }
-    args.push(PROMPTS[mode]);
+    // A head session started with --agent: does its own event carry
+    // agent_type or agent_id?
+    const extra = agentHead
+      ? ['--agents', JSON.stringify({ [AGENT_HEAD]: { description: 'Mailbox fixture head agent', prompt: 'Follow the user instruction exactly.' } }), '--agent', AGENT_HEAD]
+      : [];
+    args.push(...live.claudeArgs({ settings: path.join(runDir, 'settings.json'), prompt: PROMPTS[mode], extra }));
   } else if (cli === 'codex') {
     const home = path.join(runDir, 'home');
-    fs.mkdirSync(home, { recursive: true });
-    fs.symlinkSync(path.join(accountHome('codex'), 'auth.json'), path.join(home, 'auth.json'));
-    fs.writeFileSync(path.join(home, 'config.toml'),
-      `model_reasoning_effort = "low"\n\n[features]\nhooks = true\n\n[projects."${ws}"]\ntrust_level = "trusted"\n`);
     const hooks = {};
     for (const event of EVENTS.codex) hooks[event] = [{ hooks: [hookEntry(cli, event, runDir)] }];
-    writeJson(path.join(home, 'hooks.json'), { hooks });
+    live.makeCodexHome({ home, accountAuth: codexAccountAuth(), ws, hooks });
     env.CODEX_HOME = home;
-    args.push('exec', '--dangerously-bypass-hook-trust', '--dangerously-bypass-approvals-and-sandbox',
-      '--skip-git-repo-check', '-C', ws, PROMPTS[mode]);
+    args.push(...live.codexArgs({ ws, prompt: PROMPTS[mode] }));
   } else {
     fs.mkdirSync(path.join(ws, '.agents'), { recursive: true });
     writeJson(path.join(ws, '.agents', 'hooks.json'), {
@@ -301,15 +245,12 @@ function setUp(cli, mode, runDir, agentHead) {
  * still a symlink to the account's file, so the refresh lands in the real
  * file. A copy must never be refreshed: that burns the real refresh token.
  */
-function codexAuthState(runDir) {
-  const home = path.join(runDir, 'home');
-  const link = path.join(home, 'auth.json');
-  const isLink = isAuthLink(link, path.join(accountHome('codex'), 'auth.json'));
-  const status = spawnSync('codex', ['login', 'status'], {
-    env: cleanEnv({ CODEX_HOME: home }),
-    stdio: 'ignore',
-  });
-  return { isLink, loggedIn: status.status === 0 };
+function codexAccountAuth() {
+  return path.join(accountHome('codex'), 'auth.json');
+}
+
+function codexAuthState(runDir, env) {
+  return live.codexAuthState({ home: path.join(runDir, 'home'), accountAuth: codexAccountAuth(), env });
 }
 
 function cmdRun(cli, mode, flags) {
@@ -336,22 +277,23 @@ function cmdRun(cli, mode, flags) {
       Stop: `Mailbox fixture check: before you stop, reply with the token ${stop}.`,
     },
   });
-  const { ws, args, env } = setUp(cli, mode, runDir, agentHead);
-  hookPreflight(cli, env);
-  const authBefore = cli === 'codex' ? codexAuthState(runDir) : null;
+  const { ws, args, env: extra } = setUp(cli, mode, runDir, agentHead);
+  const env = live.cliEnv({ zdotdir: path.join(runDir, 'zdot'), extra });
+  live.hookPreflight(cli, env.HOME);
+  const authBefore = cli === 'codex' ? codexAuthState(runDir, env) : null;
   if (authBefore && !(authBefore.isLink && authBefore.loggedIn)) {
     die(`the ${ACCOUNT} codex login is not usable before the run (link ${authBefore.isLink}, logged in ${authBefore.loggedIn})`, 3);
   }
-  const before = cliVersion(cli);
+  const before = live.cliVersion(cli, env);
   const startedAt = new Date().toISOString();
   const child = spawnSync('timeout', ['300', cli, ...args], {
     cwd: ws,
-    env: cleanEnv(env),
+    env,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
     maxBuffer: 64 * 1024 * 1024,
   });
-  const after = cliVersion(cli);
+  const after = live.cliVersion(cli, env);
   fs.writeFileSync(path.join(runDir, 'output.txt'), `${child.stdout || ''}\n--- stderr ---\n${child.stderr || ''}`);
   writeJson(path.join(runDir, 'versions.json'), { before, after });
   writeJson(path.join(runDir, 'run.json'), {
@@ -361,12 +303,13 @@ function cmdRun(cli, mode, flags) {
     exit: child.status,
     command: [cli, ...args.map((a) => (a === PROMPTS[mode] ? '<prompt>' : a.startsWith('{') ? `'${a}'` : a))].join(' '),
     removedVars: REMOVED_VARS,
+    inheritedVars: live.INHERITED_VARS,
     recorderPidNamespace: fs.readlinkSync('/proc/self/ns/pid'),
   });
   process.stdout.write(`${cli} ${mode}: exit ${child.status}; versions ${before} -> ${after}; ${callsOf(runDir).length} hook calls; ${runDir}\n`);
   if (cli === 'agy') agyLoadedOneHookFile(runDir);
   if (authBefore) {
-    const authAfter = codexAuthState(runDir);
+    const authAfter = codexAuthState(runDir, env);
     process.stdout.write(`codex auth.json: ${authAfter.isLink ? 'still a link to the account file' : 'NOT A LINK'}; login status ${authAfter.loggedIn ? 'ok' : 'FAILED'}\n`);
     if (!(authAfter.isLink && authAfter.loggedIn)) {
       const aside = setAsideReplacedAuth(path.join(runDir, 'home', 'auth.json'));
@@ -404,6 +347,7 @@ function cmdHook(cli, event, runDir) {
     const ids = Object.fromEntries(ID_VARS.map((name) => [name, process.env[name] ?? null]));
     writeJson(path.join(calls, `${n}-${event}.ids.json`), ids);
     fs.writeFileSync(path.join(calls, `${n}-${event}.ns`), fs.readlinkSync('/proc/self/ns/pid'));
+    writeJson(path.join(calls, `${n}-${event}.proc.json`), processFacts(input));
     const modeFile = path.join(runDir, 'mode.json');
     const mode = fs.existsSync(modeFile) ? readJson(modeFile) : null;
     if (mode?.mode !== 'accept' || !mode.texts[event]) return;
@@ -425,6 +369,74 @@ function cmdHook(cli, event, runDir) {
   } finally {
     process.exitCode = 0;
   }
+}
+
+/** `/proc/<pid>/stat` fields after the command name, which may hold spaces. */
+function statFields(pid) {
+  const stat = fs.readFileSync(`/proc/${pid}/stat`, 'utf8');
+  return stat.slice(stat.lastIndexOf(')') + 2).split(' ');
+}
+
+/**
+ * The hook process and what it can see of the CLI above it, for the head
+ * finder (raw directory only; `redact` never reads it, since `callsOf` lists
+ * only `<n>-<event>.json`): its ancestry up to 8 levels, the names (never the
+ * values) of its environment variables, and for each ancestor that has a
+ * Claude Code session file the facts of that file, compared without copying
+ * an id.
+ */
+function processFacts(input) {
+  let payloadSession = null;
+  try {
+    payloadSession = JSON.parse(input.toString('utf8')).session_id ?? null;
+  } catch {
+    payloadSession = null;
+  }
+  const sessions = path.join(os.homedir(), '.claude', 'sessions');
+  const chain = [];
+  let pid = process.pid;
+  for (let level = 0; level < 8 && pid > 0; level += 1) {
+    let fields;
+    try {
+      fields = statFields(pid);
+    } catch {
+      break;
+    }
+    // Field 4 is ppid, 7 tty_nr, 22 starttime; fields[0] is field 3.
+    const entry = {
+      pid,
+      ppid: Number(fields[1]),
+      comm: fs.readFileSync(`/proc/${pid}/comm`, 'utf8').trim(),
+      exe: (() => {
+        try {
+          return path.basename(fs.readlinkSync(`/proc/${pid}/exe`));
+        } catch {
+          return null;
+        }
+      })(),
+      tty: Number(fields[4]) !== 0,
+    };
+    const file = path.join(sessions, `${pid}.json`);
+    if (fs.existsSync(file)) {
+      const starttime = statFields(pid)[19];
+      const doc = JSON.parse(fs.readFileSync(file, 'utf8'));
+      entry.claudeSession = {
+        keys: Object.keys(doc).sort(),
+        kind: doc.kind ?? null,
+        entrypoint: doc.entrypoint ?? null,
+        nameSource: doc.nameSource ?? null,
+        nameHasTwoHexSuffix: typeof doc.name === 'string' && /-[0-9a-f]{2}$/.test(doc.name),
+        version: doc.version ?? null,
+        sessionIdIsPayloadSession: payloadSession !== null && doc.sessionId === payloadSession,
+        filePidIsThisPid: doc.pid === pid,
+        procStart: doc.procStart === undefined ? null : String(doc.procStart),
+        statStarttime: starttime,
+      };
+    }
+    chain.push(entry);
+    pid = entry.ppid;
+  }
+  return { pid: process.pid, chain, envNames: Object.keys(process.env).sort() };
 }
 
 function callsOf(runDir) {
@@ -635,7 +647,11 @@ function cmdRedact(cli) {
   const outDir = path.join(FIXTURES, cli);
   // The vectors the tests read are kept across a re-recording.
   const vectorsFile = path.join(outDir, 'vectors.json');
-  const keptVectors = fs.existsSync(vectorsFile) ? readJson(vectorsFile).vectors : [];
+  const previous = fs.existsSync(vectorsFile) ? readJson(vectorsFile) : null;
+  const keptVectors = previous ? previous.vectors : [];
+  // A re-recording keeps naming the recording it replaces, so every version
+  // the adapters contract lists stays traceable to a recording.
+  const replaced = /^recorded (\S+) from (\S+ \S+)/.exec(previous?.source ?? '');
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.mkdirSync(outDir, { recursive: true });
 
@@ -695,6 +711,7 @@ function cmdRedact(cli) {
   const source = [
     `recorded ${run(runs.dump).startedAt.slice(0, 10)} from ${cli} ${version} on this machine by scripts/record-mailbox-hook-fixtures.mjs (redaction rules version ${REDACTION_RULES_VERSION})`,
     ...allDirs.map((d) => `${path.basename(d)} run: \`${run(d).command}\` (exit ${run(d).exit})`),
+    replaced && replaced[2] !== `${cli} ${version}` ? `replaces the recording of ${replaced[1]} from ${replaced[2]}` : '',
     `variables removed from the parent environment: ${REMOVED_VARS.join(', ')}`,
     contextAccepted
       ? `injection at PostToolUse (${meta.contextShape} shape) matched record type ${accepted.PostToolUse.matchedType}; types rejected as raw hook output: ${accepted.PostToolUse.rejectedTypes.join(', ') || 'none'}; model echoed the context canary: ${accepted.PostToolUse.modelEcho}`
@@ -730,8 +747,11 @@ function cmdRedactAgentHead(cli) {
   const outDir = path.join(FIXTURES, cli);
   const vectorsFile = path.join(outDir, 'vectors.json');
   const vectors = readJson(vectorsFile);
+  // vectors.json only refers to the payloads' placeholders (a re-recording
+  // keeps it), so it is left out of the count.
   const committed = fs
     .readdirSync(outDir)
+    .filter((f) => f !== 'vectors.json')
     .map((f) => fs.readFileSync(path.join(outDir, f), 'utf8'))
     .join('\n');
   const highest = Math.max(0, ...[...committed.matchAll(/00000000-0000-4000-8000-(\d{12})/g)].map((m) => Number(m[1])));
@@ -759,25 +779,34 @@ function cmdClean(cli) {
 }
 
 const [command, ...rest] = process.argv.slice(2);
-switch (command) {
-  case 'run':
-    cmdRun(rest[0], rest[1], rest.slice(2));
-    break;
-  case 'hook':
-    cmdHook(rest[0], rest[1], rest[2]);
-    break;
-  case 'check':
-    cmdCheck(rest[0], rest[1]);
-    break;
-  case 'redact':
-    cmdRedact(rest[0]);
-    break;
-  case 'redact-agent-head':
-    cmdRedactAgentHead(rest[0]);
-    break;
-  case 'clean':
-    cmdClean(rest[0]);
-    break;
-  default:
-    die('usage: run <cli> <mode> [--fallback] [--agent-head] [--account <name>] | hook <cli> <event> <runDir> | check <cli> accept | redact <cli> | redact-agent-head <cli> | clean <cli>');
+try {
+  main();
+} catch (error) {
+  if (error instanceof live.LiveCliError) die(error.message, error.code);
+  throw error;
+}
+
+function main() {
+  switch (command) {
+    case 'run':
+      cmdRun(rest[0], rest[1], rest.slice(2));
+      break;
+    case 'hook':
+      cmdHook(rest[0], rest[1], rest[2]);
+      break;
+    case 'check':
+      cmdCheck(rest[0], rest[1]);
+      break;
+    case 'redact':
+      cmdRedact(rest[0]);
+      break;
+    case 'redact-agent-head':
+      cmdRedactAgentHead(rest[0]);
+      break;
+    case 'clean':
+      cmdClean(rest[0]);
+      break;
+    default:
+      die('usage: run <cli> <mode> [--fallback] [--agent-head] [--account <name>] | hook <cli> <event> <runDir> | check <cli> accept | redact <cli> | redact-agent-head <cli> | clean <cli>');
+  }
 }
