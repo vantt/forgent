@@ -98,7 +98,7 @@ Where the time went, per call, from the same traces:
 | **Shim until the host starts** | **30.6 / 41.7 ms** | **33.7 / 45.2 ms** |
 | Host until exit | 21.5 / 28.2 ms | 21.6 / 29.1 ms |
 
-Held-back calls are not slower than steady ones: the pointer line costs nothing measurable. The spread is the shim and the machine's load.
+At p95, calls with held-back mail were no slower than steady ones (58.7 against 68.4 ms; 79.0 against 78.1 ms), so the pointer line adds nothing the p95 shows. Codex's p50 was higher with held-back mail (69.4 against 57.6 ms), inside the spread the shim and the machine's load give.
 
 In T2, Codex's model ran `fgos mailbox inbox --claim` right after the first pointer line ("1 message(s) too large for this channel are waiting; read them with: fgos mailbox inbox --claim"). The message was then `offered`, through the designed path; the harness's "held back" check expected `recorded` and so reads as failed. The pointer line led the model to the claim command on its first appearance.
 
