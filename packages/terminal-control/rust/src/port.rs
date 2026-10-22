@@ -200,8 +200,11 @@ pub enum FindingKind {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Finding {
     pub key: String,
+    /// The pane the finding is about, so a person can find it; `None` when no record names one.
+    pub pane_id: Option<String>,
     pub kind: FindingKind,
     pub detail: String,
 }

@@ -749,9 +749,8 @@ impl<'a> Core<'a> {
 
     // ---- reconcile scan ----------------------------------------------------
 
-    /// Report what needs attention. Closes nothing because time passed, except
-    /// a retained pane past its `until` on the same incarnation with no foreign
-    /// foreground process.
+    /// Report what needs attention, each finding with its pane id. Closes and
+    /// changes nothing: an expired retained pane is reported for a person to close.
     pub fn reconcile_scan(&self, older_than_ms: u64) -> Result<Vec<Finding>, Refusal> {
         let (store, incarnation) = self.open()?;
         let mut findings = Vec::new();
@@ -763,15 +762,15 @@ impl<'a> Core<'a> {
         }
         for key in store.record_keys().map_err(store_err)? {
             let Ok(Some(record)) = store.read_record(&key) else {
-                findings.push(Finding { key, kind: FindingKind::Unknown, detail: "record unreadable; kept".into() });
+                findings.push(Finding { key, pane_id: None, kind: FindingKind::Unknown, detail: "record unreadable; kept".into() });
                 continue;
             };
-            self.scan_record(&store, &incarnation, &record, older_than_ms, &mut findings);
+            self.scan_record(&store, &record, older_than_ms, &mut findings);
         }
         Ok(findings)
     }
 
-    /// The same foreground guard applies to immediate and expired-retention closes.
+    /// One guard for the immediate close and for reporting an expired retained pane as closable.
     /// A foreground entry is owned when it is the pane's shell (herdr's own answer) or the
     /// launched process still running with its recorded pid, start time and boot, read before
     /// and after herdr's answer. An empty list, an unreadable tuple or a mismatch is not owned.
@@ -792,8 +791,10 @@ impl<'a> Core<'a> {
         let Some(old) = Store::existing(&self.config.state_root, self.driver.name(), id) else { return };
         for key in old.record_keys().unwrap_or_default() {
             if !old.has_marker(&key, MarkerKind::Released) {
+                let pane_id = old.read_record(&key).ok().flatten().map(|r| r.pane_id);
                 findings.push(Finding {
                     key,
+                    pane_id,
                     kind: FindingKind::StaleIncarnation,
                     detail: format!("record of server incarnation {id}; invalid for every operation"),
                 });
@@ -801,9 +802,9 @@ impl<'a> Core<'a> {
         }
     }
 
-    fn scan_record(&self, store: &Store, incarnation: &ServerIncarnation, record: &AllocationRecord, older_than_ms: u64, findings: &mut Vec<Finding>) {
+    fn scan_record(&self, store: &Store, record: &AllocationRecord, older_than_ms: u64, findings: &mut Vec<Finding>) {
         let key = &record.key;
-        let note = |kind, detail: &str| Finding { key: key.clone(), kind, detail: detail.to_string() };
+        let note = |kind, detail: &str| Finding { key: key.clone(), pane_id: Some(record.pane_id.clone()), kind, detail: detail.to_string() };
         let released = store.read_marker::<ReleasedMarker>(key, MarkerKind::Released).ok().flatten();
         if released.as_ref().is_some_and(|m| m.disposition == Disposition::Close || m.outcome == ReleaseMarkerOutcome::Unlinked) {
             return;
@@ -815,20 +816,15 @@ impl<'a> Core<'a> {
             Ok(PaneLiveness::Live) => {}
         }
         if let Some(marker) = released {
-            // Retained: closable only past `until`, same incarnation (store is
-            // this incarnation's), and no foreign foreground process.
+            // Retained: reported once past `until`; a person closes the pane.
             let Some(until) = marker.until else { return };
             if self.now() <= until {
                 return;
             }
             if !self.foreground_is_owned(store, record) {
-                return findings.push(note(FindingKind::Unknown, "retain expired but the foreground is not provably the launched process; kept"));
+                return findings.push(note(FindingKind::Unknown, "retain expired but the foreground is not provably the launched process; not closed"));
             }
-            let detail = match self.close_unrecorded(&record.pane_id, incarnation) {
-                Ok(()) => "retain expired; pane closed",
-                Err(_) => "retain expired; close not proven, kept",
-            };
-            return findings.push(note(FindingKind::RetainExpired, detail));
+            return findings.push(note(FindingKind::RetainExpired, &format!("retain expired; close pane {} to release it", record.pane_id)));
         }
 
         if store.has_marker(key, MarkerKind::LaunchRequested) {

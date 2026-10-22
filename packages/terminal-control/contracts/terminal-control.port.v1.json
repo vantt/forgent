@@ -119,6 +119,7 @@
       "findings": [
         {
           "key": "key",
+          "paneId": "string | null; the pane the finding is about, null when no record names one",
           "kind": { "enum": ["allocated-not-launched-bare-shell", "retain-expired", "stale-incarnation", "unknown"] },
           "detail": "string"
         }
