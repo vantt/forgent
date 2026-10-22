@@ -96,6 +96,18 @@ T0 (≈ +150) and T1 together come to ≈ −2 640, which meets the owner's T0+T
   - Every `lock-*`, `identity-*`, `writer-identity-resolvable`, `process-containment` and `git-operation-journal` row passes.
 - **Smoke:** `dispatch decide`, gateway start/status/stop, `lock fence gateway` (free, nothing signalled), `fgos identity` (source `env`), a read-only gemini run, and a writing claude run that committed `5aafa4c98` through ScopedCommit (worktree removed). The commit of this report in the main checkout went through the new pre-commit hook.
 
+### 4b. Found after close (TEST, 2026-10-23 ~04:00), fixed on main the same night
+
+- **`test/state/runtime-coordination.test.mjs`, the same-writer settle tests: 5 of 6 runs red.**
+  - Cause: T1 made claiming spawn-free, so `addWork` and `acquireClaim` now share one millisecond, and the settle drift window (`store.mjs:1158`, `>= acquiredAt`) then counts the item's own `work.add`, stamped by another writer.
+  - The product stays fail-closed: it refuses and never accepts wrongly.
+  - Fix: one `clockTick()` per test (`e870235c1`), as the file's other claim tests already do.
+  - The close verify passed by chance; one green run is not proof for a timing-dependent test.
+- **`test/setup/active-release-drift-check.test.mjs:328`: deterministic.**
+  - Cause: `b3de68d1f` made the checkout reader ask the addon when the state root is unpinned, and the fixture stages a placeholder addon.
+  - Fix: the test pins the state root while it builds (`4003c00a4`), as the host does.
+  - It was likely missed because the test file landed on main after the close branch merged main, or because its fixture was not in the close run. Not confirmed.
+
 ## 5. Behaviour and format changes
 
 - The config key `lock.predecessorKillWaitMs` is gone, and 2000 ms is fixed everywhere. Configs that still carry the key are not rewritten; the key is ignored.

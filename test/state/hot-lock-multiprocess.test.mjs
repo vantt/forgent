@@ -91,8 +91,9 @@ test('cleanup schedule: a second process cannot enter while the first cleaner ho
       fs.writeFileSync(${JSON.stringify(flags('r1-read'))}, 'read');
       while (!fs.existsSync(${JSON.stringify(flags('r1-go'))})) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);
       unlinkRecordIfUnchanged(hotPaths(fgosDir).record, seen.raw);
-      attempt.handle.release();
+      // Marked done while still holding the lock: an entrant that sees no mark got in before the release.
       fs.writeFileSync(${JSON.stringify(flags('r1-done'))}, 'done');
+      attempt.handle.release();
     `, [f.fgosDir]);
     await waitFor(() => fs.existsSync(flags('r1-read')), 'r1 to read the record');
 
