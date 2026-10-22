@@ -2457,15 +2457,19 @@ Other checks:
 
 No product/docs/tests/skills/baseline mutation, fgOS CLI, repository Git write, live `.fgos`/secret access, npm/cargo suite, service or preview server. Only authorized records/reproduction-accounting files change; scratch is `/tmp/fgos-work/handoff-rebuild`. Runner owns commit; Lead owns acceptance/preview and subsequent actual-commit accounting. `needsWrites: []` for this bounded records rebuild; all later product work remains explicitly owned/gated rather than attempted here.
 
-## L12-125 — Suite artifact repairs; stop on out-of-scope positional liveness assertions
+## L12-125 — Suite artifact repairs, content-identity liveness and measured verification blockers
 
-**Authority/status.** Supplied `step-08-suite-fix-brief.md` plus the continuation's explicit permission for `reports/phase-06/working-identity-registry.json`. Input HEAD: `1bd5df87fa3367b03500c5fedf2290b77e159276`. **Partial delivery, blocked, not suite acceptance or closure.** No new owner decision, cutover, main landing or test weakening. The brief requires stopping if another file is needed; `test/scripts/doc-runner-liveness.test.mjs` now needs an authorized update and was not edited.
+**Current authority/status (continuation 2).** Supplied `step-08-suite-fix-brief.md`, previous registry permission, and Lead's explicit addition of `test/scripts/doc-runner-liveness.test.mjs`. Continuation input HEAD: `0962d4e834622445c1cada8436edd633ad6a84e5`. **Partial delivery, blocked on native test infrastructure and final committed-pair replay; not suite acceptance or closure.** The former owning-test scope blocker is resolved. No new owner decision, cutover, main landing, production behavior or weakened assertion. The first-delivery narrative below remains historical where explicitly labelled; current results supersede its pending commands and positional-test blocker.
+
+**Continuation repair.** Replaced the stale numeric heading offsets with the exact content-derived anchors of all **31** originally protected headings (witness: `9f3e197bb`'s owning test and `step9-liveness.json`). All **13** originally complete-record cases retain every consumer-line/symbol, extant-path, record-bound, `retired === false` and `retirementEligible === false` assertion. Each heading must now resolve exactly once; classification remains `current-decision` for every protected case. Complete liveness file: **1/1, exit 0**. No scanner/classifier, source document or evidence record was fabricated to make it green. Impact-analysis remains **degraded/unqueried** under the no-fgOS-CLI/no-GitNexus-MCP boundary; only the owning test callback changed, no product symbol or runtime contract changed.
+
+**First delivery (historical input `1bd5df87fa3367b03500c5fedf2290b77e159276`).** The old scope stop was legitimate then; the continuation explicitly authorizes its repair. Artifact, switchboard, registry and changelog delivery is committed in `0962d4e83`, not regenerated again here.
 
 **Repairs completed.** Reused `scripts/export-command-selectors.mjs` to add the missing `docs-lease` route (79 → 80 selectors). Reused `generateEnvelopeVectors()` from `test/rust-host/generate-vectors.mjs` to rewrite only `test/rust-host/vectors/envelope/version.json`; no other vector or corpus file written. Both generator `--check` modes now exit 0. Changed the local-writer switchboard entryPoint to the Identity document path without its fragment: the classifier routes files, and section 7a scope remains in the existing area name/summary. Complete candidate-status test now passes 11/11. Added the previously owed one-sentence L12-123 Land-race Unreleased note.
 
 **Registry and remaining blocker.** The single-source carry generator correctly refused edited/new `data-dictionary` content (exit 1). Its existing repo-wide carry generator succeeded against HEAD, preserving all **100,044** prior claim ids across active/gap/retired populations. The permitted registry file is rewritten in its existing compact JSON format: 91,734 → 93,220 active units; runner 497 → 517. Native carry records 107 edited-kept, 1,667 added, 124 new gaps and 57 removed-pending-disposition units; these are not semantic approvals or approved retirements. No scanner, ledger approval or source document changed.
 
-After that authentication repair, the unchanged liveness test reaches its next assertion and fails on **section 54**. At registry's former source pin `1b3302680be9ba9559d431cbef4c83cacca91216`, section 54 was decision **0020**; at current HEAD it is **0019's Hệ quả**, and decision 0020 is section **55**. All 31 required old section anchors still exist, but their listed numeric positions have shifted by one; additional headings also exist. Current sections total 176 versus 168 at that former pin. The correct follow-up preserves each protected anchor, complete-record consumer evidence, and non-retirement assertions in the owning test instead of treating arbitrary old ordinal positions as identity. A registry-only edit cannot change the scanner's heading order. **needsWrites: `test/scripts/doc-runner-liveness.test.mjs`**. Do not fabricate a consumer, alter classification logic, remove a case, or change docs to manufacture green.
+Historically, after that authentication repair, the then-unchanged liveness test reached its next assertion and failed on **section 54**. At registry's former source pin `1b3302680be9ba9559d431cbef4c83cacca91216`, section 54 was decision **0020**; at current HEAD it is **0019's Hệ quả**, and decision 0020 is section **55**. All 31 required old section anchors still exist, but their listed numeric positions have shifted by one; additional headings also exist. Current sections total 176 versus 168 at that former pin. The correct follow-up preserves each protected anchor, complete-record consumer evidence, and non-retirement assertions in the owning test instead of treating arbitrary old ordinal positions as identity. A registry-only edit cannot change the scanner's heading order. That former `needsWrites` is now authorized and repaired as recorded above. No consumer, classification logic, case or source document was altered to manufacture green.
 
 ### Attribution of the Lead's 18 branch-only failure titles
 
@@ -2473,23 +2477,23 @@ The Lead's isolated-clone runs are supplied evidence, not rerun here: branch **9
 
 | Class / branch-only titles | Count | Actual local proof / remaining duty |
 |---|---:|---|
-| A: COMMAND_REGISTRY coverage; routes clean `--check` | 2 | Fixed; complete command-routes file 14/14, exit 0 |
-| A: envelope byte regeneration; `checkVectors()` clean; vector CLI `--check` | 3 | Fixed; complete envelope-contract file 21/21, exit 0 |
-| A: host help manifest equality; release-tree R4 doctor posture | 2 | Not certified fixed. Help file stops in before-hook: missing `target/release/libfgos_node_addon.so` (0/5, exit 1). Release-tree not run before scope stop |
-| A: round5 and sync4d ownership recipes | 2 | Reproduced: 6/8 overall, exit 1; both checks enumerate the same 22 real unaccounted HEAD-ancestor report pairs. B/H/I pass. Historical lease/verifier code pairs already have exact exceptions, as did `scripts/check-evidence-relocation.mjs`; historicalOffenders alone is diagnostic, not A's failing predicate. No checker/baseline change or broad code allowlist |
-| A: real switchboard entry points | 1 | Fixed; complete candidate-status file 11/11, exit 0 |
-| A: runner decision liveness | 1 | Registry prerequisite fixed; stale positional assertion remains red, exit 1; out-of-scope owning test required |
-| B: direct audit rejects symlink output | 1 | Passes locally in full reproduction file, no code change |
-| B: run-case lease admission; holder Workflow writing unit | 2 | Lead clone-location hypothesis remains **unverified**; not run before stop |
-| C: eight-process worktrees; unfinished ledger line; Rust lock after Node death | 3 | Lead load-flake hypothesis remains **unverified**; isolated reruns not reached before stop |
+| A: COMMAND_REGISTRY coverage; routes clean `--check` | 2 | Fixed in `0962d4e83`; complete command-routes rerun 14/14, exit 0; generator check exit 0 |
+| A: envelope byte regeneration; `checkVectors()` clean; vector CLI `--check` | 3 | Fixed in `0962d4e83`; complete envelope-contract rerun 21/21, exit 0; generator check exit 0 |
+| A: host help manifest equality; release-tree R4 doctor posture | 2 | Both complete files run, exit 1: help 0/5 and release-tree 0/4. Both stop in shared before-hook on missing `target/release/libfgos_node_addon.so`, before behavioral assertions. Drift fix is not thereby certified end-to-end |
+| A: round5 and sync4d ownership recipes | 2 | Before accounting: 6/8, exit 1, same **27** real missing commit/path pairs in each recipe (previous 22 plus five from `0962d4e83`). Exact known pairs appended to both embedded exception arrays last; no historical baseline, allowlist or predicate change. Final working-tree recipes remain red on this author's out-of-allowlist report writes until runner commit + separate L12-11 accounting. See final replay below |
+| A: real switchboard entry points | 1 | Fixed in `0962d4e83`; complete candidate-status rerun 11/11, exit 0 |
+| A: runner decision liveness | 1 | Fixed here by heading identity; complete owning file 1/1, exit 0, all protected cases retained |
+| B: direct audit rejects symlink output | 1 | Passes locally in complete reproduction file; no code change |
+| B: run-case lease admission; holder Workflow writing unit | 2 | **Unverified, not executed**: both files call `ensureScriptAddon()` at module startup; the read-only addon preflight fails `git-addon-not-shipped`. Its automatic fallback builds/stages `.fgos/runtime/git-addon`, explicitly forbidden in this Unit. No clone-location conclusion, skip switch or bootstrap attempted |
+| C: eight-process worktrees; unfinished ledger line; Rust lock after Node death | 3 | Each complete file rerun once, serially: worktree 0/7, ledger 1/8, observe 0/2; all exit 1. Worktree/observe fail addon-not-shipped/lock-driver-unavailable before racing; ledger fails read-only `/var/tmp` fixture creation. These are **infrastructure-blocked reruns**, not evidence that the Lead failures were flakes or new product regressions |
 | D: dead-vocabulary guard | 1 | Lead-authorized GAP-05 red retained; not rerun |
-| **Total** | **18** | **A=11, B=3, C=3, D=1; not a claim all 18 are resolved** |
+| **Total** | **18** | **A=11, B=3, C=3, D=1; B/C labels remain Lead hypotheses where unproved. No whole-suite green claim** |
 
 No separate committed help-manifest artifact was identified: `help-routes.test.mjs` compares the live Node command manifest with a scratch staged release built by `buildRustDistribution`; the route descriptor is `packages/host-runtime/contracts/command-routes.json`. Missing compiled build inputs prevented reaching that comparison. Do not invent or hand-edit a help golden.
 
 ### Commands and exit codes
 
-Only `releasePath` was read from the specifically authorized activation file, selecting `/home/vantt/.local/state/fgos/releases/sha256:2ce473d4e0e9cda5131a660559399719a7b2318b490b11766321047c57f7b326`. Every Node command below used `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN="$RELEASE/bin/fgos"`, from this linked worktree. Tests were single complete files, never filtered. Command argv, durations and complete logs are under `/tmp/fgos-work/suite-fix-evidence/commands.jsonl` and adjacent label `.log` files (scratch, not durable committed evidence).
+Only `releasePath` was read from the specifically authorized activation file, selecting `/home/vantt/.local/state/fgos/releases/sha256:2ce473d4e0e9cda5131a660559399719a7b2318b490b11766321047c57f7b326`. Every Node command below used `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN="$RELEASE/bin/fgos"`, from this linked worktree. Tests were single complete files, never filtered. First-delivery argv/durations/logs were under `/tmp/fgos-work/suite-fix-evidence/commands.jsonl` (not available in this continuation). Continuation argv/durations/logs are under `/tmp/fgos-work/suite-fix-continuation/commands.jsonl` and adjacent label `.log` files; temporary files are not durable proof. Continuation additionally set `TMPDIR=/tmp/fgos-work`, the approved scratch root; it did not add a skip, override native-door ownership or bootstrap a repository addon.
 
 | Command (after the environment prefix) | Before → after exit | Counts / note |
 |---|---|---|
@@ -2509,4 +2513,34 @@ Only `releasePath` was read from the specifically authorized activation file, se
 
 Prior-art inspection used the existing generator/carry functions and historical exception arrays (including evidence-verifier and lease exact pairs); no replacement mechanism was designed. Impact-analysis **degraded/unqueried** under no-fgOS-CLI/no-GitNexus-MCP boundary; no product symbol edited. No fgOS CLI, npm/cargo suite, repository Git write, manual `.fgos` mutation, secret read, service or preview invocation. Markdown preview stays with Lead.
 
-**Pair accounting last / handoff.** Stopped before the remaining accounting step because of the explicit scope rule. Neither reproduction exceptions nor the allowlist was edited; their 22 actual missing pairs remain owed, as do exact admission of this authorized artifact/CHANGELOG working slice and the future runner commit's separate L12-11 accounting. No future id guessed, no clean committed-byte acceptance claimed. Lead must extend the owning-test scope, finish the approved A/B/C checks/accounting, and replay on the actual clean author/accounting pair. Phase 8 stays open.
+### Continuation commands and final accounting boundary
+
+Every command below uses the same authorized environment prefix above, plus `TMPDIR=/tmp/fgos-work`. Commands are from this worktree, not a clone. No npm/cargo full suite, fgOS CLI, Git write, native staging, secret or live `.fgos` mutation was performed. Preview remains Lead custody.
+
+| Command after prefix | Exit | Actual result |
+|---|---:|---|
+| `node scripts/export-command-selectors.mjs --check` | 0 | No route drift |
+| `node test/rust-host/generate-vectors.mjs --check` | 0 | No vector drift |
+| `node --test test/rust-host/command-routes.test.mjs` | 0 | 14/14 |
+| `node --test test/rust-host/envelope-contract.test.mjs` | 0 | 21/21 |
+| `node --test test/scripts/check-doc-candidate-status.test.mjs` | 0 | 11/11 |
+| `node --test test/scripts/doc-runner-liveness.test.mjs` | 0 | 1/1; former positional regression repaired |
+| `node --test test/rust-host/help-routes.test.mjs` | 1 | 0/5; missing compiled addon before-hook |
+| `node --test test/rust-host/release-tree.test.mjs` | 1 | 0/4; same before-hook, including R4 |
+| `node --test test/scripts/doc-rationale-reproduction.test.mjs` before accounting | 1 | 6/8; 27 missing real pairs in each recipe, symlink cases pass |
+| `node --test test/scripts/check-doc-constitution.test.mjs` | 0 | 64/64 |
+| `node --test test/scripts/check-legacy-docs-ratchet.test.mjs` | 0 | 28/28; no baseline changed |
+| `node --test test/scripts/check-decision-citation-drift.test.mjs` | 0 | 31/31 |
+| `node --test test/runner/worktree-admin-multiprocess.test.mjs` | 1 | 0/7; addon not shipped, no contention result |
+| `node --test test/workflow/workflow-store-ledger.test.mjs` | 1 | 1/8; `/var/tmp` read-only before behavioral fixture; no recovery result |
+| `node --test test/rust-host/observe-store-lock.test.mjs` | 1 | 0/2; holder cannot load lock driver, no timing result |
+| `node --input-type=module -e "import {loadNativeAddon} from './src/git/native.mjs'; loadNativeAddon();"` | 1 | Read-only B prerequisite diagnostic: `git-addon-not-shipped`; did not invoke staging fallback |
+| `node --test test/scripts/doc-runner-liveness.test.mjs` final rerun | 0 | 1/1; all 31 original anchors and the same 13 evidence cases independently compared with historical scan |
+| `node --test test/scripts/doc-rationale-reproduction.test.mjs` after accounting | 1 | 6/8; no historical pair missing; only two current author report writes fail A |
+| `node /tmp/fgos-work/suite-fix-continuation/step10-round5-reproduction/{ownership.mjs,audit-ownership.mjs,checks.mjs} --output-dir /tmp/fgos-work/suite-fix-continuation/step10-round5-reproduction` (three separate commands) | 0 / 0 / 1 | Exact unchanged embedded scripts; A has 4,179 accounted pairs, zero unaccounted; B=true, H=0 findings, I.equalToHEAD=true and I.frozenBaselineUnchanged=true |
+| Same three separate commands under `step10-sync4d-reproduction/`, same output directory | 0 / 0 / 1 | Identical final A/B/H/I outcome; neither historicalEqual=false nor I.equal=false is a failing predicate |
+| `git diff --check` | 0 | Working changes have no whitespace errors |
+
+**Pair accounting last / current handoff.** After the author records, appended only the **27 actual HEAD-ancestor pairs** to both manifests' existing `const exceptions` arrays: **18** from `4c0bd9adf6adfba20bcf40fb47ddbbc982e79f5a` (L12-124), **four** from `1bd5df87fa3367b03500c5fedf2290b77e159276` (suite brief/logs), **five** from `0962d4e834622445c1cada8436edd633ad6a84e5` (L12-125). Existing historical lease/verifier code pairs were already accounted. Exact path lists are the appended data, not a blanket code/report exemption. L12-11 forbids guessing this runner's future id or widening `allowed-paths.json` to green a working snapshot.
+
+**Final replay (executed):** complete reproduction file **6/8, exit 1**; both extracted recipes' ownership/audit/check commands **0/0/1**. Each check reports **4,179 accounted pairs / zero unaccounted**, B green, H zero findings and both effective I predicates true. A rejects exactly two working paths: `reports/phase-08/owner-answers.md` and `reports/phase-08/step-08-phase-08-scorecard.md` (under this plan). Data-only verification proved both exception arrays have the identical 27 appended pairs and every other manifest field/script byte is unchanged. Such red is **not** clean committed-byte acceptance. Lead must separately account this actual runner commit and replay both recipes on clean committed bytes, then resolve native-build/fixture prerequisites and run both B admission files plus real C contention/recovery checks. Help's comparison has no separate help golden to regenerate. No additional product-code edit is requested. Infrastructure paths `target/release/libfgos_node_addon.so` and `.fgos/runtime/git-addon` are outside this Unit's write permission and were not created. Phase 8 stays open; no B/C hypothesis or allowed D red excuses these missing proofs.

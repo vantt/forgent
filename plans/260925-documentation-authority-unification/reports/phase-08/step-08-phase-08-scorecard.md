@@ -88,23 +88,24 @@ The authority is **L12-124**, not a new Doer deferral. `step-07-readiness.json:p
 
 ### Lead suite and closure proof — measured red; suite-fix follow-up blocked
 
-Lead's two isolated-clone results below are supplied by `step-08-suite-fix-brief.md`, not rerun by the Doer. **L12-125** in [owner answers](owner-answers.md) records the local complete-file checks at input HEAD `1bd5df87fa3367b03500c5fedf2290b77e159276` plus the uncommitted artifact/record fixes. No full suite, cargo suite or clean committed-byte acceptance is claimed for those changed bytes.
+Lead's two isolated-clone results below are supplied by `step-08-suite-fix-brief.md`, not rerun by the Doer. **L12-125** in [owner answers](owner-answers.md) now includes continuation-2 complete-file checks at input HEAD `0962d4e834622445c1cada8436edd633ad6a84e5` plus the heading-identity test/record/accounting working slice. Artifact/registry/switchboard/changelog fixes are already in that input commit. No full suite, cargo suite or clean committed-byte acceptance is claimed for these changed bytes.
 
 | Command/proof | Tree / exit / failures | Ownership and attribution |
 |---|---|---|
-| `env -u CLAUDE_CODE_SESSION_ID npm test` — isolated branch | **9f49695c7 / 1 / 406 failures of 9,317 tests** (Lead-supplied) | 18 unique branch-only titles: A=11 branch-caused, B=3 proposed clone artifacts, C=3 proposed flakes, D=1 authorized GAP-05 red. Full per-title grouping/proof/limits in L12-125; B/C hypotheses are not all verified |
+| `env -u CLAUDE_CODE_SESSION_ID npm test` — isolated branch | **9f49695c7 / 1 / 406 failures of 9,317 tests** (Lead-supplied) | 18 unique branch-only titles: A=11 branch-caused, B=3 proposed clone artifacts, C=3 proposed flakes, D=1 authorized GAP-05 red. L12-125 records 7/11 A titles verified fixed, two native-before-hook blockers and two pending clean-pair recipe acceptances. Only one B case verified; native-blocked C reruns do not establish flakiness |
 | Same isolated main baseline | **9c7edde30 / 1 / 392 failures of 8,668 tests** (Lead-supplied) | Exact failure lists in `suite-logs/`; 18 title differences are not the arithmetic count delta of 14. Raw Lead logs unavailable in this sandbox. No current-tree full-suite green inferred |
 | `cargo test --workspace` when required by Lead proof frame | **not run** | Still owed if required; no historical result substituted |
-| Both embedded ownership/audit/check recipes and `test/scripts/doc-rationale-reproduction.test.mjs` after actual-pair accounting | **Local before: exit 1, 6/8; clean committed pair pending** | Symlink-output case passes. Both recipes expose 22 identical real missing report pairs; historical lease code pairs already have exact exceptions. Scope stop precedes accounting; no check/baseline changed, no future commit pre-accounted |
-| Full `check-doc-candidate-status.test.mjs` and `check-doc-constitution.test.mjs` | **Candidate: exit 0, 11/11 after entryPoint fix; constitution not run** | Both complete files still owed on final committed bytes. Candidate was 10/11 before, no test edits |
-| Command-route and envelope generators / owning files | **Both --check exit 0; command-routes 14/14 and envelope-contract 21/21, exit 0** | Reused existing generators, only command-routes.json and envelope/version.json rewritten; missing docs-lease fixed |
-| Full help-routes and release-tree proofs | **Help: exit 1, 0/5 before-hook; release-tree not run** | Missing compiled `target/release/libfgos_node_addon.so` prevented host-help comparison. No separate committed help-manifest golden identified; comparison uses the live registry and scratch staged release |
-| Runner liveness owning proof | **exit 1 after registry refresh; blocked on owning-test scope** | Existing generator preserves all old claim ids and refreshes current source population; section 54 now names a different heading, original protected decision 0020 moved to 55. Needs authorized `test/scripts/doc-runner-liveness.test.mjs` correction preserving all protected anchors/evidence/non-retirement cases; not a registry-only repair |
-| B admission checks / C three isolated flake reruns | **not reached before mandatory scope stop** | No environment/flake hypothesis declared proven without a run |
-| Full `check-legacy-docs-ratchet.test.mjs` and `check-decision-citation-drift.test.mjs` | **pending** | Explicitly named from C stop table; no baseline/allowlist/check weakening |
+| Both embedded ownership/audit/check recipes and `test/scripts/doc-rationale-reproduction.test.mjs` after actual-pair accounting | **Final: exit 1, 6/8; both recipes 0/0/1; clean committed pair still pending** | 27 actual historical pairs (18 rebuild + four brief/log + five prior repair) appended last through existing exception data only: both checks now show **4,179 accounted / zero unaccounted**, B green, H zero findings, both effective I predicates true. Only two current author report writes fail A; no allowlist/check/baseline/future-id waiver. Runner commit + separate L12-11 accounting/replay remains owed; symlink cases pass |
+| Full `check-doc-candidate-status.test.mjs` and `check-doc-constitution.test.mjs` | **Exit 0: 11/11 and 64/64** | Complete files rerun in this worktree; final clean committed-byte replay remains separate |
+| Command-route and envelope generators / owning files | **Both --check exit 0; command-routes 14/14 and envelope-contract 21/21, exit 0** | Existing-generator repairs from `0962d4e83` rechecked; no additional artifact edits |
+| Full help-routes and release-tree proofs | **Both exit 1: help 0/5; release-tree 0/4** | Missing compiled `target/release/libfgos_node_addon.so` stops both shared before-hooks, including R4, before behavior. No separate committed help golden: live registry vs scratch staged release. Native infrastructure is not fixed through a test bypass |
+| Runner liveness owning proof | **Exit 0, 1/1** | Lead-authorized owning-test repair locates all 31 original content-derived anchors uniquely; all 13 complete-record consumer/path/bounds/non-retirement cases retained. Former test-scope blocker resolved, no scanner/classifier/doc change |
+| B admission checks | **Symlink case passes; two admission files unexecuted/infrastructure-blocked** | Read-only native preflight exits 1 (`git-addon-not-shipped`). Their automatic module bootstrap would stage forbidden `.fgos/runtime/git-addon`; not attempted. Clone-location hypothesis remains unverified |
+| C three isolated reruns | **Each run once alone, all exit 1: worktree 0/7, ledger 1/8, observe 0/2** | Worktree/observe cannot load addon/lock driver; ledger cannot create `/var/tmp` fixture under confinement. These are prerequisite failures, not timing/recovery proof or confirmation of flakiness |
+| Full `check-legacy-docs-ratchet.test.mjs` and `check-decision-citation-drift.test.mjs` | **Exit 0: 28/28 and 31/31** | Complete files rerun; no baseline/allowlist/check weakening |
 | Fresh independent rebuilt-handoff closure review | **pending** | Lead starts one A38 review of final source pin, matrix, all gates, scorecard and actual-pair evidence |
 
-Any unexplained red other than the narrowly allowed GAP-05 stops close. L12-14/L12-124 waive neither frozen B nor reproduction checks. **L12-125 is blocked partial repair, not suite acceptance**: the exact remaining write is outside this Unit's test scope; Lead owns scope extension, remaining checks, last actual-pair accounting and clean committed-byte replay. Later cutover authorization remains a separate owner decision.
+Any unexplained red other than the narrowly allowed GAP-05 stops close. L12-14/L12-124 waive neither frozen B nor reproduction checks. **L12-125 is blocked partial repair, not suite acceptance**: the owning-test scope issue is resolved, but native-build/fixture prerequisites, two B admission runs, actual C behavior and clean committed-pair reproduction remain owed. Lead owns infrastructure provisioning without changing source behavior, the separate actual runner-pair accounting/replay, and remaining suite/closure proof. No future commit was pre-accounted; later cutover authorization remains a separate owner decision.
 
 ### Step 7 r3 Low observations — historical, not new acceptance
 
@@ -164,7 +165,7 @@ Historical worktree-registration snapshot from L12-122 (not a fresh current regi
 
 Main and this active plan worktree are **not retired**. Other registered Claude/runtime worktrees have no track-specific retirement evidence in this package and are not declared safe to remove; Lead owns any separate inventory/custody decision. Disposable lease rehearsal clone/worktrees were already removed (L12-114), not pending cleanup.
 
-## Owner and Lead decision index — L12-1 through L12-124
+## Owner and Lead decision index — L12-1 through L12-125
 
 One line per existing decision, grouped by work. These are pointers/summaries, not new decisions. Exact authority, reasons, dates, witnesses and supersession scope live in **`owner-answers.md`, heading of the same id**; owner decisions A49/A50/A51 and the accepted lease design remain separately inherited. Doer delivery entries are not re-labelled owner approvals.
 
@@ -308,11 +309,12 @@ One line per existing decision, grouped by work. These are pointers/summaries, n
 - **L12-121** — Remove role exemption, all-preserve premise proof, ten named patches/nine parks plus 37 further overturns; final 214 parks/226 specs.
 
 
-### Closing record updates (122–124)
+### Closing record updates (122–125)
 
 - **L12-122** — Initial scorecard delivery; closure A/C subsequently return rework. Its counts are historical, not current carriage.
 - **L12-123** — Both Land doors recheck lease admission through publication; code/race proof on plan branch only.
 - **L12-124** — Lead-under-A42 records ruling: rebuild from final records, trace behavioral additions now, move unfinished composition/review to explicit owned Phase 9 PRE-FLIP gates. This rebuilt package does not grant closure/cutover acceptance.
+- **L12-125** — Branch suite repair/attribution: artifacts and switchboard fixed, heading-identity liveness green without lost cases, 27 actual historical pairs admitted through existing exception data; native/fixture and clean committed-pair proofs remain blocked, not suite acceptance.
 
 ## Next concrete action
 
