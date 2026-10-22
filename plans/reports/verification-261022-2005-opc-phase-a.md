@@ -27,6 +27,8 @@ Also found and fixed while proving: the `linux-pgroup` `ESRCH` flake (driver), a
 
 ## Open items (owner)
 
+**Owner answers, 2026-10-22 22:45 ("1,2 theo khuyến nghị"):** item 1 (a), AC1 accepted on the harness measurement and the code; item 2 (b), the order trace is accepted for Phase A, and the device E1 runs at the next change to Git durability.
+
 1. **AC1 proof.** Options: (a) accept AC1 on the harness measurement plus the code (no fixed sleep remains), cost 0; (b) build a product A/B (base addon vs tip addon, same harness), about 1 h of a Sonnet agent plus a quiet window. Recommendation: (a), because the mechanism is measured and the end-to-end effect (≈ 1–4 % of an operation) is below what this host can resolve anyway.
 2. **E1 power-cut run.** Needs root: `sudo env "PATH=$PATH" scripts/git/e1-power-cut.sh --work /var/tmp/fgos-e1 --replay-log <replay-log> --user vantt` with xfstests' `replay-log` installed. Phase A changed no fsync or WAL path (only spawn waiting and test files), so the risk to E1 is low. Options: (a) owner runs it (`! sudo …` in this session) or on the owner machine at the next landing; (b) accept the order trace for Phase A. Recommendation: (b) for Phase A, and run the device E1 at the next Git-durability change.
 
