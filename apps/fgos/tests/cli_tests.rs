@@ -1343,6 +1343,50 @@ fn identity_session_prints_a_stable_handle_per_session_and_refuses_an_unresolved
     let _ = fs::remove_dir_all(&state);
 }
 
+/// The directory verbs over a scratch state root: the wiring (route, the
+/// operation per flag, exit codes, that only the explicit flags write). The
+/// registration, liveness and contention rules are owned by the identity
+/// crate's directory tests.
+#[test]
+fn identity_directory_registers_only_on_request_and_resolves_by_handle_and_role() {
+    let state = std::env::temp_dir().join(format!("fgos_test_identity_directory_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&state);
+    fs::create_dir_all(&state).unwrap();
+    fs::write(state.join("machine-id"), "fg-server-abc234\n").unwrap();
+    let run = |id: &str, args: &[&str]| {
+        identity_command(args)
+            .env("FGOS_STATE_ROOT", &state)
+            .env("FGOS_SESSION_ID", id)
+            .current_dir(&state)
+            .output()
+            .unwrap()
+    };
+    let handle_of = |id: &str| identity_data(&run(id, &["session", "--json"]))["handle"].as_str().unwrap().to_owned();
+    let (a, b) = (handle_of("alpha"), handle_of("beta"));
+    identity_data(&run("alpha", &["--json"]));
+    assert!(!state.join("identity").exists(), "a plain read and the bare verb never register");
+
+    let registered = identity_data(&run("alpha", &["session", "--role", "lead:MAIL", "--json"]));
+    assert_eq!(registered["handle"], a.as_str());
+    assert_eq!(registered["roles"], serde_json::json!(["lead:MAIL"]));
+    identity_data(&run("beta", &["session", "--register", "--json"]));
+
+    assert_eq!(identity_data(&run("beta", &["resolve", &a, "--json"]))["id"], "fg-server-abc234/alpha");
+    assert_eq!(identity_data(&run("alpha", &["resolve", "lead:MAIL", "--json"]))["handle"], a.as_str());
+    assert_eq!(identity_data(&run("beta", &["list", "--json"]))["sessions"].as_array().unwrap().len(), 2);
+
+    let held = run("beta", &["session", "--role", "lead:MAIL"]);
+    assert_eq!(held.status.code(), Some(65));
+    assert!(String::from_utf8_lossy(&held.stderr).contains("[role-held]"));
+    identity_data(&run("beta", &["session", "--role", "lead:MAIL", "--take", "--json"]));
+    assert_eq!(identity_data(&run("alpha", &["resolve", "lead:MAIL", "--json"]))["handle"], b.as_str());
+
+    let missing = run("alpha", &["resolve", "claude-zzzz@fg-server"]);
+    assert_eq!(missing.status.code(), Some(65));
+    assert!(String::from_utf8_lossy(&missing.stderr).contains("[not-found]"));
+    let _ = fs::remove_dir_all(&state);
+}
+
 /// `fgos identity machine` over a scratch state root: the wiring of the verb
 /// (route, operation per flag, exit code of a refusal). The id, handle and
 /// alias rules are owned by the identity crate's own tests.
