@@ -114,7 +114,8 @@ test('the mailbox selector is native with send and inbox and its flags', () => {
   assert.equal(routes.mailbox.subcommands, true);
   assert.deepEqual(routes.mailbox.subcommand_flags, {
     inbox: ['claim', 'dir', 'help', 'json'],
-    send: ['body', 'dir', 'help', 'json', 'reply-to', 'to', 'wake'],
+    // The body is positional, never a flag the host's gate lets through.
+    send: ['dir', 'help', 'json', 'reply-to', 'to', 'wake'],
   });
 });
 
