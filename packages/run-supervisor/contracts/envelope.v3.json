@@ -77,7 +77,7 @@
       "idleMs": "integer >= 1 or null; the supervisor stops the agent after this long without activity (agent-protocol activity source)",
       "hardCeiling": { "bootId": "string", "boottimeNs": "integer, absolute CLOCK_BOOTTIME nanoseconds" },
       "gateKillGraceMs": "integer >= 0, SIGTERM -> SIGKILL grace used by the gate and by kill_all; source config dispatch.gateKillGraceMs (default 10000)",
-      "killWaitMs": "integer >= 1, optional; the bound kill_all waits for the domain to be provably empty (config lock.predecessorKillWaitMs); absent means 5000",
+      "killWaitMs": "integer >= 1, optional; the bound kill_all waits for the domain to be provably empty (the holder lock's fixed 2000 ms kill wait unless the caller passes another); absent means 5000",
       "rule": "deadlines are absolute; a later start, an adopt or a resume never extends them. A bootId that differs from the current boot means every process of the attempt is already dead"
     },
     "agentProtocol": {

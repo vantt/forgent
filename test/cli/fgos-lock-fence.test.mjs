@@ -38,6 +38,27 @@ function runAsync(cwd, args) {
   });
 }
 
+test('lock-status --lock reports and probes only the named locks', async () => {
+  const cwd = initGitCwdFast();
+  const fgosDir = path.join(cwd, '.fgos');
+  const holder = await holdLockInChild('main-checkout', { fgosDir });
+  try {
+    const named = run(cwd, ['lock-status', '--lock', 'main-checkout']);
+    assert.equal(named.status, 0, named.stderr);
+    const data = envelopeData(named.stdout);
+    assert.deepEqual(data.locks.map((row) => row.name), ['main-checkout']);
+    assert.deepEqual(data.mainCheckout, { ...data.mainCheckout, outcome: 'held', holders: [holder.child.pid] });
+    const two = envelopeData(run(cwd, ['lock-status', '--lock', 'main-checkout', '--lock', 'runner']).stdout);
+    assert.deepEqual(two.locks.map((row) => row.name).sort(), ['main-checkout', 'runner']);
+    // Without the flag every reported row is listed; naming nothing known lists none and reports the main checkout unknown.
+    assert.ok(lockStatus(cwd).locks.length > 2);
+    const none = envelopeData(run(cwd, ['lock-status', '--lock', 'no-such-lock']).stdout);
+    assert.deepEqual([none.locks, none.mainCheckout.outcome], [[], 'unknown']);
+  } finally {
+    holder.child.kill('SIGKILL');
+  }
+});
+
 test('lock fence main-checkout: lists the holder pid, refuses without --yes, and --yes ends the holder and frees the lock', async () => {
   const cwd = initGitCwdFast();
   const fgosDir = path.join(cwd, '.fgos');

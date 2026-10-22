@@ -1,7 +1,8 @@
-// No driver, no lock: with no host binary every acquire/probe fails with the
+// No driver, no lock: without the addon every acquire/probe fails with the
 // named `lock-driver-unavailable` and opens nothing; on a network filesystem
 // the driver's guarantee is `none` and the same error names the filesystem.
-// Neither branch falls back to a lock implemented in Node.
+// Neither branch falls back to a lock implemented in Node. The lock door is
+// taken once, by the facade, and by nothing else.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -17,9 +18,9 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const FACADE_URL = pathToFileURL(path.join(root, 'src', 'holder-lock', 'index.mjs')).href;
 const ADAPTERS_URL = pathToFileURL(path.join(root, 'src', 'runner', 'dispatch', 'adapters.mjs')).href;
 const { bin: HOST_BIN } = resolveActiveHostBin({ fgosDir: path.join(root, '.fgos') });
-const NEEDS_HOST = HOST_BIN ? false : 'no fgos host binary: set FGOS_HOST_BIN to a host built with the internal lock-fd route';
+const NEEDS_HOST = HOST_BIN ? false : 'no fgos host binary: set FGOS_HOST_BIN to a host whose release carries the addon';
 
-test('with no host binary every door fails by name and nothing is created', () => {
+test('without the addon every facade door fails lock-driver-unavailable and creates nothing', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'holder-lock-no-driver-'));
   const fgosDir = path.join(dir, '.fgos');
   try {
@@ -42,16 +43,17 @@ try {
 out.locksDirExists = fs.existsSync(fgosDir + '/locks');
 process.stdout.write(JSON.stringify(out));
 `);
-    const { FGOS_HOST_BIN: _unset, FGOS_STATE_ROOT: _noPin, ...env } = process.env;
+    // No activation and no release manifest: the door cannot find an addon, so it throws git-addon-not-shipped.
+    const { FGOS_HOST_BIN: _unset, FGOS_STATE_ROOT: _noPin, FGOS_ACTIVE_MANIFEST_PATH: _manifest, FGOS_ACTIVE_RELEASE_PATH: _release, ...env } = process.env;
     const res = spawnSync(process.execPath, [script], { cwd: dir, env: { ...env, FGOS_DIR: fgosDir }, encoding: 'utf8', timeout: 20_000 });
     assert.equal(res.status, 0, res.stderr);
     const out = JSON.parse(res.stdout);
     for (const door of ['acquireSync', 'acquire', 'probe', 'stateRoot']) {
       assert.equal(out[door].code, 'lock-driver-unavailable', `${door}: ${JSON.stringify(out[door])}`);
-      assert.equal(out[door].reason, 'no-host-binary', door);
+      // The state root still asks the host (it moves to the door with the resolver); every lock operation asks the addon.
+      assert.equal(out[door].reason, door === 'stateRoot' ? 'no-host-binary' : 'addon-not-shipped', door);
       assert.equal(out[door].name, 'HolderLockError', door);
     }
-    assert.ok(out.acquireSync.tried >= 1, 'the error lists where the binary was looked for');
     assert.equal(out.locksDirExists, false, 'no lock directory is created when there is no driver');
     assert.deepEqual(out.workerEnv, { PATH: '/usr/bin' }, 'a worker spawn still works with no host: no pin, and never the inherited root');
   } finally {
@@ -105,33 +107,32 @@ test('a lock directory on a network filesystem is refused by name (guarantee non
   }
 });
 
-test('a host that speaks another route protocol is refused by name, and a protocol-1 answer is never trusted', { skip: process.platform === 'win32' }, () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'holder-lock-protocol-'));
-  try {
-    const script = path.join(dir, 'protocol.mjs');
-    fs.writeFileSync(script, `
+test('no module but the facade can take the lock door', { skip: NEEDS_HOST }, () => {
+  // The facade takes the capability on its first use; a second take, by anything else in the process, is refused by name.
+  const script = `
 import * as lock from ${JSON.stringify(FACADE_URL)};
-const scope = lock.createLockScope('protocol');
-try { lock.acquireSync(scope, 'main-checkout', { fgosDir: process.env.FGOS_DIR }); process.stdout.write(JSON.stringify({ outcome: 'returned' })); }
-catch (err) { process.stdout.write(JSON.stringify({ code: err.code, reason: err.reason, message: err.message })); }
-`);
-    const run = (hostBody) => {
-      const host = path.join(dir, 'fake-host');
-      fs.writeFileSync(host, `#!/bin/sh\n${hostBody}\n`, { mode: 0o755 });
-      const { FGOS_STATE_ROOT: _noPin, ...env } = process.env;
-      const res = spawnSync(process.execPath, [script], { cwd: dir, env: { ...env, FGOS_HOST_BIN: host, FGOS_DIR: path.join(dir, '.fgos') }, encoding: 'utf8', timeout: 20_000 });
-      assert.equal(res.status, 0, res.stderr);
-      return JSON.parse(res.stdout);
-    };
-    // A host of the first release refuses the protocol this facade sends (2).
-    const refused = run(`case "$*" in *"--protocol 2"*) echo "fgos internal: host-version-mismatch: this host speaks internal protocol 1" >&2; exit 3;; esac; exit 70`);
-    assert.equal(refused.code, 'lock-driver-unavailable');
-    assert.equal(refused.reason, 'host-version-mismatch');
-    // An answer stamped with protocol 1 is rejected as bad output, never read as a lock result.
-    const stale = run(`echo '{"v":1,"protocol":1,"result":"acquired"}'`);
-    assert.equal(stale.code, 'lock-route-bad-output');
-    assert.match(stale.message, /protocol 1, expected 2/);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
+import { nativeDoor } from ${JSON.stringify(pathToFileURL(path.join(root, 'src', 'native', 'door.mjs')).href)};
+import fs from 'node:fs';
+const dir = fs.mkdtempSync(process.env.TMPDIR_ROOT + '/door-');
+const out = { facade: lock.probe('main-checkout', { fgosDir: dir + '/.fgos' }).result };
+try { nativeDoor().holderLock.take(); out.second = 'taken'; } catch (err) { out.second = err.message; }
+fs.rmSync(dir, { recursive: true, force: true });
+process.stdout.write(JSON.stringify(out));
+`;
+  const res = spawnSync(process.execPath, ['--input-type=module', '-e', script], { env: { ...process.env, TMPDIR_ROOT: os.tmpdir() }, encoding: 'utf8', timeout: 20_000 });
+  assert.equal(res.status, 0, res.stderr);
+  const out = JSON.parse(res.stdout);
+  assert.equal(out.facade, 'free');
+  assert.match(out.second, /holder-lock-already-taken/);
+  // And no other source module takes the capability.
+  const users = [];
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const file = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(file);
+      else if (/\.m?js$/.test(entry.name) && /holderLock\.take\(/.test(fs.readFileSync(file, 'utf8'))) users.push(path.relative(root, file));
+    }
+  };
+  for (const dir of ['src', 'bin', 'scripts']) walk(path.join(root, dir));
+  assert.deepEqual(users, ['src/holder-lock/driver.mjs']);
 });

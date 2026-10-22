@@ -561,7 +561,7 @@ async function adhocUnitFromPrompt(prompt, flags, { mainRoot, isLinkedWorktree }
 // positional args. No dependency, no dashes-in-values ambiguity handling
 // beyond what this CLI's own verbs need.
 // Flags that may be given more than once; each use is collected into a list.
-const REPEATABLE_FLAGS = new Set(['context-ref', 'param']);
+const REPEATABLE_FLAGS = new Set(['context-ref', 'param', 'lock']);
 
 function parseArgs(args) {
   const flags = {};
@@ -4384,7 +4384,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     case 'lock-status': {
-      const { mainCheckout, locks } = collectLockStatus({ fgosDir: dir });
+      const { mainCheckout, locks } = collectLockStatus({ fgosDir: dir, names: flags.lock });
       // The commit-activity beacon is reported on its own: it is a hint the
       // pre-commit hook reads, never a lock claim/land/approve wait on.
       const beacon = readBeacon(dir);

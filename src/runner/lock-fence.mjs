@@ -12,13 +12,15 @@
 
 import fs from 'node:fs';
 import { lockHolders, probe, resolveLock, lockEntry, resolveLockRoot, HolderLockError } from '../holder-lock/index.mjs';
-import { judge, observe, signalByIdentity } from './dispatch/process-identity.mjs';
-import { ownPidChain } from '../holder-lock/fences.mjs';
+import { judge, signalByIdentity, selfChain } from './dispatch/process-identity.mjs';
 import { hotPaths, readHotRecord, clearHotRecord, judgeHotRecord } from '../state/hot-lock.mjs';
 
 export const TERM_WAIT_MS = 5000;
 export const KILL_WAIT_MS = 3000;
 const POLL_MS = 50;
+
+/** This process and its ancestors: the pids a fence must not signal (`process.ppid` is added where the platform cannot walk the chain). */
+const ownPidChain = () => [...new Set([process.pid, process.ppid, ...selfChain()])];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -112,32 +114,15 @@ export async function fenceLock({ name, fgosDir, params = {}, confirm, attestSto
     return { lock: name, path: lock.v3Path, status: 'attested-free', holders: [], terminated: [], killed: [] };
   }
 
-  if (listed.pids.length === 0) {
+  if (listed.holders.length === 0) {
     if (probe(name, filled).result === 'free') {
       return { lock: name, path: lock.v3Path, status: 'free', holders: [], terminated: [], killed: [] };
     }
     throw new HolderLockError('lock-fence-unlistable', `${name} is held, but no holder is visible to this user (another user's process?); nothing was signalled`, { lock: name });
   }
 
-  // An identity read after one listing can belong to a pid reused since: read it between two listings and keep
-  // only the pids both listings name.
-  const seen = listed.pids.map((pid) => ({ pid, seen: observe(pid) }));
-  const again = lockHolders(name, filled);
-  if (again.kind !== 'list') {
-    throw new HolderLockError('lock-fence-unlistable', `${name}: holders can no longer be listed (${again.reason}); nothing was signalled`, { lock: name, reason: again.reason });
-  }
-  const holders = [];
-  for (const { pid, seen: now } of seen.filter((entry) => again.pids.includes(entry.pid))) {
-    if (now.kind !== 'live') {
-      throw new HolderLockError('lock-fence-identity-unknown', `${name}: holder pid ${pid} has no readable identity; stop it yourself and re-run`, { lock: name, pid });
-    }
-    const { kind, ...record } = now;
-    holders.push(record);
-  }
-  if (holders.length === 0) {
-    if (probe(name, filled).result === 'free') return { lock: name, path: lock.v3Path, status: 'free', holders: [], terminated: [], killed: [] };
-    throw new HolderLockError('lock-fence-unlistable', `${name} is held, but no holder is visible to this user (another user's process?); nothing was signalled`, { lock: name });
-  }
+  // Each listed holder is a full process identity read by the listing itself, so a signal can only reach the process that held the lock.
+  const holders = listed.holders.map(({ origin, cmdline, ...record }) => record);
   const own = new Set(ownPidChain());
   const self = holders.filter((holder) => own.has(holder.pid));
   if (self.length > 0) {
@@ -150,7 +135,7 @@ export async function fenceLock({ name, fgosDir, params = {}, confirm, attestSto
 
   const stillHolding = (list) => {
     const now = lockHolders(name, filled);
-    return now.kind !== 'list' ? list : list.filter((holder) => now.pids.includes(holder.pid) && judge(holder) === 'alive');
+    return now.kind !== 'list' ? list : list.filter((holder) => now.holders.some((h) => h.pid === holder.pid) && judge(holder) === 'alive');
   };
   const { terminated, killed, left } = await terminateHolders(holders, stillHolding);
 

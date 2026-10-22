@@ -394,7 +394,7 @@ function lockParams(extra = {}) {
 
 function firstHolderPid(name, params) {
   const holders = lockHolders(name, params);
-  return holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
+  return holders.kind === 'list' && holders.holders.length > 0 ? holders.holders[0].pid : null;
 }
 
 // The lock's own answers that mean "not yours yet" become the caller-facing ProviderCapacityLockError:

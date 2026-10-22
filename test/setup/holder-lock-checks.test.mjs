@@ -1,7 +1,7 @@
-// The holder-lock doctor checks and setup fixes, run for real: the host
-// route answers the guarantee, the probe hands a real description to a real
-// child, `flock(1)` of util-linux plays a foreign holder, and the fence fix
-// goes through the host's quiesce scan.
+// The holder-lock doctor checks and setup fixes, run for real: the in-process
+// door answers the guarantee and the two-process probe, `flock(1)` of
+// util-linux plays a foreign holder, and the fence fix goes through the
+// host's quiesce scan.
 import '../helpers/process-tmp-root.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
@@ -20,16 +20,13 @@ const {
   checkLockHolders,
   checkLockFences,
   fixLockFences,
-  checkLockPredecessorKillWait,
   checkStateRoot,
   fixLockDirs,
-  twoProcessProbe,
   activatedHolderLockRelease,
   workspaceListing,
-  MAX_KILL_WAIT_MS,
 } = await import('../../src/setup/holder-lock-checks.mjs');
 const { fenceStatus, placeFences } = await import('../../src/holder-lock/fences.mjs');
-const { descriptionHolders } = await import('../../src/holder-lock/driver.mjs');
+const { fileHolders } = await import('../../src/holder-lock/index.mjs');
 const { observe } = await import('../../src/runner/dispatch/process-identity.mjs');
 
 const HOST_BIN = process.env.FGOS_HOST_BIN;
@@ -83,47 +80,12 @@ async function holdWithFlock(file, env) {
   children.add(child);
   const deadline = Date.now() + 5000;
   for (;;) {
-    const holders = descriptionHolders(file);
-    if (holders.kind === 'list' && holders.pids.includes(child.pid)) return child;
+    const holders = fileHolders('gateway', file);
+    if (holders.kind === 'list' && holders.holders.some((h) => h.pid === child.pid)) return child;
     if (Date.now() > deadline) throw new Error('flock did not take the lock');
     await new Promise((resolve) => { setTimeout(resolve, 20); });
   }
 }
-
-// ─── lock-predecessor-kill-wait ─────────────────────────────────────────
-
-test('lock-predecessor-kill-wait: absent passes with the default, valid values name their source', () => {
-  const root = workspace('kill-wait');
-  const globalConfigPath = path.join(scratch, 'kill-wait-home', '.fgos', 'config.json');
-  let res = checkLockPredecessorKillWait(root, { globalConfigPath });
-  assert.deepEqual(res, { passed: true, message: 'lock.predecessorKillWaitMs = 2000 (default)' });
-
-  writeConfig(globalConfigPath, { lock: { predecessorKillWaitMs: 750 } });
-  res = checkLockPredecessorKillWait(root, { globalConfigPath });
-  assert.deepEqual(res, { passed: true, message: 'lock.predecessorKillWaitMs = 750 (global)' });
-
-  writeConfig(path.join(root, '.fgos', 'config.json'), { lock: { predecessorKillWaitMs: 500 } });
-  res = checkLockPredecessorKillWait(root, { globalConfigPath });
-  assert.deepEqual(res, { passed: true, message: 'lock.predecessorKillWaitMs = 500 (project)' }, 'project overrides global');
-
-  writeConfig(path.join(root, '.fgos', 'config.json'), { lock: { predecessorKillWaitMs: MAX_KILL_WAIT_MS } });
-  assert.equal(checkLockPredecessorKillWait(root, { globalConfigPath }).passed, true, 'the upper bound itself is accepted');
-});
-
-test('lock-predecessor-kill-wait: negative, string, fractional and over-the-bound values fail by name', () => {
-  const root = workspace('kill-wait-bad');
-  const globalConfigPath = path.join(scratch, 'kill-wait-bad-home', '.fgos', 'config.json');
-  for (const value of [-5, 0, '2000', 1.5, MAX_KILL_WAIT_MS + 1]) {
-    writeConfig(path.join(root, '.fgos', 'config.json'), { lock: { predecessorKillWaitMs: value } });
-    const res = checkLockPredecessorKillWait(root, { globalConfigPath });
-    assert.equal(res.passed, false, `value ${JSON.stringify(value)}`);
-    assert.match(res.message, /^lock\.predecessorKillWaitMs = .* \(project\) must be an integer from 1 to 60000$/);
-  }
-  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), '{ not json');
-  const res = checkLockPredecessorKillWait(root, { globalConfigPath });
-  assert.equal(res.passed, false);
-  assert.match(res.message, /unreadable: cannot parse shared config/);
-});
 
 // ─── lock-dirs fix + lock-kernel-semantics ──────────────────────────────
 
@@ -160,28 +122,6 @@ test('lock-kernel-semantics warns for a missing lock directory, then passes on t
   assert.deepEqual(fs.readdirSync(path.join(root, '.fgos', 'locks')), [], 'the probe file is removed');
 });
 
-test('the two-process probe passes on tmpfs as well', { skip: !fs.existsSync('/dev/shm') && 'no /dev/shm' }, async () => {
-  const dir = fs.mkdtempSync(path.join('/dev/shm', 'fgos-semantics-probe-'));
-  try {
-    const ms = await twoProcessProbe(dir, HOST_BIN);
-    assert.ok(ms < 2000, `probe took ${ms} ms`);
-    assert.deepEqual(fs.readdirSync(dir), []);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('the probe refuses a probe file another process already holds', async () => {
-  const dir = path.join(scratch, 'probe-leak');
-  fs.mkdirSync(dir);
-  // A foreign process already holds the very file the probe will lock: the fresh probe file is not fresh.
-  const file = path.join(dir, `.semantics-probe-${process.pid}.lock`);
-  fs.writeFileSync(file, '');
-  const holder = await holdWithFlock(file, foreignEnv());
-  await assert.rejects(twoProcessProbe(dir, HOST_BIN), /a fresh probe file answered held/);
-  await stop(holder);
-});
-
 test('a guarantee of unsupported fails by name, a network filesystem too, a kernel one passes', () => {
   const shape = { driver: 'none', borrow: 'unsupported', holders: 'unsupported' };
   const unsupported = guaranteeRefusal('workspace', '/x/locks', { ...shape, exclusion: 'unsupported', platform: 'plan9' });
@@ -201,7 +141,9 @@ test('lock-borrow-vectors passes with the real host and real git', () => {
 
 // ─── lock-holders ───────────────────────────────────────────────────────
 
-test('lock-holders: a foreign flock holder warns with pid and cmdline; a borrowed child does not', { skip: !HAS_FLOCK && 'util-linux flock missing' }, async () => {
+// The classification itself is owned by the pure test in packages/holder-lock/rust/src/origin.rs; this is the wiring: the
+// doctor row lists real holders through the door and warns only for the origin Rust calls foreign.
+test('lock-holders: a foreign flock holder warns with pid and cmdline; a borrowed child and an attempt member do not', { skip: !HAS_FLOCK && 'util-linux flock missing' }, async () => {
   const root = workspace('holders');
   fixLockDirs(root);
   const gateway = path.join(root, '.fgos', 'locks', 'gateway.lock');
@@ -218,36 +160,8 @@ test('lock-holders: a foreign flock holder warns with pid and cmdline; a borrowe
   const clean = checkLockHolders(root);
   assert.match(clean.message, /^\d+ lock file\(s\) of 18 locks, 1 held, every holder a fgOS process or a borrowed child$/, clean.message);
   await stop(borrowed);
-});
 
-test('lock-holders covers the main checkout, merge slot and worktree-admin files: a foreign holder warns, a borrowed child does not', { skip: !HAS_FLOCK && 'util-linux flock missing' }, async () => {
-  const root = workspace('holders-main-door');
-  fixLockDirs(root);
-  const locks = path.join(root, '.fgos', 'locks');
-  const mainLock = path.join(locks, 'main-checkout.lock');
-  const slot = path.join(locks, 'merge-slot--main.lock');
-  const admin = path.join(locks, 'worktree-admin.lock');
-  for (const file of [mainLock, slot, admin]) fs.writeFileSync(file, '');
-  assert.match(checkLockHolders(root).message, /^3 lock file\(s\) of 18 locks, 0 held, every holder a fgOS process or a borrowed child$/);
-
-  const foreign = await holdWithFlock(mainLock, foreignEnv());
-  const warned = checkLockHolders(root);
-  assert.equal(warned.passed, true);
-  assert.match(warned.message, new RegExp(`^warning: main-checkout .*main-checkout\\.lock held by pid ${foreign.pid} .*not a fgOS process nor a borrowed child`));
-  await stop(foreign);
-
-  const borrowed = await holdWithFlock(mainLock, foreignEnv({ FGOS_LOCK_FD: 'main-checkout:3' }));
-  const heldSlot = await holdWithFlock(slot, foreignEnv());
-  const mixed = checkLockHolders(root);
-  assert.match(mixed.message, new RegExp(`^warning: merge-slot .*merge-slot--main\\.lock held by pid ${heldSlot.pid} `));
-  assert.ok(!mixed.message.includes('main-checkout.lock held'), 'a borrowed git child of the main checkout lock is a member');
-  await stop(borrowed);
-  await stop(heldSlot);
-});
-
-test('lock-holders: a monitor whose parent is the supervisor of the attempt is a member; once the parent is gone it is named', { skip: !HAS_FLOCK && 'util-linux flock missing' }, async () => {
-  const root = workspace('holders-attempt');
-  fixLockDirs(root);
+  // An attempt's monitor whose parent is the supervisor is a member; once the parent is gone it is named.
   const dir = path.join(root, '.fgos', 'assignments', 'asgn-1', 'runs', '01');
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-holders' }));
@@ -266,9 +180,9 @@ test('lock-holders: a monitor whose parent is the supervisor of the attempt is a
   let monitorPid;
   const deadline = Date.now() + 5000;
   for (;;) {
-    const holders = descriptionHolders(lock);
-    if (holders.kind === 'list' && holders.pids.length === 2 && holders.pids.includes(supervisor.pid)) {
-      monitorPid = holders.pids.find((pid) => pid !== supervisor.pid);
+    const holders = fileHolders('attempt', lock);
+    if (holders.kind === 'list' && holders.holders.length === 2 && holders.holders.some((h) => h.pid === supervisor.pid)) {
+      monitorPid = holders.holders.find((h) => h.pid !== supervisor.pid).pid;
       break;
     }
     assert.ok(Date.now() < deadline, 'supervisor and monitor did not both hold the lock');
@@ -276,7 +190,7 @@ test('lock-holders: a monitor whose parent is the supervisor of the attempt is a
   }
   const monitorCmdline = fs.readFileSync(`/proc/${monitorPid}/cmdline`, 'utf8').split('\0').filter(Boolean).join(' ');
   const member = checkLockHolders(root);
-  assert.match(member.message, /^1 lock file\(s\) of 18 locks, 1 held, every holder a fgOS process or a borrowed child$/, member.message);
+  assert.match(member.message, /^\d+ lock file\(s\) of 18 locks, 1 held, every holder a fgOS process or a borrowed child$/, member.message);
 
   process.kill(supervisor.pid, 'SIGKILL');
   const named = await (async () => {

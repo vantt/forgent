@@ -2157,10 +2157,12 @@ export const COMMAND_REGISTRY = [
     description: 'Read-only report on every repo- and machine-scoped registry lock (main-checkout, merge-slot, worktree-admin, gateway, ...): free or held, the holder pids the kernel shows, and the guarantee of the filesystem the lock file lives in; plus, separately, the pre-commit hook\'s commit-activity beacon (.fgos/runtime/main-checkout-activity.json). Top-level keys: mainCheckout, locks, beacon. Never creates, refreshes, or deletes a lock file or the beacon.',
     parameters: {
       type: 'object',
-      properties: {},
+      properties: {
+        lock: { type: 'string', description: 'Repeatable: report only the named registry lock (e.g. --lock main-checkout), so only that lock is probed. Omit for every repo- and machine-scoped row.' },
+      },
       required: [],
     },
-    examples: ['fgos lock-status'],
+    examples: ['fgos lock-status', 'fgos lock-status --lock main-checkout'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,

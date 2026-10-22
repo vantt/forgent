@@ -147,9 +147,8 @@ import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir
 import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
 import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations, fixTerminalDir } from './terminal-control-checks.mjs';
 import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
-import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkLockFences, fixLockFences, checkLockPredecessorKillWait, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
+import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkLockFences, fixLockFences, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
 import { checkLockRecordUnreadable } from './lock-record-checks.mjs';
-import { DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -2163,16 +2162,10 @@ registerCheck({
   check: (cwd) => checkLockRecordUnreadable(cwd),
 });
 registerCheck({
-  id: 'lock-predecessor-kill-wait',
-  description: 'lock.predecessorKillWaitMs is an integer from 1 to 60000 ms (default 2000)',
-  check: (cwd) => checkLockPredecessorKillWait(cwd),
-});
-registerCheck({
   id: 'state-root',
   description: 'Node and the Rust host resolve the same state root and lock root',
   check: (cwd) => checkStateRoot(cwd),
 });
-registerConfigDefault({ id: 'lock', key: 'lock', shape: { predecessorKillWaitMs: DEFAULT_KILL_WAIT_MS } });
 registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
 
 // Run supervisor (docs/platform/run-supervisor/spec.md): the containment driver agents run in, the

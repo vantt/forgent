@@ -8,8 +8,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { lockEntry, loadLockRegistry, resolveLock, probe, guaranteeFor, resolveLockRoot, HolderLockError } from '../holder-lock/index.mjs';
-import { descriptionHolders } from '../holder-lock/driver.mjs';
+import { lockEntry, loadLockRegistry, resolveLock, probe, guaranteeFor, fileHolders, resolveLockRoot, HolderLockError } from '../holder-lock/index.mjs';
 
 const REPORTED_SCOPES = new Set(['repo', 'machine']);
 const PLACEHOLDER = /<([^<>]+)>/g;
@@ -20,15 +19,15 @@ function errorNote(err) {
   return { code: err.code ?? err.name ?? 'error', message: err.message };
 }
 
-function holdersOf(lockPath) {
-  const listed = descriptionHolders(lockPath);
-  return listed.kind === 'list' ? { holders: listed.pids } : { holders: null, holdersNote: listed.reason };
+function holdersOf(name, lockPath) {
+  const listed = fileHolders(name, lockPath);
+  return listed.kind === 'list' ? { holders: listed.holders.map((h) => h.pid) } : { holders: null, holdersNote: listed.reason };
 }
 
-function guaranteeOf(lockPath, fgosDir) {
+function guaranteeOf(lockPath) {
   try {
     if (!fs.existsSync(path.dirname(lockPath))) return null;
-    const { driver, exclusion, notes } = guaranteeFor(lockPath, { fgosDir });
+    const { driver, exclusion, notes } = guaranteeFor(lockPath);
     return { driver, exclusion, ...(notes?.length ? { notes } : {}) };
   } catch (err) {
     return { error: errorNote(err) };
@@ -63,15 +62,15 @@ function existingInstances(template, known) {
   return candidates.filter((candidate) => fs.existsSync(candidate) && fs.statSync(candidate).isFile());
 }
 
-function reportFixedRow(entry, fgosDir, params) {
+function reportFixedRow(entry, params) {
   const base = { name: entry.name, kind: entry.kind, scope: entry.scope, rank: entry.rank };
   const lock = resolveLock(entry.name, params);
   const row = { ...base, path: lock.v3Path };
   if (!fs.existsSync(lock.v3Path)) return { ...row, status: 'free', holders: [], via: 'absent-file' };
-  const listed = holdersOf(lock.v3Path);
+  const listed = holdersOf(entry.name, lock.v3Path);
   try {
     const { result } = probe(entry.name, params);
-    return { ...row, status: result, ...listed, via: 'probe', guarantee: guaranteeOf(lock.v3Path, fgosDir) };
+    return { ...row, status: result, ...listed, via: 'probe', guarantee: guaranteeOf(lock.v3Path) };
   } catch (err) {
     return { ...row, status: 'unknown', ...listed, via: 'probe', error: errorNote(err) };
   }
@@ -80,7 +79,7 @@ function reportFixedRow(entry, fgosDir, params) {
 function reportParametricRow(entry, params) {
   const base = { name: entry.name, kind: entry.kind, scope: entry.scope, rank: entry.rank, parametric: true, template: entry.v3Path };
   const instances = existingInstances(entry.v3Path, params).map((file) => {
-    const listed = holdersOf(file);
+    const listed = holdersOf(entry.name, file);
     const status = listed.holders === null ? 'unknown' : listed.holders.length > 0 ? 'held' : 'free';
     return { path: file, status, ...listed };
   });
@@ -89,13 +88,14 @@ function reportParametricRow(entry, params) {
 }
 
 /**
- * collectLockStatus({ fgosDir }) -> { mainCheckout, locks }
+ * collectLockStatus({ fgosDir, names }) -> { mainCheckout, locks }
  *
- * `locks` has one row per repo- or machine-scoped registry row; `mainCheckout`
- * is the main-checkout row's `{ outcome, holders, guarantee }` for callers
- * that only care about that one lock.
+ * `locks` has one row per repo- or machine-scoped registry row (only the rows
+ * named in `names` when it is given, so a caller that asks about one lock
+ * probes one lock); `mainCheckout` is the main-checkout row's
+ * `{ outcome, holders, guarantee }` for callers that only care about that one lock.
  */
-export function collectLockStatus({ fgosDir }) {
+export function collectLockStatus({ fgosDir, names }) {
   const params = { fgosDir };
   let machineParams = params;
   try {
@@ -106,14 +106,14 @@ export function collectLockStatus({ fgosDir }) {
   const locks = [];
   for (const { name } of loadLockRegistry().locks) {
     const entry = lockEntry(name);
-    if (!REPORTED_SCOPES.has(entry.scope)) continue;
+    if (!REPORTED_SCOPES.has(entry.scope) || (names && !names.includes(name))) continue;
     const known = entry.scope === 'machine' ? machineParams : params;
     if (typeof entry.v3Path !== 'string') {
       locks.push({ name, kind: entry.kind, scope: entry.scope, rank: entry.rank, status: 'not-node-owned', owner: entry.owner });
       continue;
     }
     try {
-      locks.push(reportFixedRow(entry, fgosDir, known));
+      locks.push(reportFixedRow(entry, known));
     } catch (err) {
       if (!(err instanceof HolderLockError) || err.code !== 'lock-path-param-missing') {
         locks.push({ name, kind: entry.kind, scope: entry.scope, rank: entry.rank, status: 'unknown', error: errorNote(err) });

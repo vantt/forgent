@@ -45,6 +45,9 @@ before(() => {
   // The process door is this checkout's own: the door loads only the addon of the payload it runs in, so the
   // baseline tree reaches this checkout's client instead of carrying a payload (and a copy of the addon) of its own.
   fs.writeFileSync(path.join(tree, 'src/runner/dispatch/process-identity.mjs'), `export * from ${JSON.stringify(pathToFileURL(path.join(ROOT, 'src/runner/dispatch/process-identity.mjs')).href)};\n`);
+  // The lock door's own addon loader is this checkout's too, for the same reason.
+  fs.mkdirSync(path.join(tree, 'src/native'), { recursive: true });
+  fs.writeFileSync(path.join(tree, 'src/native/door.mjs'), `export * from ${JSON.stringify(pathToFileURL(path.join(ROOT, 'src/native/door.mjs')).href)};\n`);
   // The baseline callers still use the pre-cutover names; give them to the
   // copied events module as thin wrappers over the real hot lock.
   fs.appendFileSync(path.join(tree, 'src/state/events.mjs'), `

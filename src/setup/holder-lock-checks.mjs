@@ -14,11 +14,11 @@
 import fs from 'node:fs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import path from 'node:path';
-import { spawn, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 
-import { hostBin, guaranteeFor, runLockRouteSync, runStateRootRoute, descriptionHolders, lockTransport, routeEnv, ROUTE_CALL_TIMEOUT_MS } from '../holder-lock/driver.mjs';
-import { startHold, waitReadySync, releaseHold } from '../holder-lock/hold-transport.mjs';
-import { PROTOCOL, KILL_WAIT_CONFIG_KEY, DEFAULT_KILL_WAIT_MS, MAX_KILL_WAIT_MS, LOCK_FD_ENV } from '../holder-lock/protocol.mjs';
+import { hostBin, guaranteeFor, runStateRootRoute, doorTwoProcessProbe } from '../holder-lock/driver.mjs';
+import { fileHolders, predecessorState } from '../holder-lock/index.mjs';
+import { PROTOCOL } from '../holder-lock/protocol.mjs';
 import { resolveStateRoot, STATE_ROOT_ENV, LOCKS_DIR } from '../holder-lock/state-root.mjs';
 import { loadLockRegistry } from '../holder-lock/registry.mjs';
 import { isCutOverLock, fenceStatus, fenceCutover, defaultProviderRuntimeDir } from '../holder-lock/fences.mjs';
@@ -26,26 +26,10 @@ import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { judge } from '../runner/dispatch/process-identity.mjs';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { listOpenAttemptDirs } from '../run-supervisor/client.mjs';
-import { readSharedConfig } from '../config/shared-config-file.mjs';
-import { loadGlobalConfig } from '../config/global-config.mjs';
-
-/** Largest `lock.predecessorKillWaitMs` doctor accepts: past a minute a dead holder's
- * leftovers are not "being killed" any more, and every contender would wait that long. */
-export { MAX_KILL_WAIT_MS };
 
 const BORROW_VECTORS_TIMEOUT_MS = 30_000;
-const PREDECESSOR_STATE_TIMEOUT_MS = 10_000;
-/** The kernel drops a dead holder's lock at once; this only covers a racing fork in the caller. */
-const PROBE_FREE_WAIT_MS = 500;
-const PROBE_POLL_MS = 5;
-/** A probe file this old belongs to a probe that died before it removed it (its child sleeps 60 s). */
-const STALE_PROBE_MS = 120_000;
-const PROBE_PREFIX = '.semantics-probe-';
 const MAX_LISTED = 5;
 const REGISTRY_IN_PAYLOAD = path.join('packages', 'holder-lock', 'contracts', 'lock-registry.v1.json');
-/** argv[0] basenames and argv entries that name a fgOS payload (same set as the host's quiesce scan). */
-const FGOS_BINARIES = new Set(['fgos', 'fgos-runner', 'fgos-gateway']);
-const FGOS_SCRIPTS = [/(^|\/)bin\/fgos\.mjs$/, /(^|\/)scripts\/run-tests\.mjs$/];
 
 const warn = (text) => `warning: ${text}`;
 
@@ -89,137 +73,6 @@ function lockDirs(repoRoot) {
 // lock-kernel-semantics
 // ---------------------------------------------------------------------
 
-function sweepStaleProbes(dir) {
-  let entries;
-  try {
-    entries = fs.readdirSync(dir);
-  } catch {
-    return;
-  }
-  for (const name of entries) {
-    if (!name.startsWith(PROBE_PREFIX) || !name.endsWith('.lock')) continue;
-    const file = path.join(dir, name);
-    try {
-      if (Date.now() - fs.statSync(file).mtimeMs > STALE_PROBE_MS) fs.rmSync(file, { force: true });
-    } catch {
-      // another sweeper removed it
-    }
-  }
-}
-
-function sharedTry(bin, file) {
-  const fd = fs.openSync(file, fs.constants.O_RDWR);
-  try {
-    return runLockRouteSync({ bin, args: ['--shared-try'], fd, timeoutMs: ROUTE_CALL_TIMEOUT_MS }).result;
-  } finally {
-    fs.closeSync(fd);
-  }
-}
-
-function waitExit(child) {
-  if (child.exitCode !== null || child.signalCode !== null) return Promise.resolve();
-  return new Promise((resolve) => { child.once('exit', () => resolve()); });
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => { setTimeout(resolve, ms); });
-}
-
-/**
- * The two-process probe of packages/holder-lock/rust/src/semantics.rs, from
- * Node: lock a fresh probe file, hand the locked description to a `sleep`
- * child at fd 3 and close this process's copy, so the child is the only
- * holder. A second description must then see the lock held, and free once
- * the child is dead. Resolves with the wall time in ms; rejects naming the
- * half that failed. The probe file is removed either way.
- */
-export async function twoProcessProbe(dir, bin) {
-  if (lockTransport() === 'hold') return holdTwoProcessProbe(dir, bin);
-  const started = Date.now();
-  sweepStaleProbes(dir);
-  const file = path.join(dir, `${PROBE_PREFIX}${process.pid}.lock`);
-  let child = null;
-  try {
-    const fd = fs.openSync(file, fs.constants.O_RDWR | fs.constants.O_CREAT, 0o600);
-    try {
-      const line = runLockRouteSync({ bin, args: ['--try'], fd, timeoutMs: ROUTE_CALL_TIMEOUT_MS });
-      if (line.result !== 'acquired') throw new Error(`a fresh probe file answered ${line.result}${line.reason ? ` (${line.reason})` : ''}${line.detail ? `: ${line.detail}` : ''}`);
-      child = spawn('sleep', ['60'], { stdio: ['ignore', 'ignore', 'ignore', fd] });
-      await new Promise((resolve, reject) => {
-        child.once('spawn', resolve);
-        child.once('error', (err) => reject(new Error(`holder child program \`sleep\` could not be started: ${err.message}`)));
-      });
-    } finally {
-      fs.closeSync(fd);
-    }
-    const whileAlive = sharedTry(bin, file);
-    child.kill('SIGKILL');
-    await waitExit(child);
-    if (whileAlive !== 'held') throw new Error(`a lock held by a live child was seen as ${whileAlive}`);
-    const deadline = Date.now() + PROBE_FREE_WAIT_MS;
-    for (;;) {
-      const after = sharedTry(bin, file);
-      if (after === 'free') break;
-      if (Date.now() >= deadline) throw new Error(`the lock was still ${after} ${PROBE_FREE_WAIT_MS} ms after its holder child died`);
-      await sleep(PROBE_POLL_MS);
-    }
-    return Date.now() - started;
-  } finally {
-    if (child && child.exitCode === null && child.signalCode === null) {
-      child.kill('SIGKILL');
-      await waitExit(child);
-    }
-    fs.rmSync(file, { force: true });
-  }
-}
-
-function pathProbe(bin, file) {
-  return runLockRouteSync({ bin, args: ['--probe', file], timeoutMs: ROUTE_CALL_TIMEOUT_MS }).result;
-}
-
-/**
- * The same probe on the hold transport (Windows): a `lock-hold` helper takes
- * the lock in its own process, a fresh path-based probe must see it held, and
- * once the helper is terminated the lock must be free.
- */
-async function holdTwoProcessProbe(dir, bin) {
-  const started = Date.now();
-  sweepStaleProbes(dir);
-  const file = path.join(dir, `${PROBE_PREFIX}${process.pid}.lock`);
-  fs.writeFileSync(file, '', { flag: 'a' });
-  let hold = null;
-  try {
-    hold = startHold({ bin, lockPath: file, wait: { kind: 'try' }, killWaitMs: DEFAULT_KILL_WAIT_MS, env: routeEnv() });
-    const { line } = waitReadySync(hold, bin, ROUTE_CALL_TIMEOUT_MS * 2);
-    if (!line) {
-      hold = null;
-      throw new Error('the lock-hold helper did not answer');
-    }
-    if (line.result !== 'acquired') throw new Error(`a fresh probe file answered ${line.result}${line.reason ? ` (${line.reason})` : ''}${line.detail ? `: ${line.detail}` : ''}`);
-    const whileAlive = pathProbe(bin, file);
-    releaseHold(hold);
-    hold = null;
-    if (whileAlive !== 'held') throw new Error(`a lock held by a live helper was seen as ${whileAlive}`);
-    const deadline = Date.now() + PROBE_FREE_WAIT_MS;
-    for (;;) {
-      const after = pathProbe(bin, file);
-      if (after === 'free') break;
-      if (Date.now() >= deadline) throw new Error(`the lock was still ${after} ${PROBE_FREE_WAIT_MS} ms after its holder helper died`);
-      await sleep(PROBE_POLL_MS);
-    }
-    return Date.now() - started;
-  } finally {
-    if (hold) {
-      try {
-        releaseHold(hold);
-      } catch {
-        // the probe already failed; the helper dies with this process
-      }
-    }
-    fs.rmSync(file, { force: true });
-  }
-}
-
 function guaranteeShape(guarantee) {
   return JSON.stringify({ driver: guarantee.driver, exclusion: guarantee.exclusion, borrow: guarantee.borrow, holders: guarantee.holders });
 }
@@ -238,18 +91,12 @@ export function guaranteeRefusal(label, dir, guarantee) {
 
 /**
  * For `<fgosDir>/locks` and `<lockRoot>`: the driver's guarantee through
- * `lock-fd --guarantee`, then the two-process probe on that same mount.
+ * door, then the two-process probe on that same mount.
  * `kernel` with a green probe passes; a platform with no driver
  * (`unsupported`) and a network filesystem (`none`) fail by name; a missing
  * directory warns (setup creates it).
  */
 export async function checkLockKernelSemantics(repoRoot) {
-  let bin;
-  try {
-    bin = hostBin({ fgosDir: fgosDirOf(repoRoot) });
-  } catch (err) {
-    return { passed: false, message: `cannot ask the holder-lock driver: ${err.message}` };
-  }
   const failures = [];
   const warnings = [];
   const passes = [];
@@ -264,7 +111,7 @@ export async function checkLockKernelSemantics(repoRoot) {
     }
     let guarantee;
     try {
-      guarantee = guaranteeFor(path.join(dir, 'guarantee.lock'), { fgosDir: fgosDirOf(repoRoot) });
+      guarantee = guaranteeFor(path.join(dir, 'guarantee.lock'));
     } catch (err) {
       failures.push(`${label} ${dir}: ${err.message}`);
       continue;
@@ -276,7 +123,7 @@ export async function checkLockKernelSemantics(repoRoot) {
       continue;
     }
     try {
-      await twoProcessProbe(dir, bin);
+      doorTwoProcessProbe(dir);
       passes.push(`${label} ${dir} ${shape}, two-process probe green`);
     } catch (err) {
       failures.push(`${label} ${dir} ${shape}: two-process probe failed: ${err.message}`);
@@ -398,66 +245,9 @@ export function cutOverLockFiles({ fgosDir, lockRoot }) {
   });
 }
 
-function readProc(pid, name) {
-  try {
-    return fs.readFileSync(`/proc/${pid}/${name}`);
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Why `pid` may hold lock `lockName`, or null when nothing says so: a child
- * of a `runBorrowed` call of that lock (FGOS_LOCK_FD names it), a process
- * the host started (FGOS_STATE_ROOT pin), or an argv naming a fgOS payload.
- */
-export function holderOrigin(pid, lockName) {
-  const environ = readProc(pid, 'environ');
-  if (environ) {
-    const vars = environ.toString('utf8').split('\0');
-    if (vars.some((entry) => entry.startsWith(`${LOCK_FD_ENV}=${lockName}:`))) return 'borrowed';
-    if (vars.some((entry) => entry.startsWith(`${STATE_ROOT_ENV}=`))) return 'fgos-host';
-  }
-  const cmdline = readProc(pid, 'cmdline');
-  if (cmdline) {
-    const argv = cmdline.toString('utf8').split('\0').filter(Boolean);
-    if (argv.length > 0 && FGOS_BINARIES.has(path.basename(argv[0]))) return 'fgos-payload';
-    if (argv.some((arg) => FGOS_SCRIPTS.some((re) => re.test(arg)))) return 'fgos-payload';
-  }
-  return null;
-}
-
-/** The parent pid of `pid` from /proc, or null. The comm field may hold spaces, so the row is cut after its last `)`. */
-function parentPidOf(pid) {
-  const stat = readProc(pid, 'stat');
-  if (!stat) return null;
-  const text = stat.toString('utf8');
-  const fields = text.slice(text.lastIndexOf(')') + 2).split(' ');
-  const ppid = Number(fields[1]);
-  return Number.isInteger(ppid) && ppid > 0 ? ppid : null;
-}
-
-/**
- * A holder of an attempt lock that is not itself a fgOS process but whose parent is: the bwrap
- * monitor the supervisor (or the gate) started carries the same lock description, and it is as much
- * a member of the attempt as they are. Only a parent that holds the same lock counts, so a monitor
- * left behind after both are gone is still named.
- */
-function isAttemptMember(pid, holderPids, lockName) {
-  // Only the bwrap monitor qualifies: a leaked lock fd in the agent or its descendants must still be named.
-  if (String(readProc(pid, 'comm') ?? '').trim() !== 'bwrap') return false;
-  const parent = parentPidOf(pid);
-  return parent !== null && holderPids.includes(parent) && holderOrigin(parent, lockName) !== null;
-}
-
 /** The `attempt.lock` files of attempts that are not closed. Closed attempts hold nothing. */
 function attemptLockFiles(fgosDir) {
   return listOpenAttemptDirs(path.join(fgosDir, 'assignments')).flatMap((dir) => existing(path.join(dir, 'attempt.lock')));
-}
-
-function cmdlineOf(pid) {
-  const raw = readProc(pid, 'cmdline');
-  return raw ? raw.toString('utf8').split('\0').filter(Boolean).join(' ').slice(0, 200) : '<unreadable>';
 }
 
 /**
@@ -465,35 +255,22 @@ function cmdlineOf(pid) {
  * pass, never a kill): `empty` and `absent` are no problem, anything else
  * warns with the domain and the reason the host names.
  */
-function windowsJobProblem(lockFile, recordPath, record, fgosDir) {
-  let bin;
+function windowsJobProblem(lockFile, recordPath, record) {
+  let out;
   try {
-    bin = hostBin({ fgosDir });
+    out = predecessorState(lockFile);
   } catch (err) {
-    return `${recordPath} names Windows job ${JSON.stringify(record.domainId)}; the host cannot judge it: ${err.message}`;
-  }
-  const res = spawnSync(bin, ['internal', 'lock-fd', '--protocol', String(PROTOCOL), '--predecessor-state', lockFile], {
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe'],
-    timeout: PREDECESSOR_STATE_TIMEOUT_MS,
-    killSignal: 'SIGKILL',
-    maxBuffer: 1024 * 1024,
-  });
-  let out = null;
-  try {
-    out = JSON.parse(String(res.stdout ?? '').split('\n').find((line) => line.trim() !== '') ?? '');
-  } catch {
-    out = null;
+    return `${recordPath} names Windows job ${JSON.stringify(record.domainId)}; the host did not judge it (${err.message})`;
   }
   if (out?.result !== 'predecessor') {
-    return `${recordPath} names Windows job ${JSON.stringify(record.domainId)}; the host did not judge it (${res.error?.message ?? `exit ${res.status}`})`;
+    return `${recordPath} names Windows job ${JSON.stringify(record.domainId)}; the host did not judge it (${JSON.stringify(out?.result)})`;
   }
   if (out.state === 'empty' || out.state === 'absent') return null;
   return `${recordPath}: windows-job domain ${JSON.stringify(out.domain ?? record.domainId)} is ${out.state} (${out.reason ?? 'no reason named'}); the next holder ends it, or an acquire answers held (predecessor-domain-not-empty)`;
 }
 
 /** `null` when the predecessor record is absent or names an empty domain; otherwise why it does not. */
-function predecessorProblem(lockFile, fgosDir) {
+function predecessorProblem(lockFile) {
   const recordPath = `${lockFile}.predecessor.json`;
   let raw;
   try {
@@ -509,7 +286,7 @@ function predecessorProblem(lockFile, fgosDir) {
     return `${recordPath} is not JSON: ${raw.slice(0, 120)}`;
   }
   if (record?.v !== 1) return `${recordPath} has unknown version ${JSON.stringify(record?.v)}: ${raw.slice(0, 120)}`;
-  if (record.domainKind === 'windows-job') return windowsJobProblem(lockFile, recordPath, record, fgosDir);
+  if (record.domainKind === 'windows-job') return windowsJobProblem(lockFile, recordPath, record);
   const verdict = judge(record.domainId);
   if (verdict === 'dead') return null;
   return `${recordPath}: ${record.domainKind} domain ${JSON.stringify(record.domainId)} is not empty (${verdict}); the next holder kills it, or an acquire answers held (predecessor-domain-not-empty)`;
@@ -542,16 +319,17 @@ export function checkLockHolders(repoRoot) {
   for (const { lock, files: lockFiles } of scanned) {
     for (const file of lockFiles) {
       files += 1;
-      const problem = predecessorProblem(file, fgosDir);
+      const problem = predecessorProblem(file);
       if (problem) predecessors.push(`${lock}: ${problem}`);
-      const holders = descriptionHolders(file);
+      const holders = fileHolders(lock, file);
       if (holders.kind !== 'list') {
         unlistable.push(`${lock} ${file}: ${holders.reason}`);
         continue;
       }
-      if (holders.pids.length > 0) held += 1;
-      for (const pid of holders.pids) {
-        if (!holderOrigin(pid, lock) && !(lock === 'attempt' && isAttemptMember(pid, holders.pids, lock))) foreign.push(`${lock} ${file} held by pid ${pid} (${cmdlineOf(pid)}), not a fgOS process nor a borrowed child`);
+      if (holders.holders.length > 0) held += 1;
+      for (const holder of holders.holders) {
+        // Rust decides the origin; an attempt member is only meaningful under the attempt lock.
+        if (holder.origin === 'foreign' || (holder.origin === 'attempt-member' && lock !== 'attempt')) foreign.push(`${lock} ${file} held by pid ${holder.pid} (${holder.cmdline}), not a fgOS process nor a borrowed child`);
       }
     }
   }
@@ -717,40 +495,6 @@ export function fixLockFences(repoRoot, { providerRuntimeDir = defaultProviderRu
     default:
       return { changed: false, message: `fences not placed: ${result.status}: old lock still present at ${listed(result.fences?.paths ?? [])}` };
   }
-}
-
-// ---------------------------------------------------------------------
-// lock-predecessor-kill-wait
-// ---------------------------------------------------------------------
-
-function killWaitOf(config) {
-  const section = config?.lock;
-  if (!section || typeof section !== 'object' || Array.isArray(section)) return undefined;
-  return section.predecessorKillWaitMs;
-}
-
-/**
- * `lock.predecessorKillWaitMs` after the config merge (project over global):
- * its value and source. Not a positive integer, or above MAX_KILL_WAIT_MS,
- * fails by name; absent passes with the default.
- */
-export function checkLockPredecessorKillWait(repoRoot, { globalConfigPath } = {}) {
-  let project;
-  let global;
-  try {
-    project = readSharedConfig(path.resolve(repoRoot));
-    global = globalConfigPath ? loadGlobalConfig(globalConfigPath) : loadGlobalConfig();
-  } catch (err) {
-    return { passed: false, message: `${KILL_WAIT_CONFIG_KEY} unreadable: ${err.message}` };
-  }
-  const fromProject = killWaitOf(project);
-  const fromGlobal = killWaitOf(global);
-  const [value, source] = fromProject !== undefined ? [fromProject, 'project'] : fromGlobal !== undefined ? [fromGlobal, 'global'] : [undefined, 'default'];
-  if (value === undefined) return { passed: true, message: `${KILL_WAIT_CONFIG_KEY} = ${DEFAULT_KILL_WAIT_MS} (default)` };
-  if (!Number.isInteger(value) || value < 1 || value > MAX_KILL_WAIT_MS) {
-    return { passed: false, message: `${KILL_WAIT_CONFIG_KEY} = ${JSON.stringify(value)} (${source}) must be an integer from 1 to ${MAX_KILL_WAIT_MS}` };
-  }
-  return { passed: true, message: `${KILL_WAIT_CONFIG_KEY} = ${value} (${source})` };
 }
 
 // ---------------------------------------------------------------------
