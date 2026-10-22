@@ -972,3 +972,110 @@ fn a_malformed_payload_never_opens_or_creates_the_record() {
     );
     assert!(!fgos.fgos_dir().join("runtime").exists());
 }
+
+#[test]
+fn only_a_call_that_reached_the_record_resets_the_breaker_count() {
+    use fgos_mailbox::hook::breaker::Breaker;
+    let fgos = TempFgos::new("shell-breaker-reach");
+    let record = fgos.record();
+    let limits = breaker_limits();
+    let panicked = ShellOutcome {
+        panicked: true,
+        ..ShellOutcome::default()
+    };
+    for _ in 0..limits.failures - 1 {
+        Breaker::load(record.paths(), &limits).after(&panicked, T0);
+    }
+    let failures = || -> serde_json::Value {
+        serde_json::from_slice::<serde_json::Value>(&std::fs::read(fgos.paths().breaker()).unwrap())
+            .unwrap()["failures"]
+            .clone()
+    };
+    assert_eq!(failures(), limits.failures - 1);
+    // A call that never reached the record (the doctor probe's `{}`, a foreign
+    // caller) neither counts nor resets.
+    for quiet in [Quiet::NotTheHead, Quiet::OverReadCap, Quiet::NoAncestry] {
+        let outcome = ShellOutcome {
+            quiet: Some(quiet.clone()),
+            ..ShellOutcome::default()
+        };
+        Breaker::load(record.paths(), &limits).after(&outcome, T0);
+        assert_eq!(failures(), limits.failures - 1, "{quiet:?} reset the count");
+    }
+    let reached = ShellOutcome {
+        quiet: Some(Quiet::Drain(QuietReason::NothingEligible)),
+        reached_record: true,
+        ..ShellOutcome::default()
+    };
+    Breaker::load(record.paths(), &limits).after(&reached, T0);
+    assert_eq!(failures(), 0, "a call through the record resets it");
+}
+
+#[test]
+fn a_call_that_skipped_or_failed_its_drain_leaves_its_reason_in_the_hook_outcome_file_and_a_benign_one_writes_nothing(
+) {
+    use fgos_mailbox::hook::outcome_log;
+    let fgos = TempFgos::new("shell-outcome-log");
+    let record = fgos.record();
+    let paths = record.paths();
+    let benign = [
+        ShellOutcome::default(),
+        ShellOutcome {
+            quiet: Some(Quiet::Drain(QuietReason::NothingEligible)),
+            ..ShellOutcome::default()
+        },
+        ShellOutcome {
+            quiet: Some(Quiet::RunnerHead),
+            ..ShellOutcome::default()
+        },
+    ];
+    for outcome in &benign {
+        outcome_log::record(paths, Adapter::Claude, HookEvent::PostToolUse, outcome, T0);
+    }
+    assert!(
+        !paths.hook_outcome().exists(),
+        "a benign call writes nothing"
+    );
+
+    let logged = [
+        (Quiet::OverReadCap, "over-read-cap"),
+        (Quiet::BreakerOpen, "breaker-open"),
+        (Quiet::NotTheHead, "not-the-head"),
+        (Quiet::Record("snapshot-newer"), "record:snapshot-newer"),
+    ];
+    for (quiet, reason) in logged {
+        let outcome = ShellOutcome {
+            quiet: Some(quiet),
+            ..ShellOutcome::default()
+        };
+        outcome_log::record(paths, Adapter::Codex, HookEvent::Stop, &outcome, T0);
+        let line: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(paths.hook_outcome()).unwrap()).unwrap();
+        assert_eq!(line["reason"], reason);
+        assert_eq!(line["cli"], "codex");
+        assert_eq!(line["event"], "stop");
+        assert_eq!(line["atMs"], T0.as_millis());
+    }
+    let panicked = ShellOutcome {
+        panicked: true,
+        ..ShellOutcome::default()
+    };
+    outcome_log::record(
+        paths,
+        Adapter::Claude,
+        HookEvent::PostToolUse,
+        &panicked,
+        T0,
+    );
+    let line: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(paths.hook_outcome()).unwrap()).unwrap();
+    assert_eq!(line["reason"], "panic");
+    let warned = ShellOutcome {
+        warnings: vec!["Finish: disk".into()],
+        ..ShellOutcome::default()
+    };
+    outcome_log::record(paths, Adapter::Claude, HookEvent::PostToolUse, &warned, T0);
+    let line: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(paths.hook_outcome()).unwrap()).unwrap();
+    assert_eq!(line["reason"], "warning");
+}

@@ -154,6 +154,8 @@ pub struct ShellOutcome {
     pub stdout_written: bool,
     /// Whether hold 2 ran `finish` and installed it.
     pub finished: bool,
+    /// Whether hold 1 ran: the call read the record.
+    pub reached_record: bool,
     pub warnings: Vec<String>,
     pub panicked: bool,
 }
@@ -267,6 +269,7 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
         Err(error) => return quiet(Quiet::Record(record_code(&error))),
     };
     let mut outcome = ShellOutcome {
+        reached_record: true,
         state_written: held.wrote,
         warnings: held
             .warning

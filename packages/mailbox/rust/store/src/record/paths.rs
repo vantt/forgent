@@ -2,7 +2,8 @@
 //! (spec §6.4, option A). Everything else, tests included, asks `Paths`.
 //!
 //! - `<fgosDir>/runtime/mailbox/`: kept for files written without the
-//!   mailbox lock (the breaker file of spec §4.1). The record never lists it.
+//!   mailbox lock (the breaker file of spec §4.1 and the last hook outcome
+//!   of spec §6.1). The record never lists it.
 //! - `<fgosDir>/runtime/mailbox/record/`: written only by a holder of the
 //!   mailbox lock: `snapshot.json` and `bodies/<id>.body`.
 //!
@@ -20,6 +21,7 @@ const SNAPSHOT_FILE: &str = "snapshot.json";
 const BODIES_DIR: &str = "bodies";
 const BODY_SUFFIX: &str = ".body";
 const BREAKER_FILE: &str = "breaker.json";
+const HOOK_OUTCOME_FILE: &str = "hook-outcome.json";
 /// The holder-lock registry row the record takes.
 const LOCK_NAME: &str = "mailbox";
 /// The registry's template parameter for the `.fgos` directory.
@@ -57,6 +59,17 @@ impl Paths {
     /// The breaker file's name inside [`Paths::mailbox_dir`].
     pub(crate) const fn breaker_name() -> &'static str {
         BREAKER_FILE
+    }
+
+    /// The last hook call that skipped or failed its drain, beside
+    /// `record/`, written without the mailbox lock.
+    pub fn hook_outcome(&self) -> PathBuf {
+        self.mailbox_dir().join(HOOK_OUTCOME_FILE)
+    }
+
+    /// The hook outcome file's name inside [`Paths::mailbox_dir`].
+    pub(crate) const fn hook_outcome_name() -> &'static str {
+        HOOK_OUTCOME_FILE
     }
 
     /// Written only by a holder of the mailbox lock.

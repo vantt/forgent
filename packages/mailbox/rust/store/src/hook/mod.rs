@@ -3,6 +3,7 @@
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 #[cfg(unix)]
 pub mod breaker;
+pub mod outcome_log;
 mod drain;
 mod limits;
 #[cfg(unix)]
