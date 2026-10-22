@@ -55,6 +55,13 @@ pub struct Core<'a> {
     now_ms: Box<dyn Fn() -> u64 + 'a>,
 }
 
+/// Probes typed to one pane before the handshake gives up.
+const MAX_PROBES: usize = 3;
+/// Longest the handshake waits whatever the config says (keeps the deadline arithmetic far from overflow).
+const MAX_SHELL_WAIT: Duration = Duration::from_secs(3600);
+const MIN_PROBE_BACKOFF: Duration = Duration::from_millis(10);
+const SHELL_POLL: Duration = Duration::from_millis(100);
+
 fn wall_clock_ms() -> u64 {
     SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as u64).unwrap_or(0)
 }
@@ -70,8 +77,9 @@ fn store_err(e: std::io::Error) -> Refusal {
 fn shell_quote(s: &str) -> String {
     format!("'{}'", s.replace('\'', "'\\''"))
 }
+
 /// Reads a 128-bit hex nonce from /dev/urandom, failing closed if unavailable.
-/// Kept local to avoid a dependency on event-store (where identity::random_id is crate-private).
+/// Kept local: the only existing reader is crate-private in event-store, a heavy crate (git, hashing) that this leaf must not depend on.
 /// Never uses a time-derived nonce so old tokens in scrollback cannot satisfy the handshake.
 fn random_nonce() -> Result<String, LaunchOutcome> {
     use std::fs::File;
@@ -91,22 +99,6 @@ fn random_nonce() -> Result<String, LaunchOutcome> {
     Ok(s)
 }
 
-fn is_error_style_line(line: &str) -> bool {
-    let lower = line.to_ascii_lowercase();
-    lower.contains("not found")
-        || lower.contains("not-found")
-        || lower.contains("error")
-        || lower.contains("no such file")
-        || lower.contains("cannot execute")
-}
-
-fn has_consumed_error_evidence(screen: &str, prev_nonce: &str) -> bool {
-    let echo_cmd = format!("fgos-ok- {prev_nonce}");
-    screen.lines().any(|line| {
-        line.contains(prev_nonce) && !line.contains(&echo_cmd) && is_error_style_line(line)
-    })
-}
-
 fn sleep_poll(step: Duration, deadline: Instant) {
     let now = Instant::now();
     if now < deadline {
@@ -114,7 +106,6 @@ fn sleep_poll(step: Duration, deadline: Instant) {
         std::thread::sleep(step.min(rem));
     }
 }
-
 
 /// A group pane that is alive right now, with its record.
 struct LivePane {
@@ -488,91 +479,68 @@ impl<'a> Core<'a> {
     }
 
     fn wait_for_shell(&self, pane: &str) -> Result<Option<LaunchOutcome>, Refusal> {
-        let deadline = Instant::now() + Duration::from_millis(self.config.shell_ready_timeout_ms);
-        let backoff = Duration::from_millis(self.config.shell_ready_timeout_ms / 3);
-        let poll_step = Duration::from_millis(100).min(backoff).max(Duration::from_millis(1));
+        let timeout = Duration::from_millis(self.config.shell_ready_timeout_ms).min(MAX_SHELL_WAIT);
+        let deadline = Instant::now() + timeout;
+        // A swallowed first key leaves no evidence a shell prints, so the next probe is typed after
+        // a fixed backoff, never sooner than a poll step.
+        let backoff = (timeout / 3).max(MIN_PROBE_BACKOFF);
+        let poll_step = SHELL_POLL.min(backoff);
         let mut nonces: Vec<String> = Vec::new();
         let mut last_probe_at: Option<Instant> = None;
-        let mut screen = String::new();
+        let mut saw_process_info = false;
 
         loop {
-            let info = match self.driver.process_info(pane) {
-                Ok(info) => info,
+            match self.driver.process_info(pane) {
                 Err(_) => {
                     if let Ok(PaneLiveness::Gone) = self.driver.pane_liveness(pane) {
                         return Err(unknown("pane is gone"));
                     }
-                    if Instant::now() >= deadline {
-                        break;
+                }
+                Ok(info) => {
+                    saw_process_info = true;
+                    if identity::is_bare_shell(&info) {
+                        let due = match last_probe_at {
+                            None => true,
+                            Some(at) => nonces.len() < MAX_PROBES && at.elapsed() >= backoff,
+                        };
+                        if due {
+                            let nonce = match random_nonce() {
+                                Ok(n) => n,
+                                Err(not_started) => return Ok(Some(not_started)),
+                            };
+                            self.driver.pane_run(pane, &format!("printf '%s%s\\n' fgos-ok- {nonce}"))?;
+                            nonces.push(nonce);
+                            last_probe_at = Some(Instant::now());
+                        }
+                        let screen = match self.driver.read_screen(pane, Some(40), Some("recent-unwrapped")) {
+                            Ok(s) => s,
+                            Err(_) => {
+                                if let Ok(PaneLiveness::Gone) = self.driver.pane_liveness(pane) {
+                                    return Err(unknown("pane is gone"));
+                                }
+                                String::new()
+                            }
+                        };
+                        if nonces.iter().any(|n| screen.contains(&format!("fgos-ok-{n}"))) {
+                            return Ok(None);
+                        }
                     }
-                    sleep_poll(poll_step, deadline);
-                    continue;
                 }
-            };
-
-            if !identity::is_bare_shell(&info) {
-                if Instant::now() >= deadline {
-                    break;
-                }
-                sleep_poll(poll_step, deadline);
-                continue;
             }
-
-            let should_probe = if nonces.is_empty() {
-                true
-            } else if nonces.len() < 3 {
-                let prev_nonce = nonces.last().unwrap();
-                let consumed = has_consumed_error_evidence(&screen, prev_nonce);
-                let backoff_elapsed = last_probe_at.map(|t| t.elapsed() >= backoff).unwrap_or(false);
-                consumed || backoff_elapsed
-            } else {
-                false
-            };
-
-            if should_probe {
-                let nonce = match random_nonce() {
-                    Ok(n) => n,
-                    Err(not_started) => return Ok(Some(not_started)),
-                };
-                let probe_cmd = format!("printf '%s%s\\n' fgos-ok- {nonce}");
-                self.driver.pane_run(pane, &probe_cmd)?;
-                nonces.push(nonce);
-                last_probe_at = Some(Instant::now());
-            }
-
-            screen = match self.driver.read_screen(pane, Some(40), Some("recent-unwrapped")) {
-                Ok(s) => s,
-                Err(_) => {
-                    if let Ok(PaneLiveness::Gone) = self.driver.pane_liveness(pane) {
-                        return Err(unknown("pane is gone"));
-                    }
-                    String::new()
-                }
-            };
-
-            if nonces.iter().any(|n| screen.contains(&format!("fgos-ok-{n}"))) {
-                return Ok(None);
-            }
-
-            if nonces.len() < 3 && has_consumed_error_evidence(&screen, nonces.last().unwrap()) {
-                continue;
-            }
-
             if Instant::now() >= deadline {
                 break;
             }
             sleep_poll(poll_step, deadline);
         }
 
-        if nonces.is_empty() {
-            Ok(Some(LaunchOutcome::NotStarted {
-                reason: "pane foreground is not the shell".into(),
-            }))
+        let reason = if !nonces.is_empty() {
+            "pane shell did not become ready in time"
+        } else if saw_process_info {
+            "pane foreground is not the shell"
         } else {
-            Ok(Some(LaunchOutcome::NotStarted {
-                reason: "pane shell did not become ready in time".into(),
-            }))
-        }
+            "pane process info could not be read"
+        };
+        Ok(Some(LaunchOutcome::NotStarted { reason: reason.into() }))
     }
 
     fn identify_root(&self, pane: &str, spec: &LaunchSpec) -> Option<ProcessIdentity> {

@@ -16,8 +16,6 @@ pub enum ShellScript {
     PromptReadsFirstKey,
     TypedAheadSkipsPrompt,
     LineModeRead,
-    NonShellForeground,
-    EchoThenReady,
     EchoOnly,
 }
 
@@ -60,18 +58,13 @@ impl MemPane {
                     self.screen.push_str(&format!("\nfgos-ok-{nonce}\n"));
                 }
                 ShellScript::PromptReadsFirstKey => {
-                    if self.probe_count == 1 {
-                        self.screen.push_str(&format!("\nrintf: command not found: rintf (nonce {nonce})\n"));
-                    } else {
+                    // The start prompt takes the first typed line; the later ones reach the shell.
+                    if self.probe_count > 1 {
                         self.screen.push_str(&format!("\nfgos-ok-{nonce}\n"));
                     }
                 }
                 ShellScript::LineModeRead => {
                     self.screen.push_str(&format!("\nread: consumed line (nonce {nonce})\n"));
-                }
-                ShellScript::NonShellForeground => {}
-                ShellScript::EchoThenReady => {
-                    self.screen.push_str(&format!("\nprintf '%s%s\\n' fgos-ok- {nonce}\n"));
                 }
                 ShellScript::EchoOnly => {
                     self.screen.push_str(&format!("\nprintf '%s%s\\n' fgos-ok- {nonce}\n"));
@@ -177,14 +170,12 @@ impl MemDriver {
         }
     }
 
-
     pub fn tab_of(&self, pane: &str) -> String {
         self.panes.borrow()[pane].tab.clone()
     }
     pub fn env_of(&self, pane: &str) -> Option<Vec<(String, String)>> {
         self.panes.borrow().get(pane).map(|p| p.env.clone())
     }
-
 
     fn current(&self) -> ServerIncarnation {
         ServerIncarnation {
@@ -291,12 +282,6 @@ impl TerminalDriver for MemDriver {
     fn read_screen(&self, pane: &str, _lines: Option<u32>, _source: Option<&str>) -> DriverResult<String> {
         let mut panes = self.panes.borrow_mut();
         if let Some(p) = panes.get_mut(pane) {
-            if p.script == ShellScript::EchoThenReady && p.probe_count == 1 {
-                p.screen_reads += 1;
-                if p.screen_reads > 1 {
-                    p.screen.push_str(&format!("\nfgos-ok-{}\n", p.last_nonce));
-                }
-            }
             Ok(p.screen.clone())
         } else {
             Err(unknown("pane_not_found"))
