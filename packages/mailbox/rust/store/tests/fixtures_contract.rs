@@ -541,6 +541,22 @@ fn the_adapters_contract_refuses_missing_or_inconsistent_hook_facts() {
 }
 
 #[test]
+fn hook_facts_measured_on_another_platform_are_not_used_so_that_cli_is_quiet_as_untested() {
+    use fgos_mailbox::adapters::TestedClis;
+    use fgos_mailbox::hook::Adapter;
+    let text = fs::read_to_string(contracts_dir().join(ADAPTERS_CONTRACT)).unwrap();
+    let mut contract: Value = serde_json::from_str(&text).unwrap();
+    contract["hookFacts"]["claude"]["measuredOn"]["platform"] = Value::from("plan9");
+    let tested = TestedClis::from_contract(&contract.to_string()).expect("still a valid contract");
+    assert!(tested.contains(Adapter::Claude), "still a tested CLI");
+    assert!(
+        tested.facts(Adapter::Claude).is_none(),
+        "facts from another platform never drive the caller check here"
+    );
+    assert!(tested.facts(Adapter::Codex).is_some(), "the other CLI is unchanged");
+}
+
+#[test]
 fn the_limits_contract_holds_the_breaker_and_p95_keys_with_their_sources() {
     let keys = limits_keys();
     let key = |name: &str| {

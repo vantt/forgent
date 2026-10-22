@@ -145,8 +145,7 @@ struct RawFacts {
 #[serde(deny_unknown_fields)]
 struct RawMeasured {
     versions: Vec<String>,
-    #[serde(rename = "platform")]
-    _platform: String,
+    platform: String,
 }
 
 /// The CLIs an adapters contract lists under `testedAgainst`, with the
@@ -157,6 +156,8 @@ pub struct TestedClis {
     clis: Vec<String>,
     versions: Vec<(String, String)>,
     facts: BTreeMap<String, AdapterFacts>,
+    /// The platform each CLI's facts were measured on.
+    platforms: BTreeMap<String, String>,
 }
 
 impl TestedClis {
@@ -175,6 +176,7 @@ impl TestedClis {
             }
         }
         let mut facts = BTreeMap::new();
+        let mut platforms = BTreeMap::new();
         for (cli, entry) in raw.hook_facts {
             if !clis.contains(&cli) {
                 return Err(ContractError(format!(
@@ -192,6 +194,7 @@ impl TestedClis {
                     )));
                 }
             }
+            platforms.insert(cli.clone(), entry.measured_on.platform.clone());
             facts.insert(cli.clone(), facts_of(&cli, entry)?);
         }
         if let Some(missing) = clis.iter().find(|cli| !facts.contains_key(*cli)) {
@@ -208,6 +211,7 @@ impl TestedClis {
             clis,
             versions,
             facts,
+            platforms,
         })
     }
 
@@ -227,9 +231,16 @@ impl TestedClis {
         self.versions.iter().any(|(c, v)| c == cli && v == version)
     }
 
-    /// The measured hook facts of a tested CLI.
+    /// The measured hook facts of a tested CLI, only on the platform they
+    /// were measured on (`std::env::consts::OS`): elsewhere the hook shell
+    /// and head executables are unmeasured, so the CLI is quiet as untested
+    /// instead of failing the caller check on every call.
     pub fn facts(&self, adapter: Adapter) -> Option<&AdapterFacts> {
-        self.facts.get(adapter.word())
+        let word = adapter.word();
+        if self.platforms.get(word).map(String::as_str) != Some(std::env::consts::OS) {
+            return None;
+        }
+        self.facts.get(word)
     }
 }
 
