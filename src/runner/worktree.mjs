@@ -168,9 +168,9 @@ export function runWorktreeSetupCommands(worktreePath, repoRoot) {
 // real path, under the machine state root; Git never reads it.
 const PROVISIONING_CONTRACT = 'worktree-provisioning.v1';
 
-/** The state root a checkout of `repoRoot` keeps its provisioning record under. */
-export function provisioningStateRoot(repoRoot) {
-  return resolveStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
+/** The state root a checkout keeps its provisioning record under. */
+export function provisioningStateRoot() {
+  return resolveStateRoot().stateRoot;
 }
 
 function provisioningRecordPath(stateRoot, worktreePath) {
@@ -746,7 +746,7 @@ function finishWorktreeSetup(repoRoot, worktreePath, branch) {
   // for THIS worktree's own declared dependencies instead, correct at the
   // cost of the install itself. What it places is recorded, so
   // `removeWorktree` can take it back.
-  provisionWorktree(worktreePath, repoRoot, provisioningStateRoot(repoRoot));
+  provisionWorktree(worktreePath, repoRoot, provisioningStateRoot());
 }
 
 /**
@@ -1268,7 +1268,7 @@ export function createVerifyCheckout(repoRoot, commit) {
     throw new WorktreeError(`git worktree add --detach failed at ${commit}: ${err.message}`, { worktreePath });
   }
   try {
-    provisionWorktree(worktreePath, repoRoot, provisioningStateRoot(repoRoot));
+    provisionWorktree(worktreePath, repoRoot, provisioningStateRoot());
   } catch (err) {
     try { removeWorktree(repoRoot, worktreePath, { force: true }); } catch { /* the provisioning error is the one to report */ }
     throw err;
@@ -1332,7 +1332,7 @@ export function removeWorktree(repoRoot, worktreePath, opts = {}) {
       }
       const deliveredTo = opts.deliveredTo ?? expectedTip;
       const evidenceDigest = crypto.createHash('sha256').update(JSON.stringify({ worktreePath, expectedTip, deliveredTo })).digest('hex');
-      removeProvisioned(provisioningStateRoot(repoRoot), worktreePath, () => createGitWorktree({ ...options, repoPath: options.trustedMain })
+      removeProvisioned(provisioningStateRoot(), worktreePath, () => createGitWorktree({ ...options, repoPath: options.trustedMain })
         .remove({ path: worktreePath, expectedTip, deliveredTo, evidenceDigest, operationId: id }, [custody]));
     }, opts);
   } catch (err) { throw new WorktreeError(`git worktree remove failed for "${worktreePath}": ${err.message}${retained ? `; commit preserved at ${retained.retainedRef}; snapshot ${retained.snapshot}` : ''}`, { worktreePath, ...retained }); }

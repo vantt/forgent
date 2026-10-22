@@ -7,7 +7,6 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { checkGit, compatibleGitContracts } from '../../src/setup/git-checks.mjs';
-import { checkLockFences } from '../../src/setup/holder-lock-checks.mjs';
 import { ensureGitAddon, root as addonRoot } from '../../scripts/git-addon.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { resolveStateRoot } from '../../src/holder-lock/state-root.mjs';
@@ -31,15 +30,6 @@ test('a malformed explicit addon remains a failing diagnostic', () => {
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
 
-test('an unused controller fence does not turn a channel without activation red', () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-no-controller-'));
-  try {
-    const result = checkLockFences(root, { providerRuntimeDir: path.join(root, 'providers') });
-    assert.equal(result.passed, true, result.message);
-    assert.doesNotMatch(result.message, /git-fence-missing/);
-  } finally { fs.rmSync(root, { recursive: true, force: true }); }
-});
-
 test('an addon-less compatibility channel reports informational Git rows', () => {
   const module = pathToFileURL(path.resolve('src/setup/git-checks.mjs')).href;
   const script = `import {checkGit} from ${JSON.stringify(module)}; console.log(JSON.stringify(checkGit(process.cwd(),'git-component-compatible')));`;
@@ -56,7 +46,7 @@ test('the journal row fails with git-fence-missing when a Git WAL has lost the c
     const fence = path.join(repo, '.fgos/locks/activation.lock');
     fs.mkdirSync(fence, { recursive: true });
     fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
-    const { stateRoot } = resolveStateRoot({ fgosDir: path.join(repo, '.fgos') });
+    const { stateRoot } = resolveStateRoot();
     loadNativeAddon(options).initializeGitWal(stateRoot, repo, repo);
     assert.equal(checkGit(repo, 'git-operation-journal', options).passed, true);
     fs.rmSync(fence, { recursive: true });

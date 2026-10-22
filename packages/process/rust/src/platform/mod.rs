@@ -6,7 +6,7 @@ use std::io;
 use std::process::{Child, Command};
 
 use crate::control::{Signal, SignalOutcome};
-use crate::facts::{CreationMark, Holders, Observed, Observer, PidNs, ProcTuple, Relation, Scan, ScanFilter};
+use crate::facts::{CreationMark, Holders, Observed, Observer, PidNs, ProcTuple, ProcView, Relation, Scan, ScanFilter};
 use crate::{FdSlot, ProcId};
 
 #[cfg(target_os = "linux")]
@@ -43,6 +43,11 @@ pub trait ProcessPlatform: Send + Sync {
     fn relations(&self) -> Option<Vec<Relation>> {
         None
     }
+    /// Parent, group and start time of `pid` alone, from one stat read; `None`
+    /// where the OS has no such read or the process is gone.
+    fn relation_of(&self, _pid: ProcId) -> Option<Relation> {
+        None
+    }
     /// The last pid allocated in this process's pid namespace.
     fn last_pid(&self) -> Option<u32> {
         None
@@ -53,6 +58,10 @@ pub trait ProcessPlatform: Send + Sync {
     }
     /// Every live process with the facts `filter` asks for.
     fn scan(&self, filter: &ScanFilter) -> Scan;
+    /// The scan view of `pid` alone; `None` where the OS has no scan or nothing runs there.
+    fn view_of(&self, _pid: ProcId, _filter: &ScanFilter) -> Option<ProcView> {
+        None
+    }
     /// Spawn with an explicit descriptor map; see [`crate::control::spawn_with_fds`].
     fn spawn_with_fds(&self, cmd: Command, fd_map: &[(FdSlot, &File)]) -> io::Result<Child>;
     /// Signal by identity; see [`crate::control::signal_by_identity`].

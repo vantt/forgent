@@ -1,22 +1,24 @@
-// driver.mjs -- the only module of the facade that knows there is a Rust
-// host binary and a file descriptor. It finds the binary once per process
-// (same rule as the writer identity: FGOS_HOST_BIN, then the activation),
-// runs `fgos internal lock-fd` / `fgos internal state-root`, asks the
-// guarantee of a lock directory once per directory, and scans /proc for the
-// processes that hold a lock description. Nothing here decides a lock
-// result: it carries the route's answer or names why there is none.
+// driver.mjs -- the only module of the facade that knows the native door,
+// the host binary and a file descriptor. Every lock operation runs in this
+// process through the `holderLock` namespace of the combined addon: the
+// capability that lets it act on an open description is taken here once and
+// never leaves this module. The host binary is still needed for the two
+// processes that remain (`lock-fd --borrowed-check` and the Windows
+// `lock-hold` helper) and is found once per process (FGOS_HOST_BIN, then the
+// activation). Nothing here decides a lock result: it carries the door's
+// answer or names why there is none.
 //
-// There is no fallback to a lock implemented in Node: without a usable
-// driver every acquire fails with `lock-driver-unavailable`.
+// There is no fallback to a lock implemented in Node: without the addon every
+// acquire fails with `lock-driver-unavailable`.
 
-import fs from 'node:fs';
 import path from 'node:path';
-import { spawn, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
+import { nativeDoor, nativeHelperExe } from '../native/door.mjs';
 import { HolderLockError, PROTOCOL, parseRouteLine } from './protocol.mjs';
 
 const MAX_OUTPUT_BYTES = 64 * 1024;
-/** Bound for the route calls that neither wait nor kill: guarantee, state root, probe, borrowed check. */
+/** Bound for the route calls that neither wait nor kill: the borrowed check. */
 export const ROUTE_CALL_TIMEOUT_MS = 2000;
 /** Headroom added to every bounded wait, so the helper is only killed when it really hung. */
 export const ROUTE_SLACK_MS = 1000;
@@ -148,82 +150,90 @@ export function runLockRouteSync({ bin, args, fd, timeoutMs, env = routeEnv() })
   return interpretRoute(res, bin, `lock-fd ${args.join(' ')}`);
 }
 
-/** The async twin of runLockRouteSync: same argv, same fd mapping, same
- * SIGKILL at `timeoutMs`; resolves with the parsed line once the child
- * has exited and its output is drained. */
-export function runLockRoute({ bin, args, fd, timeoutMs, env = routeEnv() }) {
-  const verb = `lock-fd ${args.join(' ')}`;
-  return new Promise((resolve, reject) => {
-    const settle = (result) => {
-      try {
-        resolve(interpretRoute(result, bin, verb));
-      } catch (err) {
-        reject(err);
-      }
-    };
-    const stdio = fd === undefined ? ['ignore', 'pipe', 'pipe'] : ['ignore', 'pipe', 'pipe', fd];
-    let child;
-    try {
-      child = spawn(bin, lockFdArgv(args), { env, stdio, windowsHide: true });
-    } catch (error) {
-      settle({ error });
-      return;
-    }
-    let stdout = '';
-    let stderr = '';
-    let timedOut = false;
-    let spawnError = null;
-    let settled = false;
-    const timer = setTimeout(() => {
-      timedOut = true;
-      child.kill('SIGKILL');
-    }, timeoutMs);
-    child.stdout.setEncoding('utf8');
-    child.stderr.setEncoding('utf8');
-    child.stdout.on('data', (chunk) => { if (stdout.length < MAX_OUTPUT_BYTES) stdout += chunk; });
-    child.stderr.on('data', (chunk) => { if (stderr.length < MAX_OUTPUT_BYTES) stderr += chunk; });
-    child.on('error', (error) => {
-      spawnError = error;
-      // A spawn failure (ENOENT) emits no 'close' with a status worth reading.
-      if (!settled && (error.code === 'ENOENT' || error.code === 'EACCES')) {
-        settled = true;
-        clearTimeout(timer);
-        settle({ error });
-      }
-    });
-    child.on('close', (status, signal) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      settle({ status, signal, stdout, stderr, error: spawnError, timedOut });
-    });
-  });
+// --- the door -------------------------------------------------------------
+
+const ADDON_NEXT_STEP = {
+  'addon-not-shipped': 'onboard this project with `fgctl init`, or run through `npm run fgos:dev` from a checkout',
+  'addon-unavailable': 'the release does not carry a loadable addon; restage/activate it (fgctl), or rebuild with `npm run fgos:dev`',
+};
+
+function doorUnavailable(err) {
+  if (err instanceof HolderLockError) return err;
+  const reason = err?.code === 'git-addon-not-shipped' ? 'addon-not-shipped' : 'addon-unavailable';
+  return unavailable(reason, `${err.message} (${ADDON_NEXT_STEP[reason]})`);
 }
+
+/** Map a failure of a door call: the door's own (single load, missing driver, no `holderLock`) is `lock-driver-unavailable`. */
+function doorError(err) {
+  if (err instanceof HolderLockError) return err;
+  const message = String(err?.message ?? err);
+  if (message.startsWith('holder-lock-unavailable:')) return unavailable('addon-unavailable', message);
+  return new HolderLockError('lock-door-error', message, { cause: err?.code ?? null });
+}
+
+let door = null; // { ns, capability } taken once on first use; never exported
+
+function lockDoor() {
+  if (door) return door;
+  let addon;
+  try {
+    addon = nativeDoor();
+  } catch (err) {
+    throw doorUnavailable(err);
+  }
+  try {
+    door = { ns: addon.holderLock, capability: addon.holderLock.take() };
+  } catch (err) {
+    throw doorError(err);
+  }
+  return door;
+}
+
+/** Fail by name, before anything is created, when the lock door cannot be reached. */
+export function assertLockDoor() {
+  lockDoor();
+}
+
+function viaDoor(call) {
+  const { ns, capability } = lockDoor();
+  try {
+    return call(ns, capability);
+  } catch (err) {
+    throw doorError(err);
+  }
+}
+
+/** Lock the open description `fd`: `{ result, ... , lock? }`; `lock` (an acquired lock) belongs to the facade's entry for this fd. */
+export const doorLockFd = (fd, wait, killWaitMs, predecessorKinds) => viaDoor((ns, cap) => ns.lockFd(cap, fd, 'ex', wait, killWaitMs, predecessorKinds ?? []));
+/** The state root of `env` and what decided it: `{ stateRoot, lockRoot, source }`, the host's own formula. */
+export const doorStateRoot = (env) => viaDoor((ns) => ns.stateRoot({ ...env }));
+export const doorProbe = (lockPath) => viaDoor((ns) => ns.probe(path.resolve(lockPath)));
+export const doorDrain = (lock, childPid, protectedRoots) => viaDoor((ns, cap) => ns.drainChild(cap, lock, childPid, protectedRoots));
+export const doorClearDomain = (lock, lockPath) => viaDoor((ns, cap) => ns.clearDomain(cap, lock, path.resolve(lockPath)));
+/** Settle a lock whose own descriptor is already closed: `{ settled: 'released' | 'stuck', killed, pids }`. */
+export const doorReleaseFd = (lock) => viaDoor((ns, cap) => ns.releaseFd(cap, lock));
+/** Drop the lock's duplicate without settling: the description lives on in the process it was handed to. */
+export const doorCloseHandedOver = (lock) => viaDoor((ns, cap) => ns.closeHandedOver(cap, lock));
+/** The processes holding `lockFile`, each with the origin Rust decided for the lock `name`. */
+export const doorHolders = (lockFile, name) => viaDoor((ns) => ns.holders(path.resolve(lockFile), name));
+export const doorPredecessorState = (lockFile) => viaDoor((ns) => ns.predecessorState(path.resolve(lockFile)));
+/** Elapsed milliseconds of the two-process kernel-semantics probe in `dir`, with the release's own `fgos` as the holder helper where one is needed (Windows); a failure throws with the reason. */
+export const doorTwoProcessProbe = (dir) => viaDoor((ns) => ns.twoProcessProbe(path.resolve(dir), nativeHelperExe(nativeDoor())));
 
 const guarantees = new Map();
 
 /**
- * The driver's guarantee for the directory `lockPath` lives in, asked of
- * the route once per directory and cached for the process. The directory
- * must exist (the route reads its filesystem).
+ * The driver's guarantee for the directory `lockPath` lives in, asked of the
+ * door once per directory and cached for the process. The directory must
+ * exist (the door reads its filesystem).
  */
-export function guaranteeFor(lockPath, { fgosDir } = {}) {
+export function guaranteeFor(lockPath) {
   const dir = path.resolve(path.dirname(lockPath));
   const cached = guarantees.get(dir);
   if (cached) return cached;
-  const bin = hostBin({ fgosDir });
-  const line = runLockRouteSync({ bin, args: ['--guarantee', path.resolve(lockPath)], timeoutMs: ROUTE_CALL_TIMEOUT_MS });
-  if (line.result === 'unavailable') {
-    throw unavailable(line.reason, `${dir}: ${line.detail}`, { lockDir: dir });
-  }
-  if (line.result !== 'guarantee' || !line.guarantee || typeof line.guarantee !== 'object') {
-    throw new HolderLockError('lock-route-bad-output', `${bin} --guarantee answered ${JSON.stringify(line.result)}. ${ROUTE_NEXT_STEP}`, { lockDir: dir });
-  }
-  // This actual Rust observation precedes every acquired open using the cache.
-  // Keep the older floor: caching must never advance a live handle's reach.
-  Object.defineProperty(line.guarantee, 'reachFloorTicks', { value: line.reachFloorTicks ?? null });
-  guarantees.set(dir, line.guarantee);
-  return line.guarantee;
+  const guarantee = viaDoor((ns) => ns.guarantee(dir));
+  guarantees.set(dir, guarantee);
+  return guarantee;
 }
 
 /**
@@ -231,8 +241,8 @@ export function guaranteeFor(lockPath, { fgosDir } = {}) {
  * the named `lock-driver-unavailable` otherwise (a network filesystem gives
  * `none`, a platform without a driver gives `unsupported`).
  */
-export function assertDriverUsable(lockPath, opts = {}) {
-  const guarantee = guaranteeFor(lockPath, opts);
+export function assertDriverUsable(lockPath) {
+  const guarantee = guaranteeFor(lockPath);
   const dir = path.dirname(lockPath);
   if (guarantee.exclusion === 'none') {
     throw unavailable('unsupported-filesystem', `${dir}: the ${guarantee.driver} driver gives no exclusion on this filesystem (${(guarantee.notes ?? []).join('; ')})`, { lockDir: dir, guarantee });
@@ -241,108 +251,4 @@ export function assertDriverUsable(lockPath, opts = {}) {
     throw unavailable('unsupported-platform', `${dir}: no holder-lock driver on ${guarantee.platform} (${(guarantee.notes ?? []).join('; ')})`, { lockDir: dir, guarantee });
   }
   return guarantee;
-}
-
-/** Run `fgos internal state-root` once and return `{ stateRoot, lockRoot, source }`.
- * `env` is the environment the root is resolved FROM (the caller's, by
- * default this process's); it reaches the route minus the invocation
- * record path, like every other route call. */
-export function runStateRootRoute({ fgosDir, env = process.env } = {}) {
-  const bin = hostBin({ fgosDir });
-  const res = spawnSync(bin, ['internal', 'state-root', '--protocol', String(PROTOCOL)], {
-    env: routeEnv(env),
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe'],
-    timeout: ROUTE_CALL_TIMEOUT_MS,
-    killSignal: 'SIGKILL',
-    maxBuffer: MAX_OUTPUT_BYTES,
-    windowsHide: true,
-  });
-  const line = interpretRoute(res, bin, 'state-root');
-  // A killed helper is a route that hung, not a lock result: nothing to keep.
-  if (line.result === 'killed') {
-    throw new HolderLockError('lock-route-error', `${bin} state-root did not answer within ${ROUTE_CALL_TIMEOUT_MS} ms and was killed. ${ROUTE_NEXT_STEP}`);
-  }
-  if (typeof line.stateRoot !== 'string' || typeof line.lockRoot !== 'string' || typeof line.source !== 'string') {
-    throw new HolderLockError('lock-route-bad-output', `${bin} state-root answered without stateRoot/lockRoot/source: ${String(res.stdout ?? '').slice(0, 200)}. ${ROUTE_NEXT_STEP}`);
-  }
-  return { stateRoot: line.stateRoot, lockRoot: line.lockRoot, source: line.source };
-}
-
-function fdTargetMatches(target, real) {
-  return target === real || target === `${real} (deleted)`;
-}
-
-/** Inode numbers named by the `lock:` lines of one fdinfo text, e.g.
- * `lock:\t1: FLOCK  ADVISORY  WRITE 12345 00:2f:98765 0 EOF`; the
- * `major:minor:inode` token is the one with two colons. The kernel lists a
- * lock under a descriptor only when that descriptor's description owns it. */
-function fdinfoLockInodes(info) {
-  const inodes = [];
-  for (const line of info.split('\n')) {
-    if (!line.startsWith('lock:')) continue;
-    const token = line.split(/\s+/).find((part) => part.split(':').length === 3 && !part.endsWith(':'));
-    if (token) inodes.push(token.slice(token.lastIndexOf(':') + 1));
-  }
-  return inodes;
-}
-
-/**
- * The processes that hold a description of `lockPath` right now, as the
- * kernel shows them. Linux: every pid with a descriptor on the file whose
- * fdinfo carries a lock line for its inode, i.e. a copy of the description
- * that owns the lock. A process that only opened the file itself (a
- * contender waiting, a probe, a reader) owns no lock and is not listed.
- * Processes of another user are skipped: they cannot have inherited this
- * process's description. Elsewhere: unlistable.
- * Returns `{ kind: 'list', pids }` or `{ kind: 'unlistable', reason }`.
- */
-export function descriptionHolders(lockPath, { excludePid } = {}) {
-  if (process.platform !== 'linux') return { kind: 'unlistable', reason: `no /proc fd table on ${process.platform}` };
-  let real;
-  let ino;
-  try {
-    real = fs.realpathSync(lockPath);
-    ino = fs.statSync(real, { bigint: true }).ino.toString();
-  } catch (err) {
-    return { kind: 'unlistable', reason: `cannot resolve ${lockPath}: ${err.code}` };
-  }
-  const pids = [];
-  let entries;
-  try {
-    entries = fs.readdirSync('/proc');
-  } catch (err) {
-    return { kind: 'unlistable', reason: `cannot read /proc: ${err.code}` };
-  }
-  for (const entry of entries) {
-    if (!/^\d+$/.test(entry)) continue;
-    const pid = Number(entry);
-    if (pid === excludePid) continue;
-    let fds;
-    try {
-      fds = fs.readdirSync(`/proc/${entry}/fd`);
-    } catch {
-      continue;
-    }
-    for (const fd of fds) {
-      let target;
-      try {
-        target = fs.readlinkSync(`/proc/${entry}/fd/${fd}`);
-      } catch {
-        continue;
-      }
-      if (!fdTargetMatches(target, real)) continue;
-      let info;
-      try {
-        info = fs.readFileSync(`/proc/${entry}/fdinfo/${fd}`, 'utf8');
-      } catch {
-        continue;
-      }
-      if (fdinfoLockInodes(info).includes(ino)) {
-        pids.push(pid);
-        break;
-      }
-    }
-  }
-  return { kind: 'list', pids };
 }

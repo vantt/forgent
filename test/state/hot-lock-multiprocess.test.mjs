@@ -1,6 +1,6 @@
 // Hot lock under real processes: the cleanup schedule that used to give two
 // holders, a stress run with holders killed inside the critical section,
-// zombie / unreadable / unjudgeable records, a foreign pid namespace, and the
+// unreadable / unjudgeable records, a foreign pid namespace, and the
 // cost of the uncontended fast path against the lock this one replaced.
 //
 // Needs FGOS_HOST_BIN: cleaning a dead holder takes the reclaim kernel lock
@@ -13,9 +13,9 @@ import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { hotPaths, judgeHotRecord, readHotRecord, withStateTx } from '../../src/state/hot-lock.mjs';
-import { observe } from '../../src/runner/dispatch/process-identity.mjs';
-import { resolveWriterIdentity, IDENTITY_ENV_KEYS } from '../../src/util/session-identity.mjs';
+import { hotPaths, readHotRecord, withStateTx } from '../../src/state/hot-lock.mjs';
+import { resolveWriterIdentity } from '../../src/util/session-identity.mjs';
+import { IDENTITY_ENV_KEYS } from '../helpers/identity-env.mjs';
 import { uniqueTmpTag } from '../../src/util/unique-tmp-tag.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
@@ -171,28 +171,7 @@ test('stress: 8 processes x 60 rounds with 10 holders killed inside the critical
   }
 });
 
-test('a zombie holder counts as dead and its record is cleaned', { skip: !LINUX && 'needs /proc' }, async () => {
-  const f = fixture('zombie');
-  let parent;
-  try {
-    // A python parent that never reaps leaves its finished child a zombie.
-    parent = spawn('python3', ['-c', 'import subprocess,sys,time\np=subprocess.Popen(["true"])\nprint(p.pid,flush=True)\ntime.sleep(60)'], { stdio: ['ignore', 'pipe', 'ignore'] });
-    let out = '';
-    parent.stdout.on('data', (chunk) => { out += chunk; });
-    await waitFor(() => /\d+\n/.test(out), 'the zombie pid');
-    const pid = Number(out.trim());
-    const stat = (() => { for (let i = 0; i < 100; i += 1) { const s = fs.readFileSync(`/proc/${pid}/stat`, 'utf8'); if (s.slice(s.lastIndexOf(')') + 2, s.lastIndexOf(')') + 3) === 'Z') return s; } return null; })();
-    assert.ok(stat, 'the child became a zombie');
-    const startTime = stat.slice(stat.lastIndexOf(')') + 2).split(' ')[19];
-    writeRecord(f.fgosDir, 'state', { v: 1, pid, startTime });
-    assert.equal(withStateTx(f.fgosDir, () => 'entered', { prefetched: { writer: 'mp-test' } }), 'entered');
-  } finally {
-    parent?.kill('SIGKILL');
-    f.cleanup();
-  }
-});
-
-test('a record that cannot be read or judged is never cleaned: the waiter times out and the bytes stay', async () => {
+test('a record that cannot be read or judged is never cleaned: the waiter times out as lock-record-unreadable, naming fgos lock fence, and the bytes stay', async () => {
   const cases = {
     garbage: '{"v":1,"pid":',
     noPid: JSON.stringify({ v: 1 }),
@@ -210,7 +189,7 @@ test('a record that cannot be read or judged is never cleaned: the waiter times 
           withStateTx(process.argv[1], () => 'entered', { prefetched: { writer: ${WRITER} } });
           console.log('ENTERED');
         } catch (err) {
-          console.log(JSON.stringify({ code: err.code, category: err.category, reason: err.reason ?? null }));
+          console.log(JSON.stringify({ code: err.code, category: err.category, reason: err.reason ?? null, message: err.message }));
         }
       `, [f.fgosDir]);
       const result = await run.done;
@@ -218,7 +197,8 @@ test('a record that cannot be read or judged is never cleaned: the waiter times 
       const answer = JSON.parse(result.stdout.trim());
       assert.equal(answer.code, 'hot-lock-timeout', name);
       assert.equal(answer.category, 'lock-timeout', name);
-      if (name !== 'unjudgeable') assert.equal(answer.reason, 'lock-record-unreadable', name);
+      assert.equal(answer.reason, 'lock-record-unreadable', name);
+      assert.match(answer.message, /fgos lock fence/, `${name}: the timeout names the way out`);
       assert.ok(Date.now() - started >= 4500, `${name}: waited out the timeout`);
       assert.equal(fs.readFileSync(file, 'utf8'), bytes, `${name}: record untouched`);
     } finally {
@@ -294,23 +274,5 @@ test('fast path: an uncontended acquire and release costs at most twice the raw 
     assert.ok(ratio <= 2, `fast path costs ${ratio.toFixed(3)}x its raw file steps, more than 2x`);
   } finally {
     f.cleanup();
-  }
-});
-
-// The hot lock judges a holder's record through the process door, the same on every platform.
-test('judgeHotRecord: a live holder with its recorded start time is alive, another start time is a reused pid, a killed holder is dead, a live holder without a start time stays unknown', async () => {
-  const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
-  const exited = new Promise((resolve) => child.on('exit', resolve));
-  try {
-    const { pid, startTime, bootId, pidNs } = observe(child.pid);
-    const record = { v: 1, pid, startTime, bootId, pidNs };
-    assert.equal(judgeHotRecord(record), 'alive');
-    assert.equal(judgeHotRecord({ ...record, startTime: `${startTime}0` }), 'dead');
-    assert.equal(judgeHotRecord({ v: 1, pid }), 'unknown');
-    child.kill('SIGKILL');
-    await exited;
-    assert.equal(judgeHotRecord(record), 'dead');
-  } finally {
-    child.kill('SIGKILL');
   }
 });

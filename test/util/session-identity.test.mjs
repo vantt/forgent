@@ -1,9 +1,9 @@
-// session-identity.test.mjs -- the Node facade over the Rust session identity
-// crate. Every case runs the real host binary (FGOS_HOST_BIN, built from this
-// checkout by `npm test`) in a fresh Node process, so the per-process cache
-// starts empty and the answer comes from the one authority. Failure modes use
-// small stand-in executables (unix only); the real-binary cases run on
-// Windows too.
+// session-identity.test.mjs -- the Node facade over the Rust identity crate.
+// The rule has one owning proof, packages/identity/rust/tests/golden.rs; these
+// cases prove the door wiring (env, process tree, registry path, the doctor
+// probe's failure codes) against the addon and host built from this checkout
+// (FGOS_HOST_BIN, set by `npm test`). Probe failure modes use small stand-in
+// executables (unix only).
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -13,12 +13,12 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { IDENTITY_ENV_KEYS } from '../../src/util/session-identity.mjs';
+import { IDENTITY_ENV_KEYS } from '../helpers/identity-env.mjs';
+import { probeIdentity, resolveWriterIdentity } from '../../src/util/session-identity.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
 const FACADE_URL = new URL('../../src/util/session-identity.mjs', import.meta.url).href;
-const LOCK_URL = new URL('../../src/util/state-lock-held.mjs', import.meta.url).href;
 const CONTRACTS = path.join(REPO_ROOT, 'packages', 'identity', 'contracts');
 const HOST = process.env.FGOS_HOST_BIN;
 const UNIX = process.platform !== 'win32';
@@ -49,7 +49,6 @@ function cleanEnv(extra = {}) {
  * Node process and returns what it prints as JSON. */
 function inFreshProcess(body, { env = cleanEnv(), cwd = REPO_ROOT, viaShell = 0 } = {}) {
   const script = `const facade = await import(${JSON.stringify(FACADE_URL)});
-const lock = await import(${JSON.stringify(LOCK_URL)});
 const out = await (async () => { ${body} })();
 process.stdout.write(JSON.stringify(out));`;
   let command = process.execPath;
@@ -82,11 +81,6 @@ function calls(file) {
   }
 }
 
-test('the facade cache key names the same env variables, in the same order, as the contract', () => {
-  const contract = JSON.parse(fs.readFileSync(path.join(CONTRACTS, 'identity.writer.v1.json'), 'utf8'));
-  assert.deepEqual([...IDENTITY_ENV_KEYS], contract['x-envOrder']);
-});
-
 test('the dispatch writerId format floor uses the contract id charset and length', async () => {
   const contract = JSON.parse(fs.readFileSync(path.join(CONTRACTS, 'identity.writer.v1.json'), 'utf8'));
   const { WRITER_ID_RE, MAX_WRITER_ID_LENGTH } = await import('../../src/runner/dispatch/execution-contract.mjs');
@@ -94,76 +88,33 @@ test('the dispatch writerId format floor uses the contract id charset and length
   assert.equal(MAX_WRITER_ID_LENGTH, contract['x-maxIdLength']);
 });
 
-test('every shared env vector resolves the same through the real binary', (t) => {
+test('every shared env vector resolves the same through the door', (t) => {
   requireHost(t);
   const golden = JSON.parse(fs.readFileSync(path.join(CONTRACTS, 'identity.writer.golden.v1.json'), 'utf8'));
   const root = tmp('fgos-identity-env-');
-  const cases = golden.envCases.map((c, i) => {
-    let dir = null;
-    if (c.registry.kind !== 'none') {
-      dir = path.join(root, `case-${i}`);
-      fs.mkdirSync(dir);
-      if (c.registry.kind === 'rows') fs.writeFileSync(path.join(dir, 'sessions.json'), JSON.stringify(c.registry.rows));
-      if (c.registry.kind === 'raw') fs.writeFileSync(path.join(dir, 'sessions.json'), c.registry.raw);
-    }
-    return { name: c.name, env: c.env, dir, expected: c.expected };
-  });
-  const results = inFreshProcess(`
-    const cases = ${JSON.stringify(cases)};
-    const keys = ${JSON.stringify(IDENTITY_ENV_KEYS)};
-    return cases.map((c) => {
-      for (const key of keys) delete process.env[key];
+  const saved = Object.fromEntries(IDENTITY_ENV_KEYS.map((key) => [key, process.env[key]]));
+  try {
+    golden.envCases.forEach((c, i) => {
+      let dir;
+      if (c.registry.kind !== 'none') {
+        dir = path.join(root, `case-${i}`);
+        fs.mkdirSync(dir);
+        if (c.registry.kind === 'rows') fs.writeFileSync(path.join(dir, 'sessions.json'), JSON.stringify(c.registry.rows));
+        if (c.registry.kind === 'raw') fs.writeFileSync(path.join(dir, 'sessions.json'), c.registry.raw);
+      }
+      for (const key of IDENTITY_ENV_KEYS) delete process.env[key];
       Object.assign(process.env, c.env);
-      return facade.resolveWriterIdentity(c.dir ?? undefined);
-    });`);
-  cases.forEach((c, i) => {
-    if (c.expected === null) {
-      assert.ok([ 'pid', 'unresolved' ].includes(results[i].source), `${c.name}: ${JSON.stringify(results[i])}`);
-    } else {
-      assert.deepEqual(results[i], c.expected, c.name);
+      const answer = resolveWriterIdentity(dir);
+      assert.deepEqual(resolveWriterIdentity(dir), answer, `${c.name}: asked twice, answered the same`);
+      if (c.expected === null) assert.ok(['pid', 'unresolved'].includes(answer.source), `${c.name}: ${JSON.stringify(answer)}`);
+      else assert.deepEqual(answer, c.expected, c.name);
+    });
+  } finally {
+    for (const [key, value] of Object.entries(saved)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
     }
-  });
-});
-
-test('one exec per session env for the pid branch, whatever fgos dir is passed; a new env asks again', (t) => {
-  if (!UNIX) return t.skip('stand-in hosts are sh scripts');
-  const host = requireHost(t);
-  const dir = tmp('fgos-identity-cache-');
-  const wrapper = standIn(dir, 'host', `exec "${host}" "$@"`);
-  const [a, b, c, d] = inFreshProcess(`
-    const a = facade.resolveWriterIdentity(${JSON.stringify(path.join(dir, 'one'))});
-    const b = facade.resolveWriterIdentity(${JSON.stringify(path.join(dir, 'two'))});
-    const c = facade.resolveWriterIdentity();
-    process.env.FGOS_SESSION_ID = 'later-session';
-    const d = facade.resolveWriterIdentity(${JSON.stringify(path.join(dir, 'one'))});
-    facade.resolveWriterIdentity(${JSON.stringify(path.join(dir, 'one'))});
-    return [a, b, c, d];`, { env: cleanEnv({ FGOS_HOST_BIN: wrapper }) });
-  assert.deepEqual(a, b);
-  assert.deepEqual(a, c);
-  assert.ok(['pid', 'unresolved'].includes(a.source));
-  assert.deepEqual(d, { id: 'later-session', source: 'env' });
-  assert.equal(calls(wrapper).length, 2, calls(wrapper).join('\n'));
-});
-
-test('the env-branch cache key stays the same when the fgos dir is created under a symlink after priming', (t) => {
-  if (!UNIX) return t.skip('symlinks need privileges on Windows');
-  const host = requireHost(t);
-  const dir = tmp('fgos-identity-symlink-');
-  fs.mkdirSync(path.join(dir, 'real'));
-  fs.symlinkSync(path.join(dir, 'real'), path.join(dir, 'alias'));
-  const wrapper = standIn(dir, 'host', `exec "${host}" "$@"`);
-  const fgosDir = path.join(dir, 'alias', 'new', '.fgos');
-  const [first, second] = inFreshProcess(`
-    const fs = await import('node:fs');
-    const first = facade.resolveWriterIdentity(${JSON.stringify(fgosDir)});
-    fs.mkdirSync(${JSON.stringify(fgosDir)}, { recursive: true });
-    lock.noteLockHeld();
-    const second = facade.resolveWriterIdentity(${JSON.stringify(fgosDir)});
-    lock.noteLockReleased();
-    return [first, second];`, { env: cleanEnv({ FGOS_HOST_BIN: wrapper, FGOS_SESSION_ID: 'sess-sym' }) });
-  assert.deepEqual(first, { id: 'sess-sym', source: 'env' });
-  assert.deepEqual(second, first);
-  assert.equal(calls(wrapper).length, 1);
+  }
 });
 
 test('no fgos dir means no registry confirmation, never the cwd', (t) => {
@@ -208,108 +159,67 @@ fs.writeFileSync(${JSON.stringify(out)}, JSON.stringify({ answer: facade.resolve
   assert.deepEqual(answer, { id: session, source: 'pid' });
 });
 
-test('activation discovery finds the host without FGOS_HOST_BIN', (t) => {
+test('the doctor probe finds the activation host without FGOS_HOST_BIN, runs it with the caller pid and without the invocation record path', (t) => {
   if (!UNIX) return t.skip('stand-in release binary is a sh script');
   const host = requireHost(t);
   const root = tmp('fgos-identity-activation-');
   const release = path.join(root, 'release');
   fs.mkdirSync(path.join(release, 'bin'), { recursive: true });
-  const releaseBin = standIn(path.join(release, 'bin'), 'fgos', `exec "${host}" "$@"`);
+  const releaseBin = standIn(path.join(release, 'bin'), 'fgos', `echo "record=\${FGOS_INVOCATION_RECORD_PATH:-unset}" >> "${root}/seen"; exec "${host}" "$@"`);
   fs.mkdirSync(path.join(root, '.fgos', 'installation'), { recursive: true });
   fs.writeFileSync(path.join(root, '.fgos', 'installation', 'activation.json'), JSON.stringify({ status: 'ready', releasePath: release }));
-  const answer = inFreshProcess(`return facade.resolveWriterIdentity(${JSON.stringify(path.join(root, '.fgos'))});`, {
+  const result = inFreshProcess(`
+    const { resolveActiveHostBin } = await import(${JSON.stringify(new URL('../../src/util/host-bin-path.mjs', import.meta.url).href)});
+    const { bin } = resolveActiveHostBin({ fgosDir: ${JSON.stringify(path.join(root, '.fgos'))}, cwd: ${JSON.stringify(root)} });
+    return { bin, answer: facade.probeIdentity(bin, ${JSON.stringify(path.join(root, '.fgos'))}), pid: process.pid };`, {
     cwd: os.tmpdir(),
-    env: cleanEnv({ FGOS_HOST_BIN: undefined, FGOS_SESSION_ID: 'via-activation' }),
+    env: cleanEnv({ FGOS_HOST_BIN: undefined, FGOS_SESSION_ID: 'via-activation', FGOS_INVOCATION_RECORD_PATH: path.join(root, 'records.jsonl') }),
   });
-  assert.deepEqual(answer, { id: 'via-activation', source: 'env' });
-  assert.equal(calls(releaseBin).length, 1);
+  assert.equal(result.bin, releaseBin);
+  assert.deepEqual(result.answer, { id: 'via-activation', source: 'env' });
+  assert.equal(fs.readFileSync(path.join(root, 'seen'), 'utf8').trim(), 'record=unset');
+  assert.ok(!fs.existsSync(path.join(root, 'records.jsonl')));
+  assert.match(calls(releaseBin)[0], new RegExp(`identity --pid ${result.pid} --fgos-dir ${path.join(root, '.fgos')}$`));
 });
 
-function failure(env, body = 'facade.resolveWriterIdentity();') {
-  return inFreshProcess(`
-    const started = Date.now();
-    try { ${body} return { ok: true }; }
-    catch (err) { return { name: err.name, code: err.code, category: err.category, message: err.message, ms: Date.now() - started }; }`, { env });
-}
-
-test('no host binary anywhere is host-missing, naming where it looked', () => {
+test('without the addon the resolver is host-missing and names the dev door', () => {
   const cwd = tmp('fgos-identity-missing-');
   const result = inFreshProcess(`
     try { facade.resolveWriterIdentity(${JSON.stringify(path.join(cwd, '.fgos'))}); return { ok: true }; }
     catch (err) { return { code: err.code, category: err.category, message: err.message }; }`, {
     cwd,
-    env: cleanEnv({ FGOS_HOST_BIN: undefined }),
+    env: cleanEnv({ FGOS_HOST_BIN: undefined, FGOS_ACTIVE_RELEASE_PATH: undefined, FGOS_ACTIVE_MANIFEST_PATH: undefined }),
   });
   assert.equal(result.code, 'host-missing');
   assert.equal(result.category, 'precondition');
-  assert.match(result.message, /activation\.json/);
+  assert.match(result.message, /npm run fgos:dev/);
 });
 
-test('host failures are classified, never guessed, and never cached', (t) => {
+test('the doctor probe classifies every host failure and never guesses an id', (t) => {
   if (!UNIX) return t.skip('stand-in hosts are sh scripts');
-  const host = requireHost(t);
   const dir = tmp('fgos-identity-failures-');
   const oldHost = standIn(dir, 'old', 'echo \'fgos: unknown verb "identity". Usage: fgos <command> [args...]\' >&2; exit 4');
   const slow = standIn(dir, 'slow', `echo $$ > "${dir}/slow.pid"; exec sleep 10`);
   const junk = standIn(dir, 'junk', 'echo not json');
   const okShape = standIn(dir, 'shape', 'echo \'{"contract":"fgos.v1","generated_at":"x","data_hash":"y","data":{"id":"7","source":"pid"}}\'');
   const broken = standIn(dir, 'broken', 'echo boom >&2; exit 3');
-  const real = standIn(dir, 'real', `exec "${host}" "$@"`);
+  const codeOf = (bin) => { try { probeIdentity(bin); } catch (err) { return err; } return { code: 'answered' }; };
 
-  assert.equal(failure(cleanEnv({ FGOS_HOST_BIN: oldHost })).code, 'host-version-mismatch');
-  assert.equal(failure(cleanEnv({ FGOS_HOST_BIN: junk })).code, 'bad-output');
-  assert.equal(failure(cleanEnv({ FGOS_HOST_BIN: okShape })).code, 'bad-output', 'pid source with a string id');
-  const hostError = failure(cleanEnv({ FGOS_HOST_BIN: broken }));
+  assert.equal(codeOf(path.join(dir, 'absent')).code, 'host-missing');
+  assert.equal(codeOf(oldHost).code, 'host-version-mismatch');
+  assert.equal(codeOf(junk).code, 'host-error', 'an answer that is not JSON');
+  assert.equal(codeOf(okShape).code, 'host-error', 'a pid source with a string id');
+  const hostError = codeOf(broken);
   assert.equal(hostError.code, 'host-error');
   assert.match(hostError.message, /exit 3.*boom/);
 
-  const timeout = failure(cleanEnv({ FGOS_HOST_BIN: slow }));
-  assert.equal(timeout.code, 'timeout');
-  assert.ok(timeout.ms < 6000, `took ${timeout.ms} ms`);
+  const started = Date.now();
+  const hung = codeOf(slow);
+  assert.equal(hung.code, 'host-error', 'a hung host is killed and named');
+  assert.match(hung.message, /ETIMEDOUT|SIGKILL/);
+  assert.ok(Date.now() - started < 6000, `took ${Date.now() - started} ms`);
   const slowPid = Number(fs.readFileSync(path.join(dir, 'slow.pid'), 'utf8'));
   assert.throws(() => process.kill(slowPid, 0), { code: 'ESRCH' }, 'the timed-out host was killed and reaped');
-
-  // A failure is not remembered: the same process asks again and succeeds.
-  const retried = inFreshProcess(`
-    try { facade.resolveWriterIdentity(); } catch (err) { if (err.code !== 'bad-output') throw err; }
-    process.env.FGOS_HOST_BIN = ${JSON.stringify(real)};
-    return facade.resolveWriterIdentity();`, { env: cleanEnv({ FGOS_HOST_BIN: junk, FGOS_SESSION_ID: 'after-failure' }) });
-  assert.deepEqual(retried, { id: 'after-failure', source: 'env' });
-});
-
-test('no exec while a lock is held: a cache miss and a direct probe both refuse before spawning', (t) => {
-  if (!UNIX) return t.skip('stand-in hosts are sh scripts');
-  const host = requireHost(t);
-  const dir = tmp('fgos-identity-inlock-');
-  const wrapper = standIn(dir, 'host', `exec "${host}" "$@"`);
-  const result = inFreshProcess(`
-    const codes = [];
-    lock.noteLockHeld();
-    try { facade.resolveWriterIdentity(); } catch (err) { codes.push(err.code); }
-    try { facade.probeIdentity(${JSON.stringify(wrapper)}); } catch (err) { codes.push(err.code); }
-    lock.noteLockReleased();
-    const after = facade.resolveWriterIdentity();
-    lock.noteLockHeld();
-    const cached = facade.resolveWriterIdentity();
-    lock.noteLockReleased();
-    return { codes, after, cached };`, { env: cleanEnv({ FGOS_HOST_BIN: wrapper, FGOS_SESSION_ID: 'locked' }) });
-  assert.deepEqual(result.codes, ['identity-in-lock', 'identity-in-lock']);
-  assert.deepEqual(result.after, { id: 'locked', source: 'env' });
-  assert.deepEqual(result.cached, result.after);
-  assert.equal(calls(wrapper).length, 1);
-});
-
-test('the verb runs with the caller pid and without the invocation record path', (t) => {
-  if (!UNIX) return t.skip('stand-in hosts are sh scripts');
-  const host = requireHost(t);
-  const dir = tmp('fgos-identity-env-');
-  const wrapper = standIn(dir, 'host', `echo "record=\${FGOS_INVOCATION_RECORD_PATH:-unset}" >> "${dir}/seen"; exec "${host}" "$@"`);
-  const pid = inFreshProcess('facade.resolveWriterIdentity(); return process.pid;', {
-    env: cleanEnv({ FGOS_HOST_BIN: wrapper, FGOS_INVOCATION_RECORD_PATH: path.join(dir, 'records.jsonl') }),
-  });
-  assert.equal(fs.readFileSync(path.join(dir, 'seen'), 'utf8').trim(), 'record=unset');
-  assert.ok(!fs.existsSync(path.join(dir, 'records.jsonl')));
-  assert.match(calls(wrapper)[0], new RegExp(`identity --pid ${pid}$`));
 });
 
 test('on every platform an unresolved answer names the calling Node process', (t) => {

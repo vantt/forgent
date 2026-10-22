@@ -173,6 +173,47 @@ pub fn clear(path: &Path, wait: Duration) -> io::Result<()> {
     std::fs::remove_file(path)
 }
 
+/// One reading of the contender view of the record next to `lock_file`, as the
+/// JSON fields of the answer (`state`: `absent`, `empty`, `not-empty` or
+/// `unknown`, with `reason` and `domain` when there are any). Never kills and
+/// never edits the record.
+pub fn contender_view(lock_file: &Path) -> Value {
+    let record_path = record_path(lock_file);
+    let text = match std::fs::read_to_string(&record_path) {
+        Ok(text) => text,
+        Err(err) if err.kind() == io::ErrorKind::NotFound => return json!({ "state": "absent" }),
+        Err(err) => return json!({ "state": "unknown", "reason": "record-unreadable", "detail": err.to_string() }),
+    };
+    let Ok(raw) = serde_json::from_str::<Value>(&text) else {
+        return json!({ "state": "unknown", "reason": "record-not-json", "domain": { "raw": text.chars().take(120).collect::<String>() } });
+    };
+    let Some(domain) = parse_record(&raw) else {
+        return json!({ "state": "unknown", "reason": "record-unknown-shape", "domain": raw });
+    };
+    let mut watch = domain_watch(&domain);
+    // A dead holder whose job is gone is judged by the process tree alone, and
+    // that fallback needs two quiet polls in a row; a live member stays
+    // "not empty" through every poll.
+    let mut verdict = watch.is_empty();
+    for _ in 0..2 {
+        if verdict != DomainState::NotEmpty || watch.reason().is_some() {
+            break;
+        }
+        std::thread::sleep(Duration::from_millis(50));
+        verdict = watch.is_empty();
+    }
+    let state = match verdict {
+        DomainState::Empty => "empty",
+        DomainState::NotEmpty => "not-empty",
+        DomainState::Unknown => "unknown",
+    };
+    let mut fields = json!({ "state": state, "domain": domain_json(&domain) });
+    if state != "empty" {
+        fields["reason"] = json!(watch.reason().unwrap_or(if state == "unknown" { "no-judge-on-this-platform" } else { "domain-has-live-members" }));
+    }
+    fields
+}
+
 /// Run the rule for the record at `path`, after the kernel lock is held.
 pub fn admit(path: &Path, kill_wait: Duration) -> Admit {
     admit_with_trace(path, kill_wait).0
@@ -212,15 +253,32 @@ fn admit_traced(path: &Path, kill_wait: Duration, trace: &mut WatchTrace) -> Adm
     answer
 }
 
-fn judge(path: &Path, watch: &mut fgos_process::DomainWatch, named: Value, kill_wait: Duration) -> Admit {
+/// What the rule needs of a domain watch: the port `judge` decides over.
+trait DomainJudge {
+    fn is_empty(&mut self) -> DomainState;
+    /// End the domain, waiting at most `within` for it to be empty.
+    fn kill_all(&mut self, within: Duration) -> KillOutcome;
+}
+
+impl DomainJudge for fgos_process::DomainWatch {
+    fn is_empty(&mut self) -> DomainState {
+        fgos_process::DomainWatch::is_empty(self)
+    }
+    fn kill_all(&mut self, within: Duration) -> KillOutcome {
+        fgos_process::DomainWatch::kill_all(self, within)
+    }
+}
+
+fn judge(path: &Path, watch: &mut impl DomainJudge, named: Value, kill_wait: Duration) -> Admit {
     if watch.is_empty() == DomainState::Empty {
         remove_record(path);
         return Admit::Proceed;
     }
-    if watch.kill_all() == KillOutcome::Refused {
+    // One bound for the whole admission: the kill's own wait spends the same budget as the poll after it.
+    let deadline = Instant::now() + kill_wait;
+    if watch.kill_all(kill_wait) == KillOutcome::Refused {
         return Admit::NotEmpty { domain: named };
     }
-    let deadline = Instant::now() + kill_wait;
     loop {
         if watch.is_empty() == DomainState::Empty {
             remove_record(path);
@@ -230,5 +288,57 @@ fn judge(path: &Path, watch: &mut fgos_process::DomainWatch, named: Value, kill_
             return Admit::NotEmpty { domain: named };
         }
         std::thread::sleep(Duration::from_micros(500));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A domain whose member survives SIGKILL for `lives` (uninterruptible I/O): not empty until then,
+    /// and a kill blocks the way a driver's empty wait does, for as long as it is allowed to.
+    struct StuckMember {
+        gone_at: Instant,
+    }
+
+    impl DomainJudge for StuckMember {
+        fn is_empty(&mut self) -> DomainState {
+            if Instant::now() >= self.gone_at { DomainState::Empty } else { DomainState::NotEmpty }
+        }
+        fn kill_all(&mut self, within: Duration) -> KillOutcome {
+            let wait = within.min(self.gone_at.saturating_duration_since(Instant::now()));
+            std::thread::sleep(wait);
+            if self.is_empty() == DomainState::Empty { KillOutcome::Ok } else { KillOutcome::Refused }
+        }
+    }
+
+    #[test]
+    fn admission_over_a_member_that_outlives_the_kill_returns_within_the_kill_wait() {
+        let kill_wait = Duration::from_millis(300);
+        let path = std::env::temp_dir().join(format!("fgos-stuck-member-{}.predecessor.json", std::process::id()));
+        let mut watch = StuckMember { gone_at: Instant::now() + Duration::from_secs(30) };
+        let start = Instant::now();
+        let answer = judge(&path, &mut watch, json!({ "kind": "stuck" }), kill_wait);
+        let took = start.elapsed();
+        assert!(matches!(answer, Admit::NotEmpty { .. }), "a member that is still alive keeps the domain not empty");
+        assert!(took <= kill_wait + Duration::from_millis(250), "the kill wait bounds the whole admission, kill included: took {took:?}");
+    }
+
+    #[test]
+    fn the_contender_view_names_an_absent_and_an_unknown_record_without_editing_it() {
+        let dir = std::env::temp_dir().join(format!("fgos-contender-view-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let lock = dir.join("x.lock");
+        assert_eq!(contender_view(&lock)["state"], "absent");
+        let record = record_path(&lock);
+        std::fs::write(&record, "not json").unwrap();
+        let view = contender_view(&lock);
+        assert_eq!((view["state"].as_str(), view["reason"].as_str()), (Some("unknown"), Some("record-not-json")));
+        assert_eq!(view["domain"]["raw"], "not json");
+        assert_eq!(std::fs::read_to_string(&record).unwrap(), "not json");
+        std::fs::write(&record, r#"{"v":99}"#).unwrap();
+        let view = contender_view(&lock);
+        assert_eq!(view["reason"], "record-unknown-shape");
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 }

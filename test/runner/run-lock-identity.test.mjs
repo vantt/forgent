@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawn, spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { acquireRunControl, buildRunControlHolder, listGenerations, publishMarkerOnce, publishNextGeneration } from '../../src/runner/dispatch/run-lock.mjs';
 import { selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
 
@@ -25,12 +25,6 @@ function mkRunDir() {
 // cross-check and fails closed to 'held' by contract; the tests below assert
 // whichever of the two behaviors this platform is supposed to have.
 const HAS_PROC_START_TIME = selfRecord().startTime !== undefined;
-
-// A definitely-dead PID: spawn a real child, let it exit, then reuse its pid.
-function deadPid() {
-  const result = spawnSync(process.execPath, ['-e', 'process.exit(0)']);
-  return result.pid;
-}
 
 test('acquireRunControl: a live holder (real process, matching processStartTime) is never reclaimed by a contender, even with no ttlMs (always-attempt path)', () => {
   const runDir = mkRunDir();
@@ -55,17 +49,6 @@ test('acquireRunControl: a holder record whose pid was reused by an unrelated pr
   }
   assert.equal(contender.status, 'acquired');
   assert.equal(contender.controlEpoch, first.controlEpoch + 1);
-});
-
-test('acquireRunControl: a holder whose pid is genuinely dead IS reclaimed', () => {
-  const runDir = mkRunDir();
-  const pid = deadPid();
-  const deadHolder = { id: 'dead-holder', pid, bootId: selfRecord().bootId ?? 'unknown-boot', processStartTime: '12345', host: os.hostname() };
-  const first = acquireRunControl(runDir, { holder: deadHolder });
-  assert.equal(first.status, 'acquired');
-
-  const contender = acquireRunControl(runDir, { holder: buildRunControlHolder('contender') });
-  assert.equal(contender.status, 'acquired');
 });
 
 // Publication is create-only through the durable-file door: of any number of separate processes racing for

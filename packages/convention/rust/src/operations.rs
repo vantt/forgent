@@ -1,6 +1,7 @@
 use crate::rules::{packaged_rules, Cardinality, Rule, RuleSet, RuleShape};
 use fgos_host_runtime::civil_time::{
-    days_from_civil, format_unix_millis_rfc3339, parse_rfc3339_millis,
+    days_from_civil, format_offset, format_unix_millis_rfc3339, parse_rfc3339_millis,
+    parse_rfc3339_offset_seconds,
 };
 use serde::Serialize;
 use std::path::{Component, Path};
@@ -252,7 +253,7 @@ fn resolve_time(input: &NameInput<'_>) -> Result<(String, String, String), Conve
     let (millis, offset_seconds) = if let Some(at) = input.at {
         (
             parse_rfc3339_millis(at).ok_or(ConventionError::InvalidAt)?,
-            parse_offset(at)?,
+            parse_rfc3339_offset_seconds(at).ok_or(ConventionError::InvalidAt)?,
         )
     } else {
         (input.now_millis, input.local_offset_seconds)
@@ -275,40 +276,6 @@ fn resolve_time(input: &NameInput<'_>) -> Result<(String, String, String), Conve
         bytes[15] as char
     );
     Ok((at, offset, stamp))
-}
-
-fn parse_offset(at: &str) -> Result<i32, ConventionError> {
-    if at.ends_with('Z') || at.ends_with('z') {
-        return Ok(0);
-    }
-    let suffix = at
-        .get(at.len().checked_sub(6).ok_or(ConventionError::InvalidAt)?..)
-        .ok_or(ConventionError::InvalidAt)?;
-    let bytes = suffix.as_bytes();
-    if bytes.len() != 6 || !matches!(bytes[0], b'+' | b'-') || bytes[3] != b':' {
-        return Err(ConventionError::InvalidAt);
-    }
-    let hours: i32 = suffix[1..3]
-        .parse()
-        .map_err(|_| ConventionError::InvalidAt)?;
-    let minutes: i32 = suffix[4..6]
-        .parse()
-        .map_err(|_| ConventionError::InvalidAt)?;
-    let seconds = hours * 3_600 + minutes * 60;
-    Ok(if bytes[0] == b'-' { -seconds } else { seconds })
-}
-
-fn format_offset(offset_seconds: i32) -> Option<String> {
-    if offset_seconds % 60 != 0 || offset_seconds.unsigned_abs() > 23 * 3_600 + 59 * 60 {
-        return None;
-    }
-    let sign = if offset_seconds < 0 { '-' } else { '+' };
-    let absolute = offset_seconds.unsigned_abs();
-    Some(format!(
-        "{sign}{:02}:{:02}",
-        absolute / 3_600,
-        absolute % 3_600 / 60
-    ))
 }
 
 fn normalize_type(value: &str) -> Result<String, ConventionError> {

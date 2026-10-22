@@ -7,6 +7,7 @@
 //! thing [`main`] does is set close-on-exec on that slot.
 
 use std::ffi::OsString;
+#[cfg(not(windows))]
 use std::fs::File;
 use std::path::{Path, PathBuf};
 
@@ -15,13 +16,13 @@ use serde_json::{json, Map, Value};
 use crate::borrow_vectors::{self, RunError};
 use crate::driver;
 #[cfg(not(windows))]
-use crate::port::{NotBorrowerReason, LOCK_FD_ENV};
-use crate::port::{self, BorrowedCheck, DescriptionLock, Mode, Wait, BORROW_SLOT, DEFAULT_KILL_WAIT_MS};
+use crate::port::{NotBorrowerReason, BORROW_SLOT, LOCK_FD_ENV};
+use crate::port::{BorrowedCheck, Mode, Wait, DEFAULT_KILL_WAIT_MS};
 use crate::state_root;
 
 mod hold;
 
-/// The protocol the lock routes speak (`lock-fd`, `lock-hold`, `state-root`,
+/// The protocol the lock routes speak (`lock-fd`, `lock-hold`,
 /// `lock-borrow-vectors`). Protocol 1 was the first
 /// release; a payload that still sends it is refused, and every answer
 /// carries 2, so an older facade fails closed on either side.
@@ -88,6 +89,7 @@ fn error_as(protocol: u64, code: &str, message: &str, exit: i32) -> i32 {
     emit_as(protocol, Some("error"), json!({ "code": code, "message": message }), exit)
 }
 
+#[cfg(not(windows))]
 fn error(code: &str, message: &str, exit: i32) -> i32 {
     error_as(PROTOCOL, code, message, exit)
 }
@@ -156,7 +158,7 @@ pub fn main(args: &[OsString]) -> i32 {
         }
     }
     let Some((route, rest)) = strings.split_first() else {
-        return usage("fgos internal <lock-fd|lock-hold|state-root|quiesce-scan|lock-borrow-vectors> --protocol 2 ...");
+        return usage("fgos internal <lock-fd|lock-hold|quiesce-scan|lock-borrow-vectors> --protocol 2 ...");
     };
     // The protocol is checked before anything else about the call, so a
     // payload of another release always learns that first.
@@ -178,238 +180,84 @@ pub fn main(args: &[OsString]) -> i32 {
     match route.as_str() {
         "lock-fd" => lock_fd(&others),
         "lock-hold" => lock_hold(&others),
-        "state-root" => state_root_route(&others),
         "quiesce-scan" => quiesce_scan(&others),
         "lock-borrow-vectors" => lock_borrow_vectors(&others),
         other => usage(&format!("unknown internal route {other}")),
     }
 }
 
+#[cfg(not(windows))]
 fn take_slot3() -> std::io::Result<File> {
     fgos_process::control::take_inherited(fgos_process::FdSlot(BORROW_SLOT))
 }
 
+/// `lock-fd`: the two modes that keep a process boundary, because their caller
+/// is a process the door cannot reach (the git hook, run from a checkout).
+/// `--borrowed-check <path>` is the borrower test of a process that may have
+/// inherited a borrowed description; `--shared-try` is one non-blocking shared
+/// lock attempt on the description at fd 3, so it never waits and never
+/// obstructs a holder. Every other lock operation runs in the caller's process
+/// through the addon's `holderLock`.
 fn lock_fd(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--wait-ms", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state", "--kill-wait-ms", "--predecessor", "--drain-child", "--clear-domain", "--predecessor-kinds", "--protected-roots", "--reach-floor-ticks"], &["--try", "--shared-try"]) {
+    let flags = match Flags::parse(args, &["--borrowed-check"], &["--shared-try"]) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
-    let modes: Vec<&str> = ["--try", "--wait-ms", "--shared-try", "--borrowed-check", "--guarantee", "--probe", "--predecessor-state", "--drain-child", "--clear-domain"].into_iter().filter(|m| flags.has(m)).collect();
-    if modes.len() != 1 || flags.items.iter().filter(|(n, _)| modes.contains(&n.as_str())).count() != 1 {
-        return usage("exactly one of --try, --wait-ms N, --shared-try, --borrowed-check <path>, --guarantee <path>, --probe <path>, --predecessor-state <lockFile>");
-    }
-    let mode = modes[0];
-    if flags.has("--predecessor-kinds") && mode != "--try" && mode != "--wait-ms" {
-        return usage("--predecessor-kinds applies only to acquisition");
-    }
-    if mode != "--drain-child" && (flags.has("--protected-roots") || flags.has("--reach-floor-ticks")) {
-        return usage("--protected-roots and --reach-floor-ticks apply only to --drain-child");
-    }
-    let kinds = match flags.one("--predecessor-kinds") {
-        Ok(Some(raw)) if raw.split(',').all(|kind| !kind.is_empty()) => raw.split(',').map(str::to_string).collect::<Vec<_>>(),
-        Ok(None) => Vec::new(),
-        _ => return usage("--predecessor-kinds needs one nonempty comma-separated list"),
-    };
-    if mode != "--try" && mode != "--wait-ms" && mode != "--drain-child" && mode != "--clear-domain" && (flags.has("--kill-wait-ms") || flags.has("--predecessor")) {
-        return usage("--kill-wait-ms and --predecessor apply only to --try and --wait-ms");
-    }
-    let parsed = (|| -> Result<(Option<u64>, u64, Option<PathBuf>), String> {
-        let wait = flags.one("--wait-ms")?.map(|raw| positive_ms(raw, "--wait-ms", 1)).transpose()?;
-        let kill_wait = flags.one("--kill-wait-ms")?.map(|raw| positive_ms(raw, "--kill-wait-ms", 0)).transpose()?.unwrap_or(DEFAULT_KILL_WAIT_MS);
-        let predecessor = flags.one("--predecessor")?.map(PathBuf::from);
-        Ok((wait, kill_wait, predecessor))
-    })();
-    let (wait_ms, kill_wait_ms, predecessor) = match parsed {
-        Ok(p) => p,
-        Err(message) => return usage(&message),
-    };
-    if mode == "--guarantee" {
-        let target = PathBuf::from(flags.values("--guarantee")[0]);
-        let dir = if target.is_dir() { target } else { target.parent().map(Path::to_path_buf).unwrap_or(target) };
-        return emit(Some("guarantee"), json!({ "guarantee": port::guarantee(&dir).to_json(), "reachFloorTicks": fgos_process::facts::creation_mark().map(|mark| mark.ticks.to_string()) }), EXIT_OK);
-    }
-    if mode == "--predecessor-state" {
-        return predecessor_state(Path::new(flags.values("--predecessor-state")[0]));
+    if flags.items.len() != 1 {
+        return usage("exactly one of --borrowed-check <path>, --shared-try");
     }
     let drv = driver::current();
-    if mode == "--probe" {
-        // A fresh open and a non-blocking shared try, closed at once: it
-        // never obstructs a holder and needs no descriptor from the caller.
-        if !drv.supported() {
-            return emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": drv.unsupported_detail() }), EXIT_UNAVAILABLE);
-        }
-        let path = PathBuf::from(flags.values("--probe")[0]);
-        return match port::probe(&port::Resource::new(path.file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default(), &path)) {
-            Ok(port::Probe::Free) => emit(Some("free"), json!({}), EXIT_OK),
-            Ok(port::Probe::Held) => emit(Some("held"), json!({ "reason": "kernel-lock-held" }), EXIT_NEGATIVE),
-            Err(err) => error("io", &format!("probe {}: {err}", path.display()), EXIT_INTERNAL),
-        };
-    }
-    if mode == "--borrowed-check" {
-        let lock_path = PathBuf::from(flags.values("--borrowed-check")[0]);
-        if !drv.supported() {
-            return emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": drv.unsupported_detail() }), EXIT_UNAVAILABLE);
-        }
-        #[cfg(windows)]
-        let answer = {
-            let env = std::env::var(crate::LOCK_JOB_ENV).ok();
-            crate::borrowed_check_job(&lock_path, env.as_deref())
-        };
-        #[cfg(not(windows))]
-        let answer = {
-            let file = match take_slot3() {
-                Ok(file) => file,
-                Err(_) => return emit(Some("not-borrower"), json!({ "reason": NotBorrowerReason::FdMissing.as_str() }), EXIT_NEGATIVE),
-            };
-            let env = std::env::var(LOCK_FD_ENV).ok();
-            port::borrowed_check(&file, &lock_path, env.as_deref(), BORROW_SLOT)
-        };
-        return match answer {
-            BorrowedCheck::Borrower => emit(Some("borrower"), json!({}), EXIT_OK),
-            BorrowedCheck::NotBorrower(reason) => emit(Some("not-borrower"), json!({ "reason": reason.as_str() }), EXIT_NEGATIVE),
-        };
-    }
     if !drv.supported() {
         return emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": drv.unsupported_detail() }), EXIT_UNAVAILABLE);
     }
+    if flags.has("--shared-try") {
+        return shared_try();
+    }
+    let lock_path = match flags.one("--borrowed-check") {
+        Ok(Some(path)) => PathBuf::from(path),
+        _ => return usage("--borrowed-check needs a path"),
+    };
+    #[cfg(windows)]
+    let answer = {
+        let env = std::env::var(crate::LOCK_JOB_ENV).ok();
+        crate::borrowed_check_job(&lock_path, env.as_deref())
+    };
+    #[cfg(not(windows))]
+    let answer = {
+        let file = match take_slot3() {
+            Ok(file) => file,
+            Err(_) => return emit(Some("not-borrower"), json!({ "reason": NotBorrowerReason::FdMissing.as_str() }), EXIT_NEGATIVE),
+        };
+        let env = std::env::var(LOCK_FD_ENV).ok();
+        crate::port::borrowed_check(&file, &lock_path, env.as_deref(), BORROW_SLOT)
+    };
+    match answer {
+        BorrowedCheck::Borrower => emit(Some("borrower"), json!({}), EXIT_OK),
+        BorrowedCheck::NotBorrower(reason) => emit(Some("not-borrower"), json!({ "reason": reason.as_str() }), EXIT_NEGATIVE),
+    }
+}
+
+#[cfg(windows)]
+fn shared_try() -> i32 {
+    emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": "--shared-try hands a descriptor to the route; Windows probes through the door" }), EXIT_UNAVAILABLE)
+}
+
+#[cfg(not(windows))]
+fn shared_try() -> i32 {
     let file = match take_slot3() {
         Ok(file) => file,
         Err(err) => return error("io", &format!("fd 3 is not an open lock file: {err}"), EXIT_INTERNAL),
     };
-    if mode == "--clear-domain" {
-        let path = Path::new(flags.values("--clear-domain")[0]);
-        if port::borrowed_check(&file, path, Some("lease:3"), BORROW_SLOT) != BorrowedCheck::Borrower {
-            return error("lock-handle-invalid", "clear requires the held exclusive description", EXIT_NEGATIVE);
-        }
-        return match crate::predecessor::clear(&crate::predecessor::record_path(path), std::time::Duration::from_millis(kill_wait_ms)) {
-            Ok(()) => emit(Some("cleared"), json!({}), EXIT_OK),
-            Err(err) => error("lock-domain-not-empty", &err.to_string(), EXIT_NEGATIVE),
-        };
-    }
-    #[cfg(target_os = "linux")]
-    if mode == "--drain-child" {
-        let child = match flags.values("--drain-child")[0].parse::<u32>() {
-            Ok(pid) if pid > 1 => pid,
-            _ => return usage("--drain-child requires a child pid"),
-        };
-        let protected = match flags.one("--protected-roots") {
-            Ok(Some("-")) | Ok(None) => vec![],
-            Ok(Some(raw)) => match raw.split(',').map(str::parse::<u32>).collect::<Result<Vec<_>, _>>() {
-                Ok(pids) if pids.iter().all(|pid| *pid > 1) => pids,
-                _ => return usage("--protected-roots needs child pids"),
-            },
-            Err(e) => return usage(&e),
-        };
-        let now = fgos_process::facts::creation_mark();
-        let reach = match (flags.one("--reach-floor-ticks"), now) {
-            (Ok(Some(raw)), Some(now)) => match raw.parse::<u64>() {
-                Ok(ticks) if ticks <= now.ticks => driver::flock::Reach::Since(fgos_process::facts::CreationMark { ticks, last_pid: None, at: now.at }),
-                _ => return emit(Some("not-drained"), json!({"leftoversKilled":0,"remaining":[]}), EXIT_NEGATIVE),
-            },
-            // Compatibility callers lack a proven floor; refuse rather than scan everyone.
-            _ => return emit(Some("not-drained"), json!({"leftoversKilled":0,"remaining":[]}), EXIT_NEGATIVE),
-        };
-        // This helper's parent owns the explicitly inherited description.
-        let owner = unsafe { libc::getppid() } as u32;
-        return match driver::flock::drain_description(
-            &file,
-            Some(child),
-            owner,
-            std::time::Duration::from_millis(kill_wait_ms),
-            reach,
-            &protected,
-        ) {
-            Ok(killed) => emit(
-                Some("drained"),
-                json!({"leftoversKilled": killed, "remaining": []}),
-                EXIT_OK,
-            ),
-            Err(left) => emit(
-                Some("not-drained"),
-                json!({"leftoversKilled": left.killed, "remaining": left.pids}),
-                EXIT_NEGATIVE,
-            ),
-        };
-    }
-    match drv.file_guarantee(&file) {
+    match driver::current().file_guarantee(&file) {
         Ok(g) if !g.usable() => return emit(Some("unavailable"), json!({ "reason": "unsupported-filesystem", "detail": g.notes.join("; ") }), EXIT_UNAVAILABLE),
         Ok(_) => {}
         Err(err) => return emit(Some("unavailable"), json!({ "reason": "io-error", "detail": format!("fstatfs fd 3: {err}") }), EXIT_UNAVAILABLE),
     }
-    if mode == "--shared-try" {
-        return match port::lock_description(&file, Mode::Sh, Wait::Try) {
-            Ok(DescriptionLock::Locked) => emit(Some("free"), json!({}), EXIT_OK),
-            Ok(_) => emit(Some("held"), json!({ "reason": "kernel-lock-held" }), EXIT_NEGATIVE),
-            Err(err) => error("io", &format!("flock fd 3: {err}"), EXIT_INTERNAL),
-        };
+    match crate::port::lock_description(&file, Mode::Sh, Wait::Try) {
+        Ok(crate::port::DescriptionLock::Locked) => emit(Some("free"), json!({}), EXIT_OK),
+        Ok(_) => emit(Some("held"), json!({ "reason": "kernel-lock-held" }), EXIT_NEGATIVE),
+        Err(err) => error("io", &format!("flock fd 3: {err}"), EXIT_INTERNAL),
     }
-    let wait = wait_ms.map(Wait::Ms).unwrap_or(Wait::Try);
-    match port::lock_description(&file, Mode::Ex, wait) {
-        Ok(DescriptionLock::Locked) => {}
-        Ok(DescriptionLock::Held) => return emit(Some("held"), json!({ "reason": "kernel-lock-held" }), EXIT_NEGATIVE),
-        Ok(DescriptionLock::Timeout { waited_ms }) => return emit(Some("timeout"), json!({ "waitedMs": waited_ms }), EXIT_TIMEOUT),
-        Err(err) => return error("io", &format!("flock fd 3: {err}"), EXIT_INTERNAL),
-    }
-    // The kernel lock now lives on the caller's description. Any answer
-    // other than `acquired` tells the caller to close it, which releases it;
-    // this helper never calls LOCK_UN.
-    let lock_path = match predecessor {
-        Some(record) => record,
-        None => match drv.description_path(&file) {
-            Ok(path) => crate::predecessor::record_path(&path),
-            Err(err) => return error("io", &format!("cannot name the lock file behind fd 3: {err}"), EXIT_INTERNAL),
-        },
-    };
-    if let Some(domain) = crate::predecessor::disallowed_kind(&lock_path, &kinds) {
-        return emit(Some("held"), json!({ "reason": "predecessor-domain-not-empty", "domain": domain }), EXIT_NEGATIVE);
-    }
-    match crate::predecessor::admit(&lock_path, std::time::Duration::from_millis(kill_wait_ms)) {
-        crate::predecessor::Admit::Proceed => emit(Some("acquired"), json!({}), EXIT_OK),
-        crate::predecessor::Admit::NotEmpty { domain } => {
-            emit(Some("held"), json!({ "reason": "predecessor-domain-not-empty", "domain": domain }), EXIT_NEGATIVE)
-        }
-    }
-}
-
-/// `lock-fd --predecessor-state <lockFile>`: one reading of the contender view
-/// on the record next to `lock_file`. Never kills, never edits the record.
-fn predecessor_state(lock_file: &Path) -> i32 {
-    use fgos_process::{domain_watch, DomainState};
-    let record_path = crate::predecessor::record_path(lock_file);
-    let text = match std::fs::read_to_string(&record_path) {
-        Ok(text) => text,
-        Err(err) if err.kind() == std::io::ErrorKind::NotFound => return emit(Some("predecessor"), json!({ "state": "absent" }), EXIT_OK),
-        Err(err) => return emit(Some("predecessor"), json!({ "state": "unknown", "reason": "record-unreadable", "detail": err.to_string() }), EXIT_OK),
-    };
-    let Ok(raw) = serde_json::from_str::<serde_json::Value>(&text) else {
-        return emit(Some("predecessor"), json!({ "state": "unknown", "reason": "record-not-json", "domain": { "raw": text.chars().take(120).collect::<String>() } }), EXIT_OK);
-    };
-    let Some(domain) = crate::predecessor::parse_record(&raw) else {
-        return emit(Some("predecessor"), json!({ "state": "unknown", "reason": "record-unknown-shape", "domain": raw }), EXIT_OK);
-    };
-    let named = crate::predecessor::domain_json(&domain);
-    let mut watch = domain_watch(&domain);
-    // A dead holder whose job is gone is judged by the process tree alone, and
-    // that fallback needs two quiet polls in a row; a live member stays
-    // "not empty" through every poll.
-    let mut verdict = watch.is_empty();
-    for _ in 0..2 {
-        if verdict != DomainState::NotEmpty || watch.reason().is_some() {
-            break;
-        }
-        std::thread::sleep(std::time::Duration::from_millis(50));
-        verdict = watch.is_empty();
-    }
-    let state = match verdict {
-        DomainState::Empty => "empty",
-        DomainState::NotEmpty => "not-empty",
-        DomainState::Unknown => "unknown",
-    };
-    let mut fields = json!({ "state": state, "domain": named });
-    if state != "empty" {
-        fields["reason"] = json!(watch.reason().unwrap_or(if state == "unknown" { "no-judge-on-this-platform" } else { "domain-has-live-members" }));
-    }
-    emit(Some("predecessor"), fields, EXIT_OK)
 }
 
 /// `lock-hold --path <lockFile> --mode ex|sh --work <dir> (--try | --wait-ms N)
@@ -455,19 +303,6 @@ fn lock_hold(args: &[String]) -> i32 {
     {
         emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": "lock-hold is the Windows helper; other platforms hand a descriptor to lock-fd" }), EXIT_UNAVAILABLE)
     }
-}
-
-fn state_root_route(args: &[String]) -> i32 {
-    if let Some(extra) = args.first() {
-        return usage(&format!("unknown argument {extra}"));
-    }
-    let (root, source) = state_root::state_root();
-    let fields = json!({
-        "stateRoot": root.to_string_lossy(),
-        "lockRoot": root.join("locks").to_string_lossy(),
-        "source": source.as_str(),
-    });
-    emit(None, fields, EXIT_OK)
 }
 
 fn lock_borrow_vectors(args: &[String]) -> i32 {
@@ -562,7 +397,7 @@ mod quiesce {
         argv.iter().any(|arg| {
             let base = Path::new(arg).file_name().and_then(|n| n.to_str()).unwrap_or("");
             arg.ends_with("bin/fgos.mjs")
-                || matches!(base, "fgos" | "fgos-runner" | "fgos-gateway")
+                || crate::origin::FGOS_BINARIES.contains(&base)
                 || Path::new(arg).starts_with(state_root.join("releases"))
                 || under(arg)
         })

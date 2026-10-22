@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "01fb3e2d4263632dce769109139ae6e4e7d2ade55bd90727268a2c6228234c73",
+  "payloadDigest": "53b17c5d044af7dc8b6d5063debfb6e0b68836b6bd9449259652a8ff8e81306b",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -64,13 +64,13 @@
     ".agents/skills/fgos-researching/SKILL.md": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
     ".agents/skills/fgos-routing/SKILL.md": "8a215975394d282772c768e69a0767aabbf1a2ca30e0fe7959252f7fcdba3a8e",
     ".agents/skills/fgos-run/SKILL.md": "03546387e1980b232ef90159c93aa8b7e6f7da787f71980d284fceea855bdc11",
-    ".githooks/pre-commit": "53c4ce05726ed6372d34f15f41d32c563d208204142b1459f4ec1b8d8d58cab2",
+    ".githooks/pre-commit": "418a1c5f9969b3a9a1f2e13a77e2a7fe60e5ddb93e78bc2b25e47a70e9ea29f4",
     "apps/fgctl/src/main.rs": "3f59cfc17cfd6c8268d15dcbeb0649b8cead1d18c387c7b20e14ce55ab26b9ff",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "bfea8f7ae0cf3efc8ca60adba26fa645613ccf1b1196dc2d220b69562401b8c6",
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c8a6cb7619d9578e02479069fbb0f43a5206583b53a7c6d65373d285d69ca331",
     "apps/fgos-gateway/build.rs": "0109e37c64e9474009c71bb3f3220496fad07dfd77b28c796f1f828c9d2d5671",
     "apps/fgos-gateway/src/cf_access.rs": "be105b105b492ce1fe89a11282dd480e2daf4e5fe179d1166b03148df937feca",
-    "apps/fgos-gateway/src/gateway.rs": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+    "apps/fgos-gateway/src/gateway.rs": "24439c4bc70c23b47979f1d3aa853b653828d73b1b3d7a1264c03f94c5de4a47",
     "apps/fgos-gateway/src/lib.rs": "32d594b18ae0c15f09c3b06c69d82bb142f1370e6fffb6b95d104378b0ffa3fd",
     "apps/fgos-gateway/src/main.rs": "41e1922dd426ca7d9c26aa17ef72ba70f03e3a627d8fa9599666582cc475c928",
     "apps/fgos-gateway/src/mcp.rs": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
@@ -79,14 +79,14 @@
     "apps/fgos/src/cli_presenter.rs": "c124e14bbf4fe8aa2766fe1425cb92c5d74c53bc06cd898589494199e1b6f6f9",
     "apps/fgos/src/cli_projector.rs": "23c5b725c577d2553355a25f47b33b36a70cdb082283175970a458d8d4f6d3f8",
     "apps/fgos/src/legacy_exec.rs": "6aa96ac09b3c577b03317d3b9292104c8af977b2890eb7e5ef45a13598770a22",
-    "apps/fgos/src/main.rs": "129b4dc38fd90ed2d5cac4a634dadcf39f5d15bc0e072413f97e0411420ccf23",
+    "apps/fgos/src/main.rs": "43320493c67ab2ae3880292abaad941dbc61e8470d9bcdb0d83c917eee983a2e",
     "apps/fgos/src/wiring/friction_sources.rs": "dca5bc341cda23cc93b050e76de6851289b2a2e6be721bc6d669c4a498c1f440",
     "apps/fgos/src/wiring/metrics_sources.rs": "92b08ef96478699952332d937ab2e4c121bcf48f671b648098190dc3abe120df",
     "apps/fgos/src/wiring/mod.rs": "fe91da3081b555d716f8defadb72e9fe9ed81669e946b4017b0d87f28faa06d1",
     "apps/fgos/tests/cli_tests.rs": "08e0b31571e7d0d40e96d82446cf3d81b41a104fca10cc0e8a36b295021e96df",
-    "apps/fgos/tests/internal_lock_routes.rs": "3c524adc50f5ee65346c65d07dd8be018508f1f51d038572b6f93f4a425b274a",
+    "apps/fgos/tests/internal_lock_routes.rs": "f0ed99bdebe74d6c54bfe8f2c4025e15bf4886a0ad3a50882251e861f92924d4",
     "apps/fgos/tests/windows_borrow.rs": "59258d09ea0b2420b7cecfe73fd9b67d61f83bb3a4d97feaa770aa6d26a05521",
-    "apps/fgos/tests/windows_lock_hold_route.rs": "78fa00f135d13dea9a0ea97317e4bc3fe96aac7a2cb3989178b14142e219e62b",
+    "apps/fgos/tests/windows_lock_hold_route.rs": "fe11272fb65d947366300770cd5765c1604c800eeac7f052fad57320db7e8530",
     "apps/fgos/tests/windows_predecessor_stress.rs": "0bf5b06644fdb212a693fb2a12979c8e3fb1c88800ae96a7494c00434e01c6c0",
     "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
     "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
@@ -189,7 +189,7 @@
     "packages/agent-protocol/rust/tests/terminal_vectors.rs": "ea87b279fb961f9099d6fdf4070cb6646143daab811c48d50d28ad2af8346820",
     "packages/canonical-json/rust/src/lib.rs": "e390b41a00319d727bd0f0d44ad7f6fda85218a53bae914186699f91a27b7944",
     "packages/convention/rust/src/lib.rs": "659d829be33a7eceff3e2e1e0a804740b58374e9d5a4b9eefca4c2b9f014496b",
-    "packages/convention/rust/src/operations.rs": "cb2cb56e25a81f5475fc6120353fcf1e5483ebce9d0df80de16bfb3b69919d30",
+    "packages/convention/rust/src/operations.rs": "4ca00bed057ce292d0f37f5ca15e20ffabab2ebeb35e81ceacff59949b8a9aba",
     "packages/convention/rust/src/provider.rs": "9c7421733033e3355e94f94b6ba64d38801032cd8c53357206c161bde1b997c1",
     "packages/convention/rust/src/rules.rs": "9138347391a55a7f5999abf845c85891b568a257c2804ab32d8a0a3ac036fae9",
     "packages/convention/rust/tests/golden.rs": "79e0c50467a8548ffa3c18621c17bb97d3e051657a60613d5d96c1f66bbab80d",
@@ -261,7 +261,7 @@
     "packages/event-store/rust/tests/reader_seal_stress.rs": "f721a995073a7d466a35914f58aa06448433e2bce6383809f6abee93bf9fc34e",
     "packages/event-store/rust/tests/reader_support/mod.rs": "2a616bdb34db23fb859d850ce4e5375b7a5ecb6cd317fe0efaf9b69f2ba7b499",
     "packages/event-store/rust/tests/registry_identity_layout.rs": "d480d79d17137c8239299d5e93916d12569dc9845124c63fca7d4fc90a56e140",
-    "packages/event-store/rust/tests/registry_rows.rs": "922d064baa83664ac4bd48fd132f4764d708be5827b90aca98ba6ab463e74134",
+    "packages/event-store/rust/tests/registry_rows.rs": "4afd0326e26d038e1a2b7962cacc19bc140cd5afbb3416088b2e4798572519bb",
     "packages/event-store/rust/tests/review_fixes.rs": "d3aa5b3493b5f55d8fe3cd8809d63e9abe69598a5d26166addabd63bd1b617bb",
     "packages/event-store/rust/tests/seal_cas_race.rs": "ec575e833a1a35a026d46fbb26e46d3088d56ff9a2857cc2f309016c849d814d",
     "packages/event-store/rust/tests/seal_publication.rs": "c1f8a557e4dbe133c1c75d9bea5e7ec0dad1f6af906cf2d340d41fa891bd84fb",
@@ -275,12 +275,12 @@
     "packages/event-store/rust/tests/walk_certified.rs": "0ae2d9f7f3fc96b748167c0a3f9b5de4d3ad7a3e57d6a65ced896f93b9a2db55",
     "packages/git/node-addon/build.rs": "fcbd1ff3f627a7553fa1704dc6f558998daff8bc256015c37aace62cc49ce584",
     "packages/git/node-addon/examples/e3_fixture.rs": "f3a98f5c8de968be2109b9958a5a7d0efeca7fa5000493278277d7bba035a75a",
-    "packages/git/node-addon/src/canonical_json.rs": "6837d46ba14f53228b7d9ccc6e4fdba8bf42210f46cadeee48ce32c8d4a03fd8",
+    "packages/git/node-addon/src/canonical_json.rs": "e91f461709624467b89c145b906be459015ac77622522d9cf5e1b663a49bf14b",
     "packages/git/node-addon/src/durable_file.rs": "92d33582a588824a105683b230a694f3b103657b1b1520fc0b86bac079c490e1",
     "packages/git/node-addon/src/event_store.rs": "4db4794487da76c656b1812924e1b499bf8dbe6c807d8b3a3ea18857cfed60da",
     "packages/git/node-addon/src/git.rs": "380bbcf7b7bef7efb1011ee030f8e5b1131f60b372ce22e55443f065fd26be45",
     "packages/git/node-addon/src/git/config.rs": "521afa249294ebd96b038d99d60b5f4ff6119c7d6d6bb930ae41ea709f72515d",
-    "packages/git/node-addon/src/git/handover.rs": "91aada4bcdb5aef8b7ab11c0512a1f7cd940dcb2089d42523538ced9e8421d37",
+    "packages/git/node-addon/src/git/handover.rs": "8746ecbb13844722786507cdc20be16969cc4b27618d627c8932a0b9b3cdc803",
     "packages/git/node-addon/src/git/inspect.rs": "6751316ae2fb864008d4ef10419c3ed83b9cd3e56f8591606c91406638ee46c4",
     "packages/git/node-addon/src/git/land.rs": "c0ed6e7d9aa8006e8d5f3cff76439ed8cc1531f868baa2c93ed5f09c27807a84",
     "packages/git/node-addon/src/git/native_lock.rs": "a8ce95784f1a4f5db1f58980dda6fce26d235eae5e0fd2c315f9a17182dc5f2a",
@@ -292,8 +292,10 @@
     "packages/git/node-addon/src/git/sync.rs": "a541edc814725b495011e78e0647062bf7567669d0247a12c05d6f265a38f05a",
     "packages/git/node-addon/src/git/worktree.rs": "4d15190574dcba294db6214c818039ef754fce829a415ba204a43acf10678c30",
     "packages/git/node-addon/src/git/write_scope.rs": "657f168ae337fac9315cd39fc8681bc069c16b5ff7ce2dd607dfef39dc9ce5ee",
-    "packages/git/node-addon/src/lib.rs": "3facd144a66f0a0cba95acbc2d92c8d6bb0da914cf1c6ffe857ce92b3c70feff",
-    "packages/git/node-addon/src/process.rs": "34662e53ebd098088e58bbbea03e34b9347326ff2c761e05453b502ea4e2e713",
+    "packages/git/node-addon/src/holder_lock.rs": "2784130ce8c7f622de4d6980248547cbb42786baadc091e8ed6210aba38a8538",
+    "packages/git/node-addon/src/lib.rs": "a969ae57ab54f526d4fc6fe1788ad2b5261a6eaab43ef762464e5ca564f711c2",
+    "packages/git/node-addon/src/process.rs": "60cbc85ed1de5a7057e90c84fc1bbd6041332ba0cba336c6f6487471ab3fe657",
+    "packages/git/node-addon/src/session_identity.rs": "dd6e0c3dce078ab053aa9407f4b1394b0562e87aa9a8b45015c893626675ca78",
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
     "packages/git/rust/src/driver.rs": "8cf69968d10f4ee48276e83cb2357844890ec9fb8748c830c8fbfae5c9980ab0",
     "packages/git/rust/src/grant.rs": "d4f47e49d85994778dc093098b47584e3f73c3cec5f501af82a1c5cd787446f2",
@@ -333,22 +335,23 @@
     "packages/herdr-fgos-common/rust/src/ports.rs": "45c92b4f8a06e62a79a09655fe9c484a85dc9745049cfea6849245b886f4913f",
     "packages/herdr-fgos-common/rust/src/settings.rs": "656623292616ca598ebd64dde89c343bdc5fc0ae8d78a7f91b809b959ec3f11b",
     "packages/holder-lock/rust/src/borrow_vectors.rs": "564243e258853156023e35dbad8c09498a0af1cbfd1b7fb832f8f1d1cef99f7e",
-    "packages/holder-lock/rust/src/borrow_windows.rs": "4c56123e70e6c3519eb74ba4866fe6470f9bd428bbf5743957ee6925f9f067e4",
-    "packages/holder-lock/rust/src/driver/flock.rs": "bfcc9c74db6eb5212fb77a306fc2358c69b3306c8ea6f4a2237dae3e322dd8f1",
-    "packages/holder-lock/rust/src/driver/mod.rs": "9186ee0c26277887bd02cc45c06c88e3121447c3910e917a7ad5eb86f2ce13f0",
-    "packages/holder-lock/rust/src/driver/windows.rs": "547a69f0c5d1e25ec3f2bd818a76dde4654651ed5c29101797a66e27b80eade7",
+    "packages/holder-lock/rust/src/borrow_windows.rs": "d2ca4abeeebf6df80c2b3251dc7609d5649e804df8e6f6e4e820d9caadf1e7c2",
+    "packages/holder-lock/rust/src/driver/flock.rs": "7b3a8471eedd5f220b96f3f9ec55377c38def45dd68f3590cb1b314f3996da47",
+    "packages/holder-lock/rust/src/driver/mod.rs": "07cbfbaf1c0c3f8eeeb810b89f33b0ea2783b6992dc56721475ffd85c2dbfb10",
+    "packages/holder-lock/rust/src/driver/windows.rs": "d028f7c2117fcf0036a18617b63d612ee5d82e912068218bfc63602625fc4be3",
     "packages/holder-lock/rust/src/helper.rs": "f4f626f0a45b7d99c5bfbe95f4c791b782ee9ba1f9fecbf930f8618ee405ac6d",
-    "packages/holder-lock/rust/src/lib.rs": "2e0cffb3a9efb1092ad6e75978c8a2e338aff7c56cacb6d960b239248e52e9f9",
-    "packages/holder-lock/rust/src/port.rs": "60634f1fc9e36caf816baa3249042e165c873158e24bbb79da511f5601448b01",
-    "packages/holder-lock/rust/src/predecessor.rs": "c6ef266690f04f19f145c8726093d0dff1fa171645e5d7d89bb0eb62773ca9ce",
-    "packages/holder-lock/rust/src/route.rs": "d7b652a31830a4507198b8841083eb0496fa688673715d4a201c3a52fe438342",
+    "packages/holder-lock/rust/src/lib.rs": "5fc9363de8f5ea32447fff4b2b2a48f37df5ccd9f3ce92c2c6aacc74ace0c8a3",
+    "packages/holder-lock/rust/src/origin.rs": "a76e1fb306c54035adb2bce7b7cbd01d073e94383b5d307a54f7948c649500dd",
+    "packages/holder-lock/rust/src/port.rs": "c6afe5c3d3e53f768ba992af26e484c69dda5765352f959a338bf1aa578260a2",
+    "packages/holder-lock/rust/src/predecessor.rs": "47a4a310d1a74a567d6c9e0ecc2acdd230628e36119756a2f6a363ef565d672b",
+    "packages/holder-lock/rust/src/route.rs": "39e9fa536e58fe5e6cbf8ac4d06112c6e5d8d7d002913d0a17450fdc268ff995",
     "packages/holder-lock/rust/src/route/hold.rs": "48336f85b1025d1c289f4a560dcd8d60c32c3680403b745a21521a0ec1bb6e13",
     "packages/holder-lock/rust/src/scope.rs": "9dd5a7e31c4e8d38940ca752700fc9ef8cf80e47624441d6f028033c20dde312",
-    "packages/holder-lock/rust/src/semantics.rs": "c6b4f1425da2dd0d1d9ce972aa2b65bd86c36b3e38478c6be3fe5c4b1553553e",
+    "packages/holder-lock/rust/src/semantics.rs": "9218d6264b973ac76481c14c0dcc259b8dff3c3eb283920599a35a39aa5fed65",
     "packages/holder-lock/rust/src/state_root.rs": "b4546fc6ab97448e08374436cb1c7e56489751a0132240f59bc2261016295768",
     "packages/holder-lock/rust/src/tombstone.rs": "c83051cd8c7d405264deb827fb09997060edabeeee57ef6c1347bfc27b7ecd21",
     "packages/holder-lock/rust/tests/borrow_git.rs": "02d95563daa017ec091c0f99e1aac818240328a9e21e8459f7f35e9e7277cb0c",
-    "packages/holder-lock/rust/tests/borrow_io.rs": "b808123b754461d01be2a971a49b7827f127684dcd1d8fc9d9b11d41abdfbef7",
+    "packages/holder-lock/rust/tests/borrow_io.rs": "ba0c82d1b05ccfdd889d8afea825df4b8ae5629d3a85fb25b405f29e35a1cf80",
     "packages/holder-lock/rust/tests/common/mod.rs": "945f6e13f6aa3b7ec84205d8d20d509ea5e6c1c1c1c4f6ff586aaacc2851ff36",
     "packages/holder-lock/rust/tests/multiprocess.rs": "ef2e45ef48b96993f98363647df577947c9968dc98f5d8688ad177e554c1657a",
     "packages/holder-lock/rust/tests/predecessor_record_shape.rs": "183d257a473fca2e0f5b151cc07e43b3b78c80ae382bafdeff0abe265734f48e",
@@ -358,7 +361,7 @@
     "packages/holder-lock/rust/tests/windows_lockfileex.rs": "79e5688336e2a2968f72a65802e8cd722f2c614334e8494eeb2c2b452bfc4273",
     "packages/host-runtime/rust/src/authority_gate.rs": "ad3c0a21cc5b98ec3d8d321d0b700d1378a35fe3a8531b7ed32ccabbf2e4fe17",
     "packages/host-runtime/rust/src/catalog.rs": "491024b5536b9fa2b91496159d18ff1b78cec8b816db9e86e35f9ffa84b492c4",
-    "packages/host-runtime/rust/src/civil_time.rs": "a081fa34dd0cc596dba8d072490e28ee4a941f8e8a6068568ed12783a0be33ac",
+    "packages/host-runtime/rust/src/civil_time.rs": "e8d9e38de59f98e49b42fc0916e48a6e99013323f7805a36a168e019087fd4cc",
     "packages/host-runtime/rust/src/contracts.rs": "da9000674648a399cd32f628213a8d16cd1ce220eacb4e4896d9fad05c0af5cf",
     "packages/host-runtime/rust/src/invocation_service.rs": "bd9602d7ae4849bb434d2fe92aaa098c28ce9225ab6ef30b61fbbdb1a197bd55",
     "packages/host-runtime/rust/src/lib.rs": "1f25c007b30a9638c5c7571b040f80520a7a8a7277240ad4cd77e7c4ade73a3b",
@@ -378,16 +381,15 @@
     "packages/host-runtime/rust/tests/fixtures/external-provider/echo_process.rs": "fffe07e53575edbc812ebba86e3b3fe86a466be48cd7e76c1b9a02c78e44a02a",
     "packages/host-runtime/rust/tests/module_graph.rs": "5983813aa0fe08d9d6c9d28af9e20ae0f8ba55079586ac98d31745609dd0db32",
     "packages/host-runtime/rust/tests/two_projectors.rs": "66b488f34d6e1d41b614840287105d02bf214f2eb754ff3876a87f85b05204ed",
-    "packages/identity/rust/src/attempt.rs": "09930ab5e9b2920dddb2ff15e361a2dda67fdef9bcfc0b51678f252392e4db24",
+    "packages/identity/rust/src/attempt.rs": "8fb6c0af517fcf2bcf6e132b5fb2c613343028f3faa206993611d45636fa90d1",
     "packages/identity/rust/src/errors.rs": "2a7c34f15a605f6f14f9f24484d8b980c1ca51791a4f08b4a3da1131eba4adf1",
     "packages/identity/rust/src/launcher.rs": "dc386bb743b941d390e64b2dbb3fd0c36994415ce6f46ec0876cdd249e57b969",
-    "packages/identity/rust/src/lib.rs": "1f08679460ef77c50d296afbfa79aa5a45b0d0ae7541e280545b79b393633eaf",
+    "packages/identity/rust/src/lib.rs": "433e5dc2e4dd0e65c312b10bd6c740239bd5fc67db60582436f4124ecd979bed",
     "packages/identity/rust/src/machine.rs": "b0b603c2747156fc964d425e4f56324cabbb4e3306b9734bb1c25032451dbd15",
-    "packages/identity/rust/src/proc_tree.rs": "8f85d27341e6f793f75f45350eea559db9be9c59c86269318880dcdb2fb2cb3a",
+    "packages/identity/rust/src/proc_tree.rs": "baddf20275a77af23b5b25e821d8312760d843b7241964b0e9ac2be362358c52",
     "packages/identity/rust/src/project.rs": "19426b96ad7cab5382b095edad0b709cbe5a721877c2919dfbf8e1213865f584",
     "packages/identity/rust/src/provider.rs": "819b2d88229f778b0ff4c603d80388979f3b2527a7aa1301705cec3797542356",
     "packages/identity/rust/src/resolve.rs": "c6e571be00f7ac1ad539d3ad043c49467a1e9f1c65259a1231df7240c49d16b9",
-    "packages/identity/rust/src/route.rs": "1fa2fbd1d0b983cb36381166e38ce9c2a9527ac4048f1462fef6ef7e7c0af514",
     "packages/identity/rust/src/session.rs": "d9d0b3ceb8a24a67d0ff99b79d27915c7f965209a226512059bb9c33b06678de",
     "packages/identity/rust/src/text.rs": "ba290fdd2ba8741dbee32a6d4e6ff0be9c390759c0df599e969fa82ab329bc94",
     "packages/identity/rust/tests/attempt_writer_id.rs": "b16e1e9f4d4aa353f9737ec373c26e0312ff1966432d2c26909721a533940500",
@@ -428,16 +430,16 @@
     "packages/observe/rust/tests/store_lock_multiprocess.rs": "d6b92d856d2dd22fd3679154f9f517a17a2333e91d3077ffab7d5b872c8c9bdb",
     "packages/process/rust/src/containment/linux.rs": "7ac47e709a11c951a0f8f0a02f8f4fb62bbf1ac80660b1a626fa87f5a5aa1fab",
     "packages/process/rust/src/containment/macos.rs": "d3bce89828277f9df405659aa08cb7a5d0eee58f7a43a7f30769ab403adfffb0",
-    "packages/process/rust/src/containment/mod.rs": "7be8c55ecff6ad4d0ca321e3dad74e1932ba95d2e6c443ff538586d5e122a564",
+    "packages/process/rust/src/containment/mod.rs": "632cedae4414042256e2092dcb0312ec0e06e3960980faa3b4d9671854c7b02f",
     "packages/process/rust/src/containment/pgroup.rs": "70eae45ba0ea30ddd05210a2910fc1627e28f2dcdf95b5f6db55e191ac8ec0fd",
-    "packages/process/rust/src/containment/windows.rs": "6e4e85e4d0887a2b6b617c6e969ed274a0c9d987762550c8d65a9b016cdd3f15",
+    "packages/process/rust/src/containment/windows.rs": "a4bb12af5e5f67c4dca84a608f4ccdd52ea45a48bfb6e3eb8d7b64fcf4091f59",
     "packages/process/rust/src/control.rs": "37359bbc02a2091492ef67eff85b7977619d555ed96ee0134b0edc25c70f099d",
-    "packages/process/rust/src/facts.rs": "d721931085cc34964b5585cb0648eb59b15dfe8e1657182a2f246b7f0f674c10",
-    "packages/process/rust/src/lib.rs": "22787e2b9058e737aea22d39da0fdc83d0afee4d108ee76d97842a4d6b6cc11e",
+    "packages/process/rust/src/facts.rs": "c84d53ca9dd8a9f9eb44f611ad520531b068567db9440078f012805d1dd36150",
+    "packages/process/rust/src/lib.rs": "ad71de601877e524e4cf019681689f9359a327478acb41a75633319466fba2ef",
     "packages/process/rust/src/mapped.rs": "10a60edf2c77662c0fe53fdfa0cb42ab447421340b613f9dd6c742678c30055c",
-    "packages/process/rust/src/platform/linux.rs": "879c6013e6410389045f82215014f9617a14777b3994b60b0bf648da6ed6bc62",
+    "packages/process/rust/src/platform/linux.rs": "be9faa2af77c0eceab0fdff9028c3cf156c476b076a4102bfa6037ae8825218e",
     "packages/process/rust/src/platform/macos.rs": "8224a406882097afea071ce4750c7d3f02ff05109662a1366415a3b9d48af455",
-    "packages/process/rust/src/platform/mod.rs": "b3670dba078206b05b152d2a59373c2056620f32f53c4145369a580626a5a7f2",
+    "packages/process/rust/src/platform/mod.rs": "37eff472f270dc5a3ba0be9f712df1f791bf4ea6200e7724f7e7d8d0c2021364",
     "packages/process/rust/src/platform/windows.rs": "b0230ed4e6a61a6a112f2d3201d69234a97b376c2cf2620851f2c90f644d18d6",
     "packages/process/rust/src/platform/windows_job.rs": "0b4c5b1d99cf6764b23efbddcab454357eb963965b2ca2dbe8f9cd2591fca3bc",
     "packages/process/rust/src/platform/windows_spawn.rs": "ac4c098d7fb0249c83354d87b4ba772746af7dfadd16e3014c0c359470516e45",
@@ -553,10 +555,10 @@
     "packages/work-state/rust/src/legacy_friction.rs": "4fc646bb8bac02b8670ff8a2c5eb40bbd3d52c7d80c6b3c1e79aaa68423e512e",
     "packages/work-state/rust/src/lib.rs": "11f49bcb01e30b7ad8d466114292e0b4efe5ccbb03ca3100e18b72bbad687ffb",
     "packages/work-state/rust/src/work_source.rs": "0222f9d33ca3db5200588ed6662530218cb9717f0a9ed322a5d58a54536b94dd",
-    "scripts/backfill-status-category.mjs": "bff22a3805f8a38f1c7d93b7cee3b53ee5b6dde0d978b4fdbfb760c1cc3622d6",
+    "scripts/backfill-status-category.mjs": "559976e36826b535131e2638e024186a051182339b8012b89b857efa4422582f",
     "scripts/backfill-unit-summaries.mjs": "a11d12e63191bc31bf7a27b2c7279ac5ea8403730045dbbaa8f8ce2738b275e5",
     "scripts/build-domain-registry.mjs": "ad239f74764832366c3c3bd43c674012904a78944bd6d6b9d2c8eb481c1a62c0",
-    "scripts/build-rust-distribution.mjs": "b84bd0fb5fc14963ef6a500020ee84280844482da3e4429060694053e9f61aaf",
+    "scripts/build-rust-distribution.mjs": "6c5b170c97f1529e54e40489fb8dab522eeafe50f502b30e81687cf69c469200",
     "scripts/build-skill-wrappers.mjs": "ca8b0121333b29830a35553e7360f14c19254d0a157cb5f79c217ad749038242",
     "scripts/check-backlog-reconciliation.mjs": "5e7fa8b9548c34479e270ec666bbf8132f7fc7c38177dbac71f8d74848f9baad",
     "scripts/check-decision-citation-drift.mjs": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
@@ -594,7 +596,7 @@
     "scripts/knowledge-classifier.mjs": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
     "scripts/knowledge-migration.mjs": "10193fda8ea6a58e3727847031f372309786ec05f181c4b79a67692791f0ac51",
     "scripts/lib/dev-host-manifest.mjs": "9928ceb97e807bcb02a7fed73153cf21de09d6cc9b6d56492166cb94e48c44bb",
-    "scripts/lib/full-suite-queue.mjs": "fa7c31d57af4626de9acb5c5298d618f285c3f7e139c0ac0772a0bc9210e9d06",
+    "scripts/lib/full-suite-queue.mjs": "da176b9ad8a796ec13ede755dd2c2b12e6e29d5b5b12874ca8e6ae06803e3aba",
     "scripts/lib/git-addon-stage.mjs": "1ec1179ce9ed73ad9e8ccba357d9ee141cd5bb57aff9d86f39b45eacc8da1ad7",
     "scripts/lib/git-dir-layout.mjs": "710ff2406bed4faa4a35ff3ccd2910e97d693112b64cd82802efc2f99027232f",
     "scripts/lib/git-ports.mjs": "119f38a44c2eb068dc2f7f1236f83d44cb1a1f2c10827e2aebf5efd9c7f6b24b",
@@ -607,8 +609,8 @@
     "scripts/measure-coordination-baseline.mjs": "b890da1963fd4ee50ac84cd53e5e9b45aa7ce37a92d51c6a633bdb2374ec6a7a",
     "scripts/measure-p08-performance.mjs": "2ab686e2e3f880f584a2f9278a6bbb27a49d71effcdb65215f1cbd3865099e3e",
     "scripts/measure-verify-cost.mjs": "76c5bc7fe1894af9eb5c7bf6de2177797bfb3ff4ff05b0826c3c7c6e765e5895",
-    "scripts/migrate-actor-to-role.mjs": "4501c681a7a0399e0e57d1cf48b43ba650934b49b84acac8a446cdd99db44a48",
-    "scripts/migrate-status-proposed-to-awaiting-approval.mjs": "ac3fd799390ee06d504b49f497f41f117526b961d4ebaf3883fca91b63cf2546",
+    "scripts/migrate-actor-to-role.mjs": "c7cbf743d674d30e02cbd92046a76c30d375994292fead5c89d9445065b0ae36",
+    "scripts/migrate-status-proposed-to-awaiting-approval.mjs": "3c68423a369856864d8d675596c45328a78b410f76c715af07684738f9ab4ca5",
     "scripts/migration-proof-2a.mjs": "c8097ce5bb23d816e31280eaafdb56a2b8ccc3fc3e13c763375255ef46705c80",
     "scripts/next-doc-id.mjs": "7e88c69cf6c78b4cce5240d3fcc34a1182fc963933435827a58974df5458bc9d",
     "scripts/package-release-assets.mjs": "088b9a0ad108920363ba5b4f540fb0c93b45b2960990981ab4e7558cff5fc59e",
@@ -618,7 +620,7 @@
     "scripts/regenerate-observe-fixtures.mjs": "07c5b42795e22c36d75363e2265cf59b6f6244d63f7413d9dacf9fe0e3071631",
     "scripts/run-rust-dev-host.mjs": "e10af7fa8c280ecb62cbde50e8d2e2160e1135b2bdd20c02867d0f0351ba641b",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "a4a56dba93a272daccf0648dbd250f766fb6a92cb5013b7620d6034b02446395",
+    "scripts/run-tests.mjs": "9495f5fe973cfcd2b4367c8092dddf58c0dce818acbc3fda13eb4ecad2acfc53",
     "scripts/stress-test-files.mjs": "c3ccd385982e8e1865b54e02abef044ae3e85a4547f34c9efd2fcbcc66d37240",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
     "scripts/test-proof-inventory.mjs": "61a54de2d57888dadb31138db836c569d5663046f4f835bf63061b43cbb77a35",
@@ -652,7 +654,7 @@
     "src/evolve/iron-law.mjs": "c3dce0c23705a8fd1ec463a782fba000ee67f21889f47e7ff350043f7a7ff8d7",
     "src/git/config.mjs": "18bdab21173350229a189c2b815351f26031389f356a2879befd46960bf26a95",
     "src/git/index.mjs": "8553e54d46431f3e458978dd3d577901ce10fcdb806b8df288a03562113f3ad5",
-    "src/git/inspect.mjs": "57d08738f1e1710a389f8897ddad233f1af4d29c80540244d4b91cd34fb7f25f",
+    "src/git/inspect.mjs": "033448fa785735c32b36178c654cedc272916b10b72a0ac5098087853c1aa7e8",
     "src/git/land.mjs": "0c8a1c878a46ac19343040b6c85fc11dd0e59ac6d18b7a1490b85a06940524da",
     "src/git/native-lock.mjs": "b75f10cf57a5bc07f916b45c2ef241ab62eff89f1cf6f67505a3cb3a7ad6d515",
     "src/git/native.mjs": "6b6a0e898a3244d5f9cc5a0a62e1c6f1732880ef9e060f408691ed5bd503ace2",
@@ -663,16 +665,15 @@
     "src/git/scoped-commit.mjs": "db173261ee00a062fbc98c0650d77093a5d877153f3d5fcaade7ec6c55ddb6e5",
     "src/git/sync.mjs": "c434a1a92d2f1fe3c10bd81b3e2830a4e28765bb4dc53e35ffa166b9b3c534e2",
     "src/git/worktree.mjs": "75e467d3cd210a54c2ef0c83714ec57ab362507dae18a268efd9a5833e1c746d",
-    "src/holder-lock/driver.mjs": "52e9ca6b71ead6c20347f5b5821a404d3b8758499764c6985f46bcca528ea31e",
-    "src/holder-lock/fences.mjs": "4196ac59aaabe0076c6c8adaabc3585aebea68876bb47ffea2d37168be4a234e",
+    "src/holder-lock/driver.mjs": "8736fbce3b3d9ba22b4a7bca51eff034df07da5aafad25ca5747729094046f5e",
     "src/holder-lock/hold-transport.mjs": "107ad4ae82c21a18fd21a0d02c7909f30678cc1492a16dfff6b3f426c64c4f81",
     "src/holder-lock/hot-guard.mjs": "0cb873f2422fe1567e0265ffabd705cae3e526fa1573ec4854acdde5190c44c7",
-    "src/holder-lock/index.mjs": "7e91cc3cd86388b1e0c71c8a6adf197c6c8605af407557730fefa8572b6768f1",
+    "src/holder-lock/index.mjs": "7ce8841662d828d4f8bd7f4b9d8d44b5d39bc6c0f59cb3e799690e4fa1ceb21d",
     "src/holder-lock/lock-scope.mjs": "5b891b58de3cd9047889d768e0b46b38556a2d27cb59052696560ba63837fc24",
-    "src/holder-lock/native-handover.mjs": "aa3a1fbe4c5753e7f7c3f82dc3be6c4516c37a78a4545165c57a06d9a9a5142c",
-    "src/holder-lock/protocol.mjs": "973b2373ee23f0662a2d4ea751977a077a1c3857da11a89b3efa5f9318dfedff",
-    "src/holder-lock/registry.mjs": "7e8dd7dcd83b7a168a62070c0ab101270f8a29509060234c1f05556f11c2806f",
-    "src/holder-lock/state-root.mjs": "0e675170f350824f7960dd2798c6fc02c1ac304919bd1bee9eefe601728f0698",
+    "src/holder-lock/native-handover.mjs": "b47be97633ed606fa6ab304d2ee3e47ff46675c86ec225e0d06ee5d1f6d7d56e",
+    "src/holder-lock/protocol.mjs": "3d7aae8f95347dc438430a7a7984927943f9cbc43eb95ea1312414496a412c7c",
+    "src/holder-lock/registry.mjs": "0894e75c7cc6beebad96ca56288b637ec74dd7d704be836f376b36bdd3154247",
+    "src/holder-lock/state-root.mjs": "5d2e7120f9f8a21088a03c4354f614631e0479c19dd5c5b6e886825878abda8b",
     "src/install/coexist.mjs": "099cfd22d3f84d221507697bfb0c84f336e4c85305433117e2390ebaad632a03",
     "src/intake/classify.mjs": "e12aeddcc50ede2c469f21a8c71ad32401f23cdad3eead7f164bc11c7dcde7f1",
     "src/intake/discovery.mjs": "6da596afa6d305cd8431a7f79659c04449bfe7ecd793bc5600fd11cd2cff9c1b",
@@ -680,8 +681,8 @@
     "src/intake/plan.mjs": "c3c72be35468420d9f42bcf23a0bdec9e48a11c1f4d8dd6bb4b9be09f4c60dc6",
     "src/intake/risk-keywords.mjs": "b71f9c07e58ad759538ac3a287027273d08b9a65a397be2f39b2716595f14445",
     "src/intake/verify-pattern-check.mjs": "1cfe3feb6375b999c4b851f6e9ef8fce7b1fb1209a81c29dd0a043939cb69e0c",
-    "src/native/door.mjs": "054de88bc06dd1b03ea71377eb70bc6dca88f9cafa5e459726863ed6bed342b1",
-    "src/observe/friction-client.mjs": "fa010f78de11c002da7ed01141a38ef5e65c072e937a1589642f0ed3ced8229d",
+    "src/native/door.mjs": "123a3f7353c03afa0be3886ace33364471191b5aa5d8be2ecd0aa216f76c84d3",
+    "src/observe/friction-client.mjs": "8dbce03318efff0234eed9c99117a217fa2c1e6e81049bada559e47bca9d9949",
     "src/report/authoritative-match.mjs": "385fd87aaaab0441c290d0203f5903a9b1edc614e7bead7e0970dc6aabd6b596",
     "src/report/capability-plan-lint.mjs": "7649ad794e0171be44317557be7c10a8d558299e031d41bd28c36a746e0b5aff",
     "src/report/context-render.mjs": "21f0d004ecc62a6be3d059f2c4911dd9dd9fcd3c646d348625e8277efb750fdb",
@@ -696,7 +697,7 @@
     "src/run-supervisor/cancel-opt-in.mjs": "f5b9a2eadc709918201ed01620098886bd108e8445c2b2304b845b4e73981403",
     "src/run-supervisor/cancel-registry.mjs": "03ec19e0768cf19ce0224103187c5de05200aba9fb9618e5b2c71fa953e70e87",
     "src/run-supervisor/client.mjs": "64b632a38eb54f44f97f0020dd46cf362c7837d693a2667aac42209f50a540ec",
-    "src/run-supervisor/direct-launch.mjs": "a0147ba2e9a490c5641ff296a812d010d3a950b738a5a5515155809805b6386a",
+    "src/run-supervisor/direct-launch.mjs": "716d9a450be22d2120a44d940bdcef41ae4faa66f605fbc55915aa32d234e81f",
     "src/run-supervisor/gate-kill-grace.mjs": "378ca3875bde61e5229cdfd5738854b5ed727b05496ec308b10682c3c0cf6c03",
     "src/run-supervisor/legacy-sweep.mjs": "63d49b8910513337ae01810361b02fdcc2a4c8ab5ab17fcf5c52de1f9474d51a",
     "src/run-supervisor/payload-root.mjs": "b1ad1d5402b921254d06aecf20a7bc1fe322845c0ab72f028c5fb7047402bdd9",
@@ -719,12 +720,12 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "6de1dfce1581cb914d56bbc5591362379f7f808e5db4e03f80ede09b51754855",
     "src/runner/dispatch/assignment-layout.mjs": "afc5f5c4c742892ca2418fbe2f7ec0f0ca801784f6aec1408e4a4aa4de21b791",
     "src/runner/dispatch/assignment-normalizer.mjs": "6b35618fbb2349be178c672a52f05de765939d0eb68f1a1fa4a7535e291828f1",
-    "src/runner/dispatch/assignment-runner.mjs": "0360b4aafc7f180751b1d0ed1f65e132d34a4b31bc726675d83dfefa81e135c3",
+    "src/runner/dispatch/assignment-runner.mjs": "189752bbe501819986037a1e0fbb9c56681e6b7d034da921f5fe313fccac560b",
     "src/runner/dispatch/assignment.mjs": "a8d4660fe96ff678cb12bc9d34bb7c4c4acbd4bcc1f747fe450e72eb7e97c31f",
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
     "src/runner/dispatch/cli.mjs": "7e8f9fa875274013f49c64929188e3a640cecd1790447c7f83795d9319c70363",
     "src/runner/dispatch/config.mjs": "e2dac8b83fe02fb8ab6e14e894598127bd8a335a62ac97c45ec5b711c0ae14e7",
-    "src/runner/dispatch/confinement/attestation-store.mjs": "3b8fc1e59ac9282338f6bf0c9bdee8c787f67cc7f1853943509ffec6ff72d5d7",
+    "src/runner/dispatch/confinement/attestation-store.mjs": "79e413d77b1a92e5f5016fe5c0da789bb6810824c0c747ce7c1e38c70fbea284",
     "src/runner/dispatch/confinement/authority.mjs": "e618d5997f85e200c50f6459c43f08f31852bbd6cefb6c27c128c4e845c78709",
     "src/runner/dispatch/confinement/backend-registry.mjs": "8c07146b675d4ad1086c88685de4a521c7004bc00de39e20d2dbb99d96bfa1ff",
     "src/runner/dispatch/confinement/bypass-pairing.mjs": "0414c5c19c96bbdd2a53dfbbdefd0eae0fd69d02abd09d37e69e03981f472f62",
@@ -734,7 +735,7 @@
     "src/runner/dispatch/confinement/probes/harness.mjs": "59d42d3ef5afea0f581efdb99bfc61d095b75e7c06dd3ed3921abdf296bbee57",
     "src/runner/dispatch/confinement/request.mjs": "aba50726b489db9763742539c462cf269461943576472c71e84d2d7fe248f185",
     "src/runner/dispatch/confinement/resources.mjs": "e2d0810db054711130f9e382e19bb5e4758865cd93cdddc711aa2c1dd2255994",
-    "src/runner/dispatch/cwd-lock.mjs": "570937fa60eacf0ed2cff8738b9b72026f2b3e4417870249969636e809f24675",
+    "src/runner/dispatch/cwd-lock.mjs": "3ea87d04c00433f2d410b02fc5b971d681acbc744de6d3587269bc20f57b2e23",
     "src/runner/dispatch/dispatch-error.mjs": "a23e9b79cd73a43eb1e0b9d9afc5710e9210514079515007d36fbbce089e4cbd",
     "src/runner/dispatch/effective-execution-contract.mjs": "2c9f4561cb879685614677eaee0c417b536943059c8c6c36ee567d91cfb54adf",
     "src/runner/dispatch/evidence-attribution.mjs": "e286beb61bc988049d44645db9a7a0900ba2431132ce694861ac7c43390b229f",
@@ -748,12 +749,12 @@
     "src/runner/dispatch/operation-prompt-templates.mjs": "932f932d239ccec0ef3debd919576d25ab068c50cb990d1f15afd03ff30f46af",
     "src/runner/dispatch/plan.mjs": "355cc52529ad4186609fb663412150b764e7d10ca66de04f9888c98c651379d7",
     "src/runner/dispatch/prepare.mjs": "d2bc4e5bccce5db31c8a56a364d06d88916b4c108cb0191957e8989b44ff90ce",
-    "src/runner/dispatch/process-identity.mjs": "a6cacf01dfde39a38756166d16056d910e74b60fdd1d25815f34b72a996f8ae7",
+    "src/runner/dispatch/process-identity.mjs": "37fd2e1b2fa509428bfe64a962b8716dc7f4952beb7efc84e32212b83d739b2f",
     "src/runner/dispatch/proof-helpers.mjs": "e053aac2167c22a7f48aeccda52ff29b3f2845024d7e9207afb3d19d5265425f",
     "src/runner/dispatch/provider-account-probe.mjs": "4035d607947ca72d9f5295a768ae1a5ec77a77bdef1609fab163f51cd29a9e0f",
     "src/runner/dispatch/provider-adapter.mjs": "a977cb194613266187922324a42d5e36670830283eae2476e575278829abfe3e",
     "src/runner/dispatch/provider-auth-failure.mjs": "d87918a5cabbad7eed60876bd02c976ef1f680c45e28d379338f59effb892dda",
-    "src/runner/dispatch/provider-capacity.mjs": "b72622f8080d368d907e2d97544a768021928df222f913a9368ddc8be3a59347",
+    "src/runner/dispatch/provider-capacity.mjs": "3ab39cb15779c9f3cdd02382b09ee82a764441e868cab551ee4156f201760100",
     "src/runner/dispatch/provider-credential-probe.mjs": "b1773175ff065ce80e9bb2b5123de15cc4d9b04a9bc0f249d9a1c971653bae74",
     "src/runner/dispatch/provider-credential-renewal.mjs": "1cb5087f80db94afe6073864d920228aadffd0937dba97a7f96a08b05b862fd5",
     "src/runner/dispatch/reconciliation-planner.mjs": "4b9656622397128a0d861abbf8512830bfecd670ac9b7fe2489ad3e0eeb1af2f",
@@ -761,10 +762,10 @@
     "src/runner/dispatch/recovery.mjs": "4f2b86847289118fbfe50ca261310de18864a2718f6962214bc362569310e5ca",
     "src/runner/dispatch/resolve.mjs": "878923fcf6f36ea1b888c1981067ba0885a8195bc43a28535c96c6d6a87ced7b",
     "src/runner/dispatch/result-ladder.mjs": "32f5c419991c663b2b7165951a5d79c5a1f556a70972fea3e511ed530574e9c3",
-    "src/runner/dispatch/run-lock.mjs": "4dcd9ff6f8ee5697304e3e033503d57b4fc75ff2a0e3b3e5010869f1fa7594ba",
+    "src/runner/dispatch/run-lock.mjs": "6163eab9be0fa44f6ac4b80d800ddc6fc615a23d698b392df63f427e2356c53d",
     "src/runner/dispatch/run-result.mjs": "9d0bf13cc9f695ae58d60052debbdf446868260b481c6ef036f9acaa611890f9",
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
-    "src/runner/dispatch/runtime-inspection.mjs": "e3f115ea6367dc266ae8d92dda03005af458ffaa99c54bb997689563006ab0fd",
+    "src/runner/dispatch/runtime-inspection.mjs": "9cfb34e1c8b7a78ac3285fb354402d2c7ab014f729b7c3557d847358dbee588b",
     "src/runner/dispatch/settlement.mjs": "171c6ba0444214c62db034f7ebcfc301e04de77091ea2437139f417262dac780",
     "src/runner/dispatch/stop-processes-inside.mjs": "705cafdb80283046c205646fd4f4742b47469172557d770ec67e468a96d28bb1",
     "src/runner/dispatch/stray-writes.mjs": "8ab287ef44a7e731d4c22fb50e820017645d707e9b41b63a75b7fb4bc028f2ff",
@@ -784,12 +785,12 @@
     "src/runner/execution/account-rotation.mjs": "f538c5b3f787f0add709535aa0f6629bd007520575a316e19781cef43050553a",
     "src/runner/execution/bind.mjs": "9d6031facd7781b4e73af5c0326fb84689723d35aca4f29c5832342cb092186f",
     "src/runner/execution/case-admission-port.mjs": "e616357c33473e946ccd8db9ff6fe26eb39c7f06a68867112a287cccbc579cda",
-    "src/runner/execution/commit-unit-work.mjs": "a2c0ba962257c38dc3f2b9f50749d71f9be11c356f6f435267d4530e11c43793",
+    "src/runner/execution/commit-unit-work.mjs": "c8f585bab5df477ae3c8a6e9a7bc5211723e9c7b75fcda719ce22c9157152117",
     "src/runner/execution/dry-bind.mjs": "945e0e2cfeae2dd362d795c10f36db59177a099b5455e010445a3d8d90abc17c",
     "src/runner/execution/explain.mjs": "cf31164a70413583d7fa7d6ff70bc0b4c00c15f425d2bdaef3fd92e568ef642d",
     "src/runner/execution/handoff-refs.mjs": "89b30add23e02c443ab22ce22f7ae175175879945c96cf32b2cfb36040c5cf00",
     "src/runner/execution/legacy-seat-read.mjs": "ffd5c9b680c66cb34ed75656925feec08d9bc5c99a512b100149b981a53ccfa8",
-    "src/runner/execution/partial-writes.mjs": "04313fc2f4901e7f8ec373c999c731df9498cde44a548d4675d2106e3cbc6940",
+    "src/runner/execution/partial-writes.mjs": "9c7ab4a2f57852b93283b819ed8c4adcac2b71c9241cdd4c760e73960bc1c027",
     "src/runner/execution/patterns/debate.mjs": "6a7428b44aaee0e77c314b451e7c496e689e790f9604bdc7bbed43523e811afe",
     "src/runner/execution/patterns/history-outcome.mjs": "596e7a2b6344ce9955b9c813c2811b79a16b8825aee51fe1cb3e40839cdcd048",
     "src/runner/execution/patterns/index.mjs": "ad92908c849a25c83a67515dd1954cb81d3297636da73adab4a088c6d6bec7eb",
@@ -798,30 +799,30 @@
     "src/runner/execution/patterns/reviewed.mjs": "4d89cb1825bca71a291cefe82cbeb82c606f3e6b65877f722573592e82c37998",
     "src/runner/execution/patterns/role-tasks.mjs": "6df89972192146084a969ed83d56acdd25969f9eff8fa4f1a71c1a4f103bf3e9",
     "src/runner/execution/patterns/solo.mjs": "709db6262995af3a6dde9f6c6be4180ea99d01f0a8a9b2b84690382118495694",
-    "src/runner/execution/run.mjs": "7419868a5d9568ccd4f29ea2d8a0418064d11ec109a50011a5fff476c0e6ce56",
+    "src/runner/execution/run.mjs": "7a72073c6d17b18b132f39fc0637dababa0e2fb653f59c54eb1e7fd35aee84a1",
     "src/runner/execution/seat-ledger.mjs": "718c47642cb722a890ef3cb423cd4aec4803ea7d815b9f56ce725003a3293bc7",
     "src/runner/execution/seat-policy.mjs": "d8a43092c2664215ffc0c3d38d18685b2f9316c003364b44c85d68e8c70e145f",
     "src/runner/execution/seat-resolver.mjs": "62148faa6a09e9fdf8b0fd88c80296c6864bd1cc091f9b96d8a34a4591a3268e",
     "src/runner/execution/unit-control.mjs": "7758226c1321bda3cd53e5018c7030b714adf138ba8e3fccbeb8a4f5337f9022",
     "src/runner/execution/unit-run-history.mjs": "245c8bf2fd2221fdd3e801d426e0ee466b75ee408394cac3b104381160691ac7",
     "src/runner/execution/unit-state.mjs": "fa446821758bdebae8ed5d4858c37780796e98352c14641f6a59abf904157e90",
-    "src/runner/execution/unit-summary.mjs": "fb7b7bc94e88ace71fbecf119a901f44e2a53cc6961abd9f53050c8faf40ab16",
+    "src/runner/execution/unit-summary.mjs": "b6086bb6379052a6a1142c854725b5f4cd96054257eed494e3d4adcaac8ebd5c",
     "src/runner/execution/unit-sync.mjs": "a5dcbcd15d189d8a943f3e5ee87543a4ffb466f15b1534684b111034d7da89e5",
     "src/runner/execution/unit.mjs": "9b04463a79c9698dcf63c8f44e85027348688f6421a07f3fe185adc796bb6a02",
     "src/runner/fanout-batch.mjs": "e9eb05055909f74e30d07941caa2909ae06714dae61ee6995cf9595505bb3cdb",
     "src/runner/frozen-judge.mjs": "96265fab86a2a57ae4b191c83a864a4f285942f2c35318fbdae435a832bb75ed",
-    "src/runner/gateway-control.mjs": "f59d99ae83b6fd2a64b9b0d51adb0604750e6b844776958ee471509c40757705",
+    "src/runner/gateway-control.mjs": "50ecbcedfea9b3f37e8d45a712210d86d7caf0e19fabdd29ea222aa5194ec37b",
     "src/runner/github-adapter.mjs": "162d7b2064b9b311ea88afba25567601420626743dff6b72b0aba78f42220c00",
     "src/runner/goal-check.mjs": "f21520e58727a016945c052c2b04f72ec9120192c4cdfaaaf34526ea0bb090e0",
     "src/runner/iron-law-gate.mjs": "37e253ef40240e535e6587d41b393e6ddecc7cb174104760d0f48ba168203d43",
-    "src/runner/lock-fence.mjs": "55958945d9809538db3fd176497c2e4aafcbe4ba5b6a5589f61ae73c7c2d8ba8",
-    "src/runner/lock-status.mjs": "c9a1521a142a1e2ffc794aab608a62b7cd7bd1c06967d17e7de648fd5d37fbdd",
+    "src/runner/lock-fence.mjs": "e128397527edce60462e4337ed2253383808747ef5f12dd19a8a4e35a12eaa5f",
+    "src/runner/lock-status.mjs": "fc33d73f4e3fe2b65e6a1bdefaed2b59870a54edac15936c20f9681773910bcc",
     "src/runner/lock-wait.mjs": "833e0a3bf2d71d66358d4f230c7325ebedcba34444cdaa60324a4e4be2140301",
-    "src/runner/loop.mjs": "ed4fbb04799b1004c207baf8bcfc242594eedc0951dec04b61c35c07a935ea9d",
+    "src/runner/loop.mjs": "fa7676c6803545c5b9c62dc99400d1374fe7b8940d451a929708b54cd3fedc7b",
     "src/runner/main-checkout-activity.mjs": "84cd9b95e28c0c1004322b6edba0d2b4b45f9445eddc30613abd53314f13c071",
     "src/runner/main-checkout-reset-guard.mjs": "446d216c411dd5f59d512b5baf52b3a46eeb8ae03320f1d40be85e9447072d0c",
-    "src/runner/main-fgos-checkpoint.mjs": "7bcdab7f2b887e149170b50180f97eae0ce666abff0aca88b9477357ed4d8e52",
-    "src/runner/merge.mjs": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577",
+    "src/runner/main-fgos-checkpoint.mjs": "9ad033aaf03324cda92d6b96cc68e8c52514f4c225d3a55e3c2ed9820f25b847",
+    "src/runner/merge.mjs": "e473a4b7e64f33179a05931d6d590c47850be01701df6b04c2b4a6d0a1525373",
     "src/runner/operation-capability.mjs": "6683b7da84274722aa5d464ccc8ec9d9e34b110f779e8ea5b6f6c1d0b3c820f5",
     "src/runner/operation-choice.mjs": "866b8b61bea02f3250d9d89cf826109065e35c899b64faad0cfddc524614277e",
     "src/runner/paths.mjs": "bfbb13456f940e02d77b5ad8515b015ec6c1f8a83ee6015086138eeaed96339f",
@@ -829,16 +830,16 @@
     "src/runner/promote-preflight.mjs": "26db2c2670fc445a4c170af18880ead88e13c4ff1545846b5c8cf760fbd34e54",
     "src/runner/prompt-templates.mjs": "fd027de3376fbdfe654f2a2b8599a384d88f9b5383a0161b0b9df7bca9de39b9",
     "src/runner/recovery.mjs": "9457be6fbac75013e4273ebd5bb08a981552b5dda594ef34437d56c3d563aa1a",
-    "src/runner/repo-locks.mjs": "17dfd17dae00b587103f16b7beb11a411ad18de7baba0486559a5ad8f216d554",
+    "src/runner/repo-locks.mjs": "0f4c25c5bcb711d64a74b1c72b27b7db4e18dfe9cefbfa794f320e3c3dc1770b",
     "src/runner/rigor.mjs": "f85eabe784dd24de1e2431f16cccecd6634da8a6ca6be128dc9a87a3c91258c0",
     "src/runner/root-affinity.mjs": "0e074df4c61d29f60a2ce43fb62830ec2a2eaebe0e1998fec0cbacb4cd15e871",
-    "src/runner/session.mjs": "c5bb1cb6890408cc06c4fd2da6a473dc77f675a42c732dff11d62207b9803750",
+    "src/runner/session.mjs": "b1e73bd2e8413d5c55c425a01355c9b5947a10b3d3d1a445b034b63e3461e368",
     "src/runner/work-compat.mjs": "a804010f1992b05a28e07e11681c06919b1bc4a72fd1ab3e77bd2590bb020d25",
     "src/runner/work-dispatch.mjs": "802ceef2ed993908ab4a37d53273f0ad59e2500bbf64352f90ddbf6c8d429483",
     "src/runner/worker-log.mjs": "b33f235b50765aff48b4dfd5ad15ea09fccacea4b7ea4ca52dc4df8dd3226ba1",
-    "src/runner/worktree.mjs": "76add3322777d6c33699e07b13566b17c90516ce5f53d35983cf3af755a4af0d",
+    "src/runner/worktree.mjs": "0ab724d610be76cc45dc57ae1f8b7bbfce2b36e9272ff2c0cdc12e1228f661a9",
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
-    "src/seat-binding/client.mjs": "2b3caad164482d1f997427972d745aee8f4594afd6a4cb81cfac25dd8937c9ca",
+    "src/seat-binding/client.mjs": "58c08c0995b2a6a00eeb012ae88462253b16204c4b64bed6823121fb6cb0d88a",
     "src/setup/agent-cli-trust.mjs": "6a70801d94f369a216d626b240022c5291ab8efdf742d0e1ce63721ac1669537",
     "src/setup/agent-hooks.mjs": "0109366e1a1a117b0128a729d4753dc8de14d92ac1c5ba5893959d01a62c1088",
     "src/setup/agy-permissions.mjs": "0dd7e2fc1297acf09f0e04236ab69f2c88dcfdc04cb9a0d7f14468973195d97f",
@@ -852,23 +853,22 @@
     "src/setup/event-store-fixes.mjs": "4f3a95add8dee1f08c1dd2d38fdb0cf7b5ee7101909faf965c0b2e6ebdaa142e",
     "src/setup/executor-posture-coverage.mjs": "b9bb0adc2d173321342aaede10d6e767f221d9194f197bee5f8dcb23901843c4",
     "src/setup/executor-profile-warnings.mjs": "7edcf8b4ddb7030651b4607e364b7a2e4a78e9166c967893c25880a949ea37be",
-    "src/setup/git-checks.mjs": "1592427603412509eb41efd583dd9ae9734b71814f77ae1266078d449cb080d5",
+    "src/setup/git-checks.mjs": "e0f1f610370eb0422798ef9292b74d6e1dfd786ed6eb92f872a762f27df5ad36",
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
-    "src/setup/holder-lock-checks.mjs": "b51860bfe681104ab3ec462333150ea39d183e707162af4319d90e18040791f6",
+    "src/setup/holder-lock-checks.mjs": "7a4676d00e63d3f47508d1d081d2941a794f30de18931dfce871ed9e396f923d",
     "src/setup/identity-checks.mjs": "780fe8e248f9e26c1d658618d8a2f1764f4aa71898d1a06323e4a20f3eb3ae42",
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
     "src/setup/instruction-projections.mjs": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
     "src/setup/instruction-registry.mjs": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-    "src/setup/lock-record-checks.mjs": "08afa6351e5aa874f3fa45c57d81fc1f7266f47cf7f300005bd2e0a5de56c647",
     "src/setup/model-pool-checks.mjs": "4c115569d3644a395a09b0f6ea1d87205c791b18ccae021becd31a78bb360c6f",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "5b5be7a5ea6a0f071e821f6e0068f950d4f6678a1da83e756ed89c0cb40bbf9d",
-    "src/setup/run-supervisor-checks.mjs": "06d12ffdf06f05f27e3621d06c2f7e4680b838874e2fcd4fc45f9af3615aadef",
+    "src/setup/registrations.mjs": "2d27f0a54efe32461557ce0960f85da70068edef774e22bb7c1bba93afe74b6d",
+    "src/setup/run-supervisor-checks.mjs": "02ac1daf6c996d7dcf974675a1874fbc3a956c519ccea7678220b236c91668e8",
     "src/setup/seat-binding-checks.mjs": "b1efc2d1711dc21203c6482bf47ff4dfa7f8aa6f49b0d88a99a1479319a5f36f",
     "src/setup/seat-binding-conversion.mjs": "9f1b782a5a4a9059ad82fda27b79c6cc5ffaf057f6f1347e79ae5d74b49c00a1",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
     "src/setup/skill-wrappers.mjs": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
-    "src/setup/terminal-control-checks.mjs": "ce1e85c2d622611d2c6e6b47bfadc49ebb4a0f801c80bfcc7a91d3e8d0139656",
+    "src/setup/terminal-control-checks.mjs": "6484545f72151411a9675780fd46eb578c5a9440eeacba01dd8c5f8f5b154d6d",
     "src/setup/workflow-case-checks.mjs": "de600986a2325b0a3653835bed153a11ffc447aa31212db8cd4e9d90dd67ed59",
     "src/setup/workflow-definition-files.mjs": "40dc0e0550959c84c34e58c70947859d58baad69f7ffd4fcfa630ee57bdd0e1e",
     "src/state/awaiting-context.mjs": "dda0f698b6b0cad343fdc39738f98e19975463ff4e1457a3d9390dd0b36576ea",
@@ -891,7 +891,7 @@
     "src/state/graph-harness.mjs": "6d93e939f7d13ec8f24957eca8b02bc66aad00573c4369175bcb426915ac789b",
     "src/state/graph-metrics.mjs": "ce0c9112f0a22ae408a442773fc91628eb225ef103bc9024a16ce926c1f0f167",
     "src/state/handoff.mjs": "352dbce5f607f2ad478bf0119fbf875bf640142f3438a745ebcead4804dd4d38",
-    "src/state/hot-lock.mjs": "e2d2749a182772094c263a82680939922ab111c6e2c0f03b888fb394dfd6d71a",
+    "src/state/hot-lock.mjs": "fabd7425e2845dfe7f588a3b46a41bad06727b128bdb84280147223bb546951c",
     "src/state/impact.mjs": "5baf4a1efb7cb4e7b7b8c307e16a9671b925efe103246515b49f29710a8ddb4c",
     "src/state/knowledge-registry.mjs": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
     "src/state/legacy-event-git-adapter.mjs": "8b65b55aacf9a3b321e51847e4c5f8c4829c0d2fd6f5de2ad52046c0ac1bf7e9",
@@ -922,8 +922,7 @@
     "src/util/normalize-path.mjs": "e1519327a67834d6309a0e92e69d5fb46bb671a7ddfbe9ef5c36acc22fc3062a",
     "src/util/release-binary-path.mjs": "f74aefea9a51b750049a9d32b62c2dbd9fb9782f944535b293e9cc352b466f76",
     "src/util/release-targets.mjs": "52157efccc71fa4bc260a47717ab48047792a7057329ab29d9bd6333c322029c",
-    "src/util/session-identity.mjs": "fff0d87725fcdc864c8e338a10b2f782b0379fb8b32c78e2f49733c258d9e3f4",
-    "src/util/state-lock-held.mjs": "dd17a1e68493a6cf86671a417f04e3b7d0ebe212fecfbd066b0575ea35468a75",
+    "src/util/session-identity.mjs": "0f7f3a3f3219ba3c13d84ee71a6581da5ea8eea185043227066c8eb56e951e33",
     "src/util/third-party/js-yaml.mjs": "6f3620e6ddb211552d9cbbfec2ac923d3b6b64819bf054f426525e9227c8217b",
     "src/util/unique-tmp-tag.mjs": "712eb59d8753224dc3197af5739a3a01fa4188f0b60e6e8ed22a1854d8b68dde",
     "src/util/yaml.mjs": "96392b4286e67f309f4720ab0f2b4a75f515f4819546ed7727425f2fd732c466",
@@ -934,7 +933,7 @@
     "src/verbs/dispatch/watch.mjs": "e82fb8d94c5d76bc64b006bab2742e777f50785a4c4b12c91f15723864e457a3",
     "src/verbs/events/context.mjs": "5a47ea5bc1a590619f137cef40455898d99595e6bb8ba5a2b6d75570b101557b",
     "src/verbs/events/export.mjs": "3c163c4704f7a2054af09c4af5e69c0f3394f880319b890e8337dc2049b9f50d",
-    "src/verbs/events/migrate.mjs": "66cb5bd2b417d35f67c0ed0069136aeb6de8e6f34bf2604198bfd24ec1e7079f",
+    "src/verbs/events/migrate.mjs": "a386b37d767a9e1a7b138b9d6ba5d41828e085723be6dffbd7957d2cadf229d5",
     "src/verbs/events/parity.mjs": "6431bfc150b5876ec83bf6ff63023aeee9fe3c0b33d2e8ed54114b443e088ed7",
     "src/verbs/events/rebuild.mjs": "d60b26c628b4375b9ab4b0cb59feebd4b16cbae53cc339b549868663246c7cfa",
     "src/verbs/events/status.mjs": "6fb73280f473c45dc2de55c1ad4514235a0f5e9563ebf7e2801d7b4c072ffc6f",
@@ -958,7 +957,7 @@
     "src/workflow/case-bindings.mjs": "33a10912e1f5d1bd1c41100411c11c799f7094b81e6ec3f372acb598d5d9f22f",
     "src/workflow/case-close.mjs": "8c92c160e4cc7d704420e2f6e7888298942a3fea9358ee8ae5a7d2ef0a81d6c3",
     "src/workflow/case-frame.mjs": "2a04c4b7e12046ec6bd5696157a86b973371ac51355f62374033657bcd88f527",
-    "src/workflow/case-lock.mjs": "0b2c0cd79a19e61e647797d6cad0f7d051acc3ed368385722ec88b8ae1aca9bb",
+    "src/workflow/case-lock.mjs": "2277fb6db0004b5365c0d5add23a6e72ca67cc407d8d052ed3817364eccd8349",
     "src/workflow/case-projection.mjs": "51b9abf3ec6757c0c36dbe457ee0283a45848c382da0797b75ab75fa37ee2b86",
     "src/workflow/case-runtime.mjs": "140328e7bc6ab01d52ca2a68d4a1e080895147262a5738d9226ad64ba3b99516",
     "src/workflow/case-start.mjs": "fe6e26382c5489a58278a22a2fe7e857bb55c6c78b3f2692c326f4a07299f4ef",
@@ -995,14 +994,14 @@
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 1216,
+      "line": 1217,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? elements of section.commands",
       "family": "unresolved-binary"
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 1246,
+      "line": 1247,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "? elements of section.commands",
       "family": "unresolved-binary"
@@ -1062,58 +1061,16 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 211,
+      "line": 242,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:484"
+        ".githooks/pre-commit:515"
       ],
       "class": "hook-read-context",
       "verbs": [
         "diff"
-      ]
-    },
-    {
-      "path": ".githooks/pre-commit",
-      "line": 228,
-      "spawn": "execFileSync",
-      "binary": "git",
-      "family": "spawn",
-      "callers": [
-        ".githooks/pre-commit:490"
-      ],
-      "class": "hook-read-context",
-      "verbs": [
-        "symbolic-ref read"
-      ]
-    },
-    {
-      "path": ".githooks/pre-commit",
-      "line": 238,
-      "spawn": "execFileSync",
-      "binary": "git",
-      "family": "spawn",
-      "callers": [
-        ".githooks/pre-commit:490"
-      ],
-      "class": "hook-read-context",
-      "verbs": [
-        "diff"
-      ]
-    },
-    {
-      "path": ".githooks/pre-commit",
-      "line": 258,
-      "spawn": "execFileSync",
-      "binary": "git",
-      "family": "spawn",
-      "callers": [
-        ".githooks/pre-commit:511"
-      ],
-      "class": "hook-read-context",
-      "verbs": [
-        "rev-parse"
       ]
     },
     {
@@ -1123,7 +1080,35 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:511"
+        ".githooks/pre-commit:521"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "symbolic-ref read"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 269,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:521"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "diff"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 289,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:542"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1132,12 +1117,26 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 264,
+      "line": 290,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:511"
+        ".githooks/pre-commit:542"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "rev-parse"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 295,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:542"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1146,12 +1145,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 286,
+      "line": 317,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:517"
+        ".githooks/pre-commit:548"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1160,12 +1159,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 298,
+      "line": 329,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:517"
+        ".githooks/pre-commit:548"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1174,12 +1173,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 327,
+      "line": 358,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:517"
+        ".githooks/pre-commit:548"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1188,58 +1187,16 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 328,
+      "line": 359,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:517"
+        ".githooks/pre-commit:548"
       ],
       "class": "hook-read-context",
       "verbs": [
         "show"
-      ]
-    },
-    {
-      "path": ".githooks/pre-commit",
-      "line": 346,
-      "spawn": "execFileSync",
-      "binary": "git",
-      "family": "spawn",
-      "callers": [
-        ".githooks/pre-commit:472"
-      ],
-      "class": "hook-read-context",
-      "verbs": [
-        "ls-files"
-      ]
-    },
-    {
-      "path": ".githooks/pre-commit",
-      "line": 348,
-      "spawn": "execFileSync",
-      "binary": "git",
-      "family": "spawn",
-      "callers": [
-        ".githooks/pre-commit:472"
-      ],
-      "class": "hook-read-context",
-      "verbs": [
-        "ls-tree"
-      ]
-    },
-    {
-      "path": ".githooks/pre-commit",
-      "line": 350,
-      "spawn": "execFileSync",
-      "binary": "git",
-      "family": "spawn",
-      "callers": [
-        ".githooks/pre-commit:472"
-      ],
-      "class": "hook-read-context",
-      "verbs": [
-        "diff"
       ]
     },
     {
@@ -1249,39 +1206,39 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:478"
+        ".githooks/pre-commit:503"
       ],
       "class": "hook-read-context",
       "verbs": [
-        "symbolic-ref read"
+        "ls-files"
       ]
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 385,
+      "line": 379,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:478"
+        ".githooks/pre-commit:503"
       ],
       "class": "hook-read-context",
       "verbs": [
-        "reflog show"
+        "ls-tree"
       ]
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 395,
+      "line": 381,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:478"
+        ".githooks/pre-commit:503"
       ],
       "class": "hook-read-context",
       "verbs": [
-        "rev-parse"
+        "diff"
       ]
     },
     {
@@ -1291,7 +1248,49 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:478"
+        ".githooks/pre-commit:509"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "symbolic-ref read"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 416,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:509"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "reflog show"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 426,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:509"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "rev-parse"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 439,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:509"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1300,12 +1299,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 424,
+      "line": 455,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:502"
+        ".githooks/pre-commit:533"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1314,12 +1313,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 462,
+      "line": 493,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:485"
+        ".githooks/pre-commit:516"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1328,24 +1327,38 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 466,
+      "line": 497,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 476,
+      "line": 507,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:580"
+        ".githooks/pre-commit:617"
       ],
       "class": "hook-read-context",
       "verbs": [
         "rev-parse"
       ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 561,
+      "spawn": "mainLockVerdict -> .githooks/pre-commit:165",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 588,
+      "spawn": "identityData -> .githooks/pre-commit:117",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
     },
     {
       "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
@@ -1552,14 +1565,7 @@
     },
     {
       "path": "apps/fgos/tests/internal_lock_routes.rs",
-      "line": 199,
-      "spawn": "Command::new",
-      "binary": "sh",
-      "class": "rust-test"
-    },
-    {
-      "path": "apps/fgos/tests/internal_lock_routes.rs",
-      "line": 404,
+      "line": 213,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"
@@ -1778,6 +1784,13 @@
       "class": "rust-test"
     },
     {
+      "path": "packages/git/node-addon/src/holder_lock.rs",
+      "line": 209,
+      "spawn": "Command::new <- packages/holder-lock/rust/src/semantics.rs:118",
+      "binary": "(uncalled two_process_probe)",
+      "class": "uncalled-wrapper"
+    },
+    {
       "path": "packages/git/rust/src/driver.rs",
       "line": 1200,
       "spawn": "Command::new <- packages/process/rust/src/containment/windows.rs:86",
@@ -1986,7 +1999,7 @@
     },
     {
       "path": "packages/holder-lock/rust/src/route.rs",
-      "line": 480,
+      "line": 315,
       "spawn": "Command::new <- packages/process/rust/src/mapped.rs:146",
       "binary": "git",
       "class": "production-sandbox-probe",
@@ -2006,7 +2019,7 @@
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
-      "resolvedAt": "packages/holder-lock/rust/src/port.rs:70"
+      "resolvedAt": "packages/holder-lock/rust/src/port.rs:71"
     },
     {
       "path": "packages/holder-lock/rust/tests/borrow_git.rs",
@@ -2549,13 +2562,6 @@
       "class": "sandbox-door"
     },
     {
-      "path": "scripts/run-tests.mjs",
-      "line": 582,
-      "spawn": "hostSpeaksLockProtocol -> scripts/run-tests.mjs:595",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
       "path": "src/event-store/native.mjs",
       "line": 175,
       "spawn": "loadNativeAddon -> src/git/native.mjs:16",
@@ -2595,100 +2601,30 @@
       "function": "createGitNativeLockRepair"
     },
     {
-      "path": "src/holder-lock/driver.mjs",
-      "line": 215,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/holder-lock/driver.mjs",
-      "line": 252,
-      "spawn": "spawnSync",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/holder-lock/fences.mjs",
-      "line": 484,
-      "spawn": "scanWorkspace -> src/holder-lock/fences.mjs:440",
+      "path": "src/holder-lock/index.mjs",
+      "line": 282,
+      "spawn": "acquireHoldSync -> src/holder-lock/index.mjs:292",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/holder-lock/index.mjs",
-      "line": 103,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
+      "line": 315,
+      "spawn": "acquireLoop -> src/holder-lock/index.mjs:338",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/holder-lock/index.mjs",
-      "line": 246,
-      "spawn": "acquireHoldSync -> src/holder-lock/index.mjs:273",
+      "line": 645,
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:141",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/holder-lock/index.mjs",
-      "line": 252,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/holder-lock/index.mjs",
-      "line": 296,
-      "spawn": "acquireLoop -> src/holder-lock/index.mjs:342",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/holder-lock/index.mjs",
-      "line": 370,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/holder-lock/index.mjs",
-      "line": 374,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/holder-lock/index.mjs",
-      "line": 439,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/holder-lock/index.mjs",
-      "line": 445,
-      "spawn": "runLockRoute -> src/holder-lock/driver.mjs:167",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/holder-lock/index.mjs",
-      "line": 654,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/holder-lock/index.mjs",
-      "line": 678,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/holder-lock/index.mjs",
-      "line": 684,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
+      "line": 669,
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:141",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
@@ -2708,28 +2644,21 @@
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1892,
-      "spawn": "mintAttemptWriterId -> src/util/session-identity.mjs:212",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2000,
+      "line": 1999,
       "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:383",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2106,
-      "spawn": "startSupervisor -> src/run-supervisor/direct-launch.mjs:275",
+      "line": 2105,
+      "spawn": "startSupervisor -> src/run-supervisor/direct-launch.mjs:276",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2180,
+      "line": 2179,
       "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:724",
       "binary": "(configuration file data)",
       "class": "configured-binary"
@@ -2780,14 +2709,14 @@
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1422,
+      "line": 1423,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1422,
+      "line": 1423,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"
@@ -2862,21 +2791,7 @@
     },
     {
       "path": "src/setup/holder-lock-checks.mjs",
-      "line": 279,
-      "spawn": "twoProcessProbe -> src/setup/holder-lock-checks.mjs:137",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/setup/holder-lock-checks.mjs",
-      "line": 307,
-      "spawn": "spawnSync",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/setup/holder-lock-checks.mjs",
-      "line": 475,
+      "line": 147,
       "spawn": "spawnSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
@@ -2890,84 +2805,84 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3053,
+      "line": 3028,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3067,
+      "line": 3042,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3121,
+      "line": 3096,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3133,
+      "line": 3108,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 4417,
+      "line": 4392,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5560,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1549",
+      "line": 5535,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1547",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5607,
+      "line": 5582,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:595",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5648,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1549",
+      "line": 5623,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1547",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5655,
+      "line": 5630,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:518",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6040,
+      "line": 6015,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6291,
-      "spawn": "probeIdentity -> src/util/session-identity.mjs:109",
+      "line": 6266,
+      "spawn": "probeIdentity -> src/util/session-identity.mjs:55",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6336,
+      "line": 6311,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:128",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
@@ -2988,8 +2903,8 @@
     },
     {
       "path": "src/setup/terminal-control-checks.mjs",
-      "line": 73,
-      "spawn": "checkAnchorPane -> src/setup/terminal-control-checks.mjs:34",
+      "line": 69,
+      "spawn": "checkAnchorPane -> src/setup/terminal-control-checks.mjs:30",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
@@ -3015,20 +2930,6 @@
       "class": "configured-binary"
     },
     {
-      "path": "src/util/session-identity.mjs",
-      "line": 168,
-      "spawn": "probeIdentity -> src/util/session-identity.mjs:109",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/util/session-identity.mjs",
-      "line": 212,
-      "spawn": "execFileSync",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
       "path": "src/verbs/events/export.mjs",
       "line": 14,
       "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
@@ -3038,7 +2939,14 @@
     },
     {
       "path": "src/verbs/events/migrate.mjs",
-      "line": 68,
+      "line": 147,
+      "spawn": "scanWorkspace -> src/verbs/events/migrate.mjs:103",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/verbs/events/migrate.mjs",
+      "line": 161,
       "spawn": "eventStoreFacts -> src/event-store/native.mjs:153",
       "binary": "param ctx",
       "class": "uncalled-wrapper",
@@ -3046,15 +2954,15 @@
     },
     {
       "path": "src/verbs/events/migrate.mjs",
-      "line": 70,
-      "spawn": "checkStopped -> src/holder-lock/fences.mjs:484",
+      "line": 163,
+      "spawn": "checkStopped -> src/verbs/events/migrate.mjs:147",
       "binary": "param ctx",
       "class": "uncalled-wrapper",
       "function": "migrateUseCase"
     },
     {
       "path": "src/verbs/events/migrate.mjs",
-      "line": 73,
+      "line": 166,
       "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
       "binary": "param ctx",
       "class": "uncalled-wrapper",
@@ -3062,7 +2970,7 @@
     },
     {
       "path": "src/verbs/events/migrate.mjs",
-      "line": 95,
+      "line": 188,
       "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
       "binary": "param ctx",
       "class": "uncalled-wrapper",

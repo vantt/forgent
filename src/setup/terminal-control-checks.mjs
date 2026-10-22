@@ -19,10 +19,6 @@ import { READY_TIMEOUT_MS } from '../runner/dispatch/herdr-deadlines.mjs';
 
 const TERMINAL_DIR = 'terminal';
 
-function fgosDirOf(repoRoot) {
-  return path.join(path.resolve(repoRoot), '.fgos');
-}
-
 /** `FGOS_HERDR_ANCHOR_PANE`, when set, must name a pane herdr can resolve: it is
  * the input of `attach`. Returns a failure message, a note to append, or `''`. */
 function checkAnchorPane(bin, env) {
@@ -137,7 +133,7 @@ export function checkTerminalAllocations(repoRoot, { globalConfigPath, terminalC
 export function fixTerminalDir(repoRoot, { env = process.env } = {}) {
   let dir;
   try {
-    dir = path.join(resolveStateRoot({ env, fgosDir: fgosDirOf(repoRoot) }).stateRoot, TERMINAL_DIR);
+    dir = path.join(resolveStateRoot({ env }).stateRoot, TERMINAL_DIR);
   } catch (err) {
     return { changed: false, message: `terminal directory not created: state root unresolved: ${err.message}` };
   }

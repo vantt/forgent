@@ -278,6 +278,7 @@ dependencies = [
  "fgos-event-store",
  "fgos-git",
  "fgos-holder-lock",
+ "fgos-identity",
  "fgos-process",
  "fgos-write-scope",
  "libc",

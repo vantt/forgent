@@ -5,8 +5,10 @@ import path from 'node:path';
 import os from 'node:os';
 import { eventStoreFacts } from '../../event-store/index.mjs';
 import { isDeepStrictEqual } from 'node:util';
-import { checkStopped } from '../../holder-lock/fences.mjs';
-import { workspaceListing } from '../../setup/holder-lock-checks.mjs';
+import { spawnSync } from 'node:child_process';
+import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
+import { resolveHostBin } from '../../util/host-bin.mjs';
+import { selfChain } from '../../runner/dispatch/process-identity.mjs';
 import { fixEventStoreLockDirs, fixEventStoreMachineId, fixEventStoreRefspec } from '../../setup/event-store-fixes.mjs';
 import { foldEvents, readAllEventsFromDir, buildSnapshotFromDir, serializeView } from '../../state/replay.mjs';
 import { listPorting } from '../../state/porting-store.mjs';
@@ -60,6 +62,97 @@ export function migrationParity({ inventory, events }, { baseline, cache } = {})
     }
     return { equal: differences.length === 0, differences, cacheCompared, workEvents: workEvents.length, portingEntities: portingCount, revision: serializeView(imported).revision };
   } finally { fs.rmSync(scratch, { recursive: true, force: true }); }
+}
+
+const SCAN_PROTOCOL = 1;
+const SCAN_TIMEOUT_MS = 30_000;
+
+/** This process and its ancestors: the pids a scan must not count (`process.ppid` is added where the platform cannot walk the chain). */
+const ownPidChain = () => [...new Set([process.pid, process.ppid, ...selfChain()])];
+
+/**
+ * The workspace's Git listing the quiesce scan needs, read through Inspect:
+ * holder-lock sits below Git and never lists worktrees or branches itself.
+ * Empty outside a repository.
+ */
+export function workspaceListing(repoRoot) {
+  const inspect = createGitInspect(gitPortOptions(repoRoot));
+  if (inspect.resolveRepo().notARepository) return { worktrees: [], branches: [] };
+  const worktrees = [];
+  let cursor;
+  do {
+    const page = inspect.listWorktrees({ cursor, maxEntries: 4096 });
+    for (const row of page.entries) worktrees.push(Buffer.from(row.path).toString('utf8'));
+    cursor = page.nextCursor;
+  } while (cursor);
+  const branches = inspect.listBranches({ prefix: 'refs/heads/' }).map((ref) => ref.slice('refs/heads/'.length));
+  return { worktrees, branches };
+}
+
+function hostError(code, message, extra = {}) {
+  const err = new Error(message);
+  err.code = code;
+  Object.assign(err, extra);
+  return err;
+}
+
+function scanWorkspace(hostBin, { root, worktrees }, excludePids, timeoutMs) {
+  const args = ['internal', 'quiesce-scan', '--protocol', String(SCAN_PROTOCOL), '--root', root];
+  for (const dir of worktrees) args.push('--dir', dir);
+  for (const pid of excludePids) args.push('--exclude-pid', String(pid));
+  const res = spawnSync(hostBin, args, { encoding: 'utf8', timeout: timeoutMs, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 16 * 1024 * 1024 });
+  if (res.error) {
+    throw hostError('host-exec-error', `quiesce-scan of ${root} could not run: ${res.error.message}`, { cause: res.error });
+  }
+  const stderr = (res.stderr ?? '').trim();
+  if (res.status === 3) throw hostError('host-version-mismatch', `quiesce-scan: ${stderr || 'host-version-mismatch'}`, { status: res.status });
+  if (![0, 10, 12].includes(res.status)) {
+    throw hostError('quiesce-scan-failed', `quiesce-scan of ${root} exited ${res.status}${res.signal ? ` (${res.signal})` : ''}: ${stderr || res.stdout}`, { status: res.status, stderr });
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(res.stdout);
+  } catch (err) {
+    throw hostError('quiesce-scan-invalid-output', `quiesce-scan of ${root} printed no JSON: ${err.message}\n${res.stdout}`);
+  }
+  if (parsed?.v !== 1 || parsed.protocol !== SCAN_PROTOCOL || !['clean', 'processes', 'unavailable'].includes(parsed.result)) {
+    throw hostError('quiesce-scan-invalid-output', `quiesce-scan of ${root} answered outside its contract: ${res.stdout}`);
+  }
+  return {
+    root,
+    result: parsed.result,
+    processes: Array.isArray(parsed.processes) ? parsed.processes : [],
+    unreadable: Number.isInteger(parsed.unreadable) ? parsed.unreadable : 0,
+    detail: typeof parsed.detail === 'string' ? parsed.detail : null,
+  };
+}
+
+/**
+ * Ask the host's `quiesce-scan` whether any fgOS process other than this
+ * one (and its ancestors) is still running for each workspace. A workspace
+ * is its root path, or `{root, worktrees}` with the linked worktree
+ * directories the caller listed through Git (holder-lock never lists them
+ * itself); a bare root scans that directory alone. Returns
+ * `{status, blockers, scans, detail}` with status `clean`, `blocked` (a
+ * process was found or an entry could not be read, listed in `blockers`)
+ * or `needs-attest` (this platform cannot scan; a person has to confirm).
+ * Throws when the host binary is missing or answers outside the contract.
+ */
+export function checkStopped({ workspaces, hostBin, excludePids = ownPidChain(), timeoutMs = SCAN_TIMEOUT_MS } = {}) {
+  if (!Array.isArray(workspaces) || workspaces.length === 0) throw new Error('checkStopped requires at least one workspace root');
+  const listed = workspaces.map((workspace) => (typeof workspace === 'string' ? { root: workspace, worktrees: [] } : workspace))
+    .map(({ root, worktrees = [] }) => ({ root: path.resolve(root), worktrees: worktrees.map((dir) => path.resolve(dir)) }));
+  const bin = hostBin ?? resolveHostBin(listed[0].root);
+  if (!bin) throw hostError('host-unavailable', 'Rust host binary unavailable (FGOS_HOST_BIN unset and no active installation manifest)');
+  const scans = listed.map((workspace) => scanWorkspace(bin, workspace, excludePids, timeoutMs));
+  const blockers = [];
+  for (const scan of scans) {
+    for (const proc of scan.processes) blockers.push({ kind: 'process', workspace: scan.root, ...proc });
+    if (scan.unreadable > 0) blockers.push({ kind: 'unreadable', workspace: scan.root, count: scan.unreadable });
+  }
+  const unavailable = scans.filter((scan) => scan.result === 'unavailable');
+  const status = blockers.length > 0 ? 'blocked' : unavailable.length > 0 ? 'needs-attest' : 'clean';
+  return { status, blockers, scans, detail: unavailable.map((scan) => scan.detail).filter(Boolean).join('; ') || null };
 }
 
 export async function migrateUseCase(ctx, options = {}) {

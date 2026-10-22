@@ -218,6 +218,10 @@ impl LockDriver for LockFileExDriver {
         Err(Leftovers { killed: 0, pids: Vec::new(), foreign: false })
     }
 
+    fn unlock_private(&self, file: &File) {
+        self.before_close(file);
+    }
+
     fn before_close(&self, file: &File) {
         // On Windows no other process can share this lock, so an explicit
         // unlock is deterministic where unlock-on-close "depends upon

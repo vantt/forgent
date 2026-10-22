@@ -275,12 +275,12 @@ pub(crate) fn wait_dead(gate: &ProcTuple) {
 }
 
 /// End a `linux-pgroup` domain judged from its record alone.
-pub(crate) fn pgroup_kill(leader: &ProcTuple) -> KillOutcome {
+pub(crate) fn pgroup_kill(leader: &ProcTuple, within: std::time::Duration) -> KillOutcome {
     #[cfg(target_os = "linux")]
-    return linux::pgroup_kill(leader, &mut Vec::new(), DEFAULT_EMPTY_WAIT);
+    return linux::pgroup_kill(leader, &mut Vec::new(), within);
     #[cfg(not(target_os = "linux"))]
     {
-        let _ = leader;
+        let _ = (leader, within);
         KillOutcome::Refused
     }
 }
@@ -297,12 +297,12 @@ pub(crate) fn tree_state(root: &ProcTuple) -> DomainState {
 }
 
 /// End a `macos-tree` domain judged from its record alone.
-pub(crate) fn tree_kill(root: &ProcTuple) -> KillOutcome {
+pub(crate) fn tree_kill(root: &ProcTuple, within: std::time::Duration) -> KillOutcome {
     #[cfg(target_os = "macos")]
-    return macos::tree_kill(root, &mut Vec::new(), DEFAULT_EMPTY_WAIT);
+    return macos::tree_kill(root, &mut Vec::new(), within);
     #[cfg(not(target_os = "macos"))]
     {
-        let _ = root;
+        let _ = (root, within);
         KillOutcome::Refused
     }
 }

@@ -16,28 +16,20 @@ pub trait ProcessTree {
     fn stat(&self, pid: u32) -> Option<ProcStat>;
 }
 
-/// Parses one `/proc/<pid>/stat` line. The command name sits in parentheses
-/// and may itself hold spaces or parentheses, so fields are counted from the
-/// last `)`: state, ppid, pgrp, session, tty_nr.
-pub fn parse_proc_stat(line: &str) -> Option<ProcStat> {
-    let rest = &line[line.rfind(')')? + 1..];
-    let fields: Vec<&str> = rest.split_whitespace().collect();
-    Some(ProcStat {
-        ppid: fields.get(1)?.parse().ok()?,
-        session: fields.get(3)?.parse().ok()?,
-        tty_nr: fields.get(4)?.parse().ok()?,
-    })
-}
-
-/// Linux driver: reads `/proc/<pid>/stat`.
+/// Linux driver: one `/proc/<pid>/stat` read through `fgos-process`, the
+/// crate that owns the parser.
 #[cfg(target_os = "linux")]
-struct ProcFsTree;
+struct FactsTree;
 
 #[cfg(target_os = "linux")]
-impl ProcessTree for ProcFsTree {
+impl ProcessTree for FactsTree {
     fn stat(&self, pid: u32) -> Option<ProcStat> {
-        let line = std::fs::read_to_string(format!("/proc/{pid}/stat")).ok()?;
-        parse_proc_stat(&line)
+        let relation = fgos_process::facts::relation_of(fgos_process::ProcId(pid))?;
+        Some(ProcStat {
+            ppid: relation.parent,
+            session: relation.session,
+            tty_nr: relation.tty_nr,
+        })
     }
 }
 
@@ -73,42 +65,9 @@ impl ProcessTree for UnreadableTree {
 /// The driver for the platform this binary runs on.
 pub fn os_process_tree() -> Box<dyn ProcessTree> {
     #[cfg(target_os = "linux")]
-    return Box::new(ProcFsTree);
+    return Box::new(FactsTree);
     #[cfg(all(unix, not(target_os = "linux")))]
     return Box::new(SessionOnlyTree);
     #[cfg(not(unix))]
     return Box::new(UnreadableTree);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn parses_comm_with_spaces_and_parentheses() {
-        let line = "4242 (weird) name (x)) S 100 4242 77 34816 4242 4194304 0 0";
-        assert_eq!(
-            parse_proc_stat(line),
-            Some(ProcStat {
-                ppid: 100,
-                session: 77,
-                tty_nr: 34816
-            })
-        );
-    }
-
-    #[test]
-    fn rejects_truncated_lines() {
-        assert_eq!(parse_proc_stat("12 (sh) S 1 12"), None);
-        assert_eq!(parse_proc_stat("no parenthesis"), None);
-    }
-
-    #[cfg(target_os = "linux")]
-    #[test]
-    fn reads_the_current_process() {
-        let me = os_process_tree()
-            .stat(std::process::id())
-            .expect("own stat");
-        assert!(me.ppid > 0);
-    }
 }
