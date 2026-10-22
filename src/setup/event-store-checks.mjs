@@ -5,7 +5,7 @@ import { eventStoreFacts, eventStoreAddonAvailable, readEventStoreConfig, prepar
 export function eventStoreSetupContext(cwd, options = {}) {
   const base = { stateRoot: options.stateRoot, trustedMain: options.trustedMain ?? cwd, loaderOptions: options.loaderOptions };
   const initial = eventStoreFacts(cwd, base);
-  const config = readEventStoreConfig(initial.trustedMain, options.globalConfigPath);
+  const config = readEventStoreConfig(initial.trustedMain, options.globalConfigPath, { strict: true });
   const facts = config.remote === 'origin' ? initial : eventStoreFacts(cwd, { ...base, remote: config.remote });
   let observed;
   return { base, config, facts, status() {
@@ -28,8 +28,17 @@ const fail = message => ({ passed: false, message });
 // A doctor invocation creates one checker and shares its lazy snapshot across
 // all registered rows. A fresh invocation never reuses stale process-global data.
 export function eventStoreDoctor(cwd, options = {}) {
-  let context;
-  return kind => checkEventStore(cwd, kind, { ...options, context: () => context ??= eventStoreSetupContext(cwd, options) });
+  // The context is built once per run, a failure included: when no repository or addon is available every row
+  // reports its own failure from the one remembered error instead of recomputing the setup nine times.
+  let settled;
+  const context = () => {
+    if (!settled) {
+      try { settled = { value: eventStoreSetupContext(cwd, options) }; } catch (error) { settled = { error }; }
+    }
+    if ('error' in settled) throw settled.error;
+    return settled.value;
+  };
+  return kind => checkEventStore(cwd, kind, { ...options, context });
 }
 export function checkEventStore(cwd, kind, options = {}) {
   try {

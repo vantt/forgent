@@ -611,6 +611,8 @@ Doctor checks, registered in `src/setup/registrations.mjs`:
 | `event-store-legacy-layout` | after cutover: tracked event files, `.fgos/events/`, tracked `state.json` or backups, or a `merge=union` line for events exist; `refs/fgos/legacy` missing or its tree differs from `seal.json.treeOfFgosEvents` |
 | `event-store-orphan-branches` | warns per orphan branch stream |
 
+Clarification, 2026-10-22: only the automatic triggers are gated by the dispatched-worker rule. A dispatched worker may run `fgos events sync` explicitly, because that is a request; the end-of-command push and the Land candidate release never run in one. A shared config file that exists but does not parse never lends its defaults to a publish decision: the `events` verbs and doctor refuse with `event-store-config`, and the write path and the triggers use a config that never pushes (`sync.intervalSec` 0), so a trigger still seals.
+
 `CHANGELOG.md` gets an `[Unreleased]` entry for the verbs, the config keys, the refspec setup and the removal of tracked event files.
 
 ## 22. Support matrix and known limits
