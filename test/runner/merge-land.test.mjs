@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fixture } from '../git/land-fixture.mjs';
 import { landRunnerItem } from '../../src/runner/merge.mjs';
+import { loadNativeAddon } from '../../src/git/native.mjs';
 import { acquireDocumentationCutoverLease, DEFAULT_SIDECAR_PATH } from '../../src/runner/documentation-cutover-lease.mjs';
 
 function rootFixture() {
@@ -90,6 +91,54 @@ test('a held documentation lease permits a code-only land and its holder can lan
       }
     } finally { f.close(); }
   }
+});
+
+// Earlier lease tests acquire before admission; only this proof interleaves
+// the real transition with target selection, verification and the native CAS.
+test('runner Land refuses a scoped branch when the lease is acquired after admission', async (t) => {
+  for (const timing of ['before prepare', 'after prepare', 'before publish']) await t.test(timing, async (t) => {
+    const f = rootFixture();
+    try {
+      branchCommit(f, 'scoped', 'main', { 'docs/new.md': 'must not publish\n' });
+      const holder = path.join(f.temp, 'holder');
+      f.git('worktree', 'add', '-qb', 'holder', holder);
+      const admittedTarget = f.git('rev-parse', 'main');
+      const source = f.git('rev-parse', 'scoped');
+      const native = loadNativeAddon();
+      const prepare = native.GitLand.prototype.prepare;
+      const publish = native.GitLand.prototype.publish;
+      let preparedTarget;
+      let heldTarget;
+      let publishes = 0;
+      const acquire = () => {
+        acquireDocumentationCutoverLease({ repoRoot: holder });
+        heldTarget = f.git('rev-parse', 'main');
+      };
+      t.mock.method(native.GitLand.prototype, 'prepare', function(args, loans) {
+        preparedTarget = args.request.target;
+        if (timing === 'before prepare') acquire();
+        const result = prepare.call(this, args, loans);
+        if (timing === 'after prepare') acquire();
+        return result;
+      });
+      t.mock.method(native.GitLand.prototype, 'publish', function(...args) {
+        publishes++;
+        if (timing === 'before publish') acquire();
+        return publish.apply(this, args);
+      });
+      await assert.rejects(() => landRunnerItem(f.repo, { id: 'source', verify: 'true' }, {
+        branch: 'scoped', callerCheckout: f.repo,
+      }), { code: 'documentation-cutover-lease' });
+      assert.equal(preparedTarget, admittedTarget, 'even a docs-only branch supplies its admitted target');
+      assert.notEqual(heldTarget, admittedTarget, 'the real lease transition advanced main');
+      assert.equal(publishes, timing === 'before publish' ? 1 : 0, 'only a lease arriving after the final gate reaches the native CAS check');
+      assert.equal(f.git('rev-parse', 'main'), heldTarget);
+      assert.equal(f.git('rev-parse', 'scoped'), source);
+      assert.throws(() => f.git('show', 'main:docs/new.md'));
+      assert.equal(fs.existsSync(path.join(f.repo, 'docs/new.md')), false);
+      assert.equal(JSON.parse(f.git('show', `main:${DEFAULT_SIDECAR_PATH}`)).state, 'held');
+    } finally { f.close(); }
+  });
 });
 
 test('root publication verifies the frozen Land candidate and returns its exact receipt', async () => {

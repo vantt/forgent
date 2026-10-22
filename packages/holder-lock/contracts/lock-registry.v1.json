@@ -2,7 +2,7 @@
   "contract": { "id": "lock-registry", "version": 1 },
   "description": "One row per lock. Rust and Node read this file; it is the only list of which locks exist and in which order they may be taken. v3Path is relative to <fgosDir>/locks/, <lockRoot>/ or <runDir>/ as written.",
   "ranks": {
-    "10": { "kinds": ["lease"], "note": "runner, gateway" },
+    "10": { "kinds": ["lease"], "note": "runner, gateway, documentation-cutover" },
     "15": { "kinds": ["lease"], "note": "attempt" },
     "20": { "kinds": ["mutex"], "note": "merge-slot--<target>" },
     "30": { "kinds": ["lease"], "note": "dispatch cwd" },

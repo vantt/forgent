@@ -2382,3 +2382,57 @@ Exact carries include the 214 parks by owner and readiness membership, all 226 o
 **Next concrete action:** Lead records the real isolated-clone suite result and exact main-versus-branch failure attribution, accounts actual runner commits in both protected Phase 6 manifests through the separate L12-11 Unit, then starts ONE independent adversarial closure review. Any other unexplained red or missing mandatory proof stops close. The Lead's suite and review remain pending; no future commit id or green check is fabricated. This turn does not update either manifest outside its authorized records scope.
 
 Only the new scorecard and precise additions to progress/owner answers are authored. No product code/docs/tests/skills/baselines, fgOS CLI, lifecycle verb, repository Git write, live workspace `.fgos`/secrets access, suite execution or preview server. Evidence checks are records-only structure/reference/count checks, not production proofs. Runner owns the commit; Markdown preview remains with the Lead. `needsWrites: []` for this bounded package; later authorized execution/accounting carries are not permission to expand this turn.
+
+## L12-123 — Bind both Land doors to lease admission across prepare and publication (Lead ruling, Doer receipt)
+
+Authority: `step-08-land-race-fix-brief.md`, recording the Lead's supplied A42 ruling, not a new Doer decision or acceptance. Input HEAD: `26a2e0d3f`. Closure review B reproduced a non-holder docs Land admitted before acquire publishing on top of the held sidecar. This receipt fixes that code slice on the plan branch only; no main landing, real-repository lease, rehearsal, or Phase 9 execution.
+
+**Ruling and implementation.** Always pass the admitted target OID to native `prepare` at both consumer doors, including an empty declared-files set. Reuse `leaseAdmission`, the existing Inspect merge-base/diff reads and Land's expected-old publication; add no lock, Rust mechanism or policy port. Work re-admits its post-checkpoint target, both doors require the prepared source/target to equal admission, and both recompute paths from that exact pair's merge base and recheck committed main authority before publish. If acquire wins during native lock admission or after the final gate, the explicit target/expected-old check prevents publication. On that stale refusal, consumers report the existing named lease refusal when blocking; unrelated target changes retain Git's stale result and are never retried. Native `LandRequest` has no separate expected-base field: immutable source and target bind the base.
+
+**Prior art and impact.** Read `docs/specs/reading-map.md`, runner's integration/decision-history facts and Git spec §§7–9 before editing. History searches: `git log -6 --oneline -S'leaseAdmission' -- src/runner/merge.mjs src/workflow/runner.mjs` and `git log -4 --oneline -S'target: pinned' -- src/runner/merge.mjs` (both exit 0). Reused the gates introduced in `e8c1df31c` and caller authentication from `a5d09c37f`, plus existing typed Git stale/CAS semantics. What was missing was an unconditional admitted target and publication-time re-admission. Direct callers inspected: approve, sync-root and promote for runner Land; Workflow integrate for `mergeWorkflowBranch`. This is a high-risk correctness boundary, reported before edits. Impact-analysis is **degraded/unqueried**, not certified inactive or fresh: the assignment forbids fgOS CLI and this session exposes no GitNexus MCP. No dispatch, lifecycle or CLI call was made.
+
+**Owning proofs.** Added exactly one owning race test per door, in `test/runner/merge-land.test.mjs` and `test/workflow/units-runner.test.mjs`. Each has three deterministic interleavings: real acquire immediately before native prepare, after native preparation, and immediately before native publication (after the last consumer gate). Wrappers only schedule the real production transition and observe/delegate native calls; they do not replace the lease or Git results. Assertions bind the admitted target, require the existing lease reason, preserve the source and acquire commit on main, prove docs absent from main/ref checkout, and prove the held sidecar survives. Existing tests still own code-only/holder admission, corrupt/no-op refusal, verification, conflicts and unrelated target movement. No proof was removed or weakened.
+
+The first two race cases were run against unchanged production code and both doors exited 1: acquire-before-prepare published instead of rejecting; acquire-after-prepare reached native publish and returned stale rather than the named lease refusal. After the fix both cases exited 0; the third case then confirms expected-old protection when acquire follows the final gate. No test-only production branch or bypass flag was added.
+
+**Low corrections.** Registry rank-10 note now lists `documentation-cutover`. Git spec §7 starts hook order with `addedEventPathRefusal` and documents exact-target/re-admission semantics; §9 no longer claims Work omits target with empty declarations. The scorecard cites the true pre-fix 18/18 Land count: `63b777873` retired a non-lease proof after the historical 19/19 run. It marks the seven-step rehearsal historical/pre-T1; this turn did not rerun it. Current Land total is 22/22 (13 top-level tests, nine nested cases), including the new single race owner and its three cases.
+
+### Commands and exit codes
+
+The only activation field read was `releasePath` from `/home/vantt/projects/forgentX/.fgos/installation/activation.json`. It selected:
+
+```sh
+RELEASE='/home/vantt/.local/state/fgos/releases/sha256:2ce473d4e0e9cda5131a660559399719a7b2318b490b11766321047c57f7b326'
+# Scratch only; existing supported state/fixture-root inputs, not bypasses.
+mkdir -p /tmp/fgos-work/land-race-fix/state /tmp/fgos-work/land-race-fix/fixtures
+chmod 700 /tmp/fgos-work/land-race-fix/state
+# Run separately for each FILE in the table, both before and after changes:
+env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN="$RELEASE/bin/fgos" \
+  FGOS_STATE_ROOT=/tmp/fgos-work/land-race-fix/state \
+  FGOS_TEST_FIXTURE_ROOT=/tmp/fgos-work/land-race-fix/fixtures \
+  TMPDIR=/tmp/fgos-work node --test "$FILE"
+# Red/green focused runs, separately for each touched test file:
+# Same env, node --test --test-name-pattern='Land refuses a scoped branch when the lease is acquired after admission' "$FILE"
+```
+
+| Single test file | Pre-turn HEAD | Final working tree | Exit before → after |
+|---|---|---|---|
+| `test/runner/merge-land.test.mjs` | 18 pass / 0 fail | 22 pass / 0 fail | 0 → 0 |
+| `test/workflow/units-runner.test.mjs` | 4 pass / 21 fail | 8 pass / 21 fail | 1 → 1 |
+| `test/runner/documentation-cutover-lease.test.mjs` | 15 pass / 0 fail | 15 pass / 0 fail | 0 → 0 |
+| `test/e2e/documentation-cutover-lease-hooks.test.mjs` | 31 pass / 0 fail | 31 pass / 0 fail | 0 → 0 |
+| `test/runner/execution/run-case-admission.test.mjs` | 7 pass / 8 fail | 7 pass / 8 fail | 1 → 1 |
+| `test/holder-lock/registry-contract.test.mjs` | not rerun before (review B: 19/19) | 19 pass / 0 fail | — → 0 |
+
+All required test files ran singly; no `npm test`, `scripts/run-tests.mjs` or cargo/full suite. First attempts using default roots exited 1 on merge/Workflow/run-case (`EROFS` for machine state or `/var/tmp`); a subsequent scratch state attempt exited 1 because `mkdir` produced mode 0775. Correcting scratch state to mode 0700 and using the existing fixture-root input produced the comparable HEAD baseline above, without editing fixtures, production config or checks. Lease and hook suites passed on those initial attempts too. Raw logs live under `/tmp/fgos-work/land-race-fix/` (`before-*`, `baseline-*`, `head-*`, `red-*`, `green-*`, `after-*`, `final-*`); final counts above use `final-*` for the two touched files and `after-*` for the others.
+
+Failure-title comparison of pre-turn HEAD versus final: **zero new and zero retired failures**, identical 21 Workflow and eight run-case test titles (comparison command exit 0). Writing dispatch is refused as `nested-write-from-confined-worker`; read-only worker attempts fail infrastructure execution in this already confined worker. These failures predate this patch and were not bypassed or called green. The new Workflow Land test does not dispatch a worker and all its cases pass. Lead still owes an unrestricted/staged-host rerun before claiming the full targeted set green.
+
+Other checks:
+
+- `git diff --check` and `node --check` on both edited source and both edited test files: exit 0.
+- Existing `scan`/`census` exports from `scripts/git-one-door-scan.mjs`, using `inspectRepo` and the same scratch state, regenerated JSON into `/tmp/fgos-work/land-race-fix/mutation-census.json`: execution exit 0; output is not a clean-gate verdict. The checked-in census is byte-identical (`cmp`, exit 0). Changes are exactly the two edited source digests, payload digest and two shifted site line numbers.
+- Census comparison to HEAD: same 1,000 product files, same 58 existing sites and 253 classes; no new writer/site/class (comparison exit 0). `censusDigestMatches` is true. `verifyCensus` remains **passed: false**, reporting those 58 pre-existing sites; no census baseline or writer findings were suppressed to manufacture a pass.
+- No Rust change, added config/default/env dependency, generated skill edit, test baseline edit, fgOS CLI, repo git write, real workspace `.fgos` mutation (except permitted existing test-helper staging), secret read, or rehearsal. Git/spec and registry edits are the explicit writable exceptions in the authoritative brief. Markdown preview remains Lead custody.
+
+**Handoff.** Runner owns the commit. Lead owns fresh independent review, unrestricted targeted proof, the separately scheduled rehearsal, Git-owner §7 consent and Holder-lock notice, and later landing/accounting. `CHANGELOG.md` is outside this exact write scope: the required user-visible Unreleased bug-fix note was not written and is reported as `needsWrites: ["CHANGELOG.md"]`; add it in an authorized follow-up. This is an implementation receipt, not independent acceptance or Phase 8 closure.

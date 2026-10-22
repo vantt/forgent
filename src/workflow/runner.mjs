@@ -604,16 +604,19 @@ export async function mergeWorkflowBranch({ repoRoot, sourceBranch, targetBranch
   // can create a candidate or WAL. No rename folding: both old and new paths
   // must count, including a move out of frozen scope.
   const inspect = workflowInspect(repoRoot);
-  const base = inspect.compareCommits({ left: target, right: source }).mergeBase;
-  const paths = [];
-  let cursor;
-  do {
-    const page = inspect.diff({ before: base, after: source, renames: false, cursor, maxEntries: 4096 });
-    paths.push(...page.entries.map(entry => Buffer.from(entry.path).toString('utf8')));
-    cursor = page.nextCursor;
-  } while (cursor);
-  const admission = leaseAdmission({ repoRoot, worktreePath: callerCheckout, paths });
-  if (!admission.allowed) throw new RunnerConfigError(admission.message, { code: admission.reason });
+  const admitLease = (source, target) => {
+    const base = inspect.compareCommits({ left: target, right: source }).mergeBase;
+    const paths = [];
+    let cursor;
+    do {
+      const page = inspect.diff({ before: base, after: source, renames: false, cursor, maxEntries: 4096 });
+      paths.push(...page.entries.map(entry => Buffer.from(entry.path).toString('utf8')));
+      cursor = page.nextCursor;
+    } while (cursor);
+    const admission = leaseAdmission({ repoRoot, worktreePath: callerCheckout, paths });
+    if (!admission.allowed) throw new RunnerConfigError(admission.message, { code: admission.reason });
+  };
+  admitLease(source, target);
   if (inspect.ancestry({ ancestor: source, descendant: target }).answer === 'yes') {
     return { merged: false, sourceBranch, targetBranch, operationId: null };
   }
@@ -621,16 +624,33 @@ export async function mergeWorkflowBranch({ repoRoot, sourceBranch, targetBranch
   const port = createGitLand(gitPortOptions(repoRoot, { mutation: true }));
   try {
     const { candidate, receipt: prior } = await port.prepare({ operationId, request: {
-      source, destination,
+      source, target, destination,
       message: commitMessage ?? `merge: integrate workflow branch ${sourceBranch} into ${targetBranch}`,
       // Only the paths the branch brings count against the main checkout's own edits.
       squash, footprint: [], subtree: null, files: [],
     } });
+    if (!prior) {
+      if (candidate.source !== source || candidate.target !== target) {
+        throw new RunnerConfigError('documentation cutover admission does not match the prepared Land source/target', { code: 'documentation-cutover-lease' });
+      }
+      // A transition can commit under main-50 while Land holds only slot-20.
+      // Recheck this exact pair; a later acquire on main makes Land's CAS stale.
+      admitLease(candidate.source, candidate.target);
+    }
     const receipt = prior ?? await port.publish({ source: candidate.source, target: candidate.target,
       candidate: candidate.candidate, treeDigest: candidate.treeDigest,
       evidenceDigest: crypto.createHash('sha256').update(JSON.stringify({ policy: 'workflow integration runs no verification command', source: candidate.source, target: candidate.target, candidate: candidate.candidate })).digest('hex'),
     });
     return { merged: true, sourceBranch, targetBranch, operationId, receipt };
+  } catch (err) {
+    let detail;
+    try { detail = JSON.parse(err.message); } catch { detail = {}; }
+    if (detail.errorClass === 'stale' || detail.cause === 'land-target-changed' || detail.cause === 'land-cas-lost') {
+      // If acquire changed main during native lock admission, report the lease
+      // refusal; unrelated target movement keeps Git's existing stale result.
+      admitLease(source, target);
+    }
+    throw err;
   } finally { port.close(); }
 }
 

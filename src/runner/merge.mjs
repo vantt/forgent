@@ -857,15 +857,18 @@ export async function landRunnerItem(repoRoot, item, {
   callerCheckout = repoRoot,
 } = {}) {
   const destination = `refs/heads/${target}`;
-  // Authenticate the declared caller, not the destination checkout. Read once,
-  // before even Work's checkpoint can write; all later phases reuse this result.
+  // Authenticate the caller before any write, then re-admit the exact prepared
+  // pair before publish: a lease transition takes main-50, not Land's slot-20.
   let pinned = resolveRefSha(repoRoot, target);
   const source = resolveRefSha(repoRoot, branch);
   const inspect = inspectGit(repoRoot);
-  const base = inspect.compareCommits({ left: pinned, right: source }).mergeBase;
-  const leaseScopePaths = diffPaths(inspect, base, source, { renames: false });
-  const admission = leaseAdmission({ repoRoot, worktreePath: callerCheckout, paths: leaseScopePaths });
-  if (!admission.allowed) throw new MergeError(admission.message, { code: admission.reason, branch, targetRef: target });
+  const admitLease = (source, targetOid) => {
+    const base = inspect.compareCommits({ left: targetOid, right: source }).mergeBase;
+    const paths = diffPaths(inspect, base, source, { renames: false });
+    const admission = leaseAdmission({ repoRoot, worktreePath: callerCheckout, paths });
+    if (!admission.allowed) throw new MergeError(admission.message, { code: admission.reason, branch, targetRef: target });
+  };
+  admitLease(source, pinned);
   const fgosDir = path.join(repoRoot, '.fgos');
   const mergeSlot = ['merge-slot', { fgosDir, ref: encodeURIComponent(destination) }, `merge slot of "${destination}"`];
   const lockHeld = ([lock, params, label]) => {
@@ -895,10 +898,10 @@ export async function landRunnerItem(repoRoot, item, {
       throw toMergeLockError(err, { branch });
     }
   }
-  // Work's permitted state-only checkpoint may have advanced the target.
-  // Preserve trusted-file resolution against that post-checkpoint target;
-  // the admitted source paths are unchanged by the checkpoint.
+  // Re-admit after any checkpoint/wait, before declaring files against this
+  // exact target. A concurrent lease acquire may also have advanced main.
   pinned = resolveRefSha(repoRoot, target);
+  admitLease(source, pinned);
   const declared = declareLandFiles(repoRoot, item, pinned, source);
   if (declared.outcome) return { ...declared, branch };
   const { files } = declared;
@@ -921,7 +924,7 @@ export async function landRunnerItem(repoRoot, item, {
       waitMs: lockWaitMs,
       request: {
         source,
-        ...(files.length > 0 && { target: pinned }),
+        target: pinned,
         destination,
         message: `merge ${branch} into ${target}`,
         squash: false,
@@ -934,6 +937,11 @@ export async function landRunnerItem(repoRoot, item, {
       return settled({ outcome: 'merged', branch,
         check: { passed: true, status: 0, timedOut: false, skipped: true, output: `publication already verified and recorded by Land operation ${operationId}; awaiting Work settlement` },
         receipt: previous }, 'delivered');
+    }
+    if (candidate.source !== source || candidate.target !== pinned) {
+      throw new MergeError('documentation cutover admission does not match the prepared Land source/target', {
+        code: 'documentation-cutover-lease', branch, targetRef: target,
+      });
     }
     // Eligibility still belongs to Work, decided against the exact source and
     // target Land pinned for this candidate, never a target read before it.
@@ -959,6 +967,9 @@ export async function landRunnerItem(repoRoot, item, {
       };
     }
     if (!check.passed) return settled({ outcome: 'verify-fail', branch, check });
+    // Verification can outlive admission. Check committed authority again for
+    // this candidate's merge base; exact-old CAS covers a later acquire on main.
+    admitLease(candidate.source, candidate.target);
     phase = 'publish';
     const receipt = await port.publish({
       source: candidate.source, target: candidate.target,
@@ -967,6 +978,7 @@ export async function landRunnerItem(repoRoot, item, {
     }, { waitMs: lockWaitMs });
     return settled({ outcome: 'merged', branch, check, receipt }, 'delivered');
   } catch (err) {
+    if (err instanceof MergeError) throw err;
     let detail;
     try { detail = JSON.parse(err.message); } catch { detail = {}; }
     const cause = detail.cause;
@@ -998,7 +1010,12 @@ export async function landRunnerItem(repoRoot, item, {
     }
     // Preserve Land's stale result, including operation identity and recovery
     // evidence. Never re-run verification or CAS against a different target.
-    if (detail.errorClass === 'stale' || cause === 'land-target-changed' || cause === 'land-cas-lost') throw err;
+    if (detail.errorClass === 'stale' || cause === 'land-target-changed' || cause === 'land-cas-lost') {
+      // Acquire may win while prepare/publish waits for its own locks. Keep
+      // the named lease refusal when it blocks this pair, otherwise keep stale.
+      admitLease(source, pinned);
+      throw err;
+    }
     // A publication whose effect is unknown is never claimed abandoned: no
     // Work result is recorded, the candidate stays, and Land recovery
     // decides what happened before this id is published again.

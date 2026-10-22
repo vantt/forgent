@@ -199,6 +199,56 @@ test('workflow integration gates scoped branch paths before Land and admits a li
   assert.deepEqual(fs.readdirSync(operations).sort(), afterLand);
 });
 
+// Existing Workflow admission cases start with a held lease. Interleave a
+// real acquire around native prepare/publish without replacing Git behavior.
+test('workflow Land refuses a scoped branch when the lease is acquired after admission', async (t) => {
+  for (const timing of ['before prepare', 'after prepare', 'before publish']) await t.test(timing, async (t) => {
+    const tmp = setupRepo();
+    git(tmp, ['checkout', '-qb', 'incoming']);
+    fs.mkdirSync(path.join(tmp, 'docs'));
+    fs.writeFileSync(path.join(tmp, 'docs/new.md'), 'must not publish\n');
+    git(tmp, ['add', 'docs']); git(tmp, ['commit', '-qm', 'documentation']);
+    git(tmp, ['checkout', '-q', 'main']);
+    const holder = path.join(tmp, 'holder');
+    git(tmp, ['worktree', 'add', '-qb', 'holder', holder]);
+    const admittedTarget = git(tmp, ['rev-parse', 'main']);
+    const source = git(tmp, ['rev-parse', 'incoming']);
+    const native = loadNativeAddon();
+    const prepare = native.GitLand.prototype.prepare;
+    const publish = native.GitLand.prototype.publish;
+    let preparedTarget;
+    let heldTarget;
+    let publishes = 0;
+    const acquire = () => {
+      acquireDocumentationCutoverLease({ repoRoot: holder });
+      heldTarget = git(tmp, ['rev-parse', 'main']);
+    };
+    t.mock.method(native.GitLand.prototype, 'prepare', function(args, loans) {
+      preparedTarget = args.request.target;
+      if (timing === 'before prepare') acquire();
+      const result = prepare.call(this, args, loans);
+      if (timing === 'after prepare') acquire();
+      return result;
+    });
+    t.mock.method(native.GitLand.prototype, 'publish', function(...args) {
+      publishes++;
+      if (timing === 'before publish') acquire();
+      return publish.apply(this, args);
+    });
+    await assert.rejects(() => mergeWorkflowBranch({
+      repoRoot: tmp, sourceBranch: 'incoming', targetBranch: 'main', callerCheckout: tmp,
+    }), { code: 'documentation-cutover-lease' });
+    assert.equal(preparedTarget, admittedTarget, 'Workflow supplies its admitted target');
+    assert.notEqual(heldTarget, admittedTarget);
+    assert.equal(publishes, timing === 'before publish' ? 1 : 0);
+    assert.equal(git(tmp, ['rev-parse', 'main']), heldTarget);
+    assert.equal(git(tmp, ['rev-parse', 'incoming']), source);
+    assert.throws(() => git(tmp, ['show', 'main:docs/new.md']));
+    assert.equal(fs.existsSync(path.join(tmp, 'docs/new.md')), false);
+    assert.equal(JSON.parse(git(tmp, ['show', `main:${DEFAULT_SIDECAR_PATH}`])).state, 'held');
+  });
+});
+
 test('a units file runs through startWorkflow, and a unit\'s prefer and persona reach the Unit it runs', async () => {
   const tmp = setupRepo();
   const file = unitsFile(tmp, [
