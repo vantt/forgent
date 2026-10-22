@@ -43,7 +43,7 @@ fn tested() -> Vec<Adapter> {
 /// any is set.
 fn key_from(vars: &Value) -> Option<WriterKey> {
     let lookup = |name: &str| vars[name].as_str().map(String::from);
-    let identity = fgos_session_identity::env_identity(&lookup, None)?;
+    let identity = fgos_identity::env_identity(&lookup, None)?;
     Some(WriterKey::new(identity.id.to_string()).unwrap())
 }
 
@@ -553,7 +553,7 @@ fn the_writer_key_the_hook_derives_equals_the_one_its_tool_sees() {
         assert_eq!(payload["session_id"].as_str(), Some(from_tool.as_str()));
         match key_from(&env["hookIdVars"][files::POST_TOOL_USE]) {
             Some(from_hook) => assert_eq!(from_hook, from_tool, "{}", adapter.word()),
-            // Recorded: Codex's hook process sees no session-identity
+            // Recorded: Codex's hook process sees no identity
             // variable, so the hook cannot derive the key from its
             // environment.
             None => assert_eq!(adapter, Adapter::Codex),

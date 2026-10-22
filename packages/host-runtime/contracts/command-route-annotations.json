@@ -18,8 +18,8 @@
   },
   "identity": {
     "route_kind": "native",
-    "operation_id": "session-identity.resolve",
-    "owner_path": "packages/session-identity/rust"
+    "operation_id": "identity.writer",
+    "owner_path": "packages/identity/rust"
   },
   "metrics": {
     "route_kind": "native",

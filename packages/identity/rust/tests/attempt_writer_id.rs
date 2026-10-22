@@ -2,7 +2,7 @@
 //! resolve rule of this crate: every valid case mints to its writer id and
 //! resolves as an env id; every invalid case is refused by the mint.
 
-use fgos_session_identity::{
+use fgos_identity::{
     env_identity, mint_attempt_writer_id, scrub_and_set, Source, WriterId, ATTEMPT_PREFIX, MAX_ATTEMPT_ID_LENGTH, MAX_ID_LENGTH,
 };
 use std::collections::BTreeMap;
@@ -28,7 +28,7 @@ fn contract_bounds_match_the_resolve_rule() {
     assert_eq!(c["prefix"], ATTEMPT_PREFIX);
     assert_eq!(c["maxWriterIdLength"].as_u64().unwrap() as usize, MAX_ID_LENGTH);
     let scrubbed: Vec<&str> = contract["environment"]["scrubbed"].as_array().unwrap().iter().map(|v| v.as_str().unwrap()).collect();
-    assert_eq!(scrubbed, fgos_session_identity::launcher::SCRUBBED);
+    assert_eq!(scrubbed, fgos_identity::launcher::SCRUBBED);
     assert_eq!(c["maxAttemptIdLength"].as_u64().unwrap() as usize, MAX_ATTEMPT_ID_LENGTH);
 }
 

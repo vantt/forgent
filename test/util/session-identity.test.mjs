@@ -19,7 +19,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
 const FACADE_URL = new URL('../../src/util/session-identity.mjs', import.meta.url).href;
 const LOCK_URL = new URL('../../src/util/state-lock-held.mjs', import.meta.url).href;
-const CONTRACTS = path.join(REPO_ROOT, 'packages', 'session-identity', 'contracts');
+const CONTRACTS = path.join(REPO_ROOT, 'packages', 'identity', 'contracts');
 const HOST = process.env.FGOS_HOST_BIN;
 const UNIX = process.platform !== 'win32';
 
@@ -83,12 +83,12 @@ function calls(file) {
 }
 
 test('the facade cache key names the same env variables, in the same order, as the contract', () => {
-  const contract = JSON.parse(fs.readFileSync(path.join(CONTRACTS, 'session-identity.resolve.v1.json'), 'utf8'));
+  const contract = JSON.parse(fs.readFileSync(path.join(CONTRACTS, 'identity.writer.v1.json'), 'utf8'));
   assert.deepEqual([...IDENTITY_ENV_KEYS], contract['x-envOrder']);
 });
 
 test('the dispatch writerId format floor uses the contract id charset and length', async () => {
-  const contract = JSON.parse(fs.readFileSync(path.join(CONTRACTS, 'session-identity.resolve.v1.json'), 'utf8'));
+  const contract = JSON.parse(fs.readFileSync(path.join(CONTRACTS, 'identity.writer.v1.json'), 'utf8'));
   const { WRITER_ID_RE, MAX_WRITER_ID_LENGTH } = await import('../../src/runner/dispatch/execution-contract.mjs');
   assert.equal(WRITER_ID_RE.source, contract['x-idPattern']);
   assert.equal(MAX_WRITER_ID_LENGTH, contract['x-maxIdLength']);
@@ -96,7 +96,7 @@ test('the dispatch writerId format floor uses the contract id charset and length
 
 test('every shared env vector resolves the same through the real binary', (t) => {
   requireHost(t);
-  const golden = JSON.parse(fs.readFileSync(path.join(CONTRACTS, 'session-identity.golden.v1.json'), 'utf8'));
+  const golden = JSON.parse(fs.readFileSync(path.join(CONTRACTS, 'identity.writer.golden.v1.json'), 'utf8'));
   const root = tmp('fgos-identity-env-');
   const cases = golden.envCases.map((c, i) => {
     let dir = null;

@@ -84,7 +84,7 @@ opaque_id!(
     AttemptToken
 );
 
-/// The session-identity writer id of a head: the key of its binding. Never
+/// The identity writer id of a head: the key of its binding. Never
 /// typed by a person. Its alphabet is session identity's, `[A-Za-z0-9._-]`:
 /// every composite key of the snapshot joins keys with `|` or `@`, and the
 /// shared accounts start with `~`, all outside it, so no two different

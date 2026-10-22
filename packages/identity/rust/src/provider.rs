@@ -12,16 +12,16 @@ use std::future::Future;
 use std::path::PathBuf;
 use std::pin::Pin;
 
-pub const IDENTITY_OPERATION_ID: &str = "session-identity.resolve";
+pub const IDENTITY_OPERATION_ID: &str = "identity.writer";
 
 pub const IDENTITY_DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {
-    provider_id: Cow::Borrowed("session-identity.resolve"),
-    operation_id: OperationId::from_static("session-identity.resolve"),
-    component_class: Cow::Borrowed("session-identity"),
+    provider_id: Cow::Borrowed("identity.writer"),
+    operation_id: OperationId::from_static("identity.writer"),
+    component_class: Cow::Borrowed("identity"),
     mechanism: Cow::Borrowed("builtin"),
     lifecycle: ProviderLifecycle::Singleton,
-    request_contract: ContractRef::from_static("session-identity.resolve.request", "1.0.0"),
-    outcome_contract: ContractRef::from_static("session-identity.resolve.outcome", "1.0.0"),
+    request_contract: ContractRef::from_static("identity.writer.request", "1.0.0"),
+    outcome_contract: ContractRef::from_static("identity.writer.outcome", "1.0.0"),
     allowed_hosts: &["cli"],
     allowed_modes: &["sync"],
     capabilities: &[],
@@ -95,7 +95,7 @@ impl OperationProvider for IdentityProvider {
         events: &'a dyn EventSink,
     ) -> Pin<Box<dyn Future<Output = Result<ProviderOutcome, ProviderError>> + Send + 'a>> {
         Box::pin(async move {
-            events.record_event("session-identity.resolve.invoked");
+            events.record_event("identity.writer.invoked");
             let request = request
                 .input
                 .downcast_ref::<IdentityRequest>()

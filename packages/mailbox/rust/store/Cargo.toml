@@ -15,4 +15,4 @@ serde_json = { workspace = true }
 libc = { workspace = true }
 
 [dev-dependencies]
-fgos-session-identity = { path = "../../../session-identity/rust" }
+fgos-identity = { path = "../../../identity/rust" }

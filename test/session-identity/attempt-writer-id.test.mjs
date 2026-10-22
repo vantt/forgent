@@ -12,7 +12,7 @@ import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const HOST_BIN = process.env.FGOS_HOST_BIN;
 const vectors = JSON.parse(
-  fs.readFileSync(path.join(ROOT, 'packages/session-identity/contracts/vectors/attempt-writer-id.v1.json'), 'utf8'),
+  fs.readFileSync(path.join(ROOT, 'packages/identity/contracts/vectors/attempt-writer-id.v1.json'), 'utf8'),
 );
 
 function attemptIdOf(c) {

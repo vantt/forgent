@@ -95,7 +95,7 @@ The host resolves it only through those manifest fields, never PATH, cwd or
 hardcoded locations outside the manifest. Global npm `bin.fgos` and fallback
 `node bin/fgos.mjs` are compatibility channels calling this entry directly;
 every state write resolves the writer identity through the Rust host
-(`docs/platform/session-identity/spec.md`), so these channels write only
+(`docs/platform/identity/spec.md`), so these channels write only
 inside an activated project or with `FGOS_HOST_BIN` set to a host binary.
 
 Plain `fgos` runs the activated release recorded in

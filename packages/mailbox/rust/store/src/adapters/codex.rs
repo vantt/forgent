@@ -3,7 +3,7 @@
 //! and `agent_id`/`agent_type` on a subagent's event. `session_id` is the
 //! thread id: the id `codex queue --thread` takes and the
 //! `CODEX_THREAD_ID` the head's tool processes see. The hook process itself
-//! sees no session-identity variable.
+//! sees no identity variable.
 use super::{parse_named, session_id, Shape};
 use crate::hook::{HookEvent, Payload, Unparsed};
 use serde_json::{Map, Value};

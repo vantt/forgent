@@ -1,9 +1,9 @@
 // session-identity.mjs -- Node facade over the Session Identity component.
 //
 // The single authority for "who is the writer of this process, and how far
-// can that id be trusted" is the Rust crate fgos-session-identity, reached
+// can that id be trusted" is the Rust crate fgos-identity, reached
 // through the native verb `fgos identity`
-// (docs/platform/session-identity/spec.md). This module decides nothing about
+// (docs/platform/identity/spec.md). This module decides nothing about
 // the id: it finds the host binary, runs the verb for this process, checks
 // the answer's shape, and remembers it. When no host binary can answer, the
 // caller gets a WriterIdentityError (exit 2) -- never a guessed id and never
@@ -27,7 +27,7 @@ export const PID = 'pid';
 export const UNRESOLVED = 'unresolved';
 
 /** The env variables the identity rule reads, in its order
- * (session-identity.resolve.v1.json x-envOrder). Used here only as the
+ * (identity.writer.v1.json x-envOrder). Used here only as the
  * cache key: a different session env is a different answer. */
 export const IDENTITY_ENV_KEYS = Object.freeze(['FGOS_SESSION_ID', 'CODEX_THREAD_ID', 'CLAUDE_CODE_SESSION_ID']);
 

@@ -14,7 +14,7 @@ Last reviewed: 2026-10-17
 Related:
 - docs/platform/process/spec.md
 - docs/platform/component-boundary.md
-- docs/platform/session-identity/spec.md
+- docs/platform/identity/spec.md
 - docs/specs/distribution.md
 - docs/specs/runner.md
 - plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md
@@ -402,7 +402,7 @@ Until Git phase 03 owns removal/recovery, preserve the refused checkout and use 
 | defines (routes) | [lock-fd](../../../packages/holder-lock/contracts/internal-route.lock-fd.v1.json), [state-root](../../../packages/holder-lock/contracts/internal-route.state-root.v1.json), [quiesce-scan](../../../packages/holder-lock/contracts/internal-route.quiesce-scan.v1.json), [lock-borrow-vectors](../../../packages/holder-lock/contracts/internal-route.lock-borrow-vectors.v1.json) |
 | evidenced by (vectors) | [state-root.vectors.v1.json](../../../packages/holder-lock/contracts/state-root.vectors.v1.json) |
 | consumes | [process/spec.md](../process/spec.md) |
-| constrains | [session-identity/spec.md](../session-identity/spec.md) (identity grants no lock authority) |
+| constrains | [identity/spec.md](../identity/spec.md) (identity grants no lock authority) |
 | boundary | [component-boundary.md](../component-boundary.md) |
 | setup and doctor registry | [distribution.md](../../specs/distribution.md) |
 | implemented by | [src/holder-lock/](../../../src/holder-lock/index.mjs) (Node facade, fences), [packages/holder-lock/](../../../packages/holder-lock/rust/src/lib.rs) (crate, routes) |

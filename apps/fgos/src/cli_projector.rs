@@ -82,8 +82,8 @@ pub fn project_cli_invocation(
             ContractRef::from_static("convention.query.request", "1.0.0"),
             Box::new(project_convention_request(args, root)?),
         ),
-        "session-identity.resolve" => (
-            ContractRef::from_static("session-identity.resolve.request", "1.0.0"),
+        "identity.writer" => (
+            ContractRef::from_static("identity.writer.request", "1.0.0"),
             Box::new(project_identity_request(args)?),
         ),
         other => {
@@ -103,8 +103,8 @@ pub fn project_cli_invocation(
 /// and ignored, like every verb, because the shell integration appends it.
 fn project_identity_request(
     args: &[OsString],
-) -> Result<fgos_session_identity::IdentityRequest, String> {
-    let mut request = fgos_session_identity::IdentityRequest::default();
+) -> Result<fgos_identity::IdentityRequest, String> {
+    let mut request = fgos_identity::IdentityRequest::default();
     let mut index = 1;
     while index < args.len() {
         let value = args[index].to_string_lossy().into_owned();
