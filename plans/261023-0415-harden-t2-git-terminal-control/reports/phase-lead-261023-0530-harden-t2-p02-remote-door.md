@@ -1,5 +1,7 @@
 # Phase lead report: remote door, CF01, compaction (phase 02)
 
+**Final shape (big lead's change, last section): slice C (compaction) was reverted and left T2; Refs and config admission read the WAL once instead. Sections below about compaction, its cap and its OPC rounds describe commits that are now reverted (`3a655a8b3`).**
+
 Branch `harden/t2-p02-remote-door` (from `harden/t2-p01-red-tests`), pushed. Cargo target `/home/vantt/projects/forgent-worktrees/t2-p02-target`. Main checkout untouched (its WAL was never read; see re-measure).
 
 ## Commits (in order)
@@ -122,3 +124,21 @@ Note: `packages/git/contracts/mutation-census.v1.json` shows as modified in this
 ## Git-area commits for OPC's delta review
 
 `004807272` only (after `ee541123e`, `df4c30d82` merged). Earlier, not yet merged: `8e1ecbf63`, `7bac1c05f` (superseded in part by `004807272`).
+
+
+## Final shape: compaction reverted, one-read admission
+
+Commits (Git area, for OPC): `3a655a8b3` (revert of `8e1ecbf63`, `7bac1c05f`, `004807272`) and `3f1a7ef3c` (one-read admission). `c158aaa53` (spec line) and slices A and B are unchanged. Reports and commits for the reverted slice stay in history.
+
+- Revert: the compaction code, its constants (`RECENT_TERMINAL` is back in `publication.rs`), the CHANGELOG compaction line (the herdr socket line is kept) are gone. Retired with the behaviour (named in the commit body): the worktree cases (create kept, chain stopped, deletion cut short, compacted replay), the retention-threshold extension of the missing-owned-checkout prune case (restored to its earlier form), and the compacted ref replay case. The earlier "Slice C" and "OPC changes round" sections describe removed behaviour.
+- Admission: `refs.rs` `admission_with_land` and `repository_config.rs` no longer call `wal.scan`; `wal.active(100_000)` is the one read and its error maps to `git-wal-unreadable` (code unchanged: recovery-required for Refs, refusal text for config). `rg "wal\.scan\(" packages/git/rust/src` (outside `wal.rs` itself):
+  - `recovery.rs:83`, `recovery.rs:111` (doctor/recovery)
+  - `worktree.rs:1263` (prune)
+  - `repository_config.rs:677` (config history)
+  - `driver.rs:2557` (config facts)
+- Proofs (extended, no new file): `historical_ledger_over_admission_bound_does_not_block_new_publication` now also runs one `ensure_branch` under the same 100 000-entry ledger and it succeeds; with the scan restored it is red (`a ref change under a 100 000-entry ledger: ... cause: "git-wal-unreadable"`, checked). `remote_unknown_recovery_never_resends_and_corrupt_backlog_never_clears_admission` now also refuses one `ensure_branch` under the corrupt directory with `git-wal-unreadable` and creates no operation directory. I did not check the second one red with the scan restored (the scan refused the same directory, so it holds in both shapes; it pins that `active` alone is enough).
+- Re-measure, 322 retained finished worktree chains in a scratch repo, release build, load about 2.5 (shared machine):
+  - admission-style read: `scan` + `active` **32.3 ms** p50, `active` alone **15.8 ms** p50;
+  - `create_worktree` p50 over 9 adds: **234.7 ms** with the scan (min 209, max 258), **200.0 ms** and **214.4 ms** without it in two runs (min 185 and 188). So the add gain is about 20-35 ms, within the noise of a loaded machine; the read gain is 16.5 ms. The tail-peek step was not done.
+- Results (target `t2-p02b-target`): `land_crash_matrix` `ok. 15 passed; 0 failed; 2 ignored`; `recovery_matrix` 30 single-case runs each `ok. 1 passed`; `worktree` `ok. 9 passed`; `refs_remote` `ok. 17 passed`; `sequence` `ok. 6 passed`; `repository_config` `FAILED. 8 passed; 1 failed` (phase 3 case); `publication --no-fail-fast` `FAILED. 32 passed; 2 failed; 1 ignored` (the two phase 5 cases); `ssh_transport` `FAILED. 5 passed; 1 failed` (phase 3 hook case); `--lib` `FAILED. 67 passed; 2 failed` (phase 3 and phase 5 cases); Node boot, remote, refs, worktree, worktree-admin-multiprocess: `ℹ tests 40 / pass 40 / fail 0`; clippy clean.
+- Updated delta lines (HEAD vs `fc5b4e434`): the Rust src delta drops by the compaction code (about -90 net lines of `refs.rs`, `worktree.rs`, `wal.rs`) and the tests delta by the compaction cases; admission removes 8 lines. Exact numbers to be measured by the big lead at close.
