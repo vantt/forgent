@@ -26,16 +26,18 @@
  *       and is unchanged. `--dry` runs it against the stub under `<base>-dry/`.
  *   report
  *       Prints every case's result.json summary.
- *   cost [runs]
+ *   cost [runs] [branch|main]
  *       No model: the no-mail hook through the same shim and host outside any CLI,
  *       `runs` times (200 by default), then without the shim, then one call under
- *       strace for where the time goes.
+ *       strace for where the time goes; `main` uses the main checkout's shim bytes
+ *       instead of this branch's.
  *   stub <claude|codex> <argv>                          (the dry runs' CLI)
  *
  * Layout of a case `<base>/<case>/`:
  *   project/                       a fresh git repository with .fgos/, the model's cwd
- *   project/.fgos/installation/    bin/fgos (a byte copy of the main checkout's shim,
- *                                  never modified) and activation.json naming release/
+ *   project/.fgos/installation/    bin/fgos (the shim this branch's fgctl writes, from
+ *                                  its generator, never modified) and activation.json
+ *                                  naming release/
  *   release/bin/fgos               the branch-built host
  *   settings.json                  Claude Code: the rows the product installer wrote,
  *                                  moved out of the project so only --settings loads them
@@ -44,8 +46,8 @@
  * The hook rows come from src/setup/agent-hooks.mjs; its PreToolUse guards are removed,
  * because they need the legacy-node payload, which the private release does not stage
  * (a case that reaches legacy fails loudly instead). Deviation from spec §14 V5 ("the V4
- * live suite through the shim"): the same shim bytes over a release that is never
- * activated anywhere.
+ * live suite through the shim"): the shim this branch's fgctl would write, over a
+ * release that is never activated anywhere.
  *
  * Evidence: the transcript (Claude Code) or the rollout (Codex) is primary; the
  * snapshot corroborates. The product hook writes no log; T1/T2 time each hook call
@@ -88,8 +90,11 @@ const CLI_TIMEOUT_SEC = { L1: 600, L2: 300, C1: 600, T1: 1500, T2: 1500 };
 const CLAUDE_BIN = path.join(os.homedir(), '.local', 'bin', 'claude');
 const CODEX_BIN = path.join(os.homedir(), '.local', 'bin', 'codex');
 const CLAUDE_DIR = path.join(os.homedir(), '.claude');
-/** The shim `fgctl` writes, read-only: every case runs a byte copy of it. */
+/** The shim the main checkout's `fgctl` wrote, read-only: recorded for comparison. */
 const MAIN_SHIM = path.join(path.dirname(REPO_ROOT), 'forgent', '.fgos', 'installation', 'bin', 'fgos');
+/** The shim this branch's `fgctl` writes, byte for byte (its generator's own output):
+ * every case runs a copy of it. */
+const BRANCH_SHIM = path.join(BASE, 'shim-fgos');
 /** The Codex test account, the recorder's default (scripts/record-mailbox-hook-fixtures.mjs). */
 const CODEX_TEST_ACCOUNT = 'tetnu';
 /** T1/T2: steady no-mail calls before the held-back message, and calls after it. */
@@ -135,7 +140,12 @@ function buildHost() {
   if (out.status !== 0) die('the host did not build');
   const host = releaseHostPath();
   fs.mkdirSync(BASE, { recursive: true });
-  writeJson(BUILD_FILE, { commit: headCommit(), sha256: sha256(host), path: host, builtAt: new Date().toISOString() });
+  const shim = spawnSync('cargo', ['run', '-q', '--locked', '--release', '-p', 'fgos-distribution', '--example', 'print-workspace-shim'], {
+    cwd: REPO_ROOT, env: { ...process.env, CARGO_BUILD_JOBS: '4' }, encoding: 'utf8', maxBuffer: 1024 * 1024,
+  });
+  if (shim.status !== 0 || !shim.stdout.startsWith('#!/bin/sh')) die('the workspace shim generator did not run');
+  fs.writeFileSync(BRANCH_SHIM, shim.stdout, { mode: 0o555 });
+  writeJson(BUILD_FILE, { commit: headCommit(), sha256: sha256(host), path: host, shimSha256: sha256(BRANCH_SHIM), builtAt: new Date().toISOString() });
   return host;
 }
 
@@ -146,6 +156,7 @@ function builtHost() {
   const head = headCommit();
   if (built.commit !== head) die(`the host was built from ${built.commit}, HEAD is ${head}; run check again`);
   if (!fs.existsSync(built.path) || sha256(built.path) !== built.sha256) die(`${built.path} changed since check built it; run check again`);
+  if (!fs.existsSync(BRANCH_SHIM) || sha256(BRANCH_SHIM) !== built.shimSha256) die(`${BRANCH_SHIM} changed since check wrote it; run check again`);
   return built;
 }
 
@@ -176,7 +187,7 @@ function layOut(name, dry, built) {
   fs.mkdirSync(project, { recursive: true });
   git(dir, ['init', '-q', '--initial-branch=trunk', 'project']);
   fs.mkdirSync(path.dirname(shimOf(dir)), { recursive: true });
-  fs.copyFileSync(MAIN_SHIM, shimOf(dir));
+  fs.copyFileSync(BRANCH_SHIM, shimOf(dir));
   fs.chmodSync(shimOf(dir), 0o555);
   fs.mkdirSync(path.join(dir, 'release', 'bin'), { recursive: true });
   fs.copyFileSync(built.path, path.join(dir, 'release', 'bin', 'fgos'));
@@ -186,7 +197,7 @@ function layOut(name, dry, built) {
   else if (CLI_OF[name] === 'claude') live.makeClaudeHome({ home: homeOf(dir), claudeDir: CLAUDE_DIR });
   else fs.mkdirSync(homeOf(dir), { recursive: true });
   const rows = installRows(name, dir);
-  return { dir, project, rows, shim: { path: MAIN_SHIM, sha256: sha256(MAIN_SHIM) } };
+  return { dir, project, rows, shim: { generator: 'fgos_distribution::shim::workspace_shims', sha256: sha256(BRANCH_SHIM), mainCheckoutSha256: fs.existsSync(MAIN_SHIM) ? sha256(MAIN_SHIM) : null } };
 }
 
 /** The product installer's rows for the case's CLI, without the PreToolUse guards. */
@@ -829,16 +840,17 @@ function cmdStub(cli, argv) {
  * under strace for where the time goes. Labelled "outside the CLI": never the number
  * checked against the target.
  */
-function cmdCost(runs) {
+function cmdCost(runs, which = 'branch') {
   const built = builtHost();
-  const dir = path.join(BASE, 'cost');
+  const shimSource = which === 'main' ? MAIN_SHIM : BRANCH_SHIM;
+  const dir = path.join(BASE, `cost-${which}`);
   fs.rmSync(dir, { recursive: true, force: true });
   fs.mkdirSync(dir, { recursive: true });
   for (const sub of ['zdot', 'zdot-harness', 'trace']) fs.mkdirSync(path.join(dir, sub), { recursive: true });
   live.assertOutsideCheckout(dir);
   git(dir, ['init', '-q', '--initial-branch=trunk', 'project']);
   fs.mkdirSync(path.dirname(shimOf(dir)), { recursive: true });
-  fs.copyFileSync(MAIN_SHIM, shimOf(dir));
+  fs.copyFileSync(shimSource, shimOf(dir));
   fs.chmodSync(shimOf(dir), 0o555);
   fs.mkdirSync(path.join(dir, 'release', 'bin'), { recursive: true });
   const host = path.join(dir, 'release', 'bin', 'fgos');
@@ -887,6 +899,7 @@ function cmdCost(runs) {
   const result = {
     label: 'outside the CLI: never the number checked against the target',
     runs,
+    shim: { which, sha256: sha256(shimSource) },
     host: { commit: built.commit, sha256: built.sha256 },
     registeringCall: { ms: first.ms, status: first.status, registered },
     viaShim: stats(viaShim),
@@ -950,10 +963,10 @@ if (process.argv[1] === SCRIPT) {
         cmdStub(rest[0], rest.slice(1));
         break;
       case 'cost':
-        cmdCost(Number(rest[0] ?? 200));
+        cmdCost(Number(rest[0] ?? 200), rest[1] ?? 'branch');
         break;
       default:
-        die('usage: check [case …] | run <L1|L2|C1|T1|T2> [--dry] | report | cost [runs] | stub <claude|codex> <argv>', 2);
+        die('usage: check [case …] | run <L1|L2|C1|T1|T2> [--dry] | report | cost [runs] [branch|main] | stub <claude|codex> <argv>', 2);
     }
   } catch (error) {
     if (error instanceof live.LiveCliError) die(error.message, error.code);

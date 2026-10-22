@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1bb2dd4cd099715f2a68388e35938e1cc2e1c788640426f94f8fe7b185e3cfee",
+  "payloadDigest": "1a553f2a68f3a1502f3976cda77e29d890b6047aba53cf7a9bdcde60a2e1b13e",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -207,7 +207,7 @@
     "packages/distribution/rust/src/lib.rs": "f5c75abd8e6178076826eb9baefa6936f97785b5b9f1f50bcb91e354f59f17e0",
     "packages/distribution/rust/src/lock.rs": "e79b03663013f69e83f509bfa2745825ee3a796f979746e419241b54823094b0",
     "packages/distribution/rust/src/manifest.rs": "cc45d293313bf2de2b912293a52dc1f76214eb4c06b56b28f90ab52d640d274a",
-    "packages/distribution/rust/src/shim.rs": "4bf01406452fd954fa64ec8ec1fdeb11a83f84ad17d7fd43789b9003cb16743c",
+    "packages/distribution/rust/src/shim.rs": "3798ee5b34a74aa80f5cde34cb2087f0a8701f6baa25b0a19efa0f95db665b6b",
     "packages/distribution/rust/src/store.rs": "7bd1e141a72e4db792ef9c2346872b3a79fb72e0978b47cbbad124a65217f2c6",
     "packages/distribution/rust/src/verify.rs": "45abf2dc964ec6fe1687d1cac3bc46654a6b32552ffe8d12d0f1c5753f42b800",
     "packages/distribution/rust/src/workspace.rs": "a1ed550bb846d8a256048134a8a631afa2801f78163ba6f39b73c4ecb19e1f3f",
@@ -1825,7 +1825,14 @@
     },
     {
       "path": "packages/distribution/rust/src/shim.rs",
-      "line": 386,
+      "line": 379,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/distribution/rust/src/shim.rs",
+      "line": 397,
       "spawn": "Command::new",
       "binary": "? shim of run_shim",
       "class": "rust-test"

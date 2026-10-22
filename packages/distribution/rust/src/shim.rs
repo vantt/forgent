@@ -363,7 +363,6 @@ mod tests {
     /// and a release entry that prints its arguments.
     #[cfg(unix)]
     fn shim_scene(tag: &str, text: &str) -> (std::path::PathBuf, std::path::PathBuf) {
-        use std::os::unix::fs::PermissionsExt;
         let root = std::env::temp_dir().join(format!(
             "fgctl-shim-run-{tag}-{}-{}",
             std::process::id(),
@@ -374,8 +373,17 @@ mod tests {
         let release = root.join("release");
         std::fs::create_dir_all(release.join("bin")).unwrap();
         let entry = release.join("bin").join("fgos");
-        std::fs::write(&entry, "#!/bin/sh\necho \"ran $0 $*\"\n").unwrap();
-        std::fs::set_permissions(&entry, std::fs::Permissions::from_mode(0o755)).unwrap();
+        // Written by a child process, so no descriptor of it open for writing
+        // is inherited by a sibling test's fork (exec would fail with "text
+        // file busy").
+        let written = std::process::Command::new("sh")
+            .arg("-c")
+            .arg("printf '#!/bin/sh\\necho \"ran $0 $*\"\\n' > \"$1\" && chmod 755 \"$1\"")
+            .arg("sh")
+            .arg(&entry)
+            .status()
+            .unwrap();
+        assert!(written.success());
         let text = text.replace("RELEASE", release.to_str().unwrap());
         std::fs::write(root.join("installation").join("activation.json"), text).unwrap();
         (root, bin.join("fgos"))
@@ -383,12 +391,22 @@ mod tests {
 
     #[cfg(unix)]
     fn run_shim(shim: &Path, path_var: &str) -> std::process::Output {
-        std::process::Command::new(shim)
-            .args(["hook", "mailbox"])
-            .env_clear()
-            .env("PATH", path_var)
-            .output()
-            .unwrap()
+        // The shim was just written by this process: a sibling test's fork may
+        // still hold it open for writing for a moment.
+        for _ in 0..50 {
+            match std::process::Command::new(shim)
+                .args(["hook", "mailbox"])
+                .env_clear()
+                .env("PATH", path_var)
+                .output()
+            {
+                Err(e) if e.kind() == std::io::ErrorKind::ExecutableFileBusy => {
+                    std::thread::sleep(std::time::Duration::from_millis(20))
+                }
+                other => return other.unwrap(),
+            }
+        }
+        panic!("{} stayed busy", shim.display())
     }
 
     #[cfg(unix)]
@@ -403,7 +421,7 @@ mod tests {
             ("crlf", pretty.replace('\n', "\r\n"), path.as_str()),
             (
                 "messy",
-                "{\n\"status\"  :   \"ready\",,\n   \"releasePath\":\"RELEASE\"\n,\"status\": \"later\"\n}".to_string(),
+                "{\n\"status\"  :   \"ready\",,\n   \"releasePath\":\"RELEASE\"\n  \"status\": \"later\",\n}".to_string(),
                 path.as_str(),
             ),
         ] {
