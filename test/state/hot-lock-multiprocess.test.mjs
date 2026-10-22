@@ -9,14 +9,15 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { spawn, spawnSync, execFileSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
 import { hotPaths, judgeHotRecord, readHotRecord, withStateTx } from '../../src/state/hot-lock.mjs';
 import { observe } from '../../src/runner/dispatch/process-identity.mjs';
 import { resolveWriterIdentity, IDENTITY_ENV_KEYS } from '../../src/util/session-identity.mjs';
+import { uniqueTmpTag } from '../../src/util/unique-tmp-tag.mjs';
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
 const HOT_LOCK_URL = new URL('../../src/state/hot-lock.mjs', import.meta.url).href;
@@ -246,27 +247,28 @@ test('an observer in a foreign pid namespace never judges a record that has no n
   }
 });
 
-test('fast path: uncontended acquire and release is not more than 10% slower than the lock it replaced', async (t) => {
-  const f = fixture('bench');
+test('fast path: an uncontended acquire and release costs at most twice the raw file steps it is built on', (t) => {
+  // On disk, where a project's .fgos lives: on tmpfs the syscalls are so cheap that the fixed JS
+  // cost of a transaction dominates and the comparison stops saying anything about the mutex.
+  const dir0 = makeFixtureDir('fgos-hot-bench-');
+  const f = { fgosDir: path.join(dir0, '.fgos'), cleanup: () => fs.rmSync(dir0, { recursive: true, force: true }) };
+  fs.mkdirSync(f.fgosDir, { recursive: true });
   try {
-    let oldSource;
-    try {
-      oldSource = execFileSync('git', ['show', 'eab4d617b:src/state/events.mjs'], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
-    } catch {
-      return t.skip('not measured: the baseline commit is not in this clone');
-    }
-    const url = (rel) => pathToFileURL(path.join(ROOT, rel)).href;
-    oldSource = oldSource
-      // The lock-held counter now lives in its own module; the baseline file still names it in the identity import.
-      .replace("import { noteLockHeld, noteLockReleased, resolveWriterIdentity } from '../util/session-identity.mjs';", `import { resolveWriterIdentity } from '../util/session-identity.mjs';\nimport { noteLockHeld, noteLockReleased } from '${url('src/util/state-lock-held.mjs')}';`)
-      .replace("from './work.mjs'", `from '${url('src/state/work.mjs')}'`)
-      .replace("from '../util/session-identity.mjs'", `from '${url('src/util/session-identity.mjs')}'`)
-      .replace("from '../util/unique-tmp-tag.mjs'", `from '${url('src/util/unique-tmp-tag.mjs')}'`);
-    const oldFile = path.join(f.dir, 'events-baseline.mjs');
-    fs.writeFileSync(oldFile, oldSource);
-    const { withEventsLock: withOldLock } = await import(pathToFileURL(oldFile).href);
-    const logPath = path.join(f.fgosDir, 'events.jsonl');
     resolveWriterIdentity(f.fgosDir); // prime the identity cache once, outside the timings
+    withStateTx(f.fgosDir, () => {}); // creates the locks directory the raw steps share
+    const { dir } = hotPaths(f.fgosDir);
+    const rawRecord = path.join(dir, 'bench-raw.hot');
+    const recordBytes = JSON.stringify({ v: 1, pid: process.pid, startTime: '1234567890', bootId: 'b'.repeat(36), writer: 'w'.repeat(40), at: new Date().toISOString() });
+    // The steps the fast path cannot avoid: write the record beside its name, link it in, drop the
+    // temporary name, and unlink the record on release.
+    const runRaw = () => {
+      const rawTmp = path.join(dir, `.bench-raw.tmp-${uniqueTmpTag()}`);
+      fs.writeFileSync(rawTmp, recordBytes, 'utf8');
+      fs.linkSync(rawTmp, rawRecord);
+      fs.unlinkSync(rawTmp);
+      fs.unlinkSync(rawRecord);
+    };
+    const runNow = () => withStateTx(f.fgosDir, () => {});
 
     const p50 = (samples) => samples.sort((a, b) => a - b)[Math.floor(samples.length / 2)];
     const time = (run) => {
@@ -274,24 +276,22 @@ test('fast path: uncontended acquire and release is not more than 10% slower tha
       run();
       return Number(process.hrtime.bigint() - t0);
     };
-    const runOld = () => withOldLock(logPath, () => {}, f.fgosDir);
-    const runNow = () => withStateTx(f.fgosDir, () => {});
-    // The two locks alternate call by call, each going first half the time, so a burst of
+    // The two sides alternate call by call, each going first half the time, so a burst of
     // machine load lands on both sides instead of on whichever block it happened to hit.
     const measure = (n) => {
-      const old = [];
+      const raw = [];
       const now = [];
       for (let i = 0; i < n; i += 1) {
-        if (i % 2 === 0) { old.push(time(runOld)); now.push(time(runNow)); } else { now.push(time(runNow)); old.push(time(runOld)); }
+        if (i % 2 === 0) { raw.push(time(runRaw)); now.push(time(runNow)); } else { now.push(time(runNow)); raw.push(time(runRaw)); }
       }
-      return { old: p50(old), now: p50(now) };
+      return { raw: p50(raw), now: p50(now) };
     };
     const rounds = [];
     for (let r = 0; r < 5; r += 1) rounds.push(measure(400));
     const median = (key) => rounds.map((round) => round[key]).sort((a, b) => a - b)[2];
-    const ratio = median('now') / median('old');
-    t.diagnostic(`p50 old ${median('old')}ns, new ${median('now')}ns, ratio ${ratio.toFixed(3)}`);
-    assert.ok(ratio <= 1.1, `fast path ratio ${ratio.toFixed(3)} exceeds 1.10`);
+    const ratio = median('now') / median('raw');
+    t.diagnostic(`p50 raw steps ${median('raw')}ns, withStateTx ${median('now')}ns, ratio ${ratio.toFixed(3)}`);
+    assert.ok(ratio <= 2, `fast path costs ${ratio.toFixed(3)}x its raw file steps, more than 2x`);
   } finally {
     f.cleanup();
   }
