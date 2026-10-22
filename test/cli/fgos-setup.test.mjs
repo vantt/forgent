@@ -209,19 +209,28 @@ test('setup runs every registered fix and reports them under "fixed", never touc
   assert.match(byId['claude-plugin-marketplace'].message, /not found on PATH/);
 });
 
+// The persisted view without its cursor. The cursor records which commits were certified when the view was written;
+// every command seals after it writes, so it differs between two reads of the same folded history, while the fold
+// and its revision do not.
+function foldedView(cwd) {
+  const { cursor, ...view } = rawPersistedView(cwd);
+  return view;
+}
+
 test('rebuild reconstructs state.json from the log alone after the view file is deleted', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'a');
   addOk(cwd, 'b');
   run(cwd, ['move', 'a', '--to', 'doing']);
-  const before = rawPersistedView(cwd);
+  const before = foldedView(cwd);
 
   fs.rmSync(viewPath(cwd));
   assert.ok(!fs.existsSync(viewPath(cwd)));
 
   const result = run(cwd, ['rebuild']);
   assert.equal(result.status, 0);
-  assert.deepEqual(rawPersistedView(cwd), before);
+  assert.deepEqual(foldedView(cwd), before);
+  assert.ok(rawPersistedView(cwd).cursor, 'the rebuilt view carries the cursor it was folded to');
 });
 
 test('rebuild reconstructs state.json from the log alone when the view file still exists but is stale (not deleted)', () => {
@@ -229,7 +238,7 @@ test('rebuild reconstructs state.json from the log alone when the view file stil
   addOk(cwd, 'a');
   addOk(cwd, 'b');
   run(cwd, ['move', 'a', '--to', 'doing']);
-  const freshFromLog = rawPersistedView(cwd);
+  const freshFromLog = foldedView(cwd);
 
   // Corrupt the view IN PLACE (file still exists) rather than deleting it:
   // wrong status for "a" and a missing item "b" — the exact failure mode
@@ -242,11 +251,12 @@ test('rebuild reconstructs state.json from the log alone when the view file stil
   };
   fs.writeFileSync(viewPath(cwd), `${JSON.stringify(stale, null, 2)}\n`, 'utf8');
   assert.ok(fs.existsSync(viewPath(cwd)));
-  assert.notDeepEqual(rawPersistedView(cwd), freshFromLog);
+  assert.notDeepEqual(foldedView(cwd), freshFromLog);
 
   const result = run(cwd, ['rebuild']);
   assert.equal(result.status, 0);
-  assert.deepEqual(rawPersistedView(cwd), freshFromLog);
+  assert.deepEqual(foldedView(cwd), freshFromLog);
+  assert.ok(rawPersistedView(cwd).cursor, 'the rebuilt view carries the cursor it was folded to');
 });
 
 test('repair fixes a truncated final line via the real CLI, log becomes readable and usable again', () => {

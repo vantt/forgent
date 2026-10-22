@@ -1,5 +1,6 @@
 import { initializeWorkRepository } from '../../helpers/work-store-release.mjs';
 import { appendWorkEvent } from '../../helpers/work-event-fixture.mjs';
+import { leaveOpenWorkEvent } from '../../helpers/open-work-event.mjs';
 // fgos-cli-harness.mjs -- bộ đồ nghề dùng chung của các file test CLI, tách
 // nguyên văn ra khỏi test/cli/fgos.test.mjs khi file đó được chẻ nhỏ (tsk-3um).
 // Không có test nào ở đây: chỉ import, hằng số và helper mà các file test bên
@@ -152,7 +153,14 @@ function envelopeData(stdout) {
 }
 
 // Damages the open Event Store file the way bit rot or a hand edit would: one recorded event no longer matches its hash.
+// A command seals what it left open when it ends and publishes once per interval, so the file may already be sealed:
+// leave one fresh event open, and keep the commands that follow from sealing it (publishing is explicit-only, and a
+// fresh event is not due), so the damaged file is what they find.
 function corruptEventStore(cwd) {
+  const configPath = path.join(cwd, '.fgos', 'config.json');
+  const config = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
+  fs.writeFileSync(configPath, JSON.stringify({ ...config, eventStore: { ...config.eventStore, sync: { intervalSec: 0 } } }));
+  leaveOpenWorkEvent(cwd, { ageSec: 0 });
   const active = path.join(cwd, '.git', 'fgos', 'events', 'project', 'active.jsonl');
   fs.writeFileSync(active, fs.readFileSync(active, 'utf8').replace('"payload":{', '"payload":{"tampered":true,'));
   return active;

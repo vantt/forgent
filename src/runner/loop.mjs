@@ -66,7 +66,8 @@ import {
   categoryOf,
   EXIT_CODES,
 } from '../state/store.mjs';
-import { readClaims, withMainState } from '../state/runtime-coordination.mjs';
+import { readClaims, withMainState, getMainFgosDir } from '../state/runtime-coordination.mjs';
+import { maintainEventStore } from '../event-store/maintenance.mjs';
 import { DEFAULTS, truncateTitle } from '../state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, domainSteps, stepForPhase, classificationVocabulary } from '../state/domain-registry.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
@@ -1771,33 +1772,48 @@ export async function runWatch(options = {}) {
   const queue = options.queue ?? createWriteQueue({ onCommit: () => { committed = true; } });
   const breaker = options.breaker ?? createMissBreaker(options.breakerThreshold ?? BREAKER_MISSES);
 
-  while (!options.signal?.aborted) {
-    committed = false;
-    let result;
-    try {
-      result = await runOnce({ ...options, queue, breaker });
-    } catch (err) {
-      // A cycle-level throw must never terminate the watch loop (D8) — report
-      // it via onCycle and keep going, same accepted-risk class as the
-      // hot-loop niche noted below.
-      options.onCycle?.({ outcome: 'error', error: err });
-      result = null;
-    }
-    if (result) options.onCycle?.(result);
-    if (options.signal?.aborted) break;
-    if (!committed) {
-      // Narrow accepted niche: a cycle that commits something and then
-      // throws still sets `committed = true`, so the NEXT cycle starts
-      // immediately with no backoff (a hot loop). This is bounded in
-      // practice by MAX_VISITS/parking moving state toward quiescence, same
-      // accepted-risk class as the doc's W10 note — no throttling added.
+  // Event Store lifecycle (spec §16): a poll seals only what is due, a stop seals everything, and the loop never
+  // publishes (a clone's owner session does, at the end of its commands). Resolved once: it runs git. A directory
+  // that is no checkout resolves to nothing here, and `runOnce` reports that same fault on every cycle.
+  let store = null;
+  try {
+    const dir = options.dir ?? fgosDirFromRoot(options.repoRoot ?? resolveRepoRoot(options.cwd ?? process.cwd()));
+    store = { cwd: path.dirname(dir), trustedMain: path.dirname(getMainFgosDir(dir)) };
+  } catch { /* reported by runOnce */ }
+  const maintain = (policy) => { if (store) maintainEventStore(store.cwd, { trustedMain: store.trustedMain, ...policy }); };
+
+  try {
+    while (!options.signal?.aborted) {
+      maintain({});
+      committed = false;
+      let result;
       try {
-        await delay(options.pollFallbackMs ?? 5000, null, { signal: options.signal });
-      } catch {
-        // AbortError from the delay mid-wait — let the while condition exit
-        // the loop naturally on the next check rather than rethrowing.
-        break;
+        result = await runOnce({ ...options, queue, breaker });
+      } catch (err) {
+        // A cycle-level throw must never terminate the watch loop (D8) — report
+        // it via onCycle and keep going, same accepted-risk class as the
+        // hot-loop niche noted below.
+        options.onCycle?.({ outcome: 'error', error: err });
+        result = null;
+      }
+      if (result) options.onCycle?.(result);
+      if (options.signal?.aborted) break;
+      if (!committed) {
+        // Narrow accepted niche: a cycle that commits something and then
+        // throws still sets `committed = true`, so the NEXT cycle starts
+        // immediately with no backoff (a hot loop). This is bounded in
+        // practice by MAX_VISITS/parking moving state toward quiescence, same
+        // accepted-risk class as the doc's W10 note — no throttling added.
+        try {
+          await delay(options.pollFallbackMs ?? 5000, null, { signal: options.signal });
+        } catch {
+          // AbortError from the delay mid-wait — let the while condition exit
+          // the loop naturally on the next check rather than rethrowing.
+          break;
+        }
       }
     }
+  } finally {
+    maintain({ shutdown: true });
   }
 }

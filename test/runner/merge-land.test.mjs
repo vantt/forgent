@@ -4,11 +4,17 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fixture } from '../git/land-fixture.mjs';
-import { landRunnerItem } from '../../src/runner/merge.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
+import { branchKey } from '../../src/event-store/index.mjs';
+import { fixture as storeFixture } from '../event-store/phase07-fixture.mjs';
+import { landRunnerItem, promoteAfterLand, promoteLandedStreams } from '../../src/runner/merge.mjs';
 
+// A Land fixture whose repository also has a Work store: a land seals the store's project stream before it publishes.
 function rootFixture() {
   const f = fixture();
   f.git('branch', '-m', 'trunk', 'main');
+  activateGitFixture(f.repo);
   return f;
 }
 
@@ -174,4 +180,60 @@ test('a decision-id collision on the index is renumbered and unioned as declared
     assert.equal(f.git('show', 'main:docs/decisions/0000-index.md'), index([row('0001', '0001-base.md'), row('0002', '0002-ours.md'), row('0003', '0003-theirs.md')]).trimEnd());
     assert.match(f.git('show', 'main:docs/decisions/0003-theirs.md'), /^title: 0003 pick$/m);
   } finally { f.close(); }
+});
+
+test('Land seals the acknowledged Work events onto the project ref before it publishes anything', async () => {
+  const f = rootFixture();
+  try {
+    const dir = path.join(f.repo, '.fgos');
+    prepareWorkStore(dir, dir).store.append('project', [{ eventType: 'work.add', schemaVersion: 1, payload: { id: 'acked' }, ts: new Date().toISOString() }], {}, 'fixture', []);
+    // The verify runs on the candidate, before publication: the event ref must already exist then.
+    const result = await landRunnerItem(f.repo, {
+      id: 'source', verify: `test -n "$(git -C '${f.repo}' for-each-ref refs/fgos/events/)"`,
+    }, { branch: 'source' });
+    assert.equal(result.outcome, 'merged', JSON.stringify(result));
+    assert.deepEqual(result.promotion, { stream: 'branch:source', promoted: false }, 'no stream of the landed branch was ever opened');
+  } finally { f.close(); }
+});
+
+test('a promote that fails after publication is a recorded retryable result on the merged outcome, never a throw', async () => {
+  const f = rootFixture();
+  try {
+    // The store opens for the seal before Land; this verify then breaks its configuration, so the promotion after
+    // publication cannot open it.
+    const result = await landRunnerItem(f.repo, {
+      id: 'source', verify: `printf '{"eventStore":{"seal":{"intervalSec":0}}}' > '${path.join(f.repo, '.fgos/config.json')}'`,
+    }, { branch: 'source' });
+    assert.equal(result.outcome, 'merged', JSON.stringify(result));
+    assert.ok(f.git('show', '-s', '--format=%P', 'main').split(' ').includes(f.request.source), 'the branch landed');
+    assert.equal(result.promotion.retryable, true);
+    assert.equal(result.promotion.stream, 'branch:source');
+    assert.equal(result.promotion.error.code, 'event-store-config');
+  } finally { f.close(); }
+});
+
+test('a failed promotion is reported with the branch stream it names and retryable, whatever the cause', () => {
+  const none = fs.mkdtempSync(path.join(fs.realpathSync(process.env.TMPDIR ?? '/tmp'), 'merge-land-nostore-'));
+  try {
+    const recorded = promoteAfterLand(path.join(none, '.fgos'), 'fgw/some item');
+    assert.equal(recorded.stream, `branch:${branchKey('fgw/some item')}`);
+    assert.equal(recorded.retryable, true);
+    assert.equal(typeof recorded.error.message, 'string');
+  } finally { fs.rmSync(none, { recursive: true, force: true }); }
+});
+
+test('promotion follows the crate branch key, covers the branch through its last own event and is repeatable', (t) => {
+  const { store } = storeFixture(t);
+  const at = () => new Date().toISOString();
+  store.append('project', [{ eventType: 'work.add', schemaVersion: 1, payload: { id: 'one' }, ts: at() }], {}, 'fixture', []);
+  store.seal('project', []);
+  const stream = `branch:${branchKey('fgw/item')}`;
+  assert.equal(stream, 'branch:fgw-item', 'the stream a worktree of fgw/item writes, not branch:<id>');
+  store.append(stream, [{ eventType: 'private.branch', schemaVersion: 1, payload: { value: 1 }, ts: at() }], {}, 'fixture', []);
+  assert.equal(promoteLandedStreams(store, stream, 'fixture', []).length, 1);
+  const read = store.read({ streams: ['project'] }, []);
+  assert.ok(read.sequence.some((event) => event.type === 'store.promote' && event.payload.stream === stream));
+  assert.ok(read.sequence.some((event) => event.type === 'private.branch'), 'the promoted branch events join the project order');
+  assert.deepEqual(promoteLandedStreams(store, stream, 'fixture', []), [], 'a stream the project already names is left alone');
+  assert.deepEqual(promoteLandedStreams(store, 'branch:fgw-absent', 'fixture', []), [], 'a branch that never wrote has nothing to promote');
 });

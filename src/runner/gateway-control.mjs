@@ -32,6 +32,7 @@ import { resolveLogsDir } from './paths.mjs';
 import { observe, judge, signalByIdentity } from './dispatch/process-identity.mjs';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
 import { replaceDurably } from '../native/door.mjs';
+import { maintainEventStore } from '../event-store/maintenance.mjs';
 
 const REGISTRY_FILE = 'gateway.json';
 const DEFAULT_PORT = 4170;
@@ -356,6 +357,8 @@ export function stopGateway(fgosDir) {
     return { alreadyStopped: false, pid: entry.pid, port: entry.port };
   } finally {
     lock.release();
+    // Shutdown seals what is still open (spec §16), outside the gateway lock.
+    maintainEventStore(path.dirname(fgosDir), { shutdown: true });
   }
 }
 

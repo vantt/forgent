@@ -39,6 +39,7 @@ import { fgosDirFromRoot, resolveMainCheckoutRoot } from './paths.mjs';
 import { resolveHolderLiveness, selfRecord } from './dispatch/process-identity.mjs';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
 import { addWorktreeSync } from './repo-locks.mjs';
+import { maintainEventStore } from '../event-store/maintenance.mjs';
 
 const SESSIONS_FILE = 'sessions.json';
 
@@ -412,6 +413,8 @@ export function endSession(repoRoot, sessionId, { force = false } = {}) {
     return { ...entry, ...(retained ? { ...retained, warnings } : {}) };
   } finally {
     lock.release();
+    // A clean writer exit seals what this session left open (spec §16), outside the `sessions` lock.
+    maintainEventStore(repoRoot, { shutdown: true });
   }
 }
 

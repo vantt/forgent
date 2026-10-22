@@ -75,7 +75,9 @@ import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.m
 import { rankImpact } from '../src/state/impact.mjs';
 import { FINAL_STATUSES } from '../src/state/work.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
-import { readClaim, releaseClaim } from '../src/state/runtime-coordination.mjs';
+import { readClaim, releaseClaim, getMainFgosDir } from '../src/state/runtime-coordination.mjs';
+import { maintainEventStore } from '../src/event-store/maintenance.mjs';
+import { currentDispatchDepth } from '../src/runner/dispatch/transport.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
@@ -4814,6 +4816,13 @@ const STORE_MISSING_WARNING_VERBS = new Set([
   'gate-bypass', 'doc-sources', 'lock-status', 'recheck-blocked',
 ]);
 
+// Verbs that open the Event Store without being `requiresExistingStore` or a store-missing-warning read: they carry
+// the opportunistic seal and publish triggers of spec §16 at their start and end.
+const EVENT_STORE_LIFECYCLE_VERBS = new Set(['init', 'doctor', 'setup', 'rebuild', 'decision-index', 'docs-index', 'knowledge']);
+function opensEventStore(entry, verb) {
+  return !!(entry?.requiresExistingStore || STORE_MISSING_WARNING_VERBS.has(verb) || EVENT_STORE_LIFECYCLE_VERBS.has(verb));
+}
+
 // State/root-resolution investigation (docs/history/agent-coordination-state-root):
 // a worktree made OUTSIDE fgOS's own lifecycle (a plain `git worktree add`,
 // or an external harness's own worktree tool -- never `fgos pick`/`take`'s
@@ -5095,6 +5104,8 @@ async function main() {
   // arg-parse fault never reached this catch at all and could not be recorded.
   let faultClass = 'arg-parse';
   let dir;
+  // Set once the verb is known to open the Event Store: the facts both lifecycle triggers need (spec §16).
+  let eventStoreLifecycle = null;
   try {
     const { flags, positional } = parseArgs(rest);
 
@@ -5198,6 +5209,12 @@ async function main() {
     // above already answers it without new machinery. The error itself still
     // comes from `runVerb` unchanged.
     faultClass = entry ? null : 'unknown-verb';
+    // The main checkout is resolved (it runs git) only for a verb that opens the store; the other verbs never pay for it.
+    if (opensEventStore(entry, verb)) {
+      eventStoreLifecycle = { trustedMain: path.dirname(getMainFgosDir(dir)), dispatched: currentDispatchDepth() > 0 };
+      // `init` creates the store, so only its end trigger has anything to maintain.
+      if (verb !== 'init') maintainEventStore(path.dirname(dir), eventStoreLifecycle);
+    }
     const data = await runVerb(verb, flags, positional, dir, rest);
     if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
       process.stdout.write(renderPretty(verb, data));
@@ -5254,6 +5271,10 @@ async function main() {
     } else {
       process.exitCode = EXIT_CODES[categoryOf(err)] ?? 1;
     }
+  } finally {
+    // The end trigger runs after the verb's answer is written, on success and on refusal alike. Only a session that is
+    // not a dispatched worker publishes (D13); sealing is always safe.
+    if (eventStoreLifecycle) maintainEventStore(path.dirname(dir), { ...eventStoreLifecycle, end: true });
   }
 }
 

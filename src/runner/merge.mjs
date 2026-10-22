@@ -46,6 +46,9 @@ import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from '../util/normalize-path.mjs';
 import { listSessions } from './session.mjs';
 import { listWork } from '../state/store.mjs';
+import { prepareWorkStore } from '../state/work-event-store.mjs';
+import { branchKey } from '../event-store/index.mjs';
+import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
 import { withMainCheckout } from './repo-locks.mjs';
 import { DEFAULT_LOCK_WAIT_MS } from './lock-wait.mjs';
@@ -172,11 +175,9 @@ export function buildOwnFileSet(committedDiffPaths, footprint) {
 /** Whether a working tree has no pending changes outside of `.fgos/` — the
  * single shared gate both `return` (subtree scope) and `approve` (whole-repo
  * scope) check before either lets an item advance. `.fgos/` itself is
- * excluded: it's a live store with its own write door, mutated by the very
- * take/return/approve lifecycle operations this gate guards (each appends an
- * event as part of the same call), so it never signals an actually-dirty
- * code tree — only a manual `.fgos/events.jsonl` commit made that true
- * before this exclusion existed.
+ * excluded: it holds the store's own view caches and runtime files, written
+ * by the very take/return/approve lifecycle operations this gate guards, so
+ * it never signals an actually-dirty code tree.
  *
  * `scope` picks git's own pathspec: `'whole-repo'` (the default) runs `git
  * status --porcelain` with no pathspec — `approve` is expected to see the
@@ -612,7 +613,7 @@ function rebuildDecisionIndex(classification, idRenames) {
 // regenerated index): a `fgw/<id>` worker branch can never legitimately
 // carry a `.fgos/`-derived regenerated file through its own commit,
 // because regenerating `docs/decisions/index.md` correctly requires
-// reading `.fgos/events.jsonl`, which a worktree never carries in the
+// reading Work's store under `.fgos/`, which a worktree never carries in the
 // first place (ADR0020) -- so no branch can produce a *meaningful*
 // regenerated version to collide over in a runner merge for a normal,
 // well-formed regenerate. Cross-checked against `docs/how-to/fix-fgos-
@@ -1119,8 +1120,10 @@ export function declareLandFiles(repoRoot, item, target, source) {
  * integration branch. Land's session on the destination's full-ref slot,
  * not a caller-held slot, excludes other merges into that target through
  * candidate construction, verification and publication. Work's own event
- * files are committed through its declared checkpoint before Land starts;
- * nothing is swept into the land. A stale publication is returned once, and
+ * files are committed through its declared checkpoint and its project stream
+ * is sealed before Land starts; nothing is swept into the land. After
+ * publication Work promotes the branch's event stream and reports the result
+ * as `promotion` on the merged outcome. A stale publication is returned once, and
  * Work owns settlement; publication authorizes no candidate cleanup.
  */
 export async function landRunnerItem(repoRoot, item, {
@@ -1159,6 +1162,7 @@ export async function landRunnerItem(repoRoot, item, {
       throw toMergeLockError(err, { branch });
     }
   }
+  sealProjectBeforeLand(fgosDir, branch);
   // Trusted-side resolutions are bytes bound to the target they were read
   // against; only then is that target pinned, otherwise Land pins its own.
   const pinned = resolveRefSha(repoRoot, target);
@@ -1279,16 +1283,63 @@ export async function landRunnerItem(repoRoot, item, {
     port.close();
   } })();
   if (result.outcome !== 'merged') return result;
-  // Drift detection is read-only reporting after publication, outside the
-  // publication's error handling: its failure never turns a land into a
-  // failed merge.
+  // Promotion and drift detection run after publication, outside the
+  // publication's error handling: neither failure turns a land into a failed
+  // merge.
+  const promotion = promoteAfterLand(fgosDir, branch);
   let postLand;
   try {
     postLand = detectPostLandDrift(repoRoot, listWork(fgosDir), item, { target, landedFiles, sessions: listSessions(repoRoot) });
   } catch (err) {
     postLand = { landed: item.id, target, landedFiles, error: `post-land drift detection failed: ${err.message}` };
   }
-  return { ...result, postLand };
+  return { ...result, promotion, postLand };
+}
+
+/**
+ * Work's seal-before-land policy (Event Store spec §16): everything Work has
+ * acknowledged is on the project ref before this land can publish anything,
+ * and the promotion that follows always has a published project to follow.
+ * Nothing is published yet, so a store that cannot seal refuses the land.
+ */
+function sealProjectBeforeLand(fgosDir, branch) {
+  try {
+    prepareWorkStore(fgosDir, fgosDir).store.seal('project', []);
+  } catch (err) {
+    throw new MergeError(`cannot merge "${branch}": sealing Work's events before the land failed (${err.message})`, {
+      branch, code: 'event-seal-failed',
+    });
+  }
+}
+
+/**
+ * Promote the landed branch's event stream into the project once the land is
+ * published. The land already happened, so a failure here is a recorded
+ * result, never a throw: `{ stream, error, retryable: true }` rides on the
+ * `merged` outcome, and the same call is safe to repeat (a stream the project
+ * already names is left alone).
+ */
+export function promoteAfterLand(fgosDir, branch) {
+  let stream = null;
+  try {
+    stream = `branch:${branchKey(branch)}`;
+    const { store } = prepareWorkStore(fgosDir, fgosDir);
+    const promoted = promoteLandedStreams(store, stream, String(resolveWriterIdentity(fgosDir).id), []);
+    return { stream, promoted: promoted.length > 0 };
+  } catch (err) {
+    return { stream, error: { code: err.code ?? null, message: err.message }, retryable: true };
+  }
+}
+
+/** Work owns promotion policy; Git Land knows nothing about event streams.
+ * `stream` is the branch stream's name (`branch:<branchKey>`); the stream is
+ * promoted through its last own event unless the project already names it. */
+export function promoteLandedStreams(store, stream, writer, heldRanks) {
+  if (!store.maintenance(heldRanks).streams.some((row) => row.stream === stream)) return [];
+  const read = store.read({ streams: ['project', stream], project: false }, heldRanks);
+  const throughSeq = Math.max(0, ...read.events.filter((event) => event.stream === stream && event.origin === store.ownOrigin).map((event) => event.seq));
+  if (!throughSeq || read.events.some((event) => event.type === 'store.promote' && event.payload?.stream === stream && event.payload.throughSeq >= throughSeq)) return [];
+  return [store.promote({ branch: stream, throughSeq, cursor: read.cursor.cover, writer }, heldRanks)];
 }
 
 /** Work's unique settlement identity `(repoIdentity, operationId,

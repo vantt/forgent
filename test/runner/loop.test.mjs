@@ -14,6 +14,7 @@ import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 import { createWorktree, removeWorktree, createBranchRef, branchNameFor } from '../../src/runner/worktree.mjs';
 import { runOnce as loopRunOnce, runWatch as loopRunWatch, resolveRepoRoot } from '../../src/runner/loop.mjs';
+import { leaveOpenWorkEvent } from '../helpers/open-work-event.mjs';
 import { confinedRunnerConfig, persistRunnerConfig, countWorkerRuns, priorUnitRunsSource, unitRuns } from './loop-worker-fixture.helper.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { confinedUnitConfig } from './driver-unit-fixture.helper.mjs';
@@ -1887,6 +1888,22 @@ test('runWatch: a cycle that committed is followed by an immediate next cycle; a
   assert.ok(immediateGap < pollFallbackMs, `expected the post-commit gap (${immediateGap}ms) to stay under pollFallbackMs (${pollFallbackMs}ms)`);
   assert.ok(waitedGap >= pollFallbackMs - 20, `expected the post-idle gap (${waitedGap}ms) to be roughly pollFallbackMs (${pollFallbackMs}ms)`);
   assert.ok(waitedGap > immediateGap, 'the waited (idle) gap is clearly larger than the immediate (committed) gap');
+});
+
+test('runWatch seals what is due on every poll without waiting for the stop, and seals everything when it stops', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const openAgeSec = leaveOpenWorkEvent(repoRoot);
+  assert.ok(openAgeSec() >= 3599, 'the event is open before the loop starts');
+  const controller = new AbortController();
+  let ageAfterFirstCycle;
+  await runWatch({
+    repoRoot, dir, worktreeDir, signal: controller.signal, log: noLog,
+    onCycle: () => { ageAfterFirstCycle = openAgeSec(); controller.abort(); },
+  });
+  assert.ok(ageAfterFirstCycle < 60, 'an event older than the interval is sealed by the poll, before the stop');
+  const fresh = leaveOpenWorkEvent(repoRoot, { ageSec: 30 });
+  await runWatch({ repoRoot, dir, worktreeDir, signal: AbortSignal.abort(), log: noLog });
+  assert.equal(fresh(), 0, 'stopping the loop seals what a poll leaves because it is young');
 });
 
 test('runWatch stops promptly when its AbortSignal aborts mid-wait, and resolves cleanly without throwing', async () => {

@@ -220,7 +220,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
       kind: 'engine',
     });
     releaseLand(result.landSettlement, event, 'synced');
-    return { id, mode: 'sync-root', outcome: 'synced', target: targetBranch, branch, seq: event.seq, output: result.check.output, postLand: result.postLand };
+    return { id, mode: 'sync-root', outcome: 'synced', target: targetBranch, branch, seq: event.seq, output: result.check.output, postLand: result.postLand, promotion: result.promotion };
   };
 
   if (item.parent) {

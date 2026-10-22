@@ -660,6 +660,7 @@ export async function approveUseCase(
             error: moveResult.error.message,
             diagnosticLog: moveResult.diagnosticLog,
             postLand: result.postLand,
+            promotion: result.promotion,
           };
         }
         releaseLand(repoRoot, id, result.landSettlement, `work-delivered:${id}:${moveResult.event.seq}`, 'delivered');
@@ -672,6 +673,7 @@ export async function approveUseCase(
           seq: moveResult.event.seq,
           output: result.check.output,
           postLand: result.postLand,
+          promotion: result.promotion,
         };
       }
     }
@@ -855,6 +857,7 @@ export async function approveUseCase(
         error: moveResult.error.message,
         diagnosticLog: moveResult.diagnosticLog,
         postLand: result.postLand,
+        promotion: result.promotion,
       };
     }
     releaseLand(repoRoot, id, result.landSettlement, `work-delivered:${id}:${moveResult.event.seq}`, 'delivered');
@@ -867,6 +870,7 @@ export async function approveUseCase(
       seq: moveResult.event.seq,
       output: result.check.output,
       postLand: result.postLand,
+      promotion: result.promotion,
     };
   }
 
