@@ -211,18 +211,21 @@ test('hostRead has the order deny > blind > allow, and a blind override only nar
   assert.equal(resolveConfinementPolicy('workspace-write').controls.hostRead, 'allow');
 });
 
-test('the hidden roots are data in the contract: the three run-state directories, never all of .fgos', () => {
+test('the hidden roots are data in the contract: peer run state and the mailbox record, never all of .fgos', () => {
   assert.deepEqual([...BLIND_HIDDEN_ROOTS], [
     '{fgosDir}/assignments',
     '{fgosDir}/workflow-runs',
     '{fgosDir}/dispatch-runs',
+    '{fgosDir}/runtime/mailbox',
     '{herdrSocketDir}',
     '{confinementTempRoot}',
   ]);
 });
 
-test('hidden roots resolve to the existing ones of this project, the herdr socket directory and the temp root', () => {
+test('hidden roots resolve to the existing ones of this project, the mailbox record created when missing, the herdr socket directory and the temp root', () => {
   const project = makeProject();
+  const mailbox = path.join(project.fgosDir, 'runtime', 'mailbox');
+  assert.equal(fs.existsSync(mailbox), false, 'the project starts without a mailbox record');
   const resolved = resolveBlindHiddenRoots({
     fgosDir: project.fgosDir,
     backendConfig: { tempRoot: project.tempRoot },
@@ -232,9 +235,11 @@ test('hidden roots resolve to the existing ones of this project, the herdr socke
     path.join(project.fgosDir, 'assignments'),
     path.join(project.fgosDir, 'workflow-runs'),
     path.join(project.fgosDir, 'dispatch-runs'),
+    mailbox,
     project.herdrDir,
     project.tempRoot,
   ]);
+  assert.equal(fs.statSync(mailbox).mode & 0o777, 0o700, 'the mailbox root is created with mode 0700');
   fs.rmSync(path.join(project.fgosDir, 'dispatch-runs'), { recursive: true });
   const without = resolveBlindHiddenRoots({ fgosDir: project.fgosDir, backendConfig: { tempRoot: project.tempRoot }, env: { HERDR_SOCKET_PATH: project.socket } });
   assert.equal(without.includes(path.join(project.fgosDir, 'dispatch-runs')), false, 'a root that does not exist is skipped');

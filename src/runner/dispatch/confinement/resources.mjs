@@ -17,19 +17,29 @@ import { resolveConfinementTempRoot } from './cleanup.mjs';
 
 /**
  * `hostRead: blind` leaves the host readable except what other dispatches and live agent
- * sessions keep: the run state of the project the dispatch runs in, the herdr socket dir, and
- * the confinement temp root (sibling private homes). Tokens, resolved per dispatch below; the
- * driver never names a path of its own. Only the three run-state directories are listed,
- * never all of `.fgos`: tracked files live there and would appear deleted in the checkout
- * status under a mask.
+ * sessions keep: the run state of the project the dispatch runs in, the mailbox record of
+ * the project's live agent sessions, the herdr socket dir, and the confinement temp root
+ * (sibling private homes). Tokens, resolved per dispatch below; the driver never names a path
+ * of its own. Only peer run state and the mailbox record are listed, never all of `.fgos`:
+ * tracked files live there and would appear deleted in the checkout status under a mask.
  */
 export const BLIND_HIDDEN_ROOTS = Object.freeze([
   '{fgosDir}/assignments',
   '{fgosDir}/workflow-runs',
   '{fgosDir}/dispatch-runs',
+  // The mailbox record; its path is owned by packages/mailbox/rust/store/src/record/paths.rs.
+  '{fgosDir}/runtime/mailbox',
   '{herdrSocketDir}',
   '{confinementTempRoot}',
 ]);
+
+/**
+ * Hidden roots created (mode 0700) when missing instead of skipped: an independent session
+ * creates the mailbox record at any time, and the mask is fixed when the worker starts, so a
+ * worker started before the first message must not see the ones written later. Created only
+ * when the `.fgos` directory itself exists, as the mailbox record requires.
+ */
+const BLIND_ROOTS_CREATED_WHEN_MISSING = Object.freeze(['{fgosDir}/runtime/mailbox']);
 
 /** Whether a confinement request asks for `hostRead: blind`, by override or by its policy. */
 export function requestIsBlind(request) {
@@ -192,7 +202,8 @@ function herdrSocketDir(env = process.env) {
 
 /**
  * The absolute paths `hostRead: blind` hides for a dispatch (BLIND_HIDDEN_ROOTS with its tokens
- * filled in). A root that does not exist on this machine is skipped: there is nothing to hide.
+ * filled in). A root listed in BLIND_ROOTS_CREATED_WHEN_MISSING is created first; any other
+ * root that does not exist on this machine is skipped: there is nothing to hide.
  */
 export function resolveBlindHiddenRoots({ fgosDir, backendConfig = {}, env = process.env } = {}) {
   if (typeof fgosDir !== 'string' || !fgosDir.trim()) {
@@ -209,6 +220,11 @@ export function resolveBlindHiddenRoots({ fgosDir, backendConfig = {}, env = pro
   const roots = [];
   for (const template of BLIND_HIDDEN_ROOTS) {
     const raw = template.replace(/\{[A-Za-z]+\}/, (token) => tokens[token] ?? token);
+    // Only below an existing `.fgos`: a project without one gets none from a read-only check.
+    const creatable = BLIND_ROOTS_CREATED_WHEN_MISSING.includes(template) && fs.existsSync(tokens['{fgosDir}']);
+    if (creatable && !fs.existsSync(raw)) {
+      fs.mkdirSync(raw, { recursive: true, mode: 0o700 });
+    }
     const real = realPathOrNull(raw);
     if (real && fs.statSync(real).isDirectory() && !roots.includes(real)) roots.push(real);
   }
