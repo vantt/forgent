@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1814d7eea9e1851d38cec3c759015d1d7c586296544888fb668adfe6481ce184",
+  "payloadDigest": "755faf4d18bf0bca40f4f3f8ef59cb5b71c870fee30a79f9060086ec8048c579",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -409,11 +409,13 @@
     "packages/mailbox/rust/core/tests/stop_blocks.rs": "9ef7f43e3d444bb50c54ce2bbccae9a0a1f002fadc0768f6279483625404471e",
     "packages/mailbox/rust/core/tests/sweep.rs": "4db26a0474b48b97f327c757f899c2c8384fcdef511771f2fce22b033c772578",
     "packages/mailbox/rust/core/tests/wake.rs": "a4460aa55dde049c7a9e232c6ee1569f54b842bfcac322451aaf6e4ad5270ad2",
+    "packages/mailbox/rust/store/src/head.rs": "339975b7a8f1a2cd221f23f1c989b7aab8ff576407f2e6d71787ddfd08fc776e",
     "packages/mailbox/rust/store/src/hook/limits.rs": "b16f5965e019d4d6c7561362af24e2da1e7bb22b26e43632c5f7721cbc503a54",
     "packages/mailbox/rust/store/src/hook/mod.rs": "7171de0cef10c92d21f56a7fbf4d558d9e1c3f6978f01096efd01bb9c3465d72",
-    "packages/mailbox/rust/store/src/lib.rs": "003fff2192c42c053d47ea2e0984a122d704cc8b70a4346ccd59dc594a6206b3",
+    "packages/mailbox/rust/store/src/lib.rs": "cced893383b6f7336eac35834c6c5b276b9a1cf14cc0e4b5a8d418a69dd5c280",
     "packages/mailbox/rust/store/tests/common/mod.rs": "ba083c68af6c711895103ee4e9275eaf430382f7d6e22947b3caf588f61e98be",
     "packages/mailbox/rust/store/tests/fixtures_contract.rs": "899ce8ead3ca6295dd2ccfa9a9afb476ae63c8ea77e6f140865575d45a6d0cfc",
+    "packages/mailbox/rust/store/tests/head.rs": "965a87ad161254ce3780fe48cc87c8083249b0f0084bac2081599e460cc1df07",
     "packages/mailbox/rust/store/tests/limits_contract.rs": "f325afd89b20852e7396e15d5634a0b44095f21f9d7d80162fd00c6924f67ffc",
     "packages/observe/rust/src/case_journal.rs": "cde5b3da1389ced2c58ffc486ed5bda893e22fd8fdcbc706e1247d5f4cdc315d",
     "packages/observe/rust/src/contract.rs": "6c768d1908c4363045e30ec11a6ad9ffa0aea59d391d3e6c04701b8128ac4cfb",
