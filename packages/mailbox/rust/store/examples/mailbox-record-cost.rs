@@ -176,8 +176,9 @@ fn s0_hundred(state: &mut MailboxState, ids: &mut dyn IdSource, l: &Limits) -> P
 }
 
 /// The ceiling test's steady state: the shared sender with no head at its
-/// session budget for a whole header horizon, to two recipients.
-fn week_one(state: &mut MailboxState, ids: &mut dyn IdSource, l: &Limits) -> Population {
+/// session budget for a whole header horizon (one day at the contract's
+/// values), to two recipients.
+fn steady_one(state: &mut MailboxState, ids: &mut dyn IdSource, l: &Limits) -> Population {
     let names = [
         register(
             state,
@@ -214,11 +215,13 @@ fn week_one(state: &mut MailboxState, ids: &mut dyn IdSource, l: &Limits) -> Pop
     }
 }
 
-/// `week_one` plus `heads` registered head generations, each at its
+/// `steady_one` plus `heads` registered head generations, each at its
 /// lifetime cap of headers.
-fn week_grid(heads: usize) -> impl Fn(&mut MailboxState, &mut dyn IdSource, &Limits) -> Population {
+fn steady_grid(
+    heads: usize,
+) -> impl Fn(&mut MailboxState, &mut dyn IdSource, &Limits) -> Population {
     move |state, ids, l| {
-        let mut p = week_one(state, ids, l);
+        let mut p = steady_one(state, ids, l);
         let names: Vec<String> = ["recipient-one", "recipient-two"]
             .iter()
             .map(|k| state.binding(&key(k)).unwrap().name.as_str().to_string())
@@ -256,10 +259,10 @@ fn week_grid(heads: usize) -> impl Fn(&mut MailboxState, &mut dyn IdSource, &Lim
     }
 }
 
-/// `week_one` plus 100 bindings of exited processes, each named by one
+/// `steady_one` plus 100 bindings of exited processes, each named by one
 /// header it sent, so none is prunable.
 fn dead_bindings(state: &mut MailboxState, ids: &mut dyn IdSource, l: &Limits) -> Population {
-    let p = week_one(state, ids, l);
+    let p = steady_one(state, ids, l);
     let to = p.recipient.1.clone();
     let now = p.end;
     for (i, head) in dead_heads(100).into_iter().enumerate() {
@@ -588,30 +591,17 @@ fn main() {
         b.measure("s0-hundred send", Bench::send);
         b.measure("s0-hundred no-mail claim", Bench::no_mail_claim);
     }
-    if run("week-one") {
-        let b = Bench::new(&parent, "week-one", &week_one, limits());
-        b.measure("week-one send", Bench::send);
-        b.measure("week-one no-mail claim", Bench::no_mail_claim);
-        b.measure("week-one claim+finish", Bench::claim_finish);
+    if run("steady-one") {
+        let b = Bench::new(&parent, "steady-one", &steady_one, limits());
+        b.measure("steady-one send", Bench::send);
+        b.measure("steady-one no-mail claim", Bench::no_mail_claim);
+        b.measure("steady-one claim+finish", Bench::claim_finish);
     }
-    if run("week-one-1d") {
-        // Not a policy: the owner question Q1 recommendation measured, the
-        // contract value unchanged. The body retention set to the record
-        // TTL makes the header horizon one day.
-        let mut short = limits();
-        short.record.body_retention_sec = short.record.ttl_sec;
-        let b = Bench::new(&parent, "week-one-1d", &week_one, short);
-        b.measure(
-            "if bodyRetentionSec = 86400: week-one no-mail claim",
-            Bench::no_mail_claim,
-        );
-        b.measure("if bodyRetentionSec = 86400: week-one send", Bench::send);
-    }
-    if run("week-grid") {
+    if run("steady-grid") {
         for heads in [1, 10, 100] {
-            let b = Bench::new(&parent, "week-grid", &week_grid(heads), limits());
+            let b = Bench::new(&parent, "steady-grid", &steady_grid(heads), limits());
             b.measure(
-                &format!("week-grid {heads} heads no-mail claim"),
+                &format!("steady-grid {heads} heads no-mail claim"),
                 Bench::no_mail_claim,
             );
         }

@@ -1,6 +1,11 @@
 # Mailbox V2: what a record hold costs, against S0 and the 50 ms hook target
 
-Two runs on the same day: the first with the no-write rule decided by re-encoding the state, the second after that rule was replaced by the core's change report. The verdict below is the first run's; the re-run section updates it.
+Three runs on the same day:
+1. The no-write rule decided by re-encoding the state.
+2. After that rule was replaced by the core's change report.
+3. At the owner's Q1 answer: body retention, and so the header horizon, one day. This is the current default.
+
+The verdict below is the first run's; the sections after it update it. The third run is the one that describes the branch as it is.
 
 Plan: [`plans/261022-1005-mailbox-v2-record-store/phase-07-size-ceiling-and-costs.md`](../261022-1005-mailbox-v2-record-store/phase-07-size-ceiling-and-costs.md). Baseline: [S0 H3](research-261020-1612-mailbox-s0-hook-and-record-costs.md) §3. Branch `mailbox/v1-v3`. The example and this report are committed together, so the example's source at that commit is the one measured.
 
@@ -13,6 +18,29 @@ Plan: [`plans/261022-1005-mailbox-v2-record-store/phase-07-size-ceiling-and-cost
 - Plus 100 such heads (39,940 headers, 13.8 MB): p50 58.0 ms, p95 64.2 ms. That is over 50 ms.
 - 50 ms is the target for the whole hook. The host's own cost per call (S0: p95 6.5 ms for a native verb called directly, 11.3 ms through the shim) comes on top of these record-only numbers. Read with it, even the one-sender week is at or over the target.
 - No lever was picked (coordinator instruction). The provisional default of Q1 (a) stands, and the numbers are added to Q1 in the plan.
+
+## At the owner's new default: `bodyRetentionSec` = 86400 (third run, same day)
+
+The owner answered Q1 with option (b): `mailbox.record.bodyRetentionSec` now defaults to 86,400 s, the value of `record.ttlSec`, so the header horizon is one day. Same command, with the hold that writes from the core's change report. The "week" scenarios are renamed "steady", because the steady state now spans one day. **The machine was busier than in the first two runs (load 5.1 / 15.3 / 12.6 against about 1.5)**, so the fsync-bound write rows are noisier. The no-mail rows are read-bound and less affected.
+
+| Hold | Headers, bytes | p50 | p95 | max | Read p50 |
+|---|---|---|---|---|---|
+| **steady-one no-mail claim** (one sender at its budget for the horizon) | 2,880, 1,000,524 | **2.53** | **2.64** | 2.75 | 2.13 |
+| **steady-grid, 10 heads at lifetime cap, no-mail claim** | 4,680, 1,621,666 | **3.67** | **3.73** | 4.15 | 3.08 |
+| **steady-grid, 100 heads at lifetime cap, no-mail claim** | 22,680, 7,836,244 | **29.49** | **44.28** | 45.32 | 17.80 |
+| steady-one send | 2,880 | 10.13 | 12.96 | 14.18 | 2.19 |
+| steady-one claim+finish (two holds) | 2,880 | 12.80 | 16.61 | 19.57 | |
+| dead-bindings registering / claim+finish / send | 2,980 | 7.38 / 14.04 / 13.85 | 11.84 / 20.91 / 29.74 | 26.99 / 34.38 / 31.19 | about 2.1 |
+| s0-one send / no-mail claim | 50 | 12.71 / 0.21 | 34.11 / 0.25 | 35.95 / 0.31 | |
+| s0-hundred send / no-mail claim | 2,880 (not S0's 5,000: a one-day horizon cannot hold 100 × 50 built at the budget's pace) | 19.66 / 2.58 | 43.69 / 2.62 | 48.24 / 2.81 | 2.18 |
+| contended no-mail claim | 50 | 0.22 | 0.33 | 1,062.17 | the tail is lock acquire; a hook's 100 ms wait cap ends it with `lock-busy` |
+
+Reading:
+- At the new default, the record's no-mail hold is a few milliseconds for one saturated sender and for 10 saturated heads.
+- With 100 heads, each at its lifetime cap of 200 headers within one day, it is p95 44.3 ms. That population is now dominated by the per-generation lifetime cap, not by the retention.
+- The host's own cost per call still comes on top.
+- The 50-header write rows (12.7 ms p50, 34.1 ms p95) are above the first run's 6.8 / 9.4 ms on the same population. The fsync steps (body 7.0, file 2.5, directory 3.6 ms p50) account for the difference, consistent with the higher machine load.
+- The contended maximum (1,062 ms) repeats S0's finding that the lock is not fair. The hook's wait cap bounds it at 100 ms.
 
 ## Re-run after the hold stopped re-encoding (same day, same machine)
 

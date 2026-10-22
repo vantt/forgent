@@ -127,3 +127,18 @@ The first run showed the no-write byte comparison, which re-encodes the whole st
 
 The record's own no-mail hold is now under 50 ms p95 in every week population measured; the host's own cost per call still comes on top. The added example row, `week-one-1d`, changes no contract value. The report's re-run section has every row.
 
+## Owner decision Q1 option (b) applied (2026-10-22)
+
+- `limits.v1.json`: `mailbox.record.bodyRetentionSec` default 604800 → 86400. Its `source` and `status` name the owner decision. Recorded in branch spec §12, §5.3 and §6.4 (the values), §16 item 20 and §17, and in `plan.md` Q1.
+- No test hard-coded the seven days: every horizon is derived from the contract. The one test whose logic assumed a horizon longer than `record.ttlSec` was `record_prune.rs` :: `a_dead_binding_still_named_by_a_header_is_kept_until_the_header_retires`. It failed at the new value, and now delivers the dead head's header half a record TTL later, derived from the contract. Its mutant (the "named" rule ignored) is still killed.
+- The ceiling at the new values: `H_sender = 20 × ceil(86400 / 600) + 20 = 2,900`. The steady value is 2,880.
+- Example: the "if bodyRetentionSec = 86400" row is removed, because that is now the default. The week scenarios are renamed `steady-one` / `steady-grid`.
+
+| No-mail claim hold, p50 / p95 (ms) | 7-day horizon, after the reversal | 1-day horizon (new default) |
+|---|---|---|
+| steady-one | 22.63 / 36.83 (20,140 headers) | 2.53 / 2.64 (2,880 headers) |
+| steady-grid 10 heads | 17.18 / 36.01 | 3.67 / 3.73 |
+| steady-grid 100 heads | 44.11 / 49.68 | 29.49 / 44.28 (22,680 headers) |
+
+The third run's load average was 5 to 15 (other sessions), which made the write rows noisier; the report's third section has every row.
+

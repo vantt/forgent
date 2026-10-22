@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d64e909523f5e888f0d296f280652d8b950813df04e82aae4da2232c58d26320",
+  "payloadDigest": "f62fad13a5550f328b3412be846c9c7c49d71d48b1d84270bb60e4409875ff2d",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -409,7 +409,7 @@
     "packages/mailbox/rust/core/tests/stop_blocks.rs": "9ef7f43e3d444bb50c54ce2bbccae9a0a1f002fadc0768f6279483625404471e",
     "packages/mailbox/rust/core/tests/sweep.rs": "4db26a0474b48b97f327c757f899c2c8384fcdef511771f2fce22b033c772578",
     "packages/mailbox/rust/core/tests/wake.rs": "a4460aa55dde049c7a9e232c6ee1569f54b842bfcac322451aaf6e4ad5270ad2",
-    "packages/mailbox/rust/store/examples/mailbox-record-cost.rs": "d92875afd6e2d6f275d6e79fd3802f55c373d86e821854040de90f9e9950a86b",
+    "packages/mailbox/rust/store/examples/mailbox-record-cost.rs": "b1d2e9df79ea305a96781e112eb62d99a1d326e60b4118663543e0a76562af28",
     "packages/mailbox/rust/store/src/adapters/agy.rs": "2ca9d10a744245a4b233e26f64b96d6fde27de92394e60d9332b1a830979f9fe",
     "packages/mailbox/rust/store/src/adapters/claude.rs": "d999090b2570ce16ff6787de42cb5efe963eb41287b6bf0f8d9c3acdb303b8b1",
     "packages/mailbox/rust/store/src/adapters/codex.rs": "8c7242c132b50e4f44db955038da8c6f100e6d12436493e73c0ad0bb10fd3f5c",
@@ -437,7 +437,7 @@
     "packages/mailbox/rust/store/tests/record_ceiling.rs": "80d2a0945288f516bf2a636bef0ac44d048f813585c4da7488c9f0fff1f82418",
     "packages/mailbox/rust/store/tests/record_contention.rs": "f8afef3cca7e7c67f30ba6faadaa1f363c66b7d8d687f01a6c83f4967180c267",
     "packages/mailbox/rust/store/tests/record_crash.rs": "7cea9afb1f5cc1acd4c5340b9902308699d74cb8cb35d4a2520773f4fae81fab",
-    "packages/mailbox/rust/store/tests/record_prune.rs": "7076baf81db50a014aa9920e9ae8b9d137bc97d547a0e25d986ab9ac138ac713",
+    "packages/mailbox/rust/store/tests/record_prune.rs": "a32085775472a5ef2770ce43bec5d38515cf9cb41235e3dfe360d65c9822c7e7",
     "packages/mailbox/rust/store/tests/record_snapshot.rs": "2f0cff7014435097e83424cb322f860523fb4baef10bc06d0a747c705edf12b1",
     "packages/observe/rust/src/case_journal.rs": "cde5b3da1389ced2c58ffc486ed5bda893e22fd8fdcbc706e1247d5f4cdc315d",
     "packages/observe/rust/src/contract.rs": "6c768d1908c4363045e30ec11a6ad9ffa0aea59d391d3e6c04701b8128ac4cfb",

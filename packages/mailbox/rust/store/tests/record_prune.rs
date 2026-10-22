@@ -138,13 +138,17 @@ fn a_dead_binding_still_named_by_a_header_is_kept_until_the_header_retires() {
         .unwrap()
         .value
         .unwrap();
+    // Delivered half a record TTL later, so the header that names the dead
+    // head outlives the point where the binding becomes idle, whatever the
+    // contract's header horizon.
+    let delivered = T0.plus_secs(limits.record.ttl_sec / 2);
     record
-        .hold(Wait::Try, T0, &limits, |state, ids| {
+        .hold(Wait::Try, delivered, &limits, |state, ids| {
             let claim = state.claim(
                 &rec::key("peer"),
                 Generation::FIRST,
                 Checkpoint::Step,
-                T0,
+                delivered,
                 &limits,
                 ids,
             );
@@ -152,7 +156,7 @@ fn a_dead_binding_still_named_by_a_header_is_kept_until_the_header_retires() {
                 &rec::key("peer"),
                 Generation::FIRST,
                 &claim.token.unwrap(),
-                T0,
+                delivered,
             )
         })
         .unwrap();
@@ -170,7 +174,12 @@ fn a_dead_binding_still_named_by_a_header_is_kept_until_the_header_retires() {
         .window_sec
         .max(limits.record.ttl_sec)
         .max(limits.record.body_retention_sec);
-    writing_hold(&record, "another", T0.plus_secs(horizon + 1), &limits);
+    writing_hold(
+        &record,
+        "another",
+        delivered.plus_secs(horizon + 1),
+        &limits,
+    );
     assert!(!has_binding(&record, DEAD));
 }
 
