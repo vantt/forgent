@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "0604cede5ba63d8dbf4c3785f95f4458d0f6d2e1f1d7913d1415e6dc5f864605",
+  "payloadDigest": "98a6bc3ab72251aa2aa787c02abf90d4ba15e2b635fc35f21fdffc1c23601870",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -712,7 +712,7 @@
     "src/runner/dispatch/assignment-runner.mjs": "0360b4aafc7f180751b1d0ed1f65e132d34a4b31bc726675d83dfefa81e135c3",
     "src/runner/dispatch/assignment.mjs": "a8d4660fe96ff678cb12bc9d34bb7c4c4acbd4bcc1f747fe450e72eb7e97c31f",
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
-    "src/runner/dispatch/cli.mjs": "68e4ced9e9c07385b985e300ba698befaba214d2a7b10f8bbbe3188b43c377f9",
+    "src/runner/dispatch/cli.mjs": "7e8f9fa875274013f49c64929188e3a640cecd1790447c7f83795d9319c70363",
     "src/runner/dispatch/config.mjs": "5f5fc1775e9a50d48c86980c1b41aafcc573499b31cbd06f529d3afbe9b56aec",
     "src/runner/dispatch/confinement/attestation-store.mjs": "3b8fc1e59ac9282338f6bf0c9bdee8c787f67cc7f1853943509ffec6ff72d5d7",
     "src/runner/dispatch/confinement/authority.mjs": "e618d5997f85e200c50f6459c43f08f31852bbd6cefb6c27c128c4e845c78709",
