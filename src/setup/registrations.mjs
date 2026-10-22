@@ -145,7 +145,7 @@ import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from 
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
-import { checkIdentityMachineId, checkIdentityProjectId, fixIdentityMachineId } from './identity-checks.mjs';
+import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityProjectId, fixIdentityMachineId } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations, fixTerminalDir } from './terminal-control-checks.mjs';
 import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
@@ -6290,6 +6290,12 @@ registerCheck({
   id: 'identity-project-id',
   description: 'this repository carries one project id in the tracked file .fgos/project.json, the same in every clone; absent only warns, and there is no fix: run `fgos identity project --init` once on one machine, commit, pull elsewhere',
   check: (cwd) => checkIdentityProjectId(cwd),
+});
+
+registerCheck({
+  id: 'identity-ids-unique',
+  description: 'no two backlog rows share an id, no D-ADR number is headed with two different titles and no two decision files share a number; ids that travel between machines come from `fgos identity mint <kind>`, and a repeat here means one was written by hand',
+  check: (cwd) => checkIdentityIdsUnique(cwd),
 });
 
 /**

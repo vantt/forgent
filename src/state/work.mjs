@@ -45,7 +45,7 @@ const MAX_ID_LENGTH = 30;
 // The bound is applied at the store's own normalize points (addWork/editWork
 // in store.mjs), which every write door passes through, and reused by
 // deriveTitle so a submitted title is already within bounds by the time
-// generateId hashes it. Deliberately NOT enforced in validateWorkShape: that
+// addWork stores it. Deliberately NOT enforced in validateWorkShape: that
 // function only ever throws or returns, so a bound placed there could only
 // reject — the one behavior this contract rules out.
 export const MAX_TITLE_LENGTH = 100;

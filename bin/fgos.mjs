@@ -45,7 +45,8 @@ import { parseFrontmatter } from '../src/report/frontmatter.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromExecutors } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { rebuildViewFromDir } from '../src/state/replay.mjs';
-import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
+import { deriveTitle, classify } from '../src/intake/classify.mjs';
+import { mintWorkId } from '../src/util/identity-mint.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir, loadRunnerConfigFromDir, RunnerConfigError, runDispatchCli, runDoorHint, DispatchError } from '../src/runner/dispatch.mjs';
 import { resolveWorkForDispatch } from '../src/runner/work-dispatch.mjs';
@@ -930,7 +931,7 @@ function collectRollupData(view, id) {
 
 // Shared body of the `submit` verb (P14) — extracted per self-improve-loop
 // D15 so both `submit` and `evolve --submit <id>` construct the work item
-// through the exact same sequence: deriveTitle -> classify -> generateId ->
+// through the exact same sequence: deriveTitle -> classify -> mintWorkId ->
 // addWork -> wrapEnvelope. `opts.async`/`opts.domain` carry `submit`'s own
 // --async|--unattended/--domain flag handling; `evolve --submit` calls this
 // with the defaults (D15: no flag surface of its own, YAGNI).
@@ -944,7 +945,7 @@ function submitWork(dir, text, opts = {}) {
   const size = opts.size ?? classified.size;
   const kind = opts.kind ?? classified.kind;
   const risk = opts.risk ?? classified.risk;
-  const id = generateId(title, Object.keys(listWork(dir).work));
+  const id = mintWorkId();
   const work = {
     id,
     title,
@@ -1083,23 +1084,17 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     case 'add': {
-      // --id is optional (was required): an explicit id is still honored
-      // as-is (e.g. a deliberately chosen or parent-lineage child id like
-      // "tsk-4vo-1"), but omitting it now reuses `submit`'s own generateId
-      // (src/intake/classify.mjs) to derive a collision-free "tsk-<hash>"
-      // id from --title, instead of forcing the caller to invent one by
-      // hand. This closes the gap that let `add` accept an arbitrarily
-      // long slugified-title id in the first place (docs/explanation/
-      // long-work-item-ids-max-length-guard.md) — generateId is now the
-      // path of least resistance, not a manually-typed guess.
-      const idFlag = optionalField(positional[0] ?? flags.id, 'add --id requires a non-empty value; omit --id entirely to auto-generate one from --title.');
+      // --id is optional: an explicit id is still honored as-is (e.g. a
+      // deliberately chosen or parent-lineage child id like "tsk-4vo-1");
+      // omitting it mints a fresh "tsk-<10 base32>" id through the Identity
+      // mint door (src/util/identity-mint.mjs). Minting is a random draw, so
+      // the title is never part of the id and no existing-id check is needed.
+      const idFlag = optionalField(positional[0] ?? flags.id, 'add --id requires a non-empty value; omit --id entirely to mint one.');
       if (flags.tier !== undefined) {
         throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');
       }
-      const id = idFlag ?? generateId(
-        requireField(flags.title, 'add requires --title (used to derive the id when --id is omitted, and always required as the item\'s own title regardless)'),
-        Object.keys(listWork(dir).work),
-      );
+      requireField(flags.title, 'add requires --title (the item\'s own title)');
+      const id = idFlag ?? mintWorkId();
       const work = {
         id,
         title: flags.title,

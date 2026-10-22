@@ -94,6 +94,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'writer-identity-resolvable',
       'identity-machine-id',
       'identity-project-id',
+      'identity-ids-unique',
       'seat-binding-route',
       'seat-binding-config',
       'seat-binding-drain',

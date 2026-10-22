@@ -1,11 +1,12 @@
 //! Native host provider for `fgos identity`: three operations behind one
 //! verb. Bare `identity` answers the writer (`identity.writer`, read-only,
 //! the hook path); `identity machine|session|project` read (`identity.read`);
-//! `identity machine --alias` and `identity project --init|--new` write
-//! (`identity.write`).
+//! `identity machine --alias`, `identity project --init|--new` and
+//! `identity mint <kind>` write (`identity.write`).
 
 use crate::errors::Error;
 use crate::machine;
+use crate::mint;
 use crate::proc_tree::os_process_tree;
 use crate::project;
 use crate::resolve::{resolve, WriterIdentity};
@@ -26,7 +27,7 @@ pub const IDENTITY_READ_OPERATION_ID: &str = "identity.read";
 pub const IDENTITY_WRITE_OPERATION_ID: &str = "identity.write";
 
 /// Subcommands after `identity`; bare `identity` is `writer`.
-pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["writer", "machine", "session", "project"];
+pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["writer", "machine", "session", "project", "mint"];
 
 pub const IDENTITY_DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {
     provider_id: Cow::Borrowed("identity.writer"),
@@ -88,6 +89,8 @@ pub enum Verb {
     Session,
     /// `project [--init|--new] [--handle <h>]`.
     Project(ProjectAction),
+    /// `mint <kind> [--release <number>]`: a new id, or a sequence number given back.
+    Mint { kind: String, release: Option<u64> },
 }
 
 /// What `identity project` does.
@@ -120,7 +123,7 @@ impl IdentityRequest {
             Verb::Machine { alias: None } | Verb::Session | Verb::Project(ProjectAction::Read) => {
                 IDENTITY_READ_OPERATION_ID
             }
-            Verb::Machine { alias: Some(_) } | Verb::Project(_) => IDENTITY_WRITE_OPERATION_ID,
+            Verb::Machine { alias: Some(_) } | Verb::Project(_) | Verb::Mint { .. } => IDENTITY_WRITE_OPERATION_ID,
         }
     }
 }
@@ -304,6 +307,45 @@ pub fn writer_answer(
     value
 }
 
+/// `identity mint <kind>`: a random id needs nothing but the kernel; a
+/// sequence number is claimed (or, with `release`, given back) on the
+/// repository containing the working directory.
+fn mint_answer(state_root: &Path, kind: &str, release: Option<u64>) -> Result<serde_json::Value, Refusal> {
+    let parsed = mint::Kind::parse(kind).ok_or_else(|| Refusal {
+        reason: "unknown-kind",
+        detail: format!("unknown id kind {kind:?}. Available: {}", mint::KIND_NAMES.join(", ")),
+    })?;
+    match (parsed, release) {
+        (mint::Kind::Random(random), None) => {
+            let id = mint::random(random).map_err(|e| Refusal {
+                reason: "random-unavailable",
+                detail: e.to_string(),
+            })?;
+            Ok(serde_json::json!({ "kind": kind, "id": id }))
+        }
+        (mint::Kind::Random(_), Some(_)) => Err(Refusal {
+            reason: "not-a-sequence",
+            detail: format!("{kind} ids are random; only a sequence kind has a number to give back"),
+        }),
+        (mint::Kind::Sequence(sequence), release) => {
+            let dir = std::env::current_dir().map_err(|e| Refusal {
+                reason: "no-working-directory",
+                detail: e.to_string(),
+            })?;
+            match release {
+                None => {
+                    let claim = mint::claim_sequence(state_root, &dir, sequence)?;
+                    Ok(serde_json::json!({ "kind": kind, "id": claim.id, "number": claim.number }))
+                }
+                Some(number) => {
+                    let released = mint::release_sequence(state_root, &dir, sequence, number)?;
+                    Ok(serde_json::json!({ "kind": kind, "number": number, "released": released }))
+                }
+            }
+        }
+    }
+}
+
 fn answer(request: &IdentityRequest) -> Result<serde_json::Value, Refusal> {
     let root = state_root();
     match &request.verb {
@@ -335,6 +377,7 @@ fn answer(request: &IdentityRequest) -> Result<serde_json::Value, Refusal> {
             };
             Ok(value.expect("project answers always serialize"))
         }
+        Verb::Mint { kind, release } => mint_answer(&root, kind, *release),
         Verb::Session => {
             let machine = machine_info(&root)?;
             let identity = resolve_identity(request);
