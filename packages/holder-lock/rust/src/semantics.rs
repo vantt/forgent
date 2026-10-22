@@ -188,4 +188,16 @@ mod tests {
         );
         let _ = fs::remove_dir_all(&dir);
     }
+
+    #[test]
+    fn a_probe_file_another_process_holds_is_refused() {
+        let dir = std::env::temp_dir().join(format!("fgos-semantics-held-test-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        let held = fs::OpenOptions::new().read(true).write(true).create(true).truncate(false).open(dir.join(format!(".semantics-probe-{}.lock", std::process::id()))).unwrap();
+        assert_eq!(driver::current().try_lock(&held, crate::port::Mode::Ex).unwrap(), driver::TryLock::Locked);
+        let refused = two_process_probe(&dir, &HelperExe::current().unwrap()).unwrap_err();
+        assert!(refused.contains("already locked"), "{refused}");
+        drop(held);
+        let _ = fs::remove_dir_all(&dir);
+    }
 }

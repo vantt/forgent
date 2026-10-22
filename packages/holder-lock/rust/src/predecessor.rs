@@ -173,6 +173,47 @@ pub fn clear(path: &Path, wait: Duration) -> io::Result<()> {
     std::fs::remove_file(path)
 }
 
+/// One reading of the contender view of the record next to `lock_file`, as the
+/// JSON fields of the answer (`state`: `absent`, `empty`, `not-empty` or
+/// `unknown`, with `reason` and `domain` when there are any). Never kills and
+/// never edits the record.
+pub fn contender_view(lock_file: &Path) -> Value {
+    let record_path = record_path(lock_file);
+    let text = match std::fs::read_to_string(&record_path) {
+        Ok(text) => text,
+        Err(err) if err.kind() == io::ErrorKind::NotFound => return json!({ "state": "absent" }),
+        Err(err) => return json!({ "state": "unknown", "reason": "record-unreadable", "detail": err.to_string() }),
+    };
+    let Ok(raw) = serde_json::from_str::<Value>(&text) else {
+        return json!({ "state": "unknown", "reason": "record-not-json", "domain": { "raw": text.chars().take(120).collect::<String>() } });
+    };
+    let Some(domain) = parse_record(&raw) else {
+        return json!({ "state": "unknown", "reason": "record-unknown-shape", "domain": raw });
+    };
+    let mut watch = domain_watch(&domain);
+    // A dead holder whose job is gone is judged by the process tree alone, and
+    // that fallback needs two quiet polls in a row; a live member stays
+    // "not empty" through every poll.
+    let mut verdict = watch.is_empty();
+    for _ in 0..2 {
+        if verdict != DomainState::NotEmpty || watch.reason().is_some() {
+            break;
+        }
+        std::thread::sleep(Duration::from_millis(50));
+        verdict = watch.is_empty();
+    }
+    let state = match verdict {
+        DomainState::Empty => "empty",
+        DomainState::NotEmpty => "not-empty",
+        DomainState::Unknown => "unknown",
+    };
+    let mut fields = json!({ "state": state, "domain": domain_json(&domain) });
+    if state != "empty" {
+        fields["reason"] = json!(watch.reason().unwrap_or(if state == "unknown" { "no-judge-on-this-platform" } else { "domain-has-live-members" }));
+    }
+    fields
+}
+
 /// Run the rule for the record at `path`, after the kernel lock is held.
 pub fn admit(path: &Path, kill_wait: Duration) -> Admit {
     admit_with_trace(path, kill_wait).0
@@ -230,5 +271,28 @@ fn judge(path: &Path, watch: &mut fgos_process::DomainWatch, named: Value, kill_
             return Admit::NotEmpty { domain: named };
         }
         std::thread::sleep(Duration::from_micros(500));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_contender_view_names_an_absent_and_an_unknown_record_without_editing_it() {
+        let dir = std::env::temp_dir().join(format!("fgos-contender-view-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let lock = dir.join("x.lock");
+        assert_eq!(contender_view(&lock)["state"], "absent");
+        let record = record_path(&lock);
+        std::fs::write(&record, "not json").unwrap();
+        let view = contender_view(&lock);
+        assert_eq!((view["state"].as_str(), view["reason"].as_str()), (Some("unknown"), Some("record-not-json")));
+        assert_eq!(view["domain"]["raw"], "not json");
+        assert_eq!(std::fs::read_to_string(&record).unwrap(), "not json");
+        std::fs::write(&record, r#"{"v":99}"#).unwrap();
+        let view = contender_view(&lock);
+        assert_eq!(view["reason"], "record-unknown-shape");
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 }
