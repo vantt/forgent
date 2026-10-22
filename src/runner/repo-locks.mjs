@@ -5,9 +5,7 @@
 // description taken through the holder-lock facade: no TTL, no heartbeat, no
 // pid self-recognition. A holder that dies releases by dying.
 //
-// This module knows nothing about the event log. The `.fgos` checkpoint is a
-// separate adapter (main-fgos-checkpoint.mjs) that attaches to the handle
-// `withMainCheckout` gives its callback.
+// This module knows nothing about the event log.
 
 import fs from 'node:fs';
 import crypto from 'node:crypto';

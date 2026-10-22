@@ -99,7 +99,6 @@
     "src/runner/repo-locks.mjs": "infra",
     "src/runner/lock-fence.mjs": "infra",
     "src/runner/lock-status.mjs": "infra",
-    "src/runner/main-fgos-checkpoint.mjs": "infra",
     "src/runner/main-checkout-activity.mjs": "infra",
     "src/runner/main-checkout-reset-guard.mjs": "infra",
     "src/runner/github-adapter.mjs": "infra",
@@ -127,7 +126,6 @@
     "src/state/impact.mjs": "domain",
     "src/state/priority-formula.mjs": "domain",
     "src/state/replay.mjs": "domain",
-    "src/state/events-compaction.mjs": "infra",
     "src/state/dep-graph.mjs": "domain",
     "src/state/graph-harness.mjs": "domain",
     "src/state/graph-metrics.mjs": "domain",
@@ -174,7 +172,6 @@
     "src/state/hot-lock.mjs": "infra",
     "src/state/consumer-event-gate.mjs": "infra",
     "src/state/work-event-store.mjs": "infra",
-    "src/state/events-jsonl-truncation-guard.mjs": "infra",
     "src/state/main-checkout-guard-warnings.mjs": "kernel",
     "src/state/work.mjs": "kernel",
     "src/state/envelope.mjs": "kernel",
@@ -365,7 +362,6 @@
     "src/git/recovery.mjs": "infra",
     "src/runner/dispatch/executor-governance.mjs": "infra",
     "src/runner/dispatch/work-item-input.mjs": "infra",
-    "src/runner/execution/seat-policy.mjs": "infra",
-    "src/state/legacy-event-git-adapter.mjs": "infra"
+    "src/runner/execution/seat-policy.mjs": "infra"
   }
 }

@@ -47,7 +47,6 @@ import {
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
-import { DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../../src/state/events-jsonl-truncation-guard.mjs';
 import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT } from '../../src/setup/registrations.mjs';
 import { addDecision } from '../../src/state/store.mjs';
 import { createSession } from '../../src/runner/session.mjs';
@@ -106,7 +105,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'seat-binding-route',
       'seat-binding-config',
       'seat-binding-drain',
-      'events-jsonl-not-truncated',
       'cli-version-visible',
       'worker-slots-ceiling-usable',
       'workflow-capabilities-configured',
@@ -144,7 +142,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'bwrap-available',
       'curl-available',
       'main-checkout-guard-warnings',
-      'events-compaction-verified',
       'no-stuck-merge-abort',
       'coordination-protocol-fixtures-valid',
       'coordination-example-requests-valid',
@@ -337,51 +334,6 @@ test('leaf-notify-drift fails and names the leaf when a live session branch over
   assert.equal(passed, false);
   assert.match(message, /leaf/);
   assert.match(message, /file\.txt/);
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
-// ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────
-
-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {
-  assert.equal(
-    FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),
-    false,
-  );
-});
-
-test('events-jsonl-not-truncated passes and bootstraps a mark on first run against a healthy log', () => {
-  const dir = initRepo('checks-truncguard-bootstrap-');
-  const fgosDir = path.join(dir, '.fgos');
-  initStore(fgosDir);
-  addWork(fgosDir, { id: 'a', title: 'a', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
-
-  const { passed, message } = checkById('events-jsonl-not-truncated').check(dir);
-  assert.equal(passed, true);
-  assert.match(message, /truncation guard holds/);
-  assert.equal(fs.existsSync(path.join(fgosDir, 'runtime', 'events-jsonl.truncation-guard.json')), true, 'a passing check advances/bootstraps the mark');
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
-test('events-jsonl-not-truncated fails when the log was truncated then reappended past the old mark', () => {
-  const dir = initRepo('checks-truncguard-break-');
-  const fgosDir = path.join(dir, '.fgos');
-  initStore(fgosDir);
-  const logPath = path.join(fgosDir, 'events.jsonl');
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 1, ts: '2026-01-01T00:00:00.000Z', type: 'orig', payload: null })}\n`);
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 2, ts: '2026-01-01T00:00:01.000Z', type: 'orig', payload: null })}\n`);
-
-  const first = checkById('events-jsonl-not-truncated').check(dir);
-  assert.equal(first.passed, true, 'first run bootstraps clean');
-
-  // Simulate a stash-style truncation: revert to just line 1, then append a
-  // DIFFERENT event reusing seq 2.
-  fs.writeFileSync(logPath, `${JSON.stringify({ seq: 1, ts: '2026-01-01T00:00:00.000Z', type: 'orig', payload: null })}\n`, 'utf8');
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 2, ts: '2026-01-01T09:00:00.000Z', type: 'post-truncation', payload: null })}\n`);
-
-  const { passed, message } = checkById('events-jsonl-not-truncated').check(dir);
-  assert.equal(passed, false);
-  assert.match(message, /truncation detected/);
-  assert.match(message, /resolve-an-events-jsonl-truncation/);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -1070,7 +1022,6 @@ test('config-not-stale passes when the existing config already has every default
       gateway: { port: 4170, token: null },
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
       docRegistry: { enforce: false },
-      checkpoint: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);

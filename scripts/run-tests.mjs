@@ -1,21 +1,17 @@
 #!/usr/bin/env node
 // run-tests.mjs -- portable full-suite door (TFC-D02/TFC-D04). Replaces the
-// old `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'`
-// npm script: that string relied on the invoking SHELL to leave the glob
-// unexpanded (a single-quoted arg) and on Node's OWN CLI glob support to
-// then expand it -- Ubuntu/macOS's Node 20 CI lane never resolves that
-// pattern to any file at all (glob support for `--test` file arguments
-// landed in a later Node), and Windows's default `cmd.exe` npm shell
-// rejects the leading `VAR=value` POSIX env-assignment syntax outright.
-// Both failures happen before a single test ever runs.
+// old `node --test 'test/**/*.test.mjs'` npm script: that string relied on
+// the invoking SHELL to leave the glob unexpanded (a single-quoted arg) and
+// on Node's OWN CLI glob support to then expand it -- Ubuntu/macOS's Node 20
+// CI lane never resolves that pattern to any file at all (glob support for
+// `--test` file arguments landed in a later Node). That failure happens
+// before a single test ever runs.
 //
 // This script discovers every `*.test.mjs` file under `test/` itself with
 // `fs.readdirSync` (Node >=18, no glob dependency), passes the resulting
 // paths to `node --test` as literal argv elements (never a shell string,
-// so spaces/quotes/backslashes in a path can never be misinterpreted), and
-// sets `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1` directly on the spawned
-// child's own env object (never a shell prefix), so the exact same
-// invocation works unchanged on every OS's default shell.
+// so spaces/quotes/backslashes in a path can never be misinterpreted), so the
+// exact same invocation works unchanged on every OS's default shell.
 
 import fs from 'node:fs';
 import { REPO_ROOT, ensureGitAddon, ensureHostBin, gitAddonDirectory } from './lib/git-addon-stage.mjs';
@@ -131,7 +127,6 @@ function stageDoorManifest(childEnv) {
 /**
  * The env every spawned `node --test` run gets, whoever spawns it (the full
  * suite, the canary, the selector's related run, mutation and coverage runs):
- * - FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1;
  * - no inherited NODE_TEST_CONTEXT: an enclosing `node --test` sets it, and a
  *   nested run that inherits it reports to a parent that is not listening
  *   and exits 0 without running a single test;
@@ -146,7 +141,7 @@ function stageDoorManifest(childEnv) {
  */
 export function buildTestEnv(env = process.env) {
   const { NODE_TEST_CONTEXT: _enclosingRunner, FGOS_STATE_ROOT: _pinnedStateRoot, ...rest } = env;
-  const childEnv = { ...rest, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };
+  const childEnv = { ...rest };
   childEnv.FGOS_CLAUDE_COMMAND ||= '/nonexistent/fgos-test-claude-binary';
   if (process.platform === 'darwin') {
     const tempRoot = env.TMPDIR || os.tmpdir();
@@ -176,7 +171,7 @@ export function buildTestEnv(env = process.env) {
  * Runs `node --test` against an EXPLICIT, already-resolved file list (P03:
  * the shared seam between the full-suite door and the canary runner).
  * Applies the exact same env/argv construction `runTests()` always has
- * (FGOS_DISABLE_OPPORTUNISTIC_CHECKS, the darwin TMPDIR realpath fix, argv
+ * (the test env, the darwin TMPDIR realpath fix, argv
  * as a literal array -- never a shell string) so a canary run and the full
  * run are byte-for-byte identical in every way except which files are
  * selected. Returns `{ status, files }`, same shape as `runTests()`.
@@ -286,12 +281,11 @@ export function leftoverTempPrefixes(root, readdir = fs.readdirSync) {
 export const SENSITIVE_FGOS_FILES = new Set(['secrets.local.env', 'secrets.env']);
 
 // Derived files that any read of the live store may rewrite: the state view is a cache folded
-// from the event log, and the truncation guard records the last log size it saw. A test that
-// reads the store therefore refreshes them without leaking anything; test-written state still
-// shows up as added or changed event, observe and work files, which stay guarded.
+// from the event log. A test that reads the store therefore refreshes it without leaking
+// anything; test-written state still shows up as added or changed event, observe and work
+// files, which stay guarded.
 export const DERIVED_FGOS_FILES = new Set([
   path.join('cache', 'state.json'),
-  path.join('runtime', 'events-jsonl.truncation-guard.json'),
 ]);
 
 /**

@@ -295,21 +295,15 @@ function excludeIronLawEvidence(files, id) {
 // `.fgos/events/archive/` are equally append-only lifecycle output, never
 // an item's own declared footprint.
 //
-// tsk-3tp-1 (D2, sweep-into-merge-commit redesign): the truncation guard's
-// own mark sidecar (`events-jsonl.truncation-guard.json`) and the warnings
-// log it appends to (`main-checkout-guard-warnings.jsonl`) are the same
-// kind of append-only, no-item-owns-it output -- a fallback checkpoint (or
-// the merge-time sweep) can legitimately touch either one, never an item's
-// own declared footprint. The wildcard extension on
-// `events-jsonl.truncation-guard\..*` also subsumes tsk-vim's own narrower
-// exact-`.json` fix (independently landed on main) -- one regex alternative
-// covers both.
+// The warnings log (`main-checkout-guard-warnings.jsonl`) is the same kind of
+// append-only, no-item-owns-it output -- never an item's own declared
+// footprint.
 // `.fgos/logs/` (phase-01, plans/260825-0842-fgos-logs-dir-bucketing):
 // entropy/changelog-nag/approve-fault/invocation-fault/guard-warnings all
 // moved under this gitignored bucket -- kept here too since this regex is
 // evaluated against whatever path list a caller hands it, not only
 // `git diff --name-only` (which would never surface an ignored path).
-const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|logs\/.*|locks\/.*|observe\/.*|events-jsonl\.truncation-guard\..*|main-checkout-guard-warnings\..*)$/;
+const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|logs\/.*|locks\/.*|observe\/.*|main-checkout-guard-warnings\..*)$/;
 function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
 }
@@ -3216,12 +3210,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // Delegate to claim-port.mjs — single choke-point for all claim flows
       // (tsk-53f D1). take uses isolate:false (no worktree creation).
       const { noWait, waitMs } = parseWaitFlags(flags, 'take');
-      const doTake = (wait) => claimWork(dir, {
+      const doTake = () => claimWork(dir, {
         id,
         actor: role,
         isolate: false,
         repoRoot,
-        waitMs: wait?.waitMs,
       });
       try {
         return noWait ? await doTake() : await withLockRetry(doTake, { waitMs });
@@ -3288,14 +3281,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // default) fails that check past the first switch — pick is the only
       // caller that needs the harness-chainable location; runner/
       // merge-ephemeral callers are untouched.
-      const doPick = (wait) => claimWork(dir, {
+      const doPick = () => claimWork(dir, {
         id,
         actor: 'session',
         isolate: true,
         claimTrigger,
         repoRoot,
         worktreeDir: path.join(repoRoot, '.claude', 'worktrees'),
-        waitMs: wait?.waitMs,
       });
       try {
         return noWait ? await doPick() : await withLockRetry(doPick, { waitMs });

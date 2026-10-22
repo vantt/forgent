@@ -228,15 +228,10 @@ export function readerFindings(sources) {
   }
   return stableFindings(sites, 'retired-event');
 }
-// Each remaining site goes with the code that owns it: the doctor rows, compaction and the truncation guard
-// retire with the legacy event duties, the `repair` verb and the event-log re-exports with the removals.
+// Each remaining site goes with the code that owns it: the `repair` verb and the event-log re-exports go
+// with the removals that follow the Work cutover.
 const dormantReaderFindings = {
   "bin/fgos.mjs: repairTruncatedLastLine: retired-event": 1,
-  "src/setup/registrations.mjs: readEventsJsonLines: retired-event": 2,
-  "src/setup/registrations.mjs: readFileSync: retired-event": 1,
-  "src/state/events-compaction.mjs: import readEvents: retired-event": 1,
-  "src/state/events-compaction.mjs: readEvents: retired-event": 1,
-  "src/state/events-jsonl-truncation-guard.mjs: advanceEventsJsonlTruncationGuard: retired-event": 1,
   "src/state/events.mjs: import readEvents: retired-event": 1,
   "src/state/events.mjs: import readEventsFromByte: retired-event": 1,
   "src/state/replay.mjs: import readEvents: retired-event": 1,

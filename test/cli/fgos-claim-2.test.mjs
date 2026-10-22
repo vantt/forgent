@@ -335,43 +335,6 @@ function runAsync(cwd, args) {
   });
 }
 
-test('take --no-wait fails at once while another process holds main, naming the lock and the holder pid', async () => {
-  const cwd = initGitCwdFast();
-  addOk(cwd, 'wait-no-wait-take', { verify: 'true' });
-  await withMainHeldByChild(cwd, async (holder) => {
-    const result = await runAsync(cwd, ['take', 'wait-no-wait-take', '--no-wait']);
-    assert.equal(result.status, 7, result.stderr);
-    assert.match(result.stderr, new RegExp(`main checkout \\(claim\\) is held by another process \\(pid ${holder.child.pid}\\)`));
-    assert.doesNotMatch(result.stderr, /after waiting/, '--no-wait is one try, never a wait');
-  });
-});
-
-
-test('take (default, no flags) waits for the holder of main and succeeds once it lets go', async () => {
-  const cwd = initGitCwdFast();
-  addOk(cwd, 'wait-default-take', { verify: 'true' });
-  await withMainHeldByChild(cwd, async (holder) => {
-    setTimeout(() => holder.child.kill('SIGKILL'), 1500);
-    const result = await runAsync(cwd, ['take', 'wait-default-take']);
-    assert.equal(result.status, 0, result.stderr);
-    assert.equal(envelopeData(result.stdout).id, 'wait-default-take');
-    assert.ok(result.elapsed >= 500, `must have waited for the holder, not raced past it (took ${result.elapsed}ms)`);
-  });
-});
-
-
-test('take --wait <ms> is the budget: it fails naming the wait once spent while the holder keeps main', async () => {
-  const cwd = initGitCwdFast();
-  addOk(cwd, 'wait-tight-budget-take', { verify: 'true' });
-  await withMainHeldByChild(cwd, async () => {
-    const result = await runAsync(cwd, ['take', 'wait-tight-budget-take', '--wait', '600']);
-    assert.equal(result.status, 7, result.stderr);
-    assert.match(result.stderr, /after waiting \d+ ms/, 'an exhausted --wait budget is distinguishable from an immediate fail');
-    assert.ok(result.elapsed >= 500 && result.elapsed < 60_000, `must have waited roughly the --wait budget (took ${result.elapsed}ms)`);
-  });
-});
-
-
 test('take --wait rejects a non-numeric or non-positive value the same way --timeout already does', () => {
   const cwd = initGitCwdFast();
   addOk(cwd, 'wait-bad-value-take');
@@ -389,18 +352,6 @@ test('take --wait rejects a value above the 900000ms (15 min) cap -- tsk-2rf D3'
   const result = run(cwd, ['take', 'wait-over-cap-take', '--wait', '900001']);
   assert.equal(result.status, 4, result.stderr);
   assert.match(result.stderr, /--wait must be at most 900000ms \(15 min\)/);
-});
-
-
-test('pick --no-wait fails at once while another process holds main, same as take --no-wait', async () => {
-  const cwd = initGitCwdFast();
-  addOk(cwd, 'wait-no-wait-pick', { verify: 'true' });
-  await withMainHeldByChild(cwd, async (holder) => {
-    const result = await runAsync(cwd, ['pick', 'wait-no-wait-pick', '--no-wait']);
-    assert.equal(result.status, 7, result.stderr);
-    assert.match(result.stderr, new RegExp(`main checkout \\(claim\\) is held by another process \\(pid ${holder.child.pid}\\)`));
-    assert.doesNotMatch(result.stderr, /after waiting/, '--no-wait is one try, never a wait');
-  });
 });
 
 

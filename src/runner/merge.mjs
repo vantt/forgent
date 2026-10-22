@@ -52,7 +52,6 @@ import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
 import { withMainCheckout } from './repo-locks.mjs';
 import { DEFAULT_LOCK_WAIT_MS } from './lock-wait.mjs';
-import { checkpointMainFgos, prepareMainFgosCheckpoint } from './main-fgos-checkpoint.mjs';
 import { LockScope, acquireSync, createLockScope, lockHolders, probe } from '../holder-lock/index.mjs';
 import { createGitLand } from '../git/land.mjs';
 import { createGitRecovery } from '../git/recovery.mjs';
@@ -1148,16 +1147,12 @@ export async function landRunnerItem(repoRoot, item, {
   // Only a destination the main checkout holds involves its index at all.
   const onMain = checkedOutRef(repoRoot) === destination;
   if (onMain && mergeHeadExists(repoRoot)) return { outcome: 'merge-blocked-other-item', branch };
-  // Work decides which event files are due outside every lock; the commit
-  // itself takes the main checkout only for its own duration. Without one,
-  // no-wait still refuses in milliseconds when the main checkout Land would
-  // publish into is busy, instead of after a full verify that cannot publish.
-  const checkpoint = prepareMainFgosCheckpoint(fgosDir, repoRoot);
-  if (checkpoint?.files.length || (onMain && lockWaitMs === 0)) {
+  // Without the lock wait, no-wait still refuses in milliseconds when the
+  // main checkout Land would publish into is busy, instead of after a full
+  // verify that cannot publish.
+  if (onMain && lockWaitMs === 0) {
     try {
-      await withMainCheckout(new LockScope('land-runner-item'), checkpoint?.files.length ? 'checkpoint' : 'precheck', (mainHandle) => {
-        if (checkpoint?.files.length) checkpointMainFgos(mainHandle, fgosDir, repoRoot, { prepared: checkpoint });
-      }, { fgosDir, ...(lockWaitMs > 0 && { waitMs: lockWaitMs }) });
+      await withMainCheckout(new LockScope('land-runner-item'), 'precheck', () => {}, { fgosDir });
     } catch (err) {
       throw toMergeLockError(err, { branch });
     }

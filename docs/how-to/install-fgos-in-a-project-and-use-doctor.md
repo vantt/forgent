@@ -322,8 +322,6 @@ Mostly relevant after the project has real work items.
 | `root-drift` | No `fgw/<root>` branch is ahead of its target | `drifted root branch(es) need syncing: ... -- run fgos sync-root <root-id>` | you | `fgos sync-root <root-id>` |
 | `leaf-notify-drift` | No live session branch has post-land drift | names the branch | you | Rebase or resync the named branch |
 | `delivered-not-on-trunk` | Every handed-over item's branch is reachable from the trunk | names the item | you | Merge or catch up the named item |
-| `events-jsonl-not-truncated` | `.fgos/events.jsonl` was not silently reverted by a stash, checkout, reset or clean | `truncation detected in events.jsonl, ...` | you | No fix is registered: stop writing to the store, restore the log from backup and find what reverted it |
-| `events-compaction-verified` | Past `.fgos/events/` compactions still match their archives | names the compaction | you | Report it; do not delete archives |
 | `main-checkout-guard-warnings` | The main-checkout guard log has no recorded regressions | `1300 main checkout guard warning(s) recorded` | info | Read the log named in the message; clear only after review |
 | `no-stuck-merge-abort` | The main checkout has no lingering `MERGE_HEAD` | `merge in progress or stuck (MERGE_HEAD=...) -- run fgos main-checkout-reset ...` | you | `--fix` never acts here by design. Review `git status`, then `fgos main-checkout-reset --sha <sha> --confirm` |
 | `runner-coordination-orgPolicy-shape` | `runner.coordination.orgPolicy.dischargeOn` is an array of strings | `... dischargeOn must be an array of strings` | tool | `fgos doctor --fix` resets it to the default |

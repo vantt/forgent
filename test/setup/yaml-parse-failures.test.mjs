@@ -139,7 +139,7 @@ test('fgos doctor still runs and lists every check when agent and workflow files
   const { root, write } = makeProject(t);
   write('core/workflows/broken.yaml', MALFORMED_WORKFLOW);
   write('agents/broken.yaml', 'name: broken\ndescription: a: b\n');
-  const run = spawnSync(process.execPath, [FGOS, 'doctor', '--json'], { cwd: root, encoding: 'utf8', env: { ...process.env, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' } });
+  const run = spawnSync(process.execPath, [FGOS, 'doctor', '--json'], { cwd: root, encoding: 'utf8' });
   assert.equal(run.status, 0, run.stderr);
   const checks = JSON.parse(run.stdout).data.checks;
   assert.deepEqual(checks.map((c) => c.id), DOCTOR_CHECKS.map((c) => c.id), 'every registered check ran');

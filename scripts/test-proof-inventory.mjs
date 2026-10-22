@@ -575,7 +575,7 @@ export function buildSuiteBaseline({ files, cwd = REPO_ROOT, sha, wallSeconds, p
  */
 export function cliCost({ cwd = REPO_ROOT, runs = 5, spawn = spawnSync } = {}) {
   const bin = path.join(cwd, 'bin', 'fgos.mjs');
-  const env = { ...process.env, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };
+  const env = { ...process.env };
   const median = (argv) => {
     const times = [];
     for (let i = 0; i < runs; i += 1) {

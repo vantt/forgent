@@ -152,7 +152,7 @@ test('runTests refuses with a non-zero status and an actionable message when zer
   assert.match(result.message, new RegExp(emptyRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 });
 
-test('runTests spawns node --test with the discovered files as argv elements and FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 merged into env, preserving other env vars (R2/R3)', () => {
+test('runTests spawns node --test with the discovered files as argv elements and the caller env passed through, preserving other env vars (R2/R3)', () => {
   const root = tmpFixtureRoot();
   const f = write(root, 'x.test.mjs');
   let captured = null;
@@ -172,7 +172,6 @@ test('runTests spawns node --test with the discovered files as argv elements and
   assert.equal(result.status, 0);
   assert.equal(captured.execPath, '/fake/node');
   assert.deepEqual(captured.argv, ['--test', GUARD_ARG, SPY_ARG, path.relative(root, f)]);
-  assert.equal(captured.opts.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS, '1');
   assert.equal(captured.opts.env.PATH, '/usr/bin');
   assert.equal(captured.opts.env.UNRELATED, 'kept');
 });
@@ -326,7 +325,6 @@ test('buildTestEnv drops an inherited NODE_TEST_CONTEXT so a nested node --test 
   const env = buildTestEnv({ PATH: '/usr/bin', NODE_TEST_CONTEXT: 'child-v8', KEEP: 'yes' });
   assert.equal('NODE_TEST_CONTEXT' in env, false);
   assert.equal(env.KEEP, 'yes');
-  assert.equal(env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS, '1');
 });
 
 test('buildTestEnv points the claude CLI at a missing binary unless the caller names one, so no test reaches the real claude', () => {

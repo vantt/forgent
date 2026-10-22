@@ -8,7 +8,7 @@
 // use-case/infra-layer callers may import.
 //
 // Before this module, well-known files (state.json, tool-status.local.json,
-// the truncation-guard mark, 5 diagnostic logs) each had their path built
+// 5 diagnostic logs) each had their path built
 // independently in every module AND every test that touched them -- moving
 // state.json into a bucket once broke 51 tests across 21 files that had
 // each hardcoded their own copy, for no reason other than no shared
@@ -23,7 +23,6 @@ export const FGOS_FILE = {
   STATE: 'state',
   PORTING_STATE: 'portingState',
   TOOL_STATUS: 'toolStatus',
-  GUARD_MARK: 'guardMark',
   APPROVE_FAULT_LOG: 'approveFaultLog',
   MAIN_CHECKOUT_GUARD_WARNINGS: 'mainCheckoutGuardWarnings',
   INVOCATION_FAULTS: 'invocationFaults',
@@ -36,7 +35,6 @@ const FGOS_FILE_RESOLVERS = {
   [FGOS_FILE.STATE]: (fgosDir) => path.join(fgosDir, 'cache', 'state.json'),
   [FGOS_FILE.PORTING_STATE]: (fgosDir) => path.join(fgosDir, 'cache', 'porting-state.json'),
   [FGOS_FILE.TOOL_STATUS]: (fgosDir) => path.join(fgosDir, 'runtime', 'tool-status.local.json'),
-  [FGOS_FILE.GUARD_MARK]: (fgosDir) => path.join(fgosDir, 'runtime', 'events-jsonl.truncation-guard.json'),
   [FGOS_FILE.APPROVE_FAULT_LOG]: (fgosDir) => path.join(fgosDir, 'logs', 'approve-post-success-faults.jsonl'),
   [FGOS_FILE.MAIN_CHECKOUT_GUARD_WARNINGS]: (fgosDir) => path.join(fgosDir, 'logs', 'main-checkout-guard-warnings.jsonl'),
   [FGOS_FILE.INVOCATION_FAULTS]: (fgosDir) => path.join(fgosDir, 'logs', 'invocation-faults.jsonl'),
