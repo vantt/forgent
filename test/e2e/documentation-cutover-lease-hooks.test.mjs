@@ -725,6 +725,14 @@ test('failed CLI transitions restore main sidecar bytes and remove only freshly 
   assert.equal(f.git(['status', '--porcelain']), '');
   enable(); f.cli(['release'], holder);
   const releasedBytes = fs.readFileSync(path.join(f.repo, DEFAULT_SIDECAR_PATH));
+  // Release restores pre-existing bytes; reacquire must report that stray copy
+  // before writing another token or attempting its next transition.
+  const releasedHead = f.git(['rev-parse', 'main']);
+  const stray = f.rawCli(['acquire', '--worktree', holder]);
+  assert.notEqual(stray.status, 0); assert.match(stray.stderr + stray.stdout, /token exists in main, but main is not the recorded holder checkout/);
+  assert.equal(f.git(['rev-parse', 'main']), releasedHead);
+  assert.equal(fs.readFileSync(path.join(f.repo, DEFAULT_TOKEN_FILE), 'utf8'), 'previous main token\n');
+  fs.rmSync(path.join(f.repo, DEFAULT_TOKEN_FILE));
   fail(); acquireFails();
   assert.deepEqual(fs.readFileSync(path.join(f.repo, DEFAULT_SIDECAR_PATH)), releasedBytes);
   enable(); f.put(DEFAULT_SIDECAR_PATH, 'corrupt bytes without newline'); f.git(['add', DEFAULT_SIDECAR_PATH]);

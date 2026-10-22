@@ -6,6 +6,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { execFileSync } from 'node:child_process';
 
@@ -17,6 +18,7 @@ import { resolveLock } from '../../src/holder-lock/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
+ensureScriptAddon();
 seedFileLocalBwrapRegistry();
 if (!process.env.XDG_STATE_HOME) {
   process.env.XDG_STATE_HOME = makeFixtureDir('fgos-state-');
@@ -178,10 +180,14 @@ test('workflow integration gates scoped branch paths before Land and admits a li
   const head = git(tmp, ['rev-parse', 'main']);
   const operations = path.join(tmp, '.git/fgos/git/operations');
   const before = fs.existsSync(operations) ? fs.readdirSync(operations).sort() : [];
-  await assert.rejects(() => mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: 'incoming', targetBranch: 'main', callerCheckout: tmp }), { code: 'documentation-cutover-lease' });
-  assert.equal(git(tmp, ['rev-parse', 'main']), head);
-  assert.deepEqual(fs.existsSync(operations) ? fs.readdirSync(operations).sort() : [], before);
-  assert.equal(fs.existsSync(path.join(tmp, '.fgos/runtime/git-candidates')), false);
+  const foreign = setupRepo();
+  const outside = makeFixtureDir('fgos-workflow-land-outside-');
+  for (const callerCheckout of [tmp, foreign, outside]) {
+    await assert.rejects(() => mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: 'incoming', targetBranch: 'main', callerCheckout }), { code: 'documentation-cutover-lease' });
+    assert.equal(git(tmp, ['rev-parse', 'main']), head);
+    assert.deepEqual(fs.existsSync(operations) ? fs.readdirSync(operations).sort() : [], before);
+    assert.equal(fs.existsSync(path.join(tmp, '.fgos/runtime/git-candidates')), false);
+  }
   const result = await mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: 'incoming', targetBranch: 'main', callerCheckout: holder });
   assert.equal(result.merged, true);
   assert.equal(git(tmp, ['show', 'main:docs/new.md']), 'from workflow');

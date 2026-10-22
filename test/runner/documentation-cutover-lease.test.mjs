@@ -7,6 +7,7 @@ import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
+import { loadNativeAddon } from '../../src/git/native.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import {
   DEFAULT_LOCK_NAME, DEFAULT_SIDECAR_PATH, DEFAULT_TOKEN_FILE, LEASE_SCOPE_PATTERNS,
@@ -69,7 +70,7 @@ test('holder release from a subdirectory uses the checkout-root token and lands 
   assert.equal(result.tokenPath, path.join(holder, DEFAULT_TOKEN_FILE));
   assert.equal(fs.existsSync(path.join(holder, 'docs/.fgos')), false);
   assert.throws(() => release({ repoRoot: other }), { code: 'not-holder' });
-  assert.equal(doctor(f.repoRoot).passed, true); // consumer repos do not use these hooks
+  assert.match(doctor(f.repoRoot).message, /lease is held but its reference-transaction hook is not wired/);
   const released = release({ repoRoot: path.join(holder, 'docs') });
   assert.equal(released.result, 'released'); assert.deepEqual(released.drift, []);
   assert.equal(readSidecarFromMain(f.repoRoot).state, 'released');
@@ -130,6 +131,29 @@ test('committed freeze ignores forged disk copies, missing locks, environment to
   } finally { if (prior === undefined) delete process.env.FGOS_DOCS_LEASE_TOKEN; else process.env.FGOS_DOCS_LEASE_TOKEN = prior; }
 });
 
+// Boundary tests prove wiring only; this is the owning proof of repository
+// identity, including a copied capability and canonical linked-checkout paths.
+test('admission reads the gated main and requires its held caller to belong to the same repository', t => {
+  const f = fixture(t); const foreign = fixture(t); const holder = f.worktree();
+  const outside = path.join(f.temp, 'outside'); fs.mkdirSync(outside);
+  for (const caller of [foreign.repoRoot, outside]) assert.equal(leaseAdmission({ repoRoot: f.repoRoot, worktreePath: caller }).allowed, true);
+  const acquired = acquire({ repoRoot: holder });
+  const token = fs.readFileSync(acquired.tokenPath);
+  foreign.put(DEFAULT_TOKEN_FILE, token);
+  for (const caller of [foreign.repoRoot, outside]) {
+    for (const paths of [undefined, ['docs/new.md'], ['src/code'], []]) {
+      const refused = leaseAdmission({ repoRoot: f.repoRoot, worktreePath: caller, paths });
+      assert.equal(refused.allowed, false); assert.equal(refused.holder, false);
+      assert.match(refused.message, /caller checkout must belong to the gated repository/);
+    }
+  }
+  const alias = path.join(f.temp, 'holder-alias'); fs.symlinkSync(holder, alias, 'dir');
+  assert.deepEqual(leaseAdmission({ repoRoot: f.repoRoot, worktreePath: path.join(alias, 'docs') }), { allowed: true, holder: true });
+  // A caller-side free/released lease cannot hide corrupt gated authority.
+  f.put(DEFAULT_SIDECAR_PATH, '{broken'); f.git(['add', DEFAULT_SIDECAR_PATH]); f.git(['commit', '-qm', 'corrupt gated authority']);
+  assert.equal(leaseAdmission({ repoRoot: f.repoRoot, worktreePath: foreign.repoRoot }).reason, 'documentation-cutover-lease-corrupt');
+});
+
 test('corrupt committed sidecars fail closed for acquire and every Node gate', t => {
   const f = fixture(t);
   for (const raw of ['<<< conflict >>>', '{"state":"HELD"}', '{"state":"held"}']) {
@@ -171,8 +195,50 @@ test('doctor verifies repository hook wiring and reports held authority without 
   assert.equal(fs.existsSync(path.join(f.repoRoot, DEFAULT_TOKEN_FILE)), false);
   const active = doctor(f.repoRoot);
   assert.equal(active.passed, false); assert.match(active.message, /actively held/); assert.doesNotMatch(active.message, /token.*missing/);
+  fs.rmSync(path.join(f.repoRoot, '.githooks/reference-transaction'));
+  assert.match(doctor(f.repoRoot).message, /lease is held but its reference-transaction hook is not wired/);
+  f.put('.githooks/reference-transaction', '#!/bin/sh\nexit 0\n');
   fs.rmSync(path.join(f.repoRoot, '.fgos/locks', `${DEFAULT_LOCK_NAME}.lock`));
   assert.match(doctor(f.repoRoot).message, /resource is missing/);
+});
+
+// Synchronous rejection tests cannot observe a commit whose receipt is bad.
+// Forward through native ScopedCommit first, then corrupt only its response.
+test('acquire preserves the holder token when a landed commit returns a malformed receipt', t => {
+  const f = fixture(t); const holder = f.worktree();
+  const native = loadNativeAddon(); const call = native.GitScopedCommit.prototype.call;
+  t.mock.method(native.GitScopedCommit.prototype, 'call', function(method, ...args) {
+    const result = call.call(this, method, ...args);
+    return method === 'commit' ? { ...result, files: [] } : result;
+  });
+  assert.throws(() => acquire({ repoRoot: holder }), { code: 'lease-commit-failed' });
+  const lease = readSidecarFromMain(f.repoRoot);
+  assert.equal(lease.status, 'held');
+  assert.equal(hashHolderToken(fs.readFileSync(path.join(holder, DEFAULT_TOKEN_FILE), 'utf8')), lease.sidecar.holderTokenHash);
+  assert.deepEqual(leaseAdmission({ repoRoot: f.repoRoot, worktreePath: holder }), { allowed: true, holder: true });
+  assert.equal(f.git(['status', '--porcelain']), '');
+});
+
+// This models the persistent residue after a release dies before its finally;
+// hook/CLI success and synchronous failure are owned by the e2e file.
+test('doctor and acquire report a stray main token without deleting it or changing authority', t => {
+  const f = fixture(t); const holder = f.worktree();
+  acquire({ repoRoot: holder });
+  const token = fs.readFileSync(path.join(holder, DEFAULT_TOKEN_FILE));
+  f.put(DEFAULT_TOKEN_FILE, token);
+  const head = f.git(['rev-parse', 'main']);
+  const diagnostic = doctor(f.repoRoot);
+  assert.equal(diagnostic.passed, false); assert.match(diagnostic.message, /token exists in main, but main is not the recorded holder checkout/);
+  assert.doesNotMatch(diagnostic.message, new RegExp(token.toString().trim()));
+  assert.throws(() => acquire({ repoRoot: holder }), { code: 'stray-main-token' });
+  assert.equal(f.git(['rev-parse', 'main']), head);
+  assert.deepEqual(fs.readFileSync(path.join(f.repoRoot, DEFAULT_TOKEN_FILE)), token);
+  fs.rmSync(path.join(f.repoRoot, DEFAULT_TOKEN_FILE));
+  assert.match(doctor(f.repoRoot).message, /lease is held but its reference-transaction hook is not wired/);
+  abandon({ repoRoot: f.repoRoot, ownerConfirmed: true, reason: 'interrupted release recovery' });
+  f.put(DEFAULT_TOKEN_FILE, token);
+  assert.throws(() => acquire({ repoRoot: f.repoRoot }), { code: 'stray-main-token' });
+  assert.match(doctor(f.repoRoot).message, /possible interrupted release/);
 });
 
 test('two production acquire processes have exactly one winner across twenty trials', async t => {

@@ -1,7 +1,10 @@
 // The committed main-ref sidecar persists the freeze; kernel locks serialize
 // transitions only. Persistent tokens stay in the holder checkout's ignored
 // .fgos/, never in argv or env; release lends it to the main committer only
-// under main-50. git clean -fdX deletes the token: only owner abandon recovers.
+// under main-50. SIGKILL/power loss before the release's finally can leave a
+// lent token in main: doctor diagnoses it and acquire refuses until it is
+// removed after checking the committed lease and holder. This is not a hostile
+// same-uid boundary. git clean -fdX deletes the token: only owner abandon recovers.
 // Abandon is an explicit owner door in this single-owner repository, not holder
 // proof. Cutover consumers recompute digests; sidecar drift is not authority.
 import fs from 'node:fs';
@@ -43,6 +46,9 @@ export function hashHolderToken(token) {
 export function readTokenFromWorktree(root) {
   try { return fs.readFileSync(path.join(root, DEFAULT_TOKEN_FILE), 'utf8').trim(); }
   catch { return null; }
+}
+function hasStrayMainToken(mainRoot, lease) {
+  return fs.existsSync(path.join(mainRoot, DEFAULT_TOKEN_FILE)) && lease.sidecar?.worktree !== mainRoot;
 }
 function writeLeaseFileAtomic(file, bytes) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -169,6 +175,7 @@ function transition(options, change) {
 export function acquireDocumentationCutoverLease(options = {}) {
   return transition(options, ({ facts, mainRoot, old, baseline }) => {
     if (old.status === 'corrupt') throw leaseError('corrupt-sidecar', 'lease sidecar on main is corrupt or unreadable');
+    if (hasStrayMainToken(mainRoot, old)) throw leaseError('stray-main-token', 'documentation-cutover token exists in main, but main is not the recorded holder checkout');
     if (old.status === 'held') throw leaseError('lease-already-held', 'documentation-cutover lease is already held');
     const inspect = createGitInspect(gitPortOptions(mainRoot));
     const holder = options.worktree ? checkoutFacts(options.worktree) : facts;
@@ -183,7 +190,14 @@ export function acquireDocumentationCutoverLease(options = {}) {
     writeLeaseFileAtomic(tokenPath, `${token}\n`);
     const tokenHash = hashHolderToken(token);
     return { result: 'acquired', tokenHash, tokenPath,
-      onFailure: () => fs.rmSync(tokenPath, { force: true }), sidecar: {
+      onFailure: () => {
+        // A malformed receipt can follow a successful commit. Delete only when
+        // main proves this token is not its held capability; unreadable evidence
+        // must preserve the token for recovery, not strand a committed holder.
+        const committed = readSidecarFromMain(mainRoot);
+        if (committed.status === 'corrupt' || (committed.status === 'held' && committed.sidecar.holderTokenHash === tokenHash)) return;
+        fs.rmSync(tokenPath, { force: true });
+      }, sidecar: {
       contract: { id: 'documentation-cutover-lease', version: 1 }, state: 'held', holderTokenHash: tokenHash,
       acquiredAt: new Date().toISOString(), worktree: root, branch: 'main', baseCommit: baseline.head,
       scope: [...LEASE_SCOPE_PATTERNS], scopeDigests,
@@ -227,11 +241,21 @@ export function inspectDocumentationCutoverLease(options = {}) {
   return { ...lease.sidecar, held: true, ageMs: Math.max(0, Date.now() - Date.parse(lease.sidecar.acquiredAt)), kernelLock, sidecar: lease.sidecar };
 }
 export function leaseAdmission(ctx = {}) {
-  const root = checkoutFacts(ctx.worktreePath ?? ctx.repoRoot ?? process.cwd()).worktreeRoot;
-  const lease = readSidecarFromMain(root);
+  // Authority belongs to the gated repository, never the caller's repository.
+  // Only a non-repository repoRoot may take the execution door's read-only
+  // exception; a non-Git or foreign caller cannot hold a lease on this repo.
+  const repo = checkoutFacts(ctx.repoRoot ?? process.cwd());
+  const mainRoot = resolveMainCheckoutRoot(repo.worktreeRoot);
+  if (!mainRoot) throw leaseError('main-checkout-unavailable', 'gated main checkout cannot be resolved');
+  const lease = readSidecarFromMain(mainRoot);
   if (lease.status === 'corrupt') return { allowed: false, holder: false, reason: 'documentation-cutover-lease-corrupt', message: 'documentation cutover lease sidecar is corrupt; failing closed' };
   if (lease.status !== 'held') return { allowed: true };
-  const holder = hashHolderToken(readTokenFromWorktree(root)) === lease.sidecar.holderTokenHash;
+  const caller = ctx.worktreePath ?? repo.worktreeRoot;
+  if (resolveMainCheckoutRoot(caller) !== mainRoot) return {
+    allowed: false, holder: false, reason: 'documentation-cutover-lease',
+    message: 'documentation cutover lease is held; caller checkout must belong to the gated repository',
+  };
+  const holder = hashHolderToken(readTokenFromWorktree(checkoutFacts(caller).worktreeRoot)) === lease.sidecar.holderTokenHash;
   if (holder || (ctx.paths && !intersectsScope(ctx.paths))) return { allowed: true, holder };
   return { allowed: false, holder: false, reason: 'documentation-cutover-lease', message: 'documentation cutover lease is held; non-holder operations are refused' };
 }
@@ -244,12 +268,15 @@ export function checkLeaseCommitGuard(root = process.cwd(), options = {}) {
 }
 export function checkDocumentationCutoverLeaseDoctor(cwd = process.cwd()) {
   const mainRoot = resolveMainCheckoutRoot(cwd);
-  if (!mainRoot || !fs.existsSync(path.join(mainRoot, '.githooks/reference-transaction'))) return { passed: true, message: 'not applicable: project does not use repository hooks' };
+  if (!mainRoot) return { passed: true, message: 'not applicable: project does not use repository hooks' };
   const inspect = createGitInspect(gitPortOptions(mainRoot));
   if (!inspect.resolveRef({ name: 'refs/heads/main' })?.oid) return { passed: true, message: 'not applicable: no main branch' };
-  if (!mainCheckoutHookWired(mainRoot)) return { passed: false, message: 'documentation-cutover reference-transaction hook is not wired' };
   const lease = readSidecarFromMain(mainRoot);
   if (lease.status === 'corrupt') return { passed: false, message: 'documentation-cutover lease sidecar is corrupt or unreadable' };
+  if (hasStrayMainToken(mainRoot, lease)) return { passed: false, message: 'documentation-cutover token exists in main, but main is not the recorded holder checkout; possible interrupted release' };
+  const hookPresent = fs.existsSync(path.join(mainRoot, '.githooks/reference-transaction'));
+  if (lease.status !== 'held' && !hookPresent) return { passed: true, message: 'not applicable: project does not use repository hooks' };
+  if (!hookPresent || !mainCheckoutHookWired(mainRoot)) return { passed: false, message: `documentation-cutover ${lease.status === 'held' ? 'lease is held but its ' : ''}reference-transaction hook is not wired` };
   if (lease.status !== 'held') return { passed: true, message: 'no documentation-cutover lease is held; reference-transaction hook wired' };
   if (!fs.existsSync(path.join(mainRoot, '.fgos/locks', `${DEFAULT_LOCK_NAME}.lock`))) return { passed: false, message: 'documentation-cutover lease is held but its kernel lock resource is missing' };
   const age = Math.max(0, Math.round((Date.now() - Date.parse(lease.sidecar.acquiredAt)) / 1000));

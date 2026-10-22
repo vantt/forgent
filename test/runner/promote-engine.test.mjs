@@ -7,9 +7,12 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { resolveIntegrationBranch, retargetMember } from '../../src/runner/promote-engine.mjs';
 import { acquireDocumentationCutoverLease } from '../../src/runner/documentation-cutover-lease.mjs';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import { branchNameFor } from '../../src/runner/worktree.mjs';
 import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
+
+ensureScriptAddon();
 
 // Every test here creates its own disposable git repo (mirrors
 // merge.test.mjs's own initRepo) — never this repo's own checkout. Trunk is

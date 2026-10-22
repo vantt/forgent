@@ -146,8 +146,9 @@ export function admitDocumentationExecution({ repoRoot, callerCheckout }) {
   try {
     admission = leaseAdmission({ repoRoot, worktreePath: checkout });
   } catch (error) {
-    // Only the module's typed non-repository answer permits read-only work
-    // outside Git; inspection errors and corrupt sidecars still fail closed.
+    // Only the gated repoRoot's typed non-repository answer permits read-only
+    // work outside Git. The gate refuses foreign/non-Git callers of a held
+    // repository lease; inspection errors and corrupt sidecars fail closed.
     if (error.code !== 'not-a-repository') throw error;
     admission = { allowed: true };
   }

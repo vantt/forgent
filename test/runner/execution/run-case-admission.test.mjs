@@ -139,9 +139,21 @@ test('documentation lease admission refuses non-holder runs before writes and le
       repoRoot, cwd: repoRoot, worktree: repoRoot,
     }), { code: 'documentation-cutover-lease' });
   }
+  const foreign = setup().repoRoot;
+  const outside = makeFixtureDir('fgos-outside-');
+  for (const caller of [foreign, outside]) {
+    // Explicit caller checkout (like --dir from another project), not just cwd.
+    for (const extra of [
+      { unitData: WRITE_UNIT },
+      { unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' } },
+      { resumeUnitRunId: 'not-created' },
+    ]) await assert.rejects(() => runUnit({
+      ...extra, caseAdmission: port, repoRoot, cwd: caller, worktree: caller,
+    }), { code: 'documentation-cutover-lease' });
+  }
   await assert.rejects(() => runUnit({
     unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
-    repoRoot, cwd: makeFixtureDir('fgos-outside-'), worktree: repoRoot,
+    repoRoot, cwd: outside, worktree: repoRoot,
   }), { code: 'documentation-cutover-lease' });
   assert.deepEqual(names(port), [], 'no admission, reservation, settlement or custody');
   assert.deepEqual(assignmentsOf(repoRoot), []);

@@ -1992,3 +1992,110 @@ Read design sections 3/6, L12-104 through L12-109 and the current lease/hook/CLI
 - `timeout 20s mdview open /home/vantt/projects/forgentX-phase00-documentation-authority-unification/docs/platform/holder-lock/spec.md`: **exit 1**, `attempt to write a readonly database` (SQLite error 8). No preview URL was produced. MDView MCP is not exposed; the available CLI fallback was attempted once.
 
 No runtime tests were run for this documentation-only change, and no whole-suite or independent-review claim is made. No code/test/skill/baseline writes, fgOS CLI, Git writes, secrets reads or workspace `.fgos` access were used. The required outbox acknowledgement/report/result are the assignment-path exception. The runner owns the commit. The L-1 source follow-up is recorded, not required as an out-of-scope write to complete this docs turn.
+
+## L12-111 — Repository-bound holder proof and token diagnostics (Lead under A42; Doer delivery, 2026-10-22)
+
+### Supplied Lead rulings
+
+Recorded from `step-06b-final-fix-brief.md`, not new owner decisions:
+
+1. The one `leaseAdmission` gate reads authority from the gated `repoRoot`'s main ref. During a held lease the caller's main checkout, resolved by `resolveMainCheckoutRoot`, must equal that repository's main checkout. Foreign and non-Git callers cannot be holders; non-Git callers are refused for read-only work too. Keep the check shared by execution, Workflow operations and both Land doors.
+2. Doctor fails precisely, and acquire refuses, on a token file in main when main is not the recorded holder checkout. Document the release-token lending crash window.
+3. Fix contained L-3/L-4 issues; retain honest limits for corrupt-sidecar maintenance transactions, composite Work-item dispatch and legacy pre-case origins.
+4. `units-runner`, `case-verbs` and `promote-engine` tests stage the addon themselves once at module level using the existing `ensureScriptAddon` helper.
+
+### Delivery and owning proofs
+
+- **Same-repository admission:** `src/runner/documentation-cutover-lease.mjs` resolves gated authority first, checks caller repository identity before reading its token or allowing an out-of-scope path set, and leaves the non-repository read-only exception available only for a genuinely non-repository `repoRoot`. No same-repository checks were copied into the four call sites. `run.mjs` changes only its explanatory exception comment. Existing no-lease admission and same-repository code-only Land remain unchanged.
+  - Owning predicate proof: `test/runner/documentation-cutover-lease.test.mjs`, `admission reads the gated main and requires its held caller to belong to the same repository`. It covers foreign/non-Git callers, read-only and path-bearing asks, a copied token in a foreign repo, symlink/subdirectory holder identity, and corrupt gated authority that a free foreign repository must not hide.
+  - Wiring proofs extend `run-case-admission.test.mjs`'s existing admission test (including read-only and resume), `units-runner.test.mjs`'s existing Workflow Land test, and `case-verbs.test.mjs`'s effect snapshot test (foreground/detached start, resume and answer, plus origins recorded before the freeze). `merge-land.test.mjs` adds one foreign/non-Git caller wiring proof. Both Lands preserve main, the operation directory and candidate absence on refusal. Workflow refuses foreign start before a ledger, and a later holder/main caller cannot upgrade a previously recorded foreign/non-Git origin. Existing positive holder integration remains covered.
+- **Stray main token:** shared private predicate reused by doctor/acquire, with no token value in the error and no automatic deletion. The owning unit test models interrupted-release residue with the actual holder's token and checks unchanged main/token bytes. The existing failed-transition hook test now also proves the CLI refuses reacquire with a retained stray token; it then removes that fixture residue before testing an unrelated forced commit rejection.
+- **Doctor with missing hook:** held/corrupt sidecar authority is read before deciding applicability. The existing doctor proof removes the reference hook and observes a failing message that still names the held lease. A plain consumer without a lease and without the reference hook still gets not-applicable.
+- **Receipt failure after publication:** acquire's failure cleanup re-reads main before deleting its token. A matching held hash, or corrupt/unreadable committed evidence, keeps the token. The new owning test calls the real native ScopedCommit, corrupts only the returned receipt's file list, observes the reported failure, then proves the committed lease still has a usable holder token. Existing hook rejection/base-moved/concurrent-acquire tests retain rollback ownership.
+- **Single-file staging:** the three named files import `../../scripts/lib/git-ports.mjs` and call `ensureScriptAddon()` once at module scope. No preload is required for current-tree tests; no new helper, production bypass, config default, environment key, dependency or registration was added. The existing doctor registration continues to own this diagnostic.
+- **Generated census:** regenerated `packages/git/contracts/mutation-census.v1.json` with its existing generator. This also refreshes pre-existing stale hashes/line references left by the prior caller-admission delivery. Its 53 pre-existing sites are byte-equal to HEAD's site inventory; no site was added or suppressed. This is not a claim that the one-door scan is green.
+
+Read both review reports completely. Their `scratchpad/6b2-r2/foreign.test.mjs` and `wf-foreign.test.mjs` files were not present in the checkout or accessible scratch locations; the committed reports supply the scenarios reproduced above. This delivery does not claim to have read or executed those unavailable original scripts.
+
+Prior art: `git log -S'leaseAdmission'` identified `a5d09c37f` (declared caller identity) and `e8c1df31c` (initial gates); lease history includes `83a331410` (hook/recovery hardening). Reused the existing main-root resolver, native ScopedCommit, doctor registration, admission result threading and test staging helper; the missing piece was repository-bound authority, not another gate.
+
+### Verification environment and exact commands
+
+Pre-turn HEAD: `0ea4e6570dfdb3d761606f56d2adcea8af8f802a`. Baseline was extracted with `git archive HEAD` into `/tmp/fgos-work/lease-final-fix/baseline`, with a dependency symlink to this checkout's `node_modules`. No Git write ran on this repository. All fixture Git writes and docs-lease CLI calls were against disposable repos under `/tmp/fgos-work/lease-final-fix/`.
+
+Common environment for the commands below:
+
+```sh
+H=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos
+export PATH=/home/vantt/.cargo/bin:$PATH
+export CARGO_TARGET_DIR=/home/vantt/projects/forgentX-phase00-documentation-authority-unification/target
+export TMPDIR=/tmp/fgos-work/lease-final-fix/tmp
+# D=current-results in the worktree, baseline-rerun in the archived HEAD;
+# extras use current-extras/baseline-extras respectively.
+D=current-results
+export FGOS_STATE_ROOT=/tmp/fgos-work/lease-final-fix/$D/state
+export FGOS_TEST_FIXTURE_ROOT=/tmp/fgos-work/lease-final-fix/$D/fixtures
+# State directories were created mode 0700; fixture directories were created before use.
+```
+
+These are existing fixture/state-root overrides, not checks disabled to make tests pass. Initial unredirected baseline tests hit the sandbox's read-only `/var/tmp` and inherited state root; the comparison below reran both trees with writable scratch roots. Confined ancestry was not stripped; its pre-existing refusals are reported, not bypassed.
+
+For every Node row the exact invocation was `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN="$H" node --test <file>` with the literal file below. Baseline single-file failures exposed missing addon staging in the three named files (25/7/10 failures). To compare their actual behaviors fairly, baseline alone was rerun with `node --import /tmp/fgos-work/lease-final-fix/baseline-preload.mjs --test <file>` under the same env prefix. That preload imports the archived `ensureScriptAddon` and calls it, exactly the helper current tests now call themselves.
+
+| File / command | HEAD exit (staged control where noted) | Current exit | Current pass/fail | New failures versus control |
+| --- | --- | --- | --- | --- |
+| `test/runner/documentation-cutover-lease.test.mjs` | 0 | 0 | 14/0 | 0 |
+| `test/e2e/documentation-cutover-lease-hooks.test.mjs` | 0 | 0 | 31/0 | 0 |
+| `test/runner/merge-land.test.mjs` | 0 | 0 | 19/0 | 0 |
+| `test/runner/execution/run-case-admission.test.mjs` | 1 | 1 | 7/8 | 0 (identical failing test names) |
+| `test/workflow/units-runner.test.mjs` | 1 (staged) | 1 | 4/21 | 0 (identical failing test names) |
+| `test/workflow/case-verbs.test.mjs` | 1 (staged) | 1 | 4/5 | 0 (identical failing test names; two added origin cases pass) |
+| `test/runner/promote-engine.test.mjs` | 0 (staged) | 0 | 10/0 | 0 |
+| `test/runner/execution/bind.test.mjs` | 0 | 0 | 78/0 | 0 |
+| `test/workflow/case-admission.test.mjs` | 0 | 0 | 15/0 | 0 |
+| `test/workflow/case-admission-port.test.mjs` | 1 | 1 | 9/3 | 0 (identical failing test names) |
+| `test/architecture.test.mjs` | 0 | 0 | 29/0 | 0 |
+| `test/cli/subcommand-flag-drift.test.mjs` | 0 | 0 | 16/0 | 0 |
+| `test/holder-lock/registry-contract.test.mjs` | 0 | 0 | 23/0 | 0 |
+| `test/setup/checks.test.mjs` | 1 (archive shell-integration cases) | 0 | 110/0 | 0 |
+| `/home/vantt/.cargo/bin/cargo test --locked -p fgos-holder-lock --test scope_rank` | 0 | 0 | 5/0 | 0 |
+
+The four still-red files reproduce HEAD failures in this confined worker (nested writing/binding-view refusals and worker execution failures); they are not new regressions and were not weakened. No full-suite-green claim is made. `npm test` and `scripts/run-tests.mjs` were not run, per brief.
+
+**Red/green falsification:** after saving the original HEAD runs, copied only the new test files into the scratch baseline, leaving its production sources at HEAD. Ran each command below under the same Node env prefix in that scratch baseline and then in the worktree; **every before exit is 1, every after exit is 0**:
+
+```sh
+node --test --test-name-pattern='admission reads the gated main|acquire preserves|doctor and acquire report|doctor verifies' test/runner/documentation-cutover-lease.test.mjs
+node --test --test-name-pattern='runner Land refuses foreign' test/runner/merge-land.test.mjs
+node --test --test-name-pattern='workflow integration gates' test/workflow/units-runner.test.mjs
+node --test --test-name-pattern='workflow start, resume and answer refuse a (foreign|non-Git)' test/workflow/case-verbs.test.mjs
+node --test --test-name-pattern='documentation lease admission' test/runner/execution/run-case-admission.test.mjs
+```
+
+The five after runs pass 4, 1, 1, 2 and 1 selected tests respectively. This includes the real Workflow and runner Land repros, not a test double of admission. Scratch command/result records: `/tmp/fgos-work/lease-final-fix/{baseline-rerun,current-results}/results.json`, `extras-results.json`, `regression-results.json`; logs sit alongside those records (scratch, not a durable external proof service).
+
+Other checks:
+
+- `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN="$H" node scripts/git-one-door-scan.mjs --write-census`: **exit 1**, the same 53 pre-existing sites as HEAD; generated inventory retained all of them. No new mutation site.
+- `git diff --check`: **exit 0**, including after the report append. An inline Node check using the existing `censusDigestMatches`, SHA-256 of both touched production files and `git show HEAD:packages/git/contracts/mutation-census.v1.json` also exits **0**: valid census digest, touched hashes current, all 53 pre-existing sites unchanged.
+- `timeout 20s mdview open /home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md`: **exit 1**, SQLite error 8 (`attempt to write a readonly database`). No preview URL is available; no MCP preview tool is exposed.
+- Impact-analysis evidence is **degraded**, not zero blast radius: no fgOS capability CLI was called because this assignment forbids it. `gitnexus status` reports stale index `45792a1` versus HEAD `0ea4e65`. `gitnexus list` supplied exact repository paths; upstream impact queries for the lease/admission/doctor functions using this worktree's absolute identifier returned target-not-found. Source cross-check identifies `admitDocumentationExecution` (Unit and Workflow operations), `landRunnerItem`, `mergeWorkflowBranch`, and the doctor registry as direct consumers. `gitnexus detect-changes --scope unstaged --repo /home/vantt/projects/forgentX-phase00-documentation-authority-unification` timed out after 60 seconds; it is not claimed as proof. No index or tool config was changed.
+
+### Known limits retained, not claimed closed
+
+- **L-2:** corrupt committed sidecars also refuse no-op main transactions such as `pack-refs --all`/`gc`. Owner-confirmed abandon/repair is still the recovery door; this fail-closed maintenance limit is unchanged.
+- **N2:** composite Work-item dispatch can `pick` (claim/create worktree) before `runUnit` refuses. Claim worktrees do not hold the token, so a holder's Work-item dispatch through them is refused. No edit was made to the out-of-scope composite dispatch callers; this is distinct from the now-proven early refusal of the four assigned doors.
+- **N3:** legacy pre-case runs resumed while no lease is held may record that resumer's worktree as origin on first case creation. During a held lease the pre-origin fallback is still main and cannot upgrade to holder. Changing case creation/binding semantics was not folded into this gate fix; the limitation remains explicit.
+- Release still lends the token under main-50. SIGKILL/power loss can leave it in main before `finally`; doctor/acquire now diagnose/refuse the stray copy, but no automatic cleanup or hostile-same-uid protection is claimed. The accepted readable-token trust boundary and owner abandon remain unchanged.
+
+### Deferred documentation sentences for the next docs turn
+
+No `docs/**` or `CHANGELOG.md` writes in this code slice; these are follow-up sentences, not additional write permissions requested:
+
+- `docs/platform/holder-lock/spec.md`: admission reads the gated repository's main ref and requires a caller in the same repository; foreign/non-Git callers, including read-only, cannot hold its lease. Acquire refuses a token left in main when main is not the recorded holder; interrupted linked-holder release is a possible cause. Acquire keeps a token if a commit landed but its receipt failed validation (or committed evidence cannot be read).
+- `docs/platform/git/spec.md`: both typed Land doors use this shared repository-bound caller check before publication; their hooks-disabled behavior does not accept another project's free sidecar as authority.
+- `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`: doctor reports a held/corrupt lease even if the reference hook disappears, and fails precisely on a stray main token; no automatic token cleanup. Narrow the earlier no-hooks not-applicable statement to projects without lease authority/residue.
+- Maintainer limits in those contracts should retain the three L-2/N2/N3 limits above, rather than implying universal pre-effect refusal or retroactive legacy-origin correction.
+- `CHANGELOG.md` Unreleased follow-up: documentation lease admission is repository-bound, and doctor/acquire diagnose interrupted-release token residue.
+
+Status: code delivered on the plan branch for independent review, not merged to main and not a real cutover lease on this repository. The runner owns the commit. No lifecycle verbs, repository Git writes, fgOS CLI against this repository, secrets-file reads, or workspace `.fgos` writes beyond permitted test-helper staging were used; outbox artifacts are the assignment exception.

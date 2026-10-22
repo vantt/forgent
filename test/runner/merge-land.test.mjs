@@ -49,6 +49,27 @@ test('a non-holder cannot land scoped additions, renames, deletions or type chan
   });
 });
 
+// The scope cases above do not exercise a caller from a different repository
+// or outside Git. Land disables hooks, so prove refusal at this production door.
+test('runner Land refuses foreign and non-Git callers before publishing frozen docs', async () => {
+  const f = rootFixture(); const foreign = rootFixture();
+  try {
+    branchCommit(f, 'scoped', 'main', { 'docs/new.md': 'frozen-scope edit\n' });
+    const holder = path.join(f.temp, 'holder');
+    f.git('worktree', 'add', '-qb', 'holder', holder);
+    acquireDocumentationCutoverLease({ repoRoot: holder });
+    const head = f.git('rev-parse', 'main');
+    const operations = path.join(f.repo, '.git/fgos/git/operations');
+    const before = fs.readdirSync(operations).sort();
+    for (const callerCheckout of [foreign.repo, foreign.temp]) {
+      await assert.rejects(() => landRunnerItem(f.repo, { id: 'source', verify: 'exit 99' }, { branch: 'scoped', callerCheckout }), { code: 'documentation-cutover-lease' });
+      assert.equal(f.git('rev-parse', 'main'), head);
+      assert.deepEqual(fs.readdirSync(operations).sort(), before);
+      assert.equal(fs.existsSync(path.join(f.repo, '.fgos/runtime/git-candidates')), false);
+    }
+  } finally { f.close(); foreign.close(); }
+});
+
 test('a held documentation lease permits a code-only land and its holder can land scoped files', async () => {
   for (const holderCall of [false, true]) {
     const f = rootFixture();
