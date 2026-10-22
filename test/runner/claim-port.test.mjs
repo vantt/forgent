@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
 import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -780,16 +781,14 @@ try {
   });
   assert.equal(ack.status, 'todo', "the child's own pre-check must see 'todo' before this test's racing write lands");
 
-  // Directly append the durable move to a writer file -- a holder child holds
-  // the state lock (above), so the public moveWork would block behind it;
-  // this is the same event shape moveWork itself would append, simulating
-  // "a different process's moveWork already ran" before the lock is released.
-  const eventsDir = path.join(dir, 'events');
-  fs.mkdirSync(eventsDir, { recursive: true });
-  fs.writeFileSync(
-    path.join(eventsDir, 'racer.jsonl'),
-    `${JSON.stringify({ seq: 1, ts: new Date().toISOString(), type: 'work.move', payload: { id: 'item-a', from: 'todo', to: 'blocked' }, v: 2 })}\n`,
-  );
+  // Append the durable move straight to the Event Store -- a holder child holds
+  // the state lock (above), so the public moveWork would block behind it; this
+  // is the same event moveWork itself would append, simulating "a different
+  // process's moveWork already ran" before the lock is released.
+  prepareWorkStore(dir, dir).store.append('project', [{
+    eventType: 'work.move', schemaVersion: 1, ts: new Date().toISOString(),
+    payload: { id: 'item-a', from: 'todo', to: 'blocked' },
+  }], {}, 'racer', []);
 
   await stateHolder.release();
   const result = await new Promise((resolve, reject) => {

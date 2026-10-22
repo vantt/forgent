@@ -2,6 +2,7 @@ import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+import { readRawEvents } from '../../src/state/store.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -85,9 +86,6 @@ function submit(cwd, text, extra = {}) {
   return JSON.parse(result.stdout).data;
 }
 
-function logPath(cwd) {
-  return path.join(cwd, '.fgos', 'events.jsonl');
-}
 
 function viewPath(cwd) {
   return resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE);
@@ -104,43 +102,11 @@ function envelopeData(stdout) {
   return JSON.parse(stdout).data;
 }
 
-// Tầng A/T2/T3 (TA-D2/TA-D7/TA-D12): new events land in a per-writer file
-// under `.fgos/events/<writer-id>-<openTs>.jsonl` (many, one per CLI
-// subprocess invocation here — a fresh process is a fresh writer identity,
-// TA-D11's degraded per-invocation mode), not baseline-0's
-// `.fgos/events.jsonl` alone (still read too — legacy content lives there,
-// zero rewrite). This file's own "never import src/state directly" rule
-// (top of file) means it re-derives the TA-D7 total order `(ts, file,
-// seq)` here rather than delegating to replay.mjs's readAllEventsFromDir —
-// same order production replay produces, read as an outside observer would.
+// Every event of the Work history, in the store's order, read through the facade as an outside observer: the
+// runner and the CLI under test write through the store's gate, and where the store keeps its bytes is not
+// this file's business.
 function events(cwd) {
-  const tagged = [];
-  if (fs.existsSync(logPath(cwd))) {
-    for (const line of fs.readFileSync(logPath(cwd), 'utf8').split('\n').filter(Boolean)) {
-      tagged.push({ ev: JSON.parse(line), file: '' });
-    }
-  }
-  const eventsDir = path.join(cwd, '.fgos', 'events');
-  let names = [];
-  try {
-    names = fs
-      .readdirSync(eventsDir, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
-      .map((entry) => entry.name);
-  } catch {
-    names = [];
-  }
-  for (const name of names) {
-    for (const line of fs.readFileSync(path.join(eventsDir, name), 'utf8').split('\n').filter(Boolean)) {
-      tagged.push({ ev: JSON.parse(line), file: name });
-    }
-  }
-  tagged.sort((a, b) => {
-    if (a.ev.ts !== b.ev.ts) return a.ev.ts < b.ev.ts ? -1 : 1;
-    if (a.file !== b.file) return a.file < b.file ? -1 : 1;
-    return (a.ev.seq ?? 0) - (b.ev.seq ?? 0);
-  });
-  return tagged.map(({ ev }) => ev);
+  return readRawEvents(path.join(cwd, '.fgos'));
 }
 
 /** The runner config a confined worker binds with: the executor registered
@@ -659,7 +625,7 @@ test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commi
   // carries the marker only `test -f output.txt && echo VERIFY_OK` prints.
   assert.match(first.stdout, /VERIFY_OK/);
 
-  // events.jsonl carries the real chain: two adds, then a predicted
+  // The Work history carries the real chain: two adds, then a predicted
   // work.outcome (written at claim), then settle for item1 only (tsk-40m:
   // settleClaim writes an enriched work.attempt then transitions DIRECTLY
   // from its preClaimStatus to finalStatus -- no durable intermediate

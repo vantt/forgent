@@ -9,7 +9,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { initStore, addWork, moveWork, listWork, readRawEvents, readyWork, recordClaimAttempt } from '../../src/state/store.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
+import { appendWorkEvent } from '../helpers/work-event-fixture.mjs';
 import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 import { createWorktree, removeWorktree, createBranchRef, branchNameFor } from '../../src/runner/worktree.mjs';
@@ -581,7 +581,7 @@ test('runOnce decompose sweep folds an unrecognized item.domain to "coding" (fai
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   const docsRef = 'docs/history/item-clarify';
   mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
-  appendEvent(path.join(dir, 'events.jsonl'), {
+  appendWorkEvent(dir, {
     type: 'work.add',
     payload: {
       id: 'item-clarify',
@@ -2154,8 +2154,7 @@ test('tsk-2yo: classificationPatchFromVerdict only builds a patch on a clear dis
 test('tsk-2yo: a headless clear verdict carrying tier/kind/risk actually applies them to the work item via editWork', async () => {
   const { classificationPatchFromVerdict } = await import('../../src/runner/loop.mjs');
   const { editWork } = await import('../../src/state/store.mjs');
-  const dir = mkTempDir('fgos-loop-test-classify-');
-  initStore(dir);
+  const { dir } = setup();
   addWork(dir, {
     id: 'item-headless-classify',
     title: 'Headless classify test',
@@ -2195,7 +2194,7 @@ test('tsk-34o5: startupReap parks a stale doing item with attestation-mismatch w
   activateGitFixture(repoRoot);
   execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
 
-  appendEvent(path.join(dir, 'events.jsonl'), {
+  appendWorkEvent(dir, {
     type: 'executor.dispatch',
     payload: { id, executorId: 'cli', baseCommit, headRef: 'main' },
   });
@@ -2224,7 +2223,7 @@ test('tsk-34o5: startupReap does NOT halt a legitimate retry on a branch with pr
   execFileSync('git', ['commit', '-m', 'attempt 1'], { cwd: repoRoot });
   activateGitFixture(repoRoot);
 
-  appendEvent(path.join(dir, 'events.jsonl'), {
+  appendWorkEvent(dir, {
     type: 'executor.dispatch',
     payload: { id, executorId: 'cli', baseCommit, headRef: branch },
   });
@@ -2235,7 +2234,7 @@ test('tsk-34o5: startupReap does NOT halt a legitimate retry on a branch with pr
   activateGitFixture(repoRoot);
   execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
 
-  appendEvent(path.join(dir, 'events.jsonl'), {
+  appendWorkEvent(dir, {
     type: 'executor.dispatch',
     payload: { id, executorId: 'cli', baseCommit, headRef: branch },
   });

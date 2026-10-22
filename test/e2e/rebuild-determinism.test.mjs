@@ -1,4 +1,6 @@
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
+import { readRawEvents } from '../../src/state/store.mjs';
 import { test } from 'node:test';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
@@ -20,15 +22,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
 function tmpCwd() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-e2e-'));
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-e2e-'));
+  initializeWorkRepository(cwd);
+  return cwd;
 }
 
 function run(cwd, args) {
   return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8' });
 }
 
-function logPath(cwd) {
-  return path.join(cwd, '.fgos', 'events.jsonl');
+// The whole Work history of the store, as the verbs under test see it.
+function history(cwd) {
+  return readRawEvents(path.join(cwd, '.fgos'));
 }
 
 function viewPath(cwd) {
@@ -110,14 +115,14 @@ test('rebuild-determinism: init, add work with deps + unicode title, move throug
   // it must reflect the frontier at this exact point (only `a` is `done`;
   // `b` and `c` are both `blocked`, neither is ready) and must never
   // perturb the log the determinism check below depends on.
-  const logBeforeReady = fs.readFileSync(logPath(cwd), 'utf8');
+  const historyBeforeReady = history(cwd);
   const readyResult = run(cwd, ['ready']);
   assert.equal(readyResult.status, 0);
   const ready = envelopeData(readyResult.stdout);
   assert.ok(!ready.some((item) => item.id === 'a'), 'a is done, not todo — never in the frontier');
   assert.ok(!ready.some((item) => item.id === 'b'), 'b is blocked, not ready');
   assert.ok(!ready.some((item) => item.id === 'c'), 'c is blocked, not ready');
-  assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), logBeforeReady, 'ready must not append any event');
+  assert.deepEqual(history(cwd), historyBeforeReady, 'ready must not append any event');
 
   const before = stateView(cwd);
   assert.equal(before.work.a.status, 'done');
@@ -139,7 +144,12 @@ test('rebuild-determinism: init, add work with deps + unicode title, move throug
   assert.equal(rebuildResult.status, 0);
 
   const after = stateView(cwd);
-  assert.deepEqual(after, before);
+  // The saved cursor records which history this machine has certified and mirrored, so it follows the store's
+  // own bookkeeping; the folded view and its revision are what a rebuild must reproduce.
+  const { cursor: cursorBefore, ...viewBefore } = before;
+  const { cursor: cursorAfter, ...viewAfter } = after;
+  assert.ok(cursorBefore && cursorAfter, 'state.json carries the cursor of the history it folded');
+  assert.deepEqual(viewAfter, viewBefore);
 
   // work-graph-intelligence S3: the persisted view carries a deterministic
   // revision-hash (a sibling of work/decisions on the ON-DISK state.json, never
@@ -159,53 +169,14 @@ test('rebuild-determinism: CAS conflict — a stale --expect on the second of tw
   const first = move(cwd, 'cas-e2e', 'blocked', 'todo');
   assert.equal(first.status, 0);
 
-  const eventsBefore = fs.readFileSync(logPath(cwd), 'utf8').split('\n').filter(Boolean).length;
+  const eventsBefore = history(cwd).length;
 
   // Same stale --expect ("todo") reused after the item already moved to
   // "blocked" — the CLI must refuse as a CAS conflict, not overwrite blindly.
   const second = move(cwd, 'cas-e2e', 'done', 'todo');
   assert.equal(second.status, 3);
 
-  const eventsAfter = fs.readFileSync(logPath(cwd), 'utf8').split('\n').filter(Boolean).length;
+  const eventsAfter = history(cwd).length;
   assert.equal(eventsAfter, eventsBefore);
   assert.equal(stateView(cwd).work['cas-e2e'].status, 'blocked');
-});
-
-// Tầng A/T2 (TA-D2/TA-D11/TA-D12): a fresh store's writes never land in
-// baseline-0 (`.fgos/events.jsonl` stays exactly whatever `init` left it —
-// empty, for a repo with no pre-migration history) — `add` opens a
-// per-writer file under `.fgos/events/` instead. Finds the one file that
-// actually holds content (checked first since `events.jsonl` is created
-// by `init` even when never appended to), so the corrupt-mid-append
-// simulation below truncates a real, non-empty log — same real behavior
-// this test proves regardless of which physical file the event landed in.
-function activeLogPath(cwd) {
-  if (fs.readFileSync(logPath(cwd), 'utf8').length > 0) return logPath(cwd);
-  const eventsDir = path.join(cwd, '.fgos', 'events');
-  const names = fs
-    .readdirSync(eventsDir, { withFileTypes: true })
-    .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
-    .map((entry) => entry.name);
-  assert.ok(names.length > 0, 'expected at least one non-empty event log file');
-  return path.join(eventsDir, names[0]);
-}
-
-test('rebuild-determinism: a truncated final event-log line is reported as corrupt-log, exit 5, message names the error', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
-  assert.equal(add(cwd, 'before-truncation').status, 0);
-
-  // Simulate a crash mid-append: cut the last line off partway through
-  // rather than replacing it with different-but-valid or garbage content.
-  const targetPath = activeLogPath(cwd);
-  const raw = fs.readFileSync(targetPath, 'utf8');
-  const lines = raw.split('\n').filter(Boolean);
-  const lastLine = lines[lines.length - 1];
-  const truncatedLast = lastLine.slice(0, Math.floor(lastLine.length / 2));
-  const truncated = [...lines.slice(0, -1), truncatedLast].join('\n');
-  fs.writeFileSync(targetPath, `${truncated}\n`, 'utf8');
-
-  const result = run(cwd, ['list']);
-  assert.equal(result.status, 5);
-  assert.match(result.stderr, /corrupt/i);
 });

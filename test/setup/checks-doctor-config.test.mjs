@@ -5,6 +5,7 @@
 // import/helper đổi cho khớp phần nào file này thật sự dùng.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 import {
   DEFAULT_CLEANUP_LEAF_TTL_DAYS,
@@ -62,7 +63,7 @@ function declareExecutor(cwd, id, fields) {
 
 test('tool-registry-configured passes when no tool-capable executor is declared at all (inactive — a clean skip, never a failure)', () => {
   const cwd = mkTemp('fgos-tool-registry-inactive-');
-  execFileSync('git', ['init', '-q'], { cwd });
+  initializeWorkRepository(cwd);
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
   assert.equal(passed, true);
@@ -72,7 +73,7 @@ test('tool-registry-configured passes when no tool-capable executor is declared 
 
 test('tool-registry-configured passes when every declared tool is checked present (full)', () => {
   const cwd = mkTemp('fgos-tool-registry-full-');
-  execFileSync('git', ['init', '-q'], { cwd });
+  initializeWorkRepository(cwd);
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
   declareExecutor(cwd, 'echo-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
   const check = spawnSync(process.execPath, [FGOS, 'tool', 'check'], { cwd, encoding: 'utf8' });
@@ -85,7 +86,7 @@ test('tool-registry-configured passes when every declared tool is checked presen
 
 test('tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing or never checked (degraded) -- no longer a silent passed:true', () => {
   const cwd = mkTemp('fgos-tool-registry-degraded-');
-  execFileSync('git', ['init', '-q'], { cwd });
+  initializeWorkRepository(cwd);
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
   declareExecutor(cwd, 'never-checked-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
   // Deliberately never runs `fgos tool check` -- the tool stays "unknown",

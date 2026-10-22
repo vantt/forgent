@@ -37,11 +37,9 @@ function mkTempDir(prefix) {
 
 // Pinned to "main" (mirrors pr-gate.test.mjs/runner-loop.test.mjs's own
 // initTempRepo): approve's runner-path merge assumes this literal trunk name
-// (merge.mjs). `.fgos/state.json` is gitignored (derived view) while
-// `.fgos/events.jsonl` (the truth log) is a real tracked file — same
-// convention every e2e file in this dir already follows; approve's runner
-// path refuses a dirty main tree, so every scenario that reaches approve
-// folds pending log deltas into a real commit first.
+// (merge.mjs). The Work history lives in the Event Store, outside the tree, so a
+// Work write never dirties main; approve's runner path still refuses a dirty
+// main tree, so a scenario folds any other pending file into a real commit first.
 function initTempRepo() {
   const repoRoot = mkTempDir('fgos-self-improve-e2e-repo-');
   return initFixtureRepo(repoRoot, { branch: 'main', message: 'root commit', ignore: '.fgos/cache/\n.fgos/locks/\n' });
@@ -59,10 +57,6 @@ function runner(cwd, args = ['--once']) {
   return spawnSync(process.execPath, [RUNNER, ...args], { cwd, encoding: 'utf8' });
 }
 
-function logPath(cwd) {
-  return path.join(cwd, '.fgos', 'events.jsonl');
-}
-
 function viewPath(cwd) {
   return resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE);
 }
@@ -78,35 +72,6 @@ function envelopeData(stdout) {
   return JSON.parse(stdout).data;
 }
 
-function eventsRaw(cwd) {
-  return fs.readFileSync(logPath(cwd), 'utf8');
-}
-
-// Seeds a real `work.friction` event straight onto the disposable repo's own
-// event log — same on-disk shape events.mjs's appendEvent produces (`v` is
-// optional/backward-compatible per events.mjs's own doc comment, so omitting
-// it here is not a fabricated/degraded record; `seq` is derived from the
-// existing log tail, same rule appendEvent itself follows). This is a real
-// file write, never an `import` of src/state — the deterministic route this
-// cell's action calls for: a real unsettled friction record whose `detail`
-// contains a HEAVY_KEYWORDS entry, so a real Iron-Law-tripping candidate
-// exists, never a fabricated module-path-touching commit. `rankCandidates`
-// (src/evolve/candidates.mjs) derives candidates from `view.frictions` alone
-// — no backing `view.work[id]` entry required — so the friction id is kept
-// standalone here, deliberately avoiding an extra dispatchable item that
-// would otherwise compete in the runner's frontier during the dispatch step.
-function seedFriction(repoRoot, payload) {
-  const p = logPath(repoRoot);
-  let seq = 1;
-  if (fs.existsSync(p)) {
-    const lines = fs.readFileSync(p, 'utf8').split('\n').filter(Boolean);
-    if (lines.length > 0) seq = JSON.parse(lines[lines.length - 1]).seq + 1;
-  }
-  const event = { seq, ts: new Date().toISOString(), type: 'work.friction', payload };
-  fs.mkdirSync(path.dirname(p), { recursive: true });
-  fs.appendFileSync(p, `${JSON.stringify(event)}\n`, 'utf8');
-}
-
 function gitAt(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8' });
 }
@@ -115,12 +80,11 @@ function currentHead(repoRoot) {
   return gitAt(repoRoot, ['rev-parse', 'HEAD']).trim();
 }
 
-/** Folds every pending `.fgos/` delta into one real commit on main — same
- * convention pr-gate.test.mjs's commitPending / runner-loop.test.mjs's
- * S2-pull e2e already rely on, required before any call that refuses a dirty
- * tree (`approve` on a runner item). */
+/** Folds whatever is pending in the tree into one real commit on main, required before any call that refuses a
+ * dirty tree (`approve` on a runner item). Work events are not files, so a clean tree has nothing to fold. */
 function commitPending(repoRoot, message) {
   gitAt(repoRoot, ['add', '-A']);
+  if (gitAt(repoRoot, ['status', '--porcelain']).trim() === '') return;
   gitAt(repoRoot, ['commit', '-q', '-m', message]);
 }
 

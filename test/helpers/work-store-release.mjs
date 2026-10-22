@@ -19,3 +19,9 @@ export function initializeWorkRepository(repo) {
   activateGitFixture(repo);
   return path.join(repo, '.fgos');
 }
+
+// Legacy readers consume the immutable HEAD inventory, never mutable working files.
+export function freezeLegacyWorkFixture(repo) {
+  execFileSync('git', ['-C', repo, 'add', '.fgos/events.jsonl'], { stdio: 'pipe' });
+  execFileSync('git', ['-C', repo, 'commit', '-qm', 'frozen legacy Work fixture'], { stdio: 'pipe' });
+}

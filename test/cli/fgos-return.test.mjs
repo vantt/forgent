@@ -4,7 +4,7 @@ import { activateGitFixture, initFixtureRepo } from '../helpers/git-fixture.mjs'
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
-import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
+import { appendWorkEvent } from '../helpers/work-event-fixture.mjs';
 import { writeBeacon, beaconPath } from '../../src/runner/main-checkout-activity.mjs';
 import {
   ADD_BAD_FLAG_CASES,
@@ -1228,7 +1228,7 @@ test('tsk-34o5: return halts and parks item blocked when attestation diverges', 
   execFileSync('git', ['commit', '-q', '-m', 'work commit'], { cwd: pickData.worktree.path });
 
   const baseCommit = gitAtCwd(cwd, ['rev-parse', 'HEAD']).trim();
-  appendEvent(path.join(cwd, '.fgos', 'events.jsonl'), {
+  appendWorkEvent(path.join(cwd, '.fgos'), {
     type: 'executor.dispatch',
     payload: { id: 'return-attest-diverged', executorId: 'cli', baseCommit, headRef: 'main' },
   });
