@@ -9,6 +9,15 @@ import { deriveProviderFamily } from '../../src/runner/dispatch/resolve.mjs';
 const TIERS = ['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier'];
 
 export function bindable(input) {
+  return poolOf(input, true);
+}
+
+/** `bindable` for a config written to a project file: the loader registers the default executor itself, so the file keeps only what the fixture states plus the pool. */
+export function bindableFile(input) {
+  return poolOf(input, false);
+}
+
+function poolOf(input, expanded) {
   if (input.tierFallback) return input;
   // The global executor serves the first family the config has cells for.
   const family = Object.keys(input.modelPolicies ?? {})[0];
@@ -19,7 +28,7 @@ export function bindable(input) {
   const loaded = withDefaultExecutor(config);
   const registered = loaded.executors ?? {};
   const families = [...new Set(Object.entries(registered).filter(([, entry]) => entry?.kind !== 'tool').map(([id, entry]) => entry?.providerModel ?? deriveProviderFamily(entry, entry?.command ?? id)))];
-  return { ...loaded, tierFallback: Object.fromEntries(TIERS.map((tier) => [tier, families])) };
+  return { ...(expanded ? loaded : config), tierFallback: Object.fromEntries(TIERS.map((tier) => [tier, families])) };
 }
 
 /** `executeAssignment` with the runner config made bindable, for fixtures that state the minimum. */

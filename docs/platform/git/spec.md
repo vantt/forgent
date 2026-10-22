@@ -594,7 +594,7 @@ Setup/init registers every default/path/dependency/config in existing config-mer
 |---|---|
 | git-component-compatible | Activated host/addon/contracts/digests/Git features; **one** Git load |
 | git-trust-topology | Trusted common-dir/main/worktree backlinks/hooks |
-| git-operation-journal | Chain/version/readability, pending intent, pins vs actual ref; read-only; backlog/bytes/oldest unresolved |
+| git-operation-journal | Chain/version/readability, pending intent, pins vs actual ref; read-only; backlog/bytes/oldest unresolved; fails `git-fence-missing` when a WAL exists without the C5 controller activation tombstone (the read is Inspect's `activationFence`, the same check every WAL-writing door runs) |
 | git-native-locks | Ownership uncertainty/native files; **no deletion** |
 | git-worktree-recovery | Orphan registration, dirty/stale checkout, custody/pending operations |
 | git-land-recovery | Finished Land operations whose candidate worktree and pins are still retained (Recovery `listRetainedLand`: operation id, candidate path, the pins actually present, WAL age); read-only; warns, never fails |
