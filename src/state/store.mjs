@@ -140,8 +140,7 @@ export function initStore(dir) {
  * anything — an invalid item never reaches the log.
  *
  * The existence check through the append is one held state-lock critical
- * section (via `withStateTx`/`tx.append`, not the bare
- * `appendEvent`): two processes racing `addWork` on the same id can no
+ * section (via `withStateTx`/`tx.append`): two processes racing `addWork` on the same id can no
  * longer both read "id not present yet" and both append a `work.add` — the
  * second to acquire the lock re-reads with the first's event already in the
  * log, so its own existence check now correctly fails.
@@ -870,7 +869,7 @@ function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, 
   // attached as an ADDITIVE `learning` field on THIS SAME work.move event's
   // payload instead — composed from `before` (the pre-transition view,
   // already in hand) plus the close settlement this transition is about to
-  // create. A second appendEvent here would become the new "last event"
+  // create. A second append here would become the new "last event"
   // after every `move --to done`, which the settlement-role-attribution
   // tests (phase-3-compound-learning-5) already assert IS the move event
   // itself — an existing, unmodifiable test. One event, one extra field,
@@ -1862,7 +1861,7 @@ export function listWork(dir) {
  * A missing log rebuilds to an empty view (`{ work: {}, decisions: [] }`),
  * so `frontier` on it returns `[]` — never an error, exit 0, exactly like
  * `listWork` on an uninitialized dir. A corrupt log throws the same
- * `EventLogError('corrupt-log')` `rebuildView`/`listWork` already throw.
+ * `EventLogError('corrupt-log')` `listWork` already throws.
  * `phase` (optional): which Workflow phase counts as "ready to start" — passed
  * straight through to `frontier`'s own `phase` option (`'clarify'`/`'plan'`/
  * `'execute'`); omitted, `frontier`'s own default (`'execute'`) applies.
