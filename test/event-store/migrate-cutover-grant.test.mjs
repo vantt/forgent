@@ -147,6 +147,7 @@ test('pre-commit filesystem failure restores deleted inputs without naming a Git
 test('checkStopped does not count a pid the caller declares as its own, and counts every other matching pid', async t => {
   const f = fixture(t, { machine: false });
   if (!hostScan(t, checkStopped({ workspaces: [f.repo], hostBin: scopedHost }))) return;
+  // boundary: the host's quiesce-scan route decides what a process is; only a real process shows that checkStopped passes --exclude-pid through to it.
   const child = spawn(process.execPath, ['-e', "process.stdout.write('ready\\n'); setInterval(() => {}, 1000)", path.join(root, 'bin/fgos.mjs')], { cwd: f.repo, stdio: ['ignore', 'pipe', 'pipe'] });
   try {
     await once(child.stdout, 'data');
@@ -164,6 +165,7 @@ test('checkStopped counts a process working in a linked worktree only when the c
   if (!hostScan(t, checkStopped({ workspaces: [{ root: f.repo, worktrees: [linked] }], hostBin: scopedHost }))) return;
   // Not an fgOS process: only its cwd can name it, so the pinned state root stays out of its environment.
   const { FGOS_STATE_ROOT: _pinned, ...plainEnv } = process.env;
+  // boundary: only a real process with its cwd in a worktree shows that checkStopped passes the listed --dir values through to the host's quiesce-scan.
   const sleeper = spawn('sleep', ['30'], { cwd: linked, env: plainEnv, stdio: 'ignore' });
   try {
     const unlisted = checkStopped({ workspaces: [f.repo], hostBin: scopedHost });
