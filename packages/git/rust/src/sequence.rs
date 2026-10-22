@@ -363,10 +363,23 @@ fn commit_number(raw: &[u8]) -> Option<u64> {
         .flatten()
 }
 
-/// A `push --porcelain` row `!\t<from>:<to>\t[rejected] (stale info)`: the
-/// expected tip no longer matches the remote's.
+/// The reasons git reports on a `push --porcelain` row when the counter no
+/// longer is where the push expected it: the client's own lease check, and the
+/// remote's compare-and-swap of the same expected value, which is the one a
+/// concurrent claim loses.
+const LOST_LEASE_REASONS: [&[u8]; 4] = [
+    b"[rejected] (stale info)",
+    b"[remote rejected] (incorrect old value provided)",
+    b"[remote rejected] (reference already exists)",
+    b"[remote rejected] (reference does not exist)",
+];
+
+/// A refused row (`!\t<from>:<to>\t<reason>`) whose reason is a lost lease.
 fn is_stale_lease_row(line: &[u8]) -> bool {
-    line.first() == Some(&b'!') && line.trim_ascii_end().ends_with(b"[rejected] (stale info)")
+    line.first() == Some(&b'!')
+        && LOST_LEASE_REASONS
+            .iter()
+            .any(|reason| line.trim_ascii_end().ends_with(reason))
 }
 
 #[cfg(test)]
@@ -393,12 +406,15 @@ mod tests {
     }
 
     #[test]
-    fn only_git_s_stale_lease_row_is_a_lost_lease() {
+    fn only_a_row_reporting_the_expected_value_not_held_is_a_lost_lease() {
         let row = |reason: &str| format!("!\tabc:refs/fgos/seq/d-adr\t{reason}\n").into_bytes();
-        assert!(is_stale_lease_row(&row("[rejected] (stale info)")));
+        for lost in LOST_LEASE_REASONS {
+            assert!(is_stale_lease_row(&row(std::str::from_utf8(lost).unwrap())));
+        }
         for other in [
             "[remote rejected] (pre-receive hook declined)",
             "[remote rejected] (protected branch hook declined)",
+            "[remote rejected] (failed to update ref)",
             "[rejected] (fetch first)",
         ] {
             assert!(!is_stale_lease_row(&row(other)), "{other}");
