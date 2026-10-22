@@ -1,0 +1,76 @@
+{
+  "sourceCommit": "5e03159334df726e43ffe9505ad4ed43f72ba94d",
+  "authority": "L12-124; L12-11",
+  "recordsOnly": true,
+  "status": "actual-existing-commit-pairs-accounted; author-working-byte-acceptance-pending",
+  "performedLast": true,
+  "actualPairsAddedPerManifest": 37,
+  "previousPairsPerManifest": 4115,
+  "currentPairsPerManifest": 4152,
+  "appendedPairIndexRange": {"startInclusive": 4115, "endExclusive": 4152},
+  "appendedPairsSource": "Both unchanged embedded checks.mjs recipes independently enumerated the same exact unaccounted committed pairs; every added commit is already an ancestor of sourceCommit, never a future author id.",
+  "pairLocations": [
+    "reports/phase-06/step10-round5-reproduction.json:scripts/checks.mjs:exceptions[4115:4152]",
+    "reports/phase-06/step10-sync4d-reproduction.json:readOnlyScripts/checks.mjs:exceptions[4115:4152]"
+  ],
+  "mutationProof": {
+    "oldExceptionArrayPrefixUnchanged": true,
+    "only37ExactPairsAppended": true,
+    "newPairsEqualBothPreAuditUnaccountedSets": true,
+    "allOtherScriptBodiesUnchanged": true,
+    "checksOutsideExceptionArrayByteIdentical": true,
+    "allOtherManifestMetadataUnchanged": true,
+    "frozenBaselineOrPredicateChanged": false
+  },
+  "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py",
+  "beforeAudit": {
+    "scratch": "/tmp/fgos-work/p8-audit-g_ri4eme",
+    "exit": 1,
+    "accountedCommittedPairsPerManifest": 4115,
+    "unaccountedCommittedPairsPerManifest": 37,
+    "authorWorkingViolationsPerManifest": 17
+  },
+  "afterAudit": {
+    "scratch": "/tmp/fgos-work/p8-audit-kl1aeixc",
+    "exit": 1,
+    "manifests": [
+      {
+        "manifest": "reports/phase-06/step10-round5-reproduction.json",
+        "ownershipExit": 0,
+        "auditOwnershipExit": 0,
+        "checksExit": 1,
+        "accountedCommittedPairs": 4152,
+        "unaccountedCommittedPairs": 0,
+        "authorWorkingViolations": 18,
+        "targetDigestDriftRows": 0,
+        "newActiveSourcePairCollisions": 0,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "B": true,
+        "HFindings": 0,
+        "IEqualToHEAD": true,
+        "IFrozenBaselineUnchanged": true
+      },
+      {
+        "manifest": "reports/phase-06/step10-sync4d-reproduction.json",
+        "ownershipExit": 0,
+        "auditOwnershipExit": 0,
+        "checksExit": 1,
+        "accountedCommittedPairs": 4152,
+        "unaccountedCommittedPairs": 0,
+        "authorWorkingViolations": 18,
+        "targetDigestDriftRows": 0,
+        "newActiveSourcePairCollisions": 0,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "B": true,
+        "HFindings": 0,
+        "IEqualToHEAD": true,
+        "IFrozenBaselineUnchanged": true
+      }
+    ]
+  },
+  "auditInterpretation": "Both checks.mjs exit 1 solely because A sees this turn's 18 uncommitted report paths (including this receipt). No committed pair remains unaccounted. B/H/I pass; ownership and audit-ownership pass in both recipes with zero target digest drift or new collisions. Historical baseline inequality remains diagnostic. Author-time failure is not called a green suite or an acceptance waiver.",
+  "cleanCommittedAcceptance": false,
+  "futureRunnerCommitPreAccounted": false,
+  "nextOwner": "Lead / separate actual-runner-commit L12-11 accounting Unit",
+  "nextAction": "After runner supplies the actual author commit, account its exact pairs, then replay both unchanged recipes on the clean committed author/accounting pair and run the complete owning reproduction/ratchet/citation/candidate-status/constitution proofs plus Lead suite and fresh closure review. No Git write or test suite was performed here."
+}
