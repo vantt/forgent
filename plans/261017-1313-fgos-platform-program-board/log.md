@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 10:50 (phiên `forgentx-95`, owner 10:36 "nhiệm vụ của em hoàn tất"): **`forgentx-95` đóng.** Lane SEAT (+ MP-B1 đóng, lỗi sau land, SEAT-TRIM) giao lead `SEAT` theo [bàn giao](../reports/handoff-261022-1031-seat-lead-mpb1-close-post-land-fixes-seat-trim.md); COOK P6 giao lead `COOK` (plan từ `p-a178ca5c`, ghi chú ở dòng COOK). Đã dọn: worktree `.claude/worktrees/seat-*` (đều đã merge) và nhánh của chúng, cargo target tạm (~44G), fixture `/tmp` cũ; giữ backup land `.fgos/runtime/landing-261022/` và config backup `.fgos/runtime/config-backup-261022-0900/`. Không còn tiến trình nào của phiên này.
+
 - 2026-10-22 10:45 (phiên `forgentx-95`, owner): **COOK P6 dùng plan mới lập từ backlog `p-a178ca5c`** (pane launch race), giao cho một lead `COOK` mới. Đảo lại nếu: plan vượt tiêu chí của backlog item hoặc cần đổi hành vi ngoài terminal launch → hỏi owner.
 
 - 2026-10-22 10:35 (phiên `forgentx-95`, owner 10:30): **giao lane SEAT cho một lead mới tự xưng `SEAT`**: (1) đóng MP-B1 (làm mới model mdview/mcp-skill-hub sau một lượt thật), (2) chịu lỗi sau land của SEAT tới khi ổn định (gồm lần land kế mang `b52c2c238` + GIT `e23e34688`/`2c184ea1e`), (3) SEAT-TRIM (+ H19 của HARDEN; H19(b) phối hợp với T1 phase 6 qua board). [Bàn giao](../reports/handoff-261022-1031-seat-lead-mpb1-close-post-land-fixes-seat-trim.md). `forgentx-95` giữ điều phối chung và COOK P6.
