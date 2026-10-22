@@ -1066,9 +1066,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // Swallowed by design (D4 fail-safe) — see comment above.
       }
       // D4 fail-safe, same discipline as the coexistence manifest above: a
-      // missing git binary, a non-repo cwd, and a repo with zero commits all
-      // land in the same catch — this is a plain non-fatal notice, not a
-      // distinction worth making.
+      // failed HEAD lookup (a repo with zero commits, an unreadable ref) lands
+      // in the same catch — a plain non-fatal notice, not a distinction worth
+      // making. A cwd that is no repository never gets here: the two fixes
+      // above resolve the repository and refuse it.
       let gitHeadless = false;
       try {
         gitHeadless = typeof inspectGit(path.dirname(dir)).resolveCommit({ name: 'HEAD' }) !== 'string';
@@ -3012,13 +3013,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // guarantee).
     //
     // Uses `listWork(dir)` — NOT `rebuild(dir)` — to fold the outcomes view:
-    // both replay the SAME event log through the SAME fold logic
-    // (rebuildView), but `rebuild(dir)` additionally overwrites
-    // `.fgos/state.json` as a side effect, which would contradict this
-    // verb's own `access: 'read'` declaration and the generator's read-only
-    // prohibition (must_haves). `listWork` is store.mjs's dedicated
-    // read-only facade for exactly this "current view, rebuilt fresh from
-    // the log" need, with no write.
+    // `rebuild(dir)` additionally installs the Work cache as a side effect,
+    // which would contradict this verb's own `access: 'read'` declaration
+    // and the generator's read-only prohibition (must_haves). `listWork` is
+    // store.mjs's dedicated read-only facade for exactly this "current view
+    // from the Event Store" need, with no write.
     //
     // Idempotent by construction: every run re-enumerates the doc tree from
     // scratch and re-derives the manifest from the current event log, then

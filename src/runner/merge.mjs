@@ -1118,9 +1118,8 @@ export function declareLandFiles(repoRoot, item, target, source) {
  * `fgw/<root>`, a nested root into its parent, a promoted member into its
  * integration branch. Land's session on the destination's full-ref slot,
  * not a caller-held slot, excludes other merges into that target through
- * candidate construction, verification and publication. Work's own event
- * files are committed through its declared checkpoint and its project stream
- * is sealed before Land starts; nothing is swept into the land. After
+ * candidate construction, verification and publication. Work's project
+ * stream is sealed before Land starts; nothing is swept into the land. After
  * publication Work promotes the branch's event stream and reports the result
  * as `promotion` on the merged outcome. A stale publication is returned once, and
  * Work owns settlement; publication authorizes no candidate cleanup.
