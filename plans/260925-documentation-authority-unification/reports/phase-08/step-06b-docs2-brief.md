@@ -1,0 +1,11 @@
+# Step 6b docs follow-up: same-repository holder rule and stray token (Doer brief, docs turn)
+
+Status: Lead brief (docs turn).
+
+You are Doer for Phase 8 of plan 260925-documentation-authority-unification in the fgOS repo. Update the lease documentation written in b6edb9712 to match the code at HEAD after the final fix 2fbf9f018 (owner-answers L12-111 lists the doc sentences needed). Read L12-109..L12-111 and the current code (`src/runner/documentation-cutover-lease.mjs`, the admission call sites in `src/runner/execution/run.mjs`, `src/workflow/case-start.mjs`, `src/workflow/runner.mjs`, `src/runner/merge.mjs`, the doctor row in `src/setup/registrations.mjs`).
+
+Document, in the existing lease section of `docs/platform/holder-lock/spec.md` (no new file, no duplication): the caller checkout is declared explicitly, never inferred from cwd; it must belong to the same repository (same main checkout) as the gated repository, and lease state is always read from that repository's `refs/heads/main`; a caller outside any git repository is never the holder and is refused while a lease is held; which doors admit (runUnit, workflow start/resume/answer with the recorded origin, landRunnerItem, mergeWorkflowBranch) and that `bind()` and dry-binds do not; stray holder token in the main checkout (doctor fails, acquire refuses) and the release crash window; the known limits recorded in L12-111 (pack-refs/gc while the sidecar is corrupt, fanout pick before refusal, Work-item claim worktrees, pre-cases runs). Update the doctor registry row text in `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` if the doctor behaviour changed. Adjust the CHANGELOG entry only if it is now inaccurate.
+
+Writable (exact): docs/platform/holder-lock/spec.md, docs/platform/packaging-distribution/contracts/setup-doctor-registry.md, CHANGELOG.md, plans/260925-documentation-authority-unification/reports/phase-08/**. No code. Never a git write, never the fgos CLI, never .fgos/ or secrets. Run `node scripts/check-legacy-docs-ratchet.mjs` and report the exit. Append a short delivery note under L12-111 in owner-answers.md (do not rewrite it).
+
+Final message: first line a conventional commit subject (at most 100 characters, no plan ids, phase or finding labels), then a short Vietnamese summary (anh/em).
