@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct HookLimits {
     pub stop_block: StopBlockLimits,
+    pub hook: LockWaitLimits,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -18,4 +19,12 @@ pub struct StopBlockLimits {
     /// Consecutive Stop blocks that were written and finished for one head
     /// generation before a Stop passes without claiming.
     pub max: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct LockWaitLimits {
+    /// The longest wait, in milliseconds, for the mailbox lock before a hook
+    /// skips its drain; the next hook call tries again.
+    pub lock_wait_ms: u64,
 }

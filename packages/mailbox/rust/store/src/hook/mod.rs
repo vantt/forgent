@@ -8,7 +8,7 @@ pub use drain::{
     begin, finish, render_reply, Begun, Claimed, FinishTicket, HeadFacts, HookCall, HookReply,
     QuietReason,
 };
-pub use limits::{HookLimits, StopBlockLimits};
+pub use limits::{HookLimits, LockWaitLimits, StopBlockLimits};
 
 use fgos_mailbox_core::Cli;
 
