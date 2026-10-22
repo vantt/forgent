@@ -1186,9 +1186,18 @@ fn native_discussions_reports_owner_voters_and_root_wide_summary_diagnostics() {
     assert_eq!(report["summariesOutsideWindow"], 1);
 }
 
+/// An empty state root of its own, so the machine and session parts of the
+/// answer never depend on the machine the tests run on.
+fn identity_state_root() -> std::path::PathBuf {
+    let dir = std::env::temp_dir().join(format!("fgos_test_identity_state_{}", std::process::id()));
+    fs::create_dir_all(&dir).unwrap();
+    dir
+}
+
 fn identity_command(args: &[&str]) -> Command {
     let mut cmd = Command::new(fgos_bin());
     cmd.arg("identity").args(args);
+    cmd.env("FGOS_STATE_ROOT", identity_state_root());
     for key in [
         "FGOS_SESSION_ID",
         "CODEX_THREAD_ID",
@@ -1226,7 +1235,7 @@ fn identity_reports_the_env_session_and_confirms_it_from_the_registry() {
         .unwrap();
     assert_eq!(
         identity_data(&env_only),
-        serde_json::json!({ "id": "thread-a", "source": "env" })
+        serde_json::json!({ "id": "thread-a", "source": "env", "machine": null, "session": null })
     );
 
     let confirmed = identity_command(&["--fgos-dir", dir.to_str().unwrap()])
@@ -1235,7 +1244,7 @@ fn identity_reports_the_env_session_and_confirms_it_from_the_registry() {
         .unwrap();
     assert_eq!(
         identity_data(&confirmed),
-        serde_json::json!({ "id": "thread-a", "source": "registry" })
+        serde_json::json!({ "id": "thread-a", "source": "registry", "machine": null, "session": null })
     );
     let _ = fs::remove_dir_all(&dir);
 }
@@ -1249,7 +1258,7 @@ fn identity_runs_under_the_recursion_guard() {
         .unwrap();
     assert_eq!(
         identity_data(&output),
-        serde_json::json!({ "id": "guarded", "source": "env" })
+        serde_json::json!({ "id": "guarded", "source": "env", "machine": null, "session": null })
     );
 }
 
@@ -1288,6 +1297,93 @@ fn identity_rejects_bad_options() {
             "args {args:?} must print no envelope"
         );
     }
+}
+
+/// `fgos identity session` and the bare answer's session part over a state
+/// root that has a machine id: the wiring of the verb. The handle rules are
+/// owned by the identity crate's session tests.
+#[test]
+fn identity_session_prints_a_stable_handle_per_session_and_refuses_an_unresolved_caller() {
+    let state = std::env::temp_dir().join(format!("fgos_test_identity_session_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&state);
+    fs::create_dir_all(&state).unwrap();
+    fs::write(state.join("machine-id"), "fg-server-abc234\n").unwrap();
+    let session = |id: &str| {
+        identity_data(
+            &identity_command(&["session", "--json"])
+                .env("FGOS_STATE_ROOT", &state)
+                .env("FGOS_SESSION_ID", id)
+                .output()
+                .unwrap(),
+        )
+    };
+    let (a, b) = (session("a"), session("b"));
+    assert_eq!(a["id"], "fg-server-abc234/a");
+    assert_ne!(a["handle"], b["handle"]);
+    assert_eq!(a, session("a"), "a session's handle never changes");
+    assert!(a["handle"].as_str().unwrap().ends_with("@fg-server"));
+
+    let bare = identity_data(
+        &identity_command(&["--json"])
+            .env("FGOS_STATE_ROOT", &state)
+            .env("FGOS_SESSION_ID", "a")
+            .output()
+            .unwrap(),
+    );
+    assert_eq!(bare["session"], a);
+    assert_eq!(bare["machine"], serde_json::json!({ "id": "fg-server-abc234", "handle": "fg-server" }));
+
+    let unresolved = identity_command(&["session", "--pid", "99999999"])
+        .env("FGOS_STATE_ROOT", &state)
+        .output()
+        .unwrap();
+    assert_eq!(unresolved.status.code(), Some(65));
+    assert!(unresolved.stdout.is_empty());
+    assert!(String::from_utf8_lossy(&unresolved.stderr).contains("[unresolved]"));
+    let _ = fs::remove_dir_all(&state);
+}
+
+/// `fgos identity machine` over a scratch state root: the wiring of the verb
+/// (route, operation per flag, exit code of a refusal). The id, handle and
+/// alias rules are owned by the identity crate's own tests.
+#[test]
+fn identity_machine_reads_refuses_and_sets_the_alias_through_the_state_root() {
+    let state = std::env::temp_dir().join(format!("fgos_test_identity_machine_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&state);
+    fs::create_dir_all(&state).unwrap();
+    let machine = |args: &[&str]| {
+        identity_command(&[&["machine"], args].concat())
+            .env("FGOS_STATE_ROOT", &state)
+            .output()
+            .unwrap()
+    };
+
+    let missing = machine(&["--json"]);
+    assert_eq!(missing.status.code(), Some(65));
+    assert!(missing.stdout.is_empty());
+    assert!(String::from_utf8_lossy(&missing.stderr).contains("[machine-id-missing]"));
+
+    fs::write(state.join("machine-id"), "fg-server-abc234\n").unwrap();
+    assert_eq!(
+        identity_data(&machine(&["--json"])),
+        serde_json::json!({ "id": "fg-server-abc234", "handle": "fg-server", "alias": null })
+    );
+    assert_eq!(
+        identity_data(&machine(&["--alias", "owner"])),
+        serde_json::json!({ "id": "fg-server-abc234", "handle": "owner", "alias": "owner" })
+    );
+    assert_eq!(
+        identity_data(&machine(&[]))["handle"],
+        serde_json::json!("owner")
+    );
+    let bad = machine(&["--alias", "Not A Handle"]);
+    assert_eq!(bad.status.code(), Some(65));
+    assert!(String::from_utf8_lossy(&bad.stderr).contains("[invalid-alias]"));
+    assert_eq!(
+        fs::read_to_string(state.join("machine-alias")).unwrap().trim(),
+        "owner"
+    );
+    let _ = fs::remove_dir_all(&state);
 }
 
 /// Spawns fgos with a stdin pipe whose writer stays open (what a heredoc, an

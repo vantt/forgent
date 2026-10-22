@@ -168,6 +168,17 @@ fn sent_enters(pane: &ScriptedPane) -> usize {
         .count()
 }
 
+/// Every key pressed other than Enter, in order.
+fn sent_keys(pane: &ScriptedPane) -> Vec<String> {
+    pane.sent
+        .iter()
+        .filter_map(|s| s.keys.as_ref())
+        .flatten()
+        .filter(|key| key.as_str() != "Enter")
+        .cloned()
+        .collect()
+}
+
 #[test]
 fn terminal_every_cli_vector_resolves_as_recorded() {
     for cli in CLIS {
@@ -233,7 +244,7 @@ fn terminal_every_cli_vector_resolves_as_recorded() {
             };
             let mut want = expect.clone();
             if let Some(map) = want.as_object_mut() {
-                for key in ["readiness", "sentTexts", "submitSends", "minEnters", "maxEnters"] {
+                for key in ["readiness", "sentTexts", "sentKeys", "submitSends", "minEnters", "maxEnters"] {
                     map.remove(key);
                 }
             }
@@ -248,6 +259,10 @@ fn terminal_every_cli_vector_resolves_as_recorded() {
             assert_eq!(got, want, "{name}");
             if let Some(count) = expect["sentTexts"].as_u64() {
                 assert_eq!(sent_texts(&pane) as u64, count, "{name}: typed brief count");
+            }
+            if let Some(keys) = expect["sentKeys"].as_array() {
+                let want: Vec<&str> = keys.iter().filter_map(Value::as_str).collect();
+                assert_eq!(sent_keys(&pane), want, "{name}: non-Enter key presses");
             }
             if let Some(count) = expect["submitSends"].as_u64() {
                 assert_eq!(submit_sends(&pane) as u64, count, "{name}: prompt-door send count");

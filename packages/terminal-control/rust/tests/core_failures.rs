@@ -52,14 +52,17 @@ fn a_slot_inside_the_allocation_grace_is_not_reported() {
 #[test]
 fn launch_requested_without_launched_is_kept_and_never_launched_into_again() {
     let driver = MemDriver::new(352, 69);
-    let core = core(&driver, &MeasuredSplit, state_dir("not-launched"));
+    let mut cfg = config(state_dir("not-launched"));
+    cfg.launch_identify_timeout_ms = 50;
+    let core = Core::new(&driver, &MeasuredSplit, cfg);
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     // The foreground never becomes the command: the root is not identified.
     let out = core.launch("a", &launch_spec()).unwrap();
     assert!(matches!(out, LaunchOutcome::NotStarted { .. }), "{out:?}");
+    let runs_before = driver.calls("pane.run").len();
     let again = core.launch("a", &launch_spec()).unwrap();
     assert!(matches!(again, LaunchOutcome::NotStarted { .. }));
-    assert_eq!(driver.calls("pane.run").len(), 1, "second launch must not reach the driver");
+    assert_eq!(driver.calls("pane.run").len(), runs_before, "second launch must not reach the driver");
     let findings = core.reconcile_scan(0).unwrap();
     assert_eq!(findings.len(), 1);
     assert_eq!(findings[0].kind, FindingKind::Unknown);
@@ -73,7 +76,7 @@ fn launch_identifies_the_root_process_and_writes_the_launched_marker() {
     let core = core(&driver, &MeasuredSplit, state_dir("launched"));
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     let mut child = spawn_sleeper();
-    driver.set_foreground(
+    driver.set_launch_foreground(
         &slot.pane_id,
         900,
         vec![
@@ -88,8 +91,8 @@ fn launch_identifies_the_root_process_and_writes_the_launched_marker() {
     assert_eq!(identity.pgid, child.id());
     assert!(!identity.start_time.is_empty());
     let run = driver.calls("pane.run");
-    assert_eq!(run.len(), 1);
-    assert!(run[0].contains("cd '/tmp' && 'sleep' '30'") && !run[0].contains("exec"), "{}", run[0]);
+    let last_run = run.last().expect("at least one pane.run call");
+    assert!(last_run.contains("cd '/tmp' && 'sleep' '30'") && !last_run.contains("exec"), "{}", last_run);
     assert!(core.reconcile_scan(0).unwrap().is_empty());
     let inspection = core.inspect("a", false);
     assert_eq!(inspection.pane, PaneState::Live);
@@ -105,7 +108,7 @@ fn a_command_that_replaced_the_shell_is_still_the_foreground_of_its_slot() {
     let core = core(&driver, &MeasuredSplit, state_dir("exec-root"));
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     let mut child = spawn_sleeper();
-    driver.set_foreground(
+    driver.set_launch_foreground(
         &slot.pane_id,
         child.id(),
         vec![ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] }],
@@ -246,14 +249,14 @@ fn a_command_that_replaced_the_shell_is_identified() {
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     let mut child = spawn_sleeper();
     // `exec` keeps the shell's pid: the foreground process is the shell pid itself.
-    driver.set_foreground(
+    driver.set_launch_foreground(
         &slot.pane_id,
         child.id(),
         vec![ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] }],
         child.id(),
     );
     let out = core.launch("a", &launch_spec()).unwrap();
-    assert!(matches!(out, LaunchOutcome::Launched(ref i) if i.pid == child.id()), "{out:?}");
+    assert!(matches!(&out, LaunchOutcome::Launched(i) if i.pid == child.id()), "{out:?}");
     child.kill().unwrap();
     child.wait().unwrap();
 }
@@ -304,4 +307,280 @@ fn immediate_close_without_process_info_is_kept_without_a_release_marker() {
     assert!(matches!(core.release("a", Disposition::Close, None).unwrap(), ReleaseOutcome::KeptUnknown { .. }));
     assert!(driver.panes.borrow().contains_key(&slot.pane_id));
     assert!(driver.calls("pane.close").is_empty());
+}
+
+#[test]
+fn the_launcher_is_typed_only_after_the_shell_has_run_a_probe() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("token-first"));
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    let mut child = spawn_sleeper();
+    driver.set_launch_foreground(
+        &slot.pane_id,
+        900,
+        vec![
+            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
+            ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] },
+        ],
+        child.id(),
+    );
+    let out = core.launch("a", &launch_spec()).unwrap();
+    assert!(matches!(out, LaunchOutcome::Launched(_)), "{out:?}");
+    let runs = driver.calls("pane.run");
+    assert_eq!(runs.len(), 2);
+    assert!(runs[0].contains("printf '%s%s\\n' fgos-ok- "), "first call must be probe: {}", runs[0]);
+    assert!(runs[1].contains("cd '/tmp' && 'sleep' '30'"), "second call must be launcher: {}", runs[1]);
+    child.kill().unwrap();
+    child.wait().unwrap();
+}
+
+#[test]
+fn a_shell_whose_start_prompt_eats_the_first_key_still_gets_an_intact_launch_line() {
+    let driver = MemDriver::new(352, 69);
+    let mut cfg = config(state_dir("eats-first-key"));
+    cfg.shell_ready_timeout_ms = 1_500;
+    let core = Core::new(&driver, &MeasuredSplit, cfg);
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    driver.set_script(&slot.pane_id, ShellScript::PromptReadsFirstKey);
+    let mut child = spawn_sleeper();
+    driver.set_launch_foreground(
+        &slot.pane_id,
+        900,
+        vec![
+            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
+            ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] },
+        ],
+        child.id(),
+    );
+    let out = core.launch("a", &launch_spec()).unwrap();
+    assert!(matches!(out, LaunchOutcome::Launched(_)), "{out:?}");
+    let runs = driver.calls("pane.run");
+    assert_eq!(runs.len(), 3, "expected probe 1, probe 2, then launch line: {runs:?}");
+    assert!(runs[0].contains("printf '%s%s\\n' fgos-ok- "));
+    assert!(runs[1].contains("printf '%s%s\\n' fgos-ok- "));
+    assert!(runs[2].contains("cd '/tmp' && 'sleep' '30'"), "launch line must be intact: {}", runs[2]);
+    child.kill().unwrap();
+    child.wait().unwrap();
+}
+
+#[test]
+fn a_shell_serving_only_typed_echo_retypes_only_after_backoff_and_caps_at_three_probes() {
+    let driver = MemDriver::new(352, 69);
+    let mut cfg = config(state_dir("echo-only-backoff"));
+    cfg.shell_ready_timeout_ms = 1_500;
+    let core = Core::new(&driver, &MeasuredSplit, cfg);
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    driver.set_script(&slot.pane_id, ShellScript::EchoOnly);
+    let out = core.launch("a", &launch_spec()).unwrap();
+    assert!(matches!(&out, LaunchOutcome::NotStarted { reason } if reason.contains("not become ready")), "{out:?}");
+    let runs = driver.calls("pane.run");
+    assert_eq!(runs.len(), 3, "must type at most three probes after backoff: {runs:?}");
+    for r in &runs {
+        assert!(r.contains("printf '%s%s\\n' fgos-ok- "));
+    }
+}
+
+#[test]
+fn a_line_typed_before_the_start_prompt_draws_is_not_swallowed_and_launches_once() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("typed-ahead"));
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    driver.set_script(&slot.pane_id, ShellScript::TypedAheadSkipsPrompt);
+    let mut child = spawn_sleeper();
+    driver.set_launch_foreground(
+        &slot.pane_id,
+        900,
+        vec![
+            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
+            ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] },
+        ],
+        child.id(),
+    );
+    let out = core.launch("a", &launch_spec()).unwrap();
+    assert!(matches!(out, LaunchOutcome::Launched(_)), "{out:?}");
+    let runs = driver.calls("pane.run");
+    assert_eq!(runs.len(), 2, "single probe followed by single launch line: {runs:?}");
+    assert!(runs[1].contains("cd '/tmp' && 'sleep' '30'"));
+    child.kill().unwrap();
+    child.wait().unwrap();
+}
+
+#[test]
+fn a_shell_reading_whole_lines_gets_at_most_three_probes_and_ends_not_started() {
+    let driver = MemDriver::new(352, 69);
+    let mut cfg = config(state_dir("line-mode-read"));
+    cfg.shell_ready_timeout_ms = 1_500;
+    let core = Core::new(&driver, &MeasuredSplit, cfg);
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    driver.set_script(&slot.pane_id, ShellScript::LineModeRead);
+    let out = core.launch("a", &launch_spec()).unwrap();
+    assert!(matches!(&out, LaunchOutcome::NotStarted { reason } if reason.contains("not become ready")), "{out:?}");
+    let runs = driver.calls("pane.run");
+    assert_eq!(runs.len(), 3, "must type at most three probes: {runs:?}");
+    for r in &runs {
+        assert!(r.contains("printf '%s%s\\n' fgos-ok- "));
+    }
+}
+
+#[test]
+fn a_pane_whose_foreground_is_a_child_process_gets_nothing_typed_and_ends_not_started() {
+    let driver = MemDriver::new(352, 69);
+    let mut cfg = config(state_dir("non-shell-fg"));
+    cfg.shell_ready_timeout_ms = 50;
+    let core = Core::new(&driver, &MeasuredSplit, cfg);
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    driver.set_foreground(
+        &slot.pane_id,
+        900,
+        vec![
+            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
+            ForegroundProcess { pid: 9999, argv: vec!["sudo".into(), "-i".into()] },
+        ],
+        9999,
+    );
+    let before = driver.calls("pane.run").len();
+    let out = core.launch("a", &launch_spec()).unwrap();
+    assert!(matches!(&out, LaunchOutcome::NotStarted { reason } if reason.contains("foreground is not the shell")), "{out:?}");
+    assert_eq!(driver.calls("pane.run").len(), before, "pane.run delta must be zero");
+}
+
+#[test]
+fn a_shell_that_never_becomes_ready_ends_not_started_with_no_marker_and_reports_bare_shell() {
+    let driver = MemDriver::new(352, 69);
+    let mut cfg = config(state_dir("never-ready"));
+    cfg.shell_ready_timeout_ms = 50;
+    cfg.allocation_grace_ms = 50;
+    let now = Cell::new(100_000u64);
+    let core = Core::new(&driver, &MeasuredSplit, cfg).with_clock(|| now.get());
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    driver.set_script(&slot.pane_id, ShellScript::LineModeRead);
+
+    let out = core.launch("a", &launch_spec()).unwrap();
+    assert!(matches!(out, LaunchOutcome::NotStarted { .. }), "{out:?}");
+
+    // No launch-requested marker exists: relaunchable!
+    driver.set_script(&slot.pane_id, ShellScript::Ready);
+    let mut child = spawn_sleeper();
+    driver.set_launch_foreground(
+        &slot.pane_id,
+        900,
+        vec![
+            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
+            ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] },
+        ],
+        child.id(),
+    );
+    // Before launching again, check reconcile scan past grace reports plain bare-shell slot:
+    now.set(100_000 + 100);
+    let findings = core.reconcile_scan(0).unwrap();
+    assert_eq!(findings.len(), 1);
+    assert_eq!(findings[0].kind, FindingKind::AllocatedNotLaunchedBareShell);
+
+    // Launch again succeeds:
+    let out2 = core.launch("a", &launch_spec()).unwrap();
+    assert!(matches!(out2, LaunchOutcome::Launched(_)), "{out2:?}");
+    child.kill().unwrap();
+    child.wait().unwrap();
+}
+
+#[test]
+fn every_probe_differs_contains_no_y_and_scrollback_token_does_not_satisfy() {
+    let driver = MemDriver::new(352, 69);
+    let mut cfg = config(state_dir("scrollback-check"));
+    cfg.shell_ready_timeout_ms = 1_500;
+    let core = Core::new(&driver, &MeasuredSplit, cfg);
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    driver.set_screen(&slot.pane_id, "earlier session\nfgos-ok-cafebabedeadbeef0123456789abcdef\n");
+    driver.set_script(&slot.pane_id, ShellScript::LineModeRead);
+
+    let out = core.launch("a", &launch_spec()).unwrap();
+    assert!(matches!(out, LaunchOutcome::NotStarted { .. }), "{out:?}");
+
+    let runs = driver.calls("pane.run");
+    assert_eq!(runs.len(), 3);
+    let mut nonces = Vec::new();
+    for r in &runs {
+        assert!(!r.contains('y') && !r.contains('Y'), "probe must not contain y or Y: {r}");
+        let nonce = r.strip_prefix(&format!("pane.run {} printf '%s%s\\n' fgos-ok- ", slot.pane_id)).expect("probe format").trim();
+        nonces.push(nonce.to_string());
+    }
+    assert_ne!(nonces[0], nonces[1]);
+    assert_ne!(nonces[1], nonces[2]);
+    assert_ne!(nonces[0], nonces[2]);
+}
+
+#[test]
+fn a_vanished_pane_ends_the_handshake_at_once_with_unknown() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("vanished"));
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    *driver.vanish_on_process_info.borrow_mut() = Some(slot.pane_id.clone());
+    let out = core.launch("a", &launch_spec());
+    assert!(matches!(&out, Err(Refusal::Unknown { reason }) if reason.contains("pane is gone")), "{out:?}");
+}
+
+#[test]
+fn a_created_pane_gets_the_quiet_env() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("quiet-env-created"));
+    let req1 = request("pane-tab", "group-1");
+    let slot1 = core.allocate(&req1).unwrap().slot;
+
+    let env1 = driver.env_of(&slot1.pane_id).expect("env recorded for created tab pane");
+    assert!(
+        env1.contains(&("DISABLE_AUTO_UPDATE".to_string(), "true".to_string())),
+        "created tab pane must receive DISABLE_AUTO_UPDATE=true, got {env1:?}"
+    );
+
+    let req2 = request("pane-split", "group-1");
+    let slot2 = core.allocate(&req2).unwrap().slot;
+    let env2 = driver.env_of(&slot2.pane_id).expect("env recorded for created split pane");
+    assert!(
+        env2.contains(&("DISABLE_AUTO_UPDATE".to_string(), "true".to_string())),
+        "created split pane must receive DISABLE_AUTO_UPDATE=true, got {env2:?}"
+    );
+}
+
+#[test]
+fn a_caller_value_for_the_same_key_wins() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("quiet-env-caller-wins"));
+    let mut req = request("pane-override", "group-1");
+    req.env.insert("DISABLE_AUTO_UPDATE".into(), "false".into());
+    let slot = core.allocate(&req).unwrap().slot;
+
+    let env = driver.env_of(&slot.pane_id).expect("env recorded for created pane");
+    assert!(
+        env.contains(&("DISABLE_AUTO_UPDATE".to_string(), "false".to_string())),
+        "caller-provided DISABLE_AUTO_UPDATE must win, got {env:?}"
+    );
+    assert!(
+        !env.contains(&("DISABLE_AUTO_UPDATE".to_string(), "true".to_string())),
+        "default DISABLE_AUTO_UPDATE=true must not be added when caller provides it, got {env:?}"
+    );
+}
+
+#[test]
+fn an_attached_pane_is_created_with_no_env() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("attached-no-env"));
+    let tab = "t-existing".to_string();
+    let pane = "p-existing".to_string();
+    driver.tabs.borrow_mut().push((tab.clone(), "ext".into()));
+    driver.panes.borrow_mut().insert(
+        pane.clone(),
+        MemPane::new(&pane, tab, driver.area, bare(500), vec![]),
+    );
+
+    let tab_creates_before = driver.calls("tab.create").len();
+    let splits_before = driver.calls("pane.split").len();
+
+    let attached = core.attach("attached-key", &pane, None, None).unwrap();
+    assert_eq!(attached.origin, Origin::Attached);
+    assert_eq!(attached.slot.pane_id, pane);
+
+    assert_eq!(driver.calls("tab.create").len(), tab_creates_before);
+    assert_eq!(driver.calls("pane.split").len(), splits_before);
+    let env = driver.env_of(&pane).expect("pane exists");
+    assert!(env.is_empty(), "attached pane must have no env injected, got {env:?}");
 }

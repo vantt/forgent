@@ -52,10 +52,32 @@ pub const CATALOG: &[OperationDescriptor] = &[
         operation_id: OperationId::from_static("identity.writer"),
         owning_component_id: Cow::Borrowed("identity"),
         request_contract: ContractRef::from_static("identity.writer.request", "1.0.0"),
-        outcome_contract: ContractRef::from_static("identity.writer.outcome", "1.0.0"),
+        outcome_contract: ContractRef::from_static("identity.writer.outcome", "1.1.0"),
         effect: OperationEffect::Read,
         idempotency: OperationIdempotency::Safe,
         authority_policy_id: Cow::Borrowed("identity.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("identity.read"),
+        owning_component_id: Cow::Borrowed("identity"),
+        request_contract: ContractRef::from_static("identity.read.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("identity.read.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("identity.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("identity.write"),
+        owning_component_id: Cow::Borrowed("identity"),
+        request_contract: ContractRef::from_static("identity.write.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("identity.write.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("identity.write"),
         allowed_host_kinds: &["cli"],
         streaming_mode: StreamingMode::None,
     },
@@ -100,7 +122,7 @@ mod tests {
 
     #[test]
     fn catalog_contains_required_operations() {
-        assert_eq!(CATALOG.len(), 7);
+        assert_eq!(CATALOG.len(), 9);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -109,6 +131,8 @@ mod tests {
         assert!(ids.contains(&"observe.friction"));
         assert!(ids.contains(&"convention.query"));
         assert!(ids.contains(&"identity.writer"));
+        assert!(ids.contains(&"identity.read"));
+        assert!(ids.contains(&"identity.write"));
     }
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips

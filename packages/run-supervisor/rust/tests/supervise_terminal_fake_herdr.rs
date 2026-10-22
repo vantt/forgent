@@ -124,6 +124,27 @@ fn a_full_lifecycle_launches_briefs_waits_for_the_result_and_closes_the_pane_onc
 }
 
 #[test]
+fn a_pane_whose_shell_never_becomes_ready_ends_as_not_started_and_the_steps_still_run() {
+    let herdr = FakeHerdr::new("stuck");
+    herdr.set_flag("shell-stuck", true);
+    let mut run = terminal_run("tstuck", &herdr, "sleep 600", 3_000);
+    let supervisor = run.start_with_env(&herdr.env());
+
+    let (code, line) = finish(supervisor, LIMIT);
+    assert_eq!(code, 0, "{}", run.log());
+    assert_eq!(line["outcome"], "abandoned-not-started");
+    assert_eq!(run.json("start-refused.json").expect("start-refused")["code"], "terminal-launch-not-started");
+    let receipt = run.json("receipt.json").expect("receipt");
+    assert_eq!(receipt["outcome"], "abandoned-not-started");
+    assert_eq!(receipt["reason"], "start-refused:terminal-launch-not-started");
+    assert!(run.json("agent-binding.json").is_none() && run.json("supervisor-binding.json").is_none(), "no gate was bound");
+    assert!(run.json("steps/release-slot.json").is_some(), "the steps still run");
+    let runs = herdr.calls_starting("pane run");
+    assert!(!runs.is_empty() && runs.iter().all(|c| c.contains("fgos-ok-")), "only probes were typed: {runs:?}");
+    assert!(!herdr.dir.join("script.pid").exists(), "the launcher was never typed: only probes ran");
+}
+
+#[test]
 fn an_attempt_that_cannot_go_on_closes_the_captured_pane_and_names_why() {
     let herdr = FakeHerdr::new("blocked");
     herdr.set_explain(Verdict::Blocked);

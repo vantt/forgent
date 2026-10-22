@@ -31,12 +31,6 @@ export const CHECKER_SEATS = Object.freeze({
   tester: Object.freeze({ role: 'reviewer', verdict: false }),
 });
 
-/**
- * The capability a door runs a unit as when its caller names none (`fgos run "<prompt>"`). A door that
- * names another capability has chosen it: Seat Binding judges what that choice does to the tier.
- */
-export const DEFAULT_RUN_CAPABILITY = 'execute';
-
 /** The pseudo-seats the runner itself writes results for; never declared, never bound. */
 export const VERIFY_SEAT = 'verify';
 export const SYNC_SEAT = 'sync';
@@ -297,14 +291,11 @@ export function workflowTierOf(seat, unit, workflowId) {
 
 /**
  * The seat part of a bind ask for a seat already recorded in `unitRecord`: its id, role and posture,
- * the tier its workflow recommended and the selectors its door chose, so a replay asks what the run
- * asked. A seat the record does not list is the unit's own producer seat.
+ * the tier its workflow recommended, so a replay asks what the run asked. A seat the record does not list is the unit's own producer seat.
  */
 export function bindSeatOf(unitRecord, seatId) {
   const seat = seatOfRecord(unitRecord, seatId);
-  const selectors = unitRecord?.selectors;
-  const common = selectors && Object.keys(selectors).length > 0 ? { selectors } : {};
-  if (!seat) return { seat: seatId, role: 'producer', posture: PRODUCER_POSTURE, ...common };
+  if (!seat) return { seat: seatId, role: 'producer', posture: PRODUCER_POSTURE };
   const workflowTier = workflowTierOf(seat, unitRecord.unit, unitRecord.workflowId);
   return {
     seat: seat.seat,
@@ -312,7 +303,6 @@ export function bindSeatOf(unitRecord, seatId) {
     posture: seat.posture,
     ...(seat.persona ? { persona: seat.persona } : {}),
     ...(workflowTier ? { workflowTier } : {}),
-    ...common,
   };
 }
 

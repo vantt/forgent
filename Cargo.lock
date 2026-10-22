@@ -210,6 +210,7 @@ dependencies = [
  "fgos-durable-file",
  "fgos-git",
  "fgos-holder-lock",
+ "fgos-identity",
  "serde",
  "serde_json",
  "sha2",
@@ -256,11 +257,15 @@ dependencies = [
 name = "fgos-identity"
 version = "0.2.0"
 dependencies = [
+ "fgos-convention",
+ "fgos-durable-file",
+ "fgos-holder-lock",
  "fgos-host-runtime",
  "fgos-process",
  "libc",
  "serde",
  "serde_json",
+ "sha2",
 ]
 
 [[package]]

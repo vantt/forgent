@@ -496,10 +496,8 @@ pub struct BorrowOutcome {
     pub leftovers_killed: u32,
 }
 
-/// Environment marker of a watched borrow: unique per run, inherited by every
-/// descendant of the child.
 #[cfg(unix)]
-const WATCH_ENV: &str = "FGOS_BORROW_WATCH";
+use fgos_process::containment::{watch_token, WATCH_ENV};
 
 /// Explicit I/O and execution bound for [`run_borrowed_io`].
 #[derive(Debug, Clone)]
@@ -998,7 +996,7 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watc
     let drv = driver::current();
     let mut explicit = spec.clone();
     explicit.stdio = BorrowStdio::Null;
-    let watch_token = format!("{}-{}", std::process::id(), std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.as_nanos()));
+    let watch_token = watch_token();
     if watch {
         explicit.env.insert(WATCH_ENV.to_string(), watch_token.clone());
     }
@@ -1022,7 +1020,7 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watc
         let (mut out_open, mut err_open) = (true, true);
         // Wake on pipe activity or on the root's exit instead of sleeping in
         // fixed steps; without a process descriptor, wake at least every 1 ms.
-        let exit_fd = exit_descriptor(pid);
+        let exit_fd = fgos_process::control::exit_descriptor(pid);
         loop {
             if Instant::now() >= io.deadline {
                 return Err(BorrowError::Deadline { termination: Termination::KilledAfterGrace });
@@ -1134,25 +1132,6 @@ fn capture_available(pipe: &mut impl std::io::Read, bytes: &mut Vec<u8>, limit: 
             Some(false) => return Ok(false),
             None => return Ok(true),
         }
-    }
-}
-
-/// A descriptor that becomes readable when child `pid` exits (Linux pidfd).
-/// `None` where the kernel has none; callers then poll in short steps.
-#[cfg(unix)]
-fn exit_descriptor(pid: u32) -> Option<std::os::fd::OwnedFd> {
-    #[cfg(target_os = "linux")]
-    {
-        use std::os::fd::FromRawFd;
-        // SAFETY: pidfd_open takes a pid and flags; the result is owned below.
-        let fd = unsafe { libc::syscall(libc::SYS_pidfd_open, pid as libc::pid_t, 0 as libc::c_uint) };
-        // SAFETY: a non-negative result is a new descriptor owned by nobody else.
-        (fd >= 0).then(|| unsafe { std::os::fd::OwnedFd::from_raw_fd(fd as libc::c_int) })
-    }
-    #[cfg(not(target_os = "linux"))]
-    {
-        let _ = pid;
-        None
     }
 }
 

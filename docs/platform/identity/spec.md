@@ -5,7 +5,7 @@ Document type: BA-grade area specification (draft)
 Audience: Owner, maintainer, implementation agent
 Purpose: One authority that mints and resolves the identities of machines, projects, clones and agent sessions, globally unique across machines and independent of any one project
 Design status: G0 signed 2026-10-22 for rungs I1-I4; I5 (authenticity mechanism) open
-Implementation status: Not started
+Implementation status: Rungs I2 (machine id and handle) and I3a (session full id and handle) implemented; I1, I3b and later not started
 Canonical: Yes for rungs I1-I4 (G0 signed 2026-10-22, section 10)
 Owner: Identity component (proposed)
 Source: packages/identity/rust
@@ -59,7 +59,7 @@ It also answers a sixth question for every other owner: **which id does this new
 
 | Identity | Today's owner | Form | Scope | Gap for this component |
 |---|---|---|---|---|
-| Machine id | Event Store (`packages/event-store/rust/src/identity.rs`); minted by setup | `<hostname-slug>-<6 random base32>` in `<stateRoot>/machine-id`; overridable per clone by git config `fgos.machineId` | user level, not per project | Good form. Its owner is the event log, not an identity authority. The per-clone override means "machine id" can differ between clones on one machine |
+| Machine id | Identity (`packages/identity/rust/src/machine.rs`; minted by `fgos doctor --fix`; Event Store reads it through the crate) | `<hostname-slug>-<6 random base32>` in `<stateRoot>/machine-id`; overridable per clone by git config `fgos.machineId` | user level, not per project | Moved here (rung I2). The per-clone override stays Event Store's own ref-name rule, so "machine id" for a ref can still differ between clones on one machine |
 | Store id | Event Store | random 128-bit, `store.json` in the clone | one per clone | Fits as the clone id; no human short form |
 | Writer id | Identity, local session (section 7a; `packages/identity/rust`) | env id (`FGOS_SESSION_ID`, `CODEX_THREAD_ID`, `CLAUDE_CODE_SESSION_ID`), else a pid, else unresolved | one process tree on one machine | Not qualified by machine. Not an address. Known limits in its section 6 (shared subagent ids, Codex daemon, pid reuse) |
 | Attempt writer id | Identity, local session (`att-<attemptId>`) | pure function of the attempt id | one runner attempt | Fits as the id of a runner worker; not addressable |
@@ -74,10 +74,10 @@ Every identity has a **full id** that machines use and never changes, and a **sh
 
 | Identity | Full id (proposal) | Short handle | Minted | Lives in |
 |---|---|---|---|---|
-| Machine | today's machine id, unchanged format | the id itself, or an alias such as `owner-laptop` | once per machine by setup | user state root (`~/.fgos`) |
+| Machine | today's machine id, unchanged format | the alias when set (`owner-laptop`), else the id without its last `-<6>` suffix (`fg-server`), `m-` prefixed when it starts with a digit, at most 40 characters; Convention kind `machine-handle` | once per machine by `fgos doctor --fix` (fix `identity-machine-id`); never replaced | `<stateRoot>/machine-id` and `machine-alias` (`~/.local/state/fgos` by default, holder-lock's state root) |
 | Project | random 128-bit, minted once per project | a slug chosen at mint time, for example `forgent` | once, by the first `fgos setup` in a repository without one | a tracked file in the repository, so every clone on every machine reads the same id |
 | Clone | today's store id | `<project-handle>@<machine-handle>` | once per clone | the clone |
-| Session (agent head) | `<machine-id>/<local session id>`, where the local id comes from Session Identity's rule | `<cli>-<2-4 characters>@<machine-handle>`, unique among live sessions of the project | at registration, when a head starts | the project's session directory (section 5) |
+| Session (agent head) | `<machine-id>/<local session id>`, where the local id comes from the writer-id rule (section 7a); a pid-sourced local id is `pid-<24 hex>` of sha256(boot id, pid, start time) | `<cli>-<4 base32 characters>@<machine-handle>`; the CLI is `claude` (`CLAUDE_CODE_SESSION_ID`), `codex` (`CODEX_THREAD_ID`), `worker` (`FGOS_SESSION_ID` starting `att-`), `fgos` (any other `FGOS_SESSION_ID`) or `shell` (pid); the suffix is the first 4 characters of lowercase base32 of sha256(local id) and never lengthens; a caller that cannot be told from any other has no handle | computed on every read (implemented, rung I3a); registered in a directory later (I3b) | the project's session directory (section 5, not yet implemented) |
 | Role alias (optional) | — | for example `lead:MAIL`, `lead:HARDEN` | when a human or a lead assigns a role | the session directory; resolves to the current session holding the role |
 
 Rules:
@@ -105,7 +105,7 @@ Pushes and ref writes go through the Git component, like every other git mutatio
 - **Local directory.** Each machine keeps the sessions registered on it: full id, short handle, CLI, project id, clone, start time, liveness (from process facts), role aliases.
 - **Shared directory.** A machine publishes the entries of its projects through the Event Store, on its own `refs/fgos/events/<machine-id>`, as a registered identity event type. Another machine sees them after its next fetch. This reuses Event Store transport (its section 14); it adds no server and no daemon.
 - **Freshness.** A remote entry is as fresh as the last fetch (Event Store sync interval). The resolver reports the age of what it read. It never claims that a remote session is alive.
-- **Verbs (owner-approved 2026-10-22).** Each identity has its own read: `fgos identity machine`, `fgos identity project`, `fgos identity session`, each with `--json`, returning the full id, the handle, the source the id was read from, and aliases. The crate exports the same reads (`machine()`, `project(repo)`, `session()`) so Node, through the addon, and Rust call them in process. Bare `fgos identity` keeps its current answer (the writer id) and adds the three ids, so doctor, the pre-commit hook and people change nothing. Resolution: `fgos identity resolve <handle>` returns exactly one full id or fails with "ambiguous" or "not found" and the candidates; `fgos identity list [--project] [--machine]` lists what the directory knows, with the age of remote entries.
+- **Verbs (owner-approved 2026-10-22).** Each identity has its own read: `fgos identity machine`, `fgos identity project`, `fgos identity session`, each with `--json`, returning the full id, the handle, the source the id was read from, and aliases. `machine` is implemented: `{id, handle, alias}`, read-only (operation `identity.read`), exit 65 with reason `machine-id-missing` when no id was minted; `session` is implemented: `{id, handle}` with the full id `<machine-id>/<local id>` (operation `identity.read`), exit 65 with reason `machine-id-missing` or `unresolved` (no handle exists for a caller that cannot be told from any other). `machine --alias <name>` is the one write (operation `identity.write`, the name must follow the Convention `machine-handle` kind, an alias that does not is ignored when read). Bare `fgos identity` is also `fgos identity writer`, operation `identity.writer`, contract `1.1.0`: the answer stays `{id, source}` and adds the optional `machine` (`{id, handle}`) and `session` (`{id, handle}`), each `null` when unknown (no machine id minted, or an unresolved caller); the bare verb never writes and never fails on a missing machine id, because the pre-commit hook and the doctor row read it. The crate exports the same reads (`machine()`, `project(repo)`, `session()`) so Node, through the addon, and Rust call them in process. Bare `fgos identity` keeps its current answer (the writer id) and adds the three ids, so doctor, the pre-commit hook and people change nothing. Resolution: `fgos identity resolve <handle>` returns exactly one full id or fails with "ambiguous" or "not found" and the candidates; `fgos identity list [--project] [--machine]` lists what the directory knows, with the age of remote entries.
 
 ## 6. Consumers
 
@@ -158,7 +158,7 @@ The rule lives in `packages/identity/rust/src/resolve.rs`; the OS is read only t
 
 ### L4. Verb and contract
 
-`fgos identity [--pid <n>] [--fgos-dir <dir>]` — native route `identity.writer`, host kind `cli`, effect read, runs under `FGOS_RUST_HOST_RECURSION_GUARD`. `--pid` defaults to the process that started `fgos` (unix) or `fgos` itself (Windows). `--fgos-dir` absent skips registry confirmation. Bad options exit non-zero with no envelope. The answer is the standard `fgos.v1` envelope with `data = {id, source}`; `id` is a string for `registry`/`env` and a positive integer for `pid`/`unresolved`.
+`fgos identity [--pid <n>] [--fgos-dir <dir>]` (also `fgos identity writer`) — native route `identity.writer`, host kind `cli`, effect read, runs under `FGOS_RUST_HOST_RECURSION_GUARD`. `--pid` defaults to the process that started `fgos` (unix) or `fgos` itself (Windows). `--fgos-dir` absent skips registry confirmation. Bad options exit non-zero with no envelope. The answer is the standard `fgos.v1` envelope with `data = {id, source}` plus optional `machine` and `session` (section 5); `id` is a string for `registry`/`env` and a positive integer for `pid`/`unresolved`.
 
 ### L5. Node facade
 

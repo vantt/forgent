@@ -83,14 +83,16 @@ test('every operation of the port answers through the route', () => {
   assert.equal(scan.result, 'scan');
   assert.ok(Array.isArray(scan.findings));
 
-  // The fake herdr reports a foreground process that does not exist, so the root is never
-  // identified: the route answers not-started, and the launch request reached herdr once.
-  const launcher = client({ config: { launchIdentifyTimeoutMs: 200 } });
+  // The fake herdr's pane never has a program in its foreground that the shell holds: the shell
+  // handshake cannot prove a ready shell, so the route answers not-started and nothing is typed.
+  const launcher = client({ config: { launchIdentifyTimeoutMs: 200, shellReadyTimeoutMs: 600 } });
   assert.equal(launcher.allocate({ key: 'k-launch', groupKey: 'g-launch', display }).result, 'slot');
   const runsBefore = calls().filter((c) => c.startsWith('pane run')).length;
   const launched = launcher.launch({ key: 'k-launch', launchSpec: { command: 'sleep', args: ['300'], cwd: scratch, env: {} } });
   assert.equal(launched.result, 'not-started');
-  assert.equal(calls().filter((c) => c.startsWith('pane run')).length, runsBefore + 1);
+  assert.ok(launched.reason, 'the route names why nothing started');
+  const runsAfter = calls().filter((c) => c.startsWith('pane run')).slice(runsBefore);
+  assert.ok(runsAfter.every((c) => c.includes("printf '%s%s\\n' fgos-ok-")), `only probes were typed: ${JSON.stringify(runsAfter)}`);
 
   assert.deepEqual(tc.release({ key: 'k-attached', disposition: 'retain', until: null }), { result: 'released', disposition: 'retain' });
   assert.deepEqual(tc.release({ key: 'k-one', disposition: 'close' }), { result: 'released', disposition: 'close' });

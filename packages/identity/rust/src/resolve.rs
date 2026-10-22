@@ -48,6 +48,11 @@ impl std::fmt::Display for WriterId {
 pub struct WriterIdentity {
     pub id: WriterId,
     pub source: Source,
+    /// The env variable that gave the id (`env` and `registry` sources),
+    /// kept so a handle can name the CLI without re-reading the rule. Not
+    /// part of the `{id, source}` answer.
+    #[serde(skip)]
+    pub env_var: Option<&'static str>,
 }
 
 impl WriterIdentity {
@@ -55,12 +60,14 @@ impl WriterIdentity {
         Self {
             id: WriterId::Pid(pid),
             source: Source::Pid,
+            env_var: None,
         }
     }
     fn unresolved(pid: u32) -> Self {
         Self {
             id: WriterId::Pid(pid),
             source: Source::Unresolved,
+            env_var: None,
         }
     }
 }
@@ -104,6 +111,7 @@ pub fn env_identity(
         Some(WriterIdentity {
             id: WriterId::Session(id),
             source,
+            env_var: Some(*key),
         })
     })
 }

@@ -1,7 +1,7 @@
 //! The sole Git spawn door. Raw argv and borrowed spawn are crate-private.
 use crate::*;
 use fgos_process::containment::{self, ContainmentDriver, SpawnSpec, StartMode};
-use fgos_process::DomainState;
+use fgos_process::{DomainState, KillOutcome};
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use std::fs::{self, File};
 use std::io::Read;
@@ -12,6 +12,8 @@ use std::time::{Duration, Instant};
 
 pub(crate) const PATH_LIMIT: usize = 64 * 1024 * 1024;
 const DIFF_LIMIT: usize = 50 * 1024 * 1024;
+/// How often a contained call rechecks its output limit while it waits.
+const OVERFLOW_CHECK: Duration = Duration::from_millis(10);
 const STDERR_LIMIT: usize = 64 * 1024;
 /// A borrowed run is where commit hooks run, and Git sends their output to stderr: commit children
 /// get the holder-lock ceiling for them (holder-lock spec, run_borrowed: 64 MiB), never a cut.
@@ -962,6 +964,20 @@ impl GitDriver {
         }
         Ok(false)
     }
+    /// Whether the repository has a submodule: a `.gitmodules` file in the
+    /// worktree, or a non-empty `<common git dir>/modules` directory.
+    fn has_submodules(repo: &RepoHandle) -> bool {
+        if repo
+            .work_tree()
+            .is_some_and(|w| w.join(".gitmodules").is_file())
+        {
+            return true;
+        }
+        match fs::read_dir(repo.common_dir().join("modules")) {
+            Ok(mut entries) => entries.next().is_some(),
+            Err(_) => false,
+        }
+    }
 
     #[allow(clippy::too_many_arguments)]
     fn invoke_context(
@@ -1166,6 +1182,18 @@ impl GitDriver {
         if !input.is_empty() && policy != Policy::Inspect {
             return Err(refusal("git-input-requires-borrow"));
         }
+        let watch_token = (self.containment.guarantee().level
+            == containment::GuaranteeLevel::BestEffort
+            // Reading the configuration runs no user code, and it is itself how
+            // the predicate below learns the configuration.
+            && args.first() != Some(&"config")
+            && repo.is_some_and(|r| {
+                self.user_code_may_run(r, policy).unwrap_or(true) || Self::has_submodules(r)
+            }))
+        .then(containment::watch_token);
+        if let Some(token) = &watch_token {
+            env.0.insert(containment::WATCH_ENV.into(), token.clone());
+        }
         let (stdin_r, mut stdin_w) = std::io::pipe().map_err(io)?;
         let (stdout_r, stdout_w) = std::io::pipe().map_err(io)?;
         let (stderr_r, stderr_w) = std::io::pipe().map_err(io)?;
@@ -1201,6 +1229,8 @@ impl GitDriver {
         let overflow = Arc::new(AtomicBool::new(false));
         let out = capture(stdout_r, limit, overflow.clone());
         let err = capture(stderr_r, STDERR_LIMIT, overflow.clone());
+        #[cfg(unix)]
+        let exit_fd = fgos_process::control::exit_descriptor(spawned.child.id());
         let start = Instant::now();
         let mut stopped = None;
         let status = loop {
@@ -1213,18 +1243,38 @@ impl GitDriver {
                 } else {
                     "git-timeout"
                 });
-                self.containment.kill_all(&mut domain, 3000);
+                if self.containment.kill_all(&mut domain, 3000) != KillOutcome::Ok {
+                    std::thread::spawn(move || {
+                        let _ = spawned.child.wait();
+                    });
+                    return Err(refusal("containment-unproven"));
+                }
                 break spawned.child.wait().map_err(io)?;
             }
-            std::thread::sleep(Duration::from_millis(2));
+            // Wake on the child's exit (pidfd) without a fixed sleep; the
+            // short step still notices an output overflow promptly.
+            let step = timeout.saturating_sub(start.elapsed()).min(OVERFLOW_CHECK);
+            #[cfg(unix)]
+            match &exit_fd {
+                Some(fd) => {
+                    use std::os::fd::AsRawFd;
+                    let mut pfd = libc::pollfd { fd: fd.as_raw_fd(), events: libc::POLLIN, revents: 0 };
+                    let ms = step.as_millis().max(1) as libc::c_int;
+                    // SAFETY: one pollfd on a descriptor owned by this call.
+                    unsafe { libc::poll(&mut pfd, 1, ms) };
+                }
+                None => std::thread::sleep(step.min(Duration::from_millis(1))),
+            }
+            #[cfg(not(unix))]
+            std::thread::sleep(step.min(Duration::from_millis(1)));
         };
         // A root exit is not proof that pipe-owning descendants have exited.
-        if self.containment.is_empty(&mut domain) != DomainState::Empty {
-            self.containment.kill_all(&mut domain, 3000);
-            if self.containment.is_empty(&mut domain) != DomainState::Empty {
-                // Readers are detached, never block indefinitely on an escapee.
-                return Err(refusal("containment-unproven"));
-            }
+        if self.containment.is_empty(&mut domain) != DomainState::Empty
+            && (self.containment.kill_all(&mut domain, 3000) != KillOutcome::Ok
+                || self.containment.is_empty(&mut domain) != DomainState::Empty)
+        {
+            // Readers are detached, never block indefinitely on an escapee.
+            return Err(refusal("containment-unproven"));
         }
         let stdout = out
             .recv_timeout(Duration::from_secs(1))
@@ -1240,6 +1290,13 @@ impl GitDriver {
         }
         if overflow.load(Ordering::Relaxed) {
             return Err(refusal("git-output-limit"));
+        }
+        if status.success() {
+            if let Some(token) = &watch_token {
+                if !containment::environment_marked(containment::WATCH_ENV, token).is_empty() {
+                    return Err(refusal("containment-unproven"));
+                }
+            }
         }
         Ok(Output {
             stdout,
@@ -3158,6 +3215,161 @@ mod tests {
             redact(b"fatal: https://user:secret@host/repo?token=secret\n"),
             b"fatal: https://[redacted]@host/repo?[redacted]"
         );
+    }
+    /// Delegates to the machine's driver but can never empty a domain, as when
+    /// a member is stuck in uninterruptible I/O.
+    struct UnemptiedDriver {
+        inner: Box<dyn ContainmentDriver>,
+    }
+    impl ContainmentDriver for UnemptiedDriver {
+        fn name(&self) -> &'static str {
+            self.inner.name()
+        }
+        fn create(&self, attempt_id: &str) -> std::result::Result<containment::ContainmentDomain, containment::ContainmentError> {
+            self.inner.create(attempt_id)
+        }
+        fn spawn_in(&self, domain: &mut containment::ContainmentDomain, spec: SpawnSpec) -> std::result::Result<containment::Spawned, containment::ContainmentError> {
+            self.inner.spawn_in(domain, spec)
+        }
+        fn is_empty(&self, domain: &mut containment::ContainmentDomain) -> DomainState {
+            self.inner.is_empty(domain)
+        }
+        fn kill_all(&self, domain: &mut containment::ContainmentDomain, _grace_ms: u64) -> KillOutcome {
+            // End the real processes so the test leaves nothing behind, but
+            // answer as a driver that could not.
+            self.inner.kill_all(domain, 0);
+            KillOutcome::Refused
+        }
+        fn guarantee(&self) -> containment::Guarantee {
+            self.inner.guarantee()
+        }
+    }
+    #[test]
+    #[cfg(unix)]
+    fn a_timed_out_contained_call_whose_domain_cannot_be_emptied_returns_containment_unproven_without_waiting() {
+        let state = Temp::new();
+        let dir = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        driver.containment = Box::new(UnemptiedDriver { inner: driver.containment });
+        let repo = resolve(&driver, &dir.0);
+        let start = Instant::now();
+        let err = driver
+            .invoke(
+                Some(&repo),
+                &dir.0,
+                &["-c", "alias.stall=!sleep 30", "stall"],
+                Policy::Inspect,
+                None,
+                true,
+                1000,
+                Duration::from_millis(200),
+            )
+            .err()
+            .unwrap();
+        assert_eq!(err.cause, "containment-unproven");
+        assert!(start.elapsed() < Duration::from_secs(3), "took {:?}", start.elapsed());
+    }
+    #[test]
+    #[cfg(target_os = "linux")]
+    fn a_contained_call_whose_root_exited_but_whose_domain_cannot_be_emptied_returns_containment_unproven() {
+        let state = Temp::new();
+        let dir = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        // A process-group domain sees the background member the root leaves.
+        driver.containment = Box::new(UnemptiedDriver { inner: Box::new(fgos_process::containment::LinuxPgroup) });
+        let repo = resolve(&driver, &dir.0);
+        let err = driver
+            .invoke(
+                Some(&repo),
+                &dir.0,
+                &["-c", "alias.leave=!sleep 30 </dev/null >/dev/null 2>&1 &", "leave"],
+                Policy::Inspect,
+                None,
+                true,
+                1000,
+                Duration::from_secs(10),
+            )
+            .err()
+            .unwrap();
+        assert_eq!(err.cause, "containment-unproven");
+    }
+    #[test]
+    #[cfg(target_os = "linux")]
+    fn submodule_filter_escapee_reported_as_containment_unproven_on_best_effort_containment() {
+        let state = Temp::new();
+        let super_dir = Temp::new();
+        let sub_src = Temp::new();
+
+        git(&super_dir.0, &["init", "-q", "-b", "main"]);
+        git(&super_dir.0, &["config", "user.name", "Test"]);
+        git(&super_dir.0, &["config", "user.email", "test@test.local"]);
+        fs::write(super_dir.0.join("README"), "init").unwrap();
+        git(&super_dir.0, &["add", "README"]);
+        git(&super_dir.0, &["commit", "-q", "-m", "init"]);
+
+        git(&sub_src.0, &["init", "-q", "-b", "main"]);
+        git(&sub_src.0, &["config", "user.name", "Test"]);
+        git(&sub_src.0, &["config", "user.email", "test@test.local"]);
+        fs::write(sub_src.0.join("tracked"), "sub content").unwrap();
+        fs::write(sub_src.0.join(".gitattributes"), "tracked filter=x\n").unwrap();
+        git(&sub_src.0, &["add", "tracked", ".gitattributes"]);
+        git(&sub_src.0, &["commit", "-q", "-m", "sub init"]);
+
+        git(
+            &super_dir.0,
+            &[
+                "-c",
+                "protocol.file.allow=always",
+                "submodule",
+                "add",
+                sub_src.0.to_str().unwrap(),
+                "sub",
+            ],
+        );
+        git(&super_dir.0, &["commit", "-q", "-m", "add submodule"]);
+
+        let sub_dir = super_dir.0.join("sub");
+        let script = sub_dir.join("filter.sh");
+        let pid_file = sub_dir.join("survivor.pid");
+        fs::write(
+            &script,
+            format!(
+                "#!/bin/sh\n(setsid sh -c 'echo $$ > \"{}\"; exec sleep 5' </dev/null >/dev/null 2>&1 &)\ncat\n",
+                pid_file.display()
+            ),
+        )
+        .unwrap();
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&script, fs::Permissions::from_mode(0o755)).unwrap();
+        }
+        git(&sub_dir, &["config", "filter.x.clean", script.to_str().unwrap()]);
+
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        driver.containment = Box::new(fgos_process::containment::LinuxPgroup);
+        let repo = resolve(&driver, &super_dir.0);
+
+        let err = driver
+            .status(
+                &repo,
+                crate::inspect::Untracked::All,
+                crate::inspect::Submodules::Configured,
+                crate::inspect::Ignored::Excluded,
+                None,
+                100,
+            )
+            .unwrap_err();
+        assert_eq!(err.cause, "containment-unproven");
+
+        if let Ok(pid_text) = fs::read_to_string(&pid_file) {
+            if let Ok(pid) = pid_text.trim().parse::<u32>() {
+                // SAFETY: terminating background process started by this test.
+                unsafe { libc::kill(pid as libc::pid_t, libc::SIGKILL) };
+            }
+        }
+
     }
 }
 
