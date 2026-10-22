@@ -136,6 +136,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'doc-near-duplicate',
       'doc-provisional-aged',
       'doc-topic-oversized',
+      'documentation-cutover-lease',
       'doc-role-underused',
       'doc-source-conservation',
       'agy-permissions-configured',

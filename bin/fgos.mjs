@@ -3855,8 +3855,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const cwd = process.cwd();
       const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
       if (sub === 'acquire') {
-        const res = acquireDocumentationCutoverLease({ repoRoot: flags.worktree ?? repoRoot });
-        if (flags.json) return output(res);
+        const holderWorktree = flags.worktree ? path.resolve(flags.worktree) : cwd;
+        const res = acquireDocumentationCutoverLease({ repoRoot: holderWorktree, worktree: holderWorktree });
+        if (flags.json) return output({ result: res.result, tokenHash: res.tokenHash, tokenPath: res.tokenPath, sidecar: res.sidecar });
         console.log(`acquired documentation-cutover lease (token hash: ${res.tokenHash})`);
         return;
       }
@@ -3873,15 +3874,15 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         return;
       }
       if (sub === 'release') {
-        const res = releaseDocumentationCutoverLease({ repoRoot, token: flags.token });
+        const res = releaseDocumentationCutoverLease({ repoRoot: cwd });
         if (flags.json) return output(res);
         console.log(`released documentation-cutover lease at ${res.releasedAt}`);
         return;
       }
       if (sub === 'abandon') {
         const res = abandonDocumentationCutoverLease({
-          repoRoot,
-          ownerConfirmed: Boolean(flags['owner-confirmed'] || flags.force),
+          repoRoot: cwd,
+          ownerConfirmed: Boolean(flags['owner-confirmed']),
           reason: flags.reason,
         });
         if (flags.json) return output(res);

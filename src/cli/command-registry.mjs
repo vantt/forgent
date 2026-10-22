@@ -415,7 +415,7 @@ export const COMMAND_REGISTRY = [
       },
       release: {
         description: 'Release the documentation-cutover write lease (holder only).',
-        parameters: { type: 'object', properties: { token: { type: 'string' } }, required: [] },
+        parameters: { type: 'object', properties: {}, required: [] },
         examples: ['fgos docs-lease release'],
       },
       abandon: {

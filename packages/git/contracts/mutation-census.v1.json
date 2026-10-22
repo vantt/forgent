@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5a35ac4ea8418e237663f5466bdb5de95fa7e6ae6183fc95d71f2a2f9d3d3ff0",
+  "payloadDigest": "7718a6bbc93339adce79cde42e95ad592d2280381bf09812f665ac5ca991fd0a",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -64,8 +64,8 @@
     ".agents/skills/fgos-researching/SKILL.md": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
     ".agents/skills/fgos-routing/SKILL.md": "8a215975394d282772c768e69a0767aabbf1a2ca30e0fe7959252f7fcdba3a8e",
     ".agents/skills/fgos-run/SKILL.md": "03546387e1980b232ef90159c93aa8b7e6f7da787f71980d284fceea855bdc11",
-    ".githooks/pre-commit": "397150fc9d7e5193589b84f8ff2e61d04e66499c0b49a585bebeca33a23f28f8",
-    ".githooks/reference-transaction": "7f28ab89d03763514a88fc5bb01f1dae9b092ad697c9e491fadd412bee014f22",
+    ".githooks/pre-commit": "f814d7ba69e2da9e9b54d6f438e43f79bcf72f34ec8a3e227ecd575cc074baf3",
+    ".githooks/reference-transaction": "3b8f7a3d963a2cc3910880256843fe45352535c9a0ea83fa88931f9e5ee170e8",
     "apps/fgctl/src/main.rs": "3f59cfc17cfd6c8268d15dcbeb0649b8cead1d18c387c7b20e14ce55ab26b9ff",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "bfea8f7ae0cf3efc8ca60adba26fa645613ccf1b1196dc2d220b69562401b8c6",
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c8a6cb7619d9578e02479069fbb0f43a5206583b53a7c6d65373d285d69ca331",
@@ -92,7 +92,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
     "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
     "bin/fgos-runner.mjs": "dca3d8b530f20aaf8d9d8d424f12ec1c5d9670812566ab4d6c51583f3bb7b573",
-    "bin/fgos.mjs": "10beccbc0f4a13b8a47914c7aaf5aa0e8a5857109d4941cbe6b75d185a54bbc0",
+    "bin/fgos.mjs": "7ee9f0abc7b24e8e58010c9489d737b62e28d38b7d7a18eff019d1f8f75be32f",
     "core/skills/_shared/ak-cook-worker-contract.md": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
     "core/skills/_shared/capability-catalog.md": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -644,7 +644,7 @@
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
     "src/cli/approve-fault-log.mjs": "e362c6b4a676839f6010c08d1df648f5973c2d9ec7a13acf97e40f93b57b42ab",
-    "src/cli/command-registry.mjs": "7b6fc0ae94c6dc51510bf4efa0afe4ad3fa49401740c78b847231d5b1b6a3584",
+    "src/cli/command-registry.mjs": "a93a1baf3577a066eda80ba54e5ffdd1bd78aa1a75b75ab6f59cf6c7334f0801",
     "src/cli/deprecation.mjs": "45e7d11ad8681fc89e4c99f4ef53b7c93a477f6b5fdd6708eddcf0b579dd3985",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/invocation-fault-log.mjs": "c36b79eb7fa658c6c685d1dc99204ddf9de96b29e10eb5d03f82141cf9ab2fa9",
@@ -789,7 +789,7 @@
     "src/runner/dispatch/worker-session-boot.mjs": "4b9ab1d22466839c51a8ce0c34d973018cf365e3992e6556c8bc15a9aa110e10",
     "src/runner/dispatch/worker-session.mjs": "35e0cfe18540bad339abbf93a2ecdb99b1924249f637ae5f54b48c532892c3b0",
     "src/runner/dispatch/write-scope.mjs": "b926332413077cfb8246da969373de205ecf003b3a263baf6c08177a27d3885a",
-    "src/runner/documentation-cutover-lease.mjs": "fae7ccaf75e3f7d3c7bb36ba68f05bab43dd300f32a2e491481a59130e363cbc",
+    "src/runner/documentation-cutover-lease.mjs": "f05b84e2efd44c530e6360b45460b93925e8207d19fb75f0154f0ee8213d4fa5",
     "src/runner/execution/account-pin.mjs": "0a9d8f632bd5b814c056139df3b4e340aac0574d8bd7db6b60c7a7b0305d4cfe",
     "src/runner/execution/account-rotation.mjs": "f538c5b3f787f0add709535aa0f6629bd007520575a316e19781cef43050553a",
     "src/runner/execution/bind.mjs": "ce1143da7c20dab1c78646dbe7eab41e9c3057c142334aae6799cc8f67f0f44a",
@@ -988,6 +988,20 @@
     "src/workflow/units-source.mjs": "63fa30666c4ba9edb5174c47042a08b02007ff1bb34e95df918956029a7e37c3"
   },
   "sites": [
+    {
+      "path": ".githooks/reference-transaction",
+      "line": 68,
+      "spawn": "shell",
+      "binary": "DIFF_OUT=$(git diff-tree -r -z --no-renames --name-only 4b825dc642cb6eb9a060e54b",
+      "family": "shell"
+    },
+    {
+      "path": ".githooks/reference-transaction",
+      "line": 70,
+      "spawn": "shell",
+      "binary": "DIFF_OUT=$(git diff-tree -r -z --no-renames --name-only \"$old_oid\" \"$new_oid\" 2>",
+      "family": "shell"
+    },
     {
       "path": "scripts/check-doc-constitution.mjs",
       "line": 640,
@@ -1649,7 +1663,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:526"
+        ".githooks/pre-commit:543"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1663,7 +1677,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:526"
+        ".githooks/pre-commit:543"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1677,7 +1691,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:526"
+        ".githooks/pre-commit:543"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1691,7 +1705,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:532"
+        ".githooks/pre-commit:549"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1705,7 +1719,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:532"
+        ".githooks/pre-commit:549"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1719,7 +1733,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:532"
+        ".githooks/pre-commit:549"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1733,7 +1747,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:532"
+        ".githooks/pre-commit:549"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1845,7 +1859,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:517"
+        ".githooks/pre-commit:534"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1880,7 +1894,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:595"
+        ".githooks/pre-commit:612"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1894,7 +1908,21 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:595"
+        ".githooks/pre-commit:612"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "cat-file"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 516,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:612"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1903,32 +1931,12 @@
     },
     {
       "path": ".githooks/reference-transaction",
-      "line": 36,
+      "line": 30,
       "spawn": "shell",
-      "binary": "COMMON_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null |",
+      "binary": "SIDECAR_JSON=$(git cat-file -p refs/heads/main:plans/documentation-cutover-lease",
       "class": "hook-read-context",
       "verbs": [
-        "rev-parse"
-      ]
-    },
-    {
-      "path": ".githooks/reference-transaction",
-      "line": 78,
-      "spawn": "shell",
-      "binary": "CHANGED=$(git diff --name-only 4b825dc642cb6eb9a060e54bf8d69288fbee4904 \"$new_oi",
-      "class": "hook-read-context",
-      "verbs": [
-        "diff"
-      ]
-    },
-    {
-      "path": ".githooks/reference-transaction",
-      "line": 80,
-      "spawn": "shell",
-      "binary": "CHANGED=$(git diff --name-only \"$old_oid\" \"$new_oid\" 2>/dev/null || true)",
-      "class": "hook-read-context",
-      "verbs": [
-        "diff"
+        "cat-file"
       ]
     },
     {

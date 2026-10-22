@@ -1,11 +1,10 @@
 #!/bin/sh
 # .githooks/reference-transaction -- documentation-cutover write lease ref guard
-# (plan 260925-documentation-authority-unification Phase 8, Step 6b).
 #
 # Fires for every reference transaction in the repository. Fast-paths when:
 # 1. State is not "prepared"
-# 2. Ref name does not match target branch (main) or plan branch
-# 3. No lease sidecar exists or lease is not held
+# 2. Ref name does not match target branch (main)
+# 3. No lease sidecar exists on refs/heads/main
 set -e
 
 # Fast path 1: Only "prepared" state can abort a transaction
@@ -19,96 +18,96 @@ if [ -z "$INPUT" ]; then
   exit 0
 fi
 
-# Fast path 2: Only guard target branch (main) and the cutover plan branch
-echo "$INPUT" | grep -qE 'refs/heads/(main|plan/260925-documentation-authority-unification)' || exit 0
+# Fast path 2: Only guard target branch (refs/heads/main)
+echo "$INPUT" | grep -q 'refs/heads/main' || exit 0
 
-# Fast path 3: Resolve sidecar path (check cwd, then hook parent, then git common dir)
-REPO_ROOT=$(pwd)
-SIDECAR="$REPO_ROOT/plans/260925-documentation-authority-unification/reports/phase-08/cutover-write-lease.json"
-
-if [ ! -f "$SIDECAR" ]; then
-  HOOK_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-  MAIN_ROOT=$(cd "$HOOK_DIR/.." && pwd)
-  SIDECAR="$MAIN_ROOT/plans/260925-documentation-authority-unification/reports/phase-08/cutover-write-lease.json"
+# Fast path 3: Check sidecar on refs/heads/main (never trust working tree or cwd)
+if ! git cat-file -e refs/heads/main:plans/documentation-cutover-lease.json 2>/dev/null; then
+  exit 0
 fi
 
-if [ ! -f "$SIDECAR" ]; then
-  COMMON_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)
-  if [ -n "$COMMON_DIR" ]; then
-    COMMON_ROOT=$(dirname "$COMMON_DIR")
-    SIDECAR="$COMMON_ROOT/plans/260925-documentation-authority-unification/reports/phase-08/cutover-write-lease.json"
+# Fast path 4: Read sidecar content from refs/heads/main
+SIDECAR_JSON=$(git cat-file -p refs/heads/main:plans/documentation-cutover-lease.json 2>/dev/null || true)
+if [ -z "$SIDECAR_JSON" ]; then
+  # Fail closed on unreadable/corrupt sidecar (Ruling 5)
+  echo "reference-transaction refused: documentation-cutover lease sidecar on refs/heads/main is unreadable; failing closed." >&2
+  exit 1
+fi
+
+if ! echo "$SIDECAR_JSON" | grep -q '"state"[[:space:]]*:[[:space:]]*"held"'; then
+  exit 0
+fi
+
+# Extract holder token hash from sidecar
+HOLDER_HASH=$(echo "$SIDECAR_JSON" | grep -o '"holderTokenHash"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"holderTokenHash"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+
+# Check holder token ONLY in current worktree (.fgos/documentation-cutover.token)
+IS_HOLDER=""
+if [ -f ".fgos/documentation-cutover.token" ]; then
+  TOKEN=$(cat ".fgos/documentation-cutover.token" 2>/dev/null | tr -d '[:space:]')
+  if [ -n "$TOKEN" ]; then
+    TOKEN_HASH=$(printf "%s" "$TOKEN" | sha256sum | awk '{print $1}')
+    if [ "$TOKEN_HASH" = "$HOLDER_HASH" ]; then
+      IS_HOLDER="1"
+    fi
   fi
-fi
-
-if [ ! -f "$SIDECAR" ]; then
-  exit 0
-fi
-
-# Fast path 4: If sidecar is not in "held" state, allow immediately
-if ! grep -q '"state"[[:space:]]*:[[:space:]]*"held"' "$SIDECAR"; then
-  exit 0
 fi
 
 # Iterate over stdin lines without subshell to ensure exit 1 aborts the script
 while read -r old_oid new_oid ref_name; do
   [ -z "$ref_name" ] && continue
 
-  # 1. Plan branch protection: refuse deletion or non-fast-forward
-  if [ "$ref_name" = "refs/heads/plan/260925-documentation-authority-unification" ]; then
-    if [ "$new_oid" = "0000000000000000000000000000000000000000" ]; then
-      echo "reference-transaction refused: cannot delete plan branch while documentation-cutover lease is held." >&2
-      exit 1
-    fi
-    if [ "$old_oid" != "0000000000000000000000000000000000000000" ]; then
-      if ! git merge-base --is-ancestor "$old_oid" "$new_oid" 2>/dev/null; then
-        echo "reference-transaction refused: non-fast-forward update of plan branch is refused while documentation-cutover lease is held." >&2
-        exit 1
-      fi
-    fi
-  fi
-
-  # 2. Target branch protection
   if [ "$ref_name" = "refs/heads/main" ]; then
     if [ "$new_oid" = "0000000000000000000000000000000000000000" ]; then
       echo "reference-transaction refused: cannot delete target branch while documentation-cutover lease is held." >&2
       exit 1
     fi
 
+    # Compute changed files using git diff-tree with -z --no-renames (Ruling 6, Finding H3)
     if [ "$old_oid" = "0000000000000000000000000000000000000000" ]; then
-      CHANGED=$(git diff --name-only 4b825dc642cb6eb9a060e54bf8d69288fbee4904 "$new_oid" 2>/dev/null || true)
+      DIFF_OUT=$(git diff-tree -r -z --no-renames --name-only 4b825dc642cb6eb9a060e54bf8d69288fbee4904 "$new_oid" 2>/dev/null || echo "DIFF_FAILED")
     else
-      CHANGED=$(git diff --name-only "$old_oid" "$new_oid" 2>/dev/null || true)
+      DIFF_OUT=$(git diff-tree -r -z --no-renames --name-only "$old_oid" "$new_oid" 2>/dev/null || echo "DIFF_FAILED")
     fi
 
-    # Check if CHANGED intersects scope
-    if echo "$CHANGED" | grep -qE '^(docs(/|$)|AGENTS\.md$|CLAUDE\.md$|core/skills(/|$)|(\.agents/skills|plugins/fgOS/skills)(/|$)|plans/260925-documentation-authority-unification/(transitional-switchboard\.json|reports/phase-08/cutover-write-lease\.json))'; then
-      # Check holder token in current worktree or main checkout
-      TOKEN_FILE=""
-      if [ -f ".fgos/documentation-cutover.token" ]; then
-        TOKEN_FILE=".fgos/documentation-cutover.token"
-      elif [ -f "$REPO_ROOT/.fgos/documentation-cutover.token" ]; then
-        TOKEN_FILE="$REPO_ROOT/.fgos/documentation-cutover.token"
-      elif [ -n "$MAIN_ROOT" ] && [ -f "$MAIN_ROOT/.fgos/documentation-cutover.token" ]; then
-        TOKEN_FILE="$MAIN_ROOT/.fgos/documentation-cutover.token"
-      elif [ -f ".fgos/locks/documentation-cutover.token" ]; then
-        TOKEN_FILE=".fgos/locks/documentation-cutover.token"
+    if [ "$DIFF_OUT" = "DIFF_FAILED" ]; then
+      echo "reference-transaction refused: unable to compute diff on refs/heads/main while lease is held; failing closed." >&2
+      exit 1
+    fi
+
+    # Check scope intersection using node helper with intersectsScope (Ruling 6)
+    HOOK_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+    MAIN_DIR=$(cd "$HOOK_DIR/.." && pwd)
+    TOUCHES_SCOPE=$(printf "%s" "$DIFF_OUT" | node --input-type=module -e '
+      import fs from "node:fs";
+      import path from "node:path";
+      import { pathToFileURL } from "node:url";
+      const modPath = path.resolve(process.argv[1], "src/runner/documentation-cutover-lease.mjs");
+      const { intersectsScope } = await import(pathToFileURL(modPath).href);
+      const raw = fs.readFileSync(0);
+      const paths = [];
+      let start = 0;
+      for (let i = 0; i < raw.length; i++) {
+        if (raw[i] === 0) {
+          if (i > start) paths.push(raw.subarray(start, i));
+          start = i + 1;
+        }
+      }
+      if (start < raw.length) paths.push(raw.subarray(start));
+      if (intersectsScope(paths)) {
+        process.stdout.write("1");
+      }
+    ' "$MAIN_DIR" 2>/dev/null || echo "1")
+
+    if [ "$TOUCHES_SCOPE" = "1" ]; then
+      ONLY_SIDECAR=$(printf "%s" "$DIFF_OUT" | tr '\0' '\n' | grep -v '^plans/documentation-cutover-lease\.json$' | grep -v '^$' || true)
+      if [ -z "$ONLY_SIDECAR" ] && [ -n "$IS_HOLDER" ]; then
+        continue
       fi
 
-      IS_HOLDER=""
-      if [ -n "$TOKEN_FILE" ]; then
-        TOKEN=$(cat "$TOKEN_FILE" 2>/dev/null | tr -d '[:space:]')
-        if [ -n "$TOKEN" ]; then
-          TOKEN_HASH=$(printf "%s" "$TOKEN" | sha256sum | awk '{print $1}')
-          if grep -q "$TOKEN_HASH" "$SIDECAR"; then
-            IS_HOLDER="1"
-          fi
-        fi
-      fi
-
-      if [ -z "$IS_HOLDER" ]; then
-        echo "reference-transaction refused: reference update touches documentation scope while documentation-cutover write lease is held. Run \"fgos docs-lease status\" or \"fgos docs-lease abandon\"." >&2
-        exit 1
-      fi
+      # Otherwise refused for everyone, holder included (Ruling 3)
+      echo "reference-transaction refused: reference update touches documentation scope while documentation-cutover write lease is held. Run \"fgos docs-lease status\" or \"fgos docs-lease abandon\"." >&2
+      exit 1
     fi
   fi
 done << EOF

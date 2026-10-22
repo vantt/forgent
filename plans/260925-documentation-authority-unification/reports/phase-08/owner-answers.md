@@ -1533,3 +1533,34 @@ This is accounting only: no authority/content approval, consumer rewrite, target
 ### 4. What could not be done
 
 - `test/setup/checks.test.mjs` contains a hardcoded list of expected check IDs for `DOCTOR_CHECKS`. Adding `documentation-cutover-lease` to `src/setup/registrations.mjs` causes that specific inventory test in `checks.test.mjs` to expect `checks.test.mjs` to be updated. Because `test/setup/checks.test.mjs` is outside the writable scope of this task slice, it was not edited, and is recorded as a write dependency (`needsWrites: ["test/setup/checks.test.mjs"]`). The check's functionality and doctor contract are fully proven in `test/runner/documentation-cutover-lease.test.mjs`.
+
+
+## L12-105 — Step 6b slice 1 documentation-cutover lease rework after adversarial review (Lead under A42, 2026-10-22)
+
+### 1. Lead rulings and implemented fixes
+
+Closed all five High findings (H1–H5), all Medium findings (M1–M7), and all Low findings (L1–L5) from `review-a38-step-06b-slice1.md`:
+
+1. **H1 / Ruling 1 (Authority lives on main):** The lease sidecar path is set to the plan-independent path `plans/documentation-cutover-lease.json`. Gates (`pre-commit`, `reference-transaction`, `doctor`, `leaseAdmission`) read the committed sidecar from `refs/heads/main` through the typed Git read port (`createGitInspect` / `pathsAtRevision`) and hooks via `git cat-file -e`/`-p refs/heads/main:plans/documentation-cutover-lease.json`. A working-tree copy is never trusted; untracked or forged working-tree files cannot bypass or reopen the freeze. The sidecar path itself is in the refused scope while held.
+2. **H2 / M4 / Ruling 2 (One lock, one token location):** The kernel lock `documentation-cutover` always lives in the main checkout's `.fgos/` regardless of `--worktree`. The holder token lives strictly in the holder worktree's `.fgos/documentation-cutover.token`. Added `.fgos/*.token` to `.gitignore`. Main-root token fallbacks removed from both gates.
+3. **Ruling 3 (Holder landings onto main):** Raw ref movement on `refs/heads/main` touching scope is refused for everyone while held, holder included. Holder landings onto main go only through Land plus the slice-2 merge gate.
+4. **M3 / Ruling 4 (Abandon):** Kernel lock is not held across the holder session; abandon serializes under the kernel lock, requires explicit `--owner-confirmed` plus written non-empty `--reason`, and records `holderTokenHash` and `ageMs` in the abandon record. The undocumented `--force` flag is removed.
+5. **M1 / M6 / Ruling 5 (Fail closed everywhere):** Unreadable or corrupt sidecar on `refs/heads/main` fails closed (refuses) across all gates (`pre-commit`, `reference-transaction`, `doctor`, `leaseAdmission`). Failing `git diff` in `pre-commit` or `reference-transaction` refuses while a lease exists. Fast path: when `refs/heads/main` has no sidecar (`cat-file -e` check), hooks return immediately before computing diffs.
+6. **H3 / Ruling 6 (Hooks list paths with `-z --no-renames`):** `pre-commit` uses `git diff --cached --name-only -z --no-renames` without `--diff-filter` (catching renames, non-ASCII paths, and symlink typechanges). `reference-transaction` uses `git diff-tree -r -z --no-renames --name-only` and evaluates scope via the single exported `intersectsScope` helper from `src/runner/documentation-cutover-lease.mjs`.
+7. **H4 / Ruling 7 (Acquire is atomic):** Acquire takes the kernel lock first, then checks whether the lease is already held under the lock, writes the holder token, and records sidecar. Proven atomic with a two-process concurrent race test (20 trials, exactly 1 winner per trial).
+8. **M2 / Ruling 8 (Evidence fields):** Removed unverified `cleanWorktrees: true`. Recorded real scope digests (`tree` and `blob` OIDs from `refs/heads/main`) and `baseCommit` from `refs/heads/main`. Release compares current digests at release time against acquire-time digests and refuses if any scoped path drifted (catching `--no-verify` or `core.hooksPath=/dev/null` bypasses).
+9. **L1 / L2 / M5 / Ruling 9 (No plan ids or phase labels in product code/tests; Git one-door compliance):** Reused `resolveMainCheckoutRoot` and Git Inspect port; removed all direct `.git/` hand-reading and all `execFileSync('git', ...)` calls in `src/runner/documentation-cutover-lease.mjs`. `scripts/git-one-door-scan.mjs` reports 0 sites in product code.
+10. **M7 / Ruling 10 (Doctor check):** `checkDocumentationCutoverLeaseDoctor` verifies sidecar on `refs/heads/main`, kernel lock in main `.fgos/`, and `core.hooksPath` resolving `.githooks/reference-transaction`. When called from the main checkout while lease is held in a linked worktree, it reports actively held without falsely reporting "token missing".
+11. **L3 / Ruling 11 (Census):** Regenerated `packages/git/contracts/mutation-census.v1.json` using `node scripts/git-one-door-scan.mjs --write-census`. Unrelated plan-script sites appear due to new verification/inventory scripts on this branch that are not yet in main's census; these are preserved as generated without hand-trimming.
+12. **Ruling 12 (Red tests fixed):** Added `docs-lease` to `subcommand-flag-drift.test.mjs` MULTI array; added `documentation-cutover-lease` to `test/setup/checks.test.mjs` DOCTOR_CHECKS expected list. Both tests green.
+
+### 2. Test commands and real exit codes
+
+- `env -u CLAUDE_CODE_SESSION_ID FGOS_STATE_ROOT=/tmp/fgos-work/state FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test test/runner/documentation-cutover-lease.test.mjs`: exit 0 (15 pass, 0 fail)
+- `env -u CLAUDE_CODE_SESSION_ID FGOS_STATE_ROOT=/tmp/fgos-work/state FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test test/e2e/documentation-cutover-lease-hooks.test.mjs`: exit 0 (14 pass, 0 fail)
+- `env -u CLAUDE_CODE_SESSION_ID node --test test/holder-lock/registry-contract.test.mjs`: exit 0 (23 pass, 0 fail)
+- `cargo test -p fgos-holder-lock --test scope_rank`: exit 0 (5 pass, 0 fail)
+- `env -u CLAUDE_CODE_SESSION_ID node --test test/architecture.test.mjs`: exit 0 (29 pass, 0 fail)
+- `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test test/cli/subcommand-flag-drift.test.mjs`: exit 0 (16 pass, 0 fail)
+- `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test --test-name-pattern="DOCTOR_CHECKS has exactly" test/setup/checks.test.mjs`: exit 0 (1 pass, 0 fail)
+- `env -u CLAUDE_CODE_SESSION_ID node --test test/e2e/root-file-guard-hook.test.mjs`: exit 0 (13 pass, 0 fail)

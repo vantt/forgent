@@ -500,18 +500,35 @@ async function main() {
     return;
   }
 
-  let stagedForLease = [];
+  let sidecarRaw = null;
   try {
-    const diffOut = execFileSync('git', ['diff', '--cached', '--name-only', '--diff-filter=ACMRD'], {
+    sidecarRaw = execFileSync('git', ['cat-file', '-p', 'refs/heads/main:plans/documentation-cutover-lease.json'], {
       cwd: committingToplevel,
       encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
     });
-    stagedForLease = diffOut.split('\n').map((l) => l.trim()).filter(Boolean);
   } catch {}
-  const leaseRefusal = checkLeaseCommitGuard(committingToplevel, { stagedPaths: stagedForLease });
-  if (leaseRefusal) {
-    refuse(leaseRefusal);
-    return;
+
+  if (sidecarRaw !== null) {
+    let stagedForLease = [];
+    let diffFailed = false;
+    try {
+      const diffOut = execFileSync('git', ['diff', '--cached', '--name-only', '-z', '--no-renames'], {
+        cwd: committingToplevel,
+      });
+      stagedForLease = diffOut.toString('utf8').split('\0').filter(Boolean);
+    } catch {
+      diffFailed = true;
+    }
+    if (diffFailed) {
+      refuse('commit refused: unable to determine staged paths while documentation-cutover lease is held; failing closed.');
+      return;
+    }
+    const leaseRefusal = checkLeaseCommitGuard(committingToplevel, { stagedPaths: stagedForLease, rawSidecarBlob: sidecarRaw });
+    if (leaseRefusal) {
+      refuse(leaseRefusal);
+      return;
+    }
   }
 
   await warnOnConventionViolations(committingToplevel);
