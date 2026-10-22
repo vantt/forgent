@@ -182,12 +182,9 @@ impl GitDriver {
                 if out.success {
                     return Ok(SequencePush::Claimed(commit));
                 }
-                // Porcelain marks a ref the remote refused with a leading `!`.
-                if out
-                    .stdout
-                    .split(|b| *b == b'\n')
-                    .any(|line| line.first() == Some(&b'!'))
-                {
+                // Only git's own lease verdict means the counter moved. Any other
+                // refused ref (a receive hook, a protection rule) keeps its stderr.
+                if out.stdout.split(|b| *b == b'\n').any(is_stale_lease_row) {
                     return Ok(SequencePush::Stale);
                 }
                 Err(out.error("sequence-push-failed"))
@@ -352,6 +349,12 @@ fn commit_number(raw: &[u8]) -> Option<u64> {
         .flatten()
 }
 
+/// A `push --porcelain` row `!\t<from>:<to>\t[rejected] (stale info)`: the
+/// expected tip no longer matches the remote's.
+fn is_stale_lease_row(line: &[u8]) -> bool {
+    line.first() == Some(&b'!') && line.trim_ascii_end().ends_with(b"[rejected] (stale info)")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -373,5 +376,19 @@ mod tests {
         assert_eq!(commit_number(raw), Some(63));
         assert_eq!(commit_number(b"tree x\n\nnot a number\n"), None);
         assert_eq!(commit_number(b"tree x\n\n\n"), None);
+    }
+
+    #[test]
+    fn only_git_s_stale_lease_row_is_a_lost_lease() {
+        let row = |reason: &str| format!("!\tabc:refs/fgos/seq/d-adr\t{reason}\n").into_bytes();
+        assert!(is_stale_lease_row(&row("[rejected] (stale info)")));
+        for other in [
+            "[remote rejected] (pre-receive hook declined)",
+            "[remote rejected] (protected branch hook declined)",
+            "[rejected] (fetch first)",
+        ] {
+            assert!(!is_stale_lease_row(&row(other)), "{other}");
+        }
+        assert!(!is_stale_lease_row(b"*\tabc:ref\t[new reference]"));
     }
 }
