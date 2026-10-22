@@ -196,6 +196,12 @@ Per layer:
 
 **Known reds on main for verify runs (TEST, 2026-10-22, all fail alone on clean main `5371ca46d`, SEAT config area, logged on the board for SEAT):** `test/runner/assignment-dispatch` "decideExecutorCli resolves dispatch plan for an assignment"; `test/runner/dispatch` "the committed .fgos/config.json runner section loads and is well-formed" and "codex's cli-bypass invocation consumes model placeholder…". Main's mutation census is also stale: `npm test` rewrites it on a branch with no product change. **Also (OPC bisect, 10-22 16:20):** the one-door census on main has 5 `unresolved-binary` sites since `03c99bc61` (CFG lane, default `invariantChecks.commands` moved to `[]`): `bin/fgos.mjs:3481,3625`, `src/runner/merge.mjs:1216,1246`, `src/runner/worktree.mjs:146`. They are CFG's to fix; a release built from main fails `git-mutation-one-door` until then. A HARDEN verify compares its reds against this list and the census diff before calling anything a load flake.
 
+2026-10-22 22:45, owner, after T1 close: "1a 2c (để nguyên vì omp cần mà, cần giải pháp khác kiểu dynamic injection) 3b 4a".
+14. **Git-area review:** OPC (`forgent-35`) reviews every Git-area diff (`packages/git`, `src/git`, `.githooks/pre-commit`, census) of every lane except its own; HARDEN reviews OPC's. This covers HARDEN T2 and WORK's `790616298`.
+15. **The uncommitted AgentKit block in `AGENTS.md` stays** (omp needs it). A different mechanism, for example dynamic injection, is wanted later; not a HARDEN item. HARDEN keeps saving and re-applying the block around every pull in the main checkout.
+16. **Owner-machine landing of T1:** an agent on the owner machine follows [the T1 guide](../reports/guide-261022-2003-harden-t1-owner-machine-landing.md).
+17. **Replacing the Windows `hold-transport.mjs` helper** is an input for T4's council (RT-M3: the supervisor needs another way to receive a domain on Windows), not a commitment.
+
 ## Hand-off ledger (items HARDEN gave to other lanes)
 
 A row closes only when the receiving lane has written the item into its own plan and said where. HARDEN re-checks open rows at every layer close.
