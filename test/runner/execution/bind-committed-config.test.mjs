@@ -4,21 +4,19 @@
 // writable home for an agent that needs one.
 
 import '../../helpers/process-tmp-root.mjs';
+import { committedRunnerConfig } from '../../helpers/committed-config.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { bind } from '../../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 
 seedFileLocalBwrapRegistry();
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 // The project config names the pools its tier cells use; the account inventory that pays for
 // them lives in the machine-global config, so the test declares the one pool the cells name.
-const committed = JSON.parse(fs.readFileSync(path.join(root, '.fgos', 'config.json'), 'utf8')).runner;
+const committed = committedRunnerConfig();
 const runnerConfig = {
   ...committed,
   llmAccounts: { ...committed.llmAccounts, openrouter: { openrouter: { credentialStore: { pi: '/home/test/.pi/accounts/openrouter' } } } },
