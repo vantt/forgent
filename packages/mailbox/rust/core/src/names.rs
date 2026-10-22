@@ -128,7 +128,7 @@ impl MailboxState {
         if query.is_empty() {
             return Err(unknown());
         }
-        let steps: [(Match, &dyn Fn(&Binding) -> bool); 4] = [
+        let steps: [Step<'_>; 4] = [
             (Match::Exact, &|b| b.name.as_str() == query),
             (Match::Prefix, &|b| b.name.as_str().starts_with(query)),
             (Match::Exact, &|b| b.key.as_str() == query),
@@ -161,6 +161,9 @@ impl MailboxState {
         Err(unknown())
     }
 }
+
+/// One resolution step: how it matches, and what it matches.
+type Step<'a> = (Match, &'a dyn Fn(&Binding) -> bool);
 
 /// How a resolution step matches: an exact name or key names one head
 /// whatever its judgement; a prefix matches only heads not skipped.

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "33120d0aa1edff5f85fe6a5260348ad10d2454ffdea17d3560865e4c7ec136cb",
+  "payloadDigest": "ac37471b99c96ccc3358ba0a6f60d8da5b1c0e0ae0f92719709201b8d4f650f6",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -387,7 +387,7 @@
     "packages/mailbox/rust/core/src/ids.rs": "b9787cc8682b5b71f0cb4b64b04dc3b24fdee3c38102fbbff5d283253cafba55",
     "packages/mailbox/rust/core/src/lib.rs": "50b505a0d6114dc5ffeb9d7d470190aec94673b581719bb703a32ddbb94f71cd",
     "packages/mailbox/rust/core/src/limits.rs": "da44b53751ee76dab4f39dd736d478566159f3efcd1285d684c974b25088e6dd",
-    "packages/mailbox/rust/core/src/names.rs": "2d031feae891daadcec4d366272c70f279e8df7274db2f6cab0a0063471efeb1",
+    "packages/mailbox/rust/core/src/names.rs": "be6b22488e059855c7e2a30f514109e2a79027795cb2b51723b9d4c38e11b806",
     "packages/mailbox/rust/core/src/notices.rs": "d39dcbb220b900987221cf5ca8471de38b2728573b4581d6e6c980a52367532c",
     "packages/mailbox/rust/core/src/policy.rs": "41f41fcbec6b45fc2c7bba1123680f3b0e2750fa78388998599b3483c9925a59",
     "packages/mailbox/rust/core/src/registry.rs": "e039dc6f1d72321f6e46156e08a9fc008b7d924d01ceb3787ce79d3c48fbb421",
