@@ -530,6 +530,39 @@ fn pinned_remote_refuses_rewrites_and_repository_transport_config() {
 }
 
 #[test]
+fn a_changed_ssh_account_on_the_origin_is_refused() {
+    // The pin cases above use path origins. An ssh user name selects the account the transfer
+    // runs as, so the pin must tell `git@host` from `root@host`; no other case compares them.
+    let f = Fixture::new("files");
+    let _ = f.remote();
+    git(
+        &f.path,
+        &["config", "remote.origin.url", "ssh://git@example.invalid/x"],
+    );
+    let pinned = RemoteGrant {
+        name: "origin".into(),
+        pinned_url: Inspect::remote_url(&f.driver, &f.repo, "origin").unwrap(),
+    };
+    git(
+        &f.path,
+        &["config", "remote.origin.url", "ssh://root@example.invalid/x"],
+    );
+    let mappings = [RefMapping {
+        source: RefName::parse("refs/heads/trunk").unwrap(),
+        destination: RefName::parse("refs/heads/shared").unwrap(),
+    }];
+    let err = f
+        .driver
+        .push_refs(&f.repo, vec![], &pinned, &mappings, "fixture", "other-account")
+        .expect_err("a different ssh account than the pinned one");
+    assert!(
+        err.cause.contains("remote-url-not-pinned-or-credentials-present"),
+        "{}",
+        err.cause
+    );
+}
+
+#[test]
 fn transport_trust_uses_scope_for_main_worktree_config_and_symlinked_paths() {
     use std::os::unix::fs::symlink;
     let f = Fixture::new("files");

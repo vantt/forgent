@@ -3003,6 +3003,53 @@ mod tests {
         assert!(repo.layout.shallow);
     }
     #[test]
+    fn a_failed_read_names_the_same_layout_cause_whichever_read_hits_it() {
+        // `layouts_preserve_missing_object_diagnostics_without_fetch` checks the cause of one read.
+        // The reads that turn a failed Git child into a cause each carry their own copy of the
+        // promisor, alternates and shallow ladder, and the copies must agree on one repository.
+        let bogus = "1234567890123456789012345678901234567890";
+        let state = Temp::new();
+        let dir = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        fs::write(dir.0.join(".git/shallow"), format!("{bogus}\n")).unwrap();
+        let driver = GitDriver::new(&state.0).unwrap();
+
+        let causes = |repo: &RepoHandle| -> Vec<(&'static str, String)> {
+            let mut causes = Vec::new();
+            let mut note = |read: &'static str, e: OperationError| causes.push((read, e.cause));
+            note(
+                "checked",
+                driver
+                    .checked(repo, &["rev-list", bogus], Policy::Inspect)
+                    .unwrap_err(),
+            );
+            note(
+                "inspect_input",
+                driver
+                    .inspect_input(repo, &["rev-list", "--stdin"], bogus.as_bytes())
+                    .unwrap_err(),
+            );
+            note("resolve_head", driver.resolve_head(repo).unwrap_err());
+            causes
+        };
+        let agree = |causes: &[(&'static str, String)]| causes.iter().all(|(_, c)| *c == causes[0].1);
+
+        // A shallow boundary only.
+        fs::write(dir.0.join(".git/HEAD"), format!("{bogus}\n")).unwrap();
+        let shallow = causes(&resolve(&driver, &dir.0));
+        // Alternates as well as the shallow boundary.
+        fs::write(
+            dir.0.join(".git/objects/info/alternates"),
+            b"/missing/alternate\n",
+        )
+        .unwrap();
+        let both = causes(&resolve(&driver, &dir.0));
+        assert!(
+            agree(&shallow) && agree(&both),
+            "shallow only: {shallow:?}; alternates and shallow: {both:?}"
+        );
+    }
+    #[test]
     fn linked_registration_and_fake_gitdir() {
         let state = Temp::new();
         let dir = Temp::new();

@@ -2376,3 +2376,132 @@ fn event_publication_recovery_ignores_unrelated_recovery_leaf() {
     assert!(port.recover_publications(&repo).unwrap().is_empty());
     drop(leaf);
 }
+
+/// Appends a record to the chain of `id` the first time `step` is reached, the way a second
+/// writer racing for the same operation would.
+struct Race {
+    repo: RepoHandle,
+    id: &'static str,
+    step: &'static str,
+    fired: std::sync::atomic::AtomicBool,
+}
+impl FileSystem for Race {
+    fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+        if step == self.step && !self.fired.swap(true, Ordering::SeqCst) {
+            let wal = wal::Wal::open(&self.repo).map_err(std::io::Error::other)?;
+            let chain = wal.inspect(self.id).map_err(std::io::Error::other)?;
+            wal.append(&chain, Phase::Prepared)
+                .map_err(std::io::Error::other)?;
+        }
+        Ok(())
+    }
+}
+
+fn is_kebab(cause: &str) -> bool {
+    !cause.is_empty()
+        && cause
+            .bytes()
+            .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+}
+
+#[test]
+fn publication_names_a_busy_wal_like_every_other_port() {
+    // `attempted_operation_is_never_replayed_after_fault_or_aba` injects faults but never a second
+    // writer. A writer that wins the next record of this operation's chain makes the loser's append
+    // fail as busy; the caller must see a refusal with a lookup-able kebab cause, not recovery-required
+    // carrying a debug dump of the internal error.
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+    let a = commit(&port, &repo, vec![], "a");
+    drop(port);
+    let racing = PublicationPort::with_filesystem(
+        &driver,
+        authority(&repo, &mut h),
+        Race {
+            repo: resolve(&driver, &root),
+            id: "busy",
+            step: "pin-read-back",
+            fired: Default::default(),
+        },
+    );
+    let e = racing
+        .compare_and_swap(
+            &repo,
+            &reference(),
+            &ExpectedTip::Absent,
+            &ExpectedTip::Oid(a),
+            "busy",
+        )
+        .unwrap_err();
+    assert!(
+        e.code == ResultCode::Refused && is_kebab(&e.cause),
+        "{:?} {:?}",
+        e.code,
+        e.cause
+    );
+}
+
+#[test]
+fn a_borrow_that_is_unavailable_has_one_cause_name_whichever_check_finds_it() {
+    // The borrow is checked when the authority is built and again, through the WAL, when an
+    // operation of another writer is found on the same ref. One failure must read the same through
+    // both routes. No existing case compares the two.
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let path = h.path().to_path_buf();
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+    let a = commit(&port, &repo, vec![], "a");
+    drop(port);
+    // An operation of the default writer is left unresolved on the ref.
+    let faulty = PublicationPort::with_filesystem(
+        &driver,
+        authority(&repo, &mut h),
+        Fault("before-target-cas"),
+    );
+    faulty
+        .compare_and_swap(
+            &repo,
+            &reference(),
+            &ExpectedTip::Absent,
+            &ExpectedTip::Oid(a.clone()),
+            "left-behind",
+        )
+        .unwrap_err();
+    drop(faulty);
+
+    // Route one: the authority itself refuses a resource path that is not the borrowed lock.
+    let wrong_path = t.0.join("not-the-seal.lock");
+    fs::write(&wrong_path, b"").unwrap();
+    let built = HolderAuthority::new(&repo, &mut h, &wrong_path, reference(), "test-writer")
+        .err()
+        .expect("a borrow bound to another path");
+
+    // Route two: another writer meets the unresolved operation during admission.
+    let other = HolderAuthority::new(&repo, &mut h, &path, reference(), "other-writer").unwrap();
+    let port = PublicationPort::new(&driver, other);
+    let admitted = port
+        .compare_and_swap(
+            &repo,
+            &reference(),
+            &ExpectedTip::Absent,
+            &ExpectedTip::Oid(a),
+            "second-writer",
+        )
+        .unwrap_err();
+    // Admission may name the blocking operation in front of the cause; the cause itself is one name.
+    assert!(
+        admitted.cause.ends_with(&built.cause),
+        "the same unavailable borrow reads differently through two routes: {:?} and {:?}",
+        built.cause,
+        admitted.cause
+    );
+}

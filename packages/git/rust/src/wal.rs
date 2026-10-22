@@ -2842,6 +2842,40 @@ mod tests {
     }
 
     #[test]
+    fn failed_write_temporaries_never_count_against_the_record_bound() {
+        // The test above puts one temporary in the ledger directory. A write that keeps failing
+        // leaves one more temporary each time, inside an operation directory: beside a valid chain,
+        // or before its first record exists. Neither may turn the operation, or the scan that
+        // admission runs, into corruption.
+        let t = Temp::new();
+        let wal = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
+        let chain = attempted(&wal, "stuck");
+        let pre = wal.operation("not-begun", true).unwrap();
+        let beside = wal.operation("stuck", false).unwrap();
+        for n in 0..(MAX_RECORDS * 2 + 8) {
+            for dir in [&beside, &pre] {
+                fs::write(dir.path().join(format!(".durable-file-{n}-0.tmp")), b"partial").unwrap();
+            }
+        }
+        let mut refused = Vec::new();
+        match wal.inspect("stuck") {
+            Ok(c) if c.records().len() == chain.records().len() => (),
+            other => refused.push(format!("a chain with leftover temporaries: {other:?}")),
+        }
+        if !matches!(wal.known_id("not-begun"), Ok(false)) {
+            refused.push(format!(
+                "a pre-intent directory with leftover temporaries: {:?}",
+                wal.known_id("not-begun")
+            ));
+        }
+        match wal.scan(10) {
+            Ok(scan) if scan.complete && scan.entries.iter().all(|e| e.error.is_none()) => (),
+            other => refused.push(format!("a scan over both directories: {other:?}")),
+        }
+        assert!(refused.is_empty(), "{refused:#?}");
+    }
+
+    #[test]
     fn scan_remains_terminal_while_compaction_removes_records_and_directories() {
         struct SlowRemoval;
         impl FileSystem for SlowRemoval {

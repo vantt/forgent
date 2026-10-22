@@ -223,3 +223,30 @@ fn a_kind_that_is_not_a_slug_is_refused_before_any_ref_is_touched() {
         .is_err());
     assert!(f.driver.sequence_tip(&repo, &home, "D-ADR").is_err());
 }
+
+#[test]
+fn a_push_the_remote_refuses_for_another_reason_keeps_that_refusal() {
+    // The stale-lease case above is the only refusal the cases cover. A remote that rejects the
+    // update by its own policy (here: the counter namespace is hidden, so the server denies the
+    // update while the lease still holds) did not see a moved counter. The caller must get that
+    // error, not a "read it again" answer that makes it retry forever.
+    let f = Fixture::new();
+    let repo = f.clone_named("a", true);
+    let home = f.driver.sequence_home(&repo);
+    let first = claimed(
+        f.driver
+            .sequence_push(&repo, &home, "d-adr", None, 1, "claim-a")
+            .unwrap(),
+    );
+    git(
+        &f.root.join("origin.git"),
+        &["config", "receive.hideRefs", "refs/fgos/seq"],
+    );
+    let refused = f
+        .driver
+        .sequence_push(&repo, &home, "d-adr", Some(&first), 2, "claim-b");
+    assert!(
+        refused.is_err(),
+        "a policy refusal must not be reported as a lost lease: {refused:?}"
+    );
+}

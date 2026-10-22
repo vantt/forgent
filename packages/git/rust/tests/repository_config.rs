@@ -207,6 +207,49 @@ fn dead_config_writer_recovers_wal_before_and_after_effect_without_replay() {
     }
 }
 
+struct FailAt(&'static str);
+impl FileSystem for FailAt {
+    fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+        if step == self.0 {
+            Err(std::io::Error::other("fault between rename and parent sync"))
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[test]
+fn a_config_edit_that_failed_between_rename_and_parent_sync_is_not_acknowledged_on_observation_alone() {
+    // The dead-writer case above proves the edit is never replayed. It does not look at what the
+    // recovered outcome claims: a value that is merely visible after the rename says nothing about
+    // the parent directory, so an acknowledgement resting on that observation alone is a durability
+    // claim nobody checked.
+    let f = Fixture::new();
+    let path = f.main.join(".githooks");
+    f.driver
+        .ensure_hooks_with_filesystem(&f.repo, &path, "fault", &FailAt("config-replaced"))
+        .unwrap_err();
+    let wal = Wal::open(&f.repo).unwrap();
+    let chain = wal.inspect("fault").unwrap();
+    match chain.outcome() {
+        Some(Outcome::Transfer {
+            acknowledged,
+            details,
+            ..
+        }) => assert!(
+            !(*acknowledged && details.iter().any(|d| d == "effectObservedOnly")),
+            "acknowledged on observation alone: {details:?}"
+        ),
+        other => panic!("unexpected outcome {other:?}"),
+    }
+    // The edit is in the file exactly once, and the fault left no native lock behind.
+    assert_eq!(
+        git(&f.main, &["config", "--get-all", "core.hooksPath"]),
+        path.to_str().unwrap()
+    );
+    assert!(!f.main.join(".git/config.lock").exists());
+}
+
 struct EditAtAttempt {
     config: PathBuf,
     records: std::sync::atomic::AtomicUsize,
