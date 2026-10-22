@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Documentation routes for local writer identity now point to Identity; its candidate header retains the writer-attribution scope of section 7a.
+
 - `fgos docs-lease acquire|status|release|abandon` manages a persistent documentation write freeze. Pre-commit and main reference-transaction hooks enforce it, and doctor reports `documentation-cutover-lease`. While held, non-holder Unit/Workflow execution and scope-touching runner/Workflow Land refuse; code-only lands proceed. Release reports scope drift; owner abandon with confirmation and a reason repairs a lost holder or corrupt sidecar.
 
 - **Documentation**: Phase 02 remediation G hardens the documentation-inventory closure candidate: false one-owner split rows now demote to `unknown-blocking`, dynamic JS/TS consumer parsing skips comments/strings and Markdown prose while retaining fenced code, unresolved alias roots remain standalone gaps, carry-forward refuses pre-existing destinations and refreshes status, and regenerated dynamic fan-out drops from thousands of target items to 128.

@@ -10,6 +10,14 @@ Canonical: Yes for rungs I1-I4 (G0 signed 2026-10-22, section 10)
 Owner: Identity component (proposed)
 Source: packages/identity/rust
 Contracts: packages/identity/contracts/
+Provenance: packages/identity/rust; packages/identity/contracts/; local writer specification introduced by 6a53e65b5 and merged here by 9fdaac9ba (section 7a)
+Writer type: Agent draft writer (header completion pending independent review)
+Canonical for: Identity component scope signed for I1-I4; local writer attribution rule and native identity contract (section 7a)
+Use this when: Minting or resolving identities in the signed scope, or resolving and reviewing the writer identity of a calling process (section 7a)
+Do not use this for: Authentication before I5, lock authority, process liveness or run supervision; the local-writer resolver does not own worker creation, env scrubbing or lineage
+Supersedes: docs/platform/session-identity/spec.md (local writer specification merged into section 7a by 9fdaac9ba; no platform authority cutover)
+Superseded by: None recorded
+Last reviewed: 2026-10-22 (merge accounting only; local writer source last reviewed 2026-10-15; header pending independent review)
 Related:
 - docs/io-contract.md (writer id recorded on every state write)
 - docs/specs/observe.md

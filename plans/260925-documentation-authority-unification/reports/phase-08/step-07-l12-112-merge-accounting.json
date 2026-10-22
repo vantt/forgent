@@ -1,0 +1,3122 @@
+{
+  "inputHEAD": "75866f28a577b5687de833c1c272fc46c5b79cfc",
+  "merge": "66b637a108cd6a2659112982082b4194907b8e53",
+  "firstParent": "15d92ad2b2e7437cd36e9fade9ba846c6334e71a",
+  "main": "1d0797a7849518fac8deb132fc6f996ec6bd0966",
+  "base": "5371ca46d4d1224fcbe87b58ddba31a0f1af15b3",
+  "mainCommits": [
+    "1d0797a7849518fac8deb132fc6f996ec6bd0966 docs(plan): record the owner's choices for Land candidate release and porting duplicate adds",
+    "570db34244e3773b4b01fb4b401998c1ae8f6871 docs(cleanup): record the removal of the finished seat-binding lane worktrees",
+    "92b39f480c0717284aa885cc95358f6d5e21ece8 docs(board): report the one-door census regression to the config lane",
+    "43444229e5795b8dd688817fab79f20bac21af0f docs(plan): list main's census regression among the known reds for verify runs",
+    "4379dc44c4588cc1267b73fe4deb02bb98b155c8 docs(board): record the docs-turn refusal and the codex pin for docs turns",
+    "38b82e4156d6650b7f9db8bc8325a49992fdc176 feat(config): run docs turns on codex in a herdr pane",
+    "77947f9a162d9a43c3e08722212237fc5645f174 Merge branch 'main' of https://github.com/vantt/forgent",
+    "f3b67437b65c47066d24aa8b18c5cf25515cf477 docs(plan): point T1's identity phase at the renamed identity component",
+    "8922e13859955fb30a65cd029c0ba27261dc1a35 docs(board): record the containment baseline and the suite items handed to test governance",
+    "53ad7ee96c3ba7b8e37e5bd886f642a7336e75b8 Merge branch 'main' of https://github.com/vantt/forgent",
+    "e4aa2aada48e475fee41557def304c7ad829d57d docs(test): take the four suite-health items from OPC's baseline",
+    "9a28c9fbb4b2cfe1845ea9376656d56b5f751ee7 docs(plan): add OPC's contained-git child count to the R2 note",
+    "2eec4aea9a4d7b529e19aea88076c08adc0cd974 docs(report): record the suite and containment baseline before the containment fixes",
+    "755ad30353ff97f954e7740c7b66a822736c34ca docs(board): land the identity rename and tell the lanes that import it",
+    "b4f9a2219fe063a9ac3ab91b423b8207a6f09866 Merge remote-tracking branch 'origin/main' into ident/p00-rename-to-identity",
+    "d70e70e5cfeb3afaecc524f0b3b299f82c3d1647 docs(plan): plan the first live mailbox rung and the two-session demo",
+    "4d732a87e2bae330be71d44c7e47c41e7be31a9c Merge branch 'main' of https://github.com/vantt/forgent",
+    "5f20635fd8537f650d802dd4fb705c43d0b30a1f Merge branch 'main' of https://github.com/vantt/forgent",
+    "601e8b3870f143737b5e20de10c831211435fb57 docs(board): record the porting stream and the Work readers on the WORK lane branch",
+    "9cd826926cad162e31bf78940a6cb891ef44a70f docs(board): record the first seat-binding trim and ask the second machine for the conversion trigger",
+    "bafc6a41aca5a98a1136d27450b51ad50a6c776b chore(git): regenerate the mutation census after the seat-binding trim",
+    "0243824a98c6ef3f0df65063993c50759552060a Merge branch 'main' into seat-trim-verify",
+    "aa3f38a372e9b9519bb684e7cdeeab9cd4fb5892 test(setup): copy the seat-binding contracts into the unpacked-copy fixture",
+    "5e6c23723d904fa698313b0b5571a80a2b6a9b84 Merge remote-tracking branch 'origin/main' into ident/p00-rename-to-identity",
+    "599570dbdba3e6fa124656709468fb93a0b1a0b9 docs(plan): add the independent review of the mailbox record store",
+    "2019387cea8dda3a93642bc83e9330f5b6ee35ef fix(seat-binding): read an older host's refusal when it exits before taking the request",
+    "f4e297dfa843d7810219a263e4b22d6805897bcc docs(identity): report phase 00 rename",
+    "bb1050d393a250f91c75a7eacfef22f4b4fe6460 docs(plan): record the owner's approval of the YAML Document slice frame",
+    "94b61ca31e152c037ea240d06dd8195b1f8a60d6 docs(board): mark the mailbox record store done on its branch",
+    "479d89866d14712c3f3965726eb27b8937ad3582 test(helpers): read the tier list from the shared ladder contract in the bindable-config helper",
+    "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity",
+    "58fe3f9fd1e92a63966208722c02836286b0d90b Merge branch 'worktree-agent-a5f964ace627d3e0b' into seat-trim-verify",
+    "d29f75837f03bc81e069221480add1cac592bfd5 Merge branch 'worktree-agent-afee74254bd27cec6' into seat-trim-verify",
+    "ccd0456d5b28566e4e9c97ddec10112f5690184d Merge branch 'worktree-agent-ad4eeaa4ee31b5d51' into seat-trim-verify",
+    "9e487b3d9a5ad36e65671674e6f75d364c774e14 docs(board): record the Work write-path fixes and the census sites main now lacks",
+    "4cd5066ece72b46b89bc6d21302af0e64aee37ba docs(board): record T1 phase 2 on the integration branch",
+    "4a68ce23a0ddf4831d7c922fd4f4c9db3a606aeb docs(plan): plan the YAML Document slice with fixtures first and a parser choice gated by the owner",
+    "b6a399731629970cd32b83d562d489222fb5dcce docs(board): record the Work gate core port on the WORK lane branch",
+    "178e10b316e4e3f20b2532b5bb1decc3f222878f docs(plan): record the helper change and the verification of the duplicate-proof trim",
+    "0fbc375fea63d0f22c00233daa5ffd2229249269 docs(board): open the YAML Document and Config lane and plan its first slice",
+    "160b6b787b2290736e5ec406552f02a38689dfc2 docs(plan): apply the test-governance review to the containment conformance phase",
+    "e9ece3e94a7340809ff9c5a76f00f5f220bf3c6c docs(plan): split the bwrap mount-refusal work between T1 and OPC",
+    "2db05f2b6a75c431a2958171ad6002c57846c8cc docs(plan): record that HARDEN reviews OPC's Git-area diffs",
+    "7d324fbe8fe7515ea5a12a39ceff04576fea59da docs(board): record the owner's approval of the containment fixes plan",
+    "984e24d2c917c4754f4d96613b7a3b11cd8a2474 perf(test): prove the test host once per process",
+    "3f2d1cdd7a5f02ce2499f84442f6320970959786 docs(journal): record the containment council and its plan",
+    "71dcf5d7f6411618ca4548ac7f9666e1a251ac88 docs(plan): plan the containment fixes inside today's shape",
+    "93d89958203a89cb98c5f7719868f4a786bd040c docs(board): record the owner's answers on operation-scoped containment",
+    "e6e7391a38d3c1df263f2b7cd94feda783fa9987 docs(board): record HARDEN taking the Git review of the containment work",
+    "1aca9e83e0499563b261a30bec922e6ce9694c2c docs(identity): record the owner's answers for the mint rung",
+    "5a271db8f5bd70a5c9c1cb5e340a693e58584248 docs(report): arbitrate the operation-scoped containment council",
+    "900467f7aa8562fb0a0459ff76a190250fa8905d docs(plan): take OPC's containment error name for R3 and its per-child cost for R2",
+    "8c2a62f44ab85146beb5ece0f44ce384fed764ea docs(config): record the owner's signature on the YAML Document and Config specs",
+    "89935937d21645308eaf0871b71cc76fe4979d91 docs(board): ask every machine to be ready for the identity landing roster",
+    "79ced9053dd431be5a24c45a52636cf859453425 docs(board): tell the documentation and instruction lanes which files identity touches",
+    "6db41fad6f22f9da85ba05544f06b501356ee733 docs(config): ship a complete standard and move account pools and the gateway token to a private directory",
+    "03c99bc619a086a8af7cc9ce780c3af4fc9c6eb3 fix(setup): stop writing this repository's test command into every project's invariant checks",
+    "3b8f013d3081af6cab6fbeffb6ee7f7344c1b5ae test(seat-binding): pool only the Work configs that have no default executor to pin",
+    "4635f9f59104108164a89178e939bdfd7fd72654 docs(board): start the identity rename",
+    "ab7b9325c70acd6ab5036c870c1a394bf1f05316 docs(plan): rename to identity first and add the mint door for every owner",
+    "ddf77bb02d7f5c20315a51c645efafc8e6f2c343 docs(identity): settle cross-machine id minting with random ids and one counter ref per sequence",
+    "a53c6c2159459a4759e82245a61a41d8f989b778 docs(plan): name the Git reviewer for HARDEN's Git-area diffs",
+    "5d7cde668c6b881bd98b10cf80dab80b239f1f5b docs(board): hand the Git reviewer role to the OPC lead",
+    "d6afdc7e672b375eae2eb47b51a54ac5d22442de docs(board): open the operation-scoped containment design council",
+    "6f8fab47b8183ca0053d15226f9a1dcc741a2c46 docs(plan): record GIT's approval of T1 phase 2's Git-area diffs",
+    "d6557106018303b404e9e32119f734ec8366edde docs(board): record the Git review of HARDEN T1 phase 2",
+    "998bcca8b416cd54f7d630ad7dfe574a57fd5534 docs(plan): hold T1 phase 2's Git-area diffs for a named Git reviewer and move H15",
+    "d028ac76d51468423e7afea90c3000671cd2e641 docs(board): close the Git and Event Store coordinator session and list what needs a new owner",
+    "7a6f366ed98542852f1b501dab0119f6d20d46d8 docs(board): open the OPC design council and record the Git backlog",
+    "03cd70ae21b82bb7bc956760a4069a1df5fec935 docs(plan): keep the hook on the native shared-try route instead of a legacy verb",
+    "71833218e1e53f2e92320700dda1696aedc31da8 docs(identity): record the forge probe of one counter ref per id sequence",
+    "6844d5fc338e52251ed1f730944274b7b7508dc6 docs(plan): record the owner's choice of a one-day mailbox body retention",
+    "f223dad26df67d678c3f2706e3109666741d46ae docs(board): report the read-only claude outbox failure and the decide/bind mismatch to the seat lane",
+    "e7240e573254a105cc43feb0df80a0b0a5b28ec7 docs(landing): record the seat dispatch fix and git fence landing on the owner machine",
+    "1c4b02157473a8f1cd4b6313792e93e11aba0677 docs(plan): record the seat trim decisions on validation and override matching",
+    "f297f0dac31314c674dc5a56163a22b8ad121e70 docs(plan): report the seat trim of tier ladder and inline lead",
+    "7224110ed19d36b4b5b10b4bdeadf1d8c6f64d3e refactor(seat-binding): rank seats the session lead runs inline in the crate",
+    "a7b74431186d3bfcf6740f779e5101054d228148 refactor(seat-binding): read the tier ladder from one shared contract file",
+    "ba910c3373fc063c1f7af584d2033baefd0796ab docs(plan): fix totals line in the duplicate-proof trim report",
+    "c672c97879be8b0472fc43ff83299ee0adcd2e31 test(seat-binding): retire Node tests that re-prove golden cases",
+    "20ad88daab5c5e8438d1fbe98bf56a5b73fe69cd refactor(convention): one identifier check and one contract reader behind seat ids and definition names",
+    "21cc32e255fcc02e35ebe22471a1f4b79782ab48 docs(report): record the convention door pre-check and the compat-channel fork",
+    "96a67372563d0dd9b9cd74178f42374a92765708 chore(git): commit the mutation census the release build regenerates",
+    "b7be8795ce4b4761128a324dfac6e9658abf1386 docs(backlog): inline the gateway bind reason instead of a decision id local to another document",
+    "043ceaafbf914c1ae0c6477402d15fee1a17a3a4 docs(specs): gloss the dispatch-lock law cited in the reading map",
+    "636df9d8764a1041cc90c699d27a838db5ad426a docs(identity): make identity the one door for every id and hold the lane on collision cost",
+    "487f5842675429c4d6460b24a0e9acf9c84da808 docs(identity): grow identity inside the one existing crate and apply the plan review",
+    "83ac251d7d178964f1a2202e4d98e565a474f033 docs(plan): record the owner's answers on dead names, parent age and self-send",
+    "bb33c54c1656ed0aedeb034a61eb162f3a1572e1 docs(plan): plan the identity rungs with machine and session handles first",
+    "978fa28e7ff14932f56f5bcd77d9a3563e9f8df8 docs(board): close the mailbox hook payload rung on its branch and start the record store",
+    "71b321787fb412adae29e61aed68fdda1193dde0 docs(identity): fix one read per identity plus resolve and list as the verb surface",
+    "d210631a4a443994196f25c5dd37c8140eb4162b docs(identity): sign the identity gate for its first four rungs",
+    "0a77d6340fe77fd5223412007274c61f2f4c823e Merge branch 'main' of https://github.com/vantt/forgent",
+    "b41172cb02f025992447ce6fe1734e184d8443d6 docs(plan): plan the herdr pane launch fix as the cook trial, with red team and validation",
+    "5e6916ad650d71db87d946ab3a505aa301225bcf docs(board): answer the test lane on the three seat-binding config test failures",
+    "d7e447b7dd24792e2c71507d4b4c0e4cfe89ff7c docs(board): take the identity lane and send its gate questions to the owner",
+    "b6b708f4aa1f72251a707f11259904b61c43cf70 docs(plan): record the porting view and npm addon answers in the Work lane plan",
+    "05b60220d829928632995d4e10cbc0a14a1b5b8a docs(board): record the owner's choice to untrack the porting view",
+    "85e42bce7d55a67081ebf8d3464147746ff0fe99 docs(test): park the 50-process session test on HARDEN R2",
+    "559090ec78ac7a0bf82633caf46c1ef8313152e9 docs(git): record Git and Event Store foundation completion and tidy the open-proof table",
+    "8e707393b666b5f981148eb5c573faf069ddbfb0 docs(board): start the seat-binding trim and split the convention and lock-counter items with the holder-lock lane",
+    "236267464634bf79160b360e3b988d87b77bc3ef docs(board): open the WORK lane with the trial-merge facts",
+    "b363d8809598e32476f1fb0a23ed8304688cbcd8 docs(board): tell the identity lane how HARDEN T1 touches session identity",
+    "1d7047c1e8a9803b45955005abcd92ee575a3369 docs(board): record the WORK lane hand-off",
+    "8a4df0f8ea1e5dad21b75737995fec98f70c0131 docs(board): close the model-pool B1 lane after the model refresh in mdview and mcp-skill-hub",
+    "bb2647f9754c7f173d89c1c1fc3a41e57e3280cf docs(board): close the big-lead session after handing off the seat-binding and cook lanes",
+    "4fea2954cdba9be69c63cc204622806010a20365 test(dispatch): read the refreshed model cells in the committed config",
+    "45466adccc392bc24f82b08f8023b399151aced9 docs(plan): add the independent review of the mailbox hook payload rung",
+    "5b7c120265ebdd417f4d543ce9308d9204559a41 docs(board): record the owner's choice of plan for the cook trial",
+    "60b220e0f7f921191cf722fc9273b600bb43486a docs(board): note what the cook trial needs before it runs",
+    "8ea571a80a1e942ad2d81baaa9cce59dabef4826 docs(handoff): hand the seat-binding lane to a dedicated lead",
+    "79936520054bbd927ebd984aa6ca2de1678b913f docs(plan): plan the mailbox record store rung",
+    "f4447ba6d303697e9a3d914cf5f4602297448901 docs(identity): open the identity lane with a draft spec for cross-machine ids",
+    "31e15077ec626b076c765ef611eeca3f7259ed17 docs(landing): record the SEAT and T0 release landing on this machine",
+    "3c49306912dff7fc169bd1d0f9bc7b435290fdec docs(platform): specify the YAML Document and Config components",
+    "c17c9688ea5f2368fec4362207100b96a0dcc8f8 docs(plan): note that the reclaim path keeps one bytes compare, as the red test shows",
+    "efba97e1f6c80b48a00a2b9450dcd316794e4788 docs(board): announce the mailbox lock row and hidden root to the hardening lane",
+    "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs",
+    "be72719a9b28acbf3137094478ffd39638445f20 docs(plan): close the hot-mutex bound hand-off and list main's known reds for verify runs",
+    "b0e561a65b17cbf2e32024d24694763bbf2cc609 docs(board): log the timing batch and two more failing tests on main",
+    "7b25b0ba754eb8f227839dabf14f01666e23ce09 test(git): prove the waiting Land keeps its loop by the order of close and admission",
+    "b1a8e005f397571b2434a1382f393ae4157dcd89 test(scripts): prove the canary wrapper's overhead by the processes it starts",
+    "f8b36a5edfdac4c995e358a19a29a29ce0dd9316 test(state): bound the hot-lock fast path by the raw file steps it is built on"
+  ],
+  "changedPathCount": 199,
+  "changedPaths": [
+    {
+      "path": ".fgos/config.json",
+      "mainPathCommits": [
+        "38b82e4156d6650b7f9db8bc8325a49992fdc176 feat(config): run docs turns on codex in a herdr pane"
+      ],
+      "mainStatus": "M\t.fgos/config.json",
+      "contentRead": false
+    },
+    {
+      "path": "AGENTS.md",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tAGENTS.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "CHANGELOG.md",
+      "mainPathCommits": [
+        "5e6c23723d904fa698313b0b5571a80a2b6a9b84 Merge remote-tracking branch 'origin/main' into ident/p00-rename-to-identity",
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity",
+        "03c99bc619a086a8af7cc9ce780c3af4fc9c6eb3 fix(setup): stop writing this repository's test command into every project's invariant checks"
+      ],
+      "mainStatus": "M\tCHANGELOG.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "Cargo.lock",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tCargo.lock",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "Cargo.toml",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tCargo.toml",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "apps/fgos/Cargo.toml",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tapps/fgos/Cargo.toml",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "apps/fgos/src/cli_projector.rs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tapps/fgos/src/cli_projector.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "apps/fgos/src/main.rs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tapps/fgos/src/main.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/architecture-manifest.json",
+      "mainPathCommits": [
+        "20ad88daab5c5e8438d1fbe98bf56a5b73fe69cd refactor(convention): one identifier check and one contract reader behind seat ids and definition names"
+      ],
+      "mainStatus": "M\tdocs/architecture-manifest.json",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/backlog.md",
+      "mainPathCommits": [
+        "6db41fad6f22f9da85ba05544f06b501356ee733 docs(config): ship a complete standard and move account pools and the gateway token to a private directory",
+        "b7be8795ce4b4761128a324dfac6e9658abf1386 docs(backlog): inline the gateway bind reason instead of a decision id local to another document",
+        "3c49306912dff7fc169bd1d0f9bc7b435290fdec docs(platform): specify the YAML Document and Config components"
+      ],
+      "mainStatus": "M\tdocs/backlog.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/io-contract.md",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tdocs/io-contract.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/platform/agent-mailbox/spec.md",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tdocs/platform/agent-mailbox/spec.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "mainPathCommits": [
+        "b4f9a2219fe063a9ac3ab91b423b8207a6f09866 Merge remote-tracking branch 'origin/main' into ident/p00-rename-to-identity",
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity",
+        "8c2a62f44ab85146beb5ece0f44ce384fed764ea docs(config): record the owner's signature on the YAML Document and Config specs",
+        "3c49306912dff7fc169bd1d0f9bc7b435290fdec docs(platform): specify the YAML Document and Config components"
+      ],
+      "mainStatus": "M\tdocs/platform/component-boundary.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/platform/config/spec.md",
+      "mainPathCommits": [
+        "8c2a62f44ab85146beb5ece0f44ce384fed764ea docs(config): record the owner's signature on the YAML Document and Config specs",
+        "6db41fad6f22f9da85ba05544f06b501356ee733 docs(config): ship a complete standard and move account pools and the gateway token to a private directory",
+        "3c49306912dff7fc169bd1d0f9bc7b435290fdec docs(platform): specify the YAML Document and Config components"
+      ],
+      "mainStatus": "A\tdocs/platform/config/spec.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/platform/event-store/spec.md",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tdocs/platform/event-store/spec.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/platform/git/spec.md",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity",
+        "559090ec78ac7a0bf82633caf46c1ef8313152e9 docs(git): record Git and Event Store foundation completion and tidy the open-proof table"
+      ],
+      "mainStatus": "M\tdocs/platform/git/spec.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tdocs/platform/holder-lock/spec.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tdocs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/platform/identity/spec.md",
+      "mainPathCommits": [
+        "5e6c23723d904fa698313b0b5571a80a2b6a9b84 Merge remote-tracking branch 'origin/main' into ident/p00-rename-to-identity",
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity",
+        "1aca9e83e0499563b261a30bec922e6ce9694c2c docs(identity): record the owner's answers for the mint rung",
+        "ddf77bb02d7f5c20315a51c645efafc8e6f2c343 docs(identity): settle cross-machine id minting with random ids and one counter ref per sequence",
+        "636df9d8764a1041cc90c699d27a838db5ad426a docs(identity): make identity the one door for every id and hold the lane on collision cost",
+        "487f5842675429c4d6460b24a0e9acf9c84da808 docs(identity): grow identity inside the one existing crate and apply the plan review",
+        "71b321787fb412adae29e61aed68fdda1193dde0 docs(identity): fix one read per identity plus resolve and list as the verb surface",
+        "d210631a4a443994196f25c5dd37c8140eb4162b docs(identity): sign the identity gate for its first four rungs",
+        "d7e447b7dd24792e2c71507d4b4c0e4cfe89ff7c docs(board): take the identity lane and send its gate questions to the owner",
+        "f4447ba6d303697e9a3d914cf5f4602297448901 docs(identity): open the identity lane with a draft spec for cross-machine ids"
+      ],
+      "mainStatus": "A\tdocs/platform/identity/spec.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/platform/process/spec.md",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tdocs/platform/process/spec.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/platform/run-supervisor/spec.md",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tdocs/platform/run-supervisor/spec.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/platform/session-identity/spec.md",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "D\tdocs/platform/session-identity/spec.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/platform/terminal-control/spec.md",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tdocs/platform/terminal-control/spec.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/platform/yaml-document/spec.md",
+      "mainPathCommits": [
+        "8c2a62f44ab85146beb5ece0f44ce384fed764ea docs(config): record the owner's signature on the YAML Document and Config specs",
+        "3c49306912dff7fc169bd1d0f9bc7b435290fdec docs(platform): specify the YAML Document and Config components"
+      ],
+      "mainStatus": "A\tdocs/platform/yaml-document/spec.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/specs/distribution.md",
+      "mainPathCommits": [
+        "a7b74431186d3bfcf6740f779e5101054d228148 refactor(seat-binding): read the tier ladder from one shared contract file"
+      ],
+      "mainStatus": "M\tdocs/specs/distribution.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/specs/observe.md",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tdocs/specs/observe.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/specs/reading-map.md",
+      "mainPathCommits": [
+        "b4f9a2219fe063a9ac3ab91b423b8207a6f09866 Merge remote-tracking branch 'origin/main' into ident/p00-rename-to-identity",
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity",
+        "8c2a62f44ab85146beb5ece0f44ce384fed764ea docs(config): record the owner's signature on the YAML Document and Config specs",
+        "043ceaafbf914c1ae0c6477402d15fee1a17a3a4 docs(specs): gloss the dispatch-lock law cited in the reading map",
+        "3c49306912dff7fc169bd1d0f9bc7b435290fdec docs(platform): specify the YAML Document and Config components"
+      ],
+      "mainStatus": "M\tdocs/specs/reading-map.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tdocs/specs/runner.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/specs/seat-binding.md",
+      "mainPathCommits": [
+        "b4f9a2219fe063a9ac3ab91b423b8207a6f09866 Merge remote-tracking branch 'origin/main' into ident/p00-rename-to-identity",
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity",
+        "a7b74431186d3bfcf6740f779e5101054d228148 refactor(seat-binding): read the tier ladder from one shared contract file"
+      ],
+      "mainStatus": "M\tdocs/specs/seat-binding.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "docs/specs/workflow.md",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tdocs/specs/workflow.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "package.json",
+      "mainPathCommits": [
+        "a7b74431186d3bfcf6740f779e5101054d228148 refactor(seat-binding): read the tier ladder from one shared contract file"
+      ],
+      "mainStatus": "M\tpackage.json",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/git/contracts/mutation-census.v1.json",
+      "mainPathCommits": [
+        "b4f9a2219fe063a9ac3ab91b423b8207a6f09866 Merge remote-tracking branch 'origin/main' into ident/p00-rename-to-identity",
+        "bafc6a41aca5a98a1136d27450b51ad50a6c776b chore(git): regenerate the mutation census after the seat-binding trim",
+        "5e6c23723d904fa698313b0b5571a80a2b6a9b84 Merge remote-tracking branch 'origin/main' into ident/p00-rename-to-identity",
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity",
+        "984e24d2c917c4754f4d96613b7a3b11cd8a2474 perf(test): prove the test host once per process",
+        "96a67372563d0dd9b9cd74178f42374a92765708 chore(git): commit the mutation census the release build regenerates"
+      ],
+      "mainStatus": "M\tpackages/git/contracts/mutation-census.v1.json",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/host-runtime/contracts/command-route-annotations.json",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tpackages/host-runtime/contracts/command-route-annotations.json",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/host-runtime/contracts/command-routes.json",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tpackages/host-runtime/contracts/command-routes.json",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/host-runtime/rust/src/catalog.rs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tpackages/host-runtime/rust/src/catalog.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/identity/contracts/attempt-writer-id.v1.json",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "A\tpackages/identity/contracts/attempt-writer-id.v1.json",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/identity/contracts/identity.writer.golden.v1.json",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "A\tpackages/identity/contracts/identity.writer.golden.v1.json",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/identity/contracts/identity.writer.v1.json",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "A\tpackages/identity/contracts/identity.writer.v1.json",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/identity/contracts/vectors/attempt-writer-id.v1.json",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "A\tpackages/identity/contracts/vectors/attempt-writer-id.v1.json",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/identity/rust/Cargo.toml",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "A\tpackages/identity/rust/Cargo.toml",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/identity/rust/src/attempt.rs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "A\tpackages/identity/rust/src/attempt.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/identity/rust/src/launcher.rs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "A\tpackages/identity/rust/src/launcher.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/identity/rust/src/lib.rs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "A\tpackages/identity/rust/src/lib.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/identity/rust/src/proc_tree.rs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "A\tpackages/identity/rust/src/proc_tree.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/identity/rust/src/provider.rs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "A\tpackages/identity/rust/src/provider.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/identity/rust/src/resolve.rs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "A\tpackages/identity/rust/src/resolve.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/identity/rust/src/route.rs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "A\tpackages/identity/rust/src/route.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/identity/rust/tests/attempt_writer_id.rs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "A\tpackages/identity/rust/tests/attempt_writer_id.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/identity/rust/tests/golden.rs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "A\tpackages/identity/rust/tests/golden.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/observe/rust/Cargo.toml",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tpackages/observe/rust/Cargo.toml",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/observe/rust/src/friction.rs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tpackages/observe/rust/src/friction.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/observe/rust/src/shard.rs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tpackages/observe/rust/src/shard.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/observe/rust/tests/boundary_test.rs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tpackages/observe/rust/tests/boundary_test.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/run-supervisor/contracts/envelope.v3.json",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tpackages/run-supervisor/contracts/envelope.v3.json",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/seat-binding/contracts/seat-binding.golden.v1.json",
+      "mainPathCommits": [
+        "7224110ed19d36b4b5b10b4bdeadf1d8c6f64d3e refactor(seat-binding): rank seats the session lead runs inline in the crate"
+      ],
+      "mainStatus": "M\tpackages/seat-binding/contracts/seat-binding.golden.v1.json",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/seat-binding/contracts/seat-binding.tier-ladder.v1.json",
+      "mainPathCommits": [
+        "a7b74431186d3bfcf6740f779e5101054d228148 refactor(seat-binding): read the tier ladder from one shared contract file"
+      ],
+      "mainStatus": "A\tpackages/seat-binding/contracts/seat-binding.tier-ladder.v1.json",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/seat-binding/rust/src/lib.rs",
+      "mainPathCommits": [
+        "a7b74431186d3bfcf6740f779e5101054d228148 refactor(seat-binding): read the tier ladder from one shared contract file"
+      ],
+      "mainStatus": "M\tpackages/seat-binding/rust/src/lib.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/seat-binding/rust/src/model.rs",
+      "mainPathCommits": [
+        "7224110ed19d36b4b5b10b4bdeadf1d8c6f64d3e refactor(seat-binding): rank seats the session lead runs inline in the crate"
+      ],
+      "mainStatus": "M\tpackages/seat-binding/rust/src/model.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/seat-binding/rust/src/rank.rs",
+      "mainPathCommits": [
+        "7224110ed19d36b4b5b10b4bdeadf1d8c6f64d3e refactor(seat-binding): rank seats the session lead runs inline in the crate"
+      ],
+      "mainStatus": "M\tpackages/seat-binding/rust/src/rank.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "packages/seat-binding/rust/src/tier.rs",
+      "mainPathCommits": [
+        "a7b74431186d3bfcf6740f779e5101054d228148 refactor(seat-binding): read the tier ladder from one shared contract file"
+      ],
+      "mainStatus": "M\tpackages/seat-binding/rust/src/tier.rs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261017-1313-fgos-platform-program-board/log.md",
+      "mainPathCommits": [
+        "1d0797a7849518fac8deb132fc6f996ec6bd0966 docs(plan): record the owner's choices for Land candidate release and porting duplicate adds",
+        "92b39f480c0717284aa885cc95358f6d5e21ece8 docs(board): report the one-door census regression to the config lane",
+        "4379dc44c4588cc1267b73fe4deb02bb98b155c8 docs(board): record the docs-turn refusal and the codex pin for docs turns",
+        "8922e13859955fb30a65cd029c0ba27261dc1a35 docs(board): record the containment baseline and the suite items handed to test governance",
+        "755ad30353ff97f954e7740c7b66a822736c34ca docs(board): land the identity rename and tell the lanes that import it",
+        "4d732a87e2bae330be71d44c7e47c41e7be31a9c Merge branch 'main' of https://github.com/vantt/forgent",
+        "5f20635fd8537f650d802dd4fb705c43d0b30a1f Merge branch 'main' of https://github.com/vantt/forgent",
+        "601e8b3870f143737b5e20de10c831211435fb57 docs(board): record the porting stream and the Work readers on the WORK lane branch",
+        "9cd826926cad162e31bf78940a6cb891ef44a70f docs(board): record the first seat-binding trim and ask the second machine for the conversion trigger",
+        "94b61ca31e152c037ea240d06dd8195b1f8a60d6 docs(board): mark the mailbox record store done on its branch",
+        "9e487b3d9a5ad36e65671674e6f75d364c774e14 docs(board): record the Work write-path fixes and the census sites main now lacks",
+        "4cd5066ece72b46b89bc6d21302af0e64aee37ba docs(board): record T1 phase 2 on the integration branch",
+        "b6a399731629970cd32b83d562d489222fb5dcce docs(board): record the Work gate core port on the WORK lane branch",
+        "0fbc375fea63d0f22c00233daa5ffd2229249269 docs(board): open the YAML Document and Config lane and plan its first slice",
+        "7d324fbe8fe7515ea5a12a39ceff04576fea59da docs(board): record the owner's approval of the containment fixes plan",
+        "71dcf5d7f6411618ca4548ac7f9666e1a251ac88 docs(plan): plan the containment fixes inside today's shape",
+        "93d89958203a89cb98c5f7719868f4a786bd040c docs(board): record the owner's answers on operation-scoped containment",
+        "e6e7391a38d3c1df263f2b7cd94feda783fa9987 docs(board): record HARDEN taking the Git review of the containment work",
+        "5a271db8f5bd70a5c9c1cb5e340a693e58584248 docs(report): arbitrate the operation-scoped containment council",
+        "89935937d21645308eaf0871b71cc76fe4979d91 docs(board): ask every machine to be ready for the identity landing roster",
+        "79ced9053dd431be5a24c45a52636cf859453425 docs(board): tell the documentation and instruction lanes which files identity touches",
+        "ab7b9325c70acd6ab5036c870c1a394bf1f05316 docs(plan): rename to identity first and add the mint door for every owner",
+        "ddf77bb02d7f5c20315a51c645efafc8e6f2c343 docs(identity): settle cross-machine id minting with random ids and one counter ref per sequence",
+        "5d7cde668c6b881bd98b10cf80dab80b239f1f5b docs(board): hand the Git reviewer role to the OPC lead",
+        "d6afdc7e672b375eae2eb47b51a54ac5d22442de docs(board): open the operation-scoped containment design council",
+        "d028ac76d51468423e7afea90c3000671cd2e641 docs(board): close the Git and Event Store coordinator session and list what needs a new owner",
+        "7a6f366ed98542852f1b501dab0119f6d20d46d8 docs(board): open the OPC design council and record the Git backlog",
+        "6844d5fc338e52251ed1f730944274b7b7508dc6 docs(plan): record the owner's choice of a one-day mailbox body retention",
+        "f223dad26df67d678c3f2706e3109666741d46ae docs(board): report the read-only claude outbox failure and the decide/bind mismatch to the seat lane",
+        "e7240e573254a105cc43feb0df80a0b0a5b28ec7 docs(landing): record the seat dispatch fix and git fence landing on the owner machine",
+        "636df9d8764a1041cc90c699d27a838db5ad426a docs(identity): make identity the one door for every id and hold the lane on collision cost",
+        "487f5842675429c4d6460b24a0e9acf9c84da808 docs(identity): grow identity inside the one existing crate and apply the plan review",
+        "83ac251d7d178964f1a2202e4d98e565a474f033 docs(plan): record the owner's answers on dead names, parent age and self-send",
+        "978fa28e7ff14932f56f5bcd77d9a3563e9f8df8 docs(board): close the mailbox hook payload rung on its branch and start the record store",
+        "d210631a4a443994196f25c5dd37c8140eb4162b docs(identity): sign the identity gate for its first four rungs",
+        "0a77d6340fe77fd5223412007274c61f2f4c823e Merge branch 'main' of https://github.com/vantt/forgent",
+        "b41172cb02f025992447ce6fe1734e184d8443d6 docs(plan): plan the herdr pane launch fix as the cook trial, with red team and validation",
+        "5e6916ad650d71db87d946ab3a505aa301225bcf docs(board): answer the test lane on the three seat-binding config test failures",
+        "d7e447b7dd24792e2c71507d4b4c0e4cfe89ff7c docs(board): take the identity lane and send its gate questions to the owner",
+        "05b60220d829928632995d4e10cbc0a14a1b5b8a docs(board): record the owner's choice to untrack the porting view",
+        "559090ec78ac7a0bf82633caf46c1ef8313152e9 docs(git): record Git and Event Store foundation completion and tidy the open-proof table",
+        "8e707393b666b5f981148eb5c573faf069ddbfb0 docs(board): start the seat-binding trim and split the convention and lock-counter items with the holder-lock lane",
+        "236267464634bf79160b360e3b988d87b77bc3ef docs(board): open the WORK lane with the trial-merge facts",
+        "b363d8809598e32476f1fb0a23ed8304688cbcd8 docs(board): tell the identity lane how HARDEN T1 touches session identity",
+        "1d7047c1e8a9803b45955005abcd92ee575a3369 docs(board): record the WORK lane hand-off",
+        "8a4df0f8ea1e5dad21b75737995fec98f70c0131 docs(board): close the model-pool B1 lane after the model refresh in mdview and mcp-skill-hub",
+        "bb2647f9754c7f173d89c1c1fc3a41e57e3280cf docs(board): close the big-lead session after handing off the seat-binding and cook lanes",
+        "5b7c120265ebdd417f4d543ce9308d9204559a41 docs(board): record the owner's choice of plan for the cook trial",
+        "8ea571a80a1e942ad2d81baaa9cce59dabef4826 docs(handoff): hand the seat-binding lane to a dedicated lead",
+        "f4447ba6d303697e9a3d914cf5f4602297448901 docs(identity): open the identity lane with a draft spec for cross-machine ids",
+        "31e15077ec626b076c765ef611eeca3f7259ed17 docs(landing): record the SEAT and T0 release landing on this machine",
+        "efba97e1f6c80b48a00a2b9450dcd316794e4788 docs(board): announce the mailbox lock row and hidden root to the hardening lane",
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs",
+        "b0e561a65b17cbf2e32024d24694763bbf2cc609 docs(board): log the timing batch and two more failing tests on main"
+      ],
+      "mainStatus": "M\tplans/261017-1313-fgos-platform-program-board/log.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261017-1313-fgos-platform-program-board/plan.md",
+      "mainPathCommits": [
+        "1d0797a7849518fac8deb132fc6f996ec6bd0966 docs(plan): record the owner's choices for Land candidate release and porting duplicate adds",
+        "8922e13859955fb30a65cd029c0ba27261dc1a35 docs(board): record the containment baseline and the suite items handed to test governance",
+        "755ad30353ff97f954e7740c7b66a822736c34ca docs(board): land the identity rename and tell the lanes that import it",
+        "4d732a87e2bae330be71d44c7e47c41e7be31a9c Merge branch 'main' of https://github.com/vantt/forgent",
+        "5f20635fd8537f650d802dd4fb705c43d0b30a1f Merge branch 'main' of https://github.com/vantt/forgent",
+        "601e8b3870f143737b5e20de10c831211435fb57 docs(board): record the porting stream and the Work readers on the WORK lane branch",
+        "9cd826926cad162e31bf78940a6cb891ef44a70f docs(board): record the first seat-binding trim and ask the second machine for the conversion trigger",
+        "94b61ca31e152c037ea240d06dd8195b1f8a60d6 docs(board): mark the mailbox record store done on its branch",
+        "9e487b3d9a5ad36e65671674e6f75d364c774e14 docs(board): record the Work write-path fixes and the census sites main now lacks",
+        "b6a399731629970cd32b83d562d489222fb5dcce docs(board): record the Work gate core port on the WORK lane branch",
+        "0fbc375fea63d0f22c00233daa5ffd2229249269 docs(board): open the YAML Document and Config lane and plan its first slice",
+        "7d324fbe8fe7515ea5a12a39ceff04576fea59da docs(board): record the owner's approval of the containment fixes plan",
+        "71dcf5d7f6411618ca4548ac7f9666e1a251ac88 docs(plan): plan the containment fixes inside today's shape",
+        "93d89958203a89cb98c5f7719868f4a786bd040c docs(board): record the owner's answers on operation-scoped containment",
+        "e6e7391a38d3c1df263f2b7cd94feda783fa9987 docs(board): record HARDEN taking the Git review of the containment work",
+        "5a271db8f5bd70a5c9c1cb5e340a693e58584248 docs(report): arbitrate the operation-scoped containment council",
+        "4635f9f59104108164a89178e939bdfd7fd72654 docs(board): start the identity rename",
+        "ab7b9325c70acd6ab5036c870c1a394bf1f05316 docs(plan): rename to identity first and add the mint door for every owner",
+        "ddf77bb02d7f5c20315a51c645efafc8e6f2c343 docs(identity): settle cross-machine id minting with random ids and one counter ref per sequence",
+        "5d7cde668c6b881bd98b10cf80dab80b239f1f5b docs(board): hand the Git reviewer role to the OPC lead",
+        "d6afdc7e672b375eae2eb47b51a54ac5d22442de docs(board): open the operation-scoped containment design council",
+        "d6557106018303b404e9e32119f734ec8366edde docs(board): record the Git review of HARDEN T1 phase 2",
+        "d028ac76d51468423e7afea90c3000671cd2e641 docs(board): close the Git and Event Store coordinator session and list what needs a new owner",
+        "7a6f366ed98542852f1b501dab0119f6d20d46d8 docs(board): open the OPC design council and record the Git backlog",
+        "03cd70ae21b82bb7bc956760a4069a1df5fec935 docs(plan): keep the hook on the native shared-try route instead of a legacy verb",
+        "636df9d8764a1041cc90c699d27a838db5ad426a docs(identity): make identity the one door for every id and hold the lane on collision cost",
+        "bb33c54c1656ed0aedeb034a61eb162f3a1572e1 docs(plan): plan the identity rungs with machine and session handles first",
+        "978fa28e7ff14932f56f5bcd77d9a3563e9f8df8 docs(board): close the mailbox hook payload rung on its branch and start the record store",
+        "d210631a4a443994196f25c5dd37c8140eb4162b docs(identity): sign the identity gate for its first four rungs",
+        "b41172cb02f025992447ce6fe1734e184d8443d6 docs(plan): plan the herdr pane launch fix as the cook trial, with red team and validation",
+        "d7e447b7dd24792e2c71507d4b4c0e4cfe89ff7c docs(board): take the identity lane and send its gate questions to the owner",
+        "05b60220d829928632995d4e10cbc0a14a1b5b8a docs(board): record the owner's choice to untrack the porting view",
+        "559090ec78ac7a0bf82633caf46c1ef8313152e9 docs(git): record Git and Event Store foundation completion and tidy the open-proof table",
+        "8e707393b666b5f981148eb5c573faf069ddbfb0 docs(board): start the seat-binding trim and split the convention and lock-counter items with the holder-lock lane",
+        "236267464634bf79160b360e3b988d87b77bc3ef docs(board): open the WORK lane with the trial-merge facts",
+        "8a4df0f8ea1e5dad21b75737995fec98f70c0131 docs(board): close the model-pool B1 lane after the model refresh in mdview and mcp-skill-hub",
+        "5b7c120265ebdd417f4d543ce9308d9204559a41 docs(board): record the owner's choice of plan for the cook trial",
+        "60b220e0f7f921191cf722fc9273b600bb43486a docs(board): note what the cook trial needs before it runs",
+        "f4447ba6d303697e9a3d914cf5f4602297448901 docs(identity): open the identity lane with a draft spec for cross-machine ids",
+        "efba97e1f6c80b48a00a2b9450dcd316794e4788 docs(board): announce the mailbox lock row and hidden root to the hardening lane",
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs"
+      ],
+      "mainStatus": "M\tplans/261017-1313-fgos-platform-program-board/plan.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261018-0914-git-component-fgos-git/plan.md",
+      "mainPathCommits": [
+        "559090ec78ac7a0bf82633caf46c1ef8313152e9 docs(git): record Git and Event Store foundation completion and tidy the open-proof table"
+      ],
+      "mainStatus": "M\tplans/261018-0914-git-component-fgos-git/plan.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261018-0945-event-store-fgos-event-store/plan.md",
+      "mainPathCommits": [
+        "559090ec78ac7a0bf82633caf46c1ef8313152e9 docs(git): record Git and Event Store foundation completion and tidy the open-proof table"
+      ],
+      "mainStatus": "M\tplans/261018-0945-event-store-fgos-event-store/plan.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261020-1757-test-governance-port-inventory-and-slow-file-extraction/plan.md",
+      "mainPathCommits": [
+        "e4aa2aada48e475fee41557def304c7ad829d57d docs(test): take the four suite-health items from OPC's baseline",
+        "85e42bce7d55a67081ebf8d3464147746ff0fe99 docs(test): park the 50-process session test on HARDEN R2"
+      ],
+      "mainStatus": "M\tplans/261020-1757-test-governance-port-inventory-and-slow-file-extraction/plan.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md",
+      "mainPathCommits": [
+        "9a28c9fbb4b2cfe1845ea9376656d56b5f751ee7 docs(plan): add OPC's contained-git child count to the R2 note",
+        "900467f7aa8562fb0a0459ff76a190250fa8905d docs(plan): take OPC's containment error name for R3 and its per-child cost for R2"
+      ],
+      "mainStatus": "M\tplans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-07-closing-and-handoff.md",
+      "mainPathCommits": [
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs"
+      ],
+      "mainStatus": "M\tplans/261021-1118-harden-low-layers-bottom-up/phase-07-closing-and-handoff.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261021-1118-harden-low-layers-bottom-up/plan.md",
+      "mainPathCommits": [
+        "43444229e5795b8dd688817fab79f20bac21af0f docs(plan): list main's census regression among the known reds for verify runs",
+        "2db05f2b6a75c431a2958171ad6002c57846c8cc docs(plan): record that HARDEN reviews OPC's Git-area diffs",
+        "a53c6c2159459a4759e82245a61a41d8f989b778 docs(plan): name the Git reviewer for HARDEN's Git-area diffs",
+        "6f8fab47b8183ca0053d15226f9a1dcc741a2c46 docs(plan): record GIT's approval of T1 phase 2's Git-area diffs",
+        "998bcca8b416cd54f7d630ad7dfe574a57fd5534 docs(plan): hold T1 phase 2's Git-area diffs for a named Git reviewer and move H15",
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs",
+        "be72719a9b28acbf3137094478ffd39638445f20 docs(plan): close the hot-mutex bound hand-off and list main's known reds for verify runs"
+      ],
+      "mainStatus": "M\tplans/261021-1118-harden-low-layers-bottom-up/plan.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261021-1547-harden-t0-process-facts-door/phase-07-post-seat-carry-list.md",
+      "mainPathCommits": [
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs"
+      ],
+      "mainStatus": "M\tplans/261021-1547-harden-t0-process-facts-door/phase-07-post-seat-carry-list.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-0007-mailbox-v3-hook-payload-contract/plan.md",
+      "mainPathCommits": [
+        "978fa28e7ff14932f56f5bcd77d9a3563e9f8df8 docs(board): close the mailbox hook payload rung on its branch and start the record store"
+      ],
+      "mainStatus": "M\tplans/261022-0007-mailbox-v3-hook-payload-contract/plan.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-0007-mailbox-v3-hook-payload-contract/reports/code-review-v3.md",
+      "mainPathCommits": [
+        "45466adccc392bc24f82b08f8023b399151aced9 docs(plan): add the independent review of the mailbox hook payload rung"
+      ],
+      "mainStatus": "A\tplans/261022-0007-mailbox-v3-hook-payload-contract/reports/code-review-v3.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-0851-harden-t1-holder-lock-identity-door/phase-01-red-tests.md",
+      "mainPathCommits": [
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs"
+      ],
+      "mainStatus": "A\tplans/261022-0851-harden-t1-holder-lock-identity-door/phase-01-red-tests.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-0851-harden-t1-holder-lock-identity-door/phase-02-lock-door.md",
+      "mainPathCommits": [
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs"
+      ],
+      "mainStatus": "A\tplans/261022-0851-harden-t1-holder-lock-identity-door/phase-02-lock-door.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-0851-harden-t1-holder-lock-identity-door/phase-03-fence-deletion.md",
+      "mainPathCommits": [
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs"
+      ],
+      "mainStatus": "A\tplans/261022-0851-harden-t1-holder-lock-identity-door/phase-03-fence-deletion.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-0851-harden-t1-holder-lock-identity-door/phase-04-hot-mutex-leaf-fixes.md",
+      "mainPathCommits": [
+        "e9ece3e94a7340809ff9c5a76f00f5f220bf3c6c docs(plan): split the bwrap mount-refusal work between T1 and OPC",
+        "900467f7aa8562fb0a0459ff76a190250fa8905d docs(plan): take OPC's containment error name for R3 and its per-child cost for R2",
+        "c17c9688ea5f2368fec4362207100b96a0dcc8f8 docs(plan): note that the reclaim path keeps one bytes compare, as the red test shows",
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs"
+      ],
+      "mainStatus": "A\tplans/261022-0851-harden-t1-holder-lock-identity-door/phase-04-hot-mutex-leaf-fixes.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-0851-harden-t1-holder-lock-identity-door/phase-05-doctor-merge-specs-checkout-channel.md",
+      "mainPathCommits": [
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs"
+      ],
+      "mainStatus": "A\tplans/261022-0851-harden-t1-holder-lock-identity-door/phase-05-doctor-merge-specs-checkout-channel.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-0851-harden-t1-holder-lock-identity-door/phase-06-identity-door-counter-t0-carry.md",
+      "mainPathCommits": [
+        "f3b67437b65c47066d24aa8b18c5cf25515cf477 docs(plan): point T1's identity phase at the renamed identity component",
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs"
+      ],
+      "mainStatus": "A\tplans/261022-0851-harden-t1-holder-lock-identity-door/phase-06-identity-door-counter-t0-carry.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-0851-harden-t1-holder-lock-identity-door/phase-07-close-verify-land.md",
+      "mainPathCommits": [
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs"
+      ],
+      "mainStatus": "A\tplans/261022-0851-harden-t1-holder-lock-identity-door/phase-07-close-verify-land.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-0851-harden-t1-holder-lock-identity-door/plan.md",
+      "mainPathCommits": [
+        "03cd70ae21b82bb7bc956760a4069a1df5fec935 docs(plan): keep the hook on the native shared-try route instead of a legacy verb",
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs"
+      ],
+      "mainStatus": "A\tplans/261022-0851-harden-t1-holder-lock-identity-door/plan.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-0851-harden-t1-holder-lock-identity-door/reports/red-team-261022-0912-assume.md",
+      "mainPathCommits": [
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs"
+      ],
+      "mainStatus": "A\tplans/261022-0851-harden-t1-holder-lock-identity-door/reports/red-team-261022-0912-assume.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-0851-harden-t1-holder-lock-identity-door/reports/red-team-261022-0912-failure.md",
+      "mainPathCommits": [
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs"
+      ],
+      "mainStatus": "A\tplans/261022-0851-harden-t1-holder-lock-identity-door/reports/red-team-261022-0912-failure.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-0851-harden-t1-holder-lock-identity-door/reports/red-team-261022-0912-scope.md",
+      "mainPathCommits": [
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs"
+      ],
+      "mainStatus": "A\tplans/261022-0851-harden-t1-holder-lock-identity-door/reports/red-team-261022-0912-scope.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-0851-harden-t1-holder-lock-identity-door/reports/red-team-261022-0912-security.md",
+      "mainPathCommits": [
+        "26db57f469948189c278f7c926e980d2054b87e6 docs(plan): add the HARDEN T1 sub-plan with its red-team and validation, record its hand-offs"
+      ],
+      "mainStatus": "A\tplans/261022-0851-harden-t1-holder-lock-identity-door/reports/red-team-261022-0912-security.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1005-mailbox-v2-record-store/phase-01-preconditions-and-lock-row.md",
+      "mainPathCommits": [
+        "79936520054bbd927ebd984aa6ca2de1678b913f docs(plan): plan the mailbox record store rung"
+      ],
+      "mainStatus": "A\tplans/261022-1005-mailbox-v2-record-store/phase-01-preconditions-and-lock-row.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1005-mailbox-v2-record-store/phase-02-paths-ids-and-snapshot-hold.md",
+      "mainPathCommits": [
+        "79936520054bbd927ebd984aa6ca2de1678b913f docs(plan): plan the mailbox record store rung"
+      ],
+      "mainStatus": "A\tplans/261022-1005-mailbox-v2-record-store/phase-02-paths-ids-and-snapshot-hold.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1005-mailbox-v2-record-store/phase-03-bodies-and-garbage-collection.md",
+      "mainPathCommits": [
+        "79936520054bbd927ebd984aa6ca2de1678b913f docs(plan): plan the mailbox record store rung"
+      ],
+      "mainStatus": "A\tplans/261022-1005-mailbox-v2-record-store/phase-03-bodies-and-garbage-collection.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1005-mailbox-v2-record-store/phase-04-kill-matrix.md",
+      "mainPathCommits": [
+        "79936520054bbd927ebd984aa6ca2de1678b913f docs(plan): plan the mailbox record store rung"
+      ],
+      "mainStatus": "A\tplans/261022-1005-mailbox-v2-record-store/phase-04-kill-matrix.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1005-mailbox-v2-record-store/phase-05-two-process-contention.md",
+      "mainPathCommits": [
+        "79936520054bbd927ebd984aa6ca2de1678b913f docs(plan): plan the mailbox record store rung"
+      ],
+      "mainStatus": "A\tplans/261022-1005-mailbox-v2-record-store/phase-05-two-process-contention.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1005-mailbox-v2-record-store/phase-06-q2-pruning-and-handle-bound.md",
+      "mainPathCommits": [
+        "79936520054bbd927ebd984aa6ca2de1678b913f docs(plan): plan the mailbox record store rung"
+      ],
+      "mainStatus": "A\tplans/261022-1005-mailbox-v2-record-store/phase-06-q2-pruning-and-handle-bound.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1005-mailbox-v2-record-store/phase-07-size-ceiling-and-costs.md",
+      "mainPathCommits": [
+        "79936520054bbd927ebd984aa6ca2de1678b913f docs(plan): plan the mailbox record store rung"
+      ],
+      "mainStatus": "A\tplans/261022-1005-mailbox-v2-record-store/phase-07-size-ceiling-and-costs.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1005-mailbox-v2-record-store/phase-08-branch-docs-gates-and-handoff.md",
+      "mainPathCommits": [
+        "79936520054bbd927ebd984aa6ca2de1678b913f docs(plan): plan the mailbox record store rung"
+      ],
+      "mainStatus": "A\tplans/261022-1005-mailbox-v2-record-store/phase-08-branch-docs-gates-and-handoff.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1005-mailbox-v2-record-store/plan.md",
+      "mainPathCommits": [
+        "6844d5fc338e52251ed1f730944274b7b7508dc6 docs(plan): record the owner's choice of a one-day mailbox body retention",
+        "83ac251d7d178964f1a2202e4d98e565a474f033 docs(plan): record the owner's answers on dead names, parent age and self-send",
+        "79936520054bbd927ebd984aa6ca2de1678b913f docs(plan): plan the mailbox record store rung"
+      ],
+      "mainStatus": "A\tplans/261022-1005-mailbox-v2-record-store/plan.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1005-mailbox-v2-record-store/reports/code-review-v2.md",
+      "mainPathCommits": [
+        "599570dbdba3e6fa124656709468fb93a0b1a0b9 docs(plan): add the independent review of the mailbox record store"
+      ],
+      "mainStatus": "A\tplans/261022-1005-mailbox-v2-record-store/reports/code-review-v2.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1037-herdr-pane-launch-ready/phase-01-ready-shell-handshake.md",
+      "mainPathCommits": [
+        "b41172cb02f025992447ce6fe1734e184d8443d6 docs(plan): plan the herdr pane launch fix as the cook trial, with red team and validation"
+      ],
+      "mainStatus": "A\tplans/261022-1037-herdr-pane-launch-ready/phase-01-ready-shell-handshake.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1037-herdr-pane-launch-ready/phase-02-quiet-shell-env.md",
+      "mainPathCommits": [
+        "b41172cb02f025992447ce6fe1734e184d8443d6 docs(plan): plan the herdr pane launch fix as the cook trial, with red team and validation"
+      ],
+      "mainStatus": "A\tplans/261022-1037-herdr-pane-launch-ready/phase-02-quiet-shell-env.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1037-herdr-pane-launch-ready/phase-03-agent-start-banner.md",
+      "mainPathCommits": [
+        "b41172cb02f025992447ce6fe1734e184d8443d6 docs(plan): plan the herdr pane launch fix as the cook trial, with red team and validation"
+      ],
+      "mainStatus": "A\tplans/261022-1037-herdr-pane-launch-ready/phase-03-agent-start-banner.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1037-herdr-pane-launch-ready/phase-04-supervisor-proof-and-docs.md",
+      "mainPathCommits": [
+        "b41172cb02f025992447ce6fe1734e184d8443d6 docs(plan): plan the herdr pane launch fix as the cook trial, with red team and validation"
+      ],
+      "mainStatus": "A\tplans/261022-1037-herdr-pane-launch-ready/phase-04-supervisor-proof-and-docs.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1037-herdr-pane-launch-ready/plan.md",
+      "mainPathCommits": [
+        "b41172cb02f025992447ce6fe1734e184d8443d6 docs(plan): plan the herdr pane launch fix as the cook trial, with red team and validation"
+      ],
+      "mainStatus": "A\tplans/261022-1037-herdr-pane-launch-ready/plan.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1037-herdr-pane-launch-ready/reports/p6-measure-notebook.md",
+      "mainPathCommits": [
+        "b41172cb02f025992447ce6fe1734e184d8443d6 docs(plan): plan the herdr pane launch fix as the cook trial, with red team and validation"
+      ],
+      "mainStatus": "A\tplans/261022-1037-herdr-pane-launch-ready/reports/p6-measure-notebook.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1037-herdr-pane-launch-ready/reports/red-team-assumptions.md",
+      "mainPathCommits": [
+        "b41172cb02f025992447ce6fe1734e184d8443d6 docs(plan): plan the herdr pane launch fix as the cook trial, with red team and validation"
+      ],
+      "mainStatus": "A\tplans/261022-1037-herdr-pane-launch-ready/reports/red-team-assumptions.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1037-herdr-pane-launch-ready/reports/red-team-failure-modes.md",
+      "mainPathCommits": [
+        "b41172cb02f025992447ce6fe1734e184d8443d6 docs(plan): plan the herdr pane launch fix as the cook trial, with red team and validation"
+      ],
+      "mainStatus": "A\tplans/261022-1037-herdr-pane-launch-ready/reports/red-team-failure-modes.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1037-herdr-pane-launch-ready/reports/red-team-security.md",
+      "mainPathCommits": [
+        "b41172cb02f025992447ce6fe1734e184d8443d6 docs(plan): plan the herdr pane launch fix as the cook trial, with red team and validation"
+      ],
+      "mainStatus": "A\tplans/261022-1037-herdr-pane-launch-ready/reports/red-team-security.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1037-herdr-pane-launch-ready/reports/scout-pane-launch-prior-art.md",
+      "mainPathCommits": [
+        "b41172cb02f025992447ce6fe1734e184d8443d6 docs(plan): plan the herdr pane launch fix as the cook trial, with red team and validation"
+      ],
+      "mainStatus": "A\tplans/261022-1037-herdr-pane-launch-ready/reports/scout-pane-launch-prior-art.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-00-rename-to-identity.md",
+      "mainPathCommits": [
+        "ab7b9325c70acd6ab5036c870c1a394bf1f05316 docs(plan): rename to identity first and add the mint door for every owner"
+      ],
+      "mainStatus": "A\tplans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-00-rename-to-identity.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-01-machine-id-and-handle.md",
+      "mainPathCommits": [
+        "ab7b9325c70acd6ab5036c870c1a394bf1f05316 docs(plan): rename to identity first and add the mint door for every owner",
+        "487f5842675429c4d6460b24a0e9acf9c84da808 docs(identity): grow identity inside the one existing crate and apply the plan review",
+        "bb33c54c1656ed0aedeb034a61eb162f3a1572e1 docs(plan): plan the identity rungs with machine and session handles first"
+      ],
+      "mainStatus": "A\tplans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-01-machine-id-and-handle.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-02-session-full-id-and-handle.md",
+      "mainPathCommits": [
+        "ab7b9325c70acd6ab5036c870c1a394bf1f05316 docs(plan): rename to identity first and add the mint door for every owner",
+        "487f5842675429c4d6460b24a0e9acf9c84da808 docs(identity): grow identity inside the one existing crate and apply the plan review",
+        "bb33c54c1656ed0aedeb034a61eb162f3a1572e1 docs(plan): plan the identity rungs with machine and session handles first"
+      ],
+      "mainStatus": "A\tplans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-02-session-full-id-and-handle.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-03-project-id.md",
+      "mainPathCommits": [
+        "ab7b9325c70acd6ab5036c870c1a394bf1f05316 docs(plan): rename to identity first and add the mint door for every owner",
+        "487f5842675429c4d6460b24a0e9acf9c84da808 docs(identity): grow identity inside the one existing crate and apply the plan review",
+        "bb33c54c1656ed0aedeb034a61eb162f3a1572e1 docs(plan): plan the identity rungs with machine and session handles first"
+      ],
+      "mainStatus": "A\tplans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-03-project-id.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-04-local-directory-resolve-list.md",
+      "mainPathCommits": [
+        "ab7b9325c70acd6ab5036c870c1a394bf1f05316 docs(plan): rename to identity first and add the mint door for every owner",
+        "487f5842675429c4d6460b24a0e9acf9c84da808 docs(identity): grow identity inside the one existing crate and apply the plan review",
+        "bb33c54c1656ed0aedeb034a61eb162f3a1572e1 docs(plan): plan the identity rungs with machine and session handles first"
+      ],
+      "mainStatus": "A\tplans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-04-local-directory-resolve-list.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-05-shared-directory-across-machines.md",
+      "mainPathCommits": [
+        "ab7b9325c70acd6ab5036c870c1a394bf1f05316 docs(plan): rename to identity first and add the mint door for every owner",
+        "487f5842675429c4d6460b24a0e9acf9c84da808 docs(identity): grow identity inside the one existing crate and apply the plan review",
+        "bb33c54c1656ed0aedeb034a61eb162f3a1572e1 docs(plan): plan the identity rungs with machine and session handles first"
+      ],
+      "mainStatus": "A\tplans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-05-shared-directory-across-machines.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-06-board-and-consumers.md",
+      "mainPathCommits": [
+        "ab7b9325c70acd6ab5036c870c1a394bf1f05316 docs(plan): rename to identity first and add the mint door for every owner",
+        "487f5842675429c4d6460b24a0e9acf9c84da808 docs(identity): grow identity inside the one existing crate and apply the plan review",
+        "bb33c54c1656ed0aedeb034a61eb162f3a1572e1 docs(plan): plan the identity rungs with machine and session handles first"
+      ],
+      "mainStatus": "A\tplans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-06-board-and-consumers.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-07-mint-door-for-every-owner.md",
+      "mainPathCommits": [
+        "1aca9e83e0499563b261a30bec922e6ce9694c2c docs(identity): record the owner's answers for the mint rung",
+        "ab7b9325c70acd6ab5036c870c1a394bf1f05316 docs(plan): rename to identity first and add the mint door for every owner"
+      ],
+      "mainStatus": "A\tplans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-07-mint-door-for-every-owner.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1100-identity-i1-i4-project-machine-session-directory/plan.md",
+      "mainPathCommits": [
+        "ab7b9325c70acd6ab5036c870c1a394bf1f05316 docs(plan): rename to identity first and add the mint door for every owner",
+        "487f5842675429c4d6460b24a0e9acf9c84da808 docs(identity): grow identity inside the one existing crate and apply the plan review",
+        "bb33c54c1656ed0aedeb034a61eb162f3a1572e1 docs(plan): plan the identity rungs with machine and session handles first"
+      ],
+      "mainStatus": "A\tplans/261022-1100-identity-i1-i4-project-machine-session-directory/plan.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1335-opc-phase-a-containment-fixes/phase-00-baseline-measurements.md",
+      "mainPathCommits": [
+        "71dcf5d7f6411618ca4548ac7f9666e1a251ac88 docs(plan): plan the containment fixes inside today's shape"
+      ],
+      "mainStatus": "A\tplans/261022-1335-opc-phase-a-containment-fixes/phase-00-baseline-measurements.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1335-opc-phase-a-containment-fixes/phase-01-contained-branch-wake-and-bounded-wait.md",
+      "mainPathCommits": [
+        "71dcf5d7f6411618ca4548ac7f9666e1a251ac88 docs(plan): plan the containment fixes inside today's shape"
+      ],
+      "mainStatus": "A\tplans/261022-1335-opc-phase-a-containment-fixes/phase-01-contained-branch-wake-and-bounded-wait.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1335-opc-phase-a-containment-fixes/phase-02-mount-refusal-and-driver-reason.md",
+      "mainPathCommits": [
+        "71dcf5d7f6411618ca4548ac7f9666e1a251ac88 docs(plan): plan the containment fixes inside today's shape"
+      ],
+      "mainStatus": "A\tplans/261022-1335-opc-phase-a-containment-fixes/phase-02-mount-refusal-and-driver-reason.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1335-opc-phase-a-containment-fixes/phase-03-pgroup-escapee-watch.md",
+      "mainPathCommits": [
+        "71dcf5d7f6411618ca4548ac7f9666e1a251ac88 docs(plan): plan the containment fixes inside today's shape"
+      ],
+      "mainStatus": "A\tplans/261022-1335-opc-phase-a-containment-fixes/phase-03-pgroup-escapee-watch.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1335-opc-phase-a-containment-fixes/phase-04-containment-conformance-suite.md",
+      "mainPathCommits": [
+        "160b6b787b2290736e5ec406552f02a38689dfc2 docs(plan): apply the test-governance review to the containment conformance phase",
+        "71dcf5d7f6411618ca4548ac7f9666e1a251ac88 docs(plan): plan the containment fixes inside today's shape"
+      ],
+      "mainStatus": "A\tplans/261022-1335-opc-phase-a-containment-fixes/phase-04-containment-conformance-suite.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1335-opc-phase-a-containment-fixes/phase-05-proofs-docs-landing.md",
+      "mainPathCommits": [
+        "71dcf5d7f6411618ca4548ac7f9666e1a251ac88 docs(plan): plan the containment fixes inside today's shape"
+      ],
+      "mainStatus": "A\tplans/261022-1335-opc-phase-a-containment-fixes/phase-05-proofs-docs-landing.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1335-opc-phase-a-containment-fixes/plan.md",
+      "mainPathCommits": [
+        "160b6b787b2290736e5ec406552f02a38689dfc2 docs(plan): apply the test-governance review to the containment conformance phase",
+        "7d324fbe8fe7515ea5a12a39ceff04576fea59da docs(board): record the owner's approval of the containment fixes plan",
+        "71dcf5d7f6411618ca4548ac7f9666e1a251ac88 docs(plan): plan the containment fixes inside today's shape"
+      ],
+      "mainStatus": "A\tplans/261022-1335-opc-phase-a-containment-fixes/plan.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-00-facts.md",
+      "mainPathCommits": [
+        "4a68ce23a0ddf4831d7c922fd4f4c9db3a606aeb docs(plan): plan the YAML Document slice with fixtures first and a parser choice gated by the owner"
+      ],
+      "mainStatus": "A\tplans/261022-1342-yaml-config-slice-a-yaml-document/phase-00-facts.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-01-config-fixture-helper.md",
+      "mainPathCommits": [
+        "4a68ce23a0ddf4831d7c922fd4f4c9db3a606aeb docs(plan): plan the YAML Document slice with fixtures first and a parser choice gated by the owner"
+      ],
+      "mainStatus": "A\tplans/261022-1342-yaml-config-slice-a-yaml-document/phase-01-config-fixture-helper.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-02-crate-skeleton-contracts-fixtures.md",
+      "mainPathCommits": [
+        "4a68ce23a0ddf4831d7c922fd4f4c9db3a606aeb docs(plan): plan the YAML Document slice with fixtures first and a parser choice gated by the owner"
+      ],
+      "mainStatus": "A\tplans/261022-1342-yaml-config-slice-a-yaml-document/phase-02-crate-skeleton-contracts-fixtures.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-03-parser-independent-parts.md",
+      "mainPathCommits": [
+        "4a68ce23a0ddf4831d7c922fd4f4c9db3a606aeb docs(plan): plan the YAML Document slice with fixtures first and a parser choice gated by the owner"
+      ],
+      "mainStatus": "A\tplans/261022-1342-yaml-config-slice-a-yaml-document/phase-03-parser-independent-parts.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-04-parser-evaluation-and-owner-gate.md",
+      "mainPathCommits": [
+        "4a68ce23a0ddf4831d7c922fd4f4c9db3a606aeb docs(plan): plan the YAML Document slice with fixtures first and a parser choice gated by the owner"
+      ],
+      "mainStatus": "A\tplans/261022-1342-yaml-config-slice-a-yaml-document/phase-04-parser-evaluation-and-owner-gate.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-05-parse-profiles-limits.md",
+      "mainPathCommits": [
+        "4a68ce23a0ddf4831d7c922fd4f4c9db3a606aeb docs(plan): plan the YAML Document slice with fixtures first and a parser choice gated by the owner"
+      ],
+      "mainStatus": "A\tplans/261022-1342-yaml-config-slice-a-yaml-document/phase-05-parse-profiles-limits.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-06-edits-and-recheck.md",
+      "mainPathCommits": [
+        "4a68ce23a0ddf4831d7c922fd4f4c9db3a606aeb docs(plan): plan the YAML Document slice with fixtures first and a parser choice gated by the owner"
+      ],
+      "mainStatus": "A\tplans/261022-1342-yaml-config-slice-a-yaml-document/phase-06-edits-and-recheck.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-07-public-api-seal.md",
+      "mainPathCommits": [
+        "4a68ce23a0ddf4831d7c922fd4f4c9db3a606aeb docs(plan): plan the YAML Document slice with fixtures first and a parser choice gated by the owner"
+      ],
+      "mainStatus": "A\tplans/261022-1342-yaml-config-slice-a-yaml-document/phase-07-public-api-seal.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-08-move-serde-yaml-users.md",
+      "mainPathCommits": [
+        "4a68ce23a0ddf4831d7c922fd4f4c9db3a606aeb docs(plan): plan the YAML Document slice with fixtures first and a parser choice gated by the owner"
+      ],
+      "mainStatus": "A\tplans/261022-1342-yaml-config-slice-a-yaml-document/phase-08-move-serde-yaml-users.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-09-fuzz-targets.md",
+      "mainPathCommits": [
+        "4a68ce23a0ddf4831d7c922fd4f4c9db3a606aeb docs(plan): plan the YAML Document slice with fixtures first and a parser choice gated by the owner"
+      ],
+      "mainStatus": "A\tplans/261022-1342-yaml-config-slice-a-yaml-document/phase-09-fuzz-targets.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-10-docs-board-closeout.md",
+      "mainPathCommits": [
+        "4a68ce23a0ddf4831d7c922fd4f4c9db3a606aeb docs(plan): plan the YAML Document slice with fixtures first and a parser choice gated by the owner"
+      ],
+      "mainStatus": "A\tplans/261022-1342-yaml-config-slice-a-yaml-document/phase-10-docs-board-closeout.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1342-yaml-config-slice-a-yaml-document/plan.md",
+      "mainPathCommits": [
+        "bb1050d393a250f91c75a7eacfef22f4b4fe6460 docs(plan): record the owner's approval of the YAML Document slice frame",
+        "4a68ce23a0ddf4831d7c922fd4f4c9db3a606aeb docs(plan): plan the YAML Document slice with fixtures first and a parser choice gated by the owner"
+      ],
+      "mainStatus": "A\tplans/261022-1342-yaml-config-slice-a-yaml-document/plan.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-01-sync-preconditions-and-api-recheck.md",
+      "mainPathCommits": [
+        "d70e70e5cfeb3afaecc524f0b3b299f82c3d1647 docs(plan): plan the first live mailbox rung and the two-session demo"
+      ],
+      "mainStatus": "A\tplans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-01-sync-preconditions-and-api-recheck.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-02-version-pin-and-process-probe.md",
+      "mainPathCommits": [
+        "d70e70e5cfeb3afaecc524f0b3b299f82c3d1647 docs(plan): plan the first live mailbox rung and the two-session demo"
+      ],
+      "mainStatus": "A\tplans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-02-version-pin-and-process-probe.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-03-hidden-root-for-the-mailbox-record.md",
+      "mainPathCommits": [
+        "d70e70e5cfeb3afaecc524f0b3b299f82c3d1647 docs(plan): plan the first live mailbox rung and the two-session demo"
+      ],
+      "mainStatus": "A\tplans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-03-hidden-root-for-the-mailbox-record.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-04-contract-keys-delivery-report-and-refusal-text.md",
+      "mainPathCommits": [
+        "d70e70e5cfeb3afaecc524f0b3b299f82c3d1647 docs(plan): plan the first live mailbox rung and the two-session demo"
+      ],
+      "mainStatus": "A\tplans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-04-contract-keys-delivery-report-and-refusal-text.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-05-claude-head-finder-and-caller-check.md",
+      "mainPathCommits": [
+        "d70e70e5cfeb3afaecc524f0b3b299f82c3d1647 docs(plan): plan the first live mailbox rung and the two-session demo"
+      ],
+      "mainStatus": "A\tplans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-05-claude-head-finder-and-caller-check.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-06-hook-shell-and-verbs.md",
+      "mainPathCommits": [
+        "d70e70e5cfeb3afaecc524f0b3b299f82c3d1647 docs(plan): plan the first live mailbox rung and the two-session demo"
+      ],
+      "mainStatus": "A\tplans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-06-hook-shell-and-verbs.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-07-test-hook-entry-and-exit-status-proof.md",
+      "mainPathCommits": [
+        "d70e70e5cfeb3afaecc524f0b3b299f82c3d1647 docs(plan): plan the first live mailbox rung and the two-session demo"
+      ],
+      "mainStatus": "A\tplans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-07-test-hook-entry-and-exit-status-proof.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-08-live-claude-suite.md",
+      "mainPathCommits": [
+        "d70e70e5cfeb3afaecc524f0b3b299f82c3d1647 docs(plan): plan the first live mailbox rung and the two-session demo"
+      ],
+      "mainStatus": "A\tplans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-08-live-claude-suite.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-09-feasibility-demo-two-sessions.md",
+      "mainPathCommits": [
+        "d70e70e5cfeb3afaecc524f0b3b299f82c3d1647 docs(plan): plan the first live mailbox rung and the two-session demo"
+      ],
+      "mainStatus": "A\tplans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-09-feasibility-demo-two-sessions.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-10-branch-docs-gates-review-handoff.md",
+      "mainPathCommits": [
+        "d70e70e5cfeb3afaecc524f0b3b299f82c3d1647 docs(plan): plan the first live mailbox rung and the two-session demo"
+      ],
+      "mainStatus": "A\tplans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-10-branch-docs-gates-review-handoff.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1501-mailbox-v4-claude-live-end-to-end/plan.md",
+      "mainPathCommits": [
+        "d70e70e5cfeb3afaecc524f0b3b299f82c3d1647 docs(plan): plan the first live mailbox rung and the two-session demo"
+      ],
+      "mainStatus": "A\tplans/261022-1501-mailbox-v4-claude-live-end-to-end/plan.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1501-mailbox-v4-claude-live-end-to-end/reports/red-team-log.md",
+      "mainPathCommits": [
+        "d70e70e5cfeb3afaecc524f0b3b299f82c3d1647 docs(plan): plan the first live mailbox rung and the two-session demo"
+      ],
+      "mainStatus": "A\tplans/261022-1501-mailbox-v4-claude-live-end-to-end/reports/red-team-log.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/261022-1501-mailbox-v4-claude-live-end-to-end/reports/validation-log.md",
+      "mainPathCommits": [
+        "d70e70e5cfeb3afaecc524f0b3b299f82c3d1647 docs(plan): plan the first live mailbox rung and the two-session demo"
+      ],
+      "mainStatus": "A\tplans/261022-1501-mailbox-v4-claude-live-end-to-end/reports/validation-log.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/journals/2026-10-22-opc-containment-council-and-phase-a-plan.md",
+      "mainPathCommits": [
+        "3f2d1cdd7a5f02ce2499f84442f6320970959786 docs(journal): record the containment council and its plan"
+      ],
+      "mainStatus": "A\tplans/journals/2026-10-22-opc-containment-council-and-phase-a-plan.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/cleanup-261022-1628-seat-lane-finished-work.md",
+      "mainPathCommits": [
+        "570db34244e3773b4b01fb4b401998c1ae8f6871 docs(cleanup): record the removal of the finished seat-binding lane worktrees"
+      ],
+      "mainStatus": "A\tplans/reports/cleanup-261022-1628-seat-lane-finished-work.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/council-261022-1251-opc-arbitration.md",
+      "mainPathCommits": [
+        "93d89958203a89cb98c5f7719868f4a786bd040c docs(board): record the owner's answers on operation-scoped containment",
+        "5a271db8f5bd70a5c9c1cb5e340a693e58584248 docs(report): arbitrate the operation-scoped containment council"
+      ],
+      "mainStatus": "A\tplans/reports/council-261022-1251-opc-arbitration.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/council-261022-1251-opc-council-brief.md",
+      "mainPathCommits": [
+        "d6afdc7e672b375eae2eb47b51a54ac5d22442de docs(board): open the operation-scoped containment design council"
+      ],
+      "mainStatus": "A\tplans/reports/council-261022-1251-opc-council-brief.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/council-261022-1251-opc-seat-correctness.md",
+      "mainPathCommits": [
+        "5a271db8f5bd70a5c9c1cb5e340a693e58584248 docs(report): arbitrate the operation-scoped containment council"
+      ],
+      "mainStatus": "A\tplans/reports/council-261022-1251-opc-seat-correctness.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/council-261022-1251-opc-seat-redteam.md",
+      "mainPathCommits": [
+        "5a271db8f5bd70a5c9c1cb5e340a693e58584248 docs(report): arbitrate the operation-scoped containment council"
+      ],
+      "mainStatus": "A\tplans/reports/council-261022-1251-opc-seat-redteam.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/council-261022-1251-opc-seat-ship-maintain.md",
+      "mainPathCommits": [
+        "5a271db8f5bd70a5c9c1cb5e340a693e58584248 docs(report): arbitrate the operation-scoped containment council"
+      ],
+      "mainStatus": "A\tplans/reports/council-261022-1251-opc-seat-ship-maintain.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/council-261022-1251-opc-seat-simplicity.md",
+      "mainPathCommits": [
+        "5a271db8f5bd70a5c9c1cb5e340a693e58584248 docs(report): arbitrate the operation-scoped containment council"
+      ],
+      "mainStatus": "A\tplans/reports/council-261022-1251-opc-seat-simplicity.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/council-261022-1251-opc-seat-speed.md",
+      "mainPathCommits": [
+        "5a271db8f5bd70a5c9c1cb5e340a693e58584248 docs(report): arbitrate the operation-scoped containment council"
+      ],
+      "mainStatus": "A\tplans/reports/council-261022-1251-opc-seat-speed.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/facts-261022-1042-work-lane-p09-trial-merge.md",
+      "mainPathCommits": [
+        "236267464634bf79160b360e3b988d87b77bc3ef docs(board): open the WORK lane with the trial-merge facts"
+      ],
+      "mainStatus": "A\tplans/reports/facts-261022-1042-work-lane-p09-trial-merge.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/handoff-261022-1031-seat-lead-mpb1-close-post-land-fixes-seat-trim.md",
+      "mainPathCommits": [
+        "bb2647f9754c7f173d89c1c1fc3a41e57e3280cf docs(board): close the big-lead session after handing off the seat-binding and cook lanes",
+        "8ea571a80a1e942ad2d81baaa9cce59dabef4826 docs(handoff): hand the seat-binding lane to a dedicated lead"
+      ],
+      "mainStatus": "A\tplans/reports/handoff-261022-1031-seat-lead-mpb1-close-post-land-fixes-seat-trim.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/implement-261022-1325-identity-rename-phase-00.md",
+      "mainPathCommits": [
+        "f4e297dfa843d7810219a263e4b22d6805897bcc docs(identity): report phase 00 rename"
+      ],
+      "mainStatus": "A\tplans/reports/implement-261022-1325-identity-rename-phase-00.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/landing-261022-1018-seat-t0-release-this-machine.md",
+      "mainPathCommits": [
+        "31e15077ec626b076c765ef611eeca3f7259ed17 docs(landing): record the SEAT and T0 release landing on this machine"
+      ],
+      "mainStatus": "A\tplans/reports/landing-261022-1018-seat-t0-release-this-machine.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/landing-261022-1207-seat-fix-git-fence-owner-machine.md",
+      "mainPathCommits": [
+        "e7240e573254a105cc43feb0df80a0b0a5b28ec7 docs(landing): record the seat dispatch fix and git fence landing on the owner machine"
+      ],
+      "mainStatus": "A\tplans/reports/landing-261022-1207-seat-fix-git-fence-owner-machine.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/phase-lead-261022-1044-seat-trim-convention-door.md",
+      "mainPathCommits": [
+        "20ad88daab5c5e8438d1fbe98bf56a5b73fe69cd refactor(convention): one identifier check and one contract reader behind seat ids and definition names",
+        "21cc32e255fcc02e35ebe22471a1f4b79782ab48 docs(report): record the convention door pre-check and the compat-channel fork"
+      ],
+      "mainStatus": "A\tplans/reports/phase-lead-261022-1044-seat-trim-convention-door.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/phase-lead-261022-1044-seat-trim-crate-authority.md",
+      "mainPathCommits": [
+        "1c4b02157473a8f1cd4b6313792e93e11aba0677 docs(plan): record the seat trim decisions on validation and override matching",
+        "f297f0dac31314c674dc5a56163a22b8ad121e70 docs(plan): report the seat trim of tier ladder and inline lead"
+      ],
+      "mainStatus": "A\tplans/reports/phase-lead-261022-1044-seat-trim-crate-authority.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/phase-lead-261022-1044-seat-trim-duplicate-proofs.md",
+      "mainPathCommits": [
+        "178e10b316e4e3f20b2532b5bb1decc3f222878f docs(plan): record the helper change and the verification of the duplicate-proof trim",
+        "ba910c3373fc063c1f7af584d2033baefd0796ab docs(plan): fix totals line in the duplicate-proof trim report",
+        "c672c97879be8b0472fc43ff83299ee0adcd2e31 test(seat-binding): retire Node tests that re-prove golden cases"
+      ],
+      "mainStatus": "A\tplans/reports/phase-lead-261022-1044-seat-trim-duplicate-proofs.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/plan-refresh-261021-1215-work-lane-es-09-11.md",
+      "mainPathCommits": [
+        "1d0797a7849518fac8deb132fc6f996ec6bd0966 docs(plan): record the owner's choices for Land candidate release and porting duplicate adds",
+        "b6b708f4aa1f72251a707f11259904b61c43cf70 docs(plan): record the porting view and npm addon answers in the Work lane plan"
+      ],
+      "mainStatus": "M\tplans/reports/plan-refresh-261021-1215-work-lane-es-09-11.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/red-team-261022-1100-identity-i1-i4-plan.md",
+      "mainPathCommits": [
+        "487f5842675429c4d6460b24a0e9acf9c84da808 docs(identity): grow identity inside the one existing crate and apply the plan review"
+      ],
+      "mainStatus": "A\tplans/reports/red-team-261022-1100-identity-i1-i4-plan.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/research-261021-2221-config-access-inventory.md",
+      "mainPathCommits": [
+        "3c49306912dff7fc169bd1d0f9bc7b435290fdec docs(platform): specify the YAML Document and Config components"
+      ],
+      "mainStatus": "A\tplans/reports/research-261021-2221-config-access-inventory.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/research-261022-1217-identity-sequence-counter-ref-github-probe.md",
+      "mainPathCommits": [
+        "71833218e1e53f2e92320700dda1696aedc31da8 docs(identity): record the forge probe of one counter ref per id sequence"
+      ],
+      "mainStatus": "A\tplans/reports/research-261022-1217-identity-sequence-counter-ref-github-probe.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/research-261022-1341-opc-phase-a-baseline.md",
+      "mainPathCommits": [
+        "2eec4aea9a4d7b529e19aea88076c08adc0cd974 docs(report): record the suite and containment baseline before the containment fixes"
+      ],
+      "mainStatus": "A\tplans/reports/research-261022-1341-opc-phase-a-baseline.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/review-261022-1316-config-spec-standard-and-machine-files.md",
+      "mainPathCommits": [
+        "6db41fad6f22f9da85ba05544f06b501356ee733 docs(config): ship a complete standard and move account pools and the gateway token to a private directory"
+      ],
+      "mainStatus": "A\tplans/reports/review-261022-1316-config-spec-standard-and-machine-files.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/scout-261022-1100-identity-i1-i4-facts.md",
+      "mainPathCommits": [
+        "bb33c54c1656ed0aedeb034a61eb162f3a1572e1 docs(plan): plan the identity rungs with machine and session handles first"
+      ],
+      "mainStatus": "A\tplans/reports/scout-261022-1100-identity-i1-i4-facts.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/security-review-261022-0021-yaml-config-specs.md",
+      "mainPathCommits": [
+        "3c49306912dff7fc169bd1d0f9bc7b435290fdec docs(platform): specify the YAML Document and Config components"
+      ],
+      "mainStatus": "A\tplans/reports/security-review-261022-0021-yaml-config-specs.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "plans/reports/spike-261022-0017-yaml-config-gate-evidence.md",
+      "mainPathCommits": [
+        "3c49306912dff7fc169bd1d0f9bc7b435290fdec docs(platform): specify the YAML Document and Config components"
+      ],
+      "mainStatus": "A\tplans/reports/spike-261022-0017-yaml-config-gate-evidence.md",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "scripts/lib/git-addon-stage.mjs",
+      "mainPathCommits": [
+        "984e24d2c917c4754f4d96613b7a3b11cd8a2474 perf(test): prove the test host once per process"
+      ],
+      "mainStatus": "M\tscripts/lib/git-addon-stage.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "src/cli/command-registry.mjs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tsrc/cli/command-registry.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "src/config/shared-config-file.mjs",
+      "mainPathCommits": [
+        "03c99bc619a086a8af7cc9ce780c3af4fc9c6eb3 fix(setup): stop writing this repository's test command into every project's invariant checks"
+      ],
+      "mainStatus": "M\tsrc/config/shared-config-file.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "src/convention/definition-names.mjs",
+      "mainPathCommits": [
+        "20ad88daab5c5e8438d1fbe98bf56a5b73fe69cd refactor(convention): one identifier check and one contract reader behind seat ids and definition names"
+      ],
+      "mainStatus": "M\tsrc/convention/definition-names.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "src/convention/identifier-rules.mjs",
+      "mainPathCommits": [
+        "20ad88daab5c5e8438d1fbe98bf56a5b73fe69cd refactor(convention): one identifier check and one contract reader behind seat ids and definition names"
+      ],
+      "mainStatus": "A\tsrc/convention/identifier-rules.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "src/convention/seat-id.mjs",
+      "mainPathCommits": [
+        "20ad88daab5c5e8438d1fbe98bf56a5b73fe69cd refactor(convention): one identifier check and one contract reader behind seat ids and definition names"
+      ],
+      "mainStatus": "M\tsrc/convention/seat-id.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "src/runner/dispatch/config.mjs",
+      "mainPathCommits": [
+        "a7b74431186d3bfcf6740f779e5101054d228148 refactor(seat-binding): read the tier ladder from one shared contract file"
+      ],
+      "mainStatus": "M\tsrc/runner/dispatch/config.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "src/runner/dispatch/execution-contract.mjs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tsrc/runner/dispatch/execution-contract.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "src/runner/execution/bind.mjs",
+      "mainPathCommits": [
+        "7224110ed19d36b4b5b10b4bdeadf1d8c6f64d3e refactor(seat-binding): rank seats the session lead runs inline in the crate"
+      ],
+      "mainStatus": "M\tsrc/runner/execution/bind.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "src/seat-binding/client.mjs",
+      "mainPathCommits": [
+        "2019387cea8dda3a93642bc83e9330f5b6ee35ef fix(seat-binding): read an older host's refusal when it exits before taking the request"
+      ],
+      "mainStatus": "M\tsrc/seat-binding/client.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "mainPathCommits": [
+        "03c99bc619a086a8af7cc9ce780c3af4fc9c6eb3 fix(setup): stop writing this repository's test command into every project's invariant checks"
+      ],
+      "mainStatus": "M\tsrc/setup/registrations.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "src/util/session-identity.mjs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\tsrc/util/session-identity.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/config/shared-config-file.test.mjs",
+      "mainPathCommits": [
+        "03c99bc619a086a8af7cc9ce780c3af4fc9c6eb3 fix(setup): stop writing this repository's test command into every project's invariant checks"
+      ],
+      "mainStatus": "M\ttest/config/shared-config-file.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/git/land.test.mjs",
+      "mainPathCommits": [
+        "7b25b0ba754eb8f227839dabf14f01666e23ce09 test(git): prove the waiting Land keeps its loop by the order of close and admission"
+      ],
+      "mainStatus": "M\ttest/git/land.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/helpers/work-seat-config.mjs",
+      "mainPathCommits": [
+        "479d89866d14712c3f3965726eb27b8937ad3582 test(helpers): read the tier list from the shared ladder contract in the bindable-config helper",
+        "3b8f013d3081af6cab6fbeffb6ee7f7344c1b5ae test(seat-binding): pool only the Work configs that have no default executor to pin"
+      ],
+      "mainStatus": "M\ttest/helpers/work-seat-config.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/run-supervisor/contracts-terminal.test.mjs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\ttest/run-supervisor/contracts-terminal.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/runner/dispatch.test.mjs",
+      "mainPathCommits": [
+        "4fea2954cdba9be69c63cc204622806010a20365 test(dispatch): read the refreshed model cells in the committed config"
+      ],
+      "mainStatus": "M\ttest/runner/dispatch.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/runner/execution/bind.test.mjs",
+      "mainPathCommits": [
+        "c672c97879be8b0472fc43ff83299ee0adcd2e31 test(seat-binding): retire Node tests that re-prove golden cases"
+      ],
+      "mainStatus": "M\ttest/runner/execution/bind.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/runner/execution/tier-fallback.test.mjs",
+      "mainPathCommits": [
+        "c672c97879be8b0472fc43ff83299ee0adcd2e31 test(seat-binding): retire Node tests that re-prove golden cases"
+      ],
+      "mainStatus": "M\ttest/runner/execution/tier-fallback.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/runner/merge.test.mjs",
+      "mainPathCommits": [
+        "03c99bc619a086a8af7cc9ce780c3af4fc9c6eb3 fix(setup): stop writing this repository's test command into every project's invariant checks"
+      ],
+      "mainStatus": "M\ttest/runner/merge.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/scripts/run-test-canary.test.mjs",
+      "mainPathCommits": [
+        "984e24d2c917c4754f4d96613b7a3b11cd8a2474 perf(test): prove the test host once per process",
+        "b1a8e005f397571b2434a1382f393ae4157dcd89 test(scripts): prove the canary wrapper's overhead by the processes it starts"
+      ],
+      "mainStatus": "M\ttest/scripts/run-test-canary.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/seat-binding/client.test.mjs",
+      "mainPathCommits": [
+        "2019387cea8dda3a93642bc83e9330f5b6ee35ef fix(seat-binding): read an older host's refusal when it exits before taking the request",
+        "a7b74431186d3bfcf6740f779e5101054d228148 refactor(seat-binding): read the tier ladder from one shared contract file"
+      ],
+      "mainStatus": "M\ttest/seat-binding/client.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/session-identity/attempt-writer-id.test.mjs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\ttest/session-identity/attempt-writer-id.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/setup/checks-doctor-config.test.mjs",
+      "mainPathCommits": [
+        "03c99bc619a086a8af7cc9ce780c3af4fc9c6eb3 fix(setup): stop writing this repository's test command into every project's invariant checks"
+      ],
+      "mainStatus": "M\ttest/setup/checks-doctor-config.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/setup/checks-setup-rc-line.test.mjs",
+      "mainPathCommits": [
+        "aa3f38a372e9b9519bb684e7cdeeab9cd4fb5892 test(setup): copy the seat-binding contracts into the unpacked-copy fixture"
+      ],
+      "mainStatus": "M\ttest/setup/checks-setup-rc-line.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/setup/checks.test.mjs",
+      "mainPathCommits": [
+        "03c99bc619a086a8af7cc9ce780c3af4fc9c6eb3 fix(setup): stop writing this repository's test command into every project's invariant checks"
+      ],
+      "mainStatus": "M\ttest/setup/checks.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/setup/seat-binding-dry-bind.test.mjs",
+      "mainPathCommits": [
+        "c672c97879be8b0472fc43ff83299ee0adcd2e31 test(seat-binding): retire Node tests that re-prove golden cases"
+      ],
+      "mainStatus": "M\ttest/setup/seat-binding-dry-bind.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/state/hot-lock-multiprocess.test.mjs",
+      "mainPathCommits": [
+        "f8b36a5edfdac4c995e358a19a29a29ce0dd9316 test(state): bound the hot-lock fast path by the raw file steps it is built on"
+      ],
+      "mainStatus": "M\ttest/state/hot-lock-multiprocess.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    },
+    {
+      "path": "test/util/session-identity.test.mjs",
+      "mainPathCommits": [
+        "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+      ],
+      "mainStatus": "M\ttest/util/session-identity.test.mjs",
+      "contentRead": "Documentation units only; other paths accounted by git metadata."
+    }
+  ],
+  "families": {
+    ".fgos/config.json": [
+      ".fgos/config.json"
+    ],
+    "AGENTS.md": [
+      "AGENTS.md"
+    ],
+    "CHANGELOG.md": [
+      "CHANGELOG.md"
+    ],
+    "Cargo.lock": [
+      "Cargo.lock"
+    ],
+    "Cargo.toml": [
+      "Cargo.toml"
+    ],
+    "apps/fgos": [
+      "apps/fgos/Cargo.toml",
+      "apps/fgos/src/cli_projector.rs",
+      "apps/fgos/src/main.rs"
+    ],
+    "docs/architecture-manifest.json": [
+      "docs/architecture-manifest.json"
+    ],
+    "docs/backlog.md": [
+      "docs/backlog.md"
+    ],
+    "docs/io-contract.md": [
+      "docs/io-contract.md"
+    ],
+    "docs/platform": [
+      "docs/platform/agent-mailbox/spec.md",
+      "docs/platform/component-boundary.md",
+      "docs/platform/config/spec.md",
+      "docs/platform/event-store/spec.md",
+      "docs/platform/git/spec.md",
+      "docs/platform/holder-lock/spec.md",
+      "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "docs/platform/identity/spec.md",
+      "docs/platform/process/spec.md",
+      "docs/platform/run-supervisor/spec.md",
+      "docs/platform/session-identity/spec.md",
+      "docs/platform/terminal-control/spec.md",
+      "docs/platform/yaml-document/spec.md"
+    ],
+    "docs/specs": [
+      "docs/specs/distribution.md",
+      "docs/specs/observe.md",
+      "docs/specs/reading-map.md",
+      "docs/specs/runner.md",
+      "docs/specs/seat-binding.md",
+      "docs/specs/workflow.md"
+    ],
+    "package.json": [
+      "package.json"
+    ],
+    "packages/git": [
+      "packages/git/contracts/mutation-census.v1.json"
+    ],
+    "packages/host-runtime": [
+      "packages/host-runtime/contracts/command-route-annotations.json",
+      "packages/host-runtime/contracts/command-routes.json",
+      "packages/host-runtime/rust/src/catalog.rs"
+    ],
+    "packages/identity": [
+      "packages/identity/contracts/attempt-writer-id.v1.json",
+      "packages/identity/contracts/identity.writer.golden.v1.json",
+      "packages/identity/contracts/identity.writer.v1.json",
+      "packages/identity/contracts/vectors/attempt-writer-id.v1.json",
+      "packages/identity/rust/Cargo.toml",
+      "packages/identity/rust/src/attempt.rs",
+      "packages/identity/rust/src/launcher.rs",
+      "packages/identity/rust/src/lib.rs",
+      "packages/identity/rust/src/proc_tree.rs",
+      "packages/identity/rust/src/provider.rs",
+      "packages/identity/rust/src/resolve.rs",
+      "packages/identity/rust/src/route.rs",
+      "packages/identity/rust/tests/attempt_writer_id.rs",
+      "packages/identity/rust/tests/golden.rs"
+    ],
+    "packages/observe": [
+      "packages/observe/rust/Cargo.toml",
+      "packages/observe/rust/src/friction.rs",
+      "packages/observe/rust/src/shard.rs",
+      "packages/observe/rust/tests/boundary_test.rs"
+    ],
+    "packages/run-supervisor": [
+      "packages/run-supervisor/contracts/envelope.v3.json"
+    ],
+    "packages/seat-binding": [
+      "packages/seat-binding/contracts/seat-binding.golden.v1.json",
+      "packages/seat-binding/contracts/seat-binding.tier-ladder.v1.json",
+      "packages/seat-binding/rust/src/lib.rs",
+      "packages/seat-binding/rust/src/model.rs",
+      "packages/seat-binding/rust/src/rank.rs",
+      "packages/seat-binding/rust/src/tier.rs"
+    ],
+    "plans/261017-1313-fgos-platform-program-board": [
+      "plans/261017-1313-fgos-platform-program-board/log.md",
+      "plans/261017-1313-fgos-platform-program-board/plan.md"
+    ],
+    "plans/261018-0914-git-component-fgos-git": [
+      "plans/261018-0914-git-component-fgos-git/plan.md"
+    ],
+    "plans/261018-0945-event-store-fgos-event-store": [
+      "plans/261018-0945-event-store-fgos-event-store/plan.md"
+    ],
+    "plans/261020-1757-test-governance-port-inventory-and-slow-file-extraction": [
+      "plans/261020-1757-test-governance-port-inventory-and-slow-file-extraction/plan.md"
+    ],
+    "plans/261021-1118-harden-low-layers-bottom-up": [
+      "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md",
+      "plans/261021-1118-harden-low-layers-bottom-up/phase-07-closing-and-handoff.md",
+      "plans/261021-1118-harden-low-layers-bottom-up/plan.md"
+    ],
+    "plans/261021-1547-harden-t0-process-facts-door": [
+      "plans/261021-1547-harden-t0-process-facts-door/phase-07-post-seat-carry-list.md"
+    ],
+    "plans/261022-0007-mailbox-v3-hook-payload-contract": [
+      "plans/261022-0007-mailbox-v3-hook-payload-contract/plan.md",
+      "plans/261022-0007-mailbox-v3-hook-payload-contract/reports/code-review-v3.md"
+    ],
+    "plans/261022-0851-harden-t1-holder-lock-identity-door": [
+      "plans/261022-0851-harden-t1-holder-lock-identity-door/phase-01-red-tests.md",
+      "plans/261022-0851-harden-t1-holder-lock-identity-door/phase-02-lock-door.md",
+      "plans/261022-0851-harden-t1-holder-lock-identity-door/phase-03-fence-deletion.md",
+      "plans/261022-0851-harden-t1-holder-lock-identity-door/phase-04-hot-mutex-leaf-fixes.md",
+      "plans/261022-0851-harden-t1-holder-lock-identity-door/phase-05-doctor-merge-specs-checkout-channel.md",
+      "plans/261022-0851-harden-t1-holder-lock-identity-door/phase-06-identity-door-counter-t0-carry.md",
+      "plans/261022-0851-harden-t1-holder-lock-identity-door/phase-07-close-verify-land.md",
+      "plans/261022-0851-harden-t1-holder-lock-identity-door/plan.md",
+      "plans/261022-0851-harden-t1-holder-lock-identity-door/reports/red-team-261022-0912-assume.md",
+      "plans/261022-0851-harden-t1-holder-lock-identity-door/reports/red-team-261022-0912-failure.md",
+      "plans/261022-0851-harden-t1-holder-lock-identity-door/reports/red-team-261022-0912-scope.md",
+      "plans/261022-0851-harden-t1-holder-lock-identity-door/reports/red-team-261022-0912-security.md"
+    ],
+    "plans/261022-1005-mailbox-v2-record-store": [
+      "plans/261022-1005-mailbox-v2-record-store/phase-01-preconditions-and-lock-row.md",
+      "plans/261022-1005-mailbox-v2-record-store/phase-02-paths-ids-and-snapshot-hold.md",
+      "plans/261022-1005-mailbox-v2-record-store/phase-03-bodies-and-garbage-collection.md",
+      "plans/261022-1005-mailbox-v2-record-store/phase-04-kill-matrix.md",
+      "plans/261022-1005-mailbox-v2-record-store/phase-05-two-process-contention.md",
+      "plans/261022-1005-mailbox-v2-record-store/phase-06-q2-pruning-and-handle-bound.md",
+      "plans/261022-1005-mailbox-v2-record-store/phase-07-size-ceiling-and-costs.md",
+      "plans/261022-1005-mailbox-v2-record-store/phase-08-branch-docs-gates-and-handoff.md",
+      "plans/261022-1005-mailbox-v2-record-store/plan.md",
+      "plans/261022-1005-mailbox-v2-record-store/reports/code-review-v2.md"
+    ],
+    "plans/261022-1037-herdr-pane-launch-ready": [
+      "plans/261022-1037-herdr-pane-launch-ready/phase-01-ready-shell-handshake.md",
+      "plans/261022-1037-herdr-pane-launch-ready/phase-02-quiet-shell-env.md",
+      "plans/261022-1037-herdr-pane-launch-ready/phase-03-agent-start-banner.md",
+      "plans/261022-1037-herdr-pane-launch-ready/phase-04-supervisor-proof-and-docs.md",
+      "plans/261022-1037-herdr-pane-launch-ready/plan.md",
+      "plans/261022-1037-herdr-pane-launch-ready/reports/p6-measure-notebook.md",
+      "plans/261022-1037-herdr-pane-launch-ready/reports/red-team-assumptions.md",
+      "plans/261022-1037-herdr-pane-launch-ready/reports/red-team-failure-modes.md",
+      "plans/261022-1037-herdr-pane-launch-ready/reports/red-team-security.md",
+      "plans/261022-1037-herdr-pane-launch-ready/reports/scout-pane-launch-prior-art.md"
+    ],
+    "plans/261022-1100-identity-i1-i4-project-machine-session-directory": [
+      "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-00-rename-to-identity.md",
+      "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-01-machine-id-and-handle.md",
+      "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-02-session-full-id-and-handle.md",
+      "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-03-project-id.md",
+      "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-04-local-directory-resolve-list.md",
+      "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-05-shared-directory-across-machines.md",
+      "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-06-board-and-consumers.md",
+      "plans/261022-1100-identity-i1-i4-project-machine-session-directory/phase-07-mint-door-for-every-owner.md",
+      "plans/261022-1100-identity-i1-i4-project-machine-session-directory/plan.md"
+    ],
+    "plans/261022-1335-opc-phase-a-containment-fixes": [
+      "plans/261022-1335-opc-phase-a-containment-fixes/phase-00-baseline-measurements.md",
+      "plans/261022-1335-opc-phase-a-containment-fixes/phase-01-contained-branch-wake-and-bounded-wait.md",
+      "plans/261022-1335-opc-phase-a-containment-fixes/phase-02-mount-refusal-and-driver-reason.md",
+      "plans/261022-1335-opc-phase-a-containment-fixes/phase-03-pgroup-escapee-watch.md",
+      "plans/261022-1335-opc-phase-a-containment-fixes/phase-04-containment-conformance-suite.md",
+      "plans/261022-1335-opc-phase-a-containment-fixes/phase-05-proofs-docs-landing.md",
+      "plans/261022-1335-opc-phase-a-containment-fixes/plan.md"
+    ],
+    "plans/261022-1342-yaml-config-slice-a-yaml-document": [
+      "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-00-facts.md",
+      "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-01-config-fixture-helper.md",
+      "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-02-crate-skeleton-contracts-fixtures.md",
+      "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-03-parser-independent-parts.md",
+      "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-04-parser-evaluation-and-owner-gate.md",
+      "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-05-parse-profiles-limits.md",
+      "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-06-edits-and-recheck.md",
+      "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-07-public-api-seal.md",
+      "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-08-move-serde-yaml-users.md",
+      "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-09-fuzz-targets.md",
+      "plans/261022-1342-yaml-config-slice-a-yaml-document/phase-10-docs-board-closeout.md",
+      "plans/261022-1342-yaml-config-slice-a-yaml-document/plan.md"
+    ],
+    "plans/261022-1501-mailbox-v4-claude-live-end-to-end": [
+      "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-01-sync-preconditions-and-api-recheck.md",
+      "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-02-version-pin-and-process-probe.md",
+      "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-03-hidden-root-for-the-mailbox-record.md",
+      "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-04-contract-keys-delivery-report-and-refusal-text.md",
+      "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-05-claude-head-finder-and-caller-check.md",
+      "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-06-hook-shell-and-verbs.md",
+      "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-07-test-hook-entry-and-exit-status-proof.md",
+      "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-08-live-claude-suite.md",
+      "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-09-feasibility-demo-two-sessions.md",
+      "plans/261022-1501-mailbox-v4-claude-live-end-to-end/phase-10-branch-docs-gates-review-handoff.md",
+      "plans/261022-1501-mailbox-v4-claude-live-end-to-end/plan.md",
+      "plans/261022-1501-mailbox-v4-claude-live-end-to-end/reports/red-team-log.md",
+      "plans/261022-1501-mailbox-v4-claude-live-end-to-end/reports/validation-log.md"
+    ],
+    "plans/journals": [
+      "plans/journals/2026-10-22-opc-containment-council-and-phase-a-plan.md"
+    ],
+    "plans/reports": [
+      "plans/reports/cleanup-261022-1628-seat-lane-finished-work.md",
+      "plans/reports/council-261022-1251-opc-arbitration.md",
+      "plans/reports/council-261022-1251-opc-council-brief.md",
+      "plans/reports/council-261022-1251-opc-seat-correctness.md",
+      "plans/reports/council-261022-1251-opc-seat-redteam.md",
+      "plans/reports/council-261022-1251-opc-seat-ship-maintain.md",
+      "plans/reports/council-261022-1251-opc-seat-simplicity.md",
+      "plans/reports/council-261022-1251-opc-seat-speed.md",
+      "plans/reports/facts-261022-1042-work-lane-p09-trial-merge.md",
+      "plans/reports/handoff-261022-1031-seat-lead-mpb1-close-post-land-fixes-seat-trim.md",
+      "plans/reports/implement-261022-1325-identity-rename-phase-00.md",
+      "plans/reports/landing-261022-1018-seat-t0-release-this-machine.md",
+      "plans/reports/landing-261022-1207-seat-fix-git-fence-owner-machine.md",
+      "plans/reports/phase-lead-261022-1044-seat-trim-convention-door.md",
+      "plans/reports/phase-lead-261022-1044-seat-trim-crate-authority.md",
+      "plans/reports/phase-lead-261022-1044-seat-trim-duplicate-proofs.md",
+      "plans/reports/plan-refresh-261021-1215-work-lane-es-09-11.md",
+      "plans/reports/red-team-261022-1100-identity-i1-i4-plan.md",
+      "plans/reports/research-261021-2221-config-access-inventory.md",
+      "plans/reports/research-261022-1217-identity-sequence-counter-ref-github-probe.md",
+      "plans/reports/research-261022-1341-opc-phase-a-baseline.md",
+      "plans/reports/review-261022-1316-config-spec-standard-and-machine-files.md",
+      "plans/reports/scout-261022-1100-identity-i1-i4-facts.md",
+      "plans/reports/security-review-261022-0021-yaml-config-specs.md",
+      "plans/reports/spike-261022-0017-yaml-config-gate-evidence.md"
+    ],
+    "scripts/lib": [
+      "scripts/lib/git-addon-stage.mjs"
+    ],
+    "src/cli": [
+      "src/cli/command-registry.mjs"
+    ],
+    "src/config": [
+      "src/config/shared-config-file.mjs"
+    ],
+    "src/convention": [
+      "src/convention/definition-names.mjs",
+      "src/convention/identifier-rules.mjs",
+      "src/convention/seat-id.mjs"
+    ],
+    "src/runner": [
+      "src/runner/dispatch/config.mjs",
+      "src/runner/dispatch/execution-contract.mjs",
+      "src/runner/execution/bind.mjs"
+    ],
+    "src/seat-binding": [
+      "src/seat-binding/client.mjs"
+    ],
+    "src/setup": [
+      "src/setup/registrations.mjs"
+    ],
+    "src/util": [
+      "src/util/session-identity.mjs"
+    ],
+    "test/config": [
+      "test/config/shared-config-file.test.mjs"
+    ],
+    "test/git": [
+      "test/git/land.test.mjs"
+    ],
+    "test/helpers": [
+      "test/helpers/work-seat-config.mjs"
+    ],
+    "test/run-supervisor": [
+      "test/run-supervisor/contracts-terminal.test.mjs"
+    ],
+    "test/runner": [
+      "test/runner/dispatch.test.mjs",
+      "test/runner/execution/bind.test.mjs",
+      "test/runner/execution/tier-fallback.test.mjs",
+      "test/runner/merge.test.mjs"
+    ],
+    "test/scripts": [
+      "test/scripts/run-test-canary.test.mjs"
+    ],
+    "test/seat-binding": [
+      "test/seat-binding/client.test.mjs"
+    ],
+    "test/session-identity": [
+      "test/session-identity/attempt-writer-id.test.mjs"
+    ],
+    "test/setup": [
+      "test/setup/checks-doctor-config.test.mjs",
+      "test/setup/checks-setup-rc-line.test.mjs",
+      "test/setup/checks.test.mjs",
+      "test/setup/seat-binding-dry-bind.test.mjs"
+    ],
+    "test/state": [
+      "test/state/hot-lock-multiprocess.test.mjs"
+    ],
+    "test/util": [
+      "test/util/session-identity.test.mjs"
+    ]
+  },
+  "changedDocumentation": [
+    "AGENTS.md",
+    "CHANGELOG.md",
+    "docs/architecture-manifest.json",
+    "docs/backlog.md",
+    "docs/io-contract.md",
+    "docs/platform/agent-mailbox/spec.md",
+    "docs/platform/component-boundary.md",
+    "docs/platform/config/spec.md",
+    "docs/platform/event-store/spec.md",
+    "docs/platform/git/spec.md",
+    "docs/platform/holder-lock/spec.md",
+    "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "docs/platform/identity/spec.md",
+    "docs/platform/observe/spec.md",
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+    "docs/platform/process/spec.md",
+    "docs/platform/run-supervisor/spec.md",
+    "docs/platform/session-identity/spec.md",
+    "docs/platform/terminal-control/spec.md",
+    "docs/platform/work-state/contracts/cli-io-contract.md",
+    "docs/platform/yaml-document/spec.md",
+    "docs/reading-map.md",
+    "docs/specs/distribution.md",
+    "docs/specs/observe.md",
+    "docs/specs/reading-map.md",
+    "docs/specs/runner.md",
+    "docs/specs/seat-binding.md",
+    "docs/specs/workflow.md"
+  ],
+  "leadResolvedConflicts": [
+    {
+      "path": "CHANGELOG.md",
+      "parents": {
+        "15d92ad2b2e7437cd36e9fade9ba846c6334e71a": {
+          "sha256": "5697b796e3ad7f2f567cda0b06855524c546f6e3c3df9533e0dd5d4a2e41307d",
+          "allNonblankLinesRetainedInOrder": true
+        },
+        "1d0797a7849518fac8deb132fc6f996ec6bd0966": {
+          "sha256": "5eee178f13af805bb6e86ea04744df8c7e0b5aeb33f008a747a013d639038224",
+          "allNonblankLinesRetainedInOrder": true
+        }
+      },
+      "mergeSha256": "8b4edf53387e65c8c08149c097aa4915d17a1b18bb0635787e6bb3fe0fa590ae",
+      "mergeDiffs": {
+        "15d92ad2b2e7437cd36e9fade9ba846c6334e71a": "diff --git a/CHANGELOG.md b/CHANGELOG.md\nindex abc2dcdb2..808179d6e 100644\n--- a/CHANGELOG.md\n+++ b/CHANGELOG.md\n@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0\n - **Documentation**: Phase 01 documentation authority unification (completed, independent re-review verdict APPROVE, tagged `documentation-authority-phase-01-20260926`): established the operative transitional authority switchboard (docs/transitional-switchboard.md, transitional-switchboard.json) backed by the Phase 00 authority map, published preliminary machine-readable claim-kind and complete §6 source-disposition vocabulary (claim-and-disposition-vocabulary.{json,md}), established deterministic legacy-root file/digest baseline (scripts/check-legacy-docs-ratchet.baseline.json), implemented policy-aware legacy-growth and unaccounted-edit ratchet with strengthened exception lifecycle schema (scripts/check-legacy-docs-ratchet.mjs, scripts/check-legacy-docs-ratchet.exceptions.json, test/scripts/check-legacy-docs-ratchet.test.mjs), codified migration-time one-owner authoring rules (docs/platform/migration-authoring-rules.md), corrected verified stale standing routes in reading maps (replacing defunct fgos-coding-compounding with fgos-coding-knowledge), published deterministic machine-readable inventory of shipped path conventions derived from explicit immutable Git commit tree authority (scripts/generate-shipped-path-inventory.mjs, plans/260925-documentation-authority-unification/shipped-path-conventions-inventory.{json,md}) separating repository-local from consumer-project contracts without filesystem contamination, and codified authoritative verification protocol executing inside an isolated clean detached worktree (scripts/verify-phase-01.mjs) without authorizing Phases 02–09.\n - **Documentation**: Phase 00: separated the historical end-user knowledge-registry plan, proposed platform-authority migration, full Knowledge and Documentation Engine horizon, and future Agent Context Engine; added independent review evidence and clarified transitional authority routing (authorizing Phase 01 on isolated cell/branch; Phases 02–09 remain unauthorized).\n \n+- The Session Identity component is renamed Identity: package `packages/identity`, crate `fgos-identity`, operation id `identity.writer` (was `session-identity.resolve`), and its spec is now section 7a of `docs/platform/identity/spec.md`. The `fgos identity` verb and its `{id, source}` answer are unchanged.\n+- `fgos setup` no longer writes `node --test test/architecture.test.mjs` into a project's `invariantChecks.commands`; the default is now the empty list, so a project without that file no longer fails its merge gate. A project that already has the command keeps it until it removes it. `fgos doctor` row `invariant-checks-configured` now passes an absent section or an empty list and still fails a malformed one, the same rule as `worktree-setup-configured`.\n - `fgos doctor` row `git-operation-journal` now fails with `git-fence-missing` when a Git WAL exists but the controller's activation fence does not (every Git write refuses in that state), and names `fgctl upgrade` as the repair. It reads the fence through the Git component's Inspect, the same check the WAL-writing doors run, so the condition keeps a doctor row independent of the legacy lock-fence row.\n - A run no longer stops with `terminal:foreground-not-agent` while its agent is working: a zombie child in the pane's foreground (herdr lists it without a command line) used to make the whole foreground unreadable, so the brief was refused. Zombies are now left out of the foreground.\n - Removed the `fgos doctor` row `coordination-abandoned-claims`: nothing writes the coordination claim files it looked for any more, so it could only report on a mechanism that no longer exists. `fgos doctor --fix` no longer removes such entries.\n",
+        "1d0797a7849518fac8deb132fc6f996ec6bd0966": "diff --git a/CHANGELOG.md b/CHANGELOG.md\nindex 598dbf26e..808179d6e 100644\n--- a/CHANGELOG.md\n+++ b/CHANGELOG.md\n@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0\n \n ## [Unreleased]\n \n+- `fgos docs-lease acquire|status|release|abandon` manages a persistent documentation write freeze. Pre-commit and main reference-transaction hooks enforce it, and doctor reports `documentation-cutover-lease`. While held, non-holder Unit/Workflow execution and scope-touching runner/Workflow Land refuse; code-only lands proceed. Release reports scope drift; owner abandon with confirmation and a reason repairs a lost holder or corrupt sidecar.\n+\n+- **Documentation**: Phase 02 remediation G hardens the documentation-inventory closure candidate: false one-owner split rows now demote to `unknown-blocking`, dynamic JS/TS consumer parsing skips comments/strings and Markdown prose while retaining fenced code, unresolved alias roots remain standalone gaps, carry-forward refuses pre-existing destinations and refreshes status, and regenerated dynamic fan-out drops from thousands of target items to 128.\n+- **Documentation**: Phase 02 remediation E hardens documentation-inventory identity and verification: registry lookup keys now exclude classification/status fields, duplicate-title units use semantic fingerprints instead of ordinal anchors, ambiguous duplicate identity emits explicit blockers, dynamic `path.join`/`new URL` consumers emit standalone unresolved patterns, inventory generation requires explicit pinned identity registry input, and checker/verifier enforce registry binding, exact equality, and stale-unit detection.\n+- **Documentation**: Phase 02 documentation authority unification completed (independent closure-review verdict APPROVE; tagged `documentation-authority-phase-02-20260926`): generated and committed a populated opaque identity registry for all 4,305 immutable-base sources and 85,772 per-occurrence conservation units, then regenerated the deterministic repository-wide inventory + claim-level conservation ledger from immutable base; normal identity misses/ambiguity now become explicit blockers instead of derived fallback IDs; checker/verifier/tests validate registry supply, source coverage, commit-tree digests, shard integrity, owner/claim shape, and exact Phase 02 footprint; blob reads and gate coverage use batched git object reads so the full 4,305-file gate completes in seconds/minutes rather than hanging.\n+- **Documentation**: Phase 01 documentation authority unification (completed, independent re-review verdict APPROVE, tagged `documentation-authority-phase-01-20260926`): established the operative transitional authority switchboard (docs/transitional-switchboard.md, transitional-switchboard.json) backed by the Phase 00 authority map, published preliminary machine-readable claim-kind and complete §6 source-disposition vocabulary (claim-and-disposition-vocabulary.{json,md}), established deterministic legacy-root file/digest baseline (scripts/check-legacy-docs-ratchet.baseline.json), implemented policy-aware legacy-growth and unaccounted-edit ratchet with strengthened exception lifecycle schema (scripts/check-legacy-docs-ratchet.mjs, scripts/check-legacy-docs-ratchet.exceptions.json, test/scripts/check-legacy-docs-ratchet.test.mjs), codified migration-time one-owner authoring rules (docs/platform/migration-authoring-rules.md), corrected verified stale standing routes in reading maps (replacing defunct fgos-coding-compounding with fgos-coding-knowledge), published deterministic machine-readable inventory of shipped path conventions derived from explicit immutable Git commit tree authority (scripts/generate-shipped-path-inventory.mjs, plans/260925-documentation-authority-unification/shipped-path-conventions-inventory.{json,md}) separating repository-local from consumer-project contracts without filesystem contamination, and codified authoritative verification protocol executing inside an isolated clean detached worktree (scripts/verify-phase-01.mjs) without authorizing Phases 02–09.\n+- **Documentation**: Phase 00: separated the historical end-user knowledge-registry plan, proposed platform-authority migration, full Knowledge and Documentation Engine horizon, and future Agent Context Engine; added independent review evidence and clarified transitional authority routing (authorizing Phase 01 on isolated cell/branch; Phases 02–09 remain unauthorized).\n+\n - The Session Identity component is renamed Identity: package `packages/identity`, crate `fgos-identity`, operation id `identity.writer` (was `session-identity.resolve`), and its spec is now section 7a of `docs/platform/identity/spec.md`. The `fgos identity` verb and its `{id, source}` answer are unchanged.\n - `fgos setup` no longer writes `node --test test/architecture.test.mjs` into a project's `invariantChecks.commands`; the default is now the empty list, so a project without that file no longer fails its merge gate. A project that already has the command keeps it until it removes it. `fgos doctor` row `invariant-checks-configured` now passes an absent section or an empty list and still fails a malformed one, the same rule as `worktree-setup-configured`.\n - `fgos doctor` row `git-operation-journal` now fails with `git-fence-missing` when a Git WAL exists but the controller's activation fence does not (every Git write refuses in that state), and names `fgctl upgrade` as the repair. It reads the fence through the Git component's Inspect, the same check the WAL-writing doors run, so the condition keeps a doctor row independent of the legacy lock-fence row.\n"
+      },
+      "currentCarry": "One additive Unreleased documentation-routing note; dated/history entries unchanged."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "parents": {
+        "15d92ad2b2e7437cd36e9fade9ba846c6334e71a": {
+          "sha256": "c4be1d2cd83c8207a89608d3f6e6822b30973a6947ad8004c26fa1e45399a49b",
+          "identityLines": [
+            "| Session Identity is the single writer-identity authority in Rust. | `implemented preview` | [Session Identity spec](../../session-identity/spec.md), [packages/session-identity/rust](../../../../packages/session-identity/rust), [plans/261015-2102-identity-resolver-rust-crate](../../../../plans/261015-2102-identity-resolver-rust-crate/plan.md) | Node resolver deleted; Node calls `fgos identity` directly with no fallback. Activation needs the claim drain runbook in the plan's phase 06. |"
+          ],
+          "observeLines": [
+            "| Observe is first component fully in Rust. | `implemented complete` | [Observe Spec](../../observe/spec.md), [packages/observe/rust](../../../../packages/observe/rust), [plans/260929-1501-metrics-friction-rust-native](../../../../archive/plans/260929-1501-metrics-friction-rust-native/plan.md) | Observe migrated completely into Rust native without Node fallback; covers metrics and friction writers with native routing and writer shards. |"
+          ]
+        },
+        "1d0797a7849518fac8deb132fc6f996ec6bd0966": {
+          "sha256": "beff8876bf6dc4ed3ce4563ae15f391c8247befabb4561a83d92327c33f34fc5",
+          "identityLines": [
+            "| Session Identity is the single writer-identity authority in Rust. | `implemented preview` | [Session Identity spec](../../identity/spec.md), [packages/identity/rust](../../../../packages/identity/rust), [plans/261015-2102-identity-resolver-rust-crate](../../../../plans/261015-2102-identity-resolver-rust-crate/plan.md) | Node resolver deleted; Node calls `fgos identity` directly with no fallback. Activation needs the claim drain runbook in the plan's phase 06. |"
+          ],
+          "observeLines": [
+            "| Observe is first component fully in Rust. | `implemented complete` | [Observe Spec](../../../specs/observe.md), [packages/observe/rust](../../../../packages/observe/rust), [plans/260929-1501-metrics-friction-rust-native](../../../../plans/260929-1501-metrics-friction-rust-native/plan.md) | Observe migrated completely into Rust native without Node fallback; covers metrics and friction writers with native routing and writer shards. |"
+          ]
+        },
+        "66b637a108cd6a2659112982082b4194907b8e53": {
+          "sha256": "4deb836f9a3b19d7cf1100b8c1b327b2d9b66a01aa97d41b48b2122c2e3011f1",
+          "identityLines": [
+            "| Session Identity is the single writer-identity authority in Rust. | `implemented preview` | [Session Identity spec](../../identity/spec.md), [packages/identity/rust](../../../../packages/identity/rust), [plans/261015-2102-identity-resolver-rust-crate](../../../../plans/261015-2102-identity-resolver-rust-crate/plan.md) | Node resolver deleted; Node calls `fgos identity` directly with no fallback. Activation needs the claim drain runbook in the plan's phase 06. |"
+          ],
+          "observeLines": [
+            "| Observe is first component fully in Rust. | `implemented complete` | [Observe Spec](../../observe/spec.md), [packages/observe/rust](../../../../packages/observe/rust), [plans/260929-1501-metrics-friction-rust-native](../../../../archive/plans/260929-1501-metrics-friction-rust-native/plan.md) | Observe migrated completely into Rust native without Node fallback; covers metrics and friction writers with native routing and writer shards. |"
+          ]
+        }
+      },
+      "resolution": "Use main identity/spec.md + packages/identity/rust and keep the plan ../../observe/spec.md link (and the plan archived source-plan path). Candidate retained material and header preserved."
+    },
+    {
+      "path": "docs/platform/session-identity/spec.md",
+      "firstParentSha256": "f304413c7ac40d0511e69fa9e00a986b6ae0c7c8dd6bd84dce73e8bee62573e9",
+      "mainHasFile": false,
+      "mergeHasFile": false,
+      "planOnlyDelta": "diff --git a/docs/platform/session-identity/spec.md b/docs/platform/session-identity/spec.md\nindex 6626fc13a..10d80b436 100644\n--- a/docs/platform/session-identity/spec.md\n+++ b/docs/platform/session-identity/spec.md\n@@ -5,8 +5,13 @@ Document type: BA-grade area specification\n Audience: Human reviewer, maintainer, implementation agent\n Purpose: Define the single authority for \"who is the writer of this process\"\n Design status: Accepted\n-Implementation status: Implemented (activation pending)\n+Implementation: Implemented (activation pending)\n+Provenance: packages/session-identity/rust; packages/session-identity/contracts/; introduced by 6a53e65b5\n+Writer type: Agent draft writer (header completion pending independent review)\n Canonical: Yes\n+Canonical for: Session Identity component writer attribution rule and native identity contract\n+Use this when: Resolving or reviewing the writer identity of a calling process\n+Do not use this for: Authentication, lock authority, worker id creation, process liveness or run supervision\n Owner: Session Identity component\n Source: packages/session-identity/rust\n Contracts: packages/session-identity/contracts/\n@@ -16,6 +21,8 @@ Related:\n - docs/platform/component-boundary.md\n - docs/specs/observe.md\n - plans/261015-2102-identity-resolver-rust-crate/plan.md\n+Supersedes: None\n+Superseded by: None\n ```\n \n ## 1. Purpose\n",
+      "planHeaderAddedFields": [
+        "Implementation: Implemented (activation pending)",
+        "Provenance: packages/session-identity/rust; packages/session-identity/contracts/; introduced by 6a53e65b5",
+        "Writer type: Agent draft writer (header completion pending independent review)",
+        "Canonical for: Session Identity component writer attribution rule and native identity contract",
+        "Use this when: Resolving or reviewing the writer identity of a calling process",
+        "Do not use this for: Authentication, lock authority, worker id creation, process liveness or run supervision",
+        "Supersedes: None",
+        "Superseded by: None"
+      ],
+      "metadataNormalization": "Implementation status -> Implementation, plus seven additive candidate metadata fields; no body content delta.",
+      "resolution": "Accept main deletion; all 28 candidate units are content-mapped in step-07-l12-112-retired-candidate-carries.json. Candidate header scope (incl. writer attribution) carried to identity/spec.md; dated source history retained in section 10; explicit Step 7 carry per every original plan record."
+    }
+  ],
+  "identityRename": {
+    "commit": "9fdaac9ba",
+    "package": "packages/session-identity -> packages/identity",
+    "crate": "fgos-session-identity -> fgos-identity",
+    "operation": "session-identity.resolve -> identity.writer",
+    "candidate": "docs/platform/session-identity/spec.md deleted; local writer contents at docs/platform/identity/spec.md section 7a",
+    "liveCarryFiles": [
+      "CHANGELOG.md",
+      "docs/platform/observe/spec.md",
+      "docs/platform/identity/spec.md",
+      "docs/platform/work-state/contracts/cli-io-contract.md",
+      "docs/reading-map.md"
+    ],
+    "remainingHistoricalMatches": [
+      "CHANGELOG.md:20:- The Session Identity component is renamed Identity: package `packages/identity`, crate `fgos-identity`, operation id `identity.writer` (was `session-identity.resolve`), and its spec is now section 7a of `docs/platform/identity/spec.md`. The `fgos identity` verb and its `{id, source}` answer are unchanged.",
+      "docs/platform/identity/spec.md:18:Supersedes: docs/platform/session-identity/spec.md (local writer specification merged into section 7a by 9fdaac9ba; no platform authority cutover)",
+      "docs/platform/identity/spec.md:237:- 2026-10-22 — The component is renamed in one commit before any new code: package `packages/session-identity` to `packages/identity`, crate `fgos-session-identity` to `fgos-identity`, operation id `session-identity.resolve` to `identity.writer` (not `identity.resolve`, which the `fgos identity resolve <handle>` read keeps for itself), contract files `identity.writer.v1.json` and `identity.writer.golden.v1.json`, and the former Session Identity spec is merged into section 7a. The Node facade `src/util/session-identity.mjs` and the doctor row `writer-identity-resolvable` keep their names. Supersedes the earlier note that the rename waits for HARDEN T1 phase 6."
+    ],
+    "switchboard": "Former Session Identity row only; candidate status and candidate-transformation unchanged; entryPoint names section 7a."
+  },
+  "workM3": {
+    "priorArtCommit": "e71381aba3e5ed7a2facf1c82e392d886e376a41",
+    "presentInBothParents": true,
+    "paths": {
+      "src/runner/merge.mjs": {
+        "priorSha256": "c87ab2b813176b0f07c3bc5f229373aa3b333db2792040fd709356d685a3799a",
+        "mergeSha256": "c87ab2b813176b0f07c3bc5f229373aa3b333db2792040fd709356d685a3799a",
+        "mainSha256": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577",
+        "mergeChanges": ""
+      },
+      "src/verbs/merge/approve.mjs": {
+        "priorSha256": "94dd1e718616edf49034cbdb3790931652f8585e5ed8a141511622a853a1e8bd",
+        "mergeSha256": "94dd1e718616edf49034cbdb3790931652f8585e5ed8a141511622a853a1e8bd",
+        "mainSha256": "17e31ab88a2e358f3cda75501e36ff470f9243734c73bb1325c79e516e455195",
+        "mergeChanges": ""
+      },
+      "src/verbs/merge/sync-root.mjs": {
+        "priorSha256": "88562c410803ee1906ed8cf52d62813356ae6ad8fe41d32c4ad6d3132b774566",
+        "mergeSha256": "88562c410803ee1906ed8cf52d62813356ae6ad8fe41d32c4ad6d3132b774566",
+        "mainSha256": "c5e4e309c77ff490b1cf53b92f53c250b835cab6c41f1456c4facd0195df1ba1",
+        "mergeChanges": ""
+      },
+      "src/verbs/merge/promote-to-component.mjs": {
+        "priorSha256": "19eae52b29a359c1083611aeb6c8c714694c6ff4b99029036e14d76e55428e72",
+        "mergeSha256": "19eae52b29a359c1083611aeb6c8c714694c6ff4b99029036e14d76e55428e72",
+        "mainSha256": "da6e9b2efd3c5bdde96e04114b69e6d8b34511e88453bb91b505ca8d2ccfaa85",
+        "mergeChanges": ""
+      }
+    },
+    "interpretation": "Work Land id/acknowledgement and candidate cleanup are present at the merged tree, but were already in BOTH parents: these four files have zero merge delta. The brief names inherited M3 behavior; this receipt does not invent it as a new change imported by 66b637a10. Prior-art -S acknowledgeLand identifies e71381aba. No code was edited."
+  },
+  "evidenceRelocation": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-evidence-relocation.mjs --manifest plans/260925-documentation-authority-unification/reports/phase-08/step-06-evidence-relocation-manifest.json --before",
+    "exit": 0,
+    "entries": 867,
+    "violations": 0,
+    "consumerTableRows": 43,
+    "consumerTableChanged": false,
+    "runtimeReader": false,
+    "L12-98Carry": "Replayed per L12-98; no consumer drift, row regeneration or new classification; original L12-98 historical entry retained.",
+    "consumerTableSha256": "2716a6904857d2f5774b3fb39fadf6bc4caf20cfa987ace510594c09d11c3312",
+    "log": "[check-evidence-relocation] PASS: before mode verified (867 entries, 0 violations)"
+  },
+  "ratchet": {
+    "exit": 0,
+    "testExit": 0,
+    "testsPassed": 28,
+    "exceptionRefresh": [
+      {
+        "path": "docs/specs/reading-map.md",
+        "beforeDigest": "84197b9cc124e7aa2afd20059200d0eddf389baef30094b6c98cf7a450e64267",
+        "afterDigest": "daf82d69546be573b3c113309852745700f7f950f7d239a9f43c2b8d4bc224b1",
+        "mainPathCommits": [
+          "b4f9a2219fe063a9ac3ab91b423b8207a6f09866 Merge remote-tracking branch 'origin/main' into ident/p00-rename-to-identity",
+          "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity",
+          "8c2a62f44ab85146beb5ece0f44ce384fed764ea docs(config): record the owner's signature on the YAML Document and Config specs",
+          "043ceaafbf914c1ae0c6477402d15fee1a17a3a4 docs(specs): gloss the dispatch-lock law cited in the reading map",
+          "3c49306912dff7fc169bd1d0f9bc7b435290fdec docs(platform): specify the YAML Document and Config components"
+        ]
+      },
+      {
+        "path": "docs/specs/distribution.md",
+        "beforeDigest": "86b4092ee46aa86d783015a7e1be9af3d69e1864251e8d281610fdf225f1393a",
+        "afterDigest": "2b6c1fc5f0331bf67a298124e9506f7eed5a3dc5a653977bbf1d2b45a28f3c98",
+        "mainPathCommits": [
+          "a7b74431186d3bfcf6740f779e5101054d228148 refactor(seat-binding): read the tier ladder from one shared contract file"
+        ]
+      },
+      {
+        "path": "docs/specs/runner.md",
+        "beforeDigest": "60cff6edc1725b7c02f1608a325b679ebd876086f389ab7c783caa14fe31da2f",
+        "afterDigest": "b43408c78d213ae88352dd3a23d7fc4b2bb78256f25e4734974098295daa9b81",
+        "mainPathCommits": [
+          "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+        ]
+      },
+      {
+        "path": "docs/specs/observe.md",
+        "beforeDigest": "bf89de13303aeb0ae9c30141e96b1833646b89b54431a46e87552586a893d348",
+        "afterDigest": "18c060c9b5f48321820772c44a21277f46aa6392eb67ab97f833ea03e5dc5274",
+        "mainPathCommits": [
+          "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+        ]
+      },
+      {
+        "path": "docs/specs/workflow.md",
+        "beforeDigest": "1c5af7844ec4fbcc4076d0e3f5de23c121e7dc85656e327239288d7b4d1f44a8",
+        "afterDigest": "df63011fa93f440316bf2e0367b1757568c5323d2c45c7815894a69ef63c2e34",
+        "mainPathCommits": [
+          "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity"
+        ]
+      },
+      {
+        "path": "docs/specs/seat-binding.md",
+        "beforeDigest": "668804f982bf7eaf50ce477ec380018636332d2e8c0242b36826fba4e5b1bef4",
+        "afterDigest": "1e46fa2685528bfb4b287520b7889745c53bff078d205e4978f7dc40d9bc3dae",
+        "mainPathCommits": [
+          "b4f9a2219fe063a9ac3ab91b423b8207a6f09866 Merge remote-tracking branch 'origin/main' into ident/p00-rename-to-identity",
+          "9fdaac9ba704c2a483b9e77d052476fd9ab6249d refactor(identity): rename session identity to identity",
+          "a7b74431186d3bfcf6740f779e5101054d228148 refactor(seat-binding): read the tier ladder from one shared contract file"
+        ]
+      }
+    ],
+    "logs": [
+      "step-07-l12-112-ratchet.log",
+      "step-07-l12-112-ratchet-tests.log"
+    ]
+  },
+  "step0": {
+    "directChecked": 428,
+    "groupMembersChecked": 128,
+    "rebindingsApplied": 139,
+    "changedShards": [
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-holder-lock-predecessor.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json"
+    ],
+    "extractorsAgree": true,
+    "remainingAuthorizedLedgerDrift": 0,
+    "inheritedPreMergeSetupDrift": 3,
+    "method": "Content, ancestry and complete immediate neighbour witnesses, with both unchanged extractors. Current block indexes never used to choose a successor. No source/native claim identity changes; no approval carry.",
+    "pilotRebindingsApplied": 2,
+    "totalRebindingsApplied": 141,
+    "directCheckedIncludingPilot": 430,
+    "remainingAuthorizedPilotDrift": 0,
+    "pilotProof": "step-07-l12-112-out-of-scope-binding.json"
+  },
+  "overlapCounts": {
+    "step3": 32,
+    "step4": 15,
+    "step5": 323
+  },
+  "overlapRecords": "step-07-l12-112-deferred-rebinds.json",
+  "headDrift": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+    "exit": 0,
+    "headCommit": "75866f28a577b5687de833c1c272fc46c5b79cfc",
+    "entries": 405,
+    "failing": false,
+    "checker": {
+      "files": 1481,
+      "literalReferences": 7223,
+      "dynamicTuples": 39876,
+      "failureCount": 0
+    }
+  },
+  "census": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID FGOS_STATE_ROOT=/tmp/fgos-work/identity-accounting/state node scripts/git-one-door-scan.mjs --write-census",
+    "exit": 1,
+    "mainTakenSiteCount": 5,
+    "regeneratedSiteCount": 58,
+    "payloadDigest": "b4df2319efe7438e59f32464c4b6dc3ac9d3d3f374c0ed0edab4f340793297c6",
+    "sites": [
+      {
+        "path": ".githooks/pre-commit",
+        "line": 476,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn"
+      },
+      {
+        "path": "bin/fgos.mjs",
+        "line": 3499,
+        "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+        "binary": "? readSharedConfig(dir)[key]",
+        "family": "unresolved-binary"
+      },
+      {
+        "path": "bin/fgos.mjs",
+        "line": 3643,
+        "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+        "binary": "? readSharedConfig(dir)[key]",
+        "family": "unresolved-binary"
+      },
+      {
+        "path": "scripts/check-doc-constitution.mjs",
+        "line": 640,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-doc-constitution.mjs:719",
+          "scripts/check-doc-constitution.mjs:727",
+          "scripts/check-doc-candidate-status.mjs:149",
+          "scripts/check-doc-retirement.mjs:246"
+        ]
+      },
+      {
+        "path": "scripts/check-doc-inventory-gates.mjs",
+        "line": 33,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-doc-inventory-gates.mjs:1263"
+        ]
+      },
+      {
+        "path": "scripts/check-doc-inventory-gates.mjs",
+        "line": 398,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-doc-inventory-gates.mjs:1250",
+          "scripts/check-doc-constitution.mjs:695"
+        ]
+      },
+      {
+        "path": "scripts/check-doc-inventory-gates.mjs",
+        "line": 441,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-doc-inventory-gates.mjs:1249",
+          "scripts/check-doc-constitution.mjs:695"
+        ]
+      },
+      {
+        "path": "scripts/check-doc-inventory-gates.mjs",
+        "line": 600,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-doc-inventory-gates.mjs:550",
+          "scripts/check-doc-inventory-gates.mjs:985",
+          "scripts/check-doc-inventory-gates.mjs:992",
+          "scripts/check-doc-inventory-gates.mjs:1015",
+          "scripts/check-doc-inventory-gates.mjs:1175"
+        ]
+      },
+      {
+        "path": "scripts/check-doc-inventory-gates.mjs",
+        "line": 1044,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-doc-inventory-gates.mjs:1057"
+        ]
+      },
+      {
+        "path": "scripts/check-doc-inventory-gates.mjs",
+        "line": 1094,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-doc-inventory-gates.mjs:1154"
+        ]
+      },
+      {
+        "path": "scripts/check-doc-inventory-gates.mjs",
+        "line": 1098,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-doc-inventory-gates.mjs:1154"
+        ]
+      },
+      {
+        "path": "scripts/check-doc-inventory-gates.mjs",
+        "line": 1114,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-doc-inventory-gates.mjs:1154"
+        ]
+      },
+      {
+        "path": "scripts/check-doc-inventory-gates.mjs",
+        "line": 1131,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-doc-inventory-gates.mjs:1154"
+        ]
+      },
+      {
+        "path": "scripts/check-doc-inventory-gates.mjs",
+        "line": 1132,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-doc-inventory-gates.mjs:1154"
+        ]
+      },
+      {
+        "path": "scripts/check-doc-inventory-gates.mjs",
+        "line": 1325,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-doc-inventory-gates.mjs:1333"
+        ]
+      },
+      {
+        "path": "scripts/check-doc-inventory-gates.mjs",
+        "line": 1385,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-doc-inventory-gates.mjs:1439",
+          "scripts/check-doc-retirement.mjs:239"
+        ]
+      },
+      {
+        "path": "scripts/check-doc-inventory-gates.mjs",
+        "line": 1392,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-doc-inventory-gates.mjs:1463"
+        ]
+      },
+      {
+        "path": "scripts/check-doc-retirement.mjs",
+        "line": 217,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-doc-retirement.mjs:243"
+        ]
+      },
+      {
+        "path": "scripts/check-evidence-relocation.mjs",
+        "line": 31,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/check-evidence-relocation.mjs:39",
+          "scripts/check-evidence-relocation.mjs:51",
+          "scripts/check-evidence-relocation.mjs:300"
+        ]
+      },
+      {
+        "path": "scripts/doc-alias-resolver.mjs",
+        "line": 147,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/doc-alias-resolver.mjs:112",
+          "scripts/doc-alias-resolver.mjs:213"
+        ]
+      },
+      {
+        "path": "scripts/generate-doc-inventory.mjs",
+        "line": 56,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/generate-doc-inventory.mjs:1416",
+          "scripts/generate-doc-inventory.mjs:1475",
+          "scripts/generate-doc-inventory.mjs:1632",
+          "scripts/generate-doc-inventory.mjs:1675",
+          "scripts/generate-doc-inventory.mjs:1704"
+        ]
+      },
+      {
+        "path": "scripts/generate-doc-inventory.mjs",
+        "line": 166,
+        "spawn": "spawnSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/generate-doc-inventory.mjs:1661",
+          "scripts/generate-doc-inventory.mjs:1902",
+          "scripts/check-doc-inventory-gates.mjs:473",
+          "scripts/check-doc-inventory-gates.mjs:998"
+        ]
+      },
+      {
+        "path": "scripts/generate-doc-inventory.mjs",
+        "line": 739,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/generate-doc-inventory.mjs:808",
+          "scripts/generate-doc-inventory.mjs:1666"
+        ]
+      },
+      {
+        "path": "scripts/generate-doc-inventory.mjs",
+        "line": 749,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn"
+      },
+      {
+        "path": "scripts/generate-doc-inventory.mjs",
+        "line": 1222,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/generate-doc-inventory.mjs:1466",
+          "scripts/generate-doc-inventory.mjs:1625",
+          "scripts/generate-doc-inventory.mjs:1664"
+        ]
+      },
+      {
+        "path": "scripts/generate-doc-inventory.mjs",
+        "line": 1241,
+        "spawn": "spawnSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/generate-doc-inventory.mjs:1467",
+          "scripts/generate-doc-inventory.mjs:1626",
+          "scripts/generate-doc-inventory.mjs:1667",
+          "scripts/check-doc-inventory-gates.mjs:406",
+          "scripts/check-doc-inventory-gates.mjs:457"
+        ]
+      },
+      {
+        "path": "scripts/generate-doc-inventory.mjs",
+        "line": 1413,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/generate-doc-inventory.mjs:1945"
+        ]
+      },
+      {
+        "path": "scripts/generate-shipped-path-inventory.mjs",
+        "line": 63,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/generate-shipped-path-inventory.mjs:360",
+          "scripts/generate-shipped-path-inventory.mjs:460",
+          "scripts/generate-shipped-path-inventory.mjs:542",
+          "scripts/generate-shipped-path-inventory.mjs:625",
+          "scripts/generate-shipped-path-inventory.mjs:831",
+          "scripts/generate-doc-inventory.mjs:1411",
+          "scripts/generate-doc-inventory.mjs:1457",
+          "scripts/generate-doc-inventory.mjs:1623",
+          "scripts/generate-doc-inventory.mjs:1658",
+          "scripts/generate-doc-inventory.mjs:1900"
+        ]
+      },
+      {
+        "path": "scripts/generate-shipped-path-inventory.mjs",
+        "line": 78,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/generate-shipped-path-inventory.mjs:361",
+          "scripts/generate-shipped-path-inventory.mjs:461",
+          "scripts/generate-shipped-path-inventory.mjs:544",
+          "scripts/generate-shipped-path-inventory.mjs:626"
+        ]
+      },
+      {
+        "path": "scripts/generate-shipped-path-inventory.mjs",
+        "line": 100,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/generate-shipped-path-inventory.mjs:555",
+          "scripts/check-doc-inventory-gates.mjs:225",
+          "scripts/check-doc-inventory-gates.mjs:245",
+          "scripts/check-doc-inventory-gates.mjs:262",
+          "scripts/check-doc-inventory-gates.mjs:607",
+          "scripts/check-doc-inventory-gates.mjs:1051",
+          "scripts/check-doc-inventory-gates.mjs:1086",
+          "scripts/check-doc-inventory-gates.mjs:1099",
+          "scripts/check-doc-inventory-gates.mjs:1133",
+          "scripts/generate-doc-inventory.mjs:760",
+          "scripts/generate-doc-inventory.mjs:1017",
+          "scripts/generate-doc-inventory.mjs:1268"
+        ]
+      },
+      {
+        "path": "scripts/propose-doc-decisions.mjs",
+        "line": 469,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/propose-doc-decisions.mjs:717"
+        ]
+      },
+      {
+        "path": "scripts/propose-doc-decisions.mjs",
+        "line": 598,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/propose-doc-decisions.mjs:617"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-01.mjs",
+        "line": 78,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-01.mjs:380",
+          "scripts/verify-phase-02.mjs:282"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-01.mjs",
+        "line": 85,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-01.mjs:380",
+          "scripts/verify-phase-02.mjs:282"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-01.mjs",
+        "line": 116,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-01.mjs:380",
+          "scripts/verify-phase-02.mjs:282"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-01.mjs",
+        "line": 124,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-01.mjs:380",
+          "scripts/verify-phase-02.mjs:282"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-01.mjs",
+        "line": 176,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-01.mjs:508"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-01.mjs",
+        "line": 186,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-01.mjs:508"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-01.mjs",
+        "line": 198,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-01.mjs:508"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-01.mjs",
+        "line": 209,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-01.mjs:508"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-01.mjs",
+        "line": 225,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-01.mjs:508"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-01.mjs",
+        "line": 234,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-01.mjs:508"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-01.mjs",
+        "line": 398,
+        "spawn": "spawnSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-01.mjs:508"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-01.mjs",
+        "line": 407,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-01.mjs:508"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-01.mjs",
+        "line": 488,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-01.mjs:508"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-02.mjs",
+        "line": 75,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-02.mjs:153",
+          "scripts/verify-phase-02.mjs:154"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-02.mjs",
+        "line": 125,
+        "spawn": "runOrThrow -> scripts/verify-phase-02.mjs:86",
+        "binary": "param command (no caller found for anonymous function)",
+        "family": "unresolved-binary"
+      },
+      {
+        "path": "scripts/verify-phase-02.mjs",
+        "line": 126,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn"
+      },
+      {
+        "path": "scripts/verify-phase-02.mjs",
+        "line": 155,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-02.mjs:348"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-02.mjs",
+        "line": 163,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-02.mjs:348"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-02.mjs",
+        "line": 178,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-02.mjs:348"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-02.mjs",
+        "line": 180,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-02.mjs:348"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-02.mjs",
+        "line": 188,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-02.mjs:348"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-02.mjs",
+        "line": 325,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-02.mjs:348"
+        ]
+      },
+      {
+        "path": "scripts/verify-phase-02.mjs",
+        "line": 336,
+        "spawn": "execFileSync",
+        "binary": "git",
+        "family": "spawn",
+        "callers": [
+          "scripts/verify-phase-02.mjs:348"
+        ]
+      },
+      {
+        "path": "src/runner/merge.mjs",
+        "line": 1225,
+        "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+        "binary": "? elements of section.commands",
+        "family": "unresolved-binary"
+      },
+      {
+        "path": "src/runner/merge.mjs",
+        "line": 1255,
+        "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+        "binary": "? elements of section.commands",
+        "family": "unresolved-binary"
+      },
+      {
+        "path": "src/runner/worktree.mjs",
+        "line": 146,
+        "spawn": "execFileSync",
+        "binary": "? readSharedConfig(dir)[key]",
+        "family": "unresolved-binary"
+      }
+    ],
+    "meaning": "Generator wrote the census but its one-door scan remains red on 58 undeclared sites (52 spawn, 6 unresolved-binary). No new source code, suppression, gate change or green one-door claim. State root is private 0700 under /tmp/fgos-work. The first generator attempt refused mode 0775; chmod only this scratch state root to 0700 and reran. Generator automatically built its native addon/host on first run; no explicit fgOS CLI was run.",
+    "log": "step-07-l12-112-census.log",
+    "inheritedBranchSitesRestored": 53,
+    "inheritedInventoryProof": {
+      "firstParentSiteCount": 53,
+      "mainSiteCount": 5,
+      "currentSiteCount": 58,
+      "allFirstParentSitesPreservedIgnoringLineRelocation": true,
+      "allMainSitesPreservedIgnoringLineRelocation": true,
+      "note": "The restored 53 are inherited documentation-branch sites, including lease-related sites; not all 53 are lease code."
+    }
+  },
+  "limits": [
+    "The two identity-rename pilot bindings were applied after the continuation explicitly added their shard to write scope. Independent changed-binding review remains owed; no approval carry.",
+    "Three setup-doctor-registry bindings predate this merge and remain explicit inherited carries; no authorization to rebind unchanged source in this merge-only turn.",
+    "No independent content/binding approval, authority flip, Phase 9 cutover, runtime test, npm test or cargo test claim.",
+    "No Git write, fgOS CLI, secret env read or workspace .fgos access. The changed .fgos/config.json path is accounted from Git path/commit metadata only, never read. Native census scan only counted non-product path names."
+  ],
+  "needsWrites": [],
+  "candidateMetadataCheck": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-doc-candidate-status.mjs --strict",
+    "exit": 0,
+    "checked": 217,
+    "findings": 0
+  },
+  "preview": {
+    "command": "timeout 20s mdview open /home/vantt/projects/forgentX-phase00-documentation-authority-unification/docs/platform/identity/spec.md",
+    "exit": 1,
+    "message": "error: database error: attempt to write a readonly database: attempt to write a readonly database: Error code 8: Attempt to write a readonly database",
+    "url": null
+  }
+}

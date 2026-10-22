@@ -1,0 +1,422 @@
+{
+  "inputHEAD": "75866f28a577b5687de833c1c272fc46c5b79cfc",
+  "checkedPilotShard": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "rows": [
+    {
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "keys": [
+        "claims",
+        35
+      ],
+      "claimId": "claim_57f11d837272b3f9781b376ef1665c81",
+      "before": {
+        "claimId": "claim_57f11d837272b3f9781b376ef1665c81",
+        "sourcePath": "docs/io-contract.md",
+        "sourceAnchor": "unheaded-block-5",
+        "sourceUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+        "rationale": "Source: docs/io-contract.md:24-34#unheaded-block-5 (current lines); unit SHA256 d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:83-93#unheaded-block-10 (current lines); unit SHA256 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec Session Identity\" (platform/session-identity/spec.md) → \"spec Session Identity\" (../../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/io-contract.md#unheaded-block-5 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều vào — verb + danh tính\", target context \"CLI I/O Contract / 2. Input Direction Verb And Identity / Writer Source Trust Levels\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-10",
+        "reviewNote": "deep: io-contract unheaded-block-5 L24-34 to cli-io-contract unheaded-block-10 L83-93; rationale source and target ranges, digests, differ statement, link count 1/1 and resolved destinations (both docs/platform/session-identity/spec.md) all reproduce; after applying the one link rebase the two units are byte equal, so nothing is lost or added; last reviewed digest 8aa84914 at 345f15d95 equals the shard row there",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-04-62751458b.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "2. Input Direction Verb And Identity",
+          "Writer Source Trust Levels"
+        ],
+        "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      },
+      "oldPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 83,
+        "endLine": 93,
+        "textDigest": "8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be",
+        "sample": "- `writer.id` — cá thể nào đang gọi (phân biệt hai phiên agent chạy song\n  song), luôn có mặt.\n- `writer.source` — độ tin của `id` đó, một trong bốn giá trị theo thứ tự ưu\n  tiên: ",
+        "identityFingerprint": "b45243cbc3aa642918126e02620b2d2fe4b33f96e860cc2345ffa67cd090dc0a",
+        "ancestry": [
+          "CLI I/O Contract",
+          "2. Input Direction Verb And Identity",
+          "Writer Source Trust Levels"
+        ],
+        "text": "- `writer.id` — cá thể nào đang gọi (phân biệt hai phiên agent chạy song\n  song), luôn có mặt.\n- `writer.source` — độ tin của `id` đó, một trong bốn giá trị theo thứ tự ưu\n  tiên: `registry` (đối chiếu được với `.fgos/sessions.json`, tin nhất) ·\n  `env` (biến môi trường, ai cũng set được) · `pid` (tổ tiên cao nhất còn\n  terminal, không có thì session id của tiến trình gọi; best-effort) ·\n  `unresolved` (không nguồn nào xác nhận được — `id` vẫn là\n  pid của chính tiến trình gọi, KHÔNG rỗng, KHÔNG vắng khoá; chỉ nhãn\n  `source` nói giá trị chưa kiểm chứng được). Luật đầy đủ (thứ tự biến env,\n  giới hạn đã biết) chỉ nằm ở [spec Session Identity](../../session-identity/spec.md);\n  nguồn duy nhất là crate Rust `fgos-session-identity`."
+      },
+      "newPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 83,
+        "endLine": 93,
+        "textDigest": "f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2",
+        "sample": "- `writer.id` — cá thể nào đang gọi (phân biệt hai phiên agent chạy song\n  song), luôn có mặt.\n- `writer.source` — độ tin của `id` đó, một trong bốn giá trị theo thứ tự ưu\n  tiên: ",
+        "identityFingerprint": "24b8cc4cc18f224a576357f396cc38221b53c8f33da4b716f4dbc4aa6579af0b",
+        "ancestry": [
+          "CLI I/O Contract",
+          "2. Input Direction Verb And Identity",
+          "Writer Source Trust Levels"
+        ],
+        "text": "- `writer.id` — cá thể nào đang gọi (phân biệt hai phiên agent chạy song\n  song), luôn có mặt.\n- `writer.source` — độ tin của `id` đó, một trong bốn giá trị theo thứ tự ưu\n  tiên: `registry` (đối chiếu được với `.fgos/sessions.json`, tin nhất) ·\n  `env` (biến môi trường, ai cũng set được) · `pid` (tổ tiên cao nhất còn\n  terminal, không có thì session id của tiến trình gọi; best-effort) ·\n  `unresolved` (không nguồn nào xác nhận được — `id` vẫn là\n  pid của chính tiến trình gọi, KHÔNG rỗng, KHÔNG vắng khoá; chỉ nhãn\n  `source` nói giá trị chưa kiểm chứng được). Luật đầy đủ (thứ tự biến env,\n  giới hạn đã biết) chỉ nằm ở [spec Session Identity](../../identity/spec.md);\n  nguồn duy nhất là crate Rust `fgos-identity`."
+      },
+      "oldNeighbours": {
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-9",
+          "githubAnchor": "unheaded-block-9",
+          "stableAnchor": "unheaded-block-9",
+          "title": "Unheaded block 9",
+          "startLine": 76,
+          "endLine": 81,
+          "textDigest": "b3d95b30cc6cd2a1b0bb6bd8bec47976bedba54191c94aeec67ff6441ebdefb6",
+          "sample": "| source | Ý nghĩa | Độ tin |\n|---|---|---|\n| `registry` | `id` khớp một phiên đang sống trong sổ đăng ký phiên của fgOS (`.fgos/sessions.json`) | Cao nhất — do chính fgOS cấp và x",
+          "identityFingerprint": "6482ad4b3cb3976d6c684d82e58235cfed3a6c6eea36ea9761578a3d915dc261",
+          "ancestry": [
+            "CLI I/O Contract",
+            "2. Input Direction Verb And Identity",
+            "Writer Source Trust Levels"
+          ],
+          "text": "| source | Ý nghĩa | Độ tin |\n|---|---|---|\n| `registry` | `id` khớp một phiên đang sống trong sổ đăng ký phiên của fgOS (`.fgos/sessions.json`) | Cao nhất — do chính fgOS cấp và xác nhận |\n| `env` | `id` lấy từ biến môi trường phiên agent (`FGOS_SESSION_ID`/`CLAUDE_CODE_SESSION_ID`), nhưng KHÔNG khớp phiên nào đang sống trong sổ đăng ký | Trung bình — ai cũng tự set được biến môi trường |\n| `pid` | Không có biến môi trường phiên nào hợp lệ; suy đoán tốt-nhất từ pid một tổ tiên tiến trình gần (terminal tay gõ) | Thấp — best-effort, có thể trùng giữa hai pane cùng shell |\n| `unresolved` | KHÔNG một nguồn nào xác nhận được; `id` vẫn là pid của chính tiến trình ghi (KHÔNG BAO GIỜ rỗng/vắng mặt) — `unresolved` là một NHÃN XUẤT XỨ, không phải danh tính vắng mặt (per str46-io-contract) | Không xác định |"
+        },
+        "next": {
+          "unitKind": "heading",
+          "level": 3,
+          "title": "Writer Resolution Rules",
+          "anchor": "writer-resolution-rules",
+          "githubAnchor": "writer-resolution-rules",
+          "stableAnchor": "h-d15da6eb0707",
+          "startLine": 95,
+          "endLine": 95,
+          "textDigest": "8789fb7c71d479865e2c6f7c7ade71a6b69867ca1157db3dd424977918db061b",
+          "sample": "Writer Resolution Rules",
+          "sectionPayloadDigest": "ff49a3c3e6a16c7c56d4bd2bd990721834255fa478afa6878d8d070ec644fb62",
+          "followingBlockDigest": "882fdc920bae5cb93953dd540d22527c18f91455de1d3de225d2ab0a51734fb7",
+          "identityFingerprint": "8adb7dbf30dab47a6edc12bc9893b5bc30d6de705558092b47fb595443587ba3",
+          "ancestry": [
+            "CLI I/O Contract",
+            "2. Input Direction Verb And Identity"
+          ],
+          "text": "### Writer Resolution Rules",
+          "sectionText": "### Writer Resolution Rules\n\n**Registry chỉ ĐỐI CHIẾU, không bao giờ tự cấp danh tính** (per str46-io-contract): giá trị `id` lấy từ biến môi trường luôn giữ nguyên bất\nkể sổ đăng ký có khớp hay không — sổ đăng ký chỉ nâng độ tin (`source`) khi\nkhớp, không bao giờ đổi hay tạo ra `id`. Một dòng sổ đăng ký KHÔNG BAO GIỜ\nkhớp theo thư mục làm việc hay theo pid của chính dòng đó — chỉ khớp đúng\n`id` với `sessionId` của dòng — vì khớp theo thư mục sẽ gộp hai phiên khác\nnhau trong cùng một worktree thành một danh tính, phá đúng mục đích khoá\nhoạt động cây chính (xem spec Runner \"Khoá hoạt động cây chính\").\n\nMột giá trị `id` sai định dạng (ký tự lạ, quá dài) bị LOẠI ở tầng phân giải\nvà rơi xuống nguồn kế tiếp — KHÔNG BAO GIỜ ném lỗi, KHÔNG BAO GIỜ chặn verb\n(per str46-io-contract); không có validator nào đứng trên đường ghi\n`writer`. `writer` fold lên item KHÔNG ĐIỀU KIỆN, GHI ĐÈ mỗi lần (latest-wins)\n— khác khuôn \"cộng thêm không đè\" của outcome/friction/settlement, vì đây là\ndanh tính của LẦN GHI GẦN NHẤT, không phải một chuỗi lịch sử cần giữ mọi lần.\nItem chưa từng qua tính năng này không mang `writer` — vắng mặt hoàn toàn,\ntương thích ngược (RUL11 (tiến hóa schema)). Cơ chế phân giải đầy đủ (thứ tự nguồn, khoá hoạt động cây chính dùng cùng danh tính này): spec Runner RUL49 (compound-learning đổi trục: từ stage sang status retrospective)."
+        }
+      },
+      "newNeighbours": {
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-9",
+          "githubAnchor": "unheaded-block-9",
+          "stableAnchor": "unheaded-block-9",
+          "title": "Unheaded block 9",
+          "startLine": 76,
+          "endLine": 81,
+          "textDigest": "b3d95b30cc6cd2a1b0bb6bd8bec47976bedba54191c94aeec67ff6441ebdefb6",
+          "sample": "| source | Ý nghĩa | Độ tin |\n|---|---|---|\n| `registry` | `id` khớp một phiên đang sống trong sổ đăng ký phiên của fgOS (`.fgos/sessions.json`) | Cao nhất — do chính fgOS cấp và x",
+          "identityFingerprint": "6482ad4b3cb3976d6c684d82e58235cfed3a6c6eea36ea9761578a3d915dc261",
+          "ancestry": [
+            "CLI I/O Contract",
+            "2. Input Direction Verb And Identity",
+            "Writer Source Trust Levels"
+          ],
+          "text": "| source | Ý nghĩa | Độ tin |\n|---|---|---|\n| `registry` | `id` khớp một phiên đang sống trong sổ đăng ký phiên của fgOS (`.fgos/sessions.json`) | Cao nhất — do chính fgOS cấp và xác nhận |\n| `env` | `id` lấy từ biến môi trường phiên agent (`FGOS_SESSION_ID`/`CLAUDE_CODE_SESSION_ID`), nhưng KHÔNG khớp phiên nào đang sống trong sổ đăng ký | Trung bình — ai cũng tự set được biến môi trường |\n| `pid` | Không có biến môi trường phiên nào hợp lệ; suy đoán tốt-nhất từ pid một tổ tiên tiến trình gần (terminal tay gõ) | Thấp — best-effort, có thể trùng giữa hai pane cùng shell |\n| `unresolved` | KHÔNG một nguồn nào xác nhận được; `id` vẫn là pid của chính tiến trình ghi (KHÔNG BAO GIỜ rỗng/vắng mặt) — `unresolved` là một NHÃN XUẤT XỨ, không phải danh tính vắng mặt (per str46-io-contract) | Không xác định |"
+        },
+        "next": {
+          "unitKind": "heading",
+          "level": 3,
+          "title": "Writer Resolution Rules",
+          "anchor": "writer-resolution-rules",
+          "githubAnchor": "writer-resolution-rules",
+          "stableAnchor": "h-d15da6eb0707",
+          "startLine": 95,
+          "endLine": 95,
+          "textDigest": "8789fb7c71d479865e2c6f7c7ade71a6b69867ca1157db3dd424977918db061b",
+          "sample": "Writer Resolution Rules",
+          "sectionPayloadDigest": "ff49a3c3e6a16c7c56d4bd2bd990721834255fa478afa6878d8d070ec644fb62",
+          "followingBlockDigest": "882fdc920bae5cb93953dd540d22527c18f91455de1d3de225d2ab0a51734fb7",
+          "identityFingerprint": "8adb7dbf30dab47a6edc12bc9893b5bc30d6de705558092b47fb595443587ba3",
+          "ancestry": [
+            "CLI I/O Contract",
+            "2. Input Direction Verb And Identity"
+          ],
+          "text": "### Writer Resolution Rules",
+          "sectionText": "### Writer Resolution Rules\n\n**Registry chỉ ĐỐI CHIẾU, không bao giờ tự cấp danh tính** (per str46-io-contract): giá trị `id` lấy từ biến môi trường luôn giữ nguyên bất\nkể sổ đăng ký có khớp hay không — sổ đăng ký chỉ nâng độ tin (`source`) khi\nkhớp, không bao giờ đổi hay tạo ra `id`. Một dòng sổ đăng ký KHÔNG BAO GIỜ\nkhớp theo thư mục làm việc hay theo pid của chính dòng đó — chỉ khớp đúng\n`id` với `sessionId` của dòng — vì khớp theo thư mục sẽ gộp hai phiên khác\nnhau trong cùng một worktree thành một danh tính, phá đúng mục đích khoá\nhoạt động cây chính (xem spec Runner \"Khoá hoạt động cây chính\").\n\nMột giá trị `id` sai định dạng (ký tự lạ, quá dài) bị LOẠI ở tầng phân giải\nvà rơi xuống nguồn kế tiếp — KHÔNG BAO GIỜ ném lỗi, KHÔNG BAO GIỜ chặn verb\n(per str46-io-contract); không có validator nào đứng trên đường ghi\n`writer`. `writer` fold lên item KHÔNG ĐIỀU KIỆN, GHI ĐÈ mỗi lần (latest-wins)\n— khác khuôn \"cộng thêm không đè\" của outcome/friction/settlement, vì đây là\ndanh tính của LẦN GHI GẦN NHẤT, không phải một chuỗi lịch sử cần giữ mọi lần.\nItem chưa từng qua tính năng này không mang `writer` — vắng mặt hoàn toàn,\ntương thích ngược (RUL11 (tiến hóa schema)). Cơ chế phân giải đầy đủ (thứ tự nguồn, khoá hoạt động cây chính dùng cùng danh tính này): spec Runner RUL49 (compound-learning đổi trục: từ stage sang status retrospective)."
+        }
+      },
+      "proposedBinding": {
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-10",
+        "targetUnitDigest": "f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "2. Input Direction Verb And Identity",
+          "Writer Source Trust Levels"
+        ],
+        "reviewStatus": "pending"
+      },
+      "method": "Exact complete passage after main identity path/crate rename, same ancestry, adjacent blocks recorded. Both unchanged extractors agree.",
+      "action": "Applied under explicitly expanded pilot-file scope; independent changed-binding review remains owed.",
+      "after": {
+        "claimId": "claim_57f11d837272b3f9781b376ef1665c81",
+        "sourcePath": "docs/io-contract.md",
+        "sourceAnchor": "unheaded-block-5",
+        "sourceUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+        "rationale": "Source: docs/io-contract.md:24-34#unheaded-block-5 (current lines); unit SHA256 d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:83-93#unheaded-block-10 (current lines); unit SHA256 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec Session Identity\" (platform/session-identity/spec.md) → \"spec Session Identity\" (../../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/io-contract.md#unheaded-block-5 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều vào — verb + danh tính\", target context \"CLI I/O Contract / 2. Input Direction Verb And Identity / Writer Source Trust Levels\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. L12-112 authorized continuation: merge 66b637a10 renames the local-writer spec path and Rust crate. The complete prior passage becomes the uniquely matching current passage after only session-identity/spec.md -> identity/spec.md and fgos-session-identity -> fgos-identity. Both unchanged embedded extractors confirm full content, heading ancestry and immediate neighbours; target unheaded-block-10 SHA256 f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2. Earlier current-target/link statements describe the retained prior witness, not the current binding. Source identity and historical residual unchanged; no approval carry; independent review pending. Exact old/new passages and neighbours: step-07-l12-112-out-of-scope-binding.json.",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-10",
+        "reviewNote": "L12-112 authorized continuation: content-and-neighbour identity rename rebind; independent review pending, no approval carry.",
+        "targetUnitDigest": "f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "2. Input Direction Verb And Identity",
+          "Writer Source Trust Levels"
+        ]
+      },
+      "removedApprovalFields": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-04-62751458b.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      },
+      "freshReplay": {
+        "claimId": "claim_57f11d837272b3f9781b376ef1665c81",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "beforeDigest": "8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be",
+        "afterDigest": "f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2",
+        "anchor": "unheaded-block-10",
+        "ancestry": [
+          "CLI I/O Contract",
+          "2. Input Direction Verb And Identity",
+          "Writer Source Trust Levels"
+        ],
+        "uniqueContentMatches": 1,
+        "oldNeighbourDigests": {
+          "previous": "b3d95b30cc6cd2a1b0bb6bd8bec47976bedba54191c94aeec67ff6441ebdefb6",
+          "next": "8789fb7c71d479865e2c6f7c7ade71a6b69867ca1157db3dd424977918db061b"
+        },
+        "newNeighbourDigests": {
+          "previous": "b3d95b30cc6cd2a1b0bb6bd8bec47976bedba54191c94aeec67ff6441ebdefb6",
+          "next": "8789fb7c71d479865e2c6f7c7ade71a6b69867ca1157db3dd424977918db061b"
+        }
+      }
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "keys": [
+        "registryGaps",
+        4
+      ],
+      "claimId": "claim_f5365b8e40fb58c75adc56a574263242",
+      "before": {
+        "claimId": "claim_f5365b8e40fb58c75adc56a574263242",
+        "sourcePath": "docs/io-contract.md",
+        "sourceUnitDigest": "fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9",
+        "claimKind": "contract",
+        "disposition": "partial-carry",
+        "targetOwner": "docs/io-contract.md",
+        "targetAnchor": "unheaded-block-5",
+        "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+        "reviewNote": "deep: partial-carry gap, historical docs/io-contract.md unheaded-block-5 L24-31 at 2300d6557 (8 lines) against successor L24-34 (11 lines); my own ordered line subsequence leaves exactly 3 residual lines whose sha256 b276baca equals the remainder and the residual file, the digest fa53d50b recomputes at 2300d6557 and d3828696 at HEAD (hand recompute of the historical unit also equal, seed 20261016); rationale tells the truth that historical lines changed and the residual is kept verbatim; stale pending-review tail is the frozen L10-28 tail",
+        "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_f5365b8e40fb58c75adc56a574263242, residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957. Source fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9; primary target d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-01-62751458b.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
+        "targetAncestry": [
+          "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+          "Chiều vào — verb + danh tính"
+        ],
+        "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      },
+      "oldPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 24,
+        "endLine": 34,
+        "textDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
+        "sample": "- `writer.id` — cá thể nào đang gọi (phân biệt hai phiên agent chạy song\n  song), luôn có mặt.\n- `writer.source` — độ tin của `id` đó, một trong bốn giá trị theo thứ tự ưu\n  tiên: ",
+        "identityFingerprint": "bcd5fad94d4723e8decd7375d5df9a749a53154e519ca0b4392815883b490e04",
+        "ancestry": [
+          "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+          "Chiều vào — verb + danh tính"
+        ],
+        "text": "- `writer.id` — cá thể nào đang gọi (phân biệt hai phiên agent chạy song\n  song), luôn có mặt.\n- `writer.source` — độ tin của `id` đó, một trong bốn giá trị theo thứ tự ưu\n  tiên: `registry` (đối chiếu được với `.fgos/sessions.json`, tin nhất) ·\n  `env` (biến môi trường, ai cũng set được) · `pid` (tổ tiên cao nhất còn\n  terminal, không có thì session id của tiến trình gọi; best-effort) ·\n  `unresolved` (không nguồn nào xác nhận được — `id` vẫn là\n  pid của chính tiến trình gọi, KHÔNG rỗng, KHÔNG vắng khoá; chỉ nhãn\n  `source` nói giá trị chưa kiểm chứng được). Luật đầy đủ (thứ tự biến env,\n  giới hạn đã biết) chỉ nằm ở [spec Session Identity](platform/session-identity/spec.md);\n  nguồn duy nhất là crate Rust `fgos-session-identity`."
+      },
+      "newPassage": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 24,
+        "endLine": 34,
+        "textDigest": "9f77932759044d8262649ccec0ae84a8f707efefe51b300ddeb68cec32dc6b5b",
+        "sample": "- `writer.id` — cá thể nào đang gọi (phân biệt hai phiên agent chạy song\n  song), luôn có mặt.\n- `writer.source` — độ tin của `id` đó, một trong bốn giá trị theo thứ tự ưu\n  tiên: ",
+        "identityFingerprint": "24abd5ab141958723bf832bdf6cfc02e233abda180c9b6b13bfd6890c39c3edb",
+        "ancestry": [
+          "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+          "Chiều vào — verb + danh tính"
+        ],
+        "text": "- `writer.id` — cá thể nào đang gọi (phân biệt hai phiên agent chạy song\n  song), luôn có mặt.\n- `writer.source` — độ tin của `id` đó, một trong bốn giá trị theo thứ tự ưu\n  tiên: `registry` (đối chiếu được với `.fgos/sessions.json`, tin nhất) ·\n  `env` (biến môi trường, ai cũng set được) · `pid` (tổ tiên cao nhất còn\n  terminal, không có thì session id của tiến trình gọi; best-effort) ·\n  `unresolved` (không nguồn nào xác nhận được — `id` vẫn là\n  pid của chính tiến trình gọi, KHÔNG rỗng, KHÔNG vắng khoá; chỉ nhãn\n  `source` nói giá trị chưa kiểm chứng được). Luật đầy đủ (thứ tự biến env,\n  giới hạn đã biết) chỉ nằm ở [spec Session Identity](platform/identity/spec.md);\n  nguồn duy nhất là crate Rust `fgos-identity`."
+      },
+      "oldNeighbours": {
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-4",
+          "githubAnchor": "unheaded-block-4",
+          "stableAnchor": "unheaded-block-4",
+          "title": "Unheaded block 4",
+          "startLine": 22,
+          "endLine": 22,
+          "textDigest": "eed0b8520401ce77b1b75379282e339007dd17d09e38cccd31ba0efad4e0a4dd",
+          "sample": "Mỗi lần ghi mang thêm một trường danh tính người/tiến-trình gọi, `writer`:",
+          "identityFingerprint": "9cf3c666f0096005ced5ae8b5c96e62a47449e92d8e846b95a576d66b22e5fd4",
+          "ancestry": [
+            "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+            "Chiều vào — verb + danh tính"
+          ],
+          "text": "Mỗi lần ghi mang thêm một trường danh tính người/tiến-trình gọi, `writer`:"
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-6",
+          "githubAnchor": "unheaded-block-6",
+          "stableAnchor": "unheaded-block-6",
+          "title": "Unheaded block 6",
+          "startLine": 36,
+          "endLine": 36,
+          "textDigest": "5e59bc44bdd3a5969b8bc2b06011d61db5b1bfee5fc3ff27a35f9357a66253cd",
+          "sample": "**Writer id của một lần chạy agent (attempt).** Một agent do `fgos run` khởi động ghi dưới id riêng của attempt đó, không phải id của controller đã khởi động nó: `writer.id` = `att",
+          "identityFingerprint": "cdb98283532d13c89e3ba276b110c0cca805e39bb2f72cc98f88f5b41e2766c7",
+          "ancestry": [
+            "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+            "Chiều vào — verb + danh tính"
+          ],
+          "text": "**Writer id của một lần chạy agent (attempt).** Một agent do `fgos run` khởi động ghi dưới id riêng của attempt đó, không phải id của controller đã khởi động nó: `writer.id` = `att-<attemptId>`, tính xác định từ attempt id (một resume ra đúng id cũ). Id được đặt vào `FGOS_SESSION_ID` của agent ở cả hai cách khởi động (headless và pane); biến `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID` và `FGOS_PARENT_WRITER_ID` của cha bị gỡ trước khi agent chạy, và `FGOS_PARENT_WRITER_ID` được đặt lại bằng writer id của controller để lần theo dòng dõi (agent này do lần chạy nào sinh ra). Với `source` thì id đi theo luật env thường (`env` hoặc `registry`). Giới hạn đã biết: lệnh do codex chạy dưới daemon dùng chung chỉ thấy id của attempt khi codex được khởi động có tuỳ chọn `shell_environment_policy.set` (adapter pane tự thêm); nếu không, lệnh đó ghi dưới `CODEX_THREAD_ID`. Chi tiết: [spec Session Identity §5a và giới hạn](platform/session-identity/spec.md), cách đặt: [spec Run Supervisor](platform/run-supervisor/spec.md)."
+        }
+      },
+      "newNeighbours": {
+        "previous": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-4",
+          "githubAnchor": "unheaded-block-4",
+          "stableAnchor": "unheaded-block-4",
+          "title": "Unheaded block 4",
+          "startLine": 22,
+          "endLine": 22,
+          "textDigest": "eed0b8520401ce77b1b75379282e339007dd17d09e38cccd31ba0efad4e0a4dd",
+          "sample": "Mỗi lần ghi mang thêm một trường danh tính người/tiến-trình gọi, `writer`:",
+          "identityFingerprint": "9cf3c666f0096005ced5ae8b5c96e62a47449e92d8e846b95a576d66b22e5fd4",
+          "ancestry": [
+            "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+            "Chiều vào — verb + danh tính"
+          ],
+          "text": "Mỗi lần ghi mang thêm một trường danh tính người/tiến-trình gọi, `writer`:"
+        },
+        "next": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-6",
+          "githubAnchor": "unheaded-block-6",
+          "stableAnchor": "unheaded-block-6",
+          "title": "Unheaded block 6",
+          "startLine": 36,
+          "endLine": 36,
+          "textDigest": "b1afceea2f62d19b35a91441d180b967cc9f387c4be32b3feeb6d72e353da698",
+          "sample": "**Writer id của một lần chạy agent (attempt).** Một agent do `fgos run` khởi động ghi dưới id riêng của attempt đó, không phải id của controller đã khởi động nó: `writer.id` = `att",
+          "identityFingerprint": "ee7c648eacdd352bb1ac04ad7f7fc4b834377e68aaab5c5a1277680b9f09e830",
+          "ancestry": [
+            "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+            "Chiều vào — verb + danh tính"
+          ],
+          "text": "**Writer id của một lần chạy agent (attempt).** Một agent do `fgos run` khởi động ghi dưới id riêng của attempt đó, không phải id của controller đã khởi động nó: `writer.id` = `att-<attemptId>`, tính xác định từ attempt id (một resume ra đúng id cũ). Id được đặt vào `FGOS_SESSION_ID` của agent ở cả hai cách khởi động (headless và pane); biến `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID` và `FGOS_PARENT_WRITER_ID` của cha bị gỡ trước khi agent chạy, và `FGOS_PARENT_WRITER_ID` được đặt lại bằng writer id của controller để lần theo dòng dõi (agent này do lần chạy nào sinh ra). Với `source` thì id đi theo luật env thường (`env` hoặc `registry`). Giới hạn đã biết: lệnh do codex chạy dưới daemon dùng chung chỉ thấy id của attempt khi codex được khởi động có tuỳ chọn `shell_environment_policy.set` (adapter pane tự thêm); nếu không, lệnh đó ghi dưới `CODEX_THREAD_ID`. Chi tiết: [spec Session Identity §5a và giới hạn](platform/identity/spec.md), cách đặt: [spec Run Supervisor](platform/run-supervisor/spec.md)."
+        }
+      },
+      "proposedBinding": {
+        "targetOwner": "docs/io-contract.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "9f77932759044d8262649ccec0ae84a8f707efefe51b300ddeb68cec32dc6b5b",
+        "targetAncestry": [
+          "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+          "Chiều vào — verb + danh tính"
+        ],
+        "reviewStatus": "pending"
+      },
+      "method": "Exact complete passage after main identity path/crate rename, same ancestry, adjacent blocks recorded. Both unchanged extractors agree.",
+      "action": "Applied under explicitly expanded pilot-file scope; independent changed-binding review remains owed.",
+      "after": {
+        "claimId": "claim_f5365b8e40fb58c75adc56a574263242",
+        "sourcePath": "docs/io-contract.md",
+        "sourceUnitDigest": "fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9",
+        "claimKind": "contract",
+        "disposition": "partial-carry",
+        "targetOwner": "docs/io-contract.md",
+        "targetAnchor": "unheaded-block-5",
+        "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry. L12-112 authorized continuation: merge 66b637a10 renames the local-writer spec path and Rust crate. The complete prior passage becomes the uniquely matching current passage after only session-identity/spec.md -> identity/spec.md and fgos-session-identity -> fgos-identity. Both unchanged embedded extractors confirm full content, heading ancestry and immediate neighbours; target unheaded-block-5 SHA256 9f77932759044d8262649ccec0ae84a8f707efefe51b300ddeb68cec32dc6b5b. Earlier current-target/link statements describe the retained prior witness, not the current binding. Source identity and historical residual unchanged; no approval carry; independent review pending. Exact old/new passages and neighbours: step-07-l12-112-out-of-scope-binding.json.",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+        "reviewNote": "L12-112 authorized continuation: content-and-neighbour identity rename rebind; independent review pending, no approval carry.",
+        "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_f5365b8e40fb58c75adc56a574263242, residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957. Source fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9; primary target d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
+        "targetUnitDigest": "9f77932759044d8262649ccec0ae84a8f707efefe51b300ddeb68cec32dc6b5b",
+        "targetAncestry": [
+          "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+          "Chiều vào — verb + danh tính"
+        ]
+      },
+      "removedApprovalFields": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-01-62751458b.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      },
+      "freshReplay": {
+        "claimId": "claim_f5365b8e40fb58c75adc56a574263242",
+        "targetOwner": "docs/io-contract.md",
+        "beforeDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
+        "afterDigest": "9f77932759044d8262649ccec0ae84a8f707efefe51b300ddeb68cec32dc6b5b",
+        "anchor": "unheaded-block-5",
+        "ancestry": [
+          "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+          "Chiều vào — verb + danh tính"
+        ],
+        "uniqueContentMatches": 1,
+        "oldNeighbourDigests": {
+          "previous": "eed0b8520401ce77b1b75379282e339007dd17d09e38cccd31ba0efad4e0a4dd",
+          "next": "5e59bc44bdd3a5969b8bc2b06011d61db5b1bfee5fc3ff27a35f9357a66253cd"
+        },
+        "newNeighbourDigests": {
+          "previous": "eed0b8520401ce77b1b75379282e339007dd17d09e38cccd31ba0efad4e0a4dd",
+          "next": "b1afceea2f62d19b35a91441d180b967cc9f387c4be32b3feeb6d72e353da698"
+        }
+      }
+    }
+  ],
+  "needsWrites": [],
+  "priorScopeStop": {
+    "inputPilotSha256": "92a9a3257c81fdaf6e39c72ceefc94be703e5bda9bd6d0ca60201c961af47a3d",
+    "scopeWasExpandedBy": "Continuation brief authorizes exactly these two merge rebinds."
+  },
+  "sha256After": "7ae6bc596a8eb17e5a30898663e9af581a8bdd502a0b4f97514dfd234a56c38c",
+  "applied": 2,
+  "remainingPilotDrift": 0
+}

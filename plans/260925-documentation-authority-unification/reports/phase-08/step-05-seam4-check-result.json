@@ -5016,261 +5016,163 @@
       },
       "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "pinnedHash": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
-      "headHash": "8b340b4dd01e791454693e83a9c4871fc70b559f14d1145dc206044b3568d96f",
+      "headHash": "5839e539d80dc58e637d9710e4301a88374919e7c4dc8d60787e61f6b99d5594",
       "movedSpans": [
         {
-          "id": "author-s4-19c252476bfb8f58",
+          "id": "author-s4-ebdf0bbf30f386bc",
           "pinnedSpan": {
-            "line": 72,
-            "columnStart": 80,
-            "columnEndExclusive": 95,
-            "text": "docs/decisions/"
+            "line": 22,
+            "columnStart": 216,
+            "columnEndExclusive": 280,
+            "text": "docs/history/mvp2-scope-test-infra/reports/case-1-interactive.md"
           },
           "headMatchingLines": [
-            73,
-            115,
-            124
+            14
           ]
         },
         {
-          "id": "author-s4-f02a917bdfe98c52",
+          "id": "author-s4-3b7f91d826c53538",
           "pinnedSpan": {
-            "line": 107,
-            "columnStart": 481,
-            "columnEndExclusive": 501,
-            "text": "docs/specs/runner.md"
-          },
-          "headMatchingLines": [
-            108
-          ]
-        },
-        {
-          "id": "author-s4-2e799bbe055b244b",
-          "pinnedSpan": {
-            "line": 114,
-            "columnStart": 321,
-            "columnEndExclusive": 349,
-            "text": "docs/decisions/0000-index.md"
-          },
-          "headMatchingLines": [
-            115
-          ]
-        },
-        {
-          "id": "author-s4-033b8befd0b861df",
-          "pinnedSpan": {
-            "line": 116,
-            "columnStart": 396,
-            "columnEndExclusive": 411,
-            "text": "docs/specs/*.md"
-          },
-          "headMatchingLines": [
-            117
-          ]
-        },
-        {
-          "id": "author-s4-5caf17775c40c6b0",
-          "pinnedSpan": {
-            "line": 116,
-            "columnStart": 443,
-            "columnEndExclusive": 468,
-            "text": "docs/history/*/CONTEXT.md"
-          },
-          "headMatchingLines": [
-            49,
-            117
-          ]
-        },
-        {
-          "id": "author-s4-45dc2cd894385e72",
-          "pinnedSpan": {
-            "line": 118,
-            "columnStart": 224,
-            "columnEndExclusive": 254,
-            "text": "docs/history/dogfood-p25-run1/"
-          },
-          "headMatchingLines": [
-            119
-          ]
-        },
-        {
-          "id": "author-s4-721bff23faa8d622",
-          "pinnedSpan": {
-            "line": 118,
-            "columnStart": 356,
-            "columnEndExclusive": 396,
-            "text": "docs/history/p50-workflow-induct/plan.md"
-          },
-          "headMatchingLines": [
-            119
-          ]
-        },
-        {
-          "id": "author-s4-c9433d21d5c1e93a",
-          "pinnedSpan": {
-            "line": 118,
-            "columnStart": 756,
+            "line": 22,
+            "columnStart": 738,
             "columnEndExclusive": 799,
-            "text": "docs/history/fgos-sample-testbed/CONTEXT.md"
+            "text": "docs/history/mvp2-scope-test-infra/reports/case-2-headless.md"
           },
           "headMatchingLines": [
-            119
+            14
           ]
         },
         {
-          "id": "author-s4-229e8a5afb1230ae",
+          "id": "author-s4-08912b8301b10321",
           "pinnedSpan": {
-            "line": 121,
-            "columnStart": 1113,
-            "columnEndExclusive": 1166,
-            "text": "docs/history/str61-chat-context-continuity/CONTEXT.md"
+            "line": 29,
+            "columnStart": 142,
+            "columnEndExclusive": 168,
+            "text": "docs/specs/distribution.md"
           },
           "headMatchingLines": [
-            122
+            21
           ]
         },
         {
-          "id": "author-s4-84005ca08befe2c0",
+          "id": "author-s4-a20431be6e7a6997",
           "pinnedSpan": {
-            "line": 123,
-            "columnStart": 1728,
-            "columnEndExclusive": 1739,
-            "text": "docs/specs/"
+            "line": 44,
+            "columnStart": 835,
+            "columnEndExclusive": 867,
+            "text": "docs/specs/work-state.md:647-675"
           },
           "headMatchingLines": [
-            29,
-            44,
-            108,
-            117,
-            124
+            36
           ]
         },
         {
-          "id": "author-s4-09018bba15ce7bfe",
+          "id": "author-s4-30b59397818b58a4",
           "pinnedSpan": {
-            "line": 123,
-            "columnStart": 2502,
-            "columnEndExclusive": 2517,
-            "text": "docs/decisions/"
-          },
-          "headMatchingLines": [
-            73,
-            115,
-            124
-          ]
-        },
-        {
-          "id": "author-s4-06e8be879d39deb1",
-          "pinnedSpan": {
-            "line": 126,
-            "columnStart": 496,
-            "columnEndExclusive": 540,
-            "text": "docs/history/p50-workflow-induct/reports/..."
-          },
-          "headMatchingLines": [
-            127
-          ]
-        },
-        {
-          "id": "author-s4-68c3eab88fa07af7",
-          "pinnedSpan": {
-            "line": 127,
-            "columnStart": 1237,
-            "columnEndExclusive": 1302,
-            "text": "docs/history/p50-workflow-induct/reports/p50-workflow-induct-6.md"
-          },
-          "headMatchingLines": [
-            128
-          ]
-        },
-        {
-          "id": "author-s4-bb81392549cc3486",
-          "pinnedSpan": {
-            "line": 128,
-            "columnStart": 128,
-            "columnEndExclusive": 176,
-            "text": "docs/history/gate-dialogue-continuity/CONTEXT.md"
-          },
-          "headMatchingLines": [
-            44,
-            129
-          ]
-        },
-        {
-          "id": "author-s4-26fc8d2f9269bc9a",
-          "pinnedSpan": {
-            "line": 130,
-            "columnStart": 933,
-            "columnEndExclusive": 943,
-            "text": "docs/specs"
-          },
-          "headMatchingLines": [
-            29,
-            44,
-            108,
-            117,
-            124,
-            131
-          ]
-        },
-        {
-          "id": "author-s4-6f302576938a67b2",
-          "pinnedSpan": {
-            "line": 132,
-            "columnStart": 599,
-            "columnEndExclusive": 663,
-            "text": "docs/history/mvp-gap-measure/reports/dry-run-findings.md:129-156"
-          },
-          "headMatchingLines": [
-            133
-          ]
-        },
-        {
-          "id": "author-s4-4676c20acaf7573e",
-          "pinnedSpan": {
-            "line": 134,
-            "columnStart": 337,
-            "columnEndExclusive": 401,
-            "text": "docs/history/mvp-gap-measure/reports/dry-run-findings.md:166-170"
-          },
-          "headMatchingLines": [
-            135
-          ]
-        },
-        {
-          "id": "author-s4-d72e383c7545e538",
-          "pinnedSpan": {
-            "line": 140,
-            "columnStart": 1278,
-            "columnEndExclusive": 1336,
-            "text": "docs/history/worktree-companion-mount-ephemeral/CONTEXT.md"
-          },
-          "headMatchingLines": [
-            141
-          ]
-        },
-        {
-          "id": "author-s4-cdc5db14089ef6ef",
-          "pinnedSpan": {
-            "line": 150,
-            "columnStart": 303,
-            "columnEndExclusive": 316,
+            "line": 49,
+            "columnStart": 224,
+            "columnEndExclusive": 237,
             "text": "docs/history/"
           },
           "headMatchingLines": [
-            22,
-            44,
-            49,
-            117,
-            119,
-            122,
+            14,
+            36,
+            41,
+            116,
+            118,
+            121,
+            126,
             127,
             128,
-            129,
-            133,
-            135,
-            141,
-            151
+            132,
+            134,
+            140,
+            150
+          ]
+        },
+        {
+          "id": "author-s4-929e1de7d7453fd2",
+          "pinnedSpan": {
+            "line": 49,
+            "columnStart": 507,
+            "columnEndExclusive": 520,
+            "text": "docs/history/"
+          },
+          "headMatchingLines": [
+            14,
+            36,
+            41,
+            116,
+            118,
+            121,
+            126,
+            127,
+            128,
+            132,
+            134,
+            140,
+            150
+          ]
+        },
+        {
+          "id": "author-s4-7c7d595e2f389ade",
+          "pinnedSpan": {
+            "line": 49,
+            "columnStart": 673,
+            "columnEndExclusive": 686,
+            "text": "docs/history/"
+          },
+          "headMatchingLines": [
+            14,
+            36,
+            41,
+            116,
+            118,
+            121,
+            126,
+            127,
+            128,
+            132,
+            134,
+            140,
+            150
+          ]
+        },
+        {
+          "id": "author-s4-92d207a36a483d36",
+          "pinnedSpan": {
+            "line": 49,
+            "columnStart": 719,
+            "columnEndExclusive": 744,
+            "text": "docs/history/*/CONTEXT.md"
+          },
+          "headMatchingLines": [
+            41,
+            116
+          ]
+        },
+        {
+          "id": "author-s4-52877e7c60f16d3d",
+          "pinnedSpan": {
+            "line": 49,
+            "columnStart": 1069,
+            "columnEndExclusive": 1082,
+            "text": "docs/history/"
+          },
+          "headMatchingLines": [
+            14,
+            36,
+            41,
+            116,
+            118,
+            121,
+            126,
+            127,
+            128,
+            132,
+            134,
+            140,
+            150
           ]
         }
       ],
@@ -6966,7 +6868,7 @@
       },
       "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "pinnedHash": "d94c78e4c02c9c2f503be14358448525e2863c87480a88e5ff4dad227dbeb3fa",
-      "headHash": "c1fc958e747bf67fa4004936aa1c2a7ecc12651459d8d19e4fc39a7bd45446a2",
+      "headHash": "8a71b44d68256de1695838acd499542f616e53f287cd7ce59108cd1638991294",
       "movedSpans": [
         {
           "id": "dynamic-007909",
@@ -7379,7 +7281,7 @@
             "text": "\n  // Addon load and first call: one fresh process each.\n  {\n    const repo = bareRepo(path.join(root, 'load.git'));\n    const probe = () => JSON.parse(execFileSync(process.execPath, [SELF, 'load-probe', '--descriptor', descriptor, '--state', state, '--repo', repo], { encoding: 'utf8' }));\n    for (let i = 0; i < 5; i++) probe();\n    const runs = Array.from({ length: 50 }, probe);"
           },
           "headMatchingLines": [
-            498
+            529
           ]
         },
         {
@@ -7389,7 +7291,7 @@
             "text": "  }\n\n  const { index, loader } = await loaders(descriptor);\n  const open = (repo, reference) => index.createGitPublication({ stateRoot: state, repoPath: repo, trustedMain: repo, reference, writer: WRITER }, loader);\n\n  // The Publication rows own Rust handles. This row deliberately acquires a\n  // Node handle and lends it through the opaque addon path on every Git call."
           },
           "headMatchingLines": [
-            506
+            537
           ]
         },
         {
@@ -7399,7 +7301,7 @@
             "text": "  }\n\n  const { index, loader } = await loaders(descriptor);\n  const open = (repo, reference) => index.createGitPublication({ stateRoot: state, repoPath: repo, trustedMain: repo, reference, writer: WRITER }, loader);\n\n  // The Publication rows own Rust handles. This row deliberately acquires a\n  // Node handle and lends it through the opaque addon path on every Git call."
           },
           "headMatchingLines": [
-            506
+            537
           ]
         },
         {
@@ -7417,7 +7319,7 @@
             "text": "  // Today's Node writer shape (one execFileSync git per step) on the same disk:\n  // the \"current Node writers\" comparison and context for the DC tmpfs baseline.\n  {\n    const repo = bareRepo(path.join(root, 'spawn.git'));\n    const raw = (n, fn) => { for (let i = 0; i < 20; i++) fn(i); return stats(Array.from({ length: n }, (_, i) => time(() => fn(i + 20))[0])); };\n    const commits = [];\n    for (let i = 0; i < 221; i++) {"
           },
           "headMatchingLines": [
-            550
+            581
           ]
         },
         {
@@ -7435,7 +7337,7 @@
             "text": "\n  // writeBlob new / existing.\n  {\n    const repo = bareRepo(path.join(root, 'blob.git'));\n    const port = open(repo, 'refs/fgos/events/e3-blob');\n    const blobs = Array.from({ length: samples + 50 }, () => [...crypto.randomBytes(1024)]);\n    blobs.slice(0, 50).forEach(bytes => port.writeBlob({ bytes }));"
           },
           "headMatchingLines": [
-            566
+            597
           ]
         },
         {
@@ -7445,7 +7347,7 @@
             "text": "\n  // compareAndSwap changing, the no-op replay, WAL amplification, retention growth.\n  {\n    const repo = bareRepo(path.join(root, 'cas.git'));\n    const reference = 'refs/fgos/events/e3-cas';\n    const port = open(repo, reference);\n    let tip = null, n = 0;"
           },
           "headMatchingLines": [
-            578
+            609
           ]
         },
         {
@@ -7455,7 +7357,7 @@
             "text": "    let tip = null, n = 0;\n    const done = [];\n    const step = () => {\n      const next = commitFor(port, `cas ${n}`, tip ? [tip] : []);\n      const id = `cas-${n++}`;\n      const [ms, receipt] = time(() => port.compareAndSwap({ expected: tip, next, operationId: id }));\n      if (receipt.attribution !== 'thisInvocationWonCas') throw new Error(`unexpected receipt ${JSON.stringify(receipt)}`);"
           },
           "headMatchingLines": [
-            584
+            615
           ]
         },
         {
@@ -7465,7 +7367,7 @@
             "text": "    const done = [];\n    const step = () => {\n      const next = commitFor(port, `cas ${n}`, tip ? [tip] : []);\n      const id = `cas-${n++}`;\n      const [ms, receipt] = time(() => port.compareAndSwap({ expected: tip, next, operationId: id }));\n      if (receipt.attribution !== 'thisInvocationWonCas') throw new Error(`unexpected receipt ${JSON.stringify(receipt)}`);\n      done.push({ id, expected: tip, next });"
           },
           "headMatchingLines": [
-            585
+            616
           ]
         },
         {
@@ -7475,7 +7377,7 @@
             "text": "      const next = commitFor(port, `cas ${n}`, tip ? [tip] : []);\n      const id = `cas-${n++}`;\n      const [ms, receipt] = time(() => port.compareAndSwap({ expected: tip, next, operationId: id }));\n      if (receipt.attribution !== 'thisInvocationWonCas') throw new Error(`unexpected receipt ${JSON.stringify(receipt)}`);\n      done.push({ id, expected: tip, next });\n      tip = next;\n      return ms;"
           },
           "headMatchingLines": [
-            587
+            618
           ]
         },
         {
@@ -7485,7 +7387,7 @@
             "text": "      return ms;\n    };\n    for (let i = 0; i < 20; i++) step();\n    const wal = path.join(repo, 'fgos/git'), pins = path.join(repo, 'refs/fgos/git-operations');\n    const before = { wal: footprint(wal), pins: footprint(pins) };\n    const casSamples = Number(args.casSamples ?? 300);\n    const changing = Array.from({ length: casSamples }, step);"
           },
           "headMatchingLines": [
-            593
+            624
           ]
         },
         {
@@ -7495,7 +7397,7 @@
             "text": "      return ms;\n    };\n    for (let i = 0; i < 20; i++) step();\n    const wal = path.join(repo, 'fgos/git'), pins = path.join(repo, 'refs/fgos/git-operations');\n    const before = { wal: footprint(wal), pins: footprint(pins) };\n    const casSamples = Number(args.casSamples ?? 300);\n    const changing = Array.from({ length: casSamples }, step);"
           },
           "headMatchingLines": [
-            593
+            624
           ]
         },
         {
@@ -7505,7 +7407,7 @@
             "text": "    say('compareAndSwapRetentionGrowth', windows);\n  }\n  {\n    const repo = bareRepo(path.join(root, 'compacted.git'));\n    const before = footprint(path.join(repo, 'fgos/git'));\n    const result = fixture('compacted', state, repo, '200', WRITER);\n    const after = footprint(path.join(repo, 'fgos/git')), pins = footprint(path.join(repo, 'refs/fgos/git-operations'));"
           },
           "headMatchingLines": [
-            613
+            644
           ]
         },
         {
@@ -7515,7 +7417,7 @@
             "text": "  }\n  {\n    const repo = bareRepo(path.join(root, 'compacted.git'));\n    const before = footprint(path.join(repo, 'fgos/git'));\n    const result = fixture('compacted', state, repo, '200', WRITER);\n    const after = footprint(path.join(repo, 'fgos/git')), pins = footprint(path.join(repo, 'refs/fgos/git-operations'));\n    say('walAmplificationAfterRustCompaction', { operations: 200, walBytesPerOp: (after.bytes - before.bytes) / 200, walInodesPerOp: (after.inodes - before.inodes) / 200, pinInodesLeft: pins.inodes, compactMsPerOp: result.compactMs / 200 });"
           },
           "headMatchingLines": [
-            614
+            645
           ]
         },
         {
@@ -7541,7 +7443,7 @@
             "text": "  // /proc lists only the probe's own processes.\n  {\n    const condition = (prefix) => {\n      const repo = bareRepo(path.join(root, `rust-port-${prefix.length ? 'pidns' : 'host'}.git`));\n      const command = [...prefix, artifacts.fixture, 'port', state, repo, '100', WRITER];\n      const raw = JSON.parse(execFileSync(command[0], command.slice(1), { encoding: 'utf8', maxBuffer: 64 << 20 }));\n      return Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, stats(v)]));"
           },
           "headMatchingLines": [
-            625
+            656
           ]
         },
         {
@@ -7551,7 +7453,7 @@
             "text": "  // /proc lists only the probe's own processes.\n  {\n    const condition = (prefix) => {\n      const repo = bareRepo(path.join(root, `rust-port-${prefix.length ? 'pidns' : 'host'}.git`));\n      const command = [...prefix, artifacts.fixture, 'port', state, repo, '100', WRITER];\n      const raw = JSON.parse(execFileSync(command[0], command.slice(1), { encoding: 'utf8', maxBuffer: 64 << 20 }));\n      return Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, stats(v)]));"
           },
           "headMatchingLines": [
-            625
+            656
           ]
         },
         {
@@ -7641,7 +7543,7 @@
             "text": "\n  // Git subprocess count per operation (strace census in a separate process).\n  {\n    const log = path.join(root, 'census.strace');\n    execFileSync('strace', ['-f', '-qq', '-e', 'trace=execve,access,faccessat,faccessat2,fsync,fdatasync', '-o', log, process.execPath, SELF, 'census', '--descriptor', descriptor, '--state', state], { stdio: 'inherit' });\n    const counts = {};\n    let open = null;"
           },
           "headMatchingLines": [
-            639
+            671
           ]
         },
         {
@@ -7651,7 +7553,7 @@
             "text": "\n  // Backlog scan: 10,000 pending operations (Intent records), then the attempt shape.\n  for (const shape of ['intent', 'attempt']) {\n    const repo = bareRepo(path.join(root, `backlog-${shape}.git`));\n    const made = fixture('backlog', repo, '10000', shape, '8');\n    const native = (await import('../../src/git/native.mjs')).loadNativeAddon(loader);\n    for (let i = 0; i < 3; i++) native.inspectGit(state, repo, repo);"
           },
           "headMatchingLines": [
-            664
+            696
           ]
         },
         {
@@ -7661,7 +7563,7 @@
             "text": "\n  // Backlog scan: 10,000 pending operations (Intent records), then the attempt shape.\n  for (const shape of ['intent', 'attempt']) {\n    const repo = bareRepo(path.join(root, `backlog-${shape}.git`));\n    const made = fixture('backlog', repo, '10000', shape, '8');\n    const native = (await import('../../src/git/native.mjs')).loadNativeAddon(loader);\n    for (let i = 0; i < 3; i++) native.inspectGit(state, repo, repo);"
           },
           "headMatchingLines": [
-            664
+            696
           ]
         },
         {
@@ -7679,7 +7581,7 @@
             "text": "    const nodeMs = Array.from({ length: 20 }, () => { const [ms, facts] = time(() => native.inspectGit(state, repo, repo)); last = facts; return ms; });\n    const rust = fixture('scan', repo, '20');\n    const disk = footprint(path.join(repo, 'fgos/git'));\n    say(`backlog-${shape}`, { operations: made.created, recordsPerOperation: made.recordsPerOperation, fixtureSeconds: made.seconds, allocatedBytes: disk.bytes, inodes: disk.inodes, oldestUnresolved: last.journal.oldestUnresolved, nodeInspectGit: stats(nodeMs), complete: last.journal.complete, pendingCount: last.journal.pendingCount, errors: last.journal.errors.length, retainedBytes: last.journal.retainedBytes, rustScan: { ...stats(rust.ms), complete: rust.complete, unresolved: rust.unresolved, errors: rust.errors } });\n  }\n\n  // Reconciliation of 100 interrupted publications through the Node route."
           },
           "headMatchingLines": [
-            672
+            704
           ]
         },
         {
@@ -7689,7 +7591,7 @@
             "text": "\n  // Reconciliation of 100 interrupted publications through the Node route.\n  {\n    const repo = bareRepo(path.join(root, 'reconcile.git'));\n    const made = fixture('interrupted', state, repo, '100', WRITER);\n    const native = (await import('../../src/git/native.mjs')).loadNativeAddon(loader);\n    const pendingBefore = native.inspectGit(state, repo, repo).journal.pendingCount;"
           },
           "headMatchingLines": [
-            677
+            709
           ]
         },
         {
@@ -7699,7 +7601,7 @@
             "text": "      for (const op of made.operations) {\n        const port = open(repo, op.reference);\n        let outcome;\n        try { outcome = `receipt:${port.recover({ operationId: op.id }).attribution}`; } catch (e) { outcome = `error:${errorCode(e)}`; }\n        port.close();\n        const key = `${op.step} -> ${outcome}`;\n        outcomes[key] = (outcomes[key] ?? 0) + 1;"
           },
           "headMatchingLines": [
-            686
+            718
           ]
         },
         {
@@ -7709,7 +7611,7 @@
             "text": "      for (const op of made.operations) {\n        const port = open(repo, op.reference);\n        let outcome;\n        try { outcome = `receipt:${port.recover({ operationId: op.id }).attribution}`; } catch (e) { outcome = `error:${errorCode(e)}`; }\n        port.close();\n        const key = `${op.step} -> ${outcome}`;\n        outcomes[key] = (outcomes[key] ?? 0) + 1;"
           },
           "headMatchingLines": [
-            686
+            718
           ]
         },
         {
@@ -7719,7 +7621,7 @@
             "text": "        let outcome;\n        try { outcome = `receipt:${port.recover({ operationId: op.id }).attribution}`; } catch (e) { outcome = `error:${errorCode(e)}`; }\n        port.close();\n        const key = `${op.step} -> ${outcome}`;\n        outcomes[key] = (outcomes[key] ?? 0) + 1;\n      }\n    });"
           },
           "headMatchingLines": [
-            688
+            720
           ]
         },
         {
@@ -7729,7 +7631,7 @@
             "text": "  // Rollback with a live writer through the real activation door (fgctl, C5).\n  say('rollbackWithLiveProcesses', await rollback(root, artifacts.fgctl, descriptor, index, loader));\n\n  const out = args.out ? path.resolve(args.out) : path.join(root, 'results.json');\n  fs.writeFileSync(out, JSON.stringify(results, null, 2));\n  console.log(out);\n}"
           },
           "headMatchingLines": [
-            699
+            731
           ]
         },
         {
@@ -7739,7 +7641,7 @@
             "text": "  // Rollback with a live writer through the real activation door (fgctl, C5).\n  say('rollbackWithLiveProcesses', await rollback(root, artifacts.fgctl, descriptor, index, loader));\n\n  const out = args.out ? path.resolve(args.out) : path.join(root, 'results.json');\n  fs.writeFileSync(out, JSON.stringify(results, null, 2));\n  console.log(out);\n}"
           },
           "headMatchingLines": [
-            699
+            731
           ]
         },
         {
@@ -7749,7 +7651,7 @@
             "text": "  const { computeArtifactDigest, classifyReleasePath, nativeAddonComponent } = await import('../build-rust-distribution.mjs');\n  const staged = JSON.parse(fs.readFileSync(descriptor, 'utf8'));\n  const addonSource = path.join(staged.releaseRoot, staged.manifest.components.nativeAddon.path);\n  const base = privateDir(path.join(root, 'rollback'));\n  const ws = path.join(base, 'ws');\n  git(['init', '-q', ws]);\n  const state = privateDir(path.join(base, 'state'));"
           },
           "headMatchingLines": [
-            708
+            740
           ]
         },
         {
@@ -7759,7 +7661,7 @@
             "text": "  const staged = JSON.parse(fs.readFileSync(descriptor, 'utf8'));\n  const addonSource = path.join(staged.releaseRoot, staged.manifest.components.nativeAddon.path);\n  const base = privateDir(path.join(root, 'rollback'));\n  const ws = path.join(base, 'ws');\n  git(['init', '-q', ws]);\n  const state = privateDir(path.join(base, 'state'));\n  const sha = (b) => `sha256:${crypto.createHash('sha256').update(b).digest('hex')}`;"
           },
           "headMatchingLines": [
-            709
+            741
           ]
         },
         {
@@ -7769,7 +7671,7 @@
             "text": "  const base = privateDir(path.join(root, 'rollback'));\n  const ws = path.join(base, 'ws');\n  git(['init', '-q', ws]);\n  const state = privateDir(path.join(base, 'state'));\n  const sha = (b) => `sha256:${crypto.createHash('sha256').update(b).digest('hex')}`;\n  // Fixture releases: bin/fgos.mjs hands its argv to this harness, so the live\n  // writer's argv names the payload exactly as an installed release would."
           },
           "headMatchingLines": [
-            711
+            743
           ]
         },
         {
@@ -7779,7 +7681,7 @@
             "text": "  const ws = path.join(base, 'ws');\n  git(['init', '-q', ws]);\n  const state = privateDir(path.join(base, 'state'));\n  const sha = (b) => `sha256:${crypto.createHash('sha256').update(b).digest('hex')}`;\n  // Fixture releases: bin/fgos.mjs hands its argv to this harness, so the live\n  // writer's argv names the payload exactly as an installed release would.\n  const candidate = (name, wal) => {"
           },
           "headMatchingLines": [
-            712
+            744
           ]
         },
         {
@@ -7789,7 +7691,7 @@
             "text": "  // Fixture releases: bin/fgos.mjs hands its argv to this harness, so the live\n  // writer's argv names the payload exactly as an installed release would.\n  const candidate = (name, wal) => {\n    const dir = path.join(base, name);\n    const host = '#!/bin/sh\\nexit 0\\n', legacy = 'const [, , harness] = process.argv; await import(new URL(`file://${harness}`));\\n';\n    fs.mkdirSync(path.join(dir, 'bin'), { recursive: true });\n    fs.mkdirSync(path.join(dir, 'libexec/legacy-node/bin'), { recursive: true });"
           },
           "headMatchingLines": [
-            716
+            748
           ]
         },
         {
@@ -7799,7 +7701,7 @@
             "text": "  // Fixture releases: bin/fgos.mjs hands its argv to this harness, so the live\n  // writer's argv names the payload exactly as an installed release would.\n  const candidate = (name, wal) => {\n    const dir = path.join(base, name);\n    const host = '#!/bin/sh\\nexit 0\\n', legacy = 'const [, , harness] = process.argv; await import(new URL(`file://${harness}`));\\n';\n    fs.mkdirSync(path.join(dir, 'bin'), { recursive: true });\n    fs.mkdirSync(path.join(dir, 'libexec/legacy-node/bin'), { recursive: true });"
           },
           "headMatchingLines": [
-            716
+            748
           ]
         },
         {
@@ -7809,7 +7711,7 @@
             "text": "  // writer's argv names the payload exactly as an installed release would.\n  const candidate = (name, wal) => {\n    const dir = path.join(base, name);\n    const host = '#!/bin/sh\\nexit 0\\n', legacy = 'const [, , harness] = process.argv; await import(new URL(`file://${harness}`));\\n';\n    fs.mkdirSync(path.join(dir, 'bin'), { recursive: true });\n    fs.mkdirSync(path.join(dir, 'libexec/legacy-node/bin'), { recursive: true });\n    fs.writeFileSync(path.join(dir, 'bin/fgos'), host, { mode: 0o755 });"
           },
           "headMatchingLines": [
-            717
+            749
           ]
         },
         {
@@ -7819,7 +7721,7 @@
             "text": "  // writer's argv names the payload exactly as an installed release would.\n  const candidate = (name, wal) => {\n    const dir = path.join(base, name);\n    const host = '#!/bin/sh\\nexit 0\\n', legacy = 'const [, , harness] = process.argv; await import(new URL(`file://${harness}`));\\n';\n    fs.mkdirSync(path.join(dir, 'bin'), { recursive: true });\n    fs.mkdirSync(path.join(dir, 'libexec/legacy-node/bin'), { recursive: true });\n    fs.writeFileSync(path.join(dir, 'bin/fgos'), host, { mode: 0o755 });"
           },
           "headMatchingLines": [
-            717
+            749
           ]
         },
         {
@@ -7829,7 +7731,7 @@
             "text": "  const candidate = (name, wal) => {\n    const dir = path.join(base, name);\n    const host = '#!/bin/sh\\nexit 0\\n', legacy = 'const [, , harness] = process.argv; await import(new URL(`file://${harness}`));\\n';\n    fs.mkdirSync(path.join(dir, 'bin'), { recursive: true });\n    fs.mkdirSync(path.join(dir, 'libexec/legacy-node/bin'), { recursive: true });\n    fs.writeFileSync(path.join(dir, 'bin/fgos'), host, { mode: 0o755 });\n    fs.writeFileSync(path.join(dir, 'libexec/legacy-node/bin/fgos.mjs'), legacy);"
           },
           "headMatchingLines": [
-            718
+            750
           ]
         },
         {
@@ -7839,7 +7741,7 @@
             "text": "    const dir = path.join(base, name);\n    const host = '#!/bin/sh\\nexit 0\\n', legacy = 'const [, , harness] = process.argv; await import(new URL(`file://${harness}`));\\n';\n    fs.mkdirSync(path.join(dir, 'bin'), { recursive: true });\n    fs.mkdirSync(path.join(dir, 'libexec/legacy-node/bin'), { recursive: true });\n    fs.writeFileSync(path.join(dir, 'bin/fgos'), host, { mode: 0o755 });\n    fs.writeFileSync(path.join(dir, 'libexec/legacy-node/bin/fgos.mjs'), legacy);\n    // Both releases carry the addon exactly as the release producer stages it;"
           },
           "headMatchingLines": [
-            719
+            751
           ]
         },
         {
@@ -7849,7 +7751,7 @@
             "text": "    const host = '#!/bin/sh\\nexit 0\\n', legacy = 'const [, , harness] = process.argv; await import(new URL(`file://${harness}`));\\n';\n    fs.mkdirSync(path.join(dir, 'bin'), { recursive: true });\n    fs.mkdirSync(path.join(dir, 'libexec/legacy-node/bin'), { recursive: true });\n    fs.writeFileSync(path.join(dir, 'bin/fgos'), host, { mode: 0o755 });\n    fs.writeFileSync(path.join(dir, 'libexec/legacy-node/bin/fgos.mjs'), legacy);\n    // Both releases carry the addon exactly as the release producer stages it;\n    // only the release-level git-wal-v1 capability tells them apart."
           },
           "headMatchingLines": [
-            720
+            752
           ]
         },
         {
@@ -7859,7 +7761,7 @@
             "text": "    fs.mkdirSync(path.join(dir, 'bin'), { recursive: true });\n    fs.mkdirSync(path.join(dir, 'libexec/legacy-node/bin'), { recursive: true });\n    fs.writeFileSync(path.join(dir, 'bin/fgos'), host, { mode: 0o755 });\n    fs.writeFileSync(path.join(dir, 'libexec/legacy-node/bin/fgos.mjs'), legacy);\n    // Both releases carry the addon exactly as the release producer stages it;\n    // only the release-level git-wal-v1 capability tells them apart.\n    const addonRelative = 'libexec/native/fgos.node';"
           },
           "headMatchingLines": [
-            721
+            753
           ]
         },
         {
@@ -7869,7 +7771,7 @@
             "text": "    fs.copyFileSync(addonSource, path.join(dir, addonRelative));\n    fs.chmodSync(path.join(dir, addonRelative), 0o644);\n    const nativeAddon = nativeAddonComponent(path.join(dir, addonRelative), addonRelative, CHECKOUT);\n    const manifest = { schemaVersion: 1, entries: { fgos: 'bin/fgos' }, capabilities: wal ? ['git-wal-v1'] : [], components: { legacyNode: { root: 'libexec/legacy-node', entry: 'bin/fgos.mjs', digest: sha(legacy) }, nativeAddon }, requires: {}, stateSchemas: { read: ['1'], write: ['1'], migrations: [] }, target: { os: 'linux', arch: 'x64' }, files: [{ path: 'bin/fgos', kind: 'file', digest: sha(host), mode: '755', class: 'immutable-entry' }, { path: 'libexec/legacy-node/bin/fgos.mjs', kind: 'file', digest: sha(legacy), mode: '644', class: 'immutable-runtime' }, { path: addonRelative, kind: 'file', digest: `sha256:${nativeAddon.digest}`, mode: '644', class: classifyReleasePath(addonRelative) }] };\n    fs.writeFileSync(path.join(dir, 'manifest.json'), JSON.stringify({ ...manifest, artifactDigest: computeArtifactDigest(manifest) }));\n    return dir;\n  };"
           },
           "headMatchingLines": [
-            729
+            761
           ]
         },
         {
@@ -7879,7 +7781,7 @@
             "text": "    fs.copyFileSync(addonSource, path.join(dir, addonRelative));\n    fs.chmodSync(path.join(dir, addonRelative), 0o644);\n    const nativeAddon = nativeAddonComponent(path.join(dir, addonRelative), addonRelative, CHECKOUT);\n    const manifest = { schemaVersion: 1, entries: { fgos: 'bin/fgos' }, capabilities: wal ? ['git-wal-v1'] : [], components: { legacyNode: { root: 'libexec/legacy-node', entry: 'bin/fgos.mjs', digest: sha(legacy) }, nativeAddon }, requires: {}, stateSchemas: { read: ['1'], write: ['1'], migrations: [] }, target: { os: 'linux', arch: 'x64' }, files: [{ path: 'bin/fgos', kind: 'file', digest: sha(host), mode: '755', class: 'immutable-entry' }, { path: 'libexec/legacy-node/bin/fgos.mjs', kind: 'file', digest: sha(legacy), mode: '644', class: 'immutable-runtime' }, { path: addonRelative, kind: 'file', digest: `sha256:${nativeAddon.digest}`, mode: '644', class: classifyReleasePath(addonRelative) }] };\n    fs.writeFileSync(path.join(dir, 'manifest.json'), JSON.stringify({ ...manifest, artifactDigest: computeArtifactDigest(manifest) }));\n    return dir;\n  };"
           },
           "headMatchingLines": [
-            729
+            761
           ]
         },
         {
@@ -7889,7 +7791,7 @@
             "text": "    fs.copyFileSync(addonSource, path.join(dir, addonRelative));\n    fs.chmodSync(path.join(dir, addonRelative), 0o644);\n    const nativeAddon = nativeAddonComponent(path.join(dir, addonRelative), addonRelative, CHECKOUT);\n    const manifest = { schemaVersion: 1, entries: { fgos: 'bin/fgos' }, capabilities: wal ? ['git-wal-v1'] : [], components: { legacyNode: { root: 'libexec/legacy-node', entry: 'bin/fgos.mjs', digest: sha(legacy) }, nativeAddon }, requires: {}, stateSchemas: { read: ['1'], write: ['1'], migrations: [] }, target: { os: 'linux', arch: 'x64' }, files: [{ path: 'bin/fgos', kind: 'file', digest: sha(host), mode: '755', class: 'immutable-entry' }, { path: 'libexec/legacy-node/bin/fgos.mjs', kind: 'file', digest: sha(legacy), mode: '644', class: 'immutable-runtime' }, { path: addonRelative, kind: 'file', digest: `sha256:${nativeAddon.digest}`, mode: '644', class: classifyReleasePath(addonRelative) }] };\n    fs.writeFileSync(path.join(dir, 'manifest.json'), JSON.stringify({ ...manifest, artifactDigest: computeArtifactDigest(manifest) }));\n    return dir;\n  };"
           },
           "headMatchingLines": [
-            729
+            761
           ]
         },
         {
@@ -7899,7 +7801,7 @@
             "text": "    fs.chmodSync(path.join(dir, addonRelative), 0o644);\n    const nativeAddon = nativeAddonComponent(path.join(dir, addonRelative), addonRelative, CHECKOUT);\n    const manifest = { schemaVersion: 1, entries: { fgos: 'bin/fgos' }, capabilities: wal ? ['git-wal-v1'] : [], components: { legacyNode: { root: 'libexec/legacy-node', entry: 'bin/fgos.mjs', digest: sha(legacy) }, nativeAddon }, requires: {}, stateSchemas: { read: ['1'], write: ['1'], migrations: [] }, target: { os: 'linux', arch: 'x64' }, files: [{ path: 'bin/fgos', kind: 'file', digest: sha(host), mode: '755', class: 'immutable-entry' }, { path: 'libexec/legacy-node/bin/fgos.mjs', kind: 'file', digest: sha(legacy), mode: '644', class: 'immutable-runtime' }, { path: addonRelative, kind: 'file', digest: `sha256:${nativeAddon.digest}`, mode: '644', class: classifyReleasePath(addonRelative) }] };\n    fs.writeFileSync(path.join(dir, 'manifest.json'), JSON.stringify({ ...manifest, artifactDigest: computeArtifactDigest(manifest) }));\n    return dir;\n  };\n  const oldRelease = candidate('old', false), newRelease = candidate('new', true);"
           },
           "headMatchingLines": [
-            730
+            762
           ]
         },
         {
@@ -7909,7 +7811,7 @@
             "text": "  const oldRelease = candidate('old', false), newRelease = candidate('new', true);\n  const controller = (from) => {\n    const t = performance.now();\n    const r = spawnSync(fgctl, ['upgrade', '--from', from], { cwd: ws, env: { ...process.env, FGOS_STATE_ROOT: state }, encoding: 'utf8' });\n    const detail = (r.stderr || '').trim().split('\\n').pop();\n    return { ok: r.status === 0, ms: performance.now() - t, code: r.status === 0 ? 'completed' : (detail.match(/git-[a-z-]+/)?.[0] ?? detail), detail };\n  };"
           },
           "headMatchingLines": [
-            736
+            768
           ]
         },
         {
@@ -7919,7 +7821,7 @@
             "text": "    const detail = (r.stderr || '').trim().split('\\n').pop();\n    return { ok: r.status === 0, ms: performance.now() - t, code: r.status === 0 ? 'completed' : (detail.match(/git-[a-z-]+/)?.[0] ?? detail), detail };\n  };\n  const init = spawnSync(fgctl, ['init', '--from', oldRelease], { cwd: ws, env: { ...process.env, FGOS_STATE_ROOT: state }, encoding: 'utf8' });\n  if (init.status !== 0) return { error: `fgctl init failed: ${init.stderr}` };\n  const forward = controller(newRelease);\n  if (!forward.ok) return { error: `upgrade to WAL release failed: ${forward.code}` };"
           },
           "headMatchingLines": [
-            740
+            772
           ]
         },
         {
@@ -7929,7 +7831,7 @@
             "text": "    return { ok: r.status === 0, ms: performance.now() - t, code: r.status === 0 ? 'completed' : (detail.match(/git-[a-z-]+/)?.[0] ?? detail), detail };\n  };\n  const init = spawnSync(fgctl, ['init', '--from', oldRelease], { cwd: ws, env: { ...process.env, FGOS_STATE_ROOT: state }, encoding: 'utf8' });\n  if (init.status !== 0) return { error: `fgctl init failed: ${init.stderr}` };\n  const forward = controller(newRelease);\n  if (!forward.ok) return { error: `upgrade to WAL release failed: ${forward.code}` };\n  // The fence must be the one fgctl placed, never a fixture tombstone."
           },
           "headMatchingLines": [
-            741
+            773
           ]
         },
         {
@@ -7939,7 +7841,7 @@
             "text": "  const init = spawnSync(fgctl, ['init', '--from', oldRelease], { cwd: ws, env: { ...process.env, FGOS_STATE_ROOT: state }, encoding: 'utf8' });\n  if (init.status !== 0) return { error: `fgctl init failed: ${init.stderr}` };\n  const forward = controller(newRelease);\n  if (!forward.ok) return { error: `upgrade to WAL release failed: ${forward.code}` };\n  // The fence must be the one fgctl placed, never a fixture tombstone.\n  if (!fs.existsSync(path.join(ws, '.fgos/locks/activation.lock/TOMBSTONE'))) return { error: 'fgctl did not place the activation fence' };\n  fs.mkdirSync(path.join(ws, '.git/fgos/events/locks'), { recursive: true, mode: 0o700 });"
           },
           "headMatchingLines": [
-            743
+            775
           ]
         },
         {
@@ -7949,7 +7851,7 @@
             "text": "  const forward = controller(newRelease);\n  if (!forward.ok) return { error: `upgrade to WAL release failed: ${forward.code}` };\n  // The fence must be the one fgctl placed, never a fixture tombstone.\n  if (!fs.existsSync(path.join(ws, '.fgos/locks/activation.lock/TOMBSTONE'))) return { error: 'fgctl did not place the activation fence' };\n  fs.mkdirSync(path.join(ws, '.git/fgos/events/locks'), { recursive: true, mode: 0o700 });\n  const start = (release, mode, extra = []) => new Promise((resolve, reject) => {\n    const child = spawn(process.execPath, [path.join(release, 'libexec/legacy-node/bin/fgos.mjs'), SELF, mode, '--worktree', fs.realpathSync(ws), ...extra], { cwd: ws, stdio: ['ignore', 'pipe', 'inherit'] });"
           },
           "headMatchingLines": [
-            745
+            777
           ]
         },
         {
@@ -7959,7 +7861,7 @@
             "text": "  if (!forward.ok) return { error: `upgrade to WAL release failed: ${forward.code}` };\n  // The fence must be the one fgctl placed, never a fixture tombstone.\n  if (!fs.existsSync(path.join(ws, '.fgos/locks/activation.lock/TOMBSTONE'))) return { error: 'fgctl did not place the activation fence' };\n  fs.mkdirSync(path.join(ws, '.git/fgos/events/locks'), { recursive: true, mode: 0o700 });\n  const start = (release, mode, extra = []) => new Promise((resolve, reject) => {\n    const child = spawn(process.execPath, [path.join(release, 'libexec/legacy-node/bin/fgos.mjs'), SELF, mode, '--worktree', fs.realpathSync(ws), ...extra], { cwd: ws, stdio: ['ignore', 'pipe', 'inherit'] });\n    child.stdout.once('data', () => resolve(child));"
           },
           "headMatchingLines": [
-            746
+            778
           ]
         },
         {
@@ -7969,7 +7871,7 @@
             "text": "  if (!fs.existsSync(path.join(ws, '.fgos/locks/activation.lock/TOMBSTONE'))) return { error: 'fgctl did not place the activation fence' };\n  fs.mkdirSync(path.join(ws, '.git/fgos/events/locks'), { recursive: true, mode: 0o700 });\n  const start = (release, mode, extra = []) => new Promise((resolve, reject) => {\n    const child = spawn(process.execPath, [path.join(release, 'libexec/legacy-node/bin/fgos.mjs'), SELF, mode, '--worktree', fs.realpathSync(ws), ...extra], { cwd: ws, stdio: ['ignore', 'pipe', 'inherit'] });\n    child.stdout.once('data', () => resolve(child));\n    child.once('error', reject);\n    child.once('exit', (code) => reject(new Error(`${mode} exited early: ${code}`)));"
           },
           "headMatchingLines": [
-            748
+            780
           ]
         },
         {
@@ -7979,7 +7881,7 @@
             "text": "  fs.mkdirSync(path.join(ws, '.git/fgos/events/locks'), { recursive: true, mode: 0o700 });\n  const start = (release, mode, extra = []) => new Promise((resolve, reject) => {\n    const child = spawn(process.execPath, [path.join(release, 'libexec/legacy-node/bin/fgos.mjs'), SELF, mode, '--worktree', fs.realpathSync(ws), ...extra], { cwd: ws, stdio: ['ignore', 'pipe', 'inherit'] });\n    child.stdout.once('data', () => resolve(child));\n    child.once('error', reject);\n    child.once('exit', (code) => reject(new Error(`${mode} exited early: ${code}`)));\n  });"
           },
           "headMatchingLines": [
-            749
+            781
           ]
         },
         {
@@ -7989,7 +7891,7 @@
             "text": "    const child = spawn(process.execPath, [path.join(release, 'libexec/legacy-node/bin/fgos.mjs'), SELF, mode, '--worktree', fs.realpathSync(ws), ...extra], { cwd: ws, stdio: ['ignore', 'pipe', 'inherit'] });\n    child.stdout.once('data', () => resolve(child));\n    child.once('error', reject);\n    child.once('exit', (code) => reject(new Error(`${mode} exited early: ${code}`)));\n  });\n  const stopChild = (child) => new Promise((resolve) => { child.removeAllListeners('exit'); if (child.exitCode !== null || child.signalCode !== null) return resolve(); child.once('exit', resolve); child.kill('SIGTERM'); });\n  const log = path.join(base, 'writer.jsonl');"
           },
           "headMatchingLines": [
-            751
+            783
           ]
         },
         {
@@ -7999,7 +7901,7 @@
             "text": "    child.once('error', reject);\n    child.once('exit', (code) => reject(new Error(`${mode} exited early: ${code}`)));\n  });\n  const stopChild = (child) => new Promise((resolve) => { child.removeAllListeners('exit'); if (child.exitCode !== null || child.signalCode !== null) return resolve(); child.once('exit', resolve); child.kill('SIGTERM'); });\n  const log = path.join(base, 'writer.jsonl');\n  const reference = 'refs/fgos/events/e3-rollback';\n  const live = await start(newRelease, 'writer', ['--descriptor', descriptor, '--state', privateDir(path.join(base, 'writer-state')), '--repo', fs.realpathSync(ws), '--ref', reference, '--log', log]);"
           },
           "headMatchingLines": [
-            753
+            785
           ]
         },
         {
@@ -8009,7 +7911,7 @@
             "text": "    child.once('exit', (code) => reject(new Error(`${mode} exited early: ${code}`)));\n  });\n  const stopChild = (child) => new Promise((resolve) => { child.removeAllListeners('exit'); if (child.exitCode !== null || child.signalCode !== null) return resolve(); child.once('exit', resolve); child.kill('SIGTERM'); });\n  const log = path.join(base, 'writer.jsonl');\n  const reference = 'refs/fgos/events/e3-rollback';\n  const live = await start(newRelease, 'writer', ['--descriptor', descriptor, '--state', privateDir(path.join(base, 'writer-state')), '--repo', fs.realpathSync(ws), '--ref', reference, '--log', log]);\n  const attempts = [];"
           },
           "headMatchingLines": [
-            754
+            786
           ]
         },
         {
@@ -8019,7 +7921,7 @@
             "text": "  const stopChild = (child) => new Promise((resolve) => { child.removeAllListeners('exit'); if (child.exitCode !== null || child.signalCode !== null) return resolve(); child.once('exit', resolve); child.kill('SIGTERM'); });\n  const log = path.join(base, 'writer.jsonl');\n  const reference = 'refs/fgos/events/e3-rollback';\n  const live = await start(newRelease, 'writer', ['--descriptor', descriptor, '--state', privateDir(path.join(base, 'writer-state')), '--repo', fs.realpathSync(ws), '--ref', reference, '--log', log]);\n  const attempts = [];\n  for (let i = 0; i < 20; i++) {\n    const back = controller(oldRelease);"
           },
           "headMatchingLines": [
-            756
+            788
           ]
         },
         {
@@ -8029,7 +7931,7 @@
             "text": "  const attempts = [];\n  for (let i = 0; i < 20; i++) {\n    const back = controller(oldRelease);\n    attempts.push({ direction: 'rollback-to-non-wal-release', ...back });\n    if (back.ok) attempts.push({ direction: 'forward-to-wal-release', ...controller(newRelease) });\n  }\n  await stopChild(live);"
           },
           "headMatchingLines": [
-            760
+            792
           ]
         },
         {
@@ -8039,7 +7941,7 @@
             "text": "  for (let i = 0; i < 20; i++) {\n    const back = controller(oldRelease);\n    attempts.push({ direction: 'rollback-to-non-wal-release', ...back });\n    if (back.ok) attempts.push({ direction: 'forward-to-wal-release', ...controller(newRelease) });\n  }\n  await stopChild(live);\n  // With the WAL quiescent, a live payload whose release lacks git-wal-v1"
           },
           "headMatchingLines": [
-            761
+            793
           ]
         },
         {
@@ -8049,7 +7951,7 @@
             "text": "  const refusedForUnproven = controller(oldRelease);\n  await stopChild(unproven);\n  const receipts = fs.readFileSync(log, 'utf8').trim().split('\\n').map(l => JSON.parse(l));\n  const port = index.createGitPublication({ stateRoot: privateDir(path.join(base, 'verify-state')), repoPath: fs.realpathSync(ws), trustedMain: fs.realpathSync(ws), reference, writer: WRITER }, loader);\n  let lost = 0;\n  // Recover observes the durable receipt without replaying a publication.\n  for (const r of receipts) {"
           },
           "headMatchingLines": [
-            770
+            802
           ]
         },
         {
@@ -8059,7 +7961,7 @@
             "text": "  const refusedForUnproven = controller(oldRelease);\n  await stopChild(unproven);\n  const receipts = fs.readFileSync(log, 'utf8').trim().split('\\n').map(l => JSON.parse(l));\n  const port = index.createGitPublication({ stateRoot: privateDir(path.join(base, 'verify-state')), repoPath: fs.realpathSync(ws), trustedMain: fs.realpathSync(ws), reference, writer: WRITER }, loader);\n  let lost = 0;\n  // Recover observes the durable receipt without replaying a publication.\n  for (const r of receipts) {"
           },
           "headMatchingLines": [
-            770
+            802
           ]
         },
         {
@@ -8069,7 +7971,7 @@
             "text": "  const refusedForUnproven = controller(oldRelease);\n  await stopChild(unproven);\n  const receipts = fs.readFileSync(log, 'utf8').trim().split('\\n').map(l => JSON.parse(l));\n  const port = index.createGitPublication({ stateRoot: privateDir(path.join(base, 'verify-state')), repoPath: fs.realpathSync(ws), trustedMain: fs.realpathSync(ws), reference, writer: WRITER }, loader);\n  let lost = 0;\n  // Recover observes the durable receipt without replaying a publication.\n  for (const r of receipts) {"
           },
           "headMatchingLines": [
-            770
+            802
           ]
         },
         {
@@ -8095,7 +7997,7 @@
             "text": "  const journal = native.inspectGit(state, fs.realpathSync(ws), fs.realpathSync(ws)).journal;\n  const tally = {};\n  for (const a of attempts) tally[`${a.direction}: ${a.code}`] = (tally[`${a.direction}: ${a.code}`] ?? 0) + 1;\n  return { liveWriterReceipts: receipts.length, attempts: tally, controllerMs: stats(attempts.map(a => a.ms)), unprovenLivePayload: { outcome: refusedForUnproven.code, namesThatPid: refusedForUnproven.detail.includes(`pid ${unproven.pid} `) }, lostOrMismatchedReceipts: lost, tipMatchesLastReceipt: tipMatches, walScan: { complete: journal.complete, pending: journal.pendingCount, errors: journal.errors.length } };\n}\n\nconst at = process.argv.indexOf(SELF);"
           },
           "headMatchingLines": [
-            782
+            814
           ]
         },
         {

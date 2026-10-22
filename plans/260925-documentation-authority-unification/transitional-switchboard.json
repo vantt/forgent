@@ -1207,21 +1207,21 @@
       "scopeSummary": "Candidate platform-wide contract collection; existing source authority is unchanged."
     },
     {
-      "area": "Session Identity",
+      "area": "Identity — local writer (section 7a)",
       "authorityStatus": "candidate",
       "fileClasses": [
         "maintained-authority"
       ],
-      "entryPoint": "docs/platform/session-identity/spec.md",
+      "entryPoint": "docs/platform/identity/spec.md#7a-local-session-writer-id",
       "currentRoutes": [
         {
-          "route": "docs/platform/session-identity/**",
+          "route": "docs/platform/identity/spec.md",
           "authorityStatus": "candidate",
           "scope": "candidate-transformation",
           "role": "Candidate placement only; retained source authority and existing area status are unchanged."
         }
       ],
-      "scopeSummary": "Candidate Session Identity component specification; attribution contract owned by this component, without platform cutover or authority promotion."
+      "scopeSummary": "Candidate local writer attribution specification, now contained in Identity section 7a after merge 66b637a10 / rename 9fdaac9ba; no platform cutover or authority promotion."
     }
   ],
   "rootDocuments": [

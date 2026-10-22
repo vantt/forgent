@@ -1,0 +1,197 @@
+{
+  "inputHEAD": "75866f28a577b5687de833c1c272fc46c5b79cfc",
+  "status": "done: authorized merge/docs accounting and both pilot rebinds complete; inherited global drift explicitly carried",
+  "changedPaths": [
+    "CHANGELOG.md",
+    "docs/platform/identity/spec.md",
+    "docs/platform/observe/spec.md",
+    "docs/platform/work-state/contracts/cli-io-contract.md",
+    "docs/reading-map.md",
+    "packages/git/contracts/mutation-census.v1.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-holder-lock-predecessor.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+    "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-binding-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-census.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-deferred-rebinds.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-merge-accounting.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-merge-rebindings.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-out-of-scope-binding.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-pair-accounting.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-ratchet-tests.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-ratchet.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-retired-candidate-carries.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-verification.json",
+    "plans/260925-documentation-authority-unification/transitional-switchboard.json",
+    "scripts/check-legacy-docs-ratchet.exceptions.json"
+  ],
+  "outsideScopeWrites": [],
+  "switchboardChangedRows": [
+    21
+  ],
+  "candidateStatusPreserved": true,
+  "step345PinnedRecordsUnchanged": true,
+  "sourceAndNativeIdentityFieldsUnchanged": true,
+  "reboundAfterRowsExactlyMatchCurrentLedger": 139,
+  "retiredCandidateFileCount": 374,
+  "retiredCandidateRecordCount": 3005,
+  "retiredCandidateUnitMapCount": 28,
+  "everyRetirementCatalogFileHashMatchesFinalBytes": true,
+  "ratchet": {
+    "exit": 0,
+    "tests": 28,
+    "passed": 28,
+    "failed": 0
+  },
+  "evidenceRelocation": {
+    "exit": 0,
+    "entries": 867,
+    "violations": 0
+  },
+  "candidateMetadataAndLinks": {
+    "exit": 0,
+    "checked": 217,
+    "findings": 0
+  },
+  "step5": {
+    "exit": 0,
+    "files": 1481,
+    "literalReferences": 7223,
+    "dynamicTuples": 39876,
+    "failures": 0,
+    "nonFailingHeadDrift": 405
+  },
+  "pairAccounting": {
+    "appendedEach": 102,
+    "unaccountedAfterEach": 0,
+    "otherManifestBytesUnchanged": true
+  },
+  "globalAudit": {
+    "exit": 1,
+    "targetDigestDrifts": 3,
+    "remainingPilotDrifts": 0,
+    "inheritedPreMergeSetupDrifts": 3,
+    "uncommittedReaderChangeExpected": true,
+    "meaning": "No global green verdict; exactly the three named pre-merge setup/doctor drifts plus uncommitted A/I diagnostics remain."
+  },
+  "oneDoorCensus": {
+    "generatorWroteOutput": true,
+    "commandExit": 1,
+    "sites": 58,
+    "inheritedBranchSites": 53,
+    "mainSites": 5,
+    "scanGreen": false
+  },
+  "preview": {
+    "exit": 1,
+    "reason": "SQLite readonly database, code 8",
+    "url": null
+  },
+  "needsWrites": [],
+  "evidenceHashes": {
+    "CHANGELOG.md": "2e3aa0363c000ca1fad40cdd3dde287736cbfa7cd07e2133144a1f4f96ce4def",
+    "docs/platform/identity/spec.md": "25c8b0b647c07c7874e16bfe3e280db13a79e272eeb54a60579de6da7b517d55",
+    "docs/platform/observe/spec.md": "b80b8324a39a5c1836df1da07ed04780a332eec6731c1f805f5460f363c22723",
+    "docs/platform/work-state/contracts/cli-io-contract.md": "edcde7411de5311e644cbde9eb86f4ef9b6c9f4e0e6d321407cfe8ef1730fe8a",
+    "docs/reading-map.md": "df623495b2a5c1d0de40a66c9ef801091e88bdf76fb46effa4cdf4d0e8e2f54b",
+    "packages/git/contracts/mutation-census.v1.json": "726b6cd2558c6924e68d10f3e842f647d0d698373f74439eaeba00e2b1ca7208",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json": "98123db34d1d896ee2bd4b0fabdf479bc945516459a7d4b60d068913eeb42223",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json": "58591ee0997e688bcfbf50102434b316c105ddf46114d6d17befe3380038fc0e",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json": "7953557436aedca7f2a521d5b969dea1a0e7a62d34ce2520c35eaa84857095a6",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json": "6377b0ddf295a474e7e7f73f37bb678ba133dd984dc3e67a265ce7cefe0948a3",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-holder-lock-predecessor.json": "0448ee7be7e5f120d9407119ff5e59c0653250a154502226ec42a333ec9f306a",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json": "c935107199936454c270460de9085d6faaef70102f1d745fc6ff8fa03ef96910",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json": "18f4603dc9ae8ff9306c4c34027da86615a611cb88512c5b76950a5de7d8ce31",
+    "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json": "7ae6bc596a8eb17e5a30898663e9af581a8bdd502a0b4f97514dfd234a56c38c",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json": "95e97a16f3fae05dc87134a9de958af24412ba311d13b1bb25ba6dbaf267d0f0",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json": "db83746db22d0caf581dc7ee95db74f98b0dff1927c18d924c4e8be3b9b32ff1",
+    "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md": "6806d2f005381214c7b107fc84f8eddaf68acd6f572098a418ae96d6753dd51e",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json": "8a44b78c678571a2fe89f11c9f11f0bc5e7aa4561f9c5893eaeefc9cc7244922",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json": "2d62077d936d98f7f364cdb2135bd281d2aa50fc5e9b1d0a9673934f1b269cb6",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-check-result.json": "c4d99819aed1d2432561cbf73a1f44dd806c13e0cd0a377d662f0fe091ef7676",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check-result.json": "c849233439a10daaa40092ae18d7ea996510694a62f0bf8a187b171fcfe0c362",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-binding-check.json": "c1490598b5d55a6bb35c3a34f5d34883e8e9f29c4e3475873fd5881bc28ab3a9",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-census.log": "d5f2f4697d0e137adf7e801ed68ac45e07f957fbf381ed37fef169349f429893",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-deferred-rebinds.json": "68c1ce4befb636ac62a7b1f0fd88a07f03452cc28653a786ce7988a601f3c511",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-merge-accounting.json": "052ae66a6c6772b50490f9a94cabea77c3dabb6c99a79a1623d7827c7df5da38",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-merge-rebindings.json": "3502d7cb169e12e382ce94a881af853192052937a0fad0dbf2208400576d8546",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-out-of-scope-binding.json": "21d64a347ce2b572841b19a155c8ece6f0ae60e26abcb55d28cfd19ba15c87c5",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-pair-accounting.json": "d404d1a1c03b8616310e4b2c9083ea56356a6d844df02224ade3dfceed7cb0cd",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-ratchet-tests.log": "bc87b71ec1bf01b3b9b20b811cf751a9cd3a1efacecc5e3739acb06db4031082",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-ratchet.log": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-112-retired-candidate-carries.json": "2b4a7342c566b807f27f387d2a9a399d9ea9a46f433e287a8b13a487a3282841",
+    "plans/260925-documentation-authority-unification/transitional-switchboard.json": "9a8e82cafbbdc2c39616664d04d92b801e09f1caab4e83a786054a2478edcdee",
+    "scripts/check-legacy-docs-ratchet.exceptions.json": "cbb5dd7f1a7a98b12e7abad666e97f148cb546c60f9bd9e5393518824552cbc6"
+  },
+  "reboundAfterRowsExactlyMatchCurrentPilot": 2,
+  "totalRebindingsApplied": 141,
+  "continuation": {
+    "priorArtifactHashesAllVerifiedBeforeChanges": true,
+    "pilotContentAndNeighbourProof": "step-07-l12-112-out-of-scope-binding.json",
+    "bothUnchangedExtractorsAgree": true,
+    "ledgerAfterRowsAndNeighboursReplayed": 139,
+    "groupCandidateSuccessorsReplayed": 128,
+    "sourceIdentitiesAndHistoricalResidualPreserved": true,
+    "pilotReviewStatus": "pending; approval fields removed",
+    "ratchetReplay": {
+      "exit": 0,
+      "testsPassed": 28
+    },
+    "relocationReplay": {
+      "exit": 0,
+      "entries": 867,
+      "violations": 0
+    },
+    "candidateMetadataReplay": {
+      "exit": 0,
+      "checked": 217,
+      "findings": 0
+    },
+    "pairReplay": {
+      "accountedPairsEach": 4005,
+      "unaccountedPairsEach": 0,
+      "additionalPairsAppended": 0,
+      "onlyOriginalManifestInsertionsReproducedAgainstHEAD": true
+    },
+    "step5Replay": {
+      "exit": 0,
+      "files": 1481,
+      "literalReferences": 7223,
+      "dynamicTuples": 39876,
+      "failureCount": 0,
+      "nonFailingHeadDrift": 405,
+      "headCommit": "75866f28a577b5687de833c1c272fc46c5b79cfc"
+    },
+    "bindingReplaySha256": "6e423ff32ef6b36dfd24556854ab031f8d62b662582f9c74c80e0ab2293366c3",
+    "freshCensusOriginProof": {
+      "branchSites": 53,
+      "mainSites": 5,
+      "currentSites": 58,
+      "unionOfInheritedSitesMatchesIgnoringRelocatedLineNumbers": true
+    },
+    "freshConflictProof": {
+      "mainCommitInventory": 123,
+      "changelogParentLinesPreservedInOrder": true,
+      "migrationIdentityAndObserveLinksVerified": true,
+      "standaloneSpecDeletedInMainAndMerge": true
+    },
+    "switchboardRecheckedChangedLeaves": [
+      "areas/21/area",
+      "areas/21/entryPoint",
+      "areas/21/scopeSummary",
+      "areas/21/currentRoutes/0/route"
+    ]
+  }
+}

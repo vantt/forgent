@@ -89,8 +89,8 @@ hai nằm NGOÀI hợp đồng này.
   `unresolved` (không nguồn nào xác nhận được — `id` vẫn là
   pid của chính tiến trình gọi, KHÔNG rỗng, KHÔNG vắng khoá; chỉ nhãn
   `source` nói giá trị chưa kiểm chứng được). Luật đầy đủ (thứ tự biến env,
-  giới hạn đã biết) chỉ nằm ở [spec Session Identity](../../session-identity/spec.md);
-  nguồn duy nhất là crate Rust `fgos-session-identity`.
+  giới hạn đã biết) chỉ nằm ở [spec Session Identity](../../identity/spec.md);
+  nguồn duy nhất là crate Rust `fgos-identity`.
 
 ### Writer Resolution Rules
 
