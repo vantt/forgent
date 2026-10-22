@@ -123,11 +123,9 @@ fn admission_with_land<F: wal::FileSystem>(
     resources: &[String],
     land_binding: Option<(&str, &GitDriver, &RepoHandle)>,
 ) -> Result<()> {
-    let scan = wal.scan(100_000).map_err(failure)?;
-    if !scan.complete || scan.entries.iter().any(|e| e.error.is_some()) {
-        return Err(recovery("git-wal-unreadable"));
-    }
-    for chain in wal.active(100_000).map_err(failure)? {
+    // One read: `active` fails closed on a corrupt or truncated chain, on the bound, on a
+    // stray entry and on a pre-intent artifact.
+    for chain in wal.active(100_000).map_err(|_| recovery("git-wal-unreadable"))? {
         let exempt = if let Some((binding, driver, repo)) = land_binding {
             if binding == chain.intent().authority_binding
                 && matches!(&chain.intent().kind, OperationKind::Land(_))

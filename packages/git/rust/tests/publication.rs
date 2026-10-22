@@ -1043,12 +1043,25 @@ fn remote_unknown_recovery_never_resends_and_corrupt_backlog_never_clears_admiss
             &repo,
             &reference(),
             &ExpectedTip::Oid(a.clone()),
-            &ExpectedTip::Oid(a),
+            &ExpectedTip::Oid(a.clone()),
             "blocked",
         )
         .unwrap_err();
     assert!(result.cause.starts_with("publication-backlog-unreadable"));
     assert!(!root.join("fgos/git/operations/blocked").exists());
+    // The Refs port refuses the same corrupt directory by the same evidence, before any record.
+    let refs = driver
+        .ensure_branch(
+            &repo,
+            vec![],
+            &RefName::parse("refs/heads/blocked").unwrap(),
+            &a,
+            "fixture",
+            "refs-blocked",
+        )
+        .unwrap_err();
+    assert_eq!(refs.cause, "git-wal-unreadable");
+    assert!(!root.join("fgos/git/operations/refs-blocked").exists());
 }
 
 #[test]
@@ -1189,10 +1202,23 @@ fn historical_ledger_over_admission_bound_does_not_block_new_publication() {
         &repo,
         &reference(),
         &ExpectedTip::Oid(a.clone()),
-        &ExpectedTip::Oid(a),
+        &ExpectedTip::Oid(a.clone()),
         "after-history",
     )
     .unwrap();
+    // The Refs port reads the same history once, through `active`, so the 100 000 ledger entries
+    // that `scan` counts toward its bound do not refuse it either.
+    drop(port);
+    driver
+        .ensure_branch(
+            &repo,
+            vec![],
+            &RefName::parse("refs/heads/after-history").unwrap(),
+            &a,
+            "fixture",
+            "refs-after-history",
+        )
+        .expect("a ref change under a 100 000-entry ledger");
 }
 
 #[test]

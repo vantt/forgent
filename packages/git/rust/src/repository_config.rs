@@ -203,11 +203,7 @@ impl GitDriver {
             wal::canonical_digest(&("hooksConfig", hooks_request))
         }
         .map_err(error)?;
-        let scan = wal.scan(100_000).map_err(error)?;
-        if !scan.complete || scan.entries.iter().any(|e| e.error.is_some()) {
-            return Err(error("git-wal-unreadable"));
-        }
-        for chain in wal.active(100_000).map_err(error)? {
+        for chain in wal.active(100_000).map_err(|_| error("git-wal-unreadable"))? {
             if let OperationKind::ConfigChange(change) = &chain.intent().kind {
                 authority
                     .validate_publication_borrow(chain.intent())
