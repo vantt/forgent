@@ -1200,9 +1200,11 @@ hoặc run dir nếu không có assignment) chỉ-đọc; các mount nằm dư�
 home); cuối cùng `--remount-ro` trên các mask. Hidden root là dữ liệu của contract
 (`BLIND_HIDDEN_ROOTS`), không phải code của driver: `{fgosDir}/assignments`,
 `{fgosDir}/workflow-runs`, `{fgosDir}/dispatch-runs` của project dispatch đang chạy,
-`{fgosDir}/runtime/mailbox` (record thư của các phiên agent đang sống; tạo với mode 0700 khi chưa
-có, nếu `.fgos` đã tồn tại, để mask không phụ thuộc bên nào khởi động trước; xem
-`docs/platform/agent-mailbox/spec.md` §8 mục 6), thư mục socket của herdr, và confinement temp
+`{fgosDir}/runtime/mailbox` (record thư của các phiên agent đang sống; chỉ bước launch blind tạo
+nó, mode 0700, khi chưa có và `.fgos` đã tồn tại, để mask không phụ thuộc bên nào khởi động
+trước; phép tra hidden root và phép kiểm tra handoff ref không tạo gì; `.fgos` không nhận được
+thư mục (chỉ-đọc, của người khác, `runtime` là file) thì bỏ qua, root vắng mặt thì không có gì để
+che; xem `docs/platform/agent-mailbox/spec.md` §8 mục 6), thư mục socket của herdr, và confinement temp
 root (private home của dispatch khác, chứa transcript agent).
 Resource `hidden-root` và `own-assignment` đi vào plan/attestation; attestation ghi thêm
 `requested.override`, `effectiveControls.hostRead: blind` và `hiddenRoots`.
