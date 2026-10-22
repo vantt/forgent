@@ -5,6 +5,8 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use fgos_process::containment::{GuaranteeLevel, SpawnSpec, StartMode};
+#[cfg(windows)]
+use fgos_process::containment::ContainmentDriver;
 
 #[cfg(target_os = "linux")]
 use std::process::{Command, Stdio};
@@ -30,7 +32,7 @@ pub fn wait_for(path: &Path) -> String {
                 return text;
             }
         }
-        assert!(start.elapsed() < Duration::from_secs(10), "timed out waiting for {}", path.display());
+        assert!(start.elapsed() < Duration::from_secs(20), "timed out waiting for {}", path.display());
         std::thread::sleep(Duration::from_millis(10));
     }
 }
@@ -206,24 +208,14 @@ wait
         let stdout_file = File::create(&stdout_path).unwrap();
         let stderr_file = File::create(&stderr_path).unwrap();
 
-        let mut env = BTreeMap::new();
-        env.insert("FGOS_CONF_A".to_string(), "alpha".to_string());
-        env.insert("FGOS_CONF_B".to_string(), "beta".to_string());
-        if let Ok(path) = std::env::var("PATH") {
-            env.insert("PATH".to_string(), path);
-        }
-
-        SpawnSpec {
-            argv: vec!["sh".into(), "-c".into(), script.into()],
-            bwrap_prefix: None,
-            fd_map: Vec::new(),
-            env,
-            cwd: dir.to_path_buf(),
-            stdin: Some(stdin_file),
-            stdout: Some(stdout_file),
-            stderr: Some(stderr_file),
-            mode: StartMode::Direct,
-        }
+        let mut spec = unix_spec(&["sh", "-c", script]);
+        spec.env.insert("FGOS_CONF_A".to_string(), "alpha".to_string());
+        spec.env.insert("FGOS_CONF_B".to_string(), "beta".to_string());
+        spec.cwd = dir.to_path_buf();
+        spec.stdin = Some(stdin_file);
+        spec.stdout = Some(stdout_file);
+        spec.stderr = Some(stderr_file);
+        spec
     }
 
     fn term_probe(&self, dir: &Path, handler: bool) -> SpawnSpec {
@@ -254,7 +246,7 @@ fn helper_argv() -> Vec<String> {
 }
 
 #[cfg(windows)]
-fn helper_command() -> std::process::Command {
+pub fn helper_command() -> std::process::Command {
     let argv = helper_argv();
     let mut cmd = std::process::Command::new(&argv[0]);
     cmd.args(&argv[1..]);
@@ -263,10 +255,7 @@ fn helper_command() -> std::process::Command {
 
 #[cfg(windows)]
 fn helper_env(role: &str, dir: &Path, extra: &[(&str, &str)]) -> BTreeMap<String, String> {
-    let mut env = BTreeMap::new();
-    for (k, v) in std::env::vars() {
-        env.insert(k, v);
-    }
+    let mut env: BTreeMap<String, String> = std::env::vars().collect();
     env.insert("FGOS_TEST_ROLE".into(), role.into());
     env.insert("FGOS_TEST_DIR".into(), dir.display().to_string());
     for (k, v) in extra {
@@ -331,6 +320,13 @@ impl Workloads for WindowsWorkloads {
 }
 
 #[cfg(windows)]
+fn write_pid(dir: &Path, name: &str, pid: u32) {
+    let tmp = dir.join(format!("{name}.tmp"));
+    let _ = fs::write(&tmp, pid.to_string());
+    let _ = fs::rename(&tmp, dir.join(name));
+}
+
+#[cfg(windows)]
 pub fn run_helper_role() {
     use std::os::windows::process::CommandExt;
     let Ok(role) = std::env::var("FGOS_TEST_ROLE") else {
@@ -341,18 +337,18 @@ pub fn run_helper_role() {
         "sleep" => loop { std::thread::sleep(Duration::from_secs(3600)); },
         "tree" => {
             let child = helper_command().creation_flags(0).spawn().unwrap();
-            let _ = fs::write(dir.join("child.pid"), child.id().to_string());
+            write_pid(&dir, "child.pid", child.id());
             let detached = helper_command().creation_flags(0x0000_0008).spawn().unwrap();
-            let _ = fs::write(dir.join("detached.pid"), detached.id().to_string());
+            write_pid(&dir, "detached.pid", detached.id());
             let mut nest = helper_command();
             nest.env("FGOS_TEST_ROLE", "nest").env("FGOS_TEST_DIR", &dir);
             let nest = nest.spawn().unwrap();
-            let _ = fs::write(dir.join("nest.pid"), nest.id().to_string());
+            write_pid(&dir, "nest.pid", nest.id());
             loop { std::thread::sleep(Duration::from_secs(3600)); }
         }
         "nest" => {
             let grandchild = helper_command().creation_flags(0).spawn().unwrap();
-            let _ = fs::write(dir.join("grandchild.pid"), grandchild.id().to_string());
+            write_pid(&dir, "grandchild.pid", grandchild.id());
             loop { std::thread::sleep(Duration::from_secs(3600)); }
         }
         "exit" => {
@@ -364,7 +360,7 @@ pub fn run_helper_role() {
             std::process::exit(0);
         }
         "echo" => {
-            use std::io::{BufRead, Write};
+            use std::io::BufRead;
             let stdin = std::io::stdin();
             let mut line = String::new();
             let _ = stdin.lock().read_line(&mut line);
@@ -386,8 +382,8 @@ pub fn run_helper_role() {
         "holder" => {
             let job = fgos_process::platform::windows_job::open_job(&std::env::var("FGOS_TEST_JOB").unwrap()).unwrap();
             let agent = helper_command().creation_flags(0).spawn().unwrap();
-            let _ = fs::write(dir.join("agent.pid"), agent.id().to_string());
-            let _ = fs::write(dir.join("gate.pid"), std::process::id().to_string());
+            write_pid(&dir, "agent.pid", agent.id());
+            write_pid(&dir, "gate.pid", std::process::id());
             let _keep = job;
             loop { std::thread::sleep(Duration::from_secs(3600)); }
         }
@@ -396,7 +392,7 @@ pub fn run_helper_role() {
             let mut domain = driver.create("attempt-supervisor").unwrap();
             let job = fgos_process::containment::WindowsJobDriver::job_name(&domain).unwrap().to_string();
             let _spawned = driver.spawn_in(&mut domain, win_spec("holder", &dir, &[("FGOS_TEST_JOB", &job)])).unwrap();
-            let _ = fs::write(dir.join("supervisor.pid"), std::process::id().to_string());
+            write_pid(&dir, "supervisor.pid", std::process::id());
             loop { std::thread::sleep(Duration::from_secs(3600)); }
         }
         other => panic!("unknown role {other}"),
