@@ -26,6 +26,18 @@ Máy owner có thể vẫn chạy `653affd6…` (Git 07–08), vì bản [12:36]
 
 Lock protocol vẫn là 2. Activate thì vẫn dừng toàn bộ như mọi lần, theo yêu cầu của T0.
 
+## Cập nhật 2026-10-22 09:05: main giờ có cả SEAT
+
+Build từ main hiện tại (`ef273d860` hoặc mới hơn) sẽ kéo theo cả thay đổi Seat Binding (SEAT). Máy thứ hai đã land bản đó lúc 08:57; xem [báo cáo của HARDEN](landing-261022-0904-harden-seat-release-this-machine.md). So với các bước bên dưới, có ba chỗ khác:
+
+- **Bước 4 và bước 7:** `fgos setup` chuyển `.fgos/config.json` sang dạng SEAT (ví dụ xoá `runner.rigorToTier`), nên hash của `.fgos/config.json` sẽ đổi. Đó là thay đổi có chủ đích. Hash của `AGENTS.md`, `CLAUDE.md`, `.claude/settings.json` và `~/.fgos/config.json` vẫn phải giữ nguyên.
+- **Bước 9:** chuyển config có thể sửa key của `runner`. Chỉ dừng khi setup thêm key mới không liên quan tới SEAT.
+- **Rollback:** ngoài `fgctl upgrade` về release cũ, phải chép lại `.fgos/config.json` từ bản sao lưu, vì release trước SEAT không đọc được config dạng SEAT.
+
+Nên hỏi phiên SEAT trên máy owner (`forgentx-95`) trước khi chạy. Phiên đó cũng nên đọc dòng board 08:30 của TEST, về một project mới khởi tạo có thể không dispatch được.
+
+Doctor có thể còn cảnh báo `lock-fences` về đường dẫn `workflow-runs/*` cũ chưa có fence. Đây chỉ là thông tin; row này sẽ bị xoá ở HARDEN T1.
+
 ## Các bước
 
 Làm ở cả ba workspace, trừ chỗ có ghi khác. Thứ tự là thứ tự của hướng dẫn T0, thêm phần kiểm của Git.

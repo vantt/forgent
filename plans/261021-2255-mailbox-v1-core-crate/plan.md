@@ -1,7 +1,7 @@
 ---
 title: "Mailbox V1: the pure core crate fgos-mailbox-core"
 description: "Build rung V1 of the Agent Mailbox ladder: the serde-only Rust crate fgos-mailbox-core (envelope, registry and generations, name resolution, state machine with lazy sweep, channel policies, effective wake, bounded counters, peer frame and body escape), proven by cargo test -p fgos-mailbox-core, on branch mailbox/v1-v3 only."
-status: pending
+status: completed
 priority: P2
 effort: ~3.5d (8 phases, strictly sequential)
 branch: main (plan only); all code on branch mailbox/v1-v3 in linked worktree ../forgent-mailbox, never merged to main until feasibility is proven
@@ -41,14 +41,14 @@ Run this **at the start of every phase, at the end of every phase, and immediate
 
 | # | Phase | Proof | Status |
 |---|---|---|---|
-| 1 | [Worktree, crate skeleton, limits contract, purity lint](phase-01-worktree-crate-skeleton-and-limits-contract.md) | crate builds; contract ↔ `Limits` agreement test; disallowed-I/O lint bites | pending |
-| 2 | [Identities, registry, generations, short names, resolution](phase-02-identities-registry-and-names.md) | four-row table; generation rules; names | pending |
-| 3 | [Send (plain), claim, emit, finish, inbox view](phase-03-send-claim-finish-state-machine.md) | token and generation checks; duplicate window; inbox read-only | pending |
-| 4 | [Lazy sweep: deadlines, offer cap, record TTL, notices lane, retention](phase-04-sweep-ttl-offer-cap-and-notices.md) | sweep and notice rules | pending |
-| 5 | [Send policies and bounded refusal counters](phase-05-send-policies-and-bounded-counters.md) | size, derived link and depth, budget, lifetime, loop, group, queue; A→B→C→A; snapshot bounded under a refusal flood | pending |
-| 6 | [Effective wake, Stop drain, scripted loop replays](phase-06-effective-wake-stop-drain-and-loop-replays.md) | quota spent at send; Stop selects only effective wake; 6 / 8 / 101 | pending |
-| 7 | [Peer frame and body escape](phase-07-peer-frame-and-body-escape.md) | hostile bodies cannot close, forge or imitate | pending |
-| 8 | [Branch docs, full gates, hand-off](phase-08-branch-docs-gates-and-handoff.md) | workspace cargo gates and `npm test` green on the branch | pending |
+| 1 | [Worktree, crate skeleton, limits contract, purity lint](phase-01-worktree-crate-skeleton-and-limits-contract.md) | crate builds; contract ↔ `Limits` agreement test; disallowed-I/O lint bites | done (branch `mailbox/v1-v3`) |
+| 2 | [Identities, registry, generations, short names, resolution](phase-02-identities-registry-and-names.md) | four-row table; generation rules; names | done (branch `mailbox/v1-v3`) |
+| 3 | [Send (plain), claim, emit, finish, inbox view](phase-03-send-claim-finish-state-machine.md) | token and generation checks; duplicate window; inbox read-only | done (branch `mailbox/v1-v3`) |
+| 4 | [Lazy sweep: deadlines, offer cap, record TTL, notices lane, retention](phase-04-sweep-ttl-offer-cap-and-notices.md) | sweep and notice rules | done (branch `mailbox/v1-v3`) |
+| 5 | [Send policies and bounded refusal counters](phase-05-send-policies-and-bounded-counters.md) | size, derived link and depth, budget, lifetime, loop, group, queue; A→B→C→A; snapshot bounded under a refusal flood | done (branch `mailbox/v1-v3`) |
+| 6 | [Effective wake, Stop drain, scripted loop replays](phase-06-effective-wake-stop-drain-and-loop-replays.md) | quota spent at send; Stop selects only effective wake; 6 / 8 / 101 | done (branch `mailbox/v1-v3`) |
+| 7 | [Peer frame and body escape](phase-07-peer-frame-and-body-escape.md) | hostile bodies cannot close, forge or imitate | done (branch `mailbox/v1-v3`) |
+| 8 | [Branch docs, full gates, hand-off](phase-08-branch-docs-gates-and-handoff.md) | workspace cargo gates and `npm test` green on the branch | done with deviation: `npm test` has 21 failures, 19 also on main and 2 load-only; branch changes no Node file |
 
 Phases share `src/lib.rs` and `tests/common/mod.rs`, so they run one after another (no parallel leads).
 
