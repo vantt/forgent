@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Documentation: the documentation-cutover lease table now matches the fence-free holder-lock registry row shape.
+
 - Documentation routes for local writer identity now point to Identity; its candidate header retains the writer-attribution scope of section 7a.
 
 - `fgos docs-lease acquire|status|release|abandon` manages a persistent documentation write freeze. Pre-commit and main reference-transaction hooks enforce it, and doctor reports `documentation-cutover-lease`. While held, admission reads the gated repository's main ref and refuses foreign/non-Git callers, non-holder Unit/Workflow execution and scope-touching non-holder runner/Workflow Land; same-repository code-only lands proceed unless their caller is main with a stray token. Workflow resume/answer uses its recorded origin, including when answered from another checkout. Doctor fails and acquire refuses on stray main-token residue; held-lease admission refuses main callers with it as `stray-main-token`. Release reports scope drift and preserves pre-existing main-token bytes, so the owner removes residue by hand after checking. Owner abandon with confirmation and a reason repairs a lost holder or corrupt sidecar.

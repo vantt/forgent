@@ -1,0 +1,122 @@
+{
+  "inputHEAD": "7f375fb019569180e5a99a4ace7ab566867bef6e",
+  "status": "Bounded accounting and lease-table carry complete; current doctor inventory discrepancy explicitly reported outside writable scope.",
+  "scopeChecked": true,
+  "changedPaths": [
+    "CHANGELOG.md",
+    "docs/platform/holder-lock/spec.md",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-holder-lock-predecessor.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-117-binding-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-117-deferred-rebinds.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-117-merge-accounting.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-117-merge-rebindings.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-117-pair-accounting.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-117-ratchet-tests.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-117-ratchet.log",
+    "scripts/check-legacy-docs-ratchet.exceptions.json"
+  ],
+  "outsideScopeWrites": [],
+  "needsWrites": [
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md"
+  ],
+  "whyNeedsWrites": "Current check list retains four removed T1 IDs and omits runner-coordination-orgPolicy-shape; both-parent and live registration witnesses are in merge-accounting. No edit to that file was made.",
+  "step0": {
+    "directChecked": 297,
+    "groupsChecked": 0,
+    "contentRebindings": 8,
+    "shards": 5,
+    "remainingDrift": 0,
+    "independentReview": "pending; no approval carry"
+  },
+  "changedExceptionDigests": [
+    "docs/specs/reading-map.md",
+    "docs/specs/distribution.md",
+    "docs/specs/work-state.md",
+    "docs/specs/seat-binding.md"
+  ],
+  "allOriginalExceptionRationalesAndPolicyFieldsUnchanged": true,
+  "allReboundAfterRowsMatchFinalLedger": true,
+  "evidenceConsumerTableAndRelocationManifestUnchanged": true,
+  "manifestSingleInsertionProofMatchesFinalBytes": true,
+  "pairAccounting": {
+    "appendedEach": 4,
+    "arrayBefore": 4034,
+    "arrayAfter": 4038,
+    "unaccountedEach": 0,
+    "futureRunnerCommitPreAccounted": false
+  },
+  "step5": {
+    "exit": 0,
+    "files": 1481,
+    "references": 7223,
+    "tuples": 39876,
+    "failures": 0,
+    "nonFailingHeadDrift": 473,
+    "headCommit": "7f375fb019569180e5a99a4ace7ab566867bef6e"
+  },
+  "finalChecks": {
+    "ratchet": {
+      "exit": 0,
+      "stdout": "check-legacy-docs-ratchet: clean (997 legacy files checked; 28 accounted edit(s), 3 accounted new file(s))."
+    },
+    "ratchetTests": {
+      "exit": 0,
+      "passed": 28,
+      "failed": 0,
+      "command": "TMPDIR=/tmp/fgos-work/account-ad98c3882 env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "logSha256": "9748b0acd6097480446a18030a466692d1ede490a61c53b8efe26b6e7969ac36"
+    },
+    "relocationBefore": {
+      "exit": 0,
+      "stdout": "[check-evidence-relocation] PASS: before mode verified (867 entries, 0 violations)"
+    },
+    "globalAudit": {
+      "exit": 1,
+      "scratch": "/tmp/fgos-work/p8-audit-2jwl7oz_",
+      "reportSha256": "2445fb211262df65ae2d69c3631808bc473cc5e868fb2681e68272f92f8e595c",
+      "meaning": "Only authorized uncommitted working paths keep A non-green; both ownership recipes exit 0 with zero drift, zero committed unaccounted pairs, B true, H zero, readers equal HEAD, frozen reader baseline unchanged."
+    },
+    "whitespace": {
+      "command": "git diff --check",
+      "exit": 0
+    }
+  },
+  "preview": {
+    "attempted": [
+      "docs/platform/holder-lock/spec.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md"
+    ],
+    "exit": 1,
+    "reason": "SQLite readonly database, error 8",
+    "url": null
+  },
+  "remainingObligations": [
+    "Independent review of eight bindings and prior carries",
+    "Step 7 final assembly and A47 conservation",
+    "Separate authorized five-ID doctor inventory correction",
+    "Lead L12-11 accounting of the actual future runner commit"
+  ],
+  "evidenceHashes": {
+    "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md": "f6ee0e00fe500f471eaba4579504b2cba728b7dcaee55ae067279b51ec096b3a",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-117-binding-check.json": "dbf661afaf6ff482af1212345283ce082a5cce3f8fc08be549f722955880a3ee",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-117-merge-rebindings.json": "aebf99da0ac5ad5dd86dee9c8195c554222accfb50452291b744dff1c88ff52b",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-117-merge-accounting.json": "843df4fa8167187fb4b63748b1397e18a7ecf60aaca22564d6bb1d4bf3d6aa4f",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-117-deferred-rebinds.json": "3c42aa24be93a3f62bc8b45c71c4bb3a6f251ba8f5518209a18dcc58dde0ccef",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-117-pair-accounting.json": "d8fc2a56ebd8dd4053b83a1c80c515bff661ff5c2a7cf60885349d2bf4f41b78",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-117-ratchet.log": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-07-l12-117-ratchet-tests.log": "f4ab1ec89048f819cd639f546e6d0cbec5472d43c256abaf50d5c88ab141d751",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json": "959f425179e6ed4e1ca4a009f241e3a5aa74d23453ea75866005bbe3866e8aab",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-head-drift.json": "d4bbdd85fabac72598db171279da23c07072f53ce121d346532b385f06e3bde5"
+  }
+}

@@ -20,12 +20,12 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179249d7679df6@2026-10-20",
       "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_26f62a1ae1abc17d0f02706788bfd399, residual SHA256 4894dcf4de3a1254ebc5e89c78ffed0afafc58859c82fa2b2781ac8216b08424. Source 034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3; primary target 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
-      "targetUnitDigest": "6a79c6fbf9c39cf64e9b2690421551a68fb0b3518034361ccb3c3b97c5db3861",
+      "targetUnitDigest": "7df410607f6d4460de1cbd6bb5b9b82969aacd91fb327a21642cfc5e44384261",
       "targetAncestry": [
         "Spec: Distribution",
         "Data Dictionary"
       ],
-      "reviewNote": "L12-112 content-and-neighbour rebind after merge 66b637a10 and authorized identity docs carry; independent review pending; no approval carry."
+      "reviewNote": "L12-117 merge ad98c3882: complete Data Dictionary, ancestry and both neighbours verified with both unchanged extractors; witnesses in step-07-l12-117-merge-rebindings.json. Source identity and residual unchanged; independent review pending; no approval carry."
     },
     {
       "claimId": "claim_d9185072d68925b4c020b13ba6c4d74f",

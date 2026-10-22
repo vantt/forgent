@@ -5016,7 +5016,7 @@
       },
       "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "pinnedHash": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
-      "headHash": "5839e539d80dc58e637d9710e4301a88374919e7c4dc8d60787e61f6b99d5594",
+      "headHash": "1852674f04b5c597e8f12ccc3cf83093b04c50c6d5d910bc88c6dd14aca7ef22",
       "movedSpans": [
         {
           "id": "author-s4-ebdf0bbf30f386bc",
@@ -5078,16 +5078,16 @@
             14,
             36,
             41,
-            116,
-            118,
-            121,
-            126,
+            117,
+            119,
+            122,
             127,
             128,
-            132,
-            134,
-            140,
-            150
+            129,
+            133,
+            135,
+            141,
+            151
           ]
         },
         {
@@ -5102,16 +5102,16 @@
             14,
             36,
             41,
-            116,
-            118,
-            121,
-            126,
+            117,
+            119,
+            122,
             127,
             128,
-            132,
-            134,
-            140,
-            150
+            129,
+            133,
+            135,
+            141,
+            151
           ]
         },
         {
@@ -5126,16 +5126,16 @@
             14,
             36,
             41,
-            116,
-            118,
-            121,
-            126,
+            117,
+            119,
+            122,
             127,
             128,
-            132,
-            134,
-            140,
-            150
+            129,
+            133,
+            135,
+            141,
+            151
           ]
         },
         {
@@ -5148,7 +5148,7 @@
           },
           "headMatchingLines": [
             41,
-            116
+            117
           ]
         },
         {
@@ -5163,16 +5163,271 @@
             14,
             36,
             41,
-            116,
-            118,
-            121,
-            126,
+            117,
+            119,
+            122,
             127,
             128,
-            132,
-            134,
-            140,
-            150
+            129,
+            133,
+            135,
+            141,
+            151
+          ]
+        },
+        {
+          "id": "author-s4-19c252476bfb8f58",
+          "pinnedSpan": {
+            "line": 72,
+            "columnStart": 80,
+            "columnEndExclusive": 95,
+            "text": "docs/decisions/"
+          },
+          "headMatchingLines": [
+            73,
+            115,
+            124
+          ]
+        },
+        {
+          "id": "author-s4-f02a917bdfe98c52",
+          "pinnedSpan": {
+            "line": 107,
+            "columnStart": 481,
+            "columnEndExclusive": 501,
+            "text": "docs/specs/runner.md"
+          },
+          "headMatchingLines": [
+            108
+          ]
+        },
+        {
+          "id": "author-s4-2e799bbe055b244b",
+          "pinnedSpan": {
+            "line": 114,
+            "columnStart": 321,
+            "columnEndExclusive": 349,
+            "text": "docs/decisions/0000-index.md"
+          },
+          "headMatchingLines": [
+            115
+          ]
+        },
+        {
+          "id": "author-s4-033b8befd0b861df",
+          "pinnedSpan": {
+            "line": 116,
+            "columnStart": 396,
+            "columnEndExclusive": 411,
+            "text": "docs/specs/*.md"
+          },
+          "headMatchingLines": [
+            117
+          ]
+        },
+        {
+          "id": "author-s4-5caf17775c40c6b0",
+          "pinnedSpan": {
+            "line": 116,
+            "columnStart": 443,
+            "columnEndExclusive": 468,
+            "text": "docs/history/*/CONTEXT.md"
+          },
+          "headMatchingLines": [
+            41,
+            117
+          ]
+        },
+        {
+          "id": "author-s4-45dc2cd894385e72",
+          "pinnedSpan": {
+            "line": 118,
+            "columnStart": 224,
+            "columnEndExclusive": 254,
+            "text": "docs/history/dogfood-p25-run1/"
+          },
+          "headMatchingLines": [
+            119
+          ]
+        },
+        {
+          "id": "author-s4-721bff23faa8d622",
+          "pinnedSpan": {
+            "line": 118,
+            "columnStart": 356,
+            "columnEndExclusive": 396,
+            "text": "docs/history/p50-workflow-induct/plan.md"
+          },
+          "headMatchingLines": [
+            119
+          ]
+        },
+        {
+          "id": "author-s4-c9433d21d5c1e93a",
+          "pinnedSpan": {
+            "line": 118,
+            "columnStart": 756,
+            "columnEndExclusive": 799,
+            "text": "docs/history/fgos-sample-testbed/CONTEXT.md"
+          },
+          "headMatchingLines": [
+            119
+          ]
+        },
+        {
+          "id": "author-s4-229e8a5afb1230ae",
+          "pinnedSpan": {
+            "line": 121,
+            "columnStart": 1113,
+            "columnEndExclusive": 1166,
+            "text": "docs/history/str61-chat-context-continuity/CONTEXT.md"
+          },
+          "headMatchingLines": [
+            122
+          ]
+        },
+        {
+          "id": "author-s4-84005ca08befe2c0",
+          "pinnedSpan": {
+            "line": 123,
+            "columnStart": 1728,
+            "columnEndExclusive": 1739,
+            "text": "docs/specs/"
+          },
+          "headMatchingLines": [
+            21,
+            36,
+            108,
+            117,
+            124
+          ]
+        },
+        {
+          "id": "author-s4-09018bba15ce7bfe",
+          "pinnedSpan": {
+            "line": 123,
+            "columnStart": 2502,
+            "columnEndExclusive": 2517,
+            "text": "docs/decisions/"
+          },
+          "headMatchingLines": [
+            73,
+            115,
+            124
+          ]
+        },
+        {
+          "id": "author-s4-06e8be879d39deb1",
+          "pinnedSpan": {
+            "line": 126,
+            "columnStart": 496,
+            "columnEndExclusive": 540,
+            "text": "docs/history/p50-workflow-induct/reports/..."
+          },
+          "headMatchingLines": [
+            127
+          ]
+        },
+        {
+          "id": "author-s4-68c3eab88fa07af7",
+          "pinnedSpan": {
+            "line": 127,
+            "columnStart": 1237,
+            "columnEndExclusive": 1302,
+            "text": "docs/history/p50-workflow-induct/reports/p50-workflow-induct-6.md"
+          },
+          "headMatchingLines": [
+            128
+          ]
+        },
+        {
+          "id": "author-s4-bb81392549cc3486",
+          "pinnedSpan": {
+            "line": 128,
+            "columnStart": 128,
+            "columnEndExclusive": 176,
+            "text": "docs/history/gate-dialogue-continuity/CONTEXT.md"
+          },
+          "headMatchingLines": [
+            36,
+            129
+          ]
+        },
+        {
+          "id": "author-s4-26fc8d2f9269bc9a",
+          "pinnedSpan": {
+            "line": 130,
+            "columnStart": 933,
+            "columnEndExclusive": 943,
+            "text": "docs/specs"
+          },
+          "headMatchingLines": [
+            21,
+            36,
+            108,
+            117,
+            124,
+            131
+          ]
+        },
+        {
+          "id": "author-s4-6f302576938a67b2",
+          "pinnedSpan": {
+            "line": 132,
+            "columnStart": 599,
+            "columnEndExclusive": 663,
+            "text": "docs/history/mvp-gap-measure/reports/dry-run-findings.md:129-156"
+          },
+          "headMatchingLines": [
+            133
+          ]
+        },
+        {
+          "id": "author-s4-4676c20acaf7573e",
+          "pinnedSpan": {
+            "line": 134,
+            "columnStart": 337,
+            "columnEndExclusive": 401,
+            "text": "docs/history/mvp-gap-measure/reports/dry-run-findings.md:166-170"
+          },
+          "headMatchingLines": [
+            135
+          ]
+        },
+        {
+          "id": "author-s4-d72e383c7545e538",
+          "pinnedSpan": {
+            "line": 140,
+            "columnStart": 1278,
+            "columnEndExclusive": 1336,
+            "text": "docs/history/worktree-companion-mount-ephemeral/CONTEXT.md"
+          },
+          "headMatchingLines": [
+            141
+          ]
+        },
+        {
+          "id": "author-s4-cdc5db14089ef6ef",
+          "pinnedSpan": {
+            "line": 150,
+            "columnStart": 303,
+            "columnEndExclusive": 316,
+            "text": "docs/history/"
+          },
+          "headMatchingLines": [
+            14,
+            36,
+            41,
+            117,
+            119,
+            122,
+            127,
+            128,
+            129,
+            133,
+            135,
+            141,
+            151
           ]
         }
       ],
@@ -5359,6 +5614,68 @@
       "failing": false
     },
     {
+      "file": "scripts/backfill-status-category.mjs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 158
+      },
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "pinnedHash": "bff22a3805f8a38f1c7d93b7cee3b53ee5b6dde0d978b4fdbfb760c1cc3622d6",
+      "headHash": "559976e36826b535131e2638e024186a051182339b8012b89b857efa4422582f",
+      "movedSpans": [
+        {
+          "id": "dynamic-006306",
+          "pinnedSpan": {
+            "line": 123,
+            "text": "      parsed = JSON.parse(line);\n    } catch (err) {\n      throw new Error(\n        `backfill-status-category: line ${i + 1} of ${lines.length} does not parse as JSON -- refusing to migrate a log that is not already well-formed: ${err.message}`,\n      );\n    }\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-006308",
+          "pinnedSpan": {
+            "line": 145,
+            "text": "    return JSON.stringify(parsed);\n  });\n\n  const rewritten = outLines.map((l) => `${l}\\n`).join(\"\");\n  return { rewritten, changed, totalLines: lines.length, countsByStatus };\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-006309",
+          "pinnedSpan": {
+            "line": 145,
+            "text": "    return JSON.stringify(parsed);\n  });\n\n  const rewritten = outLines.map((l) => `${l}\\n`).join(\"\");\n  return { rewritten, changed, totalLines: lines.length, countsByStatus };\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-006317",
+          "pinnedSpan": {
+            "line": 209,
+            "text": "      // proceed to the irreversible step.\n      const backupCheck = fs.readFileSync(resolvedBackup, \"utf8\");\n      if (backupCheck !== raw) {\n        throw new Error(`backfill-status-category: backup verification failed at \"${resolvedBackup}\" -- refusing to rewrite the target without a proven-good backup.`);\n      }\n    }\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-006318",
+          "pinnedSpan": {
+            "line": 214,
+            "text": "    }\n\n    tx.writeText(logPath, rewritten);\n    return { dryRun: false, changed, totalLines, countsByStatus, logPath, backupPath: resolvedBackup ?? null };\n  }, { resource });\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-006323",
+          "pinnedSpan": {
+            "line": 242,
+            "text": "  const { logPath, backupPath, dryRun } = parseArgs(argv);\n  const resolvedLog = path.resolve(cwd, logPath);\n  const resolvedBackup = backupPath ? path.resolve(cwd, backupPath) : backupPath;\n  const report = backfillStatusCategory(resolvedLog, { backupPath: resolvedBackup, dryRun });\n  console.log(JSON.stringify(report, null, 2));\n}\n"
+          },
+          "headMatchingLines": []
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
       "file": "scripts/build-rust-distribution.mjs",
       "record": {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
@@ -5366,7 +5683,7 @@
       },
       "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "pinnedHash": "be87d54ee9740239123a8fdf71496eee5b641deb6fdc678826b86a0a8260fe4c",
-      "headHash": "b84bd0fb5fc14963ef6a500020ee84280844482da3e4429060694053e9f61aaf",
+      "headHash": "6c5b170c97f1529e54e40489fb8dab522eeafe50f502b30e81687cf69c469200",
       "movedSpans": [
         {
           "id": "dynamic-006357",
@@ -5375,7 +5692,7 @@
             "text": " */\nfunction collectSourceFiles(baseDir, relativePath, results) {\n  if (path.isAbsolute(relativePath)) {\n    throw new Error(`Absolute path refused in declared release payload entry: ${relativePath}`);\n  }\n  const fullPath = path.join(baseDir, relativePath);\n  // Round-2 red-team HIGH: `../outside-payload` is not absolute, so the"
           },
           "headMatchingLines": [
-            123
+            124
           ]
         },
         {
@@ -5385,7 +5702,7 @@
             "text": "  if (path.isAbsolute(relativePath)) {\n    throw new Error(`Absolute path refused in declared release payload entry: ${relativePath}`);\n  }\n  const fullPath = path.join(baseDir, relativePath);\n  // Round-2 red-team HIGH: `../outside-payload` is not absolute, so the\n  // isAbsolute guard above doesn't catch it, but path.join still resolves\n  // it outside baseDir. Refuse anything that escapes the source checkout,"
           },
           "headMatchingLines": [
-            125
+            126
           ]
         },
         {
@@ -5395,7 +5712,7 @@
             "text": "  if (path.isAbsolute(relativePath)) {\n    throw new Error(`Absolute path refused in declared release payload entry: ${relativePath}`);\n  }\n  const fullPath = path.join(baseDir, relativePath);\n  // Round-2 red-team HIGH: `../outside-payload` is not absolute, so the\n  // isAbsolute guard above doesn't catch it, but path.join still resolves\n  // it outside baseDir. Refuse anything that escapes the source checkout,"
           },
           "headMatchingLines": [
-            125
+            126
           ]
         },
         {
@@ -5405,7 +5722,7 @@
             "text": "  // it outside baseDir. Refuse anything that escapes the source checkout,\n  // matching the same containment discipline the staged-tree side already\n  // applies via the disposable-outDir check.\n  const resolvedFull = path.resolve(fullPath);\n  const resolvedBase = path.resolve(baseDir);\n  // Round-3 red-team MEDIUM: a declared entry must resolve to something\n  // STRICTLY inside baseDir, never baseDir itself -- an in-root"
           },
           "headMatchingLines": [
-            131
+            132
           ]
         },
         {
@@ -5415,7 +5732,7 @@
             "text": "  // matching the same containment discipline the staged-tree side already\n  // applies via the disposable-outDir check.\n  const resolvedFull = path.resolve(fullPath);\n  const resolvedBase = path.resolve(baseDir);\n  // Round-3 red-team MEDIUM: a declared entry must resolve to something\n  // STRICTLY inside baseDir, never baseDir itself -- an in-root\n  // dot-segment like \"bin/..\" lexically resolves to exactly baseDir"
           },
           "headMatchingLines": [
-            132
+            133
           ]
         },
         {
@@ -5425,7 +5742,7 @@
             "text": "  // through, staging (and packaging) the entire checkout root including\n  // unlisted workspace state.\n  if (!resolvedFull.startsWith(resolvedBase + path.sep)) {\n    throw new Error(`Declared release payload entry escapes the source checkout: ${relativePath}`);\n  }\n  if (!fs.existsSync(fullPath)) {\n    throw new Error(`Declared release payload entry does not exist: ${relativePath}`);"
           },
           "headMatchingLines": [
-            140
+            141
           ]
         },
         {
@@ -5435,7 +5752,7 @@
             "text": "    throw new Error(`Declared release payload entry escapes the source checkout: ${relativePath}`);\n  }\n  if (!fs.existsSync(fullPath)) {\n    throw new Error(`Declared release payload entry does not exist: ${relativePath}`);\n  }\n\n  const stat = fs.lstatSync(fullPath);"
           },
           "headMatchingLines": [
-            143
+            144
           ]
         },
         {
@@ -5445,7 +5762,7 @@
             "text": "\n  const stat = fs.lstatSync(fullPath);\n  if (stat.isSymbolicLink()) {\n    throw new Error(`Symlink refused in release payload: ${relativePath}`);\n  }\n\n  if (stat.isFile()) {"
           },
           "headMatchingLines": [
-            148
+            149
           ]
         },
         {
@@ -5455,7 +5772,7 @@
             "text": "    const entries = fs.readdirSync(fullPath).sort();\n    for (const ent of entries) {\n      if (ent === '.git' || ent === 'node_modules') continue;\n      const childRel = path.join(relativePath, ent);\n      collectSourceFiles(baseDir, childRel, results);\n    }\n  }"
           },
           "headMatchingLines": [
-            160
+            161
           ]
         },
         {
@@ -5497,7 +5814,7 @@
             "text": "  const queue = Object.keys(pkg.dependencies ?? {}).map((name) => ({ name, from: resolvedRepo }));\n  while (queue.length > 0) {\n    const { name, from } = queue.shift();\n    let dir = null;\n    for (let at = from; ; at = path.dirname(at)) {\n      const candidate = path.join(at, 'node_modules', name);\n      if (fs.existsSync(path.join(candidate, 'package.json'))) {"
           },
           "headMatchingLines": [
-            199
+            200
           ]
         },
         {
@@ -5507,7 +5824,7 @@
             "text": "    const { name, from } = queue.shift();\n    let dir = null;\n    for (let at = from; ; at = path.dirname(at)) {\n      const candidate = path.join(at, 'node_modules', name);\n      if (fs.existsSync(path.join(candidate, 'package.json'))) {\n        dir = fs.realpathSync(candidate);\n        break;"
           },
           "headMatchingLines": [
-            201
+            202
           ]
         },
         {
@@ -5517,7 +5834,7 @@
             "text": "    let dir = null;\n    for (let at = from; ; at = path.dirname(at)) {\n      const candidate = path.join(at, 'node_modules', name);\n      if (fs.existsSync(path.join(candidate, 'package.json'))) {\n        dir = fs.realpathSync(candidate);\n        break;\n      }"
           },
           "headMatchingLines": [
-            202
+            203
           ]
         },
         {
@@ -5527,7 +5844,7 @@
             "text": "    for (let at = from; ; at = path.dirname(at)) {\n      const candidate = path.join(at, 'node_modules', name);\n      if (fs.existsSync(path.join(candidate, 'package.json'))) {\n        dir = fs.realpathSync(candidate);\n        break;\n      }\n      if (at === resolvedRepo || at === path.dirname(at)) break;"
           },
           "headMatchingLines": [
-            203
+            204
           ]
         },
         {
@@ -5537,7 +5854,7 @@
             "text": "      if (at === resolvedRepo || at === path.dirname(at)) break;\n    }\n    if (!dir) {\n      throw new Error(`Production dependency \"${name}\" is not installed; run \"npm ci\" before building the release tree`);\n    }\n    if (!dir.startsWith(resolvedRepo + path.sep)) {\n      throw new Error(`Production dependency \"${name}\" resolves outside the checkout: ${dir}`);"
           },
           "headMatchingLines": [
-            209
+            210
           ]
         },
         {
@@ -5547,7 +5864,7 @@
             "text": "import { releaseTargetForHost, manifestTargetForHost } from '../src/util/release-targets.mjs';\n\nconst __filename = fileURLToPath(import.meta.url);\nconst __dirname = path.dirname(__filename);\nexport const REPO_ROOT = path.resolve(__dirname, '..');\n\n/** C5 scan and atomic fence support are Linux-only; unsupported targets stay dormant. */"
           },
           "headMatchingLines": [
-            21
+            22
           ]
         },
         {
@@ -5557,7 +5874,7 @@
             "text": "      throw new Error(`Production dependency \"${name}\" is not installed; run \"npm ci\" before building the release tree`);\n    }\n    if (!dir.startsWith(resolvedRepo + path.sep)) {\n      throw new Error(`Production dependency \"${name}\" resolves outside the checkout: ${dir}`);\n    }\n    if (found.has(name)) {\n      if (found.get(name) !== dir) {"
           },
           "headMatchingLines": [
-            212
+            213
           ]
         },
         {
@@ -5567,7 +5884,7 @@
             "text": "    }\n    if (found.has(name)) {\n      if (found.get(name) !== dir) {\n        throw new Error(`Production dependency \"${name}\" is installed in two places; the staged tree keeps one copy per name`);\n      }\n      continue;\n    }"
           },
           "headMatchingLines": [
-            216
+            217
           ]
         },
         {
@@ -5577,7 +5894,7 @@
             "text": "\nconst __filename = fileURLToPath(import.meta.url);\nconst __dirname = path.dirname(__filename);\nexport const REPO_ROOT = path.resolve(__dirname, '..');\n\n/** C5 scan and atomic fence support are Linux-only; unsupported targets stay dormant. */\nexport function gitCapabilitiesForHost(platform = process.platform, arch = process.arch) {"
           },
           "headMatchingLines": [
-            22
+            23
           ]
         },
         {
@@ -5587,7 +5904,7 @@
             "text": "\nconst __filename = fileURLToPath(import.meta.url);\nconst __dirname = path.dirname(__filename);\nexport const REPO_ROOT = path.resolve(__dirname, '..');\n\n/** C5 scan and atomic fence support are Linux-only; unsupported targets stay dormant. */\nexport function gitCapabilitiesForHost(platform = process.platform, arch = process.arch) {"
           },
           "headMatchingLines": [
-            22
+            23
           ]
         },
         {
@@ -5597,7 +5914,7 @@
             "text": "      continue;\n    }\n    found.set(name, dir);\n    const own = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));\n    for (const child of Object.keys(own.dependencies ?? {})) {\n      queue.push({ name: child, from: dir });\n    }"
           },
           "headMatchingLines": [
-            221
+            222
           ]
         },
         {
@@ -5607,7 +5924,7 @@
             "text": "    fs.mkdirSync(dstDir, { recursive: true });\n    for (const ent of fs.readdirSync(srcDir).sort()) {\n      if (ent === 'node_modules' || ent === '.bin') continue;\n      const src = path.join(srcDir, ent);\n      const dst = path.join(dstDir, ent);\n      const stat = fs.lstatSync(src);\n      if (stat.isSymbolicLink()) {"
           },
           "headMatchingLines": [
-            238
+            239
           ]
         },
         {
@@ -5617,7 +5934,7 @@
             "text": "    for (const ent of fs.readdirSync(srcDir).sort()) {\n      if (ent === 'node_modules' || ent === '.bin') continue;\n      const src = path.join(srcDir, ent);\n      const dst = path.join(dstDir, ent);\n      const stat = fs.lstatSync(src);\n      if (stat.isSymbolicLink()) {\n        throw new Error(`Symlink refused in release payload dependency: ${src}`);"
           },
           "headMatchingLines": [
-            239
+            240
           ]
         },
         {
@@ -5627,7 +5944,7 @@
             "text": "      const dst = path.join(dstDir, ent);\n      const stat = fs.lstatSync(src);\n      if (stat.isSymbolicLink()) {\n        throw new Error(`Symlink refused in release payload dependency: ${src}`);\n      }\n      if (stat.isDirectory()) {\n        copyTree(src, dst);"
           },
           "headMatchingLines": [
-            242
+            243
           ]
         },
         {
@@ -5645,7 +5962,7 @@
             "text": " */\nexport function runnerShimContent(form) {\n  if (form === 'cmd') {\n    return ['@echo off', 'node \"%~dp0..\\\\libexec\\\\legacy-node\\\\bin\\\\fgos-runner.mjs\" %*', ''].join('\\r\\n');\n  }\n  return ['#!/bin/sh', 'exec node \"$(dirname \"$0\")/../libexec/legacy-node/bin/fgos-runner.mjs\" \"$@\"', ''].join('\\n');\n}"
           },
           "headMatchingLines": [
-            264
+            265
           ]
         },
         {
@@ -5655,7 +5972,7 @@
             "text": "  if (form === 'cmd') {\n    return ['@echo off', 'node \"%~dp0..\\\\libexec\\\\legacy-node\\\\bin\\\\fgos-runner.mjs\" %*', ''].join('\\r\\n');\n  }\n  return ['#!/bin/sh', 'exec node \"$(dirname \"$0\")/../libexec/legacy-node/bin/fgos-runner.mjs\" \"$@\"', ''].join('\\n');\n}\n\n/**"
           },
           "headMatchingLines": [
-            266
+            267
           ]
         },
         {
@@ -5665,7 +5982,7 @@
             "text": " */\nexport function buildRustDistribution({\n  outDir,\n  repoRoot = REPO_ROOT,\n  releaseVersion = null,\n  stateSchemas = { read: ['1'], write: ['1'], migrations: [] },\n} = {}) {"
           },
           "headMatchingLines": [
-            274
+            275
           ]
         },
         {
@@ -5675,7 +5992,7 @@
             "text": "    throw new Error('outDir is required (--out)');\n  }\n\n  const resolvedOut = path.resolve(outDir);\n  const resolvedRepo = path.resolve(repoRoot);\n\n  // Refuse if outDir is inside checkout (unless it is under dist/ disposable build output)"
           },
           "headMatchingLines": [
-            282
+            283
           ]
         },
         {
@@ -5685,7 +6002,7 @@
             "text": "  }\n\n  const resolvedOut = path.resolve(outDir);\n  const resolvedRepo = path.resolve(repoRoot);\n\n  // Refuse if outDir is inside checkout (unless it is under dist/ disposable build output)\n  const isDist ="
           },
           "headMatchingLines": [
-            283
+            284
           ]
         },
         {
@@ -5695,7 +6012,7 @@
             "text": "\n  // Refuse if outDir is inside checkout (unless it is under dist/ disposable build output)\n  const isDist =\n    resolvedOut === path.join(resolvedRepo, 'dist') ||\n    resolvedOut.startsWith(path.join(resolvedRepo, 'dist') + path.sep);\n  if (!isDist && (resolvedOut === resolvedRepo || resolvedOut.startsWith(resolvedRepo + path.sep))) {\n    throw new Error(`Refusing to stage release tree inside checkout directory: ${resolvedOut}`);"
           },
           "headMatchingLines": [
-            287
+            288
           ]
         },
         {
@@ -5705,7 +6022,7 @@
             "text": "  // Refuse if outDir is inside checkout (unless it is under dist/ disposable build output)\n  const isDist =\n    resolvedOut === path.join(resolvedRepo, 'dist') ||\n    resolvedOut.startsWith(path.join(resolvedRepo, 'dist') + path.sep);\n  if (!isDist && (resolvedOut === resolvedRepo || resolvedOut.startsWith(resolvedRepo + path.sep))) {\n    throw new Error(`Refusing to stage release tree inside checkout directory: ${resolvedOut}`);\n  }"
           },
           "headMatchingLines": [
-            288
+            289
           ]
         },
         {
@@ -5715,7 +6032,7 @@
             "text": "    resolvedOut === path.join(resolvedRepo, 'dist') ||\n    resolvedOut.startsWith(path.join(resolvedRepo, 'dist') + path.sep);\n  if (!isDist && (resolvedOut === resolvedRepo || resolvedOut.startsWith(resolvedRepo + path.sep))) {\n    throw new Error(`Refusing to stage release tree inside checkout directory: ${resolvedOut}`);\n  }\n\n  const outputDir = releaseOutputDir(resolvedRepo);"
           },
           "headMatchingLines": [
-            290
+            291
           ]
         },
         {
@@ -5725,7 +6042,7 @@
             "text": "  // Refuse if outDir is inside checkout (unless it is under dist/ disposable build output)\n  const isDist =\n    resolvedOut === path.join(resolvedRepo, 'dist') ||\n    resolvedOut.startsWith(path.join(resolvedRepo, 'dist') + path.sep);\n  if (!isDist && (resolvedOut === resolvedRepo || resolvedOut.startsWith(resolvedRepo + path.sep))) {\n    throw new Error(`Refusing to stage release tree inside checkout directory: ${resolvedOut}`);\n  }"
           },
           "headMatchingLines": [
-            288
+            289
           ]
         },
         {
@@ -5735,7 +6052,7 @@
             "text": "\n/** Where `cargo build --release` leaves its artifacts for `repoRoot`: `$CARGO_TARGET_DIR/release`, else `target/release`. */\nexport function releaseOutputDir(repoRoot = REPO_ROOT, env = process.env) {\n  return path.resolve(repoRoot, env.CARGO_TARGET_DIR || 'target', 'release');\n}\n\n/** Native library name emitted by Cargo on the selected host. */"
           },
           "headMatchingLines": [
-            57
+            58
           ]
         },
         {
@@ -5745,7 +6062,7 @@
             "text": "    throw new Error(`Refusing to stage release tree inside checkout directory: ${resolvedOut}`);\n  }\n\n  const outputDir = releaseOutputDir(resolvedRepo);\n  const releaseBin = releaseBinaryPath(outputDir, 'fgos');\n  const addonLibrary = path.join(outputDir, nativeAddonLibraryName());\n  if (!fs.existsSync(addonLibrary) || !fs.lstatSync(addonLibrary).isFile()) {"
           },
           "headMatchingLines": [
-            293
+            294
           ]
         },
         {
@@ -5755,7 +6072,7 @@
             "text": "\n  const outputDir = releaseOutputDir(resolvedRepo);\n  const releaseBin = releaseBinaryPath(outputDir, 'fgos');\n  const addonLibrary = path.join(outputDir, nativeAddonLibraryName());\n  if (!fs.existsSync(addonLibrary) || !fs.lstatSync(addonLibrary).isFile()) {\n    throw new Error(`Compiled native addon not found at ${addonLibrary}; run cargo build --locked --release --workspace first`);\n  }"
           },
           "headMatchingLines": [
-            295
+            296
           ]
         },
         {
@@ -5765,7 +6082,7 @@
             "text": "  const releaseBin = releaseBinaryPath(outputDir, 'fgos');\n  const addonLibrary = path.join(outputDir, nativeAddonLibraryName());\n  if (!fs.existsSync(addonLibrary) || !fs.lstatSync(addonLibrary).isFile()) {\n    throw new Error(`Compiled native addon not found at ${addonLibrary}; run cargo build --locked --release --workspace first`);\n  }\n  if (!fs.existsSync(releaseBin)) {\n    throw new Error(`Compiled Rust binary not found at ${releaseBin}. Run \"cargo build --release --workspace\" first.`);"
           },
           "headMatchingLines": [
-            297
+            298
           ]
         },
         {
@@ -5775,7 +6092,7 @@
             "text": "    throw new Error(`Compiled native addon not found at ${addonLibrary}; run cargo build --locked --release --workspace first`);\n  }\n  if (!fs.existsSync(releaseBin)) {\n    throw new Error(`Compiled Rust binary not found at ${releaseBin}. Run \"cargo build --release --workspace\" first.`);\n  }\n\n  // Refuse a non-empty pre-existing --out: silently absorbing stale or"
           },
           "headMatchingLines": [
-            300
+            301
           ]
         },
         {
@@ -5785,7 +6102,7 @@
             "text": "  // verify against. An empty pre-existing directory (e.g. from\n  // fs.mkdtempSync) is still fine.\n  if (fs.existsSync(resolvedOut) && fs.readdirSync(resolvedOut).length > 0) {\n    throw new Error(`Refusing to stage release tree into non-empty directory: ${resolvedOut}`);\n  }\n\n  fs.mkdirSync(resolvedOut, { recursive: true });"
           },
           "headMatchingLines": [
-            309
+            310
           ]
         },
         {
@@ -5795,7 +6112,7 @@
             "text": "  fs.mkdirSync(resolvedOut, { recursive: true });\n\n  // 1. Stage bin/fgos\n  const stagedBinDir = path.join(resolvedOut, 'bin');\n  fs.mkdirSync(stagedBinDir, { recursive: true });\n\n  const stagedFgos = path.join(stagedBinDir, 'fgos');"
           },
           "headMatchingLines": [
-            315
+            316
           ]
         },
         {
@@ -5805,7 +6122,7 @@
             "text": "  fs.mkdirSync(resolvedOut, { recursive: true });\n\n  // 1. Stage bin/fgos\n  const stagedBinDir = path.join(resolvedOut, 'bin');\n  fs.mkdirSync(stagedBinDir, { recursive: true });\n\n  const stagedFgos = path.join(stagedBinDir, 'fgos');"
           },
           "headMatchingLines": [
-            315
+            316
           ]
         },
         {
@@ -5815,7 +6132,7 @@
             "text": "  const stagedBinDir = path.join(resolvedOut, 'bin');\n  fs.mkdirSync(stagedBinDir, { recursive: true });\n\n  const stagedFgos = path.join(stagedBinDir, 'fgos');\n  fs.copyFileSync(releaseBin, stagedFgos);\n  fs.chmodSync(stagedFgos, 0o755);\n  if (process.platform === 'win32') {"
           },
           "headMatchingLines": [
-            318
+            319
           ]
         },
         {
@@ -5825,7 +6142,7 @@
             "text": "  fs.copyFileSync(releaseBin, stagedFgos);\n  fs.chmodSync(stagedFgos, 0o755);\n  if (process.platform === 'win32') {\n    fs.copyFileSync(releaseBin, path.join(stagedBinDir, 'fgos.exe'));\n  }\n\n  // 2. Stage bin/fgos-runner shim (and its .cmd form for a Windows host)"
           },
           "headMatchingLines": [
-            322
+            323
           ]
         },
         {
@@ -5835,7 +6152,7 @@
             "text": "  }\n\n  // 2. Stage bin/fgos-runner shim (and its .cmd form for a Windows host)\n  const stagedRunner = path.join(stagedBinDir, 'fgos-runner');\n  fs.writeFileSync(stagedRunner, runnerShimContent('sh'), { mode: 0o755 });\n  if (process.platform === 'win32') {\n    fs.writeFileSync(path.join(stagedBinDir, 'fgos-runner.cmd'), runnerShimContent('cmd'));"
           },
           "headMatchingLines": [
-            326
+            327
           ]
         },
         {
@@ -5845,7 +6162,7 @@
             "text": "  const stagedRunner = path.join(stagedBinDir, 'fgos-runner');\n  fs.writeFileSync(stagedRunner, runnerShimContent('sh'), { mode: 0o755 });\n  if (process.platform === 'win32') {\n    fs.writeFileSync(path.join(stagedBinDir, 'fgos-runner.cmd'), runnerShimContent('cmd'));\n  }\n\n  // 3. Stage libexec/legacy-node/ from package.json files"
           },
           "headMatchingLines": [
-            329
+            330
           ]
         },
         {
@@ -5855,7 +6172,7 @@
             "text": "  }\n\n  // 3. Stage libexec/legacy-node/ from package.json files\n  const pkgPath = path.join(resolvedRepo, 'package.json');\n  if (!fs.existsSync(pkgPath)) {\n    throw new Error(`package.json not found at ${pkgPath}`);\n  }"
           },
           "headMatchingLines": [
-            333
+            334
           ]
         },
         {
@@ -5865,7 +6182,7 @@
             "text": "  }\n\n  // 3. Stage libexec/legacy-node/ from package.json files\n  const pkgPath = path.join(resolvedRepo, 'package.json');\n  if (!fs.existsSync(pkgPath)) {\n    throw new Error(`package.json not found at ${pkgPath}`);\n  }"
           },
           "headMatchingLines": [
-            333
+            334
           ]
         },
         {
@@ -5875,7 +6192,7 @@
             "text": "  // 3. Stage libexec/legacy-node/ from package.json files\n  const pkgPath = path.join(resolvedRepo, 'package.json');\n  if (!fs.existsSync(pkgPath)) {\n    throw new Error(`package.json not found at ${pkgPath}`);\n  }\n  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));\n  const legacyNodeRoot = path.join(resolvedOut, 'libexec', 'legacy-node');"
           },
           "headMatchingLines": [
-            335
+            336
           ]
         },
         {
@@ -5909,7 +6226,7 @@
             "text": "\n  for (const rel of sourceFiles) {\n    const srcFull = path.join(resolvedRepo, rel);\n    const dstFull = path.join(legacyNodeRoot, rel);\n    const stat = fs.lstatSync(srcFull);\n    if (stat.isSymbolicLink()) {\n      throw new Error(`Symlink refused in release payload: ${rel}`);"
           },
           "headMatchingLines": [
-            354
+            355
           ]
         },
         {
@@ -5919,7 +6236,7 @@
             "text": "    const dstFull = path.join(legacyNodeRoot, rel);\n    const stat = fs.lstatSync(srcFull);\n    if (stat.isSymbolicLink()) {\n      throw new Error(`Symlink refused in release payload: ${rel}`);\n    }\n    fs.mkdirSync(path.dirname(dstFull), { recursive: true });\n    fs.copyFileSync(srcFull, dstFull);"
           },
           "headMatchingLines": [
-            357
+            358
           ]
         },
         {
@@ -5931,73 +6248,13 @@
           "headMatchingLines": []
         },
         {
-          "id": "dynamic-006415",
-          "pinnedSpan": {
-            "line": 380,
-            "text": "  function collectStagedFiles(dir, prefix) {\n    const entries = fs.readdirSync(dir).sort();\n    for (const ent of entries) {\n      const full = path.join(dir, ent);\n      const rel = prefix ? prefix + '/' + ent : ent;\n      const lstat = fs.lstatSync(full);\n      if (lstat.isSymbolicLink()) {"
-          },
-          "headMatchingLines": [
-            379
-          ]
-        },
-        {
-          "id": "dynamic-006416",
-          "pinnedSpan": {
-            "line": 384,
-            "text": "      const rel = prefix ? prefix + '/' + ent : ent;\n      const lstat = fs.lstatSync(full);\n      if (lstat.isSymbolicLink()) {\n        throw new Error(`Symlink refused in staged tree: ${rel}`);\n      }\n      if (lstat.isDirectory()) {\n        collectStagedFiles(full, rel);"
-          },
-          "headMatchingLines": [
-            383
-          ]
-        },
-        {
-          "id": "dynamic-006417",
-          "pinnedSpan": {
-            "line": 390,
-            "text": "        collectStagedFiles(full, rel);\n      } else if (lstat.isFile()) {\n        if (path.isAbsolute(rel)) {\n          throw new Error(`Absolute path refused in manifest files: ${rel}`);\n        }\n        if (rel === 'manifest.json') {\n          // Ratified (round-1 review MEDIUM-3): manifest.json cannot list"
-          },
-          "headMatchingLines": [
-            389
-          ]
-        },
-        {
           "id": "dynamic-006418",
           "pinnedSpan": {
             "line": 36,
             "text": "    return JSON.stringify(value);\n  }\n  if (Array.isArray(value)) {\n    return '[' + value.map(canonicalJson).join(',') + ']';\n  }\n  const keys = Object.keys(value).sort();\n  const pairs = keys.map((k) => JSON.stringify(k) + ':' + canonicalJson(value[k]));"
           },
           "headMatchingLines": [
-            40
-          ]
-        },
-        {
-          "id": "dynamic-006419",
-          "pinnedSpan": {
-            "line": 412,
-            "text": "  for (const p of stagedFiles) {\n    const lower = p.toLowerCase();\n    if (seenLower.has(lower)) {\n      throw new Error(`Case-insensitive path collision detected: ${p}`);\n    }\n    seenLower.add(lower);\n  }"
-          },
-          "headMatchingLines": [
-            411
-          ]
-        },
-        {
-          "id": "dynamic-006420",
-          "pinnedSpan": {
-            "line": 423,
-            "text": "    .sort();\n\n  const fileEntries = normalizedFiles.map((relPath) => {\n    const full = path.join(resolvedOut, relPath);\n    const stat = fs.statSync(full);\n    const isExec = Boolean(stat.mode & 0o111) || relPath.startsWith('bin/');\n    return {"
-          },
-          "headMatchingLines": [
-            422
-          ]
-        },
-        {
-          "id": "dynamic-006421",
-          "pinnedSpan": {
-            "line": 427,
-            "text": "    const stat = fs.statSync(full);\n    const isExec = Boolean(stat.mode & 0o111) || relPath.startsWith('bin/');\n    return {\n      path: relPath,\n      kind: 'file',\n      digest: hashFile(full),\n      mode: isExec ? '755' : '644',"
-          },
-          "headMatchingLines": [
-            426
+            41
           ]
         },
         {
@@ -6007,27 +6264,7 @@
             "text": "  }\n  const keys = Object.keys(value).sort();\n  const pairs = keys.map((k) => JSON.stringify(k) + ':' + canonicalJson(value[k]));\n  return '{' + pairs.join(',') + '}';\n}\n\n/**"
           },
           "headMatchingLines": [
-            44
-          ]
-        },
-        {
-          "id": "dynamic-006423",
-          "pinnedSpan": {
-            "line": 436,
-            "text": "  });\n\n  // 5. Build manifest\n  const legacyNodeEntryPath = path.join(legacyNodeRoot, 'bin', 'fgos.mjs');\n  if (!fs.existsSync(legacyNodeEntryPath)) {\n    throw new Error(`Legacy node entry missing at ${legacyNodeEntryPath}`);\n  }"
-          },
-          "headMatchingLines": [
-            435
-          ]
-        },
-        {
-          "id": "dynamic-006424",
-          "pinnedSpan": {
-            "line": 436,
-            "text": "  });\n\n  // 5. Build manifest\n  const legacyNodeEntryPath = path.join(legacyNodeRoot, 'bin', 'fgos.mjs');\n  if (!fs.existsSync(legacyNodeEntryPath)) {\n    throw new Error(`Legacy node entry missing at ${legacyNodeEntryPath}`);\n  }"
-          },
-          "headMatchingLines": [
-            435
+            45
           ]
         },
         {
@@ -6037,46 +6274,6 @@
             "text": "  // 5. Build manifest\n  const legacyNodeEntryPath = path.join(legacyNodeRoot, 'bin', 'fgos.mjs');\n  if (!fs.existsSync(legacyNodeEntryPath)) {\n    throw new Error(`Legacy node entry missing at ${legacyNodeEntryPath}`);\n  }\n  const legacyNodeDigest = hashFile(legacyNodeEntryPath);\n"
           },
           "headMatchingLines": []
-        },
-        {
-          "id": "dynamic-006426",
-          "pinnedSpan": {
-            "line": 452,
-            "text": "    components: {\n      nativeAddon,\n      legacyNode: {\n        root: 'libexec/legacy-node',\n        entry: 'bin/fgos.mjs',\n        digest: legacyNodeDigest,\n      },"
-          },
-          "headMatchingLines": [
-            451
-          ]
-        },
-        {
-          "id": "dynamic-006427",
-          "pinnedSpan": {
-            "line": 488,
-            "text": "    files: manifestWithoutDigest.files,\n  };\n\n  const manifestPath = path.join(resolvedOut, 'manifest.json');\n  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\\n');\n\n  return {"
-          },
-          "headMatchingLines": [
-            487
-          ]
-        },
-        {
-          "id": "dynamic-006428",
-          "pinnedSpan": {
-            "line": 488,
-            "text": "    files: manifestWithoutDigest.files,\n  };\n\n  const manifestPath = path.join(resolvedOut, 'manifest.json');\n  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\\n');\n\n  return {"
-          },
-          "headMatchingLines": [
-            487
-          ]
-        },
-        {
-          "id": "dynamic-006429",
-          "pinnedSpan": {
-            "line": 492,
-            "text": "  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\\n');\n\n  return {\n    outDir: resolvedOut,\n    artifactDigest,\n    fileCount: fileEntries.length,\n    manifestPath,"
-          },
-          "headMatchingLines": [
-            491
-          ]
         },
         {
           "id": "dynamic-006430",
@@ -6101,7 +6298,7 @@
             "text": "if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {\n  const args = process.argv.slice(2);\n  let outDir = null;\n  let repoRoot = REPO_ROOT;\n\n  for (let i = 0; i < args.length; i++) {\n    if (args[i] === '--out' && args[i + 1]) {"
           },
           "headMatchingLines": [
-            526
+            530
           ]
         },
         {
@@ -6111,7 +6308,7 @@
             "text": "\n  for (let i = 0; i < args.length; i++) {\n    if (args[i] === '--out' && args[i + 1]) {\n      outDir = args[i + 1];\n      i++;\n    } else if (args[i] === '--repo-root' && args[i + 1]) {\n      repoRoot = path.resolve(args[i + 1]);"
           },
           "headMatchingLines": [
-            530
+            534
           ]
         },
         {
@@ -6121,7 +6318,7 @@
             "text": "      outDir = args[i + 1];\n      i++;\n    } else if (args[i] === '--repo-root' && args[i + 1]) {\n      repoRoot = path.resolve(args[i + 1]);\n      i++;\n    }\n  }"
           },
           "headMatchingLines": [
-            533
+            537
           ]
         },
         {
@@ -6131,7 +6328,7 @@
             "text": "      outDir = args[i + 1];\n      i++;\n    } else if (args[i] === '--repo-root' && args[i + 1]) {\n      repoRoot = path.resolve(args[i + 1]);\n      i++;\n    }\n  }"
           },
           "headMatchingLines": [
-            533
+            537
           ]
         },
         {
@@ -6141,7 +6338,7 @@
             "text": "\n  try {\n    const result = buildRustDistribution({ outDir, repoRoot });\n    console.log(`Release tree staged successfully to ${result.outDir}`);\n    console.log(`artifactDigest: ${result.artifactDigest}`);\n    console.log(`Staged files: ${result.fileCount}`);\n  } catch (err) {"
           },
           "headMatchingLines": [
-            545
+            549
           ]
         },
         {
@@ -6151,7 +6348,7 @@
             "text": "  try {\n    const result = buildRustDistribution({ outDir, repoRoot });\n    console.log(`Release tree staged successfully to ${result.outDir}`);\n    console.log(`artifactDigest: ${result.artifactDigest}`);\n    console.log(`Staged files: ${result.fileCount}`);\n  } catch (err) {\n    console.error(`Build failed: ${err.message}`);"
           },
           "headMatchingLines": [
-            546
+            550
           ]
         },
         {
@@ -6161,7 +6358,7 @@
             "text": "    const result = buildRustDistribution({ outDir, repoRoot });\n    console.log(`Release tree staged successfully to ${result.outDir}`);\n    console.log(`artifactDigest: ${result.artifactDigest}`);\n    console.log(`Staged files: ${result.fileCount}`);\n  } catch (err) {\n    console.error(`Build failed: ${err.message}`);\n    process.exit(1);"
           },
           "headMatchingLines": [
-            547
+            551
           ]
         },
         {
@@ -6171,7 +6368,7 @@
             "text": "    console.log(`artifactDigest: ${result.artifactDigest}`);\n    console.log(`Staged files: ${result.fileCount}`);\n  } catch (err) {\n    console.error(`Build failed: ${err.message}`);\n    process.exit(1);\n  }\n}"
           },
           "headMatchingLines": [
-            549
+            553
           ]
         },
         {
@@ -6181,7 +6378,7 @@
             "text": "}\n\n/** ABI provenance shared by release staging and the development host. */\nexport function nativeAddonComponent(file, relativePath, repoRoot = REPO_ROOT) {\n  const target = releaseTargetForHost();\n  if (!target) throw new Error('Native addon release target unsupported');\n  const lock = fs.readFileSync(path.join(repoRoot, 'Cargo.lock'), 'utf8');"
           },
           "headMatchingLines": [
-            66
+            67
           ]
         },
         {
@@ -6191,7 +6388,7 @@
             "text": "export function nativeAddonComponent(file, relativePath, repoRoot = REPO_ROOT) {\n  const target = releaseTargetForHost();\n  if (!target) throw new Error('Native addon release target unsupported');\n  const lock = fs.readFileSync(path.join(repoRoot, 'Cargo.lock'), 'utf8');\n  const crateChecksums = {};\n  for (const block of lock.split('[[package]]')) {\n    const field = (name) => block.match(new RegExp(`^${name} = \"([^\"\\\\n]+)\"$`, 'm'))?.[1];"
           },
           "headMatchingLines": [
-            69
+            70
           ]
         },
         {
@@ -6201,7 +6398,7 @@
             "text": "  const lock = fs.readFileSync(path.join(repoRoot, 'Cargo.lock'), 'utf8');\n  const crateChecksums = {};\n  for (const block of lock.split('[[package]]')) {\n    const field = (name) => block.match(new RegExp(`^${name} = \"([^\"\\\\n]+)\"$`, 'm'))?.[1];\n    const name = field('name');\n    if (['napi', 'napi-derive', 'napi-build'].includes(name)) {\n      const version = field('version');"
           },
           "headMatchingLines": [
-            72
+            73
           ]
         },
         {
@@ -6211,7 +6408,7 @@
             "text": "    if (['napi', 'napi-derive', 'napi-build'].includes(name)) {\n      const version = field('version');\n      const checksum = field('checksum');\n      if (!version || !/^[0-9a-f]{64}$/.test(checksum ?? '')) throw new Error(`Missing locked checksum: ${name}`);\n      crateChecksums[`${name}@${version}`] = checksum;\n    }\n  }"
           },
           "headMatchingLines": [
-            77
+            78
           ]
         },
         {
@@ -6221,7 +6418,7 @@
             "text": "      const version = field('version');\n      const checksum = field('checksum');\n      if (!version || !/^[0-9a-f]{64}$/.test(checksum ?? '')) throw new Error(`Missing locked checksum: ${name}`);\n      crateChecksums[`${name}@${version}`] = checksum;\n    }\n  }\n  if (Object.keys(crateChecksums).length !== 3) throw new Error('Expected three locked napi crates');"
           },
           "headMatchingLines": [
-            78
+            79
           ]
         },
         {
@@ -6231,7 +6428,7 @@
             "text": "    }\n  }\n  if (Object.keys(crateChecksums).length !== 3) throw new Error('Expected three locked napi crates');\n  return { path: relativePath, digest: hashFile(file).slice(7), target: `${target.platform}-${target.arch}`, napiVersion: 8, crateChecksums, capabilities: gitCapabilitiesForHost() };\n}\n\n/**"
           },
           "headMatchingLines": [
-            82
+            83
           ]
         },
         {
@@ -6241,7 +6438,7 @@
             "text": "    }\n  }\n  if (Object.keys(crateChecksums).length !== 3) throw new Error('Expected three locked napi crates');\n  return { path: relativePath, digest: hashFile(file).slice(7), target: `${target.platform}-${target.arch}`, napiVersion: 8, crateChecksums, capabilities: gitCapabilitiesForHost() };\n}\n\n/**"
           },
           "headMatchingLines": [
-            82
+            83
           ]
         },
         {
@@ -6253,7 +6450,7 @@
             "text": "docs/"
           },
           "headMatchingLines": [
-            102
+            103
           ]
         },
         {
@@ -6265,7 +6462,7 @@
             "text": "README.md"
           },
           "headMatchingLines": [
-            102
+            103
           ]
         },
         {
@@ -6277,7 +6474,7 @@
             "text": "LICENSE"
           },
           "headMatchingLines": [
-            102
+            103
           ]
         }
       ],
@@ -8853,6 +9050,44 @@
       "failing": false
     },
     {
+      "file": "scripts/lib/full-suite-queue.mjs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 201
+      },
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "pinnedHash": "fa7c31d57af4626de9acb5c5298d618f285c3f7e139c0ac0772a0bc9210e9d06",
+      "headHash": "da176b9ad8a796ec13ede755dd2c2b12e6e29d5b5b12874ca8e6ae06803e3aba",
+      "movedSpans": [
+        {
+          "id": "dynamic-008193",
+          "pinnedSpan": {
+            "line": 30,
+            "text": "\nfunction withQueueHint(err) {\n  if (!(err instanceof HolderLockError) || err.code !== 'lock-driver-unavailable') return err;\n  err.message += ` -- the full-suite queue needs it; set ${QUEUE_SWITCH_ENV}=off to run without queuing.`;\n  return err;\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008194",
+          "pinnedSpan": {
+            "line": 35,
+            "text": "}\n\nfunction holderText(holders) {\n  if (holders.kind !== 'list') return `holder not listable: ${holders.reason}`;\n  return holders.pids.length > 0 ? `pid ${holders.pids.join(', ')}` : 'holder just left';\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008195",
+          "pinnedSpan": {
+            "line": 36,
+            "text": "\nfunction holderText(holders) {\n  if (holders.kind !== 'list') return `holder not listable: ${holders.reason}`;\n  return holders.pids.length > 0 ? `pid ${holders.pids.join(', ')}` : 'holder just left';\n}\n\n/**"
+          },
+          "headMatchingLines": []
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
       "file": "scripts/lib/test-git-config-guard.mjs",
       "record": {
         "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
@@ -10121,6 +10356,114 @@
           "headMatchingLines": [
             357
           ]
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "scripts/migrate-actor-to-role.mjs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 209
+      },
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "pinnedHash": "4501c681a7a0399e0e57d1cf48b43ba650934b49b84acac8a446cdd99db44a48",
+      "headHash": "c7cbf743d674d30e02cbd92046a76c30d375994292fead5c89d9445065b0ae36",
+      "movedSpans": [
+        {
+          "id": "dynamic-008371",
+          "pinnedSpan": {
+            "line": 148,
+            "text": "    }\n\n    tx.writeText(logPath, rewritten);\n    return { dryRun: false, changed, totalLines, logPath, backupPath: resolvedBackup };\n  }, { resource });\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008376",
+          "pinnedSpan": {
+            "line": 168,
+            "text": "  const { logPath, backupPath, dryRun } = parseArgs(argv);\n  const resolvedLog = path.resolve(cwd, logPath);\n  const resolvedBackup = backupPath ? path.resolve(cwd, backupPath) : backupPath;\n  const report = migrateActorToRole(resolvedLog, { backupPath: resolvedBackup, dryRun });\n  console.log(JSON.stringify(report, null, 2));\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008377",
+          "pinnedSpan": {
+            "line": 63,
+            "text": "      parsed = JSON.parse(line);\n    } catch (err) {\n      throw new Error(\n        `migrate-actor-to-role: line ${i + 1} of ${lines.length} does not parse as JSON -- refusing to migrate a log that is not already well-formed: ${err.message}`,\n      );\n    }\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008379",
+          "pinnedSpan": {
+            "line": 91,
+            "text": "    return JSON.stringify(parsed);\n  });\n\n  const rewritten = outLines.map((l) => `${l}\\n`).join(\"\");\n  return { rewritten, changed, totalLines: lines.length };\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008380",
+          "pinnedSpan": {
+            "line": 91,
+            "text": "    return JSON.stringify(parsed);\n  });\n\n  const rewritten = outLines.map((l) => `${l}\\n`).join(\"\");\n  return { rewritten, changed, totalLines: lines.length };\n}\n"
+          },
+          "headMatchingLines": []
+        }
+      ],
+      "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
+      "failing": false
+    },
+    {
+      "file": "scripts/migrate-status-proposed-to-awaiting-approval.mjs",
+      "record": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 210
+      },
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "pinnedHash": "ac3fd799390ee06d504b49f497f41f117526b961d4ebaf3883fca91b63cf2546",
+      "headHash": "3c68423a369856864d8d675596c45328a78b410f76c715af07684738f9ab4ca5",
+      "movedSpans": [
+        {
+          "id": "dynamic-008382",
+          "pinnedSpan": {
+            "line": 99,
+            "text": "    return JSON.stringify(parsed);\n  });\n\n  const rewritten = outLines.map((l) => `${l}\\n`).join(\"\");\n  return { rewritten, changed, totalLines: lines.length };\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008383",
+          "pinnedSpan": {
+            "line": 99,
+            "text": "    return JSON.stringify(parsed);\n  });\n\n  const rewritten = outLines.map((l) => `${l}\\n`).join(\"\");\n  return { rewritten, changed, totalLines: lines.length };\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008392",
+          "pinnedSpan": {
+            "line": 155,
+            "text": "    }\n\n    tx.writeText(logPath, rewritten);\n    return { dryRun: false, changed, totalLines, logPath, backupPath: resolvedBackup };\n  }, { resource });\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008397",
+          "pinnedSpan": {
+            "line": 175,
+            "text": "  const { logPath, backupPath, dryRun } = parseArgs(argv);\n  const resolvedLog = path.resolve(cwd, logPath);\n  const resolvedBackup = backupPath ? path.resolve(cwd, backupPath) : backupPath;\n  const report = migrateStatusProposedToAwaitingApproval(resolvedLog, { backupPath: resolvedBackup, dryRun });\n  console.log(JSON.stringify(report, null, 2));\n}\n"
+          },
+          "headMatchingLines": []
+        },
+        {
+          "id": "dynamic-008398",
+          "pinnedSpan": {
+            "line": 79,
+            "text": "      parsed = JSON.parse(line);\n    } catch (err) {\n      throw new Error(\n        `migrate-status-proposed-to-awaiting-approval: line ${i + 1} of ${lines.length} does not parse as JSON -- refusing to migrate a log that is not already well-formed: ${err.message}`,\n      );\n    }\n"
+          },
+          "headMatchingLines": []
         }
       ],
       "dependency": "Step 7 final-pin assembly; L12-58(1), L12-76 R17",
@@ -11648,7 +11991,7 @@
       },
       "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "pinnedHash": "85c4db92e0f68a0a2a6a7272b8a4f44f0ab4529ecdf872b78752560df97b9864",
-      "headHash": "a4a56dba93a272daccf0648dbd250f766fb6a92cb5013b7620d6034b02446395",
+      "headHash": "9495f5fe973cfcd2b4367c8092dddf58c0dce818acbc3fda13eb4ecad2acfc53",
       "movedSpans": [
         {
           "id": "dynamic-008738",
@@ -11705,7 +12048,7 @@
             "text": " * `.test.mjs` is still discovered, since `fs.readdirSync`'s own stat\n * resolves it like any other file entry.\n */\nexport function discoverTestFiles(root = DEFAULT_TEST_ROOT) {\n  const found = new Set();\n\n  function walk(dir) {"
           },
           "headMatchingLines": [
-            58
+            56
           ]
         },
         {
@@ -11715,7 +12058,7 @@
             "text": "      return;\n    }\n    for (const entry of entries) {\n      const full = path.join(dir, entry.name);\n      if (entry.isDirectory()) {\n        if (entry.isSymbolicLink()) continue;\n        walk(full);"
           },
           "headMatchingLines": [
-            69
+            67
           ]
         },
         {
@@ -11781,7 +12124,7 @@
             "text": "  if (process.platform === 'darwin') {\n    const tempRoot = env.TMPDIR || os.tmpdir();\n    try {\n      const realTempRoot = fs.realpathSync(tempRoot);\n      childEnv.TMPDIR = realTempRoot;\n      childEnv.TMP = realTempRoot;\n      childEnv.TEMP = realTempRoot;"
           },
           "headMatchingLines": [
-            151
+            149
           ]
         },
         {
@@ -11791,7 +12134,7 @@
             "text": "    const tempRoot = env.TMPDIR || os.tmpdir();\n    try {\n      const realTempRoot = fs.realpathSync(tempRoot);\n      childEnv.TMPDIR = realTempRoot;\n      childEnv.TMP = realTempRoot;\n      childEnv.TEMP = realTempRoot;\n    } catch {"
           },
           "headMatchingLines": [
-            152
+            150
           ]
         },
         {
@@ -11809,7 +12152,7 @@
             "text": "// legitimately slower than the default. Empty on purpose: add an entry only\n// with the measured duration that justifies it, never to hide a hang.\nexport const FILE_TIMEOUT_OVERRIDES_MS = {};\nconst WATCHDOG_PATH = fileURLToPath(new URL('./lib/test-file-watchdog.mjs', import.meta.url));\nconst DEFAULT_WATCHDOG_POLL_MS = 5000;\n\n/**"
           },
           "headMatchingLines": [
-            188
+            186
           ]
         },
         {
@@ -11819,7 +12162,7 @@
             "text": "// legitimately slower than the default. Empty on purpose: add an entry only\n// with the measured duration that justifies it, never to hide a hang.\nexport const FILE_TIMEOUT_OVERRIDES_MS = {};\nconst WATCHDOG_PATH = fileURLToPath(new URL('./lib/test-file-watchdog.mjs', import.meta.url));\nconst DEFAULT_WATCHDOG_POLL_MS = 5000;\n\n/**"
           },
           "headMatchingLines": [
-            188
+            186
           ]
         },
         {
@@ -11829,7 +12172,7 @@
             "text": "  for (const file of files) {\n    // Keyed exactly as passed to `node --test`: each file's runner process\n    // carries that same string as its last argv element.\n    limits[file] = FILE_TIMEOUT_OVERRIDES_MS[file.split(path.sep).join('/')] ?? fileTimeoutMs;\n  }\n  const limitsFile = path.join(tempDir, 'file-limits.json');\n  const outFile = path.join(tempDir, 'file-timeouts.jsonl');"
           },
           "headMatchingLines": [
-            206
+            204
           ]
         },
         {
@@ -11839,7 +12182,7 @@
             "text": "    // carries that same string as its last argv element.\n    limits[file] = FILE_TIMEOUT_OVERRIDES_MS[file.split(path.sep).join('/')] ?? fileTimeoutMs;\n  }\n  const limitsFile = path.join(tempDir, 'file-limits.json');\n  const outFile = path.join(tempDir, 'file-timeouts.jsonl');\n  fs.writeFileSync(limitsFile, JSON.stringify(limits));\n  fs.writeFileSync(outFile, '');"
           },
           "headMatchingLines": [
-            208
+            206
           ]
         },
         {
@@ -11849,7 +12192,7 @@
             "text": "    limits[file] = FILE_TIMEOUT_OVERRIDES_MS[file.split(path.sep).join('/')] ?? fileTimeoutMs;\n  }\n  const limitsFile = path.join(tempDir, 'file-limits.json');\n  const outFile = path.join(tempDir, 'file-timeouts.jsonl');\n  fs.writeFileSync(limitsFile, JSON.stringify(limits));\n  fs.writeFileSync(outFile, '');\n  const child = spawnAsync("
           },
           "headMatchingLines": [
-            209
+            207
           ]
         },
         {
@@ -11859,7 +12202,7 @@
             "text": "  fs.writeFileSync(outFile, '');\n  const child = spawnAsync(\n    process.execPath,\n    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],\n    { env, stdio: ['ignore', 'ignore', 'inherit'] },\n  );\n  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));"
           },
           "headMatchingLines": [
-            214
+            212
           ]
         },
         {
@@ -11869,7 +12212,7 @@
             "text": "  fs.writeFileSync(outFile, '');\n  const child = spawnAsync(\n    process.execPath,\n    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],\n    { env, stdio: ['ignore', 'ignore', 'inherit'] },\n  );\n  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));"
           },
           "headMatchingLines": [
-            214
+            212
           ]
         },
         {
@@ -11879,7 +12222,7 @@
             "text": "  fs.writeFileSync(outFile, '');\n  const child = spawnAsync(\n    process.execPath,\n    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],\n    { env, stdio: ['ignore', 'ignore', 'inherit'] },\n  );\n  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));"
           },
           "headMatchingLines": [
-            214
+            212
           ]
         },
         {
@@ -11889,7 +12232,7 @@
             "text": "  fs.writeFileSync(outFile, '');\n  const child = spawnAsync(\n    process.execPath,\n    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],\n    { env, stdio: ['ignore', 'ignore', 'inherit'] },\n  );\n  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));"
           },
           "headMatchingLines": [
-            214
+            212
           ]
         },
         {
@@ -11899,7 +12242,7 @@
             "text": "    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],\n    { env, stdio: ['ignore', 'ignore', 'inherit'] },\n  );\n  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));\n  return {\n    stop() {\n      child.kill('SIGTERM');"
           },
           "headMatchingLines": [
-            217
+            215
           ]
         },
         {
@@ -11909,7 +12252,7 @@
             "text": "}\n/**\n * The identity keys (user.*, author.*, committer.*) the checkout's repository config holds, as\n * `scope: key=value` lines. A fixture that configures an identity in the wrong repository changes\n * exactly this, and every later commit of the checkout's owner then carries the fixture's name.\n * Covers the shared config and a linked worktree's own config.worktree; the machine-wide config is\n * not this checkout's. Empty when `cwd` is not a repository."
           },
           "headMatchingLines": [
-            227
+            225
           ]
         },
         {
@@ -11935,7 +12278,7 @@
             "text": "  const changed = [];\n  for (const [key, line] of a) {\n    if (!b.has(key)) added.push(line);\n    else if (b.get(key) !== line) changed.push(`${b.get(key)} -> ${line}`);\n  }\n  for (const [key, line] of b) if (!a.has(key)) removed.push(line);\n  return { added, removed, changed, leaked: added.length + removed.length + changed.length > 0 };"
           },
           "headMatchingLines": [
-            259
+            257
           ]
         },
         {
@@ -11945,7 +12288,7 @@
             "text": " * temp tree at exit, so anything left here came from a file that skipped that, a killed file, or\n * a child that outlived it.\n */\nexport function leftoverTempPrefixes(root, readdir = fs.readdirSync) {\n  const counts = {};\n  let names = [];\n  try { names = readdir(root); } catch { return counts; }"
           },
           "headMatchingLines": [
-            271
+            269
           ]
         },
         {
@@ -11995,7 +12338,7 @@
             "text": "// shows up as added or changed event, observe and work files, which stay guarded.\nexport const DERIVED_FGOS_FILES = new Set([\n  path.join('cache', 'state.json'),\n  path.join('runtime', 'events-jsonl.truncation-guard.json'),\n]);\n\n/**"
           },
           "headMatchingLines": [
-            291
+            289
           ]
         },
         {
@@ -12021,7 +12364,7 @@
             "text": "    }\n    for (const entry of entries) {\n      if (SENSITIVE_FGOS_FILES.has(entry.name)) continue;\n      const fullPath = path.join(currentDir, entry.name);\n      const relPath = path.relative(fgosDir, fullPath);\n      if (entry.isDirectory()) {\n        walk(fullPath);"
           },
           "headMatchingLines": [
-            313
+            311
           ]
         },
         {
@@ -12031,7 +12374,7 @@
             "text": "    }\n    for (const entry of entries) {\n      if (SENSITIVE_FGOS_FILES.has(entry.name)) continue;\n      const fullPath = path.join(currentDir, entry.name);\n      const relPath = path.relative(fgosDir, fullPath);\n      if (entry.isDirectory()) {\n        walk(fullPath);"
           },
           "headMatchingLines": [
-            313
+            311
           ]
         },
         {
@@ -12041,7 +12384,7 @@
             "text": "    for (const entry of entries) {\n      if (SENSITIVE_FGOS_FILES.has(entry.name)) continue;\n      const fullPath = path.join(currentDir, entry.name);\n      const relPath = path.relative(fgosDir, fullPath);\n      if (entry.isDirectory()) {\n        walk(fullPath);\n      } else if (entry.isFile() || entry.isSymbolicLink()) {"
           },
           "headMatchingLines": [
-            314
+            312
           ]
         },
         {
@@ -12067,7 +12410,7 @@
             "text": "export function runSelectedTests(files, {\n  cwd = REPO_ROOT,\n  forwardedArgs = [],\n  execPath = process.execPath,\n  spawn = spawnSync,\n  env = process.env,\n  stdio = 'inherit',"
           },
           "headMatchingLines": [
-            374
+            372
           ]
         },
         {
@@ -12085,7 +12428,7 @@
             "text": "  const childEnv = buildTestEnv(env);\n  let runTemp = null;\n  try {\n    runTemp = fs.mkdtempSync(path.join(childEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    childEnv.TMPDIR = runTemp;\n    childEnv.TMP = runTemp;\n    childEnv.TEMP = runTemp;"
           },
           "headMatchingLines": [
-            389
+            387
           ]
         },
         {
@@ -12095,7 +12438,7 @@
             "text": "  const childEnv = buildTestEnv(env);\n  let runTemp = null;\n  try {\n    runTemp = fs.mkdtempSync(path.join(childEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    childEnv.TMPDIR = runTemp;\n    childEnv.TMP = runTemp;\n    childEnv.TEMP = runTemp;"
           },
           "headMatchingLines": [
-            389
+            387
           ]
         },
         {
@@ -12105,7 +12448,7 @@
             "text": "  let runTemp = null;\n  try {\n    runTemp = fs.mkdtempSync(path.join(childEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));\n    childEnv.TMPDIR = runTemp;\n    childEnv.TMP = runTemp;\n    childEnv.TEMP = runTemp;\n  } catch {"
           },
           "headMatchingLines": [
-            390
+            388
           ]
         },
         {
@@ -12115,7 +12458,7 @@
             "text": "\n  // Fixtures that confined workers must reach live outside /tmp. A per-run root removed here also\n  // covers a test file the watchdog killed, which never runs its own exit cleanup.\n  let fixtureRoot = null;\n  if (fs.existsSync('/var/tmp') && env[KEEP_TMP_ENV] !== '1') {\n    try {\n      fixtureRoot = fs.mkdtempSync('/var/tmp/fgos-test-fixtures-');"
           },
           "headMatchingLines": [
-            400
+            398
           ]
         },
         {
@@ -12125,7 +12468,7 @@
             "text": "  let fixtureRoot = null;\n  if (fs.existsSync('/var/tmp') && env[KEEP_TMP_ENV] !== '1') {\n    try {\n      fixtureRoot = fs.mkdtempSync('/var/tmp/fgos-test-fixtures-');\n      childEnv.FGOS_TEST_FIXTURE_ROOT = fixtureRoot;\n    } catch {\n      fixtureRoot = null;"
           },
           "headMatchingLines": [
-            403
+            401
           ]
         },
         {
@@ -12135,7 +12478,7 @@
             "text": "  if (fs.existsSync('/var/tmp') && env[KEEP_TMP_ENV] !== '1') {\n    try {\n      fixtureRoot = fs.mkdtempSync('/var/tmp/fgos-test-fixtures-');\n      childEnv.FGOS_TEST_FIXTURE_ROOT = fixtureRoot;\n    } catch {\n      fixtureRoot = null;\n    }"
           },
           "headMatchingLines": [
-            404
+            402
           ]
         },
         {
@@ -12161,7 +12504,7 @@
             "text": "    }\n    if (runTemp) {\n      if (env[KEEP_TMP_ENV] === '1') {\n        log(`run-tests: kept this run's temp dir (${KEEP_TMP_ENV}=1): ${runTemp}`);\n      } else {\n        try {\n          fs.rmSync(runTemp, { recursive: true, force: true, maxRetries: 3 });"
           },
           "headMatchingLines": [
-            442
+            440
           ]
         },
         {
@@ -12179,7 +12522,7 @@
             "text": "  if (timedOut.length) {\n    log('run-tests: ERROR: test file(s) exceeded the per-file time limit and were killed (process tree):');\n    for (const { file, elapsedMs, limitMs } of timedOut) {\n      log(`  ${file}: timed out after ${Math.round(elapsedMs / 1000)}s (limit ${Math.round(limitMs / 1000)}s)`);\n    }\n    result.status = result.status !== 0 ? result.status : 1;\n  }"
           },
           "headMatchingLines": [
-            457
+            455
           ]
         },
         {
@@ -12189,7 +12532,7 @@
             "text": "  result.tempLeftovers = tempLeftovers;\n  if (Object.keys(tempLeftovers).length) {\n    log('run-tests: ERROR: test suite left temporary directories behind (name prefix: count):');\n    for (const [prefix, count] of Object.entries(tempLeftovers).sort()) log(`  ${prefix}*: ${count}`);\n    log('  A test file must import test/helpers/process-tmp-root.mjs first; a killed file leaves its own tree.');\n    result.status = result.status !== 0 ? result.status : 1;\n  }"
           },
           "headMatchingLines": [
-            465
+            463
           ]
         },
         {
@@ -12199,7 +12542,7 @@
             "text": "  if (fgosDiff.leaked) {\n    log('run-tests: ERROR: test suite leaked unexpected files or modifications into .fgos store:');\n    if (fgosDiff.added.length) {\n      log(`  Added (${fgosDiff.added.length}):`);\n      for (const f of fgosDiff.added) log(`    + .fgos/${f}`);\n    }\n    if (fgosDiff.modified.length) {"
           },
           "headMatchingLines": [
-            490
+            488
           ]
         },
         {
@@ -12209,7 +12552,7 @@
             "text": "    log('run-tests: ERROR: test suite leaked unexpected files or modifications into .fgos store:');\n    if (fgosDiff.added.length) {\n      log(`  Added (${fgosDiff.added.length}):`);\n      for (const f of fgosDiff.added) log(`    + .fgos/${f}`);\n    }\n    if (fgosDiff.modified.length) {\n      log(`  Modified (${fgosDiff.modified.length}):`);"
           },
           "headMatchingLines": [
-            491
+            489
           ]
         },
         {
@@ -12219,7 +12562,7 @@
             "text": "      for (const f of fgosDiff.added) log(`    + .fgos/${f}`);\n    }\n    if (fgosDiff.modified.length) {\n      log(`  Modified (${fgosDiff.modified.length}):`);\n      for (const f of fgosDiff.modified) log(`    * .fgos/${f}`);\n    }\n    if (fgosDiff.deleted.length) {"
           },
           "headMatchingLines": [
-            494
+            492
           ]
         },
         {
@@ -12229,7 +12572,7 @@
             "text": "    }\n    if (fgosDiff.modified.length) {\n      log(`  Modified (${fgosDiff.modified.length}):`);\n      for (const f of fgosDiff.modified) log(`    * .fgos/${f}`);\n    }\n    if (fgosDiff.deleted.length) {\n      log(`  Deleted (${fgosDiff.deleted.length}):`);"
           },
           "headMatchingLines": [
-            495
+            493
           ]
         },
         {
@@ -12239,7 +12582,7 @@
             "text": "      for (const f of fgosDiff.modified) log(`    * .fgos/${f}`);\n    }\n    if (fgosDiff.deleted.length) {\n      log(`  Deleted (${fgosDiff.deleted.length}):`);\n      for (const f of fgosDiff.deleted) log(`    - .fgos/${f}`);\n    }\n    result.status = result.status !== 0 ? result.status : 1;"
           },
           "headMatchingLines": [
-            498
+            496
           ]
         },
         {
@@ -12249,7 +12592,7 @@
             "text": "    }\n    if (fgosDiff.deleted.length) {\n      log(`  Deleted (${fgosDiff.deleted.length}):`);\n      for (const f of fgosDiff.deleted) log(`    - .fgos/${f}`);\n    }\n    result.status = result.status !== 0 ? result.status : 1;\n  }"
           },
           "headMatchingLines": [
-            499
+            497
           ]
         },
         {
@@ -12259,7 +12602,7 @@
             "text": "  result.gitIdentityDiff = identityDiff;\n  if (identityDiff.leaked) {\n    log('run-tests: ERROR: test suite changed the git identity held by this checkout\\'s own repository config:');\n    for (const line of identityDiff.added) log(`  + ${line}`);\n    for (const line of identityDiff.removed) log(`  - ${line}`);\n    for (const line of identityDiff.changed) log(`  * ${line}`);\n    log('  A fixture ran `git config user.*` outside its own temporary repository; restore the keys above with `git config --local`.');"
           },
           "headMatchingLines": [
-            508
+            506
           ]
         },
         {
@@ -12293,7 +12636,7 @@
             "text": "  if (identityDiff.leaked) {\n    log('run-tests: ERROR: test suite changed the git identity held by this checkout\\'s own repository config:');\n    for (const line of identityDiff.added) log(`  + ${line}`);\n    for (const line of identityDiff.removed) log(`  - ${line}`);\n    for (const line of identityDiff.changed) log(`  * ${line}`);\n    log('  A fixture ran `git config user.*` outside its own temporary repository; restore the keys above with `git config --local`.');\n    result.status = result.status !== 0 ? result.status : 1;"
           },
           "headMatchingLines": [
-            509
+            507
           ]
         },
         {
@@ -12303,7 +12646,7 @@
             "text": "    log('run-tests: ERROR: test suite changed the git identity held by this checkout\\'s own repository config:');\n    for (const line of identityDiff.added) log(`  + ${line}`);\n    for (const line of identityDiff.removed) log(`  - ${line}`);\n    for (const line of identityDiff.changed) log(`  * ${line}`);\n    log('  A fixture ran `git config user.*` outside its own temporary repository; restore the keys above with `git config --local`.');\n    result.status = result.status !== 0 ? result.status : 1;\n  }"
           },
           "headMatchingLines": [
-            510
+            508
           ]
         },
         {
@@ -12321,7 +12664,7 @@
             "text": " * replaces.\n */\nexport function runTests({\n  root = DEFAULT_TEST_ROOT,\n  forwardedArgs = [],\n  execPath = process.execPath,\n  spawn = spawnSync,"
           },
           "headMatchingLines": [
-            527
+            525
           ]
         },
         {
@@ -12331,7 +12674,7 @@
             "text": "export function runTests({\n  root = DEFAULT_TEST_ROOT,\n  forwardedArgs = [],\n  execPath = process.execPath,\n  spawn = spawnSync,\n  env = process.env,\n  cwd = REPO_ROOT,"
           },
           "headMatchingLines": [
-            529
+            527
           ]
         },
         {
@@ -12380,9 +12723,7 @@
             "line": 602,
             "text": "      const hostBin = ensure(process.env, REPO_ROOT);\n      if (hostBin) process.env.FGOS_HOST_BIN = hostBin;\n    } catch (err) {\n      log(`run-tests: warning: failed to ensure host binary: ${err.message}`);\n    }\n  }\n  return queue(options);"
           },
-          "headMatchingLines": [
-            584
-          ]
+          "headMatchingLines": []
         },
         {
           "id": "dynamic-008819",

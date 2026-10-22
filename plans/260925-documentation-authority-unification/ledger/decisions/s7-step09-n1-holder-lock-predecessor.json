@@ -15,14 +15,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/holder-lock/spec.md",
       "targetAnchor": "unheaded-block-1",
-      "targetUnitDigest": "0aebfc93d80f4472c3eff584fc0ff50ee506e394fddeb182544c24834f07453e",
+      "targetUnitDigest": "6bcdd232b69054da2ac3b64457ac4a777cfefa37bd8a90facb7567e64be1e50e",
       "targetAncestry": [
         "Holder-lock Component Specification"
       ],
       "rationale": "N1 header correction at e6b7efeec replaces the stale wait-for-decision statement with the signed Event Store implementation status. Native edited positional header predecessor is preserved as an identity gap; exact full-text before/after comparison binds this same header occurrence to successor claim_d637f3e5728bc5fa7cabdd9f7dbca07b. No identity transplant, approval, promotion or implementation-truth verdict. Independent ordinary review pending. Step 0 AUTHOR at f7686163843ca8ce6b58b1fffe0472e57ce774e7: historical native/passsage correspondence rebind unheaded-block-1 -> unheaded-block-1. The opening BA-grade specification metadata fence retains audience/purpose/status framing; main updates supported-platform/header facts. Unique metadata fence in Holder-lock specification. Source identity unchanged; no native identity assignment or approval carry; independent review pending. L12-112: merge 66b637a108cd6a2659112982082b4194907b8e53 and authorized identity docs carry. Complete passage and immediate neighbouring blocks checked with both unchanged extractors, using content and heading ancestry rather than block index. Exact witnesses in step-07-l12-112-merge-rebindings.json; source identity unchanged; no approval carry.",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:fgos-run_unit-run-179225dfe65eba@2026-10-18",
-      "reviewNote": "L12-112 content-and-neighbour rebind after merge 66b637a10 and authorized identity docs carry; independent review pending; no approval carry."
+      "reviewNote": "L12-117 merge ad98c3882: complete holder-lock header, ancestry and both neighbours verified with both unchanged extractors; witnesses in step-07-l12-117-merge-rebindings.json. Source identity unchanged; independent review pending; no approval carry."
     }
   ]
 }

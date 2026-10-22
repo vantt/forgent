@@ -172,9 +172,9 @@ Locks cut over by the Rust-callers track (registry owner `4.4`), all leaves of r
 
 Git adds `repo-config`, a repo mutex at rank 80, `<fgosDir>/locks/repo-config.lock`, with no legacy path. It serializes the local fetch-mapping writer; Git's native `config.lock` also excludes ordinary Git config writers.
 
-| Lock | Kind / scope | Rank | New path | Legacy shape / path | Fence | Owner | Access |
-|---|---|---|---|---|---|---|---|
-| `documentation-cutover` | lease / repo | 10 | `<fgosDir>/locks/documentation-cutover.lock` | null / null | `none` | `documentation` | Public acquire API only; no private holder-lock route. |
+| Name | Kind | Scope | Rank | v3Path | Owner | Note |
+|---|---|---|---|---|---|---|
+| `documentation-cutover` | lease | repo | 10 | `<fgosDir>/locks/documentation-cutover.lock` | `documentation` | Public acquire API only; no private holder-lock route. |
 
 For this row, `<fgosDir>` is always the main checkout's `.fgos`, including calls from linked worktrees. The kernel handle serializes transitions only. The committed sidecar carries the persistent freeze described in section 19.
 

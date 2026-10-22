@@ -1,0 +1,4390 @@
+{
+  "inputHEAD": "7f375fb019569180e5a99a4ace7ab566867bef6e",
+  "merge": "ad98c388214efc727740a95beab33a7028369e86",
+  "firstParent": "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7",
+  "method": "L12-65/L12-102: extract complete first-parent, merged and working-file units using both unchanged Phase 6 unitsOf implementations. Traverse every ledger and pilot JSON recursively; authenticate old anchor+digest, locate unique complete content+ancestry; changed content requires unique semantic table/header/whole-file identity plus both neighbours and the actual main diff. Block ordinals are outputs only. Re-open written shards and verify every after binding.",
+  "extractorsAgree": true,
+  "extractors": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "lib": "step10-sync287-lib.mjs",
+      "sha256": "083795c90eac1d5601fedc2261390f15668fceed68a3053777960fea9a927dc3"
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "lib": "lib.mjs",
+      "sha256": "48e153938d145bd41986b47ba816d4506db1a90c664170ee08e17bc60341ba41"
+    }
+  ],
+  "fileChecks": [
+    {
+      "path": "docs/architecture-manifest.json",
+      "candidate": false,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "d476f716fb2ce5a3a663f103dfbe6a6b87201c9a25962e78247e535f04529c7a",
+        "ad98c388214efc727740a95beab33a7028369e86": "7501b73f738573bc1a69b3d97a7176bcbadd3434780e66f6a1e4acb6c448680c",
+        "working": "7501b73f738573bc1a69b3d97a7176bcbadd3434780e66f6a1e4acb6c448680c"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 1,
+          "completeUnitsSha256": "bc8b91dd78361b2dbfb24e72a091373c869c8bc76c9b08e88c7287ebdda40202"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 1,
+          "completeUnitsSha256": "b0be9e7b91463707b833426070703fe60a2f1ad6945eae12afb9fb1bf326520c"
+        },
+        "working": {
+          "count": 1,
+          "completeUnitsSha256": "b0be9e7b91463707b833426070703fe60a2f1ad6945eae12afb9fb1bf326520c"
+        }
+      },
+      "directChecked": 3,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/backlog.md",
+      "candidate": false,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "5839e539d80dc58e637d9710e4301a88374919e7c4dc8d60787e61f6b99d5594",
+        "ad98c388214efc727740a95beab33a7028369e86": "1852674f04b5c597e8f12ccc3cf83093b04c50c6d5d910bc88c6dd14aca7ef22",
+        "working": "1852674f04b5c597e8f12ccc3cf83093b04c50c6d5d910bc88c6dd14aca7ef22"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 4,
+          "completeUnitsSha256": "d24fea7112024620ff8b60dadf813e2aec67a553e07dd429e73b00b05ea3badd"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 4,
+          "completeUnitsSha256": "9283318ac74d8301aec602161e3d4ebf3b3c6ffbb28659156b6a2dd9e45255be"
+        },
+        "working": {
+          "count": 4,
+          "completeUnitsSha256": "9283318ac74d8301aec602161e3d4ebf3b3c6ffbb28659156b6a2dd9e45255be"
+        }
+      },
+      "directChecked": 0,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "candidate": false,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "ed2eb1bfbb92964192bf1ccebb424d9620496a9b02415cf0cce50f166b3f0aee",
+        "ad98c388214efc727740a95beab33a7028369e86": "d7acf8c73aa7b52e9d5164499d92a8a39add46792eafe983133c397b404805a7",
+        "working": "d7acf8c73aa7b52e9d5164499d92a8a39add46792eafe983133c397b404805a7"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 86,
+          "completeUnitsSha256": "3346b10220786d18931db29d30e03fcf44e42e50986158bbadd91de528ebb59a"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 86,
+          "completeUnitsSha256": "78e55fefacf687c3c22113822ba82c96c326973f1a7414b4a0cefb2123addf48"
+        },
+        "working": {
+          "count": 86,
+          "completeUnitsSha256": "78e55fefacf687c3c22113822ba82c96c326973f1a7414b4a0cefb2123addf48"
+        }
+      },
+      "directChecked": 4,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/platform/agent-protocol/spec.md",
+      "candidate": true,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "cea88d449291b8ca29094fedb0bd9df1e0f06bd07bfed4a6bbb1163a39a226b6",
+        "ad98c388214efc727740a95beab33a7028369e86": "6bd368bab828957e2deded14d6f3bf8c571a8ff44eefa45e61f7eb30a506b0bd",
+        "working": "6bd368bab828957e2deded14d6f3bf8c571a8ff44eefa45e61f7eb30a506b0bd"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 37,
+          "completeUnitsSha256": "310e70bfa79e949581e9ddc3fe04fad15f3e741cdb8f295444eac1b9f6fe61bd"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 37,
+          "completeUnitsSha256": "499e8b03d119ae04e7d2d0387ec21c57b5ede01dc4d5058a28188d06c43102ef"
+        },
+        "working": {
+          "count": 37,
+          "completeUnitsSha256": "499e8b03d119ae04e7d2d0387ec21c57b5ede01dc4d5058a28188d06c43102ef"
+        }
+      },
+      "directChecked": 0,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "candidate": true,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "fd3cc90cc4f4c73f07c7eefbe3cf7f4b1a12039a940071cc6c14612fa1f21fec",
+        "ad98c388214efc727740a95beab33a7028369e86": "a8b612b6100f37b0d8301b4eaa39d1cc31c1a1df6605a66e2918b235ca68d15b",
+        "working": "a8b612b6100f37b0d8301b4eaa39d1cc31c1a1df6605a66e2918b235ca68d15b"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 297,
+          "completeUnitsSha256": "af3734764a8fbc44c56cbc6ed18f93da9977552cd49dfb614d80aba3e51b9103"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 297,
+          "completeUnitsSha256": "a705e32d014513f85cf8b888019ab33d982d2719579b73de97f85f2938fefa60"
+        },
+        "working": {
+          "count": 297,
+          "completeUnitsSha256": "a705e32d014513f85cf8b888019ab33d982d2719579b73de97f85f2938fefa60"
+        }
+      },
+      "directChecked": 271,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/platform/convention/spec.md",
+      "candidate": true,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "17dceaa007bfb1e1223cdb3cf7bfdad214a251b066bb464950e9ba925f06467b",
+        "ad98c388214efc727740a95beab33a7028369e86": "a3056f5369b86c513eca09c11b190865acb65dc4ce6a5a56c2cc22660c038e42",
+        "working": "a3056f5369b86c513eca09c11b190865acb65dc4ce6a5a56c2cc22660c038e42"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 102,
+          "completeUnitsSha256": "cc6a1140b980c83cfef2db065fbda98997d7e087ed862782747648929873a83a"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 102,
+          "completeUnitsSha256": "a0b23706ef369c1926d24a6c75e6cd401eb220e57889e65009b01a457fecd340"
+        },
+        "working": {
+          "count": 102,
+          "completeUnitsSha256": "a0b23706ef369c1926d24a6c75e6cd401eb220e57889e65009b01a457fecd340"
+        }
+      },
+      "directChecked": 0,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/platform/event-store/spec.md",
+      "candidate": true,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "537dcda9535f79aebeec04e94f354e793bbc8d799eb3ccdb56522995db93e20b",
+        "ad98c388214efc727740a95beab33a7028369e86": "3def77550d892ee25b1713792c86a67948018725aa45bd9049c4cdb2af7f6fe6",
+        "working": "3def77550d892ee25b1713792c86a67948018725aa45bd9049c4cdb2af7f6fe6"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 255,
+          "completeUnitsSha256": "77e4b37d39e2eaddd39b2bb3a2a47451ad547c3a31532d7f17bdff4a7c9207de"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 255,
+          "completeUnitsSha256": "94bdad5c9dcc2be460036dce4ade4dc9ac75072de372e9693d217b92b8d098df"
+        },
+        "working": {
+          "count": 255,
+          "completeUnitsSha256": "94bdad5c9dcc2be460036dce4ade4dc9ac75072de372e9693d217b92b8d098df"
+        }
+      },
+      "directChecked": 0,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/platform/git/spec.md",
+      "candidate": true,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "c9c8026b4bb0d73cc0eca78ccea380dd99f319593649de8e768247abcbb5a0cd",
+        "ad98c388214efc727740a95beab33a7028369e86": "30aacbc0e4389d27e8db92e7df2d2a74d46d5a496bdf2f07f39ad9abbd817c66",
+        "working": "30aacbc0e4389d27e8db92e7df2d2a74d46d5a496bdf2f07f39ad9abbd817c66"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 286,
+          "completeUnitsSha256": "c968510fab3b8d8e840f44eb7f28bf6801a35cd100860434a9e1b1e18893d0c6"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 287,
+          "completeUnitsSha256": "4c39c720a2a4258cae72910bd1a0a524cecc0e547b84d74e8de4095bd0b99684"
+        },
+        "working": {
+          "count": 287,
+          "completeUnitsSha256": "4c39c720a2a4258cae72910bd1a0a524cecc0e547b84d74e8de4095bd0b99684"
+        }
+      },
+      "directChecked": 0,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "candidate": true,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "29ff60a99cf84a4b17e2de8d2cbfd68f7bff827aafa1c94d4a83b01d84cb49cd",
+        "ad98c388214efc727740a95beab33a7028369e86": "9bda12ecdae18eb97a52befe93f303108aa48a437190aa652b4b788ae1fd12f7",
+        "working": "7727dee76181c5c6047387190772a483da8717239f7952946f5b369e56e4f0c4"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 144,
+          "completeUnitsSha256": "b8ea7852b9fe771358cb8f718c82d19397a39f2f6c8a3bbe3fe6dc15f176cc76"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 138,
+          "completeUnitsSha256": "0ade4020283fb016e5e31d9e34131bbbe33cd84a51e1ed8f9b0400492552570e"
+        },
+        "working": {
+          "count": 138,
+          "completeUnitsSha256": "e737d679379634faca12cf71278f9738366d8d44ef99f78b98394b172ece5775"
+        }
+      },
+      "directChecked": 1,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/platform/identity/spec.md",
+      "candidate": true,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "25c8b0b647c07c7874e16bfe3e280db13a79e272eeb54a60579de6da7b517d55",
+        "ad98c388214efc727740a95beab33a7028369e86": "07eb1d32ec3904c5a5e8cc3c3f46d2dd68b115b78d00419d3ec57167e65fe2ae",
+        "working": "07eb1d32ec3904c5a5e8cc3c3f46d2dd68b115b78d00419d3ec57167e65fe2ae"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 60,
+          "completeUnitsSha256": "97fafe8a369d272002974c00f9adecf95738a5157ab57243a70f357515aca624"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 62,
+          "completeUnitsSha256": "e8b05569a0511870611f1e3ebd035fe703fd13a63755cb99dd84de7eeda32912"
+        },
+        "working": {
+          "count": 62,
+          "completeUnitsSha256": "e8b05569a0511870611f1e3ebd035fe703fd13a63755cb99dd84de7eeda32912"
+        }
+      },
+      "directChecked": 0,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "candidate": true,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "d29184600b47ee5234c7d6f3d4f6bbfae6f5b15d98f488f1be250489cfbb89d4",
+        "ad98c388214efc727740a95beab33a7028369e86": "fa35e3f755e70125bdc0b92de3f41d57eb66a8d352c54b973de301bc83cf5f88",
+        "working": "fa35e3f755e70125bdc0b92de3f41d57eb66a8d352c54b973de301bc83cf5f88"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 45,
+          "completeUnitsSha256": "6a60eeed54c0472724b3eafd36fc59570d343ad1d0c2983df27145eb454f7b21"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 45,
+          "completeUnitsSha256": "c723f9ec47031b34eebb3c0d1bca1c06a30e1e72fb1acdd47c5592defef65aed"
+        },
+        "working": {
+          "count": 45,
+          "completeUnitsSha256": "c723f9ec47031b34eebb3c0d1bca1c06a30e1e72fb1acdd47c5592defef65aed"
+        }
+      },
+      "directChecked": 7,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/platform/process/spec.md",
+      "candidate": true,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "4221c117fc49b87ac9b9c3ede826d785049d9d510540ce477aeb4e77c39ebb50",
+        "ad98c388214efc727740a95beab33a7028369e86": "1ed03ecc353df1b180802791cdb904904f6141347720339347377cb5b48236db",
+        "working": "1ed03ecc353df1b180802791cdb904904f6141347720339347377cb5b48236db"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 48,
+          "completeUnitsSha256": "df198297a3a23a344ec9d8d7b59057591e46db636f3c97c0cd71bd773a09d723"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 48,
+          "completeUnitsSha256": "bc530309a8e4e24102bbfb6b0ae421272d6000a2e33faa87644bb836a96730fc"
+        },
+        "working": {
+          "count": 48,
+          "completeUnitsSha256": "bc530309a8e4e24102bbfb6b0ae421272d6000a2e33faa87644bb836a96730fc"
+        }
+      },
+      "directChecked": 0,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/platform/run-supervisor/spec.md",
+      "candidate": true,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "93f3337b152b92221ebedbcb4d8f220cde91c15b27c77cf4f4238865d74ed42f",
+        "ad98c388214efc727740a95beab33a7028369e86": "91cb0302588801a989846109d6a7c9298c28b842709195618f7c22d02ef19011",
+        "working": "91cb0302588801a989846109d6a7c9298c28b842709195618f7c22d02ef19011"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 103,
+          "completeUnitsSha256": "e0130bd0c47b9913ae5fd2561d879be6791d367b59f233221effa0223ea0482d"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 103,
+          "completeUnitsSha256": "0d3c9de18b30b0519d11290f876bc96baa221ed1475e89323a64e2f8b42274a6"
+        },
+        "working": {
+          "count": 103,
+          "completeUnitsSha256": "0d3c9de18b30b0519d11290f876bc96baa221ed1475e89323a64e2f8b42274a6"
+        }
+      },
+      "directChecked": 0,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/platform/terminal-control/spec.md",
+      "candidate": true,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "c7f323a64de96f53b8250d2612a6d987500e4a5a99924b63ca35d953211d2838",
+        "ad98c388214efc727740a95beab33a7028369e86": "e52b3c825a65b4c03771a77ff2fc721eb1345775128baa33fe18b48f3306631d",
+        "working": "e52b3c825a65b4c03771a77ff2fc721eb1345775128baa33fe18b48f3306631d"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 57,
+          "completeUnitsSha256": "75182f4a50f797d4c0cad962297917ecfacc81dfc6c733bed3b784bfcd958ad0"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 57,
+          "completeUnitsSha256": "dd1967135ef254a9b14fb9a9c6173c2c9ed70ed6d4873c98040ece473de6a175"
+        },
+        "working": {
+          "count": 57,
+          "completeUnitsSha256": "dd1967135ef254a9b14fb9a9c6173c2c9ed70ed6d4873c98040ece473de6a175"
+        }
+      },
+      "directChecked": 0,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/specs/distribution.md",
+      "candidate": false,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "2b6c1fc5f0331bf67a298124e9506f7eed5a3dc5a653977bbf1d2b45a28f3c98",
+        "ad98c388214efc727740a95beab33a7028369e86": "4165bd22b8bf314cad8a1a7e4283835710bc8790ff55ded7d2f5d8e05d750ecb",
+        "working": "4165bd22b8bf314cad8a1a7e4283835710bc8790ff55ded7d2f5d8e05d750ecb"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 41,
+          "completeUnitsSha256": "c44ef95f5b466a284ad5723e8762513680528c64bf6c0c9e3eb5cfc5ea00688c"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 41,
+          "completeUnitsSha256": "c823c1a45ed39d632b9a319df1b72f7d1507f9ff2b9acf7ce68c78ae398c6196"
+        },
+        "working": {
+          "count": 41,
+          "completeUnitsSha256": "c823c1a45ed39d632b9a319df1b72f7d1507f9ff2b9acf7ce68c78ae398c6196"
+        }
+      },
+      "directChecked": 4,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/specs/reading-map.md",
+      "candidate": false,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "daf82d69546be573b3c113309852745700f7f950f7d239a9f43c2b8d4bc224b1",
+        "ad98c388214efc727740a95beab33a7028369e86": "0c899206b1b519f9628941542b8901c21928413618458d90f7c0d2d2a3131133",
+        "working": "0c899206b1b519f9628941542b8901c21928413618458d90f7c0d2d2a3131133"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 3,
+          "completeUnitsSha256": "59d4d9cc149b68ddc558d63aabb66bf9178c799e9643e3914331778381eb2815"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 3,
+          "completeUnitsSha256": "d4a9f2c44ccad4167e46fa6389af51a912e10e3af3721cc03117bdae3834984a"
+        },
+        "working": {
+          "count": 3,
+          "completeUnitsSha256": "d4a9f2c44ccad4167e46fa6389af51a912e10e3af3721cc03117bdae3834984a"
+        }
+      },
+      "directChecked": 0,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/specs/seat-binding.md",
+      "candidate": false,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "1e46fa2685528bfb4b287520b7889745c53bff078d205e4978f7dc40d9bc3dae",
+        "ad98c388214efc727740a95beab33a7028369e86": "66519171af96b0ae135b92b4e4e113085ebde7faae52d80ead4c636f0d9ebde4",
+        "working": "66519171af96b0ae135b92b4e4e113085ebde7faae52d80ead4c636f0d9ebde4"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 98,
+          "completeUnitsSha256": "7605b3f93ae5bd9086153cc12bad1185b7a7c01b63b9767ba349bf15e716ba78"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 98,
+          "completeUnitsSha256": "4fb6154af759024df55ce6eae26a5678fdb1cd3409adba4fe1d593c267a276e2"
+        },
+        "working": {
+          "count": 98,
+          "completeUnitsSha256": "4fb6154af759024df55ce6eae26a5678fdb1cd3409adba4fe1d593c267a276e2"
+        }
+      },
+      "directChecked": 0,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "docs/specs/work-state.md",
+      "candidate": false,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "a6e9573065e87b90f08beac9d65a77e2dfddc9f7e5410c7fbb5e3d5083423db8",
+        "ad98c388214efc727740a95beab33a7028369e86": "f2b527e28dc122ae52f86001a90b93d401a1cb7b565ea9eb1b95eb6a1c34d0da",
+        "working": "f2b527e28dc122ae52f86001a90b93d401a1cb7b565ea9eb1b95eb6a1c34d0da"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 327,
+          "completeUnitsSha256": "35cfff2286173bd5ca2c44be8b86573b330e19e6386200bbf9c6ee215b5eba6d"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 327,
+          "completeUnitsSha256": "5ed0ab13dadbab271829c13a9c78fdbd0f9f02134cb61c60cb76d05dc93790d5"
+        },
+        "working": {
+          "count": 327,
+          "completeUnitsSha256": "5ed0ab13dadbab271829c13a9c78fdbd0f9f02134cb61c60cb76d05dc93790d5"
+        }
+      },
+      "directChecked": 7,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "AGENTS.md",
+      "candidate": false,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "d5e791b8e1a1bbc753d4619428130ac71c6175939f6a9c47741ab7c061eb5dcb",
+        "ad98c388214efc727740a95beab33a7028369e86": "30f6499b652d02e15f1f24144dd90731a1ad49a312e968dae3b04fc11cd7227d",
+        "working": "30f6499b652d02e15f1f24144dd90731a1ad49a312e968dae3b04fc11cd7227d"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 94,
+          "completeUnitsSha256": "a2099116141d7e8e85616131fa45034325ae865a0f69fafbedb96b695e928696"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 98,
+          "completeUnitsSha256": "655d90d4aa706957e51e5f2663bb84ddd0d9e57c8c602ef5e0302e74859e979d"
+        },
+        "working": {
+          "count": 98,
+          "completeUnitsSha256": "655d90d4aa706957e51e5f2663bb84ddd0d9e57c8c602ef5e0302e74859e979d"
+        }
+      },
+      "directChecked": 0,
+      "groupMembersChecked": 0
+    },
+    {
+      "path": "CHANGELOG.md",
+      "candidate": false,
+      "fileSha256": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": "277d67c32af7d6a760e44b090031f25951fd534cc39d137829cb1117fecb6d7b",
+        "ad98c388214efc727740a95beab33a7028369e86": "fd89911396fad9330ffb5309061a825c9ac562721d03534b4a6cdea739cd38c5",
+        "working": "c3c17d6211900bad434dd187f749980df59437aab85f17597e1bd5d1ebf95c6a"
+      },
+      "units": {
+        "a75cf471bad7f368d47a1b81fc3b50b2fa51d3b7": {
+          "count": 232,
+          "completeUnitsSha256": "cae3bd826d1c0df7ef481b2d9ab25e7b2e2e37af271005a8a9c5e026ba19dda3"
+        },
+        "ad98c388214efc727740a95beab33a7028369e86": {
+          "count": 234,
+          "completeUnitsSha256": "249c5a7bb695570e9d0728ee169f628d4ce4190a983b572553af2498d6bff60b"
+        },
+        "working": {
+          "count": 235,
+          "completeUnitsSha256": "47345a06e7068739741a59ed89dc6f8fe7fd191cd178b3dce8dbe3d0e0285c76"
+        }
+      },
+      "directChecked": 0,
+      "groupMembersChecked": 0
+    }
+  ],
+  "directChecked": 297,
+  "groupMembersChecked": 0,
+  "changedBindings": 8,
+  "remainingDrift": 0,
+  "postApplicationDirectChecks": [
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        0
+      ],
+      "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+      "targetOwner": "docs/architecture-manifest.json",
+      "afterAnchor": "file-block",
+      "afterDigest": "7501b73f738573bc1a69b3d97a7176bcbadd3434780e66f6a1e4acb6c448680c",
+      "method": "unique same semantic opening + heading ancestry; complete changed passage and immediate neighbours compared",
+      "drift": true
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        2
+      ],
+      "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-11",
+      "afterDigest": "a3e61406c54ac1e5ff345b47199223f41ebd7b356c0d4c5fbb5e9a323d04f143",
+      "method": "unique same semantic opening + heading ancestry; complete changed passage and immediate neighbours compared",
+      "drift": true
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        5
+      ],
+      "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
+      "targetOwner": "docs/specs/distribution.md",
+      "afterAnchor": "unheaded-block-14",
+      "afterDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        6
+      ],
+      "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+      "targetOwner": "docs/specs/distribution.md",
+      "afterAnchor": "unheaded-block-5",
+      "afterDigest": "7df410607f6d4460de1cbd6bb5b9b82969aacd91fb327a21642cfc5e44384261",
+      "method": "unique same semantic opening + heading ancestry; complete changed passage and immediate neighbours compared",
+      "drift": true
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        10
+      ],
+      "claimId": "claim_ac8cc5d1152e7a057ffbef1e804079aa",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "afterAnchor": "contributor-hooks-setup",
+      "afterDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        11
+      ],
+      "claimId": "claim_5c58459a3d4fb3c94d3d177ae5ff71ad",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "afterAnchor": "unheaded-block-29",
+      "afterDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        12
+      ],
+      "claimId": "claim_2cca265eea57df2daf94c3b3876393f3",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "afterAnchor": "setup",
+      "afterDigest": "067cbca86dd10e836365f4ea3cf150b4e1ecd297365f4dcb134adf1ddfc22461",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        13
+      ],
+      "claimId": "claim_40d8d8f06aaedbc16cdcc4f8603e6d09",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "afterAnchor": "doctor",
+      "afterDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "claims",
+        14
+      ],
+      "claimId": "claim_1b418e3e2ee62a83adc1420a4967de62",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "afterAnchor": "unheaded-block-31",
+      "afterDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "keys": [
+        "registryGaps",
+        5
+      ],
+      "claimId": "claim_891db485a75cdb558cf725c3315f3857",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "afterAnchor": "unheaded-block-30",
+      "afterDigest": "02ded58d5391712cc8d8adae9d73588d7392bd4f46924d3c0cbfef64815a8dab",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "keys": [
+        "registryGaps",
+        12
+      ],
+      "claimId": "claim_acd9a23bb5fe3a5dda7169c04a12b409",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "afterAnchor": "unheaded-block-1",
+      "afterDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "keys": [
+        "registryGaps",
+        0
+      ],
+      "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
+      "targetOwner": "docs/specs/distribution.md",
+      "afterAnchor": "unheaded-block-5",
+      "afterDigest": "7df410607f6d4460de1cbd6bb5b9b82969aacd91fb327a21642cfc5e44384261",
+      "method": "unique same semantic opening + heading ancestry; complete changed passage and immediate neighbours compared",
+      "drift": true
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "keys": [
+        "registryGaps",
+        2
+      ],
+      "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+      "targetOwner": "docs/specs/distribution.md",
+      "afterAnchor": "unheaded-block-5",
+      "afterDigest": "7df410607f6d4460de1cbd6bb5b9b82969aacd91fb327a21642cfc5e44384261",
+      "method": "unique same semantic opening + heading ancestry; complete changed passage and immediate neighbours compared",
+      "drift": true
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "keys": [
+        "registryGaps",
+        12
+      ],
+      "claimId": "claim_5ad7915f076019507cae1a93c14ad2d7",
+      "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "afterAnchor": "unheaded-block-27",
+      "afterDigest": "e21779e108d69203bc26537f09f82d14f57f45bc2cf5232134320c9dfe08d105",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "keys": [
+        "registryGaps",
+        13
+      ],
+      "claimId": "claim_0b03338bd7576f97d0cd046630a49fee",
+      "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "afterAnchor": "unheaded-block-28",
+      "afterDigest": "ab07915018064a880c69774d42994e1da515f12837c2276b64f98be6c00c9f88",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "keys": [
+        "registryGaps",
+        14
+      ],
+      "claimId": "claim_d85a5331d5712b2f5c2ecd9cab60e487",
+      "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "afterAnchor": "unheaded-block-29",
+      "afterDigest": "8b845575534e8e9dfe409dc59e73bb7168d3579f320d6b6cd34d709fda7cfdb5",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "keys": [
+        "registryGaps",
+        15
+      ],
+      "claimId": "claim_b741539a16b6eb2792ca6c4178b23671",
+      "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "afterAnchor": "unheaded-block-37",
+      "afterDigest": "b3adc0b131fb58d788e8d9bfea162407e7e4657d1e77040d208fc6b9d0aaef85",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "keys": [
+        "registryGaps",
+        0
+      ],
+      "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+      "targetOwner": "docs/architecture-manifest.json",
+      "afterAnchor": "file-block",
+      "afterDigest": "7501b73f738573bc1a69b3d97a7176bcbadd3434780e66f6a1e4acb6c448680c",
+      "method": "unique same semantic opening + heading ancestry; complete changed passage and immediate neighbours compared",
+      "drift": true
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "keys": [
+        "registryGaps",
+        1
+      ],
+      "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+      "targetOwner": "docs/architecture-manifest.json",
+      "afterAnchor": "file-block",
+      "afterDigest": "7501b73f738573bc1a69b3d97a7176bcbadd3434780e66f6a1e4acb6c448680c",
+      "method": "unique same semantic opening + heading ancestry; complete changed passage and immediate neighbours compared",
+      "drift": true
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        0
+      ],
+      "claimId": "claim_6a9ed963beadff6cbe381fe46ccd8d8d",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "fgos-component-boundary-advisory",
+      "afterDigest": "5d693cd0376780c965e59de839cb3db8439d9c27b2810c9c951ca99352e0c3ba",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        1
+      ],
+      "claimId": "claim_b5eaf900c55b4d0160e490fd9da0de39",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-15",
+      "afterDigest": "6e7fac96ac571658cb549018e24770c9973cbeda56203374f2cb1b6582982288",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        2
+      ],
+      "claimId": "claim_046eeac7c222602b244507f2829c43d7",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "1-purpose-1",
+      "afterDigest": "a55c1413a243228ffc24509e1e176d1c921bebdbbbbecffbb04cc36ca4e47b9c",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        3
+      ],
+      "claimId": "claim_b92189308a3f97db6d372cbc1d595e96",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-16",
+      "afterDigest": "4ccffa91cb32879adad24bbaa07de27f2045c8f092e9dc3a45da2df6960a6d1f",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        4
+      ],
+      "claimId": "claim_8b11b98d58f3e28176cc838ba918a3cc",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-17",
+      "afterDigest": "78d58148ed5a88f8afa9f17ea9dfca96f6e3782af983b93558176a1f027b77a9",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        5
+      ],
+      "claimId": "claim_bc4dae75c91315b033597e9334304bc2",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-18",
+      "afterDigest": "99604b6343fc67389feebfaa90d426013667e994f3aeea1e390c15cea87d1094",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        6
+      ],
+      "claimId": "claim_df36e613ed863d1a89c41c929818f470",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-19",
+      "afterDigest": "775e5a1e3ec8f34cedeec90a70b977b73fa12f5cf1af4375d45407efeb8ca150",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        7
+      ],
+      "claimId": "claim_957003b70a963677864efd089048503f",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-20",
+      "afterDigest": "5d824f3dd0668f48e96dd80da906608cab3e16f627adb31853cf74e08c86442b",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        8
+      ],
+      "claimId": "claim_7489ec924442f26825dccb35b9a102e9",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-21",
+      "afterDigest": "c3e3065f86803d9cf1e8ffd2bbe7b66347e7fb1fae1244d3a286f3bb089a4c84",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        9
+      ],
+      "claimId": "claim_0e028e16afe6931703eea5bb0ce1b213",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "2-architectural-reading",
+      "afterDigest": "2269bc64c0184627a65acff80ad17666348fa26cb74db769fa03d75d40a458bb",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        10
+      ],
+      "claimId": "claim_d7ef7b9695e7e7591bc63a10b5772030",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-22",
+      "afterDigest": "4816c7877f70615ff18fe93897c011d4d36a279e8a3ed8bffe7f4c0a320c0d8f",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        11
+      ],
+      "claimId": "claim_578fb4877ff64851cfa60549b49f35bb",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-23",
+      "afterDigest": "414fbebab9b091e01cff844e26ff72df54cb40200d7feffe3e9a1478be20f174",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        12
+      ],
+      "claimId": "claim_80a366589a99e93ce66ed687286316b2",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-24",
+      "afterDigest": "1a29398d79ad8a867115fd31673666e42552143a665dff177202e0c0d626050b",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        13
+      ],
+      "claimId": "claim_903c42ff170ad483bf9cada26a9c70a3",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-25",
+      "afterDigest": "58a7d0b6b06e40af6787972e6b5ae17c5c91f8a045d4cb4394a46138c132debb",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        14
+      ],
+      "claimId": "claim_fdd23574c303e8356ad0ae21e4ba868b",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-26",
+      "afterDigest": "b87cc067c17c90645cd1fcdc200f508f6e8a36b0d03d52ae40f1d3047eb7a4a1",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        15
+      ],
+      "claimId": "claim_5fd8d8715b894471ec6b7dcbb6c53b56",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "3-recommended-responsibility-chain",
+      "afterDigest": "bc830b9f64a54bfc832f27320ce6317e734dbf49001182bcf514259f253ef1b3",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        16
+      ],
+      "claimId": "claim_d59095f8b7cd6716a79350856db4e3d6",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-28",
+      "afterDigest": "dc114607aada8a58c3fc40c251a33184310b9022f9f6456a6c4f350edecd94c9",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        17
+      ],
+      "claimId": "claim_05fd95ccbaf6848e2a838e3cb13314cf",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-29",
+      "afterDigest": "5f39cf944ad6419bd674e7b2261f717adb72e7b3f56508585c9daa0c2add0148",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        18
+      ],
+      "claimId": "claim_fe2a2bbbcf220cf6078d884f7a17b23e",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-30",
+      "afterDigest": "0d2107a21d41d6c32b5d6a8d33671ad6bc26cd901f1522620f59b6f161361054",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        19
+      ],
+      "claimId": "claim_8011b527ba30707d1a1e93fe256e6205",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "4-boundary-vocabulary",
+      "afterDigest": "428c54989e74ebd6f7c81254573adeee4c4a9ea2010808f553f270bdad1e0cb3",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        20
+      ],
+      "claimId": "claim_41b292cc495c4aa071ea37e91c8c72f3",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-31",
+      "afterDigest": "34c3658a53018bbad7beb9fbea7100d39476029dc298a822baf472e0ae0e5e64",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        21
+      ],
+      "claimId": "claim_582676847955615c6264aaa11d8c23d7",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-32",
+      "afterDigest": "28a0a3648b70b5e53b3a987ba822ea55a92a6c480cae2b39be3c8c8ef0ed3eaa",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        22
+      ],
+      "claimId": "claim_1e8d9ed0c06e1735a8859fd26b5ba561",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-33",
+      "afterDigest": "9e8af87d9288e484a7a717c9795d5ed040f16b56d5a24b984d9fcc7a26b57577",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        23
+      ],
+      "claimId": "claim_460efd60b6e51025fb94368dad1ef93d",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-34",
+      "afterDigest": "2cae11e68b1290299a20e70230fcaed27919fac50d0edbaf580a2791f1cb0b0d",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        24
+      ],
+      "claimId": "claim_0468fd1a3fce3029f1ea242a13c9f46a",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-35",
+      "afterDigest": "2946d8be4ed11e89c5b9fc0211a851d0b294aa3a7fd383c538d180fd5634bf32",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        25
+      ],
+      "claimId": "claim_be53bec327318111b8b8b93a58f366bd",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-36",
+      "afterDigest": "45f67cf4091f5ed96a0ce91a95a3b6836dfbf94c5dbd622e955517017c22c04f",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        26
+      ],
+      "claimId": "claim_9e5d4af5736ee8ed729daba3843744af",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-37",
+      "afterDigest": "5122f358bb31e42999cf63d508fdb35108406dd5a412cfb92c5ce8e78afa735e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        27
+      ],
+      "claimId": "claim_ae69ca82e388b03292f8c25fe9c998c0",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "5-high-level-component-authority-register",
+      "afterDigest": "e086f83923aac7dad4e323cdf59fd7be32b2feabcc46802ad41baff5a6a406c2",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        28
+      ],
+      "claimId": "claim_aac411c433a46e14d6964975230acbb0",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-38",
+      "afterDigest": "7cb40f48a17a3f179d8bf58fd03d67ead3d86aa57776986f4130c297fa881056",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        29
+      ],
+      "claimId": "claim_f978aaa99374cdd888b78ce0c6bc1c56",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-39",
+      "afterDigest": "cf6e54194d2c0af4e35d51e88bc596a5ded47f6aed5511d07369e986a047cf6f",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        30
+      ],
+      "claimId": "claim_ab73231bdd37667748e73f92da406a7b",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-40",
+      "afterDigest": "57f9ce1415b601e5a7dc77c281d688b5ef47c7c84bf5620294bacf66ed5bde0f",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        31
+      ],
+      "claimId": "claim_23a0c7979ae73ea30c2532171f40fd25",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-41",
+      "afterDigest": "3ee7c75c68c9e527207fabf58ca9a466ee370f6358c4015ba7951d704b029139",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        32
+      ],
+      "claimId": "claim_8dd5e63923184b2300df40a3ea7ed6f5",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-42",
+      "afterDigest": "9c60676513c958dea377865ed1f2099acdca34a1234b254527d750af2aef1461",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        33
+      ],
+      "claimId": "claim_ede299755b0bfb44ab23a6be8e3f42b4",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-43",
+      "afterDigest": "7fe45de88fbd483e76e550c337d25e8e713295869b1ef0d342e335809f7c706e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        34
+      ],
+      "claimId": "claim_76bbf3565d113f96c4ad339bce3fc115",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-44",
+      "afterDigest": "ddf501baab878da28e004ffac07861746b4975d8f2f6956c30bcbbcb0936f603",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        35
+      ],
+      "claimId": "claim_d25f864350af23b18b3f416bb7887499",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-45",
+      "afterDigest": "f0f5df1caed78140a1faf77c1391de8dfe1d45f411bd11e57f8cbfec8da9ee3a",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        36
+      ],
+      "claimId": "claim_ee89ec08217e76063f85c56c2b612177",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-46",
+      "afterDigest": "c84467d45b1ab143a666b7d7baa647d6bf8b44b91d67db6a7dff994d9e710e72",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        37
+      ],
+      "claimId": "claim_a10e20a668c042d6b7391dd20f8e5ddd",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-47",
+      "afterDigest": "d52ae8848ecfb9ba6ab60ab5820cf238d032ce57339fd30a18bc56d992d458ae",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        38
+      ],
+      "claimId": "claim_aad8b37223d8857344794cafaba55cfd",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-48",
+      "afterDigest": "bd851151fbcce9fcff72bbe5777e19ad2cb3513e835f653dedd66dd345a2ff05",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        39
+      ],
+      "claimId": "claim_41f97bc51d3e290eee4ede5329ceb32a",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "6-existing-decisions-that-must-be-preserved",
+      "afterDigest": "ef51053755d718c6c0de59d110635ca0f3d6d4c46ab3391471ef91ed8ac4d687",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        40
+      ],
+      "claimId": "claim_3ce7a04c3bfa7343ae31cd061a43b8bd",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-49",
+      "afterDigest": "288dcf20143ebce3b48e0c4370668734d849197fb2800d4e420ac1e6417bb181",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        41
+      ],
+      "claimId": "claim_7ffa8fe890b4d08db7e9dcaef3af6dbe",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-50",
+      "afterDigest": "86d5fbf4fd87da5c0528c02058843a78a373d031a91466384fc2fd3a12bc6bb1",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        42
+      ],
+      "claimId": "claim_478e0d9f32b3e7d3c42a4baa93f133dc",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-51",
+      "afterDigest": "2153a68e7201b407e655d3e81260ec51b4d4b52fce90d0d7fa16aa4555fe7316",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        43
+      ],
+      "claimId": "claim_2f379340702eb45444bea0bab3361f95",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-52",
+      "afterDigest": "c13537803ff56af1fe9978fc0e6cf5cb24379e51f0722679746693df00939aa9",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        44
+      ],
+      "claimId": "claim_e8ba8df2876a0b07de5cc3acfc9af145",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-53",
+      "afterDigest": "d18d9725241f214247cc8a8c68d302f2bda761ce1eb5729eda0811508bfd97ca",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        45
+      ],
+      "claimId": "claim_f85d39c523913fc7cb660e3b67989989",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-54",
+      "afterDigest": "41a41035bd290ed0ea23e35a11172176f08e771cbd31794bd4c65f9128c3d7c4",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        46
+      ],
+      "claimId": "claim_239931ca8e26fd3b19bf970e30e2ae4b",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "7-contract-authority-matrix",
+      "afterDigest": "1788408993b6607a28c59c3925c30846ec8eaaf79c32672b36ca78c29969d35c",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        47
+      ],
+      "claimId": "claim_a308864955bd4f2a7067191e4087a00a",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-55",
+      "afterDigest": "624f0470e956272b4aa288c111d0f175986229add08fe5739a0bf474e4503e8f",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        48
+      ],
+      "claimId": "claim_47bc7210839578adf19d5c75cdbc10bf",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-56",
+      "afterDigest": "03a1a58ed3626f8b56ac509d8f89f99f17fa5c7041929d9ec4dd46d464b9874a",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        49
+      ],
+      "claimId": "claim_ae47f4ebf4390cd7a05bc5455deb37ed",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-57",
+      "afterDigest": "71392c90d7e585abc412086957cca9584606daa7415c2afff44c2593060de45e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        50
+      ],
+      "claimId": "claim_e4c5c8bed3b38df479ea7bb9fbc237c3",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-58",
+      "afterDigest": "027f2e8fb26217eb7e0fd7820c355e06c31c9c42897b4cbf11904518ab14e376",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        51
+      ],
+      "claimId": "claim_994d4c5378ce61e03cd8ccd47bf199e2",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-59",
+      "afterDigest": "ce9fedaff71e7f78a97813fd6ea31e52c50d38250d56c929852825ecde7eefcc",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        52
+      ],
+      "claimId": "claim_6f83af3c565fff22a6cee290af3a51c8",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-60",
+      "afterDigest": "143f6028eea6acd074e646e1e7d0a25e46033f231a37aa5b71110ea2b563b17b",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        53
+      ],
+      "claimId": "claim_cee2da46ee6b12adfbebaa8505598d19",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-61",
+      "afterDigest": "039a6bbc05030558465bd244a7c9cb8d2f6f3db067b716209b51023fddb35127",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        54
+      ],
+      "claimId": "claim_fe1e3cdfa133bbe5a28323f30047167b",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "8-internal-boundary-map",
+      "afterDigest": "a9dfd52ce5279d1126f5acff4866e16263c4d65ac6777f2a6a2e692afefce479",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        55
+      ],
+      "claimId": "claim_e34280f4e5259d4bc456ed92df61b1f8",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-62",
+      "afterDigest": "e1e06122c7338e94d1bd360b83b455ea69f6a538127efe50836a045c70bc3d19",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        56
+      ],
+      "claimId": "claim_83174b29e18380691596cf50df35f0d6",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-63",
+      "afterDigest": "0fbb26b5b55ac7b4a59c5822c3a1d8b7d79929464f29ff7217e322b46e2b7d63",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        57
+      ],
+      "claimId": "claim_96e947d6daf7dd7612cc711be8e3e22e",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "9-hexagonal-architecture-view",
+      "afterDigest": "c1190693935a61dea5a142fa3fa5a70a8bdcfbc27602869ca46286b551d79ee6",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        58
+      ],
+      "claimId": "claim_2ee40967845ff151533c0464a063b889",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-64",
+      "afterDigest": "54e18a3af732fb59e7231c7192c3fe8667a4d705cc22e073d4b68b414e938f60",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        59
+      ],
+      "claimId": "claim_f7863daa0185993b81a672c0420d3261",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-65",
+      "afterDigest": "9a13cfa56a3a37b764cb6d2fac4b0b13ca696a33d806bf6173f22f402899e510",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        60
+      ],
+      "claimId": "claim_263e571671bf5793b7bc367d01178f24",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-66",
+      "afterDigest": "ebb2e5e61f6da9d155d2b7458cc14f48c81f4948871f7ccc2839e109944629ae",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        61
+      ],
+      "claimId": "claim_af0d28923201cebbf946e92f79f302c0",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-67",
+      "afterDigest": "95bb03c16c761c3e870e2e9c372ca48b8c918da72d6b5b0ffcfad0a317754f1a",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        62
+      ],
+      "claimId": "claim_90f3f5b4a8e750f4048cd3eb069a59b0",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-68",
+      "afterDigest": "6ff387e7fe9208636b6d30c00e8c893f0ee98ecc4f90d8de6c5a8788bcbf077a",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        63
+      ],
+      "claimId": "claim_eae874730b5400ed90cb1cdbc684bbad",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-69",
+      "afterDigest": "4e0b5f718a485d654aca0f25e351dd175e0feb157a018259b84607dcc770056f",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        64
+      ],
+      "claimId": "claim_4e86e8414c4e3b780e81f77255853447",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-70",
+      "afterDigest": "913b0ef123585f0cb5173db892ff3183dfefcf6007df8b83e7aaae31f4bc883a",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        65
+      ],
+      "claimId": "claim_25fee31e7b2231fb32eb4e5b2aa49178",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-71",
+      "afterDigest": "4ec428faf114de8efaf929a047d5f3333d593ef04df57c8d583981b77bdc68c4",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        66
+      ],
+      "claimId": "claim_7da6822f720207b1752b95d2fcc64dc4",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-72",
+      "afterDigest": "fa69ae5f6450f46c4a7988b80abc5038b5f06938e5ba94ab0601984b4b631456",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        67
+      ],
+      "claimId": "claim_496db5ac38fbd813df06a0a32358fd67",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "10-coding-domain-component",
+      "afterDigest": "da9259bb5c1cf65c81e7db430d6ba2bd4c10821029bfd526a1bd0a50ab45d214",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        68
+      ],
+      "claimId": "claim_9452917992853b89fe05ef73b736ea35",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-73",
+      "afterDigest": "f385751c80288ab5cd93ae36c774bfef09b09a08725fd4c840fc76adeae2ae46",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        69
+      ],
+      "claimId": "claim_26f243278442f888b7593c83601b1dc9",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-74",
+      "afterDigest": "c989ffee9d3de903b8c589a0e16b030cf69920dbea41daa9c9c6ed02a555cadb",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        70
+      ],
+      "claimId": "claim_a422a8d0becbce668176375d86bda228",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-75",
+      "afterDigest": "3282bea7d6795af73b2b79156c31c44682a7cd184f1236d4b8ed85071d65e2dc",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        71
+      ],
+      "claimId": "claim_5ebfb1d167893d08f762715d6d08995f",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-76",
+      "afterDigest": "21ba8ab7c1a646118e079db523c79fb11412238a6383bd6b165062103c32d3ab",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        72
+      ],
+      "claimId": "claim_eebb5cca4b022a65034519ccdc92fa0f",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-77",
+      "afterDigest": "5879d0472fa861a6facc8cc7e880775101a83892776235abd6375a8a1f02d97a",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        73
+      ],
+      "claimId": "claim_3df789806717ec37edfaf8cdf08c828d",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-78",
+      "afterDigest": "7b026a618706c75896430901ef66d960fc7fe5aac7e875f532858165c6b3d879",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        74
+      ],
+      "claimId": "claim_8e1e374753977320844fe605c2b3e58d",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-79",
+      "afterDigest": "2623d99daaca229f65c1d63d8fe89b098d5c1cd7ae2ab5a8b01323e9abe3d2e4",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        75
+      ],
+      "claimId": "claim_daa79430ef690753f25ef64313fa6f37",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-80",
+      "afterDigest": "2ad1c3d3b9610f4271afc3a3f1ad5d9a7fa3ec232d9c57cbdcf314a8953e85f2",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        76
+      ],
+      "claimId": "claim_f15433c5dfd93b337cf99a92d964a9ca",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-81",
+      "afterDigest": "8487a251571cbbde59755701bf076c29d2c4b863752917a9e1b6e1ce985c64ba",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        77
+      ],
+      "claimId": "claim_a1ffea3ef120ab711217d25fefdde00a",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-82",
+      "afterDigest": "cd06197896e564b741335e14c700bb99eea04199f5936a24beceb23bffbe1519",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        78
+      ],
+      "claimId": "claim_2f7308769dc8999765381fb9f2a973f0",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-83",
+      "afterDigest": "075aef0ea50ce000c57519b6d3a272c39387d1cc9983e223bd9d7a5f90cebb8e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        79
+      ],
+      "claimId": "claim_3a0f4a18e99a0f6e5968081ac9bb070e",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-84",
+      "afterDigest": "11108fa8af64a1e39efc244879b8e1cfea6ec369387a0061b1a0dcdffb77e299",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        80
+      ],
+      "claimId": "claim_86d707d72757dee7f02a172cc9fd9cb1",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-85",
+      "afterDigest": "a196ca7004449f6fb3559908a35586cfcee6be16c7e82f476d82fd839a9143f7",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        81
+      ],
+      "claimId": "claim_3e16513d20dff71d29d80cf06da12165",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-86",
+      "afterDigest": "9d176ca1014df9a3bfc7f99689464ce314d58976f34ad576af3d83f45a539801",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        82
+      ],
+      "claimId": "claim_bbe784690985e1c4be3b95ae7f04c548",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-87",
+      "afterDigest": "dd73296c9c97ca818d35bf4fdd75d299134b5dbe24548bfdf44a263dbe2c3e8d",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        83
+      ],
+      "claimId": "claim_4b602ee9e58f7f4c1d5f3b3c636491c3",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-88",
+      "afterDigest": "4bdf33640ccc4168805f11dd50e1cdfa4913333c0607a99d70df055629d6a5e6",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        84
+      ],
+      "claimId": "claim_258e49d6560b98e60f0e6f96aca6fab3",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-89",
+      "afterDigest": "1cf905d9de59ab98d9cfea24e10cacfadc4ebc9f36d45371bbb33240045cc028",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        85
+      ],
+      "claimId": "claim_d54db8b092b21b8069949b0c1f5eed47",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "11-machine-first-decision-discipline",
+      "afterDigest": "d9b914e897783443ee5c3dee17662cb7856f1aa5e364d09619bc95e2927928f5",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        86
+      ],
+      "claimId": "claim_719f8acef210adbb8f66b737ab1cd3dc",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-90",
+      "afterDigest": "d0e3da46e8e11a7b515f4f1736188153dce89bbe94d6b0365ed4092312bcc05e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        87
+      ],
+      "claimId": "claim_6daa1ad5da1a7201df45de490fadcde9",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-91",
+      "afterDigest": "f078e3681320a1cb81eaf031987e078ae860f3061b2888087345c060c034e661",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        88
+      ],
+      "claimId": "claim_49a1eb38610653777f59dfe8fd631647",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-92",
+      "afterDigest": "bb7840bd2207e64f9194b6ff7e3d15ccbff3f2baecddd2541ad8a492cc1f7811",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        89
+      ],
+      "claimId": "claim_6985d72aa9dd059d485bcc093be14ed4",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-93",
+      "afterDigest": "57a0c52aad835f6b8852be6577c3415bd69c46369daa6c352900edab2bafcac9",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        90
+      ],
+      "claimId": "claim_c8cbd34dffed2afd1a8276b86bfccc93",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "12-dispatch-as-a-replaceable-system",
+      "afterDigest": "45505ac1bfd574ee86fc4be7c20afd1d6ab7ede7a64459ec66f5e041d28b7a60",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        91
+      ],
+      "claimId": "claim_4124051efeea7ff27a7e44af571dc7e9",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-94",
+      "afterDigest": "2a2eee6088a920fa829e8d4e0c4efa2c180f10cd24c2c38d7dfd13d33fa9be5b",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        92
+      ],
+      "claimId": "claim_ad017cba783d5c2919f87a1c65a8fb21",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-95",
+      "afterDigest": "1eb0d2b4a4724cc3600ed0ab5a665757f69245d9addaf01642775389cbadd173",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        93
+      ],
+      "claimId": "claim_2502546db772cc55329e34597c766214",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-96",
+      "afterDigest": "8c80d01466cddeaea2292f0586eea5295d3bfb758a9b1e41537b4525e3194909",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        94
+      ],
+      "claimId": "claim_0b5fc5e92758c9299549d543dc378d98",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-97",
+      "afterDigest": "c200204a074853d064951111f53eae21171ee1037c5989affe83e6852678a370",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        95
+      ],
+      "claimId": "claim_95a0764dec95b0ea7a1f4ef4d1dbb646",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-98",
+      "afterDigest": "747fc39a2059a60a17534118b087ad14d200a6dbaf2bed29d7450002b793fd75",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        96
+      ],
+      "claimId": "claim_0e19a85c5c569cee6ddb6dce1e9ed7ef",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "13-team-cognition-and-protocol-packages",
+      "afterDigest": "fb088e7a8d0c41abfc82d01792b29fbf1dfa572991e4efe408290d28db06137f",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        97
+      ],
+      "claimId": "claim_89aab4376670978155e6b16009e21583",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-100",
+      "afterDigest": "c6a762187bd7cf20e3561e25d3e59ac11cf3f39eeef0c300d735a518bdabd15e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        98
+      ],
+      "claimId": "claim_26e05c0027398a842f60d8d27213c428",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-101",
+      "afterDigest": "387d2c42492aa3050992d64f42039c0701de7ce87d72232bbebfe9fe3677b797",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        99
+      ],
+      "claimId": "claim_281352247e4ebd9aacff5d34fdbca03d",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-102",
+      "afterDigest": "340454f05fd5ecc61fd554e393cece52a0ff60ed8c5fdee49623ac2d74002c8c",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        100
+      ],
+      "claimId": "claim_9c67e3c640ab8e82f2df2e3bf56d29af",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-103",
+      "afterDigest": "000880bb9dd278f958576e80dab6606de6612398984d23a5dfce0f88fbd69ff6",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        101
+      ],
+      "claimId": "claim_b84458e01de1bb2c55ee8b75010e2df4",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-104",
+      "afterDigest": "98c1880eb7e54ac389d728ef86a57de3702b7c34751c1e39f8ef7fbc1bcba3a1",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        102
+      ],
+      "claimId": "claim_811f1696678b0161fab443eff5ca5e67",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-105",
+      "afterDigest": "b4ab26d39a2b0fe18cd4f472076eb2fac664fcdd286b79b177582825539ad537",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        103
+      ],
+      "claimId": "claim_e2bece3386e2875e89fe7615b91b1233",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-106",
+      "afterDigest": "00ca3ca8faf9b81dc376120a8843a7336e827b7dd9b4523410e876d874b15059",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        104
+      ],
+      "claimId": "claim_e72310dc905d2638033d8db56fda6b0f",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-107",
+      "afterDigest": "29404769dcb3b2f494906e83a4a2a198ae93ea9ab2a59a89a6a6e44b9d0a22a7",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        105
+      ],
+      "claimId": "claim_2e55c62de39cec736a1b99eb41c7f918",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "14-domain-harness-boundary",
+      "afterDigest": "5b80e0bf64ffc9246171e291ad01198934dbd3b64ac32017f6b0b22d1b701ad8",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        106
+      ],
+      "claimId": "claim_ab62dc23ff994fee7bbd91512f3e86a5",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-108",
+      "afterDigest": "e8df47b3a61149af913e75e4eb80dd0543fe5509216c16f3f26fc67d12c2002e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        107
+      ],
+      "claimId": "claim_dff5df70c31d4a2d7647bf3cdac45e9c",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-109",
+      "afterDigest": "92ffcddb34d715a3225533a7aea1328750c8e7d04082594aed33c04b0b3e24f7",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        108
+      ],
+      "claimId": "claim_997743e66e3bbcf988e0f7e9a7074526",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-110",
+      "afterDigest": "add4573458d7d4df08aa701e67dbfe43b1e4eae6eb3ece18de887d05c3ec5c74",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        109
+      ],
+      "claimId": "claim_99725bb23335dbcdfd2543884a4e64f4",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-111",
+      "afterDigest": "1ca1f287ae124c003c38007a79adcd65a6c33f1ce2d38ea3a432e4ad25fe9d70",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        110
+      ],
+      "claimId": "claim_963246447ad6c0298b5f483f39528fd0",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-112",
+      "afterDigest": "9aa55d3658ce175da46e57a7f6225d85479795228fbfb6d6fe3c3517a2efc8ba",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        111
+      ],
+      "claimId": "claim_acb43c895cd276694798b55d3fc2bdf2",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "15-run-result-evaluator-boundary",
+      "afterDigest": "4b795dba25b3ecaa882af0811d0cd7ead4cdd2fc869d7c4af11adcb793c0755a",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        112
+      ],
+      "claimId": "claim_5a4173eccabea759ed7de01c9d2a2953",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-113",
+      "afterDigest": "689abe511fe45cba827a941a960e05e19911696ac813e4c3301d06c2fa68352a",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        113
+      ],
+      "claimId": "claim_29934554706d90e3b6d1682d15e8797d",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-114",
+      "afterDigest": "dc7a7d9a95f22c0f085cd2bf7a5cfb2268746b4fe0c5042f351caa944fc78784",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        114
+      ],
+      "claimId": "claim_c7339cee9a9a4d9db15e4435fd35c0ca",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-115",
+      "afterDigest": "391f0253c18aded1b899c9afd215621ec2d27acd480648c2a027c985265deac8",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        115
+      ],
+      "claimId": "claim_cb15bd4c3b8ba24b207689585fc14ff9",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-116",
+      "afterDigest": "fa3b3fed27a768375f57c20eb9033cde0804545c02c6679c6f556b6181518118",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        116
+      ],
+      "claimId": "claim_dd73caa1fdea2da30c562d1b806182d1",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-117",
+      "afterDigest": "268b6011fe4eb35f2784e23284b4d565f8e562b02b896ea2a45122ab081e6539",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        117
+      ],
+      "claimId": "claim_9fcac968123bfab659d90fb1275dfa0c",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-118",
+      "afterDigest": "c5a5f882e20b7a8beca12d5fd91d22e91a145ca030182ff5664195deb11d769e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        118
+      ],
+      "claimId": "claim_1ab4a62689f20e2fd425d5ea1eceb1eb",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "16-plugin-and-extension-direction",
+      "afterDigest": "c7e441d93b5a502a2c0c3cee73a77de218b9a770e8250e58bb5751a5fb4844a6",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        119
+      ],
+      "claimId": "claim_6018d32f86bca4ce07876df4571030d9",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-119",
+      "afterDigest": "80ef6fc0761884b9b623ae96dde5da4d83b89b157b2732a37d370b710d033e6a",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        120
+      ],
+      "claimId": "claim_80258d4f6d8ce82389d41cd53d164a26",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-120",
+      "afterDigest": "529a70926edd3da379610e1949f74e169d6e02ce2bd0d930ae50a45deed50e36",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        121
+      ],
+      "claimId": "claim_5d0c233450a2febe21cec601d577661c",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-121",
+      "afterDigest": "682f0758b44703b155215b27fc7543d03e42f34b3607eb5c810f41bce916a376",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        122
+      ],
+      "claimId": "claim_d00accd318b092bfaa35a9080d9f5abd",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-122",
+      "afterDigest": "e8411cb1487b28a69103836cdf990db687ed54d302775b5e877ca260f9e7e56a",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        123
+      ],
+      "claimId": "claim_e511146e0c49e2a8bbf3dc600bc0182d",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-123",
+      "afterDigest": "d3a394f35521ed61db31cd608a5799a5f68e4a89660eb4a36c7166aea69b6fde",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        124
+      ],
+      "claimId": "claim_932edd032f5cd4d8398a47e7417c13ba",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "17-related-agent-coordination-contract-set",
+      "afterDigest": "637bb76caa55bade64867edf982721e1318764a79550345a35b41a0d3a27cc88",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        125
+      ],
+      "claimId": "claim_5442a147cd9c27db8d324b2bbab8d153",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-124",
+      "afterDigest": "53d93b342510833f7b513ef822adb3755284077cc596b26acb5959dac3511b97",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        126
+      ],
+      "claimId": "claim_3d1720b9dcb333314661089514c229f6",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-125",
+      "afterDigest": "89d7ce082b6fd3bc210fbbf8b914f0e8d3b3db059d3ec09615b892a2848ea986",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        127
+      ],
+      "claimId": "claim_93837ec409b17596c720905b6f047a07",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-126",
+      "afterDigest": "6f9785f16025f991b2accd9fa13f45569fccfc80280812113610e20be8e9ee15",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        128
+      ],
+      "claimId": "claim_a49a696e419fbe7d29be9b5c8d2a9994",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-127",
+      "afterDigest": "c231c6637c25a29e388340c2608310d68f8cc605b2c83e3593d4249c5a8ed5a9",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        129
+      ],
+      "claimId": "claim_f6a47662946dc038e52d945d3814adc4",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-128",
+      "afterDigest": "18145e51e38de60164ff10b81cc54662c5a386734cbf81e2afd9c3e8fe8f8a1c",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        130
+      ],
+      "claimId": "claim_9243d54bf98b5a26c0f475138ad3bb88",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-129",
+      "afterDigest": "9bead63918d019ffcef6b26bd1c7d4ab0aa91842b446935db3ad694d305f28a9",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        131
+      ],
+      "claimId": "claim_cb26fb9b206d9ed52c63820ea39550b3",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-130",
+      "afterDigest": "5fbf58d4438a92fea6480db88674ede57b9d933f80f3516c222f9c445b3ab881",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        132
+      ],
+      "claimId": "claim_4db0f0232e4a42a7fdcb2f51d2b55633",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-131",
+      "afterDigest": "03ff5a27206fd13c4aa6c436e2e4837f5e3d546c1235631cf7242d16c8240dac",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        133
+      ],
+      "claimId": "claim_58e0d17d0adb8e0103aff41210ffc1af",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "18-implementation-reality-additional-boundaries-found-in-code",
+      "afterDigest": "534a02d9a3caafadd62358d9d957d5507140c196b63b6c42947be3da8fa74014",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        134
+      ],
+      "claimId": "claim_1653b2edde8956e8090ce9790b07546f",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-132",
+      "afterDigest": "8522aea15248975f256186aaf6dbe2840ae8a7d343f48a02f3eb989d6be10a3e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        135
+      ],
+      "claimId": "claim_3bcb96eb83716fd929b9a45716fdd109",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-133",
+      "afterDigest": "6e6bfa920801e0415d82ca9e0ad3bd955d3fbdf721c1ec7f8d8bed4083fb4299",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        136
+      ],
+      "claimId": "claim_688806088654005739cc7f344fe190d9",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-134",
+      "afterDigest": "fd9fad49620988a86002a12cfddbd8390cc8e5700d936b5c6554627154d5c50f",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        137
+      ],
+      "claimId": "claim_f08e2aa14dc8178c819dff8d04029256",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-135",
+      "afterDigest": "37ea2b7e3ce2969a6371fed548d7e240e9374ba3cc16c3f3d7cae5b99aff0cc7",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        138
+      ],
+      "claimId": "claim_2eccc5715a8498d07656f0f286a858d0",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-136",
+      "afterDigest": "8f19a9315ffdb8a6cf6b076b029140f9137c1cc51610f1d705a316a1eb80c926",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        139
+      ],
+      "claimId": "claim_97258362e49102a13f78416b9fc71987",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-137",
+      "afterDigest": "407d1fe086f59dc8aa6211ed49f57e5c19fbbae6bf27a13a5d3b9bba16fa5449",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        140
+      ],
+      "claimId": "claim_1705da401bc623ce54341a7176b8e298",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-138",
+      "afterDigest": "0ae5f52a5e569a44c79e5f014af68be1557e7e0d951a41e6fd3c58c04cee0ec4",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        141
+      ],
+      "claimId": "claim_1304a21473d7c8696bf08e7e66713304",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-139",
+      "afterDigest": "deb0af411883f400c5ff60ec6eff5eaff6aca8f218e1fed3bbe1d8a19be15e5c",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        142
+      ],
+      "claimId": "claim_a4bcbc9fd4c77d29b619ce6a661e6c49",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-140",
+      "afterDigest": "1b321405870a9bbd66f8f52b379433312c674a9b479d431f7a335e5f524a712b",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        143
+      ],
+      "claimId": "claim_4bc267750de4cadc7af28d912ea1f95b",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-141",
+      "afterDigest": "e14db8828c9548fa355a76533270153f6a1d122713ecbccd78acba1d3594b132",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        144
+      ],
+      "claimId": "claim_4d4c510ca86ee7d62b84a699a2fd4769",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-142",
+      "afterDigest": "3a5816410b7026c37b1b5b9536044fcf8975ddb3fa6730cf827d43bf31b2b550",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        145
+      ],
+      "claimId": "claim_c8652d5b2fbfea7c00638af00cfb4629",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-143",
+      "afterDigest": "b25cb077292dbe4739ccfbf1cfe5ac27b4e49c4bf9a4bcba9dc285205f3ce0ef",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        146
+      ],
+      "claimId": "claim_44369101a8dc88fff5994a1fdcc5c4bb",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-144",
+      "afterDigest": "1ca3dc099797c04c74b99e0064a39de1a1262535635515fe99695e37c1cca389",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        147
+      ],
+      "claimId": "claim_8b00f27fa5e910dc0143176929df7f35",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-145",
+      "afterDigest": "121bb64d4bacdaca33af4502d80304d31b3a1ebc4b956f97735ef1fae376074c",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        148
+      ],
+      "claimId": "claim_37bea4c04541753fc73e2b8cbc30b2ce",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-146",
+      "afterDigest": "cea1eb05effe6778002b149060c5d52c2e76b7a9f39032eacbfd618217db0054",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        149
+      ],
+      "claimId": "claim_f26073998d9e3759752e268cc048adec",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-147",
+      "afterDigest": "2c52c699fbb34d0538d98c4572a5020bb053736105efbe92c62c1ea586cc29ef",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        150
+      ],
+      "claimId": "claim_3718806e07596369db436fa866c5aba0",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-148",
+      "afterDigest": "76510ebb433c5feade6edd77adb9f34af19e187054b322fbefb862c9bb4fbf62",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        151
+      ],
+      "claimId": "claim_4acc664484543bbd7fcc5549ba12cf60",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-149",
+      "afterDigest": "880c9fd651458bf954bb1ea81aece5cc5805b45b4a0701277bf130cd1dbe1b47",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        152
+      ],
+      "claimId": "claim_1f45ffd821286fb773b6ab573114a0a3",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-150",
+      "afterDigest": "6f065761f8077dbccd90ead93c1e523898261210fcb5b657e9789326c820d59d",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        153
+      ],
+      "claimId": "claim_ddd8b403be766a4b1d9ad792b2823cf1",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-151",
+      "afterDigest": "9188776d24eae57694ec89f9af8eddb72d14149c11b55e4462cf5ecd813da473",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        154
+      ],
+      "claimId": "claim_ccc01eb7cef740cdad5e26e5a7fa1533",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "19-rust-replacement-candidates",
+      "afterDigest": "db4aff6b4b82321ceed7d279dfde1a1708e603303903976902812a63658009e9",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        155
+      ],
+      "claimId": "claim_3d43d5b4dd9ee354cfbd756dcf2fc6e0",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-152",
+      "afterDigest": "71a859ed63b9cb092c76fe67c62d516a6e96f5e5b35def39a9a5fc67c38d1da0",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        156
+      ],
+      "claimId": "claim_3671af680ca7f71860045ec687a9a2cc",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-153",
+      "afterDigest": "5c7f332853dcbf039037714fb583818b8dafc869813bbe4c2530154a253b586a",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        157
+      ],
+      "claimId": "claim_60142b6138bf39b8a07c1d75cbe1434f",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-154",
+      "afterDigest": "d12142650c958ab549d6c4951684269b2b1daffec05901327995f9ee9229fa64",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        158
+      ],
+      "claimId": "claim_0ebf1469f59af30390c9cfc7e51ce1d1",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-155",
+      "afterDigest": "3fe0f038ab445e768b2ed4e28ddec5e5c3e6a32e772af137e41450edb04295b5",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        159
+      ],
+      "claimId": "claim_23375d93bd8889c8d7bd49f765397229",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "20-architectural-pressure-points",
+      "afterDigest": "715891d558b1bcae918697f7f1bf7b3fb247fb9cc489d786ac7470a993d962f4",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        160
+      ],
+      "claimId": "claim_4eca744c23d1052489bfce3c6d545ab5",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-156",
+      "afterDigest": "cb8a65913d31cbbba3ca80990c295a191d337f7ed9323f84b3eb40725f67f9be",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        161
+      ],
+      "claimId": "claim_7eb9780265a604bc3285eefd6046a236",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-157",
+      "afterDigest": "472f88c8598588587368902ac9d3e029db6b242855fb7c195b332168280acf47",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        162
+      ],
+      "claimId": "claim_27d3a09ef0b56afd3492c7213235e8ca",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "21-suggested-next-discussion-artifact",
+      "afterDigest": "52d7d5d860e2ecb33e7b15f4b2dc90d9c490d57bc3f0802807d2fae0dba22e4b",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        163
+      ],
+      "claimId": "claim_057cf501335065a4f54a49eeb0eb0d59",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-158",
+      "afterDigest": "43ab4628e076c75678fca1154aca0c8bafd0f4da49c74ef742f0860a99b072b3",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        164
+      ],
+      "claimId": "claim_5ca2b6ffe0827597b89098f4c32ce644",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-159",
+      "afterDigest": "14f6554299fda71e196ef3589ccc01223d9eb29d2565c387461fb1a9f6a7b59e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "keys": [
+        "claims",
+        165
+      ],
+      "claimId": "claim_2edc9ac16c08e3b8d4693f71bfd5369f",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-160",
+      "afterDigest": "bc33b17dfd01c19eb8fb523aff986bf0738d4aeba3484fac4522f1fd77809368",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        0
+      ],
+      "claimId": "claim_360bac2add48bf0a2a49e7af1f87e903",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "component-boundary-architecture",
+      "afterDigest": "0523eed9027c8952fd309ab937037f43e8c8025252aebbcd409100d48a9a9231",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        1
+      ],
+      "claimId": "claim_5cba6fa874b39710beebf2ab34824909",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-162",
+      "afterDigest": "19135f799ed3ec60d7da1ea132c13fab7545b9f30883380678d74284eb2201c1",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        2
+      ],
+      "claimId": "claim_9aa75d68c36bea18cf766d3ccc0a103e",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-163",
+      "afterDigest": "0bc4b93b1cfb3bba817a53834c3877f3d224c893a72e99ed8df2d2d0a993fca6",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        3
+      ],
+      "claimId": "claim_2094b9effbdcfb3aae60eeb22c9abe2f",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-164",
+      "afterDigest": "e661ee55798ab87f7b84a3df84275608074bd198e59df3c06b05d3d2aeb60636",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        4
+      ],
+      "claimId": "claim_5e9da3a2297ea0810b77633e4e384725",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-165",
+      "afterDigest": "c7c3214ef3921701e072d3fc49112a74dc3e2da752e2d19d533e84584cdfc885",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        5
+      ],
+      "claimId": "claim_c8d98c0008701e264eca755e375bf49f",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "1-how-to-read-this-folder",
+      "afterDigest": "8f3acc2c9875a25d866b98dd0d4903bb68ff8cdb44ff2d653cef53aa2c4b10e8",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        6
+      ],
+      "claimId": "claim_9dda3f43258c741830447e1f10a72fd8",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-166",
+      "afterDigest": "d502c9085325bc99f244af24c20979635885deedbe201ee7eedc972e716cbe7e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        7
+      ],
+      "claimId": "claim_c8d61d6eb9aba8dcc3ec841c10279546",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-167",
+      "afterDigest": "6af8570adb8504650c6d36ccc3e5e347ac8aa45cca06ff7b9c465b1c0225b903",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        8
+      ],
+      "claimId": "claim_c54e55e6e9ae2a4dd7d365ba03c5a421",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-168",
+      "afterDigest": "b9b6c198748ec3983b3b0fb097618b8b200bb77ad2ae2cccbed9e09eb1b91b13",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        9
+      ],
+      "claimId": "claim_750796b88a0ab406b63aa1a8353b9a0d",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-169",
+      "afterDigest": "f74695a91194175b0ebe6d4def9e454104f2fff55db0b040d5a652b21a5b56a7",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        10
+      ],
+      "claimId": "claim_b93487e7e6b7d234fe5fcb7811ad0fa7",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-170",
+      "afterDigest": "d39e4b5b9f8a2c4ff073d1e9a7ee0ee143f0fe451c9363b1e40b2174945a1b59",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        11
+      ],
+      "claimId": "claim_d120c13f7e76aeb205ef250711b86be9",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-171",
+      "afterDigest": "403ff071ce2d9781a13267023bc018142c83a0121b22fcd65787600af218aee0",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        12
+      ],
+      "claimId": "claim_fa13561423637cf97449f281ec43891c",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-172",
+      "afterDigest": "797187949ae63ddb5c42e3b0bf8df573c9a2358d4fc2add04edfd79567acf835",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        13
+      ],
+      "claimId": "claim_0d81116040bb14965e0dfa2e9d194e34",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-173",
+      "afterDigest": "b973706c156fe222b069bd657d5d6bcde95f50d98a14ad4820ea113403f05098",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        14
+      ],
+      "claimId": "claim_533b0c15729ee7e25f036b86e4be93b0",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-174",
+      "afterDigest": "73b56654cb052ff03a1ad2a5aaabc0694145d4c933c33339cbed4511014e3a08",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        15
+      ],
+      "claimId": "claim_23709cd9c32cdd8339294c0b372822d0",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-175",
+      "afterDigest": "48596c41b91763c313fe61f1e93688a9cfe37d92fcdc28578b544a0fb86e3766",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        16
+      ],
+      "claimId": "claim_8458579190fa923f1766f81f534c3c3e",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-176",
+      "afterDigest": "0e246285ffd931e2e8d66d5026627ebed177793df8289b2eb0df20dad76fd136",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        17
+      ],
+      "claimId": "claim_3f6430d4f351a7523abcc7867bafb7fe",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-177",
+      "afterDigest": "0b61e6b2a77c566443420395ded709d5f2903de8f000a0099311bbd8805201f0",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        18
+      ],
+      "claimId": "claim_526a5af09a34f8dd43d69d38ca4d16d8",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-178",
+      "afterDigest": "3446d95f4df3808c9228d010a728595b53c5cae030e85ceb865b83e066cd727f",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        19
+      ],
+      "claimId": "claim_97c40015bd680b6640e0efc66092a286",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "2-documents",
+      "afterDigest": "328ff9a2b8b5b6393c7d54c156d5fccaee7a7c609267dd886494c0998ae38696",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        20
+      ],
+      "claimId": "claim_317048c0d0e634cadad884f042e0fb41",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "component-boundary-advisory",
+      "afterDigest": "457c2097e525258924d9dcf3bef70ebf0bf716e268b245048d5ae364fca41f8e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        21
+      ],
+      "claimId": "claim_2f2826e65d051c01194cd662b5a8be9e",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-179",
+      "afterDigest": "a3a418d3011a365ff46381767ed5c15547ad1a33da57b7e83405010c7c659fdd",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        22
+      ],
+      "claimId": "claim_6a4ad0be2d1231536575859cc0b797b7",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-180",
+      "afterDigest": "5551fd216212d7accdabd3e3447be97f06bb59f0e7df3d7031cb4657ee2c98e2",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        23
+      ],
+      "claimId": "claim_995540c81874c90492ab2a4dbf509fe8",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-181",
+      "afterDigest": "b42afa8a9f4b9cc1da9b559818a6752a77ee3b72a9d51f029b02de4ca2354308",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        24
+      ],
+      "claimId": "claim_33525e399259bb23b39abf9d4f7f24f3",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-182",
+      "afterDigest": "9133812401e9915bc639f323e866b14b4fae879c7749143004685e209bed95ca",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        25
+      ],
+      "claimId": "claim_1ae387c9a41cee96fc8d499dcc6fe6f9",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-183",
+      "afterDigest": "2f80936783402627608e27fda4b89cb12506927ad508f710fc20e346b42742a6",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        26
+      ],
+      "claimId": "claim_ea14128a766600a9a0942fcc908ff4ce",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "repo-layout-vision",
+      "afterDigest": "76ec7851ade9bdd4fef5b40b167bc07ec745dcedfc0e50c3672b6bd25796ad02",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        27
+      ],
+      "claimId": "claim_841c0c452b31d698f08d8460a92f8925",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-184",
+      "afterDigest": "cd07aba31d0b8612aa7585d57c57e30a9905fc2fb17d6dd0bb53d852aae0d71b",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        28
+      ],
+      "claimId": "claim_8470d98a34a61ac21da3eed22e1f9bff",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-185",
+      "afterDigest": "ca6b14f4628ae268fde271e1970a0ee4d55743ba9f757ba3d56d659e98bdf290",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        29
+      ],
+      "claimId": "claim_dba9600769691de1386bcc6b5b48767e",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-186",
+      "afterDigest": "b42afa8a9f4b9cc1da9b559818a6752a77ee3b72a9d51f029b02de4ca2354308",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        30
+      ],
+      "claimId": "claim_3b5636929c814bde29c729dedc60cc99",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-187",
+      "afterDigest": "824d9338f41f5b7e7ac276a5809940499b22dcf703ea31a2027233fd63a102a6",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        31
+      ],
+      "claimId": "claim_0d68eb897094a19d27659cf0925e8da3",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "host-invocation-and-provider-routing",
+      "afterDigest": "31ff1014acc172147fc74a432fee687499200fb8b238a8eb6f396f2a9cee005b",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        32
+      ],
+      "claimId": "claim_9d1e7b76bcbf3b0fcf5e0edcdf130653",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-188",
+      "afterDigest": "799cd5b1d42b59ffa6bf38415e7bebe742b345003b87be4a77e5b512b1185efb",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        33
+      ],
+      "claimId": "claim_8f95e3804f09043c13b0c3799e353fce",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-189",
+      "afterDigest": "b42afa8a9f4b9cc1da9b559818a6752a77ee3b72a9d51f029b02de4ca2354308",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        34
+      ],
+      "claimId": "claim_f0bd5f56e2fb541f7ce5cfd8469a3370",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-190",
+      "afterDigest": "eced209438fbb993a839bb03099146d53a08f02ca5c7b34789e7c5fb6c189918",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        35
+      ],
+      "claimId": "claim_88c428b7e894b8c99ecc7231259db834",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "node-to-rust-component-migration",
+      "afterDigest": "498170b56dca7baacfcc063c115e7e7717e47be121d39342eb1c9b56e7eae861",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        36
+      ],
+      "claimId": "claim_57cd483e44658aa1583e968cc86e8ab9",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-191",
+      "afterDigest": "c7a72d8d1c40718a22b72f05a0cba1f869153d86ea9f6436082c3f56a0ef760a",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        37
+      ],
+      "claimId": "claim_3401119060c68c56af0822a00323287c",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-192",
+      "afterDigest": "b42afa8a9f4b9cc1da9b559818a6752a77ee3b72a9d51f029b02de4ca2354308",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        38
+      ],
+      "claimId": "claim_57bff5928ff8240df27fc7362c67f481",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-193",
+      "afterDigest": "dd910f88b577ab74a727aa2b24d4cc2481270b00a9afaf289cf01281cb913c66",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        39
+      ],
+      "claimId": "claim_d4ad966e412c3a12848ec1b573664699",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "3-relationship-between-these-documents",
+      "afterDigest": "4863554bd226c4bc1c5f5be6e6429ed64db3310aa9b59061123dfb1217d1b16b",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        40
+      ],
+      "claimId": "claim_3ac8ae95ba06f2e62be3f4d5a941b887",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-194",
+      "afterDigest": "edc5f9393cdc0d76ee32b8ba6154bf0dc9ff9d896e3a4d882da5b2b0976303cd",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        41
+      ],
+      "claimId": "claim_7d92508fc2f26920652abce703a42e05",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-195",
+      "afterDigest": "0198998af5f4d8bebe46fc6198fd11355459d1ae886a5341046eb0ab35b4f551",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        42
+      ],
+      "claimId": "claim_994e6a2612bcd57138b3acf416ea8e6e",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-196",
+      "afterDigest": "5704abd579bfd9c37779ac045cb916166559cf84e44c15e0bee46e6db27f3f73",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        43
+      ],
+      "claimId": "claim_683108aca3e656fed37a3c814155cab2",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "4-current-status",
+      "afterDigest": "b792d416bbecbe214b22c473939afab3f0fc02029f3fefcf4b0dfbabe3dd1c53",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        44
+      ],
+      "claimId": "claim_0ee219d1f56bb8618374020ebf261467",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-197",
+      "afterDigest": "641fa5c7aa8e023096cd021cc8ebd6bab088dbcbcdc20326f2df0804f8068f9d",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        45
+      ],
+      "claimId": "claim_4e615f582b4f68441901a793b989256e",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-198",
+      "afterDigest": "95e1c88e05e45a624fffb2d71a4c4852d092eba44879794adc1b2c0d43811e36",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        46
+      ],
+      "claimId": "claim_1f3e0eb3acc3bc476ddf81b58b8c9976",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "5-external-review-links",
+      "afterDigest": "d13d6906e4c75c3030d9364a26fc3b05d2d80f52f1e753a679f065167d3b49d3",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        47
+      ],
+      "claimId": "claim_3f9daed05c969b1d0c2eafb05f052a9d",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-199",
+      "afterDigest": "eb4d05b85ae250c096ece810c407c4043cea029c5a5176cf9aa1c1360ae42ccf",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        48
+      ],
+      "claimId": "claim_d590be5f9d8551d9b4290c296c4e059a",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "canonical-architecture-and-specs",
+      "afterDigest": "d5984df97888ec0c8a79017b5053c0b6377b1109ccce2b56fa13331071ac41e3",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        49
+      ],
+      "claimId": "claim_00f11cd8215f5649d5ef7bcb34bdb737",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-200",
+      "afterDigest": "9c2b09723d424834b43348d027b8a5ddf18d635bc3ce3ba67fe1cbad8dc8e1cb",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        50
+      ],
+      "claimId": "claim_d060f9dfcce5f534cfa957c4245ac9e1",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "related-agent-coordination-contracts",
+      "afterDigest": "e96eb39fc1cebb38824be7d340ccba3f4ead668994a377434a180aa976c12e33",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "keys": [
+        "claims",
+        51
+      ],
+      "claimId": "claim_919ee8461ba273f0a132459b308ab3ff",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-201",
+      "afterDigest": "db2184d7643038ad40c88bfeb7586a308ab907915fcbb5dfced23cc702ee7cce",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        0
+      ],
+      "claimId": "claim_2ec8b055e66f2e619fd52fe0e034749b",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "repo-layout-vision-apps-and-packages",
+      "afterDigest": "1ac581c7858e4e0ce09744e6ae7604d2f66acea231082ec088b4eb6ffbe376fe",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        1
+      ],
+      "claimId": "claim_677ebcfcc1b4ba2e5e942d69b86a745c",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-203",
+      "afterDigest": "600bc69a0d8c5cdc1971c2d0be88c8a834718567f57aad21da8a8bb2da8a4865",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        2
+      ],
+      "claimId": "claim_43135edc5a24c4bd52adb2d7d28043bd",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-204",
+      "afterDigest": "646da677b24d7d254aa6a427ed000fa54c265036006b85f5829784308b1e9e59",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        3
+      ],
+      "claimId": "claim_4e3f9eda058d9f35f4de1478c117e4a3",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-205",
+      "afterDigest": "a78654448d18c93b0449abec6162b702095760f3b2a170f26407a1824cea09a1",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        4
+      ],
+      "claimId": "claim_639902d65d5f6df0093258f57c8204e1",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "implementation-status-2026-10-04",
+      "afterDigest": "7b8df0d39695b13b8cff1527ff7809dd0fb088024cce3df49291107657449977",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        5
+      ],
+      "claimId": "claim_cc3cf1b3934e5d819e4e2a48d11a4ccd",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-206",
+      "afterDigest": "b057d1be2912bd98312d038ce8b46d6223cbdcac4bbde20d4538b7ab609342f9",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        6
+      ],
+      "claimId": "claim_a1748dac82eb1f3f63117716e7aa8c51",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-207",
+      "afterDigest": "9ae3c5bd75b82fb7a88e7c0862837e1bde2bc44d4f22cbfe2a0f2e5726e7aea8",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        7
+      ],
+      "claimId": "claim_70ff5c4e999f2c687855fdfdcbcec777",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-208",
+      "afterDigest": "085efe034defd5140391d5b22c2ee2116e18c038ac206cbe687bf3c794c5d0b7",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        8
+      ],
+      "claimId": "claim_dce48cdf3d5bc4286851019b60b3bef0",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "1-decision-summary",
+      "afterDigest": "4c8ea3bee535dd7bc4618bd99dcd59348fcb66d44b70566bef73fefec499261d",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        9
+      ],
+      "claimId": "claim_94cc91ea2f2b02c9eca1cc623b0b1302",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-209",
+      "afterDigest": "1c50e062e0b50fd9e2b4faa1e632491a3e3f21b307358f5ee4429689c5100263",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        10
+      ],
+      "claimId": "claim_faf7499a8768d5ba04d5c11622e1135d",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-210",
+      "afterDigest": "2a94dfe6bc6c219e71227aaec181d9075a2272a6d34b737527580773e6c699aa",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        11
+      ],
+      "claimId": "claim_5fee5ccc69ae71fc603ec44059ca4067",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-211",
+      "afterDigest": "110aca8ef2bc06d3165a6c6160c82718f8fe33b3747fae0b1d4c0e7cec0d2e3e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        12
+      ],
+      "claimId": "claim_f9ba63ae692d7ad05f5b47fd625d0e43",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-212",
+      "afterDigest": "7d16b3e1eb57c7234ee1436eeda0468502d45d1c40c18b1e9402a42e01b86fec",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        13
+      ],
+      "claimId": "claim_32d9111a44a0fd47c5931d9ae4326c98",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "2-current-problem",
+      "afterDigest": "bc360894cd27a141912d8562ce17cbe42bf6ab720f68936dacbcb8db0ebf5147",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        14
+      ],
+      "claimId": "claim_d968b79a52ef75611ff0afa4997f50f3",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-213",
+      "afterDigest": "370df883ebebddbc35d23080820f3f07198ea9f2dee98bf3173c459f4b98fabf",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        15
+      ],
+      "claimId": "claim_54f002818e588b68efc65ede2d233b91",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-214",
+      "afterDigest": "b1f621d5560adb5ba02c2b9c1355850e2494ad27e2786f7300062a7c1d8b897c",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        16
+      ],
+      "claimId": "claim_d2b96b98e8fd3c05fc34619c04219896",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-215",
+      "afterDigest": "8cc995792a8672b26745e42a76b644eb99237b92d9ac009f5bbb7fcc33e34770",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        17
+      ],
+      "claimId": "claim_a67e4cba70e6a0baab3442b5205dc118",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-216",
+      "afterDigest": "a3d94e83661afa63afd65a66a575c2e632928331239d2b30d3a5fb7b9b32a056",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        18
+      ],
+      "claimId": "claim_8540009f9b169bae2a7479d6a0df8503",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-217",
+      "afterDigest": "c182bc86d202b328850d6109efdaed9852ca667a3a0d9e1b87f38c25da3b08d0",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        19
+      ],
+      "claimId": "claim_e9755d7eb7e99534c6b8e70256c62363",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-218",
+      "afterDigest": "3742ccdedf3369a182231a7b3ecfa690e8653af1e406880b03cf450a8f23b85c",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        20
+      ],
+      "claimId": "claim_6193ca38574bdc9531791a9cb9f131c3",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-219",
+      "afterDigest": "12dc977646fc08fc8da23c4345453098e3c8fd47bbd9da32cba47f23a60a566a",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        21
+      ],
+      "claimId": "claim_a1f9409d7da8f9c4659a3a76290e20e8",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-220",
+      "afterDigest": "9992f4d1b811138d7622e7f4173ee9a9c669db9817f3aec314bb800140397155",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        22
+      ],
+      "claimId": "claim_41897bb097a7f5cd419fb5befcb4e8a5",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "3-target-layout",
+      "afterDigest": "96cc06391467cdc93adf6c14382a18fa3451e09fe96755ab605a28eb5e5d22c3",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        23
+      ],
+      "claimId": "claim_e379da0cbbb2c52753b4ea5794017642",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-221",
+      "afterDigest": "670c6c9b5d62550e0bb6719db175e6a6d7d6a9fe97d39545e77856ecc9ea5d8d",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        24
+      ],
+      "claimId": "claim_490edb0bb16303a28ae78b7658124196",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-222",
+      "afterDigest": "4b78c198e7f7243313a2a2830f4c5b27c4865e21f8f9247147ceba2c405bc050",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        25
+      ],
+      "claimId": "claim_42567e9be1c7ee274c16626c6128ca5e",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "4-app-boundaries",
+      "afterDigest": "538977e9fd4f0b4076a80bc96be36016df0b324b940e9c441c2f61d65ec2779b",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        26
+      ],
+      "claimId": "claim_6841615370614de9df635e353a9d05a8",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-223",
+      "afterDigest": "a62e1cfc75a3111fc758e51e9a5c1ca33678555f08555419f8d80890c3691978",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        27
+      ],
+      "claimId": "claim_7b1ad6dd0d0ea052141e8ff5b6a43441",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-224",
+      "afterDigest": "f7ee6f36c7e676e7a98d89f4afacb279e235ac133f77337806bd75a8b21dbcac",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        28
+      ],
+      "claimId": "claim_d06496eebad534228dbfb44cdd575a6d",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-225",
+      "afterDigest": "72aaced762de8aead8c986d440d9b7cbc326de3f99ef4d6cfb97aed779870a33",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        29
+      ],
+      "claimId": "claim_7b2e5d190d00b8bad516f9753546fed4",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-226",
+      "afterDigest": "590d2502b5043f06cba0d2e5c772d85b47d14ada786b0a9c61ecb74d8a834b26",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        30
+      ],
+      "claimId": "claim_c90e11ad1b45be63d3a2473892178963",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-227",
+      "afterDigest": "d7a19f7c33371b74b78a98a80f53e36438a7c431967ebb4608cdb50e2aba6582",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        31
+      ],
+      "claimId": "claim_4f6eab9173895d9e8f28872b08fd8482",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "5-package-boundaries",
+      "afterDigest": "d2922b54c780ce75d87809d276320ae0bad851f71cdf87726b79bbbdf72094df",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        32
+      ],
+      "claimId": "claim_45b6e170f25c8f95fd7c00d100929f3c",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-228",
+      "afterDigest": "2e7c293104ffe890e092527f886745c2779a9bb9ae222bac5ccf7b684573d1c8",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        33
+      ],
+      "claimId": "claim_e03fb1ea3489395c622232dd808073f3",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-229",
+      "afterDigest": "3f93c5f973be6b075326818a46322662d75c567fa67c7f25e2ad7df4ada4acd4",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        34
+      ],
+      "claimId": "claim_3f4fb302f4a50b7b72531c2706bef9d6",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-230",
+      "afterDigest": "23ce4e0056d551f0f1c67c6e3c354b47c5452cde9f215d90bfe8499a6bc3542d",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        35
+      ],
+      "claimId": "claim_a0bdd7e03fc99a6a4b17c4534fd85d10",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-231",
+      "afterDigest": "357ea60d598b9a799f9e843cec6de12ecd40e98315ed6658bb5d0cea4aaf0957",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        36
+      ],
+      "claimId": "claim_e5cbe793b35fc5b8e7972267aeb64ff2",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-232",
+      "afterDigest": "65cfa8d1d79e581245da36e5a276131fd06d077a60a6d8f60b2adf8828408455",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        37
+      ],
+      "claimId": "claim_94e07165e438cdc7b5d4eade767142d9",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-233",
+      "afterDigest": "0bbcd3a5192d623bb5fd6f7bfb6462c061ed0de773f5aaf76cb96e5bf2a59314",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        38
+      ],
+      "claimId": "claim_c0c91ec2161f4fc38cdff12f4e4f0b29",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-234",
+      "afterDigest": "e5987a0e96362b641d23036fd5de1d326f7b5f51e84bcda2b270ae8e8e4b865e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        39
+      ],
+      "claimId": "claim_be5b35c49f48cfe74f3e0ef9fe5500a7",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-235",
+      "afterDigest": "5eb244d8000dca602a1e066873f7db30bbbbb5cd99d8b27879537a2920d46597",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        40
+      ],
+      "claimId": "claim_d80f4913654e65647a7809aa5705fb1e",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-236",
+      "afterDigest": "4d8581ab208daaf5ad8254b89c4d2e35bb994b93704a713552d432d2a50add2c",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        41
+      ],
+      "claimId": "claim_9ab5449a4dca62046f1ab1ca6ea93ba2",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "6-execution-blast-radius",
+      "afterDigest": "3bf75232bb5ba457a6dfe0a94f58be19cad4bca5d8ca1c5f5d3ee2cc33a5df1e",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        42
+      ],
+      "claimId": "claim_2527945d27cce30a2a1458ce9b49a23f",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-237",
+      "afterDigest": "e7523279ff9f9b4c9c356c1cfebdd59ab44fc8dda560b697dd63197c168b24ac",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        43
+      ],
+      "claimId": "claim_3ca5e4a8d30db84f15490f406cfd4471",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-238",
+      "afterDigest": "01a94af982f066e67d479f6448bc04ae50babf4180fefdcfe53fab9bb3ccfff7",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        44
+      ],
+      "claimId": "claim_89f5a63cbd6de9afbbb5fc398d365779",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-239",
+      "afterDigest": "b5f72cfbe2d4b99347f1a87fa1074e064fbac10364ddf9e0f0c940d329e33fc6",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        45
+      ],
+      "claimId": "claim_1b9db4dfec256a65756b0b18f80b5a8e",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "7-out-of-scope-for-this-document",
+      "afterDigest": "ca51aad54bb762f800a1ecd68b1d0348dba2545717e7ba89fec37bcae9297c18",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        46
+      ],
+      "claimId": "claim_0ae9a7cc9fd90391dc02d171b8367af2",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-240",
+      "afterDigest": "b33ce241cb4a606c1ad73396d28c6cc8f1894783dd911c4bbe5451b1bec91fad",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        47
+      ],
+      "claimId": "claim_0850cf30f57a7c51ce2356e66ea5a1e6",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-241",
+      "afterDigest": "b8d83fe019bbd065a51466a5a808d7dca253fa397bfa9148f81e1e16745e7f59",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        48
+      ],
+      "claimId": "claim_84fed8d8645eeddbd6151762b212d4e4",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-242",
+      "afterDigest": "c49c7eb16ba5b281b3ad7bed4b218ab81ddfa142dc618353d4d8b3bce13e38af",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        49
+      ],
+      "claimId": "claim_ab116066789a96601346310606cc30a0",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "8-open-questions",
+      "afterDigest": "dceaf7e07aae4e3ef8401933e7422dbf2b89d597b6889cb82f81e413cbc1b148",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "keys": [
+        "claims",
+        50
+      ],
+      "claimId": "claim_4af5cd00b12d5ee1dabea5065f98e010",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-243",
+      "afterDigest": "32cd473aefa5dcfa0465722b173460f4b89f1205b74cfe3e54143f86d9076f02",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+      "keys": [
+        "registryGaps",
+        0
+      ],
+      "claimId": "claim_aacc38bae14d6ddc021cc4278795f5af",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "afterAnchor": "unheaded-block-5",
+      "afterDigest": "ef970220b2a0deaa9fe9d0aabe96a61d29451f0955f547b511aaa46b7f5df403",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-n1-holder-lock-predecessor.json",
+      "keys": [
+        "registryGaps",
+        0
+      ],
+      "claimId": "claim_7cfb055e3f10b99944ffec46ce877653",
+      "targetOwner": "docs/platform/holder-lock/spec.md",
+      "afterAnchor": "unheaded-block-1",
+      "afterDigest": "6bcdd232b69054da2ac3b64457ac4a777cfefa37bd8a90facb7567e64be1e50e",
+      "method": "unique same semantic opening + heading ancestry; complete changed passage and immediate neighbours compared",
+      "drift": true
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "keys": [
+        "registryGaps",
+        0
+      ],
+      "claimId": "claim_dd06c2555dc0e81c54c80376fee8ff91",
+      "targetOwner": "docs/specs/work-state.md",
+      "afterAnchor": "unheaded-block-117",
+      "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "keys": [
+        "registryGaps",
+        1
+      ],
+      "claimId": "claim_16abc69cd658a382c456cdaf23f64d87",
+      "targetOwner": "docs/specs/work-state.md",
+      "afterAnchor": "unheaded-block-121",
+      "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "keys": [
+        "registryGaps",
+        2
+      ],
+      "claimId": "claim_9c7e133ec44851189185dbb7b04a78a0",
+      "targetOwner": "docs/specs/work-state.md",
+      "afterAnchor": "unheaded-block-126",
+      "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "keys": [
+        "registryGaps",
+        3
+      ],
+      "claimId": "claim_7a0776311f7105750a4f234681f513a3",
+      "targetOwner": "docs/specs/work-state.md",
+      "afterAnchor": "unheaded-block-138",
+      "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "keys": [
+        "registryGaps",
+        4
+      ],
+      "claimId": "claim_35d0f259a0c0828577dcfd003821fb3a",
+      "targetOwner": "docs/specs/work-state.md",
+      "afterAnchor": "unheaded-block-144",
+      "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "keys": [
+        "registryGaps",
+        5
+      ],
+      "claimId": "claim_aace4a1d3e3df2ac329d0930b81bd9f4",
+      "targetOwner": "docs/specs/work-state.md",
+      "afterAnchor": "unheaded-block-150",
+      "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "keys": [
+        "registryGaps",
+        6
+      ],
+      "claimId": "claim_1d724afb521915455a45db2b1f3b34cd",
+      "targetOwner": "docs/specs/work-state.md",
+      "afterAnchor": "unheaded-block-174",
+      "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "method": "unique exact content + heading ancestry; immediate neighbours compared",
+      "drift": false
+    }
+  ],
+  "completeChangedWitnesses": "step-07-l12-117-merge-rebindings.json",
+  "independentReview": "pending; no approval carry"
+}
