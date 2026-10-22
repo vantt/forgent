@@ -103,6 +103,16 @@ test('the door canonicalises the shared vectors to their exact bytes and still r
   for (const bad of [[1, undefined], [1, , 2], NaN, 10n, () => 1, { a: [NaN] }, [Infinity]]) assert.throws(() => canonicalJson(bad), { code: 'canonical-json-not-json' });
 });
 
+test('a durable write refuses an omitted or invalid mode by name before it touches any file', () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-door-mode-'));
+  try {
+    const refused = { code: 'durable-file-mode-invalid', installed: 'none' };
+    assert.throws(() => replaceDurably(temp, 'x', 'c'), refused);
+    for (const mode of [-1, 1.5, 0o10000]) assert.throws(() => installOnce(temp, 'x', 'c', mode), refused);
+    assert.deepEqual(fs.readdirSync(temp), []);
+  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});
+
 test('real append and read run in a hot section without a child process; Git refuses there', () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-store-'));
   const repo = path.join(temp, 'repo');
