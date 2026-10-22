@@ -1646,3 +1646,75 @@ The unit command also had one later **exit 1** in the final verification loop: t
 - No GitNexus MCP tool was exposed in this worker, and the brief forbids the fgOS CLI in this repository. Caller/source searches and the architecture proof were used; no graph blast-radius or `detect_changes` claim is made. The runner, not this worker, owns committing.
 - Dispatch, Workflow-start and Land admission, cutover preconditions/rehearsal, spec/changelog text and independent A38 acceptance remain later authorized slices. No real migration freeze or overall Step 6b completion is claimed.
 - Markdown preview was attempted with `mdview open /home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md`; exit 1, read-only database. No preview URL was produced.
+
+## L12-107 — Documentation lease dispatch and Land admission (Doer delivery, 2026-10-22)
+
+### Built and reused
+
+Input HEAD `6c5c821eae23c8989b8e6dad638eae19e3b0c4c6` differs from `8b20f5185` only by the slice-2 brief. All implementation and test inputs therefore have the same baseline bytes as `8b20f5185`. Read the committed brief, design §3/§6, reuse check, L12-94/105/106, reading map, and relevant runner/Workflow admission contracts before implementation. History search found `leaseAdmission` introduced by `379e44239`; no older dispatch-gate implementation was found in the four target files.
+
+- `bind()` calls the existing production `leaseAdmission` before seat policy, so even the inline fallback cannot swallow its whole-call refusal. It strips any path filter from dispatch context: a read-only Unit is refused too. The named held reason remains the module's `documentation-cutover-lease`; corrupt authority retains the module's separate fail-closed reason.
+- `runUnitBody` calls that same gate before attempt sweeping, config bootstrap, admission-port calls, custody, controller locks or unit-directory creation, including resume. Its existing binding context now carries `lease: {repoRoot, worktreePath}` for every seat/fallback. The gate re-reads authority rather than trusting a cached grant.
+- `prepareWorkflowRun` reaches the gate through `resolveStart`, before config, parent-frame charge or ledger creation. Placing it in that shared resolver also protects seat preflight before it can bootstrap config.
+- `landRunnerItem` calls the same gate after the existing Work checkpoint and pinned-ref reads, but before `declareLandFiles`, Land port creation, candidate creation or Land WAL. Code-only lands and holder lands proceed. Existing `inspectGit`/`compareCommits`/paged `diffPaths` supply paths; no Git mutation mechanism was added.
+- Owning boundary tests were extended in `bind.test.mjs`, `run-case-admission.test.mjs`, `merge-land.test.mjs`, and `case-admission-port.test.mjs`. Neither candidate `case-admission*.test.mjs` previously called `prepareWorkflowRun`; its new boundary proof belongs in the port/integration file, not the pure predicate file. Every held fixture uses production `acquireDocumentationCutoverLease`, not a fabricated sidecar or injected callback.
+
+### Decisions inside the approved design
+
+1. **Context carries checkout coordinates, not a bearer-token copy.** The lease module alone reads/hashes the token file in that checkout; workers use the existing working checkout. No token is added to argv, env, Unit records or binding provenance. Tests deliberately separate host cwd from holder checkout to observe context propagation. No boolean/cached-holder shortcut is accepted.
+2. **Preserve read-only operation outside Git.** Run/Workflow use the existing `resolveGitRoots(..., {allowNoRepository:true})`; an explicit `worktree` is checked independently of cwd, so starting outside Git cannot evade the gate on a held target checkout. `bind` ignores only the module's explicit `not-a-repository` precondition error; every other inspection failure still propagates. No environment bypass was introduced.
+3. **Use actual source paths for Land.** The old `changedFiles(repoRoot,item)` derives `fgw/<id>` and can return `[]` for a valid explicit `branch`. Admission now computes the merge-base diff of the exact pinned `branch`/`target` pair and reuses those paths for post-land reporting. Rename detection is explicitly off, so both old and new sides count as deletion/addition; deletes and type changes also count. Tests cover an item id different from the branch, scoped addition, sidecar, rename out, rename in, deletion and file-to-symlink change.
+4. **Keep checkpoint ordering intact.** Work's existing `.fgos` checkpoint remains outside Land and before target pinning. The refusal guarantees no Land candidate/WAL; it does not claim to suppress Work's independently permitted code/state-only checkpoint.
+5. **One proof per boundary.** The existing lease-module tests own token/corruption/scope policy cases. New tests prove gate placement and holder context; the existing read-only Unit completion test still owns successful worker completion. The new holder run proof asserts an actual bound worker attempt, not successful completion: this sandbox's attempt exits 127, as do corresponding existing baseline worker tests. No existing assertion was removed or weakened.
+6. **No new configuration or infrastructure.** Existing native-fixture staging and test-only root controls are reused. The lease module, hooks, registry, doctor, skills, docs, other tests and baselines are unchanged. No real lease was acquired on this repository and no Git write or fgOS CLI command was run against it.
+
+### Tests first and verification commands
+
+New gate tests were written before production edits. Their initial single-file, name-filtered runs all exited **1**: bind reached a throwing seat-config Proxy; run reached main-checkout policy rather than lease refusal; Workflow created a run; the first merge fixture attempt exposed a fixture error (its unrestricted `git add -A` tracked and then removed its activation fence). The fixture now ignores only its local `.fgos/` through `.git/info/exclude`; it does not bypass a production check. Merge gate cases subsequently pass through real acquisition and Land. A second tests-first pair for an explicit held worktree with cwd outside Git exited **1**, then passed after checking the explicit worktree roots.
+
+The prescribed bare single-file command was attempted on all six files before edits:
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test <file>
+```
+
+Observed exits: bind **1**, run-case-admission **1**, merge-land **1**, case-admission-port **1**, run **1**, architecture **0**. The sandbox makes the default global state root and `/var/tmp` read-only. A second pass using writable test roots still exposed missing native-payload staging (and an initially group-writable scratch state root). The scratch state root was corrected to mode 0700; no production permission check was skipped.
+
+Final complete-file commands used the same installed host input plus existing fixture/state-root controls and the existing production native staging helper:
+
+```sh
+# /tmp/fgos-work/slice2/preload.mjs contains only:
+# import { ensureGitAddon } from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/git-addon.mjs';
+# ensureGitAddon();
+env -u CLAUDE_CODE_SESSION_ID \
+  FGOS_STATE_ROOT=/tmp/fgos-work/slice2/state \
+  FGOS_TEST_FIXTURE_ROOT=/tmp/fgos-work/slice2/fixtures \
+  TMPDIR=/tmp/fgos-work/slice2 \
+  FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos \
+  node --import /tmp/fgos-work/slice2/preload.mjs --test <file>
+```
+
+Each row was a separate Node invocation, never `npm test` or `scripts/run-tests.mjs`:
+
+| File | Baseline at `8b20f5185` (pass / fail; exit) | Final (pass / fail; exit) | New failing test names |
+|---|---|---|---|
+| `test/runner/execution/bind.test.mjs` | 77 / 0; **0** | 78 / 0; **0** | none |
+| `test/runner/execution/run-case-admission.test.mjs` | 6 / 8; **1** | 7 / 8; **1** | none |
+| `test/runner/merge-land.test.mjs` | 10 / 0; **0** | 18 / 0; **0** | none |
+| `test/workflow/case-admission-port.test.mjs` | 8 / 3; **1** | 9 / 3; **1** | none |
+| `test/runner/execution/run.test.mjs` | 44 / 38; **1** | 44 / 38; **1** | none |
+| `test/architecture.test.mjs` | 29 / 0; **0** | 29 / 0; **0** | none |
+
+Baseline method: merge-land and architecture were run before product edits on their byte-identical baseline inputs; the other four files were also run from `git archive 8b20f5185` under `/tmp/fgos-work/slice2/baseline-tree`. The archive was given a `native-addon.json` package descriptor and copies of the **same verified production addon/helper bytes** via the normal native-door package-descriptor channel, so missing activation did not manufacture baseline failures. It used the same test root environment above, `node --test /tmp/fgos-work/slice2/baseline-tree/<file>`; no source, assertion or guard was replaced. Successful staging exited **0**. The installed host input can be replaced internally by the existing `ensureGitAddon` helper's matching staged host; this is how the existing test bootstrap works, not a new runner channel.
+
+All four new-proof filtered invocations exited **0**, without `--import` (touched files bootstrap their native fixture through existing helpers). Exact command: the environment above, then `node --test --test-name-pattern='documentation lease|workflow preparation|non-holder cannot land' <file>` for bind, run-case-admission, merge-land and case-admission-port. Merge has two top-level tests and six path-kind subtests; the other three have one new boundary test each. `git diff --check` exited **0**.
+
+Raw logs remain under `/tmp/fgos-work/slice2/`: `baseline-staged-test_*.log`, `baseline-ready-merge.log`, `baseline-test_architecture.test.mjs.log`, `final-test_*.log`, `new-proofs-test_*.log`, and the red-test logs. Comparing the failing test-name sets yields an empty added/removed set for each of the three still-red files. **This is not a full-suite-green claim**: their inherited sandbox/fixture failures remain, and Rust/full suites were not requested for this code slice.
+
+### Limits and handoff
+
+- The lease core and scope matcher are consumed unchanged. Each gate performs one sidecar consultation through that core; no polling, doctor inspection or kernel-lease probe was added. No claim is made that a consultation costs one OS syscall: the existing module also resolves checkout/ref facts.
+- Existing test helpers staged native artifacts only under ignored runtime paths; all manual scratch and baseline extraction stayed in `/tmp/fgos-work/`. No secrets env file was read. The runner owns committing; this worker did not stage, commit, change refs or modify the program board.
+- GitNexus MCP is not exposed here, and the brief forbids fgOS CLI capability queries. Impact-analysis evidence is **degraded/unqueried**, not asserted inactive. Source/history searches and architecture checks are the available evidence; no graph blast-radius or `detect_changes` proof is claimed. Direct boundaries changed are seat binding, Unit admission/resume, Workflow start/preflight, and runner Land; independent review remains required.
+- No overall cutover completion, real freeze, independent acceptance or main landing is claimed. No write outside the authorized code/test/report set is needed for this slice.
+- Preview attempt: `mdview open /home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md` exited **1** (read-only database); no preview URL is available. A later whitespace check found a trailing blank line in this report (exit **2**); it was removed before final verification.

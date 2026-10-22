@@ -5,12 +5,64 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fixture } from '../git/land-fixture.mjs';
 import { landRunnerItem } from '../../src/runner/merge.mjs';
+import { acquireDocumentationCutoverLease, DEFAULT_SIDECAR_PATH } from '../../src/runner/documentation-cutover-lease.mjs';
 
 function rootFixture() {
   const f = fixture();
   f.git('branch', '-m', 'trunk', 'main');
   return f;
 }
+
+// Land suppresses repository hooks; only this boundary can prove that it
+// refuses scoped paths before preparing a native Land WAL or candidate.
+test('a non-holder cannot land scoped additions, renames, deletions or type changes even through an explicit branch', async (t) => {
+  const cases = [
+    ['addition', (f) => { fs.writeFileSync(path.join(f.repo, 'docs/new.md'), 'new\n'); }],
+    ['sidecar', (f) => { fs.mkdirSync(path.dirname(path.join(f.repo, DEFAULT_SIDECAR_PATH)), { recursive: true }); fs.writeFileSync(path.join(f.repo, DEFAULT_SIDECAR_PATH), '{}\n'); }],
+    ['rename out', (f) => f.git('mv', 'docs/original.md', 'outside.md')],
+    ['rename in', (f) => f.git('mv', 'b', 'docs/from-code.md')],
+    ['deletion', (f) => f.git('rm', 'docs/original.md')],
+    ['type change', (f) => { fs.unlinkSync(path.join(f.repo, 'docs/original.md')); fs.symlinkSync('../b', path.join(f.repo, 'docs/original.md')); }],
+  ];
+  for (const [name, change] of cases) await t.test(name, async () => {
+    const f = rootFixture();
+    try {
+      fs.appendFileSync(path.join(f.repo, '.git/info/exclude'), '\n.fgos/\n');
+      fs.mkdirSync(path.join(f.repo, 'docs'));
+      fs.writeFileSync(path.join(f.repo, 'docs/original.md'), 'original\n');
+      f.git('add', 'docs'); f.git('commit', '-qm', 'scope baseline');
+      f.git('checkout', '-qb', 'incoming');
+      change(f);
+      f.git('add', '-A'); f.git('commit', '-qm', name);
+      f.git('checkout', '-q', 'main');
+      const holder = path.join(f.temp, 'holder');
+      f.git('worktree', 'add', '-qb', 'holder', holder);
+      acquireDocumentationCutoverLease({ repoRoot: holder });
+      const before = f.git('rev-parse', 'main');
+      const operations = path.join(f.repo, '.git/fgos/git/operations');
+      const beforeOperations = fs.existsSync(operations) ? fs.readdirSync(operations).sort() : [];
+      await assert.rejects(() => landRunnerItem(f.repo, { id: 'not-the-branch', verify: 'exit 99' }, { branch: 'incoming' }), { code: 'documentation-cutover-lease' });
+      assert.equal(f.git('rev-parse', 'main'), before);
+      assert.equal(fs.existsSync(path.join(f.repo, '.fgos/runtime/git-candidates')), false);
+      assert.deepEqual(fs.existsSync(operations) ? fs.readdirSync(operations).sort() : [], beforeOperations, 'no Land operation beyond the lease transition');
+    } finally { f.close(); }
+  });
+});
+
+test('a held documentation lease permits a code-only land and its holder can land scoped files', async () => {
+  for (const holderCall of [false, true]) {
+    const f = rootFixture();
+    try {
+      const holder = path.join(f.temp, 'holder');
+      f.git('worktree', 'add', '-qb', 'holder', holder);
+      if (holderCall) branchCommit(f, 'scoped', 'main', { 'docs/new.md': 'holder change\n' });
+      acquireDocumentationCutoverLease({ repoRoot: holderCall ? f.repo : holder });
+      const result = await landRunnerItem(f.repo, { id: 'source', verify: 'true' }, { branch: holderCall ? 'scoped' : 'source' });
+      assert.equal(result.outcome, 'merged', JSON.stringify(result));
+      if (holderCall) assert.equal(f.git('show', 'main:docs/new.md'), 'holder change');
+    } finally { f.close(); }
+  }
+});
 
 test('root publication verifies the frozen Land candidate and returns its exact receipt', async () => {
   const f = rootFixture();

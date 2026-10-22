@@ -28,6 +28,7 @@ import { RIGOR_ORDER } from './case-projection.mjs';
 import { bindWorktree } from './case-bindings.mjs';
 import { nestedStartRefusal } from './case-admission-port.mjs';
 import { chargeNestedCase, refundNestedCase } from './case-frame.mjs';
+import { leaseAdmission } from '../runner/documentation-cutover-lease.mjs';
 
 const FRAME_COUNT_KEYS = Object.freeze(['dispatches', 'mutatingDispatches', 'fallbackPerSeat', 'deviationsBeforeAsk', 'seatLaunchesPerDispatch']);
 
@@ -153,6 +154,13 @@ function resolveStart(params) {
   const roots = resolveGitRoots(cwd, { allowNoRepository: true });
   const mainRoot = params.repoRoot ? path.resolve(params.repoRoot) : roots.mainCheckoutRoot;
   const worktreePath = params.worktree ? path.resolve(params.worktree) : roots.worktreeRoot;
+  // Both prepareWorkflowRun and seat preflight resolve here, before config
+  // bootstrap, a parent frame charge, the ledger or a detached process exists.
+  const leaseRoots = params.worktree ? resolveGitRoots(worktreePath, { allowNoRepository: true }) : roots;
+  if (!leaseRoots.notARepository) {
+    const admission = leaseAdmission({ repoRoot: mainRoot, worktreePath });
+    if (!admission.allowed) throw new RunnerConfigError(admission.message, { code: admission.reason, phase: 'pre-admission' });
+  }
 
   let workflow;
   let workflowId;

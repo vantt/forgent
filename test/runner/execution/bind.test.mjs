@@ -6,11 +6,41 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { ensureScriptAddon } from '../../../scripts/lib/git-ports.mjs';
+import { initFixtureRepo } from '../../helpers/git-fixture.mjs';
+import { acquireDocumentationCutoverLease } from '../../../src/runner/documentation-cutover-lease.mjs';
 import { bind, BIND_CONTRACT_VERSION } from '../../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 
 // posture filtering consults the machine backend registry; keep it file-local
 seedFileLocalBwrapRegistry();
+ensureScriptAddon();
+
+// The lease module owns token/state cases; this proves bind's whole-call gate,
+// including the inline fallback, before it even reads the seat configuration.
+test('a held documentation lease refuses the entire bind call, while its holder and an absent lease bind normally', (t) => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'bind-lease-'));
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  initFixtureRepo(repoRoot, { branch: 'main', ignore: '.fgos/\n' });
+  const worktreePath = path.join(repoRoot, 'holder');
+  execFileSync('git', ['worktree', 'add', '-qb', 'holder', worktreePath], { cwd: repoRoot, stdio: 'ignore' });
+  const ask = { unit: { id: 'read', capability: 'docs:write', writes: [] }, seat: 'producer', role: 'producer' };
+  const runnerConfig = createMockRunnerConfig();
+  const ctx = { runnerConfig, session: { headless: true }, lease: { repoRoot, worktreePath } };
+  const free = bind(ask, ctx);
+  assert.equal(free.refused, undefined);
+  acquireDocumentationCutoverLease({ repoRoot: worktreePath });
+  assert.deepEqual(bind(ask, ctx), free, 'the checkout token follows ctx, not the host cwd');
+  const before = fs.readdirSync(path.join(repoRoot, '.fgos')).sort();
+  const refused = bind(ask, {
+    runnerConfig: new Proxy({}, { get() { throw new Error('seat policy ran before lease admission'); } }),
+    session: { headless: false, hasNativeAgent: true },
+    lease: { repoRoot, worktreePath: repoRoot, paths: [] },
+  });
+  assert.equal(refused.refused?.reason, 'documentation-cutover-lease');
+  assert.deepEqual(fs.readdirSync(path.join(repoRoot, '.fgos')).sort(), before);
+});
 
 function createMockRunnerConfig() {
   return {

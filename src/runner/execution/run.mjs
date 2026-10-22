@@ -13,6 +13,7 @@ import {
 } from './case-admission-port.mjs';
 import { expandGenerated, partitionPaths } from '../dispatch/write-scope.mjs';
 import { bind } from './bind.mjs';
+import { leaseAdmission } from '../documentation-cutover-lease.mjs';
 import { credentialFaultPools, failedAccountsOf, inspectAccountRotation, keptBindingOf, mayRotateAccount, triedBindingsOf } from './account-rotation.mjs';
 import { assertPinnedAccountsUsable, runnerConfigForBinding } from './account-pin.mjs';
 import { simulateUnitBindings } from './dry-bind.mjs';
@@ -573,15 +574,20 @@ async function runUnitBody(options, scope) {
   // reclaimed. Best effort: a reap problem never blocks the run.
   const cwd = options.cwd ?? process.cwd();
   // A directory that is no git checkout still gets its homes reclaimed; the run then refuses as before.
-  let roots = null;
-  let rootsFailure = null;
-  try { roots = resolveGitRoots(cwd, { allowNoRepository: true }); } catch (err) { rootsFailure = err; }
-  const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots?.mainCheckoutRoot;
+  const roots = resolveGitRoots(cwd, { allowNoRepository: true });
+  const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots.mainCheckoutRoot;
+  const worktreePath = options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot;
+  // Check fresh and resumed runs before the sweep, config, case reservation,
+  // custody or unit-control locks can write anything. No path filter on dispatch.
+  const lease = { repoRoot: mainRoot, worktreePath };
+  const leaseRoots = options.worktree ? resolveGitRoots(worktreePath, { allowNoRepository: true }) : roots;
+  if (!leaseRoots.notARepository) {
+    const admission = leaseAdmission(lease);
+    if (!admission.allowed) throw new RunnerConfigError(admission.message, { code: admission.reason, phase: 'pre-admission' });
+  }
   try {
     sweepAttempts({ assignmentsRoot: mainRoot ? path.join(mainRoot, '.fgos', 'assignments') : undefined });
   } catch { /* best effort */ }
-  if (rootsFailure) throw rootsFailure;
-  const worktreePath = options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot;
   const caseRef = normalizeCaseRef(options.caseRef);
   const port = options.caseAdmission === undefined ? null : assertCaseAdmissionPort(options.caseAdmission);
 
@@ -1054,7 +1060,7 @@ async function runUnitBody(options, scope) {
     });
     const assignmentIdOf = (n) => (n === 0 ? `${unitRunId}/${seatId}/${round}` : `${unitRunId}/${seatId}/${round}-fb${n}`);
     // The lease state is read for the attempt about to run (the account this assignment already holds ranks first).
-    const bindCtxFor = (n) => ({ runnerConfig, session, accounts: { runtimeDir: options.providerCapacityRuntimeDir, assignmentId: assignmentIdOf(n) } });
+    const bindCtxFor = (n) => ({ runnerConfig, session, lease, accounts: { runtimeDir: options.providerCapacityRuntimeDir, assignmentId: assignmentIdOf(n) } });
 
     const key = `${seatId}/${round}`;
     const recorded = unitRecord.bindings[key] ?? [];

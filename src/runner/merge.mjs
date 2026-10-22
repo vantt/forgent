@@ -57,6 +57,7 @@ import { gitPortOptions } from '../git/inspect.mjs';
 import { createGitSync } from '../git/sync.mjs';
 import { nativeError } from '../git/native.mjs';
 import { createGitWorktree } from '../git/worktree.mjs';
+import { leaseAdmission } from './documentation-cutover-lease.mjs';
 
 /** Raised only for a genuinely unexpected failure (a held lock, a target
  * checked out elsewhere, an unreadable merge) — never for a conflict or a
@@ -1163,12 +1164,17 @@ export async function landRunnerItem(repoRoot, item, {
   // against; only then is that target pinned, otherwise Land pins its own.
   const pinned = resolveRefSha(repoRoot, target);
   const source = resolveRefSha(repoRoot, branch);
+  // Gate the actual explicit branch, not classifySource(item)'s conventional
+  // fgw/<id>. With rename detection off, both sides are delete/add paths;
+  // deletions and type changes are included too, before any Land WAL/candidate.
+  const inspect = inspectGit(repoRoot);
+  const base = inspect.compareCommits({ left: pinned, right: source }).mergeBase;
+  const landedFiles = diffPaths(inspect, base, source, { renames: false });
+  const admission = leaseAdmission({ repoRoot, paths: landedFiles });
+  if (!admission.allowed) throw new MergeError(admission.message, { code: admission.reason, branch, targetRef: target });
   const declared = declareLandFiles(repoRoot, item, pinned, source);
   if (declared.outcome) return { ...declared, branch };
   const { files, selfResolved } = declared;
-  // Read the paths this branch brings before it lands: afterwards the target
-  // contains it and the diff that names them is empty (tsk-2ypd).
-  const landedFiles = changedFiles(repoRoot, item, { trunk: target });
   const options = gitPortOptions(repoRoot, { mutation: true });
   const port = createGitLand(options);
   // A result that published nothing carries the `abandoned` settlement, so

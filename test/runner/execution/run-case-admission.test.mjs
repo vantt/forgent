@@ -9,6 +9,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
+import { ensureScriptAddon } from '../../../scripts/lib/git-ports.mjs';
+import { acquireDocumentationCutoverLease } from '../../../src/runner/documentation-cutover-lease.mjs';
 import { runUnit } from '../../../src/runner/execution/run.mjs';
 import { runReviewed } from '../../../src/runner/execution/patterns/reviewed.mjs';
 import { seatLaunchesOf, CaseAdmissionRefusedError } from '../../../src/runner/execution/case-admission-port.mjs';
@@ -21,6 +23,7 @@ import { activateGitFixture } from '../../helpers/git-fixture.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
 
 seedFileLocalBwrapRegistry();
+ensureScriptAddon();
 
 // Family `quotaN` ends in the usage-limit text a real agent prints, any other family settles done after
 // writing the files its brief names.
@@ -115,6 +118,42 @@ function recordingPort({ binding = 'unbound', admit, recheck, onSettle } = {}) {
 }
 const names = (port) => port.calls.map((c) => c[0]);
 const WRITE_UNIT = { id: 'u-write', objective: 'WRITE:docs/a.md', capability: 'docs:write', writes: ['docs'] };
+
+// Existing admission tests prove the case port, not the documentation freeze.
+// A missing resume record also must not get far enough to acquire its control.
+// The existing read-only Unit test owns worker completion; this wiring proof
+// observes that the holder reaches the actual worker attempt with its binding.
+test('documentation lease admission refuses non-holder runs before writes and lets its holder reach a worker attempt', async () => {
+  const { repoRoot, worktreeDir } = setup();
+  acquireDocumentationCutoverLease({ repoRoot: worktreeDir });
+  const port = recordingPort();
+  const before = fs.readdirSync(path.join(repoRoot, '.fgos')).sort();
+  for (const extra of [
+    { unitData: WRITE_UNIT },
+    { unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' } },
+    { resumeUnitRunId: 'not-created' },
+  ]) {
+    await assert.rejects(() => runUnit({
+      ...extra, caseAdmission: port, caseRef: { caseId: 'case-test', activity: 'scout' },
+      repoRoot, cwd: repoRoot, worktree: repoRoot,
+    }), { code: 'documentation-cutover-lease' });
+  }
+  await assert.rejects(() => runUnit({
+    unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
+    repoRoot, cwd: makeFixtureDir('fgos-outside-'), worktree: repoRoot,
+  }), { code: 'documentation-cutover-lease' });
+  assert.deepEqual(names(port), [], 'no admission, reservation, settlement or custody');
+  assert.deepEqual(assignmentsOf(repoRoot), []);
+  assert.deepEqual(fs.readdirSync(path.join(repoRoot, '.fgos')).sort(), before, 'no sweep or runtime directory');
+  assert.equal(dispatchCwdHolder(path.join(repoRoot, '.fgos'), repoRoot), null);
+  const allowed = await runUnit({
+    unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
+    repoRoot, cwd: repoRoot, worktree: worktreeDir,
+  });
+  assert.equal(allowed.results[0].refused, undefined);
+  assert.equal(allowed.results[0].binding.executor, 'okay', 'ctx carries the holder checkout rather than the host cwd');
+  assert.ok(allowed.results[0].runResult.runId, 'a real worker attempt was dispatched');
+});
 
 test('a writing Unit with no port is refused before anything exists, and so is a Unit that names a case', async () => {
   const { repoRoot, worktreeDir } = setup();

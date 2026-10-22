@@ -20,6 +20,7 @@ import { parseTierCell } from '../dispatch/tier-cell.mjs';
 import { legacyStateKey } from '../dispatch/llm-accounts.mjs';
 import { DEFAULT_RUN_CAPABILITY, PRODUCER_POSTURE, capabilityEntriesOf, effectiveRigorOf } from './seat-resolver.mjs';
 import { seatBinding } from './seat-policy.mjs';
+import { leaseAdmission } from '../documentation-cutover-lease.mjs';
 
 export const BIND_CONTRACT_VERSION = 'v1alpha1';
 
@@ -534,7 +535,8 @@ function decide(ask, ctx, walk) {
  * @param {object} ask unit, seat, role, posture, persona, overrides, independentOf (executors or seats the
  *   seat must differ from), preferIndependentOf ([{ seat, executor }] it should differ from), blind,
  *   workflowTier, selectors, raiseAuthorized
- * @param {object} ctx { runnerConfig, session }
+ * @param {object} ctx { runnerConfig, session, lease?: { repoRoot, worktreePath } }
+ *   Lease context names the caller checkout, never a cached grant or an environment token.
  * @param {object} [options]
  * @param {object} [options.walk] where the seat stands after a failure
  * @param {object[]} [options.walk.tried] the seat's earlier bindings, oldest first (empty: the first binding)
@@ -548,6 +550,19 @@ function decide(ask, ctx, walk) {
  * @param {string} [options.walk.reason] why the walk moved (default `provider-limit`)
  */
 export function bind(ask, ctx, { walk = {} } = {}) {
+  // A whole-call refusal must precede seat policy, including its inline fallback.
+  // Never pass unit paths: even a read-only dispatch is frozen for non-holders.
+  let admission;
+  try {
+    admission = leaseAdmission({
+      repoRoot: ctx.lease?.repoRoot ?? ctx.repoRoot,
+      worktreePath: ctx.lease?.worktreePath ?? ctx.worktreePath,
+    });
+  } catch (error) {
+    // Seat choice is also used outside Git; there is no repository lease there.
+    if (error.code !== 'not-a-repository') throw error;
+  }
+  if (admission?.allowed === false) return { refused: { reason: admission.reason, detail: admission.message } };
   const decided = decide(ask, ctx, walk);
   if (decided.refused) return { refused: decided.refused };
   return bindingOf({ out: decided.out, prep: decided.prep, ask, ctx, walk });

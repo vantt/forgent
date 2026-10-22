@@ -5,6 +5,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
+import { acquireDocumentationCutoverLease } from '../../src/runner/documentation-cutover-lease.mjs';
+import { prepareWorkflowRun } from '../../src/workflow/case-start.mjs';
 
 import { createCaseAdmissionPort } from '../../src/workflow/case-admission-port.mjs';
 import { assertCaseAdmissionPort, seatLaunchesOf } from '../../src/runner/execution/case-admission-port.mjs';
@@ -13,6 +18,28 @@ import { readReservationFiles } from '../../src/workflow/case-runtime.mjs';
 import { readBinding, listBindingRecords } from '../../src/workflow/case-bindings.mjs';
 import { appendAll, FRAME, eventsOf, openCase, projectionOf, withHold } from '../helpers/workflow-case-fixture.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+
+ensureScriptAddon();
+
+// This is the Workflow start boundary, not another copy of lease token cases.
+test('workflow preparation refuses a non-holder before config or ledger creation and lets its holder start', () => {
+  const repoRoot = makeFixtureDir('fgos-workflow-lease-');
+  initFixtureRepo(repoRoot, { branch: 'main', ignore: '.fgos/\n' });
+  const holder = path.join(repoRoot, 'holder');
+  execFileSync('git', ['worktree', 'add', '-qb', 'holder', holder], { cwd: repoRoot, stdio: 'ignore' });
+  acquireDocumentationCutoverLease({ repoRoot: holder });
+  const params = {
+    repoRoot, cwd: repoRoot,
+    workflow: { id: 'lease-start', steps: [{ id: 'read', units: [{ id: 'read', template: { capability: 'docs:write', objective: 'Read', writes: [] } }] }] },
+  };
+  const before = fs.readdirSync(path.join(repoRoot, '.fgos')).sort();
+  assert.throws(() => prepareWorkflowRun(params), { code: 'documentation-cutover-lease' });
+  assert.throws(() => prepareWorkflowRun({ ...params, cwd: makeFixtureDir('fgos-workflow-outside-'), worktree: repoRoot }), { code: 'documentation-cutover-lease' });
+  assert.deepEqual(fs.readdirSync(path.join(repoRoot, '.fgos')).sort(), before, 'no config, ledger or parent frame write');
+  const allowed = prepareWorkflowRun({ ...params, worktree: holder });
+  assert.ok(allowed.workflowRunId);
+  assert.ok(fs.existsSync(allowed.runDir));
+});
 
 const planned = (options) => {
   const run = openCase(options);
