@@ -27,7 +27,10 @@ function applyEvent(view, event) {
   switch (event.type) {
     case 'porting.add': {
       const item = event.payload;
-      if (item && typeof item === 'object' && typeof item.id === 'string') {
+      // The first add of an id stands: addPorting refuses a known id, so a second add reaches the log only when two
+      // clones added the same id before seeing each other. It must not replace the record or reset a status the
+      // first one already moved, and every clone orders the union the same way, so every clone keeps the same one.
+      if (item && typeof item === 'object' && typeof item.id === 'string' && !view.porting[item.id]) {
         view.porting[item.id] = { ...item };
       }
       break;

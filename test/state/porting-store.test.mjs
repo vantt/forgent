@@ -132,6 +132,20 @@ test('addPorting rejects a duplicate id as validation, checked BEFORE the event 
   assert.equal(raw.length, 1, 'the rejected duplicate must never reach the log');
 });
 
+test('a second porting.add of a known id, as the union of two clones produces it, keeps the first record and its moved status', () => {
+  const dir = tmpDir();
+  addPorting(dir, { id: 'p1', title: 'First clone' });
+  movePorting(dir, { id: 'p1', to: 'planned', expectedStatus: 'candidate' });
+  // The other clone added the same id before seeing this one: its event reaches the log without passing addPorting's check.
+  const store = prepareWorkStore(dir, dir).store;
+  const cover = store.read({ streams: ['project:porting'] }, []).cursor.cover;
+  store.append('project:porting', [{ eventType: 'porting.add', schemaVersion: 1, payload: { id: 'p1', status: 'candidate', title: 'Second clone' }, ts: new Date().toISOString() }], cover, 'fixture', []);
+  for (const view of [listPorting(dir), rebuild(dir)]) {
+    assert.equal(view.porting.p1.title, 'First clone');
+    assert.equal(view.porting.p1.status, 'planned', 'the later add never resets the status to candidate');
+  }
+});
+
 test('movePorting delegates transition legality to transitionPorting — an illegal edge surfaces as precondition, not duplicated logic here', () => {
   const dir = tmpDir();
   addPorting(dir, { id: 'p1' });
