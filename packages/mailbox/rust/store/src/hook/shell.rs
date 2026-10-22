@@ -22,7 +22,7 @@ use fgos_mailbox_core::{Limits, MessageId, Timestamp, WriterKey};
 use std::collections::BTreeMap;
 use std::io::{Read, Write};
 use std::panic::{catch_unwind, AssertUnwindSafe};
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicU8, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -54,9 +54,62 @@ pub struct ShellInput<'a> {
     pub ancestry: &'a dyn Fn() -> Option<Ancestry>,
     pub topology: Topology,
     pub resolve: &'a Resolver<'a>,
-    /// Set just before the first byte of stdout is written; the budget
-    /// watchdog never ends a process whose write has started.
-    pub write_started: Arc<AtomicBool>,
+    /// Shared with the budget watchdog: the shell writes stdout only after
+    /// it moved the gate from idle to writing, and the watchdog ends the
+    /// process only after it moved it from idle to done.
+    pub gate: WriteGate,
+}
+
+/// The state of a [`WriteGate`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GateState {
+    /// Neither the write nor the watchdog's exit has started.
+    Idle,
+    /// The shell is writing stdout, or has written it: the watchdog stays.
+    Writing,
+    /// The budget passed and the watchdog ends the process: no write starts.
+    Done,
+}
+
+/// The one flag the shell and the budget watchdog decide by. Each side
+/// moves it out of idle by compare-and-swap, so exactly one of them wins:
+/// the process can never end in the middle of a stdout write, and a write
+/// never starts once the watchdog has begun to end the process.
+#[derive(Debug, Clone, Default)]
+pub struct WriteGate(Arc<AtomicU8>);
+
+const IDLE: u8 = 0;
+const WRITING: u8 = 1;
+const DONE: u8 = 2;
+
+impl WriteGate {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Idle to writing; `false` when the watchdog got there first.
+    pub fn begin_write(&self) -> bool {
+        self.swap_from_idle(WRITING)
+    }
+
+    /// Idle to done; `false` when a write has started.
+    pub fn claim_exit(&self) -> bool {
+        self.swap_from_idle(DONE)
+    }
+
+    pub fn state(&self) -> GateState {
+        match self.0.load(Ordering::SeqCst) {
+            IDLE => GateState::Idle,
+            WRITING => GateState::Writing,
+            _ => GateState::Done,
+        }
+    }
+
+    fn swap_from_idle(&self, to: u8) -> bool {
+        self.0
+            .compare_exchange(IDLE, to, Ordering::SeqCst, Ordering::SeqCst)
+            .is_ok()
+    }
 }
 
 /// Why a call printed nothing.
@@ -201,7 +254,10 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
         .collect();
     let reply = render_reply(&claimed, &|id| bodies.get(id).cloned(), input.limits);
 
-    input.write_started.store(true, Ordering::SeqCst);
+    if !input.gate.begin_write() {
+        // The budget passed: the watchdog is ending the process.
+        return outcome;
+    }
     if stdout
         .write_all(reply.stdout.as_bytes())
         .and_then(|()| stdout.flush())
@@ -238,19 +294,16 @@ pub fn silence_panics() {
     std::panic::set_hook(Box::new(|_| {}));
 }
 
-/// Entry only: when `budget` passes, run `on_exit` and end the process
-/// with status 0, unless the stdout write has started, in which case the
-/// write is left to finish: a cut-off stdout would hand the CLI a truncated
-/// document with status 0, which is worse than a late one (the CLI's own
-/// hook timeout still bounds it).
-pub fn arm_budget(
-    budget: Duration,
-    write_started: Arc<AtomicBool>,
-    on_exit: impl FnOnce() + Send + 'static,
-) {
+/// Entry only: when `budget` passes, claim `gate` and, when the claim
+/// wins, run `on_exit` and end the process with status 0. When the stdout
+/// write has started the claim loses and the write is left to finish: a
+/// cut-off stdout would hand the CLI a truncated document with status 0,
+/// which is worse than a late one (the CLI's own hook timeout still bounds
+/// it).
+pub fn arm_budget(budget: Duration, gate: WriteGate, on_exit: impl FnOnce() + Send + 'static) {
     std::thread::spawn(move || {
         std::thread::sleep(budget);
-        if write_started.load(Ordering::SeqCst) {
+        if !gate.claim_exit() {
             return;
         }
         on_exit();

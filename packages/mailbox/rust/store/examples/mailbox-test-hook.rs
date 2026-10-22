@@ -28,7 +28,7 @@ use fgos_identity::{resolve_current, Source, WriterId};
 use fgos_mailbox::adapters::claude_head::find_head;
 use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::head::{Ancestry, NoHead, Topology};
-use fgos_mailbox::hook::shell::{self, Resolved, ShellInput};
+use fgos_mailbox::hook::shell::{self, Resolved, ShellInput, WriteGate};
 use fgos_mailbox::hook::{Adapter, HeadFacts, HookEvent, HookLimits};
 use fgos_mailbox::record::{Record, Wait};
 use fgos_mailbox::verbs;
@@ -36,8 +36,6 @@ use fgos_mailbox_core::{Limits, MessageId, SendRequest, Timestamp, WriterKey};
 use std::collections::BTreeMap;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
-use std::sync::atomic::AtomicBool;
-use std::sync::Arc;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 fn main() {
@@ -231,11 +229,11 @@ fn hook(flags: &Flags) -> i32 {
     let started = Instant::now();
     shell::silence_panics();
     let (limits, hook_limits) = limits();
-    let write_started = Arc::new(AtomicBool::new(false));
+    let gate = WriteGate::new();
     let budget_log = log.map(Path::to_path_buf);
     shell::arm_budget(
         Duration::from_millis(hook_limits.hook.budget_ms),
-        write_started.clone(),
+        gate.clone(),
         move || append(budget_log.as_deref(), "budget-exit"),
     );
 
@@ -299,7 +297,7 @@ fn hook(flags: &Flags) -> i32 {
         ancestry: &read_ancestry,
         topology,
         resolve: &resolve,
-        write_started,
+        gate,
     };
     let mut stdin = io::stdin().lock();
     let outcome = if fault {

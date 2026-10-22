@@ -10,7 +10,9 @@ use common::record::{self as rec, read_state, send_req, wait_exit, TempFgos, T0}
 use common::{files, fixture, hook_limits, limits};
 use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::head::{Ancestry, Topology};
-use fgos_mailbox::hook::shell::{arm_budget, run, Quiet, Resolved, ShellInput, ShellOutcome};
+use fgos_mailbox::hook::shell::{
+    arm_budget, run, GateState, Quiet, Resolved, ShellInput, ShellOutcome, WriteGate,
+};
 use fgos_mailbox::hook::{Adapter, HeadFacts, HookEvent, QuietReason};
 use fgos_mailbox::record::{Record, Wait};
 use fgos_mailbox_core::{MessageId, MessageState, Timestamp, WriterKey};
@@ -18,8 +20,6 @@ use fgos_process::facts::{identity_of, Record as ProcRecord};
 use fgos_process::ProcId;
 use std::io::{self, Write};
 use std::process::{Child, Command};
-use std::sync::atomic::AtomicBool;
-use std::sync::Arc;
 use std::time::Duration;
 
 /// A head process the test spawns; killed when the test ends.
@@ -68,6 +68,19 @@ fn call(
     stdout: &mut dyn Write,
     now: Timestamp,
 ) -> ShellOutcome {
+    gated_call(record, head, caller, stdin, stdout, now, WriteGate::new())
+}
+
+/// [`call`] with the write gate the watchdog would share.
+fn gated_call(
+    record: &Record,
+    head: &Head,
+    caller: Ancestry,
+    stdin: &[u8],
+    stdout: &mut dyn Write,
+    now: Timestamp,
+    gate: WriteGate,
+) -> ShellOutcome {
     let (_, writer) = payload(files::POST_TOOL_USE);
     let limits = limits();
     let hook = hook_limits();
@@ -96,7 +109,7 @@ fn call(
         ancestry: &ancestry,
         topology: Topology::Direct,
         resolve: &resolve,
-        write_started: Arc::new(AtomicBool::new(false)),
+        gate,
     };
     run(input, &mut &stdin[..], stdout)
 }
@@ -146,6 +159,23 @@ impl Write for Observing<'_> {
             self.seen = Some(state_of(self.record, &self.id));
         }
         self.bytes.extend_from_slice(buf);
+        Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}
+
+/// A stdout that reads the write gate at its first write.
+struct GateWatching {
+    gate: WriteGate,
+    seen: Option<GateState>,
+}
+
+impl Write for GateWatching {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        self.seen.get_or_insert(self.gate.state());
         Ok(buf.len())
     }
 
@@ -313,6 +343,62 @@ fn a_panic_while_writing_is_caught_prints_nothing_more_and_leaves_the_claim_unfi
     ));
 }
 
+#[test]
+fn the_shell_moves_the_write_gate_to_writing_before_the_first_byte_of_stdout() {
+    let fgos = TempFgos::new("shell-gate");
+    let record = fgos.record();
+    let head = Head::spawn();
+    registered_with_mail(&record, &head);
+    let (stdin, _) = payload(files::POST_TOOL_USE);
+    let gate = WriteGate::new();
+    let mut out = GateWatching {
+        gate: gate.clone(),
+        seen: None,
+    };
+
+    let outcome = gated_call(
+        &record,
+        &head,
+        head.ancestry(),
+        &stdin,
+        &mut out,
+        T0,
+        gate.clone(),
+    );
+
+    assert_eq!(
+        out.seen,
+        Some(GateState::Writing),
+        "the watchdog cannot claim it now"
+    );
+    assert!(outcome.stdout_written && outcome.finished);
+    assert!(
+        !gate.claim_exit(),
+        "a watchdog firing after the write stays"
+    );
+}
+
+#[test]
+fn a_shell_whose_gate_the_watchdog_claimed_writes_nothing_and_leaves_the_claim_unfinished() {
+    let fgos = TempFgos::new("shell-gate-claimed");
+    let record = fgos.record();
+    let head = Head::spawn();
+    let id = registered_with_mail(&record, &head);
+    let (stdin, _) = payload(files::POST_TOOL_USE);
+    let gate = WriteGate::new();
+    assert!(gate.claim_exit(), "the budget passed first");
+
+    let mut out = Vec::new();
+    let outcome = gated_call(&record, &head, head.ancestry(), &stdin, &mut out, T0, gate);
+
+    assert!(out.is_empty());
+    assert!(!outcome.stdout_written && !outcome.finished);
+    assert!(matches!(
+        state_of(&record, &id),
+        MessageState::InFlight { .. }
+    ));
+}
+
 /// The budget the watchdog children use: short, passed in by the test; the
 /// product value stays in the contract.
 const CHILD_BUDGET: Duration = Duration::from_millis(300);
@@ -323,9 +409,12 @@ fn child_entry() {
         return;
     };
     let scratch = rec::child_scratch();
-    let started = Arc::new(AtomicBool::new(role == "writing"));
+    let gate = WriteGate::new();
+    if role == "writing" {
+        assert!(gate.begin_write());
+    }
     let mark = scratch.join("budget-exit");
-    arm_budget(CHILD_BUDGET, started, move || {
+    arm_budget(CHILD_BUDGET, gate, move || {
         std::fs::write(mark, "exit").unwrap();
     });
     match role.as_str() {
