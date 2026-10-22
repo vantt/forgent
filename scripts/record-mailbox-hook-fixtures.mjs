@@ -705,6 +705,8 @@ function cmdRedact(cli) {
 
   const run = (dir) => readJson(path.join(dir, 'run.json'));
   const nsSame = [...dumpCalls, ...acceptCalls, ...subCalls].every((c) => c.ns === run(runs.dump).recorderPidNamespace);
+  // The operator's notes: observations the recorder cannot derive itself (which user hooks
+  // fired, what a subagent's tool process saw); a re-recording without them drops them.
   const notes = fs.existsSync(path.join(BASE, cli, 'notes.txt')) ? fs.readFileSync(path.join(BASE, cli, 'notes.txt'), 'utf8').trim().split('\n').join('; ') : '';
   const source = [
     `recorded ${run(runs.dump).startedAt.slice(0, 10)} from ${cli} ${version} on this machine by scripts/record-mailbox-hook-fixtures.mjs (redaction rules version ${REDACTION_RULES_VERSION})`,
