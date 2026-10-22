@@ -1,0 +1,11 @@
+# Step 6b small fix: stray token in the main checkout is never holder proof (Doer brief, code slice)
+
+Status: Lead brief (code slice under L12-92: plan branch only, no main landing, no real lease on this repo).
+
+You are Doer for Phase 8 of plan 260925-documentation-authority-unification in the fgOS repo. The final review `review-a38-step-06b-final.md` (this directory) returned ok with Low O1: while a stray holder token sits in the main checkout (a release interrupted after the token copy), the main checkout counts as the holder in `leaseAdmission`. Doctor already fails and acquire refuses (L-1).
+
+Lead ruling L12-113 (record in owner-answers.md, Lead under A42): (1) O1 — `leaseAdmission` refuses (named reason, e.g. `stray-main-token`) when the caller checkout is the main checkout, the main checkout is not the recorded holder checkout, and a token file exists there; the real holder in its own worktree is unaffected; release from the holder still works and removes the copy. One contained change in the gate, plus one owning test reproducing the reviewer's O1 scenario through the production path. (2) O2 (an answer from another checkout of the same repository to a holder's workflow is admitted because the recorded origin decides) and (3) O3 (the gate's cwd fallback when no repo root is passed; every production door passes one) stay as designed and are documented in the next docs turn.
+
+Writable (exact): src/runner/documentation-cutover-lease.mjs, test/runner/documentation-cutover-lease.test.mjs, plans/260925-documentation-authority-unification/reports/phase-08/**. Never a git write in this repo (temp repos fine), never the fgos CLI against this repo, never this repo's .fgos/ or secrets. Machine IO is constrained right now: run ONLY the touched test file plus test/e2e/documentation-cutover-lease-hooks.test.mjs and test/runner/merge-land.test.mjs, each with `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:9508f457d1ec11814de34149c6b19ce01ffbf237060ee6093fbaf442fac4b511/bin/fgos node --test <file>`; NEVER `scripts/run-tests.mjs`, `npm test`, cargo, git archive or checker sweeps. Record commands and exit codes in L12-113.
+
+Final message: first line a conventional commit subject (at most 100 characters, no plan ids, phase or finding labels), then a short Vietnamese summary (anh/em).
