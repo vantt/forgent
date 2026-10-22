@@ -5,6 +5,7 @@ edition.workspace = true
 
 [dependencies]
 fgos-host-runtime = { path = "../../host-runtime/rust" }
+fgos-process = { path = "../../process/rust" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 

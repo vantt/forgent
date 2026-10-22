@@ -17,6 +17,7 @@ fgos-git = { path = "../rust" }
 fgos-event-store = { path = "../../event-store/rust" }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
 fgos-process = { path = "../../process/rust" }
+fgos-identity = { path = "../../identity/rust" }
 fgos-durable-file = { path = "../../durable-file/rust" }
 fgos-canonical-json = { path = "../../canonical-json/rust" }
 

@@ -167,12 +167,6 @@ fn main() {
             let rest: Vec<String> = args[3..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
             std::process::exit(fgos_terminal_control::route::main(&rest));
         }
-        // `identity <op>`: the writer-id rules the Node payload must not copy
-        // (see `fgos_identity::route`).
-        if args.get(2).is_some_and(|a| a == "identity") {
-            let rest: Vec<String> = args[3..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
-            std::process::exit(fgos_identity::route::main(&rest));
-        }
         // `seat-binding <op>`: the seat binding decision the Node payload must
         // not copy (see `fgos_seat_binding::route`).
         if args.get(2).is_some_and(|a| a == "seat-binding") {

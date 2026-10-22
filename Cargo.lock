@@ -257,6 +257,7 @@ name = "fgos-identity"
 version = "0.2.0"
 dependencies = [
  "fgos-host-runtime",
+ "fgos-process",
  "libc",
  "serde",
  "serde_json",
@@ -271,6 +272,7 @@ dependencies = [
  "fgos-event-store",
  "fgos-git",
  "fgos-holder-lock",
+ "fgos-identity",
  "fgos-process",
  "fgos-write-scope",
  "libc",

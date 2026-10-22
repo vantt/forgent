@@ -11,7 +11,6 @@ pub mod launcher;
 pub mod proc_tree;
 pub mod provider;
 pub mod resolve;
-pub mod route;
 
 pub use attempt::{mint_attempt_writer_id, InvalidAttemptId, ATTEMPT_PREFIX, MAX_ATTEMPT_ID_LENGTH};
 pub use launcher::{scrub_and_set, EmptyWriterId};

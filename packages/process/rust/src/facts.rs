@@ -360,6 +360,10 @@ pub struct Relation {
     pub parent: u32,
     /// Its process group.
     pub group: u32,
+    /// Its session id (Linux `session`).
+    pub session: u32,
+    /// Its controlling terminal device number; 0 means none (Linux `tty_nr`).
+    pub tty_nr: i64,
     /// Start time in clock ticks since boot (Linux `starttime`): a process
     /// created later never has a smaller value.
     pub start_ticks: u64,
@@ -453,6 +457,8 @@ pub(crate) struct Stat {
     pub state: char,
     pub parent: u32,
     pub group: u32,
+    pub session: u32,
+    pub tty_nr: i64,
     /// Start time in clock ticks since boot (field 22).
     pub start_ticks: u64,
 }
@@ -471,14 +477,16 @@ pub(crate) fn parse_stat(line: &str) -> Option<Stat> {
         state: fields.next()?.chars().next()?,
         parent: fields.next()?.parse().ok()?,
         group: fields.next()?.parse().ok()?,
-        start_ticks: fields.nth(16)?.parse().ok()?,
+        session: fields.next()?.parse().ok()?,
+        tty_nr: fields.next()?.parse().ok()?,
+        start_ticks: fields.nth(14)?.parse().ok()?,
     })
 }
 
 /// Parent, group and start time from one `/proc/<pid>/stat` line.
 pub fn parse_relation(pid: ProcId, line: &str) -> Option<Relation> {
     let stat = parse_stat(line)?;
-    Some(Relation { pid, parent: stat.parent, group: stat.group, start_ticks: stat.start_ticks })
+    Some(Relation { pid, parent: stat.parent, group: stat.group, session: stat.session, tty_nr: stat.tty_nr, start_ticks: stat.start_ticks })
 }
 
 /// What [`scan`] reads for each process.
@@ -561,6 +569,8 @@ mod tests {
         // SAFETY: getppid has no preconditions.
         assert_eq!(me.parent, unsafe { libc::getppid() } as u32);
         assert!(me.start_ticks > 0);
+        // SAFETY: getsid has no preconditions.
+        assert_eq!(me.session, unsafe { libc::getsid(0) } as u32);
         let mut child = std::process::Command::new("sleep").arg("1").spawn().unwrap();
         let pid = child.id();
         child.kill().unwrap();
@@ -592,7 +602,7 @@ mod tests {
         let line = "4242 (weird) name (x)) S 100 4242 77 34816 4242 4194304 0 0 0 0 1 2 0 0 20 0 1 0 987654 1 2 3";
         assert_eq!(
             parse_relation(ProcId(4242), line),
-            Some(Relation { pid: ProcId(4242), parent: 100, group: 4242, start_ticks: 987654 })
+            Some(Relation { pid: ProcId(4242), parent: 100, group: 4242, session: 77, tty_nr: 34816, start_ticks: 987654 })
         );
         assert_eq!(parse_relation(ProcId(1), "1 (x) S 0"), None);
     }

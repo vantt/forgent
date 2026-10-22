@@ -58,7 +58,7 @@ export function loadNativeAddon({ hostBin, descriptor } = {}) {
       helperExes.set(addon, resolved);
     }
     const v = addon.versions(); // Enforce the process marker before exposing any crate.
-    if (v.napi !== entry.napiVersion || typeof v.git !== 'string' || typeof v.eventStore !== 'string' || typeof v.process !== 'number' || typeof v.durableFile !== 'string' || typeof v.canonicalJson !== 'number' || typeof v.holderLock !== 'number') throw unavailable('combined addon ABI mismatch');
+    if (v.napi !== entry.napiVersion || typeof v.git !== 'string' || typeof v.eventStore !== 'string' || typeof v.process !== 'number' || typeof v.durableFile !== 'string' || typeof v.canonicalJson !== 'number' || typeof v.holderLock !== 'number' || typeof v.sessionIdentity !== 'number') throw unavailable('combined addon ABI mismatch');
     loaded = { file, addon };
     return addon;
   } catch (err) {
