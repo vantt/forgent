@@ -440,6 +440,12 @@ pub fn relations() -> Option<Vec<Relation>> {
     platform::current().relations()
 }
 
+/// Parent, group and start time of the one process `pid`, from a single stat
+/// read (Linux); `None` where the platform has no such read or `pid` is gone.
+pub fn relation_of(pid: ProcId) -> Option<Relation> {
+    platform::current().relation_of(pid)
+}
+
 /// The fields of one `/proc/<pid>/stat` line that process facts use.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct Stat {
@@ -526,6 +532,11 @@ pub fn scan(filter: &ScanFilter) -> Scan {
     platform::current().scan(filter)
 }
 
+/// The facts [`scan`] reads, for the one process `pid`; `None` where nothing runs there or the platform cannot read them.
+pub fn view_of(pid: ProcId, filter: &ScanFilter) -> Option<ProcView> {
+    platform::current().view_of(pid, filter)
+}
+
 /// Parse one `/proc/<pid>/stat` line into `(state, start_time)`. The
 /// command name sits in parentheses and may hold spaces, so fields are
 /// counted from the last `)`: state is the first field after it, start
@@ -542,6 +553,24 @@ pub use crate::platform::linux::{lock_table_entries, locked_fds, own_lock_token,
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn one_process_is_read_alone_with_its_parent_and_a_gone_pid_is_none() {
+        let me = relation_of(ProcId(std::process::id())).expect("this process is readable");
+        // SAFETY: getppid has no preconditions.
+        assert_eq!(me.parent, unsafe { libc::getppid() } as u32);
+        assert!(me.start_ticks > 0);
+        let mut child = std::process::Command::new("sleep").arg("1").spawn().unwrap();
+        let pid = child.id();
+        child.kill().unwrap();
+        child.wait().unwrap();
+        assert_eq!(relation_of(ProcId(pid)), None);
+        // The scan view of the same process names its argv and the variables asked for.
+        let view = view_of(ProcId(std::process::id()), &ScanFilter { env_keys: vec!["PATH".into()], include_self: true }).expect("this process is readable");
+        assert!(view.cmdline.is_some_and(|argv| !argv.is_empty()));
+        assert!(view.env_subset.contains_key("PATH"));
+    }
 
     #[cfg(target_os = "linux")]
     #[test]

@@ -19,6 +19,25 @@ const INIT_PID_NS: &str = "pid:[4026531836]";
 /// The Linux driver: facts from `/proc`, signals through a pidfd.
 pub struct Linux;
 
+impl Linux {
+    /// The scan view of one process, or `None` when nothing runs there.
+    fn view_with(&self, pid: ProcId, filter: &ScanFilter, host: &str, boot_id: &Option<String>, pid_ns: &str) -> Option<ProcView> {
+        let mut unreadable = Vec::new();
+        let tuple = match self.observe(pid) {
+            Observed::Live { start_time } => Some(ProcTuple { host: host.to_string(), boot_id: boot_id.clone(), pid_ns: pid_ns.to_string(), pid, start_time }),
+            // Exited, or gone while the scan ran: nothing is running there.
+            Observed::Zombie | Observed::Absent => return None,
+            // A process this observer may not look at is still a process:
+            // it stays in the list, named by what could not be read.
+            Observed::Unreadable(cause) => {
+                unreadable.push(format!("stat: {cause:?}"));
+                None
+            }
+        };
+        Some(view_of(pid, tuple, filter, unreadable))
+    }
+}
+
 impl ProcessPlatform for Linux {
     fn host(&self) -> String {
         unix_hostname()
@@ -107,6 +126,10 @@ impl ProcessPlatform for Linux {
         Some(pids.into_iter().filter_map(|pid| read_relation(&proc_dir, pid, &mut buf)).collect())
     }
 
+    fn relation_of(&self, pid: ProcId) -> Option<Relation> {
+        facts::parse_relation(pid, &fs::read_to_string(format!("/proc/{}/stat", pid.0)).ok()?)
+    }
+
     fn last_pid(&self) -> Option<u32> {
         fs::read_to_string("/proc/sys/kernel/ns_last_pid").ok()?.trim().parse().ok()
     }
@@ -156,26 +179,17 @@ impl ProcessPlatform for Linux {
     fn scan(&self, filter: &ScanFilter) -> Scan {
         let own = ProcId(std::process::id());
         let (host, boot_id, pid_ns) = (self.host(), self.boot_id(), self.pid_ns().id);
-        let mut views = Vec::new();
-        for pid in proc_pids() {
-            if pid == own && !filter.include_self {
-                continue;
-            }
-            let mut unreadable = Vec::new();
-            let tuple = match self.observe(pid) {
-                Observed::Live { start_time } => Some(ProcTuple { host: host.clone(), boot_id: boot_id.clone(), pid_ns: pid_ns.clone(), pid, start_time }),
-                // Exited, or gone while the scan ran: nothing is running there.
-                Observed::Zombie | Observed::Absent => continue,
-                // A process this observer may not look at is still a process:
-                // it stays in the list, named by what could not be read.
-                Observed::Unreadable(cause) => {
-                    unreadable.push(format!("stat: {cause:?}"));
-                    None
-                }
-            };
-            views.push(view_of(pid, tuple, filter, unreadable));
-        }
-        Scan::Views(views)
+        Scan::Views(
+            proc_pids()
+                .into_iter()
+                .filter(|pid| *pid != own || filter.include_self)
+                .filter_map(|pid| self.view_with(pid, filter, &host, &boot_id, &pid_ns))
+                .collect(),
+        )
+    }
+
+    fn view_of(&self, pid: ProcId, filter: &ScanFilter) -> Option<ProcView> {
+        self.view_with(pid, filter, &self.host(), &self.boot_id(), &self.pid_ns().id)
     }
 
     fn spawn_with_fds(&self, cmd: Command, fd_map: &[(FdSlot, &File)]) -> io::Result<Child> {
