@@ -8,7 +8,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { withStateTx, hotPaths, readHotRecord, HotLockError } from '../../src/state/hot-lock.mjs';
+import { spawn } from 'node:child_process';
+import { withStateTx, hotPaths, readHotRecord, reclaimDeadHolder, HotLockError } from '../../src/state/hot-lock.mjs';
+import { observe, selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
 import { readEvents } from '../../src/state/events.mjs';
 
 function fixture() {
@@ -127,6 +129,41 @@ test('a thrown callback releases the lock and rethrows its own error', () => {
     assert.throws(() => withStateTx(f.fgosDir, () => { throw new RangeError('boom'); }, { prefetched: writer }), RangeError);
     assert.equal(readHotRecord(record).state, 'absent');
     assert.equal(withStateTx(f.fgosDir, () => 'again', { prefetched: writer }), 'again');
+  } finally {
+    f.cleanup();
+  }
+});
+
+// The record functions the state transaction cleans with. Each takes the
+// kernel reclaim lock through the holder-lock facade, so the harness's staged
+// host binary is needed.
+
+function recordFile(f) {
+  const { record, dir } = hotPaths(f.fgosDir);
+  fs.mkdirSync(dir, { recursive: true });
+  return record;
+}
+
+async function exitedHolderRecord() {
+  const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
+  const exited = new Promise((resolve) => child.on('exit', resolve));
+  const { pid, startTime, bootId, pidNs } = observe(child.pid);
+  child.kill('SIGKILL');
+  await exited;
+  return JSON.stringify({ v: 1, pid, startTime, bootId, pidNs });
+}
+
+test('a record that changed after it was judged dead is never reclaimed', async () => {
+  const f = fixture();
+  try {
+    const file = recordFile(f);
+    fs.writeFileSync(file, await exitedHolderRecord());
+    const observed = readHotRecord(file);
+    assert.equal(observed.state, 'ok');
+    const live = JSON.stringify({ v: 1, ...selfRecord() });
+    fs.writeFileSync(file, live);
+    assert.equal(reclaimDeadHolder(f.fgosDir, 'state', observed), 'changed');
+    assert.equal(fs.readFileSync(file, 'utf8'), live, 'the live holder keeps its record');
   } finally {
     f.cleanup();
   }
