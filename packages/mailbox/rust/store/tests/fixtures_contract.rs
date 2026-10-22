@@ -108,9 +108,11 @@ fn uuids(text: &str) -> Vec<&str> {
 }
 
 /// Runs of base64 or hex characters at least `SECRET_RUN` long that hold a
-/// digit (a path segment of plain words is not a secret).
+/// digit. `/` separates runs, so a path of short segments is not one run; a
+/// base64 secret holds a `/` only about once in 64 characters, so it still
+/// leaves a run this long.
 fn secret_runs(text: &str) -> Vec<String> {
-    let in_run = |c: char| c.is_ascii_alphanumeric() || matches!(c, '+' | '/' | '=');
+    let in_run = |c: char| c.is_ascii_alphanumeric() || matches!(c, '+' | '=');
     text.split(|c: char| !in_run(c))
         .filter(|run| run.len() >= SECRET_RUN && run.chars().any(|c| c.is_ascii_digit()))
         .map(str::to_string)
@@ -152,9 +154,17 @@ fn has_jwt(text: &str) -> bool {
     })
 }
 
-/// Every `/home/<x>/` whose `<x>` is not `user`.
+/// Every absolute path `/home/<x>/` whose `<x>` is not `user`. A `home`
+/// directory inside another path (a CLI home under the run directory) is
+/// not a user's home.
 fn foreign_homes(text: &str) -> Vec<String> {
     text.match_indices("/home/")
+        .filter(|(at, _)| {
+            text[..*at]
+                .chars()
+                .next_back()
+                .is_none_or(|c| matches!(c, '"' | ' ' | '`' | '\'' | '=' | ':' | '('))
+        })
         .map(|(at, _)| {
             text[at + "/home/".len()..]
                 .chars()

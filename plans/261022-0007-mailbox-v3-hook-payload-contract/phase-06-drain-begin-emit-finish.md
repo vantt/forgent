@@ -148,6 +148,12 @@ Each per-CLI case is one loop over the three CLIs' vectors, not three copies. Ea
 - **Writer key** for Claude comes from the recorded hook environment through `env_identity`; the agy pid-shaped key was not needed because agy is not drained.
 - **Result.** `tests/hook_payloads.rs`: 12 passed.
 
+## Codex drained (implementation lead, 2026-10-22, after the Codex recording)
+
+- `begin` takes the payload's thread as the binding's handle only when it equals the writer key (decision 13); owning test `the_codex_thread_handle_is_taken_only_when_it_is_the_writer`.
+- The suite's writer key is the one the head's tool processes derive (the key `send` uses). Codex's hook process sees no id variable; `the_writer_key_the_hook_derives_equals_the_one_its_tool_sees` records that, and V5's entry must take the Codex key from the payload's `session_id`.
+- Result: `tests/hook_payloads.rs` 13 passed, over Claude Code and Codex; agy proven quiet.
+
 ## Plan owner decisions (2026-10-22, after phase 3; plan owner (agent))
 
 1. **M4, one binding per head.** A second key from the same head replaces the old binding like a dead-head takeover: a new generation, its own name, `stop_blocks` 0, and mail queued for the old key is never shown to the new context. Implemented in phase 5 with its owning test.

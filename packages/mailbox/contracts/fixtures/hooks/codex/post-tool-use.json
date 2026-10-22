@@ -1,0 +1,15 @@
+{
+  "session_id": "00000000-0000-4000-8000-000000000001",
+  "turn_id": "00000000-0000-4000-8000-000000000002",
+  "transcript_path": "/run-dir/codex/dump/home/sessions/2026/10/22/rollout-2026-10-22T10-02-35-00000000-0000-4000-8000-000000000001.jsonl",
+  "cwd": "/run-dir/codex/dump/ws",
+  "hook_event_name": "PostToolUse",
+  "model": "<redacted>",
+  "permission_mode": "bypassPermissions",
+  "tool_name": "Bash",
+  "tool_input": {
+    "command": "env | grep -E '^(CODEX_THREAD_ID|CLAUDE_CODE_SESSION_ID|FGOS_SESSION_ID)=' > tool-env.txt; echo mailbox-fixture"
+  },
+  "tool_response": "<redacted>",
+  "tool_use_id": "00000000-0000-4000-8000-000000000005"
+}

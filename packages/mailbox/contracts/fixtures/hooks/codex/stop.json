@@ -1,0 +1,11 @@
+{
+  "session_id": "00000000-0000-4000-8000-000000000001",
+  "turn_id": "00000000-0000-4000-8000-000000000002",
+  "transcript_path": "/run-dir/codex/dump/home/sessions/2026/10/22/rollout-2026-10-22T10-02-35-00000000-0000-4000-8000-000000000001.jsonl",
+  "cwd": "/run-dir/codex/dump/ws",
+  "hook_event_name": "Stop",
+  "model": "<redacted>",
+  "permission_mode": "bypassPermissions",
+  "stop_hook_active": false,
+  "last_assistant_message": "done"
+}

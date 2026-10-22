@@ -153,7 +153,14 @@ pub fn begin(
         project: call.project.to_string(),
         own_suffix: call.head.own_suffix.clone(),
         head: head_text(&call.head.record),
-        handle: call.head.handle.clone(),
+        // A thread handle from the payload is taken only when it is the
+        // writer itself, so a forged payload cannot plant a handle.
+        handle: call.head.handle.clone().or_else(|| {
+            payload
+                .thread
+                .clone()
+                .filter(|thread| thread == call.writer.as_str())
+        }),
     };
     let generation = match state.register(request, judged, now, limits, ids) {
         Ok(

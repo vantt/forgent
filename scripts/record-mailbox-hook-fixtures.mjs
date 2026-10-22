@@ -21,9 +21,11 @@
  *       and writes versions.json (before and after), run.json and
  *       output.txt. `--fallback` (accept only) offers the other context shape
  *       of the two candidates below, after the first one was refused.
- *       For codex it then checks that home/auth.json is still a symlink to
- *       the account's auth.json and that the account file's bytes are
- *       unchanged; on any change it stops with exit 3 and prints only that.
+ *       For codex it checks, before and after the run, that home/auth.json
+ *       is a symlink to the account's auth.json (a token refresh during the
+ *       run then writes the real file, never a copy) and that
+ *       `codex login status` succeeds; otherwise it stops with exit 3.
+ *       `--account <name>` picks the account (default tetnu).
  *   hook <cli> <event> <runDir>
  *       The hook command each CLI is configured with. Reads stdin in full and
  *       writes <runDir>/calls/<n>-<event>.json (stdin as received),
@@ -88,7 +90,11 @@ const SCRIPT = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(SCRIPT), '..');
 const BASE = path.join(process.env.TMPDIR || '/tmp', 'fgos-work', 'mailbox-v3-record');
 const FIXTURES = path.join(REPO_ROOT, 'packages', 'mailbox', 'contracts', 'fixtures', 'hooks');
-const ACCOUNT = 'tetnu';
+/** The account a run uses: `--account <name>`, or `tetnu`. */
+const ACCOUNT = (() => {
+  const at = process.argv.indexOf('--account');
+  return at > 0 ? process.argv[at + 1] : 'tetnu';
+})();
 const REDACTION_RULES_VERSION = 1;
 
 /** The session-identity variables (fgos-session-identity ENV_ORDER), plus
@@ -131,7 +137,9 @@ const BLOCK_SHAPE = { decision: 'block', reason: '{{TEXT}}' };
  */
 const RECORD_TYPES = {
   claude: { inject: ['attachment:hook_additional_context'], raw: ['attachment:hook_success'] },
-  codex: { inject: [], raw: [] },
+  // The rollout's model-input records; no hook record type appeared in the
+  // dump run's rollout.
+  codex: { inject: ['response_item:message:developer', 'response_item:message:user'], raw: [] },
   agy: { inject: [], raw: [] },
 };
 
@@ -237,16 +245,23 @@ function setUp(cli, mode, runDir) {
   return { ws, args, env };
 }
 
-function fileDigest(file) {
-  return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
-}
-
+/**
+ * The codex login guard. A live account may refresh its tokens during a run
+ * and rewrite auth.json; that is fine as long as the run home's auth.json is
+ * still a symlink to the account's file, so the refresh lands in the real
+ * file. A copy must never be refreshed: that burns the real refresh token.
+ */
 function codexAuthState(runDir) {
-  const link = path.join(runDir, 'home', 'auth.json');
+  const home = path.join(runDir, 'home');
+  const link = path.join(home, 'auth.json');
   const target = path.join(accountHome('codex'), 'auth.json');
   const stat = fs.lstatSync(link, { throwIfNoEntry: false });
   const isLink = Boolean(stat && stat.isSymbolicLink() && fs.readlinkSync(link) === target);
-  return { isLink, digest: fileDigest(target) };
+  const status = spawnSync('codex', ['login', 'status'], {
+    env: cleanEnv({ CODEX_HOME: home }),
+    stdio: 'ignore',
+  });
+  return { isLink, loggedIn: status.status === 0 };
 }
 
 function cmdRun(cli, mode, flags) {
@@ -273,6 +288,9 @@ function cmdRun(cli, mode, flags) {
   });
   const { ws, args, env } = setUp(cli, mode, runDir);
   const authBefore = cli === 'codex' ? codexAuthState(runDir) : null;
+  if (authBefore && !(authBefore.isLink && authBefore.loggedIn)) {
+    die(`the ${ACCOUNT} codex login is not usable before the run (link ${authBefore.isLink}, logged in ${authBefore.loggedIn})`, 3);
+  }
   const before = cliVersion(cli);
   const startedAt = new Date().toISOString();
   const child = spawnSync('timeout', ['300', cli, ...args], {
@@ -294,17 +312,15 @@ function cmdRun(cli, mode, flags) {
     removedVars: REMOVED_VARS,
     recorderPidNamespace: fs.readlinkSync('/proc/self/ns/pid'),
   });
-  const calls = fs.existsSync(path.join(runDir, 'calls')) ? fs.readdirSync(path.join(runDir, 'calls')) : [];
-  process.stdout.write(`${cli} ${mode}: exit ${child.status}; versions ${before} -> ${after}; ${calls.filter((f) => /^\d+-[A-Za-z]+\.json$/.test(f)).length} hook calls; ${runDir}\n`);
+  process.stdout.write(`${cli} ${mode}: exit ${child.status}; versions ${before} -> ${after}; ${callsOf(runDir).length} hook calls; ${runDir}\n`);
   if (authBefore) {
     const authAfter = codexAuthState(runDir);
-    const intact = authAfter.isLink && authAfter.digest === authBefore.digest;
-    process.stdout.write(`codex auth.json: ${authAfter.isLink ? 'still a link' : 'NOT A LINK'}; account file ${authAfter.digest === authBefore.digest ? 'unchanged' : 'CHANGED'}\n`);
-    if (!intact) {
+    process.stdout.write(`codex auth.json: ${authAfter.isLink ? 'still a link to the account file' : 'NOT A LINK'}; login status ${authAfter.loggedIn ? 'ok' : 'FAILED'}\n`);
+    if (!(authAfter.isLink && authAfter.loggedIn)) {
       const link = path.join(runDir, 'home', 'auth.json');
       const stat = fs.lstatSync(link, { throwIfNoEntry: false });
       if (stat && !stat.isSymbolicLink()) fs.rmSync(link);
-      die('the codex login file changed; stop and ask the owner whether the tetnu login needs a fresh `codex login`', 3);
+      die(`the ${ACCOUNT} codex login link broke or its status failed; stop and ask the owner`, 3);
     }
   }
 }
@@ -548,7 +564,7 @@ function cmdRedact(cli) {
   const allDirs = [...Object.values(runs), ...(fs.existsSync(fallbackDir) ? [fallbackDir] : [])];
   const versions = new Set(allDirs.map(versionOf));
   if (versions.size !== 1) die(`the runs used different versions: ${[...versions].join(', ')}`);
-  const version = [...versions][0];
+  const version = /\d+\.\d+\.\d+/.exec([...versions][0])?.[0] ?? [...versions][0];
 
   // The fallback run stands in for the accept run only when its context
   // shape was injected.
@@ -566,6 +582,9 @@ function cmdRedact(cli) {
 
   const { redact, unknownKeys, idFor } = makeRedactor(cli);
   const outDir = path.join(FIXTURES, cli);
+  // The vectors the tests read are kept across a re-recording.
+  const vectorsFile = path.join(outDir, 'vectors.json');
+  const keptVectors = fs.existsSync(vectorsFile) ? readJson(vectorsFile).vectors : [];
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.mkdirSync(outDir, { recursive: true });
 
@@ -635,7 +654,7 @@ function cmdRedact(cli) {
     subStop ? 'stop-subagent.json: the subagent fired a Stop of its own, recorded' : 'the subagent fired no Stop of its own',
     notes,
   ].filter(Boolean).join('; ');
-  writeJson(path.join(outDir, 'vectors.json'), { cli, source: scrubSource(source), vectors: [] });
+  writeJson(path.join(outDir, 'vectors.json'), { cli, source: scrubSource(source), vectors: keptVectors });
   if (unknownKeys.size) process.stdout.write(`replaced because not on the safe list:\n  ${[...unknownKeys].join('\n  ')}\n`);
   process.stdout.write(`${cli}: fixtures written to ${outDir}\n`);
 }

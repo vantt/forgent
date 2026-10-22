@@ -1,17 +1,22 @@
-//! Codex: not recorded at V3 (the account's login had expired). The field
-//! names come from the S0 report
-//! (`plans/reports/research-261020-1612-mailbox-s0-human-input-and-peer-prompt-hooks.md`):
-//! real Codex payloads carry `hook_event_name` and `session_id`, the thread
-//! id `codex queue --thread` takes, and the binary's schema adds `agent_id`
-//! and `agent_type` for a subagent. No Stop or PostToolUse payload, and so
-//! no first-Stop marker, was recorded, and no output shape was proven:
-//! both stay deferred.
+//! Codex: payloads recorded on 0.161.0 (`contracts/fixtures/hooks/codex/`).
+//! Field names match Claude Code's: `hook_event_name`, `stop_hook_active`,
+//! and `agent_id`/`agent_type` on a subagent's event. `session_id` is the
+//! thread id: the id `codex queue --thread` takes and the
+//! `CODEX_THREAD_ID` the head's tool processes see. The hook process itself
+//! sees no session-identity variable.
 use super::{has_subagent_marker, parse_named, Shape};
 use crate::hook::{HookEvent, Payload, Unparsed};
 use serde_json::{Map, Value};
 
 pub(super) fn parse(event: HookEvent, object: &Map<String, Value>) -> Result<Payload, Unparsed> {
     parse_named(event, object)?;
+    let first_stop = match event {
+        HookEvent::Stop => object
+            .get("stop_hook_active")
+            .and_then(Value::as_bool)
+            .map(|active| !active),
+        HookEvent::PostToolUse => None,
+    };
     let thread = object
         .get("session_id")
         .and_then(Value::as_str)
@@ -20,11 +25,14 @@ pub(super) fn parse(event: HookEvent, object: &Map<String, Value>) -> Result<Pay
     Ok(Payload {
         event,
         subordinate: has_subagent_marker(object),
-        first_stop: None,
+        first_stop,
         thread,
     })
 }
 
-pub(super) fn shape(_event: HookEvent) -> Option<Shape> {
-    None
+pub(super) fn shape(event: HookEvent) -> Option<Shape> {
+    Some(match event {
+        HookEvent::Stop => Shape::StopBlock,
+        HookEvent::PostToolUse => Shape::PostToolUseContext,
+    })
 }

@@ -1,21 +1,37 @@
 {
   "cli": "codex",
-  "source": "nothing recorded at V3: the account's Codex login had expired (see adapters.v1.json deferred). Every vector is synthesized from the payload keys the S0 report recorded from real Codex 0.162.1 hook calls (hook_event_name, session_id, turn_id, cwd, transcript_path, model, permission_mode; plans/reports/research-261020-1612-mailbox-s0-human-input-and-peer-prompt-hooks.md) and the binary schema's agent_id and agent_type; no Stop or PostToolUse payload and no injected output shape were recorded",
+  "source": "recorded 2026-10-22 from codex 0.161.0 on this machine by scripts/record-mailbox-hook-fixtures.mjs (redaction rules version 1); dump run: `codex exec --dangerously-bypass-hook-trust --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check -C /run-dir/codex/dump/ws <prompt>` (exit 0); accept run: `codex exec --dangerously-bypass-hook-trust --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check -C /run-dir/codex/accept/ws <prompt>` (exit 0); subagent run: `codex exec --dangerously-bypass-hook-trust --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check -C /run-dir/codex/subagent/ws <prompt>` (exit 0); variables removed from the parent environment: FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID, CLAUDECODE; injection at PostToolUse (nested shape) matched record type response_item:message:developer; types rejected as raw hook output: none; model echoed the context canary: true; Stop block accepted by a continued Stop call: true; model echoed the Stop canary: true; hook PID namespace is the same as the recorder's; post-tool-use-subagent.json: recorded; the subagent fired no Stop of its own; user hooks that fired: none (an isolated CODEX_HOME whose hooks.json holds only the recorder's hooks); the hook processes saw none of the three id variables; the tool process saw CODEX_THREAD_ID equal to the payload's session_id, so the hook must take the writer key from the payload's session_id, not from its environment; injection record types: the rollout's model-input records (response_item message, role developer or user); the context canary was found in a developer message, and no hook-specific record type exists in the rollout; subagent: spawn_agent ran a subagent whose Bash PostToolUse carried agent_id and agent_type and the head's session_id; it fired SubagentStart and SubagentStop and no Stop of its own; its tool process saw its own CODEX_THREAD_ID, not the head's",
   "vectors": [
     {
-      "name": "stop",
+      "name": "head-stop-first-of-its-turn",
       "kind": "parse",
-      "source": "synthesized",
+      "source": "recorded",
       "event": "stop",
-      "json": {
-        "session_id": "00000000-0000-4000-8000-000000000001",
-        "transcript_path": "/home/user/.codex/sessions/00000000-0000-4000-8000-000000000001.jsonl",
-        "cwd": "/run-dir/ws",
-        "hook_event_name": "Stop",
-        "model": "<redacted>",
-        "permission_mode": "<redacted>",
-        "turn_id": "00000000-0000-4000-8000-000000000002"
-      },
+      "file": "stop.json",
+      "expect": {
+        "subordinate": false,
+        "firstStop": true,
+        "thread": "00000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "name": "head-stop-continued-after-a-block",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "stop",
+      "file": "stop-continued.json",
+      "expect": {
+        "subordinate": false,
+        "firstStop": false,
+        "thread": "00000000-0000-4000-8000-000000000003"
+      }
+    },
+    {
+      "name": "head-post-tool-use",
+      "kind": "parse",
+      "source": "recorded",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
       "expect": {
         "subordinate": false,
         "firstStop": null,
@@ -23,43 +39,15 @@
       }
     },
     {
-      "name": "post-tool-use",
+      "name": "subagent-post-tool-use",
       "kind": "parse",
-      "source": "synthesized",
+      "source": "recorded",
       "event": "post-tool-use",
-      "json": {
-        "session_id": "00000000-0000-4000-8000-000000000001",
-        "transcript_path": "/home/user/.codex/sessions/00000000-0000-4000-8000-000000000001.jsonl",
-        "cwd": "/run-dir/ws",
-        "hook_event_name": "PostToolUse",
-        "model": "<redacted>",
-        "permission_mode": "<redacted>",
-        "turn_id": "00000000-0000-4000-8000-000000000002"
-      },
+      "file": "post-tool-use-subagent.json",
       "expect": {
-        "subordinate": false,
+        "subordinate": true,
         "firstStop": null,
-        "thread": "00000000-0000-4000-8000-000000000001"
-      }
-    },
-    {
-      "name": "an-empty-session-id-is-no-thread",
-      "kind": "parse",
-      "source": "synthesized",
-      "event": "post-tool-use",
-      "json": {
-        "session_id": "",
-        "transcript_path": "/home/user/.codex/sessions/00000000-0000-4000-8000-000000000001.jsonl",
-        "cwd": "/run-dir/ws",
-        "hook_event_name": "PostToolUse",
-        "model": "<redacted>",
-        "permission_mode": "<redacted>",
-        "turn_id": "00000000-0000-4000-8000-000000000002"
-      },
-      "expect": {
-        "subordinate": false,
-        "firstStop": null,
-        "thread": null
+        "thread": "00000000-0000-4000-8000-000000000006"
       }
     },
     {
@@ -97,17 +85,35 @@
       "kind": "parse",
       "source": "synthesized",
       "event": "post-tool-use",
-      "json": {
-        "session_id": "00000000-0000-4000-8000-000000000001",
-        "transcript_path": "/home/user/.codex/sessions/00000000-0000-4000-8000-000000000001.jsonl",
-        "cwd": "/run-dir/ws",
-        "hook_event_name": "Stop",
-        "model": "<redacted>",
-        "permission_mode": "<redacted>",
-        "turn_id": "00000000-0000-4000-8000-000000000002"
-      },
+      "file": "stop.json",
       "expect": {
         "unparsed": "event-mismatch"
+      }
+    },
+    {
+      "name": "a-post-tool-use-cut-in-half",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "truncate": true,
+      "expect": {
+        "unparsed": "malformed"
+      }
+    },
+    {
+      "name": "an-empty-session-id-is-no-thread",
+      "kind": "parse",
+      "source": "synthesized",
+      "event": "post-tool-use",
+      "file": "post-tool-use.json",
+      "set": {
+        "session_id": ""
+      },
+      "expect": {
+        "subordinate": false,
+        "firstStop": null,
+        "thread": null
       }
     },
     {
@@ -115,14 +121,8 @@
       "kind": "parse",
       "source": "synthesized",
       "event": "post-tool-use",
-      "json": {
-        "session_id": "00000000-0000-4000-8000-000000000001",
-        "transcript_path": "/home/user/.codex/sessions/00000000-0000-4000-8000-000000000001.jsonl",
-        "cwd": "/run-dir/ws",
-        "hook_event_name": "PostToolUse",
-        "model": "<redacted>",
-        "permission_mode": "<redacted>",
-        "turn_id": "00000000-0000-4000-8000-000000000002",
+      "file": "post-tool-use.json",
+      "set": {
         "agent_id": ""
       },
       "expect": {
@@ -136,14 +136,8 @@
       "kind": "parse",
       "source": "synthesized",
       "event": "post-tool-use",
-      "json": {
-        "session_id": "00000000-0000-4000-8000-000000000001",
-        "transcript_path": "/home/user/.codex/sessions/00000000-0000-4000-8000-000000000001.jsonl",
-        "cwd": "/run-dir/ws",
-        "hook_event_name": "PostToolUse",
-        "model": "<redacted>",
-        "permission_mode": "<redacted>",
-        "turn_id": "00000000-0000-4000-8000-000000000002",
+      "file": "post-tool-use.json",
+      "set": {
         "agent_id": null
       },
       "expect": {
@@ -157,14 +151,8 @@
       "kind": "parse",
       "source": "synthesized",
       "event": "post-tool-use",
-      "json": {
-        "session_id": "00000000-0000-4000-8000-000000000001",
-        "transcript_path": "/home/user/.codex/sessions/00000000-0000-4000-8000-000000000001.jsonl",
-        "cwd": "/run-dir/ws",
-        "hook_event_name": "PostToolUse",
-        "model": "<redacted>",
-        "permission_mode": "<redacted>",
-        "turn_id": "00000000-0000-4000-8000-000000000002",
+      "file": "post-tool-use.json",
+      "set": {
         "agent_id": 7
       },
       "expect": {
@@ -178,14 +166,8 @@
       "kind": "parse",
       "source": "synthesized",
       "event": "post-tool-use",
-      "json": {
-        "session_id": "00000000-0000-4000-8000-000000000001",
-        "transcript_path": "/home/user/.codex/sessions/00000000-0000-4000-8000-000000000001.jsonl",
-        "cwd": "/run-dir/ws",
-        "hook_event_name": "PostToolUse",
-        "model": "<redacted>",
-        "permission_mode": "<redacted>",
-        "turn_id": "00000000-0000-4000-8000-000000000002",
+      "file": "post-tool-use.json",
+      "set": {
         "agent_type": "worker"
       },
       "expect": {

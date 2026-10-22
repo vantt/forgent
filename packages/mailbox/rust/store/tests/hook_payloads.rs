@@ -32,14 +32,20 @@ fn tested() -> Vec<Adapter> {
     ADAPTERS.into_iter().filter(|a| a.is_tested()).collect()
 }
 
-/// The writer key the hook of the recorded `file` derives from the id
-/// variables its process saw, through session identity.
-fn writer_from_env(adapter: Adapter, file: &str) -> WriterKey {
-    let vars = fixture(adapter, "env.json")["hookIdVars"][file].clone();
+/// The writer key session identity derives from recorded id variables, if
+/// any is set.
+fn key_from(vars: &Value) -> Option<WriterKey> {
     let lookup = |name: &str| vars[name].as_str().map(String::from);
-    let identity = fgos_session_identity::env_identity(&lookup, None)
-        .expect("the recorded hook saw a session id");
-    WriterKey::new(identity.id.to_string()).unwrap()
+    let identity = fgos_session_identity::env_identity(&lookup, None)?;
+    Some(WriterKey::new(identity.id.to_string()).unwrap())
+}
+
+/// The head's writer key: the one its tool processes derive, which is the
+/// key `send` uses. Claude Code's hook sees the same variable; Codex's hook
+/// sees none, so its shell must take the key from elsewhere (V5).
+fn writer_of(adapter: Adapter) -> WriterKey {
+    key_from(&fixture(adapter, "env.json")["toolIdVars"])
+        .expect("the recorded tool saw a session id")
 }
 
 fn own_record() -> Record {
@@ -65,7 +71,7 @@ impl Drain {
             state: MailboxState::new(),
             bodies: BTreeMap::new(),
             ids: SeqIds::default(),
-            writer: writer_from_env(adapter, "post-tool-use.json"),
+            writer: writer_of(adapter),
             head: HeadFacts {
                 record: own_record(),
                 own_suffix: Some("2b".to_string()),
@@ -494,14 +500,30 @@ fn a_missing_body_is_framed_honestly_and_the_rest_of_the_claim_is_delivered() {
 fn the_writer_key_the_hook_derives_equals_the_one_its_tool_sees() {
     for adapter in tested() {
         let env = fixture(adapter, "env.json");
-        let tool = env["toolIdVars"].clone();
-        let lookup = |name: &str| tool[name].as_str().map(String::from);
-        let from_tool = fgos_session_identity::env_identity(&lookup, None).unwrap();
-        let from_hook = writer_from_env(adapter, "post-tool-use.json");
-        assert_eq!(from_tool.id.to_string(), from_hook.as_str());
+        let from_tool = writer_of(adapter);
         let payload = fixture(adapter, "post-tool-use.json");
-        assert_eq!(payload["session_id"].as_str(), Some(from_hook.as_str()));
+        assert_eq!(payload["session_id"].as_str(), Some(from_tool.as_str()));
+        match key_from(&env["hookIdVars"]["post-tool-use.json"]) {
+            Some(from_hook) => assert_eq!(from_hook, from_tool, "{}", adapter.word()),
+            // Recorded: Codex's hook process sees no session-identity
+            // variable, so the hook cannot derive the key from its
+            // environment.
+            None => assert_eq!(adapter, Adapter::Codex),
+        }
     }
+}
+
+#[test]
+fn the_codex_thread_handle_is_taken_only_when_it_is_the_writer() {
+    let drain = Drain::registered(Adapter::Codex);
+    let binding = drain.state.binding(&drain.writer).unwrap();
+    assert_eq!(binding.handle.as_deref(), Some(drain.writer.as_str()));
+
+    let mut other = Drain::new(Adapter::Codex);
+    other.writer = WriterKey::new("a-sender-with-its-own-fgos-session-id").unwrap();
+    other.hook(HookEvent::PostToolUse, "post-tool-use.json");
+    let binding = other.state.binding(&other.writer).unwrap();
+    assert_eq!(binding.handle, None);
 }
 
 #[test]

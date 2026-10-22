@@ -196,6 +196,16 @@ Write the tests before recording. They fail at first (there are no fixtures yet)
 
 **Left outside the raw directory** (not deleted): Claude transcripts under `~/.claude/projects/-tmp-fgos-work-mailbox-v3-record-claude-{dump,accept,subagent}-ws/`; five agy conversations under the `tetnu` agy home's `.gemini/antigravity-cli/brain/` and its `cache/last_conversations.json`. No agy `trustedWorkspaces` entry was found.
 
+## Codex recording (implementation lead, 2026-10-22, after phase 7's gates)
+
+- **Account:** `tetnu`, logged in again by the owner at 09:56; `tetcu72` stayed an unused fallback. Three runs (dump, accept, subagent), no repeat.
+- **Login guard, corrected by the plan owner.** A live account may refresh its tokens during a run, so the recorder no longer compares the account file's bytes. Before and after every run it checks that the run home's `auth.json` is still a symlink to the account's file (a refresh then writes the real file, never a copy) and that `codex login status` succeeds. All three runs: still a link, status ok.
+- **Results** (Codex 0.161.0): `PostToolUse` nested `hookSpecificOutput.additionalContext` injected (canary in the rollout's `response_item` developer message, echoed by the model); `Stop` block accepted (a second Stop with `stop_hook_active: true`, echoed); a subagent's event carries `agent_id` and `agent_type` and the head's `session_id`, it fires `SubagentStart`/`SubagentStop` and no Stop of its own; the hook process sees no id variable, while the tool process sees `CODEX_THREAD_ID` equal to the payload's `session_id`; hook PID namespace equals the recorder's.
+- **Codex is now under `testedAgainst`** and drained (phase 6). The evidence answers the plan owner's condition: a subagent marker and both shapes.
+- **Recorder changes:** `--account <name>`; `redact` keeps a CLI's existing `vectors`; the version in `source` is the bare `x.y.z`; `cmdRun` counts calls without listing a directory itself (the repository's assignment-tree listing guard flagged it).
+- **Guard refinement:** a `home` directory inside another path (Codex's isolated home under the run directory) is not a user's home, and `/` separates base64 runs so a path of short segments is not a secret; planted values (a foreign `/home/<x>/`, a long base64 run, an e-mail) are still caught.
+- **Left outside the raw directory:** nothing; Codex wrote its rollouts inside the run home, which was deleted.
+
 ## Plan owner decisions (2026-10-22, after phase 3; plan owner (agent))
 
 1. **M4, one binding per head.** A second key from the same head replaces the old binding like a dead-head takeover: a new generation, its own name, `stop_blocks` 0, and mail queued for the old key is never shown to the new context. Implemented in phase 5 with its owning test.
