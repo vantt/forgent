@@ -1,6 +1,5 @@
-// Node facade over the writer identity: the rule lives in the Rust crate fgos-identity and is read in process
-// through the native door (docs/platform/identity/spec.md §7a). This module decides nothing about the id; when the
-// door cannot load, the caller gets a WriterIdentityError (exit 2), never a guessed id and never a second resolver.
+// Node facade over the writer identity: the rule lives in the Rust crate fgos-identity, read in process through the
+// native door (docs/platform/identity/spec.md §7a). It decides nothing about the id; no door means WriterIdentityError.
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { nativeDoor } from '../native/door.mjs';
@@ -8,11 +7,12 @@ import { nativeDoor } from '../native/door.mjs';
 export class WriterIdentityError extends Error {
   constructor(code, message) {
     super(`writer identity (${code}): ${message}`);
-    this.name = 'WriterIdentityError';
-    this.code = code;
-    this.category = 'precondition';
+    Object.assign(this, { name: 'WriterIdentityError', code, category: 'precondition' });
   }
 }
+
+const ENV_ORDER = ['FGOS_SESSION_ID', 'CODEX_THREAD_ID', 'CLAUDE_CODE_SESSION_ID']; // what the rule reads: the cache key
+const kept = new Map(); // answers only; a failure is never kept
 
 function door() {
   try {
@@ -22,12 +22,18 @@ function door() {
   }
 }
 
-/** `{ id, source }` for this process; `fgosDir` is the `.fgos` directory whose sessions.json may confirm an env id (source registry). */
+/** `{ id, source }` for this process; `fgosDir`'s sessions.json may confirm an env id (source registry). */
 export function resolveWriterIdentity(fgosDir) {
-  return door().resolve(fgosDir ? path.resolve(fgosDir) : null);
+  const dir = fgosDir ? path.resolve(fgosDir) : null, envKey = JSON.stringify(ENV_ORDER.map((key) => process.env[key] ?? null));
+  const hit = kept.get(envKey) ?? kept.get(`${envKey}\n${dir}`);
+  if (hit) return { ...hit };
+  const answer = door().resolve(dir);
+  // pid and unresolved answers depend on the env alone; env and registry answers also on the dir.
+  kept.set(['pid', 'unresolved'].includes(answer.source) ? envKey : `${envKey}\n${dir}`, answer);
+  return { ...answer };
 }
 
-/** `att-<attemptId>`, minted by the Rust crate, a pure function of the attempt id. */
+/** `att-<attemptId>`, minted by the Rust crate. */
 export function mintAttemptWriterId(attemptId) {
   if (typeof attemptId !== 'string' || attemptId.includes('\0')) throw new WriterIdentityError('invalid-attempt-id', 'the attempt id must be a string without NUL');
   const { mintAttempt } = door();
@@ -39,8 +45,7 @@ export function mintAttemptWriterId(attemptId) {
   }
 }
 
-/** Asks the host binary `bin` through `fgos identity` for this process's answer, so doctor can test each candidate
- * activation. The child writes no invocation record. Codes: host-missing, host-version-mismatch, host-error. */
+/** Doctor's probe: asks host binary `bin` (`fgos identity`) for this process's answer. Codes: host-missing, host-version-mismatch, host-error. */
 export function probeIdentity(bin, fgosDir) {
   const env = { ...process.env };
   delete env.FGOS_INVOCATION_RECORD_PATH;

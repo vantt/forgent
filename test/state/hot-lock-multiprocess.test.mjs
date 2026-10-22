@@ -234,8 +234,8 @@ test('fast path: an uncontended acquire and release costs at most twice the raw 
   const f = { fgosDir: path.join(dir0, '.fgos'), cleanup: () => fs.rmSync(dir0, { recursive: true, force: true }) };
   fs.mkdirSync(f.fgosDir, { recursive: true });
   try {
-    const { id: writer } = resolveWriterIdentity(f.fgosDir); // the identity is read once, outside the timings: the door costs the same in both sides' callers
-    withStateTx(f.fgosDir, () => {}, { prefetched: { writer } }); // creates the locks directory the raw steps share
+    resolveWriterIdentity(f.fgosDir); // prime the identity cache once, outside the timings
+    withStateTx(f.fgosDir, () => {}); // creates the locks directory the raw steps share
     const { dir } = hotPaths(f.fgosDir);
     const rawRecord = path.join(dir, 'bench-raw.hot');
     const recordBytes = JSON.stringify({ v: 1, pid: process.pid, startTime: '1234567890', bootId: 'b'.repeat(36), writer: 'w'.repeat(40), at: new Date().toISOString() });
@@ -248,7 +248,7 @@ test('fast path: an uncontended acquire and release costs at most twice the raw 
       fs.unlinkSync(rawTmp);
       fs.unlinkSync(rawRecord);
     };
-    const runNow = () => withStateTx(f.fgosDir, () => {}, { prefetched: { writer } });
+    const runNow = () => withStateTx(f.fgosDir, () => {});
 
     const p50 = (samples) => samples.sort((a, b) => a - b)[Math.floor(samples.length / 2)];
     const time = (run) => {

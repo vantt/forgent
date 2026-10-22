@@ -162,7 +162,7 @@ The rule lives in `packages/identity/rust/src/resolve.rs`; the OS is read only t
 
 ### L5. Node facade
 
-The facade has four exports and decides nothing about the id. `resolveWriterIdentity(fgosDir)` and `mintAttemptWriterId(attemptId)` call the combined addon's `sessionIdentity` namespace (`resolve`, `mintAttempt`) through `src/native/door.mjs`, in process: no exec, no cache (the rule is a pure function of the env, the process tree and the registry file, so two calls in one process agree), no refusal under a hot mutex, because nothing is spawned. The Node process is the caller, so the rule's own pid is right.
+The facade has four exports and decides nothing about the id. `resolveWriterIdentity(fgosDir)` and `mintAttemptWriterId(attemptId)` call the combined addon's `sessionIdentity` namespace (`resolve`, `mintAttempt`) through `src/native/door.mjs`, in process: no exec and no refusal under a hot mutex, because nothing is spawned. A per-process cache keeps answers, keyed on the three env variables the rule reads (`pid` and `unresolved` answers by the env alone, `env` and `registry` answers also by the resolved fgos dir); a failure is never kept. An uncached door read costs about 36 µs, a cache hit about 1 µs, and `withStateTx` resolves the writer on every call. The Node process is the caller, so the rule's own pid is right.
 
 `probeIdentity(bin, fgosDir)` is the one exec that remains: doctor asks each candidate host binary `fgos identity --pid <own pid>` directly (2000 ms kill deadline; the child writes no invocation record), so a stale activation shows up by name.
 
@@ -209,7 +209,7 @@ Who mints and who scrubs. The controller mints once per attempt and writes the r
 
 ## 10. Decision history
 
-- 2026-10-22 — The writer identity resolves in process: the combined addon gains `sessionIdentity.{resolve,mintAttempt}` over this crate, the Node facade drops its exec, caches and error classification (four exports, `host-error` kept for the doctor probe), `fgos internal identity mint-attempt` is deleted, and the process-tree adapter reads through `fgos-process`. The writer id rule and its values are unchanged (the golden vectors run unchanged). HARDEN T1 phase 6.
+- 2026-10-22 — The writer identity resolves in process: the combined addon gains `sessionIdentity.{resolve,mintAttempt}` over this crate, the Node facade drops its exec and error classification, and keeps a minimal env-keyed cache (four exports, `host-error` kept for the doctor probe), `fgos internal identity mint-attempt` is deleted, and the process-tree adapter reads through `fgos-process`. The writer id rule and its values are unchanged (the golden vectors run unchanged). HARDEN T1 phase 6.
 
 - 2026-10-22 — Owner opens lane IDENT: "identity càng sớm càng tốt", to cover cross-machine identity minting independent of any project, because lanes on different machines already talk through Git and address each other loosely and inaccurately. Draft written by session `f2c6f8ce` (lane MAIL lead) from the inventory in section 3; the owner will assign another agent on another machine to take the lane.
 - 2026-10-22 11:05 — Lane taken by session `b8f192bf` on the owner machine `fg-server`, handed over by HARDEN `forgent-a8`. Added the path-derived workspace id to section 3. G0 questions sent to the owner.
