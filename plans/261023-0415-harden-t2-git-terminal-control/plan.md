@@ -473,6 +473,24 @@ The big lead re-checked the evidence for every deviation before answering.
    - **CF09 has no unit witness** (`sync_refs` and `sync_loose_objects` have no checkpoint seam). Phase 3's proof is OPC's reading review plus a `scripts/git/e1-power-cut.*` run where root is available. It adds no new seam.
    - **The account-change red case** spawns one real `ssh` to `example.invalid` while it is red. Phase 2's fix makes the port refuse before ssh runs, and phase 2's report confirms that the spawn is gone.
 
+8. **F-C1 changes shape (2026-10-23 06:05).** Worktree/Refs compaction leaves T2. Commits 8e1ecbf63, 7bac1c05f and 004807272 are reverted.
+   - **Evidence:**
+     - OPC's second and third rounds on the compaction found new defects: a compacted Remove replay answered `Ok(())` for a different worktree; starvation was moved, not removed; auto-resume never reached `resume_compaction`. Each fix needed new mechanism: a registration-independent request digest (a v4 receipt that old releases refuse), a durable skip marker, a ledger-based resume.
+     - At steady state, compaction costs about 4 fsyncs (≈ 30–47 ms, the lead's measured ≈ 47 ms per chain) on every add, to save about 0.09 ms per retained chain. That works against priority 1.
+     - Counsel by kongming (Fable) and OPC agreed on this direction.
+   - **Instead:** Refs admission (`refs.rs` `admission_with_land`) and `repository_config.rs` admission drop `wal.scan` and keep only `wal.active`, the same shape as Publication's `admit_pending`.
+     - Every retained chain is still fully inspected, once instead of twice. The ledger term is gone, and so is a latent refusal at 100 000 ledger entries.
+     - Proofs extend `historical_ledger_over_admission_bound_does_not_block_new_publication` and `remote_unknown_recovery_never_resends_and_corrupt_backlog_never_clears_admission`.
+     - A tail-peek step is not done in T2. If it is ever done, OPC's five conditions apply: a gap-free listing; a fully valid last record plus its link to the previous record; the pin check; one rule for unknown artifacts shared with doctor; no cache that turns unknown into terminal.
+   - **Backlog item, to be minted with `fgos identity mint backlog` once the mint door is active on this machine** (the active release here has no `mint` yet): "Compact finished Worktree/Refs WAL chains off the hot path."
+     - It runs through a doctor `--fix` or the guarded prune door, never on every add.
+     - A create chain is kept while its registration or checkout exists.
+     - A compacted Worktree replay answers recovery-required. Refs replay is as in the reverted 8e1ecbf63.
+     - The spec sentence comes before the code.
+     - Reason: retained chains grow about 80 a day on a busy repository, and admission stays O(chains). Its visibility is owner pick A1.
+     - Trigger (OPC, 10-23): admission's own cost stays O(retained chains) × one `inspect` each. `retained_bytes` and the chain count (doctor's `git-operation-journal`) are the signal to schedule the item.
+   - **Result:** the phase 2 delta (`3a655a8b3`, `3f1a7ef3c`) got OPC's merge verdict. Admission read p50 at 322 chains went from 32.3 to 15.8 ms, and the tail peek was not done. Phases 1 and 2 were merged into the track branch, and the census was regenerated (`9d935588c`). Only CFG's 5 known `unresolved-binary` sites remain.
+
 ## Unresolved questions
 
 1. **Q0–Q3** are not yet answered (arbitration §6). Q0 is assumed yes.
