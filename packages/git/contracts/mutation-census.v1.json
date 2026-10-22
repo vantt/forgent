@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "41a68e975b3ef326c7a691c627f0d6c329d4c113b31849f47df1eadba2a9690f",
+  "payloadDigest": "bf9927c7c892204e6a0d3eeb496a14b0d61008bf1e2689b88f35910a942f3d9c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -875,7 +875,7 @@
     "src/state/events-compaction.mjs": "c7d412962166229dd671f06d98aaee7349b9f091a7c4018869171b384fbe3447",
     "src/state/events-jsonl-truncation-guard.mjs": "93bb6efa390d3e8a58b84399dc90c0b50298c96d6bc4876620deb37d08068965",
     "src/state/events.mjs": "1d2550961576a26f052fb1a4c64b75352182b866c3c025ae17bad0a8d6ae69f8",
-    "src/state/fgos-file-registry.mjs": "917764c062d297227d969a3349e7d0a76dc721c3a97d0241f04c4af5ce5bd3e9",
+    "src/state/fgos-file-registry.mjs": "5448fb403caa75198ddacb9758115eccb577a9a94a9d209de5293de5cfd47832",
     "src/state/frontier.mjs": "dca56e29f4928eb025fb2bf085c75a7d1969d59b3b645754b3dc6b44e3db47d7",
     "src/state/gate-bypass.mjs": "723e40beb662fb094a4ee832fa0755cfc554d01c7623cf411eeda1092e9247b8",
     "src/state/graph-harness.mjs": "6d93e939f7d13ec8f24957eca8b02bc66aad00573c4369175bcb426915ac789b",
@@ -887,7 +887,7 @@
     "src/state/legacy-event-git-adapter.mjs": "8b65b55aacf9a3b321e51847e4c5f8c4829c0d2fd6f5de2ad52046c0ac1bf7e9",
     "src/state/main-checkout-guard-warnings.mjs": "7075e5a06ee1664c953880fded940832c46533ccefda4a81801dd0c03584ab64",
     "src/state/plan-pool.mjs": "20c667909048853fa2dddf239b27467c29dbe8551cd7c90fef88c241143483ad",
-    "src/state/porting-store.mjs": "ee409980f27d11a0b67c55ae18b2510fa98183103035a4c9202737e0dc90d519",
+    "src/state/porting-store.mjs": "673fd849f8b58a97f72cf605940d2f74c7c1d5d0a664f6461a97330a24b3987f",
     "src/state/porting.mjs": "4191acd3af3ca878dd7ae10bab67d859d545ca870722b3276cd39aeba9d173f3",
     "src/state/postland-drift.mjs": "66bba6e35a60cfa81a7b430a51a816f142b0cc3e9307d7c7b421be111152299b",
     "src/state/priority-formula.mjs": "5a1767b93f0155567472eb059899aa993a147ecc0e0aaf75dafe8e93da72d6fe",
@@ -924,8 +924,8 @@
     "src/verbs/dispatch/show-run.mjs": "6ed836d83f8fc71863fc2ce04115b7d0d63f2fb1f42e8bccabc94b812cb179c9",
     "src/verbs/dispatch/watch.mjs": "e82fb8d94c5d76bc64b006bab2742e777f50785a4c4b12c91f15723864e457a3",
     "src/verbs/events/context.mjs": "5a47ea5bc1a590619f137cef40455898d99595e6bb8ba5a2b6d75570b101557b",
-    "src/verbs/events/export.mjs": "3c163c4704f7a2054af09c4af5e69c0f3394f880319b890e8337dc2049b9f50d",
-    "src/verbs/events/migrate.mjs": "66cb5bd2b417d35f67c0ed0069136aeb6de8e6f34bf2604198bfd24ec1e7079f",
+    "src/verbs/events/export.mjs": "b1af8d42892ffcfccf6521e6cebec5f0507289b18be9c1283f1514f9f00ce3e2",
+    "src/verbs/events/migrate.mjs": "81f2629921e97bcdc1f567cfffa38482d477197b82a4b4631e3f815458096972",
     "src/verbs/events/parity.mjs": "6431bfc150b5876ec83bf6ff63023aeee9fe3c0b33d2e8ed54114b443e088ed7",
     "src/verbs/events/rebuild.mjs": "6b27eb8b67e23bbbeb84f79cbe88923af2229d9ead96e8906d03bf83c257df7d",
     "src/verbs/events/status.mjs": "6fb73280f473c45dc2de55c1ad4514235a0f5e9563ebf7e2801d7b4c072ffc6f",
@@ -2984,7 +2984,7 @@
     },
     {
       "path": "src/verbs/events/migrate.mjs",
-      "line": 68,
+      "line": 66,
       "spawn": "eventStoreFacts -> src/event-store/native.mjs:153",
       "binary": "param ctx",
       "class": "uncalled-wrapper",
@@ -2992,7 +2992,7 @@
     },
     {
       "path": "src/verbs/events/migrate.mjs",
-      "line": 70,
+      "line": 68,
       "spawn": "checkStopped -> src/holder-lock/fences.mjs:484",
       "binary": "param ctx",
       "class": "uncalled-wrapper",
@@ -3000,7 +3000,7 @@
     },
     {
       "path": "src/verbs/events/migrate.mjs",
-      "line": 73,
+      "line": 71,
       "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
       "binary": "param ctx",
       "class": "uncalled-wrapper",
@@ -3008,7 +3008,7 @@
     },
     {
       "path": "src/verbs/events/migrate.mjs",
-      "line": 95,
+      "line": 93,
       "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
       "binary": "param ctx",
       "class": "uncalled-wrapper",

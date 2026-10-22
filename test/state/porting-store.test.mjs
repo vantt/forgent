@@ -1,4 +1,6 @@
 import '../helpers/process-tmp-root.mjs';
+import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -8,18 +10,23 @@ import { fork } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { initStore, addPorting, movePorting, listPorting, rebuild } from '../../src/state/porting-store.mjs';
 import { PortingError } from '../../src/state/porting.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+import { execFileSync } from 'node:child_process';
 
 const PORTING_STORE_MJS = pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/porting-store.mjs')).href;
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-porting-store-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-porting-store-')));
+}
+
+// The registry-declared cache that holds the porting view and its cursor.
+function viewPath(dir) {
+  return resolveFgosFile(dir, FGOS_FILE.PORTING_STATE);
 }
 
 function readRawPortingEvents(dir) {
-  const logPath = path.join(dir, 'porting', 'events.jsonl');
-  return fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line));
+  return prepareWorkStore(dir, dir).store.read({ streams: ['project:porting'] }, []).sequence;
 }
 
 // Spawns N real child OS processes that all call `storeCall` (a snippet of
@@ -86,11 +93,11 @@ try {
   return results;
 }
 
-test('initStore creates <dir>/porting/events.jsonl and state.json, never touching <dir>\'s own root', () => {
+test('initStore writes the derived porting view into the .fgos cache, with no event log and nothing under <dir>/porting', () => {
   const dir = tmpDir();
   initStore(dir);
-  assert.ok(fs.existsSync(path.join(dir, 'porting', 'events.jsonl')));
-  assert.ok(fs.existsSync(path.join(dir, 'porting', 'state.json')));
+  assert.ok(!fs.existsSync(path.join(dir, 'porting')));
+  assert.ok(fs.existsSync(viewPath(dir)));
   assert.ok(!fs.existsSync(path.join(dir, 'events.jsonl')));
   assert.ok(!fs.existsSync(path.join(dir, 'state.json')));
 });
@@ -121,7 +128,7 @@ test('addPorting rejects a duplicate id as validation, checked BEFORE the event 
     () => addPorting(dir, { id: 'dup' }),
     (err) => err instanceof PortingError && err.category === 'validation',
   );
-  const raw = fs.readFileSync(path.join(dir, 'porting', 'events.jsonl'), 'utf8').trim().split('\n');
+  const raw = readRawPortingEvents(dir).map(JSON.stringify);
   assert.equal(raw.length, 1, 'the rejected duplicate must never reach the log');
 });
 
@@ -161,7 +168,7 @@ test('movePorting on an id never added throws PortingError(validation)', () => {
 test('listPorting always rebuilds fresh from the log, never off a stale view file', () => {
   const dir = tmpDir();
   addPorting(dir, { id: 'p1' });
-  fs.writeFileSync(path.join(dir, 'porting', 'state.json'), `${JSON.stringify({ porting: {} })}\n`, 'utf8');
+  fs.writeFileSync(viewPath(dir), `${JSON.stringify({ porting: {} })}\n`, 'utf8');
   const view = listPorting(dir);
   assert.ok(view.porting.p1, 'listPorting must rebuild from the log, ignoring the stale view file on disk');
 });
@@ -169,24 +176,23 @@ test('listPorting always rebuilds fresh from the log, never off a stale view fil
 test('write order is append-then-rebuild: a simulated crash between the two steps recovers the correct view from the log alone via rebuild()', () => {
   const dir = tmpDir();
   initStore(dir);
-  const logPath = path.join(dir, 'porting', 'events.jsonl');
 
   // Simulate a crash: append the event directly (bypassing addPorting's own
-  // view refresh), so state.json is left exactly as initStore wrote it —
+  // view refresh), so the cache is left exactly as initStore wrote it —
   // stale relative to the log.
-  appendEvent(logPath, { type: 'porting.add', payload: { id: 'crash-p1', status: 'candidate', title: 'Crash test' } });
-  const staleView = JSON.parse(fs.readFileSync(path.join(dir, 'porting', 'state.json'), 'utf8'));
+  prepareWorkStore(dir, dir).store.append('project:porting', [{ eventType: 'porting.add', schemaVersion: 1, payload: { id: 'crash-p1', status: 'candidate', title: 'Crash test' }, ts: new Date().toISOString() }], {}, 'fixture', []);
+  const staleView = JSON.parse(fs.readFileSync(viewPath(dir), 'utf8'));
   assert.deepEqual(staleView.porting, {}, 'view is stale immediately after the simulated crash');
 
   const recovered = rebuild(dir);
   assert.equal(recovered.porting['crash-p1'].status, 'candidate');
   assert.equal(recovered.porting['crash-p1'].title, 'Crash test');
 
-  const persisted = JSON.parse(fs.readFileSync(path.join(dir, 'porting', 'state.json'), 'utf8'));
-  assert.deepEqual(persisted, recovered, 'rebuild() must also persist the recovered view to state.json');
+  const persisted = JSON.parse(fs.readFileSync(viewPath(dir), 'utf8'));
+  assert.deepEqual(persisted.porting, recovered.porting, 'rebuild() must also persist the recovered view to the cache');
 });
 
-test('porting-store never reads or writes the existing .fgos-shaped root events.jsonl/state.json — only the nested porting/ subdir', () => {
+test('porting-store never reads or writes the root-level events.jsonl/state.json', () => {
   const dir = tmpDir();
   fs.mkdirSync(dir, { recursive: true });
   const rootLogContents = '{"seq":1,"type":"work.add","payload":{"id":"w1"}}\n';
@@ -200,6 +206,30 @@ test('porting-store never reads or writes the existing .fgos-shaped root events.
     'the root-level work-item log must be left byte-for-byte untouched',
   );
   assert.ok(!fs.existsSync(path.join(dir, 'state.json')), 'porting-store must never write a root-level state.json');
+  assert.ok(!fs.existsSync(resolveFgosFile(dir, FGOS_FILE.STATE)), 'porting-store must never write Work\'s view cache');
+});
+
+test('a porting mutation leaves git status clean and keeps view and cursor in the untracked cache, even when dir is a tracked directory', () => {
+  const main = tmpDir();
+  const repo = path.dirname(main);
+  const git = (...args) => execFileSync('git', ['-C', repo, ...args], { encoding: 'utf8' });
+  const stateDir = path.join(repo, 'docs', 'distillery', 'state');
+  fs.mkdirSync(stateDir, { recursive: true });
+  fs.writeFileSync(path.join(repo, '.gitignore'), '.fgos/\n');
+  fs.writeFileSync(path.join(stateDir, 'keep.txt'), 'tracked\n');
+  git('add', '-A');
+  git('commit', '-q', '-m', 'fixture');
+  assert.equal(git('status', '--porcelain'), '');
+
+  addPorting(stateDir, { id: 'p1', title: 'Widget' });
+  movePorting(stateDir, { id: 'p1', to: 'planned', expectedStatus: 'candidate' });
+
+  assert.equal(git('status', '--porcelain'), '', 'a porting mutation must not dirty the working tree');
+  assert.deepEqual(fs.readdirSync(stateDir), ['keep.txt'], 'nothing is written beside the caller\'s dir');
+  const cached = JSON.parse(fs.readFileSync(viewPath(main), 'utf8'));
+  assert.equal(cached.porting.p1.status, 'planned');
+  assert.ok(cached.cursor, 'the cursor lives only in the untracked cache');
+  assert.equal(listPorting(stateDir).porting.p1.status, 'planned');
 });
 
 test('addPorting under concurrent OS processes racing the SAME id: exactly one succeeds, the rest see "already exists", and the log has exactly one porting.add (tsk-1jp)', async () => {
@@ -265,10 +295,10 @@ test('movePorting under concurrent OS processes racing the SAME expectedStatus C
 // test): before this fix, refreshView(dir) ran AFTER releasing
 // withStateTx, in its own unlocked critical section. Two processes
 // racing DIFFERENT ids could interleave their unlocked rebuild-and-
-// overwrite-state.json calls, letting the process with the staler log read
-// finish (and win) last — silently overwriting a fresher state.json with
+// overwrite-the-view calls, letting the process with the staler log read
+// finish (and win) last — silently overwriting a fresher view with
 // one missing that other mutation.
-test('concurrent movePorting calls on DIFFERENT ids never lose a write to state.json (tsk-1q5)', async () => {
+test('concurrent movePorting calls on DIFFERENT ids never lose a write to the view cache (tsk-1q5)', async () => {
   const dir = tmpDir();
   initStore(dir);
   const N_PROC = 8;
@@ -295,12 +325,12 @@ for (const id of ids) {
 
   assert.deepEqual(results, Array(N_PROC).fill({ ok: true }), 'every concurrent movePorting loop on distinct ids must succeed (no CAS conflict expected across different ids)');
 
-  const persisted = JSON.parse(fs.readFileSync(path.join(dir, 'porting', 'state.json'), 'utf8'));
+  const persisted = JSON.parse(fs.readFileSync(viewPath(dir), 'utf8'));
   const fresh = listPorting(dir);
   for (const ids of idLists) {
     for (const id of ids) {
-      assert.equal(persisted.porting[id].status, 'planned', `${id} must show status "planned" in the persisted state.json, not silently lost to a losing refreshView race`);
+      assert.equal(persisted.porting[id].status, 'planned', `${id} must show status "planned" in the persisted view, not silently lost to a racing writer`);
     }
   }
-  assert.deepEqual(persisted.porting, fresh.porting, 'persisted state.json must match a fresh rebuild of the log — any mismatch means a concurrent refreshView race overwrote a fresher view with a staler one');
+  assert.deepEqual(persisted.porting, fresh.porting, 'persisted view must match a fresh rebuild of the log — any mismatch means a concurrent refreshView race overwrote a fresher view with a staler one');
 });
