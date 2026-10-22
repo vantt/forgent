@@ -134,21 +134,32 @@ impl GitDriver {
         let commit = self.new_counter_commit(repo, number, claimant)?;
         match home {
             SequenceHome::Local => {
+                // The commit is durable before the ref can name it, and the ref
+                // before a number is reported: a power cut must not roll the
+                // counter back to a number already handed out.
+                crate::objects::sync_loose_objects(
+                    repo.common_dir(),
+                    std::slice::from_ref(&commit),
+                    true,
+                )
+                .map_err(|e| failure_text(e.to_string()))?;
                 let old = expected.map_or_else(
                     || "0".repeat(commit.as_str().len()),
                     |o| o.as_str().to_owned(),
                 );
                 let out = self.run_local(
                     repo,
-                    &[
+                    &durable_args(&[
                         "update-ref",
                         "--no-deref",
                         name.as_str(),
                         commit.as_str(),
                         &old,
-                    ],
+                    ]),
                 )?;
                 if out.success {
+                    sync_ref_file(repo, &name)?;
+                    crate::refs::sync_refs(repo, &name)?;
                     return Ok(SequencePush::Claimed(commit));
                 }
                 // A refused swap is a counter that moved; anything else is a fault.
@@ -182,12 +193,9 @@ impl GitDriver {
                 if out.success {
                     return Ok(SequencePush::Claimed(commit));
                 }
-                // Porcelain marks a ref the remote refused with a leading `!`.
-                if out
-                    .stdout
-                    .split(|b| *b == b'\n')
-                    .any(|line| line.first() == Some(&b'!'))
-                {
+                // Only git's own lease verdict means the counter moved. Any other
+                // refused ref (a receive hook, a protection rule) keeps its stderr.
+                if out.stdout.split(|b| *b == b'\n').any(is_stale_lease_row) {
                     return Ok(SequencePush::Stale);
                 }
                 Err(out.error("sequence-push-failed"))
@@ -317,7 +325,7 @@ impl GitDriver {
         let message = number.to_string();
         let out = self.run_local(
             repo,
-            &[
+            &durable_args(&[
                 "-c",
                 &format!("user.name={claimant}"),
                 "-c",
@@ -328,12 +336,22 @@ impl GitDriver {
                 tree,
                 "-m",
                 &message,
-            ],
+            ]),
         )?;
         if !out.success {
             return Err(out.error("sequence-commit-failed"));
         }
         parse_oid(repo, &out.stdout)
+    }
+}
+
+/// The loose ref file's bytes, before its directories: a packed or reftable
+/// ref has no such file and is flushed by git itself.
+fn sync_ref_file(repo: &RepoHandle, name: &RefName) -> Result<()> {
+    match std::fs::File::open(repo.common_dir().join(name.as_str())) {
+        Ok(file) => file.sync_all().map_err(|e| failure_text(e.to_string())),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(e) => Err(failure_text(e.to_string())),
     }
 }
 
@@ -350,6 +368,25 @@ fn commit_number(raw: &[u8]) -> Option<u64> {
     (!message.is_empty() && message.bytes().all(|b| b.is_ascii_digit()))
         .then(|| message.parse().ok())
         .flatten()
+}
+
+/// The reasons git reports on a `push --porcelain` row when the counter no
+/// longer is where the push expected it: the client's own lease check, and the
+/// remote's compare-and-swap of the same expected value, which is the one a
+/// concurrent claim loses.
+const LOST_LEASE_REASONS: [&[u8]; 4] = [
+    b"[rejected] (stale info)",
+    b"[remote rejected] (incorrect old value provided)",
+    b"[remote rejected] (reference already exists)",
+    b"[remote rejected] (reference does not exist)",
+];
+
+/// A refused row (`!\t<from>:<to>\t<reason>`) whose reason is a lost lease.
+fn is_stale_lease_row(line: &[u8]) -> bool {
+    line.first() == Some(&b'!')
+        && LOST_LEASE_REASONS
+            .iter()
+            .any(|reason| line.trim_ascii_end().ends_with(reason))
 }
 
 #[cfg(test)]
@@ -373,5 +410,22 @@ mod tests {
         assert_eq!(commit_number(raw), Some(63));
         assert_eq!(commit_number(b"tree x\n\nnot a number\n"), None);
         assert_eq!(commit_number(b"tree x\n\n\n"), None);
+    }
+
+    #[test]
+    fn only_a_row_reporting_the_expected_value_not_held_is_a_lost_lease() {
+        let row = |reason: &str| format!("!\tabc:refs/fgos/seq/d-adr\t{reason}\n").into_bytes();
+        for lost in LOST_LEASE_REASONS {
+            assert!(is_stale_lease_row(&row(std::str::from_utf8(lost).unwrap())));
+        }
+        for other in [
+            "[remote rejected] (pre-receive hook declined)",
+            "[remote rejected] (protected branch hook declined)",
+            "[remote rejected] (failed to update ref)",
+            "[rejected] (fetch first)",
+        ] {
+            assert!(!is_stale_lease_row(&row(other)), "{other}");
+        }
+        assert!(!is_stale_lease_row(b"*\tabc:ref\t[new reference]"));
     }
 }

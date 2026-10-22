@@ -305,15 +305,13 @@ pub(crate) fn install_pin(
         let pinned = driver.publication_call(
             repo,
             admin,
-            &[
-                "-c",
-                "core.fsync=all",
+            &durable_args(&[
                 "update-ref",
                 "--no-deref",
                 pin.as_str(),
                 candidate.as_str(),
                 &zero,
-            ],
+            ]),
             &[],
             false,
             Duration::from_secs(30),
@@ -369,15 +367,13 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
             let out = driver.publication_call(
                 repo,
                 admin,
-                &[
-                    "-c",
-                    "core.fsync=all",
+                &durable_args(&[
                     "update-ref",
                     "--no-deref",
                     "-d",
                     pin.as_str(),
                     candidate,
-                ],
+                ]),
                 &[],
                 false,
                 Duration::from_secs(30),
@@ -780,7 +776,7 @@ impl GitDriver {
                 return Err(failure("checkout-preflight-failed"));
             }
             for args in [
-                vec!["-c", "core.fsync=all", "update-index", "--refresh"],
+                durable_args(&["update-index", "--refresh"]),
                 vec!["read-tree", "-m", "-n", "-u", old.as_str(), next.as_str()],
             ] {
                 let result = self.publication_call(
@@ -835,25 +831,21 @@ impl GitDriver {
             };
             let args = match next {
                 ExpectedTip::Absent => {
-                    vec![
-                        "-c",
-                        "core.fsync=all",
+                    durable_args(&[
                         "update-ref",
                         "--no-deref",
                         "-d",
                         name.as_str(),
                         old_text,
-                    ]
+                    ])
                 }
-                ExpectedTip::Oid(o) => vec![
-                    "-c",
-                    "core.fsync=all",
+                ExpectedTip::Oid(o) => durable_args(&[
                     "update-ref",
                     "--no-deref",
                     name.as_str(),
                     o.as_str(),
                     old_text,
-                ],
+                ]),
             };
             let out =
                 self.publication_call(repo, admin, &args, &[], false, Duration::from_secs(30))?;
@@ -887,7 +879,7 @@ impl GitDriver {
                 let result = self.publication_call(
                     target,
                     lease,
-                    &["-c", "core.fsync=all", "read-tree", "-m", "-u", old, next],
+                    &durable_args(&["read-tree", "-m", "-u", old, next]),
                     &[],
                     false,
                     Duration::from_secs(30),

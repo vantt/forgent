@@ -402,16 +402,14 @@ impl GitDriver {
                     "--",
                 ]
             } else {
-                vec![
-                    "-c",
-                    "core.fsync=all",
+                durable_args(&[
                     "fetch",
                     "--no-write-fetch-head",
                     "--no-tags",
                     "--no-recurse-submodules",
                     "--no-auto-maintenance",
                     "--",
-                ]
+                ])
             }
             .into_iter()
             .map(str::to_owned)
@@ -483,15 +481,13 @@ impl GitDriver {
                     let cas = self.invoke(
                         Some(repo),
                         repo.trusted_main_root(),
-                        &[
-                            "-c",
-                            "core.fsync=all",
+                        &durable_args(&[
                             "update-ref",
                             "--no-deref",
                             name.as_str(),
                             next.as_str(),
                             old,
-                        ],
+                        ]),
                         if loan.is_some() {
                             Policy::Publication
                         } else {

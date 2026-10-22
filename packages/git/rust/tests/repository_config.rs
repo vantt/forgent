@@ -207,46 +207,73 @@ fn dead_config_writer_recovers_wal_before_and_after_effect_without_replay() {
     }
 }
 
-struct FailAt(&'static str);
+/// Fails every named step and records the steps it was asked about, in order.
+struct FailAt(&'static [&'static str], std::sync::Mutex<Vec<&'static str>>);
+impl FailAt {
+    fn new(steps: &'static [&'static str]) -> Self {
+        Self(steps, Default::default())
+    }
+}
 impl FileSystem for FailAt {
     fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
-        if step == self.0 {
-            Err(std::io::Error::other("fault between rename and parent sync"))
+        self.1.lock().unwrap().push(step);
+        if self.0.contains(&step) {
+            Err(std::io::Error::other("injected durability fault"))
         } else {
             Ok(())
         }
     }
 }
 
-#[test]
-fn a_config_edit_that_failed_between_rename_and_parent_sync_is_not_acknowledged_on_observation_alone() {
-    // The dead-writer case above proves the edit is never replayed. It does not look at what the
-    // recovered outcome claims: a value that is merely visible after the rename says nothing about
-    // the parent directory, so an acknowledgement resting on that observation alone is a durability
-    // claim nobody checked.
+fn edit_that_failed_after_the_rename(
+    steps: &'static [&'static str],
+) -> (Option<Outcome>, Vec<&'static str>) {
+    // A value that is merely visible after the rename says nothing about the parent directory, so
+    // an acknowledgement may rest only on a durability step that was completed and observed.
     let f = Fixture::new();
     let path = f.main.join(".githooks");
+    let fs = FailAt::new(steps);
     f.driver
-        .ensure_hooks_with_filesystem(&f.repo, &path, "fault", &FailAt("config-replaced"))
+        .ensure_hooks_with_filesystem(&f.repo, &path, "fault", &fs)
         .unwrap_err();
-    let wal = Wal::open(&f.repo).unwrap();
-    let chain = wal.inspect("fault").unwrap();
-    // Either the outcome says the edit is not acknowledged, or it stays pending for recovery
-    // (which the dead-writer case above owns); an acknowledgement must not rest on observation.
-    match chain.outcome() {
-        Some(Outcome::Transfer { acknowledged, .. }) => assert!(
-            !*acknowledged,
-            "acknowledged although the parent directory sync failed"
-        ),
-        None => {}
-        other => panic!("unexpected outcome {other:?}"),
-    }
-    // The edit is in the file exactly once, and the fault left no native lock behind.
+    let chain = Wal::open(&f.repo).unwrap().inspect("fault").unwrap();
+    // The edit is in the file exactly once, never replayed, and no native lock is left behind.
     assert_eq!(
         git(&f.main, &["config", "--get-all", "core.hooksPath"]),
         path.to_str().unwrap()
     );
     assert!(!f.main.join(".git/config.lock").exists());
+    let seen = fs.1.lock().unwrap().clone();
+    (chain.outcome().cloned(), seen)
+}
+
+#[test]
+fn a_config_edit_that_failed_after_the_rename_is_acknowledged_only_once_its_sync_completed() {
+    let (outcome, seen) = edit_that_failed_after_the_rename(&["config-replaced"]);
+    assert!(
+        matches!(
+            outcome,
+            Some(Outcome::Transfer { acknowledged: true, unknown: false, .. })
+        ),
+        "{outcome:?}"
+    );
+    // The sync step runs after the fault and before the acknowledging record is installed.
+    let synced = seen.iter().rposition(|s| *s == "config-synced");
+    let installed = seen.iter().rposition(|s| *s == "record-install");
+    assert!(synced < installed && synced.is_some(), "{seen:?}");
+}
+
+#[test]
+fn a_config_edit_whose_sync_cannot_be_completed_keeps_unknown_evidence() {
+    let (outcome, seen) = edit_that_failed_after_the_rename(&["config-replaced", "config-synced"]);
+    assert!(seen.contains(&"config-synced"), "{seen:?}");
+    assert!(
+        matches!(
+            outcome,
+            Some(Outcome::Transfer { acknowledged: false, unknown: true, .. })
+        ),
+        "{outcome:?}"
+    );
 }
 
 struct EditAtAttempt {

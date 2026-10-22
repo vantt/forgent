@@ -11,6 +11,31 @@ use std::{
 };
 
 static NEXT: AtomicU64 = AtomicU64::new(0);
+static LOGGING_GIT: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
+
+/// Puts a `git` that records `<cwd> <argv>` ahead of the real one on PATH, once, before any
+/// driver exists: the driver picks its git from PATH the first time one is created.
+fn logging_git_log() -> &'static Path {
+    LOGGING_GIT.get_or_init(|| {
+        let dir = std::env::temp_dir().join(format!("fgos-sequence-git-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir(&dir).unwrap();
+        let real = Command::new("sh").args(["-c", "command -v git"]).output().unwrap().stdout;
+        let real = String::from_utf8(real).unwrap().trim().to_owned();
+        let script = dir.join("git");
+        let log = dir.join("argv.log");
+        fs::write(
+            &script,
+            format!("#!/bin/sh\nprintf '%s %s\\n' \"$PWD\" \"$*\" >> '{}'\nexec '{real}' \"$@\"\n", log.display()),
+        )
+        .unwrap();
+        fs::set_permissions(&script, fs::Permissions::from_mode(0o755)).unwrap();
+        let mut paths = vec![dir.clone()];
+        paths.extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+        std::env::set_var("PATH", std::env::join_paths(paths).unwrap());
+        log
+    })
+}
 
 fn git(path: &Path, args: &[&str]) -> String {
     let out = Command::new("git")
@@ -35,6 +60,7 @@ struct Fixture {
 
 impl Fixture {
     fn new() -> Self {
+        logging_git_log();
         let root = std::env::temp_dir().join(format!(
             "fgos-sequence-{}-{}",
             std::process::id(),
@@ -122,6 +148,32 @@ fn a_repository_without_a_remote_keeps_its_counter_in_its_own_ref() {
             .unwrap(),
     );
     assert_ne!(first, second);
+}
+
+#[test]
+fn a_local_claim_asks_git_to_flush_even_when_the_repository_configures_writeout_only() {
+    // Git's `writeout-only` method hands bytes to the kernel without a flush. The claim must
+    // override it on the very commands that write the counter, and still be claimed and ordered.
+    let f = Fixture::new();
+    let repo = f.clone_named("alone", false);
+    git(&f.root.join("alone"), &["config", "core.fsyncMethod", "writeout-only"]);
+    let home = f.driver.sequence_home(&repo).unwrap();
+    let first = claimed(f.driver.sequence_push(&repo, &home, "d-adr", None, 1, "claim-a").unwrap());
+    assert_eq!(git(&f.root.join("alone"), &["rev-parse", "refs/fgos/seq/d-adr"]), first.as_str());
+
+    let calls = fs::read_to_string(logging_git_log()).unwrap();
+    let root = f.root.canonicalize().unwrap();
+    let ours: Vec<&str> = calls.lines().filter(|l| l.starts_with(root.to_str().unwrap())).collect();
+    for verb in ["commit-tree", "update-ref"] {
+        let call = ours
+            .iter()
+            .find(|l| l.split(' ').any(|word| word == verb))
+            .unwrap_or_else(|| panic!("no {verb} call in {ours:?}"));
+        assert!(
+            call.contains("core.fsync=all") && call.contains("core.fsyncMethod=fsync"),
+            "{verb} did not force a flushing method: {call}"
+        );
+    }
 }
 
 #[test]

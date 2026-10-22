@@ -240,18 +240,7 @@ impl GitDriver {
                     .iter()
                     .any(|r| matches!(r.phase, Phase::TargetAttempt { .. }))
                 {
-                    let installed = self.config_change_installed(repo, change)?;
-                    Outcome::Transfer {
-                        acknowledged: installed,
-                        unknown: !installed,
-                        observations: vec![],
-                        details: vec![if installed {
-                            "effectObservedOnly"
-                        } else {
-                            "uncertain"
-                        }
-                        .into()],
-                    }
+                    self.observed_config_outcome(repo, change, filesystem)?
                 } else {
                     Outcome::AbandonedBeforeAttempt
                 };
@@ -518,25 +507,11 @@ impl GitDriver {
                 .iter()
                 .any(|r| matches!(r.phase, Phase::TargetAttempt { .. }))
             {
-                let installed = self
-                    .config_change_installed(
-                        repo,
-                        match &chain.intent().kind {
-                            OperationKind::ConfigChange(c) => c,
-                            _ => unreachable!(),
-                        },
-                    )
-                    .unwrap_or(false);
-                Outcome::Transfer {
-                    acknowledged: installed,
-                    unknown: !installed,
-                    observations: vec![],
-                    details: vec![if installed {
-                        "effectObservedOnly"
-                    } else {
-                        "uncertain"
-                    }
-                    .into()],
+                match &chain.intent().kind {
+                    OperationKind::ConfigChange(c) => self
+                        .observed_config_outcome(repo, c, filesystem)
+                        .unwrap_or_else(|_| unproven_config_outcome()),
+                    _ => unreachable!(),
                 }
             } else {
                 Outcome::AbandonedBeforeAttempt
@@ -547,6 +522,15 @@ impl GitDriver {
     }
 }
 use wal::PublicationAuthority;
+
+fn unproven_config_outcome() -> Outcome {
+    Outcome::Transfer {
+        acknowledged: false,
+        unknown: true,
+        observations: vec![],
+        details: vec!["uncertain".into()],
+    }
+}
 
 /// Remove only the staging inode owned by this invocation. A substituted path
 /// is evidence for the operator, never permission to unlink another writer.
@@ -648,6 +632,32 @@ impl GitDriver {
         }
         values.into_iter().next()
             .map(|(_, _, value)| String::from_utf8(value).map_err(error)).transpose()
+    }
+    /// A visible config value is not a durable one. Finish the file and parent
+    /// directory sync before acknowledging; when it cannot be proven the chain
+    /// records the effect as unknown and keeps that evidence.
+    fn observed_config_outcome<F: wal::FileSystem>(
+        &self,
+        repo: &RepoHandle,
+        change: &wal::ConfigChange,
+        filesystem: &F,
+    ) -> Result<Outcome> {
+        if !self.config_change_installed(repo, change)? {
+            return Ok(unproven_config_outcome());
+        }
+        let synced = File::open(repo.common_dir().join("config"))
+            .and_then(|f| f.sync_all())
+            .and_then(|()| fgos_durable_file::sync_directory(repo.common_dir()))
+            .and_then(|()| filesystem.checkpoint("config-synced"));
+        Ok(match synced {
+            Ok(()) => Outcome::Transfer {
+                acknowledged: true,
+                unknown: false,
+                observations: vec![],
+                details: vec!["config file and parent synced after observation".into()],
+            },
+            Err(_) => unproven_config_outcome(),
+        })
     }
     fn config_change_installed(
         &self,
