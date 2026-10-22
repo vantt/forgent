@@ -1,0 +1,13 @@
+[package]
+name = "fgos-mailbox"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+fgos-mailbox-core = { path = "../core" }
+fgos-process = { path = "../../../process/rust" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+fgos-session-identity = { path = "../../../session-identity/rust" }

@@ -253,6 +253,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-mailbox"
+version = "0.2.0"
+dependencies = [
+ "fgos-mailbox-core",
+ "fgos-process",
+ "fgos-session-identity",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "fgos-mailbox-core"
 version = "0.2.0"
 dependencies = [
