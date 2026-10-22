@@ -118,7 +118,7 @@ export function checkProcessContainment(repoRoot, { platform = process.platform,
     if (platform === 'linux') {
       if (selectedBecause?.startsWith('containment-mount-refused:')) {
         const line = selectedBecause.slice('containment-mount-refused:'.length).trim();
-        return { passed: true, message: warn(`${driver}, level best-effort: a host mount cannot be remounted (${line}); unmount or fix it to get kernel containment${escapeText}`) };
+        return { passed: true, message: warn(`${driver}, level best-effort: a host mount cannot be remounted (${line}); unmount or fix it, then restart long-running fgOS processes (gateway, supervisors), which keep the answer they probed at start, to get kernel containment${escapeText}`) };
       }
       const reason = selectedBecause ? `(${selectedBecause})` : '(no bwrap, or user namespaces are disabled)';
       return { passed: true, message: warn(`${driver}, level best-effort: bwrap with a user namespace is unavailable here ${reason}, so agents run in a process group${escapeText}. Install bwrap and enable unprivileged user namespaces for kernel containment`) };

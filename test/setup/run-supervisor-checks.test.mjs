@@ -123,7 +123,7 @@ test('process-containment: kernel passes; best-effort warns on Linux and informs
   }));
   const mountRes = checkProcessContainment(root, { bin: mountRefused, platform: 'linux' });
   assert.equal(mountRes.passed, true);
-  assert.match(mountRes.message, /^warning: linux-pgroup, level best-effort: a host mount cannot be remounted \(bwrap: Can't bind mount \/oldroot\/var\/tmp\/x on \/newroot\/var\/tmp\/x: Invalid argument\); unmount or fix it to get kernel containment/);
+  assert.match(mountRes.message, /^warning: linux-pgroup, level best-effort: a host mount cannot be remounted \(bwrap: Can't bind mount \/oldroot\/var\/tmp\/x on \/newroot\/var\/tmp\/x: Invalid argument\); unmount or fix it, then restart long-running fgOS processes \(gateway, supervisors\), which keep the answer they probed at start, to get kernel containment/);
   assert.doesNotMatch(mountRes.message, /user namespaces are disabled/);
   const none = checkProcessContainment(root, { bin: fakeHost('h-none', probeLine({ driver: null, level: 'unsupported', escapes: [], error: 'unsupported-platform' })) });
   assert.equal(none.passed, false);

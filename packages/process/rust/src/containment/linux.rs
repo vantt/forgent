@@ -79,7 +79,7 @@ fn pidns_usable(bwrap: &Path) -> Result<(), String> {
 }
 
 fn is_mount_refusal(line: &str) -> bool {
-    line.contains("Can't bind mount") || line.contains("Can't remount") || line.contains("remount")
+    line.contains("Can't bind mount") || line.contains("remount")
 }
 
 /// `bwrap-pidns`: the gate is pid 1 of a fresh pid namespace, so the domain is
