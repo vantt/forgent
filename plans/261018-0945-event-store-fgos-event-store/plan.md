@@ -11,6 +11,12 @@ blocks: []   # Git 07 and 08 wait for ES-11 and ES-05 by phase edge, see Cross-p
 created: 2026-10-18
 ---
 
+> **Status 2026-10-22.** Phases 01–08 are done on main:
+> - crate, open log, reader, seal through Git's Publication port, sync, Node facade, verbs, migration export;
+> - power loss 20/20; forge probe PASS; V-EVENT held.
+>
+> Phases 09–11 (Work and porting cutover, proof gate, landing and rollout) were handed by the owner on 2026-10-22 to the WORK lane agent (board row WORK). The GIT/ES coordinator reviews its Git-side edits.
+
 # Plan ES: the fgos-event-store component
 
 **Approved by the owner 2026-10-18 11:44 (Asia/Saigon).** Writer machines: two, the owner machine (workspaces forgentX, mdview, mcp-skill-hub) and the second machine (`~/projects/forgent`). The third machine runs no fgOS today; if it starts, it activates the then-current release and is added to the landing list before any cutover.
