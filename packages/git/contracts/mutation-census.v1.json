@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e11f0d9c70507981f37d0666c89d55028c8c673d36db83c00a8b3d75518c0eea",
+  "payloadDigest": "a8b5e61ec2c0e052584f3689134fe708f5e0200c0e3fa551b13ac01b4ce7aa90",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -573,7 +573,7 @@
     "scripts/git-addon.mjs": "67532c2006d74a97cbc40814e82882da1de5d48b5d072670444489e2ed963d71",
     "scripts/git/e1-power-cut.mjs": "58e093cefe327fc2d7c2dd791185a02c68ee596925d0adb3b9a544abe5d18458",
     "scripts/git/e1-power-cut.sh": "be0500b7f99580694cf1ca7418c17ddf6bd70583f3a06686aaab923118e2d1fa",
-    "scripts/git/e3-bench.mjs": "c1fc958e747bf67fa4004936aa1c2a7ecc12651459d8d19e4fc39a7bd45446a2",
+    "scripts/git/e3-bench.mjs": "8a71b44d68256de1695838acd499542f616e53f287cd7ce59108cd1638991294",
     "scripts/git/p-release-checks.sh": "08bb9b3c32e7915b27f645f7aa68d42cba0dbddd2a7dc9adc45d43a75b4d0056",
     "scripts/git/p-space-resource.mjs": "31e12327e2782a769a341cb6819f7e1e24d63e78de732c1ad210e430433aad06",
     "scripts/git/p-space.sh": "ab11ec0d8fc8c5a0c32f0dcc1aa08d26c39356db710a4e395513f87af78decd3",
@@ -2341,92 +2341,92 @@
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 491,
+      "line": 522,
       "spawn": "checkoutInspect -> scripts/git/e3-bench.mjs:48",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 493,
+      "line": 524,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 495,
+      "line": 526,
       "spawn": "typedOperationRows -> scripts/git/e3-bench.mjs:298",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 509,
+      "line": 540,
       "spawn": "createGitPublication -> src/git/index.mjs:9",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 526,
+      "line": 557,
       "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 630,
+      "line": 661,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 669,
+      "line": 701,
       "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 682,
+      "line": 714,
       "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 700,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:773",
+      "line": 732,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:805",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 700,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:743",
+      "line": 732,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:775",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 798,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:773",
+      "line": 830,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:805",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 813,
+      "line": 845,
       "spawn": "createGitPublication -> src/git/index.mjs:9",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 828,
-      "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:798",
+      "line": 860,
+      "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:830",
       "binary": "(command-line arguments)",
       "class": "configured-binary"
     },

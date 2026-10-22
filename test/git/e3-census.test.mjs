@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { operationCensus } from '../../scripts/git/e3-bench.mjs';
+import { classifyFsync, operationCensus, pushVerdict } from '../../scripts/git/e3-bench.mjs';
 
 test('operation census counts completed Git execs and fresh lock descriptions, including interrupted syscalls', () => {
   const phases = { 'land-prepare': {gitExecs:[], holderLockAcquisitions:[], exclusiveLockCalls:[]} };
@@ -32,4 +32,14 @@ test('operation census recognizes the Node lock-fd acquisition adapter on inheri
 2 flock(3</r/.fgos/locks/main-checkout.lock>, LOCK_EX|LOCK_NB) = 0
 1 access("/nonexistent-e3-marker/land-legacy-end", F_OK) = -1 ENOENT`, phases, '/usr/bin/git');
   assert.equal(phases['land-legacy'].holderLockAcquisitionCount, 1);
+});
+
+test('push budgets apply only to a round whose fsync probes before and after stay in the floor mode', () => {
+  const floor = 5.2;
+  assert.equal(classifyFsync([5.21, 5.3], floor), 'fsync-fast');
+  assert.equal(classifyFsync([5.2, 7.47], floor), 'fsync-slow', 'a flip during the round counts as slow');
+  assert.equal(classifyFsync([7.6, 7.7], floor), 'fsync-slow');
+  assert.equal(pushVerdict(146, 150, 'fsync-fast'), 'passed');
+  assert.equal(pushVerdict(155, 150, 'fsync-fast'), 'failed');
+  assert.equal(pushVerdict(195, 150, 'fsync-slow'), 'not-judged: fsync-slow');
 });

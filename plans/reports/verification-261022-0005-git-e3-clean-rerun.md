@@ -45,3 +45,13 @@ This is the calm run that the [13:23 verification](verification-261021-1323-git-
 
 1. **Push without objects (p95 ≤ 150 ms).** The two calm rounds disagree: 193 ms and 146 ms, both at a similar load. Push with objects follows the same pattern (197 vs 150). So the difference is something that changes between rounds, not the transfer of objects. Per spec §4, a failed budget stops the plan for an owner decision. The 13:23 run also failed this row, under load.
 2. **The backlog budget unit.** The budget says "10,000 pending records", and that fixture passes. The 3-record-chain fixture (10,000 operations, 30,000 records) takes 303–345 ms. Does the budget mean records (pass) or operations (fail by up to 15 %)?
+
+## Resolution (2026-10-22)
+
+**Push.** The cause is the host NVMe. Its fsync latency switches between two modes, about 5.2 ms and about 7.5 ms per plain fsync, and a push without objects does 13 fsyncs. The investigation is in [the push variance debug report](debug-261022-0012-git-e3-push-variance.md).
+
+The owner chose on 2026-10-22 to judge push only when the disk is in its fast mode. The bench now pairs each push row with a plain fsync probe. It judges the 150 ms and 250 ms budgets only on rounds where the probe reads fast; slow rounds are reported and marked `not-judged: fsync-slow` (main `4428f2a90`). Under that rule the fast-mode p95 of push without objects is about 146 ms, so it **passes**.
+
+**Backlog.** The unit is records (owner, 2026-10-22), so this row **passes** too.
+
+Every E3 row now passes on the owner's host class.
