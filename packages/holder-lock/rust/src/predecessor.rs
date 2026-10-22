@@ -253,15 +253,32 @@ fn admit_traced(path: &Path, kill_wait: Duration, trace: &mut WatchTrace) -> Adm
     answer
 }
 
-fn judge(path: &Path, watch: &mut fgos_process::DomainWatch, named: Value, kill_wait: Duration) -> Admit {
+/// What the rule needs of a domain watch: the port `judge` decides over.
+trait DomainJudge {
+    fn is_empty(&mut self) -> DomainState;
+    /// End the domain, waiting at most `within` for it to be empty.
+    fn kill_all(&mut self, within: Duration) -> KillOutcome;
+}
+
+impl DomainJudge for fgos_process::DomainWatch {
+    fn is_empty(&mut self) -> DomainState {
+        fgos_process::DomainWatch::is_empty(self)
+    }
+    fn kill_all(&mut self, within: Duration) -> KillOutcome {
+        fgos_process::DomainWatch::kill_all(self, within)
+    }
+}
+
+fn judge(path: &Path, watch: &mut impl DomainJudge, named: Value, kill_wait: Duration) -> Admit {
     if watch.is_empty() == DomainState::Empty {
         remove_record(path);
         return Admit::Proceed;
     }
-    if watch.kill_all() == KillOutcome::Refused {
+    // One bound for the whole admission: the kill's own wait spends the same budget as the poll after it.
+    let deadline = Instant::now() + kill_wait;
+    if watch.kill_all(kill_wait) == KillOutcome::Refused {
         return Admit::NotEmpty { domain: named };
     }
-    let deadline = Instant::now() + kill_wait;
     loop {
         if watch.is_empty() == DomainState::Empty {
             remove_record(path);
@@ -277,6 +294,35 @@ fn judge(path: &Path, watch: &mut fgos_process::DomainWatch, named: Value, kill_
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A domain whose member survives SIGKILL for `lives` (uninterruptible I/O): not empty until then,
+    /// and a kill blocks the way a driver's empty wait does, for as long as it is allowed to.
+    struct StuckMember {
+        gone_at: Instant,
+    }
+
+    impl DomainJudge for StuckMember {
+        fn is_empty(&mut self) -> DomainState {
+            if Instant::now() >= self.gone_at { DomainState::Empty } else { DomainState::NotEmpty }
+        }
+        fn kill_all(&mut self, within: Duration) -> KillOutcome {
+            let wait = within.min(self.gone_at.saturating_duration_since(Instant::now()));
+            std::thread::sleep(wait);
+            if self.is_empty() == DomainState::Empty { KillOutcome::Ok } else { KillOutcome::Refused }
+        }
+    }
+
+    #[test]
+    fn admission_over_a_member_that_outlives_the_kill_returns_within_the_kill_wait() {
+        let kill_wait = Duration::from_millis(300);
+        let path = std::env::temp_dir().join(format!("fgos-stuck-member-{}.predecessor.json", std::process::id()));
+        let mut watch = StuckMember { gone_at: Instant::now() + Duration::from_secs(30) };
+        let start = Instant::now();
+        let answer = judge(&path, &mut watch, json!({ "kind": "stuck" }), kill_wait);
+        let took = start.elapsed();
+        assert!(matches!(answer, Admit::NotEmpty { .. }), "a member that is still alive keeps the domain not empty");
+        assert!(took <= kill_wait + Duration::from_millis(250), "the kill wait bounds the whole admission, kill included: took {took:?}");
+    }
 
     #[test]
     fn the_contender_view_names_an_absent_and_an_unknown_record_without_editing_it() {
