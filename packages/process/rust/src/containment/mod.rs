@@ -267,7 +267,10 @@ pub(crate) fn pgroup_state(leader: &ProcTuple) -> DomainState {
 
 /// Wait, within the default empty wait, until `gate` is judged dead.
 pub(crate) fn wait_dead(gate: &ProcTuple) {
+    #[cfg(target_os = "linux")]
     pgroup::wait_until(DEFAULT_EMPTY_WAIT, || crate::facts::judge_here(&gate.to_record()) == crate::facts::Verdict::Dead);
+    #[cfg(not(target_os = "linux"))]
+    let _ = gate;
 }
 
 /// End a `linux-pgroup` domain judged from its record alone.
