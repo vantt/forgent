@@ -162,3 +162,7 @@ cargo clippy --locked -p fgos -p fgos-mailbox -p fgos-git --all-targets -- -D wa
 - [ ] Retire the example and `tests/test_hook_entry.rs`, naming the owners
 - [ ] Smoke checks through `npm run fgos:dev`
 - [ ] Run the gate; regenerate routes and census; sync and push
+
+## Notes
+
+- Plan owner decision 3 (2026-10-23): the hook entry is quiet when `HOME` is unset, before it resolves anything (the Git component's relative state root is `tsk-43x4`, not fixed here; the hook path never touches that state root).

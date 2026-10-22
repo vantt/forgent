@@ -51,7 +51,7 @@
  *       Deletes <base>/<cli>/ (raw calls, the codex home with its rollouts).
  *       It refuses while a set-aside auth.json.rotated exists there (see
  *       scripts/lib/codex-auth-guard.mjs).
- *   run <claude|codex> <probe|probe-pane|ladder> [--dry]
+ *   run <claude|codex> <probe|probe-pane|ladder|ladder-sum> [--dry]
  *       The measurement modes of the product hook door (see "probes" below):
  *       process facts of the hook and of a tool process, the hook's cwd
  *       after a tool `cd`, and the largest PostToolUse context injected
@@ -804,24 +804,36 @@ function cmdClean(cli) {
  *   probe-pane  probe in an interactive Claude Code in a herdr pane opened
  *               through Terminal Control (claude only).
  *   ladder      a PostToolUse hook that prints, per step `echo step<n>`, a
- *               context of LADDER[n] bytes (step 8 in 3-byte characters);
+ *               context of the step's size (step 8 in 3-byte characters);
  *               steps 11-14 repeat the four largest sizes while a sibling
  *               hook prints a fixed 2,048-byte context.
+ *   ladder-sum  sizes 5,120-9,216 bytes, each beside the sibling: whether the
+ *               threshold applies per hook or to the sum of one event's hooks.
  *
  * `--dry` runs the same layout against the stub CLI (`stub <cli>`) under
  * <base>-dry/, with no model and no account. A real run writes spawned.json
  * before the CLI starts and refuses a run directory that has one.
  */
-const PROBE_MODES = ['probe', 'probe-pane', 'ladder'];
+const PROBE_MODES = ['probe', 'probe-pane', 'ladder', 'ladder-sum'];
 const DRY_BASE = `${BASE}-dry`;
 const PROBE_MIN_FREE_GB = 8;
 const CONTRACTS = path.join(REPO_ROOT, 'packages', 'mailbox', 'contracts');
 const CLI_BIN = { claude: path.join(os.homedir(), '.local', 'bin', 'claude'), codex: path.join(os.homedir(), '.local', 'bin', 'codex') };
 /** Bytes of each ladder step's context; steps 11-14 repeat the four largest with the sibling. */
-const LADDER = [2048, 4096, 6144, 8192, 9216, 10240, 11264, 12288, 13312, 14009, 11264, 12288, 13312, 14009];
-const LADDER_UTF8_STEP = 8;
 const SIBLING_BYTES = 2048;
-const SIBLING_FROM_STEP = 11;
+/**
+ * The ladders: `ladder` brackets one hook's inline threshold (step 8 in
+ * 3-byte characters; steps 11-14 repeat the four largest sizes beside the
+ * sibling); `ladder-sum` repeats sizes at or below the largest inline step
+ * of `ladder` (9,216 bytes), each beside the 2,048-byte sibling, so their
+ * sums cross the threshold while each hook's own text stays under it: all
+ * inline means the threshold applies per hook.
+ */
+const LADDERS = {
+  ladder: { sizes: [2048, 4096, 6144, 8192, 9216, 10240, 11264, 12288, 13312, 14009, 11264, 12288, 13312, 14009], utf8Step: 8, siblingFromStep: 11 },
+  'ladder-sum': { sizes: [5120, 6144, 7168, 8192, 9216], utf8Step: 0, siblingFromStep: 1 },
+};
+const isLadder = (mode) => mode in LADDERS;
 /** A herdr session of its own for the dry pane run, never the owner's. */
 const DRY_HERDR_SESSION = 'mbx-dry';
 const PANE_WAIT_MS = 300_000;
@@ -942,11 +954,12 @@ function cmdProbeHook(runDir, argv) {
     writeJson(path.join(calls, `${n}-${event}.argv.json`), argv);
     writeJson(path.join(calls, `${n}-${event}.proc.json`), probeFacts());
     const meta = readJson(path.join(runDir, 'mode.json'));
-    if (meta.mode !== 'ladder' || event !== 'PostToolUse') return;
+    if (!isLadder(meta.mode) || event !== 'PostToolUse') return;
+    const { sizes, utf8Step } = LADDERS[meta.mode];
     const step = stepOf(JSON.parse(input.toString('utf8') || '{}'));
-    if (!step || step > LADDER.length) return;
-    const text = sizedText('L5', step, LADDER[step - 1], step === LADDER_UTF8_STEP);
-    writeJson(path.join(calls, `${n}-ladder.json`), { step, bytes: LADDER[step - 1] });
+    if (!step || step > sizes.length) return;
+    const text = sizedText('L5', step, sizes[step - 1], step === utf8Step);
+    writeJson(path.join(calls, `${n}-ladder.json`), { step, bytes: sizes[step - 1] });
     process.stdout.write(JSON.stringify(contextShape('PostToolUse', text)));
   } catch (error) {
     try {
@@ -963,8 +976,11 @@ function cmdProbeHook(runDir, argv) {
 function cmdProbeSibling(runDir) {
   try {
     const input = readStdin();
+    const { siblingFromStep } = LADDERS[readJson(path.join(runDir, 'mode.json')).mode];
     const step = stepOf(JSON.parse(input.toString('utf8') || '{}'));
-    if (!step || step < SIBLING_FROM_STEP) return;
+    if (!step || step < siblingFromStep) return;
+    // The sibling may run before the ladder hook made the calls directory.
+    fs.mkdirSync(path.join(runDir, 'calls'), { recursive: true });
     writeJson(path.join(runDir, 'calls', `sibling-${step}.json`), { step, bytes: SIBLING_BYTES });
     process.stdout.write(JSON.stringify(contextShape('PostToolUse', sizedText('SIB', step, SIBLING_BYTES, false))));
   } catch (error) {
@@ -1010,11 +1026,12 @@ function productCommand(cli, event, ws, guarded) {
 }
 
 function probePrompt(mode, runDir, ws) {
-  if (mode === 'ladder') {
-    const steps = LADDER.map((_, i) => `${i + 1}. Run the shell command: \`echo step${i + 1}\``).join('\n');
+  if (isLadder(mode)) {
+    const { sizes } = LADDERS[mode];
+    const steps = sizes.map((_, i) => `${i + 1}. Run the shell command: \`echo step${i + 1}\``).join('\n');
     return `This is a test of hook context sizes. Do exactly these steps, one shell tool call per step, in order, and nothing else. Never combine two steps in one call.
 ${steps}
-The additional context you receive after a step is filler; do not act on it. After step ${LADDER.length}, answer with the single word done.`;
+The additional context you receive after a step is filler; do not act on it. After step ${sizes.length}, answer with the single word done.`;
   }
   const dump = `node '${path.join(runDir, 'dump-ancestry.mjs')}'`;
   const text = `This is a test of hook process facts. Do exactly these steps, one shell tool call per step, in order, and nothing else.
@@ -1030,14 +1047,14 @@ function probeSettings(cli, mode, runDir, ws) {
   const entry = (command) => ({ type: 'command', command, timeout: 30 });
   const post = [entry(productCommand(cli, 'post-tool-use', ws, false))];
   const sibling = `'${path.join(runDir, 'sibling')}'`;
-  if (mode === 'ladder') post.push(entry(sibling));
+  if (isLadder(mode)) post.push(entry(sibling));
   if (cli === 'claude') {
     const hooks = { PostToolUse: [{ matcher: '*', hooks: post }] };
-    if (mode !== 'ladder') hooks.Stop = [{ hooks: [entry(productCommand(cli, 'stop', ws, true))] }];
+    if (!isLadder(mode)) hooks.Stop = [{ hooks: [entry(productCommand(cli, 'stop', ws, true))] }];
     return { hooks, ...(mode === 'probe-pane' ? { skipDangerousModePermissionPrompt: true } : {}) };
   }
   const hooks = { PostToolUse: [{ hooks: post }] };
-  if (mode !== 'ladder') hooks.Stop = [{ hooks: [entry(productCommand(cli, 'stop', ws, true))] }];
+  if (!isLadder(mode)) hooks.Stop = [{ hooks: [entry(productCommand(cli, 'stop', ws, true))] }];
   return hooks;
 }
 
@@ -1060,7 +1077,7 @@ function layOutProbe(cli, mode, dry) {
   if (dry || cli === 'codex') fs.mkdirSync(home, { recursive: true });
   else live.makeClaudeHome({ home, claudeDir: path.join(os.homedir(), '.claude') });
   const prompt = probePrompt(mode, runDir, ws);
-  writeJson(path.join(runDir, 'mode.json'), { cli, mode, dry, ladder: mode === 'ladder' ? LADDER : null, ladderUtf8Step: LADDER_UTF8_STEP, siblingBytes: SIBLING_BYTES, siblingFromStep: SIBLING_FROM_STEP });
+  writeJson(path.join(runDir, 'mode.json'), { cli, mode, dry, ladder: LADDERS[mode] ?? null, siblingBytes: SIBLING_BYTES });
   return { runDir, ws, home, prompt };
 }
 
@@ -1286,15 +1303,16 @@ function ladderVerdict(runDir, cli) {
     if (part) return { verdict: 'moved', persisted: part.persisted, role: part.role ?? null, recordBytes: Buffer.byteLength(part.text), endMarker: part.text.includes(`${prefix}END${n}X`) };
     return { verdict: 'absent' };
   };
-  const steps = LADDER.map((bytes, i) => {
+  const { sizes, utf8Step, siblingFromStep } = LADDERS[readJson(path.join(runDir, 'mode.json')).mode];
+  const steps = sizes.map((bytes, i) => {
     const n = i + 1;
     return {
       step: n,
       bytes,
-      wide: n === LADDER_UTF8_STEP,
+      wide: n === utf8Step,
       hookRan: fs.readdirSync(path.join(runDir, 'calls')).some((f) => f.endsWith('-ladder.json') && readJson(path.join(runDir, 'calls', f)).step === n),
-      ...judge('L5', n, bytes, n === LADDER_UTF8_STEP),
-      ...(n >= SIBLING_FROM_STEP ? { sibling: judge('SIB', n, SIBLING_BYTES, false).verdict } : {}),
+      ...judge('L5', n, bytes, n === utf8Step),
+      ...(n >= siblingFromStep ? { sibling: judge('SIB', n, SIBLING_BYTES, false).verdict } : {}),
     };
   });
   return { file, steps };
@@ -1334,7 +1352,7 @@ function cmdSummarize(cli, mode, flags) {
       return { n: parseInt(f, 10), cwd: facts.cwd, claudeProjectDir: facts.claudeProjectDir, idVarsSet: facts.idVarsSet, chain: facts.chain.map(compact) };
     })
     : [];
-  const summary = { cli, mode, run: readJson(path.join(runDir, 'run.json')), versions: readJson(path.join(runDir, 'versions.json')), hookCalls, tools, ...(mode === 'ladder' ? { ladder: ladderVerdict(runDir, cli) } : {}) };
+  const summary = { cli, mode, run: readJson(path.join(runDir, 'run.json')), versions: readJson(path.join(runDir, 'versions.json')), hookCalls, tools, ...(isLadder(mode) ? { ladder: ladderVerdict(runDir, cli) } : {}) };
   writeJson(path.join(runDir, 'summary.json'), summary);
   process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
 }
@@ -1395,6 +1413,6 @@ async function main() {
       cmdClean(rest[0]);
       break;
     default:
-      die('usage: run <cli> <mode> [--fallback] [--agent-head] [--account <name>] | run <claude|codex> <probe|probe-pane|ladder> [--dry] | summarize <cli> <probe mode> [--dry] | clean-probe <cli> <probe mode> [--dry] | hook <cli> <event> <runDir> | check <cli> accept | redact <cli> | redact-agent-head <cli> | clean <cli>');
+      die('usage: run <cli> <mode> [--fallback] [--agent-head] [--account <name>] | run <claude|codex> <probe|probe-pane|ladder|ladder-sum> [--dry] | summarize <cli> <probe mode> [--dry] | clean-probe <cli> <probe mode> [--dry] | hook <cli> <event> <runDir> | check <cli> accept | redact <cli> | redact-agent-head <cli> | clean <cli>');
   }
 }

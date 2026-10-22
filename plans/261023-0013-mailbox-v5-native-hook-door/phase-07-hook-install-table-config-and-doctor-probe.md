@@ -104,3 +104,7 @@ The command above, plus `node --test test/setup/` in full (it is still small eno
 - [ ] Mailbox rows, `commandIsKind`, probe (commit 2)
 - [ ] Config registration from the contract, and the drift proof (commit 3)
 - [ ] Run the gate; regenerate the census; sync and push
+
+## Notes
+
+- Plan owner decision 2 (2026-10-23): the Codex rows use the plain `shimCommand` form. Codex runs a hook command through the user's `$SHELL -c`; a guarded form keeps that shell (the user's login shell, the program the tools run in) at the head position, while zsh execs the plain form into the direct topology. Consequence for owner question 2: on a release older than the native kind, an unguarded Codex row shows "Unknown hook kind" (exit 1) on every hook call.

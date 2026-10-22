@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "718fd76ac9b5ff362674537f3d5d9254c773f3f8e25f68fbad8b91cd8cd05977",
+  "payloadDigest": "09a2c0b12ebd58738c9ca6c04c7fbec9acbd1f8d035cf566744d9611e2e76b34",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -704,7 +704,7 @@
     "scripts/prepare-release.mjs": "f896378a498bd154408b5116a7172e0c3c3f8c73ffd2ccee7a4930200d9e8ade",
     "scripts/probe-storytelling-material.mjs": "c697fb57bee9fd1e4d2464edd31312e41e9f661e540b159f86d7573ff83e9b5c",
     "scripts/project-agents.mjs": "d8ee4167562589fa0c728847571e86bb1c8a487fef3fbb471c843e67d86063ec",
-    "scripts/record-mailbox-hook-fixtures.mjs": "6cf80874cbcd9a0983d14d49e70f4ca74fcc7cc25efb4e4ab528a6f84d1b3c63",
+    "scripts/record-mailbox-hook-fixtures.mjs": "88c1eaf313cf5b4c1218d1e8e2d47981322fecf938be583de7236537278c2435",
     "scripts/regenerate-observe-fixtures.mjs": "07c5b42795e22c36d75363e2265cf59b6f6244d63f7413d9dacf9fe0e3071631",
     "scripts/run-rust-dev-host.mjs": "e10af7fa8c280ecb62cbde50e8d2e2160e1135b2bdd20c02867d0f0351ba641b",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
@@ -1090,24 +1090,24 @@
     },
     {
       "path": "scripts/record-mailbox-hook-fixtures.mjs",
-      "line": 1144,
+      "line": 1161,
       "spawn": "spawnSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        "scripts/record-mailbox-hook-fixtures.mjs:1157"
+        "scripts/record-mailbox-hook-fixtures.mjs:1174"
       ]
     },
     {
       "path": "scripts/record-mailbox-hook-fixtures.mjs",
-      "line": 1224,
+      "line": 1241,
       "spawn": "spawnSync",
       "binary": "sh",
       "family": "unresolved-binary"
     },
     {
       "path": "scripts/record-mailbox-hook-fixtures.mjs",
-      "line": 1230,
+      "line": 1247,
       "spawn": "spawnSync",
       "binary": "zsh",
       "family": "unresolved-binary"
@@ -2725,14 +2725,14 @@
     },
     {
       "path": "scripts/record-mailbox-hook-fixtures.mjs",
-      "line": 1165,
+      "line": 1182,
       "spawn": "createTerminalControl -> src/terminal-control/client.mjs:117",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/record-mailbox-hook-fixtures.mjs",
-      "line": 1362,
+      "line": 1380,
       "spawn": "cmdRun -> scripts/record-mailbox-hook-fixtures.mjs:309",
       "binary": "(command-line arguments)",
       "class": "configured-binary"

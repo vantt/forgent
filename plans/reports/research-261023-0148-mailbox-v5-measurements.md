@@ -90,17 +90,17 @@ Verdict per step from the model input: Claude's transcript `hook_additional_cont
 
 - Claude Code's threshold counts **characters** (the 12,288-byte step of 4,096 characters stayed inline), between 9,217 and 10,240 characters. Codex's counts **bytes** (the same step was cut to about 10,100 bytes), between 9,217 and 10,240 bytes. A bound in bytes is safe for both, since a text never has more characters than bytes.
 - Largest inline step: 9,216 bytes for both CLIs, at the ladder's 1,024-byte resolution. V4 L3a's "14,010 bytes or more is moved" did not bracket the threshold; this ladder does.
-- Per hook or summed: **not determined** (deviation above). Each hook's output is its own record in both CLIs, and the moved or truncated text kept the same size with and without the sibling, which points to a per-hook threshold, but no step put two inline-sized texts over the threshold together.
+- Per hook or summed: not determined by this ladder (deviation above); settled by the authorized re-run in table (g): **per hook** in both CLIs.
 - Non-ASCII: changes the verdict for Claude (characters counted), not for Codex (bytes counted).
 
 ## (e) The values phase 3 writes
 
 | CLI | `hookTopology` | `hookShell` | `headExecutables` | `postToolUseContextMaxBytes` | Source rows |
 |---|---|---|---|---|---|
-| `claude` (2.1.308, linux) | `one-shell-hop` | `/bin/sh` | none (the head's exe basename is the version, `2.1.308`; the head is bound by the session file, not by its executable) | **4,608** | (b) P1, P2; (d) |
-| `codex` (0.161.0, linux) | `direct` | null | `codex` | **4,608** | (b) P4, (c); (d) |
+| `claude` (2.1.308, linux) | `one-shell-hop` | `/bin/sh` | none (the head's exe basename is the version, `2.1.308`; the head is bound by the session file, not by its executable) | **8,192** | (b) P1, P2; (d); (g) |
+| `codex` (0.161.0, linux) | `direct` | null | `codex` | **8,192** | (b) P4, (c); (d); (g) |
 
-The bound applies plan decision 6's margin rule for a threshold not shown to be per hook: half the largest inline step (9,216 / 2). Shown per hook, the rule would give 8,192 (9,216 − 1,024); one authorized ladder per CLI with sibling repeats at 5,120–9,216 bytes would settle it.
+The bound applies plan decision 6's margin rule for a threshold shown to apply per hook (table g): the largest inline step less one ladder step, 9,216 − 1,024 = 8,192 bytes. Before the re-run the summed-case rule gave 4,608 (9,216 / 2), which phase 3 first wrote into the contract.
 
 Whether Codex accepts the guarded command form: **it runs it** (the guarded `Stop` hook ran), but through the user's login shell, which puts that shell at the hop position: the topology then depends on the user's `$SHELL`, and the hop shell is the same program the tools run in. So the Codex row keeps the plain `shimCommand` form (decision 14's fallback), which zsh exec'd into `direct` (measured; bash also execs a lone `-c` command, not measured here). Residual: a user whose `$SHELL` does not exec a lone command (dash, the `/bin/sh` here) gets a shell at the head position, and the Codex hook then stays quiet with `NoHead::WrongExecutable`; that is a quiet failure, never a wrong registration.
 
@@ -109,3 +109,24 @@ Whether Codex accepts the guarded command form: **it runs it** (the guarded `Sto
 - **Claude Code:** accept the hop only when the parent's `exe` equals `realpath(hookShell)` (`/usr/bin/dash`) **and** its `cmdline[0]` is `hookShell` (`/bin/sh`). In every measured mode (print and interactive) the hook's shell passes and the tool's shell fails on both facts (`/usr/bin/zsh`). tty and session do not separate them (both: no tty, own session), so no tty or session predicate is added.
 - Residual: Claude Code runs tools in the user's `$SHELL`. A user whose `$SHELL` is `/bin/sh` itself would give tool shells the same two facts, and the check falls back to the topology and pid-reuse guard of spec §6.1. The tool shell's `-c` script starting with `source <shell snapshot>` and its file stdout would still differ, but they are implementation details of 2.1.308 and are not used.
 - **Codex:** `direct` with `headExecutables: ["codex"]` refuses a subreaper or pane process; a tool process of the same Codex passes the position check, as (c) shows. The `WriterMismatch` guard (an entry environment whose session variable names another session than the payload) and the `att-` check still run. Same-user processes remain outside the guard, as spec §6.1 says.
+
+## (g) Re-run: per hook or summed (2 more live invocations, authorized by the plan owner)
+
+The plan owner (agent) authorized one more ladder per CLI after the first report (total live runs of this phase: 7). Mode `ladder-sum` of the recorder: steps of 5,120, 6,144, 7,168, 8,192 and 9,216 bytes, each at or below the largest inline step, each beside the 2,048-byte sibling, so the sum of the two hooks' texts crosses the single-hook threshold (moved or truncated at 10,240) from step 4 on. Dry runs first, no retries, benign `echo` steps.
+
+| Run | Spawn marker (UTC, 2026-10-22) | Exit |
+|---|---|---|
+| P3b `run claude ladder-sum` | 2026-10-22T19:46:46Z | 0 |
+| P5b `run codex ladder-sum` | 2026-10-22T19:47:15Z | 0 |
+
+| Step | Ladder bytes | Sum with sibling | Claude 2.1.308 ladder / sibling | Codex 0.161.0 ladder / sibling |
+|---|---|---|---|---|
+| 1 | 5,120 | 7,168 | inline / not run (see below) | inline / inline |
+| 2 | 6,144 | 8,192 | inline / inline | inline / inline |
+| 3 | 7,168 | 9,216 | inline / inline | inline / inline |
+| 4 | 8,192 | 10,240 | inline / inline | inline / inline |
+| 5 | 9,216 | 11,264 | inline / inline | inline / inline |
+
+- Steps 4 and 5 put more than the single-hook threshold into one event and nothing was moved or truncated: **the threshold applies per hook** in both CLIs. Each hook's text is its own record (Claude: one `hook_additional_context` attachment per hook; Codex: one developer message per hook, 9,216 bytes alone at step 5).
+- Claude's step-1 sibling did not run: it started before the ladder hook created the run's `calls/` directory and failed on that write (a recorder race, fixed in the same commit; the sibling now creates the directory). Steps 2–5 carry the finding.
+- Removed from the real `~/.claude/projects`: `-tmp-fgos-work-mailbox-v3-record-claude-ladder-sum-ws` (1 file). Evidence: `.fgos/runtime/tmp/mailbox-v5/evidence/p2b/` (gitignored). The Codex auth guard passed before and after.
