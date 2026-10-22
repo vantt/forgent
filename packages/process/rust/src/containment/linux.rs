@@ -19,6 +19,11 @@ use crate::{signal_settled, Domain, DomainState, FdSlot, KillOutcome, ProcId};
 
 /// Where bwrap is looked for when nothing names it.
 const BWRAP_LOCATIONS: [&str; 3] = ["/usr/bin/bwrap", "/bin/bwrap", "/usr/local/bin/bwrap"];
+/// What bwrap's early exit is called; a diagnostic line may follow it.
+const NO_GATE_PID: &str = "bwrap ended without reporting a gate pid";
+/// The most stderr the diagnostic re-run keeps, and the longest it runs.
+const DIAGNOSTIC_STDERR_BYTES: u64 = 4096;
+const DIAGNOSTIC_TIMEOUT: Duration = Duration::from_secs(2);
 /// The longest wait for bwrap to report the gate's pid.
 const INFO_TIMEOUT: Duration = Duration::from_secs(10);
 
@@ -138,6 +143,10 @@ impl ContainmentDriver for BwrapPidns {
             Ok(pid) => pid,
             Err(why) => {
                 end_failed_spawn(&mut child);
+                let why = match why.starts_with(NO_GATE_PID).then(|| refusal_line(&prefix)).flatten() {
+                    Some(line) => format!("{NO_GATE_PID}: {line}"),
+                    None => why,
+                };
                 return Err(ContainmentError::NamespaceUnavailable(why));
             }
         };
@@ -200,6 +209,34 @@ impl ContainmentDriver for BwrapPidns {
             escapes: vec!["processes created by a daemon outside the namespace on the agent's request (herdr, systemd, docker)"],
         }
     }
+}
+
+/// Why bwrap ended without a gate pid, said by bwrap itself. Its stderr is the
+/// gate's own for the gate's whole life, so it cannot be piped on the real
+/// spawn; after a failed spawn the same set-up is run once more around
+/// `/bin/true` with stderr captured. A refusal that comes from the machine (a
+/// mount that cannot be remounted) repeats, so the re-run names it. Nothing is
+/// decided from the answer; `None` keeps the caller's sentence.
+fn refusal_line(prefix: &[String]) -> Option<String> {
+    let mut rerun = Command::new(&prefix[0])
+        .args(&prefix[1..])
+        .args(["--", "/bin/true"])
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped())
+        .spawn()
+        .ok()?;
+    let stderr = rerun.stderr.take()?;
+    let (sender, receiver) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let mut text = Vec::new();
+        let _ = stderr.take(DIAGNOSTIC_STDERR_BYTES).read_to_end(&mut text);
+        let _ = sender.send(text);
+    });
+    let text = receiver.recv_timeout(DIAGNOSTIC_TIMEOUT).unwrap_or_default();
+    let _ = rerun.kill();
+    let _ = rerun.wait();
+    String::from_utf8_lossy(&text).lines().map(str::trim).find(|line| !line.is_empty()).map(str::to_owned)
 }
 
 /// A spawn that failed after bwrap started: end the whole attempt, not just the
@@ -446,7 +483,7 @@ fn read_child_pid(mut read_end: File) -> Result<u32, String> {
             return Ok(pid);
         }
         if read == 0 {
-            return Err("bwrap ended without reporting a gate pid (user namespaces unavailable?)".into());
+            return Err(format!("{NO_GATE_PID} (user namespaces unavailable?)"));
         }
     }
 }
