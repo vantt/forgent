@@ -181,6 +181,20 @@ test('staged release and npm-relative manifests resolve their own addon without 
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 
+test('inspection reports whether the controller activation fence stands', { skip: process.platform === 'win32' }, () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-fence-'));
+  const repo = path.join(temp, 'repo');
+  execFileSync('git', ['init', '--bare', repo], { stdio: 'ignore' });
+  const fence = path.join(repo, '.fgos/locks/activation.lock');
+  try {
+    assert.equal(addon.inspectGit(temp, repo, repo).activationFence, false);
+    fs.mkdirSync(fence, { recursive: true });
+    fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
+    assert.equal(addon.inspectGit(temp, repo, repo).activationFence, true);
+    fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos 4.4', at: 'fixture' }));
+    assert.equal(addon.inspectGit(temp, repo, repo).activationFence, false);
+  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});
 test('inspection leaves WAL absent; setup and mapping use the shared Rust config writer', { skip: process.platform === 'win32' }, async () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-inspect-'));
   const repo = path.join(temp, 'repo');

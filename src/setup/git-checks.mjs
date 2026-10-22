@@ -43,7 +43,10 @@ export function checkGit(cwd, kind, loaderOptions) {
         return { passed: keys.length === 0, message: keys.length ? `repository-transport-config-untrusted: ${keys.join(', ')}; Publication/Remote transfers refuse these settings. ${transportRemedy}` : 'no repository-local transport settings would refuse Publication/Remote' };
       }
       case 'git-trust-topology': return { passed: true, message: `${facts.commonDir}: ${facts.layout}` };
-      case 'git-operation-journal': return { passed: facts.journal.initialized && facts.journal.complete && facts.journal.errors.length === 0 && facts.journal.pendingCount === 0, message: JSON.stringify(facts.journal) };
+      case 'git-operation-journal':
+        // Every WAL-writing door refuses without the controller's activation fence, so a WAL without it is a hard stop.
+        if (facts.journal.initialized && facts.activationFence === false) return { passed: false, message: 'git-fence-missing: the Git WAL exists but the controller activation fence does not, so every Git write refuses; run `fgctl upgrade` for the active release (it places the fence)' };
+        return { passed: facts.journal.initialized && facts.journal.complete && facts.journal.errors.length === 0 && facts.journal.pendingCount === 0, message: JSON.stringify(facts.journal) };
       case 'git-native-locks': return { passed: facts.nativeLocks.length === 0, message: facts.nativeLocks.length ? `native locks detected (never removed): ${facts.nativeLocks.join(', ')}` : 'no native Git locks detected' };
       case 'git-publication-refspecs': {
         const origin = remote === 'origin' ? facts : native.inspectGit(stateRoot, cwd, root, 'origin');

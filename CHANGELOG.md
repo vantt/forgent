@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos doctor` row `git-operation-journal` now fails with `git-fence-missing` when a Git WAL exists but the controller's activation fence does not (every Git write refuses in that state), and names `fgctl upgrade` as the repair. It reads the fence through the Git component's Inspect, the same check the WAL-writing doors run, so the condition keeps a doctor row independent of the legacy lock-fence row.
 - A run no longer stops with `terminal:foreground-not-agent` while its agent is working: a zombie child in the pane's foreground (herdr lists it without a command line) used to make the whole foreground unreadable, so the brief was refused. Zombies are now left out of the foreground.
 - Removed the `fgos doctor` row `coordination-abandoned-claims`: nothing writes the coordination claim files it looked for any more, so it could only report on a mechanism that no longer exists. `fgos doctor --fix` no longer removes such entries.
 - Removed the host route `fgos internal process-observe`: Node judges processes in-process through the native door, so nothing calls it. The doctor row `process-containment` and the lock route errors now end with the step to take.
