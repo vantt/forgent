@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A lock released while another thread of the same process forks children is now free to an immediate exclusive try: the release probe and `probe` unlock their private description before closing it, so a child forked in that window no longer keeps a shared lock and makes the next acquire answer `Held`.
 - A hot-mutex timeout whose record names a live holder that cannot be judged here now says `lock-record-unreadable` and names `fgos lock fence <resource>`, as for a record that does not parse, instead of advising to retry. On Windows a record another process holds open is waited on to the timeout and named, `fgos lock fence` and the doctor row report it, and a release whose unlink stays blocked throws `hot-lock-release-stuck` and leaves the record.
 - A durable write with a missing or out-of-range mode is refused by name (`durable-file-mode-invalid`, nothing installed) instead of failing inside the native layer.
 - `canonicalJson` now serialises as `JSON.stringify` does before canonicalising: a `Date` or any `toJSON` object becomes its `toJSON` text and a `Buffer` is accepted as `{type, data}`; a hole, an undefined array member, a non-finite number, a bigint and a function are still refused. Stored digests are unchanged.

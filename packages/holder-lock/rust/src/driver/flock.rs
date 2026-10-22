@@ -1,6 +1,7 @@
 //! `flock` driver for Linux and macOS: the lock belongs to the open file
 //! description, is released when the last copy of it is closed, and is
-//! never touched with `LOCK_UN`.
+//! never touched with `LOCK_UN`, except a probe description private to one
+//! call (see `LockDriver::unlock_private`).
 
 use std::collections::{HashMap, HashSet};
 use std::ffi::CString;
@@ -203,6 +204,12 @@ impl LockDriver for FlockDriver {
 
     fn before_close(&self, _file: &File) {}
 
+    fn unlock_private(&self, file: &File) {
+        // SAFETY: flock on a descriptor this File owns. Failure is ignored:
+        // the close that follows releases the lock anyway.
+        unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_UN) };
+    }
+
     fn same_file(&self, file: &File, path: &Path) -> bool {
         use std::os::unix::fs::MetadataExt;
         match (fgos_process::facts::file_key(file), std::fs::metadata(path)) {
@@ -361,6 +368,10 @@ pub(crate) fn settle_release(file: File, kill_wait: Duration) -> crate::port::Re
             // Absence is only a reason to probe, never a release proof.
             if let Some(file) = &probe {
                 if matches!(FlockDriver.try_lock(file, Mode::Sh), Ok(TryLock::Locked)) {
+                    // The probe description is private to this call, so it
+                    // may be unlocked; a child forked from another thread
+                    // before the close would otherwise keep its Sh lock.
+                    FlockDriver.unlock_private(file);
                     drop(probe.take());
                     return Ok(true);
                 }

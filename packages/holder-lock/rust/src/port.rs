@@ -7,7 +7,8 @@
 //! A [`Handle`] owns the open file description that carries the lock.
 //! Releasing it closes the description and settles exclusive Linux copies.
 //! On POSIX nothing here ever calls
-//! `LOCK_UN`: a borrowed copy of the description may share the lock. On
+//! `LOCK_UN` on a holder's description (a probe description private to one
+//! call is unlocked before its close): a borrowed copy of the description may share the lock. On
 //! Windows no other process can share a lock, so every successful lock is
 //! undone explicitly through [`LockDriver::before_close`] (see [`Locked`]).
 
@@ -1313,7 +1314,7 @@ pub fn probe(resource: &Resource) -> io::Result<Probe> {
     };
     let answer = match drv.try_lock(&file, Mode::Sh)? {
         TryLock::Locked => {
-            drop(Locked::new(drv, &file));
+            drv.unlock_private(&file);
             Probe::Free
         }
         TryLock::WouldBlock => Probe::Held,
