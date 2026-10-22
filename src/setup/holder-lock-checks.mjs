@@ -2,17 +2,13 @@
 // holder-lock component (docs/platform/holder-lock/spec.md, "Setup, doctor
 // and activation"). `registrations.mjs` registers them; the bodies live here.
 //
-// Every check reads; only the two fixes write. `lock-dirs` creates
-// `<fgosDir>/locks` and `<lockRoot>`. `lock-fences` is the cutover step
-// (check stopped -> place fences -> check stopped) and acts only in a
-// workspace whose own activated release already takes these locks as kernel
-// locks: fencing a workspace that still runs the old lock code would stop it.
+// Every check reads; the one fix, `lock-dirs`, creates `<fgosDir>/locks` and
+// `<lockRoot>`.
 //
 // Levels follow the doctor convention: `passed: false` fails, a message that
 // starts with `warning:` warns, `info:` is informational, anything else passes.
 
 import fs from 'node:fs';
-import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
@@ -21,15 +17,12 @@ import { fileHolders, predecessorState } from '../holder-lock/index.mjs';
 import { PROTOCOL } from '../holder-lock/protocol.mjs';
 import { resolveStateRoot, STATE_ROOT_ENV, LOCKS_DIR } from '../holder-lock/state-root.mjs';
 import { loadLockRegistry } from '../holder-lock/registry.mjs';
-import { isCutOverLock, fenceStatus, fenceCutover, defaultProviderRuntimeDir } from '../holder-lock/fences.mjs';
-import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { judge } from '../runner/dispatch/process-identity.mjs';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { listOpenAttemptDirs } from '../run-supervisor/client.mjs';
 
 const BORROW_VECTORS_TIMEOUT_MS = 30_000;
 const MAX_LISTED = 5;
-const REGISTRY_IN_PAYLOAD = path.join('packages', 'holder-lock', 'contracts', 'lock-registry.v1.json');
 
 const warn = (text) => `warning: ${text}`;
 
@@ -235,14 +228,15 @@ const LOCK_FILES = {
   'provider-account': ({ lockRoot }) => (lockRoot ? subdirs(path.join(lockRoot, 'provider-account')).flatMap((dir) => filesIn(dir, (name) => name.endsWith('.lock'))) : []),
 };
 
-/** The registry rows this release cut over, with every lock file of each that exists. */
+/**
+ * The registry rows that have a lock file to scan (a row of `LOCK_FILES`),
+ * with every lock file of each that exists. Rows without one (`attempt`,
+ * `event-seal`, `event-append`) are not scanned here.
+ */
 export function cutOverLockFiles({ fgosDir, lockRoot }) {
-  const rows = loadLockRegistry().locks.filter(isCutOverLock);
-  return rows.map((lock) => {
-    const enumerate = LOCK_FILES[lock.name];
-    if (!enumerate) throw new Error(`lock "${lock.name}" of release ${lock.owner} has no lock-file enumeration in holder-lock-checks.mjs`);
-    return { lock: lock.name, files: enumerate({ fgosDir, lockRoot }) };
-  });
+  return loadLockRegistry().locks
+    .filter((lock) => lock.name in LOCK_FILES)
+    .map((lock) => ({ lock: lock.name, files: LOCK_FILES[lock.name]({ fgosDir, lockRoot }) }));
 }
 
 /** The `attempt.lock` files of attempts that are not closed. Closed attempts hold nothing. */
@@ -340,161 +334,6 @@ export function checkLockHolders(repoRoot) {
     return { passed: true, message: `info: holders not listable here: ${listed(unlistable)} (${summary})${notes.length ? `; ${notes.join('; ')}` : ''}` };
   }
   return { passed: true, message: `${summary}, every holder a fgOS process or a borrowed child${notes.length ? `; ${notes.join('; ')}` : ''}` };
-}
-
-// ---------------------------------------------------------------------
-// lock-fences
-// ---------------------------------------------------------------------
-
-/**
- * The workspace's Git listing the fences need, read through Inspect:
- * holder-lock sits below Git and never lists worktrees or branches itself.
- * Empty outside a repository.
- */
-export function workspaceListing(repoRoot) {
-  const inspect = createGitInspect(gitPortOptions(repoRoot));
-  if (inspect.resolveRepo().notARepository) return { worktrees: [], branches: [] };
-  const worktrees = [];
-  let cursor;
-  do {
-    const page = inspect.listWorktrees({ cursor, maxEntries: 4096 });
-    for (const row of page.entries) worktrees.push(Buffer.from(row.path).toString('utf8'));
-    cursor = page.nextCursor;
-  } while (cursor);
-  const branches = inspect.listBranches({ prefix: 'refs/heads/' }).map((ref) => ref.slice('refs/heads/'.length));
-  return { worktrees, branches };
-}
-
-/**
- * Every legacy lock path of the registry carries its cutover fence. A
- * missing fence warns and names the fix; an old lock file still present
- * is named, because it blocks the fix.
- */
-export function checkLockFences(repoRoot, { providerRuntimeDir = defaultProviderRuntimeDir() } = {}) {
-  let status;
-  try {
-    status = fenceStatus({ fgosDir: fgosDirOf(repoRoot), workspaceRoot: path.resolve(repoRoot), ...workspaceListing(repoRoot), providerRuntimeDir });
-  } catch (err) {
-    return { passed: false, message: `cannot read the fence status: ${err.message}` };
-  }
-  // Channels without a controller activation or WAL have never crossed C5.
-  const activatedPath = path.join(fgosDirOf(repoRoot), 'installation/activation.json');
-  const main = resolveMainCheckoutRoot(repoRoot) ?? repoRoot;
-  const common = fs.existsSync(path.join(main, '.git')) ? path.join(main, '.git') : main;
-  if (!fs.existsSync(activatedPath) && !fs.existsSync(path.join(repoRoot, 'fgos/git')) && !fs.existsSync(path.join(common, 'fgos/git'))) {
-    status.targets = status.targets.filter(target => !(target.managedBy === 'fgctl' && target.state === 'absent'));
-    status.controllerMissing = status.targets.filter(target => target.managedBy === 'fgctl' && !target.fenced).map(target => target.path);
-  }
-  if (status.complete && status.controllerMissing.length === 0) return { passed: true, message: `all ${status.targets.length} legacy lock path(s) fenced` };
-  if (status.complete) {
-    return { passed: false, message: 'git-fence-missing: the new fgctl places the activation fence during a WAL-capable activation' };
-  }
-  const present = status.v1Present.length > 0 ? `; old lock still present (blocks the fix until its holder is gone): ${listed(status.v1Present)}` : '';
-  const activated = activatedHolderLockRelease(repoRoot);
-  const fixable = fixableTargets(status, activated);
-  const next = fixable.length > 0
-    ? 'stop every fgOS process of this workspace, then run fgos doctor --fix'
-    : `the fix waits for this release to be activated here (${activated.reason ?? 'the activated release does not yet take every one of these locks'})`;
-  return {
-    passed: true,
-    message: warn(`${status.missing.length} of ${status.targets.filter(target => target.managedBy !== 'fgctl').length} legacy lock path(s) not fenced: ${listed(status.missing)}${present} -- ${next}`),
-  };
-}
-
-/**
- * The missing fences the activated release can already stand behind: those
- * of registry owners whose rows its own registry carries. A fence placed
- * before the release that takes the lock as a kernel lock is active would
- * stop that very release from upgrading (an older `fgctl` meets the
- * tombstone at its own lock path).
- */
-function fixableTargets(status, activated) {
-  const owners = activated.owners ?? [];
-  const missing = new Set(status.missing);
-  return status.targets.filter((target) => missing.has(target.path) && owners.includes(target.owner));
-}
-
-/**
- * The release the workspace's own activation runs, when its payload takes
- * this release's locks as kernel locks (it ships the lock registry); null
- * with the reason otherwise. `owners` lists the registry owners whose locks
- * that payload's registry names.
- */
-export function activatedHolderLockRelease(repoRoot) {
-  const activationPath = path.join(fgosDirOf(repoRoot), 'installation', 'activation.json');
-  let activation;
-  try {
-    activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
-  } catch (err) {
-    return { release: null, reason: `no readable activation at ${activationPath} (${err.code ?? err.message})` };
-  }
-  if (activation?.status !== 'ready' || typeof activation.releasePath !== 'string') {
-    return { release: null, reason: `activation at ${activationPath} is not ready` };
-  }
-  let manifest;
-  try {
-    manifest = JSON.parse(fs.readFileSync(path.join(activation.releasePath, 'manifest.json'), 'utf8'));
-  } catch (err) {
-    return { release: null, reason: `the activated release ${activation.releasePath} has no readable manifest (${err.code ?? err.message})` };
-  }
-  const payloadRoot = manifest?.components?.legacyNode?.root;
-  if (typeof payloadRoot !== 'string' || !fs.existsSync(path.join(activation.releasePath, payloadRoot, REGISTRY_IN_PAYLOAD))) {
-    return { release: null, reason: `the activated release ${activation.releasePath} still runs the old lock code (no ${REGISTRY_IN_PAYLOAD} in its payload); activate this release first` };
-  }
-  let owners;
-  try {
-    const payloadRegistry = JSON.parse(fs.readFileSync(path.join(activation.releasePath, payloadRoot, REGISTRY_IN_PAYLOAD), 'utf8'));
-    owners = [...new Set(payloadRegistry.locks.map((lock) => lock.owner))];
-  } catch (err) {
-    return { release: null, reason: `the activated release ${activation.releasePath} has no readable lock registry (${err.code ?? err.message})` };
-  }
-  return { release: activation.releasePath, reason: null, owners };
-}
-
-/**
- * The cutover step for this workspace: check that every fgOS process has
- * stopped, place the fences, check again (fences.mjs `fenceCutover`). Acts
- * only when the workspace's activated release already runs holder-lock.
- * Blockers mean nothing is placed; they are listed so a person can stop them.
- */
-export function fixLockFences(repoRoot, { providerRuntimeDir = defaultProviderRuntimeDir(), excludePids, hostBin: bin } = {}) {
-  const workspaceRoot = path.resolve(repoRoot);
-  const fgosDir = fgosDirOf(repoRoot);
-  let status;
-  let listing;
-  try {
-    listing = workspaceListing(repoRoot);
-    status = fenceStatus({ fgosDir, workspaceRoot, ...listing, providerRuntimeDir });
-  } catch (err) {
-    return { changed: false, message: `cannot read the fence status: ${err.message}` };
-  }
-  if (status.complete && status.controllerMissing.length > 0) {
-    return { changed: false, message: 'fences not placed: only the new fgctl may place the activation fence during a WAL-capable activation' };
-  }
-  if (status.complete) return { changed: false, message: `all ${status.targets.length} legacy lock path(s) already fenced` };
-  const activated = activatedHolderLockRelease(repoRoot);
-  if (!activated.release) return { changed: false, message: `fences not placed: ${activated.reason}` };
-  const owners = [...new Set(fixableTargets(status, activated).map((target) => target.owner))];
-  if (owners.length === 0) return { changed: false, message: 'fences not placed: the activated release does not yet take the locks still missing a fence; activate the release that ships them first' };
-  let result;
-  try {
-    result = fenceCutover({ workspaces: [{ root: workspaceRoot, worktrees: listing.worktrees }], fgosDir, workspaceRoot, ...listing, providerRuntimeDir, owners, ...(bin ? { hostBin: bin } : {}), ...(excludePids ? { excludePids } : {}) });
-  } catch (err) {
-    return { changed: false, message: `fences not placed: ${err.message}` };
-  }
-  const blockers = (scan) => scan.blockers.map((b) => (b.kind === 'process' ? `pid ${b.pid} (${String(b.cmdline ?? '').slice(0, 120)}, ${b.matched})` : `${b.count} unreadable process entries`));
-  switch (result.status) {
-    case 'placed':
-      return { changed: result.fences.placed.length > 0, message: `placed ${result.fences.placed.length} fence(s), ${result.fences.skipped.length} already there` };
-    case 'placed-then-blocked':
-      return { changed: true, message: `placed ${result.fences.placed.length} fence(s); fgOS processes started meanwhile and now fail against them, stop them: ${listed(blockers(result.after))}` };
-    case 'blocked':
-      return { changed: false, message: `fences not placed: fgOS processes still running, stop them first: ${listed(blockers(result.before))}` };
-    case 'needs-attest':
-      return { changed: false, message: `fences not placed: this platform cannot scan for running fgOS processes (${result.before.detail ?? 'no detail'}); confirm nothing runs and place them through fenceCutover with attested` };
-    default:
-      return { changed: false, message: `fences not placed: ${result.status}: old lock still present at ${listed(result.fences?.paths ?? [])}` };
-  }
 }
 
 // ---------------------------------------------------------------------

@@ -165,7 +165,6 @@
     "src/holder-lock/hold-transport.mjs": "infra",
     "src/holder-lock/protocol.mjs": "infra",
     "src/holder-lock/lock-scope.mjs": "infra",
-    "src/holder-lock/fences.mjs": "infra",
     "src/terminal-control/client.mjs": "infra",
     "src/seat-binding/client.mjs": "infra",
     "src/terminal-control/config.mjs": "infra",

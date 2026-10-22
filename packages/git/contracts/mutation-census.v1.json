@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5c3a86c0a0c35622fa82dfbea0f669a15f7298db1bbc616c995cd7c53460de57",
+  "payloadDigest": "a0d511c254314c43ff89646523d8fa4982bbcad66a82c52bdb70e9191c469d9c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -261,7 +261,7 @@
     "packages/event-store/rust/tests/reader_seal_stress.rs": "f721a995073a7d466a35914f58aa06448433e2bce6383809f6abee93bf9fc34e",
     "packages/event-store/rust/tests/reader_support/mod.rs": "2a616bdb34db23fb859d850ce4e5375b7a5ecb6cd317fe0efaf9b69f2ba7b499",
     "packages/event-store/rust/tests/registry_identity_layout.rs": "f1e00dee91522804214ac83666c224c05cd682ebb6d1ea2b5e2e268ad4ba8e45",
-    "packages/event-store/rust/tests/registry_rows.rs": "922d064baa83664ac4bd48fd132f4764d708be5827b90aca98ba6ab463e74134",
+    "packages/event-store/rust/tests/registry_rows.rs": "4afd0326e26d038e1a2b7962cacc19bc140cd5afbb3416088b2e4798572519bb",
     "packages/event-store/rust/tests/review_fixes.rs": "d3aa5b3493b5f55d8fe3cd8809d63e9abe69598a5d26166addabd63bd1b617bb",
     "packages/event-store/rust/tests/seal_cas_race.rs": "ec575e833a1a35a026d46fbb26e46d3088d56ff9a2857cc2f309016c849d814d",
     "packages/event-store/rust/tests/seal_publication.rs": "c1f8a557e4dbe133c1c75d9bea5e7ec0dad1f6af906cf2d340d41fa891bd84fb",
@@ -547,7 +547,7 @@
     "packages/work-state/rust/src/legacy_friction.rs": "4fc646bb8bac02b8670ff8a2c5eb40bbd3d52c7d80c6b3c1e79aaa68423e512e",
     "packages/work-state/rust/src/lib.rs": "11f49bcb01e30b7ad8d466114292e0b4efe5ccbb03ca3100e18b72bbad687ffb",
     "packages/work-state/rust/src/work_source.rs": "0222f9d33ca3db5200588ed6662530218cb9717f0a9ed322a5d58a54536b94dd",
-    "scripts/backfill-status-category.mjs": "bff22a3805f8a38f1c7d93b7cee3b53ee5b6dde0d978b4fdbfb760c1cc3622d6",
+    "scripts/backfill-status-category.mjs": "559976e36826b535131e2638e024186a051182339b8012b89b857efa4422582f",
     "scripts/backfill-unit-summaries.mjs": "a11d12e63191bc31bf7a27b2c7279ac5ea8403730045dbbaa8f8ce2738b275e5",
     "scripts/build-domain-registry.mjs": "ad239f74764832366c3c3bd43c674012904a78944bd6d6b9d2c8eb481c1a62c0",
     "scripts/build-rust-distribution.mjs": "b84bd0fb5fc14963ef6a500020ee84280844482da3e4429060694053e9f61aaf",
@@ -601,8 +601,8 @@
     "scripts/measure-coordination-baseline.mjs": "b890da1963fd4ee50ac84cd53e5e9b45aa7ce37a92d51c6a633bdb2374ec6a7a",
     "scripts/measure-p08-performance.mjs": "2ab686e2e3f880f584a2f9278a6bbb27a49d71effcdb65215f1cbd3865099e3e",
     "scripts/measure-verify-cost.mjs": "76c5bc7fe1894af9eb5c7bf6de2177797bfb3ff4ff05b0826c3c7c6e765e5895",
-    "scripts/migrate-actor-to-role.mjs": "4501c681a7a0399e0e57d1cf48b43ba650934b49b84acac8a446cdd99db44a48",
-    "scripts/migrate-status-proposed-to-awaiting-approval.mjs": "ac3fd799390ee06d504b49f497f41f117526b961d4ebaf3883fca91b63cf2546",
+    "scripts/migrate-actor-to-role.mjs": "c7cbf743d674d30e02cbd92046a76c30d375994292fead5c89d9445065b0ae36",
+    "scripts/migrate-status-proposed-to-awaiting-approval.mjs": "3c68423a369856864d8d675596c45328a78b410f76c715af07684738f9ab4ca5",
     "scripts/migration-proof-2a.mjs": "c8097ce5bb23d816e31280eaafdb56a2b8ccc3fc3e13c763375255ef46705c80",
     "scripts/next-doc-id.mjs": "7e88c69cf6c78b4cce5240d3fcc34a1182fc963933435827a58974df5458bc9d",
     "scripts/package-release-assets.mjs": "088b9a0ad108920363ba5b4f540fb0c93b45b2960990981ab4e7558cff5fc59e",
@@ -612,7 +612,7 @@
     "scripts/regenerate-observe-fixtures.mjs": "07c5b42795e22c36d75363e2265cf59b6f6244d63f7413d9dacf9fe0e3071631",
     "scripts/run-rust-dev-host.mjs": "e10af7fa8c280ecb62cbde50e8d2e2160e1135b2bdd20c02867d0f0351ba641b",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "a4a56dba93a272daccf0648dbd250f766fb6a92cb5013b7620d6034b02446395",
+    "scripts/run-tests.mjs": "9495f5fe973cfcd2b4367c8092dddf58c0dce818acbc3fda13eb4ecad2acfc53",
     "scripts/stress-test-files.mjs": "c3ccd385982e8e1865b54e02abef044ae3e85a4547f34c9efd2fcbcc66d37240",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
     "scripts/test-proof-inventory.mjs": "61a54de2d57888dadb31138db836c569d5663046f4f835bf63061b43cbb77a35",
@@ -657,14 +657,13 @@
     "src/git/sync.mjs": "c434a1a92d2f1fe3c10bd81b3e2830a4e28765bb4dc53e35ffa166b9b3c534e2",
     "src/git/worktree.mjs": "75e467d3cd210a54c2ef0c83714ec57ab362507dae18a268efd9a5833e1c746d",
     "src/holder-lock/driver.mjs": "b8bc20313ebb8eb841dba2a0578e97f2c0bccdd3d134af76f71148c8d0d8cd9b",
-    "src/holder-lock/fences.mjs": "4196ac59aaabe0076c6c8adaabc3585aebea68876bb47ffea2d37168be4a234e",
     "src/holder-lock/hold-transport.mjs": "107ad4ae82c21a18fd21a0d02c7909f30678cc1492a16dfff6b3f426c64c4f81",
     "src/holder-lock/hot-guard.mjs": "0cb873f2422fe1567e0265ffabd705cae3e526fa1573ec4854acdde5190c44c7",
     "src/holder-lock/index.mjs": "7ce8841662d828d4f8bd7f4b9d8d44b5d39bc6c0f59cb3e799690e4fa1ceb21d",
     "src/holder-lock/lock-scope.mjs": "5b891b58de3cd9047889d768e0b46b38556a2d27cb59052696560ba63837fc24",
     "src/holder-lock/native-handover.mjs": "b47be97633ed606fa6ab304d2ee3e47ff46675c86ec225e0d06ee5d1f6d7d56e",
-    "src/holder-lock/protocol.mjs": "76191d1818d1b013abef845f8ef761047e6c954aa0fcdaa6e73780e24763bb18",
-    "src/holder-lock/registry.mjs": "7e8dd7dcd83b7a168a62070c0ab101270f8a29509060234c1f05556f11c2806f",
+    "src/holder-lock/protocol.mjs": "3d7aae8f95347dc438430a7a7984927943f9cbc43eb95ea1312414496a412c7c",
+    "src/holder-lock/registry.mjs": "0894e75c7cc6beebad96ca56288b637ec74dd7d704be836f376b36bdd3154247",
     "src/holder-lock/state-root.mjs": "0e675170f350824f7960dd2798c6fc02c1ac304919bd1bee9eefe601728f0698",
     "src/install/coexist.mjs": "099cfd22d3f84d221507697bfb0c84f336e4c85305433117e2390ebaad632a03",
     "src/intake/classify.mjs": "e12aeddcc50ede2c469f21a8c71ad32401f23cdad3eead7f164bc11c7dcde7f1",
@@ -847,14 +846,14 @@
     "src/setup/executor-profile-warnings.mjs": "7edcf8b4ddb7030651b4607e364b7a2e4a78e9166c967893c25880a949ea37be",
     "src/setup/git-checks.mjs": "1592427603412509eb41efd583dd9ae9734b71814f77ae1266078d449cb080d5",
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
-    "src/setup/holder-lock-checks.mjs": "bd91796b4fb35d52925b9a9efcbd0e774b9edf0e68a931e8d97abdabea2507e8",
+    "src/setup/holder-lock-checks.mjs": "0090b07b9dbcb31425165c4956f28878a4c7a0620987789cd80c48b80e366d37",
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
     "src/setup/instruction-projections.mjs": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
     "src/setup/instruction-registry.mjs": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
     "src/setup/lock-record-checks.mjs": "08afa6351e5aa874f3fa45c57d81fc1f7266f47cf7f300005bd2e0a5de56c647",
     "src/setup/model-pool-checks.mjs": "4c115569d3644a395a09b0f6ea1d87205c791b18ccae021becd31a78bb360c6f",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "8888eb9d4a764e9ef7602aa30368665cb68df874631bb2bbdcfaf904815c51c5",
+    "src/setup/registrations.mjs": "1cee98fa6bb95e697797362ee313b22163691cf15e0d978862765c12cb203a60",
     "src/setup/run-supervisor-checks.mjs": "93789ede921ca39d33fa7883fd8ae0daff5b6c120581534446c761b5e2fa0a06",
     "src/setup/seat-binding-checks.mjs": "b1efc2d1711dc21203c6482bf47ff4dfa7f8aa6f49b0d88a99a1479319a5f36f",
     "src/setup/seat-binding-conversion.mjs": "9f1b782a5a4a9059ad82fda27b79c6cc5ffaf057f6f1347e79ae5d74b49c00a1",
@@ -926,7 +925,7 @@
     "src/verbs/dispatch/watch.mjs": "e82fb8d94c5d76bc64b006bab2742e777f50785a4c4b12c91f15723864e457a3",
     "src/verbs/events/context.mjs": "5a47ea5bc1a590619f137cef40455898d99595e6bb8ba5a2b6d75570b101557b",
     "src/verbs/events/export.mjs": "3c163c4704f7a2054af09c4af5e69c0f3394f880319b890e8337dc2049b9f50d",
-    "src/verbs/events/migrate.mjs": "66cb5bd2b417d35f67c0ed0069136aeb6de8e6f34bf2604198bfd24ec1e7079f",
+    "src/verbs/events/migrate.mjs": "a386b37d767a9e1a7b138b9d6ba5d41828e085723be6dffbd7957d2cadf229d5",
     "src/verbs/events/parity.mjs": "6431bfc150b5876ec83bf6ff63023aeee9fe3c0b33d2e8ed54114b443e088ed7",
     "src/verbs/events/rebuild.mjs": "d60b26c628b4375b9ab4b0cb59feebd4b16cbae53cc339b549868663246c7cfa",
     "src/verbs/events/status.mjs": "6fb73280f473c45dc2de55c1ad4514235a0f5e9563ebf7e2801d7b4c072ffc6f",
@@ -2495,13 +2494,6 @@
       "class": "sandbox-door"
     },
     {
-      "path": "scripts/run-tests.mjs",
-      "line": 582,
-      "spawn": "hostSpeaksLockProtocol -> scripts/run-tests.mjs:595",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
       "path": "src/event-store/native.mjs",
       "line": 175,
       "spawn": "loadNativeAddon -> src/git/native.mjs:16",
@@ -2544,13 +2536,6 @@
       "path": "src/holder-lock/driver.mjs",
       "line": 260,
       "spawn": "spawnSync",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/holder-lock/fences.mjs",
-      "line": 484,
-      "spawn": "scanWorkspace -> src/holder-lock/fences.mjs:440",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
@@ -2773,91 +2758,91 @@
     },
     {
       "path": "src/setup/holder-lock-checks.mjs",
-      "line": 154,
+      "line": 147,
       "spawn": "spawnSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3066,
+      "line": 3059,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3080,
+      "line": 3073,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3134,
+      "line": 3127,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3146,
+      "line": 3139,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 4430,
+      "line": 4423,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5573,
+      "line": 5566,
       "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1547",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5620,
+      "line": 5613,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:595",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5661,
+      "line": 5654,
       "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1547",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5668,
+      "line": 5661,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:518",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6053,
+      "line": 6046,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6304,
+      "line": 6297,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:109",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 6336,
+      "line": 6329,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:126",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
@@ -2928,7 +2913,14 @@
     },
     {
       "path": "src/verbs/events/migrate.mjs",
-      "line": 68,
+      "line": 147,
+      "spawn": "scanWorkspace -> src/verbs/events/migrate.mjs:103",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/verbs/events/migrate.mjs",
+      "line": 161,
       "spawn": "eventStoreFacts -> src/event-store/native.mjs:153",
       "binary": "param ctx",
       "class": "uncalled-wrapper",
@@ -2936,15 +2928,15 @@
     },
     {
       "path": "src/verbs/events/migrate.mjs",
-      "line": 70,
-      "spawn": "checkStopped -> src/holder-lock/fences.mjs:484",
+      "line": 163,
+      "spawn": "checkStopped -> src/verbs/events/migrate.mjs:147",
       "binary": "param ctx",
       "class": "uncalled-wrapper",
       "function": "migrateUseCase"
     },
     {
       "path": "src/verbs/events/migrate.mjs",
-      "line": 73,
+      "line": 166,
       "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
       "binary": "param ctx",
       "class": "uncalled-wrapper",
@@ -2952,7 +2944,7 @@
     },
     {
       "path": "src/verbs/events/migrate.mjs",
-      "line": 95,
+      "line": 188,
       "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
       "binary": "param ctx",
       "class": "uncalled-wrapper",
