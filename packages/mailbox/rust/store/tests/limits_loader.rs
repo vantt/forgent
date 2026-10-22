@@ -84,10 +84,18 @@ fn a_wrong_type_or_a_value_the_core_rejects_makes_the_section_invalid_and_names_
 
 #[test]
 fn the_empty_section_setup_writes_and_the_opt_in_flag_load_as_the_defaults() {
-    for section in [json!({}), json!({ "enabled": true }), json!({ "enabled": false })] {
+    for section in [
+        json!({}),
+        json!({ "enabled": true }),
+        json!({ "enabled": false }),
+    ] {
         let loaded = load(Some(&json!({ "mailbox": section })))
             .unwrap_or_else(|e| panic!("{section} must load: {e}"));
-        assert_eq!(loaded, defaults(), "{section}: every value from the contract");
+        assert_eq!(
+            loaded,
+            defaults(),
+            "{section}: every value from the contract"
+        );
         assert!(
             loaded.ignored_keys.is_empty(),
             "{section}: the setup flag is a contract key, never reported as unknown"
