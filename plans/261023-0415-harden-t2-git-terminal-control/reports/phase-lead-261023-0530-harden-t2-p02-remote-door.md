@@ -10,6 +10,7 @@ Branch `harden/t2-p02-remote-door` (from `harden/t2-p01-red-tests`), pushed. Car
 | `ee541123e` | test(git): pin the exact refusals and keep the fake ssh boundary | **yes** (OPC's six items; re-review only this delta) |
 | `df4c30d82` | fix(git): one remote door reads the configured URL and accepts scp-form ssh origins (also CHANGELOG, `packages/identity`) | **yes** |
 | `8e1ecbf63` | fix(git): compact finished worktree and ref chains beyond the recent few (also CHANGELOG) | **yes** |
+| `7bac1c05f` | fix(git): compact at most eight finished chains per pass, oldest first | **yes** |
 
 Deviation from the requested order: the OPC test-fix commit lands after slice A (A was already committed when the request arrived), before both Git fix slices.
 
@@ -78,15 +79,21 @@ The checkout's real WAL could not be copied: a WAL is bound to its repository di
 - one compaction pass (one `create_worktree` including a 318-chain backlog): **14.9 s**, about 47 ms per chain, fsync bound;
 - after: 4 retained chains, **2.8 ms** p50.
 
-Concern for the big lead: on a machine with a large backlog the first worktree add after upgrade pays that one-time pass (about 15 s for 318 chains). If that is unwanted, cap the chains compacted per pass (a `.take(n)` in `compact_finished`); I did not, because the phase text asks for the full pass and a cap changes when retained history becomes bounded.
+Per-pass cap (big lead's answer): `wal::COMPACT_PER_PASS = 8` next to `RECENT_TERMINAL`, oldest eligible chains first; the rest stay readable and drain over later operations. Proof: the existing worktree compaction case now builds a 14-chain backlog, one pass leaves `backlog + 1 - 8` retained and `late-11` still readable, and later passes drain it. Worst case of one pass in the scratch setup (release build, 60 finished chains): **561-652 ms per `create_worktree` including the add itself** (retained 60 -> 53 -> 46 -> 39, one pass each).
+
+## Re-run after the cap
+
+- Node boot test: `ℹ tests 14 / pass 14 / fail 0`.
+- `cargo test --no-fail-fast -p fgos-git --test publication`: `test result: FAILED. 32 passed; 2 failed; 1 ignored` (the two phase-5 cases, unchanged: busy and borrow-unavailable).
+- `worktree` 11 passed, `refs_remote` 18 passed, clippy clean.
 
 ## Git-area commits for OPC
 
-`ee541123e` (tests only; this is the delta that answers OPC's six findings), `df4c30d82`, `8e1ecbf63`. `3e43fa59e` is Node only.
+`ee541123e` (tests only; answers OPC's six findings), `df4c30d82`, `8e1ecbf63`, `7bac1c05f` (the per-pass cap). Final Git-area list for OPC: those four. `3e43fa59e` is Node only.
 
 ## Unresolved questions
 
-1. Busy cause name: `busy` (my reading); phase 5 owns it.
-2. Worktree deferral channel: none added (contract ripple); accept?
-3. Cap per pass for the first big compaction (15 s)?
+1. Busy cause name: `busy` (my reading); phase 5 owns it (answered: phase 5 decides).
+2. (answered) Worktree gets no deferral channel; a silent retry is enough.
+3. (answered) Cap of 8 per pass, done.
 4. `rg "fn transfer_call"` line in the phase file contradicts the "call halves stay" text; the grep line probably meant `transfer_url`.
