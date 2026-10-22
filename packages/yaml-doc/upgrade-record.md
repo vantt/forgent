@@ -341,3 +341,7 @@ Scratch project: `.fgos/runtime/tmp/yaml-eval/` (own `[workspace]`, `.cargo/conf
 - Parse runner `tests/golden_parse.rs`: every parse fixture under the profiles it names, including the 33 limit and rule cases the evaluation did not run per candidate, the position cases, `spans` and `revision`. Result: green.
 - Differential against the old door (`parseYaml`, tool profile, scratch, not committed): the 56 tracked YAML files and scratch files give 55 identical canonical JSON values and 1 file both refuse at the same position (2:31); the 215 fixture inputs up to 300 kB give 165 identical, 35 refused by both and 15 different on purpose (hidden characters in keys, key and depth bounds, invalid UTF-8, `-0` kept as a float).
 - Mutation run (scratch, not committed): about 78 000 parses of mutated fixtures and repo files under both profiles in a debug build, no panic reached the guard. This is not the fuzz run; it does not replace it.
+
+## Upstream reports
+
+- 2026-10-23: empty block scalar at the end of input reads as `"\n"` instead of `""` (clip, fold and keep alike), corrected in `src/backend.rs` and pinned by fixtures: https://github.com/saphyr-rs/saphyr/issues/143. When an upgrade fixes it, the correction becomes a no-op and can be removed with that upgrade.
