@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 13:08 (phiên `b8f192bf`, owner 13:08 "chốt cơ chế"): **IDENT chốt cơ chế chống trùng id xuyên máy** ([spec mục 4a](../../docs/platform/identity/spec.md), [thử trên GitHub](../reports/research-261022-1217-identity-sequence-counter-ref-github-probe.md)): id ngẫu nhiên 50 bit (không băm từ tiêu đề); id gắn máy `<machine-id>/…`; số tuần tự (`D-ADR`, số decision file) giữ nguyên dạng, xí bằng MỘT ref đếm mỗi loại `refs/fgos/seq/<kind>` (commit không cha, push `--force-with-lease`). Không daemon. Luồng ra khỏi `held`; đổi tên sang Identity làm đầu tiên. **Mọi luồng:** chưa đổi cách sinh id nào cho tới khi bậc mint land; ai sắp ghi `D-ADR` mới thì vẫn đọc số lớn nhất trên `origin/main` ngay trước khi commit. Đảo lại nếu: forge chấp nhận một lease lỗi thời.
+
 - 2026-10-22 13:20 (GIT/ES điều phối, owner "giao cho agent OPC duyệt code Git"): vai trò duyệt code Git (`packages/git`, `src/git`, `.githooks/pre-commit`, census) chuyển sang lead OPC; việc gần nhất: diff U6 của WORK (xoá `legacyEvents`).
 
 - 2026-10-22 13:05 (phiên `forgent-35`, owner 12:50 giao OPC): **OPC mở hội đồng thiết kế containment theo thao tác** ([brief](../reports/council-261022-1251-opc-council-brief.md)), chỉ thiết kế. Bàn giao nhận: HARDEN T1 phase 4 (R3/RT-M11, `containment/linux.rs`) dùng tên lỗi mount-refused do OPC đặt; HARDEN T2 thiết kế R2 quanh port OPC, không sửa nhánh contained của `driver.rs` trước khi OPC được duyệt. Bàn giao hứa: gửi TEST kế hoạch bộ conformance. Đo đạc chỉ trong khoảng yên tĩnh TEST và HARDEN cho.
