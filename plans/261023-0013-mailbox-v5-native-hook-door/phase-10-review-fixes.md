@@ -32,7 +32,7 @@ Close the findings of the independent review `reports/code-review-v5.md` that bl
    - **L2:** `CLAUDE_PROJECT_DIR` is read for Claude Code only.
    - **L3:** facts measured on another platform are not used.
    - **L5:** the shim is replaced through `fgos_durable_file`. This goes to DIST for review.
-   - **L6a:** a native flag gate never lists a positional parameter.
+   - **L6a:** not fixed here. Dropping positional parameters from the exported flag gate also changes the routes of `convention`, `friction`, `identity` and `metrics`, which belong to other lanes, and the shared projection test holds every native route to the registry. The mailbox case is harmless: the provider refuses `--body` with exit 4. It is an item for host invocation routing. The attempt `a8e3ff321` was reverted in `218b857ed`.
    - **L6b:** repeated hook flags are proven to be usage errors.
    - **L6c:** only a call that reached the record resets the breaker.
    - **L4:** documented in spec §8.
@@ -50,7 +50,7 @@ Close the findings of the independent review `reports/code-review-v5.md` that bl
   | `23bcaab47` | M3 and L6c, store |
   | `d7669af40` | M3 wiring, L1, L2 |
   | `02ecf25b2` and `33ee702bb` | L3 |
-  | `a8e3ff321` | L6a |
+  | `a8e3ff321`, reverted in `218b857ed` | L6a (left to host invocation routing) |
   | `fbcbe4665` | L6b |
   | `b0e39084a` | L5, for DIST review |
   | `ee94a7d34` | M4 |
@@ -68,6 +68,6 @@ Close the findings of the independent review `reports/code-review-v5.md` that bl
   | L3 | 1 |
   | L6b | 2 |
 
-  - L5 and L6a are shown by their tests failing before the fix.
+  - L5 is shown by its test failing before the fix.
   - L1 has no mutant, for the reason given in decision 7.
 - **The live harness opts its cases in** (`mailbox.enabled: true`). It could not be dry-run: Claude Code on this machine moved to 2.1.309, which is not under `testedAgainst`. Adding that version needs a recording run (a live invocation), and that waits for the controller.
