@@ -1,6 +1,6 @@
 # Seat trim: duplicate proofs
 
-Status: items 1-3 edited and committed, NOT yet run (host spawn forbidden until "land done"; only `node --check` ran). Item 4 not started (needs the host to find which fixtures still need a pool).
+Status: items 1-4 done and run, rebased on 96a673725.
 
 ## Retired tests -> owner
 
@@ -45,13 +45,15 @@ Target was about -520 over the three files; what has an owner is about -225.
 
 ## Item 4: work-seat-config helper
 
-Not done. Reasons: (a) it needs the host to learn which of the 15 importing fixtures stay bindable without a `tierFallback` once the default-executor pin applies (plan.mjs:127-155 pins the named, else the default executor); (b) `test/runner/dispatch-plan-policy.test.mjs` imports `bindable` and is on the do-not-touch list, so the helper cannot be deleted, only shrunk. Plan after "land done": make `poolOf` return the input when the pin applies, run every importer, restore the pool only for fixtures that fail (no executor at all, `prefer`-only capabilities). `TIERS` literal left as is; the shared tier source comes from `seat-trim-crate`.
+`poolOf` now adds the `tierFallback` pool only to a config with no `executor` (nothing to pin, and no `prefer` for the capability). A config with a default executor gets none: plan.mjs pins the named, else the default executor, so the crate needs no pool. A first attempt that dropped the pool everywhere broke 18 tests in 7 files, all `headless-no-executor` for capability "" in fixtures with no executor, so the pool stays for those and nothing else. The helper cannot be deleted: 16 files import it, including dispatch-plan-policy.test.mjs, which is off limits. Net +17/-7 lines: it did not shrink, the rule became narrower. `TIERS` literal untouched; the shared tier source is the crate lead's.
 
 ## Verification
 
-- `node --check` on the three edited files: ok.
-- Per-file `node --test` and `npm test`: pending "land done".
+Own `CARGO_TARGET_DIR` in the worktree, session ids unset, suite env from `buildTestEnv`.
+- bind, tier-fallback, seat-binding-dry-bind: 92/92 pass.
+- the 16 work-seat-config importers: 733/733 pass (before the helper change too).
+- Full `scripts/run-tests.mjs`: only reds were load/timeouts and the known umask group; re-run solo and green: run.test, loop.test, run-provider-failover, seat-binding client.test (223/223), crash-matrix-adopt-resume + worktree (99/99), event-store-checks + session + spawn-worker (50/50). Remaining reds are fgctl download/upgrade/init (umask) and dev-host concurrent consumers, both known and not seat related.
 
 ## Open questions
 
-- Interpretation: "do not touch override tests" read as the executor/invocation/persona override tests; the two tier-override tests were retired because the task lists the override block for retirement and golden owns both.
+- Interpretation: "do not touch override tests" read as the executor/invocation/persona override tests; the two tier-override tests were retired because golden owns both (confirmed by the coordinator).
