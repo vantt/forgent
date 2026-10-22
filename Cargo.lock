@@ -334,6 +334,7 @@ dependencies = [
  "fgos-canonical-json",
  "fgos-durable-file",
  "fgos-holder-lock",
+ "fgos-identity",
  "fgos-process",
  "fgos-terminal-control",
  "libc",

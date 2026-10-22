@@ -16,7 +16,8 @@ use fgos_process::{domain_watch, facts, DomainState};
 use serde_json::{json, Value};
 
 use crate::envelope;
-use crate::publish::{iso_utc_now, publish_once};
+use crate::publish::publish_once;
+use fgos_identity::text::iso_utc_now;
 use crate::route::{refuse, report, ArgsError, Flags, EXIT_INTERNAL};
 use crate::steps::{run_steps, StepsOutcome};
 use crate::supervise::publish_receipt_as;

@@ -5,17 +5,18 @@
 //
 // The checks ask the host (`fgos identity machine|project --json`) instead of
 // reading the files, so the one validator of each id's shape stays in the Rust crate.
-// The fix mints through the same N-API door Event Store's migration uses
-// (`fixEventStoreMachineId`), never a second implementation.
+// The fix mints through the Identity N-API door (`mintMachineId`, the one mint
+// `events migrate` also calls), never a second implementation.
 // Levels follow the doctor convention: `passed: false` fails, a message that
 // starts with `warning:` warns, anything else passes.
 
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { resolveStateRoot } from '../holder-lock/state-root.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
-import { fixEventStoreMachineId } from './event-store-fixes.mjs';
+import { mintMachineId } from '../util/identity-mint.mjs';
 
 const TIMEOUT_MS = 2000;
 
@@ -82,7 +83,7 @@ export function checkIdentityProjectId(cwd, { hostBin } = {}) {
 /** identity-machine-id (setup): mint the machine id once; never replaces an existing one. */
 export function fixIdentityMachineId(cwd, options = {}) {
   try {
-    const { changed, machineId } = fixEventStoreMachineId(cwd, options);
+    const { changed, machineId } = mintMachineId(options.stateRoot ?? resolveStateRoot().stateRoot);
     return { changed, message: changed ? `minted machine id ${machineId}` : `machine id ${machineId} already minted` };
   } catch (err) {
     return { changed: false, message: `machine id not minted: ${err.message}` };

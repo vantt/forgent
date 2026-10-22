@@ -10,7 +10,6 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
-import { loaderOptions } from '../event-store/phase07-fixture.mjs';
 import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityProjectId, fixIdentityMachineId } from '../../src/setup/identity-checks.mjs';
 
 const HOST = process.env.FGOS_HOST_BIN;
@@ -35,14 +34,14 @@ test('warns while no machine id exists, mints once on fix, then passes without r
   assert.equal(absent.passed, true);
   assert.match(absent.message, /^warning: no machine id minted yet; run `fgos doctor --fix`/);
 
-  const first = fixIdentityMachineId(root, { stateRoot: state, loaderOptions });
+  const first = fixIdentityMachineId(root, { stateRoot: state });
   assert.equal(first.changed, true);
   const id = fs.readFileSync(path.join(state, 'machine-id'), 'utf8').trim();
   const present = checkIdentityMachineId(root, { hostBin: HOST });
   assert.equal(present.passed, true);
   assert.match(present.message, new RegExp(`^machine ${id}, handle `));
 
-  const second = fixIdentityMachineId(root, { stateRoot: state, loaderOptions });
+  const second = fixIdentityMachineId(root, { stateRoot: state });
   assert.equal(second.changed, false);
   assert.equal(fs.readFileSync(path.join(state, 'machine-id'), 'utf8').trim(), id);
 });

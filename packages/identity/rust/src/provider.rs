@@ -30,8 +30,7 @@ pub const IDENTITY_READ_OPERATION_ID: &str = "identity.read";
 pub const IDENTITY_WRITE_OPERATION_ID: &str = "identity.write";
 
 /// Subcommands after `identity`; bare `identity` is `writer`.
-pub const AVAILABLE_SUBCOMMANDS: &[&str] =
-    &["writer", "machine", "session", "project", "resolve", "list", "mint"];
+pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["writer", "machine", "session", "project", "resolve", "list", "mint"];
 
 pub const IDENTITY_DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {
     provider_id: Cow::Borrowed("identity.writer"),
