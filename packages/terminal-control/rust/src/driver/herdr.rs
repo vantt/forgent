@@ -5,8 +5,9 @@
 //! the way the Node round code does today. Every command has a timeout.
 //! An absent binary is `Unsupported`; a timeout, unreadable output or a
 //! herdr error is `Unknown`, never closed or gone. No descriptor outlives a
-//! command: the child gets every inherited fd >= 3 marked close-on-exec and
-//! the pipes are dropped when the command returns.
+//! command: the child is spawned through the Process descriptor door, which closes
+//! every inheritable fd >= 3, and the pipes are dropped when the command
+//! returns.
 
 use super::{
     Activity, ActivityDetail, CloseOutcome, CreatedPane, Direction, DriverResult, ForegroundProcess, PaneGeometry,
@@ -226,6 +227,21 @@ fn drain<R: Read + Send + 'static>(mut pipe: R) -> mpsc::Receiver<String> {
     rx
 }
 
+/// Sleep until the child exits or `left` passes: a wake on its exit
+/// descriptor where the kernel has one, a short step elsewhere.
+fn wait_for_exit(#[cfg(unix)] exit_fd: Option<&std::os::fd::OwnedFd>, left: Duration) {
+    #[cfg(unix)]
+    if let Some(fd) = exit_fd {
+        use std::os::fd::AsRawFd;
+        let mut pfd = libc::pollfd { fd: fd.as_raw_fd(), events: libc::POLLIN, revents: 0 };
+        let ms = left.as_millis().clamp(1, libc::c_int::MAX as u128) as libc::c_int;
+        // SAFETY: one pollfd on a descriptor the caller owns for the call.
+        unsafe { libc::poll(&mut pfd, 1, ms) };
+        return;
+    }
+    std::thread::sleep(left.min(Duration::from_millis(1)));
+}
+
 fn exec(config: &HerdrConfig, args: &[&str], timeout: Duration) -> DriverResult<Output> {
     let mut cmd = Command::new(config.bin());
     cmd.args(args).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
@@ -236,27 +252,16 @@ fn exec(config: &HerdrConfig, args: &[&str], timeout: Duration) -> DriverResult<
         cmd.env("HERDR_SOCKET_PATH", socket);
     }
     cmd.envs(config.env.iter().map(|(k, v)| (k, v)));
-    #[cfg(unix)]
-    {
-        use std::os::unix::process::CommandExt;
-        // SAFETY: only async-signal-safe `fcntl` calls run between fork and exec.
-        unsafe {
-            cmd.pre_exec(|| {
-                for fd in 3..1024 {
-                    libc::fcntl(fd, libc::F_SETFD, libc::FD_CLOEXEC);
-                }
-                Ok(())
-            });
-        }
-    }
     let label = args.iter().take(2).copied().collect::<Vec<_>>().join(" ");
-    let mut child = cmd.spawn().map_err(|e| match e.kind() {
+    let mut child = fgos_process::control::spawn_with_fds(cmd, &[]).map_err(|e| match e.kind() {
         std::io::ErrorKind::NotFound => unsupported("herdr", format!("herdr binary \"{}\" not found", config.bin())),
         _ => unknown(format!("herdr {label} could not start: {e}")),
     })?;
     let out = child.stdout.take().map(drain);
     let err = child.stderr.take().map(drain);
     let deadline = Instant::now() + timeout;
+    #[cfg(unix)]
+    let exit_fd = fgos_process::control::exit_descriptor(child.id());
     let status = loop {
         match child.try_wait() {
             Ok(Some(status)) => break status,
@@ -265,7 +270,11 @@ fn exec(config: &HerdrConfig, args: &[&str], timeout: Duration) -> DriverResult<
                 let _ = child.wait();
                 return Err(unknown(format!("herdr {label} timed out after {}ms", timeout.as_millis())));
             }
-            Ok(None) => std::thread::sleep(Duration::from_millis(1)),
+            Ok(None) => wait_for_exit(
+                #[cfg(unix)]
+                exit_fd.as_ref(),
+                deadline.saturating_duration_since(Instant::now()),
+            ),
             Err(e) => return Err(unknown(format!("herdr {label} wait failed: {e}"))),
         }
     };
