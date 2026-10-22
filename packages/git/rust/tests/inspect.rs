@@ -571,13 +571,27 @@ fn tree_of(root: &Path) -> Vec<std::path::PathBuf> {
 }
 
 #[test]
-fn main_checkout_root_finds_the_main_checkout_from_a_linked_worktree_and_a_subdirectory_without_spawning_or_writing() {
+fn main_checkout_root_finds_the_main_checkout_from_a_linked_worktree_and_a_subdirectory_without_spawning_or_writing(
+) {
     let root = std::env::temp_dir().join(format!("fgos-main-checkout-root-{}", std::process::id()));
     let _ = fs::remove_dir_all(&root);
     fs::create_dir_all(&root).unwrap();
     git(&root, &["init", "-q", "--initial-branch=trunk", "main"]);
     let main = fs::canonicalize(root.join("main")).unwrap();
-    git(&main, &["-c", "user.name=F", "-c", "user.email=f@example.invalid", "commit", "-q", "--allow-empty", "-m", "first"]);
+    git(
+        &main,
+        &[
+            "-c",
+            "user.name=F",
+            "-c",
+            "user.email=f@example.invalid",
+            "commit",
+            "-q",
+            "--allow-empty",
+            "-m",
+            "first",
+        ],
+    );
     git(&main, &["worktree", "add", "-q", "../linked"]);
     let linked = root.join("linked");
     fs::create_dir_all(linked.join("deep/er")).unwrap();
@@ -587,18 +601,31 @@ fn main_checkout_root_finds_the_main_checkout_from_a_linked_worktree_and_a_subdi
     let before = tree_of(&root);
 
     assert_eq!(main_checkout_root(&main).unwrap(), Some(main.clone()));
-    assert_eq!(main_checkout_root(&main.join("sub")).unwrap(), Some(main.clone()));
+    assert_eq!(
+        main_checkout_root(&main.join("sub")).unwrap(),
+        Some(main.clone())
+    );
     assert_eq!(main_checkout_root(&linked).unwrap(), Some(main.clone()));
-    assert_eq!(main_checkout_root(&linked.join("deep/er")).unwrap(), Some(main.clone()));
+    assert_eq!(
+        main_checkout_root(&linked.join("deep/er")).unwrap(),
+        Some(main.clone())
+    );
     assert_eq!(main_checkout_root(&outside).unwrap(), None);
 
     // A worktree whose admin directory does not name it back is refused.
     let admin = main.join(".git/worktrees/linked");
     let backlink = fs::read(admin.join("gitdir")).unwrap();
     fs::write(admin.join("gitdir"), b"/elsewhere/.git\n").unwrap();
-    assert_eq!(main_checkout_root(&linked).unwrap_err().cause, "untrusted-worktree");
+    assert_eq!(
+        main_checkout_root(&linked).unwrap_err().cause,
+        "untrusted-worktree"
+    );
     fs::write(admin.join("gitdir"), backlink).unwrap();
 
-    assert_eq!(tree_of(&root), before, "the read created or removed nothing");
+    assert_eq!(
+        tree_of(&root),
+        before,
+        "the read created or removed nothing"
+    );
     fs::remove_dir_all(root).unwrap();
 }
