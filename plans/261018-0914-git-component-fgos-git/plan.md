@@ -11,6 +11,16 @@ blocks: [261018-0945-event-store-fgos-event-store]
 created: 2026-10-18
 ---
 
+> **Status 2026-10-22.** Phases 01–08 are done on main and landed on the second machine (release `9e4c2630…`, 2026-10-22 00:21, then HARDEN's later releases).
+>
+> Proofs:
+> - E1 power cut held for Publication and ScopedCommit (1040 + 554 replay points, 0 failed);
+> - E3 passes every row under the owner's rules;
+> - P-SPACE held; P-RESOURCE held;
+> - V-EVENT, V-CONSUMER and E4 (bwrap-pidns) held.
+>
+> Remaining: the owner-machine landing ([guide](../reports/guide-261022-0011-owner-machine-git-durability-and-t0.md), with HARDEN T0 and SEAT). Open items now owned elsewhere or waiting for an owner decision are listed on the board's GIT row.
+
 # Plan GIT: the fgos-git component
 
 **Status 2026-10-20:** phases 01–06 landed; phase 07 started. Board owner decision 11:34 (Asia/Saigon): foundation layers first, Work later; Git 07 no longer waits for the Event Store Work cutover. Legacy event Git duties use a temporary Work-side typed-port adapter, removed by WORK at cutover.
