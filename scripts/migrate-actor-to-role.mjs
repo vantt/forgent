@@ -173,5 +173,7 @@ function runCli(argv, cwd) {
 }
 
 if (isMainModule(import.meta.url)) {
+  // Run from a checkout, the state lock's door and the writer identity need the checkout's staged addon and host.
+  (await import("./git-addon.mjs")).ensureGitAddon();
   runCli(process.argv.slice(2), process.cwd());
 }
