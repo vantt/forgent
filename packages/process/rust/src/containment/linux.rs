@@ -271,7 +271,8 @@ impl ContainmentDriver for LinuxPgroup {
         let Some(Domain::LinuxPgroup(leader)) = domain.domain().cloned() else {
             return DomainState::Unknown;
         };
-        if facts::judge_here(&leader.to_record()) == Verdict::Alive {
+        let leader_verdict = facts::judge_here(&leader.to_record());
+        if leader_verdict == Verdict::Alive {
             pgroup::remember_tree(members, &leader, &mut domain.seen);
         }
         pgroup_state(&leader, &domain.seen)
@@ -323,6 +324,15 @@ fn tuple_of(pid: ProcId) -> Option<ProcTuple> {
 /// A process that vanishes mid-listing is gone; one whose `stat` cannot be
 /// read is counted, never dropped.
 fn members(root: u32, walk_tree: bool, pgid: Option<u32>) -> Result<Members, Unlistable> {
+    members_with(root, walk_tree, pgid, read_stat)
+}
+
+fn members_with(
+    root: u32,
+    walk_tree: bool,
+    pgid: Option<u32>,
+    read_stat_fn: impl Fn(u32) -> io::Result<facts::Stat>,
+) -> Result<Members, Unlistable> {
     let mut unreadable = 0;
     let mut rows = Vec::new();
     for entry in fs::read_dir("/proc").map_err(|_| Unlistable)? {
@@ -333,10 +343,14 @@ fn members(root: u32, walk_tree: bool, pgid: Option<u32>) -> Result<Members, Unl
         let Some(pid) = entry.file_name().to_str().and_then(|name| name.parse::<u32>().ok()) else {
             continue;
         };
-        match read_stat(pid) {
+        match read_stat_fn(pid) {
             Ok(stat) if !stat.is_gone() => rows.push((pid, stat)),
             Ok(_) => {}
-            Err(err) if err.kind() == io::ErrorKind::NotFound => {}
+            Err(err)
+                if err.kind() == io::ErrorKind::NotFound
+                    || err.raw_os_error() == Some(libc::ESRCH)
+                    || (err.kind() == io::ErrorKind::InvalidData
+                        && unsafe { libc::kill(pid as libc::pid_t, 0) != 0 && io::Error::last_os_error().raw_os_error() == Some(libc::ESRCH) }) => {}
             Err(_) => unreadable += 1,
         }
     }
@@ -493,5 +507,13 @@ mod tests {
         assert_eq!(parse_child_pid(br#"{"child-pid": 4242}"#), Some(4242));
         assert_eq!(parse_child_pid(br#"{"child-pid": 42"#), None);
         assert_eq!(parse_child_pid(br#"{"other": 1}"#), None);
+    }
+
+    #[test]
+    fn members_treats_stat_esrch_error_as_vanished_process() {
+        let res = members_with(1, false, None, |_| {
+            Err(io::Error::from_raw_os_error(libc::ESRCH))
+        }).ok().expect("proc listing");
+        assert_eq!(res.unreadable, 0, "ESRCH indicates process vanished mid-read, treated as gone");
     }
 }

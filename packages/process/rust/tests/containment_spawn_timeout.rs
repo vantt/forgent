@@ -13,6 +13,8 @@ use std::time::{Duration, Instant};
 
 use fgos_process::containment::{BwrapPidns, ContainmentDriver, SpawnSpec, StartMode};
 
+
+mod common;
 /// Host pids of live processes whose command line contains `token`.
 fn processes_with(token: &str) -> Vec<u32> {
     let mut found = Vec::new();
@@ -32,17 +34,7 @@ fn processes_with(token: &str) -> Vec<u32> {
 
 #[test]
 fn a_timed_out_spawn_leaves_no_process_of_the_attempt() {
-    if !std::path::Path::new("/usr/bin/bwrap").exists() {
-        eprintln!("skip: spawn-timeout: no-bwrap");
-        return;
-    }
-    let usable = std::process::Command::new("/usr/bin/bwrap")
-        .args(["--unshare-user", "--unshare-pid", "--as-pid-1", "--dev-bind", "/", "/", "--proc", "/proc", "--", "/bin/true"])
-        .status()
-        .map(|s| s.success())
-        .unwrap_or(false);
-    if !usable {
-        eprintln!("skip: spawn-timeout: no-bwrap-pidns");
+    if common::require_bwrap().is_none() {
         return;
     }
     // A decimal duration that no other process on the machine has.
