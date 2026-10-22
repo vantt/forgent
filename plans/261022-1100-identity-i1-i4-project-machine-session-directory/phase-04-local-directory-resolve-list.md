@@ -21,11 +21,11 @@ On one machine, `fgos identity resolve <handle|lead:<LANE>>` returns exactly one
 - Resolve refusal codes match the mailbox's (`ambiguous`, `not-found`) so MAIL can adopt them. Convention kind `lane-id` (first `A-Z`, rest `A-Z0-9-`, max 16); `lead:` is a fixed prefix in the crate.
 
 ## Files
-- Create: `packages/session-identity/rust/src/directory.rs`, `tests/directory.rs`.
-- Modify: `packages/session-identity/rust/src/{lib.rs,provider.rs,session.rs}`, `packages/session-identity/contracts/identity.{read,write}.v1.json`, `packages/convention/contracts/convention.{rules,golden}.v1.json`, `apps/fgos/src/cli_projector.rs`, `apps/fgos/tests/cli_tests.rs`, `docs/platform/identity/spec.md` section 5, `CHANGELOG.md`.
+- Create: `packages/identity/rust/src/directory.rs`, `tests/directory.rs`.
+- Modify: `packages/identity/rust/src/{lib.rs,provider.rs,session.rs}`, `packages/identity/contracts/identity.{read,write}.v1.json`, `packages/convention/contracts/convention.{rules,golden}.v1.json`, `apps/fgos/src/cli_projector.rs`, `apps/fgos/tests/cli_tests.rs`, `docs/platform/identity/spec.md` section 5, `CHANGELOG.md`.
 
 ## Verification
-- `cargo test -p fgos-session-identity` (register; resolve one; ambiguous; not found; dead pruned on write; cap refused; role take; an env-id session is judged by its terminal ancestor, not the `fgos` child).
+- `cargo test -p fgos-identity` (register; resolve one; ambiguous; not found; dead pruned on write; cap refused; role take; an env-id session is judged by its terminal ancestor, not the `fgos` child).
 - Two live sessions on one machine register, then resolve each other by handle and by `lead:<LANE>`; the command pair and output go in the phase report.
 
 ## Risk and rollback
