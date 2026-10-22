@@ -13,10 +13,12 @@
 //! mailbox-test-hook inbox --fgos-dir <dir>
 //! ```
 //!
-//! Each flag at most once; a usage error exits 2. `hook` exits 0 on every
-//! path. `send` and `inbox` exit 0 when recorded or listed, 1 when refused
-//! or the record failed. `--fgos-dir` must exist; nothing is created
-//! outside it.
+//! Each flag at most once. `hook` exits 0 on every path, a usage error
+//! included (spec §6.1, §8 item 7: Claude Code reads exit 2 from a `Stop`
+//! hook as "block the stop"): the cause goes to `--log` when that flag
+//! parsed, else to stderr, never to stdout. `send` and `inbox` exit 2 on a
+//! usage error, 0 when recorded or listed, 1 when refused or the record
+//! failed. `--fgos-dir` must exist; nothing is created outside it.
 #[path = "../tests/common/ancestry.rs"]
 mod ancestry;
 #[path = "../../core/tests/common/support.rs"]
@@ -41,9 +43,12 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let code = match args.split_first() {
-        Some((verb, rest)) if verb == "hook" => parse(rest, &[]).map(|f| hook(&f)),
-        Some((verb, rest)) if verb == "send" => parse(rest, &["--wake"]).map(|f| send(&f)),
-        Some((verb, rest)) if verb == "inbox" => parse(rest, &[]).map(|f| inbox(&f)),
+        Some((verb, rest)) if verb == "hook" => Some(match parse(rest, &[]) {
+            Ok(flags) => hook(&flags),
+            Err(cause) => usage_error(None, &cause),
+        }),
+        Some((verb, rest)) if verb == "send" => parse(rest, &["--wake"]).ok().map(|f| send(&f)),
+        Some((verb, rest)) if verb == "inbox" => parse(rest, &[]).ok().map(|f| inbox(&f)),
         _ => None,
     };
     std::process::exit(code.unwrap_or_else(|| {
@@ -55,8 +60,7 @@ fn main() {
     }));
 }
 
-/// Flags and the free arguments; `None` on a repeated flag or a value-less
-/// flag that needs one.
+/// Flags and the free arguments.
 struct Flags {
     named: BTreeMap<String, String>,
     free: Vec<String>,
@@ -68,7 +72,9 @@ impl Flags {
     }
 }
 
-fn parse(args: &[String], switches: &[&str]) -> Option<Flags> {
+/// The flags of one verb; the cause on a repeated flag or a flag that
+/// needs a value and has none.
+fn parse(args: &[String], switches: &[&str]) -> Result<Flags, String> {
     let mut named = BTreeMap::new();
     let mut free = Vec::new();
     let mut it = args.iter();
@@ -80,13 +86,73 @@ fn parse(args: &[String], switches: &[&str]) -> Option<Flags> {
         let value = if switches.contains(&arg.as_str()) {
             String::new()
         } else {
-            it.next()?.clone()
+            it.next()
+                .ok_or_else(|| format!("{arg} needs a value"))?
+                .clone()
         };
         if named.insert(arg.clone(), value).is_some() {
-            return None;
+            return Err(format!("{arg} given twice"));
         }
     }
-    Some(Flags { named, free })
+    Ok(Flags { named, free })
+}
+
+/// A `hook` usage error: the cause goes to `log`, or to stderr when there
+/// is no log, never to stdout; the status is 0.
+fn usage_error(log: Option<&Path>, cause: &str) -> i32 {
+    let line = format!("usage-error {cause}");
+    match log {
+        Some(_) => append(log, &line),
+        None => {
+            let _ = writeln!(io::stderr(), "mailbox-test-hook: {line}");
+        }
+    }
+    0
+}
+
+/// The `hook` flags, checked.
+struct HookArgs {
+    adapter: Adapter,
+    topology: Topology,
+    event: HookEvent,
+    fgos_dir: PathBuf,
+    fault: bool,
+}
+
+fn hook_args(flags: &Flags) -> Result<HookArgs, String> {
+    let adapter = match flags.get("--cli") {
+        Some("claude") => Adapter::Claude,
+        Some("codex") => Adapter::Codex,
+        _ => return Err("--cli must be claude or codex".into()),
+    };
+    let topology = match flags.get("--topology") {
+        Some("direct") => Topology::Direct,
+        Some("one-shell-hop") => Topology::OneShellHop,
+        _ => return Err("--topology must be direct or one-shell-hop".into()),
+    };
+    let event = flags
+        .get("--event")
+        .and_then(HookEvent::from_flag)
+        .ok_or("--event must be stop or post-tool-use")?;
+    let fgos_dir = flags
+        .get("--fgos-dir")
+        .map(PathBuf::from)
+        .ok_or("--fgos-dir is missing")?;
+    if flags.get("--project").is_none() {
+        return Err("--project is missing".into());
+    }
+    let fault = match flags.get("--fault") {
+        None => false,
+        Some("panic-in-render") => true,
+        Some(_) => return Err("--fault must be panic-in-render".into()),
+    };
+    Ok(HookArgs {
+        adapter,
+        topology,
+        event,
+        fgos_dir,
+        fault,
+    })
 }
 
 fn limits() -> (Limits, HookLimits) {
@@ -151,6 +217,17 @@ fn hook(flags: &Flags) -> i32 {
             std::process::id()
         ),
     );
+    let HookArgs {
+        adapter,
+        topology,
+        event,
+        fgos_dir,
+        fault,
+    } = match hook_args(flags) {
+        Ok(args) => args,
+        Err(cause) => return usage_error(log, &cause),
+    };
+    let project = flags.get("--project").unwrap_or_default();
     let started = Instant::now();
     shell::silence_panics();
     let (limits, hook_limits) = limits();
@@ -162,28 +239,6 @@ fn hook(flags: &Flags) -> i32 {
         move || append(budget_log.as_deref(), "budget-exit"),
     );
 
-    let adapter = match flags.get("--cli") {
-        Some("claude") => Adapter::Claude,
-        Some("codex") => Adapter::Codex,
-        _ => return 2,
-    };
-    let topology = match flags.get("--topology") {
-        Some("direct") => Topology::Direct,
-        Some("one-shell-hop") => Topology::OneShellHop,
-        _ => return 2,
-    };
-    let (Some(event), Some(fgos_dir), Some(project)) = (
-        HookEvent::from_flag(event_flag),
-        flags.get("--fgos-dir").map(PathBuf::from),
-        flags.get("--project"),
-    ) else {
-        return 2;
-    };
-    let fault = match flags.get("--fault") {
-        None => false,
-        Some("panic-in-render") => true,
-        Some(_) => return 2,
-    };
     let record = match Record::open(&fgos_dir) {
         Ok(record) => record,
         Err(error) => {

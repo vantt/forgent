@@ -282,3 +282,113 @@ fn the_entry_under_one_shell_hop_delivers_and_exits_zero() {
     assert!(!out.stdout.is_empty(), "the frame was printed");
     assert!(matches!(setup.state_of(&id), MessageState::Offered { .. }));
 }
+
+/// One `hook` argv per kind of usage error, each a change of the valid argv:
+/// the flags that do not parse (a repeated flag, a flag with no value), and
+/// a missing or unknown value of each flag the entry checks.
+#[test]
+fn every_kind_of_hook_usage_error_exits_zero_prints_nothing_on_stdout_and_logs_its_cause() {
+    let setup = Setup::new("entry-usage");
+    let valid = setup.hook_args("direct", &[]);
+    let without = |flag: &str| -> Vec<String> {
+        let at = valid.iter().position(|a| a == flag).unwrap();
+        let mut args = valid.clone();
+        args.drain(at..at + 2);
+        args
+    };
+    let with = |flag: &str, value: &str| -> Vec<String> {
+        let mut args = valid.clone();
+        match args.iter().position(|a| a == flag) {
+            Some(at) => args[at + 1] = value.to_string(),
+            None => args.extend([flag.to_string(), value.to_string()]),
+        }
+        args
+    };
+    let mut repeated = valid.clone();
+    repeated.extend(["--cli", "claude"].map(String::from));
+    let mut no_value = valid.clone();
+    no_value.push("--fault".into());
+    // (kind, argv, the cause's words; `true` when it goes to the log, `false`
+    // when the flags did not parse and so it goes to stderr)
+    let cases: Vec<(&str, Vec<String>, &str, bool)> = vec![
+        ("repeated flag", repeated, "--cli given twice", false),
+        (
+            "flag without a value",
+            no_value,
+            "--fault needs a value",
+            false,
+        ),
+        ("unknown --cli", with("--cli", "agy"), "--cli must be", true),
+        ("missing --cli", without("--cli"), "--cli must be", true),
+        (
+            "unknown --topology",
+            with("--topology", "two-hops"),
+            "--topology must be",
+            true,
+        ),
+        (
+            "unknown --event",
+            with("--event", "pre-tool-use"),
+            "--event must be",
+            true,
+        ),
+        (
+            "missing --fgos-dir",
+            without("--fgos-dir"),
+            "--fgos-dir is missing",
+            true,
+        ),
+        (
+            "missing --project",
+            without("--project"),
+            "--project is missing",
+            true,
+        ),
+        (
+            "unknown --fault",
+            with("--fault", "crash"),
+            "--fault must be",
+            true,
+        ),
+    ];
+    for (kind, args, cause, logged) in cases {
+        let _ = std::fs::remove_file(setup.log());
+        let mut child = setup
+            .command(example())
+            .args(&args)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        child
+            .stdin
+            .take()
+            .unwrap()
+            .write_all(&setup.payload())
+            .unwrap();
+        let out = child.wait_with_output().unwrap();
+
+        assert!(out.status.success(), "{kind}: {}", out.status);
+        assert!(out.stdout.is_empty(), "{kind}: stdout is empty");
+        let log = std::fs::read_to_string(setup.log()).unwrap_or_default();
+        let stderr = String::from_utf8_lossy(&out.stderr);
+        let (told, silent) = if logged {
+            (log.as_str(), stderr.as_ref())
+        } else {
+            (stderr.as_ref(), log.as_str())
+        };
+        assert!(
+            told.contains(&format!("usage-error {cause}")),
+            "{kind}: the cause is told: {told:?}"
+        );
+        assert!(
+            !silent.contains("usage-error"),
+            "{kind}: told once: {silent:?}"
+        );
+    }
+    assert!(
+        !setup.fgos.paths().snapshot().exists(),
+        "no usage error opened the record"
+    );
+}
