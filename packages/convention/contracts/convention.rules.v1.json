@@ -149,6 +149,14 @@
       "reserved": []
     },
     {
+      "id": "lane-id",
+      "description": "A program lane id, the part after `lead:` in a role alias (`lead:MAIL`); the `lead:` prefix is Identity's, not Convention's.",
+      "first": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      "rest": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-",
+      "maxLength": 16,
+      "reserved": []
+    },
+    {
       "id": "backlog-id",
       "description": "A new backlog row id: `p-<10 base32>` when minted by Identity (docs/platform/identity/spec.md, section 4a). Rows written earlier (`p-<8 hex>`, `STR27`, `wf-...`) keep their ids.",
       "first": "abcdefghijklmnopqrstuvwxyz",

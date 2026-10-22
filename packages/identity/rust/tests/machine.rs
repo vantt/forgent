@@ -3,7 +3,7 @@
 //! (Event Store refs) call it and test only their own mapping.
 
 use fgos_identity::machine::{self, valid_machine_id};
-use fgos_identity::text::{base32_prefix, slug};
+use fgos_identity::text::{base32_prefix, iso_utc, slug};
 use fgos_identity::Error;
 use std::fs;
 use std::path::PathBuf;
@@ -137,4 +137,11 @@ fn slug_collapses_runs_and_trims_separators() {
 fn base32_prefix_matches_rfc_4648() {
     assert_eq!(base32_prefix(b"foob", 6), "mzxw6y");
     assert_eq!(base32_prefix(b"foobar", 4), "mzxw");
+}
+
+#[test]
+fn iso_utc_formats_known_instants_to_the_millisecond() {
+    assert_eq!(iso_utc(0, 0), "1970-01-01T00:00:00.000Z");
+    assert_eq!(iso_utc(1_791_940_354, 7), "2026-10-14T01:12:34.007Z");
+    assert_eq!(iso_utc(951_782_400, 0), "2000-02-29T00:00:00.000Z");
 }
