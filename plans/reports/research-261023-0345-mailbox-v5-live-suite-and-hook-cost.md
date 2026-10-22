@@ -5,8 +5,9 @@ Date: 2026-10-23, Asia/Saigon, machine `fg-server`. Branch `mailbox/v1-v3`. Plan
 ## Summary
 
 - **L1** (Claude Code) and **L2** (Claude Code, wrong-shape Stop row) passed every check through `fgos hook mailbox` and `fgos mailbox …` behind the shim.
-- **C1** (Codex) passed registration from the payload, an inline mid-step frame and the model's own `fgos mailbox send`; the Stop check was **not observed**: the wake message arrived after Codex's Stop (a harness timing gap, fixed after the run, not re-run).
-- **T1/T2**: the steady no-mail `PostToolUse` hook p95, measured inside each CLI under strace, was **68.4 ms** (Claude Code, N = 99) and **78.1 ms** (Codex, N = 99), against the 50 ms target. One cost dominated: the workspace shim's helper programs (p50 31–34 ms per call). Owner question 3's default (a) was applied: the shim now runs no helper program (`dc8e92240`). Outside the CLI, the same hook through the new shim measured p95 **3.4 ms** against 51.4 ms through the old one. The in-CLI re-measurement needs two more live runs, beyond the plan's ceiling of 12: it waits for the controller.
+- **C1** (Codex) passed registration from the payload, an inline mid-step frame and the model's own `fgos mailbox send`; the Stop check was **not observed**: the wake message arrived after Codex's Stop (a harness timing gap, fixed after the run); its authorized re-run passed every check, the Stop gate included.
+- **T1/T2**: the steady no-mail `PostToolUse` hook p95, measured inside each CLI under strace, was **68.4 ms** (Claude Code, N = 99) and **78.1 ms** (Codex, N = 99), against the 50 ms target. One cost dominated: the workspace shim's helper programs (p50 31–34 ms per call). Owner question 3's default (a) was applied: the shim now runs no helper program (`dc8e92240`). Outside the CLI, the same hook through the new shim measured p95 **3.4 ms** against 51.4 ms through the old one.
+- **Re-runs (authorized by the plan owner (agent), ceiling raised to 15):** with the builtins-only shim the steady no-mail p95 inside each CLI is **26.5 ms** (Claude Code, N = 99) and **38.1 ms** (Codex, N = 99), under strace: **both pass the 50 ms target.** C1 re-run with the fixed harness passed every check, the Stop gate included. Section "Re-runs" below.
 
 ## Runs (live CLI invocations: 5)
 
@@ -70,7 +71,7 @@ The hook rows are the product installer's (`installClaudeHook` / `installCodexHo
 
 The stand-in peer was registered through the product hook: this harness process acted as a Claude Code head with a session file, and the hook ran below `/bin/sh`. Its session file was removed right after.
 
-Fix after the run (`test(mailbox): give the Codex case a long final answer…`): C1 now writes the integers from 1 to 400 before its FINAL line, as L1 does, which widens the gap between the last tool and Stop. Not re-run (ceiling). The Codex Stop shape itself is owned at store level (`tests/hook_payloads.rs`, recorded Codex fixtures).
+Fix after the run (`test(mailbox): give the Codex case a long final answer…`): C1 now writes the integers from 1 to 400 before its FINAL line, as L1 does, which widens the gap between the last tool and Stop. Its authorized re-run passed the Stop check (section Re-runs). The Codex Stop shape itself is owned at store level (`tests/hook_payloads.rs`, recorded Codex fixtures).
 
 ### T1 and T2, the hook cost inside each CLI
 
@@ -140,16 +141,45 @@ Four hand mutants were killed.
 
 Consequence: workspaces whose shim was written by an older `fgctl` see `check_workspace_shims` report it as different until `fgctl repair` rewrites it. That happens only when a release carrying this change is activated, which V5 does not do.
 
-**Still open:** the in-CLI p95 with the new shim. Expected from the split above:
+**Expected before the re-runs**, from the split above:
 
 - Claude Code: shell 2 ms + shim about 1 ms + host 28 ms, about 31 ms at p95 under strace;
 - Codex: about 40 ms.
 
-Confirming it takes one T1 and one T2 re-run (2 invocations, total 14 > ceiling 12), which only the controller can authorize. Until then V5's hook-cost acceptance stays open (DONE_WITH_CONCERNS).
+Confirmed by the authorized T1 and T2 re-runs below: 26.5 ms and 38.1 ms.
+
+## Re-runs (live CLI invocations: 3; V5 total 15)
+
+Authorized by the plan owner (agent) after this report, which raised the V5 ceiling from 12 to 15: C1 with the fixed harness, T1 and T2 with the builtins-only shim. Same rules: one dry run of all three first (`check C1 T1 T2`, exit 0), benign content only, every guard on, no retry, memory checked and the board log read for a quiet window (none declared) before each. The first runs' case directories were set aside to `/tmp/fgos-work/mailbox-v5-live-first/`, never deleted. Host commit `5d664f0ff`; shim from this branch's generator, sha256 `c398aa258509…`. Evidence: `.fgos/runtime/tmp/mailbox-v5/evidence/p8b/<case>/` (gitignored).
+
+| Case | Spawn marker (UTC, 2026-10-22) | Exit | Wall time | Result |
+|---|---|---|---|---|
+| C1 | 21:00:10Z | 0 | 24.4 s | every check passed: registration (`project-codex-5c`), mid-step inline, the model's own send, and the **Stop gate** (M2 `offered`, carried by the Stop reason, its token in the final answer) |
+| T1 | 21:00:46Z | 0 | 120.4 s | p95 26.5 ms ≤ 50 ms; every check passed |
+| T2 | 21:03:10Z | 0 | 259.9 s | p95 38.1 ms ≤ 50 ms; "held back" reads failed because the model claimed the message, as in the first T2 (4 `fgos mailbox inbox --claim` calls in the rollout) |
+
+Codex's login guard passed before and after both Codex runs (the `auth.json` link intact to the test account's file, nothing set aside). Removed from the real `~/.claude/projects`: `-tmp-fgos-work-mailbox-v5-live-T1-project` (2 files).
+
+| CLI | Steady no-mail PostToolUse (N) | p50 | p95 | max | Registering call | After held-back mail (N, p50 / p95) | Stop |
+|---|---|---|---|---|---|---|---|
+| Claude Code 2.1.308 | 99 | 19.0 ms | **26.5 ms** | 32.1 ms | 18.1 ms | 21, 18.2 / 23.7 ms | 20.7 ms |
+| Codex 0.161.0 | 99 | 24.3 ms | **38.1 ms** | 41.3 ms | 33.5 ms | 22, 19.9 / 31.1 ms | 25.7 ms |
+
+**Status against `mailbox.hook.p95TargetMs` (50 ms): met in both CLIs**, under strace, with the builtins-only shim.
+
+Where the time goes now (every PostToolUse call after the registering one, same traces; p50 / p95):
+
+| Part | Claude Code (N = 120) | Codex (N = 121) |
+|---|---|---|
+| CLI's shell until the shim starts | 0.6 / 1.2 ms | 3.6 / 9.9 ms (the user's `zsh -c`) |
+| Shim until the host starts | 0.6 / 1.4 ms | 0.7 / 3.1 ms |
+| Host until exit | 17.4 / 24.0 ms | 17.4 / 25.6 ms |
+
+The host is now the largest part in both CLIs, and Codex's login shell the second. Neither is over the target.
 
 ## Limits
 
-- One run per CLI: N ≥ 80 bounds the p95 within one session, not across sessions or machines.
+- One run per CLI and shim: N ≥ 80 bounds the p95 within one session, not across sessions or machines.
 - strace slows the CLI and its children. The in-CLI numbers include its cost, and the outside-the-CLI numbers are given beside them.
 - The machine's load varied between runs (another session's test suite ran earlier the same hour). The outside-the-CLI host numbers moved from p50 9 ms to 2.4 ms between two runs.
 
