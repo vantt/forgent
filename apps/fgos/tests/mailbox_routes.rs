@@ -101,6 +101,12 @@ impl Scene {
     /// The hook as Claude Code runs it: through `/bin/sh` (not exec'd), so
     /// this test process is the head; its session file names it.
     fn claude_hook(&self, event: &str, payload: &[u8]) -> Output {
+        self.hook_as_head(&["--cli", "claude", "--event", event], payload)
+    }
+
+    /// `fgos hook mailbox <flags>` run the way [`Scene::claude_hook`] runs
+    /// it, so a call that parses as Claude Code's reaches the record.
+    fn hook_as_head(&self, flags: &[&str], payload: &[u8]) -> Output {
         let own = fgos_process::facts::self_identity().unwrap();
         let pid = std::process::id();
         let session = serde_json::json!({
@@ -120,7 +126,8 @@ impl Scene {
         let mut child = Command::new("/bin/sh")
             .args(["-c", "\"$0\" \"$@\"; :"])
             .arg(fgos_bin())
-            .args(["hook", "mailbox", "--cli", "claude", "--event", event])
+            .args(["hook", "mailbox"])
+            .args(flags)
             .current_dir(self.main())
             .env_clear()
             .env("HOME", self.home())
@@ -316,6 +323,30 @@ fn every_hook_mailbox_usage_error_exits_0_with_empty_stdout_and_stderr() {
             out.stdout.is_empty() && out.stderr.is_empty(),
             "{case:?}: {out:?}"
         );
+    }
+    // A repeated flag is a usage error even when its last value would make a
+    // call that reaches the record: run as the head, it still touches nothing.
+    let repeated: [&[&str]; 2] = [
+        &[
+            "--cli",
+            "codex",
+            "--cli",
+            "claude",
+            "--event",
+            "post-tool-use",
+        ],
+        &[
+            "--cli",
+            "claude",
+            "--event",
+            "stop",
+            "--event",
+            "post-tool-use",
+        ],
+    ];
+    for flags in repeated {
+        let out = scene.hook_as_head(flags, &post_tool_use());
+        assert_eq!(out.status.code(), Some(0), "{flags:?}");
     }
     assert!(
         !scene.mailbox_dir().exists(),
