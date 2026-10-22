@@ -83,16 +83,17 @@ function recordOfSelf(writer) {
   return text;
 }
 
-/** One look at the record file: `{state: 'absent'}`, `{state: 'unreadable',
- * raw}` or `{state: 'ok', raw, record}`. A record that is not a JSON object
- * with a positive pid is unreadable, never cleaned. */
+/** One look at the record file: `{state: 'absent'}`, `{state: 'retry', code}`
+ * (Windows: the file is open by another process, so its content is unknown),
+ * `{state: 'unreadable', raw}` or `{state: 'ok', raw, record}`. A record that
+ * is not a JSON object with a positive pid is unreadable, never cleaned. */
 export function readHotRecord(recordPath) {
   let raw;
   try {
     raw = fs.readFileSync(recordPath, 'utf8');
   } catch (err) {
     if (err.code === 'ENOENT') return { state: 'absent' };
-    if (WINDOWS_RETRYABLE.has(err.code)) return { state: 'absent' };
+    if (WINDOWS_RETRYABLE.has(err.code)) return { state: 'retry', code: err.code };
     throw err;
   }
   let record;
@@ -109,7 +110,8 @@ export function readHotRecord(recordPath) {
  * whether it was removed. Callers hold the reclaim kernel lock. */
 export function unlinkRecordIfUnchanged(recordPath, raw) {
   const current = readHotRecord(recordPath);
-  if (current.state === 'absent' || current.raw !== raw) return false;
+  if (current.state !== 'ok' && current.state !== 'unreadable') return false;
+  if (current.raw !== raw) return false;
   try {
     fs.unlinkSync(recordPath);
   } catch (err) {
@@ -128,10 +130,17 @@ export function reclaimDeadHolder(fgosDir, resource, observed) {
   const attempt = acquireSync(createLockScope(`hot-reclaim:${resource}`), resource, { fgosDir }, { waitMs: RECLAIM_WAIT_MS });
   if (attempt.result !== 'acquired') return 'busy';
   try {
+    // One read under the kernel lock: the bytes must equal what the judge saw and
+    // the judge must still answer dead; then the unlink needs no second read.
     const again = readHotRecord(record);
-    if (again.state !== 'ok' || again.raw !== observed.raw) return 'changed';
-    if (judgeHotRecord(again.record) !== 'dead') return 'changed';
-    return unlinkRecordIfUnchanged(record, observed.raw) ? 'cleaned' : 'changed';
+    if (again.state !== 'ok' || again.raw !== observed.raw || judgeHotRecord(again.record) !== 'dead') return 'changed';
+    try {
+      fs.unlinkSync(record);
+    } catch (err) {
+      if (err.code === 'ENOENT' || WINDOWS_RETRYABLE.has(err.code)) return 'changed';
+      throw err;
+    }
+    return 'cleaned';
   } finally {
     attempt.handle.release();
   }
@@ -175,34 +184,36 @@ function tryLinkRecord(paths, recordBytes) {
   }
 }
 
+function timeoutError(resource, paths, seen, verdict) {
+  const base = `timed out after ${WAIT_TIMEOUT_MS}ms acquiring ${resource} at "${paths.record}"`;
+  const fence = `fgos lock fence ${resource}`;
+  const held = { resource, path: paths.record, holderPid: seen.record?.pid ?? null };
+  if (seen.state === 'retry') {
+    return new HotLockError('hot-lock-timeout', `${base} — the record is open by another process (sharing violation, ${seen.code}); stop that process, then run \`${fence}\``, held);
+  }
+  if (seen.state === 'unreadable' || verdict === 'unknown') {
+    return new HotLockError('hot-lock-timeout', `${base} — the record cannot be ${seen.state === 'unreadable' ? 'read' : 'judged'}; confirm the holder is gone and run \`${fence}\``, { ...held, reason: 'lock-record-unreadable' });
+  }
+  return new HotLockError('hot-lock-timeout', `${base} (held by pid ${seen.record?.pid}); retry the operation.`, held);
+}
+
 function acquireRecord(fgosDir, resource, recordBytes) {
   const paths = hotPaths(fgosDir, resource);
   fs.mkdirSync(paths.dir, { recursive: true });
   const deadline = Date.now() + WAIT_TIMEOUT_MS;
-  let seen = { state: 'absent' };
   for (;;) {
     if (tryLinkRecord(paths, recordBytes)) return paths;
-    seen = readHotRecord(paths.record);
-    if (seen.state === 'ok' && judgeHotRecord(seen.record) === 'dead') {
-      // After a cleanup the next pass tries the link at once.
-      if (reclaimDeadHolder(fgosDir, resource, seen) === 'cleaned') continue;
-    }
+    const seen = readHotRecord(paths.record);
+    const verdict = seen.state === 'ok' ? judgeHotRecord(seen.record) : null;
+    // After a cleanup the next pass tries the link at once. A `retry` record is never reclaimed.
+    if (verdict === 'dead' && reclaimDeadHolder(fgosDir, resource, seen) === 'cleaned') continue;
     if (seen.state === 'absent') continue;
-    if (Date.now() >= deadline) {
-      const unreadable = seen.state === 'unreadable';
-      throw new HotLockError(
-        'hot-lock-timeout',
-        `timed out after ${WAIT_TIMEOUT_MS}ms acquiring ${resource} at "${paths.record}"`
-          + (unreadable ? ' — the record cannot be read; confirm the holder is gone and run `fgos lock fence`' : ` (held by pid ${seen.record?.pid})`)
-          + '; retry the operation.',
-        { resource, path: paths.record, holderPid: seen.record?.pid ?? null, ...(unreadable ? { reason: 'lock-record-unreadable' } : {}) },
-      );
-    }
+    if (Date.now() >= deadline) throw timeoutError(resource, paths, seen, verdict);
     sleepSync(POLL_MS);
   }
 }
 
-function releaseRecord(paths) {
+function releaseRecord(paths, resource) {
   for (let attempt = 0; attempt < 5; attempt += 1) {
     try {
       fs.unlinkSync(paths.record);
@@ -216,6 +227,7 @@ function releaseRecord(paths) {
       throw err;
     }
   }
+  throw new HotLockError('hot-lock-release-stuck', `${resource}: the record at "${paths.record}" could not be unlinked after the bounded retries (sharing violation); run \`fgos lock fence ${resource}\``, { resource, path: paths.record });
 }
 
 // --- the transaction -----------------------------------------------------
@@ -308,7 +320,7 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
     throw new HotLockError('hot-lock-reentry', `${resource}: this process already holds a hot mutex; a transaction may not open another`);
   }
   const writer = prefetched.writer ?? resolveWriterIdentity(fgosDir).id;
-  const paths = acquireRecord(fgosDir, resource, recordOfSelf(writer, fgosDir));
+  const paths = acquireRecord(fgosDir, resource, recordOfSelf(writer));
   const leaveHotLock = enterHotLock();
   noteLockHeld();
   const { tx, revoke } = createTx(fgosDir, { ...prefetched, writer });
@@ -319,7 +331,7 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
     revoke();
     leaveHotLock();
     try {
-      releaseRecord(paths);
+      releaseRecord(paths, resource);
     } finally {
       noteLockReleased();
     }

@@ -36,6 +36,7 @@ function recordProblem(resource, fgosDir, now) {
     return `${resource}: ${recordPath} cannot be read (${err.code ?? err.message})`;
   }
   if (seen.state === 'absent') return null;
+  if (seen.state === 'retry') return `${resource}: ${recordPath} is open by another process (sharing violation, ${seen.code}); stop that process, then run fgos lock fence ${resource}`;
   if (seen.state === 'unreadable') return `${resource}: ${recordPath} does not parse (${JSON.stringify(seen.raw.slice(0, 80))})`;
   if (judgeHotRecord(seen.record) !== 'unknown') return null;
   const age = ageMs(recordPath, now);

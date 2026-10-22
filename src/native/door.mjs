@@ -69,16 +69,28 @@ export function loadNativeAddon({ hostBin, descriptor } = {}) {
 /** This payload's own release addon, memoised; the first call loads. */
 export const nativeDoor = () => own ??= loadNativeAddon();
 const notJson = (cause) => Object.assign(new Error(`canonical-json-not-json: ${cause}`), { code: 'canonical-json-not-json' });
-/** RFC 8785 bytes of `value`; a value that is not JSON is refused by name, an `undefined` member is absent as in `JSON.stringify`. */
+/** The replacer that makes `JSON.stringify` refuse what it would silently turn into `null` or drop from an array. */
+function validating(key, value) {
+  if (typeof value === 'function') throw new TypeError(`${key === '' ? 'the value' : `"${key}"`} is a function`);
+  if (typeof value === 'number' && !Number.isFinite(value)) throw new TypeError(`${key === '' ? 'the value' : `"${key}"`} is ${value}`);
+  if (value === undefined && Array.isArray(this)) throw new TypeError(`array member ${key} is undefined or a hole`);
+  return value;
+}
+/** RFC 8785 bytes of `value`, serialised as `JSON.stringify` does (`toJSON` honoured, an `undefined` member absent) and canonicalised from the text. A hole, an `undefined` array member, a non-finite number, a `bigint` or a function is refused by name. */
 export function canonicalJson(value) {
-  try { JSON.stringify(value); } catch (err) { throw notJson(err.message); }
-  try { return nativeDoor().canonicalJson.canonicalJson(value); } catch (err) { throw err.code === 'InvalidArg' ? notJson(err.message) : err; }
+  let text;
+  try { text = JSON.stringify(value, validating); } catch (err) { throw notJson(err.message); }
+  if (text === undefined) throw notJson('the value has no JSON form');
+  try { return nativeDoor().canonicalJson.canonicalJson(text); } catch (err) { throw err.code === 'InvalidArg' ? notJson(err.message) : err; }
 }
 /** Write `bytes` to `dir/name` durably, replacing any file; `mode` is explicit. A failure removes the retained temporary and carries `installed`. */
 export const replaceDurably = (dir, name, bytes, mode) => durable('replaceDurably', dir, name, bytes, mode);
 /** Install `bytes` as `dir/name` without replacing: `'created'` or `'already-exists'`. */
 export const installOnce = (dir, name, bytes, mode) => durable('installOnce', dir, name, bytes, mode);
 function durable(call, dir, name, bytes, mode) {
+  if (!Number.isInteger(mode) || mode < 0 || mode > 0o7777) {
+    throw Object.assign(new Error(`durable-file-mode-invalid: mode must be an integer from 0 to 0o7777, got ${JSON.stringify(mode)}`), { code: 'durable-file-mode-invalid', installed: 'none' });
+  }
   try { return nativeDoor().durableFile[call](dir, name, Buffer.from(bytes), mode); } catch (err) {
     let fields = {};
     try { fields = JSON.parse(err.message); } catch {}

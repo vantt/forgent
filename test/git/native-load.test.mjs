@@ -92,6 +92,7 @@ test('the door refuses holes, nested non-finite numbers and undefined array memb
   // eslint-disable-next-line no-sparse-arrays
   for (const bad of [[1, undefined], [1, , 2], NaN, 10n, () => 1, { a: [NaN] }, [Infinity]]) assert.throws(() => canonicalJson(bad), { code: 'canonical-json-not-json' });
   assert.equal(canonicalJson({ b: [1], a: undefined }), '{"b":[1]}');
+  assert.equal(canonicalJson({ at: new Date(Date.UTC(2026, 9, 22)) }), '{"at":"2026-10-22T00:00:00.000Z"}');
 });
 
 test('a durable write refuses an omitted or invalid mode by name before it touches any file', () => {

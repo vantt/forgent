@@ -158,6 +158,9 @@ async function fenceHotRecord({ name, fgosDir, confirm, attestStopped }) {
   const seen = readHotRecord(recordPath);
   const result = (status, holders = [], terminated = [], killed = []) => ({ lock: name, path: recordPath, status, holders, terminated, killed });
   if (seen.state === 'absent') return result('free');
+  if (seen.state === 'retry') {
+    throw new HolderLockError('lock-fence-unlistable', `${name}: the record at ${recordPath} is open by another process (sharing violation, ${seen.code}); stop that process, then run fgos lock fence ${name} again`, { lock: name, record: recordPath });
+  }
 
   let holders = [];
   let terminated = [];

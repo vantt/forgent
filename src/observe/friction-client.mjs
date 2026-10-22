@@ -30,7 +30,7 @@ const VALID_RESOLVE_REASONS = new Set(['answer', 'done', 'wontfix', 'clarify-pas
 function resolveFgosDir(dir) {
   if (!dir) return null;
   if (dir.endsWith('.fgos')) return dir;
-  return fgosDirFromRoot(dir) || path.join(dir, '.fgos');
+  return fgosDirFromRoot(dir);
 }
 
 /**

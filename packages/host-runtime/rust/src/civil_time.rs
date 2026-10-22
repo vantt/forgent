@@ -83,6 +83,16 @@ pub fn format_system_time_utc(time: SystemTime) -> String {
     format!("{year:04}-{month:02}-{day:02}T{hour:02}:{minute:02}:{second:02}.{millis:03}Z")
 }
 
+/// Formats a UTC offset as `+HH:MM` or `-HH:MM` (`+00:00` for zero).
+pub fn format_offset(offset_seconds: i32) -> Option<String> {
+    if offset_seconds % 60 != 0 || offset_seconds.unsigned_abs() > 23 * 3_600 + 59 * 60 {
+        return None;
+    }
+    let sign = if offset_seconds < 0 { '-' } else { '+' };
+    let absolute = offset_seconds.unsigned_abs();
+    Some(format!("{sign}{:02}:{:02}", absolute / 3_600, absolute % 3_600 / 60))
+}
+
 /// Formats Unix milliseconds in the supplied numeric UTC offset.
 pub fn format_unix_millis_rfc3339(unix_millis: i64, offset_seconds: i32) -> Option<String> {
     if offset_seconds % 60 != 0 || offset_seconds.unsigned_abs() > 23 * 3_600 + 59 * 60 {
@@ -97,13 +107,7 @@ pub fn format_unix_millis_rfc3339(unix_millis: i64, offset_seconds: i32) -> Opti
     let hour = seconds_of_day / 3_600;
     let minute = seconds_of_day % 3_600 / 60;
     let second = seconds_of_day % 60;
-    let offset = if offset_seconds == 0 {
-        "Z".to_owned()
-    } else {
-        let sign = if offset_seconds < 0 { '-' } else { '+' };
-        let absolute = offset_seconds.unsigned_abs();
-        format!("{sign}{:02}:{:02}", absolute / 3_600, absolute % 3_600 / 60)
-    };
+    let offset = if offset_seconds == 0 { "Z".to_owned() } else { format_offset(offset_seconds)? };
     Some(format!(
         "{year:04}-{month:02}-{day:02}T{hour:02}:{minute:02}:{second:02}.{millis:03}{offset}"
     ))
@@ -139,6 +143,15 @@ pub fn parse_date_midnight_millis(date: &str) -> Option<i64> {
 
 /// Parses an RFC3339 instant with a `Z` or numeric offset into Unix milliseconds.
 pub fn parse_rfc3339_millis(timestamp: &str) -> Option<i64> {
+    parse_rfc3339(timestamp).map(|(millis, _)| millis)
+}
+
+/// The `Z` or numeric offset of an RFC3339 instant, in seconds east of UTC.
+pub fn parse_rfc3339_offset_seconds(timestamp: &str) -> Option<i32> {
+    parse_rfc3339(timestamp).map(|(_, offset)| offset)
+}
+
+fn parse_rfc3339(timestamp: &str) -> Option<(i64, i32)> {
     let bytes = timestamp.as_bytes();
     if bytes.len() < 20
         || !matches!(bytes[10], b'T' | b't')
@@ -170,18 +183,18 @@ pub fn parse_rfc3339_millis(timestamp: &str) -> Option<i64> {
         }
     }
     let offset = match bytes.get(position)? {
-        b'Z' | b'z' if position + 1 == bytes.len() => 0,
+        b'Z' | b'z' if position + 1 == bytes.len() => 0_i32,
         sign @ (b'+' | b'-') if position + 6 == bytes.len() && bytes[position + 3] == b':' => {
             let hours = number(timestamp.get(position + 1..position + 3)?)?;
             let minutes = number(timestamp.get(position + 4..position + 6)?)?;
             if hours > 23 || minutes > 59 {
                 return None;
             }
-            (hours * 3_600 + minutes * 60) * if *sign == b'+' { 1 } else { -1 }
+            i32::try_from((hours * 3_600 + minutes * 60) * if *sign == b'+' { 1 } else { -1 }).ok()?
         }
         _ => return None,
     };
-    Some(midnight + (hour * 3_600 + minute * 60 + second - offset) * 1_000 + fraction)
+    Some((midnight + (hour * 3_600 + minute * 60 + second - i64::from(offset)) * 1_000 + fraction, offset))
 }
 
 fn number(value: &str) -> Option<i64> {
