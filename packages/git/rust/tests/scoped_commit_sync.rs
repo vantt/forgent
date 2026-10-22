@@ -112,7 +112,6 @@ fn literal_scoped_commit_real_hook_and_replay() {
         writes: vec!["[literal]".into()],
         message: "consumer message\n\nbody\n".into(),
         cutover_grant: None,
-        legacy_events: None,
     };
     let result = f
         .driver
@@ -149,7 +148,6 @@ fn hook_tree_tampering_reports_real_effect() {
         writes: vec!["a".into()],
         message: "commit".into(),
         cutover_grant: None,
-        legacy_events: None,
     };
     let result = f
         .driver
@@ -309,7 +307,6 @@ fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
         writes: vec!["a".into()],
         message: "noop".into(),
         cutover_grant: None,
-        legacy_events: None,
     };
     assert_eq!(
         f.driver
@@ -341,7 +338,6 @@ fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
             CheckpointRequest {
                 files: vec![".fgos/events.jsonl".into()],
                 message: "refuse".into(),
-                legacy_events: None
             },
             "fixture",
             "bad-checkpoint"
@@ -355,7 +351,6 @@ fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
             CheckpointRequest {
                 files: vec!["a".into()],
                 message: "consumer checkpoint".into(),
-                legacy_events: None,
             },
             "fixture",
             "checkpoint",
@@ -403,7 +398,6 @@ fn baseline_only_cutover_commits_the_event_fence() {
                 legacy_ref_oid: legacy,
                 seal_digest: format!("{:x}", Sha256::digest(b"sealed\n")),
             }),
-            legacy_events: None,
         };
         let result = f
             .driver
@@ -450,7 +444,6 @@ fn interrupted_resources(f: &Fixture, id: &str, phase: u8, sync: bool, legacy: b
         writes: vec!["a".into()],
         message: "interrupted".into(),
         cutover_grant: None,
-        legacy_events: None,
     };
     fs::write(f.tree.join("a"), "interrupted producer").unwrap();
     git(&f.tree, &["add", "a"]);
@@ -531,7 +524,6 @@ fn fresh_commit(f: &Fixture, id: &str) {
         writes: vec!["fresh".into()],
         message: "fresh".into(),
         cutover_grant: None,
-        legacy_events: None,
     };
     assert_eq!(
         f.driver
@@ -565,7 +557,6 @@ fn admission_abandons_pre_attempt_commit_and_sync_without_blocking_fresh_ids() {
                 writes: vec!["fresh".into()],
                 message: "fresh".into(),
                 cutover_grant: None,
-                legacy_events: None,
             };
             assert_eq!(
                 f.driver
@@ -650,7 +641,6 @@ fn terminal_commit_history_is_bounded_and_compacted_receipts_replay() {
             writes: vec!["a".into()],
             message: "bounded".into(),
             cutover_grant: None,
-            legacy_events: None,
         };
         let id = format!("bounded-{n}");
         let result = f
@@ -849,7 +839,6 @@ fn legacy_chains_from_a_dead_checkout_are_abandoned_without_replay() {
                     writes: vec!["fresh".into()],
                     message: "fresh".into(),
                     cutover_grant: None,
-                    legacy_events: None,
                 },
                 "fixture",
                 "new-checkout",
@@ -1114,7 +1103,6 @@ fn lifecycle_attempts_exclude_commit_and_sync() {
                     writes: vec!["a".into()],
                     message: "new".into(),
                     cutover_grant: None,
-                    legacy_events: None,
                 },
                 "fixture",
                 "new",
@@ -1480,7 +1468,6 @@ fn nested_request() -> CommitRequest {
         writes: vec!["deep/er/file".into()],
         message: "nested\n".into(),
         cutover_grant: None,
-        legacy_events: None,
     }
 }
 fn objects_of_commit(f: &Fixture, base: &str) -> u64 {

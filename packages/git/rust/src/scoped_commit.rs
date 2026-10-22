@@ -20,62 +20,18 @@ pub struct CutoverGrant {
     pub legacy_ref_oid: String,
     pub seal_digest: String,
 }
-// WORK-lane deletion: remove at Event Store cutover with the Work adapter.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct LegacyEventLayout {
-    pub exact_paths: Vec<String>,
-}
-impl LegacyEventLayout {
-    pub(crate) fn validate(&self, repo: &RepoHandle, scope: &LockScope<'_>) -> Result<()> {
-        self.validate_paths(repo)?;
-        let main = scope.handle("main-checkout")
-            .ok_or_else(|| failure("legacy-events-main-borrow-required"))?;
-        if main.path() != repo.trusted_main_root().join(".fgos/locks/main-checkout.lock") {
-            return Err(failure("legacy-events-main-borrow-required"));
-        }
-        fgos_holder_lock::validate(main)
-            .map_err(|_| failure("legacy-events-main-borrow-required"))
-    }
-    // The hook already proves main-50 borrowing from its inherited descriptor.
-    pub(crate) fn validate_paths(&self, repo: &RepoHandle) -> Result<()> {
-        if root(repo)? != repo.trusted_main_root() || self.exact_paths.is_empty() {
-            return Err(failure("legacy-events-main-required"));
-        }
-        let mut seen = BTreeSet::new();
-        for p in &self.exact_paths {
-            let shard = p.strip_prefix(".fgos/events/").is_some_and(|name| {
-                let archived = name.strip_prefix("archive/");
-                let name = archived.unwrap_or(name);
-                !name.is_empty() && !name.contains('/')
-                    && (name.ends_with(".jsonl")
-                        || (archived.is_some() && name.strip_suffix(".manifest.json")
-                            .is_some_and(|stem| !stem.is_empty())))
-            });
-            if !seen.insert(p) || !(p == ".fgos/events.jsonl" || p == ".fgos/porting/events.jsonl" || shard)
-                || crate::fgos_scope_literal(p).is_err() {
-                return Err(failure("invalid-legacy-event-path"));
-            }
-        }
-        Ok(())
-    }
-}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct CommitRequest {
     pub writes: Vec<String>,
     pub message: String,
     pub cutover_grant: Option<CutoverGrant>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub legacy_events: Option<LegacyEventLayout>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct CheckpointRequest {
     pub files: Vec<String>,
     pub message: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub legacy_events: Option<LegacyEventLayout>,
 }
 /// Capture before producer launch. Keep this value for commit-only retry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1145,9 +1101,6 @@ impl GitDriver {
         {
             return Err(failure("invalid-commit-message"));
         }
-        if let Some(layout) = &request.legacy_events {
-            layout.validate(repo, scope)?;
-        }
         let writes = fgos_write_scope::canonicalize_all(&request.writes).map_err(failure)?;
         if baseline.worktree != root(repo)?.to_string_lossy()
             || baseline.authority != binding(handle(scope, repo)?)?
@@ -1330,9 +1283,6 @@ impl GitDriver {
             {
                 selected.push(path);
             }
-        }
-        if let Some(layout) = &request.legacy_events {
-            selected.extend(layout.exact_paths.iter().filter(|p| dirty_paths.contains(p)).cloned());
         }
         if let Some(grant) = &request.cutover_grant {
             if root(repo)? != repo.trusted_main_root() {
@@ -1756,7 +1706,7 @@ impl GitDriver {
         }
         Ok(())
     }
-    /// Main-only tracked checkpoint; WORK removes explicit legacy-event support at cutover.
+    /// Main-only tracked checkpoint of non-`.fgos` files.
     pub fn checkpoint_tracked_files(
         &self,
         repo: &RepoHandle,
@@ -1765,16 +1715,11 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<CommitResult> {
-        let CheckpointRequest {files, message, legacy_events} = request;
+        let CheckpointRequest {files, message} = request;
         if root(repo)? != repo.trusted_main_root()
-            || files.iter().any(|p| (p == ".fgos" || p.starts_with(".fgos/"))
-                && !legacy_events.as_ref().is_some_and(|l| l.exact_paths.contains(p)))
+            || files.iter().any(|p| p == ".fgos" || p.starts_with(".fgos/"))
         {
             return Err(failure("checkpoint-non-event-main-required"));
-        }
-        if let Some(layout) = &legacy_events {
-            layout.validate_paths(repo)?;
-            if layout.exact_paths.iter().any(|p| !files.contains(p)) { return Err(failure("invalid-legacy-event-path")); }
         }
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
@@ -1804,7 +1749,6 @@ impl GitDriver {
                 writes: files,
                 message,
                 cutover_grant: None,
-                legacy_events,
             },
             writer,
             id,

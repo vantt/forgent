@@ -81,7 +81,6 @@ impl GitScopedCommit {
                     CheckpointRequest {
                         files: strings(&args, "files")?,
                         message: text(&args, "message")?.into(),
-                        legacy_events: args.get("legacyEvents").filter(|v| !v.is_null()).map(|v| serde_json::from_value(v.clone()).map_err(error)).transpose()?,
                     },
                     &self.writer,
                     text(&args, "operationId")?
