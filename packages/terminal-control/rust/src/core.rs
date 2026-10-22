@@ -769,11 +769,20 @@ impl<'a> Core<'a> {
     }
 
     /// The same foreground guard applies to immediate and expired-retention closes.
+    /// A foreground entry is owned when it is the pane's shell (herdr's own answer) or the
+    /// launched process still running with its recorded pid, start time and boot, read before
+    /// and after herdr's answer. An empty list, an unreadable tuple or a mismatch is not owned.
     fn foreground_is_owned(&self, store: &Store, record: &AllocationRecord) -> bool {
         if !self.has("process.info") { return false; }
-        let Ok(info) = self.driver.process_info(&record.pane_id) else { return false };
         let Ok(launched) = store.read_marker::<LaunchedMarker>(&record.key, MarkerKind::Launched) else { return false };
-        info.foreground.iter().all(|p| p.pid == info.shell_pid || launched.as_ref().is_some_and(|l| l.identity.pid == p.pid))
+        let launched = launched.map(|l| l.identity);
+        let running_before = launched.as_ref().is_some_and(identity::is_still_running);
+        let Ok(info) = self.driver.process_info(&record.pane_id) else { return false };
+        if info.foreground.is_empty() { return false; }
+        info.foreground.iter().all(|p| {
+            p.pid == info.shell_pid
+                || launched.as_ref().is_some_and(|l| l.pid == p.pid && running_before && identity::is_still_running(l))
+        })
     }
 
     fn scan_stale(&self, id: &str, findings: &mut Vec<Finding>) {

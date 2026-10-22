@@ -54,6 +54,13 @@ pub fn identity_of(pid: u32, pgid: u32) -> Option<ProcessIdentity> {
     })
 }
 
+/// Whether the process `recorded` names is still running under that pid with
+/// the same start time and boot: a reused pid, an exited process or an
+/// unreadable tuple all answer `false`.
+pub fn is_still_running(recorded: &ProcessIdentity) -> bool {
+    identity_of(recorded.pid, recorded.pgid).is_some_and(|live| live.start_time == recorded.start_time && live.boot_id == recorded.boot_id)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
