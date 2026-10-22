@@ -39,6 +39,17 @@ test('a solo git commit in a checkout nobody holds succeeds', { skip }, () => {
   assert.equal(commitCount(repoRoot), before + 1);
 });
 
+// boundary: the hook is a cold host client; the host refuses a legacy verb under its recursion guard, which every shell a fgos verb spawns carries.
+test('a commit from a shell under a fgos verb still passes the hook: the host calls run without the recursion guard', { skip }, () => {
+  const repoRoot = initRepoWithHook();
+  const before = commitCount(repoRoot);
+
+  const result = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-under-verb', FGOS_RUST_HOST_RECURSION_GUARD: '1' });
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(commitCount(repoRoot), before + 1);
+});
+
 test('a commit inside a detached worktree writes the beacon at the worktree\'s own .fgos and takes no lock file there', { skip }, () => {
   const worktreeRoot = repoWithDetachedWorktree();
 
