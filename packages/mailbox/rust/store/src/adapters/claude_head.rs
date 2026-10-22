@@ -7,10 +7,16 @@
 //! process facts, never from fields of the file.
 //!
 //! The sessions directory is a parameter: the entry passes
-//! `$HOME/.claude/sessions` only. `CLAUDE_CONFIG_DIR` is not honoured: its
-//! effect on a print-mode session file was not measured, and an
-//! environment-chosen directory is one more lever for a same-user process.
-use crate::head::{is_complete, Ancestry, NoHead, Topology};
+//! `<config dir>/sessions`, the config directory coming from session
+//! identity's one resolver (`CLAUDE_CONFIG_DIR`, else `$HOME/.claude`),
+//! shared with Observe. The directory is chosen by the environment, but the
+//! head is bound by the caller check and by the session file's `pid`,
+//! `sessionId` and `procStart` matching process facts, never by the
+//! directory; a same-user process is outside the guard anyway (spec §6.1).
+//! Whether Claude Code writes its session file under a custom
+//! `CLAUDE_CONFIG_DIR` was not measured.
+use crate::adapters::AdapterFacts;
+use crate::head::{head_position, is_complete, Ancestry, NoHead};
 use crate::hook::{HeadFacts, HookCallLimits};
 use crate::record::read_regular_capped;
 use fgos_mailbox_core::WriterKey;
@@ -22,14 +28,14 @@ use std::path::Path;
 pub fn find_head(
     sessions_dir: &Path,
     ancestry: &Ancestry,
-    topology: Topology,
+    facts: &AdapterFacts,
     writer: &WriterKey,
     hook: &HookCallLimits,
 ) -> Result<HeadFacts, NoHead> {
-    let record = topology
-        .head_of(ancestry)
-        .filter(|r| is_complete(r))
-        .ok_or(NoHead::WrongTopology)?;
+    let record = head_position(ancestry, facts)?;
+    if !is_complete(record) {
+        return Err(NoHead::WrongTopology);
+    }
     let pid = record.pid.ok_or(NoHead::WrongTopology)?.0;
     let file = read_session_file(&sessions_dir.join(format!("{pid}.json")), hook)?;
     if file.get("pid").and_then(Value::as_u64) != Some(u64::from(pid)) {

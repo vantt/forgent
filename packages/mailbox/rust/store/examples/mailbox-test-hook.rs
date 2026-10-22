@@ -19,15 +19,13 @@
 //! parsed, else to stderr, never to stdout. `send` and `inbox` exit 2 on a
 //! usage error, 0 when recorded or listed, 1 when refused or the record
 //! failed. `--fgos-dir` must exist; nothing is created outside it.
-#[path = "../tests/common/ancestry.rs"]
-mod ancestry;
-
-use fgos_identity::{resolve_current, Source, WriterId};
-use fgos_mailbox::adapters::claude_head::find_head;
+use fgos_identity::resolve_current;
 use fgos_mailbox::adapters::TestedClis;
-use fgos_mailbox::head::{Ancestry, NoHead, Topology};
-use fgos_mailbox::hook::shell::{self, Resolved, ShellInput, WriteGate};
-use fgos_mailbox::hook::{Adapter, HeadFacts, HookEvent, HookLimits};
+use fgos_mailbox::ancestry::ancestry_of;
+use fgos_mailbox::head::Topology;
+use fgos_mailbox::hook::resolve::{resolver_for, HookEnv};
+use fgos_mailbox::hook::shell::{self, ShellInput, WriteGate};
+use fgos_mailbox::hook::{Adapter, HookEvent, HookLimits};
 use fgos_mailbox::record::{Record, Wait};
 use fgos_mailbox::verbs;
 use fgos_mailbox_core::{record_error_text, Limits, MessageId, SendRequest, Timestamp, WriterKey};
@@ -109,7 +107,6 @@ fn usage_error(log: Option<&Path>, cause: &str) -> i32 {
 /// The `hook` flags, checked.
 struct HookArgs {
     adapter: Adapter,
-    topology: Topology,
     event: HookEvent,
     fgos_dir: PathBuf,
     fault: bool,
@@ -126,6 +123,14 @@ fn hook_args(flags: &Flags) -> Result<HookArgs, String> {
         Some("one-shell-hop") => Topology::OneShellHop,
         _ => return Err("--topology must be direct or one-shell-hop".into()),
     };
+    // The topology comes from the adapters contract; the flag only states
+    // which one the caller expects.
+    let contract = TestedClis::embedded()
+        .facts(adapter)
+        .map(|facts| facts.topology);
+    if contract != Some(topology) {
+        return Err("--topology does not match the adapters contract".into());
+    }
     let event = flags
         .get("--event")
         .and_then(HookEvent::from_flag)
@@ -144,7 +149,6 @@ fn hook_args(flags: &Flags) -> Result<HookArgs, String> {
     };
     Ok(HookArgs {
         adapter,
-        topology,
         event,
         fgos_dir,
         fault,
@@ -171,16 +175,6 @@ fn append(log: Option<&Path>, line: &str) {
         .open(log)
     {
         let _ = writeln!(file, "{} {line}", now().as_millis());
-    }
-}
-
-/// The caller's session id from session identity, accepted only when it
-/// comes from a session variable (never a process id).
-fn session_writer(fgos_dir: &Path) -> Option<WriterKey> {
-    let identity = resolve_current(Some(fgos_dir));
-    match (identity.id, identity.source) {
-        (WriterId::Session(id), Source::Env | Source::Registry) => WriterKey::new(id).ok(),
-        _ => None,
     }
 }
 
@@ -212,7 +206,6 @@ fn hook(flags: &Flags) -> i32 {
     );
     let HookArgs {
         adapter,
-        topology,
         event,
         fgos_dir,
         fault,
@@ -240,46 +233,13 @@ fn hook(flags: &Flags) -> i32 {
         }
     };
 
-    let sessions =
-        std::env::var_os("HOME").map(|home| PathBuf::from(home).join(".claude/sessions"));
-    let hook_call = hook_limits.hook.clone();
-    let resolve = move |payload: &[u8], ancestry: &Ancestry| -> Result<Resolved, NoHead> {
-        match adapter {
-            Adapter::Claude => {
-                let writer = session_writer(&fgos_dir).ok_or(NoHead::OtherSession)?;
-                let sessions = sessions.as_deref().ok_or(NoHead::NoSessionFile)?;
-                let head = find_head(sessions, ancestry, topology, &writer, &hook_call)?;
-                Ok(Resolved { writer, head })
-            }
-            // Feasibility demo only, not a supported path (the Codex adapter
-            // is built at V7): Codex's hook process sees no session variable,
-            // so the writer is the payload's `session_id` (spec §7.3), and the
-            // head is the process at the topology's head position, since
-            // Codex keeps no session file. The drain's own writer check
-            // still runs.
-            Adapter::Codex => {
-                let session = serde_json::from_slice::<serde_json::Value>(payload)
-                    .ok()
-                    .and_then(|v| v["session_id"].as_str().map(String::from))
-                    .and_then(|id| WriterKey::new(id).ok())
-                    .ok_or(NoHead::OtherSession)?;
-                let record = topology
-                    .head_of(ancestry)
-                    .cloned()
-                    .ok_or(NoHead::WrongTopology)?;
-                Ok(Resolved {
-                    writer: session,
-                    head: HeadFacts {
-                        record,
-                        own_suffix: None,
-                        handle: None,
-                    },
-                })
-            }
-            Adapter::Agy => Err(NoHead::WrongTopology),
-        }
+    let Some(facts) = TestedClis::embedded().facts(adapter) else {
+        append(log, "outcome untested-cli");
+        return 0;
     };
-    let read_ancestry = || ancestry::ancestry_of(std::process::id());
+    let env = HookEnv::from_process(&fgos_dir);
+    let resolve = resolver_for(adapter, facts, &env, &hook_limits.hook);
+    let read_ancestry = || ancestry_of(std::process::id());
     let input = ShellInput {
         adapter,
         event,
@@ -290,7 +250,6 @@ fn hook(flags: &Flags) -> i32 {
         tested: TestedClis::embedded(),
         clock: &now,
         ancestry: &read_ancestry,
-        topology,
         resolve: &resolve,
         gate,
     };

@@ -6,6 +6,8 @@ pub mod breaker;
 mod drain;
 mod limits;
 #[cfg(unix)]
+pub mod resolve;
+#[cfg(unix)]
 pub mod shell;
 
 pub use drain::{

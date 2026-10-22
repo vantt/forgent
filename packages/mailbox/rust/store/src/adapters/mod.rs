@@ -9,6 +9,8 @@ mod claude;
 pub mod claude_head;
 mod codex;
 #[cfg(unix)]
+pub mod codex_head;
+#[cfg(unix)]
 pub mod version;
 
 use crate::head::Topology;

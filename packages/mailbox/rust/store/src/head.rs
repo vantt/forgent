@@ -4,8 +4,10 @@
 //! process facts. The binding keeps the head's
 //! process record as opaque text, and liveness comes from the process-facts
 //! judge.
+use crate::adapters::AdapterFacts;
 use fgos_mailbox_core::{Binding, Liveness, StoredHead};
-use fgos_process::facts::{judge_here, Record, Verdict};
+use fgos_process::facts::{judge_here, Record, Relation, Verdict};
+use std::path::{Path, PathBuf};
 
 /// Whether `record` names a process at all: a pid and a start time. A
 /// default or partial record never stands for a head.
@@ -73,56 +75,83 @@ fn same_complete_head(kept: &Record, live: &Record) -> bool {
     is_complete(&live) && is_complete(&kept) && kept == live
 }
 
-/// The hook entry's ancestry as process facts read it at one moment. The
-/// entry reads it (the store reads no process table itself); the head
-/// finder and the caller check only judge it.
+/// The hook entry's ancestry as process facts read it at one moment
+/// ([`crate::ancestry::ancestry_of`] reads it); the head finders and the
+/// caller check only judge it.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Ancestry {
     /// The entry's parent process.
     pub parent: Record,
-    /// The command name of the parent (`/proc/<pid>/comm` on Linux).
-    pub parent_comm: String,
+    /// The parent's place in the process tree, kept whole.
+    pub parent_relation: Relation,
+    /// The executable the parent runs (`/proc/<pid>/exe`).
+    pub parent_exe: Option<PathBuf>,
+    /// The path the parent was invoked as (`argv[0]`).
+    pub parent_argv0: Option<String>,
     /// The parent's parent, when it could be read.
     pub grandparent: Option<Record>,
 }
 
-/// Where the head CLI sits above its hook entry, as the CLI's hook runner
-/// was measured to start it (plans/reports/research-261022-1751-mailbox-v4-hook-process-probe.md).
+/// Where the head CLI sits above its hook entry, as the adapters contract
+/// records it per CLI (`hookFacts.<cli>.hookTopology`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Topology {
     /// The head starts the entry itself: the entry's parent is the head,
-    /// and is not a shell (Codex 0.161.0).
+    /// running one of the CLI's head executables.
     Direct,
     /// The head starts the entry through one shell that does not exec it:
-    /// the parent is `sh`, `dash`, `bash` or `zsh` and its parent is the
-    /// head (Claude Code 2.1.308).
+    /// the parent is the CLI's hook shell, and its parent is the head.
     OneShellHop,
 }
 
-/// The shells a one-hop head may run its hook command through.
-const HOP_SHELLS: [&str; 4] = ["sh", "dash", "bash", "zsh"];
-
-impl Topology {
-    /// The record at this topology's head position of `ancestry`; `None`
-    /// when the ancestry does not have this shape.
-    pub fn head_of(self, ancestry: &Ancestry) -> Option<&Record> {
-        let shell = HOP_SHELLS.contains(&ancestry.parent_comm.as_str());
-        match self {
-            Self::Direct => (!shell).then_some(&ancestry.parent),
-            Self::OneShellHop => ancestry.grandparent.as_ref().filter(|_| shell),
+/// The record at the head position of `ancestry` for a CLI with `facts`,
+/// or why there is none:
+///
+/// - `Direct`: the parent, when its executable's file name is one of
+///   `facts.head_executables` (otherwise `WrongExecutable`: a subreaper or
+///   a pane process never stands for a head);
+/// - `OneShellHop`: the grandparent, when the parent runs the resolved
+///   `facts.hook_shell` and was invoked as exactly that path (otherwise
+///   `WrongTopology`: a tool's login shell is refused unless it is
+///   literally what the CLI invokes for hooks).
+pub fn head_position<'a>(
+    ancestry: &'a Ancestry,
+    facts: &AdapterFacts,
+) -> Result<&'a Record, NoHead> {
+    match facts.topology {
+        Topology::Direct => {
+            let name = ancestry
+                .parent_exe
+                .as_deref()
+                .and_then(Path::file_name)
+                .and_then(|name| name.to_str());
+            if name.is_some_and(|name| facts.head_executables.iter().any(|e| e == name)) {
+                Ok(&ancestry.parent)
+            } else {
+                Err(NoHead::WrongExecutable)
+            }
+        }
+        Topology::OneShellHop => {
+            let shell = facts.hook_shell.as_deref().ok_or(NoHead::WrongTopology)?;
+            let invoked = ancestry.parent_argv0.as_deref().map(Path::new) == Some(shell);
+            let runs = ancestry.parent_exe.is_some()
+                && std::fs::canonicalize(shell).ok() == ancestry.parent_exe;
+            if invoked && runs {
+                ancestry.grandparent.as_ref().ok_or(NoHead::WrongTopology)
+            } else {
+                Err(NoHead::WrongTopology)
+            }
         }
     }
 }
 
-/// The caller check (spec §6.1): the record at the topology's head
-/// position of an ancestry read just before the drain is the head the
-/// finder found, both complete. A topology and pid-reuse guard, not a
-/// guard against processes of the same user: a tool process the head
-/// starts directly also has the head as its parent.
-pub fn caller_is_head(ancestry: &Ancestry, topology: Topology, head: &Record) -> bool {
-    topology
-        .head_of(ancestry)
-        .is_some_and(|at| same_complete_head(head, at))
+/// The caller check (spec §6.1): the record at the head position of an
+/// ancestry read just before the drain is the head the finder found, both
+/// complete. A topology and pid-reuse guard, not a guard against
+/// processes of the same user: a tool process the head starts directly
+/// also has the head as its parent.
+pub fn caller_is_head(ancestry: &Ancestry, facts: &AdapterFacts, head: &Record) -> bool {
+    head_position(ancestry, facts).is_ok_and(|at| same_complete_head(head, at))
 }
 
 /// Why a head finder found no head. A CLI without a session file uses
@@ -145,4 +174,12 @@ pub enum NoHead {
     /// The ancestry does not have the topology's shape, or its head
     /// position names no process.
     WrongTopology,
+    /// The process at a direct head position runs none of the CLI's head
+    /// executables.
+    WrongExecutable,
+    /// The payload names no usable session, so no writer key.
+    NoWriter,
+    /// The entry's own environment names another session than the
+    /// payload: a tool process piping someone's payload.
+    WriterMismatch,
 }

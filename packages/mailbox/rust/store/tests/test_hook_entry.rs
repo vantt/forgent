@@ -4,9 +4,10 @@
 //! path are owned by `hook_shell.rs` and `hook_payloads.rs`.
 //!
 //! The test process is the head: it writes its own Claude Code session file
-//! under a temporary `HOME` and starts the entry directly (topology A), or
-//! through one shell that does not exec it (topology B, as Claude Code
-//! 2.1.308 was measured to run hooks).
+//! under a temporary `HOME` and starts the entry through `/bin/sh`, a shell
+//! that does not exec it, as the adapters contract records Claude Code
+//! running hooks (topology one-shell-hop). The budget test starts the entry
+//! directly: it never gets past reading stdin.
 #![cfg(unix)]
 mod common;
 
@@ -106,8 +107,10 @@ impl Setup {
     /// Runs the entry directly with `stdin` and `stdout`.
     fn hook(&self, stdin: &[u8], stdout: Stdio, extra: &[&str]) -> Output {
         let mut child = self
-            .command(example())
-            .args(self.hook_args("direct", extra))
+            .command("/bin/sh")
+            .args(["-c", "\"$0\" \"$@\"; :"])
+            .arg(example())
+            .args(self.hook_args("one-shell-hop", extra))
             .stdin(Stdio::piped())
             .stdout(stdout)
             .stderr(Stdio::piped())
@@ -203,7 +206,7 @@ fn the_entry_exits_zero_when_stdin_never_closes_and_the_budget_passes() {
     let started = Instant::now();
     let mut child: Child = setup
         .command(example())
-        .args(setup.hook_args("direct", &[]))
+        .args(setup.hook_args("one-shell-hop", &[]))
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -303,7 +306,7 @@ fn the_entry_under_one_shell_hop_delivers_and_exits_zero() {
 #[test]
 fn every_kind_of_hook_usage_error_exits_zero_prints_nothing_on_stdout_and_logs_its_cause() {
     let setup = Setup::new("entry-usage");
-    let valid = setup.hook_args("direct", &[]);
+    let valid = setup.hook_args("one-shell-hop", &[]);
     let without = |flag: &str| -> Vec<String> {
         let at = valid.iter().position(|a| a == flag).unwrap();
         let mut args = valid.clone();
@@ -338,6 +341,12 @@ fn every_kind_of_hook_usage_error_exits_zero_prints_nothing_on_stdout_and_logs_i
             "unknown --topology",
             with("--topology", "two-hops"),
             "--topology must be",
+            true,
+        ),
+        (
+            "a --topology the adapters contract does not state",
+            with("--topology", "direct"),
+            "--topology does not match the adapters contract",
             true,
         ),
         (

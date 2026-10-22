@@ -17,7 +17,7 @@ use super::{
     HookLimits, QuietReason,
 };
 use crate::adapters::TestedClis;
-use crate::head::{caller_is_head, Ancestry, NoHead, Topology};
+use crate::head::{caller_is_head, Ancestry, NoHead};
 use crate::record::{Record, RecordError, Reported, Wait};
 use fgos_mailbox_core::{Limits, MessageId, Timestamp, WriterKey};
 use std::collections::BTreeMap;
@@ -53,7 +53,6 @@ pub struct ShellInput<'a> {
     /// Reads the entry's ancestry now; called before the resolver and
     /// again just before hold 1, for the caller check.
     pub ancestry: &'a dyn Fn() -> Option<Ancestry>,
-    pub topology: Topology,
     pub resolve: &'a Resolver<'a>,
     /// Shared with the budget watchdog: the shell writes stdout only after
     /// it moved the gate from idle to writing, and the watchdog ends the
@@ -215,8 +214,11 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
     if fgos_identity::is_attempt_writer_id(resolved.writer.as_str()) {
         return quiet(Quiet::RunnerHead);
     }
+    let Some(facts) = input.tested.facts(input.adapter) else {
+        return quiet(Quiet::Drain(QuietReason::Untested));
+    };
     let again = (input.ancestry)();
-    if !again.is_some_and(|a| caller_is_head(&a, input.topology, &resolved.head.record)) {
+    if !again.is_some_and(|a| caller_is_head(&a, facts, &resolved.head.record)) {
         return quiet(Quiet::NotTheHead);
     }
 

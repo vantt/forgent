@@ -1,15 +1,18 @@
-//! The Claude Code head finder over real processes and real session files.
-//! A head is a child the test spawns (or, under one shell hop, the test
-//! process itself); every ancestry is read from the operating system.
+//! The Claude Code and Codex head finders over real processes, real session
+//! files and the adapters contract's facts. A head is a child the test
+//! spawns (or, under a real one-shell hop, the test process itself).
 #![cfg(unix)]
 mod common;
 
-use common::ancestry::ancestry_of;
 use common::hook_limits;
 use common::record::{mkfifo, TempFgos};
 use fgos_mailbox::adapters::claude_head::find_head;
-use fgos_mailbox::head::{Ancestry, NoHead, Topology};
+use fgos_mailbox::adapters::{codex_head, AdapterFacts, TestedClis};
+use fgos_mailbox::ancestry::ancestry_of;
+use fgos_mailbox::head::{Ancestry, NoHead};
+use fgos_mailbox::hook::Adapter;
 use fgos_mailbox_core::WriterKey;
+use fgos_process::facts::relation_of;
 use fgos_process::facts::{identity_of, self_identity, Record};
 use fgos_process::ProcId;
 use serde_json::{json, Value};
@@ -62,16 +65,35 @@ fn write(dir: &Path, pid: u32, doc: &Value) {
     std::fs::write(dir.join(format!("{pid}.json")), doc.to_string()).unwrap();
 }
 
-/// A head the test spawns, as topology A sees it: the entry's parent.
-fn direct_head() -> (Spawned, u32, Ancestry) {
+fn facts(adapter: Adapter) -> AdapterFacts {
+    TestedClis::embedded().facts(adapter).unwrap().clone()
+}
+
+/// An ancestry whose parent runs `exe` invoked as `argv0`, under
+/// `grandparent`.
+fn ancestry(parent: Record, exe: &str, argv0: &str, grandparent: Option<Record>) -> Ancestry {
+    Ancestry {
+        parent,
+        parent_relation: relation_of(ProcId(std::process::id())).unwrap(),
+        parent_exe: Some(exe.into()),
+        parent_argv0: Some(argv0.to_string()),
+        grandparent,
+    }
+}
+
+/// A head the test spawns, as Claude Code's topology sees it: the
+/// grandparent of the entry, under the contract's hook shell.
+fn claude_head() -> (Spawned, u32, Ancestry) {
     let child = spawn("sleep", &["30"]);
     let pid = child.0.id();
-    let ancestry = Ancestry {
-        parent: record_of(pid),
-        parent_comm: "sleep".to_string(),
-        grandparent: None,
-    };
-    (child, pid, ancestry)
+    let shell = std::fs::canonicalize("/bin/sh").unwrap();
+    let hop = ancestry(
+        record_of(std::process::id()),
+        shell.to_str().unwrap(),
+        "/bin/sh",
+        Some(record_of(pid)),
+    );
+    (child, pid, hop)
 }
 
 /// The first child of `parent`, waited for.
@@ -96,18 +118,20 @@ fn child_of(parent: u32) -> u32 {
     }
 }
 
-fn find(
-    dir: &Path,
-    ancestry: &Ancestry,
-    topology: Topology,
-) -> Result<fgos_mailbox::hook::HeadFacts, NoHead> {
-    find_head(dir, ancestry, topology, &writer(), &hook_limits().hook)
+fn find(dir: &Path, ancestry: &Ancestry) -> Result<fgos_mailbox::hook::HeadFacts, NoHead> {
+    find_head(
+        dir,
+        ancestry,
+        &facts(Adapter::Claude),
+        &writer(),
+        &hook_limits().hook,
+    )
 }
 
 #[test]
 fn a_session_file_naming_the_head_and_the_writer_gives_that_process_as_the_head() {
     let dir = TempFgos::new("head-finder");
-    let (_child, pid, ancestry) = direct_head();
+    let (_child, pid, ancestry) = claude_head();
     let record = record_of(pid);
     write(
         dir.scratch().as_path(),
@@ -115,7 +139,7 @@ fn a_session_file_naming_the_head_and_the_writer_gives_that_process_as_the_head(
         &session(pid, record.start_time.as_deref().unwrap()),
     );
 
-    let head = find(dir.scratch().as_path(), &ancestry, Topology::Direct).unwrap();
+    let head = find(dir.scratch().as_path(), &ancestry).unwrap();
 
     assert_eq!(head.record, record);
     assert_eq!(head.own_suffix.as_deref(), Some("3a"));
@@ -125,11 +149,13 @@ fn a_session_file_naming_the_head_and_the_writer_gives_that_process_as_the_head(
 #[test]
 fn under_one_shell_hop_the_head_is_the_shells_parent_and_any_other_parent_is_the_wrong_topology() {
     let dir = TempFgos::new("head-finder");
-    // A shell that does not exec its last command, as Claude Code's hook
-    // runner was measured to start the entry; its parent is this process.
-    let shell = spawn("sh", &["-c", "sleep 30; :"]);
+    // A shell that does not exec its last command, invoked as the path the
+    // contract names, as Claude Code's hook runner was measured to start
+    // the entry; its parent is this process. Every fact is the OS's.
+    let shell = spawn("/bin/sh", &["-c", "sleep 30; :"]);
     let entry = child_of(shell.0.id());
     let hop = ancestry_of(entry).unwrap();
+    assert_eq!(hop.parent_argv0.as_deref(), Some("/bin/sh"));
     let own = self_identity().unwrap().to_record();
     write(
         dir.scratch().as_path(),
@@ -137,32 +163,28 @@ fn under_one_shell_hop_the_head_is_the_shells_parent_and_any_other_parent_is_the
         &session(std::process::id(), own.start_time.as_deref().unwrap()),
     );
 
-    let head = find(dir.scratch().as_path(), &hop, Topology::OneShellHop).unwrap();
+    let head = find(dir.scratch().as_path(), &hop).unwrap();
     assert_eq!(head.record, own);
-    assert_eq!(
-        find(dir.scratch().as_path(), &hop, Topology::Direct),
-        Err(NoHead::WrongTopology),
-        "a shell parent is never the head of topology A"
-    );
 
-    let (_child, _, direct) = direct_head();
+    // The same shell program invoked as `sh` is not what the CLI invokes.
+    let bare = spawn("sh", &["-c", "sleep 30; :"]);
+    let entry = child_of(bare.0.id());
     assert_eq!(
-        find(dir.scratch().as_path(), &direct, Topology::OneShellHop),
-        Err(NoHead::WrongTopology),
-        "a parent that is no shell is never the hop of topology B"
+        find(dir.scratch().as_path(), &ancestry_of(entry).unwrap()),
+        Err(NoHead::WrongTopology)
     );
 }
 
 #[test]
 fn a_session_file_of_another_session_gives_no_head() {
     let dir = TempFgos::new("head-finder");
-    let (_child, pid, ancestry) = direct_head();
+    let (_child, pid, ancestry) = claude_head();
     let mut doc = session(pid, record_of(pid).start_time.as_deref().unwrap());
     doc["sessionId"] = json!("00000000-0000-4000-8000-000000000002");
     write(dir.scratch().as_path(), pid, &doc);
 
     assert_eq!(
-        find(dir.scratch().as_path(), &ancestry, Topology::Direct),
+        find(dir.scratch().as_path(), &ancestry),
         Err(NoHead::OtherSession)
     );
 }
@@ -170,13 +192,13 @@ fn a_session_file_of_another_session_gives_no_head() {
 #[test]
 fn a_session_file_whose_pid_is_not_the_head_gives_no_head() {
     let dir = TempFgos::new("head-finder");
-    let (_child, pid, ancestry) = direct_head();
+    let (_child, pid, ancestry) = claude_head();
     let mut doc = session(pid, record_of(pid).start_time.as_deref().unwrap());
     doc["pid"] = json!(pid + 1);
     write(dir.scratch().as_path(), pid, &doc);
 
     assert_eq!(
-        find(dir.scratch().as_path(), &ancestry, Topology::Direct),
+        find(dir.scratch().as_path(), &ancestry),
         Err(NoHead::OtherProcess)
     );
 }
@@ -185,7 +207,7 @@ fn a_session_file_whose_pid_is_not_the_head_gives_no_head() {
 fn a_missing_unreadable_symlinked_fifo_or_oversized_session_file_gives_no_head_and_never_follows_the_link(
 ) {
     let limit = hook_limits().hook.max_read_bytes;
-    let (_child, pid, ancestry) = direct_head();
+    let (_child, pid, ancestry) = claude_head();
     let valid = session(pid, record_of(pid).start_time.as_deref().unwrap());
     let file = move |dir: &Path| dir.join(format!("{pid}.json"));
     let cases: Vec<(&str, Plant, NoHead)> = vec![
@@ -235,7 +257,7 @@ fn a_missing_unreadable_symlinked_fifo_or_oversized_session_file_gives_no_head_a
         let dir = TempFgos::new("head-finder");
         make(dir.scratch().as_path());
         assert_eq!(
-            find(dir.scratch().as_path(), &ancestry, Topology::Direct),
+            find(dir.scratch().as_path(), &ancestry),
             Err(expected),
             "{what}"
         );
@@ -245,7 +267,7 @@ fn a_missing_unreadable_symlinked_fifo_or_oversized_session_file_gives_no_head_a
 #[test]
 fn a_start_time_the_session_file_disagrees_with_gives_no_head() {
     let dir = TempFgos::new("head-finder");
-    let (_child, pid, ancestry) = direct_head();
+    let (_child, pid, ancestry) = claude_head();
     let start: u64 = record_of(pid).start_time.unwrap().parse().unwrap();
     write(
         dir.scratch().as_path(),
@@ -254,7 +276,7 @@ fn a_start_time_the_session_file_disagrees_with_gives_no_head() {
     );
 
     assert_eq!(
-        find(dir.scratch().as_path(), &ancestry, Topology::Direct),
+        find(dir.scratch().as_path(), &ancestry),
         Err(NoHead::StartTimeMismatch)
     );
 }
@@ -262,12 +284,103 @@ fn a_start_time_the_session_file_disagrees_with_gives_no_head() {
 #[test]
 fn a_name_that_is_not_derived_gives_no_own_suffix() {
     let dir = TempFgos::new("head-finder");
-    let (_child, pid, ancestry) = direct_head();
+    let (_child, pid, ancestry) = claude_head();
     let mut doc = session(pid, record_of(pid).start_time.as_deref().unwrap());
     doc["nameSource"] = json!("auto");
     doc["name"] = json!("fix the login bug-4c");
     write(dir.scratch().as_path(), pid, &doc);
 
-    let head = find(dir.scratch().as_path(), &ancestry, Topology::Direct).unwrap();
+    let head = find(dir.scratch().as_path(), &ancestry).unwrap();
     assert_eq!(head.own_suffix, None);
+}
+
+#[test]
+fn a_direct_head_must_run_one_of_the_adapters_head_executables() {
+    let codex = facts(Adapter::Codex);
+    let child = spawn("sleep", &["30"]);
+    let record = record_of(child.0.id());
+    let at = |exe: &str| ancestry(record.clone(), exe, exe, None);
+
+    let head =
+        codex_head::find_head(&at("/home/u/.codex/releases/0.161.0/bin/codex"), &codex).unwrap();
+    assert_eq!(head.record, record);
+    assert_eq!(head.own_suffix, None);
+    for subreaper in [
+        "/usr/lib/systemd/systemd",
+        "/home/u/.local/bin/herdr",
+        "/usr/bin/zsh",
+    ] {
+        assert_eq!(
+            codex_head::find_head(&at(subreaper), &codex),
+            Err(NoHead::WrongExecutable),
+            "{subreaper}"
+        );
+    }
+    // A real ancestry: the entry's parent is a shell, not Codex.
+    let shell = spawn("/bin/sh", &["-c", "sleep 30; :"]);
+    let entry = child_of(shell.0.id());
+    assert_eq!(
+        codex_head::find_head(&ancestry_of(entry).unwrap(), &codex),
+        Err(NoHead::WrongExecutable)
+    );
+}
+
+#[test]
+fn the_claude_sessions_directory_follows_the_shared_config_dir_resolver() {
+    use fgos_mailbox::hook::resolve::{resolver_for, HookEnv};
+    let dir = TempFgos::new("head-finder-config-dir");
+    let (_child, pid, hop) = claude_head();
+    let custom = dir.scratch().join("custom-claude");
+    std::fs::create_dir_all(custom.join("sessions")).unwrap();
+    write(
+        &custom.join("sessions"),
+        pid,
+        &session(pid, record_of(pid).start_time.as_deref().unwrap()),
+    );
+    let facts = facts(Adapter::Claude);
+    let hook = hook_limits().hook;
+    let env = |home: Option<&Path>, config: Option<&Path>| HookEnv {
+        home: home.map(|p| p.as_os_str().to_owned()),
+        claude_config_dir: config.map(|p| p.as_os_str().to_owned()),
+        session_writer: Some(writer()),
+        session_env: None,
+    };
+
+    let with_config = env(Some(&dir.scratch().join("home")), Some(&custom));
+    let resolve = resolver_for(Adapter::Claude, &facts, &with_config, &hook);
+    assert_eq!(resolve(b"{}", &hop).unwrap().head.record, record_of(pid));
+
+    let home = dir.scratch().join("home");
+    std::fs::create_dir_all(home.join(".claude")).unwrap();
+    std::fs::rename(custom.join("sessions"), home.join(".claude/sessions")).unwrap();
+    let from_home = env(Some(&home), None);
+    let resolve = resolver_for(Adapter::Claude, &facts, &from_home, &hook);
+    assert_eq!(resolve(b"{}", &hop).unwrap().head.record, record_of(pid));
+
+    let neither = env(None, None);
+    let resolve = resolver_for(Adapter::Claude, &facts, &neither, &hook);
+    assert_eq!(resolve(b"{}", &hop).unwrap_err(), NoHead::NoSessionFile);
+}
+
+#[test]
+fn a_codex_entry_takes_its_writer_from_the_payload_and_refuses_an_environment_naming_another_session(
+) {
+    let payload = br#"{"session_id":"00000000-0000-4000-8000-000000000001"}"#;
+    assert_eq!(codex_head::codex_writer(payload, None).unwrap(), writer());
+    assert_eq!(
+        codex_head::codex_writer(payload, Some(WRITER)).unwrap(),
+        writer()
+    );
+    assert_eq!(
+        codex_head::codex_writer(payload, Some("00000000-0000-4000-8000-000000000002")),
+        Err(NoHead::WriterMismatch)
+    );
+    for bad in [
+        &b"{}"[..],
+        br#"{"session_id":""}"#,
+        br#"{"session_id":"a b"}"#,
+        b"not json",
+    ] {
+        assert_eq!(codex_head::codex_writer(bad, None), Err(NoHead::NoWriter));
+    }
 }

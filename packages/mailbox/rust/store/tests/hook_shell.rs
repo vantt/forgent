@@ -9,7 +9,7 @@ mod common;
 use common::record::{self as rec, read_state, send_req, wait_exit, TempFgos, T0};
 use common::{files, fixture, hook_limits, limits};
 use fgos_mailbox::adapters::TestedClis;
-use fgos_mailbox::head::{Ancestry, Topology};
+use fgos_mailbox::head::Ancestry;
 use fgos_mailbox::hook::shell::{
     arm_budget, run, GateState, Quiet, Resolved, ShellInput, ShellOutcome, WriteGate,
 };
@@ -41,12 +41,16 @@ impl Head {
         identity_of(ProcId(self.0.id())).unwrap().to_record()
     }
 
-    /// The ancestry of an entry the head started directly.
+    /// The ancestry of an entry the head started through the hook shell
+    /// the adapters contract names for Claude Code.
     fn ancestry(&self) -> Ancestry {
+        let shell = std::fs::canonicalize("/bin/sh").unwrap();
         Ancestry {
-            parent: self.record(),
-            parent_comm: "sleep".to_string(),
-            grandparent: None,
+            parent: identity_of(ProcId(std::process::id())).unwrap().to_record(),
+            parent_relation: fgos_process::facts::relation_of(ProcId(std::process::id())).unwrap(),
+            parent_exe: Some(shell),
+            parent_argv0: Some("/bin/sh".to_string()),
+            grandparent: Some(self.record()),
         }
     }
 }
@@ -107,7 +111,6 @@ fn gated_call(
         tested: TestedClis::embedded(),
         clock: &clock,
         ancestry: &ancestry,
-        topology: Topology::Direct,
         resolve: &resolve,
         gate,
     };
@@ -536,7 +539,6 @@ fn call_as(
         tested: TestedClis::embedded(),
         clock: &clock,
         ancestry: &ancestry,
-        topology: Topology::Direct,
         resolve: &resolve,
         gate: WriteGate::new(),
     };
@@ -621,7 +623,6 @@ fn the_breaker_opens_after_the_configured_counted_failures_and_answers_quiet_bef
         tested: TestedClis::embedded(),
         clock: &clock,
         ancestry: &ancestry,
-        topology: Topology::Direct,
         resolve: &resolve,
         gate: WriteGate::new(),
     };
@@ -862,4 +863,73 @@ fn the_no_mail_path_writes_neither_snapshot_nor_breaker_file() {
         before
     );
     assert!(!fgos.paths().breaker().exists());
+}
+
+#[test]
+fn the_caller_check_runs_again_just_before_hold_1_with_the_adapters_facts() {
+    let fgos = TempFgos::new("shell-caller-facts");
+    let record = fgos.record();
+    let head = Head::spawn();
+    let (stdin, _) = payload(files::POST_TOOL_USE);
+    // The resolver found the head, but the ancestry read again just before
+    // hold 1 has a tool's login shell where the contract's hook shell must be.
+    let mut tool_shell = head.ancestry();
+    tool_shell.parent_exe = Some("/usr/bin/zsh".into());
+    tool_shell.parent_argv0 = Some("/usr/bin/zsh".to_string());
+
+    let mut out = Vec::new();
+    let outcome = call(&record, &head, tool_shell, &stdin, &mut out, T0);
+
+    assert_eq!(outcome.quiet, Some(Quiet::NotTheHead));
+    assert!(out.is_empty());
+    assert!(!fgos.paths().snapshot().exists(), "no record was opened");
+}
+
+#[test]
+fn a_codex_entry_whose_environment_names_another_session_than_its_payload_is_quiet() {
+    use fgos_mailbox::hook::resolve::{resolver_for, HookEnv};
+    let fgos = TempFgos::new("shell-codex-env");
+    let record = fgos.record();
+    let payload = serde_json::to_vec(&fixture(Adapter::Codex, files::POST_TOOL_USE)).unwrap();
+    let facts = TestedClis::embedded().facts(Adapter::Codex).unwrap();
+    let hook = hook_limits();
+    let env = HookEnv {
+        home: None,
+        claude_config_dir: None,
+        session_writer: None,
+        session_env: Some("00000000-0000-4000-8000-00000000ffff".to_string()),
+    };
+    let resolve = resolver_for(Adapter::Codex, facts, &env, &hook.hook);
+    let limits = limits();
+    let clock = || T0;
+    let ancestry = || {
+        Some(Ancestry {
+            parent: identity_of(ProcId(std::process::id())).unwrap().to_record(),
+            parent_relation: fgos_process::facts::relation_of(ProcId(std::process::id())).unwrap(),
+            parent_exe: Some("/opt/codex/bin/codex".into()),
+            parent_argv0: Some("codex".to_string()),
+            grandparent: None,
+        })
+    };
+    let input = ShellInput {
+        adapter: Adapter::Codex,
+        event: HookEvent::PostToolUse,
+        project: "forgent",
+        record: &record,
+        limits: &limits,
+        hook: &hook,
+        tested: TestedClis::embedded(),
+        clock: &clock,
+        ancestry: &ancestry,
+        resolve: &resolve,
+        gate: WriteGate::new(),
+    };
+    let mut out = Vec::new();
+    let outcome = run(input, &mut &payload[..], &mut out);
+
+    assert_eq!(
+        outcome.quiet,
+        Some(Quiet::NoHead(fgos_mailbox::head::NoHead::WriterMismatch))
+    );
+    assert!(out.is_empty() && !fgos.paths().snapshot().exists());
 }
