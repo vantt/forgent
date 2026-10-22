@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9a20bca68c61d4f6310cac35f5b0cfdf9c4430f37ddaf3a0a2c069d3c3704fab",
+  "payloadDigest": "02948eec94efcf50722bf8ec59c94380d17946ae1a1fe1ba0d652c8ca2b2243c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -323,7 +323,7 @@
     "packages/git/rust/tests/borrow_deadline.rs": "6a0db6afad96b62ded1253324e862a29a88129e115bd133292ee30ac5482fa07",
     "packages/git/rust/tests/contracts.rs": "1c7b7e1ff100cf61f3ef40953fa6b7c71b20fbe155febeab2e724d2fb9466f59",
     "packages/git/rust/tests/head_tree.rs": "8d97e1c8768e17ff462df7739aaa089a80a5e99efbc249ae993b48e060ae7d97",
-    "packages/git/rust/tests/inspect.rs": "7a61156bee94433335f93df92840b5d0a747057681018ff7ccd601214b4486f5",
+    "packages/git/rust/tests/inspect.rs": "3a4423103960ed81ff9f9dfd1f59ec88a551f366f6aaaba4f1dd2108d4e4f225",
     "packages/git/rust/tests/land.rs": "2579e5af13402be3ad2e24eb10bc883383c072ab5feab3eb54b4f50d138bf98e",
     "packages/git/rust/tests/land_crash_matrix.rs": "3e63d7c4cd185a08e0acf3c99be37c66a2baf3f730683df2acb4c075e78a7ded",
     "packages/git/rust/tests/publication.rs": "5a9b429be6b3335ea0d126e6da505959088199a6f9fe743bf8e286f696ba1798",
@@ -429,7 +429,7 @@
     "packages/mailbox/rust/core/tests/common/mod.rs": "29cd80a3f3e1d91a56880a736143b3fcf2fb615e685fda9186945221d5bfdede",
     "packages/mailbox/rust/core/tests/common/support.rs": "fa0a4c02f6c5fef41f47a35c5f2396cce78be891ad62e2aac93c5180bf4d7575",
     "packages/mailbox/rust/core/tests/counters.rs": "daa2aca6c7dacd211d1b79fb56ae32bedb6a1e87e54bfca71728b4f5c8cc6f9a",
-    "packages/mailbox/rust/core/tests/delivery.rs": "61dd8792529d614575f9efed1062cf8678999fe1b100cb2db4febf3f2457f34f",
+    "packages/mailbox/rust/core/tests/delivery.rs": "e1c535daf8e5714af498fe5380388558160e1520a63464e0ad9a529688db2d9e",
     "packages/mailbox/rust/core/tests/frame.rs": "c54ab2a44180fb80e204a3a656187089718df5f0936bbb5a71b5a826a54dd901",
     "packages/mailbox/rust/core/tests/limits_contract.rs": "f143bd68addbf251ed4675d0d91e09c5b821a6b9b0bc8d3c38c0767e0857dc1e",
     "packages/mailbox/rust/core/tests/names.rs": "2ba76412acbc32049422874071ede9631e793de26db78efc40805c3a29624269",
