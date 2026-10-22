@@ -10,6 +10,8 @@ net_size: "Node −6 / Rust 0 / tests 0 (estimate)"
 
 # Phase 07 — Post-SEAT carry list
 
+> SEAT landed on main 2026-10-22 02:48. This phase is folded into the T1 sub-plan as [phase 06 of `261022-0851-harden-t1-holder-lock-identity-door`](../261022-0851-harden-t1-holder-lock-identity-door/phase-06-identity-door-counter-t0-carry.md) (section "T0's post-SEAT carry list"), with the sites re-verified on `e94b1618d`; that phase closes it and marks this file done.
+
 ## Context
 
 Parent plan [phase 01, "SEAT carry list"](../261021-1118-harden-low-layers-bottom-up/phase-01-t0-process-facts-and-leaf-crates.md) and the hand-off rule: these items are finished in the first change after SEAT lands, before parent phase 02 closes. SEAT branch `origin/seat-binding-wave` touches `src/runner/dispatch/assignment-runner.mjs`, `src/runner/execution/run.mjs`, `src/runner/execution/unit-summary.mjs`, `src/setup/registrations.mjs`, `apps/fgos/src/main.rs` (diff list in [plan.md](plan.md) Facts). Nothing here changes behaviour; it removes the compatibility re-exports phases 2–5 left for these files and moves their three sites onto the door.
