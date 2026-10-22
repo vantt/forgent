@@ -17,6 +17,7 @@
 pub mod bodies;
 mod os_ids;
 mod paths;
+mod prune;
 mod snapshot;
 mod sys;
 
@@ -223,13 +224,17 @@ impl Record {
     }
 
     /// One hold: `mutate` runs on the installed state with a fresh id
-    /// source, and the new state is installed only when it differs.
+    /// source, and the new state is installed only when it differs. `now`
+    /// and `limits` are the ones `mutate` uses; a hold that writes also
+    /// retires dead bindings by them (owner decision Q2).
     pub fn hold<R>(
         &self,
         wait: Wait,
+        now: Timestamp,
+        limits: &Limits,
         mutate: impl FnOnce(&mut MailboxState, &mut dyn IdSource) -> R,
     ) -> Result<Held<R>, RecordError> {
-        self.hold_observed(wait, |_| Ok(()), mutate)
+        self.hold_observed(wait, now, limits, |_| Ok(()), mutate)
     }
 
     /// [`Record::hold`] with `observe` called at each [`Step`] reached. An
@@ -238,11 +243,15 @@ impl Record {
     pub fn hold_observed<R>(
         &self,
         wait: Wait,
+        now: Timestamp,
+        limits: &Limits,
         observe: impl FnMut(Step) -> io::Result<()>,
         mutate: impl FnOnce(&mut MailboxState, &mut dyn IdSource) -> R,
     ) -> Result<Held<R>, RecordError> {
         self.run(
             wait,
+            now,
+            limits,
             observe,
             |state, ids| (mutate(state, ids), None),
             Sweep::No,
@@ -251,7 +260,9 @@ impl Record {
 
     /// One hold that sends: the core decides; an accepted message's body is
     /// installed before the snapshot that names it; a refusal is saved too,
-    /// because it changed the budget and the counters (spec §5.3).
+    /// because it changed the budget and the counters (spec §5.3). The
+    /// request's `dead_keys` is the store's own judgement, made in the hold:
+    /// whatever the caller put there is replaced.
     pub fn send(
         &self,
         req: SendRequest<'_>,
@@ -274,8 +285,14 @@ impl Record {
         let body = req.body;
         self.run(
             wait,
+            now,
+            limits,
             observe,
             |state, ids| {
+                let req = SendRequest {
+                    dead_keys: prune::dead_keys(state),
+                    ..req
+                };
                 let sent = state.send(req, now, limits, ids);
                 let install = sent.as_ref().ok().map(|outcome| (outcome.id.clone(), body));
                 (sent, install)
@@ -310,6 +327,8 @@ impl Record {
     fn run<'b, R>(
         &self,
         wait: Wait,
+        now: Timestamp,
+        limits: &Limits,
         mut observe: impl FnMut(Step) -> io::Result<()>,
         mutate: impl FnOnce(&mut MailboxState, &mut dyn IdSource) -> (R, Option<(MessageId, &'b str)>),
         sweep: Sweep,
@@ -334,7 +353,7 @@ impl Record {
         if ids.failed() {
             return Err(RecordError::Ids);
         }
-        let new = snapshot::encode(&state)?;
+        let mut new = snapshot::encode(&state)?;
         if new == old {
             return Ok(Held {
                 value,
@@ -342,6 +361,9 @@ impl Record {
                 warning: None,
                 collected: Collected::default(),
             });
+        }
+        if !prune::prune(&mut state, now, limits).is_empty() {
+            new = snapshot::encode(&state)?;
         }
         before_commit(&mut observe, Step::Mutated)?;
         if let Some((id, text)) = body {

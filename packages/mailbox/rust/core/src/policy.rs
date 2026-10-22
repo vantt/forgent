@@ -100,7 +100,7 @@ impl MailboxState {
         limits: &Limits,
     ) -> Result<Admitted, Refusal> {
         check_sender_key(&req.from, limits)?;
-        let recipient = self.resolve(&req.to)?;
+        let recipient = self.resolve_skipping(&req.to, &req.dead_keys)?;
         check_not_self(&req.from, &recipient.key)?;
         self.check_reply_hint(req, from_generation, &recipient.key)?;
         check_size(req, limits)?;

@@ -1,8 +1,9 @@
 //! Short names and name resolution (spec §5.1.1).
-use crate::ids::{drawn_hex, Cli, IdSource, ShortName};
+use crate::ids::{drawn_hex, Cli, IdSource, ShortName, WriterKey};
 use crate::limits::Limits;
 use crate::registry::Binding;
 use crate::state::MailboxState;
+use std::collections::BTreeSet;
 use std::fmt;
 
 /// The length of a short name's suffix before any collision (spec §5.1.1).
@@ -101,6 +102,17 @@ impl MailboxState {
     /// prefix. A name is never
     /// taken from message text.
     pub fn resolve(&self, query: &str) -> Result<&Binding, ResolveRefusal> {
+        self.resolve_skipping(query, &BTreeSet::new())
+    }
+
+    /// [`MailboxState::resolve`] over every binding but those of `skipped`,
+    /// which then neither match nor appear as candidates.
+    pub(crate) fn resolve_skipping(
+        &self,
+        query: &str,
+        skipped: &BTreeSet<WriterKey>,
+    ) -> Result<&Binding, ResolveRefusal> {
+        let live = || self.bindings().filter(|b| !skipped.contains(&b.key));
         if query
             .chars()
             .any(|c| c == ',' || c == '*' || c.is_whitespace())
@@ -108,7 +120,7 @@ impl MailboxState {
             return Err(ResolveRefusal::Group);
         }
         if !query.is_empty() {
-            if let Some(exact) = self.bindings().find(|b| b.name.as_str() == query) {
+            if let Some(exact) = live().find(|b| b.name.as_str() == query) {
                 return Ok(exact);
             }
             let steps: [&dyn Fn(&Binding) -> bool; 3] = [
@@ -117,7 +129,7 @@ impl MailboxState {
                 &|b| b.key.as_str().starts_with(query),
             ];
             for matches in steps {
-                let found: Vec<&Binding> = self.bindings().filter(|b| matches(b)).collect();
+                let found: Vec<&Binding> = live().filter(|b| matches(b)).collect();
                 match found.as_slice() {
                     [] => continue,
                     [one] => return Ok(one),
@@ -130,7 +142,7 @@ impl MailboxState {
             }
         }
         Err(ResolveRefusal::Unknown {
-            candidates: names_of(self.bindings()),
+            candidates: names_of(live()),
         })
     }
 }

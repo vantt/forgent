@@ -22,9 +22,7 @@ pub fn head_text(record: &Record) -> String {
 /// unreadable or incomplete stored head is never the same head, and the
 /// judge reads it as `Unknown`, so nothing is guessed.
 pub fn judge_stored(stored: &Binding, registering: &Record) -> StoredHead {
-    let stored_record = serde_json::from_str(&stored.head)
-        .map(|value| Record::from_json(&value))
-        .unwrap_or_default();
+    let stored_record = stored_record(stored);
     // Compare the registering record as the binding would keep it, so a
     // field its text form drops (an empty or unknown boot id) cannot make
     // the head conflict with itself.
@@ -35,14 +33,31 @@ pub fn judge_stored(stored: &Binding, registering: &Record) -> StoredHead {
         // The registering record is the running head itself.
         Liveness::Alive
     } else {
-        match judge_here(&stored_record) {
-            Verdict::Alive => Liveness::Alive,
-            Verdict::Dead => Liveness::Dead,
-            Verdict::Unknown => Liveness::Unknown,
-        }
+        liveness_of(&stored_record)
     };
     StoredHead {
         same_head,
         liveness,
+    }
+}
+
+/// The store's one judgement of a stored head's liveness, used at
+/// registration (through [`judge_stored`]), when pruning and when a send
+/// resolves names. An unreadable head is `Unknown`, never `Dead`.
+pub fn stored_liveness(stored: &Binding) -> Liveness {
+    liveness_of(&stored_record(stored))
+}
+
+fn stored_record(stored: &Binding) -> Record {
+    serde_json::from_str(&stored.head)
+        .map(|value| Record::from_json(&value))
+        .unwrap_or_default()
+}
+
+fn liveness_of(record: &Record) -> Liveness {
+    match judge_here(record) {
+        Verdict::Alive => Liveness::Alive,
+        Verdict::Dead => Liveness::Dead,
+        Verdict::Unknown => Liveness::Unknown,
     }
 }

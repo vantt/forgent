@@ -80,7 +80,7 @@ fn child_entry() {
         }
         "register" => {
             record
-                .hold_observed(Wait::Try, block_at, |state, ids| {
+                .hold_observed(Wait::Try, T0, &common::limits(), block_at, |state, ids| {
                     rec::register(state, "head-c", T0, &limits, ids)
                 })
                 .unwrap();
@@ -95,7 +95,7 @@ fn child_entry() {
 fn set_up(fgos: &TempFgos, limits: &Limits) -> (Record, String) {
     let record = fgos.record();
     let to = record
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             rec::register(state, "head-a", T0, limits, ids);
             rec::name_of(&rec::register(state, "head-b", T0, limits, ids))
         })

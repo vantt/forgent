@@ -70,7 +70,7 @@ impl Drop for TempFgos {
 /// The installed state, read through a hold that changes nothing.
 pub fn read_state(record: &Record) -> MailboxState {
     record
-        .hold(Wait::Try, |state, _| state.clone())
+        .hold(Wait::Try, T0, &super::limits(), |state, _| state.clone())
         .unwrap()
         .value
 }
@@ -110,6 +110,7 @@ pub fn send_req<'a>(from: &str, to: &str, body: &'a str) -> SendRequest<'a> {
         body,
         wake: false,
         reply_to: None,
+        dead_keys: Default::default(),
     }
 }
 

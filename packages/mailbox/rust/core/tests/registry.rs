@@ -3,7 +3,9 @@ mod common;
 use common::{
     key, other_head, register_new, request, same_head, spec_limits, t, Pair, SeqIds, B_NAME,
 };
-use fgos_mailbox_core::{Generation, Liveness, MailboxState, RegisterRefusal, Registered};
+use fgos_mailbox_core::{
+    Generation, Liveness, MailboxState, RegisterRefusal, RegisterRequest, Registered,
+};
 
 fn is_lower_hex(text: &str) -> bool {
     text.chars()
@@ -375,6 +377,42 @@ fn a_writer_key_longer_than_the_header_bound_is_refused_at_registration() {
         Err(RegisterRefusal::KeyTooLong)
     );
     assert_eq!(state, before);
+}
+
+#[test]
+fn a_handle_longer_than_the_header_bound_is_refused_before_any_change() {
+    let limits = spec_limits();
+    let bound = limits.frame.max_header_chars as usize;
+    let mut ids = SeqIds::default();
+    let mut state = MailboxState::new();
+    let with_handle = |key_text: &str, head: &str, handle: String| RegisterRequest {
+        handle: Some(handle),
+        ..request(key_text, "codex", None, head)
+    };
+
+    assert!(state
+        .register(
+            with_handle("k1", "h1", "x".repeat(bound)),
+            None,
+            t(1),
+            &limits,
+            &mut ids
+        )
+        .is_ok());
+    let before = state.clone();
+
+    assert_eq!(
+        state.register(
+            with_handle("k2", "h2", "x".repeat(bound + 1)),
+            None,
+            t(2),
+            &limits,
+            &mut ids
+        ),
+        Err(RegisterRefusal::HandleTooLong)
+    );
+    assert_eq!(state, before);
+    assert_eq!(RegisterRefusal::HandleTooLong.code(), "handle-too-long");
 }
 
 #[test]

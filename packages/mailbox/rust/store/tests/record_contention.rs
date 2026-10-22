@@ -69,7 +69,7 @@ fn child_entry() {
         "claim" => {
             barrier();
             let held = record
-                .hold(CHILD_WAIT, |state, ids| {
+                .hold(CHILD_WAIT, T0, &common::limits(), |state, ids| {
                     state.claim(
                         &rec::key("recipient"),
                         Generation::FIRST,
@@ -92,7 +92,7 @@ fn child_entry() {
             let own = rec::own_head_record();
             barrier();
             let held = record
-                .hold(CHILD_WAIT, |state, ids| {
+                .hold(CHILD_WAIT, T0, &common::limits(), |state, ids| {
                     let judged = state
                         .binding(&rec::key("contested"))
                         .map(|stored| judge_stored(stored, &own));
@@ -120,6 +120,8 @@ fn child_entry() {
             record
                 .hold_observed(
                     CHILD_WAIT,
+                    T0,
+                    &limits,
                     |step| {
                         if step == Step::Locked {
                             rec::publish(&ready, "locked");
@@ -172,7 +174,7 @@ fn kill(children: &mut [Child]) {
 fn heads(record: &Record, keys: &[&str]) -> Vec<String> {
     let limits = common::limits();
     record
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             keys.iter()
                 .map(|k| rec::name_of(&rec::register(state, k, T0, &limits, ids)))
                 .collect()
@@ -316,7 +318,7 @@ fn two_heads_registering_at_once_get_distinct_generations() {
     let limits = common::limits();
     let dead = rec::dead_head_record();
     record
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             state
                 .register(
                     rec::register_request("contested", &dead),
@@ -368,7 +370,7 @@ fn a_hold_that_cannot_get_the_lock_within_the_wait_cap_changes_nothing() {
     rec::wait_for(&mut holder, &fgos.scratch().join("holder.ready"));
 
     let err = record
-        .hold(Wait::Ms(wait_ms), |state, ids| {
+        .hold(Wait::Ms(wait_ms), T0, &common::limits(), |state, ids| {
             rec::register(state, "head-parent", T0, &limits, ids)
         })
         .unwrap_err();

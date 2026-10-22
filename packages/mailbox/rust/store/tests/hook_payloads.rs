@@ -176,6 +176,7 @@ impl Drain {
                     body,
                     wake,
                     reply_to: None,
+                    dead_keys: Default::default(),
                 },
                 now,
                 &limits(),

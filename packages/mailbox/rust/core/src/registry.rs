@@ -93,6 +93,8 @@ pub enum RegisterRefusal {
     NameDoesNotFit,
     /// The writer key is longer than `frame.maxHeaderChars`.
     KeyTooLong,
+    /// The handle is longer than `frame.maxHeaderChars`.
+    HandleTooLong,
     /// The stored generation is the last one; only a corrupt or hand-edited
     /// snapshot gets here, and a takeover must never keep the old number.
     GenerationExhausted,
@@ -106,6 +108,7 @@ impl RegisterRefusal {
             Self::Deferred => "deferred",
             Self::NameDoesNotFit => "name-does-not-fit",
             Self::KeyTooLong => "key-too-long",
+            Self::HandleTooLong => "handle-too-long",
             Self::GenerationExhausted => "generation-exhausted",
         }
     }
@@ -134,8 +137,16 @@ impl MailboxState {
         limits: &Limits,
         ids: &mut dyn IdSource,
     ) -> Result<Registered, RegisterRefusal> {
-        if req.key.as_str().chars().count() > limits.frame.max_header_chars as usize {
+        let bound = limits.frame.max_header_chars as usize;
+        if req.key.as_str().chars().count() > bound {
             return Err(RegisterRefusal::KeyTooLong);
+        }
+        if req
+            .handle
+            .as_ref()
+            .is_some_and(|h| h.chars().count() > bound)
+        {
+            return Err(RegisterRefusal::HandleTooLong);
         }
         let takeover = match (self.bindings.get(&req.key), judged) {
             // A new key whose head already holds another key's binding: the

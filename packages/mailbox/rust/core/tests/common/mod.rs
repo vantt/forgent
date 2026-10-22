@@ -154,6 +154,7 @@ pub fn plain<'a>(from: &str, to: &str, body: &'a str) -> SendRequest<'a> {
         body,
         wake: false,
         reply_to: None,
+        dead_keys: Default::default(),
     }
 }
 

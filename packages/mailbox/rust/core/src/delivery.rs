@@ -8,6 +8,7 @@ use crate::notices::{Notice, NoticeState};
 use crate::state::MailboxState;
 use crate::time::Timestamp;
 use crate::wake::{WakeDrop, WakeParties};
+use std::collections::BTreeSet;
 use std::fmt;
 
 /// The label of a notice's sender: the mailbox itself, which no head can
@@ -40,6 +41,9 @@ pub struct SendRequest<'a> {
     pub wake: bool,
     /// A hint only; the link is derived by the core (spec §5.4).
     pub reply_to: Option<MessageId>,
+    /// Keys whose head the store judged `Dead`: name resolution skips them
+    /// (owner decision Q2, option B). Empty when the store judged none.
+    pub dead_keys: BTreeSet<WriterKey>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -313,7 +317,7 @@ impl MailboxState {
         let admitted = match self.admit(&req, &account, from_generation, now, limits) {
             Ok(admitted) => admitted,
             Err(refusal) => {
-                let to = match self.resolve(&req.to) {
+                let to = match self.resolve_skipping(&req.to, &req.dead_keys) {
                     Ok(recipient) => self.account(&recipient.key).as_str().to_string(),
                     Err(_) => UNRESOLVED.to_string(),
                 };

@@ -44,7 +44,7 @@ fn snapshot_bytes(paths: &Paths) -> Vec<u8> {
 fn registered(fgos: &TempFgos) -> Vec<u8> {
     let limits = common::limits();
     fgos.record()
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             rec::register(state, "head-a", T0, &limits, ids);
         })
         .unwrap();
@@ -71,7 +71,7 @@ fn a_first_hold_on_an_empty_record_creates_the_snapshot_through_the_mailbox_lock
     let limits = common::limits();
     let held = fgos
         .record()
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             rec::register(state, "head-a", T0, &limits, ids)
         })
         .unwrap();
@@ -90,7 +90,9 @@ fn a_hold_whose_closure_changes_nothing_installs_nothing() {
     // On an empty record the comparison is against the empty state.
     let held = fgos
         .record()
-        .hold(Wait::Try, |state, _| state.bindings().count())
+        .hold(Wait::Try, T0, &common::limits(), |state, _| {
+            state.bindings().count()
+        })
         .unwrap();
     assert!(!held.wrote);
     assert!(!fgos.paths().snapshot().exists());
@@ -100,7 +102,7 @@ fn a_hold_whose_closure_changes_nothing_installs_nothing() {
     let before = std::fs::metadata(fgos.paths().snapshot()).unwrap();
     let held = fgos
         .record()
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             state
                 .claim(
                     &rec::key("head-a"),
@@ -127,7 +129,7 @@ fn a_refused_send_is_still_saved() {
     let limits = common::limits();
     let held = fgos
         .record()
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             state.send(
                 rec::send_req("head-a", "nobody-claude-zz", "hello"),
                 T0,
@@ -154,7 +156,7 @@ fn a_newer_snapshot_is_refused_and_left_byte_for_byte() {
     std::fs::write(fgos.paths().snapshot(), &newer).unwrap();
     let err = fgos
         .record()
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             rec::register(state, "head-b", T0, &common::limits(), ids)
         })
         .unwrap_err();
@@ -169,7 +171,7 @@ fn an_older_snapshot_is_refused_as_unsupported() {
     std::fs::write(fgos.paths().snapshot(), &older).unwrap();
     let err = fgos
         .record()
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             rec::register(state, "head-b", T0, &common::limits(), ids)
         })
         .unwrap_err();
@@ -185,7 +187,7 @@ fn an_unreadable_snapshot_is_refused_and_never_overwritten() {
     std::fs::write(fgos.paths().snapshot(), &cut).unwrap();
     let err = fgos
         .record()
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             rec::register(state, "head-b", T0, &common::limits(), ids)
         })
         .unwrap_err();
@@ -203,7 +205,7 @@ fn a_snapshot_that_is_a_symlink_is_never_followed() {
     std::os::unix::fs::symlink(&outside, fgos.paths().snapshot()).unwrap();
     let err = fgos
         .record()
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             rec::register(state, "head-b", T0, &common::limits(), ids)
         })
         .unwrap_err();
@@ -218,7 +220,9 @@ fn a_snapshot_that_is_a_fifo_never_blocks_the_hold() {
     rec::mkfifo(&fgos.paths().snapshot());
     let err = rec::within(Duration::from_secs(10), move || {
         record
-            .hold(Wait::Try, |state, _| state.bindings().count())
+            .hold(Wait::Try, T0, &common::limits(), |state, _| {
+                state.bindings().count()
+            })
             .unwrap_err()
     });
     assert_eq!(err.code(), "snapshot-unreadable");
@@ -234,7 +238,7 @@ fn a_symlinked_record_directory_is_refused_before_any_write() {
     std::fs::remove_dir_all(fgos.paths().record_dir()).unwrap();
     std::os::unix::fs::symlink(&elsewhere, fgos.paths().record_dir()).unwrap();
     let err = record
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             rec::register(state, "head-a", T0, &common::limits(), ids)
         })
         .unwrap_err();
@@ -259,9 +263,13 @@ fn a_failure_after_the_rename_is_reported_as_written() {
 
     let err = fgos
         .record()
-        .hold_observed(Wait::Try, fail_at(Step::Synced), |state, ids| {
-            rec::register(state, "head-b", T0, &limits, ids)
-        })
+        .hold_observed(
+            Wait::Try,
+            T0,
+            &common::limits(),
+            fail_at(Step::Synced),
+            |state, ids| rec::register(state, "head-b", T0, &limits, ids),
+        )
         .unwrap_err();
     assert!(matches!(
         err,
@@ -275,9 +283,13 @@ fn a_failure_after_the_rename_is_reported_as_written() {
 
     let held = fgos
         .record()
-        .hold_observed(Wait::Try, fail_at(Step::Renamed), |state, ids| {
-            rec::register(state, "head-c", T0, &limits, ids)
-        })
+        .hold_observed(
+            Wait::Try,
+            T0,
+            &common::limits(),
+            fail_at(Step::Renamed),
+            |state, ids| rec::register(state, "head-c", T0, &limits, ids),
+        )
         .unwrap();
     assert!(held.wrote);
     assert_eq!(held.warning.unwrap().step, Step::Renamed);

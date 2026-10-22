@@ -20,7 +20,7 @@ const BODY: &str = "hello, head b";
 /// A record with heads `head-a` and `head-b`; returns `head-b`'s name.
 fn two_heads(record: &Record, limits: &Limits) -> String {
     record
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             rec::register(state, "head-a", T0, limits, ids);
             rec::name_of(&rec::register(state, "head-b", T0, limits, ids))
         })
@@ -150,7 +150,7 @@ fn a_body_whose_header_retires_is_deleted_by_the_install_that_retires_it() {
     let to = two_heads(&record, &limits);
     let id = send(&record, &to, BODY, T0, &limits).value.unwrap().id;
     record
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             let claim = state.claim(
                 &rec::key("head-b"),
                 Generation::FIRST,
@@ -178,7 +178,7 @@ fn a_body_whose_header_retires_is_deleted_by_the_install_that_retires_it() {
     assert_eq!(horizon, limits.record.body_retention_sec);
     let later = T0.plus_secs(horizon + 1);
     let held = record
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, later, &limits, |state, ids| {
             rec::register(state, "head-c", later, &limits, ids)
         })
         .unwrap();
@@ -239,7 +239,7 @@ fn a_hold_that_only_reads_leaves_orphans_for_the_next_send() {
     two_heads(&record, &limits);
     let plants = Plants::new(&fgos.paths());
     let held = record
-        .hold(Wait::Try, |state, ids| {
+        .hold(Wait::Try, T0, &common::limits(), |state, ids| {
             state.claim(
                 &rec::key("head-b"),
                 Generation::FIRST,

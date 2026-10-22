@@ -1,7 +1,7 @@
 mod common;
 
-use common::{register_new, request, spec_limits, t, SeqIds};
-use fgos_mailbox_core::{MailboxState, ResolveRefusal};
+use common::{key, plain, register_new, request, spec_limits, t, SeqIds};
+use fgos_mailbox_core::{MailboxState, Refusal, ResolveRefusal};
 
 fn names(list: &[&str]) -> Vec<String> {
     list.iter().map(|n| n.to_string()).collect()
@@ -202,4 +202,56 @@ fn a_comma_space_or_star_in_the_query_is_refused_as_a_group() {
             "{query}"
         );
     }
+}
+
+/// Owner decision Q2 option B (2026-10-22): name resolution at `send`
+/// skips every binding the store judged `Dead`. A name whose only binding
+/// is dead is unknown; a prefix it shared with a live head resolves to the
+/// live one.
+#[test]
+fn a_name_whose_only_binding_is_judged_dead_is_unknown_and_a_shared_prefix_resolves_to_the_live_head(
+) {
+    let limits = spec_limits();
+    let mut ids = SeqIds::default();
+    let mut state = MailboxState::new();
+    let dead_name = register_new(
+        &mut state,
+        request("k-dead", "codex", None, "h1"),
+        t(1),
+        &limits,
+        &mut ids,
+    );
+    register_new(
+        &mut state,
+        request("k-live", "codex", None, "h2"),
+        t(1),
+        &limits,
+        &mut ids,
+    );
+    register_new(
+        &mut state,
+        request("sender", "claude", Some("2b"), "h3"),
+        t(1),
+        &limits,
+        &mut ids,
+    );
+    let send = |state: &mut MailboxState, to: &str, dead: &[&str], ids: &mut SeqIds| {
+        let mut req = plain("sender", to, "hello");
+        req.dead_keys = dead.iter().map(|k| key(k)).collect();
+        state.send(req, t(2), &limits, ids)
+    };
+
+    let to_dead = send(&mut state, &dead_name, &["k-dead"], &mut ids);
+    assert!(
+        matches!(&to_dead, Err(Refusal::UnknownName { candidates }) if !candidates.iter().any(|n| n.as_str() == dead_name)),
+        "{to_dead:?}"
+    );
+    let by_prefix = send(&mut state, "forgent-codex", &["k-dead"], &mut ids).unwrap();
+    assert_eq!(state.message(&by_prefix.id).unwrap().to.as_str(), "k-live");
+    // Judged alive, the same prefix is ambiguous as before.
+    let ambiguous = send(&mut state, "forgent-codex", &[], &mut ids);
+    assert!(
+        matches!(ambiguous, Err(Refusal::AmbiguousName { .. })),
+        "{ambiguous:?}"
+    );
 }
