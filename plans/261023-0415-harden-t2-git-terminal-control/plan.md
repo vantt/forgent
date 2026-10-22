@@ -465,6 +465,14 @@ The big lead re-checked the evidence for every deviation before answering.
 5. **Conditional phases answered after phase 17 starts** become separate follow-up landings and do not block T3. The exception is Q2, as the planner recommends.
 6. **The census on the owner machine (D-T2-8)** goes into the T2 owner-machine guide. Phase 8's census-gated commits merge only after it reads zero.
 
+7. **After phase 1 (2026-10-23 05:20).** The big lead re-ran the phase verification with `--no-fail-fast`. Exactly the 16 new cases are red and every existing case passes.
+   - **CF07 closes as "not reproduced".** `redact` reads through `from_utf8_lossy`, so `remote_url` cannot fail on non-UTF-8, and nothing can inject a read timeout without a new seam.
+     - Phase 2 keeps the `sequence_home` restructure anyway, because RT01 needs it: the home is decided from the config listing, and a refusal is returned before any claim.
+     - It adds no CF07 test.
+     - The "absent versus error" half is a property of that shape, not a separate fix.
+   - **CF09 has no unit witness** (`sync_refs` and `sync_loose_objects` have no checkpoint seam). Phase 3's proof is OPC's reading review plus a `scripts/git/e1-power-cut.*` run where root is available. It adds no new seam.
+   - **The account-change red case** spawns one real `ssh` to `example.invalid` while it is red. Phase 2's fix makes the port refuse before ssh runs, and phase 2's report confirms that the spawn is gone.
+
 ## Unresolved questions
 
 1. **Q0–Q3** are not yet answered (arbitration §6). Q0 is assumed yes.
