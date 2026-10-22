@@ -13,6 +13,7 @@
 
 use std::collections::{HashMap, HashSet};
 
+use crate::guard::guard;
 use crate::model::{rule, Refusal, Segment, Value};
 
 /// Nesting bound of a merged value: the deepest profile bound, so values that already passed a
@@ -87,6 +88,10 @@ impl Kind {
 
 /// Merges `layers`, highest priority first. No layers merge to null with no origins.
 pub fn merge(layers: &[&Value], rules: &dyn RuleSource) -> Result<Merged, Refusal> {
+    guard(|| merge_layers(layers, rules))
+}
+
+fn merge_layers(layers: &[&Value], rules: &dyn RuleSource) -> Result<Merged, Refusal> {
     let mut origins = Vec::new();
     let present: Vec<(usize, &Value)> = layers.iter().copied().enumerate().collect();
     if present.is_empty() {

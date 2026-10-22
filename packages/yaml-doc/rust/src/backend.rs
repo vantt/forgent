@@ -333,6 +333,7 @@ fn new_node(
         tag_at,
         anchor_at,
     });
+    // Cannot fail: a node was pushed just above.
     tree.nodes.len() - 1
 }
 

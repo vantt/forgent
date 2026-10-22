@@ -94,6 +94,7 @@ pub(crate) fn build(tree: &Tree, limits: &Limits, ctx: &Ctx) -> Result<Value, Re
                     rest: entries.iter(),
                     key: None,
                 }),
+                // Unreachable: the backend resolves an anchor to the node it names, never to an alias.
                 Kind::Alias(_) => unreachable!("an alias points at a node that is not an alias"),
             }
         }

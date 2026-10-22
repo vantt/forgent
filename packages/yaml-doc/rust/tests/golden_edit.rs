@@ -4,57 +4,11 @@
 mod common;
 
 use common::*;
-use fgos_yaml_doc::path::parse_path;
-use fgos_yaml_doc::{parse, CommentLoss, Document, Position, Value};
+use fgos_yaml_doc::{parse, Document};
 use serde_json::Value as Json;
 
 fn text_of(bytes: &[u8]) -> String {
     String::from_utf8_lossy(bytes).into_owned()
-}
-
-/// Applies one operation; `Ok(Some(comments))` for a read.
-fn apply(doc: &mut Document, op: &Json) -> Result<Option<Json>, fgos_yaml_doc::Refusal> {
-    let name = op["op"].as_str().expect("op");
-    let path = parse_path(op["path"].as_str().expect("op path")).expect("op path parses");
-    let value = || Value::from_json(&op["value"]);
-    match name {
-        "set" => doc.set(&path, value()).map(|()| None),
-        "insert" => {
-            let key = op["key"].as_str().expect("insert key");
-            let position = match op["after"].as_str() {
-                Some(after) => Position::After(after),
-                None => Position::End,
-            };
-            doc.insert(&path, key, value(), position).map(|()| None)
-        }
-        "remove" => {
-            let ack = if op["acknowledge"].as_bool().unwrap_or(false) {
-                CommentLoss::Acknowledge
-            } else {
-                CommentLoss::Refuse
-            };
-            doc.remove(&path, ack).map(|()| None)
-        }
-        "setCommentBlock" => {
-            let lines: Vec<String> = op["lines"]
-                .as_array()
-                .expect("lines")
-                .iter()
-                .map(|l| l.as_str().expect("line").to_string())
-                .collect();
-            doc.set_comment_block(&path, &lines).map(|()| None)
-        }
-        "setInlineComment" => doc
-            .set_inline_comment(&path, op["text"].as_str().expect("text"))
-            .map(|()| None),
-        "commentsAt" => doc.comments_at(&path).map(|c| {
-            Some(serde_json::json!({
-                "block": c.above,
-                "inline": c.inline,
-            }))
-        }),
-        other => panic!("unknown op {other}"),
-    }
 }
 
 #[test]
@@ -77,7 +31,7 @@ fn edits_match_the_golden_cases() {
             let mut refused = None;
             for op in case["ops"].as_array().expect("ops") {
                 let before = doc.to_bytes();
-                match apply(&mut doc, op) {
+                match apply_op(&mut doc, op) {
                     Ok(result) => read = result.or(read),
                     Err(refusal) => {
                         if doc.to_bytes() != before {

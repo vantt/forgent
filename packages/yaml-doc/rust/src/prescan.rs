@@ -8,6 +8,7 @@
 //!
 //! Order of refusals: byte size, UTF-8, depth. A leading UTF-8 BOM is accepted.
 
+use crate::guard::guard;
 use crate::model::{rule, Profile, Refusal};
 
 struct Entry {
@@ -27,6 +28,10 @@ struct Scanner<'a> {
 
 /// Checks size, UTF-8 and depth of `bytes` under `profile`.
 pub fn check(bytes: &[u8], profile: Profile, file: &str) -> Result<(), Refusal> {
+    guard(|| check_bytes(bytes, profile, file)).map_err(|refusal| refusal.with_file(file))
+}
+
+fn check_bytes(bytes: &[u8], profile: Profile, file: &str) -> Result<(), Refusal> {
     let limits = profile.limits();
     if bytes.len() > limits.input_bytes {
         return Err(Refusal::new(rule::INPUT_TOO_LARGE)

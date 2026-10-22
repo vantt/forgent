@@ -3,8 +3,8 @@
 
 use std::path::PathBuf;
 
-use fgos_yaml_doc::path::format_path;
-use fgos_yaml_doc::{Profile, Refusal, Segment};
+use fgos_yaml_doc::path::{format_path, parse_path};
+use fgos_yaml_doc::{CommentLoss, Document, Position, Profile, Refusal, Segment, Value};
 use serde_json::Value as Json;
 
 pub fn contracts_dir() -> PathBuf {
@@ -133,5 +133,49 @@ pub fn assert_refusal(case: &str, got: &Refusal, expect: &Json) {
             Some(detail),
             "{case}: detail ({got})"
         );
+    }
+}
+
+/// Applies one operation; `Ok(Some(comments))` for a read.
+pub fn apply_op(doc: &mut Document, op: &Json) -> Result<Option<Json>, fgos_yaml_doc::Refusal> {
+    let name = op["op"].as_str().expect("op");
+    let path = parse_path(op["path"].as_str().expect("op path")).expect("op path parses");
+    let value = || Value::from_json(&op["value"]);
+    let ack = if op["acknowledge"].as_bool().unwrap_or(false) {
+        CommentLoss::Acknowledge
+    } else {
+        CommentLoss::Refuse
+    };
+    match name {
+        "set" => doc.set(&path, value(), ack).map(|()| None),
+        "insert" => {
+            let key = op["key"].as_str().expect("insert key");
+            let position = match op["after"].as_str() {
+                Some(after) => Position::After(after),
+                None => Position::End,
+            };
+            doc.insert(&path, key, value(), position, ack)
+                .map(|()| None)
+        }
+        "remove" => doc.remove(&path, ack).map(|()| None),
+        "setCommentBlock" => {
+            let lines: Vec<String> = op["lines"]
+                .as_array()
+                .expect("lines")
+                .iter()
+                .map(|l| l.as_str().expect("line").to_string())
+                .collect();
+            doc.set_comment_block(&path, &lines).map(|()| None)
+        }
+        "setInlineComment" => doc
+            .set_inline_comment(&path, op["text"].as_str())
+            .map(|()| None),
+        "commentsAt" => doc.comments_at(&path).map(|c| {
+            Some(serde_json::json!({
+                "block": c.above,
+                "inline": c.inline,
+            }))
+        }),
+        other => panic!("unknown op {other}"),
     }
 }

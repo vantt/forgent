@@ -24,10 +24,10 @@ pub enum Position<'a> {
     After(&'a str),
 }
 
-/// Whether `remove` may drop a note that sits on the removed node.
+/// Whether an edit may drop a note: `set`, `insert` and `remove` all take it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CommentLoss {
-    /// A note on the node makes the removal a `comment-would-be-lost` refusal.
+    /// A note the edit would drop makes it a `comment-would-be-lost` refusal.
     Refuse,
     /// The caller has decided the note goes with the node.
     Acknowledge,
@@ -52,20 +52,24 @@ impl Document {
 
     /// Replaces the node at `path` with `value`, creating missing parents as block mappings. A
     /// scalar replacing a scalar changes only the scalar's bytes (quoting style and inline comment
-    /// stay); an empty path replaces the whole document.
-    pub fn set(&mut self, path: &[Segment], value: Value) -> Result<(), Refusal> {
-        guard(|| self.set_inner(path, value))
+    /// stay); an empty path replaces the whole document. A note inside a node the edit has to
+    /// rewrite makes it refuse `comment-would-be-lost` unless `ack` is `Acknowledge`.
+    pub fn set(&mut self, path: &[Segment], value: Value, ack: CommentLoss) -> Result<(), Refusal> {
+        guard(|| self.set_inner(path, value, ack))
     }
 
     /// Adds `key: value` to the mapping at `mapping_path` (the empty path is the document root).
+    /// Refuses `comment-would-be-lost` like `set` when the mapping is a flow collection holding a
+    /// note that the rewrite would drop.
     pub fn insert(
         &mut self,
         mapping_path: &[Segment],
         key: &str,
         value: Value,
         position: Position<'_>,
+        ack: CommentLoss,
     ) -> Result<(), Refusal> {
-        guard(|| self.insert_inner(mapping_path, key, value, position))
+        guard(|| self.insert_inner(mapping_path, key, value, position, ack))
     }
 
     /// Deletes the entry or sequence item at `path`, with its line. A note on the node (above it
@@ -80,10 +84,15 @@ impl Document {
         guard(|| self.set_comment_block_inner(path, lines))
     }
 
-    /// Replaces the comment after the node on its line; empty `text` removes it. A node whose
-    /// last line is not a line of its own (block scalar, multi-line value, item of a flow
-    /// collection with more on the line) is refused `inline-comment-unplaceable`.
-    pub fn set_inline_comment(&mut self, path: &[Segment], text: &str) -> Result<(), Refusal> {
+    /// Replaces the comment after the node on its line; `None` removes it, empty text is refused
+    /// `inline-comment-empty`. A node whose last line is not a line of its own (block scalar,
+    /// multi-line value, item of a flow collection with more on the line) is refused
+    /// `inline-comment-unplaceable`.
+    pub fn set_inline_comment(
+        &mut self,
+        path: &[Segment],
+        text: Option<&str>,
+    ) -> Result<(), Refusal> {
         guard(|| self.set_inline_comment_inner(path, text))
     }
 
@@ -94,13 +103,19 @@ impl Document {
 }
 
 impl Document {
-    fn set_inner(&mut self, path: &[Segment], value: Value) -> Result<(), Refusal> {
+    fn set_inner(
+        &mut self,
+        path: &[Segment],
+        value: Value,
+        ack: CommentLoss,
+    ) -> Result<(), Refusal> {
+        let allow_loss = ack == CommentLoss::Acknowledge;
         self.check_value(&value, path)?;
         let (chain, matched) = self.locate(path);
         let mut expected = self.value().clone();
         if matched == path.len() && !chain.is_empty() {
             apply_set(&mut expected, path, value.clone()).map_err(|()| self.not_found(path))?;
-            let splice = self.plan_set_existing(&chain, path, &value)?;
+            let splice = self.plan_set_existing(&chain, path, &value, allow_loss)?;
             return self.commit(splice, expected);
         }
         apply_set(&mut expected, path, value.clone()).map_err(|()| self.not_found(path))?;
@@ -120,8 +135,10 @@ impl Document {
                 .cloned()
                 .ok_or_else(|| self.not_found(path))?;
             apply_set(&mut rewritten, &path[index..], value).map_err(|()| self.not_found(path))?;
-            self.plan_replace(&chain[..=index], &rewritten, false, &path[..index])?
+            self.plan_replace(&chain[..=index], &rewritten, allow_loss, &path[..index])?
         } else {
+            // Cannot fail: the chain is never empty here (every caller has taken it from `full_chain`,
+            // or checked `chain.is_empty()`, or checked `chain.len() >= 2` for the parent).
             let at = chain[chain.len() - 1];
             let parent_path = &path[..matched];
             match &self.node(at.id).kind {
@@ -130,7 +147,7 @@ impl Document {
                 }
                 Kind::Scalar { .. } if self.is_empty_null(at.id) => {
                     let filled = Value::Map(vec![(key, below)]);
-                    self.plan_replace(&chain, &filled, false, parent_path)?
+                    self.plan_replace(&chain, &filled, allow_loss, parent_path)?
                 }
                 _ => return Err(self.not_found(path)),
             }
@@ -143,7 +160,10 @@ impl Document {
         chain: &[Step],
         path: &[Segment],
         value: &Value,
+        allow_loss: bool,
     ) -> Result<Splice, Refusal> {
+        // Cannot fail: the chain is never empty here (every caller has taken it from `full_chain`,
+        // or checked `chain.is_empty()`, or checked `chain.len() >= 2` for the parent).
         let target = chain[chain.len() - 1];
         match self.flow_index(chain) {
             Some(index) if index + 1 < chain.len() => {
@@ -155,9 +175,9 @@ impl Document {
                     .ok_or_else(|| self.not_found(path))?;
                 apply_set(&mut rewritten, &path[index..], value.clone())
                     .map_err(|()| self.not_found(path))?;
-                self.plan_replace(&chain[..=index], &rewritten, false, &path[..index])
+                self.plan_replace(&chain[..=index], &rewritten, allow_loss, &path[..index])
             }
-            _ => self.plan_replace(chain, value, false, path),
+            _ => self.plan_replace(chain, value, allow_loss, path),
         }
     }
 
@@ -167,7 +187,9 @@ impl Document {
         key: &str,
         value: Value,
         position: Position<'_>,
+        ack: CommentLoss,
     ) -> Result<(), Refusal> {
+        let allow_loss = ack == CommentLoss::Acknowledge;
         self.check_value(&value, mapping_path)?;
         let (chain, matched) = self.locate(mapping_path);
         let mut expected = self.value().clone();
@@ -183,6 +205,8 @@ impl Document {
         if matched != mapping_path.len() {
             return Err(self.not_found(mapping_path));
         }
+        // Cannot fail: the chain is never empty here (every caller has taken it from `full_chain`,
+        // or checked `chain.is_empty()`, or checked `chain.len() >= 2` for the parent).
         let at = chain[chain.len() - 1];
         let splice = match (&self.node(at.id).kind, self.flow_index(&chain)) {
             (_, Some(index)) => {
@@ -191,14 +215,19 @@ impl Document {
                     .ok_or_else(|| self.not_found(mapping_path))?;
                 apply_insert(&mut rewritten, &mapping_path[index..], key, value, position)
                     .map_err(|()| self.not_found(mapping_path))?;
-                self.plan_replace(&chain[..=index], &rewritten, false, &mapping_path[..index])?
+                self.plan_replace(
+                    &chain[..=index],
+                    &rewritten,
+                    allow_loss,
+                    &mapping_path[..index],
+                )?
             }
             (Kind::Map(_), None) => {
                 self.plan_insert(&chain, mapping_path, key, &value, position)?
             }
             (Kind::Scalar { .. }, None) if self.is_empty_null(at.id) => {
                 let filled = Value::Map(vec![(key.to_string(), value)]);
-                self.plan_replace(&chain, &filled, false, mapping_path)?
+                self.plan_replace(&chain, &filled, allow_loss, mapping_path)?
             }
             _ => return Err(self.not_found(mapping_path)),
         };
@@ -215,7 +244,11 @@ impl Document {
         let mut expected = self.value().clone();
         apply_remove(&mut expected, path).map_err(|()| self.not_found(path))?;
         let allow_loss = ack == CommentLoss::Acknowledge;
+        // Cannot fail: the chain is never empty here (every caller has taken it from `full_chain`,
+        // or checked `chain.is_empty()`, or checked `chain.len() >= 2` for the parent).
         let parent = chain[chain.len() - 2];
+        // Cannot fail: the chain is never empty here (every caller has taken it from `full_chain`,
+        // or checked `chain.is_empty()`, or checked `chain.len() >= 2` for the parent).
         let target = chain[chain.len() - 1];
         let splice = if let Some(index) = self.flow_index(&chain).filter(|i| i + 1 < chain.len()) {
             let mut rewritten = value_at(self.value(), &path[..index])
@@ -272,11 +305,15 @@ impl Document {
         self.commit(splice, expected)
     }
 
-    fn set_inline_comment_inner(&mut self, path: &[Segment], text: &str) -> Result<(), Refusal> {
-        let token = if text.is_empty() {
-            None
-        } else {
-            Some(sanitize_inline(text).map_err(|r| r.with_file(self.file()))?)
+    fn set_inline_comment_inner(
+        &mut self,
+        path: &[Segment],
+        text: Option<&str>,
+    ) -> Result<(), Refusal> {
+        let token = match text {
+            None => None,
+            Some("") => return Err(Refusal::new(rule::INLINE_COMMENT_EMPTY).with_file(self.file())),
+            Some(text) => Some(sanitize_inline(text).map_err(|r| r.with_file(self.file()))?),
         };
         let chain = self.full_chain(path)?;
         let Some((tail_start, line_end)) = self.inline_slot(&chain) else {
@@ -317,6 +354,8 @@ impl Document {
             .lines()
             .map(|line| comment_body(line.trim()))
             .collect();
+        // Cannot fail: the chain is never empty here (every caller has taken it from `full_chain`,
+        // or checked `chain.is_empty()`, or checked `chain.len() >= 2` for the parent).
         let target = self.node(chain[chain.len() - 1].id);
         let inline = if matches!(
             target.kind,
@@ -647,6 +686,8 @@ impl Document {
 
     /// The start of the first line of the entry or item the chain ends at.
     fn entry_first_line(&self, chain: &[Step]) -> Option<usize> {
+        // Cannot fail: the chain is never empty here (every caller has taken it from `full_chain`,
+        // or checked `chain.is_empty()`, or checked `chain.len() >= 2` for the parent).
         let step = chain[chain.len() - 1];
         let src = self.src();
         let at = if step.in_seq {
@@ -701,6 +742,8 @@ impl Document {
         if chain.len() < 2 {
             return None;
         }
+        // Cannot fail: the chain is never empty here (every caller has taken it from `full_chain`,
+        // or checked `chain.is_empty()`, or checked `chain.len() >= 2` for the parent).
         let step = chain[chain.len() - 1];
         let node = self.node(step.id);
         let src = self.src();
@@ -1213,6 +1256,8 @@ impl Document {
 
     /// A scalar replacing a scalar inside a flow collection: only the scalar's bytes change.
     fn plan_scalar_in_flow(&self, chain: &[Step], value: &Value) -> Splice {
+        // Cannot fail: the chain is never empty here (every caller has taken it from `full_chain`,
+        // or checked `chain.is_empty()`, or checked `chain.len() >= 2` for the parent).
         let target = chain[chain.len() - 1];
         let node = self.node(target.id);
         let scope = if chain.len() > 1 {
@@ -1237,6 +1282,8 @@ impl Document {
         path: &[Segment],
     ) -> Result<Splice, Refusal> {
         let src = self.src();
+        // Cannot fail: the chain is never empty here (every caller has taken it from `full_chain`,
+        // or checked `chain.is_empty()`, or checked `chain.len() >= 2` for the parent).
         let target = chain[chain.len() - 1];
         let node = self.node(target.id);
         let layout = self.layout();
@@ -1416,6 +1463,8 @@ impl Document {
         position: Position<'_>,
     ) -> Result<Splice, Refusal> {
         let src = self.src();
+        // Cannot fail: the chain is never empty here (every caller has taken it from `full_chain`,
+        // or checked `chain.is_empty()`, or checked `chain.len() >= 2` for the parent).
         let map = chain[chain.len() - 1];
         let Kind::Map(entries) = &self.node(map.id).kind else {
             return Err(self.not_found(mapping_path));
@@ -1490,6 +1539,8 @@ impl Document {
         allow_loss: bool,
     ) -> Result<Splice, Refusal> {
         let src = self.src();
+        // Cannot fail: the chain is never empty here (every caller has taken it from `full_chain`,
+        // or checked `chain.is_empty()`, or checked `chain.len() >= 2` for the parent).
         let target = chain[chain.len() - 1];
         let node = self.node(target.id);
         let first = self
@@ -1699,7 +1750,9 @@ mod tests {
         for _ in 0..(Profile::StrictConfig.limits().depth + 1) {
             deep = Value::Seq(vec![deep]);
         }
-        let refusal = doc.set(&[Segment::Key("a".into())], deep).unwrap_err();
+        let refusal = doc
+            .set(&[Segment::Key("a".into())], deep, CommentLoss::Refuse)
+            .unwrap_err();
         assert_eq!(refusal.rule, rule::DEPTH_EXCEEDED);
         assert_eq!(doc.to_bytes(), b"a: 1\n");
     }

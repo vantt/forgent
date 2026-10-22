@@ -169,6 +169,7 @@ pub mod rule {
     pub const SYNTAX_ERROR: &str = "syntax-error";
     pub const COMMENT_WOULD_BE_LOST: &str = "comment-would-be-lost";
     pub const INLINE_COMMENT_MULTILINE: &str = "inline-comment-multiline";
+    pub const INLINE_COMMENT_EMPTY: &str = "inline-comment-empty";
     pub const EDIT_CHANGED_MEANING: &str = "edit-changed-meaning";
     pub const PATH_NOT_FOUND: &str = "path-not-found";
     pub const INLINE_COMMENT_UNPLACEABLE: &str = "inline-comment-unplaceable";
@@ -177,7 +178,7 @@ pub mod rule {
     pub const YAML_INTERNAL_ERROR: &str = "yaml-internal-error";
 
     /// Every rule id, in the order of the contract file.
-    pub const ALL: [&str; 31] = [
+    pub const ALL: [&str; 32] = [
         DUPLICATE_KEY,
         TAG_REFUSED,
         UNKNOWN_TAG,
@@ -203,6 +204,7 @@ pub mod rule {
         SYNTAX_ERROR,
         COMMENT_WOULD_BE_LOST,
         INLINE_COMMENT_MULTILINE,
+        INLINE_COMMENT_EMPTY,
         EDIT_CHANGED_MEANING,
         PATH_NOT_FOUND,
         INLINE_COMMENT_UNPLACEABLE,

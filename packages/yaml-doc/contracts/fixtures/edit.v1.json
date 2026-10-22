@@ -2513,8 +2513,8 @@
       }
     },
     {
-      "id": "comment-inline-empty-text-removes",
-      "why": "empty inline comment text removes the comment and the blanks before it",
+      "id": "comment-inline-none-removes",
+      "why": "an absent inline comment text removes the comment and the blanks before it",
       "profiles": [
         "strict-config",
         "tool"
@@ -2529,7 +2529,7 @@
         {
           "op": "setInlineComment",
           "path": "a",
-          "text": ""
+          "text": null
         }
       ],
       "expect": {
@@ -2661,6 +2661,142 @@
       ],
       "expect": {
         "output": "l:\n  - a\n  # why b\n  - b\n"
+      }
+    },
+    {
+      "id": "set-flow-with-inner-comment-acknowledged",
+      "why": "with the acknowledgement the flow collection is rewritten and its note goes",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "x: [1, # inner",
+          "  2]"
+        ]
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "x",
+          "value": [
+            1,
+            2,
+            3
+          ],
+          "acknowledge": true
+        }
+      ],
+      "expect": {
+        "output": "x:\n  - 1\n  - 2\n  - 3\n"
+      }
+    },
+    {
+      "id": "set-subtree-with-comment-acknowledged",
+      "why": "with the acknowledgement a subtree replacement may drop the note inside it",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "a:",
+          "  # keep",
+          "  b: 1"
+        ]
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "a",
+          "value": {
+            "z": 1
+          },
+          "acknowledge": true
+        }
+      ],
+      "expect": {
+        "output": "a:\n  z: 1\n"
+      }
+    },
+    {
+      "id": "insert-into-flow-with-inner-comment-refused",
+      "why": "insert into a flow mapping rewrites it; a note inside is not dropped without the acknowledgement",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "x: {a: 1, # inner",
+          "  b: 2}"
+        ]
+      },
+      "ops": [
+        {
+          "op": "insert",
+          "path": "x",
+          "key": "c",
+          "value": 3
+        }
+      ],
+      "expect": {
+        "refusal": {
+          "rule": "comment-would-be-lost"
+        }
+      }
+    },
+    {
+      "id": "insert-into-flow-with-inner-comment-acknowledged",
+      "why": "with the acknowledgement the insert rewrites the flow mapping and the note goes",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "x: {a: 1, # inner",
+          "  b: 2}"
+        ]
+      },
+      "ops": [
+        {
+          "op": "insert",
+          "path": "x",
+          "key": "c",
+          "value": 3,
+          "acknowledge": true
+        }
+      ],
+      "expect": {
+        "output": "x:\n  a: 1\n  b: 2\n  c: 3\n"
+      }
+    },
+    {
+      "id": "comment-inline-empty-text-refused",
+      "why": "an empty inline comment text is invalid; removing is the absent text",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "a: 1  # old",
+          "b: 2"
+        ]
+      },
+      "ops": [
+        {
+          "op": "setInlineComment",
+          "path": "a",
+          "text": ""
+        }
+      ],
+      "expect": {
+        "refusal": {
+          "rule": "inline-comment-empty"
+        }
       }
     }
   ]

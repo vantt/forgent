@@ -29,7 +29,7 @@ size claims of generated inputs, the mapping); it proves no parser behaviour.
 ```
 
 `profiles` lists the profiles the case runs under. A case whose expectation differs per profile is
-two cases. Some files add fields: `kind` (comment), `ops` (edit), `old: true` (a case moved from the
+two cases. Some files add fields: `kind` (comment), `ops` (edit; an op may carry `acknowledge: true`, and `setInlineComment` takes `text: null` to remove), `old: true` (a case moved from the
 Node test) and `max_millis` (a parse case that must finish within that time).
 
 ### `input`

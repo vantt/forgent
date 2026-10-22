@@ -37,6 +37,7 @@ impl LineIndex {
 
     fn position(&self, text: &str, byte: usize) -> (u32, u32) {
         let byte = byte.clamp(self.base, text.len());
+        // `starts[0]` is `base` and `byte >= base`, so at least one start is not past `byte`.
         let line = self.starts.partition_point(|start| *start <= byte) - 1;
         let from = self.starts[line];
         // `byte` is a character boundary for every offset this crate computes; stay safe anyway.
@@ -72,7 +73,6 @@ pub struct NodeSpans {
 }
 
 /// One YAML document under one profile.
-#[derive(Debug)]
 pub struct Document {
     pub(crate) text: String,
     profile: Profile,
@@ -81,6 +81,18 @@ pub struct Document {
     pub(crate) tree: Tree,
     lines: LineIndex,
     revision: String,
+}
+
+/// Names the document, never its text: a `{:?}` of a document must not put config values in a log.
+impl std::fmt::Debug for Document {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Document")
+            .field("file", &self.file)
+            .field("profile", &self.profile)
+            .field("bytes", &self.text.len())
+            .field("revision", &self.revision)
+            .finish_non_exhaustive()
+    }
 }
 
 impl std::fmt::Debug for LineIndex {
@@ -213,10 +225,12 @@ impl Document {
     /// come out sorted (JSON objects here do not keep order). A float with no JSON form (`.nan`,
     /// `.inf`; only the `tool` profile allows them) is refused.
     pub fn to_json(&self) -> Result<serde_json::Value, Refusal> {
-        json_of(&self.value).map_err(|()| {
-            Refusal::new(rule::NON_FINITE_NUMBER)
-                .with_file(&self.file)
-                .with_detail("a float with no JSON form")
+        guard(|| {
+            json_of(&self.value).map_err(|()| {
+                Refusal::new(rule::NON_FINITE_NUMBER)
+                    .with_file(&self.file)
+                    .with_detail("a float with no JSON form")
+            })
         })
     }
 }

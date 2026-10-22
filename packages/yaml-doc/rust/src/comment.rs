@@ -11,6 +11,7 @@
 //!   words, so a hidden-text attempt surfaces to the caller instead of being rewritten quietly.
 //! - An empty line is written as `#` (no trailing space).
 
+use crate::guard::guard;
 use crate::model::{rule, Refusal};
 
 fn is_line_break(ch: char) -> bool {
@@ -95,18 +96,22 @@ fn render(line: &str) -> String {
 
 /// Comment lines for a block: one `# text` line per line of `text`, never fewer than one.
 pub fn sanitize(text: &str) -> Result<Vec<String>, Refusal> {
-    split_lines(text)
-        .into_iter()
-        .enumerate()
-        .map(|(index, line)| check_hidden(line, index + 1).map(|()| render(line)))
-        .collect()
+    guard(|| {
+        split_lines(text)
+            .into_iter()
+            .enumerate()
+            .map(|(index, line)| check_hidden(line, index + 1).map(|()| render(line)))
+            .collect()
+    })
 }
 
 /// The one comment token for an inline comment; text with a line break is refused.
 pub fn sanitize_inline(text: &str) -> Result<String, Refusal> {
-    if let Some((index, _)) = text.chars().enumerate().find(|(_, ch)| is_line_break(*ch)) {
-        return Err(Refusal::new(rule::INLINE_COMMENT_MULTILINE).at(1, index as u32 + 1));
-    }
-    check_hidden(text, 1)?;
-    Ok(render(text))
+    guard(|| {
+        if let Some((index, _)) = text.chars().enumerate().find(|(_, ch)| is_line_break(*ch)) {
+            return Err(Refusal::new(rule::INLINE_COMMENT_MULTILINE).at(1, index as u32 + 1));
+        }
+        check_hidden(text, 1)?;
+        Ok(render(text))
+    })
 }

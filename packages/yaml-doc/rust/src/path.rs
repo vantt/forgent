@@ -4,6 +4,7 @@
 //! empty key) is written bracket-quoted as `["a.b"]`, with `\` escaping the next character. A
 //! dotted string is never a path by itself: `code:implement` needs no escape.
 
+use crate::guard::guard;
 use crate::model::{rule, Refusal, Segment};
 
 /// Writes segments in the canonical text form; `parse_path(&format_path(s))` returns `s`.
@@ -43,6 +44,10 @@ fn is_bare(key: &str) -> bool {
 
 /// Parses the text form back into segments. An empty text is the empty path (the document root).
 pub fn parse_path(text: &str) -> Result<Vec<Segment>, Refusal> {
+    guard(|| parse_segments(text))
+}
+
+fn parse_segments(text: &str) -> Result<Vec<Segment>, Refusal> {
     let chars: Vec<char> = text.chars().collect();
     let mut segments = Vec::new();
     let mut i = 0;
