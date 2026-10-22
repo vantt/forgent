@@ -14,13 +14,18 @@
  *
  * Subcommands
  *
- *   run <cli> <mode> [--fallback]
+ *   run <cli> <mode> [--fallback] [--agent-head] [--account <name>]
  *       <cli> is claude | codex | agy; <mode> is dump | accept | subagent.
  *       Builds <base>/<cli>/<mode>/ (refuses when it exists), writes the
  *       isolated hook configuration, runs the CLI once under `timeout 300`
  *       and writes versions.json (before and after), run.json and
  *       output.txt. `--fallback` (accept only) offers the other context shape
  *       of the two candidates below, after the first one was refused.
+ *       `--agent-head` (claude dump only) starts the head session as a
+ *       custom agent (`--agents`, `--agent`), into <mode>-agent-head/.
+ *       Before the run it refuses when a hook file other than its own would
+ *       load (Claude Code managed settings, agy account-level hook files);
+ *       after an agy run it checks agy's log names exactly one hooks file.
  *       For codex it checks, before and after the run, that home/auth.json
  *       is a symlink to the account's auth.json (a token refresh during the
  *       run then writes the real file, never a copy) and that
@@ -39,8 +44,13 @@
  *       version changed during the run or the runs used different versions.
  *       Prints every key whose string value it replaced only because the key
  *       was not on the safe list, for a human read.
+ *   redact-agent-head <cli>
+ *       Adds the `--agent-head` run's Stop and PostToolUse payloads to an
+ *       already redacted fixture directory.
  *   clean <cli>
  *       Deletes <base>/<cli>/ (raw calls, the codex home with its rollouts).
+ *       It refuses while a set-aside auth.json.rotated exists there (see
+ *       scripts/lib/codex-auth-guard.mjs).
  *
  * Where: <base> is ${TMPDIR:-/tmp}/fgos-work/mailbox-v3-record, outside every
  * git checkout, so a full-bypass agent cannot write the repository and the
@@ -85,6 +95,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { isAuthLink, setAsideAuthFiles, setAsideReplacedAuth } from './lib/codex-auth-guard.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(SCRIPT), '..');
@@ -101,6 +112,9 @@ const REDACTION_RULES_VERSION = 1;
  * CLAUDECODE, removed from every CLI's environment. */
 const ID_VARS = ['FGOS_SESSION_ID', 'CODEX_THREAD_ID', 'CLAUDE_CODE_SESSION_ID'];
 const REMOVED_VARS = [...ID_VARS, 'CLAUDECODE'];
+
+/** The agent a `--agent-head` Claude Code run starts its head session as. */
+const AGENT_HEAD = 'mbx-head';
 
 const TOOL_COMMAND =
   "env | grep -E '^(CODEX_THREAD_ID|CLAUDE_CODE_SESSION_ID|FGOS_SESSION_ID)=' > tool-env.txt; echo mailbox-fixture";
@@ -199,7 +213,37 @@ function hookEntry(cli, event, runDir) {
   return { type: 'command', command: hookCommand(cli, event, runDir), timeout: 30 };
 }
 
-function setUp(cli, mode, runDir) {
+/**
+ * Refuses a run in which a hook file other than the recorder's own would
+ * load: Claude Code's managed policy settings (which `--setting-sources`
+ * cannot exclude) and agy's account-level hook files.
+ */
+function hookPreflight(cli, env) {
+  if (cli === 'claude') {
+    for (const file of ['/etc/claude-code/managed-settings.json', '/Library/Application Support/ClaudeCode/managed-settings.json']) {
+      if (fs.existsSync(file) && /"hooks"/.test(fs.readFileSync(file, 'utf8'))) die(`${file} declares hooks that would fire during the run`);
+    }
+  }
+  if (cli === 'agy') {
+    const found = [path.join(env.HOME, '.agents', 'hooks.json')].filter((f) => fs.existsSync(f));
+    const gemini = path.join(env.HOME, '.gemini');
+    if (fs.existsSync(gemini)) {
+      for (const entry of fs.readdirSync(gemini, { recursive: true }).map(String)) {
+        if (path.basename(entry) === 'hooks.json') found.push(path.join(gemini, entry));
+      }
+    }
+    if (found.length) die(`account-level agy hook files would load: ${found.join(', ')}`);
+  }
+}
+
+/** After an agy run: its log must name exactly one loaded hooks file, the workspace's. */
+function agyLoadedOneHookFile(runDir) {
+  const log = fs.readFileSync(path.join(runDir, 'agy.log'), 'utf8');
+  const files = [...log.matchAll(/loaded \d+ named hooks from (\d+) hooks\.json file/g)].reduce((n, m) => n + Number(m[1]), 0);
+  if (files !== 1) die(`agy loaded ${files} hooks.json files; only the workspace's may load`);
+}
+
+function setUp(cli, mode, runDir, agentHead) {
   const ws = path.join(runDir, 'ws');
   fs.mkdirSync(ws, { recursive: true });
   for (let dir = ws; dir !== path.dirname(dir); dir = path.dirname(dir)) {
@@ -215,7 +259,13 @@ function setUp(cli, mode, runDir) {
     }
     writeJson(path.join(runDir, 'settings.json'), { hooks });
     args.push('-p', '--model', 'haiku', '--dangerously-skip-permissions', '--setting-sources', 'project',
-      '--settings', path.join(runDir, 'settings.json'), PROMPTS[mode]);
+      '--settings', path.join(runDir, 'settings.json'));
+    if (agentHead) {
+      // A head session started with --agent: does its own event carry
+      // agent_type or agent_id?
+      args.push('--agents', JSON.stringify({ [AGENT_HEAD]: { description: 'Mailbox fixture head agent', prompt: 'Follow the user instruction exactly.' } }), '--agent', AGENT_HEAD);
+    }
+    args.push(PROMPTS[mode]);
   } else if (cli === 'codex') {
     const home = path.join(runDir, 'home');
     fs.mkdirSync(home, { recursive: true });
@@ -254,9 +304,7 @@ function setUp(cli, mode, runDir) {
 function codexAuthState(runDir) {
   const home = path.join(runDir, 'home');
   const link = path.join(home, 'auth.json');
-  const target = path.join(accountHome('codex'), 'auth.json');
-  const stat = fs.lstatSync(link, { throwIfNoEntry: false });
-  const isLink = Boolean(stat && stat.isSymbolicLink() && fs.readlinkSync(link) === target);
+  const isLink = isAuthLink(link, path.join(accountHome('codex'), 'auth.json'));
   const status = spawnSync('codex', ['login', 'status'], {
     env: cleanEnv({ CODEX_HOME: home }),
     stdio: 'ignore',
@@ -269,7 +317,9 @@ function cmdRun(cli, mode, flags) {
   if (!PROMPTS[mode]) die(`unknown mode ${mode}`);
   const fallback = flags.includes('--fallback');
   if (fallback && mode !== 'accept') die('--fallback applies to accept only');
-  const runDir = runDirOf(cli, mode) + (fallback ? '-fallback' : '');
+  const agentHead = flags.includes('--agent-head');
+  if (agentHead && !(cli === 'claude' && mode === 'dump')) die('--agent-head applies to claude dump only');
+  const runDir = runDirOf(cli, mode) + (fallback ? '-fallback' : '') + (agentHead ? '-agent-head' : '');
   if (fs.existsSync(runDir)) die(`${runDir} exists; remove it to record again`);
   fs.mkdirSync(runDir, { recursive: true });
   const order = CONTEXT_ORDER[cli];
@@ -286,7 +336,8 @@ function cmdRun(cli, mode, flags) {
       Stop: `Mailbox fixture check: before you stop, reply with the token ${stop}.`,
     },
   });
-  const { ws, args, env } = setUp(cli, mode, runDir);
+  const { ws, args, env } = setUp(cli, mode, runDir, agentHead);
+  hookPreflight(cli, env);
   const authBefore = cli === 'codex' ? codexAuthState(runDir) : null;
   if (authBefore && !(authBefore.isLink && authBefore.loggedIn)) {
     die(`the ${ACCOUNT} codex login is not usable before the run (link ${authBefore.isLink}, logged in ${authBefore.loggedIn})`, 3);
@@ -308,19 +359,19 @@ function cmdRun(cli, mode, flags) {
     mode,
     startedAt,
     exit: child.status,
-    command: [cli, ...args.map((a) => (a === PROMPTS[mode] ? '<prompt>' : a))].join(' '),
+    command: [cli, ...args.map((a) => (a === PROMPTS[mode] ? '<prompt>' : a.startsWith('{') ? `'${a}'` : a))].join(' '),
     removedVars: REMOVED_VARS,
     recorderPidNamespace: fs.readlinkSync('/proc/self/ns/pid'),
   });
   process.stdout.write(`${cli} ${mode}: exit ${child.status}; versions ${before} -> ${after}; ${callsOf(runDir).length} hook calls; ${runDir}\n`);
+  if (cli === 'agy') agyLoadedOneHookFile(runDir);
   if (authBefore) {
     const authAfter = codexAuthState(runDir);
     process.stdout.write(`codex auth.json: ${authAfter.isLink ? 'still a link to the account file' : 'NOT A LINK'}; login status ${authAfter.loggedIn ? 'ok' : 'FAILED'}\n`);
     if (!(authAfter.isLink && authAfter.loggedIn)) {
-      const link = path.join(runDir, 'home', 'auth.json');
-      const stat = fs.lstatSync(link, { throwIfNoEntry: false });
-      if (stat && !stat.isSymbolicLink()) fs.rmSync(link);
-      die(`the ${ACCOUNT} codex login link broke or its status failed; stop and ask the owner`, 3);
+      const aside = setAsideReplacedAuth(path.join(runDir, 'home', 'auth.json'));
+      const kept = aside ? `; the replaced auth.json may hold the only valid token and was kept at ${aside} (mode 0600)` : '';
+      die(`the ${ACCOUNT} codex login link broke or its status failed${kept}; stop and ask the owner`, 3);
     }
   }
 }
@@ -492,7 +543,7 @@ const ID_KEY = /(^|_)(session|thread|conversation|prompt|tool_?use|turn|agent|ex
 const SAFE_KEYS = new Set(['hook_event_name', 'hookEventName', 'tool_name', 'toolName', 'permission_mode', 'effort', 'level', 'reasoning_effort']);
 const PLACEHOLDER = /^00000000-0000-4000-8000-\d{12}$/;
 
-function makeRedactor(cli) {
+function makeRedactor(cli, firstId = 1) {
   const ids = new Map();
   const unknownKeys = new Set();
   const home = os.homedir();
@@ -509,7 +560,7 @@ function makeRedactor(cli) {
 
   const idFor = (value) => {
     if (PLACEHOLDER.test(value)) return value;
-    if (!ids.has(value)) ids.set(value, `00000000-0000-4000-8000-${String(ids.size + 1).padStart(12, '0')}`);
+    if (!ids.has(value)) ids.set(value, `00000000-0000-4000-8000-${String(ids.size + firstId).padStart(12, '0')}`);
     return ids.get(value);
   };
 
@@ -667,8 +718,42 @@ function scrubSource(source) {
   return out.split(os.userInfo().username).join('user');
 }
 
+/**
+ * Adds the `--agent-head` run of Claude Code to the committed fixtures as
+ * stop-agent-head.json and post-tool-use-agent-head.json, numbering its ids
+ * after the highest placeholder already committed for the CLI so no false
+ * equality appears, and appends what it saw to vectors.json's source.
+ */
+function cmdRedactAgentHead(cli) {
+  const runDir = `${runDirOf(cli, 'dump')}-agent-head`;
+  if (!fs.existsSync(runDir)) die(`missing run ${runDir}`);
+  const outDir = path.join(FIXTURES, cli);
+  const vectorsFile = path.join(outDir, 'vectors.json');
+  const vectors = readJson(vectorsFile);
+  const committed = fs
+    .readdirSync(outDir)
+    .map((f) => fs.readFileSync(path.join(outDir, f), 'utf8'))
+    .join('\n');
+  const highest = Math.max(0, ...[...committed.matchAll(/00000000-0000-4000-8000-(\d{12})/g)].map((m) => Number(m[1])));
+  const { redact } = makeRedactor(cli, highest + 1);
+  const calls = callsOf(runDir);
+  const pick = (event) => calls.find((c) => c.event === event) ?? die(`no ${event} in ${runDir}`);
+  const post = pick('PostToolUse');
+  const stop = pick('Stop');
+  writeJson(path.join(outDir, 'post-tool-use-agent-head.json'), redact(post.payload, 'post-tool-use-agent-head.json'));
+  writeJson(path.join(outDir, 'stop-agent-head.json'), redact(stop.payload, 'stop-agent-head.json'));
+  const run = readJson(path.join(runDir, 'run.json'));
+  const marks = (p) => `agent_id ${'agent_id' in p ? 'present' : 'absent'}, agent_type ${'agent_type' in p ? 'present' : 'absent'}`;
+  vectors.source += `; agent-head run (${versionOf(runDir)}): \`${run.command}\` (exit ${run.exit}), the head session started with --agent; its own PostToolUse: ${marks(post.payload)}; its own Stop: ${marks(stop.payload)}`;
+  vectors.source = scrubSource(vectors.source);
+  writeJson(vectorsFile, vectors);
+  process.stdout.write(`${cli}: agent-head fixtures written to ${outDir}\n`);
+}
+
 function cmdClean(cli) {
   const dir = path.join(BASE, cli);
+  const kept = setAsideAuthFiles(dir);
+  if (kept.length) die(`refusing to clean: ${kept.join(', ')} may hold the account's only valid token; hand it to the owner first`);
   fs.rmSync(dir, { recursive: true, force: true });
   process.stdout.write(`removed ${dir}\n`);
 }
@@ -687,9 +772,12 @@ switch (command) {
   case 'redact':
     cmdRedact(rest[0]);
     break;
+  case 'redact-agent-head':
+    cmdRedactAgentHead(rest[0]);
+    break;
   case 'clean':
     cmdClean(rest[0]);
     break;
   default:
-    die('usage: run <cli> <mode> [--fallback] | hook <cli> <event> <runDir> | check <cli> accept | redact <cli> | clean <cli>');
+    die('usage: run <cli> <mode> [--fallback] [--agent-head] [--account <name>] | hook <cli> <event> <runDir> | check <cli> accept | redact <cli> | redact-agent-head <cli> | clean <cli>');
 }
