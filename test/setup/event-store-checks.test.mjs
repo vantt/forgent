@@ -109,6 +109,20 @@ test('one doctor invocation reuses its status snapshot; a new invocation observe
   assert.equal(eventStoreDoctor(f.repo, f.ctx)('event-store-integrity').passed, false);
 });
 
+test('a doctor run remembers a failed setup context instead of retrying it per row, and doctor reports an unreadable shared config', t => {
+  const f = fixture(t);
+  const config = path.join(f.repo, '.fgos/config.json');
+  fs.mkdirSync(path.dirname(config), { recursive: true });
+  fs.writeFileSync(config, '{ eventStore: half-written');
+  const check = eventStoreDoctor(f.repo, f.ctx);
+  const first = check('event-store-git-version');
+  assert.equal(first.passed, false);
+  assert.match(first.message, /event-store-config: cannot parse shared config/, 'doctor sees the parse failure, never the defaults');
+  fs.writeFileSync(config, '{}');
+  assert.deepEqual(check('event-store-open-root'), { passed: false, message: first.message }, 'every row of the run reports the one remembered failure');
+  assert.equal(eventStoreDoctor(f.repo, f.ctx)('event-store-open-root').passed, true, 'a new run observes the repaired file');
+});
+
 test('the ten Event Store rows and three fixes are registered and every row of a run shares one doctor', t => {
   const rows = DOCTOR_CHECKS.filter(({ id }) => id.startsWith('event-store-'));
   assert.deepEqual(rows.map(({ id }) => id).sort(), ['git-version', 'open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'sync', 'native-addon', 'legacy-layout', 'orphan-branches'].map(name => `event-store-${name}`).sort());

@@ -378,3 +378,66 @@ test('tsk-5pb: a normal commit that never touches .fgos/ succeeds on a worker br
 
   assert.equal(result.status, 0, result.stderr);
 });
+
+// --- event-log shrink guard: active only until the Event Store fence exists ---
+
+function commitEventLog(mainRoot, name, lines) {
+  fs.writeFileSync(path.join(mainRoot, '.fgos', name), lines);
+  execFileSync('git', ['add', `.fgos/${name}`], { cwd: mainRoot });
+}
+
+function commitStaged(mainRoot, message) {
+  return spawnSync('git', ['commit', '-q', '-m', message], { cwd: mainRoot, encoding: 'utf8' });
+}
+
+test('a commit on main staging an .fgos jsonl log with fewer lines than HEAD is refused before the event fence exists', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\nline2\nline3\nline4\nline5\n');
+  assert.equal(commitStaged(mainRoot, 'add multi-line log').status, 0);
+
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\nline2\n');
+  const result = commitStaged(mainRoot, 'shrunk log');
+
+  assert.notEqual(result.status, 0, 'a shrunk event log must be refused');
+  assert.match(result.stderr, /commit refused/);
+  assert.match(result.stderr, /\.fgos\/events\.jsonl/);
+  assert.match(result.stderr, /main is left unchanged/i);
+});
+
+test('a commit staging an .fgos jsonl log with equal-or-more lines succeeds, and a brand-new log is not refused', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\nline2\nline3\n');
+  assert.equal(commitStaged(mainRoot, 'add log').status, 0);
+
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\nline2\nline3\nline4\n');
+  commitEventLog(mainRoot, 'brand-new-log.jsonl', 'line1\nline2\n');
+  const result = commitStaged(mainRoot, 'grow log and add a new one');
+
+  assert.equal(result.status, 0, result.stderr);
+});
+
+test('a deliberate shrink of a non-log .fgos file such as config.json is not refused', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+  commitEventLog(mainRoot, 'config.json', '{\n  "a": 1,\n  "b": 2,\n  "c": 3\n}\n');
+  assert.equal(commitStaged(mainRoot, 'add config').status, 0);
+
+  commitEventLog(mainRoot, 'config.json', '{\n  "a": 1\n}\n');
+  const result = commitStaged(mainRoot, 'remove config entries');
+
+  assert.equal(result.status, 0, result.stderr);
+});
+
+test('once the event fence file exists the shrink guard is off, because the logs are retired', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\nline2\nline3\nline4\n');
+  assert.equal(commitStaged(mainRoot, 'add log').status, 0);
+  // The fence is the regular file `.fgos/events`; a shrink of a retired log is no longer this guard's concern.
+  fs.writeFileSync(path.join(mainRoot, '.fgos', 'events'), 'fence\n');
+  execFileSync('git', ['add', '.fgos/events'], { cwd: mainRoot });
+  assert.equal(commitStaged(mainRoot, 'install fence').status, 0);
+
+  commitEventLog(mainRoot, 'events.jsonl', 'line1\n');
+  const result = commitStaged(mainRoot, 'shrink retired log');
+
+  assert.doesNotMatch(result.stderr, /line count is lower|must not shrink/);
+});

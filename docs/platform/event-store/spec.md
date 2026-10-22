@@ -488,11 +488,11 @@ Agent default, accepted by the owner on 2026-10-17 15:13 (M3), configurable by `
 | Trigger | Action | Who |
 |---|---|---|
 | A `sealOnWrite` type was appended (Work: status move, answer, decision, approval, land result) | `seal(project)` right after the gate is released | the appending process |
-| The oldest unsealed event is older than the interval | seal every stream | the opportunistic check at the start and end of every fgOS command that opens the store, and in the loop of long-lived gateway and runner processes |
+| The oldest unsealed event is older than the interval | seal every stream | the opportunistic check at the start and end of every fgOS command that opens the store, and in the poll loop of the long-lived runner process (the only long-lived seal-on-poll loop) |
 | Clean writer exit | seal every stream | session end (session deregistration) and shutdown of gateway and runner |
 | A crashed process left an uncommitted batch or closed segments | repair and seal | the next fgOS command on the clone, through the same triggers |
 
-No daemon and no timer exist only for sealing. When no fgOS process runs, unsealed events wait until the next command; that window is not bounded by wall clock and the contract says so. Sealing runs only git plumbing on refs, so the council's objection to sealing on every lifecycle event (one work-tree commit and `index.lock` each) does not apply.
+Clarification, 2026-10-22: the long-lived gateway has no seal loop and seals on stop. Its Work writes go through `fgos` CLI invocations, and each of those seals in its own end-of-command trigger. No daemon and no timer exist only for sealing. When no fgOS process runs, unsealed events wait until the next command; that window is not bounded by wall clock and the contract says so. Sealing runs only git plumbing on refs, so the council's objection to sealing on every lifecycle event (one work-tree commit and `index.lock` each) does not apply.
 
 Doctor (`event-store-unsealed`): passes when nothing unsealed is older than twice the interval; warns above that; fails when the oldest unsealed event is older than 3600 s. There is no event-count cap, because lifecycle events already seal at once. These thresholds are agent defaults that the owner accepted as spec v2 on 2026-10-17 15:13.
 
@@ -610,6 +610,8 @@ Doctor checks, registered in `src/setup/registrations.mjs`:
 | `event-store-native-addon` | the combined N-API addon of section 17 (linking `fgos-event-store` and `fgos-git`) is missing from the active payload, fails to load, or was built for another Node ABI or platform. Git spec section 4 requires one ABI row for the combined addon, so the Git plan merges this check's ABI evidence with Git's `git-component-compatible` rather than adding a second ABI row |
 | `event-store-legacy-layout` | after cutover: tracked event files, `.fgos/events/`, tracked `state.json` or backups, or a `merge=union` line for events exist; `refs/fgos/legacy` missing or its tree differs from `seal.json.treeOfFgosEvents` |
 | `event-store-orphan-branches` | warns per orphan branch stream |
+
+Clarification, 2026-10-22: only the automatic triggers are gated by the dispatched-worker rule. A dispatched worker may run `fgos events sync` explicitly, because that is a request; the end-of-command push and the Land candidate release never run in one. A shared config file that exists but does not parse never lends its defaults to a publish decision: the `events` verbs and doctor refuse with `event-store-config`, and the write path and the triggers use a config that never pushes (`sync.intervalSec` 0), so a trigger still seals.
 
 `CHANGELOG.md` gets an `[Unreleased]` entry for the verbs, the config keys, the refspec setup and the removal of tracked event files.
 

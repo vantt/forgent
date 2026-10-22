@@ -1,6 +1,6 @@
 // Owning proof of the Event Store lifecycle triggers (spec §16, §14): what a trigger seals, when it publishes, and
 // that it reads maintenance facts instead of the integrity status. The runner, session and gateway wiring are proven
-// in their own files; the CLI wiring is the last test here.
+// in their own files; the CLI wiring is the last two tests here.
 import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -83,29 +83,18 @@ test('a store that cannot be opened is reported as a code, never thrown at the c
   assert.equal(typeof error, 'string');
 });
 
-test('a CLI verb that opens the store runs both triggers on maintenance facts and makes no status call', (t) => {
-  const { temp, repo, dir } = workRepo(t);
-  const spy = path.join(temp, 'native-calls.log');
-  const preload = path.join(temp, 'spy.mjs');
-  const root = path.resolve(import.meta.dirname, '../..');
-  fs.writeFileSync(preload, `
-    import fs from 'node:fs';
-    import { loadNativeAddon } from ${JSON.stringify(path.join(root, 'src/git/native.mjs'))};
-    const proto = loadNativeAddon().EventStore.prototype;
-    for (const name of ['status', 'maintenance']) {
-      const original = proto[name];
-      proto[name] = function (...args) { fs.appendFileSync(${JSON.stringify(spy)}, name + '\\n'); return original.apply(this, args); };
-    }
-  `);
-  const out = execFileSync(process.execPath, ['--import', preload, path.join(root, 'bin/fgos.mjs'), 'list', '--dir', dir], {
-    cwd: repo, encoding: 'utf8', env: { ...process.env, FGOS_DISPATCH_DEPTH: '1' },
-  });
-  assert.equal(JSON.parse(out).contract, 'fgos.v1');
-  const calls = fs.readFileSync(spy, 'utf8').trim().split('\n');
-  assert.deepEqual(calls, ['maintenance', 'maintenance'], 'one fact read at the start and one at the end, nothing else');
+test('a shared config that exists but does not parse still seals and never publishes', (t) => {
+  const { repo, store } = workRepo(t, { remote: true });
+  addAt(store, 3600);
+  fs.mkdirSync(path.join(repo, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(repo, '.fgos/config.json'), '{ eventStore: { sync: half-written');
+  assert.equal(maintainEventStore(repo, { trustedMain: repo, end: true }).error, null);
+  assert.equal(projectAge(store), 0, 'the due stream is still sealed');
+  assert.equal(store.maintenance([]).lastPush, null, 'the defaults of a file that cannot be read never decide a publish');
 });
 
-test('`events status` runs through the CLI under both triggers, and `events migrate` opens the store through none', (t) => {
+/** Run the real CLI with a preload that logs each native call a lifecycle trigger or a Land release makes. */
+function cliWithNativeSpy(t) {
   const { temp, repo, dir } = workRepo(t);
   const spy = path.join(temp, 'native-calls.log');
   const preload = path.join(temp, 'spy.mjs');
@@ -113,22 +102,47 @@ test('`events status` runs through the CLI under both triggers, and `events migr
   fs.writeFileSync(preload, `
     import fs from 'node:fs';
     import { loadNativeAddon } from ${JSON.stringify(path.join(root, 'src/git/native.mjs'))};
-    const proto = loadNativeAddon().EventStore.prototype;
-    const original = proto.maintenance;
-    proto.maintenance = function (...args) { fs.appendFileSync(${JSON.stringify(spy)}, 'maintenance\\n'); return original.apply(this, args); };
+    const addon = loadNativeAddon();
+    const log = (name) => fs.appendFileSync(${JSON.stringify(spy)}, name + '\\n');
+    for (const name of ['status', 'maintenance']) {
+      const original = addon.EventStore.prototype[name];
+      addon.EventStore.prototype[name] = function (...args) { log(name); return original.apply(this, args); };
+    }
+    const call = addon.GitRecovery.prototype.call;
+    addon.GitRecovery.prototype.call = function (method, ...args) { if (method === 'listRetainedLand') log(method); return call.call(this, method, ...args); };
   `);
-  const cli = (args) => {
+  // The Land verbs derive the repository from the cwd; the read verbs take the store directory.
+  return (args, { dispatched = true, storeDir = true } = {}) => {
     fs.rmSync(spy, { force: true });
-    const result = spawnSync(process.execPath, ['--import', preload, path.join(root, 'bin/fgos.mjs'), ...args, '--dir', dir], {
-      cwd: repo, encoding: 'utf8', env: { ...process.env, FGOS_DISPATCH_DEPTH: '1' },
-    });
+    const env = { ...process.env };
+    if (dispatched) env.FGOS_DISPATCH_DEPTH = '1'; else delete env.FGOS_DISPATCH_DEPTH;
+    const result = spawnSync(process.execPath, ['--import', preload, path.join(root, 'bin/fgos.mjs'), ...args, ...(storeDir ? ['--dir', dir] : [])], { cwd: repo, encoding: 'utf8', env });
     return { ...result, calls: fs.existsSync(spy) ? fs.readFileSync(spy, 'utf8').trim().split('\n') : [] };
   };
+}
+
+test('a CLI verb that opens the store runs both triggers on maintenance facts, and `events migrate` opens it through none', (t) => {
+  const cli = cliWithNativeSpy(t);
+  const list = cli(['list']);
+  assert.equal(JSON.parse(list.stdout).contract, 'fgos.v1');
+  assert.deepEqual(list.calls, ['maintenance', 'maintenance'], 'one fact read at the start and one at the end, no integrity status');
   const status = cli(['events', 'status']);
   assert.equal(status.status, 0, status.stderr);
   assert.equal(JSON.parse(status.stdout).data.remote, 'origin');
-  assert.deepEqual(status.calls, ['maintenance', 'maintenance'], 'the verb opens the store: one trigger at each end');
+  assert.deepEqual(status.calls.filter((call) => call === 'maintenance'), ['maintenance', 'maintenance'], 'one trigger at each end of the verb');
   // Whatever migrate answers in a fixture with nothing to import, no trigger opened the store around it.
   assert.deepEqual(cli(['events', 'migrate', '--check']).calls, []);
   assert.match(cli(['events', 'nonsense']).stderr, /events requires sync\|status\|export\|migrate/);
+});
+
+test('only a Land verb in a non-dispatched session sweeps retained Land candidates, at the end of the command', (t) => {
+  const cli = cliWithNativeSpy(t);
+  const sweeps = (args, options) => cli(args, { ...options, storeDir: false }).calls.filter((call) => call === 'listRetainedLand').length;
+  // A refusal still ends the command, so the sweep is proven without building a landable item.
+  for (const args of [['approve', 'tsk-absent'], ['sync-root', 'tsk-absent'], ['promote-to-component', 'tsk-a,tsk-b'], ['merge', 'next']]) {
+    assert.equal(sweeps(args, { dispatched: false }), 1, `${args[0]} sweeps once at its end`);
+    assert.equal(sweeps(args, { dispatched: true }), 0, `${args[0]} in a dispatched worker never sweeps`);
+  }
+  assert.equal(sweeps(['list'], { dispatched: false }), 0, 'a verb that does not land never sweeps');
+  assert.equal(sweeps(['merge', 'list'], { dispatched: false }), 0, '`merge list` does not land');
 });

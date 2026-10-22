@@ -306,6 +306,8 @@ manual step.
 
 Mostly relevant after the project has real work items.
 
+This table is selective for the Event Store: it lists the two rows a project owner acts on (`event-store-refspec`, `event-store-legacy-layout`). The ten `event-store-*` rows and what each one checks are in `docs/platform/event-store/spec.md` section 21.
+
 | Id | Checks | Typical failing message | Who | Fix |
 |---|---|---|---|---|
 | `coordination-protocol-dead-vocabulary` | Coordination protocols and workflows do not use retired `minTier` / `minRigor` | names the file | you | Edit the named definition |

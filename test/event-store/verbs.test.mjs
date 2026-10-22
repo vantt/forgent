@@ -26,6 +26,13 @@ test('status exposes real open counts, receipt, refs, deferred fields and linked
   fs.mkdirSync(path.join(linked, 'sub'));
   assert.equal(statusUseCase({ ...f.ctx, cwd: path.join(linked, 'sub') }).storeId, got.storeId);
 });
+test('status never prints the credentials of a remote URL: Git redacts userinfo and query before any verb sees it', t => {
+  const f = fixture(t, { remote: true });
+  f.git('remote', 'set-url', 'origin', 'https://user:ghp_secret@example.test/repo.git?token=querysecret');
+  const got = statusUseCase(f.ctx);
+  assert.equal(got.remoteUrl, 'https://[redacted]@example.test/repo.git?[redacted]');
+  assert.doesNotMatch(JSON.stringify(got), /ghp_secret|querysecret/, 'neither the status fields nor the whole facts carry the credential');
+});
 test('sync waits, seals and records actual fetch/push; no-push preserves last push', t => {
   const f = fixture(t, { remote: true }); fixEventStoreRefspec(f.repo, f.ctx); append(f.store, [{}]);
   const got = syncUseCase(f.ctx);
@@ -49,7 +56,10 @@ test('config merges project over global and validates integer boundaries; the Wo
   fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), JSON.stringify({ eventStore: { seal: { intervalSec: 30 }, remote: 'origin' } }));
   assert.deepEqual(readEventStoreConfig(f.repo, f.ctx.globalConfigPath), { seal: { intervalSec: 30 }, sync: { intervalSec: 20 }, rebuild: { maxAttempts: 5 }, remote: 'origin' });
   fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), '{ unrelated: half-written');
-  assert.equal(readEventStoreConfig(f.repo, f.ctx.globalConfigPath).sync.intervalSec, 20);
+  // A file that exists but does not parse never lends its defaults to a publish decision: the write path and the
+  // triggers get a config that does not push, the verbs and doctor get the error.
+  assert.equal(readEventStoreConfig(f.repo, f.ctx.globalConfigPath).sync.intervalSec, 0);
+  assert.throws(() => readEventStoreConfig(f.repo, f.ctx.globalConfigPath, { strict: true }), /event-store-config: cannot parse shared config/);
   fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), JSON.stringify({ unrelated: { broken: true }, eventStore: { sync: { intervalSec: -1 } } }));
   assert.throws(() => readEventStoreConfig(f.repo, f.ctx.globalConfigPath), /event-store-config/);
   fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), '{}');
