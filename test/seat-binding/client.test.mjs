@@ -69,6 +69,8 @@ test('a host that does not know the route throws host-version-mismatch', () => {
   const old = script('old-host.sh', `echo 'fgos: unknown verb "internal". Usage: fgos <command> [args...]' >&2\nexit 4`);
   expectCode(() => createSeatBindingClient({ hostBin: old }).tierLadder(), 'host-version-mismatch');
   expectCode(() => createSeatBindingClient({ hostBin: old }).bindSeat(golden.base), 'host-version-mismatch');
+  // A request larger than the pipe buffer: the old host exits unread, so writing it fails with EPIPE.
+  expectCode(() => createSeatBindingClient({ hostBin: old }).bindSeat({ ...golden.base, padding: 'x'.repeat(1 << 20) }), 'host-version-mismatch');
 });
 
 test('a host speaking another protocol throws host-version-mismatch', () => {
