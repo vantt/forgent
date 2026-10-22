@@ -1,6 +1,6 @@
 # Step 7 final-pin records assembly
 
-Pinned source commit: `3feee742010e60faf20758acd4acf569f2efc19b`. Latest merged main: `9c7edde30` (merge `ad98c3882`).
+Pinned source commit: `244a0435466a46e56cd95b4a70bfe03f54670996`. Latest merged main: `9c7edde30` (merge `ad98c3882`).
 
 Final owning-row decisions are applied through the digest-bound overlay, consumed by the matrix. Historical Step 3/4/5 receipts remain unchanged. No consumer edit, authority flip, cutover readiness or independent acceptance is claimed.
 
@@ -8,12 +8,12 @@ Final owning-row decisions are applied through the digest-bound overlay, consume
 
 - `applied-safe`: 0
 - `prepared-for-cutover`: 383
-- `preserved-history/fixture`: 9455
-- `individually parked`: 375
+- `preserved-history/fixture`: 9650
+- `individually parked`: 180
 - `rejected-not-consumer`: 36191
 - consumer-class rows: 10213 (5,249 ADMIT; 4,964 admission-unspecified)
 - rejected rows checked separately: 36191
-- blocked row-readiness entries: 758
+- blocked row-readiness entries: 563
 - patch specifications: 207
 - changed-candidate union: 54
 - park families: 23; members: 2311
@@ -24,10 +24,10 @@ All REJECT rows use `rejected-not-consumer`; every one resolves a non-null value
 
 ## Output sizes
 
-- `step-07-consumer-cutover-matrix.json`: 3656475 bytes
+- `step-07-consumer-cutover-matrix.json`: 3633136 bytes
 - `step-07-patch-order.json`: 244086 bytes
-- `step-07-readiness.json`: 160121 bytes
-- all four generated outputs: 4083617 bytes (limit: < 6000000 bytes)
+- `step-07-readiness.json`: 128159 bytes
+- all four generated outputs: 4030225 bytes (limit: < 6000000 bytes)
 
 ## Explicit blockers
 
@@ -43,7 +43,6 @@ All REJECT rows use `rejected-not-consumer`; every one resolves a non-null value
 - `Entry-by-entry union of docs/specs/reading-map.md into docs/reading-map.md remains uncomposed; L11-25 accepted divergence is not merge proof.`: 1
 - `Evaluate park-to-patch candidates against live work-state and runner passages and exact anchors, paired with the eventual runtime contract-reader move. Retain independent missing history/ADR operands; no Step3 reopening here.`: 1
 - `Exact supplemental comment patch prepared; compose remaining file hunks and independently review before cutover.`: 2
-- `Export receipt exists; missing decision fields, inventory role/destinations, worktree pins and complete acceptance strings still block the affected individual members. Do not rerun/export live state in this turn.`: 1
 - `Final semantic join remains for 79 introduced literal and 1158 documentation-cued dynamic inventory sites. Each site is named by class/path/line/expression hash in the current-pin rescan; lexical presence is not an unowned-consumer verdict or an old-ID approval.`: 1
 - `In-process header update is present; a digest-bound correction for remaining retired fence wording is now prepared, not applied.`: 1
 - `Keep compiler-root and citation/ratchet retirement parity obligations in final assembly; missing current/candidate root-discovery/output and candidate post-delete finding parity remain missing.`: 1
@@ -61,15 +60,15 @@ All REJECT rows use `rejected-not-consumer`; every one resolves a non-null value
 
 | Family | Preserve | Patch | Individually parked | Flips |
 |---|---:|---:|---:|---:|
-| gen-doc-registry | 1312 | 0 | 6 | 1312 |
+| gen-doc-registry | 1318 | 0 | 0 | 1318 |
 | gen-enduser-index | 493 | 0 | 13 | 493 |
-| gen-decision-index | 0 | 0 | 78 | 0 |
-| state-registry-export | 22 | 0 | 36 | 22 |
-| state-work-docsref | 0 | 0 | 56 | 0 |
+| gen-decision-index | 78 | 0 | 0 | 78 |
+| state-registry-export | 47 | 0 | 11 | 47 |
+| state-work-docsref | 53 | 0 | 3 | 53 |
 | r26:docs/decisions/index.md | 51 | 0 | 0 | 51 |
 | r26:docs/enduser-docs-index.json | 36 | 0 | 0 | 36 |
 | readset-post-retirement-scan | 0 | 0 | 31 | 0 |
-| state-inventory-oldpath | 0 | 0 | 31 | 0 |
+| state-inventory-oldpath | 30 | 0 | 1 | 30 |
 | decision-f-ratchet-retirement | 0 | 0 | 18 | 0 |
 | r26:docs/doc-governance.md | 0 | 0 | 17 | 0 |
 | gateway-ctr010-contract-citations | 1 | 0 | 16 | 1 |
@@ -80,23 +79,33 @@ All REJECT rows use `rejected-not-consumer`; every one resolves a non-null value
 | split-area-holder-mapping | 0 | 0 | 8 | 0 |
 | carry-distribution-gateway-claims | 0 | 1 | 7 | 1 |
 | r29-native-land-decisions-tree | 8 | 0 | 0 | 8 |
-| state-outcome-and-evidence | 0 | 0 | 7 | 0 |
+| state-outcome-and-evidence | 3 | 0 | 4 | 3 |
 | r26:docs/contracts/fgos-gateway-api-v1.yaml | 0 | 6 | 0 | 6 |
 | r26:docs/architecture-manifest.json | 6 | 0 | 0 | 6 |
 | r26:docs/architecture-map.md | 0 | 0 | 1 | 0 |
 
-Applied flips: **1936**. Every member, including unchanged parks, has its old/new disposition, original physical record locator, evidence and named remaining blocker/owner in `step-07-park-resolution-applied.json`. Preservation proves the member operand, not full-file generation/parity. Three generated-index families are evaluated separately; missing export columns and unregistered/final-scan operands are not guessed.
+Applied flips: **2131**. Every member, including unchanged parks, has its old/new disposition, original physical record locator, evidence and named remaining blocker/owner in `step-07-park-resolution-applied.json`. Preservation proves the member operand, not full-file generation/parity. Three generated-index families are evaluated separately; complete v2 data closes export gaps, while unregistered/final-scan and reader co-cut operands are not guessed. The original v1 rows remain immutable and the matrix consumes the appended v2 reevaluations.
+
+## Export v2
+
+The Lead export is consumed read-only, never rerun. Re-evaluated **214** previously export-blocked members: **195 preserve**, **19 remain parked**, no new patch or applied edit. Original v1 application rows, catalogs and hashes remain intact; `reevaluations` is the last-write overlay for those 214 row IDs. The other 161 pre-existing parks and all prior preserves/patches are untouched. Export delivery is complete; **180** effective parks have only named non-export blockers.
+
+- All 78 decision-index operands preserve: the existing state-wins generator produces the complete retained committed index, SHA-256 `082c2741b963b714a6976882f28bc7e84d48f5138b0f62e4feafb2db7a203200`. Free-text rationale/history paths are not silently migrated.
+- 648 docsRef values and their joined/descendant paths are outside the move set. All 332 inventory rows retain alias traceability and compute their destination from the existing migration rule, not stale inventory targetPath. The missing registry currentPath remains missing, not materialized by simulation.
+- Three Work freshness members still need successor-aware handling of **44** refs; one acceptance reader still needs handling of **two** changed clauses among **99**. Three cleanup members preserve all **647** bounded success/failure verdicts but have **two** diagnostic branch deltas needing owning acceptance. No validator is weakened or historical evidence rewritten.
+- Ten doc-sources/quadrant members still need final scan/read-set composition. Two inherited Git expressions were replaced by typed Git/ScopedCommit operations; their current successor passages are recorded but independent changed-binding review is owed. These 19 parks are consumer/source proof work, not export gaps. The 13 unrelated enduser-index scan parks are unchanged.
+- Existing assembler enumeration/custody/order/readiness logic is rerun through a scratch-only adapter that consumes these committed records instead of its hardcoded v1 resolution provider. No code file is edited. Exact replay bytes and commands are retained in `step-07-export-v2-replay.json`; running the bare v1 assembler would discard v2 and is not this receipt's replay command.
 
 ## Current obligations and owners
 
 - **A34-two-line-residual** — blocked; owner: Root-instruction owner / independent A34 reviewer. Reconcile exact AGENTS instruction claims claim_5c520fcb1a68ba27e2093341834258c7 and claim_2ae81c7bed935553943d6777b81e2114; do not delete source-to-self residuals. Other 28 A34 residual representations remain governed by their existing acceptance. Evidence: `reports/phase-06/owner-queue.md:423; phase-09-atomic-platform-authority-cutover.md:31`.
-- **L12-96-state-export** — delivered-bounded; owner: Lead state-export owner / consumer proof owners. Export receipt exists; missing decision fields, inventory role/destinations, worktree pins and complete acceptance strings still block the affected individual members. Do not rerun/export live state in this turn. Evidence: `step-07-state-path-export.json; step-07-generator-path-proof.json#limits`.
+- **L12-96-state-export** — delivered; owner: Lead state-export owner / consumer proof owners. No outstanding prerequisite in this receipt. Evidence: `step-07-state-path-export-v2.json; step-07-export-v2-proof.json; step-07-park-resolution-applied.json#reevaluations`.
 - **P7-DOC-GAP-05** — blocked; owner: Lead placement decision / component-boundary owner. Place dynamic-023895 carriage, compose successor scan, and replay dead-vocabulary guard. No expected-red waiver. Evidence: `owner-answers.md#L12-96; reports/phase-07/owner-answers.md#P7-DOC-GAP-05`.
 - **P7-DOC-GAP-06** — prepared-for-cutover; owner: Agent-coordination owner / independent promotion reviewer. Both stale citations now have exact forward/inverse patches and source digests; pending independent review/application. Evidence: `step-07-final-prepared-specs.json#stale-assignment-provenance-citation; #stale-execution-budget-citation`.
 - **PF-I022-PF-I023** — prepared-for-cutover; owner: Intent-ledger owner / Lead integration reviewer. Digest-bound sole main report reference patch is prepared, not applied or independently accepted. Evidence: `step-07-final-prepared-specs.json#intent-ledger-main-reference-reconciliation`.
 - **common-light-Git-fixture-tests** — blocked; owner: Lead in authorized proof environment. Complete candidate-status and constitution test files perform git init/add/commit in fixtures. They were not filtered or run under the strict no-Git-write worker boundary. Run both complete files before independent acceptance; not an expected-red waiver. Evidence: `step-07-final-verification.json#unrunRequiredChecks`.
 - **current-census-semantic-join** — blocked; owner: Documentation integration owner / independent census reviewer. Final semantic join remains for 79 introduced literal and 1158 documentation-cued dynamic inventory sites. Each site is named by class/path/line/expression hash in the current-pin rescan; lexical presence is not an unowned-consumer verdict or an old-ID approval. Evidence: `step-07-final-verification.json#censusRescan`.
-- **final-pin** — ready; owner: Lead integration owner. No outstanding prerequisite in this receipt. Evidence: `3feee742010e60faf20758acd4acf569f2efc19b; latest main 9c7edde30 imported by ad98c3882`.
+- **final-pin** — ready; owner: Lead integration owner. No outstanding prerequisite in this receipt. Evidence: `244a0435466a46e56cd95b4a70bfe03f54670996; latest main 9c7edde30 imported by ad98c3882`.
 - **holder-lock-status-header** — prepared-for-cutover; owner: Holder-lock owner / independent promotion reviewer. In-process header update is present; a digest-bound correction for remaining retired fence wording is now prepared, not applied. Evidence: `step-07-final-prepared-specs.json#holder-lock-current-header`.
 - **plan-a-phase-06** — ready; owner: AGENTS cutover packet owner. No outstanding prerequisite in this receipt. Evidence: `plans/261006-1415-fgos-single-door-mechanisms/reports/main-integration.md; main ancestor a004bb59802016d3ddd63f6b8e430fdfa599d60e`.
 - **plan-b-phase-06** — ready; owner: AGENTS cutover packet owner. No outstanding prerequisite in this receipt. Evidence: `archive/plans/261006-1415-fgos-convention-component/phase-06-agents-line.md; main ancestor 461e12d12a2186c53ae2eec0953bcd7cec83192b`.
@@ -129,7 +138,7 @@ Applied flips: **1936**. Every member, including unchanged parks, has its old/ne
 - `step-07-final-binding-check.json` verifies complete content/ancestry and neighbours, including the doctor-list edits e8e340887/a59ae8b01. No current target drift or rebind is hidden by ordinal rehashing. Historical priorReview snapshots are explicitly excluded, not rewritten.
 - Exact forward/inverse supplemental patches prepare gateway input/fixture path changes, the network R5 pointer and truthful triage comment, PF references, holder-lock header and both stale citations. Other file hunks still require final composition and independent acceptance. Existing patch-spec source digests are compared with this pin, with drift left as a per-spec blocker.
 - The effective move-set adjustment retains the generated docs/decisions/index.md (L12-96 Q2), enduser manifest and architecture manifest at their fixed paths. It drops the duplicate proposed decisions-index destination and suppresses those retired move proposals; the historical Step 5 move manifest is not silently rewritten. No hand edit of generated output is proposed.
-- Bounded generator parity is real, but not full live-state output certification. Decision scope/text/rationale/ts, inventory role/destination data, effective worktree pins and untruncated acceptance strings are not in the export. One current registry slot is already missing at the pin. These are named proof gaps, never fabricated state or a new export.
+- The v2 export supplies the decision fields, inventory role/destination inputs, work/head pins and untruncated acceptance. Existing decision generation reproduces the complete committed index. Registry proofs remain bounded, not full live-state drift certification. One registry slot remains missing at the pin, owned by the Knowledge-registry owner; unchanged operands are not existence proof.
 - Plan A and the actual Plan B/convention landed. The draft is Plan C and is not a cutover dependency; the preassembly mislabel is corrected from committed plans and main ancestry, not from a guessed status.
 - Both runs of the final assembler must be byte-identical; `step-07-final-determinism.json` records actual hashes/bytes and verification commands. Pair accounting is performed last in both Phase 6 manifests; its real check-A pairs and byte-preserving insertion proof live in `step-07-final-pair-accounting.json`. This turn cannot pre-account its future runner commit.
 - `step-07-final-verification.json` records actual light exits: ratchet, doc-link tests, evidence --before and diff check, both main-drift tiers and unchanged protected files. The census was freshly re-enumerated; every introduced literal/documentation-dynamic site is named, with final semantic joining explicitly blocked. Two common-light files are not run because their fixtures write Git; no filtered run or false green.
@@ -139,5 +148,6 @@ Applied flips: **1936**. Every member, including unchanged parks, has its old/ne
 ## Final-pin rerun
 
 ```sh
-python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-07-assemble.py --final --pin 3feee742010e60faf20758acd4acf569f2efc19b --output-dir plans/260925-documentation-authority-unification/reports/phase-08
+python3 -B /tmp/fgos-work/export-v2-apply/assemble.py
+# Restore exact scratch adapter from step-07-export-v2-replay.json first.
 ```

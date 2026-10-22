@@ -1,3 +1,9 @@
+## Completed export application — records-only handback (L12-119)
+
+At `244a0435466a46e56cd95b4a70bfe03f54670996`, appended **214** export-v2 reevaluations without changing v1 member rows: **195 newly preserve / 19 named non-export parks**. Effective member totals: **2,131 flips / 180 parks**. The state-export obligation is delivered; the absent registry currentPath remains owned by Knowledge-registry. Independent acceptance, reader/scan composition and physical cutover remain owed.
+
+[Assembly report](step-07-final-assembly-report.md), [v2 proof](step-07-export-v2-proof.json) and [exact scratch replay](step-07-export-v2-replay.json): two byte-identical runs, **4,030,225 bytes** across four generated outputs; zero unmatched/alias-writer violations. Existing decision generation reproduces the complete committed index. Real remaining deltas include 44 Work refs, two acceptance clauses and two cleanup diagnostic branches; no validator or historical evidence is weakened. No product/source/helper code edit, fgOS CLI, Git write or live-state/secrets read. L12-11 committed-pair accounting is performed last in both manifests; see `step-07-export-v2-pair-accounting.json`. This turn's future runner commit is not pre-accounted. Markdown preview remains with Lead.
+
 ## Step 7 park-family decisions — records-only handback (2026-10-21)
 
 Recorded **L12-96** from the owner's 18:17 acceptance: Q1/Q2/Q3 = A and the Lead-settled handling list. The bounded state export belongs to the Lead at the Step 7 final pin; it grants no write/cutover authority. Retain the generated decision index and native Land behavior (dormant in this repo); adopt the per-area narrative/RUL convention and published scope mapping at cutover, with L12-91 remaining one-way.
