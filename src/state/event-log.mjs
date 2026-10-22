@@ -6,10 +6,9 @@
 /**
  * Error raised by the state layer. `category` is a stable contract consumed by
  * the CLI's exit-code table (R4): 'corrupt-log' (an event inventory failed to
- * parse), 'validation' (invalid caller input) and 'lock-timeout' (live contention
- * on the state gate, retry the whole operation, not data corruption) are the
- * categories raised. A caller must be able to tell live contention apart from
- * a real data problem.
+ * parse) and 'validation' (invalid caller input) are the categories this class
+ * raises. Live contention on the state gate is not one of them: the gate raises
+ * `HotLockError` (`hot-lock-timeout`), whose category is also `lock-timeout`.
  */
 export class EventLogError extends Error {
   constructor(category, message) {
