@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "adef62f50b8617c91752878bbd6df7fd8caa705dd5f07d67f3becb5d1d5a24f5",
+  "payloadDigest": "a6655eeac032b454f36a1b05d179209239827dcd356b6649a4f986e1e021aa06",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -76,6 +76,8 @@
     "apps/fgos-gateway/src/mcp.rs": "d1c162643e93c2547656b1e034b84967efab2adb20090a1c058859593f36e6f8",
     "apps/fgos-gateway/src/ports.rs": "f639e87f4a9119eedf765fa10de38dc0a68315a9482b041543a5f294ca0d1999",
     "apps/fgos-gateway/src/remote_invocation.rs": "b0f0ad004ce73d737c7e09b22e5e1d445db64abbca77425b4d282f4859b1388a",
+    "apps/fgos/examples/identity-mint-machine.rs": "e5ae8784739511aa945f936188f9c3720174fa94fed32f56b7841f76a67f355e",
+    "apps/fgos/examples/mailbox-ident-cost.rs": "b615a15fb9ef510fdad97f4594cfff9aee5b7b34fd2b7306e66cf03ef8b0d6ea",
     "apps/fgos/src/cli_presenter.rs": "0248393b4dc1e72bf26b9537c8e7d9cdde91e1ce872663df79a8613e26585f8c",
     "apps/fgos/src/cli_projector.rs": "9fdbc779e3546ba7e53a34c8ffd7fba904c9a4c79ec3414c44faa8e9e410c0cf",
     "apps/fgos/src/legacy_exec.rs": "6aa96ac09b3c577b03317d3b9292104c8af977b2890eb7e5ef45a13598770a22",
@@ -1171,6 +1173,13 @@
     "src/workflow/units-source.mjs": "63fa30666c4ba9edb5174c47042a08b02007ff1bb34e95df918956029a7e37c3"
   },
   "sites": [
+    {
+      "path": "apps/fgos/examples/mailbox-ident-cost.rs",
+      "line": 85,
+      "spawn": "Command::new",
+      "binary": "git",
+      "family": "rust"
+    },
     {
       "path": "bin/fgos.mjs",
       "line": 3471,
