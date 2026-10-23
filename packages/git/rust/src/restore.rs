@@ -461,10 +461,11 @@ impl GitDriver {
         tolerate_stopped_operation: bool,
     ) -> Result<()> {
         fgos_holder_lock::validate_quiescent(checkout::handle(scope, repo)?).map_err(failure)?;
+        // A bisect leaves only its bookkeeping and never blocks a restore.
         let tolerated: &[&str] = if tolerate_stopped_operation {
-            &["MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD"]
+            &["BISECT_START", "MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD"]
         } else {
-            &[]
+            &["BISECT_START"]
         };
         checkout::require_no_native_state(&repo.git_dir, tolerated, |name| {
             recovery(format!("restore-native-state: {name}"))

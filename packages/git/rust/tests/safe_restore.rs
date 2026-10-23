@@ -756,6 +756,21 @@ fn extraction_refuses_sibling_worktree_and_state_root() {
     assert!(!sibling.join("b").exists());
 }
 #[test]
+fn a_restore_during_a_bisect_succeeds_and_leaves_the_bisect_marker() {
+    let f = Fixture::new();
+    let marker = f.main.join(".git/BISECT_START");
+    fs::write(&marker, "trunk\n").unwrap();
+    let r = request(&f, false);
+    f.driver
+        .apply_restore(&f.repo, vec![], &r, "fixture", "bisect-restore", &wal::OsFileSystem)
+        .unwrap();
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), r.target);
+    f.driver
+        .acknowledge_restore(&f.repo, vec![], "fixture", "bisect-restore", &wal::OsFileSystem)
+        .unwrap();
+    assert_eq!(fs::read(marker).unwrap(), b"trunk\n");
+}
+#[test]
 fn case_only_target_rename_preserves_index_identity() {
     let f = Fixture::new();
     fs::write(f.main.join("Readme"), "tracked").unwrap();
