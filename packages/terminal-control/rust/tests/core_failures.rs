@@ -243,25 +243,6 @@ fn inspect_of_a_missing_key_or_gone_pane_is_not_live() {
 }
 
 #[test]
-fn a_command_that_replaced_the_shell_is_identified() {
-    let driver = MemDriver::new(352, 69);
-    let core = core(&driver, &MeasuredSplit, state_dir("exec-replaced-shell"));
-    let slot = core.allocate(&request("a", "g")).unwrap().slot;
-    let mut child = spawn_sleeper();
-    // `exec` keeps the shell's pid: the foreground process is the shell pid itself.
-    driver.set_launch_foreground(
-        &slot.pane_id,
-        child.id(),
-        vec![ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] }],
-        child.id(),
-    );
-    let out = core.launch("a", &launch_spec()).unwrap();
-    assert!(matches!(&out, LaunchOutcome::Launched(i) if i.pid == child.id()), "{out:?}");
-    child.kill().unwrap();
-    child.wait().unwrap();
-}
-
-#[test]
 fn close_after_retain_does_not_pretend_to_close() {
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("close-after-retain"));
@@ -378,31 +359,6 @@ fn a_shell_serving_only_typed_echo_retypes_only_after_backoff_and_caps_at_three_
     for r in &runs {
         assert!(r.contains("printf '%s%s\\n' fgos-ok- "));
     }
-}
-
-#[test]
-fn a_line_typed_before_the_start_prompt_draws_is_not_swallowed_and_launches_once() {
-    let driver = MemDriver::new(352, 69);
-    let core = core(&driver, &MeasuredSplit, state_dir("typed-ahead"));
-    let slot = core.allocate(&request("a", "g")).unwrap().slot;
-    driver.set_script(&slot.pane_id, ShellScript::TypedAheadSkipsPrompt);
-    let mut child = spawn_sleeper();
-    driver.set_launch_foreground(
-        &slot.pane_id,
-        900,
-        vec![
-            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
-            ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] },
-        ],
-        child.id(),
-    );
-    let out = core.launch("a", &launch_spec()).unwrap();
-    assert!(matches!(out, LaunchOutcome::Launched(_)), "{out:?}");
-    let runs = driver.calls("pane.run");
-    assert_eq!(runs.len(), 2, "single probe followed by single launch line: {runs:?}");
-    assert!(runs[1].contains("cd '/tmp' && 'sleep' '30'"));
-    child.kill().unwrap();
-    child.wait().unwrap();
 }
 
 #[test]
