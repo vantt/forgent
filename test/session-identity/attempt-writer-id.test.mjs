@@ -37,16 +37,20 @@ test('every shared vector mints to the same writer id through the door', needsHo
   }
 });
 
-test('workerBaseEnv drops all three session ids of the parent and keeps the rest', () => {
+test('workerBaseEnv drops every session id of the parent and keeps the rest', () => {
   const env = workerBaseEnv({
     PATH: '/usr/bin',
     FGOS_SESSION_ID: 'parent-session',
     CLAUDE_CODE_SESSION_ID: 'claude-parent',
     CODEX_THREAD_ID: 'codex-parent',
+    PI_SESSION_ID: 'pi-parent',
+    PI_SESSION_FILE: '/sessions/pi-parent.jsonl',
   });
   assert.equal(env.FGOS_SESSION_ID, undefined);
   assert.equal(env.CLAUDE_CODE_SESSION_ID, undefined);
   assert.equal(env.CODEX_THREAD_ID, undefined);
+  assert.equal(env.PI_SESSION_ID, undefined);
+  assert.equal(env.PI_SESSION_FILE, undefined);
   assert.equal(env.PATH, '/usr/bin');
 });
 
