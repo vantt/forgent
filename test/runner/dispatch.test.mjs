@@ -335,7 +335,7 @@ test('loadRunnerConfig refuses a runner config that still carries rigorToTier, n
 
   assert.throws(
     () => loadRunnerConfig(configPath),
-    (err) => err instanceof RunnerConfigError && err.code === 'config-not-converted' && /retired "rigorToTier".*fgos setup/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /retired "rigorToTier".*delete the key/.test(err.message),
   );
 });
 
@@ -3002,7 +3002,7 @@ function writeRunnerConfigFixture(root, cfg) {
   // `execute <agent>` names the capability it runs under; every fixture
   // carries the writing one the CLI tests dispatch with.
   const capabilities = { execute: { serves: { outputKind: 'change', mutates: true } }, ...cfg.capabilities };
-  // A project config in the seat-binding schema: the loader refuses one that has no marker.
+  // A project config as setup writes it: with the seat-binding schema marker.
   const patterns = { ...cfg.patterns, seatBinding: { schema: 1 } };
   writeProjectConfig(root, { runner: { ...cfg, capabilities, patterns } });
 }

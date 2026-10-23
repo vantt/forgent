@@ -39,6 +39,10 @@ V6 chỉ chạy sau khi owner duyệt ngân sách.
 
 Claude Code trên máy vừa tự cập nhật lên **2.1.309**, bản chưa có trong danh sách đã kiểm. Harness chạy trực tiếp vì vậy từ chối mọi case, cho tới khi ghi lại payload cho bản này. Việc ghi tốn khoảng 4 lần chạy `claude -p` haiku với nội dung lành tính. Em sẽ làm cùng lúc với bước đầu của V6 nếu owner duyệt V6. Nếu cần sớm hơn, owner nói một câu.
 
+### Địa chỉ mailbox và handle IDENT (owner trả lời 2026-10-23 11:38: B rồi A)
+
+Ngay sau V6 làm bước bí danh (B). Khi làm phần xuyên máy thì chuyển hẳn sang handle (A).
+
 ## 2. Trạng thái
 
 | Bậc | Trạng thái | Ghi chú |
