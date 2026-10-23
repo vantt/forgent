@@ -17,6 +17,19 @@
   "x-stateRoot": "the fgOS state root (FGOS_STATE_ROOT, else the holder-lock resolution); files machine-id and machine-alias",
   "x-projectFile": ".fgos/project.json of the main checkout: {v: 1, projectId: 32 hex, handle: Convention project-handle, createdAt}",
   "definitions": {
+    "refusal": {
+      "$id": "identity.refusal",
+      "title": "Identity refusal under --json",
+      "description": "What stdout carries when the verb is refused and the caller passed --json: one line, exit 65, the same text on stderr as `fgos: error: <error> [<reason>]`. It is not a fgos.v1 envelope (no `contract`): the error path is not wrapped, success and failure differ by exit code. `reason` is one of the outcome's x-refusals.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["error", "reason", "candidates"],
+      "properties": {
+        "error": { "type": "string", "description": "The human message." },
+        "reason": { "type": "string", "description": "The stable code." },
+        "candidates": { "type": "array", "items": { "type": "string" }, "description": "The names the caller may have meant (not-found), the sessions a name matches (ambiguous), the roles the session holds (role-not-held); empty otherwise." }
+      }
+    },
     "outcome": {
       "$id": "identity.read.outcome",
       "title": "Identity read outcome v1",

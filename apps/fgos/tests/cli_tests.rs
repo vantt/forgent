@@ -1390,6 +1390,18 @@ fn identity_directory_registers_only_on_request_and_resolves_by_handle_and_role(
     let missing = run("alpha", &["resolve", "claude-zzzz@fg-server"]);
     assert_eq!(missing.status.code(), Some(65));
     assert!(String::from_utf8_lossy(&missing.stderr).contains("[not-found]"));
+    assert!(missing.stdout.is_empty(), "without --json a refusal prints nothing on stdout");
+
+    // With --json the same refusal is also one line of JSON on stdout: the
+    // message, the stable reason and the candidates, never a success envelope.
+    let near = run("alpha", &["resolve", &a[..10], "--json"]);
+    assert_eq!(near.status.code(), Some(65));
+    assert!(String::from_utf8_lossy(&near.stderr).contains("[not-found]"));
+    let refusal: serde_json::Value = serde_json::from_slice(&near.stdout).expect("a --json refusal is JSON");
+    assert_eq!(refusal["reason"], "not-found");
+    assert_eq!(refusal["candidates"], serde_json::json!([a.as_str()]));
+    assert!(refusal["error"].as_str().unwrap().contains(&a));
+    assert!(refusal.get("contract").is_none());
     let _ = fs::remove_dir_all(&state);
 }
 
@@ -1410,8 +1422,9 @@ fn identity_machine_reads_refuses_and_sets_the_alias_through_the_state_root() {
 
     let missing = machine(&["--json"]);
     assert_eq!(missing.status.code(), Some(65));
-    assert!(missing.stdout.is_empty());
     assert!(String::from_utf8_lossy(&missing.stderr).contains("[machine-id-missing]"));
+    let refusal: serde_json::Value = serde_json::from_slice(&missing.stdout).unwrap();
+    assert_eq!(refusal["reason"], "machine-id-missing", "a refusal under --json is not a success envelope");
 
     fs::write(state.join("machine-id"), "fg-server-abc234\n").unwrap();
     assert_eq!(
