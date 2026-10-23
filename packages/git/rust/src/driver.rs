@@ -1551,10 +1551,49 @@ fn object_gap_cause(layout: &RepoLayout) -> Option<&'static str> {
     }
 }
 /// The one name for a failed read: the layout feature that explains it, else `fallback`.
-fn layout_cause(layout: &RepoLayout, fallback: &'static str) -> &'static str {
+pub(crate) fn layout_cause(layout: &RepoLayout, fallback: &'static str) -> &'static str {
     object_gap_cause(layout)
         .or(layout.shallow.then_some("shallow-history-incomplete"))
         .unwrap_or(fallback)
+}
+
+/// What one literal ref holds: direct, symbolic or absent. A dangling symbolic ref is listed by no
+/// `for-each-ref` pattern, so a name that is not listed gets the symbolic probe before it may read
+/// as absent. `run` is the door the caller's Git children must use.
+pub(crate) fn read_ref_value(
+    repo: &RepoHandle,
+    name: &RefName,
+    run: &dyn Fn(&[&str]) -> Result<Output>,
+) -> Result<RefValue> {
+    let listing = run(&["for-each-ref", "--format=%(refname)%00%(objectname)%00%(symref)", "--", name.as_str()])?;
+    if !listing.success {
+        return Err(listing.error(layout_cause(&repo.layout, "git-command-failed")));
+    }
+    for l in listing.stdout.split(|b| *b == b'\n').filter(|l| !l.is_empty()) {
+        let fields: Vec<_> = l.split(|b| *b == 0).collect();
+        if fields.len() != 3 {
+            return Err(failure("invalid-ref-observation"));
+        }
+        if fields[0] != name.as_str().as_bytes() {
+            continue;
+        }
+        return if fields[2].is_empty() {
+            Oid::parse(line(fields[1])?, repo.object_format())
+                .map(RefValue::Direct)
+                .map_err(|_| failure("git-protocol-invalid-oid"))
+        } else {
+            symbolic_target(fields[2]).map(RefValue::Symbolic)
+        };
+    }
+    let probe = run(&["symbolic-ref", "--quiet", "--", name.as_str()])?;
+    match (probe.success, probe.code) {
+        (true, _) => symbolic_target(&probe.stdout).map(RefValue::Symbolic),
+        (false, Some(1)) => Ok(RefValue::Absent),
+        _ => Err(probe.error("read-ref-failed")),
+    }
+}
+fn symbolic_target(bytes: &[u8]) -> Result<RefName> {
+    RefName::parse(line(bytes)?).map_err(|_| failure("invalid-symbolic-target"))
 }
 
 pub(crate) struct Output {
@@ -1882,15 +1921,14 @@ impl crate::wal::RecoveryReader for WalReader<'_> {
             if self.repo.layout().shallow {
                 return Ok(false);
             }
-            return Ok(self
-                .driver
-                .checked(self.repo, &["cat-file", "-e", "--", oid], Policy::Inspect)
-                .is_ok()
+            // Intact means the candidate is a commit and everything it reaches is present.
+            let kind = self.driver.checked(self.repo, &["cat-file", "-t", "--", oid], Policy::Inspect);
+            return Ok(kind.is_ok_and(|kind| kind == b"commit\n")
                 && self
                     .driver
                     .checked(
                         self.repo,
-                        &["rev-list", "--objects", oid, "--"],
+                        &["rev-list", "--objects", "--missing=error", "--end-of-options", oid],
                         Policy::Inspect,
                     )
                     .is_ok());

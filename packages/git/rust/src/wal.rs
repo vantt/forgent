@@ -3072,14 +3072,13 @@ mod tests {
             )
             .unwrap();
             let w = Wal::open(&repo).unwrap();
-            let oid = String::from_utf8(git(
+            let text = |bytes: Vec<u8>| String::from_utf8(bytes).unwrap().trim().to_owned();
+            let tree = text(git(&t.0, &["mktree"], Some(b"")));
+            let oid = text(git(
                 &t.0,
-                &["hash-object", "-w", "--stdin"],
-                Some(b"candidate"),
-            ))
-            .unwrap()
-            .trim()
-            .to_owned();
+                &["-c", "user.name=T", "-c", "user.email=t@example.invalid", "commit-tree", "-m", "candidate", &tree],
+                None,
+            ));
             let mut i = intent(&w);
             i.object_format = repo.object_format();
             i.next = Tip::Oid(oid.clone());
@@ -3098,6 +3097,12 @@ mod tests {
                 w.recover("real", &read).unwrap(),
                 Recovery::FirstAttemptEligible
             );
+            // The candidate must be a commit: a tree or a blob is never intact.
+            for not_a_commit in [tree.clone(), text(git(&t.0, &["hash-object", "-w", "--stdin"], Some(b"blob")))] {
+                let mut other = c.intent().clone();
+                other.next = Tip::Oid(not_a_commit);
+                assert!(!read.candidate_intact(&other).unwrap());
+            }
             let c = w
                 .append(
                     &c,

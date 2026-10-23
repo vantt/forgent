@@ -211,38 +211,61 @@ pub(crate) fn receipt(
         warnings: vec![],
     })
 }
-pub(crate) fn sync_refs(repo: &RepoHandle, reference: &RefName) -> Result<()> {
+/// Every existing directory from the ref's parent up to the common dir (and
+/// `reftable/` for that backend): the directory chain of a ref created,
+/// changed or deleted. A reftable repository keeps no loose refs, so its chain
+/// is the table directory and the common dir.
+pub(crate) fn ref_dirs(repo: &RepoHandle, reference: &str) -> Result<Vec<PathBuf>> {
+    let common = repo.common_dir();
     if repo.layout().refs == RefStorage::Reftable {
-        fgos_durable_file::sync_directory(&repo.common_dir().join("reftable")).map_err(failure)?;
-        return fgos_durable_file::sync_directory(repo.common_dir()).map_err(failure);
+        return Ok(vec![common.join("reftable"), common.to_path_buf()]);
     }
-    let mut parent = repo
-        .common_dir()
-        .join(reference.as_str())
+    let mut dirs = Vec::new();
+    let mut path = common
+        .join(reference)
         .parent()
-        .unwrap()
-        .to_owned();
+        .ok_or_else(|| failure("untrusted-ref-directory"))?
+        .to_path_buf();
     loop {
-        match fs::symlink_metadata(&parent) {
-            Ok(m) if m.is_dir() && !m.file_type().is_symlink() => {
-                fgos_durable_file::sync_directory(&parent).map_err(failure)?
-            }
+        match fs::symlink_metadata(&path) {
+            Ok(meta) if meta.is_dir() && !meta.file_type().is_symlink() => dirs.push(path.clone()),
             Ok(_) => return Err(failure("untrusted-ref-directory")),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
             Err(e) => return Err(failure(e)),
         }
-        if parent == repo.common_dir() {
-            break;
+        if path == common {
+            return Ok(dirs);
         }
-        parent = parent
+        path = path
             .parent()
             .ok_or_else(|| failure("untrusted-ref-directory"))?
-            .to_owned();
+            .into();
     }
-    if repo.layout().refs == RefStorage::Reftable {
-        fgos_durable_file::sync_directory(&repo.common_dir().join("reftable")).map_err(failure)?;
-    }
-    Ok(())
+}
+/// Fsync a chain from `ref_dirs`, together when `concurrent`. A directory
+/// that a concurrent ref deletion pruned in the meantime has no entry left to
+/// make durable, and its removal is made durable by its parent, which is in
+/// the chain: it is skipped, never an error.
+pub(crate) fn sync_ref_dirs(dirs: &[PathBuf], concurrent: bool) -> std::io::Result<()> {
+    let one_by_one = || {
+        dirs.iter().try_for_each(|dir| match fgos_durable_file::sync_directory(dir) {
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+            other => other,
+        })
+    };
+    let synced = if concurrent {
+        let paths: Vec<&Path> = dirs.iter().map(PathBuf::as_path).collect();
+        match fgos_durable_file::sync_directories(&paths) {
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => one_by_one(),
+            other => other,
+        }
+    } else {
+        one_by_one()
+    };
+    synced.map_err(|e| std::io::Error::new(e.kind(), format!("directory-fsync: {e}")))
+}
+pub(crate) fn sync_refs(repo: &RepoHandle, reference: &RefName) -> Result<()> {
+    sync_ref_dirs(&ref_dirs(repo, reference.as_str())?, false).map_err(failure)
 }
 pub(crate) fn pending(mut e: OperationError, id: &str) -> OperationError {
     e.code = ResultCode::RecoveryRequired;

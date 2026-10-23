@@ -222,18 +222,7 @@ impl GitDriver {
     }
     /// Literal full refs only; missing remains distinct from errors and symbolic.
     pub fn resolve_ref(&self, repo: &RepoHandle, name: &RefName) -> Result<RefValue> {
-        let prefix = RefPrefix::parse(name.as_str()).map_err(|_| failure("invalid-ref"))?;
-        let mut cursor = None;
-        loop {
-            let found = self.list_refs(repo, std::slice::from_ref(&prefix), cursor, 4096)?;
-            if let Some(entry) = found.entries.into_iter().find(|e| &e.name == name) {
-                return Ok(entry.value);
-            }
-            if found.complete {
-                return Ok(RefValue::Absent);
-            }
-            cursor = found.next_cursor;
-        }
+        crate::driver::read_ref_value(repo, name, &|args| self.inspect_command(repo, args))
     }
     /// Explicit target, unique configured remote HEAD, then attached main HEAD.
     pub fn resolve_trunk(

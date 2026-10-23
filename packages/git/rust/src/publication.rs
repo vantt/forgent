@@ -313,13 +313,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         if out.success {
             Ok(out.stdout)
         } else {
-            Err(out.error(if repo.layout.promisor {
-                "promisor-object-unavailable"
-            } else if repo.layout.alternates {
-                "alternate-object-unavailable"
-            } else {
-                "git-command-failed"
-            }))
+            Err(out.error(crate::driver::layout_cause(&repo.layout, "git-command-failed")))
         }
     }
     fn oid(&self, repo: &RepoHandle, bytes: &[u8]) -> Result<Oid> {
@@ -350,37 +344,6 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         }
         self.point("object-durable")
     }
-    /// Every existing directory from the ref's parent up to the common dir
-    /// (and `reftable/` for that backend): the directory chain of a ref
-    /// created, changed or deleted.
-    fn ref_dirs(&self, repo: &RepoHandle, reference: &str) -> Result<Vec<PathBuf>> {
-        let mut dirs = Vec::new();
-        let mut path = repo
-            .common_dir()
-            .join(reference)
-            .parent()
-            .unwrap()
-            .to_path_buf();
-        loop {
-            match fs::symlink_metadata(&path) {
-                Ok(meta) if meta.is_dir() && !meta.file_type().is_symlink() => dirs.push(path.clone()),
-                Ok(_) => return Err(failure("untrusted-publication-directory")),
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                Err(e) => return Err(failure(e.to_string())),
-            }
-            if path == repo.common_dir() {
-                break;
-            }
-            path = path
-                .parent()
-                .ok_or_else(|| failure("ref-directory-outside-repository"))?
-                .into();
-        }
-        if repo.layout.refs == RefStorage::Reftable {
-            dirs.push(repo.common_dir().join("reftable"));
-        }
-        Ok(dirs)
-    }
     /// One existence probe first (`show-ref --exists` reads the ref itself,
     /// so a dangling symbolic ref exists): a missing ref costs one Git child
     /// instead of the listing plus the symbolic probe of `read_ref`. Any ref
@@ -399,8 +362,8 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         }
     }
     fn sync_refs(&self, repo: &RepoHandle, reference: &str) -> Result<()> {
-        let dirs = self.ref_dirs(repo, reference)?;
-        sync_ref_chain(&dirs).map_err(|e| failure(e.to_string()))?;
+        let dirs = crate::refs::ref_dirs(repo, reference)?;
+        crate::refs::sync_ref_dirs(&dirs, true).map_err(failure)?;
         for _ in &dirs {
             self.point("publication-directory-fsync")?;
         }
@@ -419,8 +382,8 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         phase: Phase,
         reference: &str,
     ) -> Result<wal::Chain> {
-        let dirs = self.ref_dirs(repo, reference)?;
-        let sync = || sync_ref_chain(&dirs);
+        let dirs = crate::refs::ref_dirs(repo, reference)?;
+        let sync = || crate::refs::sync_ref_dirs(&dirs, true);
         let mut refused: Option<OperationError> = None;
         let mut points = || -> std::io::Result<()> {
             let mut done = Ok(());
@@ -1040,24 +1003,6 @@ impl<F: FileSystem> RecoveryReader for BoundReader<'_, '_, F> {
     }
 }
 
-/// Fsync a ref's directory chain (see `ref_dirs`), concurrently. A
-/// directory that a concurrent ref deletion pruned in the meantime has no
-/// entry left to make durable, and its removal is made durable by its parent,
-/// which is in the chain: it is skipped, never an error.
-fn sync_ref_chain(dirs: &[PathBuf]) -> std::io::Result<()> {
-    let paths: Vec<&Path> = dirs.iter().map(PathBuf::as_path).collect();
-    let synced = match fgos_durable_file::sync_directories(&paths) {
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => paths.iter().try_for_each(|dir| {
-            match fgos_durable_file::sync_directory(dir) {
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
-                other => other,
-            }
-        }),
-        other => other,
-    };
-    synced.map_err(|e| std::io::Error::new(e.kind(), format!("directory-fsync: {e}")))
-}
-
 fn kind_name(kind: ObjectType) -> &'static str {
     match kind {
         ObjectType::Blob => "blob",
@@ -1176,51 +1121,7 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
         self.object_write(repo, "commit", &bytes)
     }
     fn read_ref(&self, repo: &RepoHandle, name: &RefName) -> Result<RefValue> {
-        // One listing answers for a direct ref and for a symbolic ref whose
-        // target exists. Only an unlisted name needs the symbolic probe: a
-        // dangling symbolic ref is never listed, and it must not read as absent.
-        let out = self.call(
-            repo,
-            &[
-                "for-each-ref",
-                "--format=%(refname)%00%(objectname)%00%(symref)",
-                "--",
-                name.as_str(),
-            ],
-            &[],
-        )?;
-        for l in out.split(|b| *b == b'\n').filter(|l| !l.is_empty()) {
-            let fields: Vec<_> = l.split(|b| *b == 0).collect();
-            if fields.len() != 3 {
-                return Err(failure("invalid-ref-observation"));
-            }
-            if fields[0] != name.as_str().as_bytes() {
-                continue;
-            }
-            return if fields[2].is_empty() {
-                Ok(RefValue::Direct(self.oid(repo, fields[1])?))
-            } else {
-                Ok(RefValue::Symbolic(
-                    RefName::parse(text(fields[2])?).map_err(|_| failure("invalid-symbolic-target"))?,
-                ))
-            };
-        }
-        let symbolic = self.raw(
-            repo,
-            &["symbolic-ref", "--quiet", "--", name.as_str()],
-            &[],
-            false,
-        )?;
-        if symbolic.success {
-            return Ok(RefValue::Symbolic(
-                RefName::parse(text(&symbolic.stdout)?.trim_end_matches('\n'))
-                    .map_err(|_| failure("invalid-symbolic-target"))?,
-            ));
-        }
-        if symbolic.code != Some(1) {
-            return Err(symbolic.error("read-ref-failed"));
-        }
-        Ok(RefValue::Absent)
+        crate::driver::read_ref_value(repo, name, &|args| self.raw(repo, args, &[], false))
     }
     fn read_object(
         &self,
