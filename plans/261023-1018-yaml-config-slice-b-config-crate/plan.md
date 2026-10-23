@@ -74,6 +74,21 @@ Shared edits handled in order: `src/lint.rs` and `lint.v1.json` (04a creates, 04
 - **Budget (agreed with the owner 2026-10-23):** about 1,100-1,300 lines of Rust source (the whole slice, including `open_beneath` in Durable File, excluding tests), about 1,000 lines of Rust tests (mostly golden fixtures; about 120 golden cases plus two pinned inputs). Schema YAML and standard YAML are data and counted apart: about 2,500 lines together (`runner`: schema about 450, standard about 1,400; every other section about 650 together; the split is an estimate until phases 12-13 count it), plus about 100 lines of docs. The Rust ceiling is unchanged at 1,500 lines. Effort 52h (about 6-7 working days) excluding owner wait time.
 - **Hard ceiling: 1,500 lines of Rust source.** The count is `find packages/config/rust/src packages/durable-file/rust/src/open_beneath.rs -name '*.rs' | xargs wc -l` (blank lines and comments included, so it cannot be gamed). Every phase reports the running total in its commit message; the phase that would pass 1,500 stops and reports to the owner in the decision-question template instead of landing. Planned split of source lines: 01 about 60, 02 about 40, 04 about 300, 06 about 110, 07 about 110 plus about 100 in Durable File, 08 about 90, 09 about 230, 10 about 190, 11 about 50, total about 1,280.
 
+## Budget revision (owner, 2026-10-23 12:47, option A)
+
+Measured after 04b: `packages/config/rust/src` is 1,230 lines (comments and blanks included). Meeting the old 1,500 ceiling would mean dropping spec behaviour (the scope rules or the write transaction), so the owner raised the ceiling for this crate to **2,000 lines**, with one cap per remaining module; a phase that would pass its cap stops and reports before going on:
+
+| Module | Phase | Cap |
+|---|---|---|
+| `scope.rs` | 06 | 150 |
+| `snapshot.rs` | 09 | 250 |
+| `cache.rs` | 09 | 50 |
+| `detect.rs` | 09 | 40 |
+| `write.rs` | 10 | 200 |
+| `redact.rs` | 11 | 80 |
+
+Durable File's `beneath.rs` (281) is a shared primitive and is counted with Durable File, not here. Schema and standard YAML are data and counted apart.
+
 ## Constraints
 
 - AGENTS.md: L10 one door (nothing here duplicates a door that exists; Slice C moves every caller), design principle 8 (one owning proof per behaviour, lowest layer, listed per phase), no test-only switch, flag or env branch (the one seam in phase 10 is a public observer parameter, same pattern as `fgos_durable_file::replace_durably_observed`, `packages/durable-file/rust/src/lib.rs:187`), RUL104 better not bigger, conventional commits without AI references except the attribution line the session requires.
