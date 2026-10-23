@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:fgos:config-schema-meta:v1",
-  "$comment": "owner: config. The rules every section schema (core/config-schema/<section>.schema.yaml, parsed to JSON) must satisfy, as a JSON Schema over the schema document. Each rule is one $defs entry named after its lint id; a rule that applies at the root and to every subschema has a root entry and a '<id>.node' entry, and the id is the name up to the first '.', so the absolute keyword location a validator reports (`<$id>#/$defs/<name>/...`) maps back to the id. A rule that guards a known defect of the validator crate states it in `packages/config/upgrade-record.md`: `schema-pattern-length` (a long `pattern` compiles in more than linear time) and `schema-object-comparison` (the crate compares objects wrongly when serde_json keeps key order). Not expressible here and kept in src/lint.rs: the $id section equals the file stem, a $ref that dangles or loops, and any rule that reads an ancestor or the standard files. Rules that read a node's annotations see only what the node states itself; inheritance is lint's. The subschema entry is its own resource because $dynamicAnchor must sit on a resource root for the official meta-schema's $dynamicRef to reach it.",
+  "$comment": "owner: config. The rules every section schema (core/config-schema/<section>.schema.yaml, parsed to JSON) must satisfy, as a JSON Schema over the schema document. Each rule is one $defs entry named after its lint id; a rule that applies at the root and to every subschema has a root entry and a '<id>.node' entry, and the id is the name up to the first '.', so the absolute keyword location a validator reports (`<$id>#/$defs/<name>/...`) maps back to the id. A rule that guards a known defect of the validator crate states it in `packages/config/upgrade-record.md`: `schema-pattern-length` (a long `pattern` compiles in more than linear time) and `schema-object-comparison` (the crate compares objects wrongly when serde_json keeps key order). Not expressible here and kept in src/lint.rs: the $id section equals the file stem, a $ref that dangles or loops, and any rule that reads an ancestor or the standard files. Rules that read a node's annotations see only what the node states itself; inheritance is lint's. The subschema entry is its own resource because $dynamicAnchor must sit on a resource root for the official meta-schema's $dynamicRef to reach it. A rule that forbids a keyword states it for object subschemas only: `required` passes on a boolean subschema, so a bare `not: {required: [...]}` would refuse `additionalProperties: false`.",
   "$ref": "#/$defs/root",
   "$defs": {
     "root": {
@@ -70,15 +70,20 @@
       }
     },
     "schema-dialect.node": {
-      "not": {
-        "required": [
-          "patternProperties"
-        ]
+      "if": {
+        "type": "object"
       },
-      "properties": {
-        "$ref": {
-          "type": "string",
-          "pattern": "^(#|urn:fgos:config-schema:)"
+      "then": {
+        "not": {
+          "required": [
+            "patternProperties"
+          ]
+        },
+        "properties": {
+          "$ref": {
+            "type": "string",
+            "pattern": "^(#|urn:fgos:config-schema:)"
+          }
         }
       }
     },
@@ -105,10 +110,15 @@
       }
     },
     "schema-default-forbidden": {
-      "not": {
-        "required": [
-          "default"
-        ]
+      "if": {
+        "type": "object"
+      },
+      "then": {
+        "not": {
+          "required": [
+            "default"
+          ]
+        }
       }
     },
     "schema-annotation-unknown": {

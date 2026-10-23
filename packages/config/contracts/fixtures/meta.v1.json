@@ -152,6 +152,59 @@
    }
   },
   {
+   "id": "meta-valid-boolean-subschema",
+   "why": "a boolean subschema (additionalProperties: false) is a valid schema node: the forbidden-keyword rules look at object subschemas only",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "a": {
+      "type": "object",
+      "description": "A.",
+      "additionalProperties": false,
+      "properties": {
+       "b": {
+        "type": "string",
+        "description": "B."
+       }
+      }
+     }
+    }
+   },
+   "expect": {
+    "valid": true
+   }
+  },
+  {
+   "id": "meta-default-forbidden-beside-boolean-subschema",
+   "why": "a boolean subschema does not hide a default on an object subschema next to it",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "a": {
+      "type": "object",
+      "description": "A.",
+      "additionalProperties": false,
+      "properties": {
+       "b": {
+        "type": "string",
+        "description": "B.",
+        "default": "x"
+       }
+      }
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-default-forbidden"
+   }
+  },
+  {
    "id": "meta-annotation-unknown",
    "why": "a leftover x-fgos-version is a typo guard hit",
    "schema": {
