@@ -29,12 +29,33 @@ impl From<io::Error> for WalError {
         Self::Io(e)
     }
 }
+impl WalError {
+    /// The one kebab name of this failure; free-text diagnostics travel apart.
+    pub(crate) fn cause(&self) -> &'static str {
+        match self {
+            Self::Io(_) => "git-wal-io",
+            Self::Corrupt(_) => "git-wal-corrupt",
+            Self::Untrusted => "repository-identity-changed",
+            Self::OperationIdConflict => "operation-id-conflict",
+            Self::PublicationBorrowUnavailable => "publication-borrow-unavailable",
+            Self::Busy => "busy",
+            Self::RecoveryRequired => "operation-recovery-required",
+            Self::Unsupported => "git-wal-unsupported",
+            Self::FenceMissing => "git-fence-missing",
+        }
+    }
+    pub(crate) fn diagnostic(&self) -> Option<String> {
+        match self {
+            Self::Io(e) => Some(e.to_string()),
+            Self::Corrupt(text) => Some(text.clone()),
+            _ => None,
+        }
+    }
+}
 impl std::fmt::Display for WalError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if matches!(self, Self::FenceMissing) {
-            return write!(f, "git-fence-missing");
-        }
-        write!(f, "{self:?}")
+        write!(f, "{}", self.cause())?;
+        self.diagnostic().map_or(Ok(()), |text| write!(f, ": {text}"))
     }
 }
 impl std::error::Error for WalError {}

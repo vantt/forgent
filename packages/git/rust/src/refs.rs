@@ -12,32 +12,6 @@ use std::{
     time::Duration,
 };
 
-pub(crate) fn failure(cause: impl std::fmt::Display) -> OperationError {
-    let cause = cause.to_string();
-    OperationError {
-        code: ResultCode::Refused,
-        cause,
-        retryable: false,
-        operation_id: None,
-        receipt: None,
-        exit_code: None,
-        signal: None,
-        stderr: vec![],
-        detail: None,
-    }
-}
-pub(crate) fn classified(code: ResultCode, cause: impl std::fmt::Display) -> OperationError {
-    OperationError {
-        code,
-        ..failure(cause)
-    }
-}
-pub(crate) fn recovery(cause: impl std::fmt::Display) -> OperationError {
-    classified(ResultCode::RecoveryRequired, cause)
-}
-pub(crate) fn stale(cause: impl std::fmt::Display) -> OperationError {
-    classified(ResultCode::Stale, cause)
-}
 pub(crate) fn tip(value: &ExpectedTip) -> Tip {
     match value {
         ExpectedTip::Absent => Tip::Absent,
@@ -234,6 +208,7 @@ pub(crate) fn receipt(
         } else {
             Attribution::Uncertain
         },
+        warnings: vec![],
     })
 }
 pub(crate) fn sync_refs(repo: &RepoHandle, reference: &RefName) -> Result<()> {
@@ -358,8 +333,7 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
                 expected: Tip::Oid(candidate.clone()),
                 next: Tip::Absent,
             },
-        )
-        .map_err(failure)?
+        )?
     };
     match direct(driver, repo, &pin)? {
         ExpectedTip::Absent => (),
@@ -385,7 +359,7 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
         _ => return Err(recovery("pin-release-recovery-required")),
     }
     sync_refs(repo, &pin)?;
-    wal.append(&release, Phase::PinReleased).map_err(failure)?;
+    wal.append(&release, Phase::PinReleased)?;
     Ok(())
 }
 impl GitDriver {
@@ -685,20 +659,18 @@ impl GitDriver {
                     .map(|p| p.to_string_lossy().into_owned()),
             }
         };
-        wal::require_activation_fence(repo).map_err(failure)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(recovery)?;
+        wal::require_activation_fence(repo)?;
+        let wal = Wal::with_filesystem(repo.common_dir(), filesystem)?;
         let resources = vec![name.as_str().into()];
         admission(&wal, id, &resources)?;
         let binding =
-            wal::canonical_digest(&(wal.repository_identity(), "refs", repo.trusted_main_root()))
-                .map_err(failure)?;
+            wal::canonical_digest(&(wal.repository_identity(), "refs", repo.trusted_main_root()))?;
         let authority = Authority {
             scope: &scope,
             binding: binding.clone(),
         };
         let intent = Intent {
-            request_digest: wal::canonical_digest(&(&kind, &resources, old, next, writer))
-                .map_err(failure)?,
+            request_digest: wal::canonical_digest(&(&kind, &resources, old, next, writer))?,
             kind,
             repo_identity: wal.repository_identity().into(),
             resource_set: resources,
@@ -708,7 +680,7 @@ impl GitDriver {
             expected: tip(old),
             next: tip(next),
         };
-        let chain = match wal.begin(id, intent, &authority).map_err(failure)? {
+        let chain = match wal.begin(id, intent, &authority)? {
             Begin::Created(c) => c,
             Begin::Existing(c) => {
                 if matches!(
@@ -740,8 +712,7 @@ impl GitDriver {
             Begin::Compacted(_) => return Err(recovery("operation-recovery-required")),
         };
         if direct(self, repo, name)? != *old {
-            wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                .map_err(failure)?;
+            wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
             return Err(stale("compare-and-swap-stale"));
         }
         // Reachability pin precedes prepared and the only target attempt.
@@ -753,7 +724,7 @@ impl GitDriver {
             },
         };
         install_pin(self, repo, admin, id, candidate)?;
-        let chain = wal.append(&chain, Phase::Prepared).map_err(failure)?;
+        let chain = wal.append(&chain, Phase::Prepared)?;
         scope.validate().map_err(failure)?;
         if let Some(target) = tree {
             let lease = scope
@@ -770,8 +741,7 @@ impl GitDriver {
                 .is_empty();
             if collision {
                 let terminal = wal
-                    .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                    .map_err(recovery)?;
+                    .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
                 release_pin(self, repo, admin, &wal, &terminal)?;
                 return Err(failure("checkout-preflight-failed"));
             }
@@ -789,8 +759,7 @@ impl GitDriver {
                 )?;
                 if !result.success {
                     let terminal = wal
-                        .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                        .map_err(failure)?;
+                        .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
                     release_pin(self, repo, admin, &wal, &terminal)?;
                     return Err(result.error("checkout-preflight-failed"));
                 }
@@ -804,8 +773,7 @@ impl GitDriver {
                     expected: tip(old),
                     next: tip(next),
                 },
-            )
-            .map_err(failure)?;
+            )?;
         let effect = (|| {
             filesystem
                 .checkpoint("before-target-cas")
@@ -858,8 +826,7 @@ impl GitDriver {
                         Phase::Outcome(Outcome::Loss {
                             observed: tip(&observed),
                         }),
-                    )
-                    .map_err(failure)?;
+                    )?;
                 release_pin(self, repo, admin, &wal, &terminal)?;
                 return Err(stale("compare-and-swap-stale"));
             }
@@ -909,8 +876,7 @@ impl GitDriver {
                         observed: tip(&observed),
                         attribution: wal::Attribution::ThisInvocationWonCas,
                     }),
-                )
-                .map_err(failure)?;
+                )?;
             release_pin(self, repo, admin, &wal, &terminal)?;
             receipt(
                 id,
@@ -1057,12 +1023,12 @@ impl GitDriver {
     pub fn recover_ref_operation(&self, repo: &RepoHandle, held: Vec<BorrowedHandle<'_>>, writer: &str, id: &str) -> Result<Outcome> {
         let mut scope = acquire_worktree_admin(repo, held)?;
         crate::recovery::leaf(&mut scope, repo)?;
-        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
-        let chain = wal.inspect(id).map_err(failure)?;
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
+        let chain = wal.inspect(id)?;
         let i = chain.intent();
         if !matches!(i.kind, OperationKind::RefUpdate {..} | OperationKind::RefDelete) { return Err(failure("not-ref-operation")); }
         if i.writer_identity != writer || i.repo_identity != wal.repository_identity()
-            || i.authority_binding != wal::canonical_digest(&(wal.repository_identity(), "refs", repo.trusted_main_root())).map_err(failure)? {
+            || i.authority_binding != wal::canonical_digest(&(wal.repository_identity(), "refs", repo.trusted_main_root()))? {
             return Err(failure("ref-authority-mismatch"));
         }
         if let Some(o) = chain.outcome() {
@@ -1081,7 +1047,7 @@ impl GitDriver {
                     return Err(recovery("ref-checkout-recovery-required"));
                 }
             }
-            if wal.native_lock_present(i).map_err(failure)? {
+            if wal.native_lock_present(i)? {
                 return Err(recovery("ref-checkout-or-native-state-recovery-required"));
             }
             let name = RefName::parse(&i.resource_set[0]).map_err(failure)?;
@@ -1089,7 +1055,7 @@ impl GitDriver {
             if observed == i.next { Outcome::Success { observed, attribution: wal::Attribution::EffectObservedOnly } }
             else { return Err(recovery("ref-effect-unknown")); }
         };
-        let terminal = wal.append(&chain, Phase::Outcome(outcome.clone())).map_err(failure)?;
+        let terminal = wal.append(&chain, Phase::Outcome(outcome.clone()))?;
         release_pin(self, repo, scope.handle("worktree-admin").expect("acquired"), &wal, &terminal)?;
         Ok(outcome)
     }

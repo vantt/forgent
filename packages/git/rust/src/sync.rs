@@ -1,6 +1,6 @@
 //! Operation-owned sync of a pinned commit into a producer under continuous custody.
 use crate::{
-    refs::{failure, recovery, Authority},
+    refs::Authority,
     scoped_commit::{binding, checkout_resources, compact_matches, handle, paths, root, scope},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
@@ -92,8 +92,8 @@ impl GitDriver {
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
         let scope = scope(repo, held)?;
-        let wal = Wal::open(repo).map_err(failure)?;
-        if let Some(compact) = wal.compacted(id).map_err(failure)? {
+        let wal = Wal::open(repo)?;
+        if let Some(compact) = wal.compacted(id)? {
             let kind = OperationKind::Sync(Box::new(wal::SyncIntent {
                 reference: compact.reference.clone(),
                 worktree: root(repo)?.to_string_lossy().into(),
@@ -102,13 +102,13 @@ impl GitDriver {
                 message: message.into(),
                 files: files.to_vec(),
             }));
-            if compact.request != wal::canonical_digest(&(&kind, writer)).map_err(failure)? {
+            if compact.request != wal::canonical_digest(&(&kind, writer))? {
                 return Err(failure("operation-id-reused"));
             }
             return self.continue_sync_scoped(repo, &scope, &wal, writer, id, false);
         }
-        if wal.known_id(id).map_err(failure)? {
-            let previous = wal.inspect(id).map_err(failure)?;
+        if wal.known_id(id)? {
+            let previous = wal.inspect(id)?;
             match &previous.intent().kind {
                 OperationKind::Sync(payload)
                     if payload.target == target.as_str()
@@ -168,7 +168,7 @@ impl GitDriver {
             files: files.to_vec(),
         }));
         let intent = Intent {
-            request_digest: wal::canonical_digest(&(&kind, writer)).map_err(failure)?,
+            request_digest: wal::canonical_digest(&(&kind, writer))?,
             kind,
             repo_identity: wal.repository_identity().into(),
             resource_set: resources,
@@ -182,7 +182,7 @@ impl GitDriver {
             scope: &scope,
             binding,
         };
-        let chain = match wal.begin(id, intent, &authority).map_err(failure)? {
+        let chain = match wal.begin(id, intent, &authority)? {
             Begin::Created(c) => c,
             _ => return Err(recovery("sync-recovery-required")),
         };
@@ -193,11 +193,10 @@ impl GitDriver {
         let chain = match preparation {
             Ok(chain) => chain,
             Err(error) => {
-                let pending = wal.inspect(id).map_err(failure)?;
+                let pending = wal.inspect(id)?;
                 if matches!(*pending.last_state(), Phase::Intent(_) | Phase::Prepared) {
                     let terminal = wal
-                        .append(&pending, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                        .map_err(failure)?;
+                        .append(&pending, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
                     self.compact_checkout(repo, &scope, &wal, &terminal)?;
                 }
                 return Err(error);
@@ -211,8 +210,7 @@ impl GitDriver {
                     expected: chain.intent().expected.clone(),
                     next: chain.intent().next.clone(),
                 },
-            )
-            .map_err(failure)?;
+            )?;
         // Metadata only: preserve permission bits Git does not represent for
         // clean paths that a later hook may touch before abort.
         let mut clean_modes = std::collections::BTreeMap::new();
@@ -269,8 +267,7 @@ impl GitDriver {
                     Phase::Outcome(Outcome::CommitRejected {
                         cause: "merge-refused".into(),
                     }),
-                )
-                .map_err(failure)?;
+                )?;
             self.compact_checkout(repo, &scope, &wal, &terminal)?;
             return Err(out.error("merge-refused"));
         }
@@ -319,8 +316,7 @@ impl GitDriver {
                         .collect(),
                     staged: staged.clone(),
                 },
-            )
-            .map_err(failure)?;
+            )?;
         let mut receipt = if conflicts.is_empty() && !prepare_only {
             self.finish_sync(repo, &scope, &wal, &state)
         } else {
@@ -434,7 +430,7 @@ impl GitDriver {
         let repo = &operation_repo;
         let mut scope = scope(repo, held)?;
         crate::recovery::leaf(&mut scope, repo)?;
-        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
         self.continue_sync_scoped(repo, &scope, &wal, writer, id, false)
     }
     pub fn continue_sync(
@@ -447,7 +443,7 @@ impl GitDriver {
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
         let scope = scope(repo, held)?;
-        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
         self.continue_sync_scoped(repo, &scope, &wal, writer, id, true)
     }
     /// Explicit commit-only retry of an observed rejection uses a new WAL id.
@@ -463,10 +459,10 @@ impl GitDriver {
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
         let scope = scope(repo, held)?;
-        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
-        let prior_compact = wal.compacted(id).map_err(failure)?;
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
+        let prior_compact = wal.compacted(id)?;
         let prior_chain = if prior_compact.is_none() {
-            Some(wal.inspect(id).map_err(failure)?)
+            Some(wal.inspect(id)?)
         } else {
             None
         };
@@ -481,14 +477,14 @@ impl GitDriver {
                     .request_digest
                     .as_str()
             });
-        if let Some(next) = wal.compacted(next_id).map_err(failure)? {
+        if let Some(next) = wal.compacted(next_id)? {
             if next.request != prior_request {
                 return Err(failure("operation-id-reused"));
             }
             return self.continue_sync_scoped(repo, &scope, &wal, writer, next_id, true);
         }
-        if wal.known_id(next_id).map_err(failure)? {
-            let next = wal.inspect(next_id).map_err(failure)?;
+        if wal.known_id(next_id)? {
+            let next = wal.inspect(next_id)?;
             if next.intent().request_digest != prior_request {
                 return Err(failure("operation-id-reused"));
             }
@@ -525,8 +521,8 @@ impl GitDriver {
             scope: &scope,
             binding: binding(handle(&scope, repo)?)?,
         };
-        let mut next = if wal.known_id(next_id).map_err(failure)? {
-            let next = wal.inspect(next_id).map_err(failure)?;
+        let mut next = if wal.known_id(next_id)? {
+            let next = wal.inspect(next_id)?;
             if next.intent() != prior.intent() {
                 return Err(failure("operation-id-reused"));
             }
@@ -544,8 +540,7 @@ impl GitDriver {
             next
         } else {
             match wal
-                .begin(next_id, prior.intent().clone(), &authority)
-                .map_err(failure)?
+                .begin(next_id, prior.intent().clone(), &authority)?
             {
                 Begin::Created(c) => c,
                 _ => return Err(recovery("sync-recovery-required")),
@@ -559,7 +554,7 @@ impl GitDriver {
                 next_id,
                 &Oid::parse(&state.target, repo.object_format()).map_err(failure)?,
             )?;
-            next = wal.append(&next, Phase::Prepared).map_err(failure)?;
+            next = wal.append(&next, Phase::Prepared)?;
         }
         if matches!(next.last_state(), Phase::Prepared) {
             next = wal
@@ -570,10 +565,9 @@ impl GitDriver {
                         expected: next.intent().expected.clone(),
                         next: next.intent().next.clone(),
                     },
-                )
-                .map_err(failure)?;
+                )?;
         }
-        next = wal.append(&next, recorded).map_err(failure)?;
+        next = wal.append(&next, recorded)?;
         self.finish_sync(repo, &scope, &wal, &next)
             .map_err(|mut e| {
                 e.operation_id = Some(next_id.into());
@@ -589,7 +583,7 @@ impl GitDriver {
         id: &str,
         finish: bool,
     ) -> Result<SyncResult> {
-        if let Some(compact) = wal.compacted(id).map_err(failure)? {
+        if let Some(compact) = wal.compacted(id)? {
             let intent = Intent {
                 kind: OperationKind::Sync(Box::new(wal::SyncIntent {
                     reference: compact.reference.clone(),
@@ -611,7 +605,7 @@ impl GitDriver {
             if !compact_matches(&compact, &intent, repo)? {
                 return Err(failure("sync-authority-mismatch"));
             }
-            let outcome = compact.outcome().map_err(failure)?;
+            let outcome = compact.outcome()?;
             if let Outcome::CommitRejected { cause } = &outcome {
                 if cause == "foreign-checkout-effect-unknown" {
                     return Err(recovery(cause));
@@ -663,7 +657,7 @@ impl GitDriver {
                 commit,
             ));
         }
-        let chain = wal.inspect(id).map_err(failure)?;
+        let chain = wal.inspect(id)?;
         let OperationKind::Sync(payload) = &chain.intent().kind else {
             return Err(failure("not-sync-operation"));
         };
@@ -782,8 +776,7 @@ impl GitDriver {
                 return Err(recovery("sync-commit-attempt-recovery-required"));
             };
             let terminal = wal
-                .append(&chain, Phase::Outcome(outcome))
-                .map_err(failure)?;
+                .append(&chain, Phase::Outcome(outcome))?;
             let warnings = if merge.is_none() {
                 self.compact_checkout_warning(repo, scope, wal, &terminal)
             } else {
@@ -811,16 +804,14 @@ impl GitDriver {
                         Phase::Outcome(Outcome::CommitRejected {
                             cause: "merge-effect-unknown".into(),
                         }),
-                    )
-                    .map_err(failure)?;
+                    )?;
                 let mut receipt = info(id, head, target, "merge-effect-unknown", vec![], None);
                 receipt.warnings = self.compact_checkout_warning(repo, scope, wal, &terminal);
                 return Ok(receipt);
             }
             if matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared) {
                 let terminal = wal
-                    .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                    .map_err(failure)?;
+                    .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
                 let mut receipt = info(id, head, target, "not-started", vec![], None);
                 receipt.warnings = self.compact_checkout_warning(repo, scope, wal, &terminal);
                 return Ok(receipt);
@@ -830,13 +821,13 @@ impl GitDriver {
                 &Oid::parse(target, repo.object_format()).map_err(failure)?,
                 &Oid::parse(&now, repo.object_format()).map_err(failure)?,
             )? {
-                let terminal = wal.append(&chain, Phase::Outcome(Outcome::CommitRejected {cause:"merged-outside".into()})).map_err(failure)?;
+                let terminal = wal.append(&chain, Phase::Outcome(Outcome::CommitRejected {cause:"merged-outside".into()}))?;
                 let mut receipt = info(id, head, target, "done", vec![], None);
                 receipt.warnings = self.compact_checkout_warning(repo, scope, wal, &terminal);
                 return Ok(receipt);
             }
             if &now == head {
-                let terminal = wal.append(&chain, Phase::Outcome(Outcome::CommitRejected {cause:"conflict-aborted".into()})).map_err(failure)?;
+                let terminal = wal.append(&chain, Phase::Outcome(Outcome::CommitRejected {cause:"conflict-aborted".into()}))?;
                 let mut receipt = info(id, head, target, "not-started", vec![], None);
                 receipt.warnings = self.compact_checkout_warning(repo, scope, wal, &terminal);
                 return Ok(receipt);
@@ -950,8 +941,7 @@ impl GitDriver {
         }
         let tree = self.checkout_text(repo, scope, &["write-tree"])?;
         let attempted = wal
-            .append(chain, Phase::SyncCommitAttempt { tree: tree.clone() })
-            .map_err(failure)?;
+            .append(chain, Phase::SyncCommitAttempt { tree: tree.clone() })?;
         let out = self.checkout_call(
             repo,
             scope,
@@ -969,8 +959,7 @@ impl GitDriver {
         if &observed == head {
             if !out.success {
                 let error = self.checkout_commit_failure(repo, scope, out)?;
-                wal.append(&attempted, Phase::Outcome(Outcome::CommitRejected { cause: error.cause.clone() }))
-                    .map_err(failure)?;
+                wal.append(&attempted, Phase::Outcome(Outcome::CommitRejected { cause: error.cause.clone() }))?;
                 return Err(error);
             }
             return Err(recovery("sync-commit-effect-unknown"));
@@ -996,8 +985,7 @@ impl GitDriver {
                     observed: observed.clone(),
                     contract_violation: violation,
                 }),
-            )
-            .map_err(failure)?;
+            )?;
         let warnings = self.compact_checkout_warning(repo, scope, wal, &terminal);
         let mut receipt = info(
             &chain.last().operation_id,
@@ -1034,7 +1022,7 @@ impl GitDriver {
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
         let scope = scope(repo, held)?;
-        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
         let state = self.continue_sync_scoped(repo, &scope, &wal, writer, id, false)?;
         if state.state == "done"
             || state.state == "not-started"
@@ -1045,7 +1033,7 @@ impl GitDriver {
         if state.state != "in-progress" && state.state != "rejected-open" {
             return Err(failure("sync-merge-lost"));
         }
-        let chain = wal.inspect(id).map_err(failure)?;
+        let chain = wal.inspect(id)?;
         let warnings = self.abort_sync_scoped(repo, &scope, &wal, &chain)?;
         let mut receipt = info(
             id,
@@ -1146,8 +1134,7 @@ impl GitDriver {
                 Phase::Outcome(Outcome::CommitRejected {
                     cause: "conflict-aborted".into(),
                 }),
-            )
-            .map_err(failure)?
+            )?
         };
         Ok(self.compact_checkout_warning(repo, scope, wal, &terminal))
     }

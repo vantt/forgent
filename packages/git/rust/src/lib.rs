@@ -191,6 +191,9 @@ pub struct Receipt {
     pub remote: Remote,
     pub consumer_settlement: ConsumerSettlement,
     pub attribution: Attribution,
+    /// Facts that did not fail the operation, such as a compaction left for a later call.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub warnings: Vec<String>,
 }
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -265,6 +268,55 @@ pub struct OperationError {
     pub detail: Option<Box<serde_json::Value>>,
 }
 pub type Result<T> = std::result::Result<T, OperationError>;
+
+/// The one constructor of an `OperationError`; every other one names its code.
+pub(crate) fn classified(code: ResultCode, cause: impl std::fmt::Display) -> OperationError {
+    OperationError {
+        code,
+        cause: cause.to_string(),
+        retryable: false,
+        operation_id: None,
+        receipt: None,
+        exit_code: None,
+        signal: None,
+        stderr: vec![],
+        detail: None,
+    }
+}
+pub(crate) fn failure(cause: impl std::fmt::Display) -> OperationError {
+    classified(ResultCode::Refused, cause)
+}
+pub(crate) fn failed(cause: impl std::fmt::Display) -> OperationError {
+    classified(ResultCode::Failed, cause)
+}
+pub(crate) fn recovery(cause: impl std::fmt::Display) -> OperationError {
+    classified(ResultCode::RecoveryRequired, cause)
+}
+pub(crate) fn stale(cause: impl std::fmt::Display) -> OperationError {
+    classified(ResultCode::Stale, cause)
+}
+pub(crate) fn busy(cause: impl std::fmt::Display) -> OperationError {
+    OperationError {
+        retryable: true,
+        ..classified(ResultCode::Busy, cause)
+    }
+}
+/// Every port names a WAL failure the same way: a refusal for a request that
+/// cannot proceed, recovery-required for a log that cannot be trusted, with
+/// the diagnostic text in `detail` and never in the cause.
+impl From<wal::WalError> for OperationError {
+    fn from(e: wal::WalError) -> Self {
+        use wal::WalError::*;
+        let code = match e {
+            Busy | OperationIdConflict | Untrusted | Unsupported | PublicationBorrowUnavailable => ResultCode::Refused,
+            Io(_) | Corrupt(_) | FenceMissing | RecoveryRequired => ResultCode::RecoveryRequired,
+        };
+        OperationError {
+            detail: e.diagnostic().map(|text| Box::new(serde_json::json!({ "diagnostic": text }))),
+            ..classified(code, e.cause())
+        }
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ObjectType {
@@ -548,17 +600,7 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 /// Lock-taking Git ports stay dormant until the Windows handoff exists (Q6).
 pub fn require_lock_scope_platform() -> Result<()> {
     if cfg!(target_os = "windows") {
-        return Err(OperationError {
-            code: ResultCode::Refused,
-            cause: "git-lockscope-unavailable-windows".into(),
-            retryable: false,
-            operation_id: None,
-            receipt: None,
-            exit_code: None,
-            signal: None,
-            stderr: vec![],
-        detail: None,
-        });
+        return Err(failure("git-lockscope-unavailable-windows"));
     }
     Ok(())
 }
@@ -570,17 +612,17 @@ pub use scoped_commit::{CheckpointRequest, CommitBaseline, CommitRequest, Commit
 pub(crate) fn literal_repo_path(path: &str) -> Result<()> {
     if path.is_empty() || path.starts_with('/') || path.contains('\0')
         || path.split('/').any(|p| p.is_empty() || p == "." || p == "..") {
-        return Err(refs::failure("invalid-literal-path"));
+        return Err(failure("invalid-literal-path"));
     }
     Ok(())
 }
 /// Exact scope spelling suitable for literal path staging or a resolver grant.
 pub(crate) fn fgos_scope_literal(path: &str) -> Result<()> {
-    if fgos_write_scope::canonicalize(path).map_err(refs::failure)? != path
+    if fgos_write_scope::canonicalize(path).map_err(failure)? != path
         || path.contains('*')
         || path.chars().any(char::is_control)
     {
-        return Err(refs::failure("unscopable-conflict-path"));
+        return Err(failure("unscopable-conflict-path"));
     }
     Ok(())
 }
