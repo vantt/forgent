@@ -1,0 +1,807 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "urn:fgos:config-schema:runner:v1"
+$comment: "owner: runner"
+description: "The runner: executors, capabilities, model policies, tier fallback, patterns and run limits."
+type: object
+properties:
+  executor:
+    $comment: "justification: read from the trusted main checkout, spec section 5 rule 6; the entry decides what runs on this machine"
+    x-fgos-scope: both
+    x-fgos-sensitivity: command
+    x-fgos-absent: detected
+    description: "The default executor a run spawns when no capability names one; detected from PATH when the project names none."
+    type: object
+    properties:
+      command:
+        description: "The program to spawn."
+        type: string
+        minLength: 1
+      args:
+        description: "Arguments of the program; {prompt} and {model} are replaced at launch."
+        type: array
+        items:
+          type: string
+      adapter:
+        description: "The adapter that spawns it."
+        type: string
+        minLength: 1
+      env:
+        description: "Environment variables of the launch."
+        type: object
+        additionalProperties:
+          description: "Value of the variable."
+          type: string
+    required: [command, args]
+  executors:
+    description: "The executor registry: every executor a seat can be bound to, by id."
+    type: object
+    additionalProperties:
+      $ref: "#/$defs/executorEntry"
+  capabilities:
+    description: "The capability catalog: what each capability is called, which executors serve it and how it is held."
+    type: object
+    additionalProperties:
+      $ref: "#/$defs/capability"
+  modelPolicies:
+    description: "The model each family uses at each tier, by family then tier.\nTier ladder, weakest first:\nnano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote\nmini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ\nstandard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả\nadvanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan\nflagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel\nfrontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng"
+    type: object
+    additionalProperties:
+      description: "The tiers of one family; a tier it omits has no model."
+      type: object
+      properties:
+        nano:
+          $ref: "#/$defs/tierCell"
+        mini:
+          $ref: "#/$defs/tierCell"
+        standard:
+          $ref: "#/$defs/tierCell"
+        advanced:
+          $ref: "#/$defs/tierCell"
+        flagship:
+          $ref: "#/$defs/tierCell"
+        frontier:
+          $ref: "#/$defs/tierCell"
+  tierFallback:
+    description: "The families a seat walks after a failure, per tier and in order.\nTier ladder, weakest first:\nnano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote\nmini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ\nstandard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả\nadvanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan\nflagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel\nfrontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng"
+    type: object
+    properties:
+      nano:
+        description: "Families tried in this order after the primary fails."
+        type: array
+        items:
+          type: string
+          minLength: 1
+        minItems: 1
+        uniqueItems: true
+      mini:
+        description: "Families tried in this order after the primary fails."
+        type: array
+        items:
+          type: string
+          minLength: 1
+        minItems: 1
+        uniqueItems: true
+      standard:
+        description: "Families tried in this order after the primary fails."
+        type: array
+        items:
+          type: string
+          minLength: 1
+        minItems: 1
+        uniqueItems: true
+      advanced:
+        description: "Families tried in this order after the primary fails."
+        type: array
+        items:
+          type: string
+          minLength: 1
+        minItems: 1
+        uniqueItems: true
+      flagship:
+        description: "Families tried in this order after the primary fails."
+        type: array
+        items:
+          type: string
+          minLength: 1
+        minItems: 1
+        uniqueItems: true
+      frontier:
+        description: "Families tried in this order after the primary fails."
+        type: array
+        items:
+          type: string
+          minLength: 1
+        minItems: 1
+        uniqueItems: true
+  maxTier:
+    description: "The highest tier any seat may run at; absent means no ceiling.\nTier ladder, weakest first:\nnano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote\nmini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ\nstandard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả\nadvanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan\nflagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel\nfrontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng"
+    type: string
+    enum: [nano, mini, standard, advanced, flagship, frontier]
+  defaults:
+    description: "What a seat runs at when nothing else names it."
+    type: object
+    properties:
+      tier:
+        description: "The tier a seat runs at when nothing else names one."
+        type: string
+        enum: [nano, mini, standard, advanced, flagship, frontier]
+  timeoutMs:
+    description: "Milliseconds one run may take before it is stopped."
+    type: integer
+    minimum: 60000
+    maximum: 14400000
+  idleTimeoutMs:
+    description: "Milliseconds of silence after which a worker is stopped; absent leaves idle stopping off."
+    type: integer
+    minimum: 1
+  parallel:
+    description: "How many units run at once."
+    type: object
+    properties:
+      maxRoots:
+        description: "Most root work items running at once."
+        type: integer
+        minimum: 1
+      maxLeavesPerRoot:
+        description: "Most leaf work items running at once under one root."
+        type: integer
+        minimum: 1
+  confinement:
+    description: "Runner-wide confinement setting."
+    type: object
+    properties:
+      strict:
+        description: "When true every capability must declare its own confinement."
+        type: boolean
+  confinementPolicies:
+    $comment: "justification: read from the trusted main checkout, spec section 5 rule 6; the entry decides what runs on this machine"
+    x-fgos-scope: both
+    x-fgos-sensitivity: command
+    description: "Custom confinement policies by name; a built-in policy name cannot be redefined."
+    type: object
+    additionalProperties:
+      description: "One confinement policy: its contract, controls, grants and network filter."
+      type: object
+  coordination:
+    description: "Settings of agent coordination."
+    type: object
+    properties:
+      orgPolicy:
+        description: "The organisation policy of coordination."
+        type: object
+        properties:
+          dischargeOn:
+            description: "Outcomes that discharge an obligation."
+            type: array
+            items:
+              type: string
+              minLength: 1
+  patterns:
+    description: "Settings of the collaboration patterns."
+    type: object
+    properties:
+      defaultRule:
+        description: "The rule applied when a pattern names none."
+        type: object
+        properties:
+          mutatingMinRigor:
+            description: "Lowest rigor a unit that changes files may run at."
+            type: string
+            enum: [low, standard, high, critical]
+      reviewed:
+        description: "The reviewed pattern: rounds and checkers."
+        type: object
+        properties:
+          maxRounds:
+            description: "Most review rounds before the unit stops."
+            type: integer
+            minimum: 1
+          checkersByRigor:
+            description: "The checker seats per rigor; each rigor includes the checkers of the weaker ones."
+            type: object
+            properties:
+              low:
+                description: "Checker seats at this rigor."
+                type: array
+                items:
+                  type: string
+                  enum: [reviewer, red-team, tester]
+              standard:
+                description: "Checker seats at this rigor."
+                type: array
+                items:
+                  type: string
+                  enum: [reviewer, red-team, tester]
+              high:
+                description: "Checker seats at this rigor."
+                type: array
+                items:
+                  type: string
+                  enum: [reviewer, red-team, tester]
+              critical:
+                description: "Checker seats at this rigor."
+                type: array
+                items:
+                  type: string
+                  enum: [reviewer, red-team, tester]
+      seatBinding:
+        description: "Marker that this project reads the seat binding form of the config."
+        type: object
+        properties:
+          schema:
+            description: "Version of the seat binding form; the only value this release reads is 1."
+            type: integer
+            const: 1
+  generatedPaths:
+    description: "Generated trees a unit write scope widens to when it touches their source."
+    type: array
+    items:
+      description: "One source scope entry and the render targets generated from it."
+      type: object
+      properties:
+        from:
+          description: "Source write-scope entry, starting with a literal directory."
+          type: string
+          minLength: 1
+        also:
+          description: "Render targets that follow the source."
+          type: array
+          items:
+            type: string
+            minLength: 1
+          minItems: 1
+      required: [from, also]
+  llmAccounts:
+    x-fgos-file: accounts
+    x-fgos-scope: global-only
+    x-fgos-sensitivity: secret-reference
+    description: "The account pools by pool name then account id; each account names the login directory of each CLI. Lives in the accounts file."
+    type: object
+    additionalProperties:
+      description: "One pool: its accounts in the order they are leased."
+      type: object
+      additionalProperties:
+        description: "One account."
+        type: object
+        properties:
+          credentialStore:
+            description: "Login directory per CLI name."
+            type: object
+            additionalProperties:
+              description: "Absolute directory, or one starting with ~ or ${HOME}."
+              type: string
+              minLength: 1
+          label:
+            description: "Name shown in reports."
+            type: string
+            minLength: 1
+          disabled:
+            description: "Whether the account is out of rotation."
+            type: boolean
+  providers:
+    description: "Older account inventory by provider; read only until every release reads llmAccounts."
+    type: object
+    additionalProperties:
+      description: "One provider."
+      type: object
+      properties:
+        accounts:
+          x-fgos-file: accounts
+          x-fgos-scope: global-only
+          x-fgos-sensitivity: secret-reference
+          description: "The accounts of the provider by id, in the order they are leased. Lives in the accounts file."
+          type: object
+          additionalProperties:
+            description: "One account."
+            type: object
+            properties:
+              label:
+                description: "Name shown in reports."
+                type: string
+                minLength: 1
+              credentialSource:
+                $ref: "#/$defs/accountSource"
+              credentialSources:
+                description: "Login store per CLI command name."
+                type: object
+                additionalProperties:
+                  $ref: "#/$defs/accountSource"
+$defs:
+  tierName:
+    description: "One tier of the model ladder."
+    type: string
+    enum: [nano, mini, standard, advanced, flagship, frontier]
+  preferList:
+    description: "Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider."
+    type: [string, array]
+    minLength: 1
+    minItems: 1
+    items:
+      type: [string, object]
+      minLength: 1
+      properties:
+        executor:
+          description: "Executor id."
+          type: string
+          minLength: 1
+        invocation:
+          description: "Id of one invocation of that executor."
+          type: string
+          minLength: 1
+        crossProvider:
+          description: "Whether the seat may use this executor across provider families."
+          type: boolean
+      required: [executor]
+  tierCell:
+    description: "The model a family uses at one tier: a model id, model@pool, an object with model, pool and effort, or a non-empty list of those in the order they are tried."
+    type: [string, object, array]
+    minLength: 1
+    minItems: 1
+    properties:
+      model:
+        description: "Model id."
+        type: string
+        minLength: 1
+      pool:
+        description: "Account pool that serves the model."
+        type: string
+        minLength: 1
+      effort:
+        description: "Reasoning effort sent with the model."
+        type: string
+        enum: [low, medium, high, max]
+    required: [model]
+    items:
+      type: [string, object]
+      minLength: 1
+      properties:
+        model:
+          description: "Model id."
+          type: string
+          minLength: 1
+        pool:
+          description: "Account pool that serves the model."
+          type: string
+          minLength: 1
+        effort:
+          description: "Reasoning effort sent with the model."
+          type: string
+          enum: [low, medium, high, max]
+      required: [model]
+  seatTaste:
+    description: "The tier and executors one role, persona or seat prefers."
+    type: object
+    properties:
+      tier:
+        $ref: "#/$defs/tierName"
+      prefer:
+        $ref: "#/$defs/preferList"
+  capabilityConfinement:
+    $comment: "justification: read from the trusted main checkout, spec section 5 rule 6; the entry decides what runs on this machine"
+    x-fgos-scope: both
+    x-fgos-sensitivity: command
+    description: "How a capability is confined: required or preferred names a confinement policy, unconfined runs without one."
+    type: object
+    properties:
+      mode:
+        description: "required fails without the policy, preferred uses it when it can, unconfined runs outside any policy."
+        type: string
+        enum: [required, preferred, unconfined]
+      policy:
+        description: "Name of the confinement policy; absent only when mode is unconfined."
+        type: string
+        minLength: 1
+      allowInvocationOverride:
+        description: "Whether an invocation may replace the policy; must be false when mode is unconfined."
+        type: boolean
+    required: [mode]
+  capability:
+    description: "One capability: what it is called, which executors serve it and how work on it is held."
+    type: object
+    properties:
+      description:
+        description: "What the capability is for."
+        type: string
+        minLength: 1
+      aliases:
+        description: "Other names the capability answers to."
+        type: array
+        items:
+          type: string
+          minLength: 1
+      prefer:
+        $ref: "#/$defs/preferList"
+      rigor:
+        description: "Floor rigor a unit of this capability runs at."
+        type: string
+        enum: [low, standard, high, critical]
+      persona:
+        description: "Agent persona a seat of this capability takes."
+        type: string
+        minLength: 1
+      minCheckers:
+        description: "Checker seats a reviewed unit of this capability needs at least."
+        type: array
+        items:
+          type: string
+          enum: [reviewer, red-team, tester]
+      verify:
+        $comment: "justification: read from the trusted main checkout, spec section 5 rule 6; the entry decides what runs on this machine"
+        x-fgos-scope: both
+        x-fgos-sensitivity: command
+        description: "Shell command that verifies work of this capability."
+        type: string
+        minLength: 1
+      serves:
+        description: "Attributes of the work this capability serves; each value is one scalar or a list of them."
+        type: object
+        properties:
+          outputKind:
+            description: "Kind of output the work produces."
+            type: [string, array]
+            items:
+              type: string
+          domain:
+            description: "Domain the work belongs to."
+            type: [string, array]
+            items:
+              type: string
+          mutates:
+            description: "Whether the work changes files."
+            type: [boolean, array]
+            items:
+              type: boolean
+          behaviorPreserving:
+            description: "Whether the work keeps behaviour unchanged."
+            type: [boolean, array]
+            items:
+              type: boolean
+          needsIndependentReview:
+            description: "Whether the work needs a reviewer other than its producer."
+            type: [boolean, array]
+            items:
+              type: boolean
+          hasPlanOrTrack:
+            description: "Whether the work follows a plan or track."
+            type: [boolean, array]
+            items:
+              type: boolean
+      confinement:
+        $ref: "#/$defs/capabilityConfinement"
+      tier:
+        $ref: "#/$defs/tierName"
+        x-fgos-scope: project-only
+      maxTier:
+        $ref: "#/$defs/tierName"
+        x-fgos-scope: project-only
+      roles:
+        description: "Per-role tier and executor taste; a role is producer, synthesizer, reviewer, red-team or judge."
+        type: object
+        properties:
+          producer:
+            $ref: "#/$defs/seatTaste"
+          synthesizer:
+            $ref: "#/$defs/seatTaste"
+          reviewer:
+            $ref: "#/$defs/seatTaste"
+          red-team:
+            $ref: "#/$defs/seatTaste"
+          judge:
+            $ref: "#/$defs/seatTaste"
+        x-fgos-scope: project-only
+      personas:
+        description: "Per-persona tier and executor taste."
+        type: object
+        additionalProperties:
+          $ref: "#/$defs/seatTaste"
+        x-fgos-scope: project-only
+      seats:
+        description: "Per-seat tier and executor taste."
+        type: object
+        additionalProperties:
+          $ref: "#/$defs/seatTaste"
+        x-fgos-scope: project-only
+  invocation:
+    description: "One way to run an executor: through a CLI, a task, an MCP tool or an API."
+    type: object
+    properties:
+      id:
+        description: "Name of the invocation, unique within its executor."
+        type: string
+        minLength: 1
+      via:
+        description: "How the invocation runs."
+        type: string
+        enum: [cli, task, mcp, api]
+      adapter:
+        description: "The adapter that spawns or calls it."
+        type: string
+        minLength: 1
+      command:
+        description: "The program to spawn, or for an MCP invocation its identifier."
+        type: string
+        minLength: 1
+      args:
+        description: "Arguments of the program; {prompt} and {model} are replaced at launch."
+        type: array
+        items:
+          type: string
+      url:
+        description: "Address of an api invocation."
+        type: string
+        minLength: 1
+      tools:
+        description: "For an MCP invocation, the tool that serves each capability."
+        type: object
+        additionalProperties:
+          description: "MCP tool identifier."
+          type: string
+          minLength: 1
+      env:
+        description: "Environment variables of the launch."
+        type: object
+        additionalProperties:
+          description: "Value of the variable."
+          type: string
+      permissionMode:
+        description: "Whether the worker asks before acting; bypass needs full confinement."
+        type: string
+        enum: [ask, bypass]
+      promptDelivery:
+        description: "How the prompt reaches the worker."
+        type: string
+        enum: [file-pointer, inline]
+      confinement:
+        description: "Confinement of the launch: a backend and the three isolation flags."
+        type: object
+        properties:
+          backend:
+            description: "Name of the confinement backend that wraps the launch."
+            type: string
+            minLength: 1
+          privateHome:
+            description: "Whether the worker gets a private home."
+            type: boolean
+          isolatedSession:
+            description: "Whether the worker gets an isolated session."
+            type: boolean
+          ownWorktree:
+            description: "Whether the worker gets its own worktree."
+            type: boolean
+          contract:
+            description: "Confinement contract reference."
+            type: string
+          controls:
+            description: "Confinement controls by axis."
+            type: object
+          grants:
+            description: "Resource grants of the launch."
+            type: array
+          networkFilter:
+            description: "Network allowlist of the launch."
+            type: object
+      credentialStore:
+        description: "The login store of the CLI, handed to the confined launch through its private home."
+        type: object
+        properties:
+          use:
+            description: "Name of the login store, a lowercase key such as codex or pi."
+            type: string
+            minLength: 1
+          homeEnv:
+            description: "Environment variable that points the CLI at its home."
+            type: string
+            minLength: 1
+          files:
+            description: "Login files copied into the private home, relative paths without parent steps."
+            type: array
+            items:
+              type: string
+              minLength: 1
+            minItems: 1
+        required: [use, homeEnv]
+      interactiveMode:
+        description: "How a herdr pane runs the CLI interactively."
+        type: object
+        properties:
+          exitCommand:
+            description: "Command typed to leave the CLI."
+            type: string
+            minLength: 1
+          kind:
+            description: "The agent kind herdr starts."
+            type: string
+            minLength: 1
+          trustStore:
+            description: "Which trust store the CLI keeps; null for none."
+            type: [object, "null"]
+            properties:
+              kind:
+                description: "Trust store format."
+                type: string
+                enum: [claude-json, codex-toml, agy, agy-json]
+              path:
+                description: "Path of the trust store."
+                type: string
+                minLength: 1
+            required: [kind]
+        required: [exitCommand]
+      liveOutput:
+        description: "How output is streamed while the worker runs."
+        type: object
+        properties:
+          streamFlags:
+            description: "Flags that turn streaming on."
+            type: array
+            items:
+              type: string
+          renderer:
+            description: "Name of the renderer."
+            type: string
+            minLength: 1
+      resourceBindings:
+        description: "Older form of the login store, read only to infer one."
+        type: array
+    required: [via]
+  executorEntry:
+    $comment: "justification: read from the trusted main checkout, spec section 5 rule 6; the entry decides what runs on this machine"
+    x-fgos-scope: both
+    x-fgos-sensitivity: command
+    description: "One executor: an agent that runs work or a tool that is only present, with the invocations that start it."
+    type: object
+    properties:
+      kind:
+        description: "agent runs work for a seat, tool is only called."
+        type: string
+        enum: [agent, tool]
+      description:
+        description: "What the executor is and how its invocations differ."
+        type: string
+        minLength: 1
+      providerModel:
+        description: "The model family of the executor, the key of modelPolicies."
+        type: string
+        minLength: 1
+      allowCrossProvider:
+        description: "Whether a seat of another provider family may use this executor."
+        type: boolean
+      forceCliSpawn:
+        description: "Spawn through the CLI even where a native task would do."
+        type: boolean
+      agentType:
+        description: "Agent definition a native task runs."
+        type: string
+        minLength: 1
+      model:
+        description: "Model of an executor that has its own vocabulary."
+        type: string
+        minLength: 1
+      carries:
+        description: "What the executor may be given."
+        type: string
+        enum: [user-text, repo-content]
+      for:
+        description: "Capabilities a tool serves."
+        type: array
+        items:
+          type: string
+          minLength: 1
+        minItems: 1
+      scanTarget:
+        description: "Directory a tool scans."
+        type: string
+        minLength: 1
+      responsibility:
+        description: "The responsibility a tool fills."
+        type: string
+        minLength: 1
+      command:
+        description: "The program to spawn when the executor has no invocations."
+        type: string
+        minLength: 1
+      args:
+        description: "Arguments of that program."
+        type: array
+        items:
+          type: string
+      adapter:
+        description: "The adapter that spawns it."
+        type: string
+        minLength: 1
+      env:
+        description: "Environment variables of the launch."
+        type: object
+        additionalProperties:
+          description: "Value of the variable."
+          type: string
+      permissionMode:
+        description: "Whether the worker asks before acting."
+        type: string
+        enum: [ask, bypass]
+      promptDelivery:
+        description: "How the prompt reaches the worker."
+        type: string
+        enum: [file-pointer, inline]
+      confinement:
+        description: "Confinement shared by the invocations."
+        type: object
+      interactiveMode:
+        description: "Interactive mode shared by the invocations."
+        type: object
+      identity:
+        description: "Who the executor is for audit."
+        type: object
+        properties:
+          principalRef:
+            description: "Principal the executor acts as."
+            type: string
+            minLength: 1
+          runtimeBackendRef:
+            description: "Runtime backend it runs on."
+            type: string
+            minLength: 1
+          trustDomain:
+            description: "Trust domain of the executor."
+            type: string
+            minLength: 1
+          egressClass:
+            description: "Network egress class of the executor."
+            type: string
+            minLength: 1
+        required: [principalRef, runtimeBackendRef, trustDomain, egressClass]
+      supports:
+        description: "What the executor can do."
+        type: object
+        properties:
+          providerFamilies:
+            description: "Provider families it can serve."
+            type: array
+            items:
+              type: string
+              minLength: 1
+            minItems: 1
+          reasoningEffort:
+            description: "Reasoning efforts it accepts."
+            type: array
+            items:
+              type: string
+              enum: [low, medium, high, max]
+            minItems: 1
+          skills:
+            description: "Skills it can load."
+            type: array
+            items:
+              type: string
+              minLength: 1
+            minItems: 1
+          systemPrompt:
+            description: "Whether it takes a system prompt."
+            type: boolean
+          toolGating:
+            description: "How its tools are gated."
+            type: string
+            minLength: 1
+      invocations:
+        description: "The ways to start the executor."
+        type: array
+        items:
+          $ref: "#/$defs/invocation"
+        minItems: 1
+    required: [kind]
+  accountSource:
+    description: "Where the login of one account lives."
+    type: object
+    properties:
+      kind:
+        description: "Kind of login store."
+        type: string
+        enum: [codex-home, home-files]
+      home:
+        description: "Directory of the login store."
+        type: string
+        minLength: 1
+      files:
+        description: "Files of the login store."
+        type: array
+        items:
+          type: string

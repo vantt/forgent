@@ -12,12 +12,14 @@
 //! The process facts are reached through an injected judge, so every rule
 //! here is tested without real processes.
 
-use crate::proc_tree::ProcessTree;
-use crate::provider::Refusal;
-use crate::resolve::terminal_head;
+use crate::current::{current_session, machine_info, os_record, session_for, CurrentSession};
+use crate::proc_tree::{os_process_tree, ProcessTree};
+use crate::project;
+use crate::refusal::{Candidate, Liveness, Refusal};
+use crate::resolve::{terminal_head, WriterKey};
 use crate::text::{base32_prefix, iso_utc_now};
 use fgos_durable_file::{install_once_with_mode, replace_durably_with_mode, Installed};
-use fgos_process::facts::{Record, Verdict};
+use fgos_process::facts::{judge_here, Record, Verdict};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::fs;
@@ -99,7 +101,7 @@ pub struct Listed {
     pub registered_at: String,
     pub roles: Vec<String>,
     /// `alive`, or `unknown` when nothing can prove it dead.
-    pub liveness: &'static str,
+    pub liveness: Liveness,
 }
 
 impl Listed {
@@ -112,8 +114,24 @@ impl Listed {
             clone: entry.clone.clone(),
             registered_at: entry.registered_at.clone(),
             roles: entry.roles.clone(),
-            liveness: if verdict == Verdict::Alive { "alive" } else { "unknown" },
+            liveness: liveness_of(verdict),
         }
+    }
+}
+
+fn liveness_of(verdict: Verdict) -> Liveness {
+    if verdict == Verdict::Alive {
+        Liveness::Alive
+    } else {
+        Liveness::Unknown
+    }
+}
+
+fn candidate_of(row: &Row) -> Candidate {
+    Candidate {
+        id: row.entry.id.clone(),
+        handle: row.entry.handle.clone(),
+        liveness: liveness_of(row.verdict),
     }
 }
 
@@ -158,6 +176,7 @@ pub fn head_liveness(
 
 fn unreadable(path: &Path, error: impl std::fmt::Display) -> Refusal {
     Refusal {
+        candidates: Vec::new(),
         reason: "directory-unreadable",
         detail: format!("{}: {error}", path.display()),
     }
@@ -165,6 +184,7 @@ fn unreadable(path: &Path, error: impl std::fmt::Display) -> Refusal {
 
 fn write_failed(path: &Path, error: impl std::fmt::Display) -> Refusal {
     Refusal {
+        candidates: Vec::new(),
         reason: "directory-write-failed",
         detail: format!("{}: {error}", path.display()),
     }
@@ -245,6 +265,7 @@ fn store(root: &Path, entry: &Entry, replace: bool) -> Result<Installed, Refusal
 
 fn handle_in_use(registered: &str, wanted: &str, handle: &str) -> Refusal {
     Refusal {
+        candidates: Vec::new(),
         reason: "handle-in-use",
         detail: format!(
             "handle {handle} is already registered by the live session {registered}; {wanted} cannot take it (handles never change)"
@@ -261,6 +282,7 @@ fn handle_in_use(registered: &str, wanted: &str, handle: &str) -> Refusal {
 pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<Listed, Refusal> {
     if let Some(role) = entry.roles.iter().find(|role| role_problem(role).is_some()) {
         return Err(Refusal {
+            candidates: Vec::new(),
             reason: "invalid-role",
             detail: format!("role {role:?} is not `{ROLE_PREFIX}<LANE>` with a Convention lane-id"),
         });
@@ -280,6 +302,7 @@ pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<L
             .find(|row| row.entry.id != entry.id && row.entry.roles.contains(role));
         if let (Some(holder), false) = (holder, take) {
             return Err(Refusal {
+                candidates: Vec::new(),
                 reason: "role-held",
                 detail: format!(
                     "{role} is held by the live session {}; pass --take to move it to {}",
@@ -290,6 +313,7 @@ pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<L
     }
     if own.is_none() && rows.len() + foreign >= MAX_ENTRIES {
         return Err(Refusal {
+            candidates: Vec::new(),
             reason: "directory-full",
             detail: format!(
                 "the session directory holds {MAX_ENTRIES} entries; run `fgos identity list --prune` to drop the dead ones (an entry whose liveness is unknown is never removed automatically)"
@@ -333,11 +357,142 @@ pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<L
     Ok(Listed::of(&merged, merged.verdict(judge)))
 }
 
-/// The live session `query` names: a handle, or a role alias `lead:<LANE>`.
-/// Exactly one, else `ambiguous` or `not-found` with the candidates in the
-/// detail (the codes the mailbox uses for its names).
+/// Registers `session` on this machine with `head` as the liveness record:
+/// the project of `clone_dir` (none when it is not a registered project) and
+/// [`register`] with `roles` (and `take`). The one registration body behind
+/// [`register_current`] and [`register_writer`].
+fn register_session(
+    state_root: &Path,
+    session: CurrentSession,
+    head: Option<Record>,
+    clone_dir: Option<&Path>,
+    roles: &[String],
+    take: bool,
+) -> Result<Listed, Refusal> {
+    let project_id = clone_dir
+        .and_then(|dir| project::project_info(state_root, dir).ok())
+        .map(|project| project.id);
+    let entry = Entry::new(
+        session.info.id,
+        session.info.handle,
+        session.local.cli.to_owned(),
+        project_id,
+        clone_dir.map(|dir| dir.display().to_string()),
+        roles.to_vec(),
+        head,
+    );
+    register(state_root, entry, take, &judge_here)
+}
+
+/// Registers the session the process `caller_pid` is, from the real env and
+/// OS process tree: resolves its full id and handle, the project of
+/// `clone_dir` (none when it is not a registered project), the agent head's
+/// liveness record, and calls [`register`] with `roles` (and `take`).
+///
+/// The cost is bounded for a hook on the first tool call of a head: no
+/// network, no lock (the entry is a create-once file named by the handle),
+/// one durable write, and a directory scan of at most [`MAX_ENTRIES`] files.
+/// The CLI's `identity session --register` is this function.
+pub fn register_current(
+    state_root: &Path,
+    caller_pid: u32,
+    fgos_dir: Option<&Path>,
+    clone_dir: Option<&Path>,
+    roles: &[String],
+    take: bool,
+) -> Result<Listed, Refusal> {
+    let current = current_session(state_root, caller_pid, fgos_dir)?;
+    let tree = os_process_tree();
+    let head = head_liveness(tree.as_ref(), caller_pid, &os_record);
+    register_session(state_root, current, head, clone_dir, roles, take)
+}
+
+/// Registers the session a hook-carried `key` names, for a caller whose own
+/// env does not carry it (a Codex hook process has no `CODEX_THREAD_ID`).
+/// `head_pid` is the agent head the caller already knows; its process facts
+/// are read here and recorded as the entry's liveness. Refused
+/// `invalid-writer-key` (see [`session_for`]) and `head-not-live` when the
+/// head cannot be read or is not running; every other rule is [`register`]'s.
+pub fn register_writer(
+    state_root: &Path,
+    clone_dir: Option<&Path>,
+    key: &WriterKey,
+    head_pid: u32,
+    roles: &[String],
+    take: bool,
+) -> Result<Listed, Refusal> {
+    let session = session_for(state_root, key)?;
+    let head = os_record(head_pid)
+        .filter(|record| judge_here(record) == Verdict::Alive)
+        .ok_or_else(|| Refusal {
+            reason: "head-not-live",
+            detail: format!("process {head_pid} cannot be read or is not running, so it cannot be a session's head"),
+            candidates: Vec::new(),
+        })?;
+    register_session(state_root, session, Some(head), clone_dir, roles, take)
+}
+
+/// Removes `role` from the entry of the session `own_id`, and from no other:
+/// a session drops only what it holds itself, so a role of another live
+/// session can only move through `take` on a registration. Refused
+/// `invalid-role`, `not-registered` when `own_id` has no entry, and
+/// `role-not-held` when its entry lacks the role. Afterwards the role
+/// resolves `not-found` unless another session holds it.
+pub fn drop_role(root: &Path, own_id: &str, role: &str, judge: Judge) -> Result<Listed, Refusal> {
+    if role_problem(role).is_some() {
+        return Err(Refusal {
+            candidates: Vec::new(),
+            reason: "invalid-role",
+            detail: format!("role {role:?} is not `{ROLE_PREFIX}<LANE>` with a Convention lane-id"),
+        });
+    }
+    let Scan { rows, .. } = scan(root, judge)?;
+    let Some(row) = rows.iter().find(|row| row.entry.id == own_id) else {
+        return Err(Refusal {
+            candidates: Vec::new(),
+            reason: "not-registered",
+            detail: format!("{own_id} is not in the session directory, so it holds no role; register it first"),
+        });
+    };
+    if !row.entry.roles.iter().any(|held| held == role) {
+        return Err(Refusal {
+            candidates: rows
+                .iter()
+                .filter(|other| other.verdict != Verdict::Dead && other.entry.roles.iter().any(|held| held == role))
+                .map(candidate_of)
+                .collect(),
+            reason: "role-not-held",
+            detail: format!("{} does not hold {role}; it holds: {}", row.entry.handle, join(&row.entry.roles)),
+        });
+    }
+    let mut entry = row.entry.clone();
+    entry.roles.retain(|held| held != role);
+    store(root, &entry, true)?;
+    Ok(Listed::of(&entry, row.verdict))
+}
+
+/// [`drop_role`] for the session the process `caller_pid` is.
+pub fn drop_current_role(
+    state_root: &Path,
+    caller_pid: u32,
+    fgos_dir: Option<&Path>,
+    role: &str,
+) -> Result<Listed, Refusal> {
+    let current = current_session(state_root, caller_pid, fgos_dir)?;
+    drop_role(state_root, &current.info.id, role, &judge_here)
+}
+
+/// The live session `query` names: a handle, a role alias `lead:<LANE>`, or a
+/// full id `<machine-id>/<local id>`. Exactly one, else `ambiguous` or
+/// `not-found` with the candidates in the detail and in `Refusal::candidates`
+/// (Identity's own codes; the mailbox maps them to its names). A full id of
+/// another machine is `not-found`: only this machine's directory is read until
+/// the shared directory exists.
 pub fn resolve(root: &Path, query: &str, judge: Judge) -> Result<Listed, Refusal> {
     let query = query.trim();
+    if let Some((machine_id, _)) = query.split_once('/') {
+        return resolve_full_id(root, machine_id, query, judge);
+    }
     let live = scan(root, judge)?
         .rows
         .into_iter()
@@ -371,16 +526,45 @@ pub fn resolve(root: &Path, query: &str, judge: Judge) -> Result<Listed, Refusal
             Err(Refusal {
                 reason: "not-found",
                 detail: format!("no live session is named {query:?}; candidates: {}", join(&names)),
+                candidates: live
+                    .iter()
+                    .filter(|row| {
+                        !query.is_empty()
+                            && if is_role {
+                                row.entry.roles.iter().any(|role| role.contains(query))
+                            } else {
+                                row.entry.handle.contains(query)
+                            }
+                    })
+                    .map(candidate_of)
+                    .collect(),
             })
         }
         many => {
             let ids: Vec<String> = many.iter().map(|row| format!("{} ({})", row.entry.handle, row.entry.id)).collect();
+            let candidates = many.iter().map(|row| candidate_of(row)).collect();
             Err(Refusal {
                 reason: "ambiguous",
                 detail: format!("{query:?} names {} live sessions: {}", many.len(), join(&ids)),
+                candidates,
             })
         }
     }
+}
+
+fn resolve_full_id(root: &Path, machine_id: &str, id: &str, judge: Judge) -> Result<Listed, Refusal> {
+    let not_found = |detail: String| Refusal { reason: "not-found", detail, candidates: Vec::new() };
+    if machine_info(root)?.id != machine_id {
+        return Err(not_found(format!(
+            "{id:?} names a session of machine {machine_id:?}, not this one; cross-machine resolution arrives with the shared directory"
+        )));
+    }
+    scan(root, judge)?
+        .rows
+        .iter()
+        .find(|row| row.entry.id == id && row.verdict != Verdict::Dead)
+        .map(|row| Listed::of(&row.entry, row.verdict))
+        .ok_or_else(|| not_found(format!("no live session has the id {id:?}")))
 }
 
 fn join(names: &[String]) -> String {

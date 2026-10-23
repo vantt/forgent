@@ -1,0 +1,6 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc Whether the end-user docs index is enforced.
+docRegistry:
+  # @fgos:doc When true a stale end-user docs index fails the gate; when false it is only reported. Default: false.
+  enforce: false

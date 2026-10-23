@@ -1,0 +1,6 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc The ceiling on work items running at one time.
+workerSlots:
+  # @fgos:doc Most work items that may run at once; a claim past it is refused, and null leaves the ceiling unarmed so no claim is refused. Minimum: 1.
+  ceiling: null

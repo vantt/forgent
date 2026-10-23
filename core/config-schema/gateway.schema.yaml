@@ -1,0 +1,30 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:gateway:v1
+$comment: "owner: fgos-gateway"
+description: "The fgOS gateway: its port, bind address and Cloudflare Access settings."
+type: object
+x-fgos-scope: global-only
+properties:
+  port:
+    description: TCP port the gateway listens on.
+    type: integer
+    minimum: 1
+    maximum: 65535
+  bind:
+    description: IP address the gateway binds; 0.0.0.0 is reachable on the LAN and Tailscale by design.
+    type: string
+  token:
+    description: Bearer token of the gateway; it moves to the private token file in the user's fgOS directory (~/.fgos/private/gateway-token) and is never written to a config file.
+    type: string
+    x-fgos-file: token
+    x-fgos-sensitivity: secret-value
+    x-fgos-scope: global-only
+    x-fgos-absent: "off"
+  cfAccessTeamDomain:
+    description: Cloudflare Access team domain; set it together with cfAccessAud or leave both out.
+    type: string
+    x-fgos-absent: "off"
+  cfAccessAud:
+    description: Cloudflare Access audience tag; set it together with cfAccessTeamDomain or leave both out.
+    type: string
+    x-fgos-absent: "off"

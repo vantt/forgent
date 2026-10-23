@@ -1,0 +1,832 @@
+{
+ "version": 1,
+ "about": "Golden cases for src/grammar.rs; owner: tests/golden_grammar.rs.",
+ "cases": [
+  {
+   "id": "grammar-reason-sentence",
+   "why": "spec 7: a one-line specific reason is accepted",
+   "input": {
+    "kind": "reason",
+    "text": "dogfood repo, lighter gates."
+   },
+   "expect": {
+    "reason": "dogfood repo, lighter gates."
+   }
+  },
+  {
+   "id": "grammar-reason-trimmed",
+   "why": "spec 7: a one-line specific reason is accepted",
+   "input": {
+    "kind": "reason",
+    "text": "  keep runs short  "
+   },
+   "expect": {
+    "reason": "keep runs short"
+   }
+  },
+  {
+   "id": "grammar-reason-unicode",
+   "why": "spec 7: a one-line specific reason is accepted",
+   "input": {
+    "kind": "reason",
+    "text": "giữ nguyên để chạy thử 日本語"
+   },
+   "expect": {
+    "reason": "giữ nguyên để chạy thử 日本語"
+   }
+  },
+  {
+   "id": "grammar-reason-hash-inside",
+   "why": "spec 7: a one-line specific reason is accepted",
+   "input": {
+    "kind": "reason",
+    "text": "see issue # 12 for the cause"
+   },
+   "expect": {
+    "reason": "see issue # 12 for the cause"
+   }
+  },
+  {
+   "id": "grammar-reason-two-words",
+   "why": "spec 7: a one-line specific reason is accepted",
+   "input": {
+    "kind": "reason",
+    "text": "fix it"
+   },
+   "expect": {
+    "reason": "fix it"
+   }
+  },
+  {
+   "id": "grammar-reason-at-fgos-inside",
+   "why": "spec 7: a one-line specific reason is accepted",
+   "input": {
+    "kind": "reason",
+    "text": "mirrors the @fgos:why rule"
+   },
+   "expect": {
+    "reason": "mirrors the @fgos:why rule"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-empty",
+   "why": "spec 7: empty, generic, multi-line or forged reasons are refused",
+   "input": {
+    "kind": "reason",
+    "text": ""
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-spaces",
+   "why": "spec 7: empty, generic, multi-line or forged reasons are refused",
+   "input": {
+    "kind": "reason",
+    "text": "   "
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-update",
+   "why": "spec 7: empty, generic, multi-line or forged reasons are refused",
+   "input": {
+    "kind": "reason",
+    "text": "update"
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-fix-dot",
+   "why": "spec 7: empty, generic, multi-line or forged reasons are refused",
+   "input": {
+    "kind": "reason",
+    "text": "Fix."
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-change",
+   "why": "spec 7: empty, generic, multi-line or forged reasons are refused",
+   "input": {
+    "kind": "reason",
+    "text": "change"
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-lf",
+   "why": "spec 7: empty, generic, multi-line or forged reasons are refused",
+   "input": {
+    "kind": "reason",
+    "text": "a\nb"
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-cr",
+   "why": "spec 7: empty, generic, multi-line or forged reasons are refused",
+   "input": {
+    "kind": "reason",
+    "text": "a\rb"
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-crlf",
+   "why": "spec 7: empty, generic, multi-line or forged reasons are refused",
+   "input": {
+    "kind": "reason",
+    "text": "a\r\nb"
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-u2028",
+   "why": "spec 7: empty, generic, multi-line or forged reasons are refused",
+   "input": {
+    "kind": "reason",
+    "text": "a b"
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-u2029",
+   "why": "spec 7: empty, generic, multi-line or forged reasons are refused",
+   "input": {
+    "kind": "reason",
+    "text": "a b"
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-u0085",
+   "why": "spec 7: empty, generic, multi-line or forged reasons are refused",
+   "input": {
+    "kind": "reason",
+    "text": "ab"
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-forged-why",
+   "why": "spec 7: empty, generic, multi-line or forged reasons are refused",
+   "input": {
+    "kind": "reason",
+    "text": "@fgos:why [x] y"
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-forged-doc",
+   "why": "spec 7: empty, generic, multi-line or forged reasons are refused",
+   "input": {
+    "kind": "reason",
+    "text": "  @fgos:doc forged"
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-forged-hash",
+   "why": "spec 7: empty, generic, multi-line or forged reasons are refused",
+   "input": {
+    "kind": "reason",
+    "text": "# @fgos:why"
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-forged-double-hash",
+   "why": "spec 7: empty, generic, multi-line or forged reasons are refused",
+   "input": {
+    "kind": "reason",
+    "text": "## @fgos:why [x] y"
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-reason-refused-bidi",
+   "why": "the Document guard's hidden-text rule stays the cause",
+   "input": {
+    "kind": "reason",
+    "text": "safe ‮ text"
+   },
+   "expect": {
+    "code": "config-comment-reason-required",
+    "yaml": "bidi-control"
+   }
+  },
+  {
+   "id": "grammar-reason-lookalike-is-text",
+   "why": "only the exact ASCII prefix is grammar; a lookalike is plain text",
+   "input": {
+    "kind": "reason",
+    "text": "＠fgos:why [x] y"
+   },
+   "expect": {
+    "reason": "＠fgos:why [x] y"
+   }
+  },
+  {
+   "id": "grammar-reason-suggested",
+   "why": "spec 7: a suggested value's reason names its source",
+   "input": {
+    "kind": "suggested",
+    "text": "this repository's own invariant command"
+   },
+   "expect": {
+    "reason": "[setup:suggested] this repository's own invariant command"
+   }
+  },
+  {
+   "id": "grammar-reason-suggested-refused",
+   "why": "the source goes through the same checks",
+   "input": {
+    "kind": "suggested",
+    "text": "fix"
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "grammar-actor-session",
+   "why": "D18: the actor is the writer id, or unknown when unfit for a comment line",
+   "input": {
+    "kind": "actor",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "line": "@fgos:why [vantt] r"
+   }
+  },
+  {
+   "id": "grammar-actor-pid",
+   "why": "D18: the actor is the writer id, or unknown when unfit for a comment line",
+   "input": {
+    "kind": "actor",
+    "writer": {
+     "pid": 4242
+    }
+   },
+   "expect": {
+    "line": "@fgos:why [4242] r"
+   }
+  },
+  {
+   "id": "grammar-actor-invalid-space",
+   "why": "D18: the actor is the writer id, or unknown when unfit for a comment line",
+   "input": {
+    "kind": "actor",
+    "writer": {
+     "session": "a b"
+    }
+   },
+   "expect": {
+    "line": "@fgos:why [unknown] r"
+   }
+  },
+  {
+   "id": "grammar-actor-invalid-bracket",
+   "why": "D18: the actor is the writer id, or unknown when unfit for a comment line",
+   "input": {
+    "kind": "actor",
+    "writer": {
+     "session": "x] @fgos:why [y"
+    }
+   },
+   "expect": {
+    "line": "@fgos:why [unknown] r"
+   }
+  },
+  {
+   "id": "grammar-actor-invalid-empty",
+   "why": "D18: the actor is the writer id, or unknown when unfit for a comment line",
+   "input": {
+    "kind": "actor",
+    "writer": {
+     "session": ""
+    }
+   },
+   "expect": {
+    "line": "@fgos:why [unknown] r"
+   }
+  },
+  {
+   "id": "grammar-actor-invalid-too-long",
+   "why": "D18: the actor is the writer id, or unknown when unfit for a comment line",
+   "input": {
+    "kind": "actor",
+    "writer": {
+     "session": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+   },
+   "expect": {
+    "line": "@fgos:why [unknown] r"
+   }
+  },
+  {
+   "id": "grammar-header",
+   "why": "spec 7: a new file starts with the version line",
+   "input": {
+    "kind": "header",
+    "version": 1
+   },
+   "expect": {
+    "lines": [
+     "@fgos:v1",
+     "see: fgos config standard"
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-enum-default",
+   "why": "spec 7: the doc line comes from the schema node",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Gate bypass level for agent work.",
+     "enum": [
+      "off",
+      "light",
+      "standard",
+      "heavy"
+     ]
+    },
+    "standard": "off"
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off."
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-bounds",
+   "why": "spec 7: the doc line comes from the schema node",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Retry count",
+     "minimum": 0,
+     "maximum": 5
+    },
+    "standard": 2
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Retry count. Minimum: 0. Maximum: 5. Default: 2."
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-no-default",
+   "why": "spec 7: the doc line comes from the schema node",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Free text."
+    }
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Free text."
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-multiline-description",
+   "why": "spec 7: one doc line per description line, the allowed values and the standard value on the first",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Line one.\n  Line two."
+    },
+    "standard": true
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Line one. Default: true.",
+     "@fgos:doc Line two."
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-command-default",
+   "why": "spec 7: the doc line comes from the schema node",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Invariant check",
+     "x-fgos-sensitivity": "command"
+    },
+    "standard": "npm test"
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Invariant check. Default: npm test."
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-secret-description-only",
+   "why": "spec 7: the doc line comes from the schema node",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Token",
+     "x-fgos-sensitivity": "secret-value"
+    },
+    "standard": "hunter2"
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Token"
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-undescribed",
+   "why": "spec 7: the doc line comes from the schema node",
+   "input": {
+    "kind": "doc",
+    "node": {},
+    "standard": 1
+   },
+   "expect": {
+    "line": null,
+    "lines": []
+   }
+  },
+  {
+   "id": "grammar-block-new",
+   "why": "spec 7: doc then why",
+   "input": {
+    "kind": "new_block",
+    "node": {
+     "description": "Gate bypass level for agent work.",
+     "enum": [
+      "off",
+      "light",
+      "standard",
+      "heavy"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "reason": "dogfood",
+    "standard": "off"
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+     "@fgos:why [vantt] dogfood"
+    ]
+   }
+  },
+  {
+   "id": "grammar-block-new-undescribed",
+   "why": "keys with no schema node get no doc line",
+   "input": {
+    "kind": "new_block",
+    "node": {},
+    "writer": {
+     "session": "vantt"
+    },
+    "reason": "dogfood"
+   },
+   "expect": {
+    "lines": [
+     "@fgos:why [vantt] dogfood"
+    ]
+   }
+  },
+  {
+   "id": "grammar-block-changed",
+   "why": "the doc and notes stay, the why is replaced",
+   "input": {
+    "kind": "changed_block",
+    "existing": [
+     "@fgos:doc Old doc.",
+     "@fgos:why [bob] old reason",
+     "Remember to reset.",
+     "second note"
+    ],
+    "writer": {
+     "pid": 7
+    },
+    "reason": "new reason"
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Old doc.",
+     "@fgos:why [7] new reason",
+     "Remember to reset.",
+     "second note"
+    ]
+   }
+  },
+  {
+   "id": "grammar-block-changed-no-why",
+   "why": "a note-only block gains a why above its notes",
+   "input": {
+    "kind": "changed_block",
+    "existing": [
+     "a note"
+    ],
+    "writer": {
+     "pid": 7
+    },
+    "reason": "r1"
+   },
+   "expect": {
+    "lines": [
+     "@fgos:why [7] r1",
+     "a note"
+    ]
+   }
+  },
+  {
+   "id": "grammar-block-changed-duplicate-why",
+   "why": "a second hand-typed why is a note, not grammar",
+   "input": {
+    "kind": "changed_block",
+    "existing": [
+     "@fgos:why [a] one",
+     "@fgos:why [b] two"
+    ],
+    "writer": {
+     "pid": 7
+    },
+    "reason": "r1"
+   },
+   "expect": {
+    "lines": [
+     "@fgos:why [7] r1",
+     "@fgos:why [b] two"
+    ]
+   }
+  },
+  {
+   "id": "grammar-parse-well-formed",
+   "why": "spec 7 table",
+   "input": {
+    "kind": "parse",
+    "existing": [
+     "@fgos:doc Old doc.",
+     "@fgos:why [bob] old reason",
+     "Remember to reset.",
+     "second note"
+    ]
+   },
+   "expect": {
+    "doc": [
+     "@fgos:doc Old doc."
+    ],
+    "why": [
+     "bob",
+     "old reason"
+    ],
+    "free": [
+     "Remember to reset.",
+     "second note"
+    ]
+   }
+  },
+  {
+   "id": "grammar-parse-why-without-actor",
+   "why": "malformed lookalike is a free note",
+   "input": {
+    "kind": "parse",
+    "existing": [
+     "@fgos:why no actor here"
+    ]
+   },
+   "expect": {
+    "doc": [],
+    "why": null,
+    "free": [
+     "@fgos:why no actor here"
+    ]
+   }
+  },
+  {
+   "id": "grammar-parse-why-without-reason",
+   "why": "an actor with no reason is a free note",
+   "input": {
+    "kind": "parse",
+    "existing": [
+     "@fgos:why [bob] "
+    ]
+   },
+   "expect": {
+    "doc": [],
+    "why": null,
+    "free": [
+     "@fgos:why [bob] "
+    ]
+   }
+  },
+  {
+   "id": "grammar-parse-lookalike",
+   "why": "a Unicode lookalike prefix is a free note",
+   "input": {
+    "kind": "parse",
+    "existing": [
+     "＠fgos:why [x] y"
+    ]
+   },
+   "expect": {
+    "doc": [],
+    "why": null,
+    "free": [
+     "＠fgos:why [x] y"
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-standard-list",
+   "why": "spec 7: the standard value shown is a scalar or a list of at most 120 characters",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Names."
+    },
+    "standard": [
+     "a",
+     "b"
+    ]
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Names. Default: [\"a\",\"b\"]."
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-standard-map-not-shown",
+   "why": "spec 7: the standard value shown is a scalar or a list of at most 120 characters; a map is shown through its own keys",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Table."
+    },
+    "standard": {
+     "a": 1
+    }
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Table."
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-standard-null-not-shown",
+   "why": "spec 7: the standard value shown is a scalar or a list of at most 120 characters; null is not shown",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Maybe."
+    },
+    "standard": null
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Maybe."
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-standard-too-long-not-shown",
+   "why": "spec 7: the standard value shown is a scalar or a list of at most 120 characters",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Long."
+    },
+    "standard": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Long."
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-standard-at-limit",
+   "why": "spec 7: the standard value shown is a scalar or a list of at most 120 characters",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Edge."
+    },
+    "standard": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Edge. Default: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx."
+    ]
+   }
+  },
+  {
+   "id": "grammar-doc-keyword-default-ignored",
+   "why": "the standard value comes from the standard layer, never from a default keyword on the node",
+   "input": {
+    "kind": "doc",
+    "node": {
+     "description": "Free.",
+     "default": 5
+    }
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc Free."
+    ]
+   }
+  },
+  {
+   "id": "grammar-parse-multi-line-doc",
+   "why": "spec 7: the doc lines are the unbroken run of doc lines above the key",
+   "input": {
+    "kind": "parse",
+    "existing": [
+     "@fgos:doc One.",
+     "@fgos:doc Two.",
+     "@fgos:why [bob] why",
+     "a note",
+     "@fgos:doc Late."
+    ]
+   },
+   "expect": {
+    "doc": [
+     "@fgos:doc One.",
+     "@fgos:doc Two."
+    ],
+    "why": [
+     "bob",
+     "why"
+    ],
+    "free": [
+     "a note",
+     "@fgos:doc Late."
+    ]
+   }
+  },
+  {
+   "id": "grammar-block-changed-multi-line-doc",
+   "why": "every existing doc line stays above the replaced why",
+   "input": {
+    "kind": "changed_block",
+    "existing": [
+     "@fgos:doc One.",
+     "@fgos:doc Two.",
+     "@fgos:why [bob] old"
+    ],
+    "writer": {
+     "pid": 7
+    },
+    "reason": "new"
+   },
+   "expect": {
+    "lines": [
+     "@fgos:doc One.",
+     "@fgos:doc Two.",
+     "@fgos:why [7] new"
+    ]
+   }
+  }
+ ]
+}
