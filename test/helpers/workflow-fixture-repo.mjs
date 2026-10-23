@@ -11,6 +11,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { withProviderFamilies } from './provider-families.mjs';
 import { makeFixtureDir } from './fixture-dir.mjs';
+import { writeProjectConfig } from './config-fixture.mjs';
 import { activateGitFixture } from './git-fixture.mjs';
 
 /**
@@ -86,7 +87,7 @@ export function setupWorkflowFixtureRepo({
       },
     },
   };
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify(withProviderFamilies(cfg), null, 2));
+  writeProjectConfig(tmp, withProviderFamilies(cfg));
 
   return tmp;
 }

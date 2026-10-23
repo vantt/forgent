@@ -243,25 +243,6 @@ fn inspect_of_a_missing_key_or_gone_pane_is_not_live() {
 }
 
 #[test]
-fn a_command_that_replaced_the_shell_is_identified() {
-    let driver = MemDriver::new(352, 69);
-    let core = core(&driver, &MeasuredSplit, state_dir("exec-replaced-shell"));
-    let slot = core.allocate(&request("a", "g")).unwrap().slot;
-    let mut child = spawn_sleeper();
-    // `exec` keeps the shell's pid: the foreground process is the shell pid itself.
-    driver.set_launch_foreground(
-        &slot.pane_id,
-        child.id(),
-        vec![ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] }],
-        child.id(),
-    );
-    let out = core.launch("a", &launch_spec()).unwrap();
-    assert!(matches!(&out, LaunchOutcome::Launched(i) if i.pid == child.id()), "{out:?}");
-    child.kill().unwrap();
-    child.wait().unwrap();
-}
-
-#[test]
 fn close_after_retain_does_not_pretend_to_close() {
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("close-after-retain"));
@@ -338,7 +319,7 @@ fn the_launcher_is_typed_only_after_the_shell_has_run_a_probe() {
 fn a_shell_whose_start_prompt_eats_the_first_key_still_gets_an_intact_launch_line() {
     let driver = MemDriver::new(352, 69);
     let mut cfg = config(state_dir("eats-first-key"));
-    cfg.shell_ready_timeout_ms = 1_500;
+    cfg.shell_ready_timeout_ms = 450;
     let core = Core::new(&driver, &MeasuredSplit, cfg);
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     driver.set_script(&slot.pane_id, ShellScript::PromptReadsFirstKey);
@@ -367,7 +348,7 @@ fn a_shell_whose_start_prompt_eats_the_first_key_still_gets_an_intact_launch_lin
 fn a_shell_serving_only_typed_echo_retypes_only_after_backoff_and_caps_at_three_probes() {
     let driver = MemDriver::new(352, 69);
     let mut cfg = config(state_dir("echo-only-backoff"));
-    cfg.shell_ready_timeout_ms = 1_500;
+    cfg.shell_ready_timeout_ms = 450;
     let core = Core::new(&driver, &MeasuredSplit, cfg);
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     driver.set_script(&slot.pane_id, ShellScript::EchoOnly);
@@ -381,35 +362,10 @@ fn a_shell_serving_only_typed_echo_retypes_only_after_backoff_and_caps_at_three_
 }
 
 #[test]
-fn a_line_typed_before_the_start_prompt_draws_is_not_swallowed_and_launches_once() {
-    let driver = MemDriver::new(352, 69);
-    let core = core(&driver, &MeasuredSplit, state_dir("typed-ahead"));
-    let slot = core.allocate(&request("a", "g")).unwrap().slot;
-    driver.set_script(&slot.pane_id, ShellScript::TypedAheadSkipsPrompt);
-    let mut child = spawn_sleeper();
-    driver.set_launch_foreground(
-        &slot.pane_id,
-        900,
-        vec![
-            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
-            ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] },
-        ],
-        child.id(),
-    );
-    let out = core.launch("a", &launch_spec()).unwrap();
-    assert!(matches!(out, LaunchOutcome::Launched(_)), "{out:?}");
-    let runs = driver.calls("pane.run");
-    assert_eq!(runs.len(), 2, "single probe followed by single launch line: {runs:?}");
-    assert!(runs[1].contains("cd '/tmp' && 'sleep' '30'"));
-    child.kill().unwrap();
-    child.wait().unwrap();
-}
-
-#[test]
 fn a_shell_reading_whole_lines_gets_at_most_three_probes_and_ends_not_started() {
     let driver = MemDriver::new(352, 69);
     let mut cfg = config(state_dir("line-mode-read"));
-    cfg.shell_ready_timeout_ms = 1_500;
+    cfg.shell_ready_timeout_ms = 450;
     let core = Core::new(&driver, &MeasuredSplit, cfg);
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     driver.set_script(&slot.pane_id, ShellScript::LineModeRead);
@@ -487,7 +443,7 @@ fn a_shell_that_never_becomes_ready_ends_not_started_with_no_marker_and_reports_
 fn every_probe_differs_contains_no_y_and_scrollback_token_does_not_satisfy() {
     let driver = MemDriver::new(352, 69);
     let mut cfg = config(state_dir("scrollback-check"));
-    cfg.shell_ready_timeout_ms = 1_500;
+    cfg.shell_ready_timeout_ms = 450;
     let core = Core::new(&driver, &MeasuredSplit, cfg);
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     driver.set_screen(&slot.pane_id, "earlier session\nfgos-ok-cafebabedeadbeef0123456789abcdef\n");

@@ -1,7 +1,7 @@
 ---
 phase: 7
 title: "Mint door for every owner"
-status: pending
+status: completed
 priority: P1
 effort: "1d"
 dependencies: [1]

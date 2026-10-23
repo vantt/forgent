@@ -24,6 +24,7 @@ import { execFileSync } from 'node:child_process';
 import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
 import { addWork, listWork } from '../../src/state/store.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const testHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-prod-callsite-home-'));
 const originalHome = process.env.HOME;
@@ -68,7 +69,7 @@ function fixtureRepo(makeExecutor = () => HERDR_EXECUTOR) {
   // correctly report the test's own scaffolding.
   fs.writeFileSync(path.join(root, '.gitignore'), ['herdr', 'mock-herdr.mjs', 'herdr-calls.log', 'herdr-envs.log', 'agent-exited', 'agent-pid', ''].join('\n'));
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({
+  writeProjectConfig(root, {
     runner: {
       executor: { command: 'agy', providerModel: 'agy', args: ['-i', '{prompt}'] },
       modelPolicies: { agy: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
@@ -77,7 +78,7 @@ function fixtureRepo(makeExecutor = () => HERDR_EXECUTOR) {
       executors: { 'herdr-worker': makeExecutor(root) },
       capabilities: { [IMPLEMENT_CAPABILITY]: { prefer: 'herdr-worker' } },
     },
-  }, null, 2));
+  });
   return root;
 }
 
@@ -144,7 +145,7 @@ test('in-process dispatch with required confinement refuses without trusted harn
     mode: 'required',
     policy: 'host-write-denied',
   };
-  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  writeProjectConfig(root, cfg);
 
   try {
     await assert.rejects(

@@ -486,6 +486,7 @@ test('releaseClaim refuses a different writer, lets the owner release, and allow
 test('settleClaim skips the writer-identity check for a claim written before the field existed (backward compat, never a false positive on old data)', () => {
   const dir = makeTmpDir();
   addWork(dir, { id: 'tsk-1', title: 'Task 10', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+  clockTick();
 
   const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo' });
   const claimsDir = resolveFgosFile(dir, FGOS_FILE.CLAIMS_DIR);
@@ -644,6 +645,7 @@ test('a durable content change with the SAME status is not flagged stale by buil
 test('settleClaim reconciles a revision drift caused entirely by the SAME writer that holds the claim, instead of refusing', () => {
   const dir = makeTmpDir();
   addWork(dir, { id: 'tsk-1', title: 'Task 17', kind: 'bug', status: 'todo', deps: [], refs: [], risk: 'heavy', verify: 'npm test', domain: 'coding' });
+  clockTick();
 
   const originalSessionId = process.env.FGOS_SESSION_ID;
   try {
@@ -681,6 +683,7 @@ test('settleClaim reconciles a revision drift caused entirely by the SAME writer
 test('settleClaim reconciles a same-writer drift even when unstamped side-log events (decision, gate-approve) also happened mid-claim', () => {
   const dir = makeTmpDir();
   addWork(dir, { id: 'tsk-1', title: 'Task 20', kind: 'bug', status: 'todo', deps: [], refs: [], risk: 'heavy', verify: 'npm test', domain: 'coding' });
+  clockTick();
 
   const originalSessionId = process.env.FGOS_SESSION_ID;
   try {

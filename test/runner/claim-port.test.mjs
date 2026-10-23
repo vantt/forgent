@@ -16,6 +16,7 @@ import { probe } from '../../src/holder-lock/index.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { holdStateLockInChild } from '../helpers/hold-state-lock-in-child.mjs';
 import { git, initRepoWithHook, commitCount, HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const CLAIM_PORT_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/runner/claim-port.mjs');
 const FGOS_BIN = path.resolve(fileURLToPath(import.meta.url), '../../../bin/fgos.mjs');
@@ -184,7 +185,7 @@ test('claimWork checkpoints .fgos through the borrowed main mutex under the real
   const dir = path.join(repoRoot, '.fgos');
   initStore(dir);
   addWork(dir, { id: 'item-a', title: 'Item A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify({ checkpoint: { fallbackIntervalSec: 0 } }));
+  writeProjectConfig(repoRoot, { checkpoint: { fallbackIntervalSec: 0 } });
   const before = commitCount(repoRoot);
 
   const claim = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });

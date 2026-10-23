@@ -8,6 +8,7 @@ import { loadWorkflow, startWorkflow, answerWorkflow } from '../../src/workflow/
 import { withProviderFamilies } from '../helpers/provider-families.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // The validate-plan and implement-item unit templates the coding workflow carried before its
 // lifecycle file dropped its runner fields; the reviewed pattern is what these tests exercise.
@@ -86,7 +87,7 @@ function fixture(t, mode) {
     },
   } });
   fs.mkdirSync(path.join(root, '.fgos'));
-  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify(cfg));
+  writeProjectConfig(root, cfg);
   return root;
 }
 

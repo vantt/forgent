@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 import {
   sharedConfigFilePath,
@@ -29,14 +30,14 @@ test('readSharedConfig returns {} when the shared file does not exist', () => {
 test('readSharedConfig reads the shared file directly when it exists', () => {
   const dir = mkTempDir();
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner: { timeoutMs: 5000 }, gateBypass: { level: 'standard' } }));
+  writeRawProjectConfig(dir, JSON.stringify({ runner: { timeoutMs: 5000 }, gateBypass: { level: 'standard' } }));
   assert.deepEqual(readSharedConfig(dir), { runner: { timeoutMs: 5000 }, gateBypass: { level: 'standard' } });
 });
 
 test('readSharedConfig throws a clear error on invalid JSON in the shared file', () => {
   const dir = mkTempDir();
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), '{ not valid json');
+  writeRawProjectConfig(dir, '{ not valid json');
   assert.throws(() => readSharedConfig(dir), /cannot parse shared config/);
 });
 

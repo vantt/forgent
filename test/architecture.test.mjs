@@ -1286,6 +1286,117 @@ test('YAML bundle signature catches a pasted copy of the parser and ignores code
 });
 
 
+// Config has one test door: a test puts `.fgos/config.json` on disk only through
+// test/helpers/config-fixture.mjs, so a change of the file's format or name is one edit.
+// A write call is any call named write*/append* whose first two arguments name the file
+// (a literal, or a name bound to a path built from it); reads and the helper itself are out.
+// A write inside a script held in a string (run by a child process) is invisible here by design.
+const CONFIG_FIXTURE = 'test/helpers/config-fixture.mjs';
+// The retired `.bee` tool kept a config.json of its own; writing that one is not an fgOS config write.
+const CONFIG_FILE_NAME = String.raw`(?<![\w.-])(?<!\.bee/)config\.json(?![\w-]|\.\w)`;
+
+function balancedEnd(view, open) {
+  let depth = 0;
+  for (let i = open; i < view.length; i++) {
+    if ('([{'.includes(view[i])) depth++;
+    else if (')]}'.includes(view[i])) { depth--; if (depth === 0) return i; }
+  }
+  return -1;
+}
+
+// The first `count` top-level arguments of a call's argument text (string literals are still intact here).
+function leadingArguments(argText, count) {
+  const args = [];
+  let depth = 0;
+  let quote = null;
+  let start = 0;
+  for (let i = 0; i < argText.length && args.length < count; i++) {
+    const c = argText[i];
+    if (quote) { if (c === '\\') i++; else if (c === quote) quote = null; continue; }
+    if (c === "'" || c === '"' || c === '`') quote = c;
+    else if ('([{'.includes(c)) depth++;
+    else if (')]}'.includes(c)) depth--;
+    else if (c === ',' && depth === 0) { args.push(argText.slice(start, i).trim()); start = i + 1; }
+  }
+  if (args.length < count) args.push(argText.slice(start).trim());
+  return args;
+}
+
+/**
+ * Calls in `source` that write a file named config.json by hand. Call sites and declarations are
+ * located in the `shape` view (comments and literal contents blanked, so text inside a string is
+ * never read as code); the file name is read from the `code` view of the same offsets.
+ */
+// The index of the `}` closing the innermost block that contains `index` (the end of `view` at top level).
+function enclosingBlockEnd(view, index) {
+  let depth = 0;
+  for (let i = index - 1; i >= 0; i--) {
+    if (view[i] === '}') depth++;
+    else if (view[i] === '{') { if (depth === 0) { const end = balancedEnd(view, i); return end < 0 ? view.length : end; } depth--; }
+  }
+  return view.length;
+}
+
+export function findConfigFileWrites(source) {
+  const { code, shape } = lexSource(source);
+  const names = new RegExp(CONFIG_FILE_NAME);
+  // A name bound to a config.json path counts only inside the block that declares it.
+  const bound = [];
+  for (const m of shape.matchAll(/\b(?:const|let|var)\s+(\w+)\s*=\s*/g)) {
+    const from = m.index + m[0].length;
+    const to = shape.indexOf(';', from);
+    const initializer = code.slice(from, to < 0 ? code.length : to);
+    if (names.test(initializer) && !/\b(?:read\w*|parse|exists\w*)\b/.test(initializer)) bound.push({ name: m[1], from, end: enclosingBlockEnd(shape, m.index) });
+  }
+  const hits = [];
+  for (const m of shape.matchAll(/(?<![\w$])(?:[\w$]+\.)*(?:write|append)[\w$]*\s*\(/gi)) {
+    const open = m.index + m[0].length - 1;
+    const close = balancedEnd(shape, open);
+    if (close < 0) continue;
+    const [first = '', second = ''] = leadingArguments(code.slice(open + 1, close), 2);
+    const viaName = bound.some((b) => b.name === first && open > b.from && open < b.end);
+    if (names.test(first) || names.test(second) || viaName) hits.push(code.slice(m.index, Math.min(close + 1, open + 61)).replace(/\s+/g, ' '));
+  }
+  return hits;
+}
+
+test('config has one test door: no test file writes config.json outside the config fixture helper', () => {
+  const violations = scriptFilesUnder('test')
+    .filter((file) => file !== CONFIG_FIXTURE)
+    .flatMap((file) => findConfigFileWrites(fs.readFileSync(path.join(root, file), 'utf8')).map((hit) => `${file}: ${hit}`));
+  assert.deepEqual(violations, [], `Expected every config write in tests to go through ${CONFIG_FIXTURE}, found:\n${violations.join('\n')}`);
+});
+
+test('config write guard catches each way to write the file by hand and ignores reads, other file names and the helper calls', () => {
+  const caught = [
+    "fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify(cfg));",
+    'fs.writeFileSync(path.join(dir, ".fgos/config.json"), "{}");',
+    "fs.writeFileSync(\n  path.join(dir, '.fgos', 'config.json'),\n  JSON.stringify(cfg),\n);",
+    "const configPath = path.join(dir, '.fgos', 'config.json');\nfs.writeFileSync(configPath, text);",
+    "const file = path.join(home, 'config.json'); await fsp.writeFile(file, text);",
+    "fs.appendFileSync(path.join(dir, '.fgos', 'config.json'), 'x');",
+    "writeConfig(path.join(root, '.fgos', 'config.json'), { a: 1 });",
+    "write(dir, '.fgos/config.json', 'modified\\n');",
+    "fs.promises.writeFile(`${dir}/.fgos/config.json`, text);",
+  ];
+  for (const source of caught) assert.ok(findConfigFileWrites(source).length >= 1, source);
+  const passed = [
+    "writeProjectConfig(dir, { runner: {} });",
+    "writeRawGlobalConfig(home, '{ not json');",
+    "const cfg = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'config.json'), 'utf8'));\nwriteProjectConfig(dir, cfg);",
+    "fs.writeFileSync(path.join(dir, 'runner-config.json'), text);",
+    "fs.writeFileSync(path.join(dir, 'config.json.pre-seat-binding-1'), text);",
+    "// fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), text);",
+    "const t = \"fs.writeFileSync(path.join(dir, 'config.json'), text)\";",
+    "assert.equal(fs.existsSync(path.join(dir, '.fgos', 'config.json')), false);",
+    "execFileSync('git', ['add', '.fgos/config.json']);",
+    "const configPath = path.join(dir, '.fgos', 'config.json');\nassert.ok(fs.readFileSync(configPath, 'utf8'));",
+    "test('a', () => { const file = path.join(dir, '.fgos', 'config.json'); read(file); });\ntest('b', () => { const file = path.join(dir, 'x.json'); fs.writeFileSync(file, text); });",
+  ];
+  for (const source of passed) assert.deepEqual(findConfigFileWrites(source), [], source);
+});
+
+
 test('native description handover has exactly one Git loader importer', () => {
   const importsOf = target => onDisk.filter(file => extractImports(fs.readFileSync(path.join(root,file),'utf8')).some(specifier => specifier.startsWith('.') && path.relative(root,path.resolve(root,path.dirname(file),specifier)).split(path.sep).join('/') === target));
   assert.deepEqual(importsOf('src/holder-lock/native-handover.mjs'), ['src/git/native.mjs']);
@@ -1306,7 +1417,7 @@ test('Event Store keeps consumer boundaries and one native export importer', () 
         if (target.startsWith('src/state/') || target.startsWith('src/runner/')) violations.push(`${file} -> ${target}`);
       }
     }
-    if (file !== 'src/event-store/native.mjs' && /\b(?:new\s+[^;\n]*\.EventStore\b|\w+\.(?:resolveEventStore|openStore|eventStoreFacts|ensureEventStoreRefspecs|mintEventStoreMachineId)\s*\()/.test(lexSource(source).code)) {
+    if (file !== 'src/event-store/native.mjs' && /\b(?:new\s+[^;\n]*\.EventStore\b|\w+\.(?:resolveEventStore|openStore|eventStoreFacts|ensureEventStoreRefspecs)\s*\()/.test(lexSource(source).code)) {
       violations.push(`${file}: imports native Event Store exports outside native.mjs`);
     }
   }

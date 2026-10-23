@@ -14,6 +14,7 @@ import { spawnSync } from 'node:child_process';
 
 import { DEFAULT_CAPABILITY_SLOTS } from '../../src/setup/registrations.mjs';
 import { FRESH_PROJECT_RUNNER_CONFIG } from '../../src/runner/dispatch/config.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -47,7 +48,7 @@ function tmpCwd() {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-plan-lint-cli-'));
   const runner = { ...FRESH_PROJECT_RUNNER_CONFIG, executor: { command: 'true', args: [] }, capabilities: DEFAULT_CAPABILITY_SLOTS };
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), `${JSON.stringify({ runner }, null, 2)}\n`);
+  writeProjectConfig(cwd, { runner });
   return cwd;
 }
 

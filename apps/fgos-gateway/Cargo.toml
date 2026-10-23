@@ -43,7 +43,7 @@ rhai = { version = "1", features = ["serde"] }
 # tsk-7l9-3: `search`'s only new data need -- parses the OpenAPI contract
 # (`docs/contracts/fgos-gateway-api-v1.yaml`) into a queryable operation list
 # instead of serving it as an opaque string the way `/contract` already does.
-serde_yaml = "0.9"
+fgos-yaml-doc = { path = "../../packages/yaml-doc/rust" }
 # tsk-54y: CORS layer for `build_router` -- the web client (a separate
 # static bundle, D2 of docs/history/herdr-web-dashboard-plan-realignment/
 # CONTEXT.md) is not guaranteed to share origin with the gateway. Version
@@ -84,3 +84,9 @@ fgos-git = { path = "../../packages/git/rust" }
 
 [dev-dependencies]
 tower = { version = "0.4", features = ["util"] }
+
+# fgos-yaml-doc pins its parser to the vendored copies under packages/yaml-doc/third-party; this crate
+# is outside the root workspace and has its own lock, so it repeats the root [patch.crates-io].
+[patch.crates-io]
+saphyr-parser = { path = "../../packages/yaml-doc/third-party/saphyr-parser-0.2.2" }
+arraydeque = { path = "../../packages/yaml-doc/third-party/arraydeque-0.5.1" }

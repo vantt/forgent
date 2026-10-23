@@ -16,6 +16,7 @@ import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 // file-local backend registry through its environment.
 seedFileLocalBwrapRegistry();
 import { frontier } from '../../src/state/frontier.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // e2e proof for base-workflow-model (D1-D4): a second, synthetic domain
 // dispatches through the exact same fgos-runner/dispatch code path as the
@@ -103,10 +104,7 @@ function stateView(cwd) {
 }
 
 function writeRunnerConfig(repoRoot, executorScript) {
-  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(repoRoot, '.fgos', 'config.json'),
-    JSON.stringify({
+  writeProjectConfig(repoRoot, {
       runner: confinedRunnerConfig({
         // The fixture domains' execute step resolves to the generic `execute` capability;
         // a Unit binds only from a pool the config names.
@@ -117,8 +115,7 @@ function writeRunnerConfig(repoRoot, executorScript) {
         timeoutMs: 15000,
         parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
       }),
-    }),
-  );
+  });
 }
 
 function branchExists(repoRoot, branch) {
@@ -258,10 +255,7 @@ test('e2e synthetic domain: add --domain synthetic (no --stage) dispatches throu
 test("e2e synthetic domain: the real 'fgos cleanup' verb closes a synthetic item to done without attempting a merge-still-resolves check it has no commit for", () => {
   const repoRoot = initTempRepo();
   assert.equal(fgos(repoRoot, ['init']).status, 0);
-  fs.writeFileSync(
-    path.join(repoRoot, '.fgos', 'config.json'),
-    JSON.stringify({ cleanup: { ttlDays: 0 } }),
-  );
+  writeProjectConfig(repoRoot, { cleanup: { ttlDays: 0 } });
 
   add(repoRoot, 'synth-cleanup-item', { domain: 'synthetic', verify: 'true' });
   // tsk-40m: blocked stands in for the retired todo->doing edge.

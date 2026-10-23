@@ -72,17 +72,11 @@ command -v fgos >/dev/null 2>&1 || exit 0
 . "$(dirname "$0")/terminal-port.sh"
 fgos_pane_owned "$HERDR_PANE_ID" || exit 0
 
-# fg.ssid (D1): fgOS's own session id. FGOS_SESSION_ID first, else
-# resolveWriterIdentity()'s own env/registry/pid fallback chain
-# (src/util/session-identity.mjs) -- dropped entirely if neither resolves.
+# fg.ssid (D1): fgOS's own session id. FGOS_SESSION_ID first, else the
+# activated host's writer identity (`fgos identity`: its env/registry/pid
+# chain) -- dropped entirely if neither resolves.
 fg_ssid="${FGOS_SESSION_ID:-}"
-if [ -z "$fg_ssid" ] && [ -n "$project_root" ] && [ -f "$project_root/src/util/session-identity.mjs" ]; then
-  fg_ssid=$(node -e "
-    import(process.argv[1]).then(({ resolveWriterIdentity }) => {
-      process.stdout.write(String(resolveWriterIdentity().id));
-    }).catch(() => {});
-  " -- "$project_root/src/util/session-identity.mjs" 2>/dev/null || true)
-fi
+[ -n "$fg_ssid" ] || fg_ssid=$(fgos_writer_id "$project_root")
 
 # a.ssid (D1): the coding agent tool's own native session id. Claude Code
 # exposes CLAUDE_CODE_SESSION_ID; other agent tools are not detected today

@@ -22,6 +22,7 @@ Specs: [git](../../docs/platform/git/spec.md) (§12 one-door gate, §15 E6 test 
   - **OPC baseline (2026-10-22 16:00, [report](../reports/research-261022-1341-opc-phase-a-baseline.md), main `2eec4aea9`):** one run of `test/runner/worktree-admin-multiprocess.test.mjs` starts 376 contained git children, 51 borrowed and 63 plain. Re-measure R2 against this after OPC Phase A lands.
   - **OPC measurement (2026-10-22 13:20, `forgent-35`):** per contained child, bwrap adds ≈ 2.3 ms (central) and `driver.rs`'s 2 ms poll ≈ 1.4 ms; at ≈ 22 bwrap per worktree add that is ≈ 80 ms, which does **not** explain R2's ≈ 0.5 s. T2 re-measures R2 end to end before designing, and designs around OPC's operation-domain port proposal.
   - **When R2 lands, ping TEST** (`forgent-f8`, or whoever owns TEST then): the owner cut `test/runner/worktree-admin-multiprocess.test.mjs` from 8 × 20 to 8 × 5 rounds (`ROUNDS`) until contained git is cheap; TEST plan row W2 (`plans/261020-1757-…/plan.md`) puts it back to 20. Recorded 2026-10-22 07:58.
+  - **Answered 2026-10-23 04:00 (T2 [speed seat](../reports/council-261022-2148-harden-t2-seat-speed.md) R2, [arbitration](../reports/council-261023-0402-harden-t2-arbitration.md)):** a port worktree add is ≈ 184 ms p50; fsync ≈ 131 ms (25 syncs), bwrap containment 30–65 ms (19 children). Below OPC's 100 ms trigger: Phase B stays deferred (OPC told). The 0.5 s TEST saw is unbounded Worktree/Refs WAL retention (F-C1) plus worktree count and load. TEST told: W2 waits for T2's F-C1 compaction, not for containment.
 
 ## Components, crates, Node
 

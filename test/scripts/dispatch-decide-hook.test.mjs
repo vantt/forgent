@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // Real, live runs of the actual hook script -- no fixture stands in for
 // `decide`'s own real subprocess call (tsk-60f's own verify field demands
@@ -26,7 +27,7 @@ function writeRunnerConfigFixture(root, cfg) {
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
   // A project config in the seat-binding schema: the loader refuses one that has no marker.
   const patterns = { ...cfg.patterns, seatBinding: { schema: 1 } };
-  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({ runner: { ...cfg, patterns } }, null, 2));
+  writeProjectConfig(root, { runner: { ...cfg, patterns } });
 }
 
 function runHook(repoRoot, payload) {

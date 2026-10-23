@@ -9,6 +9,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { EXIT_CODES, OUTCOME_EXIT_CODES, exitCodeForOutcome } from '../../src/state/store.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -41,7 +42,7 @@ if (match) {
 `);
 
   fs.mkdirSync(path.join(repoDir, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repoDir, '.fgos', 'config.json'), JSON.stringify({
+  writeProjectConfig(repoDir, {
     runner: {
       defaultExecutor: 'mock-pass',
       defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
@@ -65,7 +66,7 @@ if (match) {
         'docs:write': { prefer: ['mock-pass'] },
       },
     },
-  }, null, 2));
+  });
 
   return { repoDir, stateDir };
 }
@@ -194,7 +195,7 @@ test('fgos run exits with code 11 on execution-failure via real CLI', () => {
         'docs:write': { prefer: ['fail-exec'] },
       },
     };
-    fs.writeFileSync(path.join(repoDir, '.fgos', 'config.json'), JSON.stringify({ runner }, null, 2));
+    writeProjectConfig(repoDir, { runner });
 
     const unitFile = path.join(repoDir, 'unit.json');
     fs.writeFileSync(unitFile, JSON.stringify({

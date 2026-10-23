@@ -17,6 +17,14 @@ read-only check of capability annotations; it never gives you the slices.
 4. **A file list is not a write scope.** Expand brace patterns, add generated files
    (lockfiles, render targets such as `.agents/skills/`), and respect "shared file
    owner" notes. A generated target is written by running its generator, not by hand.
+   Then add the tests that exercise the code the slice changes, not only the tests
+   the plan names. Search with `rg` for the changed symbols, route and contract
+   names, and fixture paths, under `test/` and `packages/*/rust/tests/`. That
+   finds callers' tests, fakes and harness helpers, contract fixtures, and Node
+   tests that drive a Rust route. Put each hit the change can break into
+   `--writes`. The runner never commits a path that was already dirty when the
+   slice launched. A test the worker had to edit outside its writes therefore
+   stays uncommitted in the case worktree, and no later dispatch can land it.
 5. **Verification in a plan is a list of commands.** For each slice pick one narrow
    pass/fail command as its `--verify`; keep the full suite for the end.
 6. **The plan states no rigor.** Judge it from what the slice touches: a public

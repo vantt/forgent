@@ -12,6 +12,7 @@ import { parseTierCell, isExtendedTierCell } from '../../src/runner/dispatch/tie
 import { loadRunnerConfigFromDir, supportsPolicyTier, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { bind } from '../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
+import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -69,11 +70,8 @@ function loadWith(projectPolicies, globalPolicies) {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-tier-cell-home-'));
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-  fs.writeFileSync(
-    path.join(dir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: projectPolicies, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } } } }),
-  );
-  if (globalPolicies) fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: { modelPolicies: globalPolicies } }));
+  writeProjectConfig(dir, { runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: projectPolicies, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } } } });
+  if (globalPolicies) writeGlobalConfig(home, { runner: { modelPolicies: globalPolicies } });
   const prevHome = process.env.HOME;
   const prevUserProfile = process.env.USERPROFILE;
   const prevWrite = process.stderr.write;

@@ -13,6 +13,7 @@ import { acquireSync, createLockScope, spawnWithLocks } from '../../src/holder-l
 import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
 import { attemptGateCommand, attemptPaths, attemptStepEnv, awaitSettledResult, buildEnvelope, captureTail, prepareAttemptFiles, waitForBinding, writeAttemptFiles } from '../../src/run-supervisor/direct-launch.mjs';
 import { BIN_FGOS, bwrapUsable, createProject, killToken, readJson, startRun, waitUntil } from './support/direct-harness.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -161,7 +162,7 @@ test('a real run carries the configured kill grace and the lock kill wait in its
   const project = createProject({ agent: { runMs: 300 }, dispatch: { gateKillGraceMs: 2345 } });
   const config = JSON.parse(fs.readFileSync(path.join(project.repoDir, '.fgos', 'config.json'), 'utf8'));
   config.runner.executors.noisy.invocations[0].env.API_KEY = 'sk-live-secret-9';
-  fs.writeFileSync(path.join(project.repoDir, '.fgos', 'config.json'), JSON.stringify(config));
+  writeProjectConfig(project.repoDir, config);
   const run = startRun(project, project.unitFile('envelope-real'));
   const { code } = await run.exited;
   assert.equal(code, 0, run.output().stderr);

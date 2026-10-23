@@ -12,6 +12,7 @@ import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { RunCancelledError, assertNotCancelled, beginLaunch, endLaunch, installCancelOnSignal, register, registeredRuns, requestCancel, resetCancelRequest, unregister } from '../../src/run-supervisor/cancel-registry.mjs';
 import { readCancelWaitMs } from '../../src/run-supervisor/gate-kill-grace.mjs';
 import { bwrapUsable, createProject, readJson, sleep, waitUntil } from './support/direct-harness.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -44,7 +45,7 @@ test('registry keeps the delivered runs, once each', () => {
 
 test('the cancel wait defaults to the kill grace plus five seconds and refuses a value below one second', () => {
   const root = makeFixtureDir('cancel-wait-');
-  const write = (dispatch) => { fs.mkdirSync(path.join(root, '.fgos'), { recursive: true }); fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({ dispatch })); };
+  const write = (dispatch) => { fs.mkdirSync(path.join(root, '.fgos'), { recursive: true }); writeProjectConfig(root, { dispatch }); };
   write({});
   assert.equal(readCancelWaitMs({ projectRoot: root }), 15_000);
   write({ gateKillGraceMs: 2000 });

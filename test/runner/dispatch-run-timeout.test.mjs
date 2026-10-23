@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { parseRunTimeout, assertRunTimeoutMs, RUN_TIMEOUT_MAX_MS, RUN_TIMEOUT_MIN_MS, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 test('parseRunTimeout reads a whole number with one unit', () => {
   assert.equal(parseRunTimeout('90m'), 5400000);
@@ -38,14 +39,14 @@ test('runner.timeoutMs is held to the same ceiling as a run timeout', async () =
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cfg-timeout-'));
   try {
     fs.mkdirSync(path.join(dir, '.fgos'));
-    const write = (timeoutMs) => fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
+    const write = (timeoutMs) => writeProjectConfig(dir, {
       runner: {
         timeoutMs,
         defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
         modelPolicies: { node: { standard: 'node-std' } },
         executors: { 'test-node': { kind: 'agent', command: process.execPath, args: ['{prompt}'], providerModel: 'node' } },
       },
-    }));
+    });
     write(RUN_TIMEOUT_MAX_MS);
     assert.equal(loadRunnerConfigFromDir(dir).timeoutMs, RUN_TIMEOUT_MAX_MS);
     write(RUN_TIMEOUT_MAX_MS + 1);

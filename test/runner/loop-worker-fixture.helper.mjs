@@ -8,6 +8,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const CONFINED_INVOCATION_ID = 'cli';
 
@@ -64,7 +65,7 @@ export function persistRunnerConfig(repoRoot, config) {
   let existing = {};
   try { existing = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { /* none yet */ }
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, JSON.stringify({ ...existing, runner: config }, null, 2));
+  writeProjectConfig(repoRoot, { ...existing, runner: config });
 }
 
 /** The Unit runs the loop started in this repo, oldest first, each with its unit.json record. */

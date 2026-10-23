@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { writeGlobalConfig, writeRawGlobalConfig } from '../helpers/config-fixture.mjs';
 import {
   checkTrustStoreWritable,
   checkExecutorConfinement,
@@ -263,9 +264,9 @@ function withHome(home, fn) {
   try { return fn(); } finally { process.env.HOME = saved; process.chdir(cwd); }
 }
 
-function writeGlobalConfig(home, content) {
-  fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(home, '.fgos', 'config.json'), typeof content === 'string' ? content : JSON.stringify(content));
+function writeConfigContent(home, content) {
+  if (typeof content === 'string') writeRawGlobalConfig(home, content);
+  else writeGlobalConfig(home, content);
 }
 
 test('the registered confined-pane-accounts check reads the global inventory from a directory with no project config', () => {
@@ -275,7 +276,7 @@ test('the registered confined-pane-accounts check reads the global inventory fro
     fs.mkdirSync(creds);
     const entry = DOCTOR_CHECKS.find((c) => c.id === 'confined-pane-accounts');
     const runner = (accounts) => ({ ...paneExecutors(), providers: { openai: { accounts } } });
-    writeGlobalConfig(home, { runner: runner({ acct: { credentialSource: { kind: 'codex-home', home: creds } } }) });
+    writeConfigContent(home, { runner: runner({ acct: { credentialSource: { kind: 'codex-home', home: creds } } }) });
     const missing = withHome(home, () => entry.check(home));
     assert.equal(missing.passed, false, missing.message);
     assert.match(missing.message, /account "acct" has none of auth\.json/);
@@ -294,7 +295,7 @@ test('the registered confined-pane-accounts check fails with the reason when the
   ]) {
     const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pane-accounts-home-'));
     try {
-      writeGlobalConfig(home, content);
+      writeConfigContent(home, content);
       const result = withHome(home, () => entry.check(home));
       assert.equal(result.passed, false, label);
       assert.match(result.message, wantReason, label);

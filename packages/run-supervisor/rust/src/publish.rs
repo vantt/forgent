@@ -41,40 +41,6 @@ fn publication_result(result: Result<fgos_durable_file::Installed, fgos_durable_
     })
 }
 
-/// `YYYY-MM-DDTHH:MM:SS.mmmZ` for the current wall clock.
-pub fn iso_utc_now() -> String {
-    let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default();
-    iso_utc(now.as_secs(), now.subsec_millis())
-}
-
-/// Civil date from days since 1970-01-01 (Howard Hinnant's algorithm).
-fn iso_utc(secs: u64, millis: u32) -> String {
-    let days = (secs / 86_400) as i64;
-    let rem = secs % 86_400;
-    let z = days + 719_468;
-    let era = z.div_euclid(146_097);
-    let doe = z.rem_euclid(146_097);
-    let yoe = (doe - doe / 1_460 + doe / 36_524 - doe / 146_096) / 365;
-    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
-    let mp = (5 * doy + 2) / 153;
-    let day = doy - (153 * mp + 2) / 5 + 1;
-    let month = if mp < 10 { mp + 3 } else { mp - 9 };
-    let year = yoe + era * 400 + i64::from(month <= 2);
-    format!("{year:04}-{month:02}-{day:02}T{:02}:{:02}:{:02}.{millis:03}Z", rem / 3_600, rem % 3_600 / 60, rem % 60)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn civil_date_matches_known_instants() {
-        assert_eq!(iso_utc(0, 0), "1970-01-01T00:00:00.000Z");
-        assert_eq!(iso_utc(1_791_940_354, 7), "2026-10-14T01:12:34.007Z");
-        assert_eq!(iso_utc(951_782_400, 0), "2000-02-29T00:00:00.000Z");
-    }
-}
-
 #[cfg(test)]
 mod install_mapping_tests {
     use super::*;

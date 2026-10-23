@@ -238,7 +238,9 @@ fn extract_protocol_id_from_file(path: &Path) -> Option<String> {
     let mut content = String::new();
     std::io::Read::read_to_string(&mut limited, &mut content).ok()?;
 
-    let val: serde_yaml::Value = serde_yaml::from_str(&content).ok()?;
+    let val = fgos_yaml_doc::parse(content.as_bytes(), fgos_yaml_doc::Profile::Tool, "<flow>")
+        .and_then(|doc| doc.to_json())
+        .ok()?;
     let id = val.get("metadata")?.get("id")?.as_str()?;
     let id = id.trim();
     if id.is_empty() {
