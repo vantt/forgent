@@ -1,5 +1,6 @@
 // identity-checks.mjs -- the doctor checks of the Identity component's machine
-// and project ids and the setup fix of the machine id
+// and project ids, the machine signing key and its pinned peers, the OpenSSH it needs,
+// and the setup fixes of the machine id and key
 // (docs/platform/identity/spec.md, section 5).
 // `registrations.mjs` registers them; the bodies live here.
 //
@@ -10,13 +11,13 @@
 // Levels follow the doctor convention: `passed: false` fails, a message that
 // starts with `warning:` warns, anything else passes.
 
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
-import { mintMachineId } from '../util/identity-mint.mjs';
+import { mintMachineId, mintMachineKey } from '../util/identity-mint.mjs';
 
 const TIMEOUT_MS = 2000;
 
@@ -25,7 +26,9 @@ const TIMEOUT_MS = 2000;
  * `{ result }` carrying the doctor result when the host cannot answer:
  * `missing` is the `[reason]` of a refusal the caller maps itself.
  */
-function askIdentity(cwd, verb, { hostBin, missing, missingResult }) {
+const isIdentified = (data) => typeof data?.id === 'string' && typeof data?.handle === 'string';
+
+function askIdentity(cwd, verb, { hostBin, missing, missingResult, valid = isIdentified }) {
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
   const bin = hostBin ?? resolveActiveHostBin({ fgosDir: path.join(root, '.fgos'), cwd }).bin;
   if (!bin) return { result: { passed: true, message: `warning: no host binary to ask for the ${verb} id -- run fgctl init/repair, or set FGOS_HOST_BIN` } };
@@ -50,7 +53,7 @@ function askIdentity(cwd, verb, { hostBin, missing, missingResult }) {
   } catch {
     return { result: { passed: false, message: `${bin} identity ${verb} printed something that is not JSON` } };
   }
-  if (typeof data?.id !== 'string' || typeof data?.handle !== 'string') {
+  if (!valid(data)) {
     return { result: { passed: false, message: `${bin} identity ${verb} printed an unexpected answer: ${stdout.slice(0, 200)}` } };
   }
   return { data };
@@ -64,6 +67,87 @@ export function checkIdentityMachineId(cwd, { hostBin } = {}) {
     missingResult: { passed: true, message: 'warning: no machine id minted yet; run `fgos doctor --fix`' },
   });
   return result ?? { passed: true, message: `machine ${data.id}, handle ${data.handle}${data.alias ? ' (alias)' : ''}` };
+}
+
+/**
+ * pass when this machine holds a signing key, warn when it has none (or the host is older than the key),
+ * fail when the host cannot answer. `fgos doctor --fix` mints it; it is never replaced.
+ */
+export function checkIdentityMachineKey(cwd, { hostBin } = {}) {
+  const { data, result } = askIdentity(cwd, 'machine', {
+    hostBin,
+    missing: '[machine-id-missing]',
+    missingResult: { passed: true, message: 'warning: no machine id minted yet, so no machine signing key; run `fgos doctor --fix`' },
+  });
+  if (result) return result;
+  if (data.keyFingerprint === undefined) return { passed: true, message: 'warning: the active release does not know the machine signing key: it is older than this payload' };
+  if (data.keyFingerprint === null) return { passed: true, message: 'warning: no machine signing key can be read; run `fgos doctor --fix` (and check identity-ssh-keygen)' };
+  return { passed: true, message: `machine signing key ${data.keyFingerprint}` };
+}
+
+/** identity-machine-key (setup): mint the signing key once; never replaces an existing one. */
+export function fixIdentityMachineKey(cwd, options = {}) {
+  try {
+    const { changed, fingerprint } = mintMachineKey(options.stateRoot ?? resolveStateRoot().stateRoot);
+    return { changed, message: changed ? `minted machine signing key ${fingerprint}` : `machine signing key ${fingerprint} already minted` };
+  } catch (err) {
+    return { changed: false, message: `machine signing key not minted: ${err.message}` };
+  }
+}
+
+const MIN_OPENSSH = [8, 1];
+
+/** `[major, minor]` of the OpenSSH named in `ssh -V` output, or null. */
+export function parseOpensshVersion(text) {
+  const match = /OpenSSH_(\d+)\.(\d+)/.exec(text);
+  return match ? [Number(match[1]), Number(match[2])] : null;
+}
+
+/** What this machine has: whether `ssh-keygen` starts, and what `ssh -V` prints (it names the same OpenSSH). */
+function probeOpenssh() {
+  const probe = { keygen: true, versionText: '' };
+  try {
+    execFileSync('ssh-keygen', ['-?'], { stdio: 'ignore', timeout: TIMEOUT_MS, windowsHide: true });
+  } catch (err) {
+    // `-?` prints usage and exits non-zero; only a binary that cannot start is missing.
+    if (err.code === 'ENOENT') probe.keygen = false;
+  }
+  // `ssh -V` prints its version on stderr.
+  const ssh = spawnSync('ssh', ['-V'], { encoding: 'utf8', timeout: TIMEOUT_MS, windowsHide: true });
+  probe.versionText = `${ssh.stdout ?? ''}${ssh.stderr ?? ''}`;
+  return probe;
+}
+
+/**
+ * pass when `ssh-keygen` exists and OpenSSH is 8.1 or later (the first with `-Y sign`/`-Y verify`), the tool
+ * that signs and verifies for the Identity component; fail otherwise. No fix: install OpenSSH.
+ */
+export function checkIdentitySshKeygen({ probe = probeOpenssh } = {}) {
+  const { keygen, versionText } = probe();
+  if (!keygen) return { passed: false, message: 'ssh-keygen is not installed or not on PATH; install OpenSSH 8.1 or later (the Identity component signs with it)' };
+  const version = parseOpensshVersion(versionText);
+  if (!version) return { passed: false, message: `cannot read the OpenSSH version from \`ssh -V\` (${String(versionText).trim().slice(0, 100) || 'no output'}); OpenSSH 8.1 or later is needed` };
+  if (version[0] < MIN_OPENSSH[0] || (version[0] === MIN_OPENSSH[0] && version[1] < MIN_OPENSSH[1])) {
+    return { passed: false, message: `OpenSSH ${version.join('.')} is older than ${MIN_OPENSSH.join('.')}, which has no \`ssh-keygen -Y sign\`; upgrade OpenSSH` };
+  }
+  return { passed: true, message: `OpenSSH ${version.join('.')}` };
+}
+
+/**
+ * Always passes: lists the machine keys this machine pinned the first time it saw them, so the owner
+ * can compare the fingerprints across machines once. A key claimed again for a pinned machine is refused
+ * at verify time (`machine-key-changed`); `fgos identity pins --forget <machine-id>` accepts a re-key.
+ */
+export function checkIdentityPinnedMachines(cwd, { hostBin } = {}) {
+  const { data, result } = askIdentity(cwd, 'pins', {
+    hostBin,
+    missing: '[pins-unreadable]',
+    missingResult: { passed: false, message: 'a pinned machine key file cannot be read; see `fgos identity pins`' },
+    valid: (value) => Array.isArray(value?.pins),
+  });
+  if (result) return result;
+  if (data.pins.length === 0) return { passed: true, message: 'no machine pinned yet' };
+  return { passed: true, message: `${data.pins.length} pinned: ${data.pins.map((pin) => `${pin.machineId} ${pin.fingerprint}`).join('; ')}` };
 }
 
 /**

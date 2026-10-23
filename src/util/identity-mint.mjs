@@ -27,3 +27,12 @@ export function mintMachineId(stateRoot) {
   fs.mkdirSync(stateRoot, { recursive: true, mode: 0o700 });
   return door().mintMachineId(fs.realpathSync(stateRoot), os.hostname());
 }
+
+/**
+ * Mints this machine's signing key once under `stateRoot`; an existing key is never replaced.
+ * Returns `{ changed, fingerprint, message }`; a refusal (`ssh-keygen-missing`, ...) throws with the reason first.
+ */
+export function mintMachineKey(stateRoot) {
+  fs.mkdirSync(stateRoot, { recursive: true, mode: 0o700 });
+  return door().mintMachineKey(fs.realpathSync(stateRoot));
+}

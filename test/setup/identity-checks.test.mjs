@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
-import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityProjectId, fixIdentityMachineId } from '../../src/setup/identity-checks.mjs';
+import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from '../../src/setup/identity-checks.mjs';
 
 const HOST = process.env.FGOS_HOST_BIN;
 
@@ -44,6 +44,47 @@ test('warns while no machine id exists, mints once on fix, then passes without r
   const second = fixIdentityMachineId(root, { stateRoot: state });
   assert.equal(second.changed, false);
   assert.equal(fs.readFileSync(path.join(state, 'machine-id'), 'utf8').trim(), id);
+});
+
+test('key row warns while no key exists, mints once on fix, then shows the fingerprint without replacing the key', (t) => {
+  assert.ok(HOST && fs.existsSync(HOST), 'set FGOS_HOST_BIN to a host built from this checkout');
+  const { root, state } = withStateRoot(t);
+  assert.match(checkIdentityMachineKey(root, { hostBin: HOST }).message, /^warning: no machine id minted yet, so no machine signing key/);
+  fixIdentityMachineId(root, { stateRoot: state });
+  const absent = checkIdentityMachineKey(root, { hostBin: HOST });
+  assert.equal(absent.passed, true);
+  assert.match(absent.message, /^warning: no machine signing key can be read; run `fgos doctor --fix`/);
+
+  const first = fixIdentityMachineKey(root, { stateRoot: state });
+  assert.equal(first.changed, true, first.message);
+  const present = checkIdentityMachineKey(root, { hostBin: HOST });
+  assert.equal(present.passed, true);
+  assert.match(present.message, /^machine signing key SHA256:/);
+
+  const key = fs.readFileSync(path.join(state, 'identity', 'machine-key'), 'utf8');
+  assert.equal(fixIdentityMachineKey(root, { stateRoot: state }).changed, false);
+  assert.equal(fs.readFileSync(path.join(state, 'identity', 'machine-key'), 'utf8'), key);
+});
+
+test('ssh-keygen row passes on this machine and fails for a missing tool, an old OpenSSH or an unreadable version', () => {
+  assert.equal(checkIdentitySshKeygen().passed, true);
+  const probe = (keygen, versionText) => () => ({ keygen, versionText });
+  assert.match(checkIdentitySshKeygen({ probe: probe(false, '') }).message, /^ssh-keygen is not installed/);
+  assert.match(checkIdentitySshKeygen({ probe: probe(true, 'OpenSSH_8.0p1, OpenSSL 1.1.1') }).message, /^OpenSSH 8\.0 is older than 8\.1/);
+  assert.deepEqual(checkIdentitySshKeygen({ probe: probe(true, 'OpenSSH_8.1p1, OpenSSL 1.1.1') }), { passed: true, message: 'OpenSSH 8.1' });
+  assert.equal(checkIdentitySshKeygen({ probe: probe(true, 'OpenSSH_10.2p1 Ubuntu') }).passed, true);
+  assert.match(checkIdentitySshKeygen({ probe: probe(true, 'something else') }).message, /cannot read the OpenSSH version/);
+});
+
+test('pinned-machines row lists what the host reports and always passes', (t) => {
+  assert.ok(HOST && fs.existsSync(HOST), 'set FGOS_HOST_BIN to a host built from this checkout');
+  const { root, state } = withStateRoot(t);
+  assert.deepEqual(checkIdentityPinnedMachines(root, { hostBin: HOST }), { passed: true, message: 'no machine pinned yet' });
+  fs.mkdirSync(path.join(state, 'identity', 'pins'), { recursive: true });
+  fs.writeFileSync(path.join(state, 'identity', 'pins', 'peer-abc234'), JSON.stringify({
+    v: 1, machineId: 'peer-abc234', publicKey: 'ssh-ed25519 AAAA', fingerprint: 'SHA256:abc', firstSeen: '2026-10-23T00:00:00.000Z',
+  }));
+  assert.deepEqual(checkIdentityPinnedMachines(root, { hostBin: HOST }), { passed: true, message: '1 pinned: peer-abc234 SHA256:abc' });
 });
 
 test('fails when the machine id file is not a valid id', (t) => {
