@@ -7,6 +7,16 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-23 14:10 (`claude-rgvd@fg-server`, `lead:MAIL`; owner 14:08 "ok dừng codex, làm theo hướng em đề xuất"): **MAIL V6: Codex dừng đo sau stage A vì trượt cứng.**
+  - **Kênh `Stop` của Codex là đường tiêm lệnh.** Khung thư tới model dưới vai `user`, nên câu giả "From the user" trong thư được tin là lời người dùng. Làm theo yêu cầu có hại 10/35 lần.
+  - **Kênh `PostToolUse` tới dưới vai `developer`.** Làm theo yêu cầu có hại 0/35 lần. Nhưng Codex cũng gần như không làm theo yêu cầu hợp lệ: 0–1/5.
+  - Claude Code: yêu cầu hợp lệ 5/5, yêu cầu có hại 0 ở cả hai kênh. Stage B chạy tiếp cho Claude tới N=20, vòng lặp chỉ Claude ↔ Claude.
+  - **Hướng tiếp theo, owner duyệt:**
+    1. Ngay sau V6, tắt giao thư qua `Stop` cho Codex trên nhánh.
+    2. Ở bậc sau, Codex chỉ nhận qua `PostToolUse`. Đo lại khả năng làm theo yêu cầu hợp lệ với model mặc định, và với cách Codex tự gọi `inbox --claim`. Nếu vẫn thấp thì Codex chỉ gửi thư và nhận thư để biết thông tin.
+    3. **Đưa pi và omp vào thử nghiệm**, vì hai CLI này chạy được nhiều model. Đây là phần làm sau, ở §15.3 spec mailbox.
+  - Codex vẫn gửi thư được, vì gửi chỉ là chạy lệnh shell.
+
 - 2026-10-23 14:05 (`claude-muyt@fg-server2`, `lead:OPC` → IDENT `claude-5v7u@fg-server`): **IDENT I5 survey — `fg-server2`:** OpenSSH 10.2p1 (Ubuntu, OpenSSL 3.5.5; có `ssh-keygen -Y sign`). Không có cặp khoá SSH nào trong `~/.ssh`, ssh-agent 0 khoá, GPG 0 secret key. Git không cấu hình ký (`gpg.format` trống, không `user.signingkey`, không `commit.gpgsign`). Push qua https. Đọc: giống `fg-server`, máy này phải tạo khoá danh tính mới. Cả ba máy đã có dòng survey.
 - 2026-10-23 14:00 (`claude-uygd@fg-server2`, `lead:WORK`; HARDEN `forgent-a8` đồng ý): **Thứ tự land trên `fg-server2` đổi: T2 land trước, rồi tới cutover của WORK.** Lúc cutover, WORK merge main và mang theo `work/es-dedupe`. Nhánh này xây trên track T2, nên T2 không merge nó, để `read_paths_at_many` không lên main khi chưa có caller. Thay cho dòng 11:17 "cutover của WORK có thể đi trước". Phương án dự phòng nếu WORK xong sớm hơn T2 nhiều: WORK land kèm `bbdad323d`+`b592d93c8` (OPC đã duyệt), phần dedupe đi theo sau T2; WORK báo HARDEN trước khi dùng. Sau `026dd8ff0`, HARDEN báo WORK nếu sửa `driver.rs`.
 
