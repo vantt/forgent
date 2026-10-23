@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "fd0d68de2a0ef66c6c53038d689f3259ea1b24d6c6ba1d7e46a17ea90f34ecba",
+  "payloadDigest": "66609c33fe64f1ee51595f831c0be75e09a2bf672dd0de8123502c0ca32f78f2",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -811,6 +811,7 @@
     "scripts/lib/mailbox-live-cli.mjs": "084b02bbadd408f0cecb4888ba37cf760005931887b5ec31f5ba2d6e1c0ba484",
     "scripts/lib/mailbox-live-confined.mjs": "c06eda4b69e1a8ff7bc7d0d2d27a9d8120510110b0c0cd43ee62255a738f2e55",
     "scripts/lib/mailbox-role-recorder.mjs": "ba14471ab7ce65cdefa43e5256acd4e882c18a3a651bae3338ec2bc0616d7ead",
+    "scripts/lib/mailbox-wake-probe.mjs": "62cd7f4f36a1ab0be3e0c8876613cca95b64b2ba7e5afbd3542e177735eb7791",
     "scripts/lib/sandbox-git.mjs": "c45bc75afc8e5666e13d70f9ea65c6ff4e79243aeca7bae5046d4ea3e914088f",
     "scripts/lib/test-file-watchdog.mjs": "ed39439477ee26003c50fba1df7511317882727704518a3a9cb96952b96fbfa8",
     "scripts/lib/test-git-config-guard.mjs": "e9bc333d889985d94b847fd80fbfed7e6dcfa1e9b2ffffc97a14e7be326153d1",

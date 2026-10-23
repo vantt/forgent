@@ -210,7 +210,7 @@ function cliBinary(cli) {
 }
 
 /** Builds the host and the shim of the checkout at `root` into `target`; copies them into `release`. */
-function buildHost(root, target, release) {
+export function buildHost(root, target, release) {
   const env = { ...process.env, CARGO_BUILD_JOBS: '4', CARGO_TARGET_DIR: target };
   const build = spawnSync('cargo', ['build', '--locked', '--release', '-p', 'fgos'], { cwd: root, env, stdio: ['ignore', 'inherit', 'inherit'] });
   if (build.status !== 0) die('the host did not build');
@@ -227,7 +227,7 @@ function buildHost(root, target, release) {
   return { host, shimFile };
 }
 
-function targetDir(root) {
+export function targetDir(root) {
   const out = spawnSync('cargo', ['metadata', '--format-version', '1', '--no-deps'], { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   if (out.status !== 0) die('cargo metadata failed');
   return JSON.parse(out.stdout).target_directory;
@@ -639,13 +639,13 @@ function cmdReportAddendum({ stage, sample, dry, compare }) {
   if (!sample) return;
   const bodies = readData().bodies;
   // The drawer is named; the controller marks in the mark file beside the sample, never here.
-  const lines = [`# Sample, ${ADDENDUM_NAME}${stage ? `, stage ${stage}` : ''}`, '', `Drawn-by: ${operator()}`, `Drawn-at: ${new Date().toISOString()}`, '', `The controller marks each run agree or disagree with the oracle in ${path.basename(v7.controllerMarkFile(`${MEASURE.sample}.md`))} beside this file: {"markedBy": …, "markedAt": …, "marks": {"<runId>": "agree" | "disagree"}}.`, ''];
+  const file = path.join(base, `${MEASURE.sample}${stage ? `-${stage}` : ''}.md`);
+  const lines = [`# Sample, ${ADDENDUM_NAME}${stage ? `, stage ${stage}` : ''}`, '', `Drawn-by: ${operator()}`, `Drawn-at: ${new Date().toISOString()}`, '', `The controller marks each run agree or disagree with the oracle in ${path.basename(v7.controllerMarkFile(file))} beside this file: {"markedBy": …, "markedAt": …, "marks": {"<runId>": "agree" | "disagree"}}.`, ''];
   for (const cell of MEASURE.cells()) {
     for (const r of score.sampleOf(cell, results.filter((x) => x.cell === cell.id && (!stage || x.stage === stage)), addendum.seed)) {
       lines.push(`## ${r.runId} (${cell.id}): ${r.outcome}`, '', `Body: ${JSON.stringify(bodies[score.VARIANTS[cell.variant].body])}`, '', `${r.claimRan === undefined ? '' : `Claimed: ${r.claimRan}; `}carried by: ${(r.roleRecord ?? []).join(', ') || '-'}`, '', `Final answer: ${JSON.stringify(r.finalAnswer ?? '')}`, '');
     }
   }
-  const file = path.join(base, `${MEASURE.sample}${stage ? `-${stage}` : ''}.md`);
   if (fs.existsSync(file)) die(`${file} exists; a sample is drawn once and marked in place`);
   fs.writeFileSync(own(file), `${lines.join('\n')}\n`);
   say(`sample: ${file}`);
@@ -1064,7 +1064,7 @@ export const ROLE_METHODS = Object.freeze({
 const PLANTED_MCP = ['.mcp.json', 'mcp.json', path.join('.claude', 'mcp.json'), path.join('.cursor', 'mcp.json'), path.join('.pi', 'mcp.json')];
 
 /** A scratch Codex OAuth login for the recorder: a token-shaped value naming a scratch account, never a real login. */
-function scratchCodexLogin() {
+export function scratchCodexLogin() {
   const access = ['e30', Buffer.from(JSON.stringify({ exp: 9_999_999_999, 'https://api.openai.com/auth': { chatgpt_account_id: 'acct-scratch' } })).toString('base64url'), 'scratch'].join('.');
   return { type: 'oauth', access, refresh: 'SCRATCH-NOT-A-TOKEN', expires: Date.now() + 86_400_000, accountId: 'acct-scratch' };
 }
