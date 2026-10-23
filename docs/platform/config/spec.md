@@ -343,7 +343,7 @@ Owner decision 2026-10-22: native door.
 | G2 releases sharing `~/.fgos` | done on the main machine (one release, one project); the second machine is open |
 | G3 parse of real config files | done: no duplicate keys, no out-of-range integers |
 | G4 addon and host on Windows | open; needs a Windows machine |
-| G6 confinement hides `~/.fgos/private` for every confined dispatch | open; a change owned by the confinement spec (section 9) |
+| G6 confinement hides `~/.fgos/private` for every confined dispatch | open; design recorded in `docs/specs/confinement-authority.md` section 9.3 (2026-10-23), implemented by Slice D phase 02; closes when the probe passes live |
 | G5 test fixtures | counted (104 files); the helper is the first implementation step |
 
 ## 17. The six questions (platform L5)
