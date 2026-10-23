@@ -1,0 +1,120 @@
+{
+  "schema": "w1-d3.git-one-door.receipt.v1",
+  "assignment": "unit-run-1792757959949-e244ca8a/producer/1",
+  "outcome": "scoped-migration-complete-with-proposed-exemptions",
+  "workspace": "/home/vantt/projects/forgentX-p9-w1-d3",
+  "observedHead": "f59e0b63914259527827fadb555aa2de5ffeed8c",
+  "touchedIds": ["G4", "git-one-door-census-widening", "L12-137", "L13-2"],
+  "census": {
+    "path": "packages/git/contracts/mutation-census.v1.json",
+    "beforeUndeclared": 58,
+    "beforeAssignmentSitesExcludingHook": 57,
+    "beforePayloadDigest": "b1cd14d3f020354d4a39d9ed77e02fce4f28f8dfe71407dd9e1833497d8bd913",
+    "afterUndeclared": 19,
+    "netSitesRemoved": 39,
+    "scannedFiles": 1097,
+    "classifiedRows": 254,
+    "afterPayloadDigest": "3f728bbb2069e9c6d3a215d43ffcf1e103aaa28c98dd3f560b338a6a4483ea60",
+    "afterFamilies": {"spawn": 13, "unresolved-binary": 6},
+    "pendingDispositions": {"toolingCapabilityCandidates": 13, "configuredCommandProvenance": 5, "ownerColdHook": 1},
+    "approvedExemptions": 0,
+    "gatePassed": false,
+    "removedInitialCensusLocators": {
+      "scripts/check-doc-constitution.mjs": [640],
+      "scripts/check-doc-inventory-gates.mjs": [33, 600, 1044, 1094, 1098, 1114, 1131, 1132, 1325, 1392],
+      "scripts/check-doc-retirement.mjs": [217],
+      "scripts/generate-doc-inventory.mjs": [56, 166, 749],
+      "scripts/generate-shipped-path-inventory.mjs": [63, 78, 100],
+      "scripts/propose-doc-decisions.mjs": [469, 598],
+      "scripts/verify-phase-01.mjs": [78, 85, 116, 124, 176, 186, 209, 225, 234, 407, 488],
+      "scripts/verify-phase-02.mjs": [75, 126, 163, 178, 180, 188, 325, 336]
+    },
+    "remainingFinalCensusLocators": {
+      ".githooks/pre-commit": [507],
+      "bin/fgos.mjs": [3496, 3640],
+      "scripts/check-doc-inventory-gates.mjs": [396, 439, 1383],
+      "scripts/check-evidence-relocation.mjs": [34],
+      "scripts/doc-alias-resolver.mjs": [147],
+      "scripts/generate-doc-inventory.mjs": [739, 1218, 1240, 1435],
+      "scripts/verify-phase-01.mjs": [169, 363],
+      "scripts/verify-phase-02.mjs": [127, 157],
+      "src/runner/merge.mjs": [960, 994],
+      "src/runner/worktree.mjs": [146]
+    }
+  },
+  "impactAnalysis": {
+    "posture": "degraded-under-no-CLI",
+    "capabilityQueryExit": 127,
+    "reason": "Read-only capability query refused: worktree installation unavailable. No successful fgOS CLI or GitNexus query claimed.",
+    "substitute": "rg, read-only source/history inspection and individual owning proofs",
+    "blastRadiusGraphConfirmed": false
+  },
+  "proofEnvironment": {
+    "cwd": "/tmp/fgos-work/w1-d3-brief/payload",
+    "scratch": "/tmp/fgos-work/w1-d3-brief",
+    "releasePath": "/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06",
+    "addonSha256": "412b90334f418cedebd6d94b09892bdccebfb1ff6c6be3b2c1ac4fdf50c28c79",
+    "payload": "Copied source payload with production-supported native-addon.json pointing at the activated addon; no loader patch or test-only bypass. Every modified mjs byte-compared equal to the workspace.",
+    "testCommandTemplate": "env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos FGOS_STATE_ROOT=/tmp/fgos-work/w1-d3-brief/state TMPDIR=/tmp/fgos-work/w1-d3-brief node --test <file>",
+    "invocationMode": "Each file separately, never the full-suite launcher",
+    "limitations": [
+      "No source-local addon: initial direct source attempts failed loading it; no source build was attempted.",
+      "Proofs exercise source Node bytes against the existing activated native addon, not a newly built release.",
+      "Copied payload has no HEAD and omits part of the migration corpus; five repository-dependent cases remain failed, not skipped."
+    ]
+  },
+  "owningTestsModified": [
+    "test/git/one-door.test.mjs",
+    "test/scripts/check-doc-constitution.test.mjs",
+    "test/scripts/check-evidence-relocation.test.mjs",
+    "test/scripts/generate-doc-inventory.test.mjs",
+    "test/scripts/generate-shipped-path-inventory.test.mjs",
+    "test/scripts/verify-phase-02.test.mjs"
+  ],
+  "individualTests": [
+    {"file":"test/git/one-door.test.mjs","exit":0,"passed":6,"total":6},
+    {"file":"test/scripts/generate-doc-inventory.test.mjs","exit":0,"passed":97,"total":97},
+    {"file":"test/scripts/verify-phase-02.test.mjs","exit":0,"passed":6,"total":6},
+    {"file":"test/scripts/check-evidence-relocation.test.mjs","exit":0,"passed":41,"total":41},
+    {"file":"test/scripts/check-doc-retirement.test.mjs","exit":0,"passed":36,"total":36},
+    {"file":"test/scripts/doc-review-format.test.mjs","exit":0,"passed":25,"total":25},
+    {"file":"test/scripts/doc-review-authorship.test.mjs","exit":0,"passed":15,"total":15},
+    {"file":"test/scripts/doc-candidate-conservation.test.mjs","exit":0,"passed":60,"total":60},
+    {"file":"test/scripts/doc-restoration-proofs.test.mjs","exit":0,"passed":5,"total":5},
+    {"file":"test/scripts/check-doc-conservation.test.mjs","exit":0,"passed":35,"total":35},
+    {"file":"test/scripts/doc-corpus-decisions.test.mjs","exit":0,"passed":8,"total":8},
+    {"file":"test/scripts/doc-alias-resolver.test.mjs","exit":0,"passed":18,"total":18},
+    {"file":"test/scripts/doc-decision-exact.test.mjs","exit":0,"passed":7,"total":7},
+    {"file":"test/scripts/doc-decision-mirrors.test.mjs","exit":0,"passed":5,"total":5},
+    {"file":"test/scripts/doc-decision-review.test.mjs","exit":0,"passed":14,"total":14},
+    {"file":"test/scripts/doc-decision-conservation.test.mjs","exit":0,"passed":5,"total":5},
+    {"file":"test/setup/checks.test.mjs","exit":0,"passed":51,"total":51},
+    {"file":"test/runner/worktree.test.mjs","exit":0,"passed":69,"total":69},
+    {"file":"test/scripts/generate-shipped-path-inventory.test.mjs","exit":1,"passed":9,"total":11,"failures":["CLI outputs JSON and Markdown: copied payload has no HEAD","classifyPathAttributes: copied payload has no HEAD"]},
+    {"file":"test/scripts/check-doc-constitution.test.mjs","exit":1,"passed":62,"total":65,"failures":["live platform placement: copied payload is not a repository","CLI promotion report: copied payload is not a repository","usage amendment/corpus: copied payload lacks pilot/first-round"]}
+  ],
+  "latestTestTotals": {"files":20,"greenFiles":18,"passedCases":574,"totalCases":579,"failedCases":5},
+  "otherChecks": [
+    {"command":"node scripts/git-one-door-scan.mjs --root /home/vantt/projects/forgentX-p9-w1-d3 --write-census --json","cwd":"/tmp/fgos-work/w1-d3-brief/payload","exit":1,"undeclared":19,"log":"/tmp/fgos-work/w1-d3-brief/scan-after.json"},
+    {"command":"git diff --check","cwd":"/home/vantt/projects/forgentX-p9-w1-d3","exit":0},
+    {"command":"git show HEAD:packages/git/contracts/mutation-census.v1.json; git rev-parse HEAD","exit":0,"purpose":"Read-only input census and observed HEAD verification"},
+    {"command":"python3 -B source/snapshot byte comparison","exit":0,"purpose":"Verify modified mjs bytes equal the exercised copied payload"}
+  ],
+  "notRun": ["npm test", "scripts/run-tests.mjs", "cargo test --workspace", "full immutable verifier launchers", "source/release build", "GitNexus graph impact/detect_changes", "lifecycle verbs"],
+  "constraints": {
+    "gitWritesToRealRepository": false,
+    "manualStagingOrCommit": false,
+    "gitComponentImplementationChanged": false,
+    "outsideScopeProductWrites": false,
+    "exemptionsApprovedByWorker": false,
+    "testsRemovedSkippedOrWeakened": false,
+    "newConfigDefaultOrInfrastructureDependency": false
+  },
+  "needsWrites": [],
+  "evidenceRefs": [
+    "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/receipt.md",
+    "plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/exemption-proposal.md",
+    "packages/git/contracts/mutation-census.v1.json"
+  ],
+  "handoff": "Owner/Lead must disposition all 19 remaining sites and rerun the five repository-dependent cases in a properly staged payload. G4 and full DoD are not claimed green."
+}
