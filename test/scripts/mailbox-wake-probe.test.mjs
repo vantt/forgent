@@ -16,9 +16,9 @@ import * as wake from '../../scripts/lib/mailbox-wake-probe.mjs';
 const scratch = (prefix) => fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 
 test('the probes stay within the owner\'s ten sessions, each with an expected result and a stop condition, and the presence probes start none', () => {
-  assert.deepEqual(wake.PROBES.map((p) => p.id), ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10']);
-  assert.deepEqual(wake.PROBES.map((p) => p.sessions), [1, 1, 1, 0, 1, 1, 1, 0, 1, 1]);
-  assert.equal(wake.sessionsStarted(), 8, 'eight of the owner\'s ten');
+  assert.deepEqual(wake.PROBES.map((p) => p.id), ['W1', 'W2', 'W2b', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10']);
+  assert.deepEqual(wake.PROBES.map((p) => p.sessions), [1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1]);
+  assert.equal(wake.sessionsStarted(), 9, 'nine of the owner\'s ten');
   for (const p of wake.PROBES) assert.ok(p.question && p.expected && p.stop, p.id);
   assert.throws(() => wake.probeOf('W4'), /starts no session; it reads W1, W2, W3/);
   assert.throws(() => wake.probeOf('W11'), /no probe W11/);
@@ -66,6 +66,9 @@ test('the socket write sends one user line holding the nudge and nothing else, a
   await new Promise((resolve) => server.close(resolve));
   assert.equal(done.ok, true);
   assert.deepEqual(got.split('\n').filter(Boolean).map((l) => JSON.parse(l)), [{ type: 'user', message: { role: 'user', content: wake.NUDGE } }]);
+  assert.deepEqual(JSON.parse(wake.socketLine(wake.NUDGE, { fromMode: 'bypass' })), { type: 'user', message: { role: 'user', content: wake.NUDGE }, from_mode: 'bypass' }, 'W2b claims the mode; W2 claims none');
+  assert.equal('from_mode' in JSON.parse(wake.socketLine()), false);
+  assert.equal(wake.paneOf(wake.probeOf('W2b')).label, 'V7f W2b · claude · no setting, bypass, claims bypass');
   const missing = await wake.writeSocket(path.join(dir, 'none.sock'), wake.socketLine());
   assert.deepEqual([missing.ok, missing.error], [false, 'ENOENT']);
 });
@@ -109,4 +112,15 @@ test('a probe reads a dialog from the screen, the focus from herdr, the presence
   assert.equal(wake.verdict({ ...base, dialog: 'Held message' }).meetsBar, false);
   assert.equal(wake.verdict({ ...base, focusAfter: ['w1:p9'] }).meetsBar, false);
   assert.equal(wake.verdict({ ...base, started: false }).meetsBar, false);
+});
+
+test('a live run is a behaviour subcommand or a wake probe that starts real CLIs, by its own argv; a dry run, a report and a shell that names one are not', () => {
+  const node = '/usr/bin/node';
+  assert.equal(wake.liveRunOf([node, 'test/live/mailbox-behaviour.live.mjs', 'run-stage', 'B', '--addendum', 'v7f']), true);
+  assert.equal(wake.liveRunOf([node, '/x/test/live/mailbox-wake-probe.live.mjs', 'run', 'W1', '--watched']), true);
+  assert.equal(wake.liveRunOf(['timeout', '600', node, 'test/live/mailbox-behaviour.live.mjs', 'run-cell', 'claude', 'LR', 'PT']), true, 'a wrapped run is still live');
+  assert.equal(wake.liveRunOf([node, 'test/live/mailbox-behaviour.live.mjs', 'run-stage', 'A', '--dry']), false);
+  assert.equal(wake.liveRunOf([node, 'test/live/mailbox-wake-probe.live.mjs', 'run', 'W1', '--dry']), false);
+  assert.equal(wake.liveRunOf([node, 'test/live/mailbox-behaviour.live.mjs', 'report', '--stage', 'A']), false);
+  assert.equal(wake.liveRunOf(['/usr/bin/zsh', '-c', 'node test/live/mailbox-behaviour.live.mjs run-stage B']), false);
 });

@@ -424,9 +424,13 @@ test('a changed login copy is set aside, never deleted, keeps its run directory 
   assert.equal(fs.existsSync(prepared.copy), false);
   assert.match(removeRunDir(prepared.paths.dir), /refusing to remove/);
   assert.deepEqual(fs.readFileSync(w.login), source, 'the source login is untouched');
+  const asideEntry = JSON.parse(fs.readFileSync(prepared.paths.ledger, 'utf8'));
+  assert.deepEqual([asideEntry.loginSettled, asideEntry.loginAside], [true, settled.aside], 'the ledger entry records the settlement as the orphan sweep does');
 
   const { prepared: same } = await runConfined(w, 'run-same', 'true', [], { login: { cli: 'claude', home: w.loginHome } });
-  assert.equal(settleLoginCopy(same), null);
+  assert.equal(settleLoginCopy(same, { launchSettings: { model: 'm' } }), null);
+  const sameEntry = JSON.parse(fs.readFileSync(same.paths.ledger, 'utf8'));
+  assert.deepEqual([sameEntry.loginSettled, 'loginAside' in sameEntry, sameEntry.launchSettings], [true, false, { model: 'm' }]);
   assert.equal(fs.existsSync(same.copy), false, 'an unchanged copy is removed, by its name only');
   assert.ok(fs.existsSync(same.paths.home), 'the home with its transcripts stays');
 });

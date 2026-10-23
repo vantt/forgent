@@ -778,6 +778,8 @@ async function cmdCheckAddendum() {
     if (!ok) failures.push(`${line.runId}: ${line.outcome}, want ${want}`);
     const entry = readJson(path.join(ctx.base, 'ledger', `${line.runId}.json`));
     if (!entry.argv?.length || !entry.maskSha256) failures.push(`${line.runId}: the ledger entry lacks the argv or the mask hash`);
+    if (entry.loginSettled !== true) failures.push(`${line.runId}: the ledger entry does not record its login settled`);
+    if (ADDENDUM_NAME === 'v7f' && !entry.launchSettings?.model) failures.push(`${line.runId}: the ledger entry lacks the launch settings`);
     if (!line.hostSha256) failures.push(`${line.runId}: the results line lacks the host hash`);
   }
   if (failures.length) die(`check failed:\n  ${failures.join('\n  ')}`);

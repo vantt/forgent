@@ -525,7 +525,8 @@ export async function runOne(ctx, cell, runId) {
   const end = await confined.endConfinedRun(run, { outcome: timedOut ? 'timeout' : null });
   await provider?.close();
   exit ??= { code: null, signal: 'SIGKILL' };
-  const settled = confined.settleLoginCopy(prepared);
+  // A talking run's model, effort and instructions travel off the argv; the ledger entry records them.
+  const settled = confined.settleLoginCopy(prepared, talking?.settings ? { launchSettings: talking.settings({ instruction }) } : {});
   const output = `${fs.readFileSync(stdoutFile, 'utf8')}\n${fs.readFileSync(stderrFile, 'utf8')}`;
   // pi and omp exit 0 when the provider refuses, and a talking CLI ends its input cleanly; their last turn says so.
   const providerError = talk ? talk.turnError() : ext ? providerErrorOf(stdoutFile) : null;

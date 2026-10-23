@@ -532,10 +532,15 @@ export async function waitForFreshLogin(login, { intervalMs = 5 * 60_000, maxMs 
  * After a run: when the copied login still has its snapshot bytes, only that file is
  * removed (null). Otherwise it is set aside out of the home under the guard's one name
  * (codex-auth-guard), never deleted, the run directory is then never removed, and the
- * batch's stop reason is returned with the kept path.
+ * batch's stop reason is returned with the kept path. The run's ledger entry records it as the
+ * orphan sweep records an orphan's: `loginSettled` (true once settled, null for a run with no
+ * copy) and `loginAside` for a copy set aside, with `fields` beside them (a talking run's launch
+ * settings).
  */
-export function settleLoginCopy(prepared) {
-  return prepared.copy ? settleCopy({ copy: prepared.copy, snapshot: prepared.snapshot, digest: prepared.digest }, prepared.paths.dir) : null;
+export function settleLoginCopy(prepared, fields = {}) {
+  const settled = prepared.copy ? settleCopy({ copy: prepared.copy, snapshot: prepared.snapshot, digest: prepared.digest }, prepared.paths.dir) : null;
+  if (exists(prepared.paths.ledger)) writeJson(prepared.paths.ledger, { ...readJson(prepared.paths.ledger), loginSettled: prepared.copy ? true : null, ...(settled ? { loginAside: settled.aside } : {}), ...fields });
+  return settled;
 }
 
 /**

@@ -19,7 +19,7 @@
  *
  * Subcommands
  *   plan                       every probe: question, expected result, stop condition, pane, command
- *   run <W1|W2|W3|W5|W6|W7|W9|W10> [--dry | --watched] [--keep]
+ *   run <W1|W2|W2b|W3|W5|W6|W7|W9|W10> [--dry | --watched] [--keep]
  *   report [--dry]             every probe's result, with W4 (Claude presence) and W8 (Codex presence)
  *
  * Where: ../forgent-worktrees/mbx-wake[-dry]/<probe>/ (short, so a Claude Code socket path stays
@@ -72,6 +72,17 @@ function route(op, request, herdrEnv) {
   } catch {
     return { result: 'route-error', status: out.status, stderr: String(out.stderr).trim().split('\n').slice(-3).join(' ') };
   }
+}
+
+/** Pids of live runs on this machine, other than this process, by their own argv. */
+function liveRuns() {
+  return fs.readdirSync('/proc').filter((e) => /^\d+$/.test(e) && Number(e) !== process.pid).filter((e) => {
+    try {
+      return wake.liveRunOf(fs.readFileSync(`/proc/${e}/cmdline`, 'utf8').split('\0').filter(Boolean));
+    } catch {
+      return false;
+    }
+  });
 }
 
 /** A read-only herdr call (pane list, pane read) answering JSON or text. */
@@ -246,6 +257,9 @@ async function cmdRun(id, { dry, watched, keep }) {
   if (!dry && !watched) die('a real probe runs only with --watched: the owner watches the pane and answers any dialog', 2);
   const problem = live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry });
   if (problem) die(problem);
+  // One live run at a time: a dry probe spends no model, but it would skew a live run's wall time, so it is refused while one runs.
+  const running = liveRuns();
+  if (running.length) die(`a live run is in progress (pids ${running.join(', ')}); probes run after it`);
   const base = baseOf(dry);
   fs.mkdirSync(base, { recursive: true });
   live.assertOutsideCheckout(base);
@@ -312,7 +326,7 @@ async function cmdRun(id, { dry, watched, keep }) {
     result.focusBefore = wake.focusedPanes(herdr(['pane', 'list'], herdrEnv));
     if (probe.channel === 'socket') {
       const socket = wake.socketOf(claudeSession(paths.home), paths.dir);
-      fired = await wake.writeSocket(socket, wake.socketLine());
+      fired = await wake.writeSocket(socket, wake.socketLine(wake.NUDGE, { fromMode: probe.fromMode ?? null }));
     } else if (probe.channel === 'queue') {
       const at = Date.now();
       const queueBin = dry ? codexStubBin(base) : laid.bin;
@@ -401,6 +415,6 @@ if (process.argv[1] === SCRIPT) {
   if (command === 'plan') cmdPlan();
   else if (command === 'run') await cmdRun(rest[0], { dry: flag('--dry'), watched: flag('--watched'), keep: flag('--keep') });
   else if (command === 'report') cmdReport(flag('--dry'));
-  else die('usage: plan | run <W1|W2|W3|W5|W6|W7|W9|W10> [--dry | --watched] [--keep] | report [--dry]', 2);
+  else die('usage: plan | run <W1|W2|W2b|W3|W5|W6|W7|W9|W10> [--dry | --watched] [--keep] | report [--dry]', 2);
 }
 
