@@ -20,7 +20,7 @@ use crate::files::{JSON_NAME, YAML_NAME};
 use crate::grammar::{is_migrated_reason, parse_block};
 use crate::schema::{descend, json_at, key_span};
 use crate::scope::{judge, SourceKind};
-use crate::snapshot::{Context, SessionClass, SnapshotError, SnapshotRequest};
+use crate::snapshot::{snapshot, Context, SessionClass, SnapshotError, SnapshotRequest};
 use crate::write::{commit, refresh, snapshot_with, without_project};
 use crate::write::{Edit, Step, WriteRequest};
 use crate::ConfigRefusal;
@@ -409,6 +409,15 @@ pub fn check(
                     .rows(false, &mut out)
                 }
             }
+        }
+    }
+    // The sources merged: layers that are each sound alone can still disagree about a path's shape.
+    if !out
+        .iter()
+        .any(|f| BROKEN.contains(&f.row) || f.row == "config-legacy-shadowed")
+    {
+        if let Err(error) = snapshot(ctx, roots) {
+            schema_rows(error, "merged", &mut out);
         }
     }
     for mode in &facts.modes {

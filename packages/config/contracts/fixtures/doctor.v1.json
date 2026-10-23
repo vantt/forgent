@@ -30,6 +30,11 @@
   "labels": [
    "type: object",
    "additionalProperties: {type: [string, 'null']}"
+  ],
+  "mixed": [
+   "type: object",
+   "x-fgos-merge: deep",
+   "additionalProperties: {}"
   ]
  },
  "standard": {
@@ -358,6 +363,42 @@
       "config-comment-missing-why",
       "global:config.yaml",
       "gateBypass.level"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "layers-that-disagree-about-a-shape-are-a-schema-row-once-each-is-sound",
+   "why": "spec 5: a scalar in one file and a mapping in the other is reported after each file passes alone",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "mixed:",
+      "  # @fgos:why [vantt] r",
+      "  a: 1"
+     ],
+     "home/.fgos/config.yaml": [
+      "mixed:",
+      "  a:",
+      "    # @fgos:why [vantt] r",
+      "    b: 1"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-schema",
+      "merged",
+      "mixed.a"
+     ],
+     [
+      "config-unknown-key",
+      "global:config.yaml",
+      "mixed.a.b"
      ]
     ]
    }
