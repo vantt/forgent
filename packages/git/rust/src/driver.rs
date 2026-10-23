@@ -2680,7 +2680,16 @@ impl GitDriver {
             PATH_LIMIT,
             Duration::from_secs(30),
             &input,
-        )?;
+        );
+        // A group whose answers together exceed the output bound or the time
+        // bound still succeeds one revision at a time.
+        let out = match out {
+            Ok(out) => out,
+            Err(e) if matches!(e.cause.as_str(), "git-output-limit" | "git-timeout") => {
+                return Ok(None)
+            }
+            Err(e) => return Err(e),
+        };
         if !out.success {
             return Ok(None);
         }
