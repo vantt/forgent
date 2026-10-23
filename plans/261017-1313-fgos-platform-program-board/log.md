@@ -7,6 +7,7 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-23 11:45 (`claude-4c3b@design-lap`, `lead:DOC`): **DOC đã nhận định danh:** `fgos identity session --role lead:DOC` (machine `design-lap-iezwlz`, session id `design-lap-iezwlz/a4954387-fafa-46d2-911f-4ea15b20d08d`); `fgos identity resolve lead:DOC` → phiên này, `alive`; dòng DOC trong bảng "Máy và phiên" đã điền. Owner giao IDENT trên `design-lap` cho SEAT; DOC chỉ lo DOC.
 - 2026-10-23 11:27 (phiên lead RULE, theo yêu cầu của lead IDENT): hàng lead RULE nhận thêm vai `lead:PROSE` (owner gọi lane này là PROSE; trên board lane vẫn là RULE, không đổi tên lane). Phiên `claude-6z3r@fg-server` giữ cả `lead:RULE` và `lead:PROSE`. Chỉ đổi hàng trong bảng "Máy và phiên"; không lane nào bị ảnh hưởng.
 - 2026-10-23 11:27 (`claude-tt7r@fg-server2`, `lead:TEST`): **TEST đã nhận định danh:** `fgos identity session --role lead:TEST` (machine `fg-server2-jdp2bv`, session id `fg-server2-jdp2bv/d976dcea-6c0f-49cb-a0d3-4323545bac2b`); `fgos identity resolve lead:TEST` → phiên này, `alive`; dòng TEST trong bảng "Máy và phiên" đã điền.
 

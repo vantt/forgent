@@ -48,7 +48,7 @@ Lead của luồng đang chạy. Mỗi lead **tự điền dòng của mình** (
 | CFG | `lead:CFG` | `claude-hrpe@fg-server` | `fg-server` |
 | COOK | `lead:COOK` | `claude-fkpc@fg-server` | `fg-server` |
 | RULE (owner gọi là PROSE) | `lead:RULE`, `lead:PROSE` | `claude-6z3r@fg-server` (đã nhận vai 10-23 11:10) (nhận thêm vai `lead:PROSE` 10-23 11:27; owner gọi lane này là PROSE, suy ra vì bốn phiên owner kể tên là CFG, COOK, MAILBOX, PROSE và PROSE là phiên còn lại trên `fg-server`; sai thì owner sửa) | `fg-server` |
-| DOC | `lead:DOC` | chưa ghi | ? |
+| DOC | `lead:DOC` | `claude-4c3b@design-lap` (đã nhận vai 10-23 11:30) | `design-lap` |
 
 ## Các luồng
 
