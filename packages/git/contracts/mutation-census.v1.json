@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a1a8d1e042941bf4513c6cdb52525b2f8f3c274abb68068e3a96d004202280f4",
+  "payloadDigest": "555929c559b4e47d78a0cf488aecdd51839ca94745f79696bf0c7085d7590314",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -282,7 +282,7 @@
     "packages/git/node-addon/src/git/config.rs": "521afa249294ebd96b038d99d60b5f4ff6119c7d6d6bb930ae41ea709f72515d",
     "packages/git/node-addon/src/git/handover.rs": "8746ecbb13844722786507cdc20be16969cc4b27618d627c8932a0b9b3cdc803",
     "packages/git/node-addon/src/git/inspect.rs": "6751316ae2fb864008d4ef10419c3ed83b9cd3e56f8591606c91406638ee46c4",
-    "packages/git/node-addon/src/git/land.rs": "c0ed6e7d9aa8006e8d5f3cff76439ed8cc1531f868baa2c93ed5f09c27807a84",
+    "packages/git/node-addon/src/git/land.rs": "a33440d117f4ee7251af73cc216edd450989958bad72f1432751b4943830b3b2",
     "packages/git/node-addon/src/git/native_lock.rs": "a8ce95784f1a4f5db1f58980dda6fce26d235eae5e0fd2c315f9a17182dc5f2a",
     "packages/git/node-addon/src/git/recovery.rs": "e5f24da2f6f4a3c48fdd6da35d18f6458fb210446deb6f07e85944dc53524d74",
     "packages/git/node-addon/src/git/refs.rs": "d1e1413d7a99cd3d9422927e188ee1a68dbb34ad38df9dec09e3e2d5f6cfcb0b",
@@ -297,7 +297,7 @@
     "packages/git/node-addon/src/process.rs": "60cbc85ed1de5a7057e90c84fc1bbd6041332ba0cba336c6f6487471ab3fe657",
     "packages/git/node-addon/src/session_identity.rs": "589228eb52558f60aec3a5b5525101dce182e5e61a10e4e964270c7a726be4d6",
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
-    "packages/git/rust/src/driver.rs": "0a5fec1b20fd9eb7807ba3e11b1ee6d6a7227b744cb133888aed9a1c871463a1",
+    "packages/git/rust/src/driver.rs": "9389b3ed348955342e3d9777ca7cb04c4c80dbf0e9e363e4b935c4707d511d16",
     "packages/git/rust/src/grant.rs": "d4f47e49d85994778dc093098b47584e3f73c3cec5f501af82a1c5cd787446f2",
     "packages/git/rust/src/inspect.rs": "64abeda97e9455664051ac7a304a5d3152a5fde88338d95f141b1b77e1196e1c",
     "packages/git/rust/src/land.rs": "2beef35db14ec888b91615c7330765bce2f091375034e97ec1f624e9a187f36c",
@@ -318,7 +318,7 @@
     "packages/git/rust/tests/borrow_deadline.rs": "6a0db6afad96b62ded1253324e862a29a88129e115bd133292ee30ac5482fa07",
     "packages/git/rust/tests/contracts.rs": "1c7b7e1ff100cf61f3ef40953fa6b7c71b20fbe155febeab2e724d2fb9466f59",
     "packages/git/rust/tests/head_tree.rs": "8d97e1c8768e17ff462df7739aaa089a80a5e99efbc249ae993b48e060ae7d97",
-    "packages/git/rust/tests/inspect.rs": "765fe5ec0c1e162ad09762c9200099de6842ae00c48e4a0ffb4726d4ebcb6ef7",
+    "packages/git/rust/tests/inspect.rs": "731e9db872211689adea860d3393a2d3121c5264c0caded7c108aab1d9fff9da",
     "packages/git/rust/tests/land.rs": "2579e5af13402be3ad2e24eb10bc883383c072ab5feab3eb54b4f50d138bf98e",
     "packages/git/rust/tests/land_crash_matrix.rs": "3e63d7c4cd185a08e0acf3c99be37c66a2baf3f730683df2acb4c075e78a7ded",
     "packages/git/rust/tests/publication.rs": "7a3e33b4a8da671187b3d94b8e1ef18da7f917d5c1573b7914740c218ac44c8a",
@@ -714,8 +714,8 @@
     "src/evolve/iron-law.mjs": "c3dce0c23705a8fd1ec463a782fba000ee67f21889f47e7ff350043f7a7ff8d7",
     "src/git/config.mjs": "18bdab21173350229a189c2b815351f26031389f356a2879befd46960bf26a95",
     "src/git/index.mjs": "8553e54d46431f3e458978dd3d577901ce10fcdb806b8df288a03562113f3ad5",
-    "src/git/inspect.mjs": "033448fa785735c32b36178c654cedc272916b10b72a0ac5098087853c1aa7e8",
-    "src/git/land.mjs": "0c8a1c878a46ac19343040b6c85fc11dd0e59ac6d18b7a1490b85a06940524da",
+    "src/git/inspect.mjs": "40d1010878a9d83c971654fc8f8f7fb175ac7f76b0e2a796db84fdea8a2420ff",
+    "src/git/land.mjs": "c30e60f8436809e9f19f63729c22162a8c30545cb3f9cae144e570ebe7b9982d",
     "src/git/native-lock.mjs": "b75f10cf57a5bc07f916b45c2ef241ab62eff89f1cf6f67505a3cb3a7ad6d515",
     "src/git/native.mjs": "6b6a0e898a3244d5f9cc5a0a62e1c6f1732880ef9e060f408691ed5bd503ace2",
     "src/git/recovery.mjs": "fa4a733e88d2b3829d6fe5b4903a59cefbd86cd1219847c90014a99d0caa7230",
@@ -890,7 +890,7 @@
     "src/runner/promote-preflight.mjs": "26db2c2670fc445a4c170af18880ead88e13c4ff1545846b5c8cf760fbd34e54",
     "src/runner/prompt-templates.mjs": "fd027de3376fbdfe654f2a2b8599a384d88f9b5383a0161b0b9df7bca9de39b9",
     "src/runner/recovery.mjs": "9457be6fbac75013e4273ebd5bb08a981552b5dda594ef34437d56c3d563aa1a",
-    "src/runner/repo-locks.mjs": "0f4c25c5bcb711d64a74b1c72b27b7db4e18dfe9cefbfa794f320e3c3dc1770b",
+    "src/runner/repo-locks.mjs": "b47a50b3e0c5bdfbf8888bc2e14a647f32905c60e89ca90a21b7b860408eb5cd",
     "src/runner/rigor.mjs": "f85eabe784dd24de1e2431f16cccecd6634da8a6ca6be128dc9a87a3c91258c0",
     "src/runner/root-affinity.mjs": "0e074df4c61d29f60a2ce43fb62830ec2a2eaebe0e1998fec0cbacb4cd15e871",
     "src/runner/session.mjs": "b1e73bd2e8413d5c55c425a01355c9b5947a10b3d3d1a445b034b63e3461e368",
@@ -1035,7 +1035,7 @@
     "src/workflow/seats.mjs": "4b46062e29ded955b94206fc1e336d2829f9e50cb67d799686c05b3c7e64d836",
     "src/workflow/steps.mjs": "d2878353f7e697d05b97da41c9e0b092f3dea6dbfc7591b7a746b34248dd09e7",
     "src/workflow/store.mjs": "1ffea57e5d5afb57f8558107d253d80982e780ea7649d5e950cb1874e2f90da7",
-    "src/workflow/unit-handoff.mjs": "6dfe2fd3402bb3f484e20def7caa8f55cf92cddfd565c90d0a543b838c1f17d9",
+    "src/workflow/unit-handoff.mjs": "af84e939515499624ded2e37a628f6486e7cb425249eacf7f7d93cfcf0e2494b",
     "src/workflow/units-source.mjs": "63fa30666c4ba9edb5174c47042a08b02007ff1bb34e95df918956029a7e37c3"
   },
   "sites": [
@@ -1860,14 +1860,14 @@
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 2715,
+      "line": 2724,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 2866,
+      "line": 2875,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
