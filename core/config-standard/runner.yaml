@@ -59,6 +59,10 @@ runner:
           via: cli
           adapter: cli-spawn
           command: pi
+          credentialStore:
+            use: pi
+            homeEnv: PI_CODING_AGENT_DIR
+            files: ["auth.json", "models-store.json", "settings.json", "trust.json", "bin/fd", "models.json"]
           args:
             - "--model"
             - "{model}"
@@ -106,6 +110,9 @@ runner:
           via: cli
           adapter: cli-spawn
           command: codex
+          credentialStore:
+            use: codex
+            homeEnv: CODEX_HOME
           args:
             - exec
             - "--skip-git-repo-check"
@@ -122,6 +129,10 @@ runner:
           confinement:
             backend: bwrap
           command: pi
+          credentialStore:
+            use: pi
+            homeEnv: PI_CODING_AGENT_DIR
+            files: ["auth.json", "models-store.json", "settings.json", "trust.json", "bin/fd", "models.json"]
           args:
             - "--model"
             - "{model}"
@@ -139,6 +150,9 @@ runner:
           confinement:
             backend: bwrap
           command: codex
+          credentialStore:
+            use: codex
+            homeEnv: CODEX_HOME
           args:
             - "-s"
             - danger-full-access
@@ -156,6 +170,10 @@ runner:
           via: cli
           adapter: cli-spawn
           command: pi
+          credentialStore:
+            use: pi
+            homeEnv: PI_CODING_AGENT_DIR
+            files: ["auth.json", "models-store.json", "settings.json", "trust.json", "bin/fd"]
           args:
             - "--model"
             - "{model}"
@@ -184,6 +202,12 @@ runner:
           confinement:
             backend: bwrap
           command: omp
+          credentialStore:
+            use: omp
+            homeEnv: PI_CODING_AGENT_DIR
+            files: ["agent.db", "config.yml"]
+          env:
+            PI_CONFIG_DIR: "../../tmp/fgos-omp-config"
           args:
             - "--model"
             - "{model}"
@@ -199,6 +223,12 @@ runner:
           via: cli
           adapter: cli-spawn
           command: omp
+          credentialStore:
+            use: omp
+            homeEnv: PI_CODING_AGENT_DIR
+            files: ["agent.db", "config.yml"]
+          env:
+            PI_CONFIG_DIR: "../../tmp/fgos-omp-config"
           args:
             - "--model"
             - "{model}"
@@ -225,6 +255,12 @@ runner:
           via: cli
           adapter: cli-spawn
           command: omp
+          credentialStore:
+            use: omp
+            homeEnv: PI_CODING_AGENT_DIR
+            files: ["agent.db", "config.yml", "models.db"]
+          env:
+            PI_CONFIG_DIR: "../../tmp/fgos-omp-config"
           args:
             - "--model"
             - "{model}"
@@ -245,6 +281,12 @@ runner:
           confinement:
             backend: bwrap
           command: omp
+          credentialStore:
+            use: omp
+            homeEnv: PI_CODING_AGENT_DIR
+            files: ["agent.db", "config.yml", "models.db"]
+          env:
+            PI_CONFIG_DIR: "../../tmp/fgos-omp-config"
           args:
             - "--model"
             - "{model}"
@@ -268,6 +310,10 @@ runner:
           via: cli
           adapter: cli-spawn
           command: pi
+          credentialStore:
+            use: pi
+            homeEnv: PI_CODING_AGENT_DIR
+            files: ["auth.json", "models-store.json", "settings.json", "trust.json", "bin/fd", "models.json"]
           args:
             - "--model"
             - "{model}"
@@ -288,6 +334,10 @@ runner:
           confinement:
             backend: bwrap
           command: pi
+          credentialStore:
+            use: pi
+            homeEnv: PI_CODING_AGENT_DIR
+            files: ["auth.json", "models-store.json", "settings.json", "trust.json", "bin/fd", "models.json"]
           args:
             - "--model"
             - "{model}"

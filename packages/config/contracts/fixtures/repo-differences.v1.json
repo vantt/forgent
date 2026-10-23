@@ -32,8 +32,6 @@
   "vantt",
   "tetcu",
   "/home/",
-  "homeEnv",
-  "credentialStore",
   "resourceBindings",
   "token"
  ],
@@ -65,24 +63,6 @@
    "path": [
     "runner",
     "executors",
-    "glm",
-    "invocations"
-   ],
-   "reason": "scrubbed: the standard invocations carry no credentialStore (environment variable and login file names) and no env block; a list is one leaf, so this repository restates the whole list"
-  },
-  {
-   "path": [
-    "runner",
-    "executors",
-    "openai",
-    "invocations"
-   ],
-   "reason": "scrubbed: the standard invocations carry no credentialStore (environment variable and login file names) and no env block; a list is one leaf, so this repository restates the whole list"
-  },
-  {
-   "path": [
-    "runner",
-    "executors",
     "gemini",
     "description"
    ],
@@ -92,37 +72,10 @@
    "path": [
     "runner",
     "executors",
-    "gemini",
-    "invocations"
-   ],
-   "reason": "scrubbed: the standard invocations carry no credentialStore (environment variable and login file names) and no env block; a list is one leaf, so this repository restates the whole list"
-  },
-  {
-   "path": [
-    "runner",
-    "executors",
     "xai",
     "description"
    ],
    "reason": "scrubbed text: the standard description drops the login profile and home path names"
-  },
-  {
-   "path": [
-    "runner",
-    "executors",
-    "xai",
-    "invocations"
-   ],
-   "reason": "scrubbed: the standard invocations carry no credentialStore (environment variable and login file names) and no env block; a list is one leaf, so this repository restates the whole list"
-  },
-  {
-   "path": [
-    "runner",
-    "executors",
-    "deepseek",
-    "invocations"
-   ],
-   "reason": "scrubbed: the standard invocations carry no credentialStore (environment variable and login file names) and no env block; a list is one leaf, so this repository restates the whole list"
   },
   {
    "path": [
