@@ -132,6 +132,35 @@ fn inventory_roots_at(
         read_inventory_roots_at(port, repo, from_commit, roots)
     })
 }
+/// The directory roots the commit does not track, answered by one Git read of
+/// all of them: listing a missing directory costs several Git processes to
+/// learn it is empty. Anything but a plain "absent" answer (a present path, an
+/// error of any kind) leaves the root to the listing, which owns the answer.
+fn absent_roots<'a>(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    from_commit: &Oid,
+    roots: &[&'a [u8]],
+) -> BTreeSet<&'a [u8]> {
+    let probed: Vec<(&[u8], Vec<u8>)> = roots
+        .iter()
+        .filter_map(|root| Some((*root, root.strip_suffix(b"/")?.to_vec())))
+        .filter(|(_, path)| !path.is_empty())
+        .collect();
+    if probed.is_empty() {
+        return BTreeSet::new();
+    }
+    let paths: Vec<_> = probed.iter().map(|(_, path)| path.clone()).collect();
+    let Ok(reads) = port.read_paths_at(repo, from_commit, &paths, 1) else {
+        return BTreeSet::new();
+    };
+    probed
+        .iter()
+        .zip(reads)
+        .filter(|(_, read)| matches!(read.value, PathValue::Absent))
+        .map(|((root, _), _)| *root)
+        .collect()
+}
 fn read_inventory_roots_at(
     port: &dyn Inspect,
     repo: &RepoHandle,
@@ -139,7 +168,8 @@ fn read_inventory_roots_at(
     roots: &[&[u8]],
 ) -> Result<Inventory, Error> {
     let mut entries = Vec::new();
-    for root in roots {
+    let absent = absent_roots(port, repo, from_commit, roots);
+    for root in roots.iter().filter(|root| !absent.contains(*root)) {
         let mut cursor = None;
         loop {
             let page = port

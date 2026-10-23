@@ -82,10 +82,11 @@ function persist(tx) {
 export function withWorkState(dir, mainFgosDir, writer, fn, options = {}) {
   if (hotLockDepth() > 0) throw new HotLockError('hot-lock-reentry', 'Work cannot open a nested state transaction');
   const prepared = options.store ? options : { ...prepareWorkStore(dir, mainFgosDir), ...options };
+  const historyPath = resolveFgosFile(mainFgosDir, FGOS_FILE.EVENT_HISTORY);
   return withConsumerState(dir, mainFgosDir, writer, fn, { ...prepared, policy: {
     stream: 'project', resource: 'state', fold: foldEvents, lifecycle, persist,
-    readState: (store, { heldRanks, rebuild }) => readWorkState(store, { heldRanks, rebuild,
-      historyPath: resolveFgosFile(mainFgosDir, FGOS_FILE.EVENT_HISTORY),
+    historyPath,
+    readState: (store, { heldRanks, rebuild }) => readWorkState(store, { heldRanks, rebuild, historyPath,
       ...(rebuild ? {} : { cachePath: resolveFgosFile(mainFgosDir, FGOS_FILE.STATE) }) }),
     prepareEvents(tx, events) {
       // Each event records what its writer saw. Existence rides every Work event so a record for a vanished

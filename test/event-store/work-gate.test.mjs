@@ -296,6 +296,23 @@ test('lifecycle events seal after release with the native opportunistic route', 
   assert.equal(f.store.read({ streams: ['project'] }, []).events[0].h, event.h);
 });
 
+test('the seal after a lifecycle event moves the history checkpoint, so the next process has nothing new to certify', t => {
+  const f = workFixture(t);
+  const history = path.join(f.hot, 'cache/event-history.json');
+  f.run(tx => tx.append({ type: 'decision', payload: { text: 'first' } }));
+  const reads = [];
+  const process = () => ({ ownOrigin: f.store.ownOrigin, read: (request, held) => {
+    const result = f.store.read(request, held);
+    reads.push(result.checkpoint);
+    return result;
+  } });
+  readWorkState(process(), { historyPath: history });
+  f.run(tx => tx.append({ type: 'decision', payload: { text: 'second' } }));
+  assert.equal(readWorkState(process(), { historyPath: history }).events.length, 2);
+  assert.equal(reads[1].continued, true, 'the next process continues from the file');
+  assert.equal(reads[1].written, false, 'the seal already moved the file to the sealed commit');
+});
+
 function receiptSeq(f) {
   const file = path.join(f.repo, '.git/fgos/events/project/sealed.json');
   return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file)).lastSeq : 0;

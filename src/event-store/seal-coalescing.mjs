@@ -5,9 +5,11 @@
 // kill with a pending seal loses nothing: the events sit in the open batch and the next trigger seals them.
 const realClock = { now: () => Date.now(), setTimer: (fn, ms) => setTimeout(fn, ms), clearTimer: (timer) => clearTimeout(timer) };
 
+const sealOptions = (checkpointPath) => (checkpointPath ? { opportunistic: true, checkpointPath } : { opportunistic: true });
+
 export function createSealCoalescer(clock = realClock) {
   let depth = 0;
-  let pending = []; // { store, stream }, one per distinct pair
+  let pending = []; // { store, stream, checkpointPath }, one per distinct pair
   let firstAt = 0;
   let timer = null;
 
@@ -15,10 +17,10 @@ export function createSealCoalescer(clock = realClock) {
     if (timer !== null) { clock.clearTimer(timer); timer = null; }
     const due = pending;
     pending = [];
-    for (const { store, stream } of due) {
+    for (const { store, stream, checkpointPath } of due) {
       // Opportunistic like the immediate seal: a failure never turns an acknowledged append into a refusal and the
       // durable open batch stays available for the next trigger.
-      try { store.seal(stream, heldRanks, { opportunistic: true }); } catch { /* retried by the next trigger */ }
+      try { store.seal(stream, heldRanks, sealOptions(checkpointPath)); } catch { /* retried by the next trigger */ }
     }
   }
 
@@ -26,10 +28,11 @@ export function createSealCoalescer(clock = realClock) {
     get active() { return depth > 0; },
     get pending() { return pending.length > 0; },
     flush,
-    /** Seal `stream` now (CLI mode) or mark it pending (long-lived mode). `heldRanks` are the caller's held lock ranks. */
-    seal(store, stream, heldRanks, coalesceSec) {
-      if (depth === 0) { store.seal(stream, heldRanks, { opportunistic: true }); return; }
-      if (!pending.some((entry) => entry.store === store && entry.stream === stream)) pending.push({ store, stream });
+    /** Seal `stream` now (CLI mode) or mark it pending (long-lived mode). `heldRanks` are the caller's held lock ranks;
+     * `checkpointPath` is the consumer's history checkpoint the seal extends. */
+    seal(store, stream, heldRanks, coalesceSec, checkpointPath) {
+      if (depth === 0) { store.seal(stream, heldRanks, sealOptions(checkpointPath)); return; }
+      if (!pending.some((entry) => entry.store === store && entry.stream === stream)) pending.push({ store, stream, checkpointPath });
       if (timer === null && pending.length === 1) {
         firstAt = clock.now();
         timer = clock.setTimer(() => { timer = null; flush([]); }, coalesceSec * 1000);

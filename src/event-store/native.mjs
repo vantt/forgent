@@ -107,9 +107,11 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
       views.set(result.sequence, response.view);
       return result;
     },
-    seal(stream, heldRanks, { opportunistic = false } = {}) {
+    /** `checkpointPath` names the consumer's history checkpoint file: a seal that publishes new commits moves it to
+     * them, so the next read does not walk them again. The file is a cache; a failure is reported as `checkpointError`. */
+    seal(stream, heldRanks, { opportunistic = false, checkpointPath } = {}) {
       const ranks = outsideGate(heldRanks);
-      return call(() => native.seal(stream, ranks, hotLockDepth(), opportunistic));
+      return call(() => native.seal(stream, ranks, hotLockDepth(), opportunistic, checkpointPath));
     },
     sealIfDue(stream, intervalSec, heldRanks) {
       const ranks = outsideGate(heldRanks);

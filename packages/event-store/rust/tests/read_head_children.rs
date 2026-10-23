@@ -4,6 +4,7 @@
 mod reader_support;
 use fgos_event_store::{
     cursor::Cursor,
+    legacy_import::write_readiness,
     layout::StreamId,
     read::{read, ReadRequest},
 };
@@ -108,4 +109,16 @@ fn an_unborn_head_keeps_the_two_child_observation() {
     let names = read_children(&f);
     assert!(names.iter().any(|n| n == "for-each-ref"), "{names:?}");
     assert_eq!(head_children(&names), 2, "{names:?}");
+}
+
+#[test]
+fn write_admission_of_a_commit_without_legacy_directories_reads_the_roots_in_one_object_child() {
+    logging_git();
+    let f = Fixture::new();
+    commit(&f);
+    let from = logged_lines();
+    write_readiness(&f.driver, &f.repo, "origin").unwrap();
+    let names = children(&f, from);
+    assert_eq!(names.iter().filter(|n| *n == "cat-file").count(), 1, "{names:?}");
+    assert!(!names.iter().any(|n| n == "ls-tree"), "{names:?}");
 }

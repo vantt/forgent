@@ -311,6 +311,7 @@ pub fn sync_with_fs(
                 },
                 &mut guard,
                 &crate::fsio::OsFileSystem,
+                None,
             ) {
                 seal_errors.push(error);
             }

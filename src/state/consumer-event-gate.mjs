@@ -81,7 +81,7 @@ export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config,
       // Opportunistic failures do not turn an acknowledged mutation into a
       // refusal. Explicit seal/doctor retain the diagnostic failure surface.
       try {
-        if (sealedType) sealer.seal(store, stream, heldRanks, config.seal.coalesceSec);
+        if (sealedType) sealer.seal(store, stream, heldRanks, config.seal.coalesceSec, policy.historyPath);
         else store.sealIfDue(stream, config.seal.intervalSec, heldRanks);
       } catch { /* The durable open batch remains available for the next seal. */ }
       return result;

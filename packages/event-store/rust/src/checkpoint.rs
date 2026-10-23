@@ -75,6 +75,15 @@ pub(crate) fn load(
     query: &BTreeSet<String>,
     project: bool,
 ) -> Result<Option<Retained>, String> {
+    load_checked(path, store_id, Some((query, project)))
+}
+
+/// `load` for a caller that takes whatever query the file answers.
+fn load_checked(
+    path: &Path,
+    store_id: &str,
+    expected: Option<(&BTreeSet<String>, bool)>,
+) -> Result<Option<Retained>, String> {
     let bytes = match std::fs::metadata(path) {
         Ok(meta) if meta.len() > MAX_BYTES => return Err("checkpoint too large".into()),
         Ok(_) => match std::fs::read(path) {
@@ -96,7 +105,8 @@ pub(crate) fn load(
     let cursor = line(&file.cursor)
         .and_then(|canonical| Cursor::parse(&canonical))
         .map_err(|e| format!("checkpoint cursor: {e}"))?;
-    if cursor.streams != *query || cursor.project_order != project {
+    if expected.is_some_and(|(query, project)| cursor.streams != *query || cursor.project_order != project)
+    {
         return Err("checkpoint answers another query".into());
     }
     if !cursor.deferred.is_empty() {
@@ -150,4 +160,51 @@ pub(crate) fn store(
         failure.to_string()
     })?;
     Ok(())
+}
+
+/// Extend the file with commits a seal just published and verified, so the next
+/// process continues from them instead of walking them again. Applies only to a
+/// valid file whose verified tip of `reference` is `before`; any other file is
+/// left for a read to rebuild. `Ok(false)` means the file was not extended.
+///
+/// The history it writes is exactly what a read of the new tip would fold: the
+/// file's events plus the walked ones, ordered by the same rule, with the ref's
+/// verified tip moved to `after`. A history that would defer or lack an event
+/// is not written.
+pub(crate) fn advance(
+    path: &Path,
+    store_id: &str,
+    reference: &str,
+    before: &str,
+    after: &str,
+    published: &[Envelope],
+) -> Result<bool, String> {
+    let Some(file) = load_checked(path, store_id, None)? else {
+        return Ok(false);
+    };
+    let mut cursor = file.cursor;
+    if cursor.verified_tips.get(reference).map(String::as_str) != Some(before) {
+        return Ok(false);
+    }
+    let mut union = file.folded;
+    union.extend(published.iter().cloned());
+    let ordered = crate::read::fold_history(union, &cursor.streams, cursor.project_order, None)
+        .map_err(|e| e.to_string())?;
+    if !ordered.deferred.is_empty() || !ordered.missing.is_empty() {
+        return Ok(false);
+    }
+    cursor.cover = Positions::new();
+    for e in &ordered.events {
+        cursor
+            .cover
+            .entry(stream_key(e))
+            .and_modify(|n| *n = (*n).max(e.seq))
+            .or_insert(e.seq);
+    }
+    cursor
+        .verified_tips
+        .insert(reference.to_owned(), after.to_owned());
+    cursor.certified = cursor.verified_tips.values().cloned().collect();
+    store(path, store_id, &cursor, &ordered.events)?;
+    Ok(true)
 }

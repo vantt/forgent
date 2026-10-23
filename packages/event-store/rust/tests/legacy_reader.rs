@@ -194,7 +194,11 @@ fn every_legacy_file_of_a_commit_is_read_through_one_git_read_however_many_files
     )
     .unwrap();
     assert_eq!(got.legacy.len(), 9, "every legacy file is read");
-    assert_eq!(counting.single.get(), 0);
+    assert_eq!(
+        counting.single.get(),
+        1,
+        "no file is read singly: the one single read asks which legacy roots the commit tracks"
+    );
     assert_eq!(
         counting.many.get() - counting.fence.get(),
         1,

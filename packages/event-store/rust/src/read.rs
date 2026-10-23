@@ -504,6 +504,41 @@ pub fn read_checkpointed(
     Ok(result)
 }
 
+/// The ordered history of everything a read (or a seal extending a checkpoint)
+/// holds: events of the query's streams, plus any other stream's events up to
+/// what a `store.promote` claims, contiguous and causally ordered.
+pub(crate) fn fold_history(
+    mut union: Vec<Envelope>,
+    query: &BTreeSet<String>,
+    project: bool,
+    view: Option<&VerifiedView>,
+) -> Result<crate::order::Ordered, Error> {
+    let mut promoted: BTreeMap<String, u64> = BTreeMap::new();
+    if project {
+        for e in &union {
+            if query.contains(&e.stream) && e.event_type == "store.promote" {
+                if let (Some(stream), Some(high)) = (
+                    e.payload["stream"].as_str(),
+                    e.payload["throughSeq"].as_u64(),
+                ) {
+                    promoted
+                        .entry(format!("{}:{stream}", e.origin))
+                        .and_modify(|n| *n = (*n).max(high))
+                        .or_insert(high);
+                }
+            }
+        }
+    }
+    union.retain(|e| {
+        query.contains(&e.stream)
+            || promoted
+                .get(&stream_key(e))
+                .is_some_and(|high| e.seq <= *high)
+    });
+    walk::check_contiguous(&union, &Positions::new())?;
+    order_retained(&union, &Positions::new(), project, view)
+}
+
 fn holds_history(req: &ReadRequest<'_>, query: &BTreeSet<String>) -> bool {
     (req.cursor.cover.is_empty() || !req.folded.is_empty())
         && req.cursor.streams == *query
@@ -691,31 +726,7 @@ fn read_from(
     let mut union = retained_events.to_vec();
     union.extend(local.iter().cloned());
     union.extend(walked.events.iter().cloned());
-    let mut promoted: BTreeMap<String, u64> = BTreeMap::new();
-    if req.project {
-        for e in &union {
-            if req.streams.iter().any(|s| s.as_str() == e.stream) && e.event_type == "store.promote"
-            {
-                if let (Some(stream), Some(high)) = (
-                    e.payload["stream"].as_str(),
-                    e.payload["throughSeq"].as_u64(),
-                ) {
-                    promoted
-                        .entry(format!("{}:{stream}", e.origin))
-                        .and_modify(|n| *n = (*n).max(high))
-                        .or_insert(high);
-                }
-            }
-        }
-    }
-    union.retain(|e| {
-        req.streams.iter().any(|s| s.as_str() == e.stream)
-            || promoted
-                .get(&stream_key(e))
-                .is_some_and(|high| e.seq <= *high)
-    });
-    walk::check_contiguous(&union, &Positions::new())?;
-    let ordered = order_retained(&union, &Positions::new(), req.project, view)?;
+    let ordered = fold_history(union, &query, req.project, view)?;
     let mut cursor = Cursor {
         certified: certificates,
         streams: query,

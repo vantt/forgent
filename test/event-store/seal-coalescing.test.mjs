@@ -22,6 +22,13 @@ test('outside a long-lived scope every seal request seals at once', () => {
   assert.equal(coalescer.pending, false);
 });
 
+test('the history checkpoint a consumer names reaches the seal, at once or when the pending seal flushes', () => {
+  const { calls, store, coalescer } = harness();
+  coalescer.seal(store, 'project', [], 30, '/h/event-history.json');
+  coalescer.scope(() => coalescer.seal(store, 'project', [], 30, '/h/event-history.json'));
+  assert.deepEqual(calls.map(call => call.options), Array(2).fill({ opportunistic: true, checkpointPath: '/h/event-history.json' }));
+});
+
 test('several seal requests in a long-lived scope become one seal when the scope ends', () => {
   const { calls, store, coalescer } = harness();
   coalescer.scope(() => {
