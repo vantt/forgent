@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "73868d04e652751a36bb3a33da7931b18d93e8674e11d3743da3fdb046047748",
+  "payloadDigest": "39f74ece2e88df38e2f976b17a698acedf406bc88993c6092d07d5f025173bf6",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -847,7 +847,7 @@
     "src/runner/main-checkout-activity.mjs": "84cd9b95e28c0c1004322b6edba0d2b4b45f9445eddc30613abd53314f13c071",
     "src/runner/main-checkout-reset-guard.mjs": "446d216c411dd5f59d512b5baf52b3a46eeb8ae03320f1d40be85e9447072d0c",
     "src/runner/main-fgos-checkpoint.mjs": "9ad033aaf03324cda92d6b96cc68e8c52514f4c225d3a55e3c2ed9820f25b847",
-    "src/runner/merge.mjs": "18ae4c5e556ead028c60fe1d75c1eac137fa8d9cff76618feb34be10cb5b87cf",
+    "src/runner/merge.mjs": "41c298ef178b52390d324f7cd4991db5eb5cb25b4437711c809e02e1d0107913",
     "src/runner/operation-capability.mjs": "6683b7da84274722aa5d464ccc8ec9d9e34b110f779e8ea5b6f6c1d0b3c820f5",
     "src/runner/operation-choice.mjs": "866b8b61bea02f3250d9d89cf826109065e35c899b64faad0cfddc524614277e",
     "src/runner/paths.mjs": "bfbb13456f940e02d77b5ad8515b015ec6c1f8a83ee6015086138eeaed96339f",
@@ -995,7 +995,7 @@
     "src/workflow/index.mjs": "a09af900e3a8efc32b1409879b485fec1b38f6edc4797cc47fa6197b6bc89b24",
     "src/workflow/loader.mjs": "4fabe9436924c10ea4a489bb5517b752cf88cc5ec9045102cfd8237ac3c93bb3",
     "src/workflow/ref-digests.mjs": "cb4d8061dc0b4addae2f3e9d97c853027c4897ec811b12fa21311026e1ee9f29",
-    "src/workflow/runner.mjs": "15c3bd0581c4d49e9e07fa442dcb7b97af4007a77b103897b481ff78e0214b39",
+    "src/workflow/runner.mjs": "4f24aff219e431d2e028c4481107dbeab8513eab0a46529a20e4bd9dc4df02af",
     "src/workflow/seat-providers.mjs": "ae535e2b6da7beae4ac08f695df65306f139c13ba49dc2e6217e549923f23a81",
     "src/workflow/seats.mjs": "4b46062e29ded955b94206fc1e336d2829f9e50cb67d799686c05b3c7e64d836",
     "src/workflow/steps.mjs": "d2878353f7e697d05b97da41c9e0b092f3dea6dbfc7591b7a746b34248dd09e7",

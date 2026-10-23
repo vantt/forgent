@@ -115,9 +115,11 @@ test('runner Land refuses a scoped branch when the lease is acquired after admis
         heldTarget = f.git('rev-parse', 'main');
       };
       t.mock.method(native.GitLand.prototype, 'prepare', function(args, loans) {
-        preparedTarget = args.request.target;
+        assert.equal(args.request.target, undefined, 'no resolution bytes require a pre-slot target');
         if (timing === 'before prepare') acquire();
         const result = prepare.call(this, args, loans);
+        preparedTarget = result.candidate.target;
+        assert.equal(result.candidate.source, source, 'the admitted source stays pinned');
         if (timing === 'after prepare') acquire();
         return result;
       });
@@ -129,7 +131,7 @@ test('runner Land refuses a scoped branch when the lease is acquired after admis
       await assert.rejects(() => landRunnerItem(f.repo, { id: 'source', verify: 'true' }, {
         branch: 'scoped', callerCheckout: f.repo,
       }), { code: 'documentation-cutover-lease' });
-      assert.equal(preparedTarget, admittedTarget, 'even a docs-only branch supplies its admitted target');
+      assert.equal(preparedTarget, timing === 'before prepare' ? heldTarget : admittedTarget, 'lease admission must cover the target Land actually selected under its slot');
       assert.notEqual(heldTarget, admittedTarget, 'the real lease transition advanced main');
       assert.equal(publishes, timing === 'before publish' ? 1 : 0, 'only a lease arriving after the final gate reaches the native CAS check');
       assert.equal(f.git('rev-parse', 'main'), heldTarget);

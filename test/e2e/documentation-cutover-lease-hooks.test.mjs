@@ -18,12 +18,11 @@ const stateRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lease-hooks-state-
 process.env.FGOS_STATE_ROOT = stateRoot;
 after(() => fs.rmSync(stateRoot, { recursive: true, force: true }));
 ensureScriptAddon();
+// Cold CLI children need their own checkout-matching addon bootstrap too;
+// FGOS_HOST_BIN alone can name an unrelated activated release.
+const cliBootstrap = `data:text/javascript,import { ensureScriptAddon } from ${JSON.stringify(new URL('../../scripts/lib/git-ports.mjs', import.meta.url).href)}; ensureScriptAddon();`;
 
 const sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const BUILT_HOST = process.env.FGOS_HOST_BIN || path.join(sourceRoot, 'target', 'debug', 'fgos');
-if (!process.env.FGOS_HOST_BIN && fs.existsSync(BUILT_HOST)) {
-  process.env.FGOS_HOST_BIN = BUILT_HOST;
-}
 
 const env = { ...process.env };
 delete env.CLAUDE_CODE_SESSION_ID;
@@ -92,7 +91,9 @@ function fixture(t) {
       timeout: 30_000,
     });
 
-  const rawCli = (args, cwd = repo, extraEnv = {}) => spawnSync(process.execPath, [path.join(sourceRoot, 'bin/fgos.mjs'), 'docs-lease', ...args, '--json'], {
+  // boundary: real docs-lease CLI transitions and both Git hooks must share
+  // the staged host/addon; module-only tests cannot prove their wiring.
+  const rawCli = (args, cwd = repo, extraEnv = {}) => spawnSync(process.execPath, ['--import', cliBootstrap, path.join(sourceRoot, 'bin/fgos.mjs'), 'docs-lease', ...args, '--json'], {
     cwd, env: { ...env, ...extraEnv }, encoding: 'utf8', timeout: 60_000,
   });
   const cli = (args, cwd = repo) => {

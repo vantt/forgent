@@ -924,7 +924,9 @@ export async function landRunnerItem(repoRoot, item, {
       waitMs: lockWaitMs,
       request: {
         source,
-        target: pinned,
+        // Declared resolution bytes belong to this exact target. Without
+        // declarations, let Land choose the current target under its slot.
+        ...(files.length > 0 && { target: pinned }),
         destination,
         message: `merge ${branch} into ${target}`,
         squash: false,
@@ -938,11 +940,9 @@ export async function landRunnerItem(repoRoot, item, {
         check: { passed: true, status: 0, timedOut: false, skipped: true, output: `publication already verified and recorded by Land operation ${operationId}; awaiting Work settlement` },
         receipt: previous }, 'delivered');
     }
-    if (candidate.source !== source || candidate.target !== pinned) {
-      throw new MergeError('documentation cutover admission does not match the prepared Land source/target', {
-        code: 'documentation-cutover-lease', branch, targetRef: target,
-      });
-    }
+    // Slot admission may follow another successful land. Authenticate the
+    // actual prepared pair, not a target observed before waiting for the slot.
+    admitLease(candidate.source, candidate.target);
     // Eligibility still belongs to Work, decided against the exact source and
     // target Land pinned for this candidate, never a target read before it.
     const skipRedundantChecks = mergedTreeAlreadyVerified(repoRoot, item, candidate.source, candidate.target);

@@ -224,9 +224,11 @@ test('workflow Land refuses a scoped branch when the lease is acquired after adm
       heldTarget = git(tmp, ['rev-parse', 'main']);
     };
     t.mock.method(native.GitLand.prototype, 'prepare', function(args, loans) {
-      preparedTarget = args.request.target;
+      assert.equal(args.request.target, undefined, 'Workflow lets Land select the target under its slot');
       if (timing === 'before prepare') acquire();
       const result = prepare.call(this, args, loans);
+      preparedTarget = result.candidate.target;
+      assert.equal(result.candidate.source, source, 'the admitted source stays pinned');
       if (timing === 'after prepare') acquire();
       return result;
     });
@@ -238,7 +240,7 @@ test('workflow Land refuses a scoped branch when the lease is acquired after adm
     await assert.rejects(() => mergeWorkflowBranch({
       repoRoot: tmp, sourceBranch: 'incoming', targetBranch: 'main', callerCheckout: tmp,
     }), { code: 'documentation-cutover-lease' });
-    assert.equal(preparedTarget, admittedTarget, 'Workflow supplies its admitted target');
+    assert.equal(preparedTarget, timing === 'before prepare' ? heldTarget : admittedTarget, 'lease admission covers the actual prepared target');
     assert.notEqual(heldTarget, admittedTarget);
     assert.equal(publishes, timing === 'before publish' ? 1 : 0);
     assert.equal(git(tmp, ['rev-parse', 'main']), heldTarget);
@@ -247,6 +249,31 @@ test('workflow Land refuses a scoped branch when the lease is acquired after adm
     assert.equal(fs.existsSync(path.join(tmp, 'docs/new.md')), false);
     assert.equal(JSON.parse(git(tmp, ['show', `main:${DEFAULT_SIDECAR_PATH}`])).state, 'held');
   });
+});
+
+// The race proof above rejects a newly held lease; it cannot prove that an
+// unrelated target advance remains legal at Workflow's independent door.
+test('workflow integration admits the actual prepared target after an unrelated advance', async (t) => {
+  const tmp = setupRepo();
+  git(tmp, ['checkout', '-qb', 'incoming']);
+  fs.writeFileSync(path.join(tmp, 'incoming.txt'), 'incoming\n');
+  git(tmp, ['add', 'incoming.txt']); git(tmp, ['commit', '-qm', 'incoming']);
+  const source = git(tmp, ['rev-parse', 'HEAD']);
+  git(tmp, ['checkout', '-q', 'main']);
+  const native = loadNativeAddon();
+  const prepare = native.GitLand.prototype.prepare;
+  let selectedTarget;
+  t.mock.method(native.GitLand.prototype, 'prepare', function(args, loans) {
+    fs.writeFileSync(path.join(tmp, 'unrelated.txt'), 'prior land\n');
+    git(tmp, ['add', 'unrelated.txt']); git(tmp, ['commit', '-qm', 'unrelated advance']);
+    selectedTarget = git(tmp, ['rev-parse', 'main']);
+    return prepare.call(this, args, loans);
+  });
+  const result = await mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: 'incoming', targetBranch: 'main' });
+  assert.equal(result.merged, true);
+  assert.deepEqual(git(tmp, ['show', '-s', '--format=%P', 'main']).split(' '), [selectedTarget, source]);
+  assert.equal(git(tmp, ['show', 'main:incoming.txt']), 'incoming');
+  assert.equal(git(tmp, ['show', 'main:unrelated.txt']), 'prior land');
 });
 
 test('a units file runs through startWorkflow, and a unit\'s prefer and persona reach the Unit it runs', async () => {

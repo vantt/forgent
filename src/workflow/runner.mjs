@@ -624,17 +624,14 @@ export async function mergeWorkflowBranch({ repoRoot, sourceBranch, targetBranch
   const port = createGitLand(gitPortOptions(repoRoot, { mutation: true }));
   try {
     const { candidate, receipt: prior } = await port.prepare({ operationId, request: {
-      source, target, destination,
+      source, destination,
       message: commitMessage ?? `merge: integrate workflow branch ${sourceBranch} into ${targetBranch}`,
       // Only the paths the branch brings count against the main checkout's own edits.
       squash, footprint: [], subtree: null, files: [],
     } });
     if (!prior) {
-      if (candidate.source !== source || candidate.target !== target) {
-        throw new RunnerConfigError('documentation cutover admission does not match the prepared Land source/target', { code: 'documentation-cutover-lease' });
-      }
-      // A transition can commit under main-50 while Land holds only slot-20.
-      // Recheck this exact pair; a later acquire on main makes Land's CAS stale.
+      // Land chooses the target under its slot, possibly after another land.
+      // Admit that exact pair; a later acquire on main makes its CAS stale.
       admitLease(candidate.source, candidate.target);
     }
     const receipt = prior ?? await port.publish({ source: candidate.source, target: candidate.target,

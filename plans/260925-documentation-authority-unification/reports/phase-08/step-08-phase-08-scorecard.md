@@ -21,7 +21,7 @@ Status: **records-only handoff rebuilt under L12-124; no Phase 8 closure or Phas
 | 4 Final source/render slots | **33 batches / 275 source-owner records / 890 slots**; each slotKey has a distinct matrix identity even when one census edge spans multiple slots. All **45 original parks** retained. Effective: **64 prepared / 609 preserve / 217 parked** | L12-64 accepted authoring, not build/adoption. Original 236 future patch/render slots are now either composed or explicitly parked; no generated-render hand edit |
 | 5 Behavioral ownership | Original **46,404 items** retained with stable rNNNNN ids and L12-118..121 overlays. Effective: **146 prepared / 9,555 preserved / 512 parked / 36,191 rejected**. Added [post-census records](step-08-post-census-records.jsonl): **72 files / 427 items = 85 preserve + 28 park + 314 reject** | L12-90 author acceptance retained; new traces and current file composition are **pending independent/parity review**. Identity mint and setup duplicate-id scans have explicit owners/blockers; they are no longer untraced. Do not substitute a flat `docs/platform` scan for split live holders |
 | 6 Evidence verifier | Existing 867 identical mirrors; historical before 867/0 and expected pre-deletion after red 907; owning tests historically 41/41 | L12-95/97 acceptance retained. No verifier/runtime test rerun this turn. Standing-suite, retirement integration and actual after-deletion proof remain owed |
-| 6b Lease | L12-115 branch delivery retained; L12-123 adds both Land-door publication recheck and its owning race proof | Independent final lease review predates follow-ups. Real landing, Git-owner §7 consent, Holder-lock notice, current-scope proof and integrated suite remain owed |
+| 6b Lease | L12-115 branch delivery retained; L12-123 publication recheck preserved, L12-126 repairs sequential Land by admitting the actual prepared target | Independent final lease review predates follow-ups. Real landing, Git-owner §7 consent, Holder-lock notice, current-scope proof and integrated suite remain owed |
 | 7 Atomic handoff | **55,658 rows / 524 per-file specs / 423 composed roundtrips / 101 named composition parks**; all final Step 3/4/5 hunks composed together where unambiguous | **Not accepted/readiness not met.** Two byte-identical `--final --pin` runs; five generated handoff outputs **7,475,179 bytes**, below 8 MB. Pilot directories fail loudly. Roundtrip proves bytes, not semantic parity |
 | 8 Closure | This rebuilt scorecard, L12-124, progress and current receipts | **Not met:** Lead full suite/attribution, actual runner-pair clean acceptance and fresh independent closure review remain pending |
 
@@ -86,7 +86,24 @@ The authority is **L12-124**, not a new Doer deferral. `step-07-readiness.json:p
 8. **Non-behavioral census joins:** all **1,126** fixture/comment/history/caller-scalar sites have stable original site ids and owner. Confirm grade-record REJECT custody or original owning proof **before flip**, not Phase 9's post-flip search. Current static traces do not certify ignored/external/live `.fgos` inputs; two external locator parks remain outside the original Step 5 denominator.
 9. **Non-dependencies and bounded history:** A/B landing and C naming correction from L12-118 remain; L12-91 rule-management writes occur after cutover, never block it. Earlier RUL10/P8-DOC-GAP-01/02/03, two non-retiring dead links and pathless locators retain their source-specific obligations. Export v2 is delivered, not requested again. C F8 pruning metadata below authorizes no deletion.
 
-### Lead suite and closure proof — measured red; suite-fix follow-up blocked
+### Lead suite and closure proof — measured red; regression slice still blocked
+
+**Latest result (L12-126):** Lead-supplied isolated branch **`44ca64559`: 9,069 tests / 300 fail / 11 unique branch-only titles**, versus main's 392 failures. Not rerun as a full suite here. The title set comes from `suite-logs/branch-only-failures-44ca64559.txt`, not subtraction of total failures. The latest scoped worktree proof is [`step-08-regression-verification.json`](step-08-regression-verification.json); exact commands, limits and all 18 test attempts are in L12-126. No clean committed-byte/full-suite acceptance.
+
+| Latest branch-only class | Titles | Actual worktree result / remaining duty |
+|---|---:|---|
+| Sequential Land target regression | 1 | Reproduced; conditional declared-file target pin + actual prepared-pair lease admission repairs it. Owning unedited land-vs-manual-commit **9/9**, merge-land **22/22**, Workflow Land cases green, including benign advance and all three real lease race timings |
+| Red invariant classification | 1 | Owning unedited merge file **85/85 before and after**. Verify/invariant/publication order unchanged. Exact clone failure cause unconfirmed; raw Lead log absent, not claimed fixed by this edit |
+| Hook status-null timeouts | 2 | Original staged and final helper files **31/31**. Cold children now use existing addon bootstrap before the real CLI; raw host fallback removed and boundary reason present. Original timeout cause not reproduced/confirmed; no weakened assertion or raised timeout |
+| Clone-location unsafe-output / lease-admission artifacts | 2 | Both requested titles pass in this real worktree. Full reproduction **6/8** (only A red), run-case **7/15** (other nested-worker cases red). No product change for those two titles |
+| Reproduction A bookkeeping | 2 | Historical lease paths already have exact exceptions; `historicalOffenders` is diagnostic. Four later actual pairs appended through both existing arrays, no allowlist/baseline/check change. Final recipes **0/0/1 each**, **4,183 accounted / zero unaccounted**, B/H/effective I green. Nine author working paths still make A red (reproduction **6/8**); separate actual runner-pair accounting and clean committed replay required |
+| Concurrent editWork candidate flake | 1 | Once alone **1/1**, exit 0; no state change |
+| Ledger unfinished-line candidate flake | 1 | **Not a flake:** full file **7/8**, once alone **0/1**, both exit 1. Admission reads the broken tail before advance can repair it. Fix needs out-of-scope `src/workflow/case-verbs.mjs`; hard closure blocker, no test edit |
+| Allowed dead-vocabulary P7-DOC-GAP-05 | 1 | Not rerun here; still sole authorized closing red and PRE-LANDING blocker |
+
+**Current block:** authorize the ledger fix and Git-spec/changelog alignment outside this slice; preserve all race/verify proofs; investigate raw clone diagnostics; separately account the real runner commit and replay both recipes on clean bytes. Full Workflow units file is **9/30** (21 existing confined-worker/infrastructure failures); no nested-write guard is bypassed. Census stays at the same 58 pre-existing sites. L12-126 is blocked partial repair, not an exception to L12-14.
+
+#### Historical L12-125 suite/artifact repair receipt (retained, not latest attribution)
 
 Lead's two isolated-clone results below are supplied by `step-08-suite-fix-brief.md`, not rerun by the Doer. **L12-125** in [owner answers](owner-answers.md) now includes continuation-2 complete-file checks at input HEAD `0962d4e834622445c1cada8436edd633ad6a84e5` plus the heading-identity test/record/accounting working slice. Artifact/registry/switchboard/changelog fixes are already in that input commit. No full suite, cargo suite or clean committed-byte acceptance is claimed for these changed bytes.
 
@@ -165,7 +182,7 @@ Historical worktree-registration snapshot from L12-122 (not a fresh current regi
 
 Main and this active plan worktree are **not retired**. Other registered Claude/runtime worktrees have no track-specific retirement evidence in this package and are not declared safe to remove; Lead owns any separate inventory/custody decision. Disposable lease rehearsal clone/worktrees were already removed (L12-114), not pending cleanup.
 
-## Owner and Lead decision index — L12-1 through L12-125
+## Owner and Lead decision index — L12-1 through L12-126
 
 One line per existing decision, grouped by work. These are pointers/summaries, not new decisions. Exact authority, reasons, dates, witnesses and supersession scope live in **`owner-answers.md`, heading of the same id**; owner decisions A49/A50/A51 and the accepted lease design remain separately inherited. Doer delivery entries are not re-labelled owner approvals.
 
@@ -309,13 +326,14 @@ One line per existing decision, grouped by work. These are pointers/summaries, n
 - **L12-121** — Remove role exemption, all-preserve premise proof, ten named patches/nine parks plus 37 further overturns; final 214 parks/226 specs.
 
 
-### Closing record updates (122–125)
+### Closing record updates (122–126)
 
 - **L12-122** — Initial scorecard delivery; closure A/C subsequently return rework. Its counts are historical, not current carriage.
 - **L12-123** — Both Land doors recheck lease admission through publication; code/race proof on plan branch only.
 - **L12-124** — Lead-under-A42 records ruling: rebuild from final records, trace behavioral additions now, move unfinished composition/review to explicit owned Phase 9 PRE-FLIP gates. This rebuilt package does not grant closure/cutover acceptance.
 - **L12-125** — Branch suite repair/attribution: artifacts and switchboard fixed, heading-identity liveness green without lost cases, 27 actual historical pairs admitted through existing exception data; native/fixture and clean committed-pair proofs remain blocked, not suite acceptance.
+- **L12-126** — Sequential Land fixed by prepared-target lease admission; all race/verify proofs retained. Hook cold-child bootstrap hardened, two clone-only titles pass, historical A pairs already accounted. Ledger red repeats alone and requires out-of-scope production repair; four actual pairs appended, author/clean-byte/full-suite acceptance pending.
 
 ## Next concrete action
 
-Lead reviews the rebuilt 55,658-row/524-spec handoff and named PRE-FLIP assignments, reconciles Review A's one-count source-drift prose discrepancy, runs/fills the full isolated-clone suite and exact main attribution, and accounts the actual runner commit/path pairs in the separate L12-11 Unit. Then run both clean committed-byte recipes/owning tests and start ONE fresh independent A38 closure review. All residual duties are either explicit L12-124 PRE-FLIP gates or pre-close Lead proof; no silent Step 7 carry remains. Phase 8 stays open until these closing proofs and acceptance exist. Owner separately authorizes Phase 9. Markdown preview remains Lead custody under this records-only/no-runtime boundary.
+Lead first authorizes the reproducible ledger repair in `src/workflow/case-verbs.mjs`, aligns the Git spec and Unreleased changelog, and investigates the original clone invariant/hook diagnostics. Then review the rebuilt 55,658-row/524-spec handoff and named PRE-FLIP assignments, reconcile Review A's one-count source-drift prose discrepancy, rerun the full isolated-clone suite with exact main attribution, and account the actual runner commit/path pairs in the separate L12-11 Unit. Then run both clean committed-byte recipes/owning tests and start ONE fresh independent A38 closure review. All residual duties are either explicit L12-124 PRE-FLIP gates or pre-close Lead proof; no silent Step 7 carry remains. Phase 8 stays open until these closing proofs and acceptance exist. Owner separately authorizes Phase 9. Markdown preview remains Lead custody under this records-only/no-runtime boundary.
