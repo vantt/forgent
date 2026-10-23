@@ -13,6 +13,7 @@ pub mod locks;
 pub mod open_read;
 pub mod rotate;
 
+pub mod checkpoint;
 pub mod cursor;
 pub mod order;
 pub mod read;

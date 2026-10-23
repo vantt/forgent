@@ -472,6 +472,18 @@ A consumer that reads with its cursor gets one of two answers:
 
 Keying by tips bounds what is new. It does not make a walk cheap: a range walk `A..B` still traverses the reachable part it needs. In V-REF-01, on a DAG of 100,011 commits, the full `rev-list` took 224 ms and the range walk took 190 ms for 90,011 commits. Pruning at certified commits (section 11) limits a catch-up walk to what was added since the last complete walk, and a rebuild walks everything. Snapshot and compaction of the ref chain stay the follow-up for when a rebuild exceeds the budget (section 22).
 
+**Checkpoint (2026-10-23).** A consumer may name a checkpoint file for its outside-gate reads (Work: `.fgos/cache/event-history.json`, beside the view). It is a cache like the view: never tracked, never truth, rebuildable from zero, and nothing depends on it for correctness. It holds the cursor of the last complete read that deferred nothing, and the ordered events that cursor covers, so a process that starts with no retained history continues from it instead of walking the whole ref DAG: it reads the sealed commits added since, plus the header of the certified commit they sit on (section 11).
+
+A read accepts the file only when all of these hold; otherwise it ignores the file, walks from zero and replaces it, and reports why:
+
+- it parses, has the current version, belongs to this store id, and answers the same streams and order flag as the request;
+- it holds no deferred event, its certified commits are exactly the commits of the refs it verified, and its coverage equals the highest `seq` of its own events per stream;
+- every ref it verified still exists, and the walk from that ref's current tip meets the certified commit as a parent (the ref descends from it; a rewound, replaced or foreign history never does);
+- every event of this clone's own origin it holds is published (at or below the receipt) or still in the local files, so a lost local file is never papered over;
+- the mirror checks of section 14 pass, and the order, hash and contiguity checks of the read itself find nothing wrong: any error found while continuing from the file repeats the read from zero, so the answer is the one a read without a file gives.
+
+The file is written when the read certified commits that the history it started from did not, never for a read with a deferred event, and never fails the read when it cannot be written. A rebuild (`fgos rebuild`) never uses it and always replaces it. Writers replace the file atomically through the durable-file helper, so concurrent processes leave the old file or a new one; an older file is still valid, because acceptance depends on the refs and never on which writer was last. What it does not do: it does not authenticate the file against a local writer, with the same trust the view cache and the local segments have. Legacy history is not part of it (it is read from its pinned commit on every read).
+
 The usual verbs (`fgos list`, `show`, `ready` and the others) read the consumer's view after one `read(cursor)` catch-up. Commands:
 
 | Verb | Does |
@@ -1159,3 +1171,14 @@ Dated clarification with no protocol change: the cold read costs a constant numb
 
 - Section 10 (walk): the walk reads the blobs of the commits one page returns through the Git port's `read_paths_at_many`, in groups of 64 (one `cat-file --batch -Z` process per group), and holds one group of segments in memory at a time. Verification of each commit is unchanged and runs in the same order.
 - Section 11 (the tracked fence authority and the unfenced consumer read): the fence a HEAD commit carries, and the legacy file inventory it holds, are immutable, so each verified answer is kept for the life of the process under the repository, the HEAD commit and the question asked (the inventory also under its root set). A moved HEAD is another key, and a failed read is never kept, so a later command or a Land that moves HEAD reads the new fence.
+
+## Verified checkpoint and trigger costs (2026-10-23)
+
+Dated clarification; section 15 gains the checkpoint above, and the rest changes no rule:
+
+- Section 11 (coverage walk): `certified` now also lives in the checkpoint across processes; the walk, its pruning rule and the proof that a certified commit stands for its ancestors are unchanged. A ref that does not descend from the commit the checkpoint certified for it voids the checkpoint.
+- Section 17 (no spawn in the gate): the legacy-migration admission of writes (`write_readiness`) is asked of Git once per prepared store, by the first write or by the consumer's pre-gate `admitWrites`, and never by a read. A write that reaches the gate (rank 60) before admission was settled is refused with `event-store-admission-required`; it is never answered with a process spawn. A read-only command therefore no longer pays the admission (HEAD, refs and the legacy inventory).
+- Section 14 and 16 (triggers): a sync that ran counts as the attempt of its interval whether it failed before its push (an offline fetch, a remote that is not configured) or after it, so the end-of-command trigger tries once per `eventStore.sync.intervalSec` and a failing fetch never delays every command. The start and end triggers take the `event-seal` lock with `try` (section 4) for sealing and for sync alike, and skip when another process holds it; a skipped sync is not an attempt and the interval does not restart. `store.maintenance` therefore returns `lastAttempt` (`{time, remote}`) beside `lastPush`.
+- Section 10 (seal): a tip the receipt certified is not walked again before the segment is published, because a walk from a certified commit finds nothing; the read-back of the published bytes is one Git process; the walk after publication is unchanged.
+- Sections 11 and 18 (legacy reads): the legacy files of one commit, whether the pinned legacy ref's or the consumer inventory at HEAD, are read through one Git process however many files it holds, not one process per file.
+

@@ -275,6 +275,52 @@ pub fn commit_tree(p: &dyn Publication, r: &RepoHandle, tree: Oid) -> Oid {
     )
     .unwrap()
 }
+/// A detached HEAD commit holding `files` (slash-separated paths) below `.fgos/`.
+pub fn tracked_head_files(f: &Fixture, p: &dyn Publication, files: &[(&str, &[u8])]) -> Oid {
+    fn tree(f: &Fixture, p: &dyn Publication, files: &[(&str, &[u8])]) -> Oid {
+        let mut entries = Vec::new();
+        let mut dirs: std::collections::BTreeMap<&str, Vec<(&str, &[u8])>> = Default::default();
+        for (path, bytes) in files {
+            match path.split_once('/') {
+                Some((dir, rest)) => dirs.entry(dir).or_default().push((rest, bytes)),
+                None => entries.push(TreeEntry {
+                    name: path.as_bytes().to_vec(),
+                    mode: 0o100644,
+                    oid: p.write_blob(&f.repo, bytes).unwrap(),
+                }),
+            }
+        }
+        for (dir, children) in dirs {
+            entries.push(TreeEntry {
+                name: dir.as_bytes().to_vec(),
+                mode: 0o040000,
+                oid: tree(f, p, &children),
+            });
+        }
+        entries.sort_by(|a, b| a.name.cmp(&b.name));
+        p.write_tree(&f.repo, &entries).unwrap()
+    }
+    let fgos = tree(f, p, files);
+    let root = p
+        .write_tree(
+            &f.repo,
+            &[TreeEntry {
+                name: b".fgos".to_vec(),
+                mode: 0o040000,
+                oid: fgos,
+            }],
+        )
+        .unwrap();
+    let oid = commit_tree(p, &f.repo, root);
+    let result = Command::new("git")
+        .arg("-C")
+        .arg(f.root.join("repo"))
+        .args(["checkout", "-q", "--detach", oid.as_str()])
+        .output()
+        .unwrap();
+    assert!(result.status.success(), "{result:?}");
+    oid
+}
 pub fn tracked_head(f: &Fixture, p: &dyn Publication, path: &[u8], bytes: &[u8]) -> Oid {
     let blob = p.write_blob(&f.repo, bytes).unwrap();
     let fgos = p
@@ -313,6 +359,8 @@ pub struct CountingPort<'a> {
     inner: &'a dyn Inspect,
     pub single: Cell<usize>,
     pub many: Cell<usize>,
+    /// Commits asked for through `read_paths_at_many`, other than the tracked fence.
+    pub read_commits: Cell<usize>,
     /// Requests for the tracked `.fgos/events` fence, however they are batched.
     pub fence: Cell<usize>,
     /// `list_tree` calls.
@@ -324,6 +372,7 @@ impl<'a> CountingPort<'a> {
             inner,
             single: Cell::new(0),
             many: Cell::new(0),
+            read_commits: Cell::new(0),
             fence: Cell::new(0),
             trees: Cell::new(0),
         }
@@ -377,6 +426,8 @@ impl Inspect for CountingPort<'_> {
             .filter(|(_, paths)| paths.as_slice() == [b".fgos/events".to_vec()])
             .count();
         self.fence.set(self.fence.get() + fence);
+        self.read_commits
+            .set(self.read_commits.get() + reads.len() - fence);
         self.inner.read_paths_at_many(repo, reads, max_blob_bytes)
     }
     fn walk_commits(

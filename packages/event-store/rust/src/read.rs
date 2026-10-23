@@ -2,6 +2,7 @@
 pub use crate::order::VerifiedView;
 use crate::{
     append::Positions,
+    checkpoint::{self, Checkpoint, CheckpointReport, Retained},
     cursor::{fold_answer, Cursor, Fold},
     envelope::{Envelope, Scope},
     errors::{invalid, Error, ErrorCode},
@@ -9,7 +10,7 @@ use crate::{
     legacy::{self, LegacyEvent},
     open_read::read_own,
     order::{order, order_retained, stream_key},
-    walk::{self, blob, git_error},
+    walk::{self, blobs, git_error},
 };
 use fgos_git::{HeadFact, Inspect, ObjectType, Oid, RefPrefix, RefValue, RepoHandle};
 use std::collections::{BTreeMap, BTreeSet};
@@ -25,6 +26,8 @@ pub struct ReadResult {
     pub fold: Fold,
     pub full_order: Vec<String>,
     pub verified_view: VerifiedView,
+    /// What this read did with its checkpoint; default when it had none.
+    pub checkpoint: CheckpointReport,
 }
 pub struct ReadRequest<'a> {
     pub layout: &'a Layout,
@@ -138,7 +141,7 @@ fn legacy_files(
     oid: &Oid,
     streams: &[StreamId],
 ) -> Result<Vec<LegacyEvent>, Error> {
-    let mut events = Vec::new();
+    let mut selected = Vec::new();
     for entry in crate::legacy_import::all_entries(port, repo, oid)? {
         let file =
             std::str::from_utf8(&entry.path).map_err(|_| invalid("legacy provenance UTF8"))?;
@@ -155,8 +158,15 @@ fn legacy_files(
         if entry.kind != ObjectType::Blob || entry.mode != 0o100644 {
             return Err(invalid("unsafe legacy event entry"));
         }
-        let bytes = blob(port, repo, oid, &entry.path)?
-            .ok_or_else(|| invalid("listed legacy path missing"))?;
+        selected.push((entry.path.clone(), work));
+    }
+    // One Git process reads every legacy file of the commit, however many.
+    let paths: Vec<Vec<u8>> = selected.iter().map(|(path, _)| path.clone()).collect();
+    let contents = blobs(port, repo, oid, &paths)?;
+    let mut events = Vec::new();
+    for ((path, work), bytes) in selected.into_iter().zip(contents) {
+        let file = std::str::from_utf8(&path).map_err(|_| invalid("legacy provenance UTF8"))?;
+        let bytes = bytes.ok_or_else(|| invalid("listed legacy path missing"))?;
         let tag = if file == "events.jsonl" {
             ""
         } else if work {
@@ -231,12 +241,138 @@ pub fn read_with_view(
     req: ReadRequest<'_>,
     view: Option<&VerifiedView>,
 ) -> Result<ReadResult, Error> {
+    read_from(port, repo, &req, view, None)
+}
+
+/// A read that continues from the checkpoint file when the caller holds no
+/// retained history of its own, and replaces the file when the read certified
+/// commits it did not. A file that does not match the store is ignored (the
+/// report says why) and the read walks from zero, so the answer never depends
+/// on the file. `Checkpoint::reuse == false` always walks from zero.
+pub fn read_checkpointed(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    req: ReadRequest<'_>,
+    view: Option<&VerifiedView>,
+    checkpoint: &Checkpoint,
+) -> Result<ReadResult, Error> {
+    let query: BTreeSet<String> = req.streams.iter().map(|s| s.as_str().into()).collect();
+    let caller_has_history = holds_history(&req, &query);
+    let mut report = CheckpointReport::default();
+    let mut retained = None;
+    if checkpoint.reuse && !caller_has_history {
+        match checkpoint::load(&checkpoint.path, req.origin, &query, req.project) {
+            Ok(found) => retained = found,
+            Err(reason) => report.ignored = Some(reason),
+        }
+    }
+    let mut result = None;
+    if let Some(found) = &retained {
+        match read_from(port, repo, &req, view, Some(found)) {
+            Ok(read) => {
+                report.continued = true;
+                result = Some(read);
+            }
+            // Whatever the file got wrong, the store decides: walk from zero.
+            Err(error) => report.ignored = Some(error.to_string()),
+        }
+    }
+    let mut result = match result {
+        Some(read) => read,
+        None => read_from(port, repo, &req, view, None)?,
+    };
+    // A checkpoint is worth writing when this read certified commits that the
+    // history it started from did not; local-only changes are re-read cheaply.
+    let started: &BTreeMap<String, String> = match (&retained, report.continued, caller_has_history)
+    {
+        (Some(found), true, _) => &found.cursor.verified_tips,
+        (_, _, true) => &req.cursor.verified_tips,
+        _ => &BTreeMap::new(),
+    };
+    if result.deferred.is_empty()
+        && !result.cursor.verified_tips.is_empty()
+        && result.cursor.verified_tips != *started
+    {
+        match checkpoint::store(
+            &checkpoint.path,
+            req.origin,
+            &result.cursor,
+            &result.sequence,
+        ) {
+            Ok(()) => report.written = true,
+            Err(error) => report.write_error = Some(error),
+        }
+    }
+    result.checkpoint = report;
+    Ok(result)
+}
+
+fn holds_history(req: &ReadRequest<'_>, query: &BTreeSet<String>) -> bool {
+    (req.cursor.cover.is_empty() || !req.folded.is_empty())
+        && req.cursor.streams == *query
+        && req.cursor.project_order == req.project
+}
+
+/// What a checkpoint read must still prove against the live store before it
+/// may stand in for the history it records.
+fn verify_retained(
+    retained: &Retained,
+    tips: &[Tip],
+    local: &[Envelope],
+    req: &ReadRequest<'_>,
+) -> Result<(), Error> {
+    let refused = |detail: &str| Error::new(ErrorCode::EventStoreRefMoved, detail);
+    // A ref the checkpoint certified must still exist; a moved one is checked
+    // against its walk.
+    if retained
+        .cursor
+        .verified_tips
+        .keys()
+        .any(|name| !tips.iter().any(|t| &t.name == name))
+    {
+        return Err(refused("a certified ref no longer exists"));
+    }
+    // An own event the checkpoint folded is either published (at or below the
+    // receipt) or still in the local files; one that is neither was lost.
+    let receipts = crate::receipt::own_bounds(req.layout, req.origin)?;
+    let local: BTreeSet<(&str, u64, &str)> = local
+        .iter()
+        .map(|e| (e.stream.as_str(), e.seq, e.h.as_str()))
+        .collect();
+    for e in retained.folded.iter().filter(|e| e.origin == req.origin) {
+        let published = receipts.get(&stream_key(e)).copied().unwrap_or(0);
+        if e.seq > published && !local.contains(&(e.stream.as_str(), e.seq, e.h.as_str())) {
+            return Err(refused("a folded own event is neither published nor local"));
+        }
+    }
+    Ok(())
+}
+
+fn read_from(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    req: &ReadRequest<'_>,
+    view: Option<&VerifiedView>,
+    retained: Option<&Retained>,
+) -> Result<ReadResult, Error> {
     let mut local = Vec::new();
     for stream in req.streams {
         local.extend(read_own(req.layout, req.origin, stream)?.events);
     }
     let (tips, legacy_refs) = tips(port, repo, req.streams)?;
-    for (name, old) in &req.cursor.mirror_tips {
+    // A replay source is retained by the consumer, not hidden inside the cursor.
+    let query: BTreeSet<String> = req.streams.iter().map(|s| s.as_str().into()).collect();
+    let caller_has_history = holds_history(req, &query);
+    // The history this read continues from: the checkpoint's when one was
+    // loaded (and then checked below), else the caller's own.
+    let (retained_cursor, retained_events, have_history) = match retained {
+        Some(found) => (&found.cursor, found.folded.as_slice(), true),
+        None => (req.cursor, req.folded, caller_has_history),
+    };
+    if let Some(found) = retained {
+        verify_retained(found, &tips, &local, req)?;
+    }
+    for (name, old) in &retained_cursor.mirror_tips {
         let tip = tips
             .iter()
             .find(|t| &t.name == name)
@@ -249,18 +385,13 @@ pub fn read_with_view(
         }
     }
 
-    // A replay source is retained by the consumer, not hidden inside the cursor.
-    let query: BTreeSet<String> = req.streams.iter().map(|s| s.as_str().into()).collect();
-    let have_history = (req.cursor.cover.is_empty() || !req.folded.is_empty())
-        && req.cursor.streams == query
-        && req.cursor.project_order == req.project;
     let base = if have_history {
-        req.cursor.cover.clone()
+        retained_cursor.cover.clone()
     } else {
         Positions::new()
     };
     let certificates = if have_history {
-        req.cursor.certified.clone()
+        retained_cursor.certified.clone()
     } else {
         BTreeSet::new()
     };
@@ -273,7 +404,11 @@ pub fn read_with_view(
     let unchanged = |tip: &Tip| {
         have_history
             && certificates.contains(tip.oid.as_str())
-            && req.cursor.verified_tips.get(&tip.name).map(String::as_str) == Some(tip.oid.as_str())
+            && retained_cursor
+                .verified_tips
+                .get(&tip.name)
+                .map(String::as_str)
+                == Some(tip.oid.as_str())
     };
     for tip in &tips {
         if unchanged(tip) {
@@ -288,6 +423,18 @@ pub fn read_with_view(
             &tip.machine,
             tip.scope,
         )?;
+        // A checkpoint's certified commit stands in for its whole history only
+        // while the ref still descends from it: the walk must have met it.
+        if retained.is_some() {
+            if let Some(previous) = retained_cursor.verified_tips.get(&tip.name) {
+                if !part.stops_reached.contains(previous) {
+                    return Err(Error::new(
+                        ErrorCode::EventStoreRefMoved,
+                        "a ref no longer descends from its certified commit",
+                    ));
+                }
+            }
+        }
         if !tip.mirror {
             for (key, seq) in &part.published {
                 own_published
@@ -309,7 +456,7 @@ pub fn read_with_view(
             .or_insert(*seq);
     }
     for tip in tips.iter().filter(|t| t.mirror && !unchanged(t)) {
-        let mirror_stops = if req.cursor.mirror_tips.contains_key(&tip.name) {
+        let mirror_stops = if retained_cursor.mirror_tips.contains_key(&tip.name) {
             certificates.clone()
         } else {
             BTreeSet::new()
@@ -325,7 +472,7 @@ pub fn read_with_view(
         )?;
         walk::own_origin_bounded(&mirror.published, req.origin, &bounds)?;
     }
-    let mut union = req.folded.to_vec();
+    let mut union = retained_events.to_vec();
     union.extend(local);
     union.extend(walked.events.iter().cloned());
     let mut promoted: BTreeMap<String, u64> = BTreeMap::new();
@@ -414,7 +561,7 @@ pub fn read_with_view(
         .collect();
     // Coverage cannot stand in for a lost consumer view. The full sequence was
     // recovered above, but the coverage-relative delta cannot rebuild that view.
-    let fold = if have_history {
+    let fold = if caller_has_history {
         fold_answer(
             req.cursor,
             &cursor,
@@ -445,6 +592,7 @@ pub fn read_with_view(
         cursor,
         fold,
         full_order,
+        checkpoint: CheckpointReport::default(),
     })
 }
 

@@ -229,6 +229,7 @@ fn legacy_is_distributed_only_at_the_tracked_fence_pin() {
             machine: &a.machine,
             remote: "origin",
             no_push: false,
+            opportunistic: false,
             held_ranks: &[],
             hot_lock_depth: 0,
         },

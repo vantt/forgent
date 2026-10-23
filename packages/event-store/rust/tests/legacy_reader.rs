@@ -170,3 +170,34 @@ fn the_tracked_fence_and_legacy_inventory_are_read_once_per_head_commit_however_
         "the moved HEAD lists its legacy roots once more"
     );
 }
+#[test]
+fn every_legacy_file_of_a_commit_is_read_through_one_git_read_however_many_files_it_holds() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    let p = f.port(&mut h, "refs/fgos/events/test-aa");
+    let line = |seq: u32| format!("{{\"ts\":\"2026-01-01T00:00:{seq:02}.000Z\",\"seq\":{seq}}}\n");
+    let files: Vec<(String, Vec<u8>)> =
+        std::iter::once(("events.jsonl".to_owned(), line(1).into_bytes()))
+            .chain((2..=9).map(|n| (format!("events/part-{n}.jsonl"), line(n).into_bytes())))
+            .collect();
+    let borrowed: Vec<(&str, &[u8])> = files
+        .iter()
+        .map(|(p, b)| (p.as_str(), b.as_slice()))
+        .collect();
+    tracked_head_files(&f, &p, &borrowed);
+    let counting = CountingPort::new(&p);
+    let streams = [StreamId::parse("project").unwrap()];
+    let got = read(
+        &counting,
+        &f.repo,
+        request(&f, &streams, &Cursor::default()),
+    )
+    .unwrap();
+    assert_eq!(got.legacy.len(), 9, "every legacy file is read");
+    assert_eq!(counting.single.get(), 0);
+    assert_eq!(
+        counting.many.get() - counting.fence.get(),
+        1,
+        "nine files are one request, apart from the one fence lookup"
+    );
+}

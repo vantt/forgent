@@ -28,19 +28,35 @@ pub fn blob(
     oid: &Oid,
     path: &[u8],
 ) -> Result<Option<Vec<u8>>, Error> {
-    let mut values = port
-        .read_paths_at(repo, oid, &[path.to_vec()], 32 * 1024 * 1024)
-        .map_err(git_error)?;
-    match values
-        .pop()
-        .ok_or_else(|| invalid("missing path observation"))?
-        .value
-    {
-        PathValue::Blob(b) => Ok(Some(b)),
-        PathValue::Absent => Ok(None),
-        PathValue::Error(e) => Err(git_error(e)),
-        PathValue::NotABlob(_) => Err(invalid("expected blob")),
+    Ok(blobs(port, repo, oid, &[path.to_vec()])?.pop().flatten())
+}
+/// The blobs at `paths` of one commit, in order, through one Git process;
+/// `None` for a path the commit does not have.
+pub fn blobs(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    oid: &Oid,
+    paths: &[Vec<u8>],
+) -> Result<Vec<Option<Vec<u8>>>, Error> {
+    if paths.is_empty() {
+        return Ok(Vec::new());
     }
+    let mut answers = port
+        .read_paths_at_many(repo, &[(oid.clone(), paths.to_vec())], 32 * 1024 * 1024)
+        .map_err(git_error)?;
+    let values = match (answers.pop(), answers.is_empty()) {
+        (Some(values), true) if values.len() == paths.len() => values,
+        _ => return Err(invalid("path observations do not match the paths read")),
+    };
+    values
+        .into_iter()
+        .map(|read| match read.value {
+            PathValue::Blob(b) => Ok(Some(b)),
+            PathValue::Absent => Ok(None),
+            PathValue::Error(e) => Err(git_error(e)),
+            PathValue::NotABlob(_) => Err(invalid("expected blob")),
+        })
+        .collect()
 }
 pub fn header(port: &dyn Inspect, repo: &RepoHandle, oid: &Oid) -> Result<Seal, Error> {
     let bytes = blob(port, repo, oid, b"seal.json")?
@@ -59,6 +75,9 @@ pub struct Walked {
     pub events: Vec<Envelope>,
     pub published: Positions,
     pub visited: BTreeSet<String>,
+    /// The certified commits the walk met as the parent of a commit it read:
+    /// proof that the tip descends from them.
+    pub stops_reached: BTreeSet<String>,
 }
 /// Commits whose blobs one `read_paths_at_many` call returns.
 const READ_GROUP: usize = 64;
@@ -133,6 +152,13 @@ fn walk_inner(
             .map_err(git_error)?;
         let mut pending = Vec::new();
         for commit in page.commits {
+            out.stops_reached.extend(
+                commit
+                    .parents
+                    .iter()
+                    .filter(|p| certified.contains(p.as_str()))
+                    .map(|p| p.as_str().to_owned()),
+            );
             if !out.visited.insert(commit.oid.as_str().into()) {
                 continue;
             }
