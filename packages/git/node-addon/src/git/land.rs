@@ -61,6 +61,16 @@ fn answer(env: Env, outcome: std::result::Result<Value, Failure>) -> Result<JsOb
     deferred.resolve(move |_| into_napi(outcome));
     Ok(promise)
 }
+/// The one rule for a call that panics: the port goes back to idle and the call fails by name.
+fn guarded(
+    state: &Mutex<State>,
+    job: impl FnOnce() -> std::result::Result<Value, Failure>,
+) -> std::result::Result<Value, Failure> {
+    std::panic::catch_unwind(std::panic::AssertUnwindSafe(job)).unwrap_or_else(|_| {
+        *slot(state) = State::Idle;
+        Err(Failure::Text("land-worker-failed"))
+    })
+}
 /// Runs a call on its own thread so a wait never blocks the event loop, and
 /// returns the promise it settles. A worker that panics leaves the port idle.
 fn spawn(
@@ -73,11 +83,7 @@ fn spawn(
     let spawned = std::thread::Builder::new()
         .name("fgos-land".into())
         .spawn(move || {
-            let outcome = std::panic::catch_unwind(std::panic::AssertUnwindSafe(job))
-                .unwrap_or_else(|_| {
-                    *slot(&owned) = State::Idle;
-                    Err(Failure::Text("land-worker-failed"))
-                });
+            let outcome = guarded(&owned, job);
             deferred.resolve(move |_| into_napi(outcome));
         });
     if let Err(e) = spawned {
@@ -164,7 +170,7 @@ impl GitLand {
             }
         };
         if held_here {
-            return answer(env, job(held));
+            return answer(env, guarded(&self.state, || job(held)));
         }
         spawn(env, &self.state, move || job(Vec::new()))
     }
