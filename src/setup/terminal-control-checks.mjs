@@ -11,8 +11,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { createTerminalControl } from '../terminal-control/client.mjs';
-import { resolveTerminalConfig, terminalConfigProblems } from '../terminal-control/config.mjs';
+import { createTerminalControl, TerminalControlError } from '../terminal-control/client.mjs';
+import { resolveTerminalConfig, terminalConfigProblems, terminalRouteConfig } from '../terminal-control/config.mjs';
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { READY_TIMEOUT_MS } from '../runner/dispatch/herdr-deadlines.mjs';
@@ -77,20 +77,41 @@ export function checkTerminalControl({ env = process.env, terminalControl, platf
 
 /**
  * terminal-config: `terminal.*` after the merge (project over global over
- * default), each value with its source; a value that breaks a rule fails by name.
+ * default), each value with its source. The core refuses a layout value it
+ * cannot run with and names it; the two rules only Node can judge are checked here.
  */
-export function checkTerminalConfig(repoRoot, { globalConfigPath } = {}) {
-  let resolved;
+export function checkTerminalConfig(repoRoot, { globalConfigPath, createClient = (config) => createTerminalControl({ herdrBin: resolveHerdrBin(), config }) } = {}) {
+  const root = path.resolve(repoRoot);
+  let explicit;
   try {
-    resolved = resolveTerminalConfig(path.resolve(repoRoot), { globalConfigPath });
+    resolveTerminalConfig(root, { globalConfigPath });
+    explicit = terminalRouteConfig(root, { globalConfigPath });
   } catch (err) {
     return { passed: false, message: `terminal.* unreadable: ${err.message}` };
   }
+  const ask = (config) => createClient(config).capabilities();
+  let report;
+  let refused = null;
+  try {
+    try {
+      report = ask(explicit);
+    } catch (err) {
+      if (!isConfigRefusal(err)) throw err;
+      refused = `${err.routeMessage} (${err.code})`;
+      report = ask({});
+    }
+  } catch (err) {
+    return { passed: true, message: `warning: the terminal-control route did not answer, so terminal.* cannot be judged here (${err.message})` };
+  }
+  const resolved = resolveTerminalConfig(root, { globalConfigPath, defaults: report.defaults });
   const problems = terminalConfigProblems(resolved.values, { readyTimeoutMs: READY_TIMEOUT_MS });
+  if (refused) problems.push(`the core refused the layout: ${refused}`);
   if (problems.length > 0) return { passed: false, message: problems.join('; ') };
   const shown = resolved.entries.map(({ name, value, source }) => `${name}=${JSON.stringify(value)} (${source})`).join(', ');
   return { passed: true, message: shown };
 }
+
+const isConfigRefusal = (err) => err instanceof TerminalControlError && ['terminal-control-route-usage', 'terminal-config-below-floor'].includes(err.code);
 
 const FINDING_TEXT = {
   'allocated-not-launched-bare-shell': 'a slot was allocated but never launched and its pane is a bare shell',
@@ -104,9 +125,16 @@ const FINDING_TEXT = {
  * retained panes past their time. Reports only; nothing is closed.
  */
 export function checkTerminalAllocations(repoRoot, { globalConfigPath, terminalControl } = {}) {
+  const tc = terminalControl ?? createTerminalControl({ herdrBin: resolveHerdrBin() });
+  let defaults;
+  try {
+    ({ defaults } = tc.capabilities());
+  } catch (err) {
+    return { passed: true, message: `warning: the terminal-control route did not answer, allocations not scanned (${err.message})` };
+  }
   let grace;
   try {
-    grace = resolveTerminalConfig(path.resolve(repoRoot), { globalConfigPath }).values.allocationGraceMs;
+    grace = resolveTerminalConfig(path.resolve(repoRoot), { globalConfigPath, defaults }).values.allocationGraceMs;
   } catch (err) {
     return { passed: true, message: `warning: terminal.* unreadable, allocations not scanned: ${err.message}` };
   }
@@ -115,7 +143,7 @@ export function checkTerminalAllocations(repoRoot, { globalConfigPath, terminalC
   }
   let scan;
   try {
-    scan = (terminalControl ?? createTerminalControl({ herdrBin: resolveHerdrBin() })).reconcileScan({ olderThanMs: grace });
+    scan = tc.reconcileScan({ olderThanMs: grace });
   } catch (err) {
     return { passed: true, message: `warning: the terminal-control route did not answer, allocations not scanned (${err.message})` };
   }

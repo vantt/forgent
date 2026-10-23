@@ -152,12 +152,12 @@ fn core_config(envelope: &Value) -> Result<(CoreConfig, Box<dyn PlacementPolicy>
     let number = |name: &str, default: u64| -> Result<u64, String> {
         match config.get(name) {
             None | Some(Value::Null) => Ok(default),
-            Some(v) => v.as_u64().ok_or_else(|| format!("config.{name} needs a non-negative integer")),
+            Some(v) => v.as_u64().ok_or_else(|| format!("config.{name} needs a non-negative integer, got {v}")),
         }
     };
     let limit = |name: &str, default: u32, floor: u32| -> Result<u32, ConfigRefusal> {
         let n = number(name, default as u64)?;
-        let n = u32::try_from(n).ok().filter(|n| *n >= 1).ok_or_else(|| format!("config.{name} needs an integer >= 1"))?;
+        let n = u32::try_from(n).ok().filter(|n| *n >= 1).ok_or_else(|| format!("config.{name} needs an integer >= 1, got {n}"))?;
         if n < floor {
             let message = format!("layout.{name}={n} < {floor}, the measured floor: the agent CLIs were not shown to start in a pane that small");
             return Err(ConfigRefusal { code: CODE_BELOW_FLOOR, message });

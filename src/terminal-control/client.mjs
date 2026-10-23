@@ -74,8 +74,9 @@ function interpret({ status, signal, stdout, stderr, error, timedOut }, bin, op)
     throw new TerminalControlError('terminal-control-route-bad-output', `${bin} terminal-control ${op} answered non-JSON: ${text.slice(0, 200)}`);
   }
   if (line.result === 'error') {
-    if (line.code === 'host-version-mismatch') throw new TerminalControlError('host-version-mismatch', `${bin} terminal-control ${op}: ${line.message}`);
-    throw new TerminalControlError('terminal-control-route-usage', `${bin} terminal-control ${op}: ${line.message}`);
+    // The route's own refusal codes keep their name; everything else it refuses is a usage error.
+    const code = line.code === 'host-version-mismatch' || String(line.code).startsWith('terminal-config-') ? line.code : 'terminal-control-route-usage';
+    throw new TerminalControlError(code, `${bin} terminal-control ${op}: ${line.message}`, { routeMessage: line.message });
   }
   const { v, protocol, op: _op, ...result } = line;
   if (typeof result.result !== 'string') {
@@ -100,7 +101,7 @@ export function createTerminalControl({ hostBin, herdrBin, env, config, timeoutM
   const bin = () => hostBin ?? activeHostBin();
 
   const prepare = (op, request) => {
-    const envelope = { v: PROTOCOL, driver: 'herdr', request };
+    const envelope = { v: PROTOCOL, driver: 'herdr', timeoutMs, request };
     if (herdrBin) envelope.herdrBin = herdrBin;
     if (env) envelope.env = env;
     if (config) envelope.config = config;

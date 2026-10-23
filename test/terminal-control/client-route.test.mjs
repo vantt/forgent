@@ -12,6 +12,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createTerminalControl, TerminalControlError } from '../../src/terminal-control/client.mjs';
+import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const HOST_BIN = process.env.FGOS_HOST_BIN;
@@ -56,6 +57,15 @@ test('every operation of the port answers through the route', () => {
   }
   assert.equal(capabilities.serverIncarnation.endpoint, socketPath);
   assert.equal(capabilities.serverIncarnation.pid, process.pid);
+  // The core's own defaults and policy registry are what setup writes and the contract names.
+  const { layout, allocationGraceMs } = DEFAULT_TERMINAL_CONFIG;
+  assert.deepEqual(
+    { minCols: layout.minCols, minRows: layout.minRows, maxPanesPerTab: layout.maxPanesPerTab, policy: layout.policy, allocationGraceMs },
+    { minCols: capabilities.defaults.minCols, minRows: capabilities.defaults.minRows, maxPanesPerTab: capabilities.defaults.maxPanesPerTab, policy: capabilities.defaults.policy, allocationGraceMs: capabilities.defaults.allocationGraceMs },
+  );
+  const placement = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'packages/terminal-control/contracts/placement-policy.v1.json'), 'utf8'));
+  assert.deepEqual(capabilities.policies, placement.registry.names);
+  assert.equal(capabilities.defaults.policy, placement.registry.default);
 
   const slot = tc.allocate({ key: 'k-one', groupKey: 'g-one', display });
   assert.equal(slot.result, 'slot');
