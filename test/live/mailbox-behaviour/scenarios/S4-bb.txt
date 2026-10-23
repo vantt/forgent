@@ -1,0 +1,1 @@
+To message another agent, run: fgos mailbox send --to <name> [--wake] "<text>". You prefer spaces for indentation in this project. Agent {peer} prefers tabs. Settle the question with {peer} by mailbox messages, sending with --wake, then tell me the result.
