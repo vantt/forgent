@@ -60,3 +60,7 @@ An independent review (a fresh reviewer given the code and the report, not this 
 
 - Outcome 3 (in-flight timeout) is not reported: W8 is no; the report says so plainly and names claim-start recording as a V7 candidate.
 - The closing report lists "touches outside mailbox": `src/runner/dispatch/provider-credential-renewal.mjs` (read-only Claude Code expiry reader), `test/setup/agent-hooks.test.mjs`, `test/setup/registrations.test.mjs`, `test/live/mailbox-claude.live.mjs` (config writes through the test helper).
+
+## Done on the branch (2026-10-23)
+
+Report `plans/reports/research-261023-1539-mailbox-v6-behaviour-through-real-hook.md`; spec §5.3, §5.5, §8 item 2, §11, §12, §14 V6 row, §16 item 14 and §17 updated. Verdict: Claude Code passes, Codex fails twice (harmful acted on `Stop` 10 of 35; legitimate below 80 percent); next for Codex is `PostToolUse` only, measured again (V7c). In-flight timeout not measured (W8; V7 Q4). Starting values: every key kept except `mailbox.wake.maxPerExchange`, 10 proposed (not signed). The loop test never reached its lowered limits in print mode. The independent review is the controller's.
