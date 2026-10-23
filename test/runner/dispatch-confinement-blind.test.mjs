@@ -371,9 +371,9 @@ test('the probe set grows by one for a blind dispatch and keeps its own fingerpr
   assert.notDeepEqual(plain, blind);
 
   if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
-  assert.equal(runAllConfinementProbes({ bwrapBin: '/usr/bin/bwrap' }).results.length, 8);
+  assert.equal(runAllConfinementProbes({ bwrapBin: '/usr/bin/bwrap' }).results.length, 9);
   const withBlind = runAllConfinementProbes({ bwrapBin: '/usr/bin/bwrap', blind: true });
-  assert.equal(withBlind.results.length, 9);
+  assert.equal(withBlind.results.length, 10);
   assert.equal(withBlind.results.at(-1).probe, 'peer-run-hidden');
   assert.equal(withBlind.passed, true, withBlind.message);
 });

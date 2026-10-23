@@ -5589,13 +5589,13 @@ export function checkConfinementProbeFreshness() {
 
   return {
     passed: true,
-    message: 'confinement probe freshness: all 8 local-bwrap-v1 probes passed (fresh)',
+    message: `confinement probe freshness: all ${probeResult.results.length} local-bwrap-v1 probes passed (fresh)`,
   };
 }
 
 registerCheck({
   id: 'confinement-probe-freshness',
-  description: 'confinement probe freshness status (runs the 8-probe falsification harness against the registered bwrap backend)',
+  description: 'confinement probe freshness status (runs the falsification probe harness against the registered bwrap backend)',
   check: () => checkConfinementProbeFreshness(),
 });
 

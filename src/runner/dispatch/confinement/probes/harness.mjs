@@ -9,6 +9,8 @@
 //   6. no inherited writable fd survives outside explicit grant (MED-1 fix)
 //   7. executor credentials read-only
 //   8. host read and network not overclaimed
+//   9. machine-private roots hidden under every built-in policy (spec section 9.3)
+//   10. (blind dispatches only) a peer's run state hidden
 //
 // Every probe includes a RED FALSIFIER: a deliberately broken sandbox config
 // that the probe correctly catches and fails on.
@@ -19,7 +21,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { BWRAP_DRIVER_VERSION, prepareBwrapSync } from '../drivers/bwrap.mjs';
-import { resolveConfinementResources } from '../resources.mjs';
+import { MACHINE_PRIVATE_ROOTS, resolveConfinementResources } from '../resources.mjs';
+import { BUILTIN_POLICIES, BUILTIN_POLICY_IDS } from '../policies.mjs';
 
 export const PROOF_PROFILE = 'local-bwrap-v1';
 
@@ -56,6 +59,7 @@ export function computeProbeFingerprint({
     backendConfigDigest,
     platformDigest,
     proofProfile: PROOF_PROFILE,
+    machinePrivate: crypto.createHash('sha256').update(JSON.stringify(MACHINE_PRIVATE_ROOTS)).digest('hex'),
     ...(blind ? { blind: true } : {}),
   };
 }
@@ -545,8 +549,113 @@ export function probePeerRunHidden({ bwrapBin = '/usr/bin/bwrap', scratchDir, br
 }
 
 /**
- * Run all 8 probes against a bwrap executable and test directory. A blind dispatch adds a
- * ninth, probePeerRunHidden.
+ * Probe 9: machine-private roots (spec section 9.3) are hidden from a worker under every
+ * built-in policy, and under `hostRead: blind` as well when `blind` is set. The home is a
+ * stand-in in the scratch directory, handed to the real resolver and to the worker alike, with a
+ * file planted where the driver masks; the argv comes from the real prepareBwrap. The worker
+ * must find neither file and an empty directory, still write its outbox, and see its workspace
+ * the way the policy grants it.
+ *
+ * RED FALSIFIER (`brokenConfig`): the same plans without their machine-private masks must let the
+ * worker read the planted files.
+ */
+export function probeMachinePrivateHidden({ bwrapBin = '/usr/bin/bwrap', scratchDir, blind = false, brokenConfig = false } = {}) {
+  // The sandbox starts with an empty /tmp, which would hide a planted file by itself and let the probe
+  // pass without the mask: the stand-in home must live where the sandbox sees the host.
+  const scratch = fs.realpathSync(scratchDir);
+  const ownsRoot = scratch === '/tmp' || scratch.startsWith('/tmp/');
+  const root = ownsRoot ? fs.mkdtempSync('/var/tmp/fgos-machine-private-probe-') : scratch;
+  try {
+    return probeMachinePrivateHiddenIn({ bwrapBin, root, blind, brokenConfig });
+  } finally {
+    if (ownsRoot) fs.rmSync(root, { recursive: true, force: true });
+  }
+}
+
+function probeMachinePrivateHiddenIn({ bwrapBin, root, blind, brokenConfig }) {
+  const home = path.join(root, 'home');
+  const privateDir = path.join(home, '.fgos', 'private');
+  const planted = [path.join(privateDir, 'accounts.yaml'), path.join(privateDir, 'gateway-token')];
+  fs.mkdirSync(privateDir, { recursive: true });
+  for (const file of planted) fs.writeFileSync(file, 'PLANTED');
+
+  const failures = [];
+  const variants = BUILTIN_POLICY_IDS.flatMap((policyId) => (blind ? [[policyId, false], [policyId, true]] : [[policyId, false]]));
+  for (const [policyId, blindVariant] of variants) {
+    const label = `${policyId}${blindVariant ? '+blind' : ''}`;
+    const dir = path.join(root, label.replace('+', '-'));
+    const project = path.join(dir, 'project');
+    const fgosDir = path.join(project, '.fgos');
+    const ownDir = path.join(fgosDir, 'assignments', 'probe-unit', 'self', '1');
+    const runDir = path.join(ownDir, 'runs', '01');
+    const outboxFile = path.join(runDir, 'worker-output', 'outbox', 'probe-out.txt');
+    const workspaceFile = path.join(project, 'probe-workspace.txt');
+    const credsDir = path.join(dir, 'creds');
+    for (const d of [path.dirname(outboxFile), credsDir]) fs.mkdirSync(d, { recursive: true });
+    fs.writeFileSync(path.join(ownDir, 'brief.md'), 'OWN');
+    const grants = BUILTIN_POLICIES[policyId].grants;
+
+    const resources = resolveConfinementResources({
+      dispatchId: `probe-machine-private-${label.replace('+', '-')}`,
+      context: { cwd: project, repoRoot: project, runDir, fgosDir, assignmentLaunchContext: {} },
+      grants,
+      backendConfig: { tempRoot: path.join(dir, 'confinement-temp') },
+      providerSources: { credentialsPath: credsDir },
+      blind: blindVariant,
+      homeDir: home,
+    }).filter((res) => !(brokenConfig && res.machinePrivate));
+
+    const script = `
+      const fs = require('fs');
+      const code = (fn) => { try { fn(); return 'ok'; } catch (e) { return e.code; } };
+      process.stdout.write(JSON.stringify({
+        accounts: code(() => fs.readFileSync(${JSON.stringify(planted[0])})),
+        token: code(() => fs.readFileSync(${JSON.stringify(planted[1])})),
+        entries: (() => { try { return fs.readdirSync(${JSON.stringify(privateDir)}).length; } catch (e) { return e.code; } })(),
+        outbox: code(() => fs.writeFileSync(${JSON.stringify(outboxFile)}, 'WRITTEN')),
+        workspace: code(() => fs.writeFileSync(${JSON.stringify(workspaceFile)}, 'WRITTEN')),
+      }));
+    `;
+    const request = {
+      dispatchId: `probe-machine-private-${label.replace('+', '-')}`,
+      ...(blindVariant ? { override: { controls: { hostRead: 'blind' } } } : {}),
+      invocation: { command: 'node', args: ['-e', script], env: {} },
+      context: { cwd: project, repoRoot: project, runDir, fgosDir },
+    };
+    const prepared = prepareBwrapSync({ resources }, request, { id: 'bwrap', config: { executable: bwrapBin } });
+    const res = cp.spawnSync(prepared.invocation.command, prepared.invocation.args, { encoding: 'utf8' });
+
+    let seen = null;
+    try {
+      seen = JSON.parse(res.stdout);
+    } catch {
+      // seen stays null: the worker never reported
+    }
+    const workspaceWritable = grants.some((g) => g.resource === 'workspace' && g.access !== 'read');
+    const outboxHostSide = fs.existsSync(outboxFile) && fs.readFileSync(outboxFile, 'utf8') === 'WRITTEN';
+    const ok = Boolean(seen)
+      && seen.accounts === 'ENOENT'
+      && seen.token === 'ENOENT'
+      && seen.entries === 0
+      && seen.outbox === 'ok'
+      && outboxHostSide
+      && (workspaceWritable ? seen.workspace === 'ok' : seen.workspace === 'EROFS');
+    if (!ok) failures.push(`${label}: ${seen ? JSON.stringify(seen) : (res.stderr || 'worker reported nothing')}`);
+  }
+
+  const passed = failures.length === 0;
+  return {
+    probe: 'machine-private-hidden',
+    passed,
+    detail: passed
+      ? `a worker under ${variants.length} policy and hostRead combinations cannot read a machine-private directory and keeps its outbox and workspace`
+      : `machine-private probe failed: ${failures.join('; ')}`,
+  };
+}
+
+/**
+ * Run all 9 probes against a bwrap executable and test directory. A blind dispatch adds a
+ * tenth, probePeerRunHidden, and its machine-private probe also covers `hostRead: blind`.
  */
 export function runAllConfinementProbes({
   bwrapBin = '/usr/bin/bwrap',
@@ -575,7 +684,8 @@ export function runAllConfinementProbes({
     const hostFile = path.join(tempRoot, 'host-fd-test.txt');
     const credsDir = path.join(tempRoot, 'creds');
 
-    for (const d of [runDir, targetDir, wsDir, outsideDir, otherRunDir, hostHomeDir, privateHomeDir, credsDir]) {
+    const machinePrivateDir = path.join(tempRoot, 'machine-private');
+    for (const d of [runDir, targetDir, wsDir, outsideDir, otherRunDir, hostHomeDir, privateHomeDir, credsDir, machinePrivateDir]) {
       fs.mkdirSync(d, { recursive: true });
     }
 
@@ -588,6 +698,7 @@ export function runAllConfinementProbes({
       probeNoInheritedWritableFd({ bwrapBin, hostFile }),
       probeExecutorCredentialsReadOnly({ bwrapBin, credsDir }),
       probeHostReadAndNetworkNotOverclaimed({ bwrapBin }),
+      probeMachinePrivateHidden({ bwrapBin, scratchDir: machinePrivateDir, blind }),
     ];
     if (blind) {
       const blindDir = path.join(tempRoot, 'blind');

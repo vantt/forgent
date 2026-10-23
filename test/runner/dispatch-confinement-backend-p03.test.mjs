@@ -1072,11 +1072,11 @@ test('R7: probe 8 (host read and network not overclaimed) passes on valid sandbo
   assert.equal(red.passed, false, 'probe correctly detected overclaimed network denial');
 });
 
-test('R7: runAllConfinementProbes runs all 8 probes and succeeds on Linux', () => {
+test('R7: runAllConfinementProbes runs all 9 probes and succeeds on Linux', () => {
   if (!HAS_WORKING_BWRAP) return;
   const result = runAllConfinementProbes();
   assert.equal(result.passed, true);
-  assert.equal(result.results.length, 8);
+  assert.equal(result.results.length, 9);
   for (const r of result.results) {
     assert.equal(r.passed, true, `probe "${r.probe}" failed: ${r.detail}`);
   }
@@ -1091,7 +1091,7 @@ test('R8: checkConfinementProbeFreshness in doctor passes on Linux with working 
   const check = checkConfinementProbeFreshness();
   assert.equal(check.passed, true);
   if (os.platform() === 'linux') {
-    assert.match(check.message, /all 8 local-bwrap-v1 probes passed/);
+    assert.match(check.message, /all 9 local-bwrap-v1 probes passed/);
   }
 });
 
