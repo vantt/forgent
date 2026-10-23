@@ -20,6 +20,8 @@ are added as the phases that own them land.
 | `scope.v1.json` | `tests/golden_scope.rs` | which file may hold which key: scope, ancestors, wildcards, file placement |
 | `snapshot.v1.json` | `tests/golden_snapshot.rs` | the snapshot: ladder, merge rules, provenance, trusted root, confined accounts, detected values, refusals |
 | `write.v1.json` | `tests/write_golden.rs` | the write transaction's edit semantics: byte fidelity, comment blocks, redundancy, refusals and their order, modes (locking and races: `tests/write_concurrency.rs`) |
+| `no-echo.v1.json` | `tests/golden_no_echo.rs` | sentinels beside a fault: no refusal, finding or display form echoes a value; `<redacted>` in the display form |
+| `failure-matrix.v1.json` | `tests/failure_matrix.rs` | coverage only: the owning proof of each failure id that no fixture case expects |
 
 `json-schema-suite/` is the official JSON-Schema-Test-Suite (draft 2020-12), vendored verbatim for the
 keywords fgOS schemas use; see its README. It is run by `tests/validator_acceptance.rs` and is not

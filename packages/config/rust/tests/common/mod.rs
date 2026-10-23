@@ -106,3 +106,70 @@ pub fn lay_out(dir: &Path, input: &Value) -> SnapshotRequest {
         },
     }
 }
+
+/// The section schemas and standard layer a fixture states at its top.
+pub fn schemas_and_standard(
+    fixture: &Value,
+) -> (
+    fgos_config::schema::Schemas,
+    fgos_config::standard::Standard,
+) {
+    let schema_files = files(&fixture["schemas"], true);
+    let schemas = fgos_config::schema::Schemas::parse(&refs(&schema_files)).expect("schemas");
+    let standard_files = files(&fixture["standard"], false);
+    let standard =
+        fgos_config::standard::Standard::parse(&refs(&standard_files), &schemas).expect("standard");
+    (schemas, standard)
+}
+
+/// The write of a case: its target, the revision it was computed against (`current`, `absent` or
+/// `stale`), edits, reason and acknowledgement. Also the file the target is.
+#[cfg(unix)]
+pub fn write_request(
+    dir: &Path,
+    input: &Value,
+    roots: SnapshotRequest,
+) -> (fgos_config::write::WriteRequest, &'static str) {
+    use fgos_config::scope::SourceKind;
+    use fgos_config::write::{Edit, WriteRequest};
+    use sha2::{Digest, Sha256};
+    let (target, file) = match input["target"].as_str() {
+        Some("global") => (SourceKind::Global, "home/.fgos/config.yaml"),
+        Some("accounts") => (SourceKind::Accounts, "home/.fgos/private/accounts.yaml"),
+        _ => (SourceKind::Project, "project/.fgos/config.yaml"),
+    };
+    let expected = match input["expected"].as_str() {
+        Some("absent") => None,
+        Some("stale") => Some("0".repeat(64)),
+        _ => std::fs::read(dir.join(file))
+            .ok()
+            .map(|bytes| format!("{:x}", Sha256::digest(bytes))),
+    };
+    let path = |p: &Value| match p.as_str().expect("path") {
+        "" => Vec::new(),
+        text => fgos_yaml_doc::path::parse_path(text).expect("path text"),
+    };
+    let edit = |e: &Value| match e.get("unset") {
+        Some(p) => Edit::Unset { path: path(p) },
+        None => Edit::Set {
+            path: path(&e["set"]),
+            value: e["value"].clone(),
+        },
+    };
+    let request = WriteRequest {
+        roots,
+        lock_root: dir.join("locks"),
+        target,
+        expected,
+        edits: input["edits"]
+            .as_array()
+            .expect("edits")
+            .iter()
+            .map(edit)
+            .collect(),
+        reason: input["reason"].as_str().expect("reason").to_string(),
+        acknowledge_comment_loss: input["ack"] == true,
+        lock_wait_ms: 2000,
+    };
+    (request, file)
+}

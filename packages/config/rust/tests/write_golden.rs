@@ -9,14 +9,10 @@ use std::fs;
 use std::os::unix::fs::{symlink, PermissionsExt};
 use std::path::Path;
 
-use common::{files, refs, text};
+use common::text;
 use fgos_config::detect::NoDetectors;
-use fgos_config::schema::Schemas;
-use fgos_config::scope::SourceKind;
 use fgos_config::snapshot::{Context, SnapshotError};
-use fgos_config::standard::Standard;
-use fgos_config::write::{commit, Edit, WriteRequest};
-use fgos_yaml_doc::path::parse_path;
+use fgos_config::write::commit;
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 
@@ -51,33 +47,10 @@ fn mode(path: &Path) -> u32 {
     fs::metadata(path).unwrap().permissions().mode() & 0o777
 }
 
-fn edits(list: &Value) -> Vec<Edit> {
-    let path = |p: &Value| match p.as_str().unwrap() {
-        "" => Vec::new(),
-        text => parse_path(text).unwrap(),
-    };
-    list.as_array()
-        .unwrap()
-        .iter()
-        .map(|e| match e.get("unset") {
-            Some(p) => Edit::Unset { path: path(p) },
-            None => Edit::Set {
-                path: path(&e["set"]),
-                value: e["value"].clone(),
-            },
-        })
-        .collect()
-}
-
 #[test]
 fn write_cases() {
     let fixture = common::fixture("write.v1.json");
-    let (schema_files, standard_files) = (
-        files(&fixture["schemas"], true),
-        files(&fixture["standard"], false),
-    );
-    let schemas = Schemas::parse(&refs(&schema_files)).unwrap();
-    let standard = Standard::parse(&refs(&standard_files), &schemas).unwrap();
+    let (schemas, standard) = common::schemas_and_standard(&fixture);
     let ctx = Context {
         schemas: &schemas,
         standard: &standard,
@@ -105,28 +78,7 @@ fn write_cases() {
             )
             .unwrap();
         }
-        let (target, file) = match input["target"].as_str() {
-            Some("global") => (SourceKind::Global, "home/.fgos/config.yaml"),
-            Some("accounts") => (SourceKind::Accounts, "home/.fgos/private/accounts.yaml"),
-            _ => (SourceKind::Project, "project/.fgos/config.yaml"),
-        };
-        let expected = match input["expected"].as_str() {
-            Some("absent") => None,
-            Some("stale") => Some("0".repeat(64)),
-            _ => fs::read(dir.join(file))
-                .ok()
-                .map(|bytes| format!("{:x}", Sha256::digest(bytes))),
-        };
-        let req = WriteRequest {
-            roots,
-            lock_root: dir.join("locks"),
-            target,
-            expected,
-            edits: edits(&input["edits"]),
-            reason: input["reason"].as_str().unwrap().to_string(),
-            acknowledge_comment_loss: input["ack"] == true,
-            lock_wait_ms: 2000,
-        };
+        let (req, file) = common::write_request(&dir, input, roots);
         let before = tree(&dir);
         let got = commit(&ctx, &req, &common::writer(&input["writer"]));
         let refused = want.get("code").or(want.get("yaml")).is_some();

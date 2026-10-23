@@ -1,0 +1,557 @@
+{
+ "version": 1,
+ "about": "No error, finding or display form echoes a value (docs/platform/config/spec.md section 9). Each case lays files out as the snapshot fixture does, puts two sentinels beside the fault (kind `snapshot`, `write` or `render`) and checks that the Display, Debug and pretty-Debug of every refusal, and the display form of a snapshot, contain no byte of either. A line holding @PAD@ is filled with `pad` letters. Expect: code (a refusal), or redacted (paths shown as <redacted>) and kept (paths shown as stored).",
+ "schemas": {
+  "vault": [
+   "type: object",
+   "properties:",
+   "  token: {type: string, x-fgos-sensitivity: secret-value}",
+   "  ref: {type: string, x-fgos-sensitivity: secret-reference}",
+   "  port: {type: integer}"
+  ],
+  "gateway": [
+   "type: object",
+   "x-fgos-scope: global-only",
+   "properties:",
+   "  token: {type: string, x-fgos-sensitivity: secret-value}"
+  ],
+  "limits": [
+   "type: object",
+   "properties:",
+   "  count: {type: integer, minimum: 1}"
+  ],
+  "gateBypass": [
+   "type: object",
+   "properties:",
+   "  level: {type: string, enum: [off, light, standard, heavy]}"
+  ],
+  "accounts": [
+   "type: object",
+   "x-fgos-file: accounts",
+   "additionalProperties:",
+   "  type: object",
+   "  properties:",
+   "    login: {type: string, x-fgos-sensitivity: secret-reference}"
+  ]
+ },
+ "standard": {},
+ "cases": [
+  {
+   "id": "echo-syntax-error-next-to-an-account-entry",
+   "why": "spec 9: the break sits beside an account entry in accounts.yaml",
+   "input": {
+    "kind": "snapshot",
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "accounts:",
+      "  pool:",
+      "    login: SENTINEL-eee65f53e942",
+      "  broken: [{t}"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-eee65f53e942",
+     "SENTINEL-1ce50211670e"
+    ],
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-parse"
+   }
+  },
+  {
+   "id": "echo-type-mismatch-beside-a-global-secret",
+   "why": "spec 9: the wrong value and its neighbour are both sentinels",
+   "input": {
+    "kind": "snapshot",
+    "files": {
+     "home/.fgos/config.yaml": [
+      "vault:",
+      "  token: SENTINEL-ae679f02e8d2",
+      "  port: SENTINEL-8a79023c39c2"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-ae679f02e8d2",
+     "SENTINEL-8a79023c39c2"
+    ],
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-schema"
+   }
+  },
+  {
+   "id": "echo-enum-violation-in-the-project-file",
+   "why": "spec 9",
+   "input": {
+    "kind": "snapshot",
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  level: SENTINEL-00661fccd268"
+     ],
+     "home/.fgos/config.yaml": [
+      "vault:",
+      "  token: SENTINEL-a29a0d347301"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-00661fccd268",
+     "SENTINEL-a29a0d347301"
+    ],
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-schema"
+   }
+  },
+  {
+   "id": "echo-duplicate-key-with-sentinel-values",
+   "why": "spec 9",
+   "input": {
+    "kind": "snapshot",
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: SENTINEL-ef56e64dc3cd",
+      "  count: SENTINEL-6089065c3146"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-ef56e64dc3cd",
+     "SENTINEL-6089065c3146"
+    ],
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-parse"
+   }
+  },
+  {
+   "id": "echo-complex-key",
+   "why": "spec 9",
+   "input": {
+    "kind": "snapshot",
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  ? [SENTINEL-e80a9c222670]",
+      "  : SENTINEL-bbe4f4c54977"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-e80a9c222670",
+     "SENTINEL-bbe4f4c54977"
+    ],
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-parse"
+   }
+  },
+  {
+   "id": "echo-bidi-character-in-a-value",
+   "why": "spec 9",
+   "input": {
+    "kind": "snapshot",
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  level: ‮SENTINEL-656cf2d13318"
+     ],
+     "home/.fgos/config.yaml": [
+      "vault:",
+      "  token: SENTINEL-7c8df95247f2"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-656cf2d13318",
+     "SENTINEL-7c8df95247f2"
+    ],
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-parse"
+   }
+  },
+  {
+   "id": "echo-project-gateway-token-is-out-of-scope",
+   "why": "spec 3 and 9: the refused value is a secret",
+   "input": {
+    "kind": "snapshot",
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateway:",
+      "  token: SENTINEL-866028de7115",
+      "  other: SENTINEL-9b42b4ea410f"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-866028de7115",
+     "SENTINEL-9b42b4ea410f"
+    ],
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-key-out-of-scope"
+   }
+  },
+  {
+   "id": "echo-account-pool-in-the-project-file",
+   "why": "spec 3 and 9",
+   "input": {
+    "kind": "snapshot",
+    "files": {
+     "project/.fgos/config.yaml": [
+      "accounts:",
+      "  pool:",
+      "    login: SENTINEL-b9102f29a422",
+      "    other: SENTINEL-eb14ab2f2d0f"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-b9102f29a422",
+     "SENTINEL-eb14ab2f2d0f"
+    ],
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-key-in-wrong-file"
+   }
+  },
+  {
+   "id": "echo-merge-type-mismatch-between-layers",
+   "why": "spec 5 and 9",
+   "input": {
+    "kind": "snapshot",
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits: SENTINEL-0cc022238dac"
+     ],
+     "home/.fgos/config.yaml": [
+      "limits:",
+      "  count: 3",
+      "  note: SENTINEL-eee2092f073f"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-0cc022238dac",
+     "SENTINEL-eee2092f073f"
+    ],
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-schema"
+   }
+  },
+  {
+   "id": "echo-input-over-the-size-bound",
+   "why": "spec 9: the file is refused before a parse",
+   "input": {
+    "kind": "snapshot",
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: SENTINEL-f80b9465aef7",
+      "# @PAD@"
+     ],
+     "home/.fgos/config.yaml": [
+      "vault:",
+      "  token: SENTINEL-ac86d66c7a64"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-f80b9465aef7",
+     "SENTINEL-ac86d66c7a64"
+    ],
+    "pad": 1100000,
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-parse"
+   }
+  },
+  {
+   "id": "echo-scalar-over-the-size-bound",
+   "why": "spec 9",
+   "input": {
+    "kind": "snapshot",
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: SENTINEL-4fb12853ef86@PAD@"
+     ],
+     "home/.fgos/config.yaml": [
+      "vault:",
+      "  token: SENTINEL-dcfaea21818b"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-4fb12853ef86",
+     "SENTINEL-dcfaea21818b"
+    ],
+    "pad": 70000,
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-parse"
+   }
+  },
+  {
+   "id": "echo-both-formats-present",
+   "why": "spec 5 and 9",
+   "input": {
+    "kind": "snapshot",
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: SENTINEL-904ce6087413"
+     ],
+     "project/.fgos/config.json": [
+      "{\"limits\": {\"count\": \"SENTINEL-e3b266f850f1\"}}"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-904ce6087413",
+     "SENTINEL-e3b266f850f1"
+    ],
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-legacy-shadowed"
+   }
+  },
+  {
+   "id": "echo-secret-value-is-redacted-in-the-display-form",
+   "why": "spec 9 and acceptance 15: the in-process value carries it, the display form never does",
+   "input": {
+    "kind": "render",
+    "files": {
+     "home/.fgos/config.yaml": [
+      "vault:",
+      "  token: SENTINEL-578b5c72dc4e",
+      "  ref: SENTINEL-e60caea63367",
+      "  port: 7"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-578b5c72dc4e"
+    ],
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "redacted": [
+     "vault.token"
+    ],
+    "kept": {
+     "vault.port": 7
+    }
+   }
+  },
+  {
+   "id": "echo-reason-with-a-line-break",
+   "why": "spec 7 and 9: a refused reason is not echoed",
+   "input": {
+    "kind": "write",
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-c29a80b21ead",
+     "SENTINEL-8f062d15a4f4"
+    ],
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "SENTINEL-c29a80b21ead\n@fgos:why [x] SENTINEL-8f062d15a4f4",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
+   "id": "echo-write-with-a-mismatched-value",
+   "why": "spec 9",
+   "input": {
+    "kind": "write",
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-ef27e9589c69",
+     "SENTINEL-48f6d30c01c3"
+    ],
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": "SENTINEL-ef27e9589c69"
+     }
+    ],
+    "reason": "tune the limit for this repository",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-schema"
+   }
+  },
+  {
+   "id": "echo-write-of-a-value-with-hidden-text",
+   "why": "spec 9",
+   "input": {
+    "kind": "write",
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-f252edc87ff4",
+     "SENTINEL-adfa36d08401"
+    ],
+    "edits": [
+     {
+      "set": "vault.ref",
+      "value": "‮SENTINEL-f252edc87ff4"
+     }
+    ],
+    "reason": "tune the limit for this repository",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-parse"
+   }
+  },
+  {
+   "id": "echo-write-into-legacy-json",
+   "why": "D11 and spec 9",
+   "input": {
+    "kind": "write",
+    "files": {
+     "project/.fgos/config.json": [
+      "{\"a\": \"SENTINEL-64709ab7f3f3\", \"b\": \"SENTINEL-86d0cd566647\"}"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-64709ab7f3f3",
+     "SENTINEL-86d0cd566647"
+    ],
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "tune the limit for this repository",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-format-legacy-json"
+   }
+  },
+  {
+   "id": "echo-write-conflict-on-a-file-holding-secrets",
+   "why": "spec 6 and 9",
+   "input": {
+    "kind": "write",
+    "files": {
+     "home/.fgos/config.yaml": [
+      "vault:",
+      "  token: SENTINEL-b5aa66634742",
+      "  ref: SENTINEL-8c3dd46c036b"
+     ]
+    },
+    "sentinels": [
+     "SENTINEL-b5aa66634742",
+     "SENTINEL-8c3dd46c036b"
+    ],
+    "target": "global",
+    "expected": "stale",
+    "edits": [
+     {
+      "set": "vault.port",
+      "value": 9
+     }
+    ],
+    "reason": "tune the limit for this repository",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-write-conflict"
+   }
+  },
+  {
+   "id": "echo-write-of-a-project-gateway-secret",
+   "why": "spec 3 and 9",
+   "input": {
+    "kind": "write",
+    "files": {},
+    "sentinels": [
+     "SENTINEL-b3a62f301f46",
+     "SENTINEL-536559314e23"
+    ],
+    "expected": "absent",
+    "edits": [
+     {
+      "set": "gateway.token",
+      "value": "SENTINEL-b3a62f301f46"
+     }
+    ],
+    "reason": "tune the limit for this repository SENTINEL-536559314e23",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-key-out-of-scope"
+   }
+  }
+ ]
+}
