@@ -1,0 +1,64 @@
+{
+  "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
+  "gateId": "non-behavioral-census-join",
+  "status": "records-complete-judgments-open",
+  "independentApproval": false,
+  "noReadinessClaim": true,
+  "counts": {
+    "sites": 1126,
+    "files": 140,
+    "joinedOwningTest": 646,
+    "confirmedGradeRecordREJECT": 293,
+    "gradedTotal": 314,
+    "judgmentRequired": 187,
+    "judgmentFixtureSites": 159,
+    "judgmentGradeSites": 21,
+    "judgmentOtherSites": 7,
+    "currentNewLiteralSites": 84,
+    "postPinDeltaLiteralSites": 16,
+    "deltaJoinedYamlFixtureSlots": 3,
+    "deltaJudgmentRequired": 13
+  },
+  "touchedIds": {
+    "owningArtifact": "join.json",
+    "selector": "rows[*].id",
+    "count": 1126,
+    "uniqueAndExhaustiveAgainstRegister": true,
+    "residueSelector": "residue.json#rows[*].id",
+    "postPinLiteralSelector": "post-pin-literals.json#rows[*]",
+    "meaning": "New digest-bound custody rows only; original census/register/grades unchanged. The explicit exhaustive id list is in the owning artifact, not duplicated here."
+  },
+  "commands": [
+    {
+      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py", "--rescan"],
+      "exit": 0
+    },
+    {
+      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py"],
+      "exit": 0,
+      "evidence": "../preserve-premise/verification.json",
+      "proof": "Two isolated join runs, all three artifacts plus stdout byte-identical and equal to delivered bytes."
+    },
+    {
+      "argv": ["node", "--expose-internals", "plans/260925-documentation-authority-unification/reports/phase-09/census-join/test-locators.mjs"],
+      "exit": 0,
+      "invocation": "Called by join.py with pin and source-file list on stdin; syntax parsing only."
+    }
+  ],
+  "developmentFailures": [
+    {
+      "command": "python3 -B census-join/join.py --rescan (initial development version)",
+      "exit": 1,
+      "reason": "A removed source file was assumed present. Fixed by checking the tracked pin tree and leaving removed-source custody unresolved, never recreating the file."
+    }
+  ],
+  "priorArt": [
+    "step-08-preflip-gates.json#nonBehavioralCensusSites",
+    "step-08-post-census-records.jsonl and step-08-post-census-join.json",
+    "Unchanged step-02l-inventory.py build() and grammar",
+    "Read-only Git history and exact diff-line rebinding; no repository mutation"
+  ],
+  "impactAnalysis": "degraded/unqueried: fgOS CLI forbidden by brief; no product symbol edited",
+  "notRun": ["product owning tests", "npm test", "scripts/run-tests.mjs", "cargo test --workspace", "fgos CLI", "pair accounting", "final-pin F census", "independent census review", "markdown preview (Lead custody)"],
+  "needsWrites": []
+}

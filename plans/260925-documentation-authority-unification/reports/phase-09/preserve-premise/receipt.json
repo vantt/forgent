@@ -1,0 +1,79 @@
+{
+  "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
+  "gateId": "step3-step4-preserve-premise-review",
+  "status": "records-complete-owned-judgments-open",
+  "independentApproval": false,
+  "noReadinessClaim": true,
+  "counts": {
+    "step3Preserves": 4804,
+    "step4Preserves": 609,
+    "premiseRows": 5413,
+    "excludedRetireWithTree": 38,
+    "finalStep3Batches": 130,
+    "finalStep4Batches": 33,
+    "matrixCatalogBatches": 136,
+    "verifiedZeroEdgeBatches": 27,
+    "sourceConfirmedHistory": 3011,
+    "operandReachabilityUnchanged": 1268,
+    "ownedUnconfirmedPremiseParks": 888,
+    "ownedUnboundPassageParks": 92,
+    "ownedAbsentSourceParks": 2,
+    "leadDatedNoteProposals": 152,
+    "proposalSourceFiles": 89,
+    "namedReviewBatchFilesCovered": 73,
+    "namedReviewBatchFilesMissing": 0,
+    "physicalOldPathsRemoved": 1039,
+    "indexBefore": 492,
+    "indexAfter": 490,
+    "negativeL12_121PremiseProbes": 3,
+    "negativeEffectiveDecisionProbes": 3,
+    "byteIdenticalArtifactsAcrossG2AndG6": 7
+  },
+  "touchedIds": {
+    "owningArtifact": "proof.json",
+    "selector": "rows[*].rowId",
+    "count": 5413,
+    "uniqueAndExhaustiveAgainstFinalRecords": true,
+    "retiringSelector": "retire-with-tree.json#rows[*].rowId",
+    "retiringCount": 38,
+    "judgmentSelector": "judgments.json#rows[*].rowId",
+    "judgmentCount": 1134,
+    "historyProposalSelector": "history-wrapper-proposals.json#rows[*].rowId",
+    "meaning": "New source/operand/reason/item-digest evidence rows only; no original matrix/record/owner-answer/progress edits. The exhaustive id lists live in the owning artifacts rather than duplicate receipt arrays."
+  },
+  "commands": [
+    {
+      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py"],
+      "exit": 0
+    },
+    {
+      "argv": ["node", "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/physical-move.mjs", "3e2d05af89313dbfbf0d26cd0de34f6b660d194b", "/tmp/fgos-work/w1-d4/<invocation-scratch>"],
+      "exit": 0,
+      "invocation": "Called by proof.py; tracked document scratch copies, pure generators and copied negative predicate, no original top-level script import."
+    },
+    {
+      "argv": ["python3", "-B", "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py"],
+      "exit": 0,
+      "evidence": "verification.json",
+      "proof": "Two separate G2 runs and two separate G6 runs, byte-identical artifacts and stdout, equal to delivered artifacts; exact identity conservation; named 73-file wrapper coverage."
+    },
+    {"argv": ["git", "diff", "--check"], "exit": 0},
+    {
+      "command": "Read-only git status/rev-parse/log -S historicalPremise and log -S 4804; no add/commit/ref/worktree mutation",
+      "exit": 0,
+      "history": "L12-121 historicalPremise introduced in 9395aa111; extend its physical and digest-bound method rather than resurrecting a removed mechanism."
+    }
+  ],
+  "developmentFailures": [
+    {"command": "python3 -B preserve-premise/proof.py (development)", "exit": 1, "reason": "Initially assumed all 163 final batches have matrix catalog entries; fixed by separately hashing and verifying the 27 omitted zero-edge batches."},
+    {"command": "python3 -B preserve-premise/proof.py (development)", "exit": 1, "reason": "Some final records use a boolean authorAddedEdge marker; fixed by reading normalizedReference only from actual objects."},
+    {"command": "python3 -B preserve-premise/proof.py (development)", "exit": 1, "reason": "An adversarial literal contains '..'; fixed by recording unsafe literal status and refusing scratch path lookup, without normalizing away its fixture semantics."}
+  ],
+  "priorArt": {
+    "reused": ["L12-121 physical tracked-document scratch move and non-overwriting successor treatment", "unchanged historicalPremise predicate copied from step-07-post-move-proof.mjs", "existing enumerateDocEntries/buildEnduserIndex and computeKnowledgeProjection", "final assembler Step 4 slotKey identity recipe", "final Step 3 normalized references and source spans"],
+    "missingBeforeThisTurn": "The 9650-input L12-121 proof was Step 5-only. It did not establish any final Step 3/4 preserve premise or compose dated wrapper notes."
+  },
+  "impactAnalysis": "degraded/unqueried under the no-CLI records boundary; no product symbol edited",
+  "notRun": ["product owning tests", "npm test", "scripts/run-tests.mjs", "cargo test --workspace", "fgos CLI", "pair accounting", "final-pin F replay", "independent G6 review", "product note/patch composition", "markdown preview (Lead custody)"],
+  "needsWrites": []
+}

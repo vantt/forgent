@@ -1,0 +1,229 @@
+{
+  "currentNewLiteralSites": 84,
+  "deltaCount": 16,
+  "method": "Unchanged step-02l-inventory.py build() × frozen class4/5/6; compare complete lexical delta to original step-07 census. Not final pin F or behavioral completeness.",
+  "rows": [
+    {
+      "expressionSha256": "ae7284b0fbcdcaa3cef125e767dc32c6e439712b7ecbb14d722c130b25d3f5d6",
+      "file": ".agents/skills/fgos-cook/references/route-table-pending.md",
+      "klass": 4,
+      "line": 31,
+      "operand": "docs/specs/workflow.md",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "roleHint": "reader",
+      "sourceSha256": "85519f98cdcdb882c25887ab3561942d9ff6403cf33b31da80764ee005f507ae",
+      "status": "judgment-required"
+    },
+    {
+      "expressionSha256": "ae7284b0fbcdcaa3cef125e767dc32c6e439712b7ecbb14d722c130b25d3f5d6",
+      "file": "plugins/fgOS/skills/fgos-cook/references/route-table-pending.md",
+      "klass": 4,
+      "line": 31,
+      "operand": "docs/specs/workflow.md",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "roleHint": "reader",
+      "sourceSha256": "85519f98cdcdb882c25887ab3561942d9ff6403cf33b31da80764ee005f507ae",
+      "status": "judgment-required"
+    },
+    {
+      "expressionSha256": "9962d17eead34735648d24a7f486ecb16e37d433c50dd48ef61a1c5a2fac0acf",
+      "file": "packages/config/contracts/fixtures/authoring-source.config.json",
+      "klass": 5,
+      "line": 100,
+      "operand": "docs/history/capability-aware-dispatch-activation/CONTEXT.md",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "roleHint": "fixture-literal",
+      "sourceSha256": "7d89f588cfa29c0f1f9d07c2204a02e99cd6aa204d7e4451a56cb1608158ad79",
+      "status": "judgment-required"
+    },
+    {
+      "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
+      "file": "packages/config/contracts/fixtures/authoring-source.config.json",
+      "klass": 5,
+      "line": 121,
+      "operand": "docs/history/agent-coordination-foundation/plan.md",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "roleHint": "fixture-literal",
+      "sourceSha256": "7d89f588cfa29c0f1f9d07c2204a02e99cd6aa204d7e4451a56cb1608158ad79",
+      "status": "judgment-required"
+    },
+    {
+      "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
+      "file": "packages/config/contracts/fixtures/authoring-source.config.json",
+      "klass": 5,
+      "line": 143,
+      "operand": "docs/history/agent-coordination-foundation/plan.md",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "roleHint": "fixture-literal",
+      "sourceSha256": "7d89f588cfa29c0f1f9d07c2204a02e99cd6aa204d7e4451a56cb1608158ad79",
+      "status": "judgment-required"
+    },
+    {
+      "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
+      "file": "packages/config/contracts/fixtures/authoring-source.config.json",
+      "klass": 5,
+      "line": 162,
+      "operand": "docs/history/agent-coordination-foundation/plan.md",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "roleHint": "fixture-literal",
+      "sourceSha256": "7d89f588cfa29c0f1f9d07c2204a02e99cd6aa204d7e4451a56cb1608158ad79",
+      "status": "judgment-required"
+    },
+    {
+      "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
+      "file": "packages/config/contracts/fixtures/authoring-source.config.json",
+      "klass": 5,
+      "line": 183,
+      "operand": "docs/history/agent-coordination-foundation/plan.md",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "roleHint": "fixture-literal",
+      "sourceSha256": "7d89f588cfa29c0f1f9d07c2204a02e99cd6aa204d7e4451a56cb1608158ad79",
+      "status": "judgment-required"
+    },
+    {
+      "custody": "Golden parse loop consumes fixture_cases(\"parse\"); common/mod.rs resolves fixtures/parse.v1.json. Path strings are scalar parser inputs, not documentation reads.",
+      "expressionSha256": "5568b7982645185e772b7bfe7e4d0dcc0ed43ccce4774371f7909fe990ced3f2",
+      "file": "packages/yaml-doc/contracts/fixtures/parse.v1.json",
+      "fixtureLoader": {
+        "file": "packages/yaml-doc/rust/tests/common/mod.rs",
+        "line": 28,
+        "sourceSha256": "13021da3a23d2248aaf16b0e657ecbf935dd2a394e14e37de891fa81b2dbbd5b"
+      },
+      "klass": 5,
+      "line": 1979,
+      "operand": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "owningProofs": [
+        {
+          "file": "packages/yaml-doc/rust/tests/golden_parse.rs",
+          "line": 185,
+          "locator": "packages/yaml-doc/rust/tests/golden_parse.rs:parse_matches_the_golden_cases",
+          "sourceSha256": "fae0796d36be7224d05987dfb01e4cf513090d65014f5cba7e9368aff13a5811",
+          "testTitle": "parse_matches_the_golden_cases"
+        }
+      ],
+      "roleHint": "fixture-literal",
+      "sourceSha256": "ad8d69e5ec34182f9c1e3a0a5e4770d04df9e9867ef59f5cb7fd0864719fd3ec",
+      "status": "joined-fixture-contract"
+    },
+    {
+      "custody": "Golden parse loop consumes fixture_cases(\"parse\"); common/mod.rs resolves fixtures/parse.v1.json. Path strings are scalar parser inputs, not documentation reads.",
+      "expressionSha256": "0109e9e44013327bb4358675db2faeab4f791e003f3b4947f0e47c09ba4c26c4",
+      "file": "packages/yaml-doc/contracts/fixtures/parse.v1.json",
+      "fixtureLoader": {
+        "file": "packages/yaml-doc/rust/tests/common/mod.rs",
+        "line": 28,
+        "sourceSha256": "13021da3a23d2248aaf16b0e657ecbf935dd2a394e14e37de891fa81b2dbbd5b"
+      },
+      "klass": 5,
+      "line": 1986,
+      "operand": "docs/specs/work-state.md",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "owningProofs": [
+        {
+          "file": "packages/yaml-doc/rust/tests/golden_parse.rs",
+          "line": 185,
+          "locator": "packages/yaml-doc/rust/tests/golden_parse.rs:parse_matches_the_golden_cases",
+          "sourceSha256": "fae0796d36be7224d05987dfb01e4cf513090d65014f5cba7e9368aff13a5811",
+          "testTitle": "parse_matches_the_golden_cases"
+        }
+      ],
+      "roleHint": "help-text",
+      "sourceSha256": "ad8d69e5ec34182f9c1e3a0a5e4770d04df9e9867ef59f5cb7fd0864719fd3ec",
+      "status": "joined-fixture-contract"
+    },
+    {
+      "custody": "Golden parse loop consumes fixture_cases(\"parse\"); common/mod.rs resolves fixtures/parse.v1.json. Path strings are scalar parser inputs, not documentation reads.",
+      "expressionSha256": "0109e9e44013327bb4358675db2faeab4f791e003f3b4947f0e47c09ba4c26c4",
+      "file": "packages/yaml-doc/contracts/fixtures/parse.v1.json",
+      "fixtureLoader": {
+        "file": "packages/yaml-doc/rust/tests/common/mod.rs",
+        "line": 28,
+        "sourceSha256": "13021da3a23d2248aaf16b0e657ecbf935dd2a394e14e37de891fa81b2dbbd5b"
+      },
+      "klass": 5,
+      "line": 1994,
+      "operand": "docs/specs/work-state.md",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "owningProofs": [
+        {
+          "file": "packages/yaml-doc/rust/tests/golden_parse.rs",
+          "line": 185,
+          "locator": "packages/yaml-doc/rust/tests/golden_parse.rs:parse_matches_the_golden_cases",
+          "sourceSha256": "fae0796d36be7224d05987dfb01e4cf513090d65014f5cba7e9368aff13a5811",
+          "testTitle": "parse_matches_the_golden_cases"
+        }
+      ],
+      "roleHint": "fixture-literal",
+      "sourceSha256": "ad8d69e5ec34182f9c1e3a0a5e4770d04df9e9867ef59f5cb7fd0864719fd3ec",
+      "status": "joined-fixture-contract"
+    },
+    {
+      "expressionSha256": "db121bc2fb494549d902f1da8e326baa8153aceb424b7b3217d77a7ea5177432",
+      "file": "apps/fgos/src/cli_presenter.rs",
+      "klass": 6,
+      "line": 83,
+      "operand": "docs/io-contract.md",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "roleHint": "comment",
+      "sourceSha256": "0ff90c05d8fa1a81c258285884fef8bc22e1805a414ac04cd7905f9178184192",
+      "status": "judgment-required"
+    },
+    {
+      "expressionSha256": "9962d17eead34735648d24a7f486ecb16e37d433c50dd48ef61a1c5a2fac0acf",
+      "file": "core/config-standard/runner.yaml",
+      "klass": 6,
+      "line": 402,
+      "operand": "docs/history/capability-aware-dispatch-activation/CONTEXT.md",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "roleHint": "help-text",
+      "sourceSha256": "52f1f459bca78368d7d44dfb370d635dba2d247c8c02a0621ac5c97e20b2d62e",
+      "status": "judgment-required"
+    },
+    {
+      "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
+      "file": "core/config-standard/runner.yaml",
+      "klass": 6,
+      "line": 414,
+      "operand": "docs/history/agent-coordination-foundation/plan.md",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "roleHint": "help-text",
+      "sourceSha256": "52f1f459bca78368d7d44dfb370d635dba2d247c8c02a0621ac5c97e20b2d62e",
+      "status": "judgment-required"
+    },
+    {
+      "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
+      "file": "core/config-standard/runner.yaml",
+      "klass": 6,
+      "line": 428,
+      "operand": "docs/history/agent-coordination-foundation/plan.md",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "roleHint": "help-text",
+      "sourceSha256": "52f1f459bca78368d7d44dfb370d635dba2d247c8c02a0621ac5c97e20b2d62e",
+      "status": "judgment-required"
+    },
+    {
+      "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
+      "file": "core/config-standard/runner.yaml",
+      "klass": 6,
+      "line": 438,
+      "operand": "docs/history/agent-coordination-foundation/plan.md",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "roleHint": "help-text",
+      "sourceSha256": "52f1f459bca78368d7d44dfb370d635dba2d247c8c02a0621ac5c97e20b2d62e",
+      "status": "judgment-required"
+    },
+    {
+      "expressionSha256": "f50c7a5ca54d581183f273e55e75f16472da84db664244dd6acf15a1bf6a9894",
+      "file": "core/config-standard/runner.yaml",
+      "klass": 6,
+      "line": 451,
+      "operand": "docs/history/agent-coordination-foundation/plan.md",
+      "owner": "Documentation integration owner / final-pin census reviewer",
+      "roleHint": "help-text",
+      "sourceSha256": "52f1f459bca78368d7d44dfb370d635dba2d247c8c02a0621ac5c97e20b2d62e",
+      "status": "judgment-required"
+    }
+  ],
+  "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b"
+}

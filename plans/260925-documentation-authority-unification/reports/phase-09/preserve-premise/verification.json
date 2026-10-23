@@ -1,0 +1,186 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+        "--rescan",
+        "--out",
+        "/tmp/fgos-work/w1-d4/double-replay-wpgwg24o/census-1"
+      ],
+      "exit": 0,
+      "label": "census",
+      "round": 1,
+      "stderr": "",
+      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 293, \"joined-owning-test\": 646, \"judgment-required\": 187}}\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py",
+        "--rescan",
+        "--out",
+        "/tmp/fgos-work/w1-d4/double-replay-wpgwg24o/census-2"
+      ],
+      "exit": 0,
+      "label": "census",
+      "round": 2,
+      "stderr": "",
+      "stdout": "{\"files\": 140, \"sites\": 1126, \"statuses\": {\"confirmed-grade-record-REJECT\": 293, \"joined-owning-test\": 646, \"judgment-required\": 187}}\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py",
+        "--out",
+        "/tmp/fgos-work/w1-d4/double-replay-wpgwg24o/preserve-1"
+      ],
+      "exit": 0,
+      "label": "preserve",
+      "round": 1,
+      "stderr": "",
+      "stdout": "{\"byResult\": {\"judgment-preserve-with-dated-note\": 152, \"park-current-passage-unbound\": 92, \"park-source-absent\": 2, \"park-unconfirmed-preserve-premise\": 888, \"preserve-operand-reachability-unchanged\": 1268, \"preserve-source-confirmed-history\": 3011}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py",
+        "--out",
+        "/tmp/fgos-work/w1-d4/double-replay-wpgwg24o/preserve-2"
+      ],
+      "exit": 0,
+      "label": "preserve",
+      "round": 2,
+      "stderr": "",
+      "stdout": "{\"byResult\": {\"judgment-preserve-with-dated-note\": 152, \"park-current-passage-unbound\": 92, \"park-source-absent\": 2, \"park-unconfirmed-preserve-premise\": 888, \"preserve-operand-reachability-unchanged\": 1268, \"preserve-source-confirmed-history\": 3011}, \"byStage\": {\"step-03\": 4804, \"step-04\": 609}, \"excludedRetireWithTree\": 38, \"finalBatchPopulation\": {\"step-03\": 130, \"step-04\": 33}, \"recordBatches\": 136, \"total\": 5413}\n"
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "label": "diff-check",
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "comparisons": [
+    {
+      "bytes": 2115687,
+      "checkedInWorkingArtifactEqual": true,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.json",
+      "runsByteIdentical": true,
+      "sha256": "7a2a7d37515652ff570758dd7d696bd0e6e301da1f150404ba03f22a1a6f52f5"
+    },
+    {
+      "bytes": 297829,
+      "checkedInWorkingArtifactEqual": true,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/residue.json",
+      "runsByteIdentical": true,
+      "sha256": "d6950d6b01f5a71ff4d8e642a42f61beb3f8d4d7a05669e8ea81eb37c8856f22"
+    },
+    {
+      "bytes": 10848,
+      "checkedInWorkingArtifactEqual": true,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/census-join/post-pin-literals.json",
+      "runsByteIdentical": true,
+      "sha256": "8b4a963304bc3b079289bd27266798639b9249b711f787b29a027eff3aeb57ca"
+    },
+    {
+      "bytes": 15807524,
+      "checkedInWorkingArtifactEqual": true,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.json",
+      "runsByteIdentical": true,
+      "sha256": "6c20d4b9b64d5d50adffe0cc62eabb8fbe731fe755deb512f77482dfdad9ef80"
+    },
+    {
+      "bytes": 18404,
+      "checkedInWorkingArtifactEqual": true,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/retire-with-tree.json",
+      "runsByteIdentical": true,
+      "sha256": "45c4fa718176a85f13dd14bfcf297db5d19d3e164aaff60181a22cf79ef75463"
+    },
+    {
+      "bytes": 1225560,
+      "checkedInWorkingArtifactEqual": true,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/judgments.json",
+      "runsByteIdentical": true,
+      "sha256": "c6e80b55efec3e5f42c9afd69dc61d2b450de9972e798e449fd5a2f792d21e94"
+    },
+    {
+      "bytes": 221938,
+      "checkedInWorkingArtifactEqual": true,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/history-wrapper-proposals.json",
+      "runsByteIdentical": true,
+      "sha256": "bdbc38c6a7ceeace5d64662c83d93b592ee7c05eab35d851e96a3cf17936319c"
+    }
+  ],
+  "counts": {
+    "G2": {
+      "files": 140,
+      "sites": 1126,
+      "statuses": {
+        "confirmed-grade-record-REJECT": 293,
+        "joined-owning-test": 646,
+        "judgment-required": 187
+      }
+    },
+    "G6": {
+      "byResult": {
+        "judgment-preserve-with-dated-note": 152,
+        "park-current-passage-unbound": 92,
+        "park-source-absent": 2,
+        "park-unconfirmed-preserve-premise": 888,
+        "preserve-operand-reachability-unchanged": 1268,
+        "preserve-source-confirmed-history": 3011
+      },
+      "byStage": {
+        "step-03": 4804,
+        "step-04": 609
+      },
+      "excludedRetireWithTree": 38,
+      "finalBatchPopulation": {
+        "step-03": 130,
+        "step-04": 33
+      },
+      "recordBatches": 136,
+      "total": 5413
+    }
+  },
+  "independentApproval": false,
+  "negativeProbes": {
+    "copiedL12_121HistoricalPredicate": 3,
+    "effectiveDecisionPredicate": 3
+  },
+  "noReadinessClaim": true,
+  "notRun": [
+    "npm test",
+    "scripts/run-tests.mjs",
+    "cargo test --workspace",
+    "owning product tests (fixture Git writes / no need for runtime assertions in this records-only task)",
+    "fgos CLI / impact capability query (forbidden by brief)",
+    "pair accounting (Lead A1 custody)",
+    "final-pin F census and independent G2/G6 review",
+    "markdown preview (Lead custody)"
+  ],
+  "scriptDigests": {
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/join.py": "d72d367fe91113a9802a0055c1a5be6ce675342a552ba9bbbd06d578fdd5b627",
+    "plans/260925-documentation-authority-unification/reports/phase-09/census-join/test-locators.mjs": "7e3c81518493f842dde5508a35fb65ad8c96d21facec23ea5bbf483ea697e5ac",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/physical-move.mjs": "dcd82982cba5dc9af79de7e02789fde2c60f702d4090a981fd3552e6d85651b9",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/proof.py": "d1b8fa7f868c3182b441124f77d1e42c81beb07b38243f5c55c1b6e117bd77a6",
+    "plans/260925-documentation-authority-unification/reports/phase-09/preserve-premise/verify.py": "6cded335607f401c8c470140455923e8de0feeb91212641e378c4cab941f2962"
+  },
+  "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
+  "status": "records-replay-passed-not-gate-acceptance",
+  "wrapperReviewBatchCoverage": {
+    "coveredByProposals": 73,
+    "missing": [],
+    "reviewBatchPaths": 73
+  }
+}

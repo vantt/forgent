@@ -1,0 +1,285 @@
+#!/usr/bin/env python3
+"""G6 records proof: final Step 3/4 identities, physical moves, source-bound premises.
+
+Reuse: L12-121 physical simulator/pure generators (physical-move.mjs), final
+assembler's Step 4 slot hash, Step 3 normalized references and source witnesses.
+Missing premise evidence becomes an owned judgment/park, never an exemption.
+"""
+import sys
+sys.dont_write_bytecode = True
+import argparse, collections, hashlib, json, pathlib, posixpath, re, subprocess, tempfile
+HERE = pathlib.Path(__file__).resolve().parent
+ROOT = HERE.parents[4]
+OLD = HERE.parent.parent / 'phase-08'
+
+
+def sha(value):
+    return hashlib.sha256(value if isinstance(value, bytes) else value.encode()).hexdigest()
+
+
+def git(*args):
+    return subprocess.check_output(['git', '-C', str(ROOT), *args])
+
+
+def dump(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':')) + '\n')
+
+
+def bind_spans(source, spans):
+    """Only exact text at its line or one unambiguous current line. No fuzzy rebind."""
+    lines = source.splitlines()
+    result = []
+    for span in spans:
+        text, original = span.get('text', ''), span['line']
+        if text and original <= len(lines) and text in lines[original - 1]:
+            result.append(original)
+        else:
+            hits = [n for n, line in enumerate(lines, 1) if text and text in line]
+            if len(hits) != 1:
+                return None
+            result.append(hits[0])
+    return result or None
+
+
+def unit_at(source, lines):
+    text = source.splitlines()
+    start, end = min(lines) - 1, max(lines)
+    # A table row is one unit, never the entire table. Bound prose to the
+    # adjacent paragraph and stop at sibling list items (no distant done/date cue).
+    if text[start].lstrip().startswith('|'): return '\n'.join(text[start:end])
+    while start > max(0,min(lines)-25) and text[start-1].strip() and not re.match(r'^(?:#{1,6} |[-*] |\d+\. |\|)', text[start]):
+        if re.match(r'^#{1,6} |^\|',text[start-1]): break
+        start -= 1
+    while end < min(len(text),max(lines)+25) and text[end].strip() and not re.match(r'^(?:#{1,6} |[-*] |\d+\. |\|)', text[end]): end += 1
+    return '\n'.join(text[start:end])
+
+
+def historical_evidence(source, line, reason, unit, span):
+    """Content + position + reason, not a role/path whitelist."""
+    prefix = '\n'.join(source.splitlines()[:line])
+    current = source.splitlines()[line-1]
+    if 'inside literal carriage' in reason.lower():
+        declaration = reason.split('declaration:',1)[-1].strip().split(' Non-executable successor note:')[0].rstrip('.')
+        declaration = declaration.split(' Carriage declaration:')[-1].strip().rstrip('.')
+        if declaration and declaration in prefix:
+            return {'kind':'literal-carriage-declaration', 'text':declaration}
+        for match in re.finditer(r'(?im)^#{1,6} (?:Literal Snapshot|.*source carriage|Retained .*source (?:detail|material)|Full source retained)[^\n]*', prefix):
+            return {'kind':'literal-carriage-section', 'text':match[0]}
+        match = re.search(r'(?im)^(?:Purpose: Preserve .*|Added in candidate: .*retained verbatim.*|.*retained verbatim.*(?:non.authority history|not navigation).*)$', prefix)
+        if match: return {'kind':'explicit-carriage-framing', 'text':match[0]}
+    # Exact source/evidence table-cell custody, not a blanket history-file rule.
+    if current.lstrip().startswith('|') and re.search(r'(?i)(?:source|evidence|provenance|ledger|audit)',reason):
+        prior = source.splitlines()[:line-1]
+        header = None
+        for n in range(len(prior)-1,0,-1):
+            if not prior[n].strip(): break
+            if re.match(r'^\s*\|[\s:|\-]+\|\s*$',prior[n]):
+                header = prior[n-1]; break
+        cells = list(re.finditer(r'(?<=\|)([^|]*)(?=\|)',current))
+        headers = header.split('|')[1:-1] if header else []
+        col = span.get('columnStart',1)-1
+        text = span.get('text','')
+        if not current[col:col+len(text)] == text:
+            occurrences = [m.start() for m in re.finditer(re.escape(text),current)] if text else []
+            col = occurrences[0] if len(occurrences)==1 else -1
+        for i,cell in enumerate(cells):
+            if cell.start() <= col < cell.end() and i < len(headers) and re.search(r'(?i)^(?:source(?:[ /-].*)?|evidence|input(?:s)?|original[^|]*)$',headers[i].strip()):
+                return {'kind':'original-source-evidence-table-cell','header':header,'column':i+1,'text':cell[0]}
+    if re.search(r'(?i)(?:provenance|lineage|source.locator|original Source)', reason):
+        if re.search(r'(?i)^\s*(?:[-*]\s+)?(?:\*\*)?(?:Source|Provenance|Promoted from|Preserved from|Original source|Canonical source|Supersedes)\b', current):
+            return {'kind':'source-provenance-label', 'text':current}
+    headings = []
+    for match in re.finditer(r'(?m)^(#{1,6}) (.*)$',prefix):
+        level = len(match[1]); headings = [h for h in headings if h[0] < level] + [(level,match[0])]
+    history = [h for _,h in headings if re.search(r'(?i)Document history|Change log|Changelog|Lịch sử|Completed|Done / Declined',h)]
+    if history and re.search(r'(?i)(?:histor|dated|completed|capture|original|audited)', reason):
+        return {'kind':'source-history-section', 'text':history[-1]}
+    if re.search(r'(?i)(?:completed|done|dated|audit|capture|history|source identity)', reason):
+        marker = re.search(r'(?i)(?:—\s*(?:\*\*)?done\b|\btsk-[a-z0-9]+\b|\b20\d{2}-\d\d-\d\d\b|\bcommit\s+[a-f0-9]{7,40}\b|Phase 0\d|\b(?:đã fix|đã xác minh|đã đóng|completed|retired in|captured output)\b)', unit)
+        # A nearby task id alone cannot historicize a current pointer. Require a
+        # completed marker, date, explicit dated-record header or source inventory.
+        completed = re.search(r'(?i)(?:—\s*(?:\*\*)?done\b|đã fix|đã xác minh|đã đóng|completed|retired in|captured output)', unit)
+        dated_header = re.search(r'(?im)^#{1,6} .*20\d{2}[-/]\d\d[-/]\d\d|^(?:Date|Recorded|Captured|Extraction|Cursor|Source):', prefix)
+        if marker and (completed or dated_header): return {'kind':'completed-or-dated-source-unit', 'text':marker[0]}
+        if re.search(r'\b[0-9a-f]{7,40}\b',unit) and re.search(r'(?i)(?:clean|verified|green|fixed|passed|complete)',unit) and re.search(r'(?i)(?:dated|archive|completed)',reason):
+            return {'kind':'commit-bound-completed-proof-row','text':unit}
+    if 'Whole-source architecture carriage' in reason and re.search(r'(?m)^Writer type: Agent carriage',source[:7000]) and re.search(r'(?m)^Purpose: Preserve the complete',source[:7000]):
+        return {'kind':'explicit-whole-source-carriage-header','text':'Writer type: Agent carriage; Purpose: Preserve the complete'}
+    if re.search(r'(?i)(?:upstream source coordinates|external.project|literal example|illustrative|adversarial)', reason):
+        # Require actual quoting/example/source framing; never just the claimed role.
+        marker = re.search(r'(?im)^#{1,6} .*?(?:Example|Ví dụ|Sample|Upstream|Bee|Distill)|^(?:Source|Cursor):[^\n]*|(?:e\.g\.|for example|ví dụ|example project)', source)
+        if marker: return {'kind':'explicit-external-or-example-framing', 'text':marker[0]}
+    return None
+
+
+def premise(source_present, bound, stable_targets, evidence, wrapper):
+    if not source_present: return 'park-source-absent'
+    if not bound: return 'park-current-passage-unbound'
+    if wrapper: return 'judgment-preserve-with-dated-note'
+    if evidence: return 'preserve-source-confirmed-history'
+    if stable_targets: return 'preserve-operand-reachability-unchanged'
+    return 'park-unconfirmed-preserve-premise'
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--out', type=pathlib.Path, default=HERE)
+    args = ap.parse_args()
+    assert args.out.resolve() == HERE or str(args.out.resolve()).startswith('/tmp/fgos-work/w1-d4/')
+    args.out.mkdir(parents=True, exist_ok=True)
+    pin = git('rev-parse','HEAD').decode().strip()
+    matrix = json.loads((OLD/'step-07-consumer-cutover-matrix.json').read_text())
+    catalog = {r['id']:r for r in matrix['recordCatalog'] if r['path'].startswith(('step-03-records/','step-04-records/'))}
+    # Empty/zero-edge final batches have no row/catalog entry. Verify the full
+    # 130+33 batch directories separately; do not invent 27 catalog memberships.
+    batch_counts = {s:len(list((OLD/(s+'-records')).glob('*.jsonl'))) for s in ['step-03','step-04']}
+    assert batch_counts == {'step-03':130,'step-04':33}
+    zero_edge_batches = []
+    for stage in ['step-03','step-04']:
+        for path in sorted((OLD/(stage+'-records')).glob('*.jsonl')):
+            if str(path.relative_to(OLD)) not in {r['path'] for r in catalog.values()}:
+                raw = path.read_bytes()
+                entries = [json.loads(l) for l in raw.decode().splitlines()]
+                assert all(not r.get('edges') for r in entries), path
+                zero_edge_batches.append(dict(path=str(path.relative_to(ROOT)),records=len(entries),sha256=sha(raw),edges=0))
+    assert len(zero_edge_batches) == 27
+    records = {}
+    for id, rec in catalog.items():
+        raw = (OLD/rec['path']).read_bytes()
+        assert sha(raw) == rec['sha256'], rec['path']
+        records[id] = [json.loads(line) for line in raw.decode().splitlines()]
+    census = {i['edgeId']:i for i in json.loads((OLD/'step-02j-census-maps-portals-prose.json').read_text())['entries']}
+    tracked = {line.split('\t')[1]:line.split()[0] for line in git('ls-tree','-r',pin).decode().splitlines()}
+    source_cache = {}
+    def source_of(file):
+        assert not file.startswith(('.fgos/','.bee/')) and '..' not in pathlib.PurePosixPath(file).parts
+        if file not in source_cache:
+            source_cache[file] = git('show',pin+':'+file).decode() if tracked.get(file) in ('100644','100755') else None
+        return source_cache[file]
+    base = pathlib.Path('/tmp/fgos-work/w1-d4');base.mkdir(parents=True,exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='preserve-',dir=base) as name:
+        scratch = pathlib.Path(name)
+        run = subprocess.run(['node',str(HERE/'physical-move.mjs'),pin,name],cwd=ROOT,capture_output=True,text=True,check=True)
+        physical = json.loads(run.stdout)
+        candidate = scratch/'candidate'
+        move_map = {r['from']:r['targets'] for r in physical['physicalMoves']}
+        moving = set(move_map) | set(physical['additionalStep6Removals'])
+        def present(file):
+            target = candidate/file
+            return target.is_file() or target.is_dir() and any(p.is_file() for p in target.rglob('*'))
+        rows, retired, seen_members = [], [], set()
+        for row in matrix['consumerRows']:
+            if row[1] not in catalog or row[4] != 'preserved-history/fixture': continue
+            rec = records[row[1]][row[2]-1]
+            stage = catalog[row[1]]['path'][:7]
+            def item_id(item):
+                if stage == 'step-04': return str(item.get('edgeId') or 'slot')+'@'+sha(item['slotKey'])[:20]
+                return str(item.get('referenceId') or item.get('id') or item.get('edgeId'))
+            items = [i for i in rec['edges'] if item_id(i) == row[3]]
+            assert len(items) == 1, row[0]
+            item = items[0]
+            basic = dict(rowId=row[0],stage=stage,file=rec['file'],memberId=row[3],
+                         record=str((OLD/catalog[row[1]]['path']).relative_to(ROOT)),recordLine=row[2],
+                         itemSha256=sha(json.dumps(item,sort_keys=True,ensure_ascii=False,separators=(',',':'))))
+            if item.get('retiresWithTree'):
+                retired.append(dict(**basic,reason=item['reason'],result='excluded-retire-with-tree',sourceRemoved=not present(rec['file'])))
+                continue
+            assert item['disposition'] == 'preserve'
+            seen_members.add((catalog[row[1]]['path'],row[2],row[3]))
+            source = source_of(rec['file'])
+            reason = item['reason']; token = item.get('matchedExpression','')
+            spans = item.get('sourceSpans',item.get('slotSourceSpans',[]))
+            bound = bind_spans(source,spans) if source is not None else None
+            unit = unit_at(source,bound) if bound else ''
+            added = item.get('authorAddedEdge')
+            normalized = (added.get('normalizedReference') if isinstance(added,dict) else None) or census.get(item.get('edgeId'),{}).get('normalizedReference') or item.get('legacyPath')
+            targets = []
+            if normalized: targets.append(normalized)
+            targets += [f['path'] for f in item.get('targetFacts',[])]
+            if not targets:
+                targets += re.findall(r'docs/[\w./<>*?{}@+-]+',token)
+                for dest in re.findall(r'\]\(([^) ]+)',token):
+                    if not re.match(r'(?:\w+:|#)',dest): targets.append(posixpath.normpath(posixpath.join(posixpath.dirname(rec['file']),dest)))
+            paths = sorted({p.split('#')[0].rstrip('/') for p in targets if p and not p.startswith(('http:','https:'))})
+            reach = []
+            for p in paths:
+                unsafe = '..' in pathlib.PurePosixPath(p).parts or pathlib.PurePosixPath(p).is_absolute()
+                wildcard = bool(re.search(r'[<>*?{}]',p))
+                before = bool(tracked.get(p)) or any(t.startswith(p.rstrip('/')+'/') for t in tracked)
+                after = present(p) if p.startswith('docs/') and not wildcard and not unsafe else None
+                reach.append(dict(path=p,beforePresent=before,afterPresent=after,wildcard=wildcard,unsafeLiteral=unsafe,
+                                  removedByMoveOrStep6=p in moving,successors=[dict(path=t,present=present(t),sha256=sha((candidate/t).read_bytes()) if (candidate/t).is_file() else None) for t in move_map.get(p,[])]))
+            stable = bool(reach) and all(r['beforePresent'] and r['afterPresent'] and not r['wildcard'] for r in reach)
+            current_line = min(bound) if bound else None
+            current_text = source.splitlines()[current_line-1] if current_line else ''
+            wrapper = bool(bound and 'inside literal carriage' not in reason.lower() and re.search(r'(?:Superseded by:.*docs/specs/runner\.md|see [`]?docs/specs/runner\.md.*CoordinationSession)',current_text) and ('history-wrapper' in reason or 'Superseded by' in current_text or 'history' in reason.lower()))
+            evidence = historical_evidence(source,current_line,reason,unit,spans[0]) if bound else None
+            if bound and 'frozen rename copy at 4ee0e3a3c' in reason:
+                origin = git('show','4ee0e3a3c:'+rec['file']).decode()
+                if source == origin:
+                    evidence = dict(kind='frozen-source-snapshot-byte-equality',origin='4ee0e3a3c',sha256=sha(origin),text=current_text)
+            result = premise(source is not None,bool(bound),stable,evidence,wrapper)
+            check = dict(**basic,token=token,operandSha256=sha(token),statedReason=reason,statedReasonSha256=sha(reason),
+                         recordSourceSha256=rec.get('digest'),sourceSha256=sha(source) if source is not None else None,
+                         sourceChanged=source is None or sha(source)!=rec.get('digest'),sourceSpans=spans,currentLines=bound,
+                         currentUnit=unit,currentUnitSha256=sha(unit),normalizedOperands=reach,
+                         evidence=evidence,result=result,proposedDisposition='preserve' if result.startswith('preserve-') else 'owned-park',
+                         owner='Documentation consumer-composition owner / Lead',independentApproval=False)
+            if wrapper:
+                successor = 'docs/platform/runner/decisions/h-aabefc85f0c9.md' if 'CoordinationSession' in current_text else 'docs/platform/runner/spec.md'
+                assert present(successor)
+                check.update(proposedDisposition='preserve-with-dated-note',decisionOwner='Lead',
+                             successor=dict(path=successor,sha256=sha((candidate/successor).read_bytes()),presentAfterCutover=True),
+                             proposedDatedNote='2026-10-23 cutover note: The legacy runner citation above is a historical coordinate, not a post-cutover link. Current successor: '+successor+'.',
+                             alternatives=['preserve-with-dated-note','repoint'],
+                             recommendationReason='L12-26(8)/L12-35(3) explicitly conserve history-wrapper wording. Add a dated, reachable successor outside the literal snapshot rather than rewriting the historical claim. Lead decides; no product patch or acceptance is implied.',
+                             blocker='Lead must approve the row-specific dated note or choose repoint; then compose/review it with the owning file patch before cutover.')
+            elif not result.startswith('preserve-'):
+                successors = sorted({s['path'] for r in reach for s in r['successors'] if s['present']})
+                check['candidateSuccessors'] = successors
+                if result == 'park-current-passage-unbound':
+                    check['owner'] = 'G9 source-binding reviewer / Documentation consumer-composition owner'
+                    check['blocker'] = 'Rebind '+row[0]+' in '+rec['file']+' from the recorded spans to one exact current source unit at final pin F; only then rejudge its preserve premise. No digest-only carry over passage drift.'
+                elif result == 'park-source-absent':
+                    check['owner'] = 'G9 source-binding reviewer / Lead'
+                    check['blocker'] = 'Source '+rec['file']+' is absent at this pin: identify its retirement or exact successor and disposition '+row[0]+' without recreating the removed source.'
+                else:
+                    lost = ', '.join(r['path'] for r in reach if not r['afterPresent']) or token
+                    check['blocker'] = 'For '+row[0]+' in '+rec['file']+', confirm source-bound non-dereferencing semantics of '+lost+' or co-compose/review the live-pointer successor ('+(', '.join(successors) or 'no exact successor currently bound')+'). Lead owns this row before flip; no Step 5 proof inheritance.'
+            rows.append(check)
+        assert collections.Counter(r['stage'] for r in rows) == {'step-03':4804,'step-04':609}
+        assert len(retired) == 38 and all(r['sourceRemoved'] for r in retired)
+        assert len({r['rowId'] for r in rows}) == 5413
+        expected_members = set()
+        for id, batch in records.items():
+            stage = catalog[id]['path'][:7]
+            for line, rec in enumerate(batch,1):
+                for item in rec.get('edges',[]):
+                    if item.get('disposition') != 'preserve': continue
+                    member = str(item.get('edgeId') or 'slot')+'@'+sha(item['slotKey'])[:20] if stage=='step-04' else str(item.get('referenceId') or item.get('id') or item.get('edgeId'))
+                    expected_members.add((catalog[id]['path'],line,member))
+        assert seen_members == expected_members, 'final-record preserve identity mismatch'
+        # Negative mutations exercise the same effective decision predicate as rows.
+        probes = [dict(case='false retained-pointer premise over removed target',actual=premise(True,True,False,None,False)),
+                  dict(case='historical-looking reason with mismatching passage',actual=premise(True,False,False,{'kind':'history'},False)),
+                  dict(case='navigation label with no history evidence over removed target',actual=premise(True,True,False,None,False))]
+        assert all(p['actual'].startswith('park-') for p in probes)
+        counts = dict(total=len(rows),byStage=dict(collections.Counter(r['stage'] for r in rows)),byResult=dict(collections.Counter(r['result'] for r in rows)),excludedRetireWithTree=len(retired),recordBatches=len(catalog),finalBatchPopulation=batch_counts)
+        report = dict(sourceCommit=pin,authority='L12-137; G6; L12-121 method extended, not inherited',
+                      inputs={f:sha((OLD/f).read_bytes()) for f in ['step-07-consumer-cutover-matrix.json','step-05-cutover-move-set.json','step-07-post-move-proof.mjs','step-02j-census-maps-portals-prose.json']},
+                      counts=counts,physical=physical,zeroEdgeBatches=zero_edge_batches,negativeDecisionProbes=probes,
+                      noReadinessClaim=True,independentApproval=False,
+                      scope='Tracked source blobs and physical scratch moves only. Exact source spans + reason/operand/source digests per final identity; retained reachability proves operand stability, not contract/runtime parity. Unconfirmed premises are owned parks. No checkout move, source edit, CLI, Git write, live state or test execution.',rows=rows)
+        dump(args.out/'proof.json',report)
+        dump(args.out/'retire-with-tree.json',dict(sourceCommit=pin,count=len(retired),rows=retired))
+        judgments = [r for r in rows if not r['result'].startswith('preserve-')]
+        # One owning evidence row in proof.json. Secondary indexes carry locators,
+        # decisions and digests, not duplicate multi-kilobyte source passages.
+        keys = ['rowId','stage','file','memberId','record','recordLine','currentLines','sourceSha256','itemSha256','result','proposedDisposition','owner','blocker','candidateSuccessors']
+        dump(args.out/'judgments.json',dict(sourceCommit=pin,count=len(judgments),owningEvidence='proof.json#rows[rowId]',rows=[{k:r[k] for k in keys if k in r} for r in judgments]))
+        keys += ['decisionOwner','successor','proposedDatedNote','alternatives','recommendationReason']
+        dump(args.out/'history-wrapper-proposals.json',dict(sourceCommit=pin,count=sum('decisionOwner' in r for r in rows),owningEvidence='proof.json#rows[rowId]',rows=[{k:r[k] for k in keys if k in r} for r in rows if 'decisionOwner' in r]))
+        print(json.dumps(counts,sort_keys=True))
+
+
+if __name__ == '__main__': main()
