@@ -648,7 +648,7 @@ fn recovery_reconciles_an_attempt_stored_with_the_retired_legacy_events_field() 
         }
         let outcome = f
             .driver
-            .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted")
+            .recover_scoped_commit(&f.repo, f.held(), "fixture", "interrupted", &wal::OsFileSystem)
             .unwrap();
         assert!(if committed {
             matches!(outcome, wal::Outcome::Commit { .. })
