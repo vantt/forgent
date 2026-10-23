@@ -87,6 +87,8 @@ Measured after 04b: `packages/config/rust/src` is 1,230 lines (comments and blan
 | `write.rs` | 10 | 200 |
 | `redact.rs` | 11 | 80 |
 
+Second revision (owner, 2026-10-23 14:01, option A): after the simplification pass the crate was 1,896 lines (about 1,540 of code), so the crate ceiling is **2,200 lines**; the `write.rs` (200) and `redact.rs` (80) caps stand.
+
 Durable File's `beneath.rs` (281) is a shared primitive and is counted with Durable File, not here. Schema and standard YAML are data and counted apart.
 
 ## Constraints
