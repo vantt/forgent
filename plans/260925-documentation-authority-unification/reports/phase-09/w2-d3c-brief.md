@@ -1,0 +1,12 @@
+# W2 D3c: verifier cleanup and one avoidable census site (Doer brief, code slice)
+
+Status: Lead brief under L12-137, L13-2, L13-3. Review: `reviews/w2-g4-code-review.{json,md}` (summary `w2-review-notes.md` section G4).
+
+Common rules: read `preflip-execution-plan.md` §1-§2, `w1-review-notes.md` and `owner-answers.md` (L13-*) in this directory, and the receipts of the wave-1 Doers that your task builds on. Never a git write in this repository (temporary test-fixture repositories under /tmp are fine), never the fgos CLI against this repo, never `.fgos/` or secrets, never `scripts/run-tests.mjs` or `npm test`. Python `python3 -B`; scratch `/tmp/fgos-work/<brief-name>/`. Single tests only: `env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=<releasePath>/bin/fgos node --test <file>` (`releasePath` from `/home/vantt/projects/forgentX/.fgos/installation/activation.json`); report what could not run. No pair accounting; no `owner-answers.md`/`progress.md`/`preflip-gate-status.json` writes: write `receipt.md` + `receipt.json` in your own directory. Anything outside the writable list: stop, report `needsWrites`. Final message: first line a conventional commit subject (at most 100 characters, no plan ids, phase or finding labels), then a short Vietnamese summary (anh/em).
+
+Tasks (tests first; extend owning tests):
+1. **HIGH:** `scripts/verify-phase-01.mjs` (~448-455) and `scripts/verify-phase-02.mjs` (~341-348) leave a registered temp worktree plus `node_modules` on every run because the guarded `removeWorktree` refuses ignored bytes (`worktree-ignored-bytes-preserved`). Make each verifier remove what it installed itself (or record it through the existing provisioning record the Git worktree port honours) before `removeWorktree`, so a run leaves nothing registered and nothing in tmp. Prove it with an owning test that runs the cleanup path in a temp fixture repository. Correct the CHANGELOG/exemption wording.
+2. **MEDIUM:** drop the raw `cat-file --batch` branch in `scripts/lib/doc-git-reads.mjs` (~76) that only a test reaches; remove its exemption row; adjust the test.
+3. Regenerate the census; rerun every touched test file and check B (`python3 -B P/reports/phase-08/audit-report.py`, report B).
+
+Writable (exact): scripts/verify-phase-01.mjs, scripts/verify-phase-02.mjs, scripts/lib/doc-git-reads.mjs, test/scripts/**, packages/git/contracts/mutation-census.v1.json, CHANGELOG.md, plans/260925-documentation-authority-unification/reports/phase-09/git-one-door/**.

@@ -29,3 +29,28 @@
 - f07526 "Canonical architecture moved to: docs/architect/..." navigation line becomes false -> repoint.
 - Stale pin: 90 rows in files changed 3e2d05af8..cffe725b9; 18 no longer bind -> refresh at final pin F (and add --pin).
 - 152 history-wrapper proposals sound (preserve-with-dated-note).
+## G0 delta (w2-g0-delta-review, 10/2) -> G0-fix2 (after D7, ledger serialization)
+- claim_af89c4e6 (s3-host-invocation-boundary-gaps registryGaps[2]) stale again: e5af4c501 (D6) rewrote component-boundary Workflow/Seat Binding rows -> rebind (17b94e60 -> badfb72a); verify scripts must check HEAD not the authoring pin.
+- Ancestry convention: 52 rows include heading's own title in targetAncestry, 2 rows (claim_4ff3a128 s2 claims[404]; claim_b2a51d5d s8-observe claims[4]) parents-only; verify.py:186 accepts both -> declare self-inclusive in bindingHashEncoding, recompute 2 rows, tighten verifier.
+- Lead decision: group rows (s9-runner-01 registryGaps[2],[4]-[18], 16 null-anchor rows share hash over targetOwner only) -> add a member-digest key (sorted member unit digests) to the recipe for group rows so approvals bind content.
+- s12-late-areas nativeIdentityGaps rows store hash without digest/ancestry inputs -> store inputs.
+- residual row 14 outOfScopeProposalOnly=true now live -> fix flag.
+- pilot/decisions/b-io-contract.json write was authorized by the Lead in the continuation prompt of turn 662 (record in L13-5).
+## G8 archive (w2-g8-archive-review, 6/6) -> D5b
+- 313 retirement specs name the deleted file itself as owningProof -> name the real owning proof or state "behaviour retired"; 10 are current Phase 9 gate replayers (census-join/join.py, composition/*, preserve-premise/*, carries/*): conditional retirement, but tip measure assumes gone -> mark them retire-at-final-pin and measure tip both ways.
+- Rehearsal never reaches check A (frozen ownership tests fail at audit-ownership first); removal commit would trip check A with 375 moved paths outside allowed-paths.json -> design must name pair accounting for the removal commit.
+- 1.27 GB: 491 MB live readers (identity registries 170 MB, phase-02 inventory parts 195 MB, ledger shards, rationale inputs); 540 MB / 5,663 small files kept only by the 1 MB threshold, no reader reason -> move the small-record tranche too unless a reader needs it (Lead decides: move it); design.md:30 misstates cause; live product inputs labelled "small record" (alias-table.json, claim-and-disposition-vocabulary.json, shipped-path-conventions-inventory.json, dropped-claims-register.json, plan.md) need real reasons.
+- Real-disk worktree add median 21.0 s (control full pin 99.3 s) — under 60 s.
+- Low: rehearse.py hardcodes "tmpfs" label; main manifest 2.7 MB (2.4 MB retained-audit rows) + archive/** 14 MB on tip -> slim.
+## Late areas (w2-late-areas-review, 20/2)
+- scan-legacy-drift.mjs:78 used u.textDigest (undefined) -> removedOrReplaced listed every unit; Lead fixed to sourceUnitDigest (commit after ae9b9a6ef); regenerate legacy-drift.json right before D7 (after D1b). missingCarriage counts were already right.
+- changedBindings[19] (claim_af89c4e6) join to D6 overlay broken by e70742232 hash add -> G0-fix2: join on shard+index+anchor+digest, not hash.
+- component-boundary.md still has 5 ../specs/workflow.md links (Work Lifecycle, Execution Core, Holder-lock rows, nav row 122) + two end-user spec links -> D7 fix.
+- New specs keep legacy front matter (coverage: full-target) above candidate header; knowledge-registry has "Document type" twice -> D7 tidy.
+- candidateSuccessor switchboard field unread by any script (label only).
+- Check D6 worker checkout (forgentX-p9-w1-d2) for build leftovers: .fgos/runtime/git-addon/, target/.
+## G4 code (w2-g4-code-review, 17/2) -> D3c
+- HIGH: scripts/verify-phase-01.mjs:448-455, verify-phase-02.mjs:341-348: temp worktree made with createDetached, npm install/ci leaves node_modules (ignored), guarded removeWorktree refuses worktree-ignored-bytes-preserved -> every run leaks a registered worktree + node_modules. Fix: remove what the verifier installed itself (or record via existing provisioning record) before removeWorktree; correct CHANGELOG/exemption wording ("occasional").
+- MEDIUM: scripts/lib/doc-git-reads.mjs:76 raw cat-file --batch branch only for maxSize>31MiB, used only by test -> drop branch + its exemption row.
+- Note: verifiers list changed paths without rename detection (stricter; counts can differ from historical receipts).
+- 26 census sites all covered by exemption proposal (1 pre-commit, 5 configured commands, 10 missing-capability, 10 pinned tooling).

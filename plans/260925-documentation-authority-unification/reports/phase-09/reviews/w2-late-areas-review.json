@@ -1,0 +1,160 @@
+{
+ "scope": "w2-late-areas",
+ "commit": "ae9b9a6ef",
+ "verdicts": [
+  {
+   "id": "legacy-sources-unchanged",
+   "verdict": "APPROVE",
+   "reason": "Blob ids of all four legacy sources are identical at author pin 282afe45e, e5af4c501~1, review HEAD ae9b9a6ef and current main; nothing changed after the carry.",
+   "locator": "docs/specs/{seat-binding,workflow,enduser-docs-authoring,enduser-docs-index}.md"
+  },
+  {
+   "id": "seat-binding-verbatim",
+   "verdict": "APPROVE",
+   "reason": "diff vs HEAD:docs/specs/seat-binding.md shows only the inserted txt header after the H1 and 13 link destination rebases; prose, front matter, errata and pointers are byte-identical.",
+   "locator": "docs/platform/seat-binding/spec.md"
+  },
+  {
+   "id": "workflow-verbatim",
+   "verdict": "APPROVE",
+   "reason": "diff vs HEAD:docs/specs/workflow.md shows only the txt header and link-destination rebases (10 links); everything else is byte-identical.",
+   "locator": "docs/platform/workflow/spec.md"
+  },
+  {
+   "id": "relative-links",
+   "verdict": "APPROVE",
+   "reason": "My own resolver checked 15+16 links in the specs and 123 in component-boundary.md: none missing, no anchor misses, and no link still points into docs/specs/.",
+   "locator": "docs/platform/{seat-binding,workflow}/spec.md"
+  },
+  {
+   "id": "header-layout",
+   "verdict": "APPROVE",
+   "reason": "The candidateCore fields (Document type, Audience, Purpose, Design status, Last reviewed, Related) are present. With the real minimum-constitution.json the checker returns 0 findings and the switchboard reports status candidate. Low: the legacy front matter (status: implemented, coverage: full-target) sits above the candidate header, and the header lacks the Canonical: No / Supersedes lines that the runner candidate carries. The Design status line disclaims promotion.",
+   "locator": "docs/platform/seat-binding/spec.md:1-22; docs/platform/workflow/spec.md:1-22"
+  },
+  {
+   "id": "unit-coverage-295",
+   "verdict": "APPROVE",
+   "reason": "The native extractor at HEAD gives 99+147+20+29=295 source units. Each has exactly one binding row; its target anchor and digest exist in the current holder; no target is bound twice. Only the new header block (unheaded-block-2) in each spec is unbound, which is expected because it is candidate-added.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json#/unitCarries"
+  },
+  {
+   "id": "equal-vs-adapted",
+   "verdict": "APPROVE",
+   "reason": "250 rows have an equal digest (disposition move) and 45 are adapted (supersede). For all 45 adapted rows the only difference is the link destination, heading depth or YAML fence, checked by normalised comparison.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json"
+  },
+  {
+   "id": "binding-hash-365",
+   "verdict": "APPROVE",
+   "reason": "I recomputed 365 of 365 bindingSha256 values with the HEAD-declared python recipe (step-08-preflip-gates.json#/bindingHashEncoding, sorted keys, ensure_ascii=False, compact JSON plus LF): 0 mismatches. The shard cites changedBindings/11, which held the same recipe at the author pin.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json"
+  },
+  {
+   "id": "native-identity",
+   "verdict": "APPROVE",
+   "reason": "286 rows are registered-current-digest with nativeClaimRef and 9 are unregistered-current-digest (Seat Binding). claims[] and registryGaps[] are empty, which matches the receipt.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json#/nativeIdentityGaps"
+  },
+  {
+   "id": "rebindings-70",
+   "verdict": "APPROVE",
+   "reason": "All 70 new targets are current digests in the edited holders (69 registry, 1 component-boundary). Every old row on the two holders across all shards (367 rows) is either still current (297) or superseded by an overlay (70); 0 are stale and unrefreshed.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json kind=existing-target-rebinding"
+  },
+  {
+   "id": "rebind-join-after-later-commits",
+   "verdict": "REWORK",
+   "reason": "Lead-owned, not a D6 defect. e70742232 later gave s3-host-invocation-boundary-gaps.json registryGaps[2] a bindingSha256 (a44cca1d...), so the D6 overlay's supersedesBinding.bindingSha256=null no longer matches. The gate register's changedBindings[19] still points at the old component-boundary unheaded-block-11 digest 17b94e60..., which is not current. Join the overlay into the register row, matching on shard, index, anchor and digest rather than on the hash.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json#/changedBindings/19"
+  },
+  {
+   "id": "enduser-contract-carry",
+   "verdict": "APPROVE",
+   "reason": "I rebuilt both sources from the registry sections (unfence the YAML, undeepen headings): they are byte-equal apart from one extra blank line after the fence. The registry's original prose is unchanged. The generator and the doctor check are named as code truth. Low: the file now carries Document type: Contract twice (fenced and plain) and two status lines.",
+   "locator": "docs/platform/work-state/contracts/knowledge-registry.md:3-13,325-"
+  },
+  {
+   "id": "switchboard-rows",
+   "verdict": "APPROVE",
+   "reason": "The Seat Binding and Workflow areas resolve each legacy file to legacy-current and each candidate path to candidate, and proposedTargetOwner derives from entryPoint. The end-user successor anchors resolve through list-doc-anchors --check. Note: candidateSuccessor/successorStatus is a new field that no script, src or test reads, so the end-user rows still resolve proposedTargetOwner=null. That is advisory metadata only, and the pre-existing runner and work-state rows behave the same way.",
+   "locator": "plans/260925-documentation-authority-unification/transitional-switchboard.json:753-800,1218-1254"
+  },
+  {
+   "id": "component-boundary-links",
+   "verdict": "APPROVE",
+   "reason": "Only the Workflow and Seat Binding table-row links changed, and they resolve. Residue for Lead/D7: 5 further ../specs/workflow.md links remain (Work Lifecycle, Execution Core and Holder-lock rows, plus the navigation row 'workflow guide, case and admission' at line 122), as do the enduser-docs links. All of these break at cutover.",
+   "locator": "docs/platform/component-boundary.md:69,71,122"
+  },
+  {
+   "id": "drift-enumeration-complete",
+   "verdict": "APPROVE",
+   "reason": "I re-enumerated both windows (final pin 5e0315933 and inventory pin f0c76c5e5) with --no-renames ACMRT, git diff net and log -m. All return the same 3 and 33 files. The 4 extra paths under -m in the final window are net-unchanged merge-parent diffs. There are no deletions or renames in either window, both pins are ancestors, and the roots have no diff from 282afe45e to ae9b9a6ef.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json#/postFinalPinPaths,/postInventoryPinPaths"
+  },
+  {
+   "id": "drift-rescan-replay",
+   "verdict": "APPROVE",
+   "reason": "A scratch copy of the scanner gives identical records both in --check mode (head 282afe45e) and on a fresh rescan at ae9b9a6ef: 33 files, 26 unproven, 184 missing changed units. The committed file now differs only in ledgerInputs sha256 (13 shards edited by later commits), so the committed --check would fail at HEAD. The byte-identical claim holds only at e5af4c501.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json#/ledgerInputs"
+  },
+  {
+   "id": "drift-sample-5-missing-counts",
+   "verdict": "APPROVE",
+   "reason": "Seed 20261023 picked runtime-identity-and-activation.md, component-boundary/README.md, confinement-authority.md, domainization/README.md and distribution.md. Independent digest sets agree on currentUnits, changedSinceInventory, missingCurrent and missingChangedSinceInventory for all 5: 170/7/27/3, 52/2/21/1, 200/39/24/18, 66/2/4/0 and 43/27/16/9. distribution missingChangedSinceFinal is 2, which also agrees.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json#/records[*].counts"
+  },
+  {
+   "id": "drift-removed-units-bug",
+   "verdict": "REWORK",
+   "reason": "In scan-legacy-drift.mjs, `const present=new Set(units.map(u=>u.textDigest))` reads mapped unit objects that only have sourceUnitDigest, so present={undefined}. As a result removedOrReplacedInventoryUnits lists EVERY inventory unit in all 30 modified files (for example 115/115 for coordination-session.md). On the sample the true counts are 6, 2, 19, 2 and 15 against the recorded 169, 52, 180, 66 and 31. Fix by changing it to u.sourceUnitDigest and regenerating. The D7 triage input is otherwise flooded with false deletions.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs (const present=...); plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json#/records[*]/removedOrReplacedInventoryUnits"
+  },
+  {
+   "id": "receipt-counts",
+   "verdict": "APPROVE",
+   "reason": "The receipt figures match my recomputation: 295 = 250 + 45, 286 + 9, 70 rebindings, 365 hashes, 3 and 33 window files, 184 units in 26 files, and ratchet clean with 28 edits and 3 additions. verify-late-areas.mjs exits 0 at HEAD.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/receipt.md"
+  },
+  {
+   "id": "write-scope",
+   "verdict": "APPROVE",
+   "reason": "All 28 committed paths in e5af4c501 fall inside the D6 writable list. No later commit touches the D6 outputs. The commit was cherry-picked onto c9826a369/7d9a33a2d rather than the author pin, but recomputation with the HEAD extractor still matches.",
+   "locator": "git show --stat e5af4c501"
+  },
+  {
+   "id": "auto-build-incident",
+   "verdict": "APPROVE",
+   "reason": "The disclosure is honest and nothing outside the writable list was committed. The incident was a 60 s timeout of the check-doc-candidate-status CLI whose ensureScriptAddon fallback ran a cargo build. I found no target/ entries modified 20:38-21:19 in any listed worktree, and no addon-*.log anywhere in the window (find / -xdev -maxdepth 7). The worker checkout is not identifiable and .fgos/runtime/git-addon was not inspected (forbidden), so incidental gitignored artifacts remain uncertified. Recommend Lead check the worker checkout's .fgos/runtime/git-addon/ and target/.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/receipt.md 'Disclosed Direct-Checker Attempt'; receipt.json#/initialOptionalCheckerAttempt"
+  },
+  {
+   "id": "l13-4-s3-scope",
+   "verdict": "APPROVE",
+   "reason": "Not delivered by D6, and correctly so: L13-4 section 3 (architecture-intent evidence rows) is assigned to D7 (w2-d7-brief writable docs/platform/**), not to the D6 brief.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/w2-d6-brief.md; w2-d7-brief.md"
+  }
+ ],
+ "summary": {
+  "approve": 20,
+  "rework": 2,
+  "sample": {
+   "seed": 20261023,
+   "files": [
+    "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "docs/architect/component-boundary/README.md",
+    "docs/specs/confinement-authority.md",
+    "docs/architect/domainization/README.md",
+    "docs/specs/distribution.md"
+   ]
+  },
+  "itemsCheckedExhaustively": "295 source bindings, 70 rebindings, 365 hashes, 31 spec links, 33 drift files enumerated",
+  "topFindings": [
+   "legacy-drift removedOrReplacedInventoryUnits lists every inventory unit (scanner key bug)",
+   "gate register changedBindings[19] not joined to D6 component-boundary overlay after e70742232",
+   "5 remaining ../specs/workflow.md links + enduser links in component-boundary.md break at cutover",
+   "candidateSuccessor switchboard field has no consumer",
+   "auto-build artifacts in the worker checkout uncertified"
+  ]
+ }
+}

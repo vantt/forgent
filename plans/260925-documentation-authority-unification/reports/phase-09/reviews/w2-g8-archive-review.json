@@ -1,0 +1,103 @@
+{
+ "scope": "w2-g8-archive",
+ "commit": "ae9b9a6ef",
+ "verdicts": [
+  {
+   "id": "G8-1 manifest custody",
+   "verdict": "APPROVE",
+   "locator": "P/reports/phase-09/archive/manifest.json#/records",
+   "reason": "Recomputed against cffe725b9: 6,663 plan files partitioned 573/6,090 with no overlap or gap; blobId/size/mode match ls-tree and sha256 matches cat-file for all 6,663 rows; every record pins archiveCommit; rows are path-sorted and unique."
+  },
+  {
+   "id": "G8-2 archive ref / real merge / no rewrite",
+   "verdict": "APPROVE",
+   "locator": "P/reports/phase-09/archive/design.md:34-47; manifest.json#/archiveRefPolicy",
+   "reason": "Fixed name refs/heads/archive/260925-records, create-only and refuses a different target; origin publish and real merge are left to cutover approval. No ref exists in the review repo (for-each-ref is empty). This matches L12-129 + L12-137, design only."
+  },
+  {
+   "id": "G8-3 prior-prune recovery",
+   "verdict": "APPROVE",
+   "locator": "P/reports/phase-09/archive/prior-prune-recovery.json",
+   "reason": "All 279 blobs exist, size and sha256 match, and each blob sits at its path in ab4c65d17^ (an ancestor of the pin)."
+  },
+  {
+   "id": "G8-4 scriptRefs join completeness",
+   "verdict": "APPROVE",
+   "locator": "P/reports/phase-09/archive/reader-patches/prior-script-refs.json; historical-replay-specs.json",
+   "reason": "2,918 joins = 2,783 str + 135 historical-object scriptRefs in step-08-tree-prune-manifest; per-target counts equal for all 312 targets; targetDisposition agrees with the manifest for every row; 47 readers / 135 joins; six restored inputs retained."
+  },
+  {
+   "id": "G8-5 nothing a retained check/test reads is moved",
+   "verdict": "APPROVE",
+   "locator": "test/ scripts/ src/ bin/ packages/ crates/ apps/ at cffe725b9",
+   "reason": "0 live readers point at a non-retained target. Every plan-path literal in the 11 plan-reading scripts and src/runner/documentation-cutover-lease.mjs resolves to a retained file. Basename grep over 843 moved/pruned names gives only 3 false positives (help text pack.json, a fixture string part-0001.jsonl, a docs shell). No ledger/ path moves."
+  },
+  {
+   "id": "G8-6 retirement specs name an owning proof",
+   "verdict": "REWORK",
+   "locator": "P/reports/phase-09/archive/reader-patches/standalone-retirement-specs.json#/specs[*].owningProof",
+   "reason": "In all 313 specs the owningProof is the retired file itself, so no proof is named, which L12-129 requires. 53 specs have empty reasonTargets: they read no moved record and are retired only because they enumerate, which is scope beyond the size goal and saves 3.3 MB in total. Ten are current Phase 09 gate replayers (census-join/join.py, composition/*, preserve-premise/*, carries/*). They are conditioned, but the measured tip already assumes them gone."
+  },
+  {
+   "id": "G8-7 rehearsal test equivalence",
+   "verdict": "REWORK",
+   "locator": "P/reports/phase-09/archive/test-logs/*-doc-rationale-reproduction.test.mjs.log; P/reports/phase-06/step10-round5-reproduction.json#/scripts/checks.mjs:9-23",
+   "reason": "The 10 files are pass/fail-identical (292/295 each side, same 3 titles, no ENOENT after reduction; verified). But both ownership tests fail at audit-ownership before checks.mjs, so the reduction's effect on check A is never observed. Statically, checks.mjs lines 9/23 put every non-merge first-parent commit since B0 into offender pairs, and 375 of the 573 moved paths are outside allowed-paths.json. The removal commit therefore adds unaccounted A pairs. The design must name pair accounting for the archive commit, or land the removal so check A excludes it."
+  },
+  {
+   "id": "G8-8 tip size 1.269 GB",
+   "verdict": "APPROVE",
+   "locator": "P/reports/phase-09/archive/rehearsal.json#/candidateLogicalBytes",
+   "reason": "A reviewer rebuild (pin tree − 573 records + 16 included artifacts at c9826a369) gives 16,243 files / 1,269,268,475 B against the claimed 16,243 / 1,269,268,322. The 153 B difference is the disclosed post-measurement wording edit. Plan share is 1,085,588,864 B; non-plan tip is 183.7 MB."
+  },
+  {
+   "id": "G8-9 1.27 GB vs ~0.2 GB justification",
+   "verdict": "REWORK",
+   "locator": "P/reports/phase-09/archive/design.md:30; manifest.json#/retained[*].reasons",
+   "reason": "Only part of the retained bytes is justified. 47 files ≥1 MB (491 MB) have live-reader reasons: identity registries 170 MB, Phase 02 inventory parts 195 MB, ledger shards, rationale inputs. But 5,663 files / 540 MB are kept only by the inherited 1 MB threshold, with no reader reason, and that is the largest single block. The design says reaching 0.2 GB needs 'retirement/repoint of still-live inventory inputs', which misstates the cause. Its reasons also mislabel live product inputs (claim-and-disposition-vocabulary.json, alias-table.json, shipped-path-conventions-inventory.json, step-06-evidence-consumer-table.json, dropped-claims-register.json, claim-ledger.schema.json, plan.md) as just 'small record', so they cannot guide a next cut. This needs an owner decision on the small-record tranche."
+  },
+  {
+   "id": "G8-10 checkout time < 60 s",
+   "verdict": "APPROVE",
+   "locator": "P/reports/phase-09/archive/rehearsal.json#/runs; reviewer measurement",
+   "reason": "The rehearsal clone /tmp/fgos-work/archive is absent from this reviewer's /tmp (the Doer has a private /tmp), so the Doer's tree could not be re-timed. A reviewer reconstruction of the same tree (16,243 files / 1,269,268,475 B) on real disk (ext4 NVMe, load avg 22-30) took 21.03 / 23.86 / 18.67 s, median 21.03 s. A control on the full pin took 99.3 s (Lead measured 139.96 s). Under 60 s, but just over the execution plan's ≤20 s target and 2.5× the tmpfs 8.5 s."
+  },
+  {
+   "id": "G8-11 filesystem label",
+   "verdict": "REWORK",
+   "locator": "P/reports/phase-09/archive/rehearse.py (timing dict 'filesystem'); rehearsal.json#/filesystem",
+   "reason": "The 'tmpfs' string is a hardcoded literal, not a probe. Low severity: record it from statfs/df, or drop the claim."
+  },
+  {
+   "id": "G8-12 'small manifest on main'",
+   "verdict": "REWORK",
+   "locator": "P/reports/phase-09/archive/manifest.json; archive/** at c9826a369",
+   "reason": "Low severity. manifest.json is 2.7 MB, and about 2.4 MB of it is the 6,090-row 'retained' audit, which is not part of the path→blob mapping. The archive/** directory adds 13.98 MB to the tip. Land only the records table and recovery rules on main; keep the audit and the scan queues on the archive ref."
+  }
+ ],
+ "summary": {
+  "approve": 7,
+  "rework": 5,
+  "measuredWorktreeAdd": {
+   "filesystem": "ext4 NVMe (/dev/nvme0n1p2)",
+   "tree": "reviewer rebuild equal to a2206bdff content (16,243 files / 1,269,268,475 B)",
+   "runsSeconds": [
+    21.03,
+    23.86,
+    18.67
+   ],
+   "medianSeconds": 21.03,
+   "pinControlSeconds": 99.31,
+   "loadAvg": "22-30"
+  },
+  "tipBytes": {
+   "claimed": 1269268322,
+   "recomputed": 1269268475,
+   "plan": 1085588864,
+   "nonPlan": 183679611,
+   "retainedLiveReaderGe1MB": 490954894,
+   "retainedSmallOnlyNoReader": 540013457
+  },
+  "g8Status": "partial (not met-local): owning-proof naming, check-A pair accounting for the removal commit, small-record tranche decision"
+ }
+}

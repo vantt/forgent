@@ -1,0 +1,91 @@
+{
+ "scope": "w2-g0-delta",
+ "commit": "ae9b9a6ef",
+ "verdicts": [
+  {
+   "id": "claim_20a5804444535524364c0049e5bc87dd",
+   "verdict": "APPROVE",
+   "reason": "s9-runner-01 registryGaps[24] partial-carry: target runner.md#unheaded-block-9 digest ad50d1b4 recomputes; source f14dad0a authenticated at 8b4be4fcf; 2 changed source lines ('| 1 |' and '| 1b |' provider-capacity) both in residual row 9 (residualSha256 + fileSha256 2e0ff11f recompute).",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json#registryGaps[24]"
+  },
+  {
+   "id": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+   "verdict": "APPROVE",
+   "reason": "registryGaps[26] rebound to unheaded-block-93 (runner.md:1098-1152, opens RUL77); block-92 is RUL76; digest fb0b0100 + ancestry [Spec: Runner, Business Rules] recompute; supersede accounting: difflib vs source eb016bbb@ef2d9c33 gives exactly the 5 replaced lines named (RUL79/80/86/91/96).",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json#registryGaps[26]"
+  },
+  {
+   "id": "claim_d5ba1eda7530b865fec747ee0adbc102",
+   "verdict": "APPROVE",
+   "reason": "registryGaps[27] rebound to unheaded-block-93; 5 source lines absent from target, all in residual row 11; residual primaryTarget = current digest fb0b0100.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json#registryGaps[27]"
+  },
+  {
+   "id": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+   "verdict": "APPROVE",
+   "reason": "registryGaps[29] residual row 13 now names current block-101 digest 443f8e74 and covers all 6 changed source lines (verbatim-set and autojunk-off difflib both 0 uncovered).",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json#registryGaps[29]"
+  },
+  {
+   "id": "claim_af89c4e6063eb43c4e690c3fdd430677",
+   "verdict": "REWORK",
+   "reason": "Stale at the review commit: bound targetUnitDigest 17b94e60 but docs/platform/component-boundary.md#unheaded-block-11 (lines 66-97) is badfb72a at ae9b9a6ef. e5af4c501 (late-areas, after the cffe725b9 authoring pin) rewrote the Workflow and Seat Binding row links (../specs/workflow.md -> workflow/spec.md, ../specs/seat-binding.md -> seat-binding/spec.md). Rebind to badfb72a, refresh the link accounting in the rationale (it says 0 destination changes), recompute bindingSha256 and the register row. This is the only one of the 257 register rows that is stale.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json#registryGaps[2]; register changedBindings id claim_af89c4e6"
+  },
+  {
+   "id": "claim_15308eb4847ddd38be79bd87bd69a0b6",
+   "verdict": "APPROVE",
+   "reason": "Conditional after-state verified independently: step-07 predecessor patch takes 36c35527 to 088cdffe, then carry:credential-store-setup takes it to 6509ab97 (patch --fuzz=0). After-state unheaded-block-73 digest 5364ce63 and ancestry recompute; its text is byte-equal to current legacy confinement-authority.md#unheaded-block-140; neighbours are the 13.1 'Cong thuc' intro (block-72) and the 'Lich su' block (block-74). It is not present in the live file, so G9 must re-verify after the patch is applied.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json#registryGaps[4]"
+  },
+  {
+   "id": "claim_a7278e1567e5432cfb079506cf2f5050",
+   "verdict": "APPROVE",
+   "reason": "Rebound to sibling claim_bf1888a0's candidate unit observe/spec.md#unheaded-block-5 (324fe8aa, between '### Owns' and '### Must Not Own'); residual row 2 covers both changed source lines; source authenticated at 2300d6557.",
+   "locator": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json#registryGaps[0]"
+  },
+  {
+   "id": "claim_f5365b8e40fb58c75adc56a574263242",
+   "verdict": "APPROVE",
+   "reason": "Rebound to cli-io-contract.md#unheaded-block-10 (f62415e8), the same unit sibling claim_57f11d83 (claims[35]) uses; neighbours are the trust table (block-9) and '### Writer Resolution Rules'; residual row 14 covers all 3 changed lines. Note: pilot/decisions is outside the brief's writable list; the authorization ('continuation a27d85d0a') is not in committed plan bytes, and a27d85d0a is on no branch.",
+   "locator": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json#registryGaps[4]"
+  },
+  {
+   "id": "recipe-single-declared",
+   "verdict": "APPROVE",
+   "reason": "bindingHashEncoding declares one 4-key compact+LF recipe. Own recompute: 257/257 register rows and 1631/1631 ledger+pilot rows outside s12 match it; 0 rows still on the legacy recipe; all 257 register rows join their ledger row exactly (5 target fields + hash + id). recipe-migration.json: 257 rows; old register and old ledger hashes equal the 0ed5a246e bytes and every new hash equals the current ledger. All 136 ledger rows changed by the G0 commits are in the register. All 257 rows are pending.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json#bindingHashEncoding; reports/phase-09/g0fix/recipe-migration.json"
+  },
+  {
+   "id": "recipe-heading-ancestry-convention",
+   "verdict": "REWORK",
+   "reason": "targetAncestry for heading units has two conventions under the one recipe. 52 heading rows (D1 s4/s5, and late-areas s12) include the heading's own title. claim_4ff3a128 (s2-agent-coordination-truth-judgment claims[404]) and claim_b2a51d5d (s8-observe-01 claims[4]) list parents only. verify.py:186 accepts either, so one binding has two valid hashes. Declare self-inclusive in bindingHashEncoding, recompute these 2 rows, and tighten verify.py.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/verify.py:186; register ids claim_4ff3a12817bb891341b26283460beea0, claim_b2a51d5d39832d330879947bdbbcb227"
+  },
+  {
+   "id": "register-scope",
+   "verdict": "APPROVE",
+   "reason": "Structural diff of the register 0ed5a246e->ae9b9a6ef: only changedBindings (191->257 rows; targetAncestry added) and bindingHashEncoding changed.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-08/step-08-preflip-gates.json"
+  },
+  {
+   "id": "partial-carry-sweep",
+   "verdict": "APPROVE",
+   "reason": "All 27 partial-carry rows enumerated (26 ledger + 1 pilot, none missed). 15 refreshed residuals fully recomputed (all, not a sample of 10): source text authenticated by digest at its witness commit; primaryTarget equals ledger equals current file digest; residualRef row, file and residual sha recompute; 0 uncovered lines under both the verbatim-set and difflib methods. The 12 'unchanged-since-step0' rows have the same target digest at f76861638 and at HEAD.",
+   "locator": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-sweep.json; partial-carry-residuals.json"
+  }
+ ],
+ "summary": {
+  "approve": 10,
+  "rework": 2,
+  "method": "Own recompute at ae9b9a6ef with scripts/generate-doc-inventory.mjs extractMarkdownConservationUnits (textDigest) and a python hash recompute. Every item was checked; no sampling: 257/257 register rows, 1640 ledger hash rows, and 15/15 refreshed residuals.",
+  "informational": [
+   "The 16 null-anchor contextual-group rows (s9-runner-01 registryGaps[2],[4]-[18]) all share bindingSha256 cd6314fa..., which hashes only targetOwner. successorGroup is excluded per the brief, so a change to group membership or member digests does not move the binding hash that approvals key on. All 8 members currently resolve (95a357e2). Lead decision: add a group digest key, or accept the gap.",
+   "s12-late-areas nativeIdentityGaps[0..8] (late-areas Doer, outside the D1/G0 scope) store bindingSha256 without targetUnitDigest/targetAncestry. The hash recomputes only after re-deriving both from seat-binding/spec.md (9/9 then match). The rows are not self-verifying.",
+   "Residual row 14 keeps outOfScopeProposalOnly=true while it is the live residual of an applied binding. This is documented in the receipt, but a mechanical reader of row 14 will be misled.",
+   "Prior partial-acceptance metadata (reviewEntryId/acceptanceScope/evidenceDigest) was removed from 10 refreshed rows. This is consistent with no approval carry, and the before-state is retained in record-edits.json.",
+   "The Doer's verify.py authenticates against the cffe725b9 pin, not HEAD, which is why it missed the e5af4c501 drift on claim_af89c4e6.",
+   "The review worktree has an untracked target-review/ directory."
+  ]
+ }
+}
