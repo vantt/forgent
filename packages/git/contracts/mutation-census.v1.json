@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2fb3d07e5437a11ea2933cfb9fe9fcdbc2eabfdefde709dee62172ebb05422f4",
+  "payloadDigest": "343b06f12f4fbd51cf4e56af944d8c7373a60023034e96cd4952012215515377",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -296,7 +296,7 @@
     "packages/git/node-addon/src/process.rs": "60cbc85ed1de5a7057e90c84fc1bbd6041332ba0cba336c6f6487471ab3fe657",
     "packages/git/node-addon/src/session_identity.rs": "589228eb52558f60aec3a5b5525101dce182e5e61a10e4e964270c7a726be4d6",
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
-    "packages/git/rust/src/driver.rs": "98fb5f2e371cdf0c9dc8f55c539002acb07541e7d0105cd1797c321d60a315af",
+    "packages/git/rust/src/driver.rs": "9161cd442f94ba66cff15a3d0784b50c42086902206026a11021e16007773753",
     "packages/git/rust/src/grant.rs": "1a96595205c5deea732fd37208802e07a44409201ca4e591b89b687e798044b5",
     "packages/git/rust/src/inspect.rs": "d900d81f350dabd1973c1f4265fa01f843bfe4e1605a0923068a5cf650aa066b",
     "packages/git/rust/src/land.rs": "0cf8be1440888112cf8a8955f03cecb58580ed3ad65dcecf73f1abedfe8120a0",
@@ -1852,21 +1852,21 @@
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 1189,
+      "line": 1214,
       "spawn": "Command::new <- packages/process/rust/src/containment/windows.rs:86",
       "binary": "? path.to_str() .map(str::to_owned) .ok_or_else(|| failure(\"non-utf8-authority-pat",
       "class": "git-driver"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 2653,
+      "line": 2678,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 2804,
+      "line": 2865,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
