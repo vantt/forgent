@@ -22,7 +22,8 @@ use crate::locks::PROJECT_CONFIG;
 use crate::schema::{json_at, json_put};
 use crate::scope::{judge, SourceKind};
 use crate::snapshot::{Context, SessionClass, SnapshotError, SnapshotRequest};
-use crate::write::{conflict, dir_identity, hold, io_error, produce, snapshot_with, Edit};
+use crate::write::{conflict, dir_identity, hold, io_error, produce};
+use crate::write::{snapshot_with, without_project, Edit};
 use crate::ConfigRefusal;
 
 const BACKUPS: &str = ".fgos/runtime/config-migrate";
@@ -254,14 +255,8 @@ fn differences(
     old: &[u8],
     new: &[u8],
 ) -> Result<Vec<String>, SnapshotError> {
-    // A root with no `.fgos`: the project layer is exactly the bytes, even while both files exist.
-    let absent = roots.project_root.join(".fgos-migrate-absent");
-    let trusted = (roots.trusted_root != roots.project_root).then(|| roots.trusted_root.clone());
-    let isolated = SnapshotRequest {
-        trusted_root: trusted.unwrap_or_else(|| absent.clone()),
-        project_root: absent,
-        ..roots.clone()
-    };
+    // The project layer is exactly the bytes, even while both files of the project exist.
+    let isolated = without_project(roots);
     let read =
         |bytes| snapshot_with(ctx, &isolated, "project", bytes).map(|snapshot| snapshot.value);
     let mut found = BTreeSet::new();

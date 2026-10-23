@@ -402,6 +402,23 @@ pub(crate) fn snapshot_with(
     build(ctx, roots, &sources)
 }
 
+/// `roots` without the project layer, so a source replaced in `snapshot_with` is read over the machine
+/// files alone even while both files of a project exist. A linked worktree keeps the main checkout's
+/// commands.
+pub(crate) fn without_project(roots: &SnapshotRequest) -> SnapshotRequest {
+    let absent = roots.project_root.join(".fgos-absent");
+    let linked = roots.trusted_root != roots.project_root;
+    SnapshotRequest {
+        trusted_root: if linked {
+            roots.trusted_root.clone()
+        } else {
+            absent.clone()
+        },
+        project_root: absent,
+        ..roots.clone()
+    }
+}
+
 /// Rewrite the `@fgos:doc` lines of `req.target` that differ from the render: [`commit_observed`]
 /// with the one docs edit. The reason and any edits of the request are not used.
 pub fn refresh(
