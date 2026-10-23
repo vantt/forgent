@@ -4,11 +4,13 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { sandboxGit } from '../../scripts/lib/sandbox-git.mjs';
-import { verifyMarkdownLinks } from '../../scripts/verify-phase-01.mjs';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
+import { verifyMarkdownLinks, runPhase01Verification } from '../../scripts/verify-phase-01.mjs';
 
 import {
   parseArgs,
   verifyForbiddenPhase02Diff,
+  runPhase02Verification,
 } from '../../scripts/verify-phase-02.mjs';
 
 function withoutBaseEnv(fn) {
@@ -86,6 +88,84 @@ test('Markdown verification reads the end commit and ignores deleted documents',
     assert.throws(() => verifyMarkdownLinks(root, base, broken), /missing link target/);
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
+
+// Argument/scope/link proofs never execute either verifier's finally block.
+// Real Git fixture ports own registration/removal here; only npm is a local
+// fixture executable, so no network install or full-suite command is needed.
+for (const [phase, verify] of [['01', runPhase01Verification], ['02', runPhase02Verification]]) {
+  for (const scenario of ['check failure', 'partial install', 'keep worktree', 'unrelated ignored bytes', 'committed dependencies']) {
+    test(`verifier ${phase} cleans its setup after ${scenario} without forcing removal`, (t) => {
+      const root = fs.mkdtempSync(path.join(os.tmpdir(), 'verify-cleanup-'));
+      const repo = path.join(root, 'repo');
+      const bin = path.join(root, 'bin');
+      fs.mkdirSync(repo);
+      fs.mkdirSync(bin);
+      initFixtureRepo(repo, { ignore: '.fgos/\nnode_modules/\ntarget/\nforeign/\n' });
+      const git = (args) => sandboxGit(root)(args, { cwd: repo });
+      const installReceipt = path.join(root, 'install.json');
+      const partial = scenario === 'partial install';
+      const keep = scenario === 'keep worktree';
+      const foreign = scenario === 'unrelated ignored bytes';
+      const committedDeps = scenario === 'committed dependencies';
+      if (committedDeps) {
+        fs.mkdirSync(path.join(repo, 'node_modules'));
+        fs.writeFileSync(path.join(repo, 'node_modules/committed'), 'preserve committed bytes');
+        git(['add', '-f', 'node_modules/committed']);
+      }
+      fs.mkdirSync(path.join(repo, 'target'));
+      fs.writeFileSync(path.join(repo, 'target', 'shared-cache'), 'preserve host bytes');
+      fs.writeFileSync(path.join(repo, 'package-lock.json'), '{}\n');
+      git(['add', 'package-lock.json']);
+      git(['-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '-qm', 'lockfile']);
+      fs.writeFileSync(path.join(bin, 'npm'), `#!${process.execPath}
+const fs = require('node:fs');
+fs.mkdirSync('node_modules', { recursive: true });
+fs.writeFileSync('node_modules/installed', 'regenerable');
+${foreign ? "fs.mkdirSync('foreign'); fs.writeFileSync('foreign/valuable', 'preserve');" : ''}
+fs.writeFileSync(${JSON.stringify(installReceipt)}, JSON.stringify({ cwd: process.cwd(), args: process.argv.slice(2) }));
+process.exit(${partial ? 23 : 0});
+`, { mode: 0o755 });
+      const oldTmpdir = process.env.TMPDIR;
+      process.env.TMPDIR = root;
+      const oldPath = process.env.PATH;
+      process.env.PATH = `${bin}${path.delimiter}${oldPath}`;
+      const warnings = [];
+      t.mock.method(console, 'log', () => {});
+      t.mock.method(console, 'warn', (message) => warnings.push(message));
+      let worktree;
+      try {
+        assert.throws(() => verify({ base: 'HEAD', fixedEnd: 'HEAD', keepWorktree: keep }, repo),
+          partial ? /npm.*failed|Command failed/ : /Focused tests failed|--test.*failed/);
+        const installed = JSON.parse(fs.readFileSync(installReceipt, 'utf8'));
+        worktree = installed.cwd;
+        assert.deepEqual(installed.args, phase === '01' ? ['install'] : ['ci']);
+        const registrations = git(['worktree', 'list', '--porcelain']);
+        if (keep || foreign || committedDeps) {
+          assert.ok(registrations.includes(worktree));
+          assert.equal(fs.existsSync(path.join(worktree, 'node_modules')), keep || committedDeps);
+          assert.equal(warnings.length, keep ? 0 : 1);
+          if (!keep) assert.match(warnings[0], /ignored-bytes-preserved/);
+          if (foreign) assert.equal(fs.readFileSync(path.join(worktree, 'foreign/valuable'), 'utf8'), 'preserve');
+          if (committedDeps) assert.equal(fs.readFileSync(path.join(worktree, 'node_modules/committed'), 'utf8'), 'preserve committed bytes');
+          if (phase === '01') assert.equal(fs.existsSync(path.join(worktree, 'target')), keep);
+        } else {
+          assert.equal(fs.existsSync(worktree), false, 'owned dependency bytes must not block cleanup');
+          assert.equal(registrations.includes(worktree), false, 'no dangling worktree registration');
+          assert.deepEqual(warnings, []);
+        }
+        assert.equal(fs.readFileSync(path.join(repo, 'target/shared-cache'), 'utf8'), 'preserve host bytes');
+      } finally {
+        if (oldTmpdir === undefined) delete process.env.TMPDIR;
+        else process.env.TMPDIR = oldTmpdir;
+        if (oldPath === undefined) delete process.env.PATH;
+        else process.env.PATH = oldPath;
+        // Destructive teardown is confined to this disposable fixture repository.
+        if (worktree && fs.existsSync(worktree)) git(['worktree', 'remove', '--force', worktree]);
+        fs.rmSync(root, { recursive: true, force: true });
+      }
+    });
+  }
+}
 
 test('verifyForbiddenPhase02Diff rejects unrelated edits', () => {
   const calls = [];

@@ -178,6 +178,9 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
     testTotals: {},
   };
 
+  // Record our own setup outputs before creation, including partial failures.
+  // Existing checkout bytes remain subject to the guarded removal contract.
+  const installedPaths = [];
   try {
     const head = resolveCommitSha('HEAD', tempWorktreeDir);
     if (head !== fixedEndSha) throw new Error(`Worktree checkout mismatch: HEAD ${head} !== FIXED_END ${fixedEndSha}`);
@@ -189,6 +192,8 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
 
     console.log('\n[Setup] Provisioning dependencies in clean worktree (npm ci when lockfile exists)...');
     const npmArgs = fs.existsSync(path.join(tempWorktreeDir, 'package-lock.json')) ? ['ci'] : ['install'];
+    const nodeModules = path.join(tempWorktreeDir, 'node_modules');
+    if (!fs.lstatSync(nodeModules, { throwIfNoEntry: false })) installedPaths.push(nodeModules);
     runOrThrow('npm', npmArgs, { cwd: tempWorktreeDir, stdio: ['pipe', 'pipe', 'pipe'] });
     const postSetupEntries = statusEntries(inspectRepo(tempWorktreeDir), 'none');
     const postSetupStatus = postSetupEntries.length ? JSON.stringify(postSetupEntries) : '';
@@ -303,6 +308,8 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
 
     if (!skipFullSuite) {
       console.log('\n[Check 9/9] Building clean-worktree Rust release binaries, then running full npm test suite...');
+      const target = path.join(tempWorktreeDir, 'target');
+      if (!fs.lstatSync(target, { throwIfNoEntry: false })) installedPaths.push(target);
       const rustBuild = runOrThrow('cargo', ['build', '--release', '--workspace'], {
         cwd: tempWorktreeDir,
         stdio: ['ignore', 'pipe', 'pipe'],
@@ -341,6 +348,8 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
     if (!keepWorktree) {
       console.log(`\nCleaning up temporary worktree ${tempWorktreeDir}...`);
       try {
+        // Remove only our regenerable outputs; other dirt still refuses removal.
+        for (const installed of installedPaths) fs.rmSync(installed, { recursive: true, force: true });
         removeWorktree(repoRoot, tempWorktreeDir);
         console.log('✓ Temporary worktree removed');
       } catch (err) {

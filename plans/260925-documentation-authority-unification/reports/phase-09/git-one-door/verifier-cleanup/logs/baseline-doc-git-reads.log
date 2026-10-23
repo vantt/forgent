@@ -1,0 +1,31 @@
+✔ typed commit reads preserve unusual paths, immutable text and exact blob identity (233.772517ms)
+✔ typed scope binding ignores outside changes and rejects scope changes or unresolved commits (138.057638ms)
+✖ typed blob batches preserve binary bytes, split bounds, filter sizes and reject missing objects (17093.37409ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 2
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17616.010897
+
+✖ failing tests:
+
+test at test/scripts/doc-git-reads.test.mjs:68:1
+✖ typed blob batches preserve binary bytes, split bounds, filter sizes and reject missing objects (17093.37409ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w2-d3c-brief/payload/test/scripts/doc-git-reads.test.mjs:91:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /object exceeds Inspect read bound/,
+    operator: 'throws',
+    diff: 'simple'
+  }

@@ -190,6 +190,9 @@ export function runPhase01Verification(options, repoRoot = REPO_ROOT) {
     checks: {},
   };
 
+  // Only setup outputs absent from the committed checkout belong to this run.
+  // Record before installing so a partial npm failure is cleaned up too.
+  const installedPaths = [];
   try {
     // 3. Assert worktree invariants
     const worktreeHead = resolveCommitSha('HEAD', tempWorktreeDir);
@@ -208,13 +211,17 @@ export function runPhase01Verification(options, repoRoot = REPO_ROOT) {
 
     // 4. Provision dependencies inside the isolated worktree
     console.log('\n[Setup] Provisioning dependencies in clean worktree (npm install)...');
+    const nodeModules = path.join(tempWorktreeDir, 'node_modules');
+    if (!fs.lstatSync(nodeModules, { throwIfNoEntry: false })) installedPaths.push(nodeModules);
     execFileSync('npm', ['install'], {
       cwd: tempWorktreeDir,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
     const targetSrc = path.join(repoRoot, 'target');
     if (fs.existsSync(targetSrc) && !fs.existsSync(path.join(tempWorktreeDir, 'target'))) {
-      fs.symlinkSync(targetSrc, path.join(tempWorktreeDir, 'target'), 'dir');
+      const targetLink = path.join(tempWorktreeDir, 'target');
+      fs.symlinkSync(targetSrc, targetLink, 'dir');
+      installedPaths.push(targetLink);
     }
     console.log('✓ Dependencies provisioned');
 
@@ -448,6 +455,9 @@ export function runPhase01Verification(options, repoRoot = REPO_ROOT) {
     if (!keepWorktree) {
       console.log(`\nCleaning up temporary worktree ${tempWorktreeDir}...`);
       try {
+        // Reclaim our dependencies/cache link, never the worktree itself or
+        // unrelated ignored bytes. The guarded Git port still owns removal.
+        for (const installed of installedPaths) fs.rmSync(installed, { recursive: true, force: true });
         removeWorktree(repoRoot, tempWorktreeDir);
         console.log('✓ Temporary worktree removed');
       } catch (err) {

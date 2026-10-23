@@ -1,0 +1,173 @@
+✔ parseArgs requires explicit base and fixed-end (1.614229ms)
+✔ parseArgs binds immutable base/fixed-end and skip-full-suite flags (0.851148ms)
+✔ parseArgs rejects unknown flags instead of silently ignoring moving-worktree input (0.183075ms)
+✔ verifyForbiddenPhase02Diff allows exact Phase 02 footprint including shard directory (0.319944ms)
+✔ Markdown verification reads the end commit and ignores deleted documents (279.729723ms)
+✖ verifier 01 cleans its setup after check failure without forcing removal (342.613484ms)
+✖ verifier 01 cleans its setup after partial install without forcing removal (276.471378ms)
+✔ verifier 01 cleans its setup after keep worktree without forcing removal (284.858898ms)
+✖ verifier 01 cleans its setup after unrelated ignored bytes without forcing removal (325.607625ms)
+✖ verifier 01 cleans its setup after committed dependencies without forcing removal (321.166125ms)
+✖ verifier 02 cleans its setup after check failure without forcing removal (361.626843ms)
+✖ verifier 02 cleans its setup after partial install without forcing removal (273.875743ms)
+✔ verifier 02 cleans its setup after keep worktree without forcing removal (293.889849ms)
+✖ verifier 02 cleans its setup after unrelated ignored bytes without forcing removal (353.326931ms)
+✔ verifier 02 cleans its setup after committed dependencies without forcing removal (345.642306ms)
+✔ verifyForbiddenPhase02Diff rejects unrelated edits (0.561399ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 9
+ℹ fail 7
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3625.989466
+
+✖ failing tests:
+
+test at test/scripts/verify-phase-02.test.mjs:97:5
+✖ verifier 01 cleans its setup after check failure without forcing removal (342.613484ms)
+  AssertionError [ERR_ASSERTION]: owned dependency bytes must not block cleanup
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w2-d3c-brief/payload/test/scripts/verify-phase-02.test.mjs:152:18)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/verify-phase-02.test.mjs:97:5
+✖ verifier 01 cleans its setup after partial install without forcing removal (276.471378ms)
+  AssertionError [ERR_ASSERTION]: owned dependency bytes must not block cleanup
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w2-d3c-brief/payload/test/scripts/verify-phase-02.test.mjs:152:18)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/verify-phase-02.test.mjs:97:5
+✖ verifier 01 cleans its setup after unrelated ignored bytes without forcing removal (325.607625ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w2-d3c-brief/payload/test/scripts/verify-phase-02.test.mjs:145:18)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/verify-phase-02.test.mjs:97:5
+✖ verifier 01 cleans its setup after committed dependencies without forcing removal (321.166125ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /ignored-bytes-preserved/. Input:
+  
+  'Temporary worktree retained at /tmp/fgos-work/w2-d3c-brief/tmp/verify-cleanup-WhnJWy/fgos-verify-phase01-DlzGcc: git worktree remove failed for "/tmp/fgos-work/w2-d3c-brief/tmp/verify-cleanup-WhnJWy/fgos-verify-phase01-DlzGcc": {"code":"refused","cause":"worktree-dirty-preserved","retryable":false,"operationId":null,"receipt":null,"exitCode":null,"signal":null,"stderr":[],"detail":null}'
+  
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w2-d3c-brief/payload/test/scripts/verify-phase-02.test.mjs:147:29)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Temporary worktree retained at /tmp/fgos-work/w2-d3c-brief/tmp/verify-cleanup-WhnJWy/fgos-verify-phase01-DlzGcc: git worktree remove failed for "/tmp/fgos-work/w2-d3c-brief/tmp/verify-cleanup-WhnJWy/fgos-verify-phase01-DlzGcc": {"code":"refused","cause":"worktree-dirty-preserved","retryable":false,"operationId":null,"receipt":null,"exitCode":null,"signal":null,"stderr":[],"detail":null}',
+    expected: /ignored-bytes-preserved/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at test/scripts/verify-phase-02.test.mjs:97:5
+✖ verifier 02 cleans its setup after check failure without forcing removal (361.626843ms)
+  AssertionError [ERR_ASSERTION]: owned dependency bytes must not block cleanup
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w2-d3c-brief/payload/test/scripts/verify-phase-02.test.mjs:152:18)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/verify-phase-02.test.mjs:97:5
+✖ verifier 02 cleans its setup after partial install without forcing removal (273.875743ms)
+  AssertionError [ERR_ASSERTION]: owned dependency bytes must not block cleanup
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w2-d3c-brief/payload/test/scripts/verify-phase-02.test.mjs:152:18)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/verify-phase-02.test.mjs:97:5
+✖ verifier 02 cleans its setup after unrelated ignored bytes without forcing removal (353.326931ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w2-d3c-brief/payload/test/scripts/verify-phase-02.test.mjs:145:18)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

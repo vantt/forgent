@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Documentation gates and immutable-verification tooling reuse typed Git reads and bounded blob batches, preserving non-ASCII and tab-containing filenames. Verifiers retain a disposable checkout with a warning when guarded cleanup refuses, rather than force-deleting its files.
+- Documentation gates and immutable-verification tooling reuse typed Git reads and bounded blob batches, preserving non-ASCII and tab-containing filenames. Verifiers reclaim their own dependency/build outputs (including partial installs) before guarded worktree removal; unrelated dirty or ignored bytes still retain the checkout with a warning. The non-pinned blob reader rejects objects beyond Inspect's bound instead of spawning raw Git.
 - Reproduction-pinned documentation generators retain their exact historical bytes; migrated callers use a separate non-pinned reader so reproduction check B remains valid without rebaselining.
 
 - Human-mode `fgos docs-lease` prints its result line and exits 0, reporting corrupt sidecars clearly; a refused non-holder `fgos run` writes nothing, including no config bootstrap or case-bindings sentinel.

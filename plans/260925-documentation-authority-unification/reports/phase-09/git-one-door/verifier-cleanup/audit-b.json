@@ -1,0 +1,138 @@
+{
+  "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py",
+  "cwd": "/tmp/fgos-work/w2-d3c-brief/payload",
+  "exit": 1,
+  "baselineExit": 1,
+  "completeAuditOk": false,
+  "fullOutputScratch": "/tmp/fgos-work/w2-d3c-brief/logs/audit-report.json",
+  "fullOutputSha256": "738193429f9563fcf8d10c4297a6c11b2e46975932769eeef1592a0588762066",
+  "manifests": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "B": {
+        "ok": true,
+        "rows": [
+          {
+            "path": "scripts/generate-doc-inventory.mjs",
+            "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+            "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+            "sourceWorktreeBlobOid": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+          },
+          {
+            "path": "scripts/doc-inventory-artifact.mjs",
+            "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+            "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+            "sourceWorktreeBlobOid": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+          },
+          {
+            "path": "scripts/generate-shipped-path-inventory.mjs",
+            "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+            "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+            "sourceWorktreeBlobOid": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+          },
+          {
+            "path": "scripts/check-legacy-docs-ratchet.mjs",
+            "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+            "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+            "sourceWorktreeBlobOid": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+          },
+          {
+            "path": "scripts/lib/is-main-module.mjs",
+            "expected": "680570946fa1381474900c9192795514b5b88f48",
+            "actual": "680570946fa1381474900c9192795514b5b88f48",
+            "sourceWorktreeBlobOid": "680570946fa1381474900c9192795514b5b88f48"
+          }
+        ]
+      },
+      "baselineB": true,
+      "fullAuditCommands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 1
+        },
+        {
+          "script": "checks.mjs",
+          "exit": 1
+        }
+      ],
+      "ownership": {
+        "noNewDoubleOwnership": false,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": []
+      },
+      "ownershipEqualToBaseline": true,
+      "targetDigestDriftCount": 76,
+      "targetDigestDriftEqualToBaseline": true,
+      "A_ok": false,
+      "wholeChecksOk": false
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "B": {
+        "ok": true,
+        "rows": [
+          {
+            "path": "scripts/generate-doc-inventory.mjs",
+            "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+            "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+            "sourceWorktreeBlobOid": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+          },
+          {
+            "path": "scripts/doc-inventory-artifact.mjs",
+            "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+            "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+            "sourceWorktreeBlobOid": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+          },
+          {
+            "path": "scripts/generate-shipped-path-inventory.mjs",
+            "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+            "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+            "sourceWorktreeBlobOid": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+          },
+          {
+            "path": "scripts/check-legacy-docs-ratchet.mjs",
+            "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+            "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+            "sourceWorktreeBlobOid": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+          },
+          {
+            "path": "scripts/lib/is-main-module.mjs",
+            "expected": "680570946fa1381474900c9192795514b5b88f48",
+            "actual": "680570946fa1381474900c9192795514b5b88f48",
+            "sourceWorktreeBlobOid": "680570946fa1381474900c9192795514b5b88f48"
+          }
+        ]
+      },
+      "baselineB": true,
+      "fullAuditCommands": [
+        {
+          "script": "ownership.mjs",
+          "exit": 0
+        },
+        {
+          "script": "audit-ownership.mjs",
+          "exit": 1
+        },
+        {
+          "script": "checks.mjs",
+          "exit": 1
+        }
+      ],
+      "ownership": {
+        "noNewDoubleOwnership": false,
+        "nativePlatformTargetIdentityDuplicates": 0,
+        "newActiveSourcePairCollisions": []
+      },
+      "ownershipEqualToBaseline": true,
+      "targetDigestDriftCount": 76,
+      "targetDigestDriftEqualToBaseline": true,
+      "A_ok": false,
+      "wholeChecksOk": false
+    }
+  ],
+  "limits": "Scratch fixture binds source HEAD via read-only objects; complete A/ownership audit is not green. No pair accounting or rebaseline performed."
+}

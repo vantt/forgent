@@ -1,0 +1,27 @@
+[
+  {
+    "path": "scripts/verify-phase-01.mjs",
+    "sha256": "9cf5685899f1fc7c848e6654b5fbbcf16d4661c7a53218115bbfd40a5a7bc60a",
+    "testedPayloadByteEqual": true
+  },
+  {
+    "path": "scripts/verify-phase-02.mjs",
+    "sha256": "82618d8815049142dc5c491ee3a653ce0831435b9cd692aeda411c833e7196df",
+    "testedPayloadByteEqual": true
+  },
+  {
+    "path": "scripts/lib/doc-git-reads.mjs",
+    "sha256": "f76eaf64f01ba9934ba0104483051bf758feb78f991adc8b5e6c10b882227952",
+    "testedPayloadByteEqual": true
+  },
+  {
+    "path": "test/scripts/verify-phase-02.test.mjs",
+    "sha256": "fdd4a0d9065492f294faf28cad92fae89bfe7767f70b353b88f8a9096e46b288",
+    "testedPayloadByteEqual": true
+  },
+  {
+    "path": "test/scripts/doc-git-reads.test.mjs",
+    "sha256": "1f74ada6cfeabaa7880b07c623863f3b52b03fed06c9a03d60bc658d7657d1a0",
+    "testedPayloadByteEqual": true
+  }
+]

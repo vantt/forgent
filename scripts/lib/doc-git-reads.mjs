@@ -2,7 +2,6 @@
 // generators are byte-pinned: their historical readers must not be edited or used
 // as the implementation of these migrated callers.
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { inspectRepo } from './git-ports.mjs';
 import { inspectEntries, inspectPath } from '../../src/util/git-paths.mjs';
 
@@ -70,32 +69,6 @@ export function readCommitBlobMap(repoRoot, entries, options = {}) {
   const maxSize = options.maxSize ?? 20 * 1024 * 1024;
   const readable = entries.filter((entry) => entry?.blobSha && Number(entry.size) <= maxSize);
   if (readable.length === 0) return new Map();
-  // L13-2 candidate retained from D3: explicitly raised single-object capacity
-  // has no existing typed equivalent. This is never a retry after typed failure.
-  if (readable.some((entry) => Number(entry.size) > 31 * 1024 * 1024)) {
-    const result = spawnSync('git', ['cat-file', '--batch'], {
-      cwd: repoRoot,
-      input: readable.map((entry) => entry.blobSha).join('\n') + '\n',
-      maxBuffer: Math.max(64 * 1024 * 1024, readable.reduce((n, entry) => n + Number(entry.size || 0), 0) + readable.length * 200),
-    });
-    if (result.status !== 0) throw new Error(`git cat-file --batch failed: ${(result.stderr || Buffer.alloc(0)).toString('utf8').trim()}`);
-    const byPath = new Map();
-    const stdout = result.stdout || Buffer.alloc(0);
-    let offset = 0;
-    for (const entry of readable) {
-      const newline = stdout.indexOf(0x0a, offset);
-      if (newline < 0) throw new Error(`git cat-file --batch truncated before ${entry.blobSha}`);
-      const header = stdout.subarray(offset, newline).toString('utf8');
-      const [sha, type, sizeText] = header.split(' ');
-      const size = Number(sizeText);
-      if (sha !== entry.blobSha || type !== 'blob' || !Number.isFinite(size) || size !== Number(entry.size)) throw new Error(`git cat-file --batch unexpected header for ${entry.path}: ${header}`);
-      const end = newline + 1 + size;
-      if (end >= stdout.length) throw new Error(`git cat-file --batch truncated body for ${entry.path}`);
-      byPath.set(entry.path.split(path.sep).join('/'), Buffer.from(stdout.subarray(newline + 1, end)));
-      offset = end + 1;
-    }
-    return byPath;
-  }
   const port = inspectRepo(repoRoot);
   const byPath = new Map();
   for (let start = 0; start < readable.length;) {

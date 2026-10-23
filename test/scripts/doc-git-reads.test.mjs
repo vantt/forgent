@@ -86,5 +86,7 @@ test('typed blob batches preserve binary bytes, split bounds, filter sizes and r
   const oversizedSha = hash(oversized);
   const oversizedEntries = [{ path: 'explicit-large-limit', blobSha: oversizedSha, size: oversized.length }];
   assert.equal(readCommitBlobMap(root, oversizedEntries).size, 0);
-  assert.ok(readCommitBlobMap(root, oversizedEntries, { maxSize: oversized.length }).get('explicit-large-limit').equals(oversized));
+  // The non-pinned adapter has only Inspect's bounded read contract; no
+  // production caller needs the generator's historical raised-capacity path.
+  assert.throws(() => readCommitBlobMap(root, oversizedEntries, { maxSize: oversized.length }), /object exceeds Inspect read bound/);
 });

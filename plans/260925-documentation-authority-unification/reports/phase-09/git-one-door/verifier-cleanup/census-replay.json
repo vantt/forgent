@@ -1,0 +1,12 @@
+{
+  "byteEqual": true,
+  "payloadDigest": "ef12230b4a0da586fdf2106e52f3b16b47c99cfe068d292d9185edbb95aab64c",
+  "files": 1098,
+  "sites": 25,
+  "classes": 254,
+  "families": {
+    "spawn": 19,
+    "unresolved-binary": 6
+  },
+  "removedRawReader": true
+}

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "397b0969d8608f88bf91230dc05fe944b66df4fc9af76c7d9aa3fe1147b334a8",
+  "payloadDigest": "ef12230b4a0da586fdf2106e52f3b16b47c99cfe068d292d9185edbb95aab64c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -712,7 +712,7 @@
     "scripts/knowledge-classifier.mjs": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
     "scripts/knowledge-migration.mjs": "10193fda8ea6a58e3727847031f372309786ec05f181c4b79a67692791f0ac51",
     "scripts/lib/dev-host-manifest.mjs": "9928ceb97e807bcb02a7fed73153cf21de09d6cc9b6d56492166cb94e48c44bb",
-    "scripts/lib/doc-git-reads.mjs": "05cc34d350d8d016d38d28f25e6dee7d024c4a6b5a9ad520f4cd22323ea58ff1",
+    "scripts/lib/doc-git-reads.mjs": "f76eaf64f01ba9934ba0104483051bf758feb78f991adc8b5e6c10b882227952",
     "scripts/lib/full-suite-queue.mjs": "da176b9ad8a796ec13ede755dd2c2b12e6e29d5b5b12874ca8e6ae06803e3aba",
     "scripts/lib/git-addon-stage.mjs": "1ec1179ce9ed73ad9e8ccba357d9ee141cd5bb57aff9d86f39b45eacc8da1ad7",
     "scripts/lib/git-dir-layout.mjs": "710ff2406bed4faa4a35ff3ccd2910e97d693112b64cd82802efc2f99027232f",
@@ -752,8 +752,8 @@
     "scripts/test-select.mjs": "8f10398be7ebbd1c782e005218925b84f6757b554b67b827f0d42e0a5686dd8b",
     "scripts/test-timing.mjs": "9b9dd13f78f4aaeaf60d43909e3224c465a4e34270032bf9845c23529bc243c1",
     "scripts/verify-fanout-overlap.mjs": "3f96381f4ea858b09f8103987f83d712a368ebaf9f8297ef223a7190f1d29fd6",
-    "scripts/verify-phase-01.mjs": "b8f6429342569bad91a324be86f690dcec8a208b84a34c68b20dad740d0e19d1",
-    "scripts/verify-phase-02.mjs": "2a3310393ab78b9dbf7c2dfff6ed48282fd06dd9047bed86c03fb82aa4def88f",
+    "scripts/verify-phase-01.mjs": "9cf5685899f1fc7c848e6654b5fbbcf16d4661c7a53218115bbfd40a5a7bc60a",
+    "scripts/verify-phase-02.mjs": "82618d8815049142dc5c491ee3a653ce0831435b9cd692aeda411c833e7196df",
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
     "src/cli/approve-fault-log.mjs": "e362c6b4a676839f6010c08d1df648f5973c2d9ec7a13acf97e40f93b57b42ab",
@@ -1300,34 +1300,23 @@
       ]
     },
     {
-      "path": "scripts/lib/doc-git-reads.mjs",
-      "line": 76,
-      "spawn": "spawnSync",
-      "binary": "git",
-      "family": "spawn",
-      "callers": [
-        "scripts/check-doc-inventory-gates.mjs:405",
-        "scripts/check-doc-inventory-gates.mjs:456"
-      ]
-    },
-    {
       "path": "scripts/verify-phase-01.mjs",
       "line": 169,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        "scripts/verify-phase-01.mjs:465"
+        "scripts/verify-phase-01.mjs:475"
       ]
     },
     {
       "path": "scripts/verify-phase-01.mjs",
-      "line": 363,
+      "line": 370,
       "spawn": "spawnSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        "scripts/verify-phase-01.mjs:465"
+        "scripts/verify-phase-01.mjs:475"
       ]
     },
     {
@@ -1344,7 +1333,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        "scripts/verify-phase-02.mjs:358"
+        "scripts/verify-phase-02.mjs:367"
       ]
     },
     {

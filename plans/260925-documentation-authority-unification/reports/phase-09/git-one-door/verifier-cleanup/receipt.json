@@ -1,0 +1,132 @@
+{
+  "brief": "w2-d3c-brief.md",
+  "assignment": "unit-run-1792768140207-72fac9de/producer/1",
+  "inputHead": "e158e672682f4b305230e099f72a1b10adda25e7",
+  "outcome": "both requested review findings fixed; touched tests green; reproduction B green; remaining census sites remain declared pending proposals, not approved exemptions",
+  "needsWrites": [],
+  "touchedFindings": [
+    "w2-g4-code-review: verifier provisioning blocks guarded cleanup",
+    "w2-g4-code-review: test-only raw blob branch"
+  ],
+  "proofOwner": "test/scripts/verify-phase-02.test.mjs owns verifier cleanup; test/scripts/doc-git-reads.test.mjs owns bounded reader",
+  "retiredBehavior": "non-pinned reader supports explicitly raised single-object raw Git capacity; no production caller used it",
+  "reuse": [
+    "existing typed Worktree create and guarded removeWorktree",
+    "existing Inspect readObjects batching",
+    "existing initFixtureRepo activation-fence helper"
+  ],
+  "priorArtCommits": [
+    "898989f21",
+    "7d9a33a2d",
+    "56e3172ed"
+  ],
+  "impactAnalysis": "degraded under no-fgOS-CLI rule; callers/imports/history cross-checked, no graph proof",
+  "environment": {
+    "cwd": "/tmp/fgos-work/w2-d3c-brief/payload",
+    "releasePath": "/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06",
+    "FGOS_STATE_ROOT": "/tmp/fgos-work/w2-d3c-brief/state-root",
+    "TMPDIR": "/tmp/fgos-work/w2-d3c-brief/tmp",
+    "CLAUDE_CODE_SESSION_ID": "unset",
+    "native": "activated release addon/helper copied to scratch with supported native-addon.json; no loader patch, bypass or fresh build"
+  },
+  "tests": [
+    {
+      "file": "test/scripts/verify-phase-02.test.mjs",
+      "command": "env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos FGOS_STATE_ROOT=/tmp/fgos-work/w2-d3c-brief/state-root TMPDIR=/tmp/fgos-work/w2-d3c-brief/tmp node --test test/scripts/verify-phase-02.test.mjs",
+      "exit": 0,
+      "tests": 16,
+      "pass": 16,
+      "fail": 0,
+      "skipped": 0,
+      "log": "logs/verify-phase-02.log",
+      "unchangedHeadReplay": {
+        "exit": 1,
+        "tests": 16,
+        "pass": 9,
+        "fail": 7,
+        "skipped": 0,
+        "log": "logs/baseline-verify-phase-02.log"
+      }
+    },
+    {
+      "file": "test/scripts/doc-git-reads.test.mjs",
+      "command": "env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos FGOS_STATE_ROOT=/tmp/fgos-work/w2-d3c-brief/state-root TMPDIR=/tmp/fgos-work/w2-d3c-brief/tmp node --test test/scripts/doc-git-reads.test.mjs",
+      "exit": 0,
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "skipped": 0,
+      "log": "logs/doc-git-reads.log",
+      "unchangedHeadReplay": {
+        "exit": 1,
+        "tests": 3,
+        "pass": 2,
+        "fail": 1,
+        "skipped": 0,
+        "log": "logs/baseline-doc-git-reads.log"
+      }
+    }
+  ],
+  "total": {
+    "tests": 19,
+    "pass": 19,
+    "fail": 0
+  },
+  "census": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos FGOS_STATE_ROOT=/tmp/fgos-work/w2-d3c-brief/state-root TMPDIR=/tmp/fgos-work/w2-d3c-brief/tmp node scripts/git-one-door-scan.mjs --root /home/vantt/projects/forgentX-p9-w1-d3 --write-census --json",
+    "exit": 1,
+    "beforeSites": 26,
+    "byteEqual": true,
+    "payloadDigest": "ef12230b4a0da586fdf2106e52f3b16b47c99cfe068d292d9185edbb95aab64c",
+    "files": 1098,
+    "sites": 25,
+    "classes": 254,
+    "families": {
+      "spawn": 19,
+      "unresolved-binary": 6
+    },
+    "removedRawReader": true,
+    "removedSite": "scripts/lib/doc-git-reads.mjs:76",
+    "approval": "none; all remaining 25 sites still counted"
+  },
+  "audit": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos FGOS_STATE_ROOT=/tmp/fgos-work/w2-d3c-brief/state-root TMPDIR=/tmp/fgos-work/w2-d3c-brief/tmp python3 -B plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py",
+    "exit": 1,
+    "B": [
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+        "ok": true
+      },
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+        "ok": true
+      }
+    ],
+    "evidence": "audit-b.json",
+    "baselineOwnershipAndDriftUnchanged": true
+  },
+  "sourceByteCheck": "source-byte-check.json",
+  "setupIncidents": [
+    "Initial fixture sandbox root excluded generated worktrees; set fixture TMPDIR within its sandbox.",
+    "Initial scratch payload omitted package contracts; copied existing contracts before baseline/current final replays."
+  ],
+  "notRun": [
+    "real-repository end-to-end verifiers",
+    "verifier full-suite and Cargo branch",
+    "npm test or scripts/run-tests.mjs",
+    "Cargo build/test",
+    "fgOS CLI or Work lifecycle",
+    "graph impact/detect_changes",
+    "git add/commit or other real-repository Git mutation"
+  ],
+  "mdview": {
+    "exit": 1,
+    "reason": "attempt to write a readonly database",
+    "log": "logs/mdview.log"
+  },
+  "diffCheck": {
+    "command": "git diff --check",
+    "exit": 0
+  },
+  "additionalFeatures": []
+}

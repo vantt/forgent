@@ -1,0 +1,24 @@
+✔ parseArgs requires explicit base and fixed-end (1.643011ms)
+✔ parseArgs binds immutable base/fixed-end and skip-full-suite flags (0.854497ms)
+✔ parseArgs rejects unknown flags instead of silently ignoring moving-worktree input (0.182414ms)
+✔ verifyForbiddenPhase02Diff allows exact Phase 02 footprint including shard directory (0.309058ms)
+✔ Markdown verification reads the end commit and ignores deleted documents (289.575556ms)
+✔ verifier 01 cleans its setup after check failure without forcing removal (408.524515ms)
+✔ verifier 01 cleans its setup after partial install without forcing removal (359.694715ms)
+✔ verifier 01 cleans its setup after keep worktree without forcing removal (286.640959ms)
+✔ verifier 01 cleans its setup after unrelated ignored bytes without forcing removal (344.251936ms)
+✔ verifier 01 cleans its setup after committed dependencies without forcing removal (356.169666ms)
+✔ verifier 02 cleans its setup after check failure without forcing removal (417.503903ms)
+✔ verifier 02 cleans its setup after partial install without forcing removal (350.290706ms)
+✔ verifier 02 cleans its setup after keep worktree without forcing removal (295.374744ms)
+✔ verifier 02 cleans its setup after unrelated ignored bytes without forcing removal (353.294544ms)
+✔ verifier 02 cleans its setup after committed dependencies without forcing removal (367.279385ms)
+✔ verifyForbiddenPhase02Diff rejects unrelated edits (0.531692ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3990.039809
