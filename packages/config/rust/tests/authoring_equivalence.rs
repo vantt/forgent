@@ -313,7 +313,7 @@ fn the_tier_ladder_renders_one_doc_line_per_tier_from_the_seat_binding_contract(
     ] {
         let path = fgos_yaml_doc::path::parse_path(path).unwrap();
         let node = schemas.resolve(&path).unwrap().node;
-        let lines = doc_lines(&node, standard.value_at(&path));
+        let lines = doc_lines(node, standard.value_at(&path));
         assert!(
             lines.len() > want.len(),
             "{path:?}: the node's own line comes first"

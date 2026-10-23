@@ -122,7 +122,7 @@ fn standard_files_equal_what_setup_seeds_except_the_named_differences() {
 /// The doc lines the standard value and the schema node render to.
 fn rendered(schemas: &Schemas, standard: &Standard, path: &[Segment]) -> Vec<String> {
     schemas.resolve(path).map_or_else(Vec::new, |found| {
-        doc_lines(&found.node, standard.value_at(path))
+        doc_lines(found.node, standard.value_at(path))
     })
 }
 
