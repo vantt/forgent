@@ -51,16 +51,17 @@ export function loginDigest(file) {
 }
 
 /**
- * After a run that held a copied login at `copy`: null when the copy still has the bytes of
- * `snapshot` (its sha256 at copy time). Otherwise, the copy (changed, or replaced by another
- * entry) is moved to `asideDir`/auth.json.rotated, mode 0600, and that path is returned; a
- * missing copy returns `missing`, which the caller treats as changed. Never deletes anything:
- * it throws rather than replace a file already set aside there.
+ * After a run that held a copied login at `copy`: null when the copy's `digest` (by default the
+ * sha256 of its bytes; a login kept in a database passes the digest of its credential rows)
+ * still equals `snapshot`, its digest at copy time. Otherwise, the copy (changed, or replaced
+ * by another entry) is moved to `asideDir`/auth.json.rotated, mode 0600, and that path is
+ * returned; a missing copy returns `missing`, which the caller treats as changed. Never deletes
+ * anything: it throws rather than replace a file already set aside there.
  */
-export function setAsideChangedCopy(copy, snapshot, asideDir) {
+export function setAsideChangedCopy(copy, snapshot, asideDir, digest = loginDigest) {
   const stat = fs.lstatSync(copy, { throwIfNoEntry: false });
   if (!stat) return 'missing';
-  if (stat.isFile() && loginDigest(copy) === snapshot) return null;
+  if (stat.isFile() && digest(copy) === snapshot) return null;
   const aside = path.join(asideDir, ROTATED_AUTH);
   if (fs.existsSync(aside)) throw new Error(`${aside} exists already; ${copy} is left in place`);
   fs.renameSync(copy, aside);

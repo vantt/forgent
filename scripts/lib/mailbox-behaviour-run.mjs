@@ -265,6 +265,29 @@ export const CLAUDE_NO_CONNECTORS_ENV = Object.freeze({ ENABLE_CLAUDEAI_MCP_SERV
 /** The environment a confined run of `cli` adds to its base: Claude Code's connector switch. */
 export const cliRunEnv = (cli) => (cli === 'claude' ? { ...CLAUDE_NO_CONNECTORS_ENV } : {});
 
+/**
+ * pi's and omp's switches that keep a confined run to the one extension under test: no
+ * discovered or built-in extension (pi's MCP support is one), no MCP server, no skills, no
+ * prompt templates or rules; pi's startup network work is off. omp has no MCP switch: its
+ * project MCP sources are off by the `--config` overlay `OMP_OFF_CONFIG` and its user sources
+ * live in the fresh private home, which holds none.
+ */
+export const PI_OFF = Object.freeze(['--offline', '--no-extensions', '--no-mcp', '--no-skills', '--no-prompt-templates']);
+export const OMP_OFF = Object.freeze(['--no-extensions', '--no-skills', '--no-rules', '--no-lsp', '--no-title']);
+export const OMP_OFF_CONFIG = 'mcp:\n  enableProjectConfig: false\n';
+
+/**
+ * The print-mode argv of a pi or omp run: the JSON event stream, the one `extension` loaded by
+ * path, every other source off (`off`; the MCP falsifier drops them), the account's Codex
+ * model at the pinned thinking `effort`, the receiver instruction appended to the system
+ * prompt, the task. omp names its `profile` and its off overlay file `offConfig`.
+ */
+export function piOmpArgs(cli, { extension, model, effort, instruction = null, prompt, profile = null, offConfig = null, off = true }) {
+  if (!effort) throw new Error(`a ${cli} run names its thinking effort; it is never inherited`);
+  const head = cli === 'pi' ? ['-p', '--mode', 'json', ...(off ? PI_OFF : [])] : [`--profile=${profile}`, '-p', '--mode', 'json', ...OMP_OFF, ...(off ? [`--config=${offConfig}`] : [])];
+  return [...head, '-e', extension, '--model', `openai-codex/${model}`, '--thinking', effort, ...(instruction ? ['--append-system-prompt', instruction] : []), prompt];
+}
+
 /** The CLI argv of a run: print mode, the model (`models`, V6's by default), no MCP server, the hook rows, the instruction, the task. */
 export function cliArgs(cli, { settings, ws, lastMessage, instruction, prompt, models = score.MODELS }) {
   if (cli === 'claude') {

@@ -52,6 +52,7 @@ import * as score from '../../scripts/lib/mailbox-behaviour-score.mjs';
 import * as runs from '../../scripts/lib/mailbox-behaviour-run.mjs';
 import * as v7 from '../../scripts/lib/mailbox-behaviour-v7.mjs';
 import { runStub } from './mailbox-behaviour-stub.mjs';
+import { rolesCarrying, startRecorder } from '../../scripts/lib/mailbox-role-recorder.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
 const STUB = fileURLToPath(new URL('./mailbox-behaviour-stub.mjs', import.meta.url));
@@ -158,8 +159,20 @@ const headCommit = (root) => spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root
  * the dry runs' stub executes, and for a dry run the stub itself. Nothing else under the home.
  */
 function confinedMasks(dry) {
-  const allow = [cliBinary('codex').release, cliBinary('claude').bin, path.dirname(path.dirname(process.execPath)), ...(dry ? [STUB] : [])];
+  const allow = [cliBinary('codex').release, cliBinary('claude').bin, path.dirname(path.dirname(process.execPath)), ...piOmpInstall().allow, ...(dry ? [STUB] : [])];
   return confined.maskPlan({ allow });
+}
+
+/**
+ * pi's and omp's installs as a confined run binds them back, read-only: pi's launcher and its
+ * managed install (the launcher reads `install/current-version`), omp's binary and its unpacked
+ * natives (`PI_NATIVES_DIR` points there, so nothing is unpacked into a run). Nothing else of
+ * `~/.pi` or `~/.omp`: no account, profile, session or settings.
+ */
+function piOmpInstall() {
+  const home = os.homedir();
+  const allow = [path.join(home, '.pi', 'agent', 'bin'), path.join(home, '.pi', 'agent', 'install'), path.join(home, '.local', 'bin', 'omp'), path.join(home, '.omp', 'natives')];
+  return { allow, pi: path.join(home, '.pi', 'agent', 'bin', 'pi'), omp: path.join(home, '.local', 'bin', 'omp'), natives: path.join(home, '.omp', 'natives') };
 }
 
 /** A dry run's login: scratch bytes in a scratch home, never a real login. */
@@ -825,6 +838,124 @@ async function cmdMcpProbe(cli, { off, dry }) {
   return mcp;
 }
 
+// ---------------------------------------------------------------- pi and omp probes (no model)
+
+const ROLE_PROBE_EXT = path.join(REPO_ROOT, 'test', 'live', 'mailbox-role-probe-ext.ts');
+const MCP_PROBE_SERVER = path.join(REPO_ROOT, 'test', 'live', 'mailbox-mcp-probe-server.mjs');
+/** The Codex model the pi and omp pairs share with V7c (owner Q2). */
+const PI_OMP_MODEL = 'gpt-6.1-sol';
+/** Every injection method the role probe tries, per CLI (`kind:deliverAs` for the message calls). */
+export const ROLE_METHODS = Object.freeze({
+  pi: ['tool-result', 'context', 'context-developer', 'context-with-system', 'provider-request', 'system', 'sendMessage:none', 'sendMessage:steer', 'sendMessage:followUp', 'sendMessage:nextTurn', 'sendUserMessage:none', 'sendUserMessage:steer', 'sendUserMessage:followUp'],
+  omp: ['tool-result', 'context', 'context-developer', 'context-with-system', 'provider-request', 'system', 'sendMessage:none', 'sendMessage:steer', 'sendMessage:followUp', 'sendMessage:aside', 'sendMessage:nextTurn', 'sendUserMessage:steer', 'sendUserMessage:followUp', 'sendUserMessage:aside'],
+});
+/** The project MCP configurations the MCP falsifier plants (pi also gets its user file in the private home). */
+const PLANTED_MCP = ['.mcp.json', 'mcp.json', path.join('.claude', 'mcp.json'), path.join('.cursor', 'mcp.json'), path.join('.pi', 'mcp.json')];
+
+/** A scratch Codex OAuth login for the recorder: a token-shaped value naming a scratch account, never a real login. */
+function scratchCodexLogin() {
+  const access = ['e30', Buffer.from(JSON.stringify({ exp: 9_999_999_999, 'https://api.openai.com/auth': { chatgpt_account_id: 'acct-scratch' } })).toString('base64url'), 'scratch'].join('.');
+  return { type: 'oauth', access, refresh: 'SCRATCH-NOT-A-TOKEN', expires: Date.now() + 86_400_000, accountId: 'acct-scratch' };
+}
+
+/**
+ * One zero-model pi or omp run under the exact confined launch of the behaviour runs, its
+ * provider pointed at the recording endpoint, the role probe extension loaded by path and the
+ * marker injected by `method`: `plant` plants a stdio MCP server in every project MCP source
+ * (and pi's user file), `off` false drops the off switches (the falsifier), `runnerId` puts a
+ * runner worker's `FGOS_SESSION_ID` into the CLI's environment, `subagent` (omp) answers the
+ * head's first request with a `task` call and a `wait`. Its own home `mailbox-v7e-probe-live`.
+ */
+async function zeroModelProbe(cli, { method = 'none', plant = false, off = true, runnerId = null, subagent = false }) {
+  const base = path.join(TMP, 'fgos-work', 'mailbox-v7e-probe-live');
+  fs.mkdirSync(base, { recursive: true });
+  live.assertOutsideCheckout(base);
+  const orphans = confined.sweepOrphans(base);
+  if (orphans.left.length || orphans.unsettled.length || orphans.asides.length) die('orphans or login copies left in the probe home');
+  const install = piOmpInstall();
+  const runId = `${cli}-${method.replace(':', '-')}${plant ? '-planted' : ''}${off ? '' : '-without-off'}${runnerId ? '-runner' : ''}${subagent ? '-subagent' : ''}-${Date.now()}`;
+  const paths = confined.runPaths(base, runId);
+  const recorderDir = path.join(base, 'recorder', runId);
+  const spawnCall = { name: 'task', arguments: JSON.stringify({ context: '# Goal\nprobe', tasks: [{ name: 'Sub', task: 'Run ls, then reply done.', solutionSpace: 'one step' }] }) };
+  const called = (body) => (body?.input ?? []).filter((i) => i.type === 'function_call').map((i) => i.name);
+  const recorder = await startRecorder({ dir: recorderDir, callFor: (body) => {
+    if (!subagent || !JSON.stringify(body?.input ?? []).includes('SPAWN-SUBAGENT')) return null;
+    if (!called(body).includes('task')) return spawnCall;
+    return called(body).includes('wait') ? null : { name: 'wait', arguments: JSON.stringify({ ids: ['Sub'] }) };
+  } });
+  const offConfig = path.join(base, 'settings', `${runId}-omp-off.yml`);
+  fs.mkdirSync(path.dirname(offConfig), { recursive: true });
+  fs.writeFileSync(offConfig, runs.OMP_OFF_CONFIG);
+  const probeLog = path.join(paths.home, 'probe.log');
+  const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', runId), extra: { MBX_LOG: probeLog, MBX_METHOD: method, ...(cli === 'pi' ? { PI_CODING_AGENT_DIR: paths.home } : { PI_NATIVES_DIR: install.natives }) } });
+  if (runnerId) env.FGOS_SESSION_ID = runnerId;
+  const prompt = subagent ? 'SPAWN-SUBAGENT: delegate one task.' : 'Run ls, then reply done.';
+  const args = runs.piOmpArgs(cli, { extension: ROLE_PROBE_EXT, model: PI_OMP_MODEL, effort: 'low', prompt, profile: 'acct', offConfig, off });
+  const prepared = confined.prepareConfinedRun({ base, runId, command: install[cli], args, env, masks: confinedMasks(false), readOnly: [ROLE_PROBE_EXT, MCP_PROBE_SERVER, offConfig], accountLogin: { cli, credential: scratchCodexLogin(), profile: 'acct', ompBin: install.omp, nativesDir: install.natives } });
+  if (cli === 'pi') writeJson(path.join(paths.home, 'models.json'), { providers: { [confined.ACCOUNT_PROVIDER]: { baseUrl: recorder.url } } });
+  else fs.writeFileSync(path.join(paths.home, '.omp', 'profiles', 'acct', 'agent', 'models.yml'), `providers:\n  ${confined.ACCOUNT_PROVIDER}:\n    baseUrl: ${recorder.url}\n`);
+  fs.writeFileSync(path.join(paths.ws, 'readme.txt'), 'probe\n');
+  if (plant) {
+    const config = JSON.stringify({ mcpServers: { planted: { command: process.execPath, args: [MCP_PROBE_SERVER] } } });
+    for (const rel of [...PLANTED_MCP.map((r) => path.join(paths.ws, r)), ...(cli === 'pi' ? [path.join(paths.home, 'mcp.json')] : [])]) {
+      fs.mkdirSync(path.dirname(rel), { recursive: true });
+      fs.writeFileSync(rel, config);
+    }
+  }
+  fs.mkdirSync(paths.capture, { recursive: true });
+  const run = confined.startConfinedRun(prepared, { stdio: ['ignore', fs.openSync(path.join(paths.capture, 'stdout.txt'), 'w'), fs.openSync(path.join(paths.capture, 'stderr.txt'), 'w')] });
+  const timeout = setTimeout(() => confined.endConfinedRun(run), 180_000);
+  const exit = await run.exited;
+  clearTimeout(timeout);
+  const end = await confined.endConfinedRun(run);
+  await recorder.close();
+  const settled = confined.settleLoginCopy(prepared);
+  const requests = recorder.requests().map((f) => readJson(f));
+  const events = fs.existsSync(probeLog) ? fs.readFileSync(probeLog, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)) : [];
+  const toolNames = [...new Set(requests.flatMap((r) => (Array.isArray(r.body?.tools) ? r.body.tools.map((t) => t.name ?? t.type) : [])))];
+  const result = {
+    runId, cli, method, plant, off, runnerId, subagent, version: cliBinary(cli).version, invocations: 0,
+    argv: prepared.launch.argv, maskSha256: prepared.launch.maskSha256, exit, left: end.left.length, settled,
+    requests: requests.map((r) => `${r.method} ${r.path}${r.upgrade ? ' (upgrade)' : ''}`),
+    carriers: rolesCarrying(requests, `MARK-${method}`),
+    plantedInRequests: requests.filter((r) => JSON.stringify(r.body ?? '').includes('mbx_planted_probe')).length,
+    toolNames,
+    loads: events.filter((e) => e.at === 'load').map((e) => e.proc),
+    toolResults: events.filter((e) => e.at === 'tool_result').map(({ tool, id, subagent: sub, proc }) => ({ tool, id, subagent: sub, proc })),
+    extensionTools: events.filter((e) => e.at === 'tools').map((e) => e.all),
+    errors: events.filter((e) => e.at === 'error'),
+  };
+  writeJson(path.join(base, 'results', `${runId}.json`), result);
+  if (settled) die(`${settled.stop}: ${settled.aside}`);
+  return result;
+}
+
+async function cmdRoleProbe(cli, only) {
+  if (!['pi', 'omp'].includes(cli)) die('role-probe takes pi or omp', 2);
+  for (const method of only ? only.split(',') : ROLE_METHODS[cli]) {
+    const r = await zeroModelProbe(cli, { method });
+    say(`role-probe ${cli} ${method}: exit ${r.exit.code}; ${r.requests.length} requests; carriers ${JSON.stringify(r.carriers)}${r.errors.length ? `; errors ${JSON.stringify(r.errors.map((e) => e.error))}` : ''}`);
+  }
+}
+
+async function cmdSessionProbe(cli) {
+  if (!['pi', 'omp'].includes(cli)) die('session-probe takes pi or omp', 2);
+  const runner = await zeroModelProbe(cli, { runnerId: 'att-probe-runner' });
+  say(`session-probe ${cli} runner: the extension saw FGOS_SESSION_ID ${JSON.stringify(runner.toolResults.map((t) => t.proc.FGOS_SESSION_ID))}; process ${JSON.stringify(runner.toolResults[0]?.proc ?? null)}`);
+  if (cli === 'omp') {
+    const sub = await zeroModelProbe(cli, { subagent: true });
+    say(`session-probe omp subagent: ${sub.loads.length} extension loads; tool results ${JSON.stringify(sub.toolResults.map((t) => ({ tool: t.tool, id: t.id, subagent: t.subagent, pid: t.proc.pid })))}`);
+  }
+}
+
+/** pi's and omp's MCP-off proof, no model: the planted server is absent from the confined launch's tools, and present without the off switches. */
+async function cmdMcpProbePiOmp(cli, { off }) {
+  const r = await zeroModelProbe(cli, { plant: true, off });
+  const mcpTools = r.extensionTools.flat().filter((t) => /mcp|codemode|tool_search/i.test(t));
+  say(`mcp-probe ${cli} ${off ? 'confined' : 'without the off switches'}: exit ${r.exit.code}; extension tools ${JSON.stringify(r.extensionTools.at(-1) ?? null)}; MCP tools ${JSON.stringify(mcpTools)}; planted tool named in ${r.plantedInRequests} provider requests; ${path.join(TMP, 'fgos-work', 'mailbox-v7e-probe-live', 'results', `${r.runId}.json`)}`);
+  return r;
+}
+
 // ---------------------------------------------------------------- main
 
 const [command, ...rest] = process.argv.slice(2);
@@ -861,7 +992,14 @@ if (process.argv[1] === SCRIPT) {
         cmdReport({ stage: option('--stage'), sample: flag('--sample'), dry: flag('--dry'), compare: option('--compare') });
         break;
       case 'mcp-probe':
-        await cmdMcpProbe(rest[0], { off: !flag('--without-off'), dry: flag('--dry') });
+        if (['pi', 'omp'].includes(rest[0])) await cmdMcpProbePiOmp(rest[0], { off: !flag('--without-off') });
+        else await cmdMcpProbe(rest[0], { off: !flag('--without-off'), dry: flag('--dry') });
+        break;
+      case 'role-probe':
+        await cmdRoleProbe(rest[0], option('--methods'));
+        break;
+      case 'session-probe':
+        await cmdSessionProbe(rest[0]);
         break;
       case 'stub':
         runStub(rest[0], rest.slice(1));

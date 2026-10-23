@@ -15,12 +15,17 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { DatabaseSync } from 'node:sqlite';
 import {
+  credentialRowsDigest,
   endConfinedRun,
   layOutRunProject,
   maskPlan,
   maskPlanSha256,
+  materializeAccountLogin,
   prepareConfinedRun,
+  readAccountCredential,
+  settleCopy,
   processesOfRun,
   settleLoginCopy,
   startConfinedRun,
@@ -513,4 +518,104 @@ test('a confined Codex run lists no MCP server and has its connectors off, and t
 
   assert.match(await zeroModel('run-mcp-planted', ['mcp', 'list'], planted), /^planted\s/m, 'the falsifier: a planted server is listed');
   assert.equal(flag(await zeroModel('run-features-on', ['features', 'list'], withoutOff), 'apps'), 'true', 'the falsifier: connectors are on by default');
+});
+
+/** pi's launcher and managed install, and omp's binary and natives, when installed here. */
+function piOmpInstall() {
+  const piBin = path.join(HOME, '.pi', 'agent', 'bin', 'pi');
+  const omp = path.join(HOME, '.local', 'bin', 'omp');
+  return fs.existsSync(piBin) && fs.existsSync(omp)
+    ? { piBin, piAllow: [path.join(HOME, '.pi', 'agent', 'bin'), path.join(HOME, '.pi', 'agent', 'install')], omp, natives: path.join(HOME, '.omp', 'natives') }
+    : null;
+}
+
+/** A scratch OAuth credential in the account shape: never a real token. */
+const scratchCredential = () => ({ type: 'oauth', access: 'SCRATCH-NOT-A-TOKEN', refresh: 'SCRATCH-REFRESH', expires: Date.now() + 864e5, accountId: 'acct-scratch' });
+
+test('a confined pi or omp run cannot read the real account stores, starts from its bound-back binary, and its copied account holds no sessions', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  const install = piOmpInstall();
+  if (!install) return t.skip('pi and omp are not installed');
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'mbx-piomp-'));
+  const masks = maskPlan({ allow: [...install.piAllow, install.omp, install.natives, path.dirname(path.dirname(process.execPath))] });
+  // Every account store of both CLIs, by the real paths the owner's accounts use.
+  const stores = Object.fromEntries([
+    ...['.pi/accounts', '.omp/profiles'].flatMap((dir) => (fs.existsSync(path.join(HOME, dir)) ? fs.readdirSync(path.join(HOME, dir)).map((a) => [`${dir}/${a}`, path.join(HOME, dir, a)]) : [])),
+    ['.pi/agent/auth.json', path.join(HOME, '.pi', 'agent', 'auth.json')],
+    ['.omp/agent/agent.db', path.join(HOME, '.omp', 'agent', 'agent.db')],
+  ]);
+  const confinedRun = async (runId, command, args, { env = {}, accountLogin }) => {
+    const prepared = prepareConfinedRun({ base, runId, command, args, env: baseEnv(env), masks, accountLogin });
+    const run = startConfinedRun(prepared);
+    let stdout = '';
+    run.child.stdout.on('data', (d) => { stdout += d; });
+    run.child.stderr.on('data', (d) => { stdout += d; });
+    const exit = await run.exited;
+    await endConfinedRun(run);
+    return { prepared, stdout, exit };
+  };
+  const probeScript = `const fs = require('fs'); const P = JSON.parse(process.env.PROBE); process.stdout.write(JSON.stringify(Object.fromEntries(Object.entries(P).map(([k, f]) => { try { fs.statSync(f); return [k, 'visible']; } catch (e) { return [k, e.code]; } }))));`;
+  const pi = await confinedRun('run-pi', process.execPath, ['-e', probeScript], { env: { PROBE: JSON.stringify(stores) }, accountLogin: { cli: 'pi', credential: scratchCredential() } });
+  for (const [key, value] of Object.entries(JSON.parse(pi.stdout))) assert.equal(value, 'ENOENT', `${key} is hidden`);
+  // The copied account: the login file alone, a copy (never a link), no sessions.
+  assert.deepEqual(fs.readdirSync(pi.prepared.paths.home).filter((f) => f !== '.ownership.json' && !f.startsWith('.fgos')).sort(), ['auth.json']);
+  assert.equal(fs.lstatSync(pi.prepared.copy).isSymbolicLink(), false);
+  assert.equal(fs.statSync(pi.prepared.copy).mode & 0o777, 0o600);
+
+  const piVersion = await confinedRun('run-pi-version', install.piBin, ['--version'], { env: { PI_CODING_AGENT_DIR: path.join(base, 'run-pi-version', 'home') }, accountLogin: { cli: 'pi', credential: scratchCredential() } });
+  assert.equal(piVersion.exit.code, 0, piVersion.stdout);
+  assert.match(piVersion.stdout, /^\d+\.\d+\.\d+/m, 'pi starts from its bound-back launcher and install');
+
+  const omp = await confinedRun('run-omp-version', install.omp, ['--version'], { env: { PI_NATIVES_DIR: install.natives }, accountLogin: { cli: 'omp', credential: scratchCredential(), profile: 'acct', ompBin: install.omp, nativesDir: install.natives } });
+  assert.equal(omp.exit.code, 0, omp.stdout);
+  assert.match(omp.stdout, /omp\/\d+\.\d+\.\d+/, 'omp starts from its bound-back binary and natives');
+  const agentDir = path.dirname(omp.prepared.copy);
+  assert.equal(omp.prepared.copy, path.join(omp.prepared.paths.home, '.omp', 'profiles', 'acct', 'agent', 'agent.db'));
+  assert.equal(fs.existsSync(path.join(agentDir, 'sessions')) ? fs.readdirSync(path.join(agentDir, 'sessions')).length : 0, 0, 'the copied omp account holds no sessions');
+  assert.equal(fs.existsSync(path.join(omp.prepared.paths.home, '.omp', 'natives')), false, 'the natives are read where they are installed, never unpacked into the run');
+});
+
+test('an omp login copy is compared by its credential rows: rows a run adds leave it unchanged and it is removed, leaving no WAL file; a changed credential is set aside and stops the batch', async (t) => {
+  const install = piOmpInstall();
+  if (!install) return t.skip('omp is not installed');
+  const home = makeFixtureDir('mbx-omp-login-');
+  const run = path.dirname(home);
+  const made = materializeAccountLogin({ cli: 'omp', home, credential: scratchCredential(), profile: 'acct', ompBin: install.omp, nativesDir: install.natives });
+  assert.equal(made.digest, 'credentials');
+  // The rows omp writes on every run (usage, cache) are not the login.
+  const db = new DatabaseSync(made.copy);
+  db.exec("CREATE TABLE IF NOT EXISTS usage_probe (n INTEGER); INSERT INTO usage_probe VALUES (1);");
+  db.close();
+  assert.equal(credentialRowsDigest(made.copy), made.snapshot);
+  assert.equal(settleCopy(made, run), null);
+  for (const f of [made.copy, `${made.copy}-wal`, `${made.copy}-shm`]) assert.equal(fs.existsSync(f), false, f);
+
+  const again = materializeAccountLogin({ cli: 'omp', home: makeFixtureDir('mbx-omp-login-'), credential: scratchCredential(), profile: 'acct', ompBin: install.omp, nativesDir: install.natives });
+  const changed = new DatabaseSync(again.copy);
+  changed.exec(`UPDATE auth_credentials SET data = json_set(data, '$.access', 'ROTATED')`);
+  changed.close();
+  const settled = settleCopy(again, path.dirname(path.dirname(again.copy)));
+  assert.match(settled.stop, /login refreshed inside a run/);
+  assert.equal(path.basename(settled.aside), ROTATED_AUTH);
+  assert.equal(fs.existsSync(again.copy), false);
+  const kept = new DatabaseSync(settled.aside, { readOnly: true });
+  assert.match(kept.prepare('SELECT data FROM auth_credentials').get().data, /ROTATED/, 'the set-aside copy keeps the rotated credential');
+  kept.close();
+});
+
+test('the account credential is read from the profile store read-only, and a store with no credential or no database refuses the launch', () => {
+  const profile = makeFixtureDir('mbx-omp-profile-');
+  assert.throws(() => readAccountCredential(profile), /never logged in/);
+  fs.mkdirSync(path.join(profile, 'agent'));
+  const db = new DatabaseSync(path.join(profile, 'agent', 'agent.db'));
+  db.exec('CREATE TABLE auth_credentials (id INTEGER PRIMARY KEY, provider TEXT, credential_type TEXT, data TEXT, disabled_cause TEXT)');
+  db.close();
+  assert.throws(() => readAccountCredential(profile), /holds no openai-codex credential/);
+  const rw = new DatabaseSync(path.join(profile, 'agent', 'agent.db'));
+  rw.prepare('INSERT INTO auth_credentials (provider, credential_type, data) VALUES (?, ?, ?)').run('openai-codex', 'oauth', JSON.stringify({ access: 'A', refresh: 'R', expires: 5, accountId: 'X' }));
+  rw.prepare('INSERT INTO auth_credentials (provider, credential_type, data, disabled_cause) VALUES (?, ?, ?, ?)').run('openai-codex', 'oauth', JSON.stringify({ access: 'OLD' }), 'revoked');
+  rw.close();
+  const before = sha256(path.join(profile, 'agent', 'agent.db'));
+  assert.deepEqual(readAccountCredential(profile), { type: 'oauth', access: 'A', refresh: 'R', expires: 5, accountId: 'X' });
+  assert.equal(sha256(path.join(profile, 'agent', 'agent.db')), before, 'the source store is never written');
 });

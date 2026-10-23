@@ -31,7 +31,8 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
+import { DatabaseSync } from 'node:sqlite';
 import { prepareBwrapSync } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
 import { DEFAULT_REFRESH_AHEAD_MIN_THRESHOLD_MS, readCredentialExpiry } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
@@ -46,6 +47,24 @@ export const BWRAP = '/usr/bin/bwrap';
 export const LOGINS = Object.freeze({
   claude: { layout: 'claude-credentials-json', file: path.join('.claude', '.credentials.json'), homeEnv: 'HOME', source: (home) => ({ kind: 'home-files', home, files: [path.join('.claude', '.credentials.json')] }) },
   codex: { layout: 'codex-auth-json', file: 'auth.json', homeEnv: 'CODEX_HOME', source: (home) => ({ kind: 'codex-home', home }) },
+});
+
+/** The provider whose OAuth login a pi or omp run carries: the ChatGPT account's Codex login. */
+export const ACCOUNT_PROVIDER = 'openai-codex';
+
+/**
+ * The account login of a pi or omp run. Both read the one account's login from that account's
+ * omp profile store (`<profile dir>/agent/agent.db`, opened read-only, the source never
+ * written); pi's own store of the account is not read (its token expired 2026-10-23 and only a
+ * refresh, which would rotate the refresh token, could renew it). The login is materialized in
+ * the private home, never linked: pi gets `auth.json` (its file, `PI_CODING_AGENT_DIR` pointing
+ * at the home), omp an `agent.db` holding that credential only, written by its own `auth import`.
+ * `digest` names how a copy is compared after the run: pi's by bytes, omp's by its credential
+ * rows (omp writes usage and cache rows into the same database on every run).
+ */
+export const ACCOUNT_LOGINS = Object.freeze({
+  pi: { copyPath: (home) => path.join(home, 'auth.json'), digest: 'bytes' },
+  omp: { copyPath: (home, profile) => path.join(home, '.omp', 'profiles', profile, 'agent', 'agent.db'), digest: 'credentials' },
 });
 
 /** A launch refused before any CLI started. */
@@ -155,6 +174,59 @@ export const maskArgs = ({ hidden, bindBack }) => [...hidden.flatMap((d) => ['--
 /** The bwrap arguments that make each hidden tmpfs read-only, last, once every mount point inside it exists. */
 export const maskSealArgs = ({ hidden }) => hidden.flatMap((d) => ['--remount-ro', d]);
 
+/** The account's `provider` OAuth credential in an omp profile store, read-only (its WAL honoured): `{type, ...data}`. */
+export function readAccountCredential(profileDir, provider = ACCOUNT_PROVIDER) {
+  const file = path.join(profileDir, 'agent', 'agent.db');
+  if (!exists(file)) throw new ConfinedLaunchError(`no login store at ${file}; the account was never logged in`);
+  const db = new DatabaseSync(file, { readOnly: true });
+  try {
+    const row = db.prepare('SELECT credential_type, data FROM auth_credentials WHERE provider = ? AND disabled_cause IS NULL ORDER BY id DESC LIMIT 1').get(provider);
+    if (!row) throw new ConfinedLaunchError(`the login store at ${file} holds no ${provider} credential`);
+    return { type: row.credential_type, ...JSON.parse(row.data) };
+  } finally {
+    db.close();
+  }
+}
+
+/**
+ * The sha256 of the credential rows of an omp `agent.db` (provider, type, data, disabled
+ * cause), after folding its WAL into the file, so the rows omp writes on every run (usage,
+ * cache, model statistics) never read as a changed login.
+ */
+export function credentialRowsDigest(file) {
+  const db = new DatabaseSync(file);
+  try {
+    db.exec('PRAGMA wal_checkpoint(TRUNCATE)');
+    const rows = db.prepare('SELECT provider, credential_type, data, disabled_cause FROM auth_credentials ORDER BY id').all();
+    return crypto.createHash('sha256').update(JSON.stringify(rows.map((r) => [r.provider, r.credential_type, r.data, r.disabled_cause]))).digest('hex');
+  } finally {
+    db.close();
+  }
+}
+
+const DIGESTS = { bytes: loginDigest, credentials: credentialRowsDigest };
+
+/**
+ * Writes the account login of a `cli` (pi or omp) run into its private `home`: pi's `auth.json`
+ * (mode 0600), or omp's `agent.db` for `profile` through `<ompBin> auth import -` with the home as
+ * `HOME` (the credential on stdin, never in a file). Returns the copy, its snapshot digest and
+ * the digest's kind.
+ */
+export function materializeAccountLogin({ cli, home, credential, profile = null, ompBin = null, nativesDir = null }) {
+  const spec = ACCOUNT_LOGINS[cli];
+  if (!spec) throw new ConfinedLaunchError(`no account login rule for ${cli}`);
+  const copy = spec.copyPath(home, profile);
+  if (cli === 'pi') {
+    const { type, access, refresh, expires, accountId } = credential;
+    fs.writeFileSync(copy, `${JSON.stringify({ [ACCOUNT_PROVIDER]: { type, access, refresh, expires, accountId } }, null, 2)}\n`, { mode: 0o600, flag: 'wx' });
+  } else {
+    const env = { PATH: process.env.PATH, HOME: home, LANG: 'C.UTF-8', ...(nativesDir ? { PI_NATIVES_DIR: nativesDir } : {}) };
+    const out = spawnSync(ompBin, [`--profile=${profile}`, 'auth', 'import', '-'], { input: JSON.stringify({ version: 1, credentials: [{ provider: ACCOUNT_PROVIDER, credential }] }), env, encoding: 'utf8', timeout: 60_000 });
+    if (out.status !== 0 || !exists(copy)) throw new ConfinedLaunchError(`omp auth import into the private home failed (exit ${out.status}): ${String(out.stderr).trim().split('\n')[0]}`);
+  }
+  return { copy, snapshot: DIGESTS[spec.digest](copy), digest: spec.digest };
+}
+
 /**
  * Prepares run `runId` under `base` through the bwrap driver: the run directory (or the
  * shared `workspace`) as a writable workspace grant, a private home inside it (the driver copies `login`'s file
@@ -162,7 +234,7 @@ export const maskSealArgs = ({ hidden }) => hidden.flatMap((d) => ['--remount-ro
  * base read-only, and `readOnly` paths bound read-only last. Returns the argv and env to
  * spawn, the paths, and the copied login's path and snapshot digest. Starts nothing.
  */
-export function prepareConfinedRun({ base, runId, command, args = [], env = {}, login = null, masks, readOnly = [], workspace = null }) {
+export function prepareConfinedRun({ base, runId, command, args = [], env = {}, login = null, accountLogin = null, masks, readOnly = [], workspace = null }) {
   const paths = runPaths(base, runId, workspace);
   if (exists(paths.dir)) throw new ConfinedLaunchError(`${paths.dir} exists; every run gets a fresh directory`);
   if (exists(paths.ledger)) throw new ConfinedLaunchError(`${paths.ledger} exists; ${runId} was launched before`);
@@ -196,10 +268,14 @@ export function prepareConfinedRun({ base, runId, command, args = [], env = {}, 
   const tail = argv.splice(separator);
   const head = argv.splice(0, afterBase);
   const confined = [...head, ...maskArgs(masks), '--ro-bind', base, base, ...argv, ...readOnly.flatMap((p) => ['--ro-bind', p, p]), ...maskSealArgs(masks), ...tail];
-  const copy = spec ? path.join(paths.home, spec.file) : null;
   // `launch` goes into the ledger entry: the CLI's own argv as given, and the masks in force.
   const launch = { argv: [command, ...args], masks: { hidden: masks.hidden, bindBack: masks.bindBack }, maskSha256: maskPlanSha256(masks) };
-  return { paths, command: prepared.invocation.command, args: confined, env: prepared.invocation.env, copy, snapshot: copy ? loginDigest(copy) : null, launch };
+  if (accountLogin) {
+    const made = materializeAccountLogin({ ...accountLogin, home: paths.home });
+    return { paths, command: prepared.invocation.command, args: confined, env: prepared.invocation.env, ...made, launch };
+  }
+  const copy = spec ? path.join(paths.home, spec.file) : null;
+  return { paths, command: prepared.invocation.command, args: confined, env: prepared.invocation.env, copy, snapshot: copy ? loginDigest(copy) : null, digest: 'bytes', launch };
 }
 
 // ---------------------------------------------------------------- processes
@@ -302,7 +378,7 @@ function killRunProcesses(dir, pidNs, waitMs) {
 export function startConfinedRun(prepared, { stdio = ['ignore', 'pipe', 'pipe'] } = {}) {
   const { paths } = prepared;
   // The login copy and its snapshot let the orphan sweep settle the copy of a run it ends.
-  const entry = { runId: paths.runId, dir: paths.dir, startedAt: new Date().toISOString(), ...prepared.launch, login: prepared.copy ? { copy: prepared.copy, snapshot: prepared.snapshot } : null };
+  const entry = { runId: paths.runId, dir: paths.dir, startedAt: new Date().toISOString(), ...prepared.launch, login: prepared.copy ? { copy: prepared.copy, snapshot: prepared.snapshot, digest: prepared.digest ?? 'bytes' } : null };
   writeJson(paths.ledger, entry);
   // `prepared.command` is always BWRAP (the driver's configured executable); the program is named here.
   const child = spawn(BWRAP, prepared.args, { cwd: paths.ws, env: prepared.env, stdio });
@@ -416,22 +492,27 @@ export async function waitForFreshLogin(login, { intervalMs = 5 * 60_000, maxMs 
  * batch's stop reason is returned with the kept path.
  */
 export function settleLoginCopy(prepared) {
-  return prepared.copy ? settleCopy({ copy: prepared.copy, snapshot: prepared.snapshot }, prepared.paths.dir) : null;
+  return prepared.copy ? settleCopy({ copy: prepared.copy, snapshot: prepared.snapshot, digest: prepared.digest }, prepared.paths.dir) : null;
 }
 
 /**
- * The one settlement of a login copy, for a finished run and an orphan alike: a copy that
- * still has its snapshot bytes is removed (null); any other copy (changed, replaced or gone)
- * is set aside into `dir` under the guard's one name, and the batch's stop reason is returned
- * with the kept path.
+ * The one settlement of a login copy, for a finished run and an orphan alike: a copy whose
+ * `digest` (bytes by default, an omp database's credential rows for `credentials`) still equals
+ * its snapshot is removed (null); any other copy
+ * (changed, replaced or gone) is set aside into `dir` under the guard's one name, and the
+ * batch's stop reason is returned with the kept path.
  */
-export function settleCopy({ copy, snapshot }, dir) {
-  const aside = setAsideChangedCopy(copy, snapshot, dir);
+export function settleCopy({ copy, snapshot, digest = 'bytes' }, dir) {
+  // A database copy is compared after its WAL is folded in; closing it leaves no WAL or index file.
+  const aside = setAsideChangedCopy(copy, snapshot, dir, DIGESTS[digest]);
   if (aside === null) {
     fs.rmSync(copy);
     return null;
   }
   return { stop: STOP_LOGIN, aside };
 }
+
+/** `fresh` when an account credential stays valid for at least the renewal threshold from `now`, else `stale`. */
+export const accountLoginFreshness = (credential, now = Date.now()) => (Number(credential?.expires) - now >= DEFAULT_REFRESH_AHEAD_MIN_THRESHOLD_MS ? 'fresh' : 'stale');
 
 const STOP_LOGIN = 'login refreshed inside a run; the copy may hold the only valid token; ask the owner';
