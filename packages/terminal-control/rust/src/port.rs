@@ -3,6 +3,7 @@
 //! Every operation can answer `Unsupported` and `Unknown`; the core never
 //! guesses and never turns `Unknown` into gone or closed.
 
+use crate::driver::AgentFacts;
 use serde::{Deserialize, Serialize};
 
 /// Display data written to the terminal and the record; never read back to
@@ -176,6 +177,30 @@ pub struct CapabilitiesReport {
     pub driver: String,
     pub capabilities: Vec<String>,
     pub server_incarnation: Option<ServerIncarnation>,
+    pub anchor_pane: AnchorPane,
+    /// The socket the driver talks to; `None` when it cannot be named.
+    pub socket_path: Option<String>,
+    /// Present only when the caller asked for it.
+    pub agents: Option<AgentFacts>,
+}
+
+/// What a `capabilities` caller asks beyond the always-given answer.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct CapabilitiesAsk<'a> {
+    /// The pane the caller named as its anchor.
+    pub anchor_pane: Option<&'a str>,
+    /// Also read the agent kinds and integration hooks (two more driver reads).
+    pub agents: bool,
+}
+
+/// Whether the pane a caller named as its anchor can be resolved by the driver.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "state", rename_all = "lowercase")]
+pub enum AnchorPane {
+    /// The caller named none.
+    Absent,
+    Resolved,
+    Unresolvable { reason: String },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

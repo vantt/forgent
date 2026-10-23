@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createFakeHerdr } from '../helpers/fake-herdr-pane.mjs';
 import { startTerminalHarness } from '../helpers/terminal-host-harness.mjs';
@@ -25,9 +25,9 @@ let binDir;
 let allocationsDir;
 let renameArgs;
 
-// The fake reports shell_pid 100 for every pane; the ownership guard needs the pane's
-// shell to be an ancestor of the script, so the wrapper reports this process instead,
-// except for the pane named in FAKE_FOREIGN_PANE.
+// The fake reports shell_pid 100 for every pane; the port's attach needs the pane's
+// shell to be an ancestor of the caller, so the wrapper reports this process instead,
+// except for the pane named in FAKE_FOREIGN_PANE, whose shell is FAKE_FOREIGN_PID.
 function installShims() {
   binDir = path.join(scratch, 'bin');
   fs.mkdirSync(binDir);
@@ -38,7 +38,7 @@ function installShims() {
 case "$1 $2" in
   "pane process-info")
     pid=${process.pid}
-    [ "$4" = "$FAKE_FOREIGN_PANE" ] && pid=1
+    [ "$4" = "$FAKE_FOREIGN_PANE" ] && pid=$FAKE_FOREIGN_PID
     "${fake.herdrBin}" "$@" | sed "s/\\"shell_pid\\":100/\\"shell_pid\\":$pid/" ;;
   *) exec "${fake.herdrBin}" "$@" ;;
 esac
@@ -77,20 +77,26 @@ function openPane(label) {
   return JSON.parse(out.stdout).result.root_pane.pane_id;
 }
 
+const callerEnv = (env = {}) => ({
+  PATH: `${binDir}:${process.env.PATH}`,
+  HOME: process.env.HOME,
+  FGOS_STATE_ROOT: harness.stateRoot,
+  HERDR_SOCKET_PATH: harness.socketPath,
+  FGOS_HERDR_BIN: path.join(binDir, 'herdr'),
+  FGOS_SESSION_ID: 'sess-skill',
+  HERDR_ENV: '1',
+  ...env,
+});
+
 function run(script, args, env = {}) {
-  return spawnSync('bash', [path.join(skills, script), ...args], {
-    encoding: 'utf8',
-    env: {
-      PATH: `${binDir}:${process.env.PATH}`,
-      HOME: process.env.HOME,
-      FGOS_STATE_ROOT: harness.stateRoot,
-      HERDR_SOCKET_PATH: harness.socketPath,
-      FGOS_HERDR_BIN: path.join(binDir, 'herdr'),
-      FGOS_SESSION_ID: 'sess-skill',
-      HERDR_ENV: '1',
-      ...env,
-    },
-  });
+  return spawnSync('bash', [path.join(skills, script), ...args], { encoding: 'utf8', env: callerEnv(env) });
+}
+
+/** A live process that is a sibling of the caller: it descends from this test, it is not an ancestor of anything it starts. */
+function siblingProcess() {
+  const sleeper = spawn('sleep', ['30'], { stdio: 'ignore' });
+  after(() => sleeper.kill());
+  return sleeper.pid;
 }
 
 const records = () => {
@@ -134,12 +140,31 @@ test('rename.sh without herdr does nothing and exits 0', () => {
   assert.equal(fake.calls().length, calls);
 });
 
-test('rename.sh refuses a pane that is not the caller own', () => {
+test('rename.sh refuses a pane held by a sibling process', () => {
   const foreign = openPane('foreign');
   const calls = fake.calls().filter((c) => c[1] === 'rename').length;
-  const r = run('terminal/rename.sh', renameArgs, { HERDR_PANE_ID: foreign, FAKE_FOREIGN_PANE: foreign });
+  const r = run('terminal/rename.sh', renameArgs, { HERDR_PANE_ID: foreign, FAKE_FOREIGN_PANE: foreign, FAKE_FOREIGN_PID: String(siblingProcess()) });
   assert.equal(r.status, 0);
   assert.equal(fake.calls().filter((c) => c[1] === 'rename').length, calls);
+});
+
+test('attach names the refusal when the pane belongs to a sibling process, and records nothing', () => {
+  const sibling = siblingProcess();
+  const foreign = openPane('named-refusal');
+  const attach = (pane, key, env) => {
+    const out = spawnSync(hostBin, ['internal', 'terminal-control', 'attach', '--protocol', '1', '--json'], {
+      input: JSON.stringify({ v: 1, herdrBin: path.join(binDir, 'herdr'), request: { key, pane } }),
+      encoding: 'utf8',
+      env: callerEnv(env),
+    });
+    assert.equal(out.status, 0, out.stderr);
+    return JSON.parse(out.stdout);
+  };
+  const refused = attach(foreign, 'sess-sibling', { FAKE_FOREIGN_PANE: foreign, FAKE_FOREIGN_PID: String(sibling) });
+  assert.equal(refused.result, 'unknown');
+  assert.match(refused.reason, /^pane-not-owned: the shell of pane \S+ \(process \d+\) is not among the caller's ancestors/);
+  assert.equal(attach(openPane('mine-direct'), 'sess-direct', {}).result, 'slot', 'a pane whose shell is the caller is taken');
+  assert.equal(fs.existsSync(path.join(allocationsDir(), 'sess-sibling.json')), false);
 });
 
 test('close.sh closes the caller own pane and no other pane', () => {
@@ -151,9 +176,9 @@ test('close.sh closes the caller own pane and no other pane', () => {
   assert.ok(fake.panes()[bystander] && !fake.panes()[bystander].closed);
 });
 
-test('close.sh never closes a pane that is not the caller own', () => {
+test('close.sh never closes a pane held by a sibling process', () => {
   const foreign = openPane('foreign-2');
-  const r = run('terminal-close/close.sh', [], { HERDR_PANE_ID: foreign, FAKE_FOREIGN_PANE: foreign, FGOS_SESSION_ID: 'sess-close-2' });
+  const r = run('terminal-close/close.sh', [], { HERDR_PANE_ID: foreign, FAKE_FOREIGN_PANE: foreign, FAKE_FOREIGN_PID: String(siblingProcess()), FGOS_SESSION_ID: 'sess-close-2' });
   assert.equal(r.status, 0);
   assert.ok(!fake.closedPaneIds().includes(foreign));
 });

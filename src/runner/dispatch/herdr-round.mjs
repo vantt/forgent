@@ -104,7 +104,7 @@ function openRound({ runDir, workId, tier, model, agentName }) {
  * Apply declared confinement, before anything is launched.
  *
  * Two measures, and neither closes the hole alone. A private HOME closes the
- * `$HOME/.config/herdr/herdr.sock` fallback a worker would otherwise find
+ * default socket under `$HOME`, the fallback a worker would otherwise find
  * with no environment variable at all. It does NOT stop the worker reaching
  * the cockpit, because herdr injects `HERDR_SOCKET_PATH` into every pane it
  * creates and overwrites any override -- measured. What that leaves is the

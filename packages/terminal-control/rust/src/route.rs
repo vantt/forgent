@@ -8,6 +8,7 @@
 
 use crate::core::{Core, CoreConfig, Want};
 use crate::driver::herdr::{HerdrConfig, HerdrDriver};
+use crate::identity;
 use crate::policy::{policy_by_name, Limits, PlacementPolicy, DEFAULT_POLICY, POLICY_NAMES};
 use crate::port::*;
 use serde::de::DeserializeOwned;
@@ -186,7 +187,7 @@ fn core_config(envelope: &Value) -> Result<(CoreConfig, Box<dyn PlacementPolicy>
 
 /// The caller's whole budget for this operation rides in `timeoutMs`; herdr commands may use
 /// nine tenths of it, so a stuck command is answered `unknown` before the caller gives up.
-fn herdr_config(envelope: &Value, started: Instant) -> Result<HerdrConfig, String> {
+fn herdr_config(envelope: &Value, started: Instant, inherited_socket: Option<String>) -> Result<HerdrConfig, String> {
     let mut config = HerdrConfig::new(match envelope.get("herdrBin") {
         None | Some(Value::Null) => String::new(),
         Some(v) => v.as_str().ok_or("herdrBin needs a string")?.to_string(),
@@ -212,14 +213,20 @@ fn herdr_config(envelope: &Value, started: Instant) -> Result<HerdrConfig, Strin
     }
     // herdr sets `HERDR_SOCKET_PATH` in every pane it creates, so a caller
     // running inside one reaches the same server the CLI would; the caller's own
-    // `env` still wins.
-    if config.socket_path.is_none() {
-        config.socket_path = std::env::var("HERDR_SOCKET_PATH").ok().filter(|p| !p.is_empty());
+    // `env` still wins, and a named session is never redirected to the inherited
+    // socket of another one.
+    if config.socket_path.is_none() && config.session.is_none() {
+        config.socket_path = inherited_socket.filter(|p| !p.is_empty());
     }
     Ok(config)
 }
 
-fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
+/// The pane the caller named as its anchor in the envelope's `env`, when it named one.
+fn anchor_pane(envelope: &Value) -> Option<&str> {
+    envelope.pointer("/env/FGOS_HERDR_ANCHOR_PANE").and_then(Value::as_str).map(str::trim).filter(|p| !p.is_empty())
+}
+
+fn dispatch(op: &str, core: &Core, request: &Value, anchor: Option<&str>) -> Result<Answer, String> {
     Ok(match op {
         "allocate" => answer(core.allocate(&whole::<AllocateRequest>(request)?), slot_answer),
         "attach" => {
@@ -298,14 +305,22 @@ fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
             answer(core.label(&key, &display), ok_answer)
         }
         "capabilities" => {
-            let report = core.capabilities();
-            ("capabilities".into(), json!({
+            let agents: Option<bool> = optional(request, "agents")?;
+            let report = core.capabilities(CapabilitiesAsk { anchor_pane: anchor, agents: agents.unwrap_or(false) });
+            let mut fields = json!({
                 "driver": report.driver,
                 "capabilities": report.capabilities,
                 "serverIncarnation": report.server_incarnation,
+                "anchorPane": report.anchor_pane,
+                "endpoint": { "socketPath": report.socket_path },
                 "defaults": defaults(),
                 "policies": POLICY_NAMES,
-            }))
+            });
+            if let Some(facts) = report.agents {
+                fields["agentKinds"] = facts.kinds.map_or(json!("unknown"), |kinds| json!(kinds));
+                fields["integrations"] = facts.integrations.map_or(json!("unknown"), |states| json!(states));
+            }
+            ("capabilities".into(), fields)
         }
         "reconcile-scan" => {
             let older: u64 = field(request, "olderThanMs")?;
@@ -382,14 +397,15 @@ pub fn main(args: &[String]) -> i32 {
         Ok(c) => c,
         Err(refusal) => return error(refusal.code, &refusal.message, EXIT_USAGE),
     };
-    let herdr = match herdr_config(&envelope, started) {
+    let herdr = match herdr_config(&envelope, started, std::env::var("HERDR_SOCKET_PATH").ok()) {
         Ok(c) => c,
         Err(message) => return usage(&message),
     };
     let request = envelope.get("request").cloned().unwrap_or_else(|| json!({}));
     let driver = HerdrDriver::new(herdr);
-    let core = Core::new(&driver, policy.as_ref(), config);
-    match dispatch(op, &core, &request) {
+    // The route is a child of its caller: the OS names the caller, the request never does.
+    let core = Core::new(&driver, policy.as_ref(), config).with_caller(identity::parent_of_this_process());
+    match dispatch(op, &core, &request, anchor_pane(&envelope)) {
         Ok((result, fields)) => {
             let mut fields = fields;
             // `op` rides next to the result, as the contract's stdout shape says.
@@ -454,11 +470,30 @@ mod tests {
     }
 
     #[test]
+    fn a_named_session_is_never_pointed_at_the_inherited_socket() {
+        let started = Instant::now();
+        let inherited = || Some("/cockpit/herdr.sock".to_string());
+        assert_eq!(herdr_config(&json!({}), started, inherited()).unwrap().socket_path.as_deref(), Some("/cockpit/herdr.sock"));
+        let named = herdr_config(&json!({ "env": { "HERDR_SESSION": "fgos-worker" } }), started, inherited()).unwrap();
+        assert_eq!((named.session.as_deref(), named.socket_path), (Some("fgos-worker"), None));
+        let both = herdr_config(&json!({ "env": { "HERDR_SESSION": "fgos-worker", "HERDR_SOCKET_PATH": "/own.sock" } }), started, inherited()).unwrap();
+        assert_eq!(both.socket_path.as_deref(), Some("/own.sock"), "the caller's own socket still wins");
+    }
+
+    #[test]
+    fn the_anchor_pane_comes_from_the_envelope_env_only() {
+        assert_eq!(anchor_pane(&json!({ "env": { "FGOS_HERDR_ANCHOR_PANE": " w1:p2 " } })), Some("w1:p2"));
+        for none in [json!({}), json!({ "env": {} }), json!({ "env": { "FGOS_HERDR_ANCHOR_PANE": "  " } }), json!({ "request": { "anchorPane": "w1:p2" } })] {
+            assert_eq!(anchor_pane(&none), None, "{none}");
+        }
+    }
+
+    #[test]
     fn the_operation_budget_bounds_every_herdr_command() {
         let started = Instant::now();
-        assert!(herdr_config(&json!({ "timeoutMs": 0 }), started).is_err());
-        assert!(herdr_config(&json!({}), started).unwrap().deadline.is_none());
-        let deadline = herdr_config(&json!({ "timeoutMs": 10_000 }), started).unwrap().deadline.unwrap();
+        assert!(herdr_config(&json!({ "timeoutMs": 0 }), started, None).is_err());
+        assert!(herdr_config(&json!({}), started, None).unwrap().deadline.is_none());
+        let deadline = herdr_config(&json!({ "timeoutMs": 10_000 }), started, None).unwrap().deadline.unwrap();
         assert_eq!(deadline.duration_since(started), Duration::from_millis(9_000));
     }
 }

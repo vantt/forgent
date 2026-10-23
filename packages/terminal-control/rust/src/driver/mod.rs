@@ -126,6 +126,16 @@ pub struct ActivityDetail {
     pub prompt_text: String,
 }
 
+/// What the multiplexer says about the agents it can start. A field is `None`
+/// when the multiplexer's text could not be read: unknown, never a guess.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct AgentFacts {
+    /// The agent kinds a launch may name.
+    pub kinds: Option<Vec<String>>,
+    /// Integration hook state per agent: `current`, `outdated` or `not installed`.
+    pub integrations: Option<std::collections::BTreeMap<String, String>>,
+}
+
 /// Outcome of a close that checked the server incarnation before and after.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CloseOutcome {
@@ -177,6 +187,14 @@ pub trait TerminalDriver {
     fn label_pane(&self, pane: &str, label: &str) -> DriverResult<()>;
     /// Geometry of the tab holding `pane`: the rects the multiplexer reports, one read.
     fn layout_geometry(&self, pane: &str) -> DriverResult<TabGeometry>;
+    /// The socket the driver talks to, when it can be named without asking the server.
+    fn socket_path(&self) -> Option<String> {
+        None
+    }
+    /// The agent kinds and integration hooks the multiplexer reports; unknown by default.
+    fn agent_facts(&self) -> AgentFacts {
+        AgentFacts::default()
+    }
     /// The pty size behind `pane` when the driver and the OS allow the read.
     fn pane_pty(&self, _pane: &str) -> Option<PtySize> {
         None

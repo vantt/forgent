@@ -13,11 +13,10 @@ set -u
 command -v herdr >/dev/null 2>&1 || exit 0
 command -v fgos >/dev/null 2>&1 || exit 0
 [ -n "${HERDR_PANE_ID:-}" ] || exit 0
-# Same ownership guard as terminal/rename.sh: never close a dead or foreign
-# pane named by an inherited HERDR_PANE_ID.
-. "$(dirname "$0")/../terminal/pane-owned.sh"
+# Same ownership rule as terminal/rename.sh, kept by the port's attach below:
+# a dead or foreign pane named by an inherited HERDR_PANE_ID is never taken, so
+# never closed.
 . "$(dirname "$0")/../terminal/terminal-port.sh"
-fgos_pane_owned "$HERDR_PANE_ID" || exit 0
 
 # The pane is attached under this session's key (idempotent when /fgOS:terminal
 # already did it). Naming it as the caller's own pane is what lets the port

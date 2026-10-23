@@ -188,6 +188,12 @@ impl MemDriver {
     }
 }
 
+/// Make the test process the shell of `pane`: the caller of a core built in a test runs in it.
+pub fn run_caller_in(driver: &MemDriver, pane: &str) {
+    let me = std::process::id();
+    driver.set_foreground(pane, me, vec![ForegroundProcess { pid: me, argv: vec!["bash".into()] }], me);
+}
+
 pub fn bare(shell: u32) -> ProcessInfo {
     ProcessInfo {
         shell_pid: shell,

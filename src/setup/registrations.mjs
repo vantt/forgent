@@ -112,6 +112,7 @@ import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAcc
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackMarker, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
+import { createTerminalControl } from '../terminal-control/client.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
 import {
@@ -4361,37 +4362,16 @@ export function checkInvocationGitWriteGrants(runnerCfg = {}) {
   };
 }
 
-/** herdr's own list of agent kinds it can start, read from the command that
- * enforces it rather than copied into this repo where it would go stale in
- * silence. Returns null when herdr cannot be asked -- absence is already
- * `terminal-control`'s business, and reporting it twice helps nobody. */
-export function readHerdrAgentKinds(run = defaultHerdrRun) {
-  const help = run(['agent', 'start', '--help']);
-  if (help === null) return null;
-  const match = help.match(/\[possible values:\s*([^\]]+)\]/);
-  if (!match) return null;
-  return match[1].split(',').map((s) => s.trim()).filter(Boolean);
-}
-
-/** herdr's per-agent integration hook status, as `name -> 'current' |
- * 'outdated' | 'not installed'`. */
-export function readHerdrIntegrationStatus(run = defaultHerdrRun) {
-  const out = run(['integration', 'status']);
-  if (out === null) return null;
-  const status = {};
-  for (const line of out.split('\n')) {
-    const m = line.match(/^\s*([a-z0-9-]+):\s*(current|outdated|not installed)\b/i);
-    if (m) status[m[1]] = m[2].toLowerCase();
-  }
-  return status;
-}
-
-function defaultHerdrRun(args) {
+/** What herdr says it can start and which integration hooks it has, asked through the
+ * terminal-control port. `null` for either when herdr cannot be asked or its text cannot be
+ * read: absence is already `terminal-control`'s business, and reporting it twice helps nobody. */
+function askHerdrFacts() {
   try {
-    const bin = resolveHerdrBin();
-    return execFileSync(bin, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 10000 });
+    const report = createTerminalControl({ herdrBin: resolveHerdrBin() }).capabilities({ agents: true });
+    const known = (value) => (value !== null && typeof value === 'object' ? value : null);
+    return { kinds: known(report.agentKinds), integrations: known(report.integrations) };
   } catch {
-    return null;
+    return { kinds: null, integrations: null };
   }
 }
 
@@ -4419,12 +4399,7 @@ function resolveCliInvocation(executor) {
   return (executor?.invocations ?? []).find((i) => i.via === 'cli') ?? executor;
 }
 
-export function checkHerdrExecutorKinds(runnerCfg = {}, injected = {}) {
-  // Presence, not truthiness: a caller passing `kinds: null` is saying "herdr
-  // could not be asked", which is a different statement from not passing it
-  // at all, and `??` cannot tell those two apart.
-  const hasKinds = Object.prototype.hasOwnProperty.call(injected, 'kinds');
-  const hasIntegrations = Object.prototype.hasOwnProperty.call(injected, 'integrations');
+export function checkHerdrExecutorKinds(runnerCfg = {}, ask = askHerdrFacts) {
   const executors = Object.entries(runnerCfg.executors ?? {});
   const herdrExecutors = [];
   for (const [id, executor] of executors) {
@@ -4438,7 +4413,7 @@ export function checkHerdrExecutorKinds(runnerCfg = {}, injected = {}) {
     return { passed: true, message: 'no executor dispatches through a herdr pane' };
   }
 
-  const supported = hasKinds ? injected.kinds : readHerdrAgentKinds();
+  const { kinds: supported, integrations: status } = ask();
   if (!supported) {
     return { passed: true, message: 'herdr could not be asked which agent kinds it supports; kinds not evaluated' };
   }
@@ -4451,7 +4426,6 @@ export function checkHerdrExecutorKinds(runnerCfg = {}, injected = {}) {
     };
   }
 
-  const status = hasIntegrations ? injected.integrations : readHerdrIntegrationStatus();
   const notes = [];
   const stale = [];
   for (const e of herdrExecutors) {

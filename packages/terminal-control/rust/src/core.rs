@@ -53,6 +53,9 @@ pub struct Core<'a> {
     policy: &'a dyn PlacementPolicy,
     config: CoreConfig,
     now_ms: Box<dyn Fn() -> u64 + 'a>,
+    /// The process that asked, as the OS names it: this process, unless the route says its own
+    /// parent. `attach` takes only a pane that process runs in.
+    caller: Option<u32>,
 }
 
 /// Probes typed to one pane before the handshake gives up.
@@ -117,7 +120,14 @@ struct LivePane {
 
 impl<'a> Core<'a> {
     pub fn new(driver: &'a dyn TerminalDriver, policy: &'a dyn PlacementPolicy, config: CoreConfig) -> Self {
-        Core { driver, policy, config, now_ms: Box::new(wall_clock_ms) }
+        Core { driver, policy, config, now_ms: Box::new(wall_clock_ms), caller: Some(std::process::id()) }
+    }
+
+    /// The process that asked, when it is not this one (the route is a child of its caller);
+    /// `None` when the OS does not say. The caller is never read from a request.
+    pub fn with_caller(mut self, caller: Option<u32>) -> Self {
+        self.caller = caller;
+        self
     }
 
     /// Use another clock (epoch ms) for record times and expiry decisions.
@@ -242,11 +252,37 @@ impl<'a> Core<'a> {
 
     /// Take a pane the caller already has. `group_key` lets it join a group so
     /// the group's next pane opens beside it; it defaults to the key itself.
+    /// The caller must run in the pane: its shell is the caller or one of the
+    /// caller's ancestors. This is judged before anything is read from the
+    /// store, so a key already bound to the pane is no way around it.
     pub fn attach(&self, key: &str, pane: &str, group_key: Option<&str>, display: Option<Display>) -> Result<Allocation, Refusal> {
         Self::check_key(key)?;
         if let Some(group) = group_key {
             Self::check_key(group)?;
         }
+        self.require_caller_owns(pane)?;
+        self.attach_owned(key, pane, group_key, display)
+    }
+
+    /// `Ok` when the pane's shell is the caller or one of its ancestors, by the tuples the OS
+    /// reports now. Anything unreadable refuses: ownership is never assumed.
+    fn require_caller_owns(&self, pane: &str) -> Result<(), Refusal> {
+        let not_owned = |why: String| unknown(format!("pane-not-owned: {why}"));
+        self.need("process.info")?;
+        let shell = self.driver.process_info(pane)?.shell_pid;
+        let Some(caller) = self.caller else { return Err(not_owned("the process that asked could not be identified".into())) };
+        let chain = identity::ancestry(caller);
+        if chain.is_empty() {
+            return Err(not_owned(format!("the caller, process {caller}, cannot be read")));
+        }
+        if chain.iter().any(|t| t.pid.0 == shell) {
+            return Ok(());
+        }
+        let seen: Vec<String> = chain.iter().map(|t| format!("{}@{}", t.pid.0, t.start_time)).collect();
+        Err(not_owned(format!("the shell of pane {pane} (process {shell}) is not among the caller's ancestors [{}]", seen.join(" "))))
+    }
+
+    fn attach_owned(&self, key: &str, pane: &str, group_key: Option<&str>, display: Option<Display>) -> Result<Allocation, Refusal> {
         let (store, incarnation) = self.open()?;
         if let Some(record) = store.read_record(key).map_err(store_err)? {
             if record.pane_id == pane {
@@ -272,7 +308,7 @@ impl<'a> Core<'a> {
             origin: Origin::Attached,
         };
         if !store.publish_record(&record).map_err(store_err)? {
-            return self.attach(key, pane, group_key, None);
+            return self.attach_owned(key, pane, group_key, None);
         }
         Ok(Allocation { slot: Slot { tab_id, pane_id: pane.to_string() }, origin: Origin::Attached })
     }
@@ -657,11 +693,24 @@ impl<'a> Core<'a> {
         self.driver.label_pane(&record.pane_id, &display.label)
     }
 
-    pub fn capabilities(&self) -> CapabilitiesReport {
+    /// What the driver can do. A named anchor pane is answered by whether the
+    /// driver resolves it; agent facts are read only when asked for.
+    pub fn capabilities(&self, ask: CapabilitiesAsk) -> CapabilitiesReport {
+        let anchor_pane = match ask.anchor_pane {
+            None => AnchorPane::Absent,
+            Some(pane) => match self.driver.pane_liveness(pane) {
+                Ok(PaneLiveness::Live) => AnchorPane::Resolved,
+                Ok(PaneLiveness::Gone) => AnchorPane::Unresolvable { reason: format!("pane {pane} does not exist") },
+                Err(refusal) => AnchorPane::Unresolvable { reason: refusal.to_string() },
+            },
+        };
         CapabilitiesReport {
             driver: self.driver.name().to_string(),
             capabilities: self.driver.capabilities().into_iter().map(String::from).collect(),
             server_incarnation: self.driver.server_incarnation().ok(),
+            anchor_pane,
+            socket_path: self.driver.socket_path(),
+            agents: ask.agents.then(|| self.driver.agent_facts()),
         }
     }
 
@@ -685,7 +734,7 @@ impl<'a> Core<'a> {
         if let Some(done) = store.read_marker::<ReleasedMarker>(key, MarkerKind::Released).map_err(store_err)? {
             if done.disposition == Disposition::Retain && disposition == Disposition::Close && record.origin == Origin::Allocated {
                 return Ok(ReleaseOutcome::KeptUnknown {
-                    reason: "already retained; the pane closes when its retain expires".into(),
+                    reason: "already retained; once its retain time passes the pane is reported for a person to close".into(),
                 });
             }
             return Ok(ReleaseOutcome::Released { disposition: done.disposition });

@@ -1,0 +1,12 @@
+Start an agent in a pane
+
+Usage: herdr agent start [OPTIONS] --kind <KIND>
+
+Options:
+      --kind <KIND>
+          Agent kind to start
+          
+          [possible values: pi, claude, codex, agy, gemini]
+
+  -h, --help
+          Print help

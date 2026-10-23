@@ -32,7 +32,8 @@
     "attach": {
       "input": { "key": "key", "pane": "driver pane id", "groupKey": "optional groupKey: the pane joins that group so its next pane opens beside it; defaults to the key", "display": "optional display" },
       "results": ["slot", "unsupported", "unknown"],
-      "effects": ["records origin attached; core never closes an attached pane, release only removes its label and link"]
+      "effects": ["records origin attached; core never closes an attached pane, release only removes its label and link"],
+      "rule": "the caller must run in the pane: the pane's shell (the driver's process.info shell pid) is the caller or one of the caller's ancestors, judged by the process tuples the OS reports now. The caller is named by the OS (the process the route was started by; in process, the process itself), never by the request. Anything unreadable, an unnamed caller or a shell that is not an ancestor is refused as unknown with a reason that starts pane-not-owned:. The check runs before the store is read, so a key already bound to the pane is no way around it. Off Linux the OS gives no parent, so only a pane whose shell is the caller itself is taken."
     },
     "launch": {
       "input": {
@@ -87,9 +88,9 @@
       "results": ["ok", "unsupported", "unknown"]
     },
     "capabilities": {
-      "input": {},
+      "input": { "agents": "optional boolean: also answer agentKinds and integrations (two more herdr reads; omitted otherwise)" },
       "results": ["capabilities"],
-      "meaning": "driver name, declared capability list (driver-capabilities.v1.json), current server incarnation or unknown, the core's default for every config key and the registered placement policy names; doctor reads this"
+      "meaning": "driver name, declared capability list (driver-capabilities.v1.json), current server incarnation or unknown, the socket the driver talks to, whether the pane the caller named in the envelope env FGOS_HERDR_ANCHOR_PANE resolves, the agent kinds and integration hooks when asked, the core's default for every config key and the registered placement policy names; doctor reads this"
     },
     "reconcile-scan": {
       "input": { "olderThanMs": "integer >= 0" },
@@ -117,6 +118,10 @@
       "driver": "string",
       "capabilities": "string[]",
       "serverIncarnation": "serverIncarnation | null",
+      "endpoint": "{socketPath: string | null}: the socket the driver talks to, named without asking the server: the caller's own HERDR_SOCKET_PATH, else the one herdr keeps for the HERDR_SESSION the caller named (the default session's when it named none); null when no home directory is known or the session name is not one herdr accepts",
+      "anchorPane": "{state: absent} when the caller named none, {state: resolved} when the driver finds the pane, {state: unresolvable, reason} otherwise (one driver read, only when a pane was named)",
+      "agentKinds": "string[] | \"unknown\"; only when asked (agents: true): the kinds herdr's agent start accepts, \"unknown\" when its text cannot be read",
+      "integrations": "object | \"unknown\"; only when asked: agent name -> current | outdated | not installed, \"unknown\" when herdr's text cannot be read",
       "defaults": "object: the core's value for every key the route's config accepts (minCols, minRows, maxPanesPerTab, policy, allocationGraceMs, launchIdentifyTimeoutMs, shellReadyTimeoutMs)",
       "policies": "string[]: the placement policy names the core registers (placement-policy.v1.json registry.names)"
     },
