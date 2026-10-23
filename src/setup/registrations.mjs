@@ -145,7 +145,7 @@ import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from 
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
-import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityProjectId, fixIdentityMachineId } from './identity-checks.mjs';
+import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations, fixTerminalDir } from './terminal-control-checks.mjs';
 import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
@@ -6285,6 +6285,25 @@ registerCheck({
   check: (cwd) => checkIdentityMachineId(cwd),
 });
 registerFix({ id: 'identity-machine-id', fix: (cwd) => fixIdentityMachineId(cwd) });
+
+registerCheck({
+  id: 'identity-machine-key',
+  description: 'this machine has an ed25519 signing key minted by the Identity component (what signs for MAIL and the shared directory); absent only warns, `fgos doctor --fix` mints it once and never replaces it',
+  check: (cwd) => checkIdentityMachineKey(cwd),
+});
+registerFix({ id: 'identity-machine-key', fix: (cwd) => fixIdentityMachineKey(cwd) });
+
+registerCheck({
+  id: 'identity-ssh-keygen',
+  description: 'ssh-keygen from OpenSSH 8.1 or later is installed: the Identity component signs and verifies through it (no crypto library of its own); no fix, install OpenSSH',
+  check: () => checkIdentitySshKeygen(),
+});
+
+registerCheck({
+  id: 'identity-pinned-machines',
+  description: 'lists the machine keys this machine pinned the first time it saw each machine (informational, for the one-time fingerprint comparison across machines); `fgos identity pins --forget <machine-id>` accepts a re-key',
+  check: (cwd) => checkIdentityPinnedMachines(cwd),
+});
 
 registerCheck({
   id: 'identity-project-id',
