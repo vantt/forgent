@@ -30,15 +30,46 @@ pub(crate) fn list(
     repo: &fgos_git::RepoHandle,
     prefixes: &[fgos_git::RefPrefix],
 ) -> Result<Vec<fgos_git::RefEntry>, Error> {
+    Ok(list_with_head(port, repo, prefixes, 256)?.0)
+}
+/// `list` that also reports the HEAD the listing itself observed: the branch HEAD names with that
+/// branch's listed value, when `refs/heads/` is among the prefixes. Each page's child reads HEAD once,
+/// so a page's pair is one observation; HEAD marked on two pages differently (it moved between
+/// pages) is ambiguous and reported as no observation, never as either.
+pub(crate) fn list_with_head(
+    port: &dyn fgos_git::Inspect,
+    repo: &fgos_git::RepoHandle,
+    prefixes: &[fgos_git::RefPrefix],
+    page_size: usize,
+) -> Result<(Vec<fgos_git::RefEntry>, Option<fgos_git::HeadFact>), Error> {
     let mut cursor = None;
     let mut entries = Vec::new();
+    let mut seen: Vec<(fgos_git::RefName, fgos_git::Oid)> = Vec::new();
     loop {
         let page = port
-            .list_refs(repo, prefixes, cursor, 256)
+            .list_refs(repo, prefixes, cursor, page_size)
             .map_err(crate::walk::git_error)?;
+        if let Some(name) = page.head {
+            if let Some(fgos_git::RefValue::Direct(commit)) = page
+                .entries
+                .iter()
+                .find(|e| e.name == name)
+                .map(|e| e.value.clone())
+            {
+                if !seen.contains(&(name.clone(), commit.clone())) {
+                    seen.push((name, commit));
+                }
+            }
+        }
         entries.extend(page.entries);
         if page.complete {
-            return Ok(entries);
+            let head = match seen.pop() {
+                Some((target, commit)) if seen.is_empty() => {
+                    Some(fgos_git::HeadFact::Attached { target, commit })
+                }
+                _ => None,
+            };
+            return Ok((entries, head));
         }
         cursor = Some(
             page.next_cursor

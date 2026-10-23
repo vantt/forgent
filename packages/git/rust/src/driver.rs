@@ -2300,7 +2300,7 @@ impl Inspect for GitDriver {
         let mut args = vec![
             "for-each-ref".to_owned(),
             "--sort=refname".to_owned(),
-            "--format=%(refname)%00%(objectname)%00%(symref)".to_owned(),
+            "--format=%(refname)%00%(objectname)%00%(symref)%00%(HEAD)".to_owned(),
         ];
         for prefix in &binding {
             if prefix.ends_with('/') {
@@ -2313,10 +2313,11 @@ impl Inspect for GitDriver {
         let args: Vec<&str> = args.iter().map(String::as_str).collect();
         let bytes = self.checked(repo, &args, Policy::Inspect)?;
         let mut entries = Vec::new();
+        let mut head = None;
         let mut more = false;
         for line in bytes.split(|b| *b == b'\n').filter(|l| !l.is_empty()) {
             let fields: Vec<_> = line.split(|b| *b == 0).collect();
-            if fields.len() != 3 {
+            if fields.len() != 4 {
                 return Err(failure("invalid-ref-observation"));
             }
             let name = std::str::from_utf8(fields[0]).map_err(|_| failure("non-utf8-ref-name"))?;
@@ -2353,10 +2354,14 @@ impl Inspect for GitDriver {
                     .map_err(|_| failure("invalid-symbolic-target"))?,
                 )
             };
-            entries.push(RefEntry {
-                name: RefName::parse(name).map_err(|_| failure("invalid-ref-name"))?,
-                value,
-            });
+            let name = RefName::parse(name).map_err(|_| failure("invalid-ref-name"))?;
+            // `%(HEAD)` is `*` on the one listed ref that HEAD, read once by this child, names.
+            // Only a direct branch is a HEAD fact (Git keeps `refs/heads/` to commits, so no object
+            // type read is needed); anything else is left to `resolve_head`.
+            if fields[3] == b"*" && name.as_str().starts_with("refs/heads/") && matches!(value, RefValue::Direct(_)) {
+                head = Some(name.clone());
+            }
+            entries.push(RefEntry { name, value });
         }
         let next_cursor = if more {
             Some(RefCursor {
@@ -2368,6 +2373,7 @@ impl Inspect for GitDriver {
         };
         Ok(RefPage {
             entries,
+            head,
             complete: !more,
             next_cursor,
         })

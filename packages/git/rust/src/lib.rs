@@ -539,6 +539,10 @@ pub struct RefEntry {
 #[derive(Debug)]
 pub struct RefPage {
     pub entries: Vec<RefEntry>,
+    /// The returned entry that HEAD names, when HEAD is attached to a direct branch (`refs/heads/`) that
+    /// this page returned. HEAD is read once by the listing's own child, so this name and that
+    /// entry's value are one observation; `None` (detached, unborn, or not listed) says nothing.
+    pub head: Option<RefName>,
     pub complete: bool,
     pub next_cursor: Option<RefCursor>,
 }
