@@ -127,9 +127,10 @@ fn a_dead_session_is_never_resolved_and_the_next_write_removes_it() {
     assert_eq!(files(&root), 1, "a read never removes");
 
     directory::register(&root, entry("bbbb", Some(20), &[]), false, &after_death).unwrap();
-    assert_eq!(files(&root), 1, "the write removed the dead entry");
-    // Its role is free: another session takes it without --take.
+    assert_eq!(files(&root), 2, "a write that takes no role and is below the cap scans nothing, so it prunes nothing");
+    // A write that takes a role scans, removes the dead entry and finds its role free.
     directory::register(&root, entry("bbbb", Some(20), &["lead:MAIL"]), false, &after_death).unwrap();
+    assert_eq!(files(&root), 1, "the role write removed the dead entry");
 }
 
 #[test]
@@ -243,8 +244,11 @@ fn a_second_live_session_with_the_same_handle_is_refused_with_both_ids() {
     let refused = directory::register(&root, clash.clone(), false, &alive).unwrap_err();
     assert_eq!(refused.reason, "handle-in-use");
     assert!(refused.detail.contains("fg-abc234/aaaa") && refused.detail.contains("fg-abc234/other"));
-    // Once the first one is dead the handle is free.
-    directory::register(&root, clash, false, &judge(&[10])).unwrap();
+    // Once the first one is dead the handle is free: the dead entry is replaced, not left beside it.
+    let taken = directory::register(&root, clash, false, &judge(&[10])).unwrap();
+    assert_eq!(taken.id, "fg-abc234/other");
+    assert_eq!(files(&root), 1);
+    assert_eq!(directory::resolve(&root, "claude-aaaa@fg", &judge(&[10])).unwrap().id, "fg-abc234/other");
 }
 
 #[test]
@@ -283,10 +287,28 @@ fn a_full_directory_refuses_a_new_entry_and_prune_is_the_way_out() {
     // A session already in the directory still refreshes.
     directory::register(&root, entry("s0", Some(1_000), &[]), false, &alive).unwrap();
 
+    // At the cap a write removes the dead entries first, so a new session fits.
+    let one_dead = judge(&[1_005]);
+    directory::register(&root, entry("extra", Some(1), &[]), false, &one_dead).unwrap();
+    assert_eq!(files(&root), MAX_ENTRIES, "one dead entry went, one session came");
+    assert!(!directory::list(&root, None, false, &one_dead).unwrap().sessions.iter().any(|s| s.handle == "claude-s5@fg"));
+
     // Every head dies: prune empties the directory and a new session fits.
     let all_dead = |_: &Record| Verdict::Dead;
     assert_eq!(directory::list(&root, None, true, &all_dead).unwrap().pruned, MAX_ENTRIES);
     directory::register(&root, entry("extra", Some(1), &[]), false, &alive).unwrap();
+}
+
+#[test]
+fn a_full_directory_of_entries_that_may_be_alive_is_never_pruned_by_a_write() {
+    let root = state_root();
+    let alive = judge(&[]);
+    for n in 0..MAX_ENTRIES {
+        directory::register(&root, entry(&format!("u{n}"), None, &[]), false, &alive).unwrap();
+    }
+    let refused = directory::register(&root, entry("extra", Some(1), &[]), false, &alive).unwrap_err();
+    assert_eq!(refused.reason, "directory-full");
+    assert_eq!(files(&root), MAX_ENTRIES, "unknown liveness is never removed");
 }
 
 #[test]
