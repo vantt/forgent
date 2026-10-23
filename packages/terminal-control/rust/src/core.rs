@@ -296,7 +296,9 @@ impl<'a> Core<'a> {
 
     fn place(&self, store: &Store, incarnation: &ServerIncarnation, request: &AllocateRequest) -> Result<CreatedPane, Refusal> {
         let group = self.live_group(store, &request.group_key)?;
-        let tab_label = request.display.label.clone();
+        // A group's second and later tabs carry their ordinal so two tabs never share a name.
+        let tabs_open = group.iter().map(|l| l.record.tab_id.as_str()).collect::<std::collections::BTreeSet<_>>().len();
+        let tab_label = if tabs_open == 0 { request.display.label.clone() } else { format!("{} ({})", request.display.label, tabs_open + 1) };
         if group.is_empty() {
             return self.new_tab(request, &tab_label);
         }

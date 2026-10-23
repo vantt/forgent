@@ -66,7 +66,8 @@ fn every_pane_of_the_group_vanishing_while_it_is_measured_continues_in_a_new_tab
     let b = core.allocate(&request("b", "g")).expect("a vanished pane is no error").slot;
     assert_ne!(b.tab_id, a.tab_id);
     let labels: Vec<_> = driver.tabs.borrow().iter().map(|t| t.1.clone()).collect();
-    assert_eq!(labels, vec!["label-g", "label-g"]);
+    // The first tab was still live when the group was read, so the new one counts as the second.
+    assert_eq!(labels, vec!["label-g", "label-g (2)"]);
 }
 
 #[test]
@@ -107,6 +108,10 @@ fn the_policy_opens_a_new_tab_when_no_split_keeps_the_minimum() {
     assert_ne!(first.tab_id, second.tab_id);
     assert!(driver.calls("pane.split").is_empty());
     assert!(driver.calls("pane.close").is_empty());
+    // Each overflow tab of the group is numbered, so no two tabs share a name.
+    core.allocate(&request("c", "g")).unwrap();
+    let labels: Vec<_> = driver.tabs.borrow().iter().map(|t| t.1.clone()).collect();
+    assert_eq!(labels, vec!["label-g", "label-g (2)", "label-g (3)"]);
 }
 
 /// A policy that always splits, so the core's own re-measure is what protects
