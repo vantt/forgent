@@ -130,6 +130,10 @@ impl ProcessPlatform for Linux {
         facts::parse_relation(pid, &fs::read_to_string(format!("/proc/{}/stat", pid.0)).ok()?)
     }
 
+    fn command_name_of(&self, pid: ProcId) -> Option<String> {
+        facts::parse_command_name(&fs::read_to_string(format!("/proc/{}/stat", pid.0)).ok()?).map(str::to_owned)
+    }
+
     fn last_pid(&self) -> Option<u32> {
         fs::read_to_string("/proc/sys/kernel/ns_last_pid").ok()?.trim().parse().ok()
     }

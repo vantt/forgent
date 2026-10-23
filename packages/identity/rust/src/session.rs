@@ -49,6 +49,8 @@ pub fn cli_of(env_var: &str, local_id: &str) -> &'static str {
     match env_var {
         "CLAUDE_CODE_SESSION_ID" => "claude",
         "CODEX_THREAD_ID" => "codex",
+        // The neutral label; the process ancestry may say `omp` instead.
+        crate::resolve::PI_SESSION_VAR => "pi",
         _ if crate::attempt::is_attempt_writer_id(local_id) => "worker",
         _ => "fgos",
     }
@@ -76,7 +78,13 @@ pub fn local(
     facts: &dyn Fn(u32) -> Option<PidFacts>,
 ) -> Option<Local> {
     match &identity.id {
-        WriterId::Session(id) => Some(env_local(identity.env_var?, id)),
+        WriterId::Session(id) => {
+            let mut local = env_local(identity.env_var?, id);
+            if let Some(cli) = identity.cli {
+                local.cli = cli;
+            }
+            Some(local)
+        }
         WriterId::Pid(pid) if identity.source == crate::resolve::Source::Pid => Some(Local {
             id: pid_local_id(&facts(*pid)?, *pid),
             cli: "shell",

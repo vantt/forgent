@@ -36,6 +36,7 @@ pub fn writer(spec: &Value) -> fgos_identity::WriterIdentity {
         id,
         source,
         env_var: None,
+        cli: None,
     }
 }
 

@@ -7,8 +7,16 @@ use std::collections::BTreeMap;
 
 /// Variables the agent must not inherit: another session's id would outrank
 /// or confuse the minted one (resolve order is `FGOS_SESSION_ID`, then
-/// `CODEX_THREAD_ID`, then `CLAUDE_CODE_SESSION_ID`).
-pub const SCRUBBED: [&str; 3] = ["CLAUDE_CODE_SESSION_ID", "CODEX_THREAD_ID", "FGOS_PARENT_WRITER_ID"];
+/// `CODEX_THREAD_ID`, then `PI_SESSION_ID`, then `CLAUDE_CODE_SESSION_ID`).
+/// pi and omp also hand `PI_SESSION_FILE` to their children; it names the
+/// parent's session file, so it goes too.
+pub const SCRUBBED: [&str; 5] = [
+    "CLAUDE_CODE_SESSION_ID",
+    "CODEX_THREAD_ID",
+    "PI_SESSION_ID",
+    "PI_SESSION_FILE",
+    "FGOS_PARENT_WRITER_ID",
+];
 
 /// The writer id to export is empty: an empty `FGOS_SESSION_ID` would be
 /// ignored by the resolve rule and fall through to the process tree.

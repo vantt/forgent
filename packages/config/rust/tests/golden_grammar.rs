@@ -22,6 +22,7 @@ fn writer(spec: &Value) -> WriterIdentity {
         id,
         source,
         env_var: None,
+        cli: None,
     }
 }
 

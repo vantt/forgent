@@ -450,6 +450,21 @@ pub fn relation_of(pid: ProcId) -> Option<Relation> {
     platform::current().relation_of(pid)
 }
 
+/// The kernel's short command name of the one process `pid` (Linux `comm`:
+/// the executable's name, or the title the process set, cut to 15 bytes);
+/// `None` where the platform has no such read or `pid` is gone.
+pub fn command_name_of(pid: ProcId) -> Option<String> {
+    platform::current().command_name_of(pid)
+}
+
+/// The command name of a `/proc/<pid>/stat` line: the text between the first
+/// `(` and the last `)`, so a name holding spaces or parentheses stays whole.
+pub fn parse_command_name(line: &str) -> Option<&str> {
+    let open = line.find('(')?;
+    let close = line.rfind(')')?;
+    (close > open).then(|| &line[open + 1..close])
+}
+
 /// The fields of one `/proc/<pid>/stat` line that process facts use.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct Stat {
@@ -611,6 +626,15 @@ mod tests {
     fn parses_state_and_start_time_from_a_stat_line_with_spaces_in_comm() {
         let line = "4242 (weird) name (x)) S 100 4242 77 34816 4242 4194304 0 0 0 0 1 2 0 0 20 0 1 0 987654 1 2 3";
         assert_eq!(parse_proc_stat(line), Some(('S', "987654".to_string())));
+    }
+
+    #[test]
+    fn reads_the_command_name_with_spaces_and_parentheses_whole() {
+        assert_eq!(parse_command_name("4242 (weird) name (x)) S 100"), Some("weird) name (x)"));
+        assert_eq!(parse_command_name("1 (omp) S 0"), Some("omp"));
+        assert_eq!(parse_command_name("no parenthesis"), None);
+        #[cfg(target_os = "linux")]
+        assert!(!command_name_of(ProcId(std::process::id())).expect("this process is readable").is_empty());
     }
 
     #[test]
