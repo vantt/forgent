@@ -1,6 +1,6 @@
 # @fgos:v1
 # see: fgos config standard
-# @fgos:doc The fgOS gateway: port, bind address, token and Cloudflare Access pair.
+# @fgos:doc The fgOS gateway: its port, bind address and Cloudflare Access settings.
 gateway:
   # @fgos:doc TCP port the gateway listens on. Minimum: 1. Maximum: 65535. Default: 4170.
   port: 4170

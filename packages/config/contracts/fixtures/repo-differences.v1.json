@@ -1,0 +1,208 @@
+{
+ "version": 1,
+ "about": "The authoring equivalence record: this repository's tuned config, pinned, against the bundled standard files. differences are the paths where the pinned source differs from the standard layer (maps compared per entry, lists as leaves), each with its reason; standard-only are paths the standard holds and the source does not. Owning test: tests/authoring_equivalence.rs.",
+ "source": {
+  "file": "authoring-source.config.json",
+  "copied-from": ".fgos/config.json",
+  "commit": "ef4a056d7",
+  "sha256": "7d89f588cfa29c0f1f9d07c2204a02e99cd6aa204d7e4451a56cb1608158ad79"
+ },
+ "exclusions": [
+  {
+   "path": [
+    "gateway"
+   ],
+   "reason": "global-only section: a project file is refused for it by name (config-key-out-of-scope); the token also leaves for its own file"
+  },
+  {
+   "path": [
+    "lock"
+   ],
+   "reason": "retired section with no schema: kept and reported as a key with no schema node, dropped by migration"
+  },
+  {
+   "path": [
+    "runner",
+    "$comment"
+   ],
+   "reason": "becomes @fgos:doc text; the standard files carry no $comment key"
+  }
+ ],
+ "scrub-search-strings": [
+  "vantt",
+  "tetcu",
+  "/home/",
+  "homeEnv",
+  "credentialStore",
+  "resourceBindings",
+  "token"
+ ],
+ "differences": [
+  {
+   "path": [
+    "herdrOrchestrator",
+    "autoDiscover"
+   ],
+   "reason": "this repository's own choice for a setting the standard fixes at the code default"
+  },
+  {
+   "path": [
+    "runner",
+    "executor"
+   ],
+   "reason": "project-specific: detected from PATH when the project names none (x-fgos-absent: detected); this repository names claude with an allowedTools list of its own build commands"
+  },
+  {
+   "path": [
+    "runner",
+    "capabilities",
+    "fgos-coding-implement",
+    "description"
+   ],
+   "reason": "scrubbed text: the standard description drops the omp profile name"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "glm",
+    "invocations"
+   ],
+   "reason": "scrubbed: the standard invocations carry no credentialStore (environment variable and login file names) and no env block; a list is one leaf, so this repository restates the whole list"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "openai",
+    "invocations"
+   ],
+   "reason": "scrubbed: the standard invocations carry no credentialStore (environment variable and login file names) and no env block; a list is one leaf, so this repository restates the whole list"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "gemini",
+    "description"
+   ],
+   "reason": "scrubbed text: the standard description drops the login profile and home path names"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "gemini",
+    "invocations"
+   ],
+   "reason": "scrubbed: the standard invocations carry no credentialStore (environment variable and login file names) and no env block; a list is one leaf, so this repository restates the whole list"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "xai",
+    "description"
+   ],
+   "reason": "scrubbed text: the standard description drops the login profile and home path names"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "xai",
+    "invocations"
+   ],
+   "reason": "scrubbed: the standard invocations carry no credentialStore (environment variable and login file names) and no env block; a list is one leaf, so this repository restates the whole list"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "deepseek",
+    "invocations"
+   ],
+   "reason": "scrubbed: the standard invocations carry no credentialStore (environment variable and login file names) and no env block; a list is one leaf, so this repository restates the whole list"
+  },
+  {
+   "path": [
+    "runner",
+    "timeoutMs"
+   ],
+   "reason": "scalar the code already defaults (900000): the standard takes the code default, this repository runs 2100000"
+  },
+  {
+   "path": [
+    "runner",
+    "maxTier"
+   ],
+   "reason": "scalar with no code default (absent means no ceiling): the standard holds none, this repository caps seats at flagship"
+  },
+  {
+   "path": [
+    "runner",
+    "generatedPaths"
+   ],
+   "reason": "project-specific: this repository's skill render paths; the standard holds an empty list"
+  },
+  {
+   "path": [
+    "runner",
+    "idleTimeoutMs"
+   ],
+   "reason": "scalar with no code default (absent leaves idle stopping off): the standard holds none, this repository stops a silent worker after 5400000 ms"
+  },
+  {
+   "path": [
+    "gateBypass",
+    "level"
+   ],
+   "reason": "this repository's own choice for a setting the standard fixes at the code default"
+  },
+  {
+   "path": [
+    "cleanup",
+    "ttlDays"
+   ],
+   "reason": "this repository's own choice for a setting the standard fixes at the code default"
+  },
+  {
+   "path": [
+    "invariantChecks",
+    "commands"
+   ],
+   "reason": "this repository's own choice for a setting the standard fixes at the code default"
+  },
+  {
+   "path": [
+    "docRegistry",
+    "enforce"
+   ],
+   "reason": "this repository's own choice for a setting the standard fixes at the code default"
+  },
+  {
+   "path": [
+    "worktreeSetup",
+    "commands"
+   ],
+   "reason": "this repository's own choice for a setting the standard fixes at the code default"
+  }
+ ],
+ "standard-only": [
+  [
+   "eventStore",
+   "seal"
+  ],
+  [
+   "eventStore",
+   "sync"
+  ],
+  [
+   "eventStore",
+   "rebuild"
+  ],
+  [
+   "secrets"
+  ]
+ ]
+}

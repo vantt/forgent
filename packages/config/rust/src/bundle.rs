@@ -50,6 +50,10 @@ pub const SCHEMAS: &[(&str, &str)] = &[
         include_str!("../../../../core/config-schema/ironLaw.schema.yaml"),
     ),
     (
+        "runner",
+        include_str!("../../../../core/config-schema/runner.schema.yaml"),
+    ),
+    (
         "secrets",
         include_str!("../../../../core/config-schema/secrets.schema.yaml"),
     ),
@@ -107,6 +111,10 @@ pub const STANDARD: &[(&str, &str)] = &[
     (
         "ironLaw",
         include_str!("../../../../core/config-standard/ironLaw.yaml"),
+    ),
+    (
+        "runner",
+        include_str!("../../../../core/config-standard/runner.yaml"),
     ),
     (
         "secrets",

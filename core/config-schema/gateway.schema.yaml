@@ -1,7 +1,7 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: urn:fgos:config-schema:gateway:v1
 $comment: "owner: fgos-gateway"
-description: "The fgOS gateway: port, bind address, token and Cloudflare Access pair."
+description: "The fgOS gateway: its port, bind address and Cloudflare Access settings."
 type: object
 x-fgos-scope: global-only
 properties:

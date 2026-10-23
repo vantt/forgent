@@ -162,12 +162,10 @@ fn every_doc_line_in_a_bundled_standard_file_is_the_render_of_its_schema_node() 
             if body.starts_with('#') || body.starts_with('-') || body.is_empty() {
                 continue;
             }
-            let key = body
-                .split(':')
-                .next()
-                .unwrap()
-                .trim_matches('"')
-                .to_string();
+            let key = match body.strip_prefix('"') {
+                Some(quoted) => quoted.split('"').next().unwrap().to_string(),
+                None => body.split(':').next().unwrap().to_string(),
+            };
             while stack.last().is_some_and(|(i, _)| *i >= indent) {
                 stack.pop();
             }
