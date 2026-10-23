@@ -10,9 +10,9 @@
     "literalCandidateLines": 378,
     "enumerationCandidateLines": 60169,
     "removedPaths": 279,
-    "removedRowsWithReaders": 34,
-    "readerTargetJoins": 121,
-    "historicalReaderFiles": 43,
+    "removedRowsWithReaders": 48,
+    "readerTargetJoins": 135,
+    "historicalReaderFiles": 47,
     "currentOwningReaders": 0,
     "restores": 0,
     "kinds": {
@@ -29,7 +29,7 @@
         "reports/phase-06/sensitivity-6-checkpoint-whole-system/pack.json"
       ]
     },
-    "ambiguousNameResolution": "All six pack.json candidate lines are output construction, prose or copied CLI help, not reads of either removed checkpoint pack. Literal matching returns both candidate paths before root triage.",
+    "ambiguousNameResolution": "Superseded by L12-135: review C round 4 showed review-10-checkpoint.md:51 and review-6-checkpoint.md:29 record `--seed-pack pack.json` commands that read the removed checkpoint packs (now recorded as command-argument historical replays); the other pack.json candidate lines are output construction, prose or copied CLI help. Literal matching returns both candidate paths before root triage.",
     "allRemovedNamesMatchScannerPattern": true,
     "removedSuffixCounts": {
       ".json": 258,
@@ -62,7 +62,7 @@
     "output": "/tmp/fgos-work/closure-r3/scan.json",
     "triage": "Manual input/output, path-root and liveness resolution; accepted joins/source excerpts below are the durable selection, not a claim that the regex proves arbitrary program reachability."
   },
-  "locatorContract": "Directory containing this manifest; # suffix identifies decoded source field or Markdown fence start (physical line); line is 1-based within that decoded source/fence, not the JSON physical line.",
+  "locatorContract": "Directory containing this manifest; # suffix identifies decoded source field or Markdown fence (fence@N = physical line of the first line inside the code fence); line is 1-based within that decoded source/fence, not the JSON physical line.",
   "readerBlobs": [
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-06/accounting-261015-0700-whole-system-verdict-corrections.md.json",
@@ -6351,7 +6351,7 @@
       ]
     },
     "matchedDirectoryFilters": [],
-    "constructedNames": "Runner label loops reading both/identity/phase02 resolve six additional removed variants; both-name literals alone would undercount these inputs.",
+    "constructedNames": "Runner label loops reading both/identity/phase02 resolve sixteen additional removed variants (six found by L12-134, ten more plus the step9-native siblings recorded by L12-135 after review C round 4); both-name literals alone would undercount these inputs.",
     "nonmatchingRoots": [
       "pilot/decisions",
       "ledger and ledger/decisions",
