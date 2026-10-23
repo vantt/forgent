@@ -1,0 +1,9 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:herdrWebDashboard:v1
+$comment: "owner: herdr-web-dashboard"
+description: "The herdr web dashboard on the selected machine."
+type: object
+properties:
+  staticServing:
+    description: When true the dashboard serves the web bundle it carries; unlike the orchestrator toggles it is on out of the box.
+    type: boolean

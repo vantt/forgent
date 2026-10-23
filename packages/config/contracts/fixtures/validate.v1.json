@@ -1,0 +1,361 @@
+{
+ "version": 1,
+ "about": "Owning cases of Schemas::validate (src/validate.rs): the effective value against the section schemas, reported as path and keyword. Keyword semantics are the validator crate's own proof (tests/validator_acceptance.rs); these cases prove the wiring: section lookup, paths, required on the merged value, null, sorting.",
+ "cases": [
+  {
+   "id": "validate-clean",
+   "why": "a value that fits every keyword has no violation",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "required: [a]",
+      "properties:",
+      "  a: {type: integer, minimum: 1, maximum: 9}",
+      "  e: {enum: [x, y]}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties: {type: string}",
+      "  l:",
+      "    type: array",
+      "    items: {type: boolean}",
+      "  n: {type: [string, \"null\"]}",
+      "  z: {type: string}"
+     ]
+    },
+    "effective": [
+     "s:",
+     "  a: 5",
+     "  e: x",
+     "  m: {k: v}",
+     "  l: [true]",
+     "  n: null"
+    ]
+   },
+   "expect": {
+    "violations": []
+   }
+  },
+  {
+   "id": "validate-type-and-enum",
+   "why": "a wrong type and a value outside enum are reported at their path",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "required: [a]",
+      "properties:",
+      "  a: {type: integer, minimum: 1, maximum: 9}",
+      "  e: {enum: [x, y]}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties: {type: string}",
+      "  l:",
+      "    type: array",
+      "    items: {type: boolean}",
+      "  n: {type: [string, \"null\"]}",
+      "  z: {type: string}"
+     ]
+    },
+    "effective": [
+     "s:",
+     "  a: text",
+     "  e: w"
+    ]
+   },
+   "expect": {
+    "violations": [
+     [
+      "s.a",
+      "type"
+     ],
+     [
+      "s.e",
+      "enum"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "validate-bounds",
+   "why": "minimum and maximum are reported on the key they bound",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "required: [a]",
+      "properties:",
+      "  a: {type: integer, minimum: 1, maximum: 9}",
+      "  e: {enum: [x, y]}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties: {type: string}",
+      "  l:",
+      "    type: array",
+      "    items: {type: boolean}",
+      "  n: {type: [string, \"null\"]}",
+      "  z: {type: string}"
+     ]
+    },
+    "effective": [
+     "s:",
+     "  a: 10"
+    ]
+   },
+   "expect": {
+    "violations": [
+     [
+      "s.a",
+      "maximum"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "validate-required-on-the-merge",
+   "why": "a missing required key is named by its path in the effective value",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "required: [a]",
+      "properties:",
+      "  a: {type: integer, minimum: 1, maximum: 9}",
+      "  e: {enum: [x, y]}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties: {type: string}",
+      "  l:",
+      "    type: array",
+      "    items: {type: boolean}",
+      "  n: {type: [string, \"null\"]}",
+      "  z: {type: string}"
+     ]
+    },
+    "effective": [
+     "s:",
+     "  e: x"
+    ]
+   },
+   "expect": {
+    "violations": [
+     [
+      "s.a",
+      "required"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "validate-map-entry",
+   "why": "a map entry is judged by additionalProperties and reported at the entry",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "required: [a]",
+      "properties:",
+      "  a: {type: integer, minimum: 1, maximum: 9}",
+      "  e: {enum: [x, y]}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties: {type: string}",
+      "  l:",
+      "    type: array",
+      "    items: {type: boolean}",
+      "  n: {type: [string, \"null\"]}",
+      "  z: {type: string}"
+     ]
+    },
+    "effective": [
+     "s:",
+     "  a: 1",
+     "  m:",
+     "    k: 1"
+    ]
+   },
+   "expect": {
+    "violations": [
+     [
+      "s.m.k",
+      "type"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "validate-array-item",
+   "why": "an array item is reported by index",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "required: [a]",
+      "properties:",
+      "  a: {type: integer, minimum: 1, maximum: 9}",
+      "  e: {enum: [x, y]}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties: {type: string}",
+      "  l:",
+      "    type: array",
+      "    items: {type: boolean}",
+      "  n: {type: [string, \"null\"]}",
+      "  z: {type: string}"
+     ]
+    },
+    "effective": [
+     "s:",
+     "  a: 1",
+     "  l: [true, 3]"
+    ]
+   },
+   "expect": {
+    "violations": [
+     [
+      "s.l[1]",
+      "type"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "validate-null-refused",
+   "why": "null is refused unless the node's type includes null",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "required: [a]",
+      "properties:",
+      "  a: {type: integer, minimum: 1, maximum: 9}",
+      "  e: {enum: [x, y]}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties: {type: string}",
+      "  l:",
+      "    type: array",
+      "    items: {type: boolean}",
+      "  n: {type: [string, \"null\"]}",
+      "  z: {type: string}"
+     ]
+    },
+    "effective": [
+     "s:",
+     "  a: 1",
+     "  z: null",
+     "  n: null"
+    ]
+   },
+   "expect": {
+    "violations": [
+     [
+      "s.z",
+      "type"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "validate-unknown-annotation-ignored",
+   "why": "an x-fgos- keyword changes nothing for validation",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "properties:",
+      "  a: {type: integer, x-fgos-scope: project-only, x-fgos-made-up: 1}"
+     ]
+    },
+    "effective": [
+     "s:",
+     "  a: 1"
+    ]
+   },
+   "expect": {
+    "violations": []
+   }
+  },
+  {
+   "id": "validate-undescribed-section-passes",
+   "why": "a section with no schema is not judged (undescribed paths are a doctor warning)",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "required: [a]",
+      "properties:",
+      "  a: {type: integer, minimum: 1, maximum: 9}",
+      "  e: {enum: [x, y]}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties: {type: string}",
+      "  l:",
+      "    type: array",
+      "    items: {type: boolean}",
+      "  n: {type: [string, \"null\"]}",
+      "  z: {type: string}"
+     ]
+    },
+    "effective": [
+     "s:",
+     "  a: 1",
+     "other:",
+     "  q: 1"
+    ]
+   },
+   "expect": {
+    "violations": []
+   }
+  },
+  {
+   "id": "validate-sorted",
+   "why": "violations come sorted by path then keyword, whatever order the schema lists them",
+   "input": {
+    "schemas": {
+     "s": [
+      "type: object",
+      "required: [a]",
+      "properties:",
+      "  a: {type: integer, minimum: 1, maximum: 9}",
+      "  e: {enum: [x, y]}",
+      "  m:",
+      "    type: object",
+      "    additionalProperties: {type: string}",
+      "  l:",
+      "    type: array",
+      "    items: {type: boolean}",
+      "  n: {type: [string, \"null\"]}",
+      "  z: {type: string}"
+     ]
+    },
+    "effective": [
+     "s:",
+     "  e: w",
+     "  a: text",
+     "  m: {k: 1, j: 2}"
+    ]
+   },
+   "expect": {
+    "violations": [
+     [
+      "s.a",
+      "type"
+     ],
+     [
+      "s.e",
+      "enum"
+     ],
+     [
+      "s.m.j",
+      "type"
+     ],
+     [
+      "s.m.k",
+      "type"
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,527 @@
+{
+ "version": 1,
+ "about": "Inputs for the meta-schema ../config-schema.meta.v1.json: each case is a section schema document (JSON form) and expects either valid or the rule id (the $defs name up to the first dot) of the refusal. Runner: tests/golden_meta.rs.",
+ "cases": [
+  {
+   "id": "meta-valid-minimal",
+   "why": "a conforming section schema passes",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name."
+     }
+    }
+   },
+   "expect": {
+    "valid": true
+   }
+  },
+  {
+   "id": "meta-valid-multi-line-description",
+   "why": "a description may span lines; each line becomes one doc line",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name.\nSecond line."
+     }
+    }
+   },
+   "expect": {
+    "valid": true
+   }
+  },
+  {
+   "id": "meta-valid-global-only-account",
+   "why": "an accounts entry with global-only scope and a secret sensitivity passes",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "pool": {
+      "type": "object",
+      "description": "Account pool.",
+      "x-fgos-file": "accounts",
+      "x-fgos-scope": "global-only",
+      "x-fgos-sensitivity": "secret-reference"
+     }
+    }
+   },
+   "expect": {
+    "valid": true
+   }
+  },
+  {
+   "id": "meta-valid-both-justified",
+   "why": "scope both on a non-public key with a justification comment passes",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "cmd": {
+      "type": "string",
+      "description": "The name.",
+      "x-fgos-scope": "both",
+      "x-fgos-sensitivity": "command",
+      "$comment": "justification: the shell snippet is the same in both scopes"
+     }
+    }
+   },
+   "expect": {
+    "valid": true
+   }
+  },
+  {
+   "id": "meta-dialect-missing",
+   "why": "spec section 4: $schema must be 2020-12",
+   "schema": {
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name."
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-dialect"
+   }
+  },
+  {
+   "id": "meta-dialect-pattern-properties",
+   "why": "patternProperties needs a regex engine in resolve and is refused",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "m": {
+      "type": "object",
+      "description": "Map.",
+      "patternProperties": {
+       "^a": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-dialect"
+   }
+  },
+  {
+   "id": "meta-dialect-remote-ref",
+   "why": "a $ref outside the bundled set is refused",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "m": {
+      "$ref": "https://example.com/x.json"
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-dialect"
+   }
+  },
+  {
+   "id": "meta-default-forbidden-nested",
+   "why": "the standard file is the one source of values (no default at any depth)",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "a": {
+      "type": "object",
+      "description": "A.",
+      "properties": {
+       "b": {
+        "type": "string",
+        "description": "The name.",
+        "default": "x"
+       }
+      }
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-default-forbidden"
+   }
+  },
+  {
+   "id": "meta-valid-boolean-subschema",
+   "why": "a boolean subschema (additionalProperties: false) is a valid schema node: the forbidden-keyword rules look at object subschemas only",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "a": {
+      "type": "object",
+      "description": "A.",
+      "additionalProperties": false,
+      "properties": {
+       "b": {
+        "type": "string",
+        "description": "B."
+       }
+      }
+     }
+    }
+   },
+   "expect": {
+    "valid": true
+   }
+  },
+  {
+   "id": "meta-default-forbidden-beside-boolean-subschema",
+   "why": "a boolean subschema does not hide a default on an object subschema next to it",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "a": {
+      "type": "object",
+      "description": "A.",
+      "additionalProperties": false,
+      "properties": {
+       "b": {
+        "type": "string",
+        "description": "B.",
+        "default": "x"
+       }
+      }
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-default-forbidden"
+   }
+  },
+  {
+   "id": "meta-annotation-unknown",
+   "why": "a leftover x-fgos-version is a typo guard hit",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name.",
+      "x-fgos-version": 2
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-annotation-unknown"
+   }
+  },
+  {
+   "id": "meta-annotation-value",
+   "why": "scope outside its allowed set",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name.",
+      "x-fgos-scope": "global"
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-annotation-value"
+   }
+  },
+  {
+   "id": "meta-id-pattern",
+   "why": "$id must be urn:fgos:config-schema:<section>:v<N> with N from 1",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v0",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name."
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-id"
+   }
+  },
+  {
+   "id": "meta-owner-missing",
+   "why": "the root $comment first line names the owner",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name."
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-owner"
+   }
+  },
+  {
+   "id": "meta-description-missing",
+   "why": "a key reachable by a config path needs a description",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-description-missing"
+   }
+  },
+  {
+   "id": "meta-scope-implicit",
+   "why": "a non-public key must state its scope itself",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name.",
+      "x-fgos-sensitivity": "secret-value"
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-scope-implicit"
+   }
+  },
+  {
+   "id": "meta-scope-both-unjustified",
+   "why": "scope both on a non-public key needs a justification comment",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name.",
+      "x-fgos-scope": "both",
+      "x-fgos-sensitivity": "command"
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-scope-both-unjustified"
+   }
+  },
+  {
+   "id": "meta-file-placement-token-type",
+   "why": "the token file holds a string secret value only",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "tok": {
+      "type": "integer",
+      "description": "Token.",
+      "x-fgos-file": "token",
+      "x-fgos-scope": "global-only",
+      "x-fgos-sensitivity": "secret-value"
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-file-placement"
+   }
+  },
+  {
+   "id": "meta-valid-scalar-enum-unique",
+   "why": "a scalar enum, a scalar const and uniqueItems over scalar items pass",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "mode": {
+      "type": "string",
+      "description": "Mode.",
+      "enum": [
+       "a",
+       "b"
+      ],
+      "const": "a"
+     },
+     "tags": {
+      "type": "array",
+      "description": "Tags.",
+      "uniqueItems": true,
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "expect": {
+    "valid": true
+   }
+  },
+  {
+   "id": "meta-pattern-length",
+   "why": "a pattern of 257 characters is refused (a long pattern compiles in more than linear time)",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name.",
+      "pattern": "^aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-pattern-length"
+   }
+  },
+  {
+   "id": "meta-pattern-length-limit",
+   "why": "a pattern of exactly 256 characters passes",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name.",
+      "pattern": "^aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     }
+    }
+   },
+   "expect": {
+    "valid": true
+   }
+  },
+  {
+   "id": "meta-object-const",
+   "why": "a const that holds an object is refused (the crate compares objects wrongly when key order is kept)",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name.",
+      "const": {
+       "a": 1
+      }
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-object-comparison"
+   }
+  },
+  {
+   "id": "meta-object-enum",
+   "why": "an enum member that is an object is refused",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name.",
+      "enum": [
+       {
+        "a": 1
+       },
+       "b"
+      ]
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-object-comparison"
+   }
+  },
+  {
+   "id": "meta-object-unique-items",
+   "why": "uniqueItems over items that are not scalar-typed is refused",
+   "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:fgos:config-schema:demo:v1",
+    "$comment": "owner: config",
+    "type": "object",
+    "properties": {
+     "list": {
+      "type": "array",
+      "description": "List.",
+      "uniqueItems": true,
+      "items": {
+       "type": "object"
+      }
+     }
+    }
+   },
+   "expect": {
+    "rule": "schema-object-comparison"
+   }
+  }
+ ]
+}

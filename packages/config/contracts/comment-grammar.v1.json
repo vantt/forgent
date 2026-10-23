@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "about": "The comment grammar Config writes (docs/platform/config/spec.md section 7). Rust reads this file at build time; there is no second copy of these lists.",
+  "header": ["@fgos:v1", "see: fgos config standard"],
+  "doc-prefix": "@fgos:doc ",
+  "why-prefix": "@fgos:why ",
+  "suggested-source-tag": "[setup:suggested]",
+  "forbidden-line-start": "@fgos:",
+  "generic-reason-words": ["update", "fix", "change"],
+  "line-break-codepoints": ["000A", "000D", "0085", "2028", "2029"],
+  "actor": { "allowed": "A-Z a-z 0-9 . _ -", "max-length": 200, "fallback": "unknown" }
+}
