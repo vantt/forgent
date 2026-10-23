@@ -8,7 +8,8 @@ use fgos_yaml_doc::{Segment, Span};
 /// The rarely set parts of a refusal. Never a value of the input.
 #[derive(Clone, Default, PartialEq, Eq)]
 pub struct Detail {
-    /// The failing JSON Schema keyword and its schema location, for `config-schema`.
+    /// The failing JSON Schema keyword and its schema location, for `config-schema`. For
+    /// `config-write-conflict` the keyword is the reason (`lock-held`, `revision-changed`).
     pub keyword: Option<String>,
     pub schema_path: Option<String>,
     /// For a key in the wrong place: the role of the file it belongs in (`global`, `project`,

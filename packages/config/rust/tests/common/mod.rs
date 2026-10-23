@@ -2,20 +2,41 @@
 #![allow(dead_code)]
 use std::path::{Path, PathBuf};
 
+use fgos_config::snapshot::{SessionClass, SnapshotRequest};
 use serde_json::Value;
 
 pub fn contracts() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../contracts")
 }
 
-pub fn cases(file: &str) -> Vec<Value> {
+/// The whole fixture document: its cases and any shared members of its own.
+pub fn fixture(file: &str) -> Value {
     let path = contracts().join("fixtures").join(file);
     let text = std::fs::read_to_string(&path).unwrap_or_else(|e| panic!("{}: {e}", path.display()));
-    let doc: Value = serde_json::from_str(&text).unwrap_or_else(|e| panic!("{file}: {e}"));
+    serde_json::from_str(&text).unwrap_or_else(|e| panic!("{file}: {e}"))
+}
+
+pub fn cases(file: &str) -> Vec<Value> {
+    let doc = fixture(file);
     doc["cases"]
         .as_array()
         .unwrap_or_else(|| panic!("{file}: cases"))
         .clone()
+}
+
+/// The writer identity of a fixture: a `session` id or a `pid`.
+pub fn writer(spec: &Value) -> fgos_identity::WriterIdentity {
+    use fgos_identity::{Source, WriterId, WriterIdentity};
+    let (id, source) = match (spec["session"].as_str(), spec["pid"].as_u64()) {
+        (Some(s), _) => (WriterId::Session(s.to_string()), Source::Env),
+        (_, Some(p)) => (WriterId::Pid(p as u32), Source::Pid),
+        _ => panic!("writer needs session or pid"),
+    };
+    WriterIdentity {
+        id,
+        source,
+        env_var: None,
+    }
 }
 
 /// A file is an array of lines in the fixtures.
@@ -51,4 +72,37 @@ pub fn refs(files: &[(String, Vec<u8>)]) -> Vec<(&str, &[u8])> {
         .iter()
         .map(|(n, b)| (n.as_str(), b.as_slice()))
         .collect()
+}
+
+/// A fresh empty directory for one case of a runner.
+pub fn temp(prefix: &str, id: &str) -> PathBuf {
+    let dir =
+        std::env::temp_dir().join(format!("fgos-config-{prefix}-{id}-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+    dir
+}
+
+/// Writes the `files` of a case (path to lines) under `dir` and names its roots: `project/`, `main/`
+/// (the trusted root, when a file lies under it) and `home/.fgos/` (global; `private/accounts.yaml`).
+pub fn lay_out(dir: &Path, input: &Value) -> SnapshotRequest {
+    for (rel, lines) in input["files"].as_object().into_iter().flatten() {
+        let path = dir.join(rel);
+        std::fs::create_dir_all(path.parent().expect("parent")).expect("create directory");
+        std::fs::write(path, text(lines)).expect("write file");
+    }
+    let project = dir.join("project");
+    SnapshotRequest {
+        trusted_root: if dir.join("main").exists() {
+            dir.join("main")
+        } else {
+            project.clone()
+        },
+        project_root: project,
+        global_dir: dir.join("home/.fgos"),
+        class: if input["class"] == "confined" {
+            SessionClass::Confined
+        } else {
+            SessionClass::Unconfined
+        },
+    }
 }

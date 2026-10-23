@@ -67,6 +67,8 @@ pub enum AccountsState {
 }
 
 pub struct Snapshot {
+    /// The in-process value: a `secret-value` is carried as stored for the consumer that needs it.
+    /// Every display form goes through `redact::render_for_display`.
     pub value: Value,
     pub origins: Vec<Origin>,
     /// Revision of the bytes read per source role, `absent` for a missing source.
@@ -92,8 +94,37 @@ pub enum SnapshotError {
     Io(std::io::Error),
 }
 
+// The one error of a read and of a write: refusals by id, or an operating-system error without one.
+// A YAML Document refusal is carried whole inside `config-parse`.
+impl From<ConfigRefusal> for SnapshotError {
+    fn from(refusal: ConfigRefusal) -> Self {
+        SnapshotError::Refused(vec![refusal])
+    }
+}
+
+impl From<fgos_yaml_doc::Refusal> for SnapshotError {
+    fn from(refusal: fgos_yaml_doc::Refusal) -> Self {
+        ConfigRefusal::parse(refusal).into()
+    }
+}
+
+impl From<std::io::Error> for SnapshotError {
+    fn from(error: std::io::Error) -> Self {
+        SnapshotError::Io(error)
+    }
+}
+
+impl From<FileError> for SnapshotError {
+    fn from(error: FileError) -> Self {
+        match error {
+            FileError::Refused(refusal) => (*refusal).into(),
+            FileError::Io(error) => error.into(),
+        }
+    }
+}
+
 pub(crate) struct Src {
-    role: &'static str,
+    pub(crate) role: &'static str,
     name: String,
     pub(crate) file: Option<LoadedFile>,
 }

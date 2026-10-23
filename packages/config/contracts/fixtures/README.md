@@ -19,6 +19,7 @@ are added as the phases that own them land.
 | `meta.v1.json` | `tests/golden_meta.rs` | one failing section schema per meta-schema rule, plus passing ones |
 | `scope.v1.json` | `tests/golden_scope.rs` | which file may hold which key: scope, ancestors, wildcards, file placement |
 | `snapshot.v1.json` | `tests/golden_snapshot.rs` | the snapshot: ladder, merge rules, provenance, trusted root, confined accounts, detected values, refusals |
+| `write.v1.json` | `tests/write_golden.rs` | the write transaction's edit semantics: byte fidelity, comment blocks, redundancy, refusals and their order, modes (locking and races: `tests/write_concurrency.rs`) |
 
 `json-schema-suite/` is the official JSON-Schema-Test-Suite (draft 2020-12), vendored verbatim for the
 keywords fgOS schemas use; see its README. It is run by `tests/validator_acceptance.rs` and is not

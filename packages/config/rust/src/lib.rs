@@ -29,12 +29,14 @@ pub mod detect;
 pub mod files;
 pub mod grammar;
 pub mod lint;
-mod redact;
+pub mod redact;
 pub mod schema;
 pub mod scope;
 pub mod snapshot;
 pub mod standard;
 pub mod validate;
-mod write;
+/// The write door needs the no-follow directory primitives of Durable File, which are Unix only.
+#[cfg(unix)]
+pub mod write;
 
 pub use error::ConfigRefusal;

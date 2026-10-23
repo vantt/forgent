@@ -4,14 +4,11 @@
 mod common;
 
 use std::fs;
-use std::path::PathBuf;
 
-use common::{cases, files, refs, text};
+use common::{cases, files, refs};
 use fgos_config::detect::Detectors;
 use fgos_config::schema::Schemas;
-use fgos_config::snapshot::{
-    snapshot, AccountsState, Context, SessionClass, SnapshotError, SnapshotRequest,
-};
+use fgos_config::snapshot::{snapshot, AccountsState, Context, SnapshotError};
 use fgos_config::standard::Standard;
 use fgos_yaml_doc::path::{format_path, parse_path};
 use fgos_yaml_doc::{Segment, Value as Doc};
@@ -36,35 +33,6 @@ pub fn at<'a>(value: &'a Value, path: &str) -> Option<&'a Value> {
         })
 }
 
-fn temp(id: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!("fgos-config-snap-{id}-{}", std::process::id()));
-    let _ = fs::remove_dir_all(&dir);
-    dir
-}
-
-fn write(dir: &std::path::Path, input: &Value) -> SnapshotRequest {
-    for (rel, lines) in input["files"].as_object().unwrap() {
-        let path = dir.join(rel);
-        fs::create_dir_all(path.parent().unwrap()).unwrap();
-        fs::write(path, text(lines)).unwrap();
-    }
-    let project = dir.join("project");
-    SnapshotRequest {
-        trusted_root: if dir.join("main").exists() {
-            dir.join("main")
-        } else {
-            project.clone()
-        },
-        project_root: project,
-        global_dir: dir.join("home/.fgos"),
-        class: if input["class"] == "confined" {
-            SessionClass::Confined
-        } else {
-            SessionClass::Unconfined
-        },
-    }
-}
-
 #[test]
 fn snapshot_cases() {
     for case in cases("snapshot.v1.json") {
@@ -79,8 +47,8 @@ fn snapshot_cases() {
         );
         let schemas = Schemas::parse(&refs(&schema_files)).unwrap();
         let standard = Standard::parse(&refs(&standard_files), &schemas).unwrap();
-        let dir = temp(id);
-        let req = write(&dir, input);
+        let dir = common::temp("snap", id);
+        let req = common::lay_out(&dir, input);
         let ctx = Context {
             schemas: &schemas,
             standard: &standard,
@@ -206,8 +174,8 @@ fn a_comment_only_edit_changes_the_revision_and_not_the_value() {
         digest: "d",
         detectors: &Fixed(json!({})),
     };
-    let dir = temp("comment-only");
-    let req = write(
+    let dir = common::temp("snap", "comment-only");
+    let req = common::lay_out(
         &dir,
         &json!({"files": {"project/.fgos/config.yaml": ["s:", "  a: 1"]}}),
     );
