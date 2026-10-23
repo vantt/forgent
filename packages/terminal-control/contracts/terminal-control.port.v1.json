@@ -87,9 +87,9 @@
       "results": ["ok", "unsupported", "unknown"]
     },
     "capabilities": {
-      "input": {},
+      "input": { "agents": "optional boolean: also answer agentKinds and integrations (two more herdr reads; omitted otherwise)" },
       "results": ["capabilities"],
-      "meaning": "driver name, declared capability list (driver-capabilities.v1.json), current server incarnation or unknown, whether the pane the caller named in the envelope env FGOS_HERDR_ANCHOR_PANE resolves, the core's default for every config key and the registered placement policy names; doctor reads this"
+      "meaning": "driver name, declared capability list (driver-capabilities.v1.json), current server incarnation or unknown, whether the pane the caller named in the envelope env FGOS_HERDR_ANCHOR_PANE resolves, the agent kinds and integration hooks when asked, the core's default for every config key and the registered placement policy names; doctor reads this"
     },
     "reconcile-scan": {
       "input": { "olderThanMs": "integer >= 0" },
@@ -118,6 +118,8 @@
       "capabilities": "string[]",
       "serverIncarnation": "serverIncarnation | null",
       "anchorPane": "{state: absent} when the caller named none, {state: resolved} when the driver finds the pane, {state: unresolvable, reason} otherwise (one driver read, only when a pane was named)",
+      "agentKinds": "string[] | \"unknown\"; only when asked (agents: true): the kinds herdr's agent start accepts, \"unknown\" when its text cannot be read",
+      "integrations": "object | \"unknown\"; only when asked: agent name -> current | outdated | not installed, \"unknown\" when herdr's text cannot be read",
       "defaults": "object: the core's value for every key the route's config accepts (minCols, minRows, maxPanesPerTab, policy, allocationGraceMs, launchIdentifyTimeoutMs, shellReadyTimeoutMs)",
       "policies": "string[]: the placement policy names the core registers (placement-policy.v1.json registry.names)"
     },

@@ -303,15 +303,21 @@ fn dispatch(op: &str, core: &Core, request: &Value, anchor: Option<&str>) -> Res
             answer(core.label(&key, &display), ok_answer)
         }
         "capabilities" => {
-            let report = core.capabilities(anchor);
-            ("capabilities".into(), json!({
+            let agents: Option<bool> = optional(request, "agents")?;
+            let report = core.capabilities(CapabilitiesAsk { anchor_pane: anchor, agents: agents.unwrap_or(false) });
+            let mut fields = json!({
                 "driver": report.driver,
                 "capabilities": report.capabilities,
                 "serverIncarnation": report.server_incarnation,
                 "anchorPane": report.anchor_pane,
                 "defaults": defaults(),
                 "policies": POLICY_NAMES,
-            }))
+            });
+            if let Some(facts) = report.agents {
+                fields["agentKinds"] = facts.kinds.map_or(json!("unknown"), |kinds| json!(kinds));
+                fields["integrations"] = facts.integrations.map_or(json!("unknown"), |states| json!(states));
+            }
+            ("capabilities".into(), fields)
         }
         "reconcile-scan" => {
             let older: u64 = field(request, "olderThanMs")?;

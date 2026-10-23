@@ -10,12 +10,13 @@
 //! returns.
 
 use super::{
-    Activity, ActivityDetail, CloseOutcome, CreatedPane, Direction, DriverResult, ForegroundProcess, PaneGeometry,
+    Activity, ActivityDetail, AgentFacts, CloseOutcome, CreatedPane, Direction, DriverResult, ForegroundProcess, PaneGeometry,
     PaneLiveness, ProcessInfo, PtySize, Rect, TabGeometry, TerminalDriver,
 };
 use crate::port::{Refusal, ServerIncarnation};
 use serde_json::Value;
 use std::cell::RefCell;
+use std::collections::BTreeMap;
 use std::io::Read;
 use std::process::{Command, Stdio};
 use std::sync::mpsc;
@@ -179,6 +180,30 @@ pub fn parse_explain(body: &Value) -> ActivityDetail {
         matched_rule: matched.map(str::to_string),
         prompt_text,
     }
+}
+
+/// `agent start --help`: the agent kinds herdr starts, from the first `[possible values: a, b]` list.
+pub fn parse_agent_kinds(help: &str) -> Option<Vec<String>> {
+    const MARK: &str = "[possible values:";
+    let rest = &help[help.find(MARK)? + MARK.len()..];
+    let kinds: Vec<String> = rest[..rest.find(']')?].split(',').map(|k| k.trim().to_string()).filter(|k| !k.is_empty()).collect();
+    (!kinds.is_empty()).then_some(kinds)
+}
+
+/// `integration status`: one `name: state (details)` line per agent, with the state
+/// `current`, `outdated` or `not installed`. Lines of another shape are skipped.
+pub fn parse_integrations(text: &str) -> Option<BTreeMap<String, String>> {
+    let states = text.lines().filter_map(|line| {
+        let (name, rest) = line.trim_start().split_once(':')?;
+        let name_ok = !name.is_empty() && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '-');
+        let rest = rest.trim_start().to_ascii_lowercase();
+        let state = ["current", "outdated", "not installed"].into_iter().find(|state| {
+            rest.strip_prefix(state).is_some_and(|after| !after.starts_with(|c: char| c.is_ascii_alphanumeric() || c == '_'))
+        })?;
+        name_ok.then(|| (name.to_ascii_lowercase(), state.to_string()))
+    });
+    let states: BTreeMap<String, String> = states.collect();
+    (!states.is_empty()).then_some(states)
 }
 
 /// `status server --json`: the socket the CLI talks to, when the server runs.
@@ -604,6 +629,18 @@ impl TerminalDriver for HerdrDriver {
         self.require("layout.geometry")?;
         let result = self.run(&["pane", "layout", "--pane", pane])?;
         parse_layout(&result).ok_or_else(|| unknown("herdr pane layout answered an unexpected shape"))
+    }
+
+    fn agent_facts(&self) -> AgentFacts {
+        if self.caps.is_empty() {
+            return AgentFacts::default();
+        }
+        // Plain text, not the JSON envelope: only a command that ran and exited 0 is read.
+        let said = |args: &[&str]| exec(&self.config, args, self.config.timeout()).ok().filter(|out| out.status == Some(0)).map(|out| out.stdout);
+        AgentFacts {
+            kinds: said(&["agent", "start", "--help"]).and_then(|help| parse_agent_kinds(&help)),
+            integrations: said(&["integration", "status"]).and_then(|text| parse_integrations(&text)),
+        }
     }
 
     /// The rect herdr reports can differ from the pty when several clients are

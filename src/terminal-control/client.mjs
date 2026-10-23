@@ -205,7 +205,7 @@ export function createTerminalControl({ hostBin, herdrBin, env, config, timeoutM
       if (result.result === 'released') groupOfKey.delete(request.key);
       return result;
     },
-    capabilities: () => callSync('capabilities', {}),
+    capabilities: (request = {}) => callSync('capabilities', request),
     reconcileScan: (request) => callSync('reconcile-scan', request),
 
     /** Queued per `request.groupKey`; remembers the key's group for `releaseAsync`. */

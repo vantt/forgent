@@ -657,10 +657,10 @@ impl<'a> Core<'a> {
         self.driver.label_pane(&record.pane_id, &display.label)
     }
 
-    /// What the driver can do. `anchor_pane` is the pane the caller named as
-    /// its anchor, if any: the answer says whether the driver resolves it.
-    pub fn capabilities(&self, anchor_pane: Option<&str>) -> CapabilitiesReport {
-        let anchor_pane = match anchor_pane {
+    /// What the driver can do. A named anchor pane is answered by whether the
+    /// driver resolves it; agent facts are read only when asked for.
+    pub fn capabilities(&self, ask: CapabilitiesAsk) -> CapabilitiesReport {
+        let anchor_pane = match ask.anchor_pane {
             None => AnchorPane::Absent,
             Some(pane) => match self.driver.pane_liveness(pane) {
                 Ok(PaneLiveness::Live) => AnchorPane::Resolved,
@@ -673,6 +673,7 @@ impl<'a> Core<'a> {
             capabilities: self.driver.capabilities().into_iter().map(String::from).collect(),
             server_incarnation: self.driver.server_incarnation().ok(),
             anchor_pane,
+            agents: ask.agents.then(|| self.driver.agent_facts()),
         }
     }
 

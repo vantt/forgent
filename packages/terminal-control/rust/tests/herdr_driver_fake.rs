@@ -5,7 +5,7 @@ use fgos_terminal_control::core::{Core, CoreConfig};
 use fgos_terminal_control::driver::herdr::{HerdrConfig, HerdrDriver};
 use fgos_terminal_control::driver::*;
 use fgos_terminal_control::policy::{measured_split::MeasuredSplit, Limits};
-use fgos_terminal_control::port::{AnchorPane, Refusal, ServerIncarnation};
+use fgos_terminal_control::port::{AnchorPane, CapabilitiesAsk, Refusal, ServerIncarnation};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU32, Ordering};
 
@@ -423,8 +423,8 @@ mod incarnation {
         };
 
         let counts = [
-            ("capabilities", ran(&|| drop(core.capabilities(None)))),
-            ("capabilities naming an anchor pane", ran(&|| drop(core.capabilities(Some("wS:p59X"))))),
+            ("capabilities", ran(&|| drop(core.capabilities(CapabilitiesAsk::default())))),
+            ("capabilities naming an anchor pane", ran(&|| drop(core.capabilities(CapabilitiesAsk { anchor_pane: Some("wS:p59X"), ..Default::default() })))),
             ("allocate into a new tab", ran(&|| drop(core.allocate(&allocate("k1")).unwrap()))),
             ("allocate beside a live pane", ran(&|| drop(core.allocate(&allocate("k2")).unwrap()))),
             ("allocate beside two live panes", ran(&|| drop(core.allocate(&allocate("k5")).unwrap()))),
@@ -436,6 +436,7 @@ mod incarnation {
             ("read", ran(&|| drop(core.read("k1", Some(5), None).unwrap()))),
             ("inspect", ran(&|| drop(core.inspect("k1", false)))),
             ("label", ran(&|| core.label("k1", &Display { label: "renamed".into(), ..Default::default() }).unwrap())),
+            ("capabilities asking for the agent facts", ran(&|| drop(core.capabilities(CapabilitiesAsk { agents: true, ..Default::default() })))),
             ("reconcile-scan over six records", ran(&|| drop(core.reconcile_scan(0).unwrap()))),
             ("release close", ran(&|| drop(core.release("k2", Disposition::Close, None).unwrap()))),
         ];
@@ -455,7 +456,8 @@ mod incarnation {
                 ("read", 2),
                 ("inspect", 3),
                 ("label", 2),
-                ("reconcile-scan over six records", 12),
+                ("capabilities asking for the agent facts", ran(&|| drop(core.capabilities(CapabilitiesAsk { agents: true, ..Default::default() })))),
+            ("reconcile-scan over six records", 12),
                 ("release close", 2),
             ],
         );
@@ -541,7 +543,7 @@ fn a_pane_with_no_recognised_agent_answers_unknown_state_while_a_failed_read_sta
 fn capabilities_say_whether_the_named_anchor_pane_resolves() {
     let anchor = |fake: &Fake, named: Option<&str>| {
         let driver = fake.driver();
-        let report = Core::new(&driver, &MeasuredSplit, core_config(fake)).capabilities(named);
+        let report = Core::new(&driver, &MeasuredSplit, core_config(fake)).capabilities(CapabilitiesAsk { anchor_pane: named, ..Default::default() });
         report.anchor_pane
     };
     let live = Fake::new("anchor-live");
@@ -553,6 +555,24 @@ fn capabilities_say_whether_the_named_anchor_pane_resolves() {
     assert!(matches!(anchor(&gone, Some("ghost")), AnchorPane::Unresolvable { reason } if reason.contains("ghost")));
 
     let absent = HerdrDriver::new(HerdrConfig::new("/no/such/herdr"));
-    let report = Core::new(&absent, &MeasuredSplit, core_config(&live)).capabilities(Some("wS:p59X"));
+    let report = Core::new(&absent, &MeasuredSplit, core_config(&live)).capabilities(CapabilitiesAsk { anchor_pane: Some("wS:p59X"), ..Default::default() });
     assert!(matches!(report.anchor_pane, AnchorPane::Unresolvable { reason } if reason.contains("not found")), "no herdr runs, and the pane is not claimed to resolve");
+}
+
+#[test]
+fn agent_kinds_and_integrations_come_from_herdrs_own_text_and_are_unknown_when_it_cannot_be_read() {
+    let ask = |fake: &Fake| {
+        let driver = fake.driver();
+        let report = Core::new(&driver, &MeasuredSplit, core_config(fake)).capabilities(CapabilitiesAsk { agents: true, ..Default::default() });
+        report.agents.expect("asked for")
+    };
+    let fake = Fake::new("agents");
+    let facts = ask(&fake);
+    assert_eq!(facts.kinds.unwrap(), ["pi", "claude", "codex", "agy", "gemini"]);
+    assert_eq!(facts.integrations.unwrap().get("codex").map(String::as_str), Some("outdated"));
+    assert!(fake.calls().ends_with(&["agent start --help".to_string(), "integration status".to_string()]), "{:?}", fake.calls());
+
+    assert_eq!(ask(&Fake::new("agents-garbled").env("FAKE_HERDR_GARBLE", "1")), AgentFacts::default());
+    let driver = HerdrDriver::new(HerdrConfig::new("/no/such/herdr"));
+    assert_eq!(driver.agent_facts(), AgentFacts::default(), "an absent herdr is asked nothing");
 }

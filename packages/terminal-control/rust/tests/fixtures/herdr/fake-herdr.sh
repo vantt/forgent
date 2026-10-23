@@ -21,6 +21,7 @@ fi
 if [ -n "$FAKE_HERDR_FDS" ]; then ls /proc/$$/fd > "$FAKE_HERDR_FDS" 2>/dev/null; fi
 if [ "$1" = "--session" ]; then shift 2; fi
 [ "$1" = "--version" ] && { echo "herdr 0.9.1-fake"; exit 0; }
+[ "$1 $2 $3" = "agent start --help" ] && [ -z "$FAKE_HERDR_GARBLE" ] && { cat "$dir/agent-start-help.txt"; exit 0; }
 [ "$3" = "--help" ] && { echo "usage"; exit 0; }
 [ -n "$FAKE_HERDR_GARBLE" ] && { echo "oops, not json"; exit 0; }
 case "$FAKE_HERDR_HANG" in "$1 $2") exec sleep 30 ;; esac
@@ -40,6 +41,7 @@ case "$1 $2" in
   "workspace create") cat "$dir/tab-create.json" ;;
   "status server") sed "s#\"socket\":\"[^\"]*\"#\"socket\":\"$FAKE_HERDR_SOCKET\"#" "$dir/status-server.json" ;;
   "tab create") cat "$dir/tab-create.json" ;;
+  "integration status") cat "$dir/integration-status.txt" ;;
   "tab rename"|"pane rename"|"pane run"|"pane send-text"|"pane send-keys"|"agent prompt") cat "$dir/pane-close-ok.json" ;;
   "pane split") cat "$dir/pane-split.json" ;;
   "pane layout") cat "$dir/pane-layout-two-panes.json" ;;
