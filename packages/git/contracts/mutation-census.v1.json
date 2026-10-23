@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2fb3d07e5437a11ea2933cfb9fe9fcdbc2eabfdefde709dee62172ebb05422f4",
+  "payloadDigest": "858e94dcd5afb51c55e0ab28e874a7638a5dfcf610094914b5b6f5e5157c1cb1",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -299,13 +299,13 @@
     "packages/git/rust/src/driver.rs": "98fb5f2e371cdf0c9dc8f55c539002acb07541e7d0105cd1797c321d60a315af",
     "packages/git/rust/src/grant.rs": "1a96595205c5deea732fd37208802e07a44409201ca4e591b89b687e798044b5",
     "packages/git/rust/src/inspect.rs": "d900d81f350dabd1973c1f4265fa01f843bfe4e1605a0923068a5cf650aa066b",
-    "packages/git/rust/src/land.rs": "0cf8be1440888112cf8a8955f03cecb58580ed3ad65dcecf73f1abedfe8120a0",
-    "packages/git/rust/src/lib.rs": "dbdaf859c6624c2ae576f62fcf45961be1d6a70cf8308d3339ade19c9d9bdd8a",
+    "packages/git/rust/src/land.rs": "9205c084d08ef414a0122b8893b981bf9723d363ff1d4bddc3e293dc09f6ad1e",
+    "packages/git/rust/src/lib.rs": "ec1a65b8884e24cb15953a6696e99b5049f0adbb3e89a826c7fc8a686382e04f",
     "packages/git/rust/src/native_lock.rs": "94ea0e46e34acdec4de3f40552b33a6cd8f2c4656d524dd9b1539a6cd2d55abb",
     "packages/git/rust/src/objects.rs": "ba519abbf01327819f9f2fb5cf42f05633e108cc6741e26e00b289f54b064b9c",
     "packages/git/rust/src/publication.rs": "5c4d03b39a165ff82c025814cbb057076bdb4d8ffc1a3e01377a09c78936987d",
     "packages/git/rust/src/recovery.rs": "a8245f0cf573ccb51cac4373e2ee3566c1d48bafb6142fadc5c5302efe18f073",
-    "packages/git/rust/src/refs.rs": "311fb6961e6962d2d5e8761f0da20e90133d367cce8e1ab693b3dd4553af400d",
+    "packages/git/rust/src/refs.rs": "58c5d28fa0ab5f73675b9df2de387805de1497023bf0967324768ea4d38b5dfa",
     "packages/git/rust/src/remote.rs": "e53761592bb96509fda62e0362e0f035b991e278aedf54f5c9f4b4740714708a",
     "packages/git/rust/src/repository_config.rs": "40a9792c910b87a3fd8f7756de5a78674a3572cb492e8de8dcfb9bb1ddd46ed9",
     "packages/git/rust/src/restore.rs": "8ebe818730acbc307af3cf3e4a2c7476876eae026a7ea2216d4b4a4a08e1e525",
@@ -313,7 +313,7 @@
     "packages/git/rust/src/sequence.rs": "02ca2ff90ac57645df2377e1b7746f88037091a8f1f9b005057be1158e7f28eb",
     "packages/git/rust/src/sync.rs": "0fd36afdf42dc99246386d3ed9b87c2086c88edab260f99bbd9f2327c9a85cca",
     "packages/git/rust/src/wal.rs": "6a361d9d3ea4bc1d8349a153f98e915d53a8ce6368aae62139a32b6c821f4666",
-    "packages/git/rust/src/worktree.rs": "a1094850624cfe314efc2aed5666c50596557c028ac6614e8f34182b667aee84",
+    "packages/git/rust/src/worktree.rs": "4ce73cd220e9fd29a288afe51698f6b0a286accbc5af5f471ba37734ed4a0d12",
     "packages/git/rust/tests/borrow_deadline.rs": "6a0db6afad96b62ded1253324e862a29a88129e115bd133292ee30ac5482fa07",
     "packages/git/rust/tests/contracts.rs": "91acedb270a60ee727e10dd823c817d4a914062dead0a8fd6f319f381d4fb2b1",
     "packages/git/rust/tests/head_switch.rs": "9e84d97212a643b94d08c3a62b9916f7294459a0b7022c34acf39175343ff34b",
@@ -643,7 +643,7 @@
     "scripts/fgos-session-start-hook.mjs": "6ec944bb42698570cb5cb860d24bde1229d884f968ce0f6771c05b9c11a93af6",
     "scripts/fgos-shell-integration.sh": "89d74fd3352594dccc46c85174725a7095714ed436a599342ef87c78a60b732c",
     "scripts/git-addon.mjs": "67532c2006d74a97cbc40814e82882da1de5d48b5d072670444489e2ed963d71",
-    "scripts/git/e1-power-cut.mjs": "58e093cefe327fc2d7c2dd791185a02c68ee596925d0adb3b9a544abe5d18458",
+    "scripts/git/e1-power-cut.mjs": "af07cfc52374eff25ee30cad13a2603ba93fc2cda385e6dcd6a7f2497eac5335",
     "scripts/git/e1-power-cut.sh": "be0500b7f99580694cf1ca7418c17ddf6bd70583f3a06686aaab923118e2d1fa",
     "scripts/git/e3-bench.mjs": "8a71b44d68256de1695838acd499542f616e53f287cd7ce59108cd1638991294",
     "scripts/git/p-release-checks.sh": "08bb9b3c32e7915b27f645f7aa68d42cba0dbddd2a7dc9adc45d43a75b4d0056",
@@ -1879,6 +1879,13 @@
       "class": "rust-test"
     },
     {
+      "path": "packages/git/rust/src/refs.rs",
+      "line": 1165,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
       "path": "packages/git/rust/src/wal.rs",
       "line": 3044,
       "spawn": "Command::new",
@@ -2485,28 +2492,35 @@
     },
     {
       "path": "scripts/git/e1-power-cut.mjs",
-      "line": 108,
+      "line": 111,
       "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e1-power-cut.mjs",
-      "line": 143,
+      "line": 141,
+      "spawn": "createGitWorktree -> src/git/worktree.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e1-power-cut.mjs",
+      "line": 163,
       "spawn": "createGitPublication -> src/git/index.mjs:9",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e1-power-cut.mjs",
-      "line": 214,
+      "line": 234,
       "spawn": "createGitRecovery -> src/git/recovery.mjs:7",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e1-power-cut.mjs",
-      "line": 293,
+      "line": 313,
       "spawn": "createGitRecovery -> src/git/recovery.mjs:7",
       "binary": "(configuration file data)",
       "class": "configured-binary"
