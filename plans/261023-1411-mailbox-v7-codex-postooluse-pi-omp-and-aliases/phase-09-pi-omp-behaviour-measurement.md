@@ -24,3 +24,7 @@ Commit the addendum; `pin --addendum v7e`; `run-stage A --addendum v7e`; stop ru
 ## Acceptance
 
 Ledger complete inside the ceiling; numbers regenerate from the ledger.
+
+## Plan-owner decision after the V6 review (agent, 2026-10-23)
+
+These runs use only the launch phase 5 hardened after `plans/261023-0049-mailbox-v6-behaviour-through-real-hook/reports/code-review-v6.md`: no MCP server or account connector (H3, phase 5 T10 green), the one credential mask list with its hash in each ledger entry (M6), the reasoning effort pinned where the CLI has one (M3; Codex `model_reasoning_effort` from the addendum), and killed runs settling their login copy through the existing guard (H4). A run whose ledger entry lacks the argv or the mask hash is not counted.
