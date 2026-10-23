@@ -145,15 +145,10 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'terminal-control',
       'git-component-compatible',
       'git-worktree-recovery',
-      'git-land-recovery',
-      'git-transport-config',
-      'git-trust-topology',
+      'git-repository-config',
       'git-operation-journal',
       'git-native-locks',
-      'git-publication-refspecs',
-      'git-durability-capability',
       'git-mutation-one-door',
-      'terminal-config',
       'terminal-allocations',
       'trust-store-readable',
       // Phase 07 (herdr-trust-supervisor R3): codex-toml/agy trust stores had
@@ -1075,4 +1070,14 @@ test('operation-capability-resolves reports passing status for retired coordinat
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('a doctor row keeps its facts under detail so its message stays one sentence', () => {
+  const root = initRepo('doctor-detail-');
+  try {
+    const row = checkById('git-component-compatible').check(root);
+    assert.equal(row.passed, true, row.message);
+    assert.equal(typeof row.detail.versions.napi, 'number');
+    assert.ok(!row.message.includes('{"'), 'a message carries no JSON');
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });

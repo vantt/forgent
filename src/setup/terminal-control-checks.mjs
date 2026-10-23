@@ -39,44 +39,18 @@ function incarnationText(incarnation) {
 }
 
 /**
- * terminal-control: the driver the port runs on, what it can do, and which
- * herdr server it would talk to. A missing herdr is a warning (direct mode
- * does not use a terminal); a bad anchor pane fails.
+ * terminal-control: the driver the port runs on, what it can do, which herdr
+ * server it would talk to, and `terminal.*` after the merge (project over
+ * global over default) with each value's source. The core refuses a layout
+ * value it cannot run with and names it; the rules only Node can judge (grace
+ * against the ready timeout, the retain time) are checked here. A missing herdr
+ * only warns (direct mode does not use a terminal); a bad anchor pane or
+ * `terminal.*` value fails.
  */
-export function checkTerminalControl({ env = process.env, terminalControl, platform = process.platform } = {}) {
-  const herdrBin = resolveHerdrBin();
-  let report;
-  try {
-    report = (terminalControl ?? createTerminalControl({ herdrBin })).capabilities();
-  } catch (err) {
-    return { passed: true, message: `warning: the terminal-control route did not answer, so terminal mode cannot be judged here (${err.message}); direct mode is unaffected` };
-  }
-  if (report.result !== 'capabilities') {
-    return { passed: true, message: `warning: terminal-control answered ${report.result}${report.reason ? ` (${report.reason})` : ''}; direct mode is unaffected` };
-  }
-  const { driver, capabilities, serverIncarnation } = report;
-  if (capabilities.length === 0) {
-    const why = platform === 'win32'
-      ? 'Windows has no herdr build, and terminal-control runs on herdr only'
-      : `herdr is not usable (${herdrBin})`;
-    return { passed: true, message: `warning: terminal mode unsupported: ${why}; direct mode unaffected` };
-  }
-  const anchor = checkAnchorPane(herdrBin, env);
-  if (anchor.failure) return { passed: false, message: `terminal-control driver ${driver} is available, but ${anchor.failure}` };
-  const summary = `driver ${driver}, ${capabilities.length} capabilities (${capabilities.join(', ')}); ${incarnationText(serverIncarnation)}${anchor.note}`;
-  if (!capabilities.includes('layout.geometry')) {
-    return { passed: true, message: `info: ${summary}; this herdr cannot report pane geometry, so tabs fall back to the fixed split and only maxPanesPerTab applies` };
-  }
-  return { passed: true, message: summary };
-}
-
-/**
- * terminal-config: `terminal.*` after the merge (project over global over
- * default), each value with its source. The core refuses a layout value it
- * cannot run with and names it; the two rules only Node can judge are checked here.
- */
-export function checkTerminalConfig(repoRoot, { globalConfigPath, createClient } = {}) {
+export function checkTerminalControl(repoRoot, { env = process.env, platform = process.platform, globalConfigPath, createClient } = {}) {
   const root = path.resolve(repoRoot);
+  const herdrBin = resolveHerdrBin();
+  const client = (config) => createClient?.(config) ?? createTerminalControl({ herdrBin, config });
   let explicit;
   try {
     resolveTerminalConfig(root, { globalConfigPath });
@@ -88,21 +62,36 @@ export function checkTerminalConfig(repoRoot, { globalConfigPath, createClient }
   let refused = null;
   try {
     try {
-      report = (createClient?.(explicit) ?? createTerminalControl({ herdrBin: resolveHerdrBin(), config: explicit })).capabilities();
+      report = client(explicit).capabilities();
     } catch (err) {
       if (!isConfigRefusal(err)) throw err;
       refused = `${err.routeMessage} (${err.code})`;
-      report = (createClient?.({}) ?? createTerminalControl({ herdrBin: resolveHerdrBin(), config: {} })).capabilities();
+      report = client({}).capabilities();
     }
   } catch (err) {
-    return { passed: true, message: `warning: the terminal-control route did not answer, so terminal.* cannot be judged here (${err.message})` };
+    return { passed: true, message: `warning: the terminal-control route did not answer, so terminal mode and terminal.* cannot be judged here (${err.message}); direct mode is unaffected` };
   }
   const resolved = resolveTerminalConfig(root, { globalConfigPath, defaults: report.defaults });
   const problems = terminalConfigProblems(resolved.values, { readyTimeoutMs: READY_TIMEOUT_MS });
   if (refused) problems.push(`the core refused the layout: ${refused}`);
+  const answered = report.result === 'capabilities';
+  const { driver, capabilities, serverIncarnation } = report;
+  const anchor = answered && capabilities.length > 0 ? checkAnchorPane(herdrBin, env) : { note: '' };
+  if (anchor.failure) problems.push(`terminal-control driver ${driver} is available, but ${anchor.failure}`);
   if (problems.length > 0) return { passed: false, message: problems.join('; ') };
+  if (!answered) return { passed: true, message: `warning: terminal-control answered ${report.result}${report.reason ? ` (${report.reason})` : ''}; direct mode is unaffected` };
+  if (capabilities.length === 0) {
+    const why = platform === 'win32'
+      ? 'Windows has no herdr build, and terminal-control runs on herdr only'
+      : `herdr is not usable (${herdrBin})`;
+    return { passed: true, message: `warning: terminal mode unsupported: ${why}; direct mode unaffected` };
+  }
   const shown = resolved.entries.map(({ name, value, source }) => `${name}=${JSON.stringify(value)} (${source})`).join(', ');
-  return { passed: true, message: shown };
+  const summary = `driver ${driver}, ${capabilities.length} capabilities (${capabilities.join(', ')}); ${incarnationText(serverIncarnation)}${anchor.note}; ${shown}`;
+  if (!capabilities.includes('layout.geometry')) {
+    return { passed: true, message: `info: ${summary}; this herdr cannot report pane geometry, so tabs fall back to the fixed split and only maxPanesPerTab applies` };
+  }
+  return { passed: true, message: summary };
 }
 
 const isConfigRefusal = (err) => err instanceof TerminalControlError && ['terminal-control-route-usage', 'terminal-config-below-floor'].includes(err.code);
@@ -133,7 +122,7 @@ export function checkTerminalAllocations(repoRoot, { globalConfigPath, terminalC
     return { passed: true, message: `warning: terminal.* unreadable, allocations not scanned: ${err.message}` };
   }
   if (!Number.isInteger(grace) || grace < 0) {
-    return { passed: true, message: 'warning: terminal.allocationGraceMs is invalid (see terminal-config), allocations not scanned' };
+    return { passed: true, message: 'warning: terminal.allocationGraceMs is invalid (see terminal-control), allocations not scanned' };
   }
   let scan;
   try {
@@ -144,6 +133,6 @@ export function checkTerminalAllocations(repoRoot, { globalConfigPath, terminalC
   if (scan.result === 'unsupported') return { passed: true, message: `info: allocations not scanned: terminal mode is unsupported here (${scan.detail ?? scan.capability})` };
   if (scan.result !== 'scan') return { passed: true, message: `warning: allocation scan answered ${scan.result}${scan.reason ? ` (${scan.reason})` : ''}` };
   if (scan.findings.length === 0) return { passed: true, message: `no slot older than ${grace} ms is stuck and no retained pane is past its time` };
-  const lines = scan.findings.map((f) => `${f.key}: ${FINDING_TEXT[f.kind] ?? f.kind}${f.detail ? ` (${f.detail})` : ''}`);
+  const lines = scan.findings.map((f) => `${f.key}${f.paneId ? ` (pane ${f.paneId})` : ''}: ${FINDING_TEXT[f.kind] ?? f.kind}${f.detail ? ` (${f.detail})` : ''}`);
   return { passed: true, message: `warning: ${scan.findings.length} slot(s) need a person; nothing was closed: ${lines.join('; ')}` };
 }

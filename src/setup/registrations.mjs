@@ -1,6 +1,6 @@
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { resolveHolderLiveness } from '../runner/dispatch/process-identity.mjs';
-import { checkGit, checkMutationOneDoor, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories, fixLandRecovery, checkLandRetainedCandidates } from './git-checks.mjs';
+import { checkGit, checkMutationOneDoor, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories, fixLandRecovery } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
 // D1/D2, docs/history/setup-doctor-config-registry/): the one place a module
@@ -146,7 +146,7 @@ import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
 import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityProjectId, fixIdentityMachineId } from './identity-checks.mjs';
-import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations } from './terminal-control-checks.mjs';
+import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
 import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
@@ -4474,13 +4474,8 @@ export function checkHerdrExecutorKinds(runnerCfg = {}, injected = {}) {
 
 registerCheck({
   id: 'terminal-control',
-  description: 'the terminal-control driver (herdr) answers, which capabilities it declares and which server it talks to; a bad FGOS_HERDR_ANCHOR_PANE fails, a missing herdr only warns',
-  check: () => checkTerminalControl(),
-});
-registerCheck({
-  id: 'terminal-config',
-  description: 'terminal.* after the config merge, each value with its source; allocationGraceMs, retainFailedPaneMs, the layout policy and limits must satisfy their rules',
-  check: (cwd) => checkTerminalConfig(cwd),
+  description: 'the terminal-control driver (herdr) answers, which capabilities it declares and which server it talks to, and terminal.* after the config merge with each value and its source; a bad FGOS_HERDR_ANCHOR_PANE or terminal.* value fails, a missing herdr only warns',
+  check: (cwd) => checkTerminalControl(cwd),
 });
 registerCheck({
   id: 'terminal-allocations',
@@ -6350,23 +6345,15 @@ registerCheck({
 registerConfigDefault({ id: 'event-store', key: 'eventStore', shape: { remote: 'origin' } });
 
 // Git and Event Store share one addon ABI admission row.
-for (const id of ['git-worktree-recovery', 'git-component-compatible', 'git-transport-config', 'git-trust-topology', 'git-operation-journal', 'git-native-locks', 'git-publication-refspecs', 'git-durability-capability']) {
+for (const id of ['git-worktree-recovery', 'git-component-compatible', 'git-repository-config', 'git-operation-journal', 'git-native-locks']) {
   registerCheck({ id, description: {
     'git-worktree-recovery': 'Orphan, dirty/stale checkout and pending worktree operations (read-only)',
-    'git-component-compatible': 'Combined addon contracts and Git feature floor',
-    'git-transport-config': 'Repository transport settings refused by Publication/Remote',
-    'git-trust-topology': 'Trusted repository layout and common directory',
-    'git-operation-journal': 'Readable Git WAL with no unresolved operations, under the controller activation fence (`git-fence-missing` when the fence is gone)',
+    'git-component-compatible': 'Combined addon contracts and Git feature floor, with the repository layout and measured durability',
+    'git-repository-config': 'Repository transport settings refused by Publication/Remote, and the Event Store mirror fetch mappings',
+    'git-operation-journal': 'Readable Git WAL with no unresolved operations, under the controller activation fence (`git-fence-missing` when the fence is gone); warns about retained Land candidates awaiting Work acknowledgement',
     'git-native-locks': 'Native Git lock residue (read-only detection)',
-    'git-publication-refspecs': 'Additive Event Store mirror fetch mappings',
-    'git-durability-capability': 'Measured Git durability guarantees',
   }[id], check: (cwd) => checkGit(cwd, id) });
 }
-registerCheck({
-  id: 'git-land-recovery',
-  description: 'Finished Land operations whose candidate worktree and pins are still retained awaiting Work acknowledgement (read-only; warns, never fails)',
-  check: (cwd) => checkLandRetainedCandidates(cwd),
-});
 registerCheck({
   id: 'git-mutation-one-door',
   description: 'The release mutation census lists no Git or hook spawn outside the fgos-git driver and matches the payload it was built from',

@@ -13,6 +13,7 @@ import { OWN_PAYLOAD_ROOT } from '../run-supervisor/payload-root.mjs';
 import { verifyCensus } from '../../scripts/git-one-door-scan.mjs';
 
 const transportRemedy = 'For actions/checkout use persist-credentials: false, remove its repo-local http.<url>.extraheader, and configure a trusted global credential helper or GIT_CONFIG_GLOBAL-level setting. Doctor never moves credentials automatically.';
+const notARepository = { passed: true, message: 'info: not a Git repository' };
 
 // A checkout kept for its owner (dirty) or locked by a still-running process is not a broken registration.
 const advisoryWorktreeReasons = new Set(['dirty-or-stale-checkout-preserved', 'locked-by-live-process']);
@@ -24,45 +25,68 @@ function context(cwd, loaderOptions) {
   const native = loadNativeAddon(loaderOptions);
   return { root, remote: config.eventStore?.remote ?? 'origin', stateRoot: resolveStateRoot().stateRoot, native };
 }
-export function checkGit(cwd, kind, loaderOptions) {
+
+function worktreeRecoveryRow(facts) {
+  if (facts.notARepository) return notARepository;
+  const reasons = [...new Set([...facts.issues.map(issue => issue.reason), ...(facts.pendingOperations.length ? ['pending-worktree-operation'] : [])])];
+  if (!reasons.length) return { passed: true, message: 'no orphan, dirty or pending worktree found', detail: facts };
+  const passed = facts.issues.every(issue => advisoryWorktreeReasons.has(issue.reason)) && facts.pendingOperations.length === 0;
+  // This check never repairs or clears predecessor evidence; the finding names what a person must look at.
+  return { passed, message: passed ? `info: ${reasons.join(', ')}; nothing to repair, the checkout stays with its owner` : `worktree findings need a person (${reasons.join(', ')}); nothing was changed, inspect them with \`fgos doctor --json\`, then recover each by hand`, detail: facts };
+}
+
+function repositoryConfigRow(facts, { remote, mappingMissing, readOrigin }) {
+  const keys = facts.untrustedTransportConfig;
+  if (!Array.isArray(keys)) return { passed: false, message: 'Git addon lacks transport diagnostics; upgrade the active release' };
+  const reserved = facts.reservedLegacyRefs ?? [];
+  const problems = [
+    keys.length ? `repository-transport-config-untrusted: ${keys.join(', ')}; Publication/Remote transfers refuse these settings. ${transportRemedy}` : '',
+    mappingMissing ? 'the required fetch mapping is missing; run fgos doctor --fix (git-publication-refspecs)' : '',
+    facts.obsoleteFetchMapping || (remote !== 'origin' && readOrigin().obsoleteFetchMapping) ? 'obsolete exact legacy mapping breaks plain fetch when the remote has no refs/fgos/legacy; run fgos doctor --fix (git-publication-refspecs)' : '',
+    reserved.length ? `reserved legacy mirror refs detected: ${reserved.join(', ')}; inspect and remove the foreign refs at their source and these mirrors` : '',
+  ].filter(Boolean);
+  const detail = { fetchRefspecs: facts.fetchRefspecs, untrustedTransportConfig: keys, reservedLegacyRefs: reserved };
+  return problems.length ? { passed: false, message: problems.join('; '), detail } : { passed: true, message: 'repository transport settings and fetch mappings are as fgOS expects', detail };
+}
+
+function journalRow(facts, landWarning) {
+  const { journal } = facts;
+  const detail = { journal, retainedLand: landWarning };
+  // Every WAL-writing door refuses without the controller's activation fence, so a WAL without it is a hard stop.
+  if (journal.initialized && facts.activationFence === false) return { passed: false, message: 'git-fence-missing: the Git WAL exists but the controller activation fence does not, so every Git write refuses; run `fgctl upgrade` for the active release (it places the fence)', detail };
+  const steps = [
+    !journal.initialized ? 'the Git WAL is not initialized; run `fgos doctor --fix` (git-wal-dir)' : '',
+    journal.initialized && !journal.complete ? 'the Git WAL listing is incomplete; inspect it with `fgos doctor --json`' : '',
+    journal.errors.length ? `${journal.errors.length} Git WAL error(s); inspect them with \`fgos doctor --json\`` : '',
+    journal.pendingCount > 0 ? `${journal.pendingCount} Git operation(s) unresolved; run \`fgos doctor --fix\` (git-land-recovery) for interrupted Land operations` : '',
+  ].filter(Boolean);
+  if (steps.length) return { passed: false, message: steps.join('; '), detail };
+  return { passed: true, message: landWarning ?? 'the Git WAL is readable with no unresolved operation', detail };
+}
+
+export function checkGit(cwd, kind, loaderOptions, portOptions) {
   try {
     const { root, remote, stateRoot, native } = context(cwd, loaderOptions);
-    if (kind === 'git-worktree-recovery') {
-      const facts = native.inspectGitWorktreeRecovery(stateRoot, cwd, root);
-      if (facts.notARepository) return { passed: true, message: 'info: not a Git repository' };
-      // Each producer owns its diagnostic row; custody adds its own facts here
-      // in phase 04. This check never repairs or clears predecessor evidence.
-      return { passed: facts.issues.every(issue => advisoryWorktreeReasons.has(issue.reason)) && facts.pendingOperations.length === 0, message: JSON.stringify(facts) };
-    }
-    const versions = native.versions();
+    if (kind === 'git-worktree-recovery') return worktreeRecoveryRow(native.inspectGitWorktreeRecovery(stateRoot, cwd, root));
     const facts = native.inspectGit(stateRoot, cwd, root, remote);
-    if (kind === 'git-component-compatible') return { passed: compatibleGitContracts(versions, facts.floor), message: JSON.stringify({ versions, floor: facts.floor }) };
-    if (facts.notARepository) return { passed: true, message: 'info: not a Git repository' };
+    if (kind === 'git-component-compatible') {
+      const detail = { versions: native.versions(), floor: facts.floor };
+      if (!compatibleGitContracts(detail.versions, facts.floor)) return { passed: false, message: 'the Git addon, its contract versions or the Git feature floor do not match this release; upgrade the active release or its Git binary', detail };
+      return { passed: true, message: facts.notARepository ? 'the Git addon, its contracts and the Git feature floor are compatible' : `info: ${facts.commonDir}: ${facts.layout}; ${facts.durability}`, detail };
+    }
+    if (facts.notARepository) return notARepository;
     switch (kind) {
-      case 'git-transport-config': {
-        const keys = facts.untrustedTransportConfig;
-        if (!Array.isArray(keys)) return { passed: false, message: 'Git addon lacks transport diagnostics; upgrade the active release' };
-        return { passed: keys.length === 0, message: keys.length ? `repository-transport-config-untrusted: ${keys.join(', ')}; Publication/Remote transfers refuse these settings. ${transportRemedy}` : 'no repository-local transport settings would refuse Publication/Remote' };
-      }
-      case 'git-trust-topology': return { passed: true, message: `${facts.commonDir}: ${facts.layout}` };
-      case 'git-operation-journal':
-        // Every WAL-writing door refuses without the controller's activation fence, so a WAL without it is a hard stop.
-        if (facts.journal.initialized && facts.activationFence === false) return { passed: false, message: 'git-fence-missing: the Git WAL exists but the controller activation fence does not, so every Git write refuses; run `fgctl upgrade` for the active release (it places the fence)' };
-        return { passed: facts.journal.initialized && facts.journal.complete && facts.journal.errors.length === 0 && facts.journal.pendingCount === 0, message: JSON.stringify(facts.journal) };
-      case 'git-native-locks': return { passed: facts.nativeLocks.length === 0, message: facts.nativeLocks.length ? `native locks detected (never removed): ${facts.nativeLocks.join(', ')}` : 'no native Git locks detected' };
-      case 'git-publication-refspecs': {
-        const origin = remote === 'origin' ? facts : native.inspectGit(stateRoot, cwd, root, 'origin');
-        const obsolete = facts.obsoleteFetchMapping || origin.obsoleteFetchMapping;
-        const reserved = facts.reservedLegacyRefs ?? [];
-        return { passed: native.gitFetchMappings(remote).every(r => facts.fetchRefspecs.includes(r)) && !obsolete && reserved.length === 0,
-          message: [JSON.stringify(facts.fetchRefspecs), obsolete ? 'obsolete exact legacy mapping breaks plain fetch when the remote has no refs/fgos/legacy; run fgos doctor --fix (git-publication-refspecs)' : '', reserved.length ? `reserved legacy mirror refs detected: ${reserved.join(', ')}; inspect and remove the foreign refs at their source and these mirrors` : ''].filter(Boolean).join('; ') };
-      }
-      case 'git-durability-capability': return { passed: true, message: `info: ${facts.durability}` };
+      case 'git-repository-config': return repositoryConfigRow(facts, { remote, mappingMissing: !native.gitFetchMappings(remote).every(r => facts.fetchRefspecs.includes(r)), readOrigin: () => native.inspectGit(stateRoot, cwd, root, 'origin') });
+      case 'git-operation-journal': return journalRow(facts, facts.journal.initialized && facts.activationFence !== false ? retainedLandWarning(cwd, loaderOptions, portOptions) : null);
+      case 'git-native-locks': return facts.nativeLocks.length
+        ? { passed: false, message: `${facts.nativeLocks.length} native Git lock(s) present and never removed by fgOS; follow the runbook in docs/platform/git/spec.md section 11`, detail: { nativeLocks: facts.nativeLocks } }
+        : { passed: true, message: 'no native Git locks detected' };
       default: throw new Error(`unknown Git check: ${kind}`);
     }
   } catch (err) {
-    if (kind === 'git-transport-config' && /repository-config-untrusted: credential\.helper/.test(err.message)) return { passed: false, message: `${err.message}; ${transportRemedy}` };
-    return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel: onboard this project with `fgctl init`' : err.message }; }
+    if (kind === 'git-repository-config' && /repository-config-untrusted: credential\.helper/.test(err.message)) return { passed: false, message: `${err.message}; ${transportRemedy}` };
+    return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel: onboard this project with `fgctl init`' : err.message };
+  }
 }
 /** The release's mutation census (built from its own payload) lists no Git spawn outside the driver. */
 export function checkMutationOneDoor(payloadRoot = OWN_PAYLOAD_ROOT) {
@@ -150,22 +174,18 @@ export function fixLandRecovery(cwd, loaderOptions, portOptions) {
  * warning, never a failure, because nothing is broken: the candidate waits
  * for a release that needs Work's acknowledgement reader.
  */
-export function checkLandRetainedCandidates(cwd, loaderOptions, portOptions, now = Date.now()) {
-  try {
-    // The Recovery port is constructed with a writer even for reads, as the fix above is.
-    const recovery = createGitRecovery(portOptions ?? gitPortOptions(resolveMainCheckoutRoot(cwd) ?? cwd, { mutation: true }), loaderOptions);
-    const { candidates, complete } = recovery.listRetainedLand();
-    if (!candidates.length) return { passed: true, message: complete ? 'no retained Land candidate' : 'warning: Land candidate scan incomplete' };
-    const rows = candidates.map(c => {
-      const age = c.updatedAtMs == null ? 'age unknown' : `${Math.max(0, Math.round((now - c.updatedAtMs) / 60000))} min old`;
-      return `${c.operationId} (${c.worktreePresent ? c.worktree : `${c.worktree} already gone`}; pins ${c.pins.join(', ') || 'none'}; ${age})`;
-    });
-    return { passed: true, message: `warning: retained Land candidates: ${rows.join('; ')}. No manual release command exists today; the release sweep arrives with the Work lane, which supplies the acknowledgement it needs. Never delete the worktree or pins by hand.` };
-  } catch (err) {
-    return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel: onboard this project with `fgctl init`' : err.message };
-  }
+function retainedLandWarning(cwd, loaderOptions, portOptions, now = Date.now()) {
+  // The Recovery port is constructed with a writer even for reads, as the fix above is.
+  const recovery = createGitRecovery(portOptions ?? gitPortOptions(resolveMainCheckoutRoot(cwd) ?? cwd, { mutation: true }), loaderOptions);
+  const { candidates, complete } = recovery.listRetainedLand();
+  if (!candidates.length) return complete ? null : 'warning: Land candidate scan incomplete';
+  const rows = candidates.map(c => {
+    const age = c.updatedAtMs == null ? 'age unknown' : `${Math.max(0, Math.round((now - c.updatedAtMs) / 60000))} min old`;
+    return `${c.operationId} (${c.worktreePresent ? c.worktree : `${c.worktree} already gone`}; pins ${c.pins.join(', ') || 'none'}; ${age})`;
+  });
+  return `warning: retained Land candidates: ${rows.join('; ')}. No manual release command exists today; the release sweep arrives with the Work lane, which supplies the acknowledgement it needs. Never delete the worktree or pins by hand.`;
 }
 
 export function compatibleGitContracts(versions, floor) {
-  return versions.napi === 8 && Object.entries({ gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 }).every(([key, version]) => versions.contracts?.[key] === version) && floor.supported && floor.probes.every(p => p.passed);
+  return versions.napi === 8 && Object.entries({ gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 }).every(([key, version]) => versions.contracts?.[key] === version) && floor.supported;
 }

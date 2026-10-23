@@ -55,3 +55,40 @@ test('the journal row fails with git-fence-missing when a Git WAL has lost the c
     assert.match(result.message, /^git-fence-missing: .*fgctl upgrade/);
   } finally { fs.rmSync(repo, { recursive: true, force: true }); }
 });
+
+function withRepo(prefix, body) {
+  const built = ensureGitAddon();
+  const options = { descriptor: { manifest: JSON.parse(fs.readFileSync(built.manifest)), releaseRoot: addonRoot } };
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  try { return body(dir, options); } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+}
+
+test('the repository rows report information, not a failure, outside a Git repository', { skip: process.platform === 'win32' }, () => {
+  withRepo('fgos-not-a-repo-', (dir, options) => {
+    for (const id of ['git-repository-config', 'git-operation-journal', 'git-native-locks']) {
+      assert.deepEqual(checkGit(dir, id, options), { passed: true, message: 'info: not a Git repository' }, id);
+    }
+  });
+});
+
+test('the journal row fails and names the fix while no Git WAL exists', { skip: process.platform === 'win32' }, () => {
+  withRepo('fgos-journal-missing-', (repo, options) => {
+    execFileSync('git', ['init', '-q', repo], { stdio: 'ignore' });
+    const result = checkGit(repo, 'git-operation-journal', options);
+    assert.equal(result.passed, false);
+    assert.match(result.message, /not initialized.*fgos doctor --fix.*git-wal-dir/);
+    assert.equal(result.detail.journal.initialized, false);
+  });
+});
+
+test('the native-locks row fails with one sentence naming the runbook and keeps the lock paths as detail', { skip: process.platform === 'win32' }, () => {
+  withRepo('fgos-native-lock-', (repo, options) => {
+    execFileSync('git', ['init', '-q', repo], { stdio: 'ignore' });
+    assert.equal(checkGit(repo, 'git-native-locks', options).passed, true);
+    fs.writeFileSync(path.join(repo, '.git', 'index.lock'), '');
+    const result = checkGit(repo, 'git-native-locks', options);
+    assert.equal(result.passed, false);
+    assert.match(result.message, /^1 native Git lock\(s\) present and never removed by fgOS; follow the runbook in docs\/platform\/git\/spec\.md section 11$/);
+    assert.equal(result.detail.nativeLocks.length, 1);
+  });
+});
