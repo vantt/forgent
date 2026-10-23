@@ -519,6 +519,17 @@ The big lead re-checked the evidence for every deviation before answering.
      - P3, the visible label format;
      - P2b, rebalancing when the batch size is unknown.
 
+13. **Slice 5C, the publication ceremony (2026-10-23 14:35, OPC's note from WORK's measurement).**
+   - **What it addresses.** A Work `move` seal costs 29 git children; 15 of them are the publication ceremony (candidate pin, CAS, release). Together with HEAD, these make up most of the gap between WORK's branch and main in `loop.test` (387 against 191 git children per case).
+   - **What 5C does.** After 5B merges, 5C folds only the ceremony children whose answers are already known in-process.
+   - **What must hold.**
+     - The CAS stays exact-old.
+     - Recovery must still tell an interrupted publication from a finished one.
+     - The owning proofs are the crash matrices and `tests/publication.rs`.
+     - A trim that weakens either rule is dropped and named in the report.
+   - **Report.** Children per seal, before and after.
+   - **Not in T2.** The terminal layout and naming questions Q4–Q6 are still open with the owner.
+
 ## Unresolved questions
 
 1. **Q0–Q3** are not yet answered (arbitration §6). Q0 is assumed yes.
