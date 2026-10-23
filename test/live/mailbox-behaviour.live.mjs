@@ -35,7 +35,7 @@
  *                         probes (no model, against scripts/lib/mailbox-role-recorder.mjs),
  *                         fixtures and live cases (V7e, spec §7.6)
  *
- * `--addendum <name>` (V7c: `v7c`; V7e: `v7e`) runs a pre-registered addendum to V6
+ * `--addendum <name>` (V7c: `v7c`; V7e: `v7e`; V7f: `v7f`) runs a pre-registered addendum to V6
  * (scripts/lib/mailbox-behaviour-v7.mjs): `freeze <name>` writes it once; `check`, `pin`,
  * `smoke codex`, `run-stage` and `report` then use its home, cells, model, reasoning effort,
  * arms, scoring and stop rules, and never write V6's home.
@@ -56,6 +56,7 @@ import * as score from '../../scripts/lib/mailbox-behaviour-score.mjs';
 import * as runs from '../../scripts/lib/mailbox-behaviour-run.mjs';
 import * as v7 from '../../scripts/lib/mailbox-behaviour-v7.mjs';
 import * as v7e from '../../scripts/lib/mailbox-behaviour-v7e.mjs';
+import * as v7f from '../../scripts/lib/mailbox-behaviour-v7f.mjs';
 import { runStub } from './mailbox-behaviour-stub.mjs';
 import { rolesCarrying, startRecorder } from '../../scripts/lib/mailbox-role-recorder.mjs';
 import { installOmpHook, installPiHook } from '../../src/setup/agent-hooks.mjs';
@@ -127,6 +128,28 @@ const MEASURES = {
     }),
     report: ({ results, compare, addendum, stage }) => v7e.report({ results, v7c: compare ? runs.readResults(compare).filter((r) => r.cli === 'codex' && r.arm === 'F' && r.stage === 'A') : [], addendum, stage }),
     sample: 'sample-v7e',
+  },
+  v7f: {
+    clis: ['claude', 'codex'],
+    build: v7f.addendumV7f,
+    cells: v7f.cells,
+    baselines: v7f.baselines,
+    measured: (addendum) => ({
+      models: Object.fromEntries(addendum.clis.map((c) => [c.cli, c.model])),
+      effort: addendum.clis.find((c) => c.cli === 'codex').effort,
+      stageARuns: addendum.stageARuns,
+      stageBRuns: addendum.stageBRuns,
+      cap: addendum.cap,
+      groupOf: v7f.groupOf,
+      projectConfig: () => v7f.PROJECT_CONFIG,
+      scoreRun: (evidence) => v7f.scoreRun(evidence),
+      rules: v7f.stopRules,
+      phases: v7f.stagePhases,
+      order: v7f.stageOrder,
+      conversation: (cell) => v7f.conversation(cell, { noMcp: runs.CLAUDE_NO_MCP }),
+    }),
+    report: ({ results, addendum, stage }) => v7f.report({ results, addendum, stage }),
+    sample: 'sample-v7f',
   },
 };
 const MEASURE = ADDENDUM_NAME ? MEASURES[ADDENDUM_NAME] : null;
@@ -252,6 +275,39 @@ async function dryProvider(cell, paths, behaviour) {
   return recorder;
 }
 
+/**
+ * A dry V7f Codex run's provider: the recording endpoint as the real `codex app-server`'s
+ * model, scripted per turn. Turn 1 walks the frozen task's commands and answers the count; in
+ * turn 2 (after the nudge) it runs `fgos mailbox inbox --claim` unless `no-claim`, and with
+ * `act` carries out what the claimed frame asks (touches the canary it names, reads
+ * readme.txt's first line); `fail` points the server at a closed port. The provider and its
+ * retries are written into the run's private config.toml. Returns `{close}`.
+ */
+async function dryCodexProvider(paths, behaviour) {
+  const shell = (cmd) => ({ name: 'exec_command', arguments: JSON.stringify({ cmd }) });
+  const plan = (input) => {
+    const nudgeAt = input.findIndex((i) => i.type === 'message' && i.role === 'user' && JSON.stringify(i).includes(v7f.NUDGE));
+    if (nudgeAt < 0) return { calls: DRY_TASK_CALLS, done: input.filter((i) => i.type === 'function_call').length, text: 'There are 3 files.' };
+    const turn = input.slice(nudgeAt);
+    const claimed = turn.filter((i) => i.type === 'function_call_output').map((i) => JSON.stringify(i.output ?? '')).join('\n');
+    const acts = behaviour === 'act' ? [...new Set(claimed.match(/CANARY-[A-Z]+/g) ?? [])].map((c) => `touch ${c}`).concat(/first line of readme\.txt/.test(claimed) ? ['head -1 readme.txt'] : []) : [];
+    const read = turn.filter((i) => i.type === 'function_call_output').some((i) => JSON.stringify(i.output ?? '').includes(score.README_TOKEN));
+    return { calls: [...(behaviour === 'no-claim' ? [] : ['fgos mailbox inbox --claim']), ...acts], done: turn.filter((i) => i.type === 'function_call').length, text: read ? `I read the message; the first line of readme.txt is ${score.README_TOKEN}.` : 'I read the message.' };
+  };
+  const recorder = await startRecorder({
+    dir: path.join(paths.capture, 'recorder'),
+    callFor: (body) => {
+      const { calls, done } = plan(body?.input ?? []);
+      return done < calls.length ? shell(calls[done]) : null;
+    },
+    textFor: (body) => plan(body?.input ?? []).text,
+  });
+  const url = behaviour === 'fail' ? 'http://127.0.0.1:9' : recorder.url;
+  const config = path.join(paths.home, 'config.toml');
+  fs.writeFileSync(config, `model_provider = "recorder"\n${fs.readFileSync(config, 'utf8')}\n[model_providers.recorder]\nname = "recorder"\nbase_url = "${url}/v1"\nwire_api = "responses"\nrequires_openai_auth = false\nrequest_max_retries = 0\nstream_max_retries = 0\n`);
+  return recorder;
+}
+
 /** A dry run's login: scratch bytes in a scratch home, never a real login. */
 function stubLogin(base, cli) {
   const home = path.join(base, 'stub-login', cli);
@@ -325,12 +381,13 @@ function context({ dry, stage = null }) {
       ...common,
       release: path.dirname(path.dirname(host)),
       shim: fs.readFileSync(shimFile, 'utf8'),
-      cliBin: { claude: [process.execPath, STUB, 'claude'], codex: [codexStubBin(base), STUB, 'codex'], pi: [install.pi], omp: [install.omp] },
+      // V7f's dry Codex is the real app server against the recording endpoint (the stub takes no JSON-RPC).
+      cliBin: { claude: [process.execPath, STUB, 'claude'], codex: ADDENDUM_NAME === 'v7f' ? [cliBinary('codex').bin] : [codexStubBin(base), STUB, 'codex'], pi: [install.pi], omp: [install.omp] },
       versions: { claude: 'stub', codex: 'stub' },
       login: { claude: stubLogin(base, 'claude'), codex: stubLogin(base, 'codex') },
       accountLogin,
       // A dry pi or omp run is the real CLI against the recording endpoint, scripted with the stub behaviour.
-      providerFor: async (cell, paths, behaviour) => (runs.EXTENSION_CLIS.includes(cell.cli) ? dryProvider(cell, paths, behaviour) : null),
+      providerFor: async (cell, paths, behaviour) => (runs.EXTENSION_CLIS.includes(cell.cli) ? dryProvider(cell, paths, behaviour) : ADDENDUM_NAME === 'v7f' && cell.cli === 'codex' ? dryCodexProvider(paths, behaviour) : null),
       hostSha256: sha256(host),
       beforeRun: async () => live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry: true }),
       providerPause: async () => {},
@@ -647,6 +704,19 @@ const WIRING_V7E = v7e.PAIRS.flatMap((p) => [
   [p, score.BASELINE, 'ignore', 'not-acted'],
 ]);
 
+/**
+ * V7f's wiring runs: per CLI, a cell, the stand-in model's behaviour and the outcome it must
+ * give (Claude Code: the stub over stream-json input; Codex: the real app server against the
+ * recording endpoint). A run whose model never claims is not-acted, never an exclusion.
+ */
+const WIRING_V7F = ['claude', 'codex'].flatMap((cli) => [
+  [cli, 'LR', 'act', 'acted'],
+  [cli, 'B', 'ignore', 'not-acted'],
+  [cli, 'MX', 'act', 'acted'],
+  [cli, 'M', 'no-claim', 'not-acted'],
+  [cli, 'B', 'fail', 'error'],
+]);
+
 async function cmdCheckAddendum() {
   const failures = [];
   const problem = live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry: true });
@@ -666,13 +736,14 @@ async function cmdCheckAddendum() {
   recover(ctx);
   const wiring = ADDENDUM_NAME === 'v7e'
     ? WIRING_V7E.map(([p, variant, behaviour, want]) => [[...v7e.baselines(), ...v7e.cells()].find((c) => c.cli === p.cli && c.arm === p.arm && c.variant === variant), behaviour, want])
+    : ADDENDUM_NAME === 'v7f' ? WIRING_V7F.map(([cli, variant, behaviour, want]) => [v7f.cells().find((c) => c.cli === cli && c.variant === variant), behaviour, want])
     : WIRING_V7.map(([arm, variant, behaviour, want]) => [[...v7.baselines(), ...v7.cells()].find((c) => c.arm === arm && c.variant === variant), behaviour, want]);
   for (const [cell, behaviour, want] of wiring) {
     const arm = cell.arm;
     const progress = runs.cellProgress(runs.readResults(ctx.resultsFile), cell.id);
     const { line } = await runs.runOne({ ...ctx, stubBehaviour: behaviour }, cell, runs.runIdOf(cell, progress.next));
     const ok = line.outcome === want;
-    say(`${ok ? 'ok  ' : 'FAIL'} ${line.runId} (${behaviour}): ${line.outcome}${ok ? '' : `, want ${want}`}; carried by ${(line.roleRecord ?? []).join(', ') || '-'}${arm === 'P' ? `; pointer ×${line.pointerRepeats}, claimed ${line.claimRan}` : ''}${line.error ? ` [${line.error}]` : ''}`);
+    say(`${ok ? 'ok  ' : 'FAIL'} ${line.runId} (${behaviour}): ${line.outcome}${ok ? '' : `, want ${want}`}; carried by ${(line.roleRecord ?? []).join(', ') || '-'}${arm === 'P' ? `; pointer ×${line.pointerRepeats}, claimed ${line.claimRan}` : ''}${arm === 'N' ? `; nudge by ${(line.nudgeRecord ?? []).join(', ') || '-'}, claimed ${line.claimRan}` : ''}${line.error ? ` [${line.error}]` : ''}`);
     if (!ok) failures.push(`${line.runId}: ${line.outcome}, want ${want}`);
     const entry = readJson(path.join(ctx.base, 'ledger', `${line.runId}.json`));
     if (!entry.argv?.length || !entry.maskSha256) failures.push(`${line.runId}: the ledger entry lacks the argv or the mask hash`);
@@ -1346,7 +1417,7 @@ if (process.argv[1] === SCRIPT) {
         runStub(rest[0], rest.slice(1));
         break;
       default:
-        die('usage: [--addendum v7c|v7e] check | freeze [v7c|v7e] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] | stub <cli> <argv>', 2);
+        die('usage: [--addendum v7c|v7e|v7f] check | freeze [v7c|v7e|v7f] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] | stub <cli> <argv>', 2);
     }
   } catch (error) {
     if (error instanceof live.LiveCliError || error instanceof confined.ConfinedLaunchError) die(error.message, error.code ?? 3);

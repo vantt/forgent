@@ -18,7 +18,9 @@ import {
   cellProgress,
   loopConfigs,
   loopPrompt,
+  nextConversationAction,
   nextHarnessAction,
+  wakes,
   pinOf,
   pinProblems,
   PEER_FILE,
@@ -114,6 +116,24 @@ test('PT sends only after registration and before go1; ST sends only after the s
   const codex = records('codex-steps.jsonl');
   assert.equal(stepFinished('codex', codex.slice(0, -1), 'go2.txt'), false, 'the call without its output');
   assert.equal(stepFinished('codex', codex, 'go2.txt'), true);
+});
+
+test('a two-turn run sends the task first, then sends the mail only once turn 1 ended, nudges after the send, and ends the input only after turn 2; a stall ends it with no send and no nudge', () => {
+  const at = { started: true, registered: true, go1: true, summary: true, go2: true, sent: false, nudged: false, ended: false, turnsDone: 0, stalled: null };
+  assert.deepEqual(nextConversationAction({ ...at, started: false, registered: false }), { action: 'turn1' });
+  assert.deepEqual(nextConversationAction({ ...at, registered: false }), { action: 'wait', waitingFor: 'registration' });
+  assert.deepEqual(nextConversationAction({ ...at, go1: false }), { action: 'go1' });
+  assert.deepEqual(nextConversationAction({ ...at, go2: false, summary: false }), { action: 'wait', waitingFor: 'summary' });
+  assert.deepEqual(nextConversationAction({ ...at, go2: false }), { action: 'go2' });
+  assert.deepEqual(nextConversationAction(at), { action: 'wait', waitingFor: 'turn1' }, 'no mail while turn 1 still runs');
+  assert.deepEqual(nextConversationAction({ ...at, turnsDone: 1 }), { action: 'send' });
+  assert.deepEqual(nextConversationAction({ ...at, turnsDone: 1, sent: true }), { action: 'nudge' });
+  assert.deepEqual(nextConversationAction({ ...at, turnsDone: 1, sent: true, nudged: true }), { action: 'wait', waitingFor: 'turn2' });
+  assert.deepEqual(nextConversationAction({ ...at, turnsDone: 2, sent: true, nudged: true }), { action: 'end' });
+  assert.deepEqual(nextConversationAction({ ...at, turnsDone: 2, sent: true, nudged: true, ended: true }), { action: 'wait', waitingFor: 'exit' });
+  assert.deepEqual(nextConversationAction({ ...at, stalled: 'registration', registered: false }), { action: 'end' });
+  assert.deepEqual(nextConversationAction({ ...at, stalled: 'turn1', ended: true }), { action: 'wait', waitingFor: 'exit' });
+  assert.deepEqual(['PT', 'ST', 'NU'].map(wakes), [false, true, false], 'the NU send asks no wake, so no Stop gate can carry the frame');
 });
 
 test('the trusted list renders the sender exactly as the frame shows it, and refuses a name the header escape would change', () => {

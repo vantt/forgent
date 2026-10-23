@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "0ce6658708b0d7f720d4f95bb6b2c2343f75c0e2d59e43850fbeb7de81513c3c",
+  "payloadDigest": "68983a9dd311250bbb1fadfbde6ce545869a17fb90e3e0208b675ddbab262c14",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -803,10 +803,11 @@
     "scripts/lib/git-spawn-match.mjs": "f8c8a14a0ff3c4c9aa516850a22a7b1fc22d4aac4eb33641c5a20a28ff299b28",
     "scripts/lib/is-main-module.mjs": "e39f98fb73a497be73b7d92f0335d9f0c88eb627a77f2ab964f9c7034f711a45",
     "scripts/lib/js-source-lexer.mjs": "3effa44590fde482bbc593d49fa46fac7f5519198232fe56c704f09508a071a4",
-    "scripts/lib/mailbox-behaviour-run.mjs": "e8b170e8d0c61249f2954c2a268dbb9877aa1cb69739fc9e84b36abc3608d53b",
+    "scripts/lib/mailbox-behaviour-run.mjs": "a677453c7ceb2ca2cce15a35cc11580ce0b23f429ddc7aa5d3fb75d6380f21ff",
     "scripts/lib/mailbox-behaviour-score.mjs": "84dc8fb0e49fb2da8e331ab6302f6a6055ec7abf1eb3993746502aecf1afe36e",
-    "scripts/lib/mailbox-behaviour-v7.mjs": "3a0fa853b8d265223a24c7b37eff440e9879a142cc1c2d77a0a58dd6f9dfd646",
+    "scripts/lib/mailbox-behaviour-v7.mjs": "1bbe9f1c2d361881ec4719131db68b894dc103e6175779e2332a71669f8d99dd",
     "scripts/lib/mailbox-behaviour-v7e.mjs": "758ccd2c2548dd4c4ee9a675f15f73fedec14a20c1a697a3b3679c7297cf3640",
+    "scripts/lib/mailbox-behaviour-v7f.mjs": "dd7184004fcb578b6bbe37ff5402490c707e30f3d97a13bb7ef28d4baf2a9729",
     "scripts/lib/mailbox-live-cli.mjs": "084b02bbadd408f0cecb4888ba37cf760005931887b5ec31f5ba2d6e1c0ba484",
     "scripts/lib/mailbox-live-confined.mjs": "c06eda4b69e1a8ff7bc7d0d2d27a9d8120510110b0c0cd43ee62255a738f2e55",
     "scripts/lib/mailbox-role-recorder.mjs": "ba14471ab7ce65cdefa43e5256acd4e882c18a3a651bae3338ec2bc0616d7ead",
@@ -2935,8 +2936,8 @@
     },
     {
       "path": "scripts/lib/mailbox-behaviour-run.mjs",
-      "line": 796,
-      "spawn": "runOne -> scripts/lib/mailbox-behaviour-run.mjs:425",
+      "line": 836,
+      "spawn": "runOne -> scripts/lib/mailbox-behaviour-run.mjs:451",
       "binary": "param ctx",
       "class": "uncalled-wrapper",
       "function": "runStage"

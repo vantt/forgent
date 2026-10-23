@@ -168,6 +168,27 @@ export function nextHarnessAction(channel, o) {
   return { action: 'wait', waitingFor: 'exit' };
 }
 
+/**
+ * The harness's next step in a two-turn run (V7f's NU): the user's task as turn 1, the go
+ * files as for a baseline once the head registered, then, once turn 1 ended and the head is
+ * idle, the send (no wake), the nudge as turn 2, and the end of the CLI's input once turn 2
+ * ended. A stalled run skips the send and the nudge and ends the input.
+ */
+export function nextConversationAction(o) {
+  if (!o.started) return { action: 'turn1' };
+  if (o.stalled) return o.ended ? { action: 'wait', waitingFor: 'exit' } : { action: 'end' };
+  if (!o.registered) return { action: 'wait', waitingFor: 'registration' };
+  if (!o.go1) return { action: 'go1' };
+  if (!o.summary) return { action: 'wait', waitingFor: 'summary' };
+  if (!o.go2) return { action: 'go2' };
+  if (o.turnsDone < 1) return { action: 'wait', waitingFor: 'turn1' };
+  if (!o.sent) return { action: 'send' };
+  if (!o.nudged) return { action: 'nudge' };
+  if (o.turnsDone < 2) return { action: 'wait', waitingFor: 'turn2' };
+  if (!o.ended) return { action: 'end' };
+  return { action: 'wait', waitingFor: 'exit' };
+}
+
 const commandText = (value) => (typeof value === 'string' ? value : JSON.stringify(value ?? ''));
 
 /**
@@ -274,6 +295,9 @@ export function harnessSend(ws, to, body, { wake = false, sender }) {
   const out = spawnSync(path.join(ws, '.fgos', 'installation', 'bin', 'fgos'), ['mailbox', 'send', '--to', to, ...(wake ? ['--wake'] : []), '--', body], { cwd: ws, env, encoding: 'utf8' });
   return { status: out.status, text: `${out.stdout}${out.stderr}`.trim(), id: /^recorded (\S+) for/.exec(out.stdout || '')?.[1] ?? null, at: Date.now() };
 }
+
+/** Whether the harness's send asks for a wake: only on ST, whose message must be taken at the Stop gate; a PT or NU message must reach the model by its own channel. */
+export const wakes = (channel) => channel === 'ST';
 
 /** Claude Code's MCP servers for a confined run: none, and no other MCP configuration is read. */
 export const CLAUDE_NO_MCP = Object.freeze(['--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}']);
@@ -416,7 +440,9 @@ export async function runOne(ctx, cell, runId) {
   const instruction = renderInstruction(data.instruction, [score.SENDERS.trusted.label]);
   const { lastMessage } = paths;
   const ext = EXTENSION_CLIS.includes(cell.cli);
-  const args = ext
+  // A two-turn cell (V7f's NU) talks to the CLI over its input and output.
+  const talking = ctx.conversation?.(cell) ?? null;
+  const args = talking ? talking.args({ settings: paths.settings, instruction }) : ext
     ? piOmpArgs(cell.cli, { extension: paths.extension, model: ctx.models[cell.cli], effort: ctx.effort, instruction, prompt: data.task, profile: RUN_PROFILE, offConfig: paths.ompOff })
     : cliArgs(cell.cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction, prompt: data.task, models: ctx.models });
   const extEnv = ext ? (cell.cli === 'pi' ? { PI_CODING_AGENT_DIR: paths.home } : { PI_NATIVES_DIR: ctx.natives }) : {};
@@ -434,11 +460,13 @@ export async function runOne(ctx, cell, runId) {
   const stdoutFile = path.join(paths.capture, 'stdout.txt');
   const stderrFile = path.join(paths.capture, 'stderr.txt');
   const startedAt = Date.now();
-  const run = confined.startConfinedRun(prepared, { stdio: ['ignore', fs.openSync(stdoutFile, 'w'), fs.openSync(stderrFile, 'w')] });
+  fs.writeFileSync(stdoutFile, '');
+  const run = confined.startConfinedRun(prepared, { stdio: [talking ? 'pipe' : 'ignore', talking ? 'pipe' : fs.openSync(stdoutFile, 'w'), fs.openSync(stderrFile, 'w')] });
+  const talk = talking ? talking.attach(run.child, { stdoutFile, ws: paths.ws, home: paths.home, instruction }) : null;
   let exit = null;
   run.exited.then((e) => { exit = e; });
 
-  const o = { registered: false, sent: false, go1: false, go2: false, summary: false, step4Done: false };
+  const o = { registered: false, sent: false, go1: false, go2: false, summary: false, step4Done: false, started: false, nudged: false, ended: false, turnsDone: 0 };
   let sent = null;
   let stalled = null;
   let waitSince = Date.now();
@@ -456,10 +484,21 @@ export async function runOne(ctx, cell, runId) {
     o.summary = fs.existsSync(path.join(paths.ws, 'summary.txt'));
     if (cell.channel === 'ST' && o.go2 && !o.step4Done) o.step4Done = stepFinished(cell.cli, modelRecords(cell.cli, paths.home), 'go2.txt');
     if (baseline || stalled) o.sent = true;
-    const next = nextHarnessAction(baseline ? 'Q0' : cell.channel, o);
+    o.stalled = stalled;
+    o.turnsDone = talk?.turnsDone() ?? 0;
+    const next = talk ? nextConversationAction(o) : nextHarnessAction(baseline ? 'Q0' : cell.channel, o);
     if (next.action === 'send') {
-      sent = harnessSend(paths.ws, binding.name, body, { wake: cell.channel === 'ST', sender });
+      sent = harnessSend(paths.ws, binding.name, body, { wake: wakes(cell.channel), sender });
       o.sent = true;
+    } else if (next.action === 'turn1') {
+      talk.say(data.task);
+      o.started = true;
+    } else if (next.action === 'nudge') {
+      talk.say(talking.nudge);
+      o.nudged = true;
+    } else if (next.action === 'end') {
+      talk.end();
+      o.ended = true;
     } else if (next.action === 'go1') {
       touch('go1.txt');
       o.go1 = true;
@@ -488,18 +527,18 @@ export async function runOne(ctx, cell, runId) {
   exit ??= { code: null, signal: 'SIGKILL' };
   const settled = confined.settleLoginCopy(prepared);
   const output = `${fs.readFileSync(stdoutFile, 'utf8')}\n${fs.readFileSync(stderrFile, 'utf8')}`;
-  // pi and omp exit 0 when the provider refuses; their last turn says so.
-  const providerError = ext ? providerErrorOf(stdoutFile) : null;
+  // pi and omp exit 0 when the provider refuses, and a talking CLI ends its input cleanly; their last turn says so.
+  const providerError = talk ? talk.turnError() : ext ? providerErrorOf(stdoutFile) : null;
   const providerLimit = (exit.code !== 0 && PROVIDER_LIMIT.test(output)) || Boolean(providerError && PROVIDER_LIMIT.test(providerError));
   const error = settled ? 'login-guard' : timedOut ? 'timeout' : exit.code !== 0 ? `exit ${exit.code ?? exit.signal}` : providerError ? `provider error: ${providerError.split('\n')[0].slice(0, 200)}` : end.left.length ? 'processes left' : sent && sent.status !== 0 ? `send refused: ${sent.text.split('\n')[0]}` : null;
-  const finalAnswer = finalAnswerOf(cell.cli, stdoutFile, lastMessage);
+  const finalAnswer = talk ? talk.finalAnswer() : finalAnswerOf(cell.cli, stdoutFile, lastMessage);
   const message = sent?.id ? (snapshotOf(paths.ws)?.messages ?? []).find((m) => m.id === sent.id) : null;
   const records = modelRecords(cell.cli, paths.home);
   const didAct = score.acted(cell.variant, { runDir: paths.dir, ws: paths.ws, finalAnswer, body });
   const offered = stateName(message) === 'offered';
   // An addendum scores with its own rules (V7c arm P: the pointer line, not the message id).
   const scored = ctx.scoreRun
-    ? ctx.scoreRun({ arm: cell.arm, error, baseline, sentId: sent?.id ?? null, offered, records, acted: didAct })
+    ? ctx.scoreRun({ cli: cell.cli, arm: cell.arm, error, baseline, sentId: sent?.id ?? null, offered, records, acted: didAct })
     : (() => {
       const channelSeen = sent?.id ? score.injectionChannel(cell.cli, records, sent.id) : null;
       return { outcome: score.runOutcome({ error, baseline, offered, channel: channelSeen, expectedChannel: cell.channel, acted: didAct }), channelSeen };
@@ -529,7 +568,8 @@ export async function runOne(ctx, cell, runId) {
     latencyMs: message?.state?.offered?.at && message?.recorded_at ? message.state.offered.at - message.recorded_at : null,
     exit,
     wallMs: Date.now() - startedAt,
-    usage: usageOf(cell.cli, stdoutFile),
+    usage: talk ? talk.usage() : usageOf(cell.cli, stdoutFile),
+    ...(talk ? { talk: talk.evidence() } : {}),
     finalAnswer,
     invocations: ctx.dry ? 0 : 1,
   };

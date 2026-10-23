@@ -17,7 +17,10 @@
  * PostToolUse hook's attachment) under `$HOME/.claude/projects/stub/`, a Codex rollout (tool
  * call, hook output, call output) under `$CODEX_HOME/sessions/stub/`. A Stop block is
  * answered once more. The final answer is printed (a result record with
- * `--output-format stream-json`) and kept in `-o <file>` when given.
+ * `--output-format stream-json`) and kept in `-o <file>` when given. With Claude Code's
+ * `--input-format stream-json` each stdin line is one user turn (recorded as a user record,
+ * answered with its own result record) until stdin ends; a turn whose text names
+ * `fgos mailbox inbox --claim` and no steps (a nudge) runs that command as its one step.
  *
  * `MAILBOX_STUB` picks what the stand-in model does: `act` carries out what a frame asks
  * (creates the canary it names, adds the summary line, quotes readme.txt's first line);
@@ -141,37 +144,80 @@ export function runStub(cli, argv) {
     const { pointed } = step(command, n);
     if (pointed && behaviour !== 'no-claim') frames.push(step('fgos mailbox inbox --claim', (n += 1)).output);
   };
-  const commands = promptCommands(prompt);
-  commands.forEach(run);
-  if (behaviour === 'extra-step') {
-    blockFor(2500);
-    run('true');
-  }
-  blockFor(500);
   const answer = () => {
     const done = behaviour === 'act' ? frames.map((f) => actOn(f, ws)).filter(Boolean) : [];
     const summary = path.join(ws, 'summary.txt');
     return [`The number is ${fs.existsSync(summary) ? fs.readFileSync(summary, 'utf8').split('\n')[0] : '?'}.`, ...done].join(' ');
   };
-  let text = answer();
-  say(text);
-  if (hooksOn()) {
-    const block = fire('Stop', { session_id: session, cwd: ws, hook_event_name: 'Stop', stop_hook_active: false, last_assistant_message: text }).find((out) => out?.decision === 'block');
-    if (block) {
-      if (codex) write({ type: 'message', role: 'user', content: [{ type: 'input_text', text: block.reason }] });
-      else write({ type: 'attachment', attachment: { type: 'hook_blocking_error', hookEvent: 'Stop', blockingError: { blockingError: block.reason } } });
-      frames.push(block.reason);
-      text = answer();
-      say(text);
+  /** One turn: the prompt's steps (a nudge naming `inbox --claim` is followed unless `no-claim`), the answer, the Stop hook. */
+  const turn = (text) => {
+    const commands = promptCommands(text);
+    commands.forEach(run);
+    if (!commands.length && text.includes('fgos mailbox inbox --claim') && behaviour !== 'no-claim') frames.push(step('fgos mailbox inbox --claim', (n += 1)).output);
+    if (behaviour === 'extra-step') {
+      blockFor(2500);
+      run('true');
     }
+    blockFor(500);
+    let said = answer();
+    say(said);
+    if (hooksOn()) {
+      const block = fire('Stop', { session_id: session, cwd: ws, hook_event_name: 'Stop', stop_hook_active: false, last_assistant_message: said }).find((out) => out?.decision === 'block');
+      if (block) {
+        if (codex) write({ type: 'message', role: 'user', content: [{ type: 'input_text', text: block.reason }] });
+        else write({ type: 'attachment', attachment: { type: 'hook_blocking_error', hookEvent: 'Stop', blockingError: { blockingError: block.reason } } });
+        frames.push(block.reason);
+        said = answer();
+        say(said);
+      }
+    }
+    return said;
+  };
+  const resultLine = (text) => `${JSON.stringify({ type: 'result', subtype: 'success', is_error: false, result: text })}\n`;
+  let text;
+  if (!codex && argv.includes('--input-format')) {
+    // Claude Code's stream-json input: one user message per stdin line, one turn and one result record each, until the input ends.
+    for (const message of stdinLines()) {
+      const content = String(JSON.parse(message).message?.content ?? '');
+      write({ type: 'user', message: { role: 'user', content } });
+      text = turn(content);
+      process.stdout.write(resultLine(text));
+    }
+  } else {
+    text = turn(prompt);
+    const out = argv.indexOf('-o');
+    if (out >= 0) fs.writeFileSync(argv[out + 1], `${text}\n`);
+    // Claude Code's print mode with stream JSON ends with a result record; the suite reads the final answer there.
+    const stream = !codex && argv.includes('stream-json');
+    process.stdout.write(stream ? resultLine(text) : `${text}\n`);
   }
   if (sessionFile) fs.rmSync(sessionFile, { force: true });
-  const out = argv.indexOf('-o');
-  if (out >= 0) fs.writeFileSync(argv[out + 1], `${text}\n`);
-  // Claude Code's print mode with stream JSON ends with a result record; the suite reads the final answer there.
-  const stream = !codex && argv.includes('stream-json');
-  process.stdout.write(stream ? `${JSON.stringify({ type: 'result', subtype: 'success', is_error: false, result: text })}\n` : `${text}\n`);
   if (behaviour === 'fail') process.exit(1);
+}
+
+/** The lines of stdin, read synchronously as they arrive, until it ends. */
+function* stdinLines() {
+  const chunk = Buffer.alloc(65536);
+  let buffer = '';
+  for (;;) {
+    let read;
+    try {
+      read = fs.readSync(0, chunk, 0, chunk.length, null);
+    } catch (error) {
+      if (error.code === 'EAGAIN') {
+        blockFor(50);
+        continue;
+      }
+      throw error;
+    }
+    if (read === 0) break;
+    buffer += chunk.toString('utf8', 0, read);
+    for (let i = buffer.indexOf('\n'); i >= 0; i = buffer.indexOf('\n')) {
+      const line = buffer.slice(0, i);
+      buffer = buffer.slice(i + 1);
+      if (line.trim()) yield line;
+    }
+  }
 }
 
 if (process.argv[1] && fs.realpathSync(process.argv[1]) === fs.realpathSync(new URL(import.meta.url).pathname)) {
