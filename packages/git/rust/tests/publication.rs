@@ -2407,3 +2407,38 @@ fn event_publication_recovery_ignores_unrelated_recovery_leaf() {
     assert!(port.recover_publications(&repo).unwrap().is_empty());
     drop(leaf);
 }
+
+#[test]
+fn a_group_read_over_the_output_bound_falls_back_to_single_reads() {
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+    // Three blobs of 30 MiB: each read alone fits the 64 MiB output bound, the group does not.
+    let reads: Vec<_> = (0..3u8)
+        .map(|n| {
+            let blob = port.write_blob(&repo, &vec![n; 30 * 1024 * 1024]).unwrap();
+            let tree = port
+                .write_tree(
+                    &repo,
+                    &[TreeEntry {
+                        name: b"big".to_vec(),
+                        mode: 0o100644,
+                        oid: blob,
+                    }],
+                )
+                .unwrap();
+            (tree, vec![b"big".to_vec()])
+        })
+        .collect();
+    let many = port
+        .read_paths_at_many(&repo, &reads, 32 * 1024 * 1024)
+        .unwrap();
+    assert_eq!(many.len(), 3);
+    for (n, answer) in many.iter().enumerate() {
+        assert!(matches!(&answer[0].value, PathValue::Blob(b) if b.len() == 30 * 1024 * 1024 && b[0] == n as u8));
+    }
+}
