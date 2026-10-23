@@ -208,6 +208,7 @@ Per layer:
 20. **Option (a): the last pane access moves behind the terminal-control port:** the anchor pane, agent kinds and integrations, caller ownership on `attach`, and the socket path.
 21. **Additions A1 and A2 are taken:** the retained-chain count and oldest age in the journal row, and one repository handle per process. A3 is left for a separate item; A4 and A5 are not taken.
 22. **Terminal-control layout and naming review:** HARDEN reviews whether layout and tab/pane names can be prettier and easier to use (owner example: three columns for three panes on a widescreen). The review comes back as a proposal; the owner picks before anything that adds a layout rule is built (RUL104).
+23. **2026-10-23 17:20, owner: "Q1 đồng ý". Decision 19 is withdrawn: the worktree pin keeps `core.fsync=all`.** Phase 10 measured 25 → 23 fsyncs per worktree add and no measurable time change (p50 191.4 → 189.4 ms, within noise): chained directory syncs cost almost nothing, while a flush after new metadata costs about 5 ms. The extra write path was therefore not worth its code (RUL104). Branch `harden/t2-p10-worktree-pin-fsync` stays unmerged as a record; its `land.rs` header fix was taken separately. The real fsync-bound block is the ≈ 6 operation records per add (≈ 64 of 172 ms); it is a possible later addition, not T2.
 
 ## Hand-off ledger (items HARDEN gave to other lanes)
 
