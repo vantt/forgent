@@ -1,4 +1,4 @@
-// Dormant facade. Never bypass the hot gate merely because Rust can spawn directly.
+// Facade. Never bypass the hot gate merely because Rust can spawn directly.
 import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { loadNativeAddon, nativeHelperExe } from './native.mjs';
 function outsideGate() {

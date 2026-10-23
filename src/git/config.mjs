@@ -1,4 +1,4 @@
-// Dormant RepositoryConfig facade; every policy and mutation belongs to Rust.
+// RepositoryConfig facade; every policy and mutation belongs to Rust.
 import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { loadNativeAddon } from './native.mjs';
 export function createGitRepositoryConfig(options, loaderOptions) {

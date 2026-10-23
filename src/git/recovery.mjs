@@ -1,4 +1,4 @@
-// Dormant transport. Recovery policy and resource locks belong to Rust.
+// Transport. Recovery policy and resource locks belong to Rust.
 import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { loadNativeAddon, withNativeLocks } from './native.mjs';
 export function createGitRecovery(options, loaderOptions) {

@@ -1,4 +1,4 @@
-// Dormant transport. Keep the native session alive across consumer verification.
+// Transport. Keep the native session alive across consumer verification.
 import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { loadNativeAddon, withNativeLocks } from './native.mjs';
 

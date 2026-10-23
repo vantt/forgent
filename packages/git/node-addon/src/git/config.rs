@@ -1,4 +1,4 @@
-//! Dormant RepositoryConfig transport. Policy and effects live in Rust.
+//! RepositoryConfig transport. Policy and effects live in Rust.
 use super::{operation, text};
 use crate::{check, error};
 use fgos_git::*;
