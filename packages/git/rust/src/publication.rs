@@ -789,12 +789,6 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         // A peer operation's recovery leaf must not delay live publications.
         let wal = self.wal(repo)?;
         if let Some(c) = wal.compacted(id)? {
-            if c.v == 1 {
-                let mut e = recovery("operation-recovery-required");
-                e.cause = "legacy-compact-receipt-incomplete: expected and next were not recorded; exact-request replay remains available".into();
-                e.operation_id = Some(id.into());
-                return Err(e);
-            }
             let decode_tip = |s: &str| if s == "-" { Tip::Absent } else { Tip::Oid(s.into()) };
             let intent = Intent {
                 kind: wal::OperationKind::PublicationCas,

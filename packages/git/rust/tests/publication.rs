@@ -2232,17 +2232,6 @@ fn publication_keeps_retained_chains_bounded_and_compacted_ids_bound() {
     assert!(port
         .compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(done[1].2.clone()), id)
         .is_err());
-    // Old experimental entries lack expected/next. Preserve their bindings
-    // and exact replay; read-only recovery must report the missing evidence.
-    let journal = wal::Wal::open(&repo).unwrap();
-    let compacted = journal.compacted(id).unwrap().unwrap();
-    let legacy_digest = wal::canonical_digest(&(1u8, "legacy-receipt", &compacted.request, &compacted.binding, &compacted.receipt)).unwrap();
-    let legacy = serde_json::json!({"v": 1, "id": "legacy-receipt", "q": compacted.request, "b": compacted.binding, "r": compacted.receipt, "digest": legacy_digest});
-    fgos_durable_file::install_once(&repo.common_dir().join("fgos/git/compacted"), "legacy-receipt", legacy.to_string().as_bytes()).unwrap();
-    let incomplete = port.recover(&repo, "legacy-receipt").unwrap_err();
-    assert_eq!(incomplete.code, ResultCode::RecoveryRequired);
-    assert!(incomplete.cause.starts_with("legacy-compact-receipt-incomplete"));
-    assert_eq!(port.compare_and_swap(&repo, &reference(), old, &ExpectedTip::Oid(next.clone()), "legacy-receipt").unwrap().local_effect.published_oid.as_ref(), Some(next));
     // The latest id keeps its whole chain for recover.
     let (last, _, last_next) = done.last().unwrap();
     let recovered = port.recover(&repo, last).unwrap();

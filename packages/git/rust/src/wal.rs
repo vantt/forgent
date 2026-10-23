@@ -1990,12 +1990,10 @@ fn valid_compact_outcome(o: &[String]) -> bool {
     }
 }
 impl CompactReceipt {
-    /// What the entry's `digest` binds. Version 1 omitted expected/next, which
-    /// must never be guessed; version 3 adds the reference.
+    /// What the entry's `digest` binds; version 3 adds the reference.
     fn ledger_digest(&self) -> WalResult<String> {
         let c = self;
         match c.v {
-            1 => canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt)),
             3 => canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt, &c.expected, &c.next, &c.reference)),
             _ => canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt, &c.expected, &c.next)),
         }
@@ -2130,16 +2128,10 @@ impl<F: FileSystem> Wal<F> {
             Err(WalError::Io(e)) if e.kind() == io::ErrorKind::NotFound => return Ok(None),
             Err(e) => return Err(e),
         };
-        // Version 1 omitted expected/next. Keep its immutable binding and
-        // exact-request replay readable; missing facts must never be guessed.
-        let tips_valid = if c.v == 1 {
-            c.expected.is_empty() && c.next.is_empty()
-        } else {
-            [&c.expected, &c.next].iter().all(|s| {
-                *s == "-" || matches!(s.len(), 40 | 64) && s.bytes().all(|b| b.is_ascii_hexdigit())
-            })
-        };
-        if !matches!(c.v, 1..=3)
+        let tips_valid = [&c.expected, &c.next].iter().all(|s| {
+            *s == "-" || matches!(s.len(), 40 | 64) && s.bytes().all(|b| b.is_ascii_hexdigit())
+        });
+        if !matches!(c.v, 2..=3)
             || (c.v < 3 && c.reference.is_some())
             || c.reference
                 .as_ref()
@@ -2975,34 +2967,6 @@ mod tests {
         assert!(scan.entries[0].error.is_some());
         assert!(path.exists());
     }
-    #[test]
-    fn legacy_compact_entries_keep_their_binding_and_exact_request_replay() {
-        let t = Temp::new();
-        let wal = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
-        let i = intent(&wal);
-        let receipt = compact_outcome(&Outcome::Success {
-            observed: i.next.clone(),
-            attribution: Attribution::ThisInvocationWonCas,
-        });
-        let binding = binding_digest(&i).unwrap();
-        let digest =
-            canonical_digest(&(1u8, "legacy", &i.request_digest, &binding, &receipt)).unwrap();
-        let old = serde_json::json!({"v": 1, "id": "legacy", "q": i.request_digest, "b": binding, "r": receipt, "digest": digest});
-        fgos_durable_file::install_once(&wal.ledger.path(), "legacy", old.to_string().as_bytes())
-            .unwrap();
-        assert!(matches!(
-            wal.begin("legacy", i.clone(), &Authority).unwrap(),
-            Begin::Compacted(_)
-        ));
-        let mut other = i;
-        other.expected = Tip::Oid("c".repeat(40));
-        assert!(matches!(
-            wal.begin("legacy", other, &Authority),
-            Err(WalError::OperationIdConflict)
-        ));
-        assert_eq!(wal.scan(10).unwrap().unresolved, 0);
-    }
-
     #[test]
     fn compact_retains_binding_and_receipt_before_deletion() {
         let t = Temp::new();
