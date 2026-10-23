@@ -93,6 +93,16 @@ pub struct WriterKey<'a> {
     pub value: &'a str,
 }
 
+/// One process named by its pid and the start time that pid had when the
+/// caller checked it (the text `fgos_process::facts::Record::start_time`
+/// carries). A pid alone can be reused between the caller's check and
+/// Identity's read; pid plus start time cannot.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HeadRef {
+    pub pid: u32,
+    pub start_time: String,
+}
+
 impl<'a> WriterKey<'a> {
     /// The rule's env variable and the trimmed id, or `None` when `source` is
     /// not one of the rule's env variables or the value is not usable.
