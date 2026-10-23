@@ -13,7 +13,8 @@ fgos-identity = { path = "../../identity/rust", default-features = false }
 # The host provider's edges (the `fgos config` verbs); the addon and the gateway build without them.
 fgos-host-runtime = { path = "../../host-runtime/rust", optional = true }
 fgos-git = { path = "../../git/rust", optional = true }
-serde_json.workspace = true
+# preserve_order: the global JSON is rewritten with its keys in the order they were read (relocate.rs).
+serde_json = { workspace = true, features = ["preserve_order"] }
 sha2.workspace = true
 jsonschema.workspace = true
 

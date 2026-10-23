@@ -1,0 +1,2090 @@
+{
+ "version": 1,
+ "about": "Owning cases of the two-stage move of the account pools and the gateway token out of the global JSON. A case lays files out as the machine-files fixture does (files, raw, dirs, links, modes; plus before: step index to extra files laid before that step) and runs steps in order: plan, copy, finish (checked: false withholds the machine check), snapshot. A step may set confined, abortAt (the observer returns an error at that Step), editAt with append (the observer appends text to the global file at that Step), holdLock with waitMs (a child process holds global-config). Only the last step's result is compared with expect; earlier steps must succeed (or abort where abortAt says so). Expect: code with file, path and reason; io (an observer abort); paths; reformatted; plan [path, entries, state]; snapshot with at and notices [id, path]; and the state of the files: global (exact lines), globalUnchanged, globalAppended, accounts (parsed), accountsText, accountsAbsent, accountsStable, token, tokenAbsent, modes (relative to the global directory), backups (count), backupName, backupEqualsOriginal, backupMode, backupDirMode. sentinels never appear in any shown form of a refusal.",
+ "schemas": {
+  "runner": [
+   "type: object",
+   "properties:",
+   "  note: {type: string}",
+   "  llmAccounts:",
+   "    type: object",
+   "    x-fgos-file: accounts",
+   "    x-fgos-scope: global-only",
+   "    additionalProperties:",
+   "      type: object",
+   "      additionalProperties:",
+   "        type: object",
+   "        properties:",
+   "          login: {type: string, x-fgos-sensitivity: secret-reference}",
+   "  providers:",
+   "    type: object",
+   "    additionalProperties:",
+   "      type: object",
+   "      properties:",
+   "        accounts:",
+   "          type: object",
+   "          x-fgos-file: accounts",
+   "          x-fgos-scope: global-only",
+   "          additionalProperties:",
+   "            type: object",
+   "            properties:",
+   "              login: {type: string, x-fgos-sensitivity: secret-reference}"
+  ],
+  "gateway": [
+   "type: object",
+   "x-fgos-scope: global-only",
+   "properties:",
+   "  port: {type: integer}",
+   "  token: {type: string, x-fgos-file: token, x-fgos-sensitivity: secret-value, x-fgos-scope: global-only}"
+  ]
+ },
+ "standard": {
+  "gateway": [
+   "gateway:",
+   "  port: 8080"
+  ]
+ },
+ "cases": [
+  {
+   "id": "plan-names-keys-entries-and-state-without-values",
+   "why": "spec 13: the plan names the keys, how many entries each holds and what the destination holds; no value",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "plan"
+     }
+    ]
+   },
+   "expect": {
+    "plan": [
+     [
+      "gateway.token",
+      1,
+      "missing"
+     ],
+     [
+      "runner.llmAccounts",
+      1,
+      "missing"
+     ],
+     [
+      "runner.providers.gemini.accounts",
+      2,
+      "missing"
+     ],
+     [
+      "runner.providers.codex.accounts",
+      1,
+      "missing"
+     ],
+     [
+      "runner.providers.pi.accounts",
+      1,
+      "missing"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "copy-carries-accounts-and-token-and-keeps-the-source",
+   "why": "spec 13 stage 1: destination written and verified, source untouched, files 0600 in a 0700 directory, every leaf carries the migrate reason",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     }
+    ]
+   },
+   "expect": {
+    "paths": [
+     "gateway.token",
+     "runner.llmAccounts",
+     "runner.providers.gemini.accounts",
+     "runner.providers.codex.accounts",
+     "runner.providers.pi.accounts"
+    ],
+    "globalUnchanged": true,
+    "accounts": {
+     "runner": {
+      "llmAccounts": {
+       "claude": {
+        "work": {
+         "login": "~/.claude-work"
+        },
+        "home": {
+         "login": "~/.claude-home"
+        }
+       }
+      },
+      "providers": {
+       "gemini": {
+        "accounts": {
+         "g1": {
+          "login": "~/.gemini-1"
+         },
+         "g2": {
+          "login": "~/.gemini-2"
+         }
+        }
+       },
+       "codex": {
+        "accounts": {
+         "c1": {
+          "login": "~/.codex-1"
+         }
+        }
+       },
+       "pi": {
+        "accounts": {
+         "p1": {
+          "login": "~/.pi-1"
+         }
+        }
+       }
+      }
+     }
+    },
+    "accountsText": "[migrate] carried over from ~/.fgos/config.json, reason never recorded",
+    "token": "tok-SENTINEL-0123456789\n",
+    "modes": {
+     "private": "700",
+     "private/accounts.yaml": "600",
+     "private/gateway-token": "600"
+    }
+   }
+  },
+  {
+   "id": "copy-then-snapshot-passes-and-the-destination-wins",
+   "why": "spec 13: after the copy the key is in both files, the snapshot passes with a notice per key and the value comes from the accounts file",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     },
+     {
+      "op": "snapshot"
+     }
+    ]
+   },
+   "expect": {
+    "snapshot": true,
+    "at": {
+     "runner.llmAccounts.claude.work.login": "~/.claude-work"
+    },
+    "notices": [
+     [
+      "shadowed-by-destination",
+      "gateway.token"
+     ],
+     [
+      "shadowed-by-destination",
+      "runner.llmAccounts"
+     ],
+     [
+      "shadowed-by-destination",
+      "runner.providers.gemini.accounts"
+     ],
+     [
+      "shadowed-by-destination",
+      "runner.providers.codex.accounts"
+     ],
+     [
+      "shadowed-by-destination",
+      "runner.providers.pi.accounts"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "copy-twice-writes-nothing-the-second-time",
+   "why": "spec 13: an equal destination makes the copy a no-op",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     },
+     {
+      "op": "copy"
+     }
+    ]
+   },
+   "expect": {
+    "paths": [
+     "gateway.token",
+     "runner.llmAccounts",
+     "runner.providers.gemini.accounts",
+     "runner.providers.codex.accounts",
+     "runner.providers.pi.accounts"
+    ],
+    "accountsStable": true,
+    "globalUnchanged": true
+   }
+  },
+  {
+   "id": "copy-refuses-an-accounts-file-holding-different-data",
+   "why": "spec 13: a destination that differs is refused before anything is written, naming file and path, never a value",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ],
+     "home/.fgos/private/accounts.yaml": [
+      "runner:",
+      "  llmAccounts:",
+      "    claude:",
+      "      work: {login: ~/.dest-login-different}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     }
+    ]
+   },
+   "expect": {
+    "code": "config-move-destination-differs",
+    "file": "private/accounts.yaml",
+    "path": "runner.llmAccounts",
+    "globalUnchanged": true,
+    "tokenAbsent": true,
+    "sentinels": [
+     "~/.claude-work",
+     "~/.dest-login-different",
+     "tok-SENTINEL-0123456789"
+    ]
+   }
+  },
+  {
+   "id": "copy-refuses-a-token-file-holding-another-token",
+   "why": "spec 13: the token destination differs: refused, no byte of either token shown, accounts not written",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     }
+    ],
+    "raw": {
+     "home/.fgos/private/gateway-token": "other-token-SENTINEL-B\n"
+    },
+    "modes": {
+     "home/.fgos/private/gateway-token": "600"
+    }
+   },
+   "expect": {
+    "code": "config-move-destination-differs",
+    "file": "private/gateway-token",
+    "path": "gateway.token",
+    "globalUnchanged": true,
+    "accountsAbsent": true,
+    "sentinels": [
+     "tok-SENTINEL-0123456789",
+     "other-token-SENTINEL-B"
+    ]
+   }
+  },
+  {
+   "id": "copy-carries-a-token-alone",
+   "why": "spec 13: no account keys: only the token file is written",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"gateway\": {",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     }
+    ]
+   },
+   "expect": {
+    "paths": [
+     "gateway.token"
+    ],
+    "token": "tok-SENTINEL-0123456789\n",
+    "accountsAbsent": true,
+    "globalUnchanged": true
+   }
+  },
+  {
+   "id": "copy-carries-accounts-alone",
+   "why": "spec 13: no token key: only the accounts file is written",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        }",
+      "      }",
+      "    }",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     }
+    ]
+   },
+   "expect": {
+    "paths": [
+     "runner.llmAccounts"
+    ],
+    "tokenAbsent": true,
+    "accounts": {
+     "runner": {
+      "llmAccounts": {
+       "claude": {
+        "work": {
+         "login": "~/.claude-work"
+        }
+       }
+      }
+     }
+    },
+    "globalUnchanged": true
+   }
+  },
+  {
+   "id": "copy-with-keys-that-hold-nothing-writes-nothing",
+   "why": "a null token and an empty pool have nothing to carry: no file is created and the snapshot passes with the notices",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"gateway\": {",
+      "    \"token\": null",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {}",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     },
+     {
+      "op": "snapshot"
+     }
+    ]
+   },
+   "expect": {
+    "snapshot": true,
+    "notices": [
+     [
+      "shadowed-by-destination",
+      "gateway.token"
+     ],
+     [
+      "shadowed-by-destination",
+      "runner.llmAccounts"
+     ]
+    ],
+    "accountsAbsent": true,
+    "tokenAbsent": true,
+    "globalUnchanged": true
+   }
+  },
+  {
+   "id": "copy-without-a-global-json-file-moves-nothing",
+   "why": "spec 13: nothing to move is no error",
+   "input": {
+    "files": {},
+    "steps": [
+     {
+      "op": "copy"
+     }
+    ]
+   },
+   "expect": {
+    "paths": [],
+    "accountsAbsent": true,
+    "tokenAbsent": true
+   }
+  },
+  {
+   "id": "copy-by-a-confined-session-is-refused",
+   "why": "spec 6: a confined session writes nothing",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy",
+      "confined": true
+     }
+    ]
+   },
+   "expect": {
+    "code": "config-write-confined",
+    "globalUnchanged": true,
+    "accountsAbsent": true
+   }
+  },
+  {
+   "id": "copy-refuses-a-token-that-is-not-one-line",
+   "why": "D6: a source token that the token file could not hold is refused with no byte of it shown and nothing written",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"gateway\": {",
+      "    \"token\": \"two words SENTINEL-bad-token\"",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     }
+    ]
+   },
+   "expect": {
+    "code": "config-token-invalid",
+    "file": "config.json",
+    "reason": "shape",
+    "tokenAbsent": true,
+    "sentinels": [
+     "SENTINEL-bad-token"
+    ]
+   }
+  },
+  {
+   "id": "copy-refuses-a-global-file-that-is-not-json",
+   "why": "spec 9: a broken source names file and position, never a byte of its content",
+   "input": {
+    "files": {},
+    "steps": [
+     {
+      "op": "copy"
+     }
+    ],
+    "raw": {
+     "home/.fgos/config.json": "{ \"a\": SENTINEL-broken"
+    }
+   },
+   "expect": {
+    "code": "config-parse",
+    "file": "config.json",
+    "accountsAbsent": true,
+    "sentinels": [
+     "SENTINEL-broken"
+    ]
+   }
+  },
+  {
+   "id": "a-crash-after-the-destination-is-written-leaves-the-key-in-both-files",
+   "why": "spec 13: the observer aborts after the write: the key is in both files, the source untouched, the snapshot passes with the notices",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy",
+      "abortAt": "DestinationWritten"
+     },
+     {
+      "op": "snapshot"
+     }
+    ]
+   },
+   "expect": {
+    "snapshot": true,
+    "notices": [
+     [
+      "shadowed-by-destination",
+      "gateway.token"
+     ],
+     [
+      "shadowed-by-destination",
+      "runner.llmAccounts"
+     ],
+     [
+      "shadowed-by-destination",
+      "runner.providers.gemini.accounts"
+     ],
+     [
+      "shadowed-by-destination",
+      "runner.providers.codex.accounts"
+     ],
+     [
+      "shadowed-by-destination",
+      "runner.providers.pi.accounts"
+     ]
+    ],
+    "globalUnchanged": true,
+    "accounts": {
+     "runner": {
+      "llmAccounts": {
+       "claude": {
+        "work": {
+         "login": "~/.claude-work"
+        },
+        "home": {
+         "login": "~/.claude-home"
+        }
+       }
+      },
+      "providers": {
+       "gemini": {
+        "accounts": {
+         "g1": {
+          "login": "~/.gemini-1"
+         },
+         "g2": {
+          "login": "~/.gemini-2"
+         }
+        }
+       },
+       "codex": {
+        "accounts": {
+         "c1": {
+          "login": "~/.codex-1"
+         }
+        }
+       },
+       "pi": {
+        "accounts": {
+         "p1": {
+          "login": "~/.pi-1"
+         }
+        }
+       }
+      }
+     }
+    },
+    "token": "tok-SENTINEL-0123456789\n"
+   }
+  },
+  {
+   "id": "finish-without-the-machine-check-is-refused",
+   "why": "spec 13: removal needs the machine check; the source is untouched",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     },
+     {
+      "op": "finish",
+      "checked": false
+     }
+    ]
+   },
+   "expect": {
+    "code": "config-machine-check-required",
+    "globalUnchanged": true,
+    "backups": 0
+   }
+  },
+  {
+   "id": "finish-removes-the-moved-keys-and-keeps-every-other-byte",
+   "why": "spec 13 stage 2: the remaining JSON is byte for byte the original without the moved keys, key order kept, final newline, empty parents left in place (codex)",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     },
+     {
+      "op": "finish"
+     }
+    ],
+    "modes": {
+     "home/.fgos/config.json": "600"
+    }
+   },
+   "expect": {
+    "paths": [
+     "gateway.token",
+     "runner.llmAccounts",
+     "runner.providers.gemini.accounts",
+     "runner.providers.codex.accounts",
+     "runner.providers.pi.accounts"
+    ],
+    "reformatted": false,
+    "global": [
+     "{",
+     "  \"bin\": {",
+     "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+     "  },",
+     "  \"gateway\": {",
+     "    \"port\": 9090",
+     "  },",
+     "  \"runner\": {",
+     "    \"providers\": {",
+     "      \"gemini\": {",
+     "        \"enabled\": true",
+     "      },",
+     "      \"codex\": {},",
+     "      \"pi\": {",
+     "        \"note\": \"keep\"",
+     "      }",
+     "    },",
+     "    \"zeta\": [",
+     "      1,",
+     "      2",
+     "    ]",
+     "  },",
+     "  \"unrelated\": {",
+     "    \"keep\": true",
+     "  }",
+     "}"
+    ],
+    "modes": {
+     "config.json": "600"
+    }
+   }
+  },
+  {
+   "id": "finish-backs-the-source-up-before-it-rewrites",
+   "why": "D16: the backup is create-only, 0600, in a 0700 directory, named by the first 16 hex of the revision, and holds the original bytes",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     },
+     {
+      "op": "finish"
+     }
+    ]
+   },
+   "expect": {
+    "paths": [
+     "gateway.token",
+     "runner.llmAccounts",
+     "runner.providers.gemini.accounts",
+     "runner.providers.codex.accounts",
+     "runner.providers.pi.accounts"
+    ],
+    "backups": 1,
+    "backupName": "cd6657eca88eb44e-config.json",
+    "backupEqualsOriginal": true,
+    "backupMode": "600",
+    "backupDirMode": "700"
+   }
+  },
+  {
+   "id": "finish-refuses-while-the-destination-is-missing",
+   "why": "spec 13: nothing is removed that the destination does not hold; no backup",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "finish"
+     }
+    ]
+   },
+   "expect": {
+    "code": "config-move-destination-differs",
+    "path": "gateway.token",
+    "globalUnchanged": true,
+    "backups": 0
+   }
+  },
+  {
+   "id": "finish-refuses-while-the-destination-differs",
+   "why": "spec 13: a destination holding other data keeps the source: no byte of either shown, no backup",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     },
+     {
+      "op": "finish"
+     }
+    ],
+    "before": {
+     "1": {
+      "files": {
+       "home/.fgos/private/accounts.yaml": [
+        "runner:",
+        "  llmAccounts:",
+        "    claude:",
+        "      work: {login: other-account-SENTINEL}"
+       ]
+      }
+     }
+    }
+   },
+   "expect": {
+    "code": "config-move-destination-differs",
+    "globalUnchanged": true,
+    "backups": 0,
+    "sentinels": [
+     "~/.claude-work",
+     "other-account-SENTINEL"
+    ]
+   }
+  },
+  {
+   "id": "finish-refuses-when-the-file-changed-after-the-backup",
+   "why": "spec 6: the second revision check: a change after the backup aborts and the file keeps the other writer's bytes",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     },
+     {
+      "op": "finish",
+      "editAt": "SourceBackedUp",
+      "append": "\n"
+     }
+    ]
+   },
+   "expect": {
+    "code": "config-write-conflict",
+    "reason": "revision-changed",
+    "globalAppended": "\n",
+    "backups": 1
+   }
+  },
+  {
+   "id": "a-crash-after-the-backup-leaves-the-source-untouched",
+   "why": "spec 13: aborted after the backup and before the rewrite: nothing changed but the backup",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     },
+     {
+      "op": "finish",
+      "abortAt": "SourceBackedUp"
+     }
+    ]
+   },
+   "expect": {
+    "io": true,
+    "globalUnchanged": true,
+    "backups": 1
+   }
+  },
+  {
+   "id": "finish-reports-a-file-that-was-not-in-the-two-space-style",
+   "why": "spec 13 risk: the rewrite is two-space with a final newline; a file written another way is reported as reformatted, never silently",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "    \"bin\": {",
+      "        \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "    },",
+      "    \"gateway\": {",
+      "        \"port\": 9090,",
+      "        \"token\": \"tok-SENTINEL-0123456789\"",
+      "    },",
+      "    \"runner\": {",
+      "        \"llmAccounts\": {",
+      "            \"claude\": {",
+      "                \"work\": {",
+      "                    \"login\": \"~/.claude-work\"",
+      "                },",
+      "                \"home\": {",
+      "                    \"login\": \"~/.claude-home\"",
+      "                }",
+      "            }",
+      "        },",
+      "        \"providers\": {",
+      "            \"gemini\": {",
+      "                \"accounts\": {",
+      "                    \"g1\": {",
+      "                        \"login\": \"~/.gemini-1\"",
+      "                    },",
+      "                    \"g2\": {",
+      "                        \"login\": \"~/.gemini-2\"",
+      "                    }",
+      "                },",
+      "                \"enabled\": true",
+      "            },",
+      "            \"codex\": {",
+      "                \"accounts\": {",
+      "                    \"c1\": {",
+      "                        \"login\": \"~/.codex-1\"",
+      "                    }",
+      "                }",
+      "            },",
+      "            \"pi\": {",
+      "                \"accounts\": {",
+      "                    \"p1\": {",
+      "                        \"login\": \"~/.pi-1\"",
+      "                    }",
+      "                },",
+      "                \"note\": \"keep\"",
+      "            }",
+      "        },",
+      "        \"zeta\": [",
+      "            1,",
+      "            2",
+      "        ]",
+      "    },",
+      "    \"unrelated\": {",
+      "        \"keep\": true",
+      "    }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     },
+     {
+      "op": "finish"
+     }
+    ]
+   },
+   "expect": {
+    "paths": [
+     "gateway.token",
+     "runner.llmAccounts",
+     "runner.providers.gemini.accounts",
+     "runner.providers.codex.accounts",
+     "runner.providers.pi.accounts"
+    ],
+    "reformatted": true,
+    "global": [
+     "{",
+     "  \"bin\": {",
+     "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+     "  },",
+     "  \"gateway\": {",
+     "    \"port\": 9090",
+     "  },",
+     "  \"runner\": {",
+     "    \"providers\": {",
+     "      \"gemini\": {",
+     "        \"enabled\": true",
+     "      },",
+     "      \"codex\": {},",
+     "      \"pi\": {",
+     "        \"note\": \"keep\"",
+     "      }",
+     "    },",
+     "    \"zeta\": [",
+     "      1,",
+     "      2",
+     "    ]",
+     "  },",
+     "  \"unrelated\": {",
+     "    \"keep\": true",
+     "  }",
+     "}"
+    ]
+   }
+  },
+  {
+   "id": "finish-twice-changes-nothing-the-second-time",
+   "why": "spec 13: with the keys gone there is nothing to remove and no second backup",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     },
+     {
+      "op": "finish"
+     },
+     {
+      "op": "finish"
+     }
+    ]
+   },
+   "expect": {
+    "paths": [],
+    "global": [
+     "{",
+     "  \"bin\": {",
+     "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+     "  },",
+     "  \"gateway\": {",
+     "    \"port\": 9090",
+     "  },",
+     "  \"runner\": {",
+     "    \"providers\": {",
+     "      \"gemini\": {",
+     "        \"enabled\": true",
+     "      },",
+     "      \"codex\": {},",
+     "      \"pi\": {",
+     "        \"note\": \"keep\"",
+     "      }",
+     "    },",
+     "    \"zeta\": [",
+     "      1,",
+     "      2",
+     "    ]",
+     "  },",
+     "  \"unrelated\": {",
+     "    \"keep\": true",
+     "  }",
+     "}"
+    ],
+    "backups": 1
+   }
+  },
+  {
+   "id": "finish-removes-keys-that-hold-nothing-without-a-copy",
+   "why": "a null token and an empty pool are removed too; the empty parents stay",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"gateway\": {",
+      "    \"token\": null",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {}",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "finish"
+     }
+    ]
+   },
+   "expect": {
+    "paths": [
+     "gateway.token",
+     "runner.llmAccounts"
+    ],
+    "global": [
+     "{",
+     "  \"gateway\": {},",
+     "  \"runner\": {}",
+     "}"
+    ],
+    "backups": 1
+   }
+  },
+  {
+   "id": "after-the-finish-the-snapshot-has-no-notices",
+   "why": "spec 13: with the keys gone the snapshot passes and the accounts come from the accounts file alone",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     },
+     {
+      "op": "finish"
+     },
+     {
+      "op": "snapshot"
+     }
+    ]
+   },
+   "expect": {
+    "snapshot": true,
+    "notices": [],
+    "at": {
+     "runner.providers.gemini.accounts.g2.login": "~/.gemini-2"
+    }
+   }
+  },
+  {
+   "id": "finish-waits-for-the-global-config-lock-and-changes-nothing",
+   "why": "the lock registry: a held global-config lock gives config-write-conflict after the bound",
+   "input": {
+    "files": {
+     "home/.fgos/config.json": [
+      "{",
+      "  \"bin\": {",
+      "    \"globalFgosPath\": \"/usr/local/bin/fgos\"",
+      "  },",
+      "  \"gateway\": {",
+      "    \"port\": 9090,",
+      "    \"token\": \"tok-SENTINEL-0123456789\"",
+      "  },",
+      "  \"runner\": {",
+      "    \"llmAccounts\": {",
+      "      \"claude\": {",
+      "        \"work\": {",
+      "          \"login\": \"~/.claude-work\"",
+      "        },",
+      "        \"home\": {",
+      "          \"login\": \"~/.claude-home\"",
+      "        }",
+      "      }",
+      "    },",
+      "    \"providers\": {",
+      "      \"gemini\": {",
+      "        \"accounts\": {",
+      "          \"g1\": {",
+      "            \"login\": \"~/.gemini-1\"",
+      "          },",
+      "          \"g2\": {",
+      "            \"login\": \"~/.gemini-2\"",
+      "          }",
+      "        },",
+      "        \"enabled\": true",
+      "      },",
+      "      \"codex\": {",
+      "        \"accounts\": {",
+      "          \"c1\": {",
+      "            \"login\": \"~/.codex-1\"",
+      "          }",
+      "        }",
+      "      },",
+      "      \"pi\": {",
+      "        \"accounts\": {",
+      "          \"p1\": {",
+      "            \"login\": \"~/.pi-1\"",
+      "          }",
+      "        },",
+      "        \"note\": \"keep\"",
+      "      }",
+      "    },",
+      "    \"zeta\": [",
+      "      1,",
+      "      2",
+      "    ]",
+      "  },",
+      "  \"unrelated\": {",
+      "    \"keep\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "steps": [
+     {
+      "op": "copy"
+     },
+     {
+      "op": "finish",
+      "holdLock": true,
+      "waitMs": 300
+     }
+    ]
+   },
+   "expect": {
+    "code": "config-write-conflict",
+    "reason": "lock-held",
+    "minMs": 250,
+    "globalUnchanged": true,
+    "backups": 0
+   }
+  }
+ ]
+}
