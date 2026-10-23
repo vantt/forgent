@@ -76,7 +76,9 @@ pub fn read_beneath(
         BeneathError::Refused(BeneathRefusal::TooLarge) => {
             let mut parse = ConfigRefusal::new("config-parse");
             parse.file = Some(name.to_string());
-            parse.yaml = Some(fgos_yaml_doc::Refusal::new("input-too-large").with_file(&name));
+            parse.yaml = Some(Box::new(
+                fgos_yaml_doc::Refusal::new("input-too-large").with_file(&name),
+            ));
             FileError::Refused(Box::new(parse))
         }
         BeneathError::Refused(_) => refusal("config-path-symlink", &name),

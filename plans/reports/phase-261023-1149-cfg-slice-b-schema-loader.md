@@ -1,52 +1,41 @@
-# Phase 04a report: schema loader, resolve, lint, standard (stopped at the 1,000-line gate)
+# Phase 04a report: schema loader, resolve, standard, meta-schema, cross-node lint
 
-Status: BLOCKED by the line gate, not by a defect. The code is written, compiles and is clippy-clean
-(`-D warnings`, all targets), but is NOT committed and has NO tests/fixtures yet. The brief said to stop
-and report if the crate total would pass 1,000 lines after 04a.
+Status: DONE. Supersedes the earlier "stopped at the line gate" version of this report; the coordinator
+directed per-node rules into data (decision 2026-10-23 11:55) and the crate is back under the gate.
 
-## Count (rule: `find packages/config/rust/src ... | xargs wc -l`, comments and blanks included)
+## Line counts (`cat packages/config/rust/src/*.rs | wc -l`, comments and blanks included)
 
-- Before: 453 lines in `packages/config/rust/src`.
-- After: 1,180 (+727 added/changed). Per file: schema.rs 283, lint.rs 322, standard.rs 77, bundle.rs 40, error.rs +11.
-- The `open_beneath.rs` path in the plan's count command does not exist (the file is now elsewhere in
-  `packages/durable-file/rust/src`); the figure above is the config crate only.
-- Phase 04 was budgeted at about 300 lines; 04a alone is 2.4x that, before 04b (about 80 more) and before tests.
+- Crate `src` total: 986 (was 453 before 04a; the first draft with hand-written lint was 1,180).
+- `lint.rs` 139 (first draft 322; target "well under 120" missed: rustfmt widens the long closures), `schema.rs` 272 (283), `standard.rs` 77, `bundle.rs` 40.
+- Tests/fixtures (not counted): 828 lines of Rust tests (all test files, not only the new ones), plus JSON fixtures; the plan budgeted about 1,000 for the whole slice.
+- The count command in plan.md names `packages/durable-file/rust/src/open_beneath.rs`, which is now `beneath.rs`; the figure above is the config crate only.
 
-## What exists (uncommitted, in the worktree `packages/config/`)
+## Delivered
 
-- `src/schema.rs`: `Schemas::{parse, bundled, section, resolve, undescribed}`, `Resolved` with the five
-  inherited annotations (referrer then `$ref` target, nearest ancestor wins, then contract default), local and
-  cross-section `$ref` by `$id`. Reuses yaml-doc `parse` (StrictConfig), `to_json`, `span_of`.
-- `src/bundle.rs`: empty `SCHEMAS`/`STANDARD` lists (no real files yet), order-independent length-prefixed sha256 digest.
-- `src/standard.rs`: `Standard::{parse, bundled, value, value_at, span_of}`; files ordered by schema set and
-  merged with yaml-doc `merge` (no new merge code).
-- `src/lint.rs`: all 14 04a rule ids (`standard-invalid` is 04b), findings `{id, file, path, line, column}`, no values.
-- `src/error.rs`: `ConfigRefusal.yaml` is now `Option<Box<Refusal>>` plus `ConfigRefusal::parse(yaml)`; this
-  clears `clippy::result_large_err`, so grammar.rs's local allow is removed (phase 09 coordinator note done). files.rs/grammar.rs adjusted.
-- `contracts/annotations.v1.json`: cut to the five annotations with their allowed values and defaults (the old
-  file still listed suggestion, justification, owner, version, which the amended spec removed).
-- `src/lib.rs`: bundle, lint, schema, standard are now `pub mod`.
+- `contracts/config-schema.meta.v1.json`: JSON Schema 2020-12 over the schema document; `$ref`s the official
+  meta-schema, applies to every subschema through `$dynamicRef` (the subschema entry is its own resource because
+  `$dynamicAnchor` must sit on a resource root). One `$defs` entry per rule, named after the id (root rules and
+  `<id>.node` rules; id is the name up to the first dot): schema-dialect, schema-default-forbidden,
+  schema-annotation-unknown, schema-annotation-value, schema-id, schema-owner, schema-description-missing,
+  schema-scope-implicit, schema-scope-both-unjustified, schema-file-placement. Checked here with python
+  `jsonschema` 4.19 (scratch, not committed): each bad fixture fails on its own rule, the three good ones pass.
+- `contracts/fixtures/meta.v1.json`: 14 cases (3 valid, 11 one-per-rule). Runner is 04b's.
+- `src/lint.rs` keeps only: `schema-id` section equals file stem, `schema-dialect` for a dangling or looping `$ref`
+  (walk-based), `schema-scope-conflict`, `schema-absent-conflict`, `standard-orphan`, `standard-forbidden-key`.
+- `src/schema.rs`: `$ref` pointer walk now uses `serde_json::Value::pointer`; one shared `descend` walker serves `undescribed` and the standard lint. Kept: `resolve` (one door), annotation inheritance.
+- Loader, standard, `bundle`, `ConfigRefusal` boxed payload (clears `result_large_err`, grammar.rs allow removed), annotations contract cut to five.
+- Tests: `golden_schema` (14 cases + bundle-lists-match-core test), `golden_standard` (7), `golden_lint` (15 + `bundled_set_is_clean`); `fixture_shape` now skips the `version` check for JSON Schema documents. `failure-codes` prefixes `schema-` and `standard-`. Full `cargo test -p fgos-config`, clippy `-D warnings`, fmt: green.
 
-## Not done
+## What the meta-schema cannot express (stays code) and its limits
 
-Fixtures `schema/lint/standard.v1.json`, `tests/golden_{schema,lint,standard}.rs`, the bundle-completeness test,
-`schema-` ids appended to `failure-codes.v1.json`, CHANGELOG (none needed yet: no user-visible change), commit.
-Tests were not started because the gate says stop first.
+- `$id` section equals the file stem (needs the file name): lint.
+- A `$ref` that dangles or loops: not a schema-validation fact; the meta-schema only pins `$ref` to `#...` or `urn:fgos:config-schema:` (local to the bundled set).
+- Scope conflict (ancestor), absent conflict and the standard rules read other nodes or files: lint.
+- Behaviour change to flag: meta rules see only what a node states itself, not inheritance. So `schema-scope-both-unjustified` and `schema-file-placement` look at the node's own sensitivity, scope and type (a token or accounts node must state its own scope `global-only`; before, an inherited one passed). A node that is only a `$ref` is treated as described (the target's description is not checked by the meta-schema).
 
-## Projection
+## Open points for 04b
 
-At the end of 04 (plus 04b, about 80) the crate is about 1,260. Phases 06 (110), 09 (230), 10 (190), 11 (50)
-are still ahead: about 1,840, plus about 100 for `open_beneath` in Durable File: about 1,940 against the 1,500 ceiling.
+- Map a validator error's schema location to the rule id: the `$defs` name up to the first dot; confirm the Rust validator reports the resolved path (python reports keyword paths without def names; the `instance` path and keyword suffice to tell rules apart in the fixtures).
+- Cross-section `$ref` in a `$ref` into an array uses Key segments in positions (positions only; resolution is by pointer).
 
-## Decision question
-
-What is happening: the schema/lint/standard slice costs 727 Rust lines, not about 300, and the slice projects to about 1,940.
-Cause: the amended spec kept 14 lint rules, `$ref` following with annotation inheritance, per-file positions and
-the standard loader; each is small, together they are not. Lines are counted with comments and blanks (about 90 doc comment lines in the new files).
-Options:
-1. Raise the Rust ceiling to about 2,000 and continue (cost: owner re-agrees the budget; no behaviour lost). Recommended: every rule traces to the spec, cuts would drop spec behaviour.
-2. Keep 1,500 and cut: drop `undescribed` (about 25), `schema-absent-conflict`, `schema-scope-conflict` and `schema-file-placement` lint rules to doctor later (about 60), cross-section `$ref` (about 15); still about 1,700, so this alone does not meet 1,500; phases 09/10 would also need cuts.
-3. Trim formatting-driven length only (rustfmt widens the long closures): saves perhaps 40 lines, not enough.
-Scope of the answer: the whole slice budget, phases 04b through 11.
-
-Status: BLOCKED
+Status: DONE

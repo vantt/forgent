@@ -2,10 +2,6 @@
 //! `@fgos:why` and `@fgos:doc` lines, the new-file header and the block of lines above a key. Pure
 //! over text; applying the lines to a document belongs to the write transaction. Lists live in
 //! `contracts/comment-grammar.v1.json`.
-// `ConfigRefusal` is the crate's one refusal type and carries its whole location; boxing it is a crate-wide
-// decision for its owner, not for this module.
-#![allow(clippy::result_large_err)]
-
 use std::sync::OnceLock;
 
 use fgos_identity::WriterIdentity;
@@ -61,7 +57,7 @@ impl Reason {
         }
         // Hidden-text characters are refused by the Document guard; keep its refusal as the cause.
         sanitize(reason).map_err(|yaml| ConfigRefusal {
-            yaml: Some(yaml),
+            yaml: Some(Box::new(yaml)),
             ..ConfigRefusal::new(REASON_REQUIRED)
         })?;
         Ok(Reason(reason.to_string()))

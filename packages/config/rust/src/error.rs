@@ -7,7 +7,7 @@ pub struct ConfigRefusal {
     /// A closed id from `contracts/failure-codes.v1.json`.
     pub code: &'static str,
     /// The wrapped YAML Document refusal, when the id comes from the parser.
-    pub yaml: Option<fgos_yaml_doc::Refusal>,
+    pub yaml: Option<Box<fgos_yaml_doc::Refusal>>,
     pub file: Option<String>,
     pub path: Option<String>,
     pub line: Option<u32>,
@@ -26,6 +26,17 @@ impl ConfigRefusal {
             line: None,
             column: None,
             schema_path: None,
+        }
+    }
+
+    /// A file that does not parse or breaks the profile: `config-parse` carrying the YAML refusal.
+    pub fn parse(yaml: fgos_yaml_doc::Refusal) -> Self {
+        Self {
+            file: Some(yaml.file.clone()).filter(|file| !file.is_empty()),
+            line: yaml.line,
+            column: yaml.column,
+            yaml: Some(Box::new(yaml)),
+            ..Self::new("config-parse")
         }
     }
 }

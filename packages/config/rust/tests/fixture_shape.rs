@@ -43,7 +43,11 @@ fn contract_files_parse_and_carry_version_one() {
     let files = json_files(&contracts());
     assert!(files.len() >= 2, "failure-codes and annotations exist");
     for file in files {
-        assert_eq!(read_json(&file)["version"], 1, "{}", file.display());
+        let doc = read_json(&file);
+        // A JSON Schema document carries its revision in its `$id`, not a `version` member.
+        if doc.get("$schema").is_none() {
+            assert_eq!(doc["version"], 1, "{}", file.display());
+        }
     }
 }
 

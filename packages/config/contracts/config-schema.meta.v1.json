@@ -1,0 +1,330 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fgos:config-schema-meta:v1",
+  "$comment": "owner: config. The rules every section schema (core/config-schema/<section>.schema.yaml, parsed to JSON) must satisfy, as a JSON Schema over the schema document. Each rule is one $defs entry named after its lint id; a rule that applies at the root and to every subschema has a root entry and a '<id>.node' entry, and the id is the name up to the first '.', so a validator error's schema path maps back to the id. Not expressible here and kept in src/lint.rs: the $id section equals the file stem, a $ref that dangles or loops, and any rule that reads an ancestor or the standard files. Rules that read a node's annotations see only what the node states itself; inheritance is lint's. The subschema entry is its own resource because $dynamicAnchor must sit on a resource root for the official meta-schema's $dynamicRef to reach it.",
+  "$ref": "#/$defs/root",
+  "$defs": {
+    "root": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/schema-dialect"
+        },
+        {
+          "$ref": "#/$defs/schema-id"
+        },
+        {
+          "$ref": "#/$defs/schema-owner"
+        },
+        {
+          "$ref": "urn:fgos:config-schema-meta:v1:subschema"
+        }
+      ]
+    },
+    "subschema": {
+      "$id": "urn:fgos:config-schema-meta:v1:subschema",
+      "$dynamicAnchor": "meta",
+      "allOf": [
+        {
+          "$ref": "https://json-schema.org/draft/2020-12/schema"
+        },
+        {
+          "$ref": "urn:fgos:config-schema-meta:v1#/$defs/schema-dialect.node"
+        },
+        {
+          "$ref": "urn:fgos:config-schema-meta:v1#/$defs/schema-default-forbidden"
+        },
+        {
+          "$ref": "urn:fgos:config-schema-meta:v1#/$defs/schema-annotation-unknown"
+        },
+        {
+          "$ref": "urn:fgos:config-schema-meta:v1#/$defs/schema-annotation-value"
+        },
+        {
+          "$ref": "urn:fgos:config-schema-meta:v1#/$defs/schema-description-missing"
+        },
+        {
+          "$ref": "urn:fgos:config-schema-meta:v1#/$defs/schema-scope-implicit"
+        },
+        {
+          "$ref": "urn:fgos:config-schema-meta:v1#/$defs/schema-scope-both-unjustified"
+        },
+        {
+          "$ref": "urn:fgos:config-schema-meta:v1#/$defs/schema-file-placement"
+        }
+      ]
+    },
+    "schema-dialect": {
+      "required": [
+        "$schema"
+      ],
+      "properties": {
+        "$schema": {
+          "const": "https://json-schema.org/draft/2020-12/schema"
+        }
+      }
+    },
+    "schema-dialect.node": {
+      "not": {
+        "required": [
+          "patternProperties"
+        ]
+      },
+      "properties": {
+        "$ref": {
+          "type": "string",
+          "pattern": "^(#|urn:fgos:config-schema:)"
+        }
+      }
+    },
+    "schema-id": {
+      "required": [
+        "$id"
+      ],
+      "properties": {
+        "$id": {
+          "type": "string",
+          "pattern": "^urn:fgos:config-schema:[a-z][a-z0-9-]*:v[1-9][0-9]*$"
+        }
+      }
+    },
+    "schema-owner": {
+      "required": [
+        "$comment"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string",
+          "pattern": "^owner: [^\\s]"
+        }
+      }
+    },
+    "schema-default-forbidden": {
+      "not": {
+        "required": [
+          "default"
+        ]
+      }
+    },
+    "schema-annotation-unknown": {
+      "propertyNames": {
+        "if": {
+          "pattern": "^x-fgos-"
+        },
+        "then": {
+          "enum": [
+            "x-fgos-scope",
+            "x-fgos-sensitivity",
+            "x-fgos-file",
+            "x-fgos-merge",
+            "x-fgos-absent"
+          ]
+        }
+      }
+    },
+    "schema-annotation-value": {
+      "properties": {
+        "x-fgos-scope": {
+          "enum": [
+            "both",
+            "project-only",
+            "global-only"
+          ]
+        },
+        "x-fgos-sensitivity": {
+          "enum": [
+            "public",
+            "command",
+            "secret-reference",
+            "secret-value"
+          ]
+        },
+        "x-fgos-file": {
+          "enum": [
+            "config",
+            "accounts",
+            "token"
+          ]
+        },
+        "x-fgos-merge": {
+          "enum": [
+            "deep",
+            "replace",
+            "leaf"
+          ]
+        },
+        "x-fgos-absent": {
+          "enum": [
+            "detected",
+            "required",
+            "off"
+          ]
+        }
+      }
+    },
+    "schema-description-missing": {
+      "properties": {
+        "properties": {
+          "additionalProperties": {
+            "$ref": "#/$defs/described"
+          }
+        },
+        "additionalProperties": {
+          "if": {
+            "type": "object"
+          },
+          "then": {
+            "$ref": "#/$defs/described"
+          }
+        }
+      }
+    },
+    "described": {
+      "anyOf": [
+        {
+          "required": [
+            "description"
+          ],
+          "properties": {
+            "description": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[^\\n]*\\n?$"
+            }
+          }
+        },
+        {
+          "required": [
+            "$ref"
+          ]
+        }
+      ]
+    },
+    "schema-scope-implicit": {
+      "if": {
+        "required": [
+          "x-fgos-sensitivity"
+        ],
+        "properties": {
+          "x-fgos-sensitivity": {
+            "not": {
+              "const": "public"
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "x-fgos-scope"
+        ]
+      }
+    },
+    "schema-scope-both-unjustified": {
+      "if": {
+        "required": [
+          "x-fgos-scope",
+          "x-fgos-sensitivity"
+        ],
+        "properties": {
+          "x-fgos-scope": {
+            "const": "both"
+          },
+          "x-fgos-sensitivity": {
+            "not": {
+              "const": "public"
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "$comment"
+        ],
+        "properties": {
+          "$comment": {
+            "type": "string",
+            "pattern": "^\\s*justification:"
+          }
+        }
+      }
+    },
+    "schema-file-placement": {
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "x-fgos-file"
+            ],
+            "properties": {
+              "x-fgos-file": {
+                "enum": [
+                  "accounts",
+                  "token"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "x-fgos-scope"
+            ],
+            "properties": {
+              "x-fgos-scope": {
+                "const": "global-only"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "x-fgos-file"
+            ],
+            "properties": {
+              "x-fgos-file": {
+                "const": "token"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "type",
+              "x-fgos-sensitivity"
+            ],
+            "properties": {
+              "type": {
+                "const": "string"
+              },
+              "x-fgos-sensitivity": {
+                "const": "secret-value"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "x-fgos-file"
+            ],
+            "properties": {
+              "x-fgos-file": {
+                "const": "accounts"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "x-fgos-sensitivity"
+            ],
+            "properties": {
+              "x-fgos-sensitivity": {
+                "not": {
+                  "const": "public"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
