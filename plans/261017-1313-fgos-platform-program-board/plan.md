@@ -45,7 +45,7 @@ Lead của luồng đang chạy. Mỗi lead **tự điền dòng của mình** (
 | TEST | `lead:TEST` | chưa ghi (phiên `forgent-f8`) | `fg-server2`? |
 | WORK | `lead:WORK` | chưa ghi (phiên `forgent-cd`) | `fg-server2` |
 | OPC | `lead:OPC` | `claude-muyt@fg-server2` | `fg-server2` |
-| CFG | `lead:CFG` | chưa ghi (phiên `9548be33`) | `fg-server` |
+| CFG | `lead:CFG` | `claude-hrpe@fg-server` | `fg-server` |
 | COOK | `lead:COOK` | chưa ghi | `fg-server` |
 | DOC | `lead:DOC` | chưa ghi | ? |
 
