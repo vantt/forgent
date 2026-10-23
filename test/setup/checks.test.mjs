@@ -1004,7 +1004,7 @@ test('provider-capacity-state doctor check reports quarantine without clearing i
         },
       },
     },
-  }, null, 2));
+  }));
   const stateDir = path.join(fgosHome, 'runtime', 'provider-capacity');
   fs.mkdirSync(stateDir, { recursive: true });
   const statePath = path.join(stateDir, 'state.json');
