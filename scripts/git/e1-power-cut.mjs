@@ -6,13 +6,16 @@
 //
 //   node scripts/git/e1-power-cut.mjs workload --root <dir> --descriptor <file> --plan <file> [--kind publication|scoped] [--ops N] [--handshake]
 //   node scripts/git/e1-power-cut.mjs check    --root <dir> --descriptor <file> --plan <file> --acked <n> [--kind publication|scoped]
-//   node scripts/git/e1-power-cut.mjs trace    --root <fresh dir> [--kind publication|scoped] [--ops N] [--addon <.so> --host <fgos>]  (strace; no root)
+//   node scripts/git/e1-power-cut.mjs trace    --root <fresh dir> [--kind publication|scoped|worktree] [--ops N] [--addon <.so> --host <fgos>]  (strace; no root)
 //   node scripts/git/e1-power-cut.mjs order    --trace <strace log>             (checks a trace)
 //
 // `--kind scoped` runs ScopedCommit instead of Publication: each operation commits a new file in a
 // new nested directory, so a blob, two trees and a commit are new loose objects every time. Its
 // check adds what only a scoped commit can lose: an acknowledged commit must be on the producer
 // branch with every tree and blob readable (`git fsck --full` reports an empty loose object).
+// `--kind worktree` (trace only; the device replay does not judge it) creates, moves and removes a
+// linked worktree per operation: the trace rules check the operation pin's ref file and directory
+// chain are flushed before the first target attempt, and its release flushed before `pinReleased`.
 // `--addon`/`--host` stage a prebuilt addon and host instead of the checkout's build, to compare
 // two binaries on the same workload.
 //
@@ -129,8 +132,25 @@ async function scopedWorkload(args) {
   }
 }
 
+async function worktreeWorkload(args) {
+  const ops = Number(args.ops ?? 4);
+  const root = path.resolve(args.root);
+  const { repo, state } = prepareScoped(root);
+  const { index, loader } = await loaders(args.descriptor);
+  const tip = sandboxGit(root)(['-C', repo, 'rev-parse', 'HEAD']).toString().trim();
+  const port = index.createGitWorktree({ stateRoot: state, repoPath: repo, trustedMain: repo, writer: WRITER }, loader);
+  fs.mkdirSync(path.join(root, 'worktrees'));
+  for (let i = 0; i < ops; i++) {
+    const made = path.join(root, 'worktrees', `w${i}`), moved = path.join(root, 'worktrees', `m${i}`);
+    port.createDetached({ path: made, operationId: `e1-wt-create-${i}` });
+    port.relocate({ source: made, destination: moved, expectedTip: tip, operationId: `e1-wt-move-${i}` });
+    port.remove({ path: moved, expectedTip: tip, deliveredTo: tip, evidenceDigest: 'a'.repeat(64), operationId: `e1-wt-remove-${i}` });
+  }
+}
+
 async function workload(args) {
   if (args.kind === 'scoped') return scopedWorkload(args);
+  if (args.kind === 'worktree') return worktreeWorkload(args);
   const ops = Number(args.ops ?? 24);
   const { repo, state, git } = prepare(path.resolve(args.root));
   const { index, loader } = await loaders(args.descriptor);
@@ -354,7 +374,7 @@ const ok = (text) => /= 0$/.test(text) || /= 0 /.test(text);
  *     unwritten bytes and every ref packed into it is gone). */
 export function checkOrder(trace) {
   const list = calls(trace);
-  const writes = new Map(), installs = [], fsyncs = [], refRenames = [], objectLinks = [], planIntents = [], violations = [];
+  const writes = new Map(), installs = [], fsyncs = [], removals = [], refRenames = [], objectLinks = [], planIntents = [], violations = [];
   const cwds = new Map();
   // fgos-git installs through `/proc/self/fd/<dirfd>/<name>`; resolve those from openat results.
   const fds = new Map();
@@ -377,6 +397,8 @@ export function checkOrder(trace) {
       const from = path.resolve(cwds.get(pid) ?? '/', lk[1]), to = path.resolve(cwds.get(pid) ?? '/', lk[2]);
       if (/\/objects\/[0-9a-f]{2}\/[0-9a-f]{38,62}$/.test(to)) objectLinks.push({ at, from, to });
     }
+    const un = text.match(/^unlinkat\((?:AT_FDCWD|-?\d+)<([^>]*)>, "([^"]+)", (?:0|AT_REMOVEDIR)\) = 0/) ?? text.match(/^(?:unlink|rmdir)\("([^"]+)"\) = 0/);
+    if (un) removals.push({ at, path: path.resolve(un.length > 2 ? un[1] : cwds.get(pid) ?? '/', un.at(-1)) });
     const f = text.match(/^f(?:data)?sync\(/);
     if (f && ok(text)) fsyncs.push({ at, path: fdPath(text) });
     const r2 = text.match(/^renameat2\(-?\w+<?([^>,]*)>?, "([^"]+)", -?\w+<?([^>,]*)>?, "([^"]+)", RENAME_NOREPLACE\)/);
@@ -386,7 +408,7 @@ export function checkOrder(trace) {
       if (!m || !ok(text)) continue;
       const from = path.resolve(m[1] || '/', real(pid, m[2])), to = path.resolve(m[3] || '/', real(pid, m[4]));
       if (/\/fgos\/git\/operations\/[^/]+\/\d{8}\.json$/.test(to)) installs.push({ at, from, to, how });
-      else if (/\.lock$/.test(from) && /\/refs\//.test(to)) refRenames.push({ at, to });
+      else if (/\.lock$/.test(from) && /\/refs\//.test(to)) refRenames.push({ at, to, from });
       else if (/\/packed-refs$/.test(to)) refRenames.push({ at, to, from });
     }
   });
@@ -405,6 +427,36 @@ export function checkOrder(trace) {
   }
   for (const r of refRenames.filter((x) => x.from && /\/packed-refs$/.test(x.to))) {
     if (!fsyncedBefore(r.from, r.at)) violations.push(`R9 ${r.to}: new file not fsynced before it was renamed into place`);
+  }
+  // R10/R11: an operation's reachability pin. Its ref file (flushed under the lock name before
+  // the rename, or under its own name after it) and every directory from its own up to the common
+  // directory are flushed before the first target attempt; the directory that lost an entry when
+  // the pin was deleted is flushed before `pinReleased`.
+  const pinRefs = refRenames.filter((x) => /\/refs\/fgos\/git-operations\/[^/]+\/candidate$/.test(x.to));
+  const pins = [];
+  for (const r of pinRefs) {
+    const op = path.basename(path.dirname(r.to));
+    const chain = records.filter((q) => q.op === op);
+    const attempt = chain.find((q) => q.phase === 'target-attempt');
+    const row = { op, pin: r.to };
+    pins.push(row);
+    if (!attempt) { row.note = 'no target attempt (not judged)'; continue; }
+    const fileSynced = fsyncs.some((x) => (x.path === r.from && x.at < r.at) || (x.path === r.to && x.at > r.at && x.at < attempt.at));
+    if (!fileSynced) violations.push(`R10 ${op}: pin ref file not fsynced before the target attempt`);
+    const common = path.resolve(r.to, ...Array(5).fill('..'));
+    for (let dir = path.dirname(r.to); ; dir = path.dirname(dir)) {
+      if (!fsyncedAfter(dir, r.at, attempt.at)) violations.push(`R10 ${op}: ${dir} not fsynced between the pin rename and the target attempt`);
+      if (dir === common) break;
+    }
+    const released = chain.find((q) => q.phase === 'pin-released');
+    if (!released) continue;
+    const pinDir = path.dirname(r.to);
+    const namespace = path.join(common, 'refs/fgos');
+    const ofPin = (x) => x === r.to || x === `${r.to}.lock` || (x.startsWith(`${namespace}/`) && (pinDir === x || pinDir.startsWith(`${x}/`)));
+    const gone = removals.filter((x) => x.at > attempt.at && x.at < released.at && ofPin(x.path)).at(-1);
+    row.release = gone ? path.dirname(gone.path) : null;
+    if (!gone) { row.note = 'no pin removal observed (reftable)'; continue; }
+    if (!fsyncedAfter(path.dirname(gone.path), gone.at, released.at)) violations.push(`R11 ${op}: ${path.dirname(gone.path)} not fsynced between the pin removal and pinReleased`);
   }
   const byOp = Map.groupBy(records, (r) => r.op);
   const ops = [];
@@ -458,7 +510,7 @@ export function checkOrder(trace) {
     }
     ops.push(row);
   }
-  return { records: records.length, operations: ops, fsyncs: fsyncs.length, refRenames: refRenames.length, violations };
+  return { records: records.length, pins, operations: ops, fsyncs: fsyncs.length, refRenames: refRenames.length, violations };
 }
 
 async function traceMode(args) {
@@ -468,7 +520,7 @@ async function traceMode(args) {
   const descriptor = args.descriptor ?? await stageDescriptor(root, { ...args, cleanup: true });
   const out = path.join(root, 'e1.strace');
   const plan = path.join(root, 'plan.jsonl');
-  execFileSync('strace', ['-f', '-qq', '-yy', '-s', '4096', '-e', 'trace=write,pwrite64,fsync,fdatasync,rename,renameat,renameat2,link,linkat,openat,mkdir,mkdirat', '-o', out,
+  execFileSync('strace', ['-f', '-qq', '-yy', '-s', '4096', '-e', 'trace=write,pwrite64,fsync,fdatasync,rename,renameat,renameat2,link,linkat,openat,mkdir,mkdirat,unlink,unlinkat,rmdir', '-o', out,
     process.execPath, SELF, 'workload', '--root', path.join(root, 'device'), '--descriptor', descriptor, '--plan', plan, '--kind', args.kind ?? 'publication', '--ops', String(args.ops ?? 12)], { stdio: 'inherit' });
   const verdict = checkOrder(fs.readFileSync(out, 'utf8'));
   verdict.trace = out;
