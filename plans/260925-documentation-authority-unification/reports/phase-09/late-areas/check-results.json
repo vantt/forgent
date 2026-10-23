@@ -1,0 +1,95 @@
+[
+  {
+    "command": [
+      "node",
+      "scripts/check-legacy-docs-ratchet.mjs"
+    ],
+    "exit": 0,
+    "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-01.log",
+    "stdoutSha256": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319"
+  },
+  {
+    "command": [
+      "node",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/verify-late-areas.mjs"
+    ],
+    "exit": 0,
+    "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-02.log",
+    "stdoutSha256": "73944e1bcbf80f1ffb0a2c737e92199f5a2d2f9296805af6ccbd812e2861828f"
+  },
+  {
+    "command": [
+      "node",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs",
+      "--check"
+    ],
+    "exit": 0,
+    "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-03.log",
+    "stdoutSha256": "dcd7669f6cb6c077b7c72ff492ad5cfbff50c973323092018107b90dc96918c3"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-04.log",
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "node",
+      "scripts/list-doc-anchors.mjs",
+      "--check",
+      "docs/platform/seat-binding/spec.md#spec-seat-binding-một-authority-cho-câu-hỏi-ghế-này-chạy-bằng-gì"
+    ],
+    "exit": 0,
+    "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-05.log",
+    "stdoutSha256": "9d579a33e2504cd144a49964d4340b6d4d4cfbec23db71a2dfb6f686e7de9691"
+  },
+  {
+    "command": [
+      "node",
+      "scripts/list-doc-anchors.mjs",
+      "--check",
+      "docs/platform/workflow/spec.md#spec-workflow-guide-case-admission"
+    ],
+    "exit": 0,
+    "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-06.log",
+    "stdoutSha256": "2998c8c32b2eccc8c7942fa18e62af97c4e56c23dfba5d5b8bcca7e0f6aa9240"
+  },
+  {
+    "command": [
+      "node",
+      "scripts/list-doc-anchors.mjs",
+      "--check",
+      "docs/platform/work-state/contracts/knowledge-registry.md#spec-soạn-nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring"
+    ],
+    "exit": 0,
+    "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-07.log",
+    "stdoutSha256": "b290ec38764e71958178d8abfc50015c6888293f876b1ca54a8cf36524d005e0"
+  },
+  {
+    "command": [
+      "node",
+      "scripts/list-doc-anchors.mjs",
+      "--check",
+      "docs/platform/work-state/contracts/knowledge-registry.md#spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index"
+    ],
+    "exit": 0,
+    "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-08.log",
+    "stdoutSha256": "8d1d5caf4133eaec6944054039927802eaeb8f30ae562659701d50f3abffd51d"
+  },
+  {
+    "command": [
+      "python3",
+      "-B",
+      "-c",
+      "import json,hashlib;from pathlib import Path;s=json.loads(Path('plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json').read_text());rows=s['unitCarries'];assert len(rows)==365;assert all(hashlib.sha256((json.dumps({k:r.get(k) for k in ['targetOwner','targetAnchor','targetUnitDigest','targetAncestry']},sort_keys=True,ensure_ascii=False,separators=(',',':'))+'\\n').encode()).hexdigest()==r['bindingSha256'] for r in rows);print('365/365 independent Python binding hashes equal')"
+    ],
+    "exit": 0,
+    "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-09.log",
+    "stdoutSha256": "f283c532ffd9c36222e72743044f91d7570a2344db22dffaa1180a0bca15124e"
+  }
+]

@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "status": "author-verification-pass; independent review pending",
+  "sourcePin": "282afe45e67a3d8719614e338c55cab86ec41347",
+  "sourceUnits": 295,
+  "equalNativeDigests": 250,
+  "adaptedNativeDigests": 45,
+  "registeredIdentityRefs": 286,
+  "currentIdentityGaps": 9,
+  "additiveRebindings": 70,
+  "candidateMetadata": {
+    "findings": [],
+    "counts": {
+      "files": 3,
+      "byStatus": {
+        "promoted": 0,
+        "candidate": 3,
+        "legacy-current": 0,
+        "non-authority": 0,
+        "unrouted": 0
+      },
+      "exemptUnrouted": 0,
+      "checked": 3,
+      "findings": 0,
+      "byType": {}
+    }
+  },
+  "successorRoutes": 4,
+  "checkedRelativeLinks": 30,
+  "checks": [
+    "one current binding per native source unit including front matter and heading context",
+    "source and target complete unit digests, content, ancestry and binding hashes",
+    "verbatim full-source reconstruction except enumerated header/link/heading-depth adaptations",
+    "old registry prose unchanged after removing added candidate header",
+    "only Seat Binding and Workflow row links changed in component-boundary",
+    "switchboard statuses and unrelated rows unchanged; explicit successor files and anchors resolve",
+    "all new candidate markdown links resolve without retiring-tree destinations"
+  ],
+  "needsWrites": []
+}

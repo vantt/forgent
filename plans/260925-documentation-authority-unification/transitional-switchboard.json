@@ -753,13 +753,19 @@
           "scope": "authoring-guide-and-profile-rules",
           "route": "docs/specs/enduser-docs-authoring.md",
           "authorityStatus": "non-authority",
-          "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+          "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)",
+          "candidateSuccessor": "docs/platform/work-state/contracts/knowledge-registry.md#spec-soạn-nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring",
+          "successorStatus": "candidate",
+          "authority": "L13-4; no cutover or authority promotion"
         },
         {
           "scope": "tag-and-metadata-index-spec",
           "route": "docs/specs/enduser-docs-index.md",
           "authorityStatus": "non-authority",
-          "role": "End-user tag and metadata index specification (user profile)"
+          "role": "End-user tag and metadata index specification (user profile)",
+          "candidateSuccessor": "docs/platform/work-state/contracts/knowledge-registry.md#spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index",
+          "successorStatus": "candidate",
+          "authority": "L13-4; no cutover or authority promotion"
         },
         {
           "scope": "generated-registry-projection",
@@ -780,13 +786,19 @@
           "scope": "authoring-guide-and-profile-rules",
           "route": "docs/specs/enduser-docs-authoring.md",
           "authorityStatus": "non-authority",
-          "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+          "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)",
+          "candidateSuccessor": "docs/platform/work-state/contracts/knowledge-registry.md#spec-soạn-nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring",
+          "successorStatus": "candidate",
+          "authority": "L13-4; no cutover or authority promotion"
         },
         {
           "scope": "tag-and-metadata-index-spec",
           "route": "docs/specs/enduser-docs-index.md",
           "authorityStatus": "non-authority",
-          "role": "End-user tag and metadata index specification (user profile)"
+          "role": "End-user tag and metadata index specification (user profile)",
+          "candidateSuccessor": "docs/platform/work-state/contracts/knowledge-registry.md#spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index",
+          "successorStatus": "candidate",
+          "authority": "L13-4; no cutover or authority promotion"
         },
         {
           "scope": "generated-registry-projection",
@@ -1205,6 +1217,40 @@
         }
       ],
       "scopeSummary": "Candidate platform-wide contract collection; existing source authority is unchanged."
+    },
+    {
+      "area": "Seat Binding",
+      "authorityStatus": "legacy-current",
+      "fileClasses": ["maintained-authority"],
+      "entryPoint": "docs/platform/seat-binding/spec.md",
+      "canonicalRoute": "docs/specs/seat-binding.md",
+      "canonicalRoutes": ["docs/specs/seat-binding.md"],
+      "scopedRoutes": [
+        {"route":"docs/specs/seat-binding.md","authorityStatus":"legacy-current","scope":"agent-seat-choice","candidateSuccessor":"docs/platform/seat-binding/spec.md","successorStatus":"candidate","role":"Current source; L13-4 verbatim candidate carry, no promotion"},
+        {"route":"docs/platform/seat-binding/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate carry only; current source authority unchanged"}
+      ],
+      "currentRoutes": [
+        {"route":"docs/specs/seat-binding.md","authorityStatus":"legacy-current","scope":"agent-seat-choice","candidateSuccessor":"docs/platform/seat-binding/spec.md","successorStatus":"candidate","role":"Current source; L13-4 verbatim candidate carry, no promotion"},
+        {"route":"docs/platform/seat-binding/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate carry only; current source authority unchanged"}
+      ],
+      "scopeSummary": "Seat choice policy and ranking; candidate carry authorized by L13-4, no cutover."
+    },
+    {
+      "area": "Workflow",
+      "authorityStatus": "legacy-current",
+      "fileClasses": ["maintained-authority"],
+      "entryPoint": "docs/platform/workflow/spec.md",
+      "canonicalRoute": "docs/specs/workflow.md",
+      "canonicalRoutes": ["docs/specs/workflow.md"],
+      "scopedRoutes": [
+        {"route":"docs/specs/workflow.md","authorityStatus":"legacy-current","scope":"guide-case-admission","candidateSuccessor":"docs/platform/workflow/spec.md","successorStatus":"candidate","role":"Current source; L13-4 verbatim candidate carry, no promotion"},
+        {"route":"docs/platform/workflow/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate carry only; current source authority unchanged"}
+      ],
+      "currentRoutes": [
+        {"route":"docs/specs/workflow.md","authorityStatus":"legacy-current","scope":"guide-case-admission","candidateSuccessor":"docs/platform/workflow/spec.md","successorStatus":"candidate","role":"Current source; L13-4 verbatim candidate carry, no promotion"},
+        {"route":"docs/platform/workflow/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate carry only; current source authority unchanged"}
+      ],
+      "scopeSummary": "Guide, case ledger and admission; candidate carry authorized by L13-4, no cutover."
     },
     {
       "area": "Identity — local writer (section 7a)",

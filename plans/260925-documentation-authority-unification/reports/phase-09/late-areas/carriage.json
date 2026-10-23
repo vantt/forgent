@@ -1,0 +1,325 @@
+{
+  "version": 1,
+  "sourcePin": "282afe45e67a3d8719614e338c55cab86ec41347",
+  "documents": [
+    {
+      "source": "docs/specs/seat-binding.md",
+      "target": "docs/platform/seat-binding/spec.md",
+      "sourceSha256": "d297de21e54e8a8f1cf32b71b288036154f285065d86e0002b352b4a92ebeb13",
+      "targetSha256": "889238fafc53603da579ac45f0a7a38019d6fd96135b22227cbd67526a598158",
+      "transformation": "Original front matter and prose retained; txt candidate header inserted after H1; relative markdown link destinations rebased or routed to candidate successors.",
+      "sourceUnits": 99
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "target": "docs/platform/workflow/spec.md",
+      "sourceSha256": "df63011fa93f440316bf2e0367b1757568c5323d2c45c7815894a69ef63c2e34",
+      "targetSha256": "eca6ef9f7a0b1973fdc35d22c87d01cf126cf587209cc649888cb2559982d3f3",
+      "transformation": "Original front matter and prose retained; txt candidate header inserted after H1; relative markdown link destinations rebased or routed to candidate successors.",
+      "sourceUnits": 147
+    },
+    {
+      "source": "docs/specs/enduser-docs-authoring.md",
+      "target": "docs/platform/work-state/contracts/knowledge-registry.md",
+      "sourceSha256": "1d306eedfc56a43f3d5a01e0e888ec7009a103c72e7e6d22347bbfa5c816143b",
+      "transformation": "All prose and original metadata retained; source front matter fenced under source H1; all headings deepened by one.",
+      "sourceUnits": 20,
+      "targetSha256": "5131101af68485a6775a11f437e878612675541fddecba082e48afbc740ee630"
+    },
+    {
+      "source": "docs/specs/enduser-docs-index.md",
+      "target": "docs/platform/work-state/contracts/knowledge-registry.md",
+      "sourceSha256": "10774136285a478f23fc87bc573621444f72162d33de7d9cc958e5b3f5973f0e",
+      "transformation": "All prose and original metadata retained; source front matter fenced under source H1; all headings deepened by one.",
+      "sourceUnits": 29,
+      "targetSha256": "5131101af68485a6775a11f437e878612675541fddecba082e48afbc740ee630"
+    }
+  ],
+  "linkChanges": [
+    {
+      "source": "docs/specs/seat-binding.md",
+      "line": 12,
+      "original": "runner.md",
+      "sourceReferent": "docs/specs/runner.md",
+      "target": "../runner/spec.md",
+      "targetReferent": "docs/platform/runner/spec.md",
+      "kind": "candidate-successor"
+    },
+    {
+      "source": "docs/specs/seat-binding.md",
+      "line": 40,
+      "original": "../platform/component-boundary.md",
+      "sourceReferent": "docs/platform/component-boundary.md",
+      "target": "../component-boundary.md",
+      "targetReferent": "docs/platform/component-boundary.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/seat-binding.md",
+      "line": 397,
+      "original": "../../plans/reports/spec-draft-261020-2028-seat-binding-component-consolidated.md",
+      "sourceReferent": "plans/reports/spec-draft-261020-2028-seat-binding-component-consolidated.md",
+      "target": "../../../plans/reports/spec-draft-261020-2028-seat-binding-component-consolidated.md",
+      "targetReferent": "plans/reports/spec-draft-261020-2028-seat-binding-component-consolidated.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/seat-binding.md",
+      "line": 417,
+      "original": "runner.md",
+      "sourceReferent": "docs/specs/runner.md",
+      "target": "../runner/spec.md",
+      "targetReferent": "docs/platform/runner/spec.md",
+      "kind": "candidate-successor"
+    },
+    {
+      "source": "docs/specs/seat-binding.md",
+      "line": 433,
+      "original": "runner.md",
+      "sourceReferent": "docs/specs/runner.md",
+      "target": "../runner/spec.md",
+      "targetReferent": "docs/platform/runner/spec.md",
+      "kind": "candidate-successor"
+    },
+    {
+      "source": "docs/specs/seat-binding.md",
+      "line": 436,
+      "original": "../platform/component-boundary.md",
+      "sourceReferent": "docs/platform/component-boundary.md",
+      "target": "../component-boundary.md",
+      "targetReferent": "docs/platform/component-boundary.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/seat-binding.md",
+      "line": 443,
+      "original": "../../plans/reports/spec-draft-261020-2028-seat-binding-component-consolidated.md",
+      "sourceReferent": "plans/reports/spec-draft-261020-2028-seat-binding-component-consolidated.md",
+      "target": "../../../plans/reports/spec-draft-261020-2028-seat-binding-component-consolidated.md",
+      "targetReferent": "plans/reports/spec-draft-261020-2028-seat-binding-component-consolidated.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/seat-binding.md",
+      "line": 443,
+      "original": "../../plans/reports/spec-draft-261020-1017-seat-binding-component.md",
+      "sourceReferent": "plans/reports/spec-draft-261020-1017-seat-binding-component.md",
+      "target": "../../../plans/reports/spec-draft-261020-1017-seat-binding-component.md",
+      "targetReferent": "plans/reports/spec-draft-261020-1017-seat-binding-component.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/seat-binding.md",
+      "line": 443,
+      "original": "../../plans/reports/council-261020-1547-seat-binding-spec-review.md",
+      "sourceReferent": "plans/reports/council-261020-1547-seat-binding-spec-review.md",
+      "target": "../../../plans/reports/council-261020-1547-seat-binding-spec-review.md",
+      "targetReferent": "plans/reports/council-261020-1547-seat-binding-spec-review.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/seat-binding.md",
+      "line": 443,
+      "original": "../../plans/reports/research-261020-0955-seat-binding-needs-and-mechanisms-inventory.md",
+      "sourceReferent": "plans/reports/research-261020-0955-seat-binding-needs-and-mechanisms-inventory.md",
+      "target": "../../../plans/reports/research-261020-0955-seat-binding-needs-and-mechanisms-inventory.md",
+      "targetReferent": "plans/reports/research-261020-0955-seat-binding-needs-and-mechanisms-inventory.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/seat-binding.md",
+      "line": 443,
+      "original": "../../plans/reports/research-261020-1339-model-family-tier-ladders.md",
+      "sourceReferent": "plans/reports/research-261020-1339-model-family-tier-ladders.md",
+      "target": "../../../plans/reports/research-261020-1339-model-family-tier-ladders.md",
+      "targetReferent": "plans/reports/research-261020-1339-model-family-tier-ladders.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/seat-binding.md",
+      "line": 444,
+      "original": "runner.md",
+      "sourceReferent": "docs/specs/runner.md",
+      "target": "../runner/spec.md",
+      "targetReferent": "docs/platform/runner/spec.md",
+      "kind": "candidate-successor"
+    },
+    {
+      "source": "docs/specs/seat-binding.md",
+      "line": 444,
+      "original": "workflow.md",
+      "sourceReferent": "docs/specs/workflow.md",
+      "target": "../workflow/spec.md",
+      "targetReferent": "docs/platform/workflow/spec.md",
+      "kind": "candidate-successor"
+    },
+    {
+      "source": "docs/specs/seat-binding.md",
+      "line": 445,
+      "original": "../platform/component-boundary.md",
+      "sourceReferent": "docs/platform/component-boundary.md",
+      "target": "../component-boundary.md",
+      "targetReferent": "docs/platform/component-boundary.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/seat-binding.md",
+      "line": 446,
+      "original": "../platform/identity/spec.md",
+      "sourceReferent": "docs/platform/identity/spec.md",
+      "target": "../identity/spec.md",
+      "targetReferent": "docs/platform/identity/spec.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 12,
+      "original": "runner.md",
+      "sourceReferent": "docs/specs/runner.md",
+      "target": "../runner/spec.md",
+      "targetReferent": "docs/platform/runner/spec.md",
+      "kind": "candidate-successor"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 12,
+      "original": "../../plans/261019-1238-workflow-case-ledger-and-admission/plan.md",
+      "sourceReferent": "plans/261019-1238-workflow-case-ledger-and-admission/plan.md",
+      "target": "../../../plans/261019-1238-workflow-case-ledger-and-admission/plan.md",
+      "targetReferent": "plans/261019-1238-workflow-case-ledger-and-admission/plan.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 14,
+      "original": "../../plans/reports/brief-261018-2235-agent-workflow-model-owner-direction.md",
+      "sourceReferent": "plans/reports/brief-261018-2235-agent-workflow-model-owner-direction.md",
+      "target": "../../../plans/reports/brief-261018-2235-agent-workflow-model-owner-direction.md",
+      "targetReferent": "plans/reports/brief-261018-2235-agent-workflow-model-owner-direction.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 14,
+      "original": "../../plans/reports/research-261018-2239-workflow-design-intent-and-current-state.md",
+      "sourceReferent": "plans/reports/research-261018-2239-workflow-design-intent-and-current-state.md",
+      "target": "../../../plans/reports/research-261018-2239-workflow-design-intent-and-current-state.md",
+      "targetReferent": "plans/reports/research-261018-2239-workflow-design-intent-and-current-state.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 14,
+      "original": "../../plans/reports/review-261019-0930-agent-workflow-model-ba-spec.md",
+      "sourceReferent": "plans/reports/review-261019-0930-agent-workflow-model-ba-spec.md",
+      "target": "../../../plans/reports/review-261019-0930-agent-workflow-model-ba-spec.md",
+      "targetReferent": "plans/reports/review-261019-0930-agent-workflow-model-ba-spec.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 355,
+      "original": "seat-binding.md",
+      "sourceReferent": "docs/specs/seat-binding.md",
+      "target": "../seat-binding/spec.md",
+      "targetReferent": "docs/platform/seat-binding/spec.md",
+      "kind": "candidate-successor"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 403,
+      "original": "seat-binding.md",
+      "sourceReferent": "docs/specs/seat-binding.md",
+      "target": "../seat-binding/spec.md",
+      "targetReferent": "docs/platform/seat-binding/spec.md",
+      "kind": "candidate-successor"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 637,
+      "original": "runner.md",
+      "sourceReferent": "docs/specs/runner.md",
+      "target": "../runner/spec.md",
+      "targetReferent": "docs/platform/runner/spec.md",
+      "kind": "candidate-successor"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 673,
+      "original": "../platform/component-boundary.md",
+      "sourceReferent": "docs/platform/component-boundary.md",
+      "target": "../component-boundary.md",
+      "targetReferent": "docs/platform/component-boundary.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 674,
+      "original": "runner.md",
+      "sourceReferent": "docs/specs/runner.md",
+      "target": "../runner/spec.md",
+      "targetReferent": "docs/platform/runner/spec.md",
+      "kind": "candidate-successor"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 675,
+      "original": "work-state.md",
+      "sourceReferent": "docs/specs/work-state.md",
+      "target": "../work-state/spec.md",
+      "targetReferent": "docs/platform/work-state/spec.md",
+      "kind": "candidate-successor"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 676,
+      "original": "../platform-foundations.md",
+      "sourceReferent": "docs/platform-foundations.md",
+      "target": "../../platform-foundations.md",
+      "targetReferent": "docs/platform-foundations.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 677,
+      "original": "../platform/holder-lock/spec.md",
+      "sourceReferent": "docs/platform/holder-lock/spec.md",
+      "target": "../holder-lock/spec.md",
+      "targetReferent": "docs/platform/holder-lock/spec.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 677,
+      "original": "../platform/event-store/spec.md",
+      "sourceReferent": "docs/platform/event-store/spec.md",
+      "target": "../event-store/spec.md",
+      "targetReferent": "docs/platform/event-store/spec.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 677,
+      "original": "../platform/run-supervisor/spec.md",
+      "sourceReferent": "docs/platform/run-supervisor/spec.md",
+      "target": "../run-supervisor/spec.md",
+      "targetReferent": "docs/platform/run-supervisor/spec.md",
+      "kind": "relative-rebase"
+    },
+    {
+      "source": "docs/specs/workflow.md",
+      "line": 677,
+      "original": "../platform/identity/spec.md",
+      "sourceReferent": "docs/platform/identity/spec.md",
+      "target": "../identity/spec.md",
+      "targetReferent": "docs/platform/identity/spec.md",
+      "kind": "relative-rebase"
+    }
+  ],
+  "counts": {
+    "sourceUnits": 295,
+    "registeredIdentityRefs": 286,
+    "currentIdentityGaps": 9
+  },
+  "originalKnowledgePrefixSha256": "1c1df3cdb5b6ffaac29f06c1fa60e23ca3429afcf798b79905e37f5bc9728e8e"
+}

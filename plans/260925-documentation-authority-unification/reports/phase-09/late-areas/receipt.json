@@ -1,0 +1,328 @@
+{
+  "version": 1,
+  "brief": "plans/260925-documentation-authority-unification/reports/phase-09/w2-d6-brief.md",
+  "authority": "L13-4",
+  "author": "fgos-run_unit-run-17927628380ac6",
+  "sourcePin": "282afe45e67a3d8719614e338c55cab86ec41347",
+  "status": "authored-and-verified-pending-independent-review",
+  "createdAt": "2026-10-23T13:48:43.706744+00:00",
+  "productArtifacts": [
+    {
+      "path": "docs/platform/seat-binding/spec.md",
+      "sha256": "889238fafc53603da579ac45f0a7a38019d6fd96135b22227cbd67526a598158",
+      "bytes": 54489
+    },
+    {
+      "path": "docs/platform/workflow/spec.md",
+      "sha256": "eca6ef9f7a0b1973fdc35d22c87d01cf126cf587209cc649888cb2559982d3f3",
+      "bytes": 103746
+    },
+    {
+      "path": "docs/platform/work-state/contracts/knowledge-registry.md",
+      "sha256": "5131101af68485a6775a11f437e878612675541fddecba082e48afbc740ee630",
+      "bytes": 43116
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "sha256": "c7cb30642e6f0b661cba21f79ded76a2388d010392181285bf925bfaf49f7443",
+      "bytes": 113310
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/transitional-switchboard.json",
+      "sha256": "d7b0dfcd7457519b2f59d5fb61e65334f17efa40cd8240df78722904dcfeca92",
+      "bytes": 75537
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+      "sha256": "6e282efbe74924207b6988c77c40d45c9d423b6a68831789548c2f7f6144c445",
+      "bytes": 1202192
+    }
+  ],
+  "sourceArtifacts": [
+    {
+      "path": "docs/specs/seat-binding.md",
+      "sha256": "d297de21e54e8a8f1cf32b71b288036154f285065d86e0002b352b4a92ebeb13",
+      "bytes": 53861
+    },
+    {
+      "path": "docs/specs/workflow.md",
+      "sha256": "df63011fa93f440316bf2e0367b1757568c5323d2c45c7815894a69ef63c2e34",
+      "bytes": 103134
+    },
+    {
+      "path": "docs/specs/enduser-docs-authoring.md",
+      "sha256": "1d306eedfc56a43f3d5a01e0e888ec7009a103c72e7e6d22347bbfa5c816143b",
+      "bytes": 8989
+    },
+    {
+      "path": "docs/specs/enduser-docs-index.md",
+      "sha256": "10774136285a478f23fc87bc573621444f72162d33de7d9cc958e5b3f5973f0e",
+      "bytes": 19960
+    }
+  ],
+  "conservation": {
+    "sourceUnits": 295,
+    "equalNativeDigests": 250,
+    "adaptedNativeDigests": 45,
+    "registeredIdentityRefs": 286,
+    "currentIdentityGaps": 9,
+    "additiveRebindings": 70,
+    "successorRoutes": 4,
+    "checkedRelativeLinks": 30
+  },
+  "bindingCollection": "s12-late-areas.json unitCarries; claims/registryGaps intentionally empty to avoid duplicate native disposition decisions",
+  "bindingHashEncodingSource": "reports/phase-08/step-08-preflip-gates.json#/changedBindings/11/bindingHashEncoding",
+  "driftScan": {
+    "finalSourcePin": "5e03159334df726e43ffe9505ad4ed43f72ba94d",
+    "inventoryPin": "f0c76c5e590339d9c815038539ff1f4a072c64e4",
+    "postFinalPinFiles": 3,
+    "postInventoryPinFiles": 33,
+    "files": 33,
+    "filesWithUnprovenChange": 26,
+    "missingChangedUnits": 184,
+    "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json",
+    "qualification": "Unproven strict unit carriage is not semantic loss. Both source windows retained. Packaging/runner re-sync belongs to D1b."
+  },
+  "checks": [
+    {
+      "command": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "exit": 0,
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-01.log",
+      "stdoutSha256": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319"
+    },
+    {
+      "command": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/verify-late-areas.mjs"
+      ],
+      "exit": 0,
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-02.log",
+      "stdoutSha256": "73944e1bcbf80f1ffb0a2c737e92199f5a2d2f9296805af6ccbd812e2861828f"
+    },
+    {
+      "command": [
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs",
+        "--check"
+      ],
+      "exit": 0,
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-03.log",
+      "stdoutSha256": "dcd7669f6cb6c077b7c72ff492ad5cfbff50c973323092018107b90dc96918c3"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-04.log",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/list-doc-anchors.mjs",
+        "--check",
+        "docs/platform/seat-binding/spec.md#spec-seat-binding-một-authority-cho-câu-hỏi-ghế-này-chạy-bằng-gì"
+      ],
+      "exit": 0,
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-05.log",
+      "stdoutSha256": "9d579a33e2504cd144a49964d4340b6d4d4cfbec23db71a2dfb6f686e7de9691"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/list-doc-anchors.mjs",
+        "--check",
+        "docs/platform/workflow/spec.md#spec-workflow-guide-case-admission"
+      ],
+      "exit": 0,
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-06.log",
+      "stdoutSha256": "2998c8c32b2eccc8c7942fa18e62af97c4e56c23dfba5d5b8bcca7e0f6aa9240"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/list-doc-anchors.mjs",
+        "--check",
+        "docs/platform/work-state/contracts/knowledge-registry.md#spec-soạn-nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring"
+      ],
+      "exit": 0,
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-07.log",
+      "stdoutSha256": "b290ec38764e71958178d8abfc50015c6888293f876b1ca54a8cf36524d005e0"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/list-doc-anchors.mjs",
+        "--check",
+        "docs/platform/work-state/contracts/knowledge-registry.md#spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index"
+      ],
+      "exit": 0,
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-08.log",
+      "stdoutSha256": "8d1d5caf4133eaec6944054039927802eaeb8f30ae562659701d50f3abffd51d"
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "-c",
+        "import json,hashlib;from pathlib import Path;s=json.loads(Path('plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json').read_text());rows=s['unitCarries'];assert len(rows)==365;assert all(hashlib.sha256((json.dumps({k:r.get(k) for k in ['targetOwner','targetAnchor','targetUnitDigest','targetAncestry']},sort_keys=True,ensure_ascii=False,separators=(',',':'))+'\\n').encode()).hexdigest()==r['bindingSha256'] for r in rows);print('365/365 independent Python binding hashes equal')"
+      ],
+      "exit": 0,
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-09.log",
+      "stdoutSha256": "f283c532ffd9c36222e72743044f91d7570a2344db22dffaa1180a0bca15124e"
+    }
+  ],
+  "singleFileTests": [
+    {
+      "test": "test/scripts/check-doc-candidate-status.test.mjs",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+        "node",
+        "--test",
+        "test/scripts/check-doc-candidate-status.test.mjs"
+      ],
+      "cwd": "/tmp/fgos-work/w2-d6-checks-01/checkout",
+      "exit": 0,
+      "stdoutSha256": "840a59120f1282ddbe7991fecb40d30efd5cbd370d988f4f002fe227025ba568",
+      "summary": [
+        "ℹ tests 11",
+        "ℹ pass 11",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "scratchLog": "/tmp/fgos-work/w2-d6-checks-01/01.log",
+      "qualification": "Unchanged current Node source/tests against digest-verified activated addon via the existing shipped-package descriptor. Temporary test repositories may use git init/add; no git write in this checkout. Not Rust working-tree freshness.",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/01.log"
+    },
+    {
+      "test": "test/scripts/list-doc-anchors.test.mjs",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "FGOS_HOST_BIN=/home/vantt/.local/state/fgos/releases/sha256:447cb9a40339333a4ef51c33b9bc39c33a7b2dff31618e2f4296ef427c734d06/bin/fgos",
+        "node",
+        "--test",
+        "test/scripts/list-doc-anchors.test.mjs"
+      ],
+      "cwd": "/tmp/fgos-work/w2-d6-checks-01/checkout",
+      "exit": 0,
+      "stdoutSha256": "671ac645a6d70146d13bb19379b1538444f2ffe5c5b7ef3dac68904fb7f8b1cd",
+      "summary": [
+        "ℹ tests 3",
+        "ℹ pass 3",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ],
+      "scratchLog": "/tmp/fgos-work/w2-d6-checks-01/02.log",
+      "qualification": "Unchanged current Node source/tests against digest-verified activated addon via the existing shipped-package descriptor. Temporary test repositories may use git init/add; no git write in this checkout. Not Rust working-tree freshness.",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/02.log"
+    }
+  ],
+  "testTotals": {
+    "files": 2,
+    "tests": 14,
+    "pass": 14,
+    "fail": 0,
+    "skipped": 0
+  },
+  "candidateMetadata": {
+    "findings": [],
+    "counts": {
+      "files": 3,
+      "byStatus": {
+        "promoted": 0,
+        "candidate": 3,
+        "legacy-current": 0,
+        "non-authority": 0,
+        "unrouted": 0
+      },
+      "exemptUnrouted": 0,
+      "checked": 3,
+      "findings": 0,
+      "byType": {}
+    }
+  },
+  "initialOptionalCheckerAttempt": {
+    "command": [
+      "node",
+      "scripts/check-doc-candidate-status.mjs",
+      "--json"
+    ],
+    "exit": null,
+    "result": "timed-out-after-60-seconds; no checker verdict",
+    "observed": "Existing ensureScriptAddon fallback auto-built fgos-node-addon; Cargo reported successful dev build after 45.14 seconds. That door then stages checkout-local artifacts rather than merely using FGOS_HOST_BIN.",
+    "potentialIncidentalArtifacts": [
+      "target/",
+      ".fgos/runtime/git-addon/<checkout-hash>/"
+    ],
+    "custody": "Not subsequently inspected or cleaned under the no-.fgos/exact-writes boundary. Absence of incidental runtime artifacts is not certified. Later checks used pure metadata checking and shipped-addon scratch copies.",
+    "countedAsProof": false
+  },
+  "impactAnalysis": "degraded/unqueried under no-CLI boundary; no production symbols changed",
+  "notRun": [
+    "npm test",
+    "scripts/run-tests.mjs",
+    "cargo test --workspace",
+    "live fgOS lifecycle/CLI operations against this repository",
+    "Markdown preview service"
+  ],
+  "reused": [
+    "native markdown conservation extractor and anchor checker",
+    "D1 unitCarries placement convention",
+    "D1 shipped native-addon descriptor scratch-proof recipe",
+    "existing candidate metadata checker and unchanged owning tests"
+  ],
+  "writeScopeCheck": {
+    "allSourceChangesInDeclaredScope": true,
+    "paths": [
+      "docs/platform/component-boundary.md",
+      "docs/platform/seat-binding/spec.md",
+      "docs/platform/work-state/contracts/knowledge-registry.md",
+      "docs/platform/workflow/spec.md",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s12-late-areas.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/binding-refresh.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/carriage.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/check-results.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/legacy-drift.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/receipt.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/receipt.md",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/replay-checks.py",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/scan-legacy-drift.mjs",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/01.log",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/02.log",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-01.log",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-02.log",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-03.log",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-04.log",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-05.log",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-06.log",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-07.log",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-08.log",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-evidence/check-09.log",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/test-results.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/verification.json",
+      "plans/260925-documentation-authority-unification/reports/phase-09/late-areas/verify-late-areas.mjs",
+      "plans/260925-documentation-authority-unification/transitional-switchboard.json"
+    ]
+  },
+  "handoff": [
+    "Independent review pending; no approvals inherited.",
+    "Join 70 supersedesBinding overlays by prior shard/collection/index; old shards unchanged.",
+    "Nine current-identity gaps remain explicit; no native IDs minted.",
+    "Re-enumerate legacy drift at final source pin; do not infer candidate freshness only from matching old target digests.",
+    "Broader area repairs, gate acceptance, pair accounting and preview belong to Lead/owners."
+  ],
+  "needsWrites": []
+}

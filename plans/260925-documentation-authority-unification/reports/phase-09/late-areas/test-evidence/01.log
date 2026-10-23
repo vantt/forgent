@@ -1,0 +1,19 @@
+✔ status comes only from the switchboard (5.26812ms)
+✔ a Design status header never changes the computed status (16.263887ms)
+✔ a candidate missing candidateCore fields is reported; a complete one is clean (5.992177ms)
+✔ a headerless candidate is reported (0.889801ms)
+✔ a promoted document needs the governance baseline plus the promotion extras (4.893556ms)
+✔ unresolved relative links and Related paths are reported, resolved ones are not (1.991264ms)
+✔ link and Related extraction helpers (0.365675ms)
+✔ runCli is report-only by default and fatal under --strict (553.197315ms)
+✔ the real switchboard routes every promoted and candidate area entry point (36.844045ms)
+✔ a routed document that matches no placement pattern is reported, and an ambiguous switchboard route is surfaced (1.679088ms)
+✔ strict candidate status includes untracked Markdown but not ignored draft files (87.504385ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1061.598291
