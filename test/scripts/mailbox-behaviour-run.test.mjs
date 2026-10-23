@@ -34,6 +34,7 @@ import {
   CODEX_FEATURES_OFF,
 } from '../../scripts/lib/mailbox-behaviour-run.mjs';
 import { SENDERS, cellTable } from '../../scripts/lib/mailbox-behaviour-score.mjs';
+import * as runs from '../../scripts/lib/mailbox-behaviour-run.mjs';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const FIXTURES = path.join(REPO, 'test', 'fixtures', 'mailbox-behaviour');
@@ -185,4 +186,28 @@ test('an arm\'s run id names its arm, and an unfinished arm run is recovered int
   const results = path.join(base, 'results.jsonl');
   const { appended } = recoverLedger(base, results);
   assert.deepEqual(appended.map((l) => [l.runId, l.cell, l.arm]), [['codex.P.LR.PT.007', 'codex/P/LR/PT', 'P']]);
+});
+
+test('a pi or omp run reads the head\'s session records only, and a provider refusal it exits 0 with is named from its last turn', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'piomp-records-'));
+  const write = (rel, lines) => {
+    fs.mkdirSync(path.dirname(path.join(home, rel)), { recursive: true });
+    fs.writeFileSync(path.join(home, rel), lines.map((l) => JSON.stringify(l)).join('\n'));
+  };
+  const head = { type: 'message', message: { role: 'toolResult', content: [{ type: 'text', text: 'HEAD' }] } };
+  const sub = { type: 'message', message: { role: 'toolResult', content: [{ type: 'text', text: 'SUB' }] } };
+  write(path.join('sessions', '--ws--', 's1.jsonl'), [head]);
+  write(path.join('sessions', '--ws--', 's1', 'Sub.jsonl'), [sub]);
+  assert.deepEqual(runs.modelRecords('pi', home), [head]);
+  const omp = path.join('.omp', 'profiles', runs.RUN_PROFILE, 'agent', 'sessions', '--ws--');
+  write(path.join(omp, 's2.jsonl'), [head]);
+  write(path.join(omp, 's2', 'Sub.jsonl'), [sub]);
+  assert.deepEqual(runs.modelRecords('omp', home), [head], 'an omp subagent\'s records, under its parent\'s directory, are left out');
+
+  const stdout = path.join(home, 'stdout.txt');
+  const end = (message) => JSON.stringify({ type: 'message_end', message: { role: 'assistant', ...message } });
+  fs.writeFileSync(stdout, [end({ content: [{ type: 'text', text: 'ok' }], stopReason: 'toolUse' }), end({ content: [], stopReason: 'error', errorMessage: 'You have hit your usage limit' })].join('\n'));
+  assert.equal(runs.providerErrorOf(stdout), 'You have hit your usage limit');
+  fs.writeFileSync(stdout, end({ content: [{ type: 'text', text: 'done' }], stopReason: 'stop' }));
+  assert.equal(runs.providerErrorOf(stdout), null);
 });
