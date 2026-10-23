@@ -2390,7 +2390,15 @@ impl Inspect for GitDriver {
         if paths.len() > 4096 || max_blob_bytes == 0 || max_blob_bytes > 32 * 1024 * 1024 {
             return Err(failure("invalid-path-read-bounds"));
         }
-        // Validate the root separately so a missing root never becomes absent paths.
+        let miss = match self.read_path_group(
+            repo,
+            &[(revision.clone(), paths.to_vec())],
+            max_blob_bytes,
+        )? {
+            Ok(mut answers) => return Ok(answers.pop().unwrap_or_default()),
+            Err(miss) => miss,
+        };
+        // A missing root never becomes absent paths: name it before anything else.
         let kind = self.checked(
             repo,
             &["cat-file", "-t", revision.as_str()],
@@ -2399,93 +2407,10 @@ impl Inspect for GitDriver {
         if kind != b"commit\n" && kind != b"tree\n" {
             return Err(failure("revision-not-commit-or-tree"));
         }
-        let mut input = Vec::new();
-        for path in paths {
-            if path.is_empty()
-                || path.len() > 4096
-                || path.contains(&0)
-                || path.starts_with(b"/")
-                || path
-                    .split(|b| *b == b'/')
-                    .any(|p| p == b".." || p == b"." || p.is_empty())
-            {
-                return Err(failure("invalid-literal-path"));
-            }
-            input.extend_from_slice(revision.as_str().as_bytes());
-            input.push(b':');
-            input.extend_from_slice(path);
-            input.push(0);
-        }
-        self.require_floor()?;
-        self.preflight(repo)?;
-        let out = self.invoke_input(
-            Some(repo),
-            &repo.trusted_main_root,
-            &["cat-file", "--batch", "-Z"],
-            Policy::Inspect,
-            None,
-            true,
-            PATH_LIMIT,
-            Duration::from_secs(30),
-            &input,
-        )?;
-        if !out.success {
-            return Err(out.error(layout_cause(&repo.layout, "path-read-failed")));
-        }
-        let mut rest = out.stdout.as_slice();
-        let mut result = Vec::new();
-        for path in paths {
-            let end = rest
-                .iter()
-                .position(|b| *b == 0)
-                .ok_or_else(|| failure("invalid-path-header"))?;
-            let header = &rest[..end];
-            rest = &rest[end + 1..];
-            let value = if header.ends_with(b" missing") {
-                object_gap_cause(&repo.layout).map_or(PathValue::Absent, |cause| PathValue::Error(failure(cause)))
-            } else {
-                let fields: Vec<_> = header.split(|b| *b == b' ').collect();
-                if fields.len() != 3 {
-                    return Err(failure("invalid-path-header"));
-                }
-                Oid::parse(
-                    std::str::from_utf8(fields[0]).map_err(|_| failure("invalid-object-oid"))?,
-                    repo.object_format(),
-                )
-                .map_err(|_| failure("invalid-object-oid"))?;
-                let kind = match fields[1] {
-                    b"blob" => ObjectType::Blob,
-                    b"tree" => ObjectType::Tree,
-                    b"commit" => ObjectType::Commit,
-                    b"tag" => ObjectType::Tag,
-                    _ => return Err(failure("invalid-object-type")),
-                };
-                let size = std::str::from_utf8(fields[2])
-                    .ok()
-                    .and_then(|s| s.parse::<usize>().ok())
-                    .ok_or_else(|| failure("invalid-object-size"))?;
-                if size >= rest.len() || rest[size] != 0 {
-                    return Err(failure("invalid-object-size"));
-                }
-                let value = if kind != ObjectType::Blob {
-                    PathValue::NotABlob(kind)
-                } else if size > max_blob_bytes {
-                    PathValue::Error(failure("blob-too-large"))
-                } else {
-                    PathValue::Blob(rest[..size].to_vec())
-                };
-                rest = &rest[size + 1..];
-                value
-            };
-            result.push(PathRead {
-                path: path.clone(),
-                value,
-            });
-        }
-        if !rest.is_empty() {
-            return Err(failure("unexpected-path-output"));
-        }
-        Ok(result)
+        Err(match miss {
+            GroupMiss::Failed(error) => error,
+            GroupMiss::Root => failure("path-read-failed"),
+        })
     }
 
     fn read_paths_at_many(
@@ -2496,14 +2421,15 @@ impl Inspect for GitDriver {
     ) -> Result<Vec<Vec<PathRead>>> {
         // One process answers a bounded group, so a walk page costs a few
         // processes however many commits it holds. Anything the group cannot
-        // answer (a refused root, a failed or oversized process) is re-asked
-        // one revision at a time, which owns the refusal and cause mapping.
+        // answer (a refused root, a failed, oversized or slow process) is
+        // re-asked one revision at a time, which owns the refusal and cause
+        // mapping.
         const GROUP: usize = 64;
         let mut all = Vec::with_capacity(reads.len());
         for group in reads.chunks(GROUP) {
             match self.read_path_group(repo, group, max_blob_bytes)? {
-                Some(answers) => all.extend(answers),
-                None => {
+                Ok(answers) => all.extend(answers),
+                Err(_) => {
                     for (revision, paths) in group {
                         all.push(Inspect::read_paths_at(
                             self,
@@ -2625,6 +2551,14 @@ pub(crate) fn config_facts(driver: &GitDriver, repo: &RepoHandle, key: &str) -> 
         .collect()
 }
 
+/// Why a grouped read has no answer for the caller to return as it is.
+enum GroupMiss {
+    /// The root is missing, or neither a commit nor a tree.
+    Root,
+    /// The request or the process failed with this error.
+    Failed(OperationError),
+}
+
 /// A path that is not a plain relative literal inside a tree.
 fn invalid_literal_path(path: &[u8]) -> bool {
     path.is_empty()
@@ -2643,7 +2577,7 @@ fn next_batch_object(rest: &[u8], format: ObjectFormat) -> Result<BatchObject<'_
     let end = rest
         .iter()
         .position(|b| *b == 0)
-        .ok_or_else(|| refusal("invalid-path-header"))?;
+        .ok_or_else(|| failure("invalid-path-header"))?;
     let header = &rest[..end];
     let rest = &rest[end + 1..];
     if header.ends_with(b" missing") {
@@ -2651,46 +2585,47 @@ fn next_batch_object(rest: &[u8], format: ObjectFormat) -> Result<BatchObject<'_
     }
     let fields: Vec<_> = header.split(|b| *b == b' ').collect();
     if fields.len() != 3 {
-        return Err(refusal("invalid-path-header"));
+        return Err(failure("invalid-path-header"));
     }
     Oid::parse(
-        std::str::from_utf8(fields[0]).map_err(|_| refusal("invalid-object-oid"))?,
+        std::str::from_utf8(fields[0]).map_err(|_| failure("invalid-object-oid"))?,
         format,
     )
-    .map_err(|_| refusal("invalid-object-oid"))?;
+    .map_err(|_| failure("invalid-object-oid"))?;
     let size = std::str::from_utf8(fields[2])
         .ok()
         .and_then(|s| s.parse::<usize>().ok())
-        .ok_or_else(|| refusal("invalid-object-size"))?;
+        .ok_or_else(|| failure("invalid-object-size"))?;
     if size >= rest.len() || rest[size] != 0 {
-        return Err(refusal("invalid-object-size"));
+        return Err(failure("invalid-object-size"));
     }
     Ok((Some((fields[1], &rest[..size])), &rest[size + 1..]))
 }
 
 impl GitDriver {
-    /// Answers `reads` through one `cat-file --batch -Z` process. `Ok(None)`
-    /// means the group needs the per-revision read: a root that is not a
-    /// commit or tree, a failed process, or an absent path in a repository whose
-    /// layout can hide objects. Every refusal of the request itself is an `Err`.
+    /// Answers `reads` through one `cat-file --batch -Z` process, the one place
+    /// that parses its output. `Ok(Err(miss))` means the group has no answer
+    /// and the caller names the cause: a root that is not a commit or tree, an
+    /// invalid path, or a process that failed, overflowed or timed out. A
+    /// malformed request or output is an `Err`.
     fn read_path_group(
         &self,
         repo: &RepoHandle,
         reads: &[(Oid, Vec<Vec<u8>>)],
         max_blob_bytes: usize,
-    ) -> Result<Option<Vec<Vec<PathRead>>>> {
+    ) -> Result<std::result::Result<Vec<Vec<PathRead>>, GroupMiss>> {
         if max_blob_bytes == 0 || max_blob_bytes > 32 * 1024 * 1024 {
-            return Err(refusal("invalid-path-read-bounds"));
+            return Err(failure("invalid-path-read-bounds"));
         }
         let mut input = Vec::new();
         for (revision, paths) in reads {
             Oid::parse(revision.as_str(), repo.object_format())
-                .map_err(|_| refusal("object-format-mismatch"))?;
+                .map_err(|_| failure("object-format-mismatch"))?;
             if paths.len() > 4096 {
-                return Err(refusal("invalid-path-read-bounds"));
+                return Err(failure("invalid-path-read-bounds"));
             }
             if paths.iter().any(|path| invalid_literal_path(path)) {
-                return Err(refusal("invalid-literal-path"));
+                return Ok(Err(GroupMiss::Failed(failure("invalid-literal-path"))));
             }
             // The bare revision answers whether the root exists and what it is,
             // which a path lookup cannot tell apart from an absent path.
@@ -2704,7 +2639,7 @@ impl GitDriver {
             }
         }
         if input.is_empty() {
-            return Ok(Some(Vec::new()));
+            return Ok(Ok(Vec::new()));
         }
         self.require_floor()?;
         self.preflight(repo)?;
@@ -2720,16 +2655,18 @@ impl GitDriver {
             &input,
         );
         // A group whose answers together exceed the output bound or the time
-        // bound still succeeds one revision at a time.
+        // bound may still succeed one revision at a time.
         let out = match out {
             Ok(out) => out,
             Err(e) if matches!(e.cause.as_str(), "git-output-limit" | "git-timeout") => {
-                return Ok(None)
+                return Ok(Err(GroupMiss::Failed(e)));
             }
             Err(e) => return Err(e),
         };
         if !out.success {
-            return Ok(None);
+            return Ok(Err(GroupMiss::Failed(
+                out.error(layout_cause(&repo.layout, "path-read-failed")),
+            )));
         }
         let format = repo.object_format();
         let mut rest = out.stdout.as_slice();
@@ -2738,24 +2675,24 @@ impl GitDriver {
             let (root, after) = next_batch_object(rest, format)?;
             rest = after;
             if !matches!(root, Some((kind, _)) if kind == b"commit" || kind == b"tree") {
-                return Ok(None);
+                return Ok(Err(GroupMiss::Root));
             }
             let mut answer = Vec::with_capacity(paths.len());
             for path in paths {
                 let (object, after) = next_batch_object(rest, format)?;
                 rest = after;
                 let value = match object {
-                    None if repo.layout.promisor || repo.layout.alternates => return Ok(None),
-                    None => PathValue::Absent,
+                    None => object_gap_cause(&repo.layout)
+                        .map_or(PathValue::Absent, |cause| PathValue::Error(failure(cause))),
                     Some((kind, content)) => match kind {
                         b"blob" if content.len() > max_blob_bytes => {
-                            PathValue::Error(refusal("blob-too-large"))
+                            PathValue::Error(failure("blob-too-large"))
                         }
                         b"blob" => PathValue::Blob(content.to_vec()),
                         b"tree" => PathValue::NotABlob(ObjectType::Tree),
                         b"commit" => PathValue::NotABlob(ObjectType::Commit),
                         b"tag" => PathValue::NotABlob(ObjectType::Tag),
-                        _ => return Err(refusal("invalid-object-type")),
+                        _ => return Err(failure("invalid-object-type")),
                     },
                 };
                 answer.push(PathRead {
@@ -2766,9 +2703,9 @@ impl GitDriver {
             answers.push(answer);
         }
         if !rest.is_empty() {
-            return Err(refusal("unexpected-path-output"));
+            return Err(failure("unexpected-path-output"));
         }
-        Ok(Some(answers))
+        Ok(Ok(answers))
     }
 }
 
