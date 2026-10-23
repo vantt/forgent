@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "about": "The closed list of failure ids fgos-config produces. YAML Document refusals pass through with their own rule id and are listed in packages/yaml-doc/contracts/refusal-rules.v1.json, never copied here.",
+  "codes": [
+    { "id": "config-legacy-shadowed", "origin": "spec", "section": "5, 14", "meaning": "config.yaml and config.json both exist in one scope." },
+    { "id": "config-write-conflict", "origin": "spec", "section": "6, 14", "meaning": "The file revision changed between read and write, or the write lock stayed held." },
+    { "id": "config-comment-reason-required", "origin": "spec", "section": "7, 14", "meaning": "A change that differs from the standard carries no usable reason." },
+    { "id": "config-write-confined", "origin": "spec", "section": "6, 14", "meaning": "A confined session called a write door." },
+    { "id": "config-path-symlink", "origin": "spec", "section": "9, 14", "meaning": "A config file or .fgos directory is a symlink or resolves outside its root." },
+    { "id": "config-key-in-wrong-file", "origin": "spec", "section": "3, 14", "meaning": "An account pool or the gateway token sits in a config file." },
+    { "id": "config-accounts-unavailable-confined", "origin": "spec", "section": "9, 14", "meaning": "A confined worker called a verb that needs the account pool." },
+    { "id": "config-parse", "origin": "chosen", "section": "14", "meaning": "A config file does not parse or breaks strict-config." },
+    { "id": "config-schema", "origin": "chosen", "section": "14", "meaning": "The effective value fails a section schema; names the schema path and keyword, never the value." },
+    { "id": "config-key-out-of-scope", "origin": "chosen", "section": "3, 14", "meaning": "A key sits in a file its scope does not allow, or on or above a global-only path." },
+    { "id": "config-format-legacy-json", "origin": "chosen", "section": "5, 13", "meaning": "A write was aimed at a legacy config.json." },
+    { "id": "config-platform-unsupported", "origin": "chosen", "section": "9", "meaning": "The platform has no no-follow open, so a file rule cannot be enforced." }
+  ],
+  "reserved-prefixes": [
+    { "prefix": "schema-", "owner": "annotation lint of the section schemas", "meaning": "Lint rule ids; the list is closed by the lint and appended here when it lands." }
+  ],
+  "not-produced-here": [
+    { "id": "config-addon-missing", "section": "14", "owner": "the Node door", "meaning": "The native addon is missing on the channel; the door names it, this crate never sees it." }
+  ]
+}

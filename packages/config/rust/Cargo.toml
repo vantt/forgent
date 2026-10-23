@@ -1,0 +1,13 @@
+[package]
+name = "fgos-config"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+fgos-yaml-doc = { path = "../../yaml-doc/rust" }
+fgos-durable-file = { path = "../../durable-file/rust" }
+fgos-holder-lock = { path = "../../holder-lock/rust" }
+# Only the writer id types are used; the host provider (and its host-runtime, git and convention edges) stays out.
+fgos-identity = { path = "../../identity/rust", default-features = false }
+serde_json.workspace = true
+sha2.workspace = true

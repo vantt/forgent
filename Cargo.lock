@@ -168,6 +168,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-config"
+version = "0.2.0"
+dependencies = [
+ "fgos-durable-file",
+ "fgos-holder-lock",
+ "fgos-identity",
+ "fgos-yaml-doc",
+ "serde_json",
+ "sha2",
+]
+
+[[package]]
 name = "fgos-convention"
 version = "0.2.0"
 dependencies = [

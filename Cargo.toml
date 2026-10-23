@@ -25,6 +25,7 @@ members = [
     "packages/secrets/rust",
     "packages/seat-binding/rust",
     "packages/yaml-doc/rust",
+    "packages/config/rust",
 ]
 exclude = [
     "herdr-dashboard",

@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "about": "The closed list of x-fgos- annotations of a section schema (spec section 4). The JSON Schema keywords themselves are the standard's and are not copied here. A node that does not state an inheriting annotation takes the nearest ancestor's, then the default.",
+  "annotations": [
+    { "name": "x-fgos-scope", "values": ["both", "project-only", "global-only"], "default": "both", "where": "any-node", "inherits": true },
+    { "name": "x-fgos-sensitivity", "values": ["public", "command", "secret-reference", "secret-value"], "default": "public", "where": "any-node", "inherits": true },
+    { "name": "x-fgos-file", "values": ["config", "accounts", "token"], "default": "config", "where": "any-node", "inherits": true },
+    { "name": "x-fgos-merge", "values": ["deep", "replace", "leaf"], "where": "any-node", "inherits": true },
+    { "name": "x-fgos-absent", "values": ["detected", "required", "off"], "where": "any-node", "inherits": true, "only-without": "default" },
+    { "name": "x-fgos-suggestion", "type": "value of the node's type", "where": "any-node", "inherits": false },
+    { "name": "x-fgos-justification", "type": "non-empty text", "where": "any-node", "inherits": false, "needed-for": "x-fgos-scope: both on a node whose sensitivity is not public" },
+    { "name": "x-fgos-owner", "type": "non-empty text (component name)", "where": "root", "inherits": false },
+    { "name": "x-fgos-version", "type": "positive integer", "where": "root", "inherits": false }
+  ]
+}
