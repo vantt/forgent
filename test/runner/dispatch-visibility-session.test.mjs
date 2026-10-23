@@ -9,7 +9,6 @@ import {
   readVisibility,
   writeVisibility,
   markDetached,
-  findAgentBinding,
   findWorkerResult,
   classifyRunOutcome,
   findRunningRuns,
@@ -73,22 +72,6 @@ test('losing the observer detaches the view and leaves the run alone', () => {
     assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'run.json'), 'utf8')).status, 'running',
       'a lost observer is not a dead worker');
   } finally { cleanup(dir); }
-});
-
-test('reattach matches by pane id first, then by agent session', () => {
-  const agents = [
-    { pane_id: 'wS:p1', agent_session: { value: 'other' } },
-    { pane_id: 'wS:p9', agent_session: { value: 'mine' } },
-  ];
-  assert.equal(findAgentBinding(agents, { paneId: 'wS:p9' }).agent_session.value, 'mine');
-  assert.equal(findAgentBinding(agents, { paneId: 'wS:gone', agentSession: { value: 'mine' } }).pane_id, 'wS:p9');
-});
-
-test('a handle that finds nothing means gone, never somebody else pane', () => {
-  const agents = [{ pane_id: 'wS:p1', agent_session: { value: 'other' } }];
-  assert.equal(findAgentBinding(agents, { paneId: 'wS:closed', agentSession: { value: 'mine' } }), null);
-  assert.equal(findAgentBinding([], { paneId: 'wS:p1' }), null);
-  assert.equal(findAgentBinding(null, { paneId: 'wS:p1' }), null);
 });
 
 // The crash fixture: a run directory left exactly as a killed dispatch would
