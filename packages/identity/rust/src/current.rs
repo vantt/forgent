@@ -190,9 +190,14 @@ pub fn session_for(
         ),
         candidates: Vec::new(),
     })?;
-    let tree = crate::proc_tree::os_process_tree();
-    let trusted = head.filter(|head| read_head(head).is_ok()).map(|head| head.pid);
-    let cli = crate::resolve::ancestry_cli(key.source, tree.as_ref(), trusted);
+    // Only the shared variable's label needs the ancestry, so only it pays for
+    // the process-tree handle and the head read.
+    let cli = (key.source == crate::resolve::PI_SESSION_VAR)
+        .then(|| {
+            let trusted = head.filter(|head| read_head(head).is_ok()).map(|head| head.pid);
+            crate::resolve::ancestry_cli(key.source, crate::proc_tree::os_process_tree().as_ref(), trusted)
+        })
+        .flatten();
     let local = Local { cli: cli.unwrap_or(local.cli), ..local };
     Ok(named(&machine_info(state_root)?, local))
 }
