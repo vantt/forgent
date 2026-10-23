@@ -1,5 +1,6 @@
 //! HEAD-only inventory and legacy publication. Git owns objects, refs and WAL.
 use crate::{
+    commit_memo::CommitMemo,
     envelope::Seal,
     errors::{invalid, Error, ErrorCode},
     layout::{Layout, StreamId},
@@ -11,7 +12,7 @@ use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet};
 use std::result::Result;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Inventory {
     pub from_commit: Oid,
@@ -113,7 +114,22 @@ fn committed_head(head: &HeadFact) -> Result<&Oid, Error> {
         HeadFact::Unborn { .. } => Err(invalid("migration requires a committed HEAD")),
     }
 }
+/// The tracked legacy files of one commit never change, so every read and
+/// admission of a process shares one inventory per commit and root set.
+static INVENTORIES: CommitMemo<Inventory> = CommitMemo::new();
+
 fn inventory_roots_at(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    from_commit: &Oid,
+    roots: &[&[u8]],
+) -> Result<Inventory, Error> {
+    let question = roots.join(&0u8);
+    INVENTORIES.get_or_compute(repo, from_commit, &question, || {
+        read_inventory_roots_at(port, repo, from_commit, roots)
+    })
+}
+fn read_inventory_roots_at(
     port: &dyn Inspect,
     repo: &RepoHandle,
     from_commit: &Oid,
@@ -588,7 +604,14 @@ pub fn ensure_clean(driver: &GitDriver, repo: &RepoHandle, inv: &Inventory) -> R
     let mut cursor = None;
     loop {
         let page = driver
-            .status(repo, Untracked::All, Submodules::Configured, Ignored::Excluded, cursor, 4096)
+            .status(
+                repo,
+                Untracked::All,
+                Submodules::Configured,
+                Ignored::Excluded,
+                cursor,
+                4096,
+            )
             .map_err(git_error)?;
         for e in page.entries {
             let p = std::str::from_utf8(&e.path).map_err(|_| invalid("status path UTF8"))?;

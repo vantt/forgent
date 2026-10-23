@@ -29,9 +29,10 @@ pub mod reconcile;
 pub mod refspec;
 pub mod sync;
 
+mod commit_memo;
 mod fence;
 
-pub mod export;
 pub mod diagnostics;
+pub mod export;
 
 pub mod legacy_import;

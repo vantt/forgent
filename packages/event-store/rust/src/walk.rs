@@ -60,6 +60,8 @@ pub struct Walked {
     pub published: Positions,
     pub visited: BTreeSet<String>,
 }
+/// Commits whose blobs one `read_paths_at_many` call returns.
+const READ_GROUP: usize = 64;
 /// Never mutates supplied coverage/certificates, including on an error after
 /// several successful pages. Git owns traversal, stops and object decoding.
 pub fn walk(
@@ -129,6 +131,7 @@ fn walk_inner(
                 },
             )
             .map_err(git_error)?;
+        let mut pending = Vec::new();
         for commit in page.commits {
             if !out.visited.insert(commit.oid.as_str().into()) {
                 continue;
@@ -141,165 +144,183 @@ fn walk_inner(
             } else {
                 vec![b"seal.json".to_vec(), b"events.jsonl".to_vec()]
             };
-            let mut observed = port
-                .read_paths_at(repo, &commit.oid, &paths, 32 * 1024 * 1024)
-                .map_err(git_error)?
-                .into_iter();
-            let seal = match observed.next().map(|p| p.value) {
-                Some(PathValue::Blob(bytes)) => parse_header(&bytes)?,
-                Some(PathValue::Error(e)) => return Err(git_error(e)),
-                _ => return Err(Error::new(ErrorCode::EventStoreGap, "seal.json missing")),
-            };
-            let scope = scopes
-                .get(commit.oid.as_str())
-                .copied()
-                .unwrap_or(Scope::Project);
-            let actual_machine = match &seal {
-                Seal::Seal { machine_id, .. } | Seal::Merge { machine_id, .. } => {
-                    Some(machine_id.clone())
-                }
-                Seal::Legacy { .. } => None,
-            };
-            if identity.is_some() {
-                let expected_machine = machines
-                    .get(commit.oid.as_str())
-                    .and_then(|m| m.as_deref())
-                    .or(actual_machine.as_deref())
-                    .ok_or_else(|| invalid("legacy in event ancestry"))?;
-                verify_tip(&seal, expected_machine, scope)?;
+            pending.push((commit, paths));
+        }
+        // One object-database process per group, not per commit; the group
+        // bound keeps the segments held in memory at once small.
+        while !pending.is_empty() {
+            let group: Vec<_> = pending.drain(..pending.len().min(READ_GROUP)).collect();
+            let reads: Vec<_> = group
+                .iter()
+                .map(|(commit, paths)| (commit.oid.clone(), paths.clone()))
+                .collect();
+            let answers = port
+                .read_paths_at_many(repo, &reads, 32 * 1024 * 1024)
+                .map_err(git_error)?;
+            if answers.len() != group.len() {
+                return Err(invalid("path observations do not match the commits read"));
             }
-            if identity.is_some() {
-                machines.insert(commit.oid.as_str().into(), actual_machine.clone());
-            }
-            let merge_commit = matches!(&seal, Seal::Merge { .. });
-            if certified.contains(commit.oid.as_str()) {
-                continue;
-            }
-            let mut promoted_parent = None;
-            match seal {
-                Seal::Seal {
-                    origin,
-                    stream,
-                    scope,
-                    first_seq,
-                    last_seq,
-                    count,
-                    sha256: hash,
-                    ..
-                } => {
-                    out.published
-                        .entry(format!("{origin}:{stream}"))
-                        .and_modify(|n| *n = (*n).max(last_seq))
-                        .or_insert(last_seq);
-                    let bytes = match observed.next().map(|p| p.value) {
-                        Some(PathValue::Blob(bytes)) => bytes,
-                        Some(PathValue::Error(e)) => return Err(git_error(e)),
-                        _ => return Err(invalid("seal events missing")),
-                    };
-                    if sha256(&bytes) != hash {
-                        return Err(Error::new(
-                            ErrorCode::EventStoreSealMismatch,
-                            "segment digest mismatch",
-                        ));
-                    }
-                    let framed = decode(&bytes, &origin, &StreamId::parse(&stream)?, true)
-                        .map_err(|e| Error::new(ErrorCode::EventStoreRefTampered, e.to_string()))?;
-                    if framed.events.first().map(|e| e.seq) != Some(first_seq)
-                        || framed.events.last().map(|e| e.seq) != Some(last_seq)
-                        || framed.events.len() as u64 != count
-                        || framed.events.iter().any(|e| e.scope != scope)
-                    {
-                        return Err(Error::new(
-                            ErrorCode::EventStoreRefTampered,
-                            "seal/event identity, scope or range mismatch",
-                        ));
-                    }
-                    if let Some((index, parent)) = commit.parents.iter().enumerate().next_back() {
-                        if framed.events.iter().any(|e| {
-                            e.event_type == "store.promote"
-                                && e.payload["tip"].as_str() == Some(parent.as_str())
-                        }) {
-                            promoted_parent = Some(index);
-                        }
-                    }
-                    if identity.is_some()
-                        && ((commit.parents.len() > 1 && promoted_parent.is_none())
-                            || (promoted_parent.is_some()
-                                && (scope != Scope::Project || commit.parents.len() > 2))
-                            || (framed
-                                .events
-                                .iter()
-                                .any(|e| e.event_type == "store.promote")
-                                && promoted_parent.is_none()))
-                    {
-                        return Err(Error::new(
-                            ErrorCode::EventStoreRefTampered,
-                            "invalid promote ancestry",
-                        ));
-                    }
-                    let high = cover
-                        .get(&format!("{origin}:{stream}"))
-                        .copied()
-                        .unwrap_or(0);
-                    out.events
-                        .extend(framed.events.into_iter().filter(|e| e.seq > high));
-                }
-                Seal::Merge { parents, .. } => {
-                    if commit
-                        .parents
-                        .iter()
-                        .map(|p| p.as_str())
-                        .collect::<Vec<_>>()
-                        != parents.iter().map(String::as_str).collect::<Vec<_>>()
-                    {
-                        return Err(invalid("merge parent mismatch"));
-                    }
-                }
-                Seal::Legacy { .. } => return Err(invalid("legacy ref passed to event walk")),
-            }
-            for (index, parent) in commit.parents.iter().enumerate() {
-                // The mirror side of a merge is another machine's ref. Its
-                // header establishes that chain's machine; first-parent and
-                // promote ancestry retain their actual source machine.
-                let expected_machine = if merge_commit && index == 1 {
-                    None
-                } else {
-                    actual_machine.clone()
+            for ((commit, _), answer) in group.into_iter().zip(answers) {
+                let mut observed = answer.into_iter();
+                let seal = match observed.next().map(|p| p.value) {
+                    Some(PathValue::Blob(bytes)) => parse_header(&bytes)?,
+                    Some(PathValue::Error(e)) => return Err(git_error(e)),
+                    _ => return Err(Error::new(ErrorCode::EventStoreGap, "seal.json missing")),
                 };
-                match machines.entry(parent.as_str().into()) {
-                    std::collections::btree_map::Entry::Vacant(e) => {
-                        e.insert(expected_machine);
+                let scope = scopes
+                    .get(commit.oid.as_str())
+                    .copied()
+                    .unwrap_or(Scope::Project);
+                let actual_machine = match &seal {
+                    Seal::Seal { machine_id, .. } | Seal::Merge { machine_id, .. } => {
+                        Some(machine_id.clone())
                     }
-                    std::collections::btree_map::Entry::Occupied(mut e) => {
-                        if identity.is_some()
-                            && e.get().is_some()
-                            && expected_machine.is_some()
-                            && e.get() != &expected_machine
+                    Seal::Legacy { .. } => None,
+                };
+                if identity.is_some() {
+                    let expected_machine = machines
+                        .get(commit.oid.as_str())
+                        .and_then(|m| m.as_deref())
+                        .or(actual_machine.as_deref())
+                        .ok_or_else(|| invalid("legacy in event ancestry"))?;
+                    verify_tip(&seal, expected_machine, scope)?;
+                }
+                if identity.is_some() {
+                    machines.insert(commit.oid.as_str().into(), actual_machine.clone());
+                }
+                let merge_commit = matches!(&seal, Seal::Merge { .. });
+                if certified.contains(commit.oid.as_str()) {
+                    continue;
+                }
+                let mut promoted_parent = None;
+                match seal {
+                    Seal::Seal {
+                        origin,
+                        stream,
+                        scope,
+                        first_seq,
+                        last_seq,
+                        count,
+                        sha256: hash,
+                        ..
+                    } => {
+                        out.published
+                            .entry(format!("{origin}:{stream}"))
+                            .and_modify(|n| *n = (*n).max(last_seq))
+                            .or_insert(last_seq);
+                        let bytes = match observed.next().map(|p| p.value) {
+                            Some(PathValue::Blob(bytes)) => bytes,
+                            Some(PathValue::Error(e)) => return Err(git_error(e)),
+                            _ => return Err(invalid("seal events missing")),
+                        };
+                        if sha256(&bytes) != hash {
+                            return Err(Error::new(
+                                ErrorCode::EventStoreSealMismatch,
+                                "segment digest mismatch",
+                            ));
+                        }
+                        let framed = decode(&bytes, &origin, &StreamId::parse(&stream)?, true)
+                            .map_err(|e| {
+                                Error::new(ErrorCode::EventStoreRefTampered, e.to_string())
+                            })?;
+                        if framed.events.first().map(|e| e.seq) != Some(first_seq)
+                            || framed.events.last().map(|e| e.seq) != Some(last_seq)
+                            || framed.events.len() as u64 != count
+                            || framed.events.iter().any(|e| e.scope != scope)
                         {
                             return Err(Error::new(
                                 ErrorCode::EventStoreRefTampered,
-                                "ancestor reached through incompatible machine identities",
+                                "seal/event identity, scope or range mismatch",
                             ));
                         }
-                        if e.get().is_none() {
-                            e.insert(expected_machine);
+                        if let Some((index, parent)) = commit.parents.iter().enumerate().next_back()
+                        {
+                            if framed.events.iter().any(|e| {
+                                e.event_type == "store.promote"
+                                    && e.payload["tip"].as_str() == Some(parent.as_str())
+                            }) {
+                                promoted_parent = Some(index);
+                            }
+                        }
+                        if identity.is_some()
+                            && ((commit.parents.len() > 1 && promoted_parent.is_none())
+                                || (promoted_parent.is_some()
+                                    && (scope != Scope::Project || commit.parents.len() > 2))
+                                || (framed
+                                    .events
+                                    .iter()
+                                    .any(|e| e.event_type == "store.promote")
+                                    && promoted_parent.is_none()))
+                        {
+                            return Err(Error::new(
+                                ErrorCode::EventStoreRefTampered,
+                                "invalid promote ancestry",
+                            ));
+                        }
+                        let high = cover
+                            .get(&format!("{origin}:{stream}"))
+                            .copied()
+                            .unwrap_or(0);
+                        out.events
+                            .extend(framed.events.into_iter().filter(|e| e.seq > high));
+                    }
+                    Seal::Merge { parents, .. } => {
+                        if commit
+                            .parents
+                            .iter()
+                            .map(|p| p.as_str())
+                            .collect::<Vec<_>>()
+                            != parents.iter().map(String::as_str).collect::<Vec<_>>()
+                        {
+                            return Err(invalid("merge parent mismatch"));
                         }
                     }
+                    Seal::Legacy { .. } => return Err(invalid("legacy ref passed to event walk")),
                 }
-                let expected = if promoted_parent == Some(index) {
-                    Scope::Branch
-                } else {
-                    scope
-                };
-                if scopes
-                    .insert(parent.as_str().into(), expected)
-                    .is_some_and(|old| old != expected)
-                    && identity.is_some()
-                {
-                    return Err(Error::new(
-                        ErrorCode::EventStoreRefTampered,
-                        "ancestor reached through incompatible scopes",
-                    ));
+                for (index, parent) in commit.parents.iter().enumerate() {
+                    // The mirror side of a merge is another machine's ref. Its
+                    // header establishes that chain's machine; first-parent and
+                    // promote ancestry retain their actual source machine.
+                    let expected_machine = if merge_commit && index == 1 {
+                        None
+                    } else {
+                        actual_machine.clone()
+                    };
+                    match machines.entry(parent.as_str().into()) {
+                        std::collections::btree_map::Entry::Vacant(e) => {
+                            e.insert(expected_machine);
+                        }
+                        std::collections::btree_map::Entry::Occupied(mut e) => {
+                            if identity.is_some()
+                                && e.get().is_some()
+                                && expected_machine.is_some()
+                                && e.get() != &expected_machine
+                            {
+                                return Err(Error::new(
+                                    ErrorCode::EventStoreRefTampered,
+                                    "ancestor reached through incompatible machine identities",
+                                ));
+                            }
+                            if e.get().is_none() {
+                                e.insert(expected_machine);
+                            }
+                        }
+                    }
+                    let expected = if promoted_parent == Some(index) {
+                        Scope::Branch
+                    } else {
+                        scope
+                    };
+                    if scopes
+                        .insert(parent.as_str().into(), expected)
+                        .is_some_and(|old| old != expected)
+                        && identity.is_some()
+                    {
+                        return Err(Error::new(
+                            ErrorCode::EventStoreRefTampered,
+                            "ancestor reached through incompatible scopes",
+                        ));
+                    }
                 }
             }
         }
