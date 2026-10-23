@@ -704,8 +704,10 @@ async function runA(name, ctx) {
   const registered = await waitFor(() => own() && ownIdentity(), cli);
   let toHandle = null;
   let toRole = null;
-  if (registered) {
-    toHandle = harnessSend(dir, ownIdentity().handle, `Please include the token ${byHandle} in your final answer. No reply is needed.`, false, peer.key);
+  // Read while the head runs: Identity lists no dead session, and the head ends with the run.
+  const identity = registered ? ownIdentity() : null;
+  if (identity) {
+    toHandle = harnessSend(dir, identity.handle, `Please include the token ${byHandle} in your final answer. No reply is needed.`, false, peer.key);
     if (name === 'A1') toRole = harnessSend(dir, ALIAS_ROLE, `Please include the token ${byRole} in your final answer. No reply is needed.`, false, peer.key);
   }
   fs.writeFileSync(path.join(ctx.project, 'go.txt'), 'go\n');
@@ -714,13 +716,12 @@ async function runA(name, ctx) {
   const input = cliName === 'claude' ? readModelInput('claude', findTranscript(homeOf(dir), uuid)) : readModelInput('codex', codexRollout(ctx.codexHome));
   const snap = snapshot(dir);
   const finals = input.assistantTexts.join('\n').split('\n').filter((l) => l.startsWith('FINAL:'));
-  const identity = ownIdentity() ?? null;
   const binding = own() ?? null;
   const inline = (token) => input.contexts.some((c) => c.includes(token) && c.includes('</mailbox-message>'));
   const peerHandleShown = input.contexts.some((c) => /<mailbox-message [^>]*handle="[^"]*@[^"]*"/.test(c));
   const checks = {
     run: check(problems.length === 0, { problems, exit: cli.status }),
-    identityKnowsHead: identity ? check(Boolean(binding) && identity.liveness !== 'dead', { handle: identity.handle, liveness: identity.liveness, roles: identity.roles }) : notObserved('Identity never listed the head'),
+    identityKnowsHead: identity ? check(Boolean(binding), { handle: identity.handle, liveness: identity.liveness, roles: identity.roles }) : notObserved('Identity never listed the head'),
     byHandle: toHandle ? check(Boolean(toHandle.id) && toHandle.text.includes(` for ${binding?.name}`) && messageState(snap, toHandle.id) === 'offered' && inline(byHandle), {
       answer: toHandle.text, state: toHandle.id ? messageState(snap, toHandle.id) : null, inline: inline(byHandle),
     }) : notObserved('never sent'),
