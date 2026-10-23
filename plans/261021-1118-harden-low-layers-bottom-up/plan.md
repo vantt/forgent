@@ -212,6 +212,13 @@ Per layer:
 24. **2026-10-23 17:26, owner: "Q4a Q6b; Q5 bàn thêm".** Q4 (a): an `even-split` placement policy that splits by the measured width (as many columns as keep each ≥ `minCols`, else rows or a grid) and sizes evenly from a known batch size becomes the default; `measured-split` stays selectable. It uses the measured width per cell, not a screen ratio, so it does not reopen the 2026-10-15 rejection. Q6 (b): no rebalancing for panes that join later. Q5 (label format) is still under discussion.
 25. **2026-10-23 17:35, owner: Q5 (a), the label format.** Labels remain display only; the core finds tabs from allocation records by group key, never by label.
 26. **2026-10-23 18:00, owner: config keeps every key with its default value** ("để config default thì người dùng còn biết để đổi … doctor nên copy mọi config vào và cho giá trị default"). Setup/doctor writes every setting with its default so a person can see what can be changed; nothing is removed to make a new default apply. For the layout: setup keeps writing `terminal.layout.policy`, now `even-split`; configs that hold the old written default `measured-split` are changed to `even-split` (repo `.fgos/config.json` in T2; each machine's `~/.fgos/config.json` at landing, backed up first). This supersedes hand-off H27's "differences only" direction for CFG.
+27. **2026-10-23 18:10, owner: what binds in the config spec is the schema/contract and its version, not the "config files hold only differences" rule.**
+    - Config files keep every key with its standard value, so a person sees what can be changed.
+    - Each section schema is versioned (`$id` `urn:fgos:config-schema:<section>:v<N>`). When a standard value changes, the version is bumped and the old standard value is recorded.
+    - Doctor or setup then moves a value that still equals the previous version's standard to the new standard. A value that differs was a choice and is never touched.
+    - This amends `docs/platform/config/spec.md` §2 ("Config files hold only differences", `config-redundant-value`).
+    - Owner: CFG (the config component), in its migration and doctor slice.
+    - T2 changes only `terminal.layout.policy` `measured-split` → `even-split` by hand, the same move that migration will make.
     - Tab: `<short id> · <title, ≤ 24 chars>`, for example `tsk-1lv · fix terminal layout`. An `fgos run` without a work item uses `run-xxxx · <first words of the prompt>`. An overflow tab adds ` (n)`.
     - Worker pane: `<role> · <model>`.
     - The owner's own pane: `<short id> · <title> | fg.ssid:<8 chars>`.
