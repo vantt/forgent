@@ -443,9 +443,6 @@ fn baseline_only_cutover_commits_the_event_fence() {
 
 /// Construct real durable interruption states under the fixture's held custody.
 fn interrupted(f: &Fixture, id: &str, phase: u8, sync: bool) -> wal::Chain {
-    interrupted_resources(f, id, phase, sync, false)
-}
-fn interrupted_resources(f: &Fixture, id: &str, phase: u8, sync: bool, legacy: bool) -> wal::Chain {
     use wal::*;
     struct Held<'a>(&'a Handle);
     impl PublicationAuthority for Held<'_> {
@@ -498,15 +495,11 @@ fn interrupted_resources(f: &Fixture, id: &str, phase: u8, sync: bool, legacy: b
         },
         kind,
         repo_identity: wal.repository_identity().into(),
-        resource_set: vec![if legacy {
-            format!("worktree:{}", baseline.worktree)
-        } else {
-            format!(
-                "worktree:{}:custody:{}",
-                baseline.worktree,
-                f.lease.as_ref().unwrap().path().display()
-            )
-        }],
+        resource_set: vec![format!(
+            "worktree:{}:custody:{}",
+            baseline.worktree,
+            f.lease.as_ref().unwrap().path().display()
+        )],
         authority_binding: baseline.authority,
         writer_identity: "fixture".into(),
         object_format: f.repo.object_format(),
@@ -808,11 +801,11 @@ fn pre_attempt_recovery_does_not_unstage_a_changed_index() {
 }
 
 #[test]
-fn legacy_chains_from_a_dead_checkout_are_abandoned_without_replay() {
+fn chains_from_a_dead_checkout_are_abandoned_without_replay() {
     use std::os::unix::fs::MetadataExt;
     for (phase, residue) in [(0, false), (2, false), (0, true), (2, true)] {
         let mut f = Fixture::new();
-        interrupted_resources(&f, "dead", phase, false, true);
+        interrupted(&f, "dead", phase, false);
         drop(f.lease.take());
         git(
             &f.main,

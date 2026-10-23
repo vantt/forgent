@@ -322,8 +322,7 @@ pub(crate) fn binding(handle: &Handle) -> Result<String> {
         Err(failure("git-lockscope-unavailable-windows"))
     }
 }
-/// New chains bind the directory identity used by custody; legacy chains keep
-/// their path-only resource and are accepted only under their original lease.
+/// Chains bind the directory identity used by custody.
 pub(crate) fn checkout_resources(repo: &RepoHandle) -> Result<Vec<String>> {
     #[cfg(unix)]
     let custody = crate::refs::custody_lock_path(repo, root(repo)?)?;
@@ -335,30 +334,13 @@ pub(crate) fn checkout_resources(repo: &RepoHandle) -> Result<Vec<String>> {
         custody.display()
     )])
 }
-pub(crate) fn compact_matches(
-    compact: &wal::CompactReceipt,
-    intent: &Intent,
-    repo: &RepoHandle,
-) -> Result<bool> {
-    if compact.matches(intent)? {
-        return Ok(true);
-    }
-    let mut legacy = intent.clone();
-    legacy.resource_set = vec![legacy_resource(repo)?];
-    compact.matches(&legacy).map_err(failure)
-}
 /// A path of the fgOS store, which no checkout commit or resolver grant carries.
 pub(crate) fn is_store_path(path: &str) -> bool {
     path == ".fgos" || path.starts_with(".fgos/")
 }
-/// The resource chains named before custody bound the directory identity.
-fn legacy_resource(repo: &RepoHandle) -> Result<String> {
-    Ok(format!("worktree:{}", root(repo)?.display()))
-}
-/// Whether a chain was taken for this checkout, under its custody resource or
-/// the older plain-worktree one.
+/// Whether a chain was taken for this checkout, under its custody resource.
 fn in_checkout(intent: &Intent, repo: &RepoHandle) -> Result<bool> {
-    Ok(intent.resource_set == checkout_resources(repo)? || intent.resource_set == [legacy_resource(repo)?])
+    Ok(intent.resource_set == checkout_resources(repo)?)
 }
 /// The one authority question every checkout port asks of a chain it did not
 /// just begin: it answers to this checkout and this custody and, where the
@@ -482,8 +464,6 @@ impl GitDriver {
     ) -> Result<Vec<String>> {
         let mut warnings = vec![];
         let resources = checkout_resources(repo)?;
-        let legacy = legacy_resource(repo)?;
-        let current_binding = binding(handle(scope, repo)?)?;
         for mut chain in wal.retained(100_000)? {
             let worktree = match &chain.intent().kind {
                 OperationKind::ScopedCommit(p) => &p.worktree,
@@ -493,12 +473,7 @@ impl GitDriver {
             if worktree != &root(repo)?.to_string_lossy() {
                 continue;
             }
-            let foreign = if chain.intent().resource_set == vec![legacy.clone()] {
-                chain.intent().authority_binding != current_binding
-            } else {
-                chain.intent().resource_set != resources
-            };
-            if foreign {
+            if chain.intent().resource_set != resources {
                 // Current custody proves that this directory is a different
                 // checkout. Close only its old WAL, never touch its index or
                 // replay an effect. Existing terminal causes stay unchanged.
@@ -804,7 +779,7 @@ impl GitDriver {
                 (checkout_resources(repo)?, binding(handle(&scope, repo)?)?),
                 (Tip::Oid(compact.expected.clone()), Tip::Oid(compact.next.clone())),
             );
-            if !compact_matches(&compact, &intent, repo)? {
+            if !compact.matches(&intent)? {
                 return Err(failure("commit-authority-mismatch"));
             }
             return compact.outcome().map_err(failure);
@@ -1310,10 +1285,10 @@ impl GitDriver {
                 (checkout_resources(repo)?, binding(handle(scope, repo)?)?),
                 (Tip::Oid(baseline.head.clone()), Tip::Oid(baseline.head.clone())),
             );
-            let ordinary = compact_matches(&compact, &intent, repo)?;
+            let ordinary = compact.matches(&intent)?;
             intent.request_digest =
                 wal::canonical_digest(&(baseline, request, writer, "no-op"))?;
-            let noop = compact_matches(&compact, &intent, repo)?;
+            let noop = compact.matches(&intent)?;
             if !ordinary && !noop {
                 return Err(failure("operation-id-reused"));
             }
