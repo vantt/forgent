@@ -338,13 +338,6 @@ fn has_borrowed_copy(dev: u64, ino: u64, pid: u32) -> bool {
     }))
 }
 
-/// Without the Linux fd tables nothing proves a direct child is an adopted borrower. At every call
-/// `true` means "kill or release it", so `false` is the answer that keeps the child protected.
-#[cfg(not(target_os = "linux"))]
-fn has_borrowed_copy(_dev: u64, _ino: u64, _pid: u32) -> bool {
-    false
-}
-
 /// Close first; the kernel's locker stamp distinguishes our escaped copies
 /// from a later acquirer's fresh description, without taking a probe lock.
 #[cfg(target_os = "linux")]
