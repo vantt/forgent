@@ -1,0 +1,6 @@
+{
+  "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+  "specId": "proof:recursive-platform-citation-scan",
+  "requirement": "Nested default area/subcomponent spec and decisions reader set, with retained legacy and explicit override fixtures.",
+  "status": "composed; full-file replay result is in post-move-replay.json; real-repo baseline case remains red"
+}

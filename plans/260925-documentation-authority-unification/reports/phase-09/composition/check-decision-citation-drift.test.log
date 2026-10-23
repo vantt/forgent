@@ -1,0 +1,191 @@
+✔ ADR<n> form is recognized (3.416574ms)
+✔ bare NNNN form is recognized only when known (0.494095ms)
+✔ a bare id inside an ADR<id> match is not double-counted (0.370155ms)
+✔ multiple distinct ids on one line (0.343773ms)
+✔ a superseded id cited with no acknowledgement reports a dead-framing finding (0.64244ms)
+✔ citing both the superseded id and its superseding id on the same line reports zero (0.323384ms)
+✔ citing a decision that was never superseded reports zero findings (0.355701ms)
+✔ CLI run over a fixture reports the dead-framing finding and exits 1 (47.915966ms)
+✔ CLI run over a fixture with no drift exits 0 (53.484362ms)
+✔ a paren with real prose is a gloss (0.598579ms)
+✔ a paren with only other id tokens is not a gloss (0.353008ms)
+✔ an empty paren is not a gloss (0.218219ms)
+✔ no paren at all is not a gloss (0.186485ms)
+✔ a bare ADR citation with no gloss reports bare-citation (0.932099ms)
+✔ an ADR citation with a real gloss reports nothing (0.252624ms)
+✔ a RUL citation with only the old area-suffix, no real gloss, still reports bare-citation (0.262832ms)
+✔ a D-local id cited outside its own CONTEXT.md reports d-local-outside-home, gloss or not (0.285159ms)
+✔ a D-local id cited inside its OWN CONTEXT.md reports nothing (0.20059ms)
+✔ a comma-list of D-local ids each report their own finding (0.246885ms)
+✔ a slash-separated D-local list reports each id separately (0.227166ms)
+✔ a heading-parenthetical D-local citation still reports (0.150878ms)
+✔ a citation inside a fenced code block is skipped (0.145778ms)
+✔ a baselined finding does not report as new, a genuinely new one does (0.430326ms)
+✔ a shifted line number alone does not make a baselined finding report as new (tsk-3x8 F1: content-keyed, not line-keyed) (0.231141ms)
+✔ two citations of the same id on different lines/text stay distinct (0.183971ms)
+✔ a genuinely new Nth occurrence of an already-duplicated key is not silently absorbed (tsk-6at: count consumption, not membership) (0.260591ms)
+✔ findNewFindings/baselineFromFindings do not throw on a "__proto__" file (tsk-1pf: Object.create(null) hardening) (0.252989ms)
+✔ --write-baseline snapshots current findings, and a bare re-run against the SAME tree exits 0 (102.53764ms)
+✔ a NEW finding appended after --write-baseline still fails (92.410033ms)
+✔ a line inserted BEFORE a baselined finding does not make it report as new (tsk-3x8 F1: the exact hand-verified repro, CLI level) (95.918037ms)
+✖ CLI run against the real repo root, with the checked-in baseline, exits 0 (171.907664ms)
+✔ default citation scan includes nested area rules and decision narratives without losing legacy specs (46.906211ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 31
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 723.552695
+
+✖ failing tests:
+
+test at test/scripts/check-decision-citation-drift.test.mjs:759:1
+✖ CLI run against the real repo root, with the checked-in baseline, exits 0 (171.907664ms)
+  AssertionError [ERR_ASSERTION]: expected 0 new findings against the checked-in baseline, got:
+  check-decision-citation-drift: 126 finding(s):
+    - docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md:74: cites D-local id D0014 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md:139: cites D-local id D0014 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/agent-mailbox/spec.md:653: cites D-local id D2 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/agent-mailbox/spec.md:684: cites D-local id D2 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/agent-mailbox/spec.md:692: cites D-local id D2 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/agent-protocol/spec.md:101: cites D-local id D4 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/agent-protocol/spec.md:132: cites D-local id D4 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/coexistence/spec.md:108: cites ADR0009 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/config/spec.md:223: cites ADR0072 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/config/spec.md:233: cites D-local id D7 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/config/spec.md:364: cites ADR0072 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/event-store/spec.md:158: cites D-local id D9 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/event-store/spec.md:245: cites D-local id D5 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/event-store/spec.md:245: cites D-local id D2 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/event-store/spec.md:755: cites ADR0003 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/event-store/spec.md:801: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/event-store/spec.md:825: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/event-store/spec.md:829: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/event-store/spec.md:876: cites D-local id D18 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/event-store/spec.md:1138: cites D-local id D9 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/git/spec.md:3: cites ADR0057 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:5: cites ADR0057 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:5: cites ADR0058 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:85: cites RUL84 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:293: cites RUL84 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:297: cites RUL101 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:315: cites RUL84 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:357: cites RUL84 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:710: cites RUL84 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:726: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:782: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:800: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:804: cites ADR0042 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:819: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:836: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:862: cites ADR0057 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:885: cites ADR0042 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:919: cites D-local id D8 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/git/spec.md:920: cites ADR0042 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1151: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1152: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1154: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1155: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1160: cites ADR0042 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1161: cites ADR0042 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1164: cites ADR0042 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1180: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1182: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1183: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1232: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1249: cites RUL11 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1268: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1272: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1273: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1274: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1275: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1276: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/git/spec.md:1285: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/holder-lock/spec.md:161: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/holder-lock/spec.md:408: cites D-local id D8 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:420: cites D-local id D1 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:420: cites D-local id D2 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:420: cites D-local id D3 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:420: cites D-local id D4 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:420: cites D-local id D5 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:420: cites D-local id D6 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:420: cites D-local id D7 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:420: cites D-local id D8 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:425: cites D-local id D1 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:425: cites D-local id D4 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:425: cites D-local id D5 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:425: cites D-local id D6 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:425: cites D-local id D7 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:425: cites D-local id D8 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:427: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/holder-lock/spec.md:428: cites D-local id D1 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:428: cites D-local id D2 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:428: cites D-local id D3 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:428: cites D-local id D4 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:428: cites D-local id D5 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:428: cites D-local id D6 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/holder-lock/spec.md:430: cites D-local id D8 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/identity/spec.md:252: cites RUL104 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/packaging-distribution/spec.md:203: cites RUL102 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/packaging-distribution/spec.md:284: cites ADR0009 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/platform-foundations.md:50: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/platform-foundations.md:58: cites RUL11 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/platform-foundations.md:186: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/platform-foundations.md:273: cites D-local id D1 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/platform-foundations.md:274: cites D-local id D2 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/platform-foundations.md:275: cites D-local id D3 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/platform-foundations.md:276: cites D-local id D4 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/platform-foundations.md:276: cites D-local id D2 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/platform-foundations.md:277: cites D-local id D5 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/platform-foundations.md:282: cites D-local id D1 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/platform-foundations.md:282: cites D-local id D3 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/platform-foundations.md:315: cites D-local id D3 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/platform-foundations.md:320: cites D-local id D1 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/platform-foundations.md:320: cites D-local id D5 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/platform-foundations.md:322: cites D-local id D1 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/platform-foundations.md:383: cites RUL3 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/platform-foundations.md:385: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/process/spec.md:119: cites D-local id D3 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/process/spec.md:119: cites D-local id D8 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/process/spec.md:121: cites D-local id D3 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/process/spec.md:121: cites D-local id D8 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/run-supervisor/spec.md:344: cites D-local id D4 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/run-supervisor/spec.md:345: cites D-local id D6 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/run-supervisor/spec.md:347: cites D-local id D9 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/runner/spec.md:30: cites RUL100 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/terminal-control/spec.md:193: cites D-local id D1 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/terminal-control/spec.md:193: cites D-local id D2 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/terminal-control/spec.md:193: cites D-local id D6 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/terminal-control/spec.md:193: cites D-local id D1 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/terminal-control/spec.md:193: cites D-local id D7 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/terminal-control/spec.md:195: cites D-local id D4 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/terminal-control/spec.md:195: cites D-local id D7 outside its own CONTEXT.md (decision 0017 -- inline the content, delete the id)
+    - docs/platform/work-state/spec.md:1050: cites ADR0055 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/work-state/spec.md:1050: cites ADR0003 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/yaml-document/spec.md:38: cites RUL101 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/yaml-document/spec.md:172: cites RUL101 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/yaml-document/spec.md:192: cites RUL101 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/yaml-document/spec.md:205: cites RUL101 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - docs/platform/yaml-document/spec.md:208: cites RUL101 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - .agents/skills/fgos-researching/SKILL.md:91: cites RUL45 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+    - plugins/fgOS/skills/fgos-researching/SKILL.md:91: cites RUL45 with no gloss -- self-contained citation must be "<ID> (<one-line gloss>)"
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///tmp/fgos-work/w1-d2-brief/post-move/test/scripts/check-decision-citation-drift.test.mjs:772:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

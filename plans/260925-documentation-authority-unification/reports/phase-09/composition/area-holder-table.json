@@ -1,0 +1,207 @@
+{
+  "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
+  "authority": "L12-96 Q3",
+  "scopeIsFreeText": true,
+  "repoScope": {
+    "scope": "repo",
+    "readFirst": "docs/reading-map.md",
+    "facts": "docs/platform-foundations.md",
+    "orientation": "docs/platform/platform-foundations.md",
+    "decisions": "docs/platform/decisions/",
+    "status": "proposed repo narrative placement; Lead acceptance required",
+    "projection": "docs/decisions/index.md"
+  },
+  "rows": [
+    {
+      "scope": "confinement-authority",
+      "canonicalArea": "agent-confinement",
+      "readFirst": "docs/platform/agent-confinement/README.md",
+      "factAndRuleHolders": [
+        "docs/platform/agent-confinement/spec.md"
+      ],
+      "narrativeHolders": [
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "decisionWriteHome": "docs/platform/agent-confinement/decisions/",
+      "legacySource": "docs/specs/confinement-authority.md",
+      "status": "candidate-routing; acceptance at cutover"
+    },
+    {
+      "scope": "decision-citation-drift",
+      "canonicalArea": "decision-citation-drift",
+      "readFirst": "docs/platform/decision-citation-drift/README.md",
+      "factAndRuleHolders": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "narrativeHolders": [],
+      "decisionWriteHome": "docs/platform/decision-citation-drift/decisions/",
+      "legacySource": "docs/specs/decision-citation-drift.md",
+      "status": "candidate-routing; acceptance at cutover"
+    },
+    {
+      "scope": "distillery",
+      "canonicalArea": "distillery",
+      "readFirst": "docs/platform/distillery/README.md",
+      "factAndRuleHolders": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "narrativeHolders": [],
+      "decisionWriteHome": "docs/platform/distillery/decisions/",
+      "legacySource": "docs/specs/distillery.md",
+      "status": "candidate-routing; acceptance at cutover"
+    },
+    {
+      "scope": "distribution",
+      "canonicalArea": "packaging-distribution",
+      "readFirst": "docs/platform/packaging-distribution/README.md",
+      "factAndRuleHolders": [
+        "docs/platform/packaging-distribution/spec.md"
+      ],
+      "narrativeHolders": [
+        "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md"
+      ],
+      "decisionWriteHome": "docs/platform/packaging-distribution/decisions/",
+      "legacySource": "docs/specs/distribution.md",
+      "status": "candidate-routing; acceptance at cutover"
+    },
+    {
+      "scope": "enduser-docs-authoring",
+      "canonicalArea": "enduser-docs-authoring",
+      "readFirst": null,
+      "factAndRuleHolders": [],
+      "narrativeHolders": [],
+      "decisionWriteHome": "docs/platform/enduser-docs-authoring/decisions/",
+      "legacySource": "docs/specs/enduser-docs-authoring.md",
+      "status": "missing-live-holder; Lead/D1 carriage required"
+    },
+    {
+      "scope": "enduser-docs-index",
+      "canonicalArea": "enduser-docs-index",
+      "readFirst": null,
+      "factAndRuleHolders": [],
+      "narrativeHolders": [],
+      "decisionWriteHome": "docs/platform/enduser-docs-index/decisions/",
+      "legacySource": "docs/specs/enduser-docs-index.md",
+      "status": "missing-live-holder; Lead/D1 carriage required"
+    },
+    {
+      "scope": "fgos-plugin",
+      "canonicalArea": "claude-plugin",
+      "readFirst": "docs/platform/claude-plugin/README.md",
+      "factAndRuleHolders": [
+        "docs/platform/claude-plugin/spec.md"
+      ],
+      "narrativeHolders": [],
+      "decisionWriteHome": "docs/platform/claude-plugin/decisions/",
+      "legacySource": "docs/specs/fgos-plugin.md",
+      "status": "candidate-routing; acceptance at cutover"
+    },
+    {
+      "scope": "herdr-web-dashboard",
+      "canonicalArea": "herdr-web-dashboard",
+      "readFirst": "docs/platform/herdr-web-dashboard/README.md",
+      "factAndRuleHolders": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "narrativeHolders": [],
+      "decisionWriteHome": "docs/platform/herdr-web-dashboard/decisions/",
+      "legacySource": "docs/specs/herdr-web-dashboard.md",
+      "status": "candidate-routing; acceptance at cutover"
+    },
+    {
+      "scope": "observe",
+      "canonicalArea": "observe",
+      "readFirst": "docs/platform/observe/README.md",
+      "factAndRuleHolders": [
+        "docs/platform/observe/spec.md"
+      ],
+      "narrativeHolders": [
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "decisionWriteHome": "docs/platform/observe/decisions/",
+      "legacySource": "docs/specs/observe.md",
+      "status": "candidate-routing; acceptance at cutover"
+    },
+    {
+      "scope": "platform-foundations",
+      "canonicalArea": "platform-foundations",
+      "readFirst": "docs/platform/platform-foundations.md",
+      "factAndRuleHolders": [
+        "docs/platform/platform-foundations.md"
+      ],
+      "narrativeHolders": [],
+      "decisionWriteHome": "docs/platform/platform-foundations/decisions/",
+      "legacySource": "docs/specs/platform-foundations.md",
+      "status": "candidate-routing; acceptance at cutover"
+    },
+    {
+      "scope": "runner",
+      "canonicalArea": "runner",
+      "readFirst": "docs/platform/runner/README.md",
+      "factAndRuleHolders": [
+        "docs/platform/runner/spec.md",
+        "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+        "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+        "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md"
+      ],
+      "narrativeHolders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "docs/platform/runner/decisions/h-aabefc85f0c9.md"
+      ],
+      "decisionWriteHome": "docs/platform/runner/decisions/",
+      "legacySource": "docs/specs/runner.md",
+      "status": "candidate-routing; acceptance at cutover"
+    },
+    {
+      "scope": "seat-binding",
+      "canonicalArea": "seat-binding",
+      "readFirst": null,
+      "factAndRuleHolders": [],
+      "narrativeHolders": [],
+      "decisionWriteHome": "docs/platform/seat-binding/decisions/",
+      "legacySource": "docs/specs/seat-binding.md",
+      "status": "missing-live-holder; Lead/D1 carriage required"
+    },
+    {
+      "scope": "system-overview",
+      "canonicalArea": "system-overview",
+      "readFirst": "docs/platform/system-overview/spec.md",
+      "factAndRuleHolders": [
+        "docs/platform/system-overview/spec.md"
+      ],
+      "narrativeHolders": [],
+      "decisionWriteHome": "docs/platform/system-overview/decisions/",
+      "legacySource": "docs/specs/system-overview.md",
+      "status": "candidate-routing; acceptance at cutover"
+    },
+    {
+      "scope": "work-state",
+      "canonicalArea": "work-state",
+      "readFirst": "docs/platform/work-state/README.md",
+      "factAndRuleHolders": [
+        "docs/platform/work-state/spec.md"
+      ],
+      "narrativeHolders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md"
+      ],
+      "decisionWriteHome": "docs/platform/work-state/decisions/",
+      "legacySource": "docs/specs/work-state.md",
+      "status": "candidate-routing; acceptance at cutover"
+    },
+    {
+      "scope": "workflow",
+      "canonicalArea": "workflow",
+      "readFirst": null,
+      "factAndRuleHolders": [],
+      "narrativeHolders": [],
+      "decisionWriteHome": "docs/platform/workflow/decisions/",
+      "legacySource": "docs/specs/workflow.md",
+      "status": "missing-live-holder; Lead/D1 carriage required"
+    }
+  ]
+}

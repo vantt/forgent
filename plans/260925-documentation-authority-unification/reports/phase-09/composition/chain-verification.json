@@ -1,0 +1,67 @@
+{
+  "edges": [
+    {
+      "specId": "carry:credential-store-setup",
+      "predecessor": "file:docs/platform/agent-confinement/spec.md",
+      "sha256": "088cdffe4070462f34aff500dbd5494e6ebb421997352dff433a4b2bd3297153",
+      "valid": true
+    },
+    {
+      "specId": "convention:citation-homes",
+      "predecessor": "file:core/skills/_shared/citation-format.md",
+      "sha256": "96e6a82023f77367266c5f714a78a57d20d89a58a6413d6e08aa60a0ea2a3d47",
+      "valid": true
+    },
+    {
+      "specId": "scope-consumer:src/cli/command-registry.mjs",
+      "predecessor": "recomposed-predecessor:src/cli/command-registry.mjs",
+      "sha256": "2855d62d5849ed36b8ccc1bdfe99bd71a750d43e031a9cb4cf0e5662d374fa92",
+      "valid": true
+    },
+    {
+      "specId": "scope-consumer:AGENTS.md",
+      "predecessor": "file:AGENTS.md",
+      "sha256": "2fbb15efb976305c8601c59da700075e38e3ba44ca63999307c650fc4e597d77",
+      "valid": true
+    },
+    {
+      "specId": "hunk-park:bin/fgos.mjs",
+      "predecessor": "scope-consumer:bin/fgos.mjs",
+      "sha256": "4e7412ebfafada1bb7c4971fb454f1741fbb871336194830b7d34f89bdc84c76",
+      "valid": true
+    },
+    {
+      "specId": "description:work-boundary",
+      "predecessor": "file:docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "sha256": "79d3429c3d778eb47d60d6ea28cea6e460d01306d1d2cdb8502b803e2fe507bf",
+      "valid": true
+    },
+    {
+      "specId": "description:mutation-admission",
+      "predecessor": "file:docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "sha256": "a51071833a5d6243521603e46e74368eac39d7a0444be3845e1bfd8f112f4ca4",
+      "valid": true
+    },
+    {
+      "specId": "description:read-first",
+      "predecessor": "file:docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "sha256": "6fd1ca54e32a5590eb80ddcf7f31318ac95b5b49f5e672fafd94fa10ff632c16",
+      "valid": true
+    },
+    {
+      "specId": "description:cas-evidence-correction",
+      "predecessor": "file:docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
+      "sha256": "f0ccfa0d2aab0b0186f4060ab74262f532e0a51d3f0bfd3dd76ab0c39792ff4b",
+      "valid": true
+    },
+    {
+      "specId": "status-units:docs/platform/governance.md",
+      "predecessor": "convention:area-holder-table",
+      "sha256": "824c8c1c39fa6c8a3b53c6c85d72e35749c9e7f788c78787968069f02be37355",
+      "valid": true
+    }
+  ],
+  "allImmediateEdgesValid": true,
+  "historicalApprovalTransfers": false,
+  "note": "Recomposed current-byte predecessors require G9 delta review; historical approval does not transfer."
+}

@@ -1,0 +1,1718 @@
+{
+  "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
+  "counts": {
+    "8": 48,
+    "13": 16,
+    "17": 8
+  },
+  "rows": [
+    {
+      "familyNumber": 8,
+      "rowId": "r09010",
+      "memberId": "reference-002441",
+      "source": {
+        "file": "scripts/check-decision-citation-drift.baseline.json",
+        "sha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+        "verbatimPassage": "  \"docs/specs/platform-foundations.md\": [\n    \"bare-citation:ADR0055:- **RUL3 (truth = changeset append-only committed; database là view).** Truth của mọi database tương lai là changeset append-only được commit; database là view dựng lại được từ zero; graph store là view cấp 2 không bao giờ ghi ngược; mọi ghi qua MỘT cửa (L3, per ae461c8b; truth-ở-git-tree và một-cửa-CLI đã bị D-ADR0055 thay ngày 2026-10-17: truth là changeset niêm phong trên ref mỗi máy, xem docs/platform/event-store/spec.md).\"\n  ],\n  \"docs/specs/work-state.md\": [\n    \"bare-citation:ADR0055:- **RUL10 (tiền đề có ngưỡng).** Một người ghi tại một thời điểm; khi nhiều agent ghi đồng thời thành tải chính, mở lại thiết kế store theo ngưỡng đã ghi trong luật L3 (per ae461c8b; ngưỡng này đã chạm và store được thiết kế lại theo D-ADR0055 ngày 2026-10-17, docs/platform/event-store/spec.md; bố cục `events.jsonl` tracked của D-ADR0003 bị thay khi cutover). **Bổ chú (fgos-multi-session-checkout Epic 3 / STR35):** cửa ghi sự kiện `appendEvent` nay tự khóa liên-tiến-trình bằng một `.fgos/events.lock` riêng (chính sách CHẶN-có-timeout — thử lại với backoff cho tới khi thắng hoặc hết giờ, mirror `acquireSessionsLock` chứ KHÔNG phải lối lùi-không-chặn của `acquireRunnerLock`; một thể hiện thứ ba độc lập của cùng primitive wx-atomic-create + gặt-pid-chết, không đụng `runner.lock`/`sessions.lock`). Nhờ đó hai tiến trình `fgos` chạy song song không còn cùng đọc một `seq` cuối rồi cùng ghi `seq+1` — đua trùng-seq trên nhật ký append-only (đã xác nhận bằng spike) bị đóng NGAY TẠI append. Hết timeout khi giành khóa → phạm trù lỗi MỚI `lock-timeout` (tách bạch `corrupt-log`/`validation`: nghĩa là \\\"đang có người ghi, thử lại cả thao tác\\\", không phải hỏng dữ liệu). **Bổ chú 2 (store-atomic-rmw):** dư lượng trên — khóa chỉ đóng đua tại chính append, không đóng đua đọc-sửa-ghi cấp cao ở `store.mjs` — nay ĐÃ ĐÓNG. `events.mjs` xuất thêm `withEventsLock(logPath, fn)` (giữ nguyên `.fgos/events.lock` hiện có, không khóa mới) và `appendEventLocked` (lõi không-tự-khóa của `appendEvent`, dùng khi khóa đã đang giữ). `addWork`/`editWork`/`moveWork`/`moveStage` ở `store.mjs` nay bọc TRỌN chuỗi đọc-tiền-kiểm-rồi-ghi (kiểm id-đã-tồn-tại, CAS `expectedStatus`/`expectedStage`) trong MỘT phiên giữ khóa đó — tiến trình thứ hai giành khóa sẽ đọc lại SAU KHI sự kiện của tiến trình thứ nhất đã nằm trong nhật ký, nên tiền-kiểm của nó phát hiện đúng xung đột (`validation` \\\"already exists\\\" hoặc `conflict` CAS) thay vì cùng qua rồi cùng ghi. `refreshView` (dựng lại bản chiếu + ghi `state.json`) vẫn chạy SAU khi khóa nhả, không đổi. `runner.lock`/hàng-ghi ở tầng vòng lặp không đụng tới.\",\n    \"bare-citation:ADR0003:- **RUL10 (tiền đề có ngưỡng).** Một người ghi tại một thời điểm; khi nhiều agent ghi đồng thời thành tải chính, mở lại thiết kế store theo ngưỡng đã ghi trong luật L3 (per ae461c8b; ngưỡng này đã chạm và store được thiết kế lại theo D-ADR0055 ngày 2026-10-17, docs/platform/event-store/spec.md; bố cục `events.jsonl` tracked của D-ADR0003 bị thay khi cutover). **Bổ chú (fgos-multi-session-checkout Epic 3 / STR35):** cửa ghi sự kiện `appendEvent` nay tự khóa liên-tiến-trình bằng một `.fgos/events.lock` riêng (chính sách CHẶN-có-timeout — thử lại với backoff cho tới khi thắng hoặc hết giờ, mirror `acquireSessionsLock` chứ KHÔNG phải lối lùi-không-chặn của `acquireRunnerLock`; một thể hiện thứ ba độc lập của cùng primitive wx-atomic-create + gặt-pid-chết, không đụng `runner.lock`/`sessions.lock`). Nhờ đó hai tiến trình `fgos` chạy song song không còn cùng đọc một `seq` cuối rồi cùng ghi `seq+1` — đua trùng-seq trên nhật ký append-only (đã xác nhận bằng spike) bị đóng NGAY TẠI append. Hết timeout khi giành khóa → phạm trù lỗi MỚI `lock-timeout` (tách bạch `corrupt-log`/`validation`: nghĩa là \\\"đang có người ghi, thử lại cả thao tác\\\", không phải hỏng dữ liệu). **Bổ chú 2 (store-atomic-rmw):** dư lượng trên — khóa chỉ đóng đua tại chính append, không đóng đua đọc-sửa-ghi cấp cao ở `store.mjs` — nay ĐÃ ĐÓNG. `events.mjs` xuất thêm `withEventsLock(logPath, fn)` (giữ nguyên `.fgos/events.lock` hiện có, không khóa mới) và `appendEventLocked` (lõi không-tự-khóa của `appendEvent`, dùng khi khóa đã đang giữ). `addWork`/`editWork`/`moveWork`/`moveStage` ở `store.mjs` nay bọc TRỌN chuỗi đọc-tiền-kiểm-rồi-ghi (kiểm id-đã-tồn-tại, CAS `expectedStatus`/`expectedStage`) trong MỘT phiên giữ khóa đó — tiến trình thứ hai giành khóa sẽ đọc lại SAU KHI sự kiện của tiến trình thứ nhất đã nằm trong nhật ký, nên tiền-kiểm của nó phát hiện đúng xung đột (`validation` \\\"already exists\\\" hoặc `conflict` CAS) thay vì cùng qua rồi cùng ghi. `refreshView` (dựng lại bản chiếu + ghi `state.json`) vẫn chạy SAU khi khóa nhả, không đổi. `runner.lock`/hàng-ghi ở tầng vòng lặp không đụng tới.\"\n  ]",
+        "verbatimPassageSha256": "2c0b709d94e76e4a33407caca75d3e447a51010320bb660046896cd359b2031b",
+        "passageStillExact": true,
+        "originalSourceSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 4,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "scripts/check-decision-citation-drift.mjs#findNewFindings",
+      "composedSpecIds": [
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "Preserve the entire baseline byte-for-byte, including old-root keys. New findings stay failures. No key migration or rebaseline is proposed.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r09011",
+      "memberId": "reference-002442",
+      "source": {
+        "file": "scripts/check-decision-citation-drift.baseline.json",
+        "sha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+        "verbatimPassage": "  \"plugins/fgOS/skills/triage/SKILL.md\": [\n    \"bare-citation:ADR0020:`--dir` (tsk-2ew): a worktree never carries its own `.fgos/` (ADR0020),\"\n  ],\n  \"docs/specs/platform-foundations.md\": [\n    \"bare-citation:ADR0055:- **RUL3 (truth = changeset append-only committed; database là view).** Truth của mọi database tương lai là changeset append-only được commit; database là view dựng lại được từ zero; graph store là view cấp 2 không bao giờ ghi ngược; mọi ghi qua MỘT cửa (L3, per ae461c8b; truth-ở-git-tree và một-cửa-CLI đã bị D-ADR0055 thay ngày 2026-10-17: truth là changeset niêm phong trên ref mỗi máy, xem docs/platform/event-store/spec.md).\"\n  ],\n  \"docs/specs/work-state.md\": [",
+        "verbatimPassageSha256": "455c457bef69396a694f37352f7011d941b3918f03d7b0c72e60887312fa94e5",
+        "passageStillExact": true,
+        "originalSourceSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 4,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "scripts/check-decision-citation-drift.mjs#findNewFindings",
+      "composedSpecIds": [
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "Preserve the entire baseline byte-for-byte, including old-root keys. New findings stay failures. No key migration or rebaseline is proposed.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r09012",
+      "memberId": "reference-002443",
+      "source": {
+        "file": "scripts/check-decision-citation-drift.baseline.json",
+        "sha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+        "verbatimPassage": "    \"d-local-outside-home:D2:- **Fan out only through a contracted dispatch, never ad hoc (D2).** When a\",\n    \"d-local-outside-home:D6:D6: the `gather`-purpose executor this section used to consult is\",\n    \"d-local-outside-home:D5:- **Record every round durably, never silently (D5).** Append findings to\",\n    \"bare-citation:RUL45:(RUL45, `docs/specs/runner.md`) — never splice it raw into a shell\"\n  ],\n  \"plugins/fgOS/skills/goal/SKILL.md\": [\n    \"bare-citation:ADR0020:design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves to the main\"",
+        "verbatimPassageSha256": "dbd5c90a7c3cb872965f0337f0e6aaafae1cd77441cc1cbf193beff3ea652482",
+        "passageStillExact": true,
+        "originalSourceSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 4,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "scripts/check-decision-citation-drift.mjs#findNewFindings",
+      "composedSpecIds": [
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "Preserve the entire baseline byte-for-byte, including old-root keys. New findings stay failures. No key migration or rebaseline is proposed.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r09013",
+      "memberId": "reference-002444",
+      "source": {
+        "file": "scripts/check-decision-citation-drift.baseline.json",
+        "sha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+        "verbatimPassage": "    \"d-local-outside-home:D2:- **Fan out only through a contracted dispatch, never ad hoc (D2).** When a\",\n    \"d-local-outside-home:D6:D6: the `gather`-purpose executor this section used to consult is\",\n    \"d-local-outside-home:D5:- **Record every round durably, never silently (D5).** Append findings to\",\n    \"bare-citation:RUL45:(RUL45, `docs/specs/runner.md`) — never splice it raw into a shell\"\n  ],\n  \"plugins/fgOS/skills/_shared/executor-dispatch-fallback.md\": [\n    \"d-local-outside-home:D2:`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2).\",",
+        "verbatimPassageSha256": "3b5f1783dcd3f060b78247bbdbe5ba62b0e145382dbc7af640956b803b67016c",
+        "passageStillExact": true,
+        "originalSourceSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 4,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "scripts/check-decision-citation-drift.mjs#findNewFindings",
+      "composedSpecIds": [
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "Preserve the entire baseline byte-for-byte, including old-root keys. New findings stay failures. No key migration or rebaseline is proposed.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r11573",
+      "memberId": "reference-003579",
+      "source": {
+        "file": "scripts/generate-shipped-path-inventory.mjs",
+        "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "verbatimPassage": "\n  // 3. Repository-local contracts: internal to fgOS platform codebase itself (Mission #3)\n  if (\n    norm.startsWith('docs/specs/') ||\n    norm === 'docs/specs' ||\n    norm.startsWith('docs/architect/') ||\n    norm === 'docs/architect' ||",
+        "verbatimPassageSha256": "609cd8531b0ce6da537f8650a2e9426673af82e5a87f23a4ae3a223b16b3249c",
+        "passageStillExact": true,
+        "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "record": "step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 191,
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+      },
+      "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r11574",
+      "memberId": "reference-003580",
+      "source": {
+        "file": "scripts/generate-shipped-path-inventory.mjs",
+        "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "verbatimPassage": "    norm === 'docs/platform-foundations.md' ||\n    norm === 'docs/architecture-map.md' ||\n    norm === 'docs/backlog.md' ||\n    norm === 'docs/io-contract.md' ||\n    norm === 'docs/routing-handoff-contract.md' ||\n    norm === 'docs/coexistence.md' ||\n    norm === 'docs/doc-governance.md' ||",
+        "verbatimPassageSha256": "d566f1027c20b9d2d3deec745172ca4b0c7f78509988cc0c76136d93b187772e",
+        "passageStillExact": true,
+        "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "record": "step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 191,
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+      },
+      "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r11575",
+      "memberId": "reference-003581",
+      "source": {
+        "file": "scripts/generate-shipped-path-inventory.mjs",
+        "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "verbatimPassage": "    norm === 'docs/backlog.md' ||\n    norm === 'docs/io-contract.md' ||\n    norm === 'docs/routing-handoff-contract.md' ||\n    norm === 'docs/coexistence.md' ||\n    norm === 'docs/doc-governance.md' ||\n    norm === 'docs/reading-map.md' ||\n    norm === 'docs/transitional-switchboard.md' ||",
+        "verbatimPassageSha256": "161a1fafbd5fbff432ea622b463d62f75322a1c06e6539e6bf9ffd8fce31d02a",
+        "passageStillExact": true,
+        "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "record": "step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 191,
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+      },
+      "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r11581",
+      "memberId": "reference-003587",
+      "source": {
+        "file": "scripts/generate-shipped-path-inventory.mjs",
+        "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "verbatimPassage": "    norm === 'docs/io-contract.md' ||\n    norm === 'docs/routing-handoff-contract.md' ||\n    norm === 'docs/coexistence.md' ||\n    norm === 'docs/doc-governance.md' ||\n    norm === 'docs/reading-map.md' ||\n    norm === 'docs/transitional-switchboard.md' ||\n    norm === 'docs/id-systems-audit.md' ||",
+        "verbatimPassageSha256": "2adaa1ad3ef0c82a67d89b5e0338b8db17602799a95eee2170f91b7956a229ef",
+        "passageStillExact": true,
+        "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "record": "step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 191,
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+      },
+      "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r11582",
+      "memberId": "reference-003588",
+      "source": {
+        "file": "scripts/generate-shipped-path-inventory.mjs",
+        "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "verbatimPassage": "  if (\n    norm.startsWith('docs/specs/') ||\n    norm === 'docs/specs' ||\n    norm.startsWith('docs/architect/') ||\n    norm === 'docs/architect' ||\n    norm.startsWith('docs/platform/') ||\n    norm === 'docs/platform' ||",
+        "verbatimPassageSha256": "0e5d301e7a19f7fd0a2f3cb2e280df87f919d6a5f146fcaa58371dbcc562e21f",
+        "passageStillExact": true,
+        "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "record": "step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 191,
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+      },
+      "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r11585",
+      "memberId": "reference-003591",
+      "source": {
+        "file": "scripts/generate-shipped-path-inventory.mjs",
+        "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "verbatimPassage": "    norm.startsWith('docs/journals/') ||\n    norm === 'docs/journals' ||\n    norm === 'docs/platform-foundations.md' ||\n    norm === 'docs/architecture-map.md' ||\n    norm === 'docs/backlog.md' ||\n    norm === 'docs/io-contract.md' ||\n    norm === 'docs/routing-handoff-contract.md' ||",
+        "verbatimPassageSha256": "b703446bfe04c34d07f215e8bacd7bd6aefc033d51a70a04d67a4f3affa10fac",
+        "passageStillExact": true,
+        "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "record": "step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 191,
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+      },
+      "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r11586",
+      "memberId": "reference-003592",
+      "source": {
+        "file": "scripts/generate-shipped-path-inventory.mjs",
+        "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "verbatimPassage": "    norm === 'docs/doc-governance.md' ||\n    norm === 'docs/reading-map.md' ||\n    norm === 'docs/transitional-switchboard.md' ||\n    norm === 'docs/id-systems-audit.md' ||\n    norm === 'docs/operator-runbook-herdr-cockpit.md' ||\n    norm === 'docs/work-item-lifecycle-vision.md' ||\n    norm === 'docs/distribution-vision.md' ||",
+        "verbatimPassageSha256": "6dc9e07d63d4974596387d15120625d81d741359fc202024651d2dda61a07750",
+        "passageStillExact": true,
+        "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "record": "step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 191,
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+      },
+      "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r11589",
+      "memberId": "reference-003595",
+      "source": {
+        "file": "scripts/generate-shipped-path-inventory.mjs",
+        "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "verbatimPassage": "    norm === 'docs/id-systems-audit.md' ||\n    norm === 'docs/operator-runbook-herdr-cockpit.md' ||\n    norm === 'docs/work-item-lifecycle-vision.md' ||\n    norm === 'docs/distribution-vision.md' ||\n    norm === 'docs/notes.md' ||\n    norm === 'docs/metadata'\n  ) {",
+        "verbatimPassageSha256": "d1d830946111c91d635f785fbc8cc8f085ccee32f65524318bdc9abdc42280b4",
+        "passageStillExact": true,
+        "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "record": "step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 191,
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+      },
+      "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r11590",
+      "memberId": "reference-003596",
+      "source": {
+        "file": "scripts/generate-shipped-path-inventory.mjs",
+        "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "verbatimPassage": "    norm === 'docs/decisions' ||\n    norm.startsWith('docs/journals/') ||\n    norm === 'docs/journals' ||\n    norm === 'docs/platform-foundations.md' ||\n    norm === 'docs/architecture-map.md' ||\n    norm === 'docs/backlog.md' ||\n    norm === 'docs/io-contract.md' ||",
+        "verbatimPassageSha256": "2361c882aab6fb6abd3cf8a27d95f6206c3f53d3148e2c9a43d4f5202ac98766",
+        "passageStillExact": true,
+        "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "record": "step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 191,
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+      },
+      "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r11592",
+      "memberId": "reference-003598",
+      "source": {
+        "file": "scripts/generate-shipped-path-inventory.mjs",
+        "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "verbatimPassage": "    norm === 'docs/architecture-map.md' ||\n    norm === 'docs/backlog.md' ||\n    norm === 'docs/io-contract.md' ||\n    norm === 'docs/routing-handoff-contract.md' ||\n    norm === 'docs/coexistence.md' ||\n    norm === 'docs/doc-governance.md' ||\n    norm === 'docs/reading-map.md' ||",
+        "verbatimPassageSha256": "d3908e2dde51531deb55df36e95c97bf147af223b83fb7461821db634026867a",
+        "passageStillExact": true,
+        "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "record": "step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 191,
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+      },
+      "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r11593",
+      "memberId": "reference-003599",
+      "source": {
+        "file": "scripts/generate-shipped-path-inventory.mjs",
+        "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "verbatimPassage": "    norm === 'docs/transitional-switchboard.md' ||\n    norm === 'docs/id-systems-audit.md' ||\n    norm === 'docs/operator-runbook-herdr-cockpit.md' ||\n    norm === 'docs/work-item-lifecycle-vision.md' ||\n    norm === 'docs/distribution-vision.md' ||\n    norm === 'docs/notes.md' ||\n    norm === 'docs/metadata'",
+        "verbatimPassageSha256": "eb0f711a338281d42580c3b9dd4631f9d87cd752060bcc175230ac41afc05eae",
+        "passageStillExact": true,
+        "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "record": "step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 191,
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+      },
+      "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r11594",
+      "memberId": "reference-003600",
+      "source": {
+        "file": "scripts/generate-shipped-path-inventory.mjs",
+        "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "verbatimPassage": "    norm === 'docs/reading-map.md' ||\n    norm === 'docs/transitional-switchboard.md' ||\n    norm === 'docs/id-systems-audit.md' ||\n    norm === 'docs/operator-runbook-herdr-cockpit.md' ||\n    norm === 'docs/work-item-lifecycle-vision.md' ||\n    norm === 'docs/distribution-vision.md' ||\n    norm === 'docs/notes.md' ||",
+        "verbatimPassageSha256": "6df8346033e6ee61ec4ed0470d5b68ebb9da53ed3a33289d4de1bf72bfb3e517",
+        "passageStillExact": true,
+        "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "record": "step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 191,
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+      },
+      "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r11595",
+      "memberId": "reference-003601",
+      "source": {
+        "file": "scripts/generate-shipped-path-inventory.mjs",
+        "sha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "verbatimPassage": "    }\n  } else {\n    // Exists in git tree\n    if (norm === 'docs/specs/platform-foundations.md') {\n      // Explicit generated projection of platform operating laws; non-authority mirror (F3)\n      referenceKind = 'generated-mirror';\n      sourceRole = 'generated-projection-non-authority';",
+        "verbatimPassageSha256": "2d37a694c56901ef838080cbd8ae250d5917cf11417d1280ce0637bd487e67ef",
+        "passageStillExact": true,
+        "originalSourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+        "record": "step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 191,
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+      },
+      "liveHolder": "scripts/generate-shipped-path-inventory.mjs#classifyContractScope",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r12598",
+      "memberId": "reference-003634",
+      "source": {
+        "file": "scripts/test-proof-inventory.mjs",
+        "sha256": "61a54de2d57888dadb31138db836c569d5663046f4f835bf63061b43cbb77a35",
+        "verbatimPassage": "\nconst DIR_RULES = [\n  // Strong, structural signal only: rust-host tests genuinely cross the\n  // Rust/Node package boundary by directory convention (see docs/specs\n  // and P00's baseline report), not a content guess.\n  { test: (dir) => dir === 'rust-host', responsibility: 'cross-language-packaging', reason: 'test/rust-host/** exercises the real Rust binary across the package boundary' },\n];",
+        "verbatimPassageSha256": "abdb4653b839fe2106c6aff82b26ad9f89444aaff4510f11ec0c562051147c6d",
+        "passageStillExact": true,
+        "originalSourceSha256": "44b222ef7b565cbaf6c1caf0ca683a2dec793eb5b8f34376c60f0e1a0a9a65f7",
+        "record": "step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 224,
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+      },
+      "liveHolder": "scripts/test-proof-inventory.mjs",
+      "composedSpecIds": [
+        "scan:proof-inventory-comment"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": null,
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r12914",
+      "memberId": "reference-003640",
+      "source": {
+        "file": "scripts/verify-phase-01.mjs",
+        "sha256": "e089db66f5bdb206c6a201ecf1cc2d71c58454a1fa94c7a87606598c3526198f",
+        "verbatimPassage": "    }).split('\\n').filter(Boolean);\n\n    for (const name of diffNames) {\n      if (name.startsWith('docs/specs/') && name !== 'docs/specs/reading-map.md') {\n        throw new Error(`Forbidden edit to docs/specs: ${name}`);\n      }\n      if (name.startsWith('docs/architect/')) {",
+        "verbatimPassageSha256": "3bdcb1638c93f4e5351726247096b8f9a18e6781a11083b5a1c8a13f2341e745",
+        "passageStillExact": true,
+        "originalSourceSha256": "e089db66f5bdb206c6a201ecf1cc2d71c58454a1fa94c7a87606598c3526198f",
+        "record": "step-05-records/generators-skills-and-support.jsonl",
+        "recordLine": 234,
+        "recordSha256": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6"
+      },
+      "liveHolder": "scripts/verify-phase-01.mjs",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": null,
+      "disposition": "Preserve historical forbidden-edit membership test: it constrains changes in the original phase, not a read of a retired root. D3 may change its Git adapter, not this identity.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r18309",
+      "memberId": "dynamic-014397",
+      "source": {
+        "file": "src/setup/registrations.mjs",
+        "sha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "verbatimPassage": "function checkDocNearDuplicate(cwd) {\n  const root = resolveMainCheckout(cwd) ?? cwd;\n  const docsDir = path.join(root, 'docs');\n  if (!fs.existsSync(docsDir)) return { passed: true, message: 'skipped' };\n  const candidates = [];",
+        "verbatimPassageSha256": "935d5715e7c2a810a9c858c6eea3a88837d776b413238e8d4647a4bc8ac99756",
+        "passageStillExact": true,
+        "originalSourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+        "record": "step-05-records/setup-doctor-roots.jsonl",
+        "recordLine": 21,
+        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130"
+      },
+      "liveHolder": "src/setup/registrations.mjs#checkDocNearDuplicate",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/setup/knowledge-doctor.test.mjs",
+      "disposition": "Existing whole-docs recursive walk already covers successors; reuse it unchanged. All six old operation witnesses bind to this function at current bytes.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r18310",
+      "memberId": "dynamic-014398",
+      "source": {
+        "file": "src/setup/registrations.mjs",
+        "sha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "verbatimPassage": "function checkDocNearDuplicate(cwd) {\n  const root = resolveMainCheckout(cwd) ?? cwd;\n  const docsDir = path.join(root, 'docs');\n  if (!fs.existsSync(docsDir)) return { passed: true, message: 'skipped' };\n  const candidates = [];",
+        "verbatimPassageSha256": "935d5715e7c2a810a9c858c6eea3a88837d776b413238e8d4647a4bc8ac99756",
+        "passageStillExact": true,
+        "originalSourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+        "record": "step-05-records/setup-doctor-roots.jsonl",
+        "recordLine": 21,
+        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130"
+      },
+      "liveHolder": "src/setup/registrations.mjs#checkDocNearDuplicate",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/setup/knowledge-doctor.test.mjs",
+      "disposition": "Existing whole-docs recursive walk already covers successors; reuse it unchanged. All six old operation witnesses bind to this function at current bytes.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r18311",
+      "memberId": "dynamic-014399",
+      "source": {
+        "file": "src/setup/registrations.mjs",
+        "sha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "verbatimPassage": "  for (const relPath of fs.readdirSync(docsDir, { recursive: true })) {\n    if (!relPath.endsWith('.md')) continue;\n    const absPath = path.join(docsDir, relPath);\n    if (!fs.statSync(absPath).isFile()) continue;\n    const { meta } = parseFrontmatter(fs.readFileSync(absPath, 'utf8'));",
+        "verbatimPassageSha256": "1d013ee4c1407c79c77e1666bf9eee9c6a07ab15976cdac63c30f1546cf922fd",
+        "passageStillExact": true,
+        "originalSourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+        "record": "step-05-records/setup-doctor-roots.jsonl",
+        "recordLine": 21,
+        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130"
+      },
+      "liveHolder": "src/setup/registrations.mjs#checkDocNearDuplicate",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/setup/knowledge-doctor.test.mjs",
+      "disposition": "Existing whole-docs recursive walk already covers successors; reuse it unchanged. All six old operation witnesses bind to this function at current bytes.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r18312",
+      "memberId": "dynamic-014400",
+      "source": {
+        "file": "src/setup/registrations.mjs",
+        "sha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "verbatimPassage": "  for (const relPath of fs.readdirSync(docsDir, { recursive: true })) {\n    if (!relPath.endsWith('.md')) continue;\n    const absPath = path.join(docsDir, relPath);\n    if (!fs.statSync(absPath).isFile()) continue;\n    const { meta } = parseFrontmatter(fs.readFileSync(absPath, 'utf8'));",
+        "verbatimPassageSha256": "1d013ee4c1407c79c77e1666bf9eee9c6a07ab15976cdac63c30f1546cf922fd",
+        "passageStillExact": true,
+        "originalSourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+        "record": "step-05-records/setup-doctor-roots.jsonl",
+        "recordLine": 21,
+        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130"
+      },
+      "liveHolder": "src/setup/registrations.mjs#checkDocNearDuplicate",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/setup/knowledge-doctor.test.mjs",
+      "disposition": "Existing whole-docs recursive walk already covers successors; reuse it unchanged. All six old operation witnesses bind to this function at current bytes.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r18313",
+      "memberId": "dynamic-014401",
+      "source": {
+        "file": "src/setup/registrations.mjs",
+        "sha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "verbatimPassage": "    const authoritativeFor = Array.isArray(meta.authoritative_for) ? meta.authoritative_for[0] : meta.authoritative_for;\n    if (typeof authoritativeFor === 'string' && authoritativeFor.trim()) {\n      candidates.push({ path: path.join('docs', relPath), authoritativeFor });\n    }\n  }",
+        "verbatimPassageSha256": "bc07bd6e85c5e42b8ffdc47fbd7e24ad62f0210e73d26e352f408938ec4b0720",
+        "passageStillExact": true,
+        "originalSourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+        "record": "step-05-records/setup-doctor-roots.jsonl",
+        "recordLine": 21,
+        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130"
+      },
+      "liveHolder": "src/setup/registrations.mjs#checkDocNearDuplicate",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/setup/knowledge-doctor.test.mjs",
+      "disposition": "Existing whole-docs recursive walk already covers successors; reuse it unchanged. All six old operation witnesses bind to this function at current bytes.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r18314",
+      "memberId": "dynamic-014402",
+      "source": {
+        "file": "src/setup/registrations.mjs",
+        "sha256": "8d011dbe38f68e1facb8a4e2b0e8aea0c005097e3c1169fdf314da9ba501d719",
+        "verbatimPassage": "    const authoritativeFor = Array.isArray(meta.authoritative_for) ? meta.authoritative_for[0] : meta.authoritative_for;\n    if (typeof authoritativeFor === 'string' && authoritativeFor.trim()) {\n      candidates.push({ path: path.join('docs', relPath), authoritativeFor });\n    }\n  }",
+        "verbatimPassageSha256": "bc07bd6e85c5e42b8ffdc47fbd7e24ad62f0210e73d26e352f408938ec4b0720",
+        "passageStillExact": true,
+        "originalSourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+        "record": "step-05-records/setup-doctor-roots.jsonl",
+        "recordLine": 21,
+        "recordSha256": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130"
+      },
+      "liveHolder": "src/setup/registrations.mjs#checkDocNearDuplicate",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/setup/knowledge-doctor.test.mjs",
+      "disposition": "Existing whole-docs recursive walk already covers successors; reuse it unchanged. All six old operation witnesses bind to this function at current bytes.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r26231",
+      "memberId": "dynamic-021577",
+      "source": {
+        "file": "test/report/helpers/docs-index-state-fixture.mjs",
+        "sha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310",
+        "verbatimPassage": "const __dirname = path.dirname(fileURLToPath(import.meta.url));\nexport const REPO_ROOT = path.resolve(__dirname, '../../..');\n\nexport const REAL_DEMO_OUTCOME_ID = 'doc-fgos-rollup-howto';\nexport const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';\n\n/**\n * Builds a fresh fixture root: `docs/` symlinked to this repo's own real\n * docs tree, `.fgos/` a small freshly-initialized store carrying exactly",
+        "verbatimPassageSha256": "8294db557113cb98c8d60d27407fec2cfc6f51bf6a39ee3a77ae842e2f736faa",
+        "passageStillExact": true,
+        "originalSourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310",
+        "record": "step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 11,
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+      },
+      "liveHolder": "docs/knowledge/how-to-check-forgent-work-progress-rollup-check-dashboard/check-rollup-progress.md",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/report/enduser-index.test.mjs",
+      "disposition": "Reuse Step 7 rollup capture co-cut plus enduser-index-test. SourceCaptureId stays doc-fgos-rollup-howto. Post-move generator parity must decide any missing carry, not a fixture invented to pass.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r26241",
+      "memberId": "reference-004353",
+      "source": {
+        "file": "test/report/helpers/docs-index-state-fixture.mjs",
+        "sha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310",
+        "verbatimPassage": "export const REPO_ROOT = path.resolve(__dirname, '../../..');\n\nexport const REAL_DEMO_OUTCOME_ID = 'doc-fgos-rollup-howto';\nexport const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';\n\n/**\n * Builds a fresh fixture root: `docs/` symlinked to this repo's own real",
+        "verbatimPassageSha256": "84f037fbb3f7054aa3105b0dbf41414f200f0c714b33c7224d95382e2c2d88f3",
+        "passageStillExact": true,
+        "originalSourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310",
+        "record": "step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 11,
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+      },
+      "liveHolder": "docs/knowledge/how-to-check-forgent-work-progress-rollup-check-dashboard/check-rollup-progress.md",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/report/enduser-index.test.mjs",
+      "disposition": "Reuse Step 7 rollup capture co-cut plus enduser-index-test. SourceCaptureId stays doc-fgos-rollup-howto. Post-move generator parity must decide any missing carry, not a fixture invented to pass.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r28561",
+      "memberId": "dynamic-023835",
+      "source": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "sha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "verbatimPassage": "  const results = [];\n  if (!fs.existsSync(dir)) return results;\n  const entries = fs.readdirSync(dir, { withFileTypes: true });\n  for (const entry of entries) {\n    const fullPath = path.join(dir, entry.name);\n    if (entry.isDirectory()) {\n      if (entry.name === 'node_modules' || entry.name === '.git') continue;\n      // Probe domains are added and removed by other test files while this walk runs.\n      if (entry.name.startsWith('zzz-test-')) continue;",
+        "verbatimPassageSha256": "4c939b847ab6cb96a8a6fc8057019416a9b4e74d6a80796fda47c0853d624425",
+        "passageStillExact": true,
+        "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "record": "step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+      },
+      "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
+      "composedSpecIds": [
+        "scan:successor-dead-vocabulary"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/runner/dead-vocabulary-guard.test.mjs",
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r28562",
+      "memberId": "dynamic-023836",
+      "source": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "sha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "verbatimPassage": "  const results = [];\n  if (!fs.existsSync(dir)) return results;\n  const entries = fs.readdirSync(dir, { withFileTypes: true });\n  for (const entry of entries) {\n    const fullPath = path.join(dir, entry.name);\n    if (entry.isDirectory()) {\n      if (entry.name === 'node_modules' || entry.name === '.git') continue;\n      // Probe domains are added and removed by other test files while this walk runs.\n      if (entry.name.startsWith('zzz-test-')) continue;",
+        "verbatimPassageSha256": "4c939b847ab6cb96a8a6fc8057019416a9b4e74d6a80796fda47c0853d624425",
+        "passageStillExact": true,
+        "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "record": "step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+      },
+      "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
+      "composedSpecIds": [
+        "scan:successor-dead-vocabulary"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/runner/dead-vocabulary-guard.test.mjs",
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r28599",
+      "memberId": "dynamic-023873",
+      "source": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "sha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "verbatimPassage": "    'fgos-code-change',\n    'fgos-capability-dispatching',\n  ];\n\n  const searchDirs = ['docs/specs', 'core', 'domains'].map((d) => path.join(REPO_ROOT, d));\n  const docFiles = searchDirs.flatMap((d) => collectFiles(d, ['.md']));\n  const agentsMd = path.join(REPO_ROOT, 'AGENTS.md');\n  if (fs.existsSync(agentsMd)) docFiles.push(agentsMd);\n  const readmeMd = path.join(REPO_ROOT, 'README.md');",
+        "verbatimPassageSha256": "2d58618bdb4c7fdf78e22e8f086bb3b4b54b961929406b3db7e0af22983c5643",
+        "passageStillExact": true,
+        "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "record": "step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+      },
+      "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
+      "composedSpecIds": [
+        "scan:successor-dead-vocabulary"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/runner/dead-vocabulary-guard.test.mjs",
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r28600",
+      "memberId": "dynamic-023874",
+      "source": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "sha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "verbatimPassage": "    'fgos-code-change',\n    'fgos-capability-dispatching',\n  ];\n\n  const searchDirs = ['docs/specs', 'core', 'domains'].map((d) => path.join(REPO_ROOT, d));\n  const docFiles = searchDirs.flatMap((d) => collectFiles(d, ['.md']));\n  const agentsMd = path.join(REPO_ROOT, 'AGENTS.md');\n  if (fs.existsSync(agentsMd)) docFiles.push(agentsMd);\n  const readmeMd = path.join(REPO_ROOT, 'README.md');",
+        "verbatimPassageSha256": "2d58618bdb4c7fdf78e22e8f086bb3b4b54b961929406b3db7e0af22983c5643",
+        "passageStillExact": true,
+        "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "record": "step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+      },
+      "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
+      "composedSpecIds": [
+        "scan:successor-dead-vocabulary"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/runner/dead-vocabulary-guard.test.mjs",
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r28616",
+      "memberId": "dynamic-023890",
+      "source": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "sha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "verbatimPassage": "  const walk = (dir) => {\n    const out = [];\n    if (!fs.existsSync(dir)) return out;\n    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {\n      const full = path.join(dir, entry.name);\n      if (entry.isDirectory()) {\n        if (!skipDirs.has(entry.name)) out.push(...walk(full));\n      } else if (entry.isFile() && extensions.some((ext) => entry.name.endsWith(ext))) {\n        out.push(full);",
+        "verbatimPassageSha256": "e88d00388681b1b874ca4fd748829106fa8d5c1e982f3feb4e3ab2359b2b4044",
+        "passageStillExact": true,
+        "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "record": "step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+      },
+      "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
+      "composedSpecIds": [
+        "scan:successor-dead-vocabulary"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/runner/dead-vocabulary-guard.test.mjs",
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r28617",
+      "memberId": "dynamic-023891",
+      "source": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "sha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "verbatimPassage": "    }\n    return out;\n  };\n\n  const roots = ['src', 'bin', 'core', 'domains', 'packages', 'apps', 'herdr-dashboard', path.join('docs', 'specs')];\n  const files = [\n    ...roots.flatMap((d) => walk(path.join(REPO_ROOT, d))),\n    path.join(REPO_ROOT, 'AGENTS.md'),\n    path.join(REPO_ROOT, 'docs', 'platform', 'component-boundary.md'),",
+        "verbatimPassageSha256": "83468f7a3778765ce371a120869bbcef7b47435a1f303f93df57e7e660fafa74",
+        "passageStillExact": true,
+        "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "record": "step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+      },
+      "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
+      "composedSpecIds": [
+        "scan:successor-dead-vocabulary"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/runner/dead-vocabulary-guard.test.mjs",
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r28618",
+      "memberId": "dynamic-023892",
+      "source": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "sha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "verbatimPassage": "    }\n    return out;\n  };\n\n  const roots = ['src', 'bin', 'core', 'domains', 'packages', 'apps', 'herdr-dashboard', path.join('docs', 'specs')];\n  const files = [\n    ...roots.flatMap((d) => walk(path.join(REPO_ROOT, d))),\n    path.join(REPO_ROOT, 'AGENTS.md'),\n    path.join(REPO_ROOT, 'docs', 'platform', 'component-boundary.md'),",
+        "verbatimPassageSha256": "83468f7a3778765ce371a120869bbcef7b47435a1f303f93df57e7e660fafa74",
+        "passageStillExact": true,
+        "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "record": "step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+      },
+      "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
+      "composedSpecIds": [
+        "scan:successor-dead-vocabulary"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/runner/dead-vocabulary-guard.test.mjs",
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r28619",
+      "memberId": "dynamic-023893",
+      "source": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "sha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "verbatimPassage": "  };\n\n  const roots = ['src', 'bin', 'core', 'domains', 'packages', 'apps', 'herdr-dashboard', path.join('docs', 'specs')];\n  const files = [\n    ...roots.flatMap((d) => walk(path.join(REPO_ROOT, d))),\n    path.join(REPO_ROOT, 'AGENTS.md'),\n    path.join(REPO_ROOT, 'docs', 'platform', 'component-boundary.md'),\n  ];\n",
+        "verbatimPassageSha256": "8ff82c043aad52c500da80edc3f948aa61b30ab17c4bdda5fc1a861d05342cb6",
+        "passageStillExact": true,
+        "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "record": "step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+      },
+      "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
+      "composedSpecIds": [
+        "scan:successor-dead-vocabulary"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/runner/dead-vocabulary-guard.test.mjs",
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r28621",
+      "memberId": "dynamic-023895",
+      "source": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "sha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "verbatimPassage": "  const roots = ['src', 'bin', 'core', 'domains', 'packages', 'apps', 'herdr-dashboard', path.join('docs', 'specs')];\n  const files = [\n    ...roots.flatMap((d) => walk(path.join(REPO_ROOT, d))),\n    path.join(REPO_ROOT, 'AGENTS.md'),\n    path.join(REPO_ROOT, 'docs', 'platform', 'component-boundary.md'),\n  ];\n\n  // `herdr-plugin.toml` is herdr's own manifest file name and `herdr-fgos-common`\n  // is the shared crate; neither is the retired crate/binary/directory name.",
+        "verbatimPassageSha256": "79e405a81cedf0b158ca4879364593ce9e347b8898bceda8030dc1c5e89a7eb3",
+        "passageStillExact": true,
+        "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "record": "step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+      },
+      "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
+      "composedSpecIds": [
+        "scan:successor-dead-vocabulary"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/runner/dead-vocabulary-guard.test.mjs",
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r28622",
+      "memberId": "dynamic-023896",
+      "source": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "sha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "verbatimPassage": "  const configJson = path.join(REPO_ROOT, '.fgos', 'config.json');\n  if (fs.existsSync(configJson)) {\n    codeFiles.push(configJson);\n  }\n\n  const docDirs = [\n    path.join(REPO_ROOT, 'docs', 'specs'),\n    path.join(REPO_ROOT, 'docs', 'platform', 'agent-coordination', 'contracts'),\n    path.join(REPO_ROOT, 'docs', 'architect', 'agent-coordination', 'contracts'),\n  ];\n  const docFiles = docDirs.flatMap((d) => collectFiles(d, ['.md']));",
+        "verbatimPassageSha256": "574ef28a32e1553667d173f827274f25224328e0e93dd5b3a5011bca1b4021e4",
+        "passageStillExact": true,
+        "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "record": "step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+      },
+      "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
+      "composedSpecIds": [
+        "scan:successor-dead-vocabulary"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/runner/dead-vocabulary-guard.test.mjs",
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r28627",
+      "memberId": "dynamic-023901",
+      "source": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "sha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "verbatimPassage": "    codeFiles.push(configJson);\n  }\n\n  const docDirs = [\n    path.join(REPO_ROOT, 'docs', 'specs'),\n    path.join(REPO_ROOT, 'docs', 'platform', 'agent-coordination', 'contracts'),\n    path.join(REPO_ROOT, 'docs', 'architect', 'agent-coordination', 'contracts'),\n  ];\n  const docFiles = docDirs.flatMap((d) => collectFiles(d, ['.md']));",
+        "verbatimPassageSha256": "b95b7c78838a7575ab191648359b1d6954d57edb929b04a50a496a564f5c8d6d",
+        "passageStillExact": true,
+        "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "record": "step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+      },
+      "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
+      "composedSpecIds": [
+        "scan:successor-dead-vocabulary"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/runner/dead-vocabulary-guard.test.mjs",
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r28628",
+      "memberId": "dynamic-023902",
+      "source": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "sha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "verbatimPassage": "  }\n\n  const docDirs = [\n    path.join(REPO_ROOT, 'docs', 'specs'),\n    path.join(REPO_ROOT, 'docs', 'platform', 'agent-coordination', 'contracts'),\n    path.join(REPO_ROOT, 'docs', 'architect', 'agent-coordination', 'contracts'),\n  ];\n  const docFiles = docDirs.flatMap((d) => collectFiles(d, ['.md']));\n",
+        "verbatimPassageSha256": "dd005b03b74e9a7a544113ccf5dcb1125808ef6b1f84eab41ea7fe4bd072f027",
+        "passageStillExact": true,
+        "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "record": "step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+      },
+      "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
+      "composedSpecIds": [
+        "scan:successor-dead-vocabulary"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/runner/dead-vocabulary-guard.test.mjs",
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r28629",
+      "memberId": "dynamic-023903",
+      "source": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "sha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "verbatimPassage": "\n  const docDirs = [\n    path.join(REPO_ROOT, 'docs', 'specs'),\n    path.join(REPO_ROOT, 'docs', 'platform', 'agent-coordination', 'contracts'),\n    path.join(REPO_ROOT, 'docs', 'architect', 'agent-coordination', 'contracts'),\n  ];\n  const docFiles = docDirs.flatMap((d) => collectFiles(d, ['.md']));\n\n  const violations = [];",
+        "verbatimPassageSha256": "0ed22db48bbe0046e74f60e9bf8752f364c1fa7d4a7d08197902b09dfb850f7c",
+        "passageStillExact": true,
+        "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "record": "step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+      },
+      "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
+      "composedSpecIds": [
+        "scan:successor-dead-vocabulary"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/runner/dead-vocabulary-guard.test.mjs",
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r28634",
+      "memberId": "reference-004371",
+      "source": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "sha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "verbatimPassage": "    return out;\n  };\n\n  const roots = ['src', 'bin', 'core', 'domains', 'packages', 'apps', 'herdr-dashboard', path.join('docs', 'specs')];\n  const files = [\n    ...roots.flatMap((d) => walk(path.join(REPO_ROOT, d))),\n    path.join(REPO_ROOT, 'AGENTS.md'),",
+        "verbatimPassageSha256": "4d4ed723c56a0ec2c6edb5c6bc2ada6c1eed338964874f7a7e999e350bbcbd5e",
+        "passageStillExact": true,
+        "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "record": "step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+      },
+      "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
+      "composedSpecIds": [
+        "scan:successor-dead-vocabulary"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/runner/dead-vocabulary-guard.test.mjs",
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r28636",
+      "memberId": "reference-004373",
+      "source": {
+        "file": "test/runner/dead-vocabulary-guard.test.mjs",
+        "sha256": "df36a4b180349cf57c3c56e053779ab908927191900a927b4d9ef17636a08f4e",
+        "verbatimPassage": "    'fgos-capability-dispatching',\n  ];\n\n  const searchDirs = ['docs/specs', 'core', 'domains'].map((d) => path.join(REPO_ROOT, d));\n  const docFiles = searchDirs.flatMap((d) => collectFiles(d, ['.md']));\n  const agentsMd = path.join(REPO_ROOT, 'AGENTS.md');\n  if (fs.existsSync(agentsMd)) docFiles.push(agentsMd);",
+        "verbatimPassageSha256": "25dde8f1a4c8b8503a4da4528dba78c27f8c72f477c944f94e1f39e0aa58ef06",
+        "passageStillExact": true,
+        "originalSourceSha256": "728f084b6d966b4aae4d22aa948a0c3ef55097e39f58036a03b0fd0bdad633f8",
+        "record": "step-05-records/tests-judgment-batch4.jsonl",
+        "recordLine": 1,
+        "recordSha256": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6"
+      },
+      "liveHolder": "test/runner/dead-vocabulary-guard.test.mjs#collectPlatformSpecs",
+      "composedSpecIds": [
+        "scan:successor-dead-vocabulary"
+      ],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/runner/dead-vocabulary-guard.test.mjs",
+      "disposition": "successor scan co-cut composed; coverage replay remains independent evidence",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r39490",
+      "memberId": "dynamic-033375",
+      "source": {
+        "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
+        "sha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+        "verbatimPassage": "  assert.equal(parserTestAttr.resolutionStatus, 'example-not-target');\n  assert.equal(parserTestAttr.isSafeRewriteTarget, false);\n\n  // Real existing repository-local spec\n  const runnerAttr = classifyPathAttributes('docs/specs/runner.md', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'repository-local-contract' });\n  assert.equal(runnerAttr.referenceKind, 'literal-current-path');\n  assert.equal(runnerAttr.existenceStatus, 'exists');\n  assert.equal(runnerAttr.sourceRole, 'platform-specification-or-doctrine');\n  assert.equal(runnerAttr.resolutionStatus, 'resolved');",
+        "verbatimPassageSha256": "e32afaa879c58a8d06566c9a432d29c5fada9a38e1ae2440f3b0cbd644fa0c07",
+        "passageStillExact": true,
+        "originalSourceSha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+        "record": "step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 29,
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+      },
+      "liveHolder": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r39491",
+      "memberId": "dynamic-033376",
+      "source": {
+        "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
+        "sha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+        "verbatimPassage": "  assert.equal(parserTestAttr.resolutionStatus, 'example-not-target');\n  assert.equal(parserTestAttr.isSafeRewriteTarget, false);\n\n  // Real existing repository-local spec\n  const runnerAttr = classifyPathAttributes('docs/specs/runner.md', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'repository-local-contract' });\n  assert.equal(runnerAttr.referenceKind, 'literal-current-path');\n  assert.equal(runnerAttr.existenceStatus, 'exists');\n  assert.equal(runnerAttr.sourceRole, 'platform-specification-or-doctrine');\n  assert.equal(runnerAttr.resolutionStatus, 'resolved');",
+        "verbatimPassageSha256": "e32afaa879c58a8d06566c9a432d29c5fada9a38e1ae2440f3b0cbd644fa0c07",
+        "passageStillExact": true,
+        "originalSourceSha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+        "record": "step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 29,
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+      },
+      "liveHolder": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r39498",
+      "memberId": "dynamic-033383",
+      "source": {
+        "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
+        "sha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+        "verbatimPassage": "  assert.equal(staleAttr.resolutionStatus, 'stale-retired');\n  assert.equal(staleAttr.isSafeRewriteTarget, false);\n\n  // F3: Curated generated projection of platform operating laws\n  const genMirrorAttr = classifyPathAttributes('docs/specs/platform-foundations.md', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'repository-local-contract' });\n  assert.equal(genMirrorAttr.referenceKind, 'generated-mirror');\n  assert.equal(genMirrorAttr.existenceStatus, 'exists');\n  assert.equal(genMirrorAttr.sourceRole, 'generated-projection-non-authority');\n  assert.equal(genMirrorAttr.resolutionStatus, 'resolved');",
+        "verbatimPassageSha256": "49c1e5ddc4642a7573d365c5656068c69d6ab8342d05f73308674ecd7e43fabb",
+        "passageStillExact": true,
+        "originalSourceSha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+        "record": "step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 29,
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+      },
+      "liveHolder": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r39499",
+      "memberId": "dynamic-033384",
+      "source": {
+        "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
+        "sha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+        "verbatimPassage": "  assert.equal(staleAttr.resolutionStatus, 'stale-retired');\n  assert.equal(staleAttr.isSafeRewriteTarget, false);\n\n  // F3: Curated generated projection of platform operating laws\n  const genMirrorAttr = classifyPathAttributes('docs/specs/platform-foundations.md', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'repository-local-contract' });\n  assert.equal(genMirrorAttr.referenceKind, 'generated-mirror');\n  assert.equal(genMirrorAttr.existenceStatus, 'exists');\n  assert.equal(genMirrorAttr.sourceRole, 'generated-projection-non-authority');\n  assert.equal(genMirrorAttr.resolutionStatus, 'resolved');",
+        "verbatimPassageSha256": "49c1e5ddc4642a7573d365c5656068c69d6ab8342d05f73308674ecd7e43fabb",
+        "passageStillExact": true,
+        "originalSourceSha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+        "record": "step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 29,
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+      },
+      "liveHolder": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r39557",
+      "memberId": "reference-005064",
+      "source": {
+        "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
+        "sha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+        "verbatimPassage": "  assert.equal(parserTestAttr.isSafeRewriteTarget, false);\n\n  // Real existing repository-local spec\n  const runnerAttr = classifyPathAttributes('docs/specs/runner.md', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'repository-local-contract' });\n  assert.equal(runnerAttr.referenceKind, 'literal-current-path');\n  assert.equal(runnerAttr.existenceStatus, 'exists');\n  assert.equal(runnerAttr.sourceRole, 'platform-specification-or-doctrine');",
+        "verbatimPassageSha256": "fb9456e722dc069600ff1fba3b9fded2aad760f66b0408a6a61a1a4a2393b0e3",
+        "passageStillExact": true,
+        "originalSourceSha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+        "record": "step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 29,
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+      },
+      "liveHolder": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 8,
+      "rowId": "r39565",
+      "memberId": "reference-005072",
+      "source": {
+        "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
+        "sha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+        "verbatimPassage": "  assert.equal(staleAttr.isSafeRewriteTarget, false);\n\n  // F3: Curated generated projection of platform operating laws\n  const genMirrorAttr = classifyPathAttributes('docs/specs/platform-foundations.md', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'repository-local-contract' });\n  assert.equal(genMirrorAttr.referenceKind, 'generated-mirror');\n  assert.equal(genMirrorAttr.existenceStatus, 'exists');\n  assert.equal(genMirrorAttr.sourceRole, 'generated-projection-non-authority');",
+        "verbatimPassageSha256": "dfc3f4da03c9acca5a6c2fc8df4d5ded601c8920eb712c8d69eaf877a835bd91",
+        "passageStillExact": true,
+        "originalSourceSha256": "aa88cf711944f80ce3945931d88d38efa08f2140440e912868394b1aefe6bcc7",
+        "record": "step-05-records/tests-judgment-batch6.jsonl",
+        "recordLine": 29,
+        "recordSha256": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80"
+      },
+      "liveHolder": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "composedSpecIds": [],
+      "policyRef": "scan-policy.json",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "disposition": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r00004",
+      "memberId": "reference-000004",
+      "source": {
+        "file": ".agents/skills/_shared/citation-format.md",
+        "sha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+        "verbatimPassage": "tsk-37i: fgOS has three citation ID systems, each with a different\nlifetime and scope — global-permanent (`ADR<n>`, `docs/decisions/*.md`),\narea-scoped-reset-per-file (`RUL<n>`, resets inside each\n`docs/specs/<area>.md`), and feature-scoped (`D<n>` \"D-local\",\n`docs/history/<feature>/CONTEXT.md`). That 3-tier shape is correct and\nstays as-is — upstream project `beegog` independently converged on the\nidentical structure, recorded in",
+        "verbatimPassageSha256": "e62c6b7bb493aee8c6300a996213accbf6bd0f4006342cb400c5865f2882273c",
+        "passageStillExact": true,
+        "originalSourceSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 1,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r00012",
+      "memberId": "reference-000012",
+      "source": {
+        "file": ".agents/skills/_shared/citation-format.md",
+        "sha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+        "verbatimPassage": "design record) detects two finding kinds relevant to this rule —\n`bare-citation` (an `ADR`/`RUL` id with no qualifying gloss) and\n`d-local-outside-home` (a `D<n>` id in any file that is not its own\n`CONTEXT.md`) — across `docs/backlog.md`, `docs/specs/*.md`, and any\n`--skills-dir` root given to it. It ratchets against a checked-in\nbaseline (`scripts/check-decision-citation-drift.baseline.json`): a\ncitation already known at the time the baseline was generated stays",
+        "verbatimPassageSha256": "5c316438d32212f9bebe0da8df784f09cff3c59c21deb90a5e1f62b258904eb9",
+        "passageStillExact": true,
+        "originalSourceSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 1,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r00013",
+      "memberId": "reference-000013",
+      "source": {
+        "file": ".agents/skills/_shared/citation-format.md",
+        "sha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+        "verbatimPassage": "# Shared fragment: citation-format\n\ntsk-37i: fgOS has three citation ID systems, each with a different\nlifetime and scope — global-permanent (`ADR<n>`, `docs/decisions/*.md`),\narea-scoped-reset-per-file (`RUL<n>`, resets inside each\n`docs/specs/<area>.md`), and feature-scoped (`D<n>` \"D-local\",\n`docs/history/<feature>/CONTEXT.md`). That 3-tier shape is correct and",
+        "verbatimPassageSha256": "77699642125c2ce133740843b39a12cd1f07e172bccbfe183cd368e636d9b661",
+        "passageStillExact": true,
+        "originalSourceSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 1,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r01964",
+      "memberId": "author-s67-citation-core-4-51",
+      "source": {
+        "file": "core/skills/_shared/citation-format.md",
+        "sha256": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+        "verbatimPassage": "# Shared fragment: citation-format\n\ntsk-37i: fgOS has three citation ID systems, each with a different\nlifetime and scope — global-permanent (`ADR<n>`, `docs/decisions/*.md`),\narea-scoped-reset-per-file (`RUL<n>`, resets inside each\n`docs/specs/<area>.md`), and feature-scoped (`D<n>` \"D-local\",\n`docs/history/<feature>/CONTEXT.md`). That 3-tier shape is correct and",
+        "verbatimPassageSha256": "77699642125c2ce133740843b39a12cd1f07e172bccbfe183cd368e636d9b661",
+        "passageStillExact": true,
+        "originalSourceSha256": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 2,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r01967",
+      "memberId": "author-s67-citation-core-6-2",
+      "source": {
+        "file": "core/skills/_shared/citation-format.md",
+        "sha256": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+        "verbatimPassage": "tsk-37i: fgOS has three citation ID systems, each with a different\nlifetime and scope — global-permanent (`ADR<n>`, `docs/decisions/*.md`),\narea-scoped-reset-per-file (`RUL<n>`, resets inside each\n`docs/specs/<area>.md`), and feature-scoped (`D<n>` \"D-local\",\n`docs/history/<feature>/CONTEXT.md`). That 3-tier shape is correct and\nstays as-is — upstream project `beegog` independently converged on the\nidentical structure, recorded in",
+        "verbatimPassageSha256": "e62c6b7bb493aee8c6300a996213accbf6bd0f4006342cb400c5865f2882273c",
+        "passageStillExact": true,
+        "originalSourceSha256": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 2,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r01971",
+      "memberId": "author-s67-citation-core-96-44",
+      "source": {
+        "file": "core/skills/_shared/citation-format.md",
+        "sha256": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+        "verbatimPassage": "design record) detects two finding kinds relevant to this rule —\n`bare-citation` (an `ADR`/`RUL` id with no qualifying gloss) and\n`d-local-outside-home` (a `D<n>` id in any file that is not its own\n`CONTEXT.md`) — across `docs/backlog.md`, `docs/specs/*.md`, and any\n`--skills-dir` root given to it. It ratchets against a checked-in\nbaseline (`scripts/check-decision-citation-drift.baseline.json`): a\ncitation already known at the time the baseline was generated stays",
+        "verbatimPassageSha256": "5c316438d32212f9bebe0da8df784f09cff3c59c21deb90a5e1f62b258904eb9",
+        "passageStillExact": true,
+        "originalSourceSha256": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 2,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r08634",
+      "memberId": "reference-002308",
+      "source": {
+        "file": "plugins/fgOS/skills/_shared/citation-format.md",
+        "sha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+        "verbatimPassage": "tsk-37i: fgOS has three citation ID systems, each with a different\nlifetime and scope — global-permanent (`ADR<n>`, `docs/decisions/*.md`),\narea-scoped-reset-per-file (`RUL<n>`, resets inside each\n`docs/specs/<area>.md`), and feature-scoped (`D<n>` \"D-local\",\n`docs/history/<feature>/CONTEXT.md`). That 3-tier shape is correct and\nstays as-is — upstream project `beegog` independently converged on the\nidentical structure, recorded in",
+        "verbatimPassageSha256": "e62c6b7bb493aee8c6300a996213accbf6bd0f4006342cb400c5865f2882273c",
+        "passageStillExact": true,
+        "originalSourceSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 3,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r08642",
+      "memberId": "reference-002316",
+      "source": {
+        "file": "plugins/fgOS/skills/_shared/citation-format.md",
+        "sha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+        "verbatimPassage": "design record) detects two finding kinds relevant to this rule —\n`bare-citation` (an `ADR`/`RUL` id with no qualifying gloss) and\n`d-local-outside-home` (a `D<n>` id in any file that is not its own\n`CONTEXT.md`) — across `docs/backlog.md`, `docs/specs/*.md`, and any\n`--skills-dir` root given to it. It ratchets against a checked-in\nbaseline (`scripts/check-decision-citation-drift.baseline.json`): a\ncitation already known at the time the baseline was generated stays",
+        "verbatimPassageSha256": "5c316438d32212f9bebe0da8df784f09cff3c59c21deb90a5e1f62b258904eb9",
+        "passageStillExact": true,
+        "originalSourceSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 3,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r08643",
+      "memberId": "reference-002317",
+      "source": {
+        "file": "plugins/fgOS/skills/_shared/citation-format.md",
+        "sha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+        "verbatimPassage": "# Shared fragment: citation-format\n\ntsk-37i: fgOS has three citation ID systems, each with a different\nlifetime and scope — global-permanent (`ADR<n>`, `docs/decisions/*.md`),\narea-scoped-reset-per-file (`RUL<n>`, resets inside each\n`docs/specs/<area>.md`), and feature-scoped (`D<n>` \"D-local\",\n`docs/history/<feature>/CONTEXT.md`). That 3-tier shape is correct and",
+        "verbatimPassageSha256": "77699642125c2ce133740843b39a12cd1f07e172bccbfe183cd368e636d9b661",
+        "passageStillExact": true,
+        "originalSourceSha256": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 3,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "core/skills/_shared/citation-format.md#decision-homes-after-the-authority-cutover",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r09039",
+      "memberId": "dynamic-006494",
+      "source": {
+        "file": "scripts/check-decision-citation-drift.mjs",
+        "sha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+        "verbatimPassage": "  if (fs.existsSync(specsDir)) {\n    const specFiles = fs\n      .readdirSync(specsDir)\n      .filter((f) => f.endsWith('.md'));\n    for (const file of specFiles) {\n      const fullPath = path.join(specsDir, file);\n      sources.push({\n        file: path.relative(cwd, fullPath).replaceAll('\\\\', '/'),\n        lines: fs\n          .readFileSync(fullPath, 'utf8')\n          .split('\\n'),",
+        "verbatimPassageSha256": "70b4730418678af13adec8a97e1b4100d71683db876e865e711542a850d19032",
+        "passageStillExact": true,
+        "originalSourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 5,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "scripts/check-decision-citation-drift.mjs#loadSourceFiles",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r09040",
+      "memberId": "dynamic-006495",
+      "source": {
+        "file": "scripts/check-decision-citation-drift.mjs",
+        "sha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+        "verbatimPassage": "  if (fs.existsSync(specsDir)) {\n    const specFiles = fs\n      .readdirSync(specsDir)\n      .filter((f) => f.endsWith('.md'));\n    for (const file of specFiles) {\n      const fullPath = path.join(specsDir, file);\n      sources.push({\n        file: path.relative(cwd, fullPath).replaceAll('\\\\', '/'),\n        lines: fs\n          .readFileSync(fullPath, 'utf8')\n          .split('\\n'),",
+        "verbatimPassageSha256": "70b4730418678af13adec8a97e1b4100d71683db876e865e711542a850d19032",
+        "passageStillExact": true,
+        "originalSourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 5,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "scripts/check-decision-citation-drift.mjs#loadSourceFiles",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r09056",
+      "memberId": "dynamic-006511",
+      "source": {
+        "file": "scripts/check-decision-citation-drift.mjs",
+        "sha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+        "verbatimPassage": "        : 'docs/decisions',\n    backlogPath:\n      backlogIdx >= 0\n        ? argv[backlogIdx + 1]\n        : 'docs/backlog.md',\n    specsDir:\n      specsIdx >= 0 ? argv[specsIdx + 1] : 'docs/specs',\n    skillsDirs,\n    baselinePath:\n      baselineIdx >= 0\n        ? argv[baselineIdx + 1]",
+        "verbatimPassageSha256": "40ba9ad20551bc8fbef7c82796b73cb2e2e7103f1a447aec3f48d306869aeb25",
+        "passageStillExact": true,
+        "originalSourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 5,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "scripts/check-decision-citation-drift.mjs#loadSourceFiles",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r09061",
+      "memberId": "dynamic-006516",
+      "source": {
+        "file": "scripts/check-decision-citation-drift.mjs",
+        "sha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+        "verbatimPassage": "  const supersededById = loadSupersededById(\n    path.resolve(cwd, decisionsDir),\n  );\n  const sourceFiles = loadSourceFiles(\n    path.resolve(cwd, backlogPath),\n    path.resolve(cwd, specsDir),\n    skillsDirs.map((d) => path.resolve(cwd, d)),\n    cwd,\n  );\n  const driftFindings = findCitationDriftFindings(\n    sourceFiles,",
+        "verbatimPassageSha256": "386e6cc32f81ca22d01b8c86a2c7bf8e6a6f85d974f7c0be7cf8ca0f2195f604",
+        "passageStillExact": true,
+        "originalSourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 5,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "scripts/check-decision-citation-drift.mjs#loadSourceFiles",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r09076",
+      "memberId": "reference-002467",
+      "source": {
+        "file": "scripts/check-decision-citation-drift.mjs",
+        "sha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+        "verbatimPassage": "#!/usr/bin/env node\n// check-decision-citation-drift.mjs -- detects two families of citation\n// defect across docs/backlog.md, docs/specs/*.md, and any --skills-dir\n// roots (recursive, *.md):\n// (1) dead-framing: a line cites a decision (ADR<n> or a bare NNNN) which\n//     has since been superseded, without naming the superseding decision",
+        "verbatimPassageSha256": "84fdf4f2a6c56daf97f9639ecd38dcb4328fa35d92157cacf645fe4d8d068a3d",
+        "passageStillExact": true,
+        "originalSourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 5,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "scripts/check-decision-citation-drift.mjs#loadSourceFiles",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r09078",
+      "memberId": "reference-002469",
+      "source": {
+        "file": "scripts/check-decision-citation-drift.mjs",
+        "sha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+        "verbatimPassage": "        ? argv[backlogIdx + 1]\n        : 'docs/backlog.md',\n    specsDir:\n      specsIdx >= 0 ? argv[specsIdx + 1] : 'docs/specs',\n    skillsDirs,\n    baselinePath:\n      baselineIdx >= 0",
+        "verbatimPassageSha256": "26e3625256481ca636ad183b16f8bbc57457b39c846a2a846072ea0662def657",
+        "passageStillExact": true,
+        "originalSourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 5,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "scripts/check-decision-citation-drift.mjs#loadSourceFiles",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 13,
+      "rowId": "r09080",
+      "memberId": "reference-002471",
+      "source": {
+        "file": "scripts/check-decision-citation-drift.mjs",
+        "sha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+        "verbatimPassage": " * Recursively collect `{file, lines}` for every markdown/JS source file\n * under `roots` (repo-root-relative), for the write-time citation sweep\n * `fgos decision --relation supersedes:<id>|touches:<id>` runs (D2/D8's\n * \"sweep docs/**+src/**+plugins/**\", not just docs/backlog.md+docs/specs/\n * *.md like this file's own CLI mode above). `excludeRelDirs` additionally\n * skips any file whose repo-relative path starts with one of the given\n * prefixes — the \"feature's own docs/history dir\" self-citation carve-out",
+        "verbatimPassageSha256": "01960d4af098f77e4e2d0f3a52e4ad0a5dadf9d4e1ce1a011451cdba08366295",
+        "passageStillExact": true,
+        "originalSourceSha256": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+        "record": "step-05-records/citation-ratchet-roots.jsonl",
+        "recordLine": 5,
+        "recordSha256": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b"
+      },
+      "liveHolder": "scripts/check-decision-citation-drift.mjs#loadSourceFiles",
+      "composedSpecIds": [
+        "convention:citation-homes",
+        "scan:recursive-platform-citations"
+      ],
+      "policyRef": null,
+      "owningProof": "test/scripts/check-decision-citation-drift.test.mjs",
+      "disposition": "composed scan/convention; render followers generated from core",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 17,
+      "rowId": "r00728",
+      "memberId": "author-seam8-agents-decision-home-74",
+      "source": {
+        "file": "AGENTS.md",
+        "sha256": "30f6499b652d02e15f1f24144dd90731a1ad49a312e968dae3b04fc11cd7227d",
+        "verbatimPassage": "6. **What learning gets left behind?** A settled decision goes into\n   `docs/decisions/`; a settled spec fact goes into the relevant\n   `docs/specs/<area>.md`.",
+        "verbatimPassageSha256": "bebaa1a45369af55897849a8af31ec7fe846ebcbfa8b42c0b2319a374ae88396",
+        "passageStillExact": true,
+        "originalSourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
+        "record": "step-05-records/runtime-judgment-part-22.jsonl",
+        "recordLine": 2,
+        "recordSha256": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c"
+      },
+      "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
+      "composedSpecIds": [
+        "convention:area-holder-table",
+        "scope-consumer:AGENTS.md",
+        "status-units:docs/platform/governance.md"
+      ],
+      "policyRef": null,
+      "owningProof": "area-holder-table.json",
+      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 17,
+      "rowId": "r00735",
+      "memberId": "reference-000123",
+      "source": {
+        "file": "AGENTS.md",
+        "sha256": "30f6499b652d02e15f1f24144dd90731a1ad49a312e968dae3b04fc11cd7227d",
+        "verbatimPassage": "- docs/specs/reading-map.md — where every doc and source path in this repo lives\n- docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)\n- plans/261017-1313-fgos-platform-program-board/plan.md — platform program board (lanes, waits, shared-file collisions). Do not read it by default. Open it only when you start, finish, block or land a platform lane (lock/git/state/config/runner): read the \"Các luồng\" and \"File chung dễ va\" sections, update your own lane's row, and add one line at the top of its `log.md`. Never read `log.md` whole; grep it by lane ID, date or commit.\n- docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary\n- docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own \"Lịch sử quyết định\" sections (tsk-1lv-4)\n- domains/<domain>/AGENTS.md — domain-specific doctrine (e.g. domains/coding/AGENTS.md for fgos-coding-* workflows), read dynamically by fgos-routing\n\n## Product priority order (D-ADR0030, docs/specs/runner.md)\n",
+        "verbatimPassageSha256": "c3e14d98deedc571a3fe14bbd7e71dce6f732259866429895c3a1cef02cf24b7",
+        "passageStillExact": true,
+        "originalSourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
+        "record": "step-05-records/runtime-judgment-part-22.jsonl",
+        "recordLine": 2,
+        "recordSha256": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c"
+      },
+      "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
+      "composedSpecIds": [
+        "convention:area-holder-table",
+        "scope-consumer:AGENTS.md",
+        "status-units:docs/platform/governance.md"
+      ],
+      "policyRef": null,
+      "owningProof": "area-holder-table.json",
+      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 17,
+      "rowId": "r00757",
+      "memberId": "reference-000145",
+      "source": {
+        "file": "AGENTS.md",
+        "sha256": "30f6499b652d02e15f1f24144dd90731a1ad49a312e968dae3b04fc11cd7227d",
+        "verbatimPassage": "\n\n## Before touching code\n\nRead `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for whatever\nyou're about to change. Specs are the state layer — BA-grade, tech-agnostic — read\nthe spec before the code.\n\n**Prior art before design.** Before designing a mechanism, find out what already existed",
+        "verbatimPassageSha256": "7c55cfd5c54486c9b0fed80d7441748c83de827e30e15dd1fc7a423a8b863565",
+        "passageStillExact": true,
+        "originalSourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
+        "record": "step-05-records/runtime-judgment-part-22.jsonl",
+        "recordLine": 2,
+        "recordSha256": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c"
+      },
+      "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
+      "composedSpecIds": [
+        "convention:area-holder-table",
+        "scope-consumer:AGENTS.md",
+        "status-units:docs/platform/governance.md"
+      ],
+      "policyRef": null,
+      "owningProof": "area-holder-table.json",
+      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 17,
+      "rowId": "r00763",
+      "memberId": "reference-000151",
+      "source": {
+        "file": "AGENTS.md",
+        "sha256": "30f6499b652d02e15f1f24144dd90731a1ad49a312e968dae3b04fc11cd7227d",
+        "verbatimPassage": "   behavior: never add an env switch, flag, or test-only code branch that skips\n   checks to make tests pass; fix production code or the fixture instead.\n6. **What learning gets left behind?** A settled decision goes into\n   `docs/decisions/`; a settled spec fact goes into the relevant\n   `docs/specs/<area>.md`.\n\n## Scratch artifacts\n\nKeep draft scripts, logs, patches and dumps out of the repository root. Use",
+        "verbatimPassageSha256": "9e61dbd096d1eb5c24d858274019eb357cba22653242a21adc03b6b37993a39b",
+        "passageStillExact": true,
+        "originalSourceSha256": "a4ce85494b7e0efaa72c746504b2df22aeb8e8c7c5089f74d85ae4de0322dfd9",
+        "record": "step-05-records/runtime-judgment-part-22.jsonl",
+        "recordLine": 2,
+        "recordSha256": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c"
+      },
+      "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
+      "composedSpecIds": [
+        "convention:area-holder-table",
+        "scope-consumer:AGENTS.md",
+        "status-units:docs/platform/governance.md"
+      ],
+      "policyRef": null,
+      "owningProof": "area-holder-table.json",
+      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 17,
+      "rowId": "r01903",
+      "memberId": "reference-000231",
+      "source": {
+        "file": "bin/fgos.mjs",
+        "sha256": "4ad9ed0cb07518ae19774ddcf058d78484b53de25b850ae641b7b53011010d5f",
+        "verbatimPassage": "      const source = optionalField(flags.source, 'decision --source requires a non-empty value (omit --source entirely to skip it)');\n      const id = optionalField(flags.id, 'decision --id requires a non-empty value (omit --id entirely to skip per-item scoping)');\n      // tsk-1lv-2 D4: a platform/repo-wide decision (no --id) carries\n      // --scope <area-slug> (e.g. \"repo\" for the whole codebase, or an\n      // area name matching docs/specs/<area>.md) so `fgos decision-index`\n      // can project it into docs/decisions/index.md. Purely optional and\n      // additive -- an item-scoped decision (--id set) has no use for it,\n      // and omitting it entirely is unaffected (same posture as\n      // --alternatives/--source above).",
+        "verbatimPassageSha256": "77f8297be1850916dd435551b2c04cb7dadbc61b34bf38feba44fa3d12415b16",
+        "passageStillExact": true,
+        "originalSourceSha256": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
+        "record": "step-05-records/runtime-judgment-part-22.jsonl",
+        "recordLine": 13,
+        "recordSha256": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c"
+      },
+      "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
+      "composedSpecIds": [
+        "convention:area-holder-table",
+        "hunk-park:bin/fgos.mjs",
+        "scope-consumer:bin/fgos.mjs",
+        "status-units:docs/platform/governance.md"
+      ],
+      "policyRef": null,
+      "owningProof": "area-holder-table.json",
+      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 17,
+      "rowId": "r13046",
+      "memberId": "reference-003643",
+      "source": {
+        "file": "src/cli/command-registry.mjs",
+        "sha256": "f31a4a3a1cf513e7c5219d445fd414296d90a3928ee7d5b7d6122516bbf9642e",
+        "verbatimPassage": "        id: { type: 'string', description: 'Work item id to also fold this decision under (optional; omit for the global log only).' },\n        relation: { type: 'string', description: 'none|supersedes:<id>|touches:<id> -- every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep.' },\n        scope: { type: 'string', description: 'An area slug (e.g. \"repo\", or one matching docs/specs/<area>.md) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by \"fgos decision-index\". Optional; omit for an item-scoped (--id) or unscoped decision.' },\n      },\n      positional: ['text'],",
+        "verbatimPassageSha256": "edf3360d6fc02a00eb98d57672960c009958bea7b2d5ed18b4b8cb21a12d6500",
+        "passageStillExact": true,
+        "originalSourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+        "record": "step-05-records/cli-help-messages.jsonl",
+        "recordLine": 3,
+        "recordSha256": "e87cdf03429074018e7cb4dd971cb71502dc87b28e17744d3d2c02d0d942ab67"
+      },
+      "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
+      "composedSpecIds": [
+        "convention:area-holder-table",
+        "recomposed-predecessor:src/cli/command-registry.mjs",
+        "scope-consumer:src/cli/command-registry.mjs",
+        "status-units:docs/platform/governance.md"
+      ],
+      "policyRef": null,
+      "owningProof": "area-holder-table.json",
+      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 17,
+      "rowId": "r13069",
+      "memberId": "reference-003666",
+      "source": {
+        "file": "src/cli/command-registry.mjs",
+        "sha256": "f31a4a3a1cf513e7c5219d445fd414296d90a3928ee7d5b7d6122516bbf9642e",
+        "verbatimPassage": "        id: { type: 'string', description: 'Work item id to also fold this decision under (optional; omit for the global log only).' },\n        relation: { type: 'string', description: 'none|supersedes:<id>|touches:<id> -- every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep.' },\n        scope: { type: 'string', description: 'An area slug (e.g. \"repo\", or one matching docs/specs/<area>.md) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by \"fgos decision-index\". Optional; omit for an item-scoped (--id) or unscoped decision.' },\n      },\n      positional: ['text'],",
+        "verbatimPassageSha256": "edf3360d6fc02a00eb98d57672960c009958bea7b2d5ed18b4b8cb21a12d6500",
+        "passageStillExact": true,
+        "originalSourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+        "record": "step-05-records/cli-help-messages.jsonl",
+        "recordLine": 3,
+        "recordSha256": "e87cdf03429074018e7cb4dd971cb71502dc87b28e17744d3d2c02d0d942ab67"
+      },
+      "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
+      "composedSpecIds": [
+        "convention:area-holder-table",
+        "recomposed-predecessor:src/cli/command-registry.mjs",
+        "scope-consumer:src/cli/command-registry.mjs",
+        "status-units:docs/platform/governance.md"
+      ],
+      "policyRef": null,
+      "owningProof": "area-holder-table.json",
+      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "independentVerdict": "pending"
+    },
+    {
+      "familyNumber": 17,
+      "rowId": "r19798",
+      "memberId": "reference-003908",
+      "source": {
+        "file": "src/state/store.mjs",
+        "sha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343",
+        "verbatimPassage": " * prefixes.\n *\n * `scope` (tsk-1lv-2 D4): optional free text (no enum, same posture as\n * `source`/`kind`) — an area slug (e.g. `'repo'`, or one matching\n * `docs/specs/<area>.md`) marking a PLATFORM/repo-wide decision, as\n * opposed to `id`'s per-item scoping. Absent entirely for an item-scoped\n * or unscoped decision; `src/report/decision-index.mjs`'s\n * `buildDecisionIndexMarkdown` is the one reader that filters on its\n * presence to build `docs/decisions/index.md`. This function never",
+        "verbatimPassageSha256": "d0c53d8e10bac426c2032c7e3451d579a8aaa612c0d313a4f98bee87530df9a5",
+        "passageStillExact": true,
+        "originalSourceSha256": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343",
+        "record": "step-05-records/runtime-judgment-part-28.jsonl",
+        "recordLine": 30,
+        "recordSha256": "5dfc39c71630b882fe11d4de1f78a01d9139de7b795442d5e31ab403214f533a"
+      },
+      "liveHolder": "docs/platform/governance.md#decision-scope-to-holder-table",
+      "composedSpecIds": [
+        "convention:area-holder-table",
+        "scope-consumer:src/state/store.mjs",
+        "status-units:docs/platform/governance.md"
+      ],
+      "policyRef": null,
+      "owningProof": "area-holder-table.json",
+      "disposition": "composed table/consumer packet; missing holder rows remain explicit carriage blockers",
+      "independentVerdict": "pending"
+    }
+  ],
+  "independentAcceptance": false
+}

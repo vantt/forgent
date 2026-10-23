@@ -1,0 +1,15 @@
+{
+  "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+  "sourceSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+  "headings": [
+    "### 0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]",
+    "### 0049 — P3b Work không còn stage: Work chỉ còn bản ghi/lifecycle, Workflow runner là sequencer duy nhất, đóng A4",
+    "### 0061 — Unit ad-hoc được `prefer`/`persona` mềm; one-liner `fgos run \"<prompt>\"`; `workflow start --units`/`--effort`; unit ghi nối nhánh (thay một phần mục 1 của 0047)"
+  ],
+  "requiredCarriages": [
+    "Participant append/read/subscribe",
+    "enduser-docs-authoring",
+    "enduser-docs-index",
+    "architecture intent live evidence holders"
+  ]
+}

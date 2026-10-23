@@ -1,0 +1,34 @@
+{
+  "sourceCommit": "3e2d05af89313dbfbf0d26cd0de34f6b660d194b",
+  "policies": [
+    {
+      "files": [
+        "scripts/generate-shipped-path-inventory.mjs",
+        "test/scripts/generate-shipped-path-inventory.test.mjs"
+      ],
+      "resolution": "Preserve old-root identity predicates as well as existing docs/platform classification. This classifies strings in a pinned inventory; it does not dereference docs/specs. No flat substitution, no new baseline.",
+      "owningProof": "test/scripts/generate-shipped-path-inventory.test.mjs"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "symbol": "checkDocNearDuplicate",
+      "resolution": "Existing whole-docs recursive walk already covers successors; reuse it unchanged. All six old operation witnesses bind to this function at current bytes.",
+      "owningProof": "test/setup/knowledge-doctor.test.mjs",
+      "proofScope": "Registry wiring only; production check replayed directly on current/post-move scratch docs. No claimed full owning behavior test."
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "resolution": "Preserve historical forbidden-edit membership test: it constrains changes in the original phase, not a read of a retired root. D3 may change its Git adapter, not this identity.",
+      "owningProof": null,
+      "proofGap": "No existing verifier owning test found; historical membership predicate retained by inspection. Verifier replay is D3-owned."
+    },
+    {
+      "file": "scripts/check-decision-citation-drift.baseline.json",
+      "resolution": "Preserve the entire baseline byte-for-byte, including old-root keys. New findings stay failures. No key migration or rebaseline is proposed."
+    },
+    {
+      "file": "test/report/helpers/docs-index-state-fixture.mjs",
+      "resolution": "Reuse Step 7 rollup capture co-cut plus enduser-index-test. SourceCaptureId stays doc-fgos-rollup-howto. Post-move generator parity must decide any missing carry, not a fixture invented to pass."
+    }
+  ]
+}

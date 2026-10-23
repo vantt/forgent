@@ -1,0 +1,120 @@
+{
+  "citation": {
+    "beforeFiles": 17,
+    "afterFiles": 68,
+    "beforeFindings": 0,
+    "afterFindings": 124,
+    "missingExactFindingOccurrences": 0,
+    "exactCoverageSuperset": true,
+    "retainedSourceFilesNotScanned": [],
+    "baselineSha256": "ac0a6e980278f4be3ea3b2f7dbcf0f9004cf5fe1a7a35dbe1451aa0328ab4fff",
+    "baselineUnchanged": true,
+    "newUnbaselinedFindings": 124,
+    "note": "Strict finding-content coverage is not acceptance or a baseline rewrite; each miss needs source-unit carriage/rewrite review."
+  },
+  "enduser": {
+    "before": 492,
+    "after": 490,
+    "beforeSha256": "9bc71cf022a86ec5cad295fb2487cf96351f17d3630f02cd15d719f5bfb2bb9d",
+    "afterSha256": "f1da752704c0599673f8c6d96d0c3a28c56aa8d5cfa4a8320c56ed1ba18eb9e4",
+    "removed": [
+      "docs/explanation/work-item-lifecycle-and-domain-model.md",
+      "docs/how-to/check-rollup-progress.md"
+    ],
+    "added": [],
+    "boundedExportSha256": "704bc549891c7fdac665b18d46362c192c758478cd4ca61d717635f785774159",
+    "noLiveStoreRead": true
+  },
+  "shippedClassifier": {
+    "cases": [
+      {
+        "path": "docs/specs",
+        "before": {
+          "scope": "repository-local-contract",
+          "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+        },
+        "after": {
+          "scope": "repository-local-contract",
+          "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+        }
+      },
+      {
+        "path": "docs/specs/runner.md",
+        "before": {
+          "scope": "repository-local-contract",
+          "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+        },
+        "after": {
+          "scope": "repository-local-contract",
+          "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+        }
+      },
+      {
+        "path": "docs/architect",
+        "before": {
+          "scope": "repository-local-contract",
+          "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+        },
+        "after": {
+          "scope": "repository-local-contract",
+          "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+        }
+      },
+      {
+        "path": "docs/architect/component-boundary/README.md",
+        "before": {
+          "scope": "repository-local-contract",
+          "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+        },
+        "after": {
+          "scope": "repository-local-contract",
+          "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+        }
+      },
+      {
+        "path": "docs/platform/runner/spec.md",
+        "before": {
+          "scope": "repository-local-contract",
+          "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+        },
+        "after": {
+          "scope": "repository-local-contract",
+          "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+        }
+      },
+      {
+        "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "before": {
+          "scope": "repository-local-contract",
+          "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+        },
+        "after": {
+          "scope": "repository-local-contract",
+          "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+        }
+      },
+      {
+        "path": "docs/knowledge/example/guide.md",
+        "before": {
+          "scope": "mixed-or-unclassified",
+          "rationale": "Requires audit during Phase 02 inventory"
+        },
+        "after": {
+          "scope": "mixed-or-unclassified",
+          "rationale": "Requires audit during Phase 02 inventory"
+        }
+      }
+    ],
+    "unchanged": true
+  },
+  "nearDuplicate": {
+    "before": {
+      "passed": true,
+      "message": "no near-duplicate authoritative claims"
+    },
+    "after": {
+      "passed": true,
+      "message": "no near-duplicate authoritative claims"
+    }
+  }
+}
