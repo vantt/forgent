@@ -393,3 +393,7 @@ Lead checks this bounded repair and the three r2 verdicts, accounts the actual r
 ### Closure review round 4 (C) and L12-135
 
 A-r3 APPROVE, B-r3 APPROVE, C-r3 REWORK → L12-134, C-r4 REWORK (12 unrecorded historical-replay readers, sibling inconsistency, fence@N wording) → L12-135 (Lead, records-only; manifest 48 inputs / 135 joins / 47 reader files in the L12-129 gate; assembler rerun twice byte-identical; determinism record refreshed after 7adba4a48 left it stale).
+
+### Phase 8 closed (L12-136, 2026-10-23)
+
+A r3 APPROVE, B r3 APPROVE, C r5 checks pass with stale-field fixes verified by recount. Pair audit exit 0 at f33123174. Not landed on main; Phase 9 starts only on the owner's explicit cutover approval and must clear the 12 PRE-FLIP gates first.
