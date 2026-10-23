@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "96e7d38d0020ee999664fb7f70d51249f20ae6f0f29a24dd46c438a6be0180ad",
+  "payloadDigest": "071c6263ca8816c90e371b64b8a4b1b5dde2b33842941446277dce318b29320c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -327,7 +327,7 @@
     "packages/git/rust/tests/repository_config.rs": "cdd3a5d0ffa5cfe78e3533a3c58ab3a65aab5ff52dd87cb719aa37f4ee7e3212",
     "packages/git/rust/tests/safe_restore.rs": "ad8c5d0dabd9e7076a4d26fb706523fd293ce713bcc805b21600e5ee4a56f7e5",
     "packages/git/rust/tests/scoped_commit_sync.rs": "70afc54504d532f507352a6d24c1d144428d8c608c490a0ba442a927efb29d3c",
-    "packages/git/rust/tests/sequence.rs": "00aa2632cbf646e1dd4ab3861f2dc144230583a48671f6d02ecf6e643d2427c9",
+    "packages/git/rust/tests/sequence.rs": "40fd63b603f193c20ade1d1dd20bc309c2defc1ce902deda9b4241693f777df1",
     "packages/git/rust/tests/ssh_transport.rs": "0c49c0d61922fc89472a7168711b8d27c1266a50bece8fc200534c1f5b6e8d41",
     "packages/git/rust/tests/support/land.rs": "46bec8c0928eb4b53d6db71204661638b626b6dfe199d39f4890444c1b14ac07",
     "packages/git/rust/tests/support/signing.rs": "a083733ad39ab4d35f12a600b5cd90ac08c53ae35686ce66f22147b933bf634c",
@@ -927,7 +927,7 @@
     "src/setup/seat-binding-conversion.mjs": "9f1b782a5a4a9059ad82fda27b79c6cc5ffaf057f6f1347e79ae5d74b49c00a1",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
     "src/setup/skill-wrappers.mjs": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
-    "src/setup/terminal-control-checks.mjs": "752969cf35bce6a6bfbea3d7a1d13523b322bbf67ad7c5dfbeaf5e3e4f3bb5bf",
+    "src/setup/terminal-control-checks.mjs": "8819c4ad5330d955c1c022fd740f263c0ee9018cd41f09a4ed31863bfc719490",
     "src/setup/workflow-case-checks.mjs": "de600986a2325b0a3653835bed153a11ffc447aa31212db8cd4e9d90dd67ed59",
     "src/setup/workflow-definition-files.mjs": "40dc0e0550959c84c34e58c70947859d58baad69f7ffd4fcfa630ee57bdd0e1e",
     "src/state/awaiting-context.mjs": "dda0f698b6b0cad343fdc39738f98e19975463ff4e1457a3d9390dd0b36576ea",
@@ -1071,13 +1071,6 @@
       "line": 146,
       "spawn": "execFileSync",
       "binary": "? readSharedConfig(dir)[key]",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/setup/terminal-control-checks.mjs",
-      "line": 92,
-      "spawn": "ask -> src/setup/terminal-control-checks.mjs:87",
-      "binary": "? value",
       "family": "unresolved-binary"
     }
   ],
