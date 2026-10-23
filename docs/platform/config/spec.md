@@ -5,11 +5,11 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for fgOS configuration: which files, which schema, which value wins, who may write, and the comments every writer must leave
 Design status: Signed by the owner on 2026-10-22 as a whole; amended 2026-10-23 (section 4 now JSON Schema, section 10 settled, counts corrected) and again 2026-10-23 11:45 (shape in the schema, values in a separate standard file, fewer annotations); see "Lịch sử quyết định"
-Implementation status: Not started
+Implementation status: Rust crate done (schemas and standard for every section, snapshot with provenance, scope rules, one-file write transaction, comment grammar, redaction; validator `jsonschema` =0.60.0, record in packages/config/upgrade-record.md). Not wired: no Node door and no caller reads config through it yet (Slice C); no migration, doctor checks or `~/.fgos/private` move (Slice D)
 Canonical: Yes
 Owner: Config component (proposed)
-Source (planned): packages/config/rust (crate fgos-config); section schemas (JSON Schema authored as YAML) core/config-schema/, section standards (the release's standard values) core/config-standard/
-Contracts (planned): packages/config/contracts/
+Source: packages/config/rust (crate fgos-config); section schemas (JSON Schema authored as YAML) core/config-schema/, section standards (the release's standard values) core/config-standard/
+Contracts: packages/config/contracts/
 Last reviewed: 2026-10-23
 Related:
 - docs/platform/yaml-document/spec.md (the leaf below: parse, edit, merge primitive)
