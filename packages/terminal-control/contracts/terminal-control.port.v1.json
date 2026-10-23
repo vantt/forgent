@@ -78,7 +78,7 @@
       "results": ["released", "kept-unknown", "unsupported", "unknown"],
       "effects": [
         "close: closes only the pane this key allocated, only when the server incarnation matches right before and right after the close; never closes a tab",
-        "retain: records released{retain, until}; a later reconcile closes only past until, same incarnation, foreground not foreign",
+        "retain: records released{retain, until}; the pane stays open, a later close by key is refused, and a person closes it (reconcile-scan reports it as retain-expired past until)",
         "attached slots: release removes label and link only, except a close whose callerPane is the slot's own pane (a person closing their own pane through /fgOS:terminal-close), which closes it like an allocated pane (same incarnation checks); the only exception"
       ]
     },
@@ -94,7 +94,7 @@
     "reconcile-scan": {
       "input": { "olderThanMs": "integer >= 0" },
       "results": ["scan", "unsupported", "unknown"],
-      "rule": "reports only; never closes anything because time passed (except retain past until under the release rule)"
+      "rule": "reports only; never closes anything, however much time passed; a retained pane past until is reported as retain-expired with its pane id"
     }
   },
   "results": {

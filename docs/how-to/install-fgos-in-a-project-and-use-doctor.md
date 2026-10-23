@@ -278,8 +278,7 @@ manual step.
 | `lock-kernel-semantics` | Both lock directories (`.fgos/locks`, `~/.local/state/fgos/locks`) give kernel lock exclusion, proven by a two-process probe | `... does not exist yet, not measured` (warning) or `... the filesystem gives no lock exclusion`; it also prints the state root and its source | you | Run `fgos setup` for a missing directory; move the workspace or state root off a network filesystem; from a checkout run through `npm run fgos:dev -- doctor` |
 | `lock-borrow-vectors` | A lock lent to a git child never leaks to a background process git starts | `borrowed lock leaks (git version ...): <vector>: <detail>` | you | Report it: activation refuses the same release; do not work around it |
 | `lock-holders` | Every holder of an fgOS lock is an fgOS process or a borrowed child, no previous holder's processes are left, and the `state` and `porting-events` hot records parse and name a holder that can be judged | `warning: gateway <path> held by pid <n> (<cmdline>), not a fgOS process ...` or `warning: state: <path> does not parse ...` | you | Stop the named process; for a `predecessor.json` warning, confirm the domain is gone, then remove that record; for a hot record, confirm the holder is gone, then run `fgos lock fence <resource>` |
-| `terminal-control` | The terminal driver (herdr) answers through the terminal port; prints its capabilities and the herdr server it talks to | `warning: terminal mode unsupported: herdr is not usable (herdr); direct mode unaffected` (a failure only for a bad `FGOS_HERDR_ANCHOR_PANE`) | you | Install herdr to use terminal mode; direct mode needs nothing |
-| `terminal-config` | `terminal.*` settings pass their rules; prints each value and whether it came from the project, the global config or the default | `terminal.allocationGraceMs = 40000 must be an integer of at least 60000 ...` | you | Fix the value in `.fgos/config.json` or `~/.fgos/config.json` |
+| `terminal-control` | The terminal driver (herdr) answers through the terminal port; prints its capabilities and the herdr server it talks to, then each `terminal.*` value with whether it came from the project, the global config or the default, and fails a value the rules refuse | `warning: terminal mode unsupported: herdr is not usable (herdr); direct mode unaffected` (a failure for a bad `FGOS_HERDR_ANCHOR_PANE` or a bad `terminal.*` value such as `terminal.allocationGraceMs = 40000 must be an integer of at least 60000 ...`) | you | Install herdr to use terminal mode (direct mode needs nothing); fix a bad value in `.fgos/config.json` or `~/.fgos/config.json` |
 | `terminal-allocations` | No terminal slot is stuck past `terminal.allocationGraceMs` and no retained pane is past its time | `warning: 1 slot(s) need a person; nothing was closed: <key>: ...` | you | Close the named pane yourself; doctor never closes one |
 | `herdr-executor-kinds` | Every executor dispatched through a herdr pane names a supported agent kind and no outdated integration hook | names the executor | you | Fix the executor's kind in the config |
 | `executor-profile-warnings` | Legacy executor entries hardcoding policy-shaped flags or account-pool env | `9 legacy executor-profile warning(s) (informational, not blocking)` | info | Migrate when convenient; each item names the target |
@@ -461,7 +460,6 @@ and nothing was recorded for a while. In that case continue it with
 | `.fgos/workflow-runs/<run-id>/advance.log` | Output of the detached advance process |
 | `.fgos/assignments/<unit-run>/<role>/<n>/assignment.json` | The unit's assignment (executor, brief) |
 | `.fgos/assignments/<unit-run>/<role>/<n>/runs/<NN>/visibility.json` | What was seen of the agent: outcome, pane, prompt readiness, `trustSeedFailed` |
-| `.fgos/assignments/<unit-run>/<role>/<n>/runs/<NN>/herdr-diagnosis.json` | What herdr said about the agent when the round did not settle: agent state, the detection rule that matched, the last screen |
 | `.fgos/assignments/<unit-run>/<role>/<n>/runs/<NN>/{result,evidence,exit}.json`, `stdout.log`, `stderr.log` | The agent's result and logs |
 
 ### 6.3. The outcome `blocked`
@@ -474,12 +472,12 @@ own home, then run again." Concretely:
 1. Open `visibility.json` of the failing round. A `trustSeedFailed` value names
    the agent home and says the project root "is not itself trusted ... so there
    is nothing to derive trust from": trust is missing, fix it as in 5.3.
-2. Open `herdr-diagnosis.json` and read `detectionScreen` to see the actual
-   dialog. If it is not a trust prompt (a login, a quota screen), solve that in
-   the agent CLI.
-3. If the pane is still open (the failure text says "Pane ... is left open"),
-   you can answer it there, but the run has already ended as failed. Grant trust
-   and start the run again; a run does not retry itself past a blocked outcome.
+2. If the pane is still open (the failure text says "Pane ... is left open"),
+   read the actual dialog there. If it is not a trust prompt (a login, a quota
+   screen), solve that in the agent CLI.
+3. You can answer the dialog in that pane, but the run has already ended as
+   failed. Grant trust and start the run again; a run does not retry itself past
+   a blocked outcome.
 4. Re-run `fgos doctor`: `agent-cli-project-trusted` should now be green.
 
 ### 6.4. Other failures
@@ -487,7 +485,7 @@ own home, then run again." Concretely:
 | Symptom | Likely cause | What to do |
 |---|---|---|
 | Step refused with `policy-refusal ... violates independence requirement against [...]` | A `reviewed` checker has no provider family different from the producer's (a panel never refuses for this) | Add a family to the pool (5.2); the producer already ran |
-| `execution-timeout` after a long wait | An agent looped or stalled. A busy stream is not treated as idle | Read the round's `stdout.log` and `herdr-diagnosis.json`; consider a different executor in the pool |
+| `execution-timeout` after a long wait | An agent looped or stalled. A busy stream is not treated as idle | Read the round's `stdout.log`; consider a different executor in the pool |
 | `parked` with an open question | A human gate | Answer: `fgos workflow answer <run-id> --step <step-id> --answer "<text>"`; the run continues |
 | `status` says `running`, no progress, `advance.running` false | Detached advance died | `fgos workflow resume <run-id>` |
 | Run not found | Wrong project or you ran with a mismatched `--dir` | Run from inside the project (5.4) |
