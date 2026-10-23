@@ -182,3 +182,13 @@ test('the pre-registration hashes every frozen file, and any change, addition or
   fs.rmSync(path.join(repo, removed));
   assert.deepEqual(freezeBroken(repo, frozen), [body, added, removed].sort());
 });
+
+test('V6\'s report reproduces at this HEAD: the scorer and the suite data V6 froze are byte-identical, only the contracts V7 overrides differ', () => {
+  const frozen = JSON.parse(fs.readFileSync(path.join(DATA, 'preregistration.json'), 'utf8'));
+  const contracts = [path.join('packages', 'mailbox', 'contracts', 'frame.v1.txt'), path.join('packages', 'mailbox', 'contracts', 'limits.v1.json')];
+  const broken = freezeBroken(REPO, frozen);
+  assert.deepEqual(broken.filter((f) => !contracts.includes(f)), [], 'V6\'s report reads only the scorer and the data, so they must keep V6\'s bytes');
+  assert.ok(Object.keys(frozen.files).includes(path.join('scripts', 'lib', 'mailbox-behaviour-score.mjs')));
+  assert.deepEqual(cellTable().map((c) => c.id), frozen.cells);
+  assert.deepEqual(baselineCells().map((c) => c.id), frozen.baselines);
+});

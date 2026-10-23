@@ -25,6 +25,7 @@
  * and its private home, writable), then the read-only binds the caller names
  * (added here), then the driver's command.
  */
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -45,10 +46,17 @@ export const LOGINS = Object.freeze({
   codex: { layout: 'codex-auth-json', file: 'auth.json', homeEnv: 'CODEX_HOME', source: (home) => ({ kind: 'codex-home', home }) },
 });
 
-/** The home directories masked by an empty read-only tmpfs: login stores and secrets. */
-export const MASKED_HOME_DIRS = Object.freeze(['.claude', '.codex', '.fgos', '.ssh', '.gnupg', '.aws', path.join('.config', 'gh'), '.agy-homes', '.gemini']);
-/** The files masked by an empty file, besides every `secrets.local.env` found under the secret roots. */
-export const MASKED_HOME_FILES = Object.freeze(['.claude.json']);
+/**
+ * The one list of known credential stores every confined launch masks, relative to the home.
+ * Directories get an empty read-only tmpfs: the CLIs' login stores, fgOS's own, SSH and GnuPG
+ * keys, and the GitHub, AWS, Google Cloud and Azure CLIs' stores.
+ */
+export const MASKED_HOME_DIRS = Object.freeze(['.claude', '.codex', '.fgos', '.ssh', '.gnupg', '.aws', path.join('.config', 'gh'), path.join('.config', 'gcloud'), '.azure', '.agy-homes', '.gemini']);
+/**
+ * Files masked by an empty file, besides every `secrets.local.env` found under the secret
+ * roots: Claude Code's account file, the npm, git, netrc, Docker and Kubernetes credentials.
+ */
+export const MASKED_HOME_FILES = Object.freeze(['.claude.json', '.npmrc', '.git-credentials', '.netrc', path.join('.docker', 'config.json'), path.join('.kube', 'config')]);
 const SECRET_FILE = 'secrets.local.env';
 const SECRET_DEPTH = 4;
 
@@ -170,6 +178,9 @@ export function maskPlan({ home = os.homedir(), codexAccountHomes = [], secretRo
   return { dirs, files, bindBack };
 }
 
+/** The sha256 of a mask plan, recorded in each run's ledger entry as the masks in force. */
+export const maskPlanSha256 = (masks) => crypto.createHash('sha256').update(JSON.stringify({ dirs: masks.dirs, files: masks.files, bindBack: masks.bindBack })).digest('hex');
+
 /**
  * The bwrap arguments of a mask plan: tmpfs, binds back, each tmpfs made read-only, and
  * each masked file replaced by `empty`, an empty regular file (bwrap binds without device
@@ -231,7 +242,9 @@ export function prepareConfinedRun({ base, runId, command, args = [], env = {}, 
   }
   const confined = [...head, ...maskArgs(masks, empty), '--ro-bind', base, base, ...argv, ...readOnly.flatMap((p) => ['--ro-bind', p, p]), ...tail];
   const copy = spec ? path.join(paths.home, spec.file) : null;
-  return { paths, command: prepared.invocation.command, args: confined, env: prepared.invocation.env, copy, snapshot: copy ? loginDigest(copy) : null };
+  // `launch` goes into the ledger entry: the CLI's own argv as given, and the masks in force.
+  const launch = { argv: [command, ...args], maskSha256: maskPlanSha256(masks) };
+  return { paths, command: prepared.invocation.command, args: confined, env: prepared.invocation.env, copy, snapshot: copy ? loginDigest(copy) : null, launch };
 }
 
 // ---------------------------------------------------------------- processes
@@ -333,7 +346,8 @@ function killRunProcesses(dir, pidNs, waitMs) {
  */
 export function startConfinedRun(prepared, { stdio = ['ignore', 'pipe', 'pipe'] } = {}) {
   const { paths } = prepared;
-  const entry = { runId: paths.runId, dir: paths.dir, startedAt: new Date().toISOString() };
+  // The login copy and its snapshot let the orphan sweep settle the copy of a run it ends.
+  const entry = { runId: paths.runId, dir: paths.dir, startedAt: new Date().toISOString(), ...prepared.launch, login: prepared.copy ? { copy: prepared.copy, snapshot: prepared.snapshot } : null };
   writeJson(paths.ledger, entry);
   // `prepared.command` is always BWRAP (the driver's configured executable); the program is named here.
   const child = spawn(BWRAP, prepared.args, { cwd: paths.ws, env: prepared.env, stdio });
@@ -369,14 +383,17 @@ export async function endConfinedRun(run, { waitMs = 5000, outcome = null } = {}
 /**
  * At every harness start: each ledger entry under `base` without an end is an orphan of a
  * harness that died. Its processes are killed (matched by recorded start times and its pid
- * namespace, or by the run directory), and it is recorded `error` (`orphan`). Returns the
- * swept run ids and the pids left; the caller starts no run while any is left.
+ * namespace, or by the run directory), its login copy is settled like a finished run's
+ * (`settleCopy`), and it is recorded `error` (`orphan`). Returns the swept run ids, the pids
+ * left and the copies set aside; the caller starts no run while any pid is left, and stops
+ * the batch for a copy set aside.
  */
 export function sweepOrphans(base, { waitMs = 5000 } = {}) {
   const dir = path.join(base, 'ledger');
   const swept = [];
   const left = [];
-  if (!isDir(dir)) return { swept, left };
+  const asides = [];
+  if (!isDir(dir)) return { swept, left, asides };
   for (const name of fs.readdirSync(dir).filter((n) => n.endsWith('.json')).sort()) {
     const file = path.join(dir, name);
     const entry = readJson(file);
@@ -386,10 +403,12 @@ export function sweepOrphans(base, { waitMs = 5000 } = {}) {
     killIfSame(entry.bwrapPid, entry.bwrapStart);
     const still = killRunProcesses(entry.dir, pidNs, waitMs);
     left.push(...still);
-    writeJson(file, { ...entry, endedAt: new Date().toISOString(), outcome: 'error', reason: 'orphan', left: still.length });
+    const settled = entry.login && !still.length ? settleCopy(entry.login, entry.dir) : null;
+    if (settled) asides.push({ runId: entry.runId, ...settled });
+    writeJson(file, { ...entry, endedAt: new Date().toISOString(), outcome: 'error', reason: 'orphan', left: still.length, ...(settled ? { loginAside: settled.aside } : {}) });
     swept.push(entry.runId);
   }
-  return { swept, left };
+  return { swept, left, asides };
 }
 
 // ---------------------------------------------------------------- the login guard
@@ -426,11 +445,22 @@ export async function waitForFreshLogin(login, { intervalMs = 5 * 60_000, maxMs 
  * batch's stop reason is returned with the kept path.
  */
 export function settleLoginCopy(prepared) {
-  if (!prepared.copy) return null;
-  const aside = setAsideChangedCopy(prepared.copy, prepared.snapshot, prepared.paths.dir);
+  return prepared.copy ? settleCopy({ copy: prepared.copy, snapshot: prepared.snapshot }, prepared.paths.dir) : null;
+}
+
+/**
+ * The one settlement of a login copy, for a finished run and an orphan alike: a copy that
+ * still has its snapshot bytes is removed (null); any other copy (changed, replaced or gone)
+ * is set aside into `dir` under the guard's one name, and the batch's stop reason is returned
+ * with the kept path.
+ */
+export function settleCopy({ copy, snapshot }, dir) {
+  const aside = setAsideChangedCopy(copy, snapshot, dir);
   if (aside === null) {
-    fs.rmSync(prepared.copy);
+    fs.rmSync(copy);
     return null;
   }
-  return { stop: 'login refreshed inside a run; the copy may hold the only valid token; ask the owner', aside };
+  return { stop: STOP_LOGIN, aside };
 }
+
+const STOP_LOGIN = 'login refreshed inside a run; the copy may hold the only valid token; ask the owner';

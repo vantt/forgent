@@ -104,6 +104,43 @@ fn the_empty_section_setup_writes_and_the_opt_in_flag_load_as_the_defaults() {
 }
 
 #[test]
+fn the_pointer_key_takes_a_list_of_cli_names_and_refuses_an_unknown_name() {
+    use fgos_mailbox::hook::Adapter;
+    assert!(defaults().hook.post_tool_use.pointer_clis.is_empty());
+    let with = |clis: Value| json!({ "mailbox": { "postToolUse": { "pointerClis": clis } } });
+
+    let loaded = load(Some(&with(json!(["codex"])))).unwrap();
+    assert_eq!(loaded.hook.post_tool_use.pointer_clis, vec![Adapter::Codex]);
+    let mut expected = defaults();
+    expected.hook.post_tool_use.pointer_clis = vec![Adapter::Codex];
+    assert_eq!(loaded, expected, "only the listed key changes");
+
+    assert_eq!(
+        load(Some(&with(json!(["codex", "pi"])))),
+        Err(LimitsError::Rejected(
+            "mailbox.postToolUse.pointerClis".to_string()
+        ))
+    );
+    assert_eq!(
+        load(Some(&with(json!("codex")))),
+        Err(LimitsError::WrongType(
+            "mailbox.postToolUse.pointerClis".to_string()
+        ))
+    );
+    // A number where the contract has a list, and a list where it has a number.
+    assert_eq!(
+        load(Some(&with(json!(1)))),
+        Err(LimitsError::WrongType(
+            "mailbox.postToolUse.pointerClis".to_string()
+        ))
+    );
+    assert_eq!(
+        load(Some(&json!({ "mailbox": { "maxOffers": [3] } }))),
+        Err(LimitsError::WrongType("mailbox.maxOffers".to_string()))
+    );
+}
+
+#[test]
 fn the_harness_only_key_is_dropped_before_deserialising() {
     let config = json!({ "mailbox": { "hook": { "p95TargetMs": 10 } } });
     let loaded = load(Some(&config)).expect("the hook's strict section never sees the harness key");

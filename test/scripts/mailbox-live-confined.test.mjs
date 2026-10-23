@@ -16,9 +16,12 @@ import { fileURLToPath } from 'node:url';
 
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import {
+  MASKED_HOME_DIRS,
+  MASKED_HOME_FILES,
   endConfinedRun,
   layOutRunProject,
   maskPlan,
+  maskPlanSha256,
   prepareConfinedRun,
   processesOfRun,
   settleLoginCopy,
@@ -26,6 +29,7 @@ import {
   sweepOrphans,
 } from '../../scripts/lib/mailbox-live-confined.mjs';
 import { ROTATED_AUTH, removeRunDir } from '../../scripts/lib/codex-auth-guard.mjs';
+import { CODEX_FEATURES_OFF, writeCodexConfig } from '../../scripts/lib/mailbox-behaviour-run.mjs';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const MODULE = path.join(REPO, 'scripts', 'lib', 'mailbox-live-confined.mjs');
@@ -272,7 +276,7 @@ test('the orphan sweep kills a run the harness did not finish, even one whose la
     const C = await import(${JSON.stringify(MODULE)});
     const entries = [];
     for (const runId of ['run-orphan-a', 'run-orphan-b']) {
-      const prepared = C.prepareConfinedRun({ base: ${JSON.stringify(w.base)}, runId, command: 'sleep', args: ['600'], env: { PATH: process.env.PATH }, masks: ${JSON.stringify(w.masks)} });
+      const prepared = C.prepareConfinedRun({ base: ${JSON.stringify(w.base)}, runId, command: 'sleep', args: ['600'], env: { PATH: process.env.PATH }, masks: ${JSON.stringify(w.masks)}, login: { cli: 'claude', home: ${JSON.stringify(w.loginHome)} } });
       entries.push(C.startConfinedRun(prepared, { stdio: 'ignore' }).entry);
     }
     process.stdout.write(JSON.stringify(entries) + '\\n');
@@ -280,6 +284,9 @@ test('the orphan sweep kills a run the harness did not finish, even one whose la
   const child = cp.spawn(process.execPath, ['--input-type=module', '-e', harness], { stdio: ['ignore', 'pipe', 'inherit'] });
   const line = await new Promise((resolve) => { let buf = ''; child.stdout.on('data', (d) => { buf += d; if (buf.includes('\n')) resolve(buf.split('\n')[0]); }); });
   const entries = JSON.parse(line);
+  // Each ledger entry names its login copy and the copy's snapshot; one copy changes while it runs.
+  for (const entry of entries) assert.equal(entry.login.snapshot, sha256(w.login), entry.runId);
+  fs.appendFileSync(entries[0].login.copy, 'REFRESHED');
   child.kill('SIGKILL');
   await new Promise((resolve) => child.once('exit', resolve));
   for (const entry of entries) assert.ok(processesOfRun(entry.dir, entry.pidNs).length > 0, `${entry.runId} outlives its killed harness`);
@@ -287,9 +294,18 @@ test('the orphan sweep kills a run the harness did not finish, even one whose la
   const bareFile = path.join(w.base, 'ledger', 'run-orphan-b.json');
   fs.writeFileSync(bareFile, JSON.stringify({ runId: 'run-orphan-b', dir: entries[1].dir, startedAt: entries[1].startedAt }));
 
-  const { swept, left } = sweepOrphans(w.base);
+  // The bare entry lost its launch facts but keeps the copy's: written before the spawn.
+  fs.writeFileSync(bareFile, JSON.stringify({ ...JSON.parse(fs.readFileSync(bareFile, 'utf8')), login: entries[1].login }));
+  const { swept, left, asides } = sweepOrphans(w.base);
   assert.deepEqual(swept, ['run-orphan-a', 'run-orphan-b']);
   assert.deepEqual(left, []);
+  // An orphan's login copy is settled as a finished run's: the changed one set aside, the equal one removed.
+  assert.deepEqual(asides.map((a) => [a.runId, a.aside]), [['run-orphan-a', path.join(entries[0].dir, ROTATED_AUTH)]]);
+  assert.match(asides[0].stop, /login refreshed inside a run/);
+  assert.match(fs.readFileSync(asides[0].aside, 'utf8'), /REFRESHED$/);
+  assert.equal(fs.existsSync(entries[0].login.copy), false);
+  assert.equal(fs.existsSync(entries[1].login.copy), false, 'an unchanged copy is removed');
+  assert.ok(fs.existsSync(path.dirname(entries[1].login.copy)), 'only the copy, never its home');
   for (const entry of entries) {
     assert.deepEqual(processesOfRun(entry.dir, entry.pidNs), [], entry.runId);
     const recorded = JSON.parse(fs.readFileSync(path.join(w.base, 'ledger', `${entry.runId}.json`), 'utf8'));
@@ -358,4 +374,100 @@ test('a changed login copy is set aside, never deleted, keeps its run directory 
   assert.equal(settleLoginCopy(same), null);
   assert.equal(fs.existsSync(same.copy), false, 'an unchanged copy is removed, by its name only');
   assert.ok(fs.existsSync(same.paths.home), 'the home with its transcripts stays');
+});
+
+/** A scratch home holding a planted file at every credential store of the one mask list. */
+function plantedHome() {
+  const home = makeFixtureDir('mbx-cred-home-');
+  const planted = {};
+  for (const dir of MASKED_HOME_DIRS) {
+    const file = path.join(home, dir, 'planted-credential');
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, 'PLANTED-CREDENTIAL\n');
+    planted[`dir:${dir}`] = file;
+  }
+  for (const rel of MASKED_HOME_FILES) {
+    const file = path.join(home, rel);
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, 'PLANTED-CREDENTIAL\n');
+    planted[`file:${rel}`] = file;
+  }
+  return { home, planted };
+}
+
+test('every credential store on the one mask list is masked in each CLI\'s confined argv, and a planted file at each path is unreadable inside the sandbox', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  for (const store of ['.npmrc', '.git-credentials', '.netrc', path.join('.docker', 'config.json'), path.join('.kube', 'config')]) assert.ok(MASKED_HOME_FILES.includes(store), store);
+  for (const store of ['.aws', path.join('.config', 'gh'), path.join('.config', 'gcloud'), '.azure', '.ssh', '.gnupg', '.claude', '.codex']) assert.ok(MASKED_HOME_DIRS.includes(store), store);
+  const { home, planted } = plantedHome();
+  const masks = maskPlan({ home, secretRoots: [] });
+  assert.equal(masks.dirs.length, MASKED_HOME_DIRS.length);
+  assert.equal(masks.files.length, MASKED_HOME_FILES.length);
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'mbx-cred-'));
+  const loginHome = makeFixtureDir('mbx-cred-login-');
+  fs.mkdirSync(path.join(loginHome, '.claude'));
+  fs.writeFileSync(path.join(loginHome, '.claude', '.credentials.json'), '{"claudeAiOauth":{"accessToken":"SCRATCH","expiresAt":1}}');
+  fs.writeFileSync(path.join(loginHome, 'auth.json'), '{"tokens":{"access_token":"SCRATCH"}}');
+  for (const cli of ['claude', 'codex']) {
+    const prepared = prepareConfinedRun({ base, runId: `run-cred-${cli}`, command: process.execPath, args: nodeProbe(READ_PROBE), env: baseEnv({ PROBE: JSON.stringify(planted) }), masks, login: { cli, home: loginHome } });
+    for (const dir of masks.dirs) assert.ok(prepared.args.join('\0').includes(['--tmpfs', dir].join('\0')), `${cli}: ${dir}`);
+    for (const file of masks.files) assert.ok(prepared.args.join('\0').includes(['--ro-bind', path.join(base, 'masks', 'empty'), file].join('\0')), `${cli}: ${file}`);
+    assert.equal(prepared.launch.maskSha256, maskPlanSha256(masks));
+    const run = startConfinedRun(prepared);
+    let stdout = '';
+    run.child.stdout.on('data', (d) => { stdout += d; });
+    run.child.stderr.resume();
+    await run.exited;
+    await endConfinedRun(run);
+    const seen = JSON.parse(stdout);
+    for (const key of Object.keys(planted)) assert.equal(seen[key], key.startsWith('dir:') ? 'ENOENT' : 0, `${cli} ${key}: ${stdout}`);
+    const entry = JSON.parse(fs.readFileSync(prepared.paths.ledger, 'utf8'));
+    assert.deepEqual(entry.argv, [process.execPath, ...nodeProbe(READ_PROBE)], 'the ledger entry records the argv');
+    assert.equal(entry.maskSha256, maskPlanSha256(masks), 'the ledger entry records the masks in force');
+  }
+  // The falsifier: the same probe without the confined launch reads every planted file.
+  const open = cp.spawnSync(process.execPath, nodeProbe(READ_PROBE), { env: baseEnv({ PROBE: JSON.stringify(planted) }), encoding: 'utf8' });
+  for (const [key, value] of Object.entries(JSON.parse(open.stdout))) assert.equal(value, 'PLANTED-CREDENTIAL\n'.length, key);
+});
+
+test('a confined Codex run lists no MCP server and has its connectors off, and the same launch with a planted server and without the off switches lists one', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  const release = codexRelease();
+  if (!release) return t.skip('Codex is not installed');
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'mbx-mcp-'));
+  const loginHome = makeFixtureDir('mbx-mcp-login-');
+  fs.writeFileSync(path.join(loginHome, 'auth.json'), '{"tokens":{"access_token":"SCRATCH-NOT-A-TOKEN"}}');
+  const masks = maskPlan({ codexAccountHomes: codexAccountHomes(), secretRoots: [], codexRelease: release });
+  const codex = path.join(release, 'bin', 'codex');
+  const zeroModel = async (runId, args, config) => {
+    const prepared = prepareConfinedRun({ base, runId, command: codex, args, env: baseEnv(), masks, login: { cli: 'codex', home: loginHome } });
+    config(prepared.paths.home);
+    const run = startConfinedRun(prepared);
+    let stdout = '';
+    run.child.stdout.on('data', (d) => { stdout += d; });
+    run.child.stderr.on('data', (d) => { stdout += d; });
+    const exit = await run.exited;
+    await endConfinedRun(run);
+    assert.equal(exit.code, 0, `${runId}: ${stdout}`);
+    return stdout;
+  };
+  const confinedConfig = (home) => writeCodexConfig(home, path.join(base, 'ws'), {}, { effort: 'low' });
+  const planted = (home) => {
+    confinedConfig(home);
+    fs.appendFileSync(path.join(home, 'config.toml'), '\n[mcp_servers.planted]\ncommand = "/bin/true"\n');
+  };
+  const withoutOff = (home) => {
+    confinedConfig(home);
+    const toml = fs.readFileSync(path.join(home, 'config.toml'), 'utf8');
+    fs.writeFileSync(path.join(home, 'config.toml'), toml.split('\n').filter((l) => !CODEX_FEATURES_OFF.some((f) => l.startsWith(`${f} =`))).join('\n'));
+  };
+  const flag = (listing, feature) => new RegExp(`^${feature}\\s+\\S.*\\s(true|false)$`, 'm').exec(listing)?.[1];
+
+  assert.match(await zeroModel('run-mcp-list', ['mcp', 'list'], confinedConfig), /No MCP servers configured/);
+  const features = await zeroModel('run-features', ['features', 'list'], confinedConfig);
+  // The account's connectors are the H3 risk: named here, not only through the list under test.
+  for (const feature of new Set(['apps', 'plugins', ...CODEX_FEATURES_OFF])) assert.equal(flag(features, feature), 'false', feature);
+
+  assert.match(await zeroModel('run-mcp-planted', ['mcp', 'list'], planted), /^planted\s/m, 'the falsifier: a planted server is listed');
+  assert.equal(flag(await zeroModel('run-features-on', ['features', 'list'], withoutOff), 'apps'), 'true', 'the falsifier: connectors are on by default');
 });

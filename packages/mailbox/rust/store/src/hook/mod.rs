@@ -13,10 +13,10 @@ pub mod shell;
 
 pub use drain::{
     begin, finish, render_reply, Begun, Claimed, FinishTicket, HandleOf, HeadFacts, HookCall,
-    HookReply, PointerOnly, QuietReason,
+    HookReply, PointerOnly, PointerReason, QuietReason,
 };
 pub(crate) use drain::{claim_inbox, InboxClaim};
-pub use limits::{BreakerLimits, HookCallLimits, HookLimits, StopBlockLimits};
+pub use limits::{BreakerLimits, HookCallLimits, HookLimits, PostToolUseLimits, StopBlockLimits};
 
 use fgos_mailbox_core::Cli;
 
@@ -39,8 +39,10 @@ impl HookEvent {
 }
 
 /// The CLI whose hook calls the entry. The entry is told which one; the
-/// drain never guesses it from the payload.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// drain never guesses it from the payload. Its serde form is
+/// [`Adapter::word`], so a config list of CLI names refuses an unknown one.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum Adapter {
     Claude,
     Codex,

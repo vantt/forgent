@@ -11,6 +11,17 @@ use serde::{Deserialize, Serialize};
 pub struct HookLimits {
     pub stop_block: StopBlockLimits,
     pub hook: HookCallLimits,
+    pub post_tool_use: PostToolUseLimits,
+}
+
+/// How a `PostToolUse` drain delivers.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct PostToolUseLimits {
+    /// The CLIs whose `PostToolUse` drain claims nothing and prints only the
+    /// pointer line (`[message.pointer]`), so the model reads its mail with
+    /// `inbox --claim`. A name that is not an adapter refuses the section.
+    pub pointer_clis: Vec<super::Adapter>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

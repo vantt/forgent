@@ -30,6 +30,10 @@ import {
   stageOrder,
   stagePhases,
   stepFinished,
+  writeCodexConfig,
+  CODEX_FEATURES_OFF,
+  harnessSend,
+  SEND_TRIES,
 } from '../../scripts/lib/mailbox-behaviour-run.mjs';
 import { SENDERS, cellTable } from '../../scripts/lib/mailbox-behaviour-score.mjs';
 
@@ -155,4 +159,54 @@ test('a stage limited to one CLI walks only that CLI\'s cells', () => {
   assert.ok(cells.every((c) => c.cli === 'claude'));
   assert.equal(stagePhases('B')[0].length, 38);
   assert.deepEqual(stagePhases('A', ['codex']).map((p) => p.length), [1, 19]);
+});
+
+test('the Codex run config writes the addendum\'s reasoning effort with every MCP and connector source off, and a run without an effort is refused', () => {
+  const home = scratch('codex-home-');
+  writeCodexConfig(home, '/w/ws', { PostToolUse: [] }, { effort: 'low' });
+  const toml = fs.readFileSync(path.join(home, 'config.toml'), 'utf8');
+  assert.match(toml, /^model_reasoning_effort = "low"$/m);
+  for (const feature of ['apps', 'plugins', 'remote_plugin', 'skill_mcp_dependency_install']) assert.match(toml, new RegExp(`^${feature} = false$`, 'm'));
+  assert.deepEqual(CODEX_FEATURES_OFF, ['apps', 'plugins', 'remote_plugin', 'skill_mcp_dependency_install']);
+  assert.doesNotMatch(toml, /mcp_servers/);
+  assert.match(toml, /^hooks = true$/m);
+  writeCodexConfig(home, '/w/ws', {}, { effort: 'medium' });
+  assert.match(fs.readFileSync(path.join(home, 'config.toml'), 'utf8'), /^model_reasoning_effort = "medium"$/m);
+  for (const effort of [undefined, null, '']) assert.throws(() => writeCodexConfig(home, '/w/ws', {}, { effort }), /names its reasoning effort/);
+});
+
+test('an arm\'s run id names its arm, and an unfinished arm run is recovered into its own cell', () => {
+  const cell = { id: 'codex/P/LR/PT', cli: 'codex', arm: 'P', variant: 'LR', channel: 'PT' };
+  assert.equal(runIdOf(cell, 7), 'codex.P.LR.PT.007');
+  assert.deepEqual(cellOfRunId('codex.P.LR.PT.007'), cell);
+  assert.deepEqual(cellOfRunId('codex.F.Q0.base.001'), { id: 'codex/F/Q0', cli: 'codex', arm: 'F', variant: 'Q0', channel: null });
+  assert.deepEqual(cellOfRunId('claude.LR.PT.001'), { id: 'claude/LR/PT', cli: 'claude', variant: 'LR', channel: 'PT' });
+  const base = scratch('arm-ledger-');
+  fs.mkdirSync(path.join(base, 'ledger'));
+  fs.writeFileSync(path.join(base, 'ledger', 'codex.P.LR.PT.007.json'), JSON.stringify({ runId: 'codex.P.LR.PT.007', dir: path.join(base, 'codex.P.LR.PT.007'), startedAt: 'x', endedAt: 'y', outcome: 'error', reason: 'orphan' }));
+  const results = path.join(base, 'results.jsonl');
+  const { appended } = recoverLedger(base, results);
+  assert.deepEqual(appended.map((l) => [l.runId, l.cell, l.arm]), [['codex.P.LR.PT.007', 'codex/P/LR/PT', 'P']]);
+});
+
+test('the harness\'s own send is tried again only while the record\'s lock is busy, and says how many tries it took', () => {
+  const ws = scratch('send-ws-');
+  const bin = path.join(ws, '.fgos', 'installation', 'bin', 'fgos');
+  fs.mkdirSync(path.dirname(bin), { recursive: true });
+  // The shim's stand-in answers from a script of replies, one per call.
+  const shim = (replies) => {
+    fs.writeFileSync(path.join(ws, 'replies'), replies.join('\n'));
+    fs.rmSync(path.join(ws, 'calls'), { force: true });
+    fs.writeFileSync(bin, `#!/bin/sh\necho x >> calls\nn=$(wc -l < calls)\nline=$(sed -n "\${n}p" replies)\ncase "$line" in ok) echo "recorded m-$n for head"; exit 0;; *) echo "$line"; exit 1;; esac\n`, { mode: 0o755 });
+  };
+  const busy = 'Not done: the mailbox record failed (lock-busy) and nothing was changed. Try once more later; do not loop.';
+  shim([busy, 'ok']);
+  const second = harnessSend(ws, 'head', 'hi', { sender: 'planner1' });
+  assert.deepEqual([second.status, second.id, second.tries], [0, 'm-2', 2]);
+  shim(Array(SEND_TRIES).fill(busy));
+  const gaveUp = harnessSend(ws, 'head', 'hi', { sender: 'planner1' });
+  assert.deepEqual([gaveUp.status, gaveUp.tries], [1, SEND_TRIES]);
+  shim(['Refused: unknown-name (to=head).', 'ok']);
+  const refused = harnessSend(ws, 'head', 'hi', { sender: 'planner1' });
+  assert.deepEqual([refused.status, refused.tries], [1, 1], 'any other refusal is final');
 });

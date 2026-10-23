@@ -33,7 +33,7 @@ use super::{Adapter, HookEvent, HookLimits};
 use crate::adapters::{Shape, TestedClis};
 use crate::head::{head_text, is_complete, judge_stored};
 use fgos_mailbox_core::{
-    render, too_large_pointer, AttemptToken, Checkpoint, ClaimedItem, ClaimedWhat, Cli, Finished,
+    mode_pointer, render, too_large_pointer, AttemptToken, Checkpoint, ClaimedItem, ClaimedWhat, Cli, Finished,
     Generation, IdSource, Limits, MailboxState, MessageId, RegisterRefusal, RegisterRequest,
     Registered, Timestamp, WriterKey, FRAME_SEPARATOR,
 };
@@ -118,19 +118,39 @@ pub struct Claimed {
     ticket: FinishTicket,
 }
 
-/// A step drain that found only items too large for its channel: the
-/// shell writes the pointer line alone and finishes nothing.
+/// Why a step drain prints only the pointer line.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PointerReason {
+    /// Every pending item is too large alone for the channel.
+    TooLarge,
+    /// The CLI is in pointer mode (`mailbox.postToolUse.pointerClis`): its
+    /// step drain never claims; the model reads its mail with
+    /// `inbox --claim`.
+    Mode,
+}
+
+/// A step drain that writes the pointer line alone and finishes nothing.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PointerOnly {
-    pub too_large: u32,
+    pub reason: PointerReason,
+    /// The items the line names.
+    pub count: u32,
+    /// Whether the drain stamped `last_drain_at`: only when the stamp was
+    /// older than the newest pending item, so a repeated pointer writes the
+    /// snapshot once per new mail.
+    changed: bool,
     shape: Shape,
 }
 
 impl PointerOnly {
     /// The pointer line in the CLI's output shape.
     pub fn reply(&self) -> HookReply {
+        let line = match self.reason {
+            PointerReason::TooLarge => too_large_pointer(self.count),
+            PointerReason::Mode => mode_pointer(self.count),
+        };
         HookReply {
-            stdout: self.shape.render(&too_large_pointer(self.too_large)),
+            stdout: self.shape.render(&line),
         }
     }
 }
@@ -157,8 +177,7 @@ pub enum Begun {
     /// A claim to render, write and finish; a claim always changes the
     /// snapshot.
     Claimed(Claimed),
-    /// Only the pointer line to write; the drain stamped `last_drain_at`,
-    /// so the snapshot changed.
+    /// Only the pointer line to write; nothing is claimed.
     Pointer(PointerOnly),
 }
 
@@ -167,7 +186,8 @@ impl Begun {
     pub fn state_changed(&self) -> bool {
         match self {
             Self::Quiet { state_changed, .. } => *state_changed,
-            Self::Claimed(_) | Self::Pointer(_) => true,
+            Self::Claimed(_) => true,
+            Self::Pointer(pointer) => pointer.changed,
         }
     }
 
@@ -308,6 +328,19 @@ pub fn begin(
             .facts(call.adapter)
             .and_then(|facts| facts.post_tool_use_max_bytes)
         {
+            Some(_) if hook.post_tool_use.pointer_clis.contains(&call.adapter) => {
+                let pointed = state.point(key, generation, now, limits, ids);
+                if pointed.count == 0 {
+                    return after(QuietReason::NothingEligible, changed | pointed.changed);
+                }
+                // A registering call has no mail, so `changed` is the stamp alone.
+                return Begun::Pointer(PointerOnly {
+                    reason: PointerReason::Mode,
+                    count: pointed.count,
+                    changed: changed | pointed.changed,
+                    shape,
+                });
+            }
             Some(bound) => Checkpoint::BoundedStep(bound),
             None => return after(QuietReason::NoStepBound, changed),
         },
@@ -317,7 +350,9 @@ pub fn begin(
     let Some(token) = claim.token else {
         if claim.too_large > 0 {
             return Begun::Pointer(PointerOnly {
-                too_large: claim.too_large,
+                reason: PointerReason::TooLarge,
+                count: claim.too_large,
+                changed,
                 shape,
             });
         }

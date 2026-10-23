@@ -38,8 +38,9 @@ pub struct Loaded {
 /// file.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LimitsError {
-    /// The value at this key is not an unsigned integer, or an object
-    /// stands where a value belongs (or the reverse).
+    /// The value at this key is not of its default's kind (an unsigned
+    /// integer, or a list), or an object stands where a value belongs (or
+    /// the reverse).
     WrongType(String),
     /// The limits' own types refused the value at this key.
     Rejected(String),
@@ -119,7 +120,7 @@ pub fn load(project_config: Option<&Value>) -> Result<Loaded, LimitsError> {
                 .keys()
                 .any(|k| k.starts_with(&format!("{key}.")));
             match (contract.defaults.contains_key(&key), is_prefix, value) {
-                (true, _, value) if value.as_u64().is_some() => {
+                (true, _, value) if same_kind(&contract.defaults[&key], &value) => {
                     values.insert(key.clone(), value.clone());
                     overridden.push(key);
                 }
@@ -147,6 +148,16 @@ pub fn load(project_config: Option<&Value>) -> Result<Loaded, LimitsError> {
                 .unwrap_or_else(|| SECTION.to_string());
             Err(LimitsError::Rejected(key))
         }
+    }
+}
+
+/// Whether an override has the kind of its contract default: an unsigned
+/// integer for a number, a list for a list (its items are checked when the
+/// section is deserialised).
+fn same_kind(default: &Value, value: &Value) -> bool {
+    match default {
+        Value::Array(_) => value.is_array(),
+        _ => value.as_u64().is_some(),
     }
 }
 

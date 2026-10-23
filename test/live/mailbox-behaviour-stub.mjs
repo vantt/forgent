@@ -24,7 +24,10 @@
  * `ignore` (the default) does not; `no-hooks` fires only the first hook (it registers) and
  * no other; `skip-post` fires no PostToolUse after the registering one (mail waits for
  * Stop); `extra-step` runs one more command a moment after its last step (mail sent at the
- * turn's end meets that command's PostToolUse); `fail` exits 1 after its steps.
+ * turn's end meets that command's PostToolUse); `fail` exits 1 after its steps. A context
+ * that names `fgos mailbox inbox --claim` (the pointer line) is followed as Codex followed it
+ * live: one more step runs that command, and its output reaches the stand-in model like a
+ * frame; `no-claim` never follows it.
  */
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -130,12 +133,19 @@ export function runStub(cli, argv) {
     if (codex) write({ type: 'custom_tool_call_output', call_id: id, output });
     else write({ type: 'api-request' });
     frames.push(...contexts);
+    return { output, pointed: contexts.some((text) => text.includes('fgos mailbox inbox --claim')) };
+  };
+  let n = 0;
+  const run = (command) => {
+    n += 1;
+    const { pointed } = step(command, n);
+    if (pointed && behaviour !== 'no-claim') frames.push(step('fgos mailbox inbox --claim', (n += 1)).output);
   };
   const commands = promptCommands(prompt);
-  commands.forEach((command, i) => step(command, i + 1));
+  commands.forEach(run);
   if (behaviour === 'extra-step') {
     blockFor(2500);
-    step('true', commands.length + 1);
+    run('true');
   }
   blockFor(500);
   const answer = () => {

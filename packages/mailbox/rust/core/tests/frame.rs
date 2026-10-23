@@ -391,6 +391,10 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
             "message.too-large-for-channel",
             &["{{count}}", "fgos mailbox inbox --claim"][..],
         ),
+        (
+            "message.pointer",
+            &["{{count}}", "fgos mailbox inbox --claim"][..],
+        ),
         ("report.untested-version", &["{{version}}"][..]),
         ("report.version-unknown", &[][..]),
     ];

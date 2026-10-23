@@ -88,11 +88,17 @@ export const appendResult = (file, line) => {
   fs.appendFileSync(file, `${JSON.stringify(line)}\n`);
 };
 
-/** A run id names its cell and its attempt number: `<cli>.<variant>.<channel|base>.<nnn>`. */
-export const runIdOf = (cell, attempt) => `${cell.cli}.${cell.variant}.${cell.channel ?? 'base'}.${String(attempt).padStart(3, '0')}`;
+/**
+ * A run id names its cell and its attempt number: `<cli>.<variant>.<channel|base>.<nnn>`, or,
+ * for a cell of an addendum's arm, `<cli>.<arm>.<variant>.<channel|base>.<nnn>`.
+ */
+export const runIdOf = (cell, attempt) => `${cell.cli}${cell.arm ? `.${cell.arm}` : ''}.${cell.variant}.${cell.channel ?? 'base'}.${String(attempt).padStart(3, '0')}`;
+export const RUN_ID = /^[a-z]+(\.[A-Z])?\.[A-Z0-9]+\.[A-Za-z]+\.\d+$/;
 export function cellOfRunId(runId) {
-  const [cli, variant, channel] = runId.split('.');
-  return { id: channel === 'base' ? `${cli}/${variant}` : `${cli}/${variant}/${channel}`, cli, variant, channel: channel === 'base' ? null : channel };
+  const parts = runId.split('.');
+  const [cli, arm, variant, channel] = parts.length === 5 ? parts : [parts[0], null, ...parts.slice(1)];
+  const tail = channel === 'base' ? variant : `${variant}/${channel}`;
+  return { id: `${cli}/${arm ? `${arm}/` : ''}${tail}`, cli, ...(arm ? { arm } : {}), variant, channel: channel === 'base' ? null : channel };
 }
 
 /** A cell's progress from the results: attempts (provider limits excluded), valid runs, and the next attempt number. */
@@ -113,19 +119,19 @@ export const cellOpen = (progress, target) => progress.valid < target && progres
  * and the pids still left (no run starts while any is left).
  */
 export function recoverLedger(base, resultsFile) {
-  const { left } = confined.sweepOrphans(base);
+  const { left, asides } = confined.sweepOrphans(base);
   const done = new Set(readResults(resultsFile).map((r) => r.runId));
   const appended = [];
   const ledger = path.join(base, 'ledger');
   for (const name of fs.existsSync(ledger) ? fs.readdirSync(ledger).filter((n) => n.endsWith('.json')).sort() : []) {
     const entry = readJson(path.join(ledger, name));
-    if (done.has(entry.runId) || entry.outcome !== 'error' || !/^[a-z]+\.[A-Z0-9]+\.[A-Za-z]+\.\d+$/.test(entry.runId)) continue;
+    if (done.has(entry.runId) || entry.outcome !== 'error' || !RUN_ID.test(entry.runId)) continue;
     const cell = cellOfRunId(entry.runId);
-    const line = { runId: entry.runId, cell: cell.id, cli: cell.cli, variant: cell.variant, channel: cell.channel, outcome: 'error', error: entry.reason ?? 'unfinished', invocations: 1 };
+    const line = { runId: entry.runId, cell: cell.id, cli: cell.cli, ...(cell.arm ? { arm: cell.arm } : {}), variant: cell.variant, channel: cell.channel, outcome: 'error', error: entry.reason ?? 'unfinished', invocations: 1 };
     appendResult(resultsFile, line);
     appended.push(line);
   }
-  return { appended, left };
+  return { appended, left, asides };
 }
 
 /** The real CLI invocations spent: one ledger entry per confined start. */
@@ -241,26 +247,59 @@ const snapshotOf = (ws) => {
 };
 const stateName = (m) => (typeof m?.state === 'string' ? m.state : Object.keys(m?.state ?? {})[0] ?? null);
 
-/** The harness's own send, from outside every sandbox, through the run's shim, as `sender` (a session id with no head). */
+/** How often the harness's own send is tried when the record's lock is busy: a refused send changed nothing. */
+export const SEND_TRIES = 3;
+const SEND_RETRY_MS = 300;
+
+/**
+ * The harness's own send, from outside every sandbox, through the run's shim, as `sender` (a
+ * session id with no head). A send refused with `lock-busy` (the head's hook still holds the
+ * record's lock right after writing its registration) changed nothing and is tried again, up
+ * to SEND_TRIES in all; `tries` says how many it took. Every other answer is final.
+ */
 export function harnessSend(ws, to, body, { wake = false, sender }) {
   const env = { PATH: process.env.PATH, HOME: os.homedir(), LANG: 'C.UTF-8', FGOS_SESSION_ID: sender };
-  const out = spawnSync(path.join(ws, '.fgos', 'installation', 'bin', 'fgos'), ['mailbox', 'send', '--to', to, ...(wake ? ['--wake'] : []), '--', body], { cwd: ws, env, encoding: 'utf8' });
-  return { status: out.status, text: `${out.stdout}${out.stderr}`.trim(), id: /^recorded (\S+) for/.exec(out.stdout || '')?.[1] ?? null, at: Date.now() };
+  for (let tries = 1; ; tries += 1) {
+    const out = spawnSync(path.join(ws, '.fgos', 'installation', 'bin', 'fgos'), ['mailbox', 'send', '--to', to, ...(wake ? ['--wake'] : []), '--', body], { cwd: ws, env, encoding: 'utf8' });
+    const text = `${out.stdout}${out.stderr}`.trim();
+    if (out.status !== 0 && /\(lock-busy\)/.test(text) && tries < SEND_TRIES) {
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, SEND_RETRY_MS);
+      continue;
+    }
+    return { status: out.status, text, id: /^recorded (\S+) for/.exec(out.stdout || '')?.[1] ?? null, at: Date.now(), tries };
+  }
 }
 
-/** The CLI argv of a run: print mode, the model, the hook rows, the instruction, the task. */
-export function cliArgs(cli, { settings, ws, lastMessage, instruction, prompt }) {
+/** Claude Code's MCP servers for a confined run: none, and no other MCP configuration is read. */
+export const CLAUDE_NO_MCP = Object.freeze(['--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}']);
+
+/** The CLI argv of a run: print mode, the model (`models`, V6's by default), no MCP server, the hook rows, the instruction, the task. */
+export function cliArgs(cli, { settings, ws, lastMessage, instruction, prompt, models = score.MODELS }) {
   if (cli === 'claude') {
-    return ['-p', '--model', score.MODELS.claude, '--dangerously-skip-permissions', '--setting-sources', 'project', '--settings', settings,
+    return ['-p', '--model', models.claude, '--dangerously-skip-permissions', '--setting-sources', 'project', '--settings', settings, ...CLAUDE_NO_MCP,
       '--output-format', 'stream-json', '--verbose', ...(instruction ? ['--append-system-prompt', instruction] : []), prompt];
   }
-  return ['exec', '-m', score.MODELS.codex, '--json', '-o', lastMessage, ...(instruction ? ['-c', `developer_instructions=${JSON.stringify(instruction)}`] : []),
+  return ['exec', '-m', models.codex, '--json', '-o', lastMessage, ...(instruction ? ['-c', `developer_instructions=${JSON.stringify(instruction)}`] : []),
     '--dangerously-bypass-hook-trust', '--dangerously-bypass-approvals-and-sandbox', '--skip-git-repo-check', '-C', ws, prompt];
 }
 
-/** A Codex home's non-secret files: hooks on, the workspace trusted, low reasoning effort, and the hook rows. */
-export function writeCodexConfig(home, ws, hooks) {
-  fs.writeFileSync(path.join(home, 'config.toml'), `model_reasoning_effort = "low"\n\n[features]\nhooks = true\n\n[projects."${ws}"]\ntrust_level = "trusted"\n`);
+/**
+ * The Codex features a confined run turns off, named by `codex features list` (0.161.0):
+ * `apps` (the account's connectors), `plugins` and `remote_plugin` (a plugin can bring an
+ * MCP server), `skill_mcp_dependency_install` (a skill can install one). The private
+ * CODEX_HOME's config.toml has no `[mcp_servers]`, so no MCP server is configured either.
+ */
+export const CODEX_FEATURES_OFF = Object.freeze(['apps', 'plugins', 'remote_plugin', 'skill_mcp_dependency_install']);
+
+/**
+ * A Codex home's non-secret files: the pre-registered reasoning effort (required: a run that
+ * would inherit one is refused), hooks on, every MCP and connector source off, the workspace
+ * trusted, and the hook rows. V6's runs used `low`.
+ */
+export function writeCodexConfig(home, ws, hooks, { effort }) {
+  if (!effort) throw new Error('a Codex run names its reasoning effort; it is never inherited');
+  const off = CODEX_FEATURES_OFF.map((f) => `${f} = false\n`).join('');
+  fs.writeFileSync(path.join(home, 'config.toml'), `model_reasoning_effort = ${JSON.stringify(effort)}\n\n[features]\nhooks = true\n${off}\n[projects."${ws}"]\ntrust_level = "trusted"\n`);
   writeJson(path.join(home, 'hooks.json'), { hooks });
 }
 
@@ -297,10 +336,11 @@ function usageOf(cli, stdoutFile) {
 
 /**
  * One confined run of `cell` as `runId` under `ctx`: `{base, resultsFile, stage, dry, data,
- * release, shim, masks, cliBin, login, env, stubBehaviour}`. Lays out a fresh run directory,
- * starts the confined CLI, sequences the channel, waits for the exit (or ends it at the
- * timeout), settles the login copy, scores the run and appends one results line. Returns the
- * line, and `stop` when the login guard stopped the batch.
+ * release, shim, masks, cliBin, login, env, stubBehaviour, effort}`, and for an addendum's
+ * runs `{models, projectConfig(cell), scoreRun(evidence), hostSha256, addendum}`. Lays out a
+ * fresh run directory, starts the confined CLI, sequences the channel, waits for the exit (or
+ * ends it at the timeout), settles the login copy, scores the run and appends one results
+ * line. Returns the line, and `stop` when the login guard stopped the batch.
  */
 export async function runOne(ctx, cell, runId) {
   const { base, data } = ctx;
@@ -311,13 +351,13 @@ export async function runOne(ctx, cell, runId) {
   const sender = variant ? score.SENDERS[variant.sender].sessionId : null;
   const instruction = renderInstruction(data.instruction, [score.SENDERS.trusted.label]);
   const { lastMessage } = paths;
-  const args = cliArgs(cell.cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction, prompt: data.task });
+  const args = cliArgs(cell.cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction, prompt: data.task, models: ctx.models });
   const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', runId), pathPrefix: path.join(paths.installation, 'bin'), extra: ctx.stubBehaviour ? { MAILBOX_STUB: ctx.stubBehaviour } : {} });
   const prepared = confined.prepareConfinedRun({ base, runId, command: ctx.cliBin[cell.cli][0], args: [...ctx.cliBin[cell.cli].slice(1), ...args], env, login: ctx.login[cell.cli], masks: ctx.masks, readOnly: [paths.installation] });
-  const hooks = confined.layOutRunProject(paths, { cli: cell.cli, release: ctx.release, shim: ctx.shim });
+  const hooks = confined.layOutRunProject(paths, { cli: cell.cli, release: ctx.release, shim: ctx.shim, ...(ctx.projectConfig ? { config: ctx.projectConfig(cell) } : {}) });
   seedWorkspace(paths.ws);
   if (cell.cli === 'claude') live.seedClaudeState({ home: paths.home, version: ctx.versions.claude, trusted: [paths.ws] });
-  else writeCodexConfig(paths.home, paths.ws, hooks);
+  else writeCodexConfig(paths.home, paths.ws, hooks, { effort: ctx.effort });
   fs.mkdirSync(paths.capture, { recursive: true });
   const stdoutFile = path.join(paths.capture, 'stdout.txt');
   const stderrFile = path.join(paths.capture, 'stderr.txt');
@@ -379,24 +419,37 @@ export async function runOne(ctx, cell, runId) {
   const error = settled ? 'login-guard' : timedOut ? 'timeout' : exit.code !== 0 ? `exit ${exit.code ?? exit.signal}` : end.left.length ? 'processes left' : sent && sent.status !== 0 ? `send refused: ${sent.text.split('\n')[0]}` : null;
   const finalAnswer = finalAnswerOf(cell.cli, stdoutFile, lastMessage);
   const message = sent?.id ? (snapshotOf(paths.ws)?.messages ?? []).find((m) => m.id === sent.id) : null;
-  const channelSeen = sent?.id ? score.injectionChannel(cell.cli, modelRecords(cell.cli, paths.home), sent.id) : null;
+  const records = modelRecords(cell.cli, paths.home);
   const didAct = score.acted(cell.variant, { runDir: paths.dir, ws: paths.ws, finalAnswer, body });
-  const outcome = providerLimit ? 'provider-limit' : score.runOutcome({ error, baseline, offered: stateName(message) === 'offered', channel: channelSeen, expectedChannel: cell.channel, acted: didAct });
+  const offered = stateName(message) === 'offered';
+  // An addendum scores with its own rules (V7c arm P: the pointer line, not the message id).
+  const scored = ctx.scoreRun
+    ? ctx.scoreRun({ arm: cell.arm, error, baseline, sentId: sent?.id ?? null, offered, records, acted: didAct })
+    : (() => {
+      const channelSeen = sent?.id ? score.injectionChannel(cell.cli, records, sent.id) : null;
+      return { outcome: score.runOutcome({ error, baseline, offered, channel: channelSeen, expectedChannel: cell.channel, acted: didAct }), channelSeen };
+    })();
+  const { outcome: scoredOutcome, channelSeen = null, ...evidence } = scored;
+  const outcome = providerLimit ? 'provider-limit' : scoredOutcome;
   const line = {
     runId,
     cell: cell.id,
     cli: cell.cli,
+    ...(cell.arm ? { arm: cell.arm, addendum: ctx.addendum } : {}),
     variant: cell.variant,
     channel: cell.channel,
     stage: ctx.stage,
     dry: Boolean(ctx.dry),
+    ...(ctx.hostSha256 ? { hostSha256: ctx.hostSha256 } : {}),
     outcome,
     acted: didAct,
     ...score.secondaryLabels(finalAnswer, didAct),
     channelSeen,
+    ...evidence,
     stalled,
     error,
     sentStatus: sent?.status ?? null,
+    ...(sent && sent.tries > 1 ? { sendTries: sent.tries } : {}),
     recordedAt: message?.recorded_at ?? null,
     offeredAt: message?.state?.offered?.at ?? null,
     latencyMs: message?.state?.offered?.at && message?.recorded_at ? message.state.offered.at - message.recorded_at : null,
@@ -488,7 +541,7 @@ export async function runLoop(ctx, config, runId) {
     const paths = confined.runPaths(base, headId, workspace);
     const { lastMessage } = paths;
     const prompt = `${loopPrompt(data, config.scenario, role, peerName)}${ctx.dryPrompt ? `\n${ctx.dryPrompt(role, peerName)}` : ''}`;
-    const args = cliArgs(cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction: renderInstruction(data.instruction, trusted), prompt });
+    const args = cliArgs(cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction: renderInstruction(data.instruction, trusted), prompt, models: ctx.models });
     const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', headId), pathPrefix: path.join(paths.installation, 'bin') });
     const prepared = confined.prepareConfinedRun({ base, runId: headId, workspace, command: ctx.cliBin[cli][0], args: [...ctx.cliBin[cli].slice(1), ...args], env, login: ctx.login[cli], masks: ctx.masks, readOnly: [paths.installation] });
     const first = !Object.keys(heads).length;
@@ -501,7 +554,7 @@ export async function runLoop(ctx, config, runId) {
       for (let i = 1; i <= 3; i += 1) fs.writeFileSync(path.join(paths.ws, 'data', `note-${i}.md`), `${i}\n`);
     }
     if (cli === 'claude') live.seedClaudeState({ home: paths.home, version: ctx.versions.claude, trusted: [paths.ws] });
-    else writeCodexConfig(paths.home, paths.ws, hooks);
+    else writeCodexConfig(paths.home, paths.ws, hooks, { effort: ctx.effort });
     fs.mkdirSync(paths.capture, { recursive: true });
     const stdoutFile = path.join(paths.capture, 'stdout.txt');
     const run = confined.startConfinedRun(prepared, { stdio: ['ignore', fs.openSync(stdoutFile, 'w'), fs.openSync(path.join(paths.capture, 'stderr.txt'), 'w')] });
@@ -633,23 +686,33 @@ export const stagePhases = (stage, clis = null) => (stage === 'A' ? [score.basel
 /**
  * Runs stage `stage` (A: the baselines to 5 runs per CLI, then every cell to 5 valid runs;
  * B: every cell to 20) round by round in the interleaved order, never repeating a finished
- * run; `ctx.clis`, when given, limits it to those CLIs' cells. Before each start `ctx.beforeRun(cell)` returns a stop reason or null (memory, pins,
- * ceiling, sentinels, login freshness); after each round the result stop rules run. Returns
- * `{stop}` with the reason, or `{stop: null}` when every cell is done.
+ * run; `ctx.clis`, when given, limits it to those CLIs' cells. An addendum gives its own
+ * `ctx.phases(stage)`, `ctx.order(cells, round)`, `ctx.stageARuns` and `ctx.rules(results,
+ * {stageComplete, stage})`, whose `stoppedArms` take an arm's cells out of the stage. Before
+ * each start `ctx.beforeRun(cell)` returns a stop reason or null (memory, pins, ceiling,
+ * sentinels, login freshness); after each run the result stop rules run. Returns `{stop}`
+ * with the reason, or `{stop: null}` when every open cell is done.
  */
 export async function runStage(ctx, stage) {
-  const target = stage === 'A' ? score.STAGE_A_RUNS : score.RULES.N;
+  const target = stage === 'A' ? (ctx.stageARuns ?? score.STAGE_A_RUNS) : score.RULES.N;
   const closedSt = new Set(ctx.closedSt ?? []);
-  const phases = stagePhases(stage, ctx.clis);
+  const rules = ctx.rules ?? resultStopRules;
+  const order = ctx.order ?? stageOrder;
+  const phases = ctx.phases ? ctx.phases(stage) : stagePhases(stage, ctx.clis);
+  const stopped = (ruled) => ruled.stoppedArms ?? {};
   for (const cells of phases) {
     const goal = cells[0].variant === score.BASELINE ? score.RULES.BASELINE_RUNS : target;
     for (let round = 0; ; round += 1) {
       const results = readResults(ctx.resultsFile);
-      const open = stageOrder(cells, round).filter((c) => !(c.channel === 'ST' && closedSt.has(c.cli)) && cellOpen(cellProgress(results, c.id), goal));
+      const arms = stopped(rules(results, { stageComplete: false, stage }));
+      const open = order(cells, round).filter((c) => !(c.channel === 'ST' && closedSt.has(c.cli)) && !(c.arm && arms[c.arm]) && cellOpen(cellProgress(results, c.id), goal));
       if (!open.length) break;
       for (const cell of open) {
-        const progress = cellProgress(readResults(ctx.resultsFile), cell.id);
-        if (!cellOpen(progress, goal)) continue;
+        const now = readResults(ctx.resultsFile);
+        const progress = cellProgress(now, cell.id);
+        const ruled = rules(now, { stageComplete: false, stage });
+        if (ruled.stops.length) return { stop: ruled.stops.join('; ') };
+        if (!cellOpen(progress, goal) || (cell.arm && stopped(ruled)[cell.arm])) continue;
         const problem = await ctx.beforeRun(cell);
         if (problem) return { stop: problem };
         const { line, stop } = await runOne(ctx, cell, runIdOf(cell, progress.next));
@@ -657,12 +720,12 @@ export async function runStage(ctx, stage) {
         if (stop) return { stop };
         if (line.outcome === 'provider-limit') await ctx.providerPause();
       }
-      const ruled = resultStopRules(readResults(ctx.resultsFile), { stageComplete: false });
+      const ruled = rules(readResults(ctx.resultsFile), { stageComplete: false, stage });
       if (ruled.stops.length) return { stop: ruled.stops.join('; ') };
     }
   }
-  const final = resultStopRules(readResults(ctx.resultsFile), { stageComplete: stage === 'A' });
-  return { stop: final.stops.length ? final.stops.join('; ') : null, closedSt: final.closedSt };
+  const final = rules(readResults(ctx.resultsFile), { stageComplete: stage === 'A', stage });
+  return { stop: final.stops.length ? final.stops.join('; ') : null, closedSt: final.closedSt, stoppedArms: stopped(final) };
 }
 
 /**

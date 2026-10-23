@@ -313,6 +313,14 @@ impl Claim {
     }
 }
 
+/// What a pointer-only drain found: the items a full step would take now,
+/// and whether it changed the state (it stamped `last_drain_at`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Pointed {
+    pub count: u32,
+    pub changed: bool,
+}
+
 /// One eligible item a claim may take: an index into the messages or the
 /// notices.
 #[derive(Debug, Clone, Copy)]
@@ -514,6 +522,25 @@ impl MailboxState {
         if self.current_generation(key) != Some(generation) || !self.has_pending(key, generation) {
             return Claim::empty(false, 0);
         }
+        // A bounded step that would take nothing but a pointer, already
+        // stamped since the newest pending item, changes nothing: a pointer
+        // repeating at every tool call writes the snapshot once per new mail.
+        // An item in flight may expire at the sweep and become claimable, so
+        // its presence always takes the full path.
+        let in_flight = self.messages.iter().any(|h| {
+            &h.to == key
+                && h.to_generation == generation
+                && matches!(h.state, MessageState::InFlight { .. })
+        });
+        if matches!(checkpoint, Checkpoint::BoundedStep(_))
+            && !in_flight
+            && self.drained_since_newest(key, generation)
+        {
+            let (picks, too_large) = self.select(key, generation, checkpoint, limits);
+            if picks.is_empty() && too_large > 0 {
+                return Claim::empty(false, too_large);
+            }
+        }
         self.sweep(now, limits, ids);
         let now = self.last_now;
         if let Some(binding) = self.bindings.get_mut(key) {
@@ -542,6 +569,69 @@ impl MailboxState {
             items,
             changed: true,
             too_large,
+        }
+    }
+
+    /// The pointer drain of a CLI in pointer mode: claims nothing and
+    /// counts what a full step would take. It sweeps and stamps
+    /// `last_drain_at` only when the stamp is older than the newest pending
+    /// item, so a pointer repeating at every tool call changes the state
+    /// once per new mail; otherwise it reads the state and changes nothing.
+    pub fn point(
+        &mut self,
+        key: &WriterKey,
+        generation: Generation,
+        now: Timestamp,
+        limits: &Limits,
+        ids: &mut dyn IdSource,
+    ) -> Pointed {
+        if self.current_generation(key) != Some(generation) || !self.has_pending(key, generation) {
+            return Pointed {
+                count: 0,
+                changed: false,
+            };
+        }
+        let changed = !self.drained_since_newest(key, generation);
+        if changed {
+            self.sweep(now, limits, ids);
+            let now = self.last_now;
+            if let Some(binding) = self.bindings.get_mut(key) {
+                binding.last_drain_at = Some(now);
+            }
+        }
+        let (picks, _) = self.select(key, generation, Checkpoint::Step, limits);
+        Pointed {
+            count: u32::try_from(picks.len()).unwrap_or(u32::MAX),
+            changed,
+        }
+    }
+
+    /// Whether `key`'s last drain is at or after the newest item pending
+    /// for `generation`.
+    fn drained_since_newest(&self, key: &WriterKey, generation: Generation) -> bool {
+        let mail = self
+            .messages
+            .iter()
+            .filter(|h| {
+                &h.to == key
+                    && h.to_generation == generation
+                    && matches!(
+                        h.state,
+                        MessageState::Recorded | MessageState::InFlight { .. }
+                    )
+            })
+            .map(|h| h.recorded_at);
+        let notices = self
+            .notices
+            .iter()
+            .filter(|n| &n.to == key && n.to_generation == generation)
+            .map(|n| n.created_at);
+        let newest = mail.chain(notices).max();
+        let stamp = self.binding(key).and_then(|b| b.last_drain_at);
+        match (stamp, newest) {
+            (_, None) => true,
+            (None, Some(_)) => false,
+            (Some(at), Some(newest)) => at >= newest,
         }
     }
 

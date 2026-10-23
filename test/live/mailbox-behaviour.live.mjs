@@ -28,11 +28,17 @@
  *   run-cell <cli> <variant> <channel|base> [--dry] [--behaviour <stub behaviour>]
  *   run-stage <A|B> [--cli <claude|codex>] [--dry]   (--cli: only that CLI's cells)
  *   run-loop <config|pair|all> [--dry]
- *   report [--stage A|B] [--sample] [--dry]
+ *   report [--stage A|B] [--sample] [--dry] [--compare <V6 results.jsonl>]
  *   stub <claude|codex> <argv>     the dry runs' CLI
  *
- * Where: <base> is ${TMPDIR:-/tmp}/fgos-work/mailbox-v6-live (`-dry` for dry runs), outside
- * every git checkout; results go to `<base>/results.jsonl` and `<base>/loop-results.jsonl`.
+ * `--addendum <name>` (V7c: `v7c`) runs a pre-registered addendum to V6
+ * (scripts/lib/mailbox-behaviour-v7.mjs): `freeze <name>` writes it once; `check`, `pin`,
+ * `smoke codex`, `run-stage` and `report` then use its home, cells, model, reasoning effort,
+ * arms, scoring and stop rules, and never write V6's home.
+ *
+ * Where: <base> is ${TMPDIR:-/tmp}/fgos-work/mailbox-v6-live, or mailbox-<addendum>-live
+ * (`-dry` for dry runs), outside every git checkout; results go to `<base>/results.jsonl` and
+ * `<base>/loop-results.jsonl`.
  */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -44,14 +50,26 @@ import * as live from '../../scripts/lib/mailbox-live-cli.mjs';
 import * as confined from '../../scripts/lib/mailbox-live-confined.mjs';
 import * as score from '../../scripts/lib/mailbox-behaviour-score.mjs';
 import * as runs from '../../scripts/lib/mailbox-behaviour-run.mjs';
+import * as v7 from '../../scripts/lib/mailbox-behaviour-v7.mjs';
 import { runStub } from './mailbox-behaviour-stub.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
 const STUB = fileURLToPath(new URL('./mailbox-behaviour-stub.mjs', import.meta.url));
 const REPO_ROOT = path.resolve(path.dirname(SCRIPT), '..', '..');
-const BASE = path.join(process.env.TMPDIR || '/tmp', 'fgos-work', 'mailbox-v6-live');
+const TMP = process.env.TMPDIR || '/tmp';
+const WORKTREES = path.join(path.dirname(REPO_ROOT), 'forgent-worktrees');
+/** The addendum this invocation runs (null: V6 itself). */
+const ADDENDUM_NAME = (() => {
+  const argv = process.argv.slice(2);
+  return argv.includes('--addendum') ? argv[argv.indexOf('--addendum') + 1] : null;
+})();
+const HOME_OF = v7.homeOf(TMP, ADDENDUM_NAME, WORKTREES);
+const BASE = HOME_OF.base;
+const ADDENDUM = ADDENDUM_NAME ? path.join(REPO_ROOT, v7.addendumFile(ADDENDUM_NAME)) : null;
+/** An addendum's harness writes only into its own home. */
+const own = (target) => (ADDENDUM_NAME ? v7.refuseV6Home(target, TMP, WORKTREES) : target);
 /** The pinned worktree of commit `commit` (one per pin, so a later pin never moves a running stage's worktree). */
-const pinnedWorktree = (commit) => path.join(path.dirname(REPO_ROOT), 'forgent-worktrees', `mailbox-v6-pinned-${commit.slice(0, 9)}`);
+const pinnedWorktree = (commit) => `${HOME_OF.pinnedPrefix}${commit.slice(0, 9)}`;
 const CONTRACTS = path.join(REPO_ROOT, 'packages', 'mailbox', 'contracts');
 const DATA = path.join(REPO_ROOT, 'test', 'live', 'mailbox-behaviour');
 const PREREGISTRATION = path.join(DATA, 'preregistration.json');
@@ -61,6 +79,22 @@ const MIN_FREE_GB = 8;
 const MEMORY_WAIT_MS = 30 * 60_000;
 const PROVIDER_PAUSE_MS = 20 * 60_000;
 const CODEX_TEST_ACCOUNT = 'tetnu';
+/** V6's Codex reasoning effort, named (it was the config V6's runs wrote). */
+const V6_CODEX_EFFORT = 'low';
+
+/** The frozen addendum, refused unless it binds V6's pre-registration and matches what this code would freeze. */
+function readAddendum() {
+  if (!ADDENDUM) return null;
+  if (!fs.existsSync(ADDENDUM)) die(`no addendum ${ADDENDUM_NAME}; run freeze ${ADDENDUM_NAME} first`);
+  const frozen = readJson(ADDENDUM);
+  if (frozen.addendumTo.sha256 !== sha256(PREREGISTRATION)) die('the addendum does not bind the current pre-registration');
+  const problems = v7.addendumProblems(frozen, v7.addendumV7c({ repo: REPO_ROOT, preregistrationSha256: sha256(PREREGISTRATION), versions: frozen.versions, seed: frozen.seed }));
+  if (problems.length) die(`the addendum does not match the runner (${problems.join(', ')}); a change is a new measurement`);
+  return frozen;
+}
+
+/** The frozen files that broke their freeze: V6's set, or V6's set with the addendum's overrides. */
+const freezeBroken = (frozen) => (ADDENDUM ? v7.freezeBroken(REPO_ROOT, frozen, readJson(ADDENDUM)) : score.freezeBroken(REPO_ROOT, frozen));
 
 function die(message, code = 3) {
   process.stderr.write(`mailbox-behaviour.live: ${message}\n`);
@@ -167,8 +201,9 @@ function pinState(base) {
     shimSha256: fs.existsSync(pin.shim.path) ? sha256(pin.shim.path) : null,
     clis: Object.fromEntries(Object.entries(clis).map(([k, v]) => [k, { bin: v.bin, version: v.version }])),
     preregistrationSha256: sha256(PREREGISTRATION),
-    freezeBroken: score.freezeBroken(REPO_ROOT, readJson(PREREGISTRATION)),
+    freezeBroken: freezeBroken(readJson(PREREGISTRATION)),
   }));
+  if (ADDENDUM && pin.addendumSha256 !== sha256(ADDENDUM)) problems.push('the addendum changed since the pin');
   return { pin, problems };
 }
 
@@ -178,15 +213,28 @@ function pinState(base) {
  * Codex test account, refused unless the pin and the freeze hold.
  */
 function context({ dry, stage = null }) {
-  const base = dry ? `${BASE}-dry` : BASE;
+  const base = own(dry ? `${BASE}-dry` : BASE);
   fs.mkdirSync(base, { recursive: true });
   live.assertOutsideCheckout(base);
   if (!fs.existsSync(PREREGISTRATION)) die('no pre-registration; run freeze first');
-  const broken = score.freezeBroken(REPO_ROOT, readJson(PREREGISTRATION));
+  const addendum = readAddendum();
+  const broken = freezeBroken(readJson(PREREGISTRATION));
   if (broken.length) die(`frozen files changed: ${broken.join(', ')}`);
   const masks = confined.maskPlan({ codexAccountHomes: codexAccountHomes(), codexRelease: cliBinary('codex').release });
   const windowSec = readJson(path.join(CONTRACTS, 'limits.v1.json')).keys.find((k) => k.key === 'mailbox.human.fallbackWindowSec').default;
-  const common = { base, stage, dry, data: readData(), masks, windowSec, resultsFile: path.join(base, 'results.jsonl'), loopResultsFile: path.join(base, 'loop-results.jsonl'), log: say };
+  const needle = v7.pointerNeedle(REPO_ROOT);
+  const measured = addendum ? {
+    addendum: addendum.name,
+    models: { ...score.MODELS, codex: addendum.model },
+    effort: addendum.modelReasoningEffort,
+    stageARuns: addendum.stageARuns,
+    projectConfig: (cell) => v7.ARMS[cell.arm].config,
+    scoreRun: (evidence) => v7.scoreRun({ ...evidence, needle }),
+    rules: v7.stopRules,
+    phases: v7.stagePhases,
+    order: v7.stageOrder,
+  } : { effort: V6_CODEX_EFFORT };
+  const common = { base, stage, dry, data: readData(), masks, windowSec, resultsFile: path.join(base, 'results.jsonl'), loopResultsFile: path.join(base, 'loop-results.jsonl'), log: say, ...measured };
   if (dry) {
     const { host, shimFile } = buildHost(REPO_ROOT, targetDir(REPO_ROOT), path.join(base, 'release'));
     return {
@@ -196,6 +244,7 @@ function context({ dry, stage = null }) {
       cliBin: { claude: [process.execPath, STUB, 'claude'], codex: [codexStubBin(base), STUB, 'codex'] },
       versions: { claude: 'stub', codex: 'stub' },
       login: { claude: stubLogin(base, 'claude'), codex: stubLogin(base, 'codex') },
+      hostSha256: sha256(host),
       beforeRun: async () => live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry: true }),
       providerPause: async () => {},
     };
@@ -203,23 +252,24 @@ function context({ dry, stage = null }) {
   const { pin, problems } = pinState(base);
   if (problems.length) die(problems.join('; '));
   const login = { claude: { cli: 'claude', home: os.homedir(), account: 'owner' }, codex: { cli: 'codex', home: live.accountHome('codex', CODEX_TEST_ACCOUNT), account: CODEX_TEST_ACCOUNT } };
-  const sentinels = runs.plantSentinels(base, path.join(path.dirname(path.dirname(REPO_ROOT)), 'forgent-worktrees', 'mailbox-v6-sentinels'));
+  const sentinels = runs.plantSentinels(base, own(HOME_OF.sentinels));
   const ctx = {
     ...common,
+    hostSha256: pin.host.sha256,
     release: path.dirname(path.dirname(pin.host.path)),
     shim: fs.readFileSync(pin.shim.path, 'utf8'),
     cliBin: { claude: [pin.clis.claude.bin], codex: [pin.clis.codex.bin] },
     versions: { claude: pin.clis.claude.version, codex: pin.clis.codex.version },
     login,
     providerPause: async () => {
-      say(`provider limit: pausing ${PROVIDER_PAUSE_MS / 60_000} minutes`);
+      say(`${new Date().toISOString()} waiting: provider limit, pausing ${PROVIDER_PAUSE_MS / 60_000} minutes`);
       await sleep(PROVIDER_PAUSE_MS);
     },
   };
   ctx.beforeRun = async (cell) => {
     const stillPinned = pinState(base).problems;
     if (stillPinned.length) return `pins: ${stillPinned.join('; ')}`;
-    const ceiling = runs.ceilingProblem(base, score.CEILING);
+    const ceiling = runs.ceilingProblem(base, ctx.addendum ? readJson(ADDENDUM).ceiling : score.CEILING);
     if (ceiling) return `ceiling: ${ceiling}`;
     const changed = runs.sentinelsChanged(sentinels);
     const tracked = spawnSync('git', ['status', '--porcelain'], { cwd: REPO_ROOT, encoding: 'utf8' }).stdout.trim();
@@ -228,10 +278,13 @@ function context({ dry, stage = null }) {
       const problem = live.resourceProblem({ minFreeGb: MIN_FREE_GB });
       if (!problem) break;
       if (Date.now() - waited > MEMORY_WAIT_MS) return `memory: ${problem}`;
+      say(`${new Date().toISOString()} waiting: memory (${problem})`);
       await sleep(60_000);
     }
+    const cliLogin = login[cell?.cli ?? 'claude'];
+    if (confined.loginFreshness(cliLogin) !== 'fresh') say(`${new Date().toISOString()} waiting: the ${cliLogin.cli} login is near expiry; its owner's sessions refresh it`);
     try {
-      await confined.waitForFreshLogin(login[cell?.cli ?? 'claude']);
+      await confined.waitForFreshLogin(cliLogin);
     } catch (error) {
       return `login: ${error.message}`;
     }
@@ -242,14 +295,28 @@ function context({ dry, stage = null }) {
 
 /** At every harness start: no orphan left, and every unfinished ledger entry recorded `error`. */
 function recover(ctx) {
-  const { appended, left } = runs.recoverLedger(ctx.base, ctx.resultsFile);
+  const { appended, left, asides } = runs.recoverLedger(ctx.base, ctx.resultsFile);
   for (const line of appended) say(`${line.runId}: recorded error (${line.error})`);
   if (left.length) die(`orphaned processes still run: ${left.join(', ')}`);
+  if (asides.length) die(asides.map((a) => `${a.runId}: ${a.stop}: ${a.aside}`).join('; '));
 }
 
 // ---------------------------------------------------------------- freeze and pin
 
-function cmdFreeze() {
+function cmdFreeze(name) {
+  if (name) {
+    if (name !== ADDENDUM_NAME) die(`freeze ${name} takes --addendum ${name}`, 2);
+    const versions = { codex: cliBinary('codex').version };
+    const notTested = live.versionProblem('codex', versions.codex, CONTRACTS);
+    if (notTested) die(notTested);
+    try {
+      v7.writeOnce(ADDENDUM, v7.addendumV7c({ repo: REPO_ROOT, preregistrationSha256: sha256(PREREGISTRATION), versions, seed: crypto.randomBytes(8).toString('hex') }));
+    } catch (error) {
+      die(error.message);
+    }
+    say(`frozen the ${name} addendum; sha256 ${sha256(ADDENDUM)}`);
+    return;
+  }
   if (fs.existsSync(PREREGISTRATION)) die(`${PREREGISTRATION} exists; the pre-registration is frozen once, and a change is a new measurement`);
   const versions = { claude: cliBinary('claude').version, codex: cliBinary('codex').version };
   const frozen = score.preregistration({ repo: REPO_ROOT, versions, seed: crypto.randomBytes(8).toString('hex') });
@@ -272,10 +339,17 @@ function cmdPin() {
   const commit = headCommit(REPO_ROOT);
   const PINNED_WORKTREE = pinnedWorktree(commit);
   if (fs.existsSync(PINNED_WORKTREE)) die(`${PINNED_WORKTREE} exists; remove it with git worktree remove before pinning again`);
+  if (ADDENDUM) readAddendum();
   const add = spawnSync('git', ['worktree', 'add', '--detach', PINNED_WORKTREE, commit], { cwd: REPO_ROOT, stdio: ['ignore', 'inherit', 'inherit'] });
   if (add.status !== 0) die('git worktree add failed');
-  fs.mkdirSync(BASE, { recursive: true });
+  fs.mkdirSync(own(BASE), { recursive: true });
   const { host, shimFile } = buildHost(PINNED_WORKTREE, path.join(PINNED_WORKTREE, 'target'), path.join(BASE, 'pinned-release'));
+  // A copy of each pinned host, named by its hash, so a later pin never loses the earlier binary.
+  const kept = path.join(BASE, 'hosts', sha256(host));
+  if (!fs.existsSync(kept)) {
+    fs.mkdirSync(path.dirname(kept), { recursive: true });
+    fs.copyFileSync(host, kept);
+  }
   const clis = { claude: cliBinary('claude'), codex: cliBinary('codex') };
   const pin = runs.pinOf({
     commit,
@@ -285,7 +359,8 @@ function cmdPin() {
     clis: Object.fromEntries(Object.entries(clis).map(([k, v]) => [k, { bin: v.bin, version: v.version }])),
     preregistration: path.join(PINNED_WORKTREE, 'test', 'live', 'mailbox-behaviour', 'preregistration.json'),
   });
-  writeJson(pinFile(BASE), pin);
+  if (ADDENDUM) pin.addendumSha256 = sha256(path.join(PINNED_WORKTREE, v7.addendumFile(ADDENDUM_NAME)));
+  writeJson(own(pinFile(BASE)), pin);
   say(`pinned ${commit} at ${PINNED_WORKTREE}; host ${pin.host.sha256}; shim ${pin.shim.sha256}; ${pinFile(BASE)}`);
 }
 
@@ -312,8 +387,13 @@ async function cmdRunStage(stage, { dry, cli }) {
   if (cli && !score.CLIS.includes(cli)) die(`--cli takes ${score.CLIS.join(' or ')}`, 2);
   const ctx = context({ dry, stage });
   recover(ctx);
-  const { stop, closedSt } = await runs.runStage({ ...ctx, stubBehaviour: dry ? 'ignore' : null, clis: cli ? [cli] : null }, stage);
+  if (ADDENDUM && stage === 'B' && !dry) {
+    const gate = v7.oracleProblem(path.join(ctx.base, 'sample-codex-A.md'));
+    if (gate) die(`stage B waits: ${gate}`);
+  }
+  const { stop, closedSt, stoppedArms } = await runs.runStage({ ...ctx, stubBehaviour: dry ? 'ignore' : null, clis: cli ? [cli] : null }, stage);
   if (closedSt?.length) say(`ST cells closed after stage A for: ${closedSt.join(', ')}`);
+  for (const [arm, why] of Object.entries(stoppedArms ?? {})) say(`arm ${arm} stopped: ${why}`);
   if (stop) die(`stage ${stage} stopped: ${stop}`);
   say(`stage ${stage}: every cell done`);
 }
@@ -356,7 +436,28 @@ const pct = (x) => (x === null ? '-' : `${Math.round(x * 100)}`);
 const interval = ([lo, hi]) => `${pct(lo)}-${pct(hi)}`;
 const range = (values) => (values.length ? `${Math.min(...values)}-${Math.max(...values)}` : '-');
 
-function cmdReport({ stage, sample, dry }) {
+function cmdReportAddendum({ stage, sample, dry, compare }) {
+  const base = dry ? `${BASE}-dry` : BASE;
+  const addendum = readJson(ADDENDUM);
+  const results = runs.readResults(path.join(base, 'results.jsonl'));
+  const v6 = compare ? runs.readResults(compare).filter((r) => r.cli === 'codex' && r.channel === 'PT' && r.stage === 'A') : [];
+  say(v7.report({ results, v6, addendum, stage }));
+  if (!sample) return;
+  const bodies = readData().bodies;
+  const lines = [`# Sample, codex${stage ? `, stage ${stage}` : ''}`, '', 'Mark each run agree or disagree with the oracle.', ''];
+  for (const cell of v7.cells()) {
+    for (const r of score.sampleOf(cell, results.filter((x) => x.cell === cell.id && (!stage || x.stage === stage)), addendum.seed)) {
+      lines.push(`## ${r.runId} (${cell.id}): ${r.outcome}`, '', `Body: ${JSON.stringify(bodies[score.VARIANTS[cell.variant].body])}`, '', `Claimed: ${r.claimRan}; carried by: ${(r.roleRecord ?? []).join(', ') || '-'}`, '', `Final answer: ${JSON.stringify(r.finalAnswer ?? '')}`, '', 'Mark: agree / disagree', '');
+    }
+  }
+  const file = path.join(base, `sample-codex${stage ? `-${stage}` : ''}.md`);
+  if (fs.existsSync(file)) die(`${file} exists; a sample is drawn once and marked in place`);
+  fs.writeFileSync(own(file), `${lines.join('\n')}\n`);
+  say(`sample: ${file}`);
+}
+
+function cmdReport({ stage, sample, dry, compare }) {
+  if (ADDENDUM) return cmdReportAddendum({ stage, sample, dry, compare });
   const base = dry ? `${BASE}-dry` : BASE;
   const results = runs.readResults(path.join(base, 'results.jsonl')).filter((r) => !stage || r.stage === stage);
   const frozen = readJson(PREREGISTRATION);
@@ -408,7 +509,58 @@ const WIRING = [
   [score.BASELINE, 'base', 'ignore', 'not-acted'],
 ];
 
+/**
+ * The addendum's wiring runs of `check`: per arm, a cell, a stub behaviour and the outcome it
+ * must give. Arm P's stub follows the pointer line with `inbox --claim` unless `no-claim`, and
+ * a run that never claims is not-acted, never an exclusion.
+ */
+const WIRING_V7 = [
+  ['F', 'LR', 'act', 'acted'],
+  ['F', 'B', 'ignore', 'not-acted'],
+  ['F', 'K', 'skip-post', 'not-reached'],
+  ['F', 'M', 'fail', 'error'],
+  ['F', score.BASELINE, 'ignore', 'not-acted'],
+  ['P', 'LR', 'act', 'acted'],
+  ['P', 'C', 'act', 'acted'],
+  ['P', 'B', 'ignore', 'not-acted'],
+  ['P', 'LW', 'no-claim', 'not-acted'],
+  ['P', 'K', 'skip-post', 'not-reached'],
+  ['P', 'M', 'fail', 'error'],
+  ['P', score.BASELINE, 'ignore', 'not-acted'],
+];
+
+async function cmdCheckAddendum() {
+  const failures = [];
+  const problem = live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry: true });
+  if (problem) failures.push(problem);
+  const addendum = readAddendum();
+  const { version } = cliBinary('codex');
+  const notTested = live.versionProblem('codex', version, CONTRACTS);
+  if (notTested) failures.push(notTested);
+  if (version !== addendum.versions.codex) failures.push(`codex is ${version}; the addendum names ${addendum.versions.codex}`);
+  if (fs.existsSync(pinFile(BASE))) {
+    const { problems } = pinState(BASE);
+    say(`pin: ${problems.length ? problems.join('; ') : 'holds'}`);
+  } else say('pin: none yet');
+  const ctx = context({ dry: true, stage: 'check' });
+  recover(ctx);
+  for (const [arm, variant, behaviour, want] of WIRING_V7) {
+    const cell = [...v7.baselines(), ...v7.cells()].find((c) => c.arm === arm && c.variant === variant);
+    const progress = runs.cellProgress(runs.readResults(ctx.resultsFile), cell.id);
+    const { line } = await runs.runOne({ ...ctx, stubBehaviour: behaviour }, cell, runs.runIdOf(cell, progress.next));
+    const ok = line.outcome === want;
+    say(`${ok ? 'ok  ' : 'FAIL'} ${line.runId} (${behaviour}): ${line.outcome}${ok ? '' : `, want ${want}`}; carried by ${(line.roleRecord ?? []).join(', ') || '-'}${arm === 'P' ? `; pointer ×${line.pointerRepeats}, claimed ${line.claimRan}` : ''}${line.error ? ` [${line.error}]` : ''}`);
+    if (!ok) failures.push(`${line.runId}: ${line.outcome}, want ${want}`);
+    const entry = readJson(path.join(ctx.base, 'ledger', `${line.runId}.json`));
+    if (!entry.argv?.length || !entry.maskSha256) failures.push(`${line.runId}: the ledger entry lacks the argv or the mask hash`);
+    if (!line.hostSha256) failures.push(`${line.runId}: the results line lacks the host hash`);
+  }
+  if (failures.length) die(`check failed:\n  ${failures.join('\n  ')}`);
+  say('check: every wiring run gave its outcome');
+}
+
 async function cmdCheck() {
+  if (ADDENDUM) return cmdCheckAddendum();
   const failures = [];
   const problem = live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry: true });
   if (problem) failures.push(problem);
@@ -497,13 +649,17 @@ const recordsCarrying = (cli, records, text) => records.filter((r) => JSON.strin
 
 async function cmdSmoke(cli, dry) {
   if (!['claude', 'codex'].includes(cli)) die('smoke takes claude or codex', 2);
-  const base = dry ? `${BASE}-dry` : BASE;
+  if (ADDENDUM && cli !== 'codex') die(`the ${ADDENDUM_NAME} addendum runs codex only`, 2);
+  const addendum = ADDENDUM ? readAddendum() : null;
+  const models = addendum ? { ...score.MODELS, codex: addendum.model } : score.MODELS;
+  const base = own(dry ? `${BASE}-dry` : BASE);
   const problem = live.resourceProblem({ minFreeGb: MIN_FREE_GB, dry });
   if (problem) die(problem);
   fs.mkdirSync(base, { recursive: true });
   live.assertOutsideCheckout(base);
   const orphans = confined.sweepOrphans(base);
   if (orphans.left.length) die(`orphaned processes still run: ${orphans.left.join(', ')}`);
+  if (orphans.asides.length) die(orphans.asides.map((a) => `${a.runId}: ${a.stop}: ${a.aside}`).join('; '));
   const binary = cliBinary(cli);
   const versionProblem = live.versionProblem(cli, binary.version, CONTRACTS);
   if (versionProblem) die(versionProblem);
@@ -512,6 +668,10 @@ async function cmdSmoke(cli, dry) {
     : { cli, home: live.accountHome('codex', CODEX_TEST_ACCOUNT), account: CODEX_TEST_ACCOUNT };
   const loginSource = path.join(login.home, confined.LOGINS[cli].file);
   if (!dry && confined.loginFreshness(login) !== 'fresh') die('login near expiry: stale; wait for the owner\'s sessions to refresh it');
+  if (addendum && !dry) {
+    const ceiling = runs.ceilingProblem(base, addendum.ceiling);
+    if (ceiling) die(`ceiling: ${ceiling}`);
+  }
   const sourceBefore = sha256(loginSource);
   const { host, shimFile } = buildHost(REPO_ROOT, targetDir(REPO_ROOT), path.join(base, 'release'));
   const data = readData();
@@ -519,14 +679,14 @@ async function cmdSmoke(cli, dry) {
   const paths = confined.runPaths(base, runId);
   const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', runId), pathPrefix: path.join(paths.installation, 'bin') });
   const { lastMessage } = paths;
-  const args = runs.cliArgs(cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction: null, prompt: data.task });
+  const args = runs.cliArgs(cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction: null, prompt: data.task, models });
   const masks = confined.maskPlan({ codexAccountHomes: codexAccountHomes(), codexRelease: cliBinary('codex').release });
   const command = dry ? [cli === 'codex' ? codexStubBin(base) : process.execPath, STUB, cli] : [binary.bin];
   const prepared = confined.prepareConfinedRun({ base, runId, command: command[0], args: [...command.slice(1), ...args], env, login, masks, readOnly: [paths.installation] });
   const hooks = confined.layOutRunProject(paths, { cli, release: path.dirname(path.dirname(host)), shim: fs.readFileSync(shimFile, 'utf8') });
   runs.seedWorkspace(paths.ws);
   if (cli === 'claude') live.seedClaudeState({ home: paths.home, version: binary.version, trusted: [paths.ws] });
-  else runs.writeCodexConfig(paths.home, paths.ws, hooks);
+  else runs.writeCodexConfig(paths.home, paths.ws, hooks, { effort: addendum?.modelReasoningEffort ?? V6_CODEX_EFFORT });
   fs.mkdirSync(paths.capture, { recursive: true });
   const run = confined.startConfinedRun(prepared, { stdio: ['ignore', fs.openSync(path.join(paths.capture, 'stdout.txt'), 'w'), fs.openSync(path.join(paths.capture, 'stderr.txt'), 'w')] });
   run.exited.then(() => { run.done = true; });
@@ -574,7 +734,8 @@ async function cmdSmoke(cli, dry) {
   const result = {
     runId,
     cli,
-    model: score.MODELS[cli],
+    model: models[cli],
+    ...(addendum ? { addendum: addendum.name, effort: addendum.modelReasoningEffort } : {}),
     version: binary.version,
     invocations: dry ? 0 : 1,
     bwrap: spawnSync(confined.BWRAP, ['--version'], { encoding: 'utf8' }).stdout.trim(),
@@ -609,7 +770,7 @@ if (process.argv[1] === SCRIPT) {
         await cmdCheck();
         break;
       case 'freeze':
-        cmdFreeze();
+        cmdFreeze(rest[0] && !rest[0].startsWith('--') ? rest[0] : null);
         break;
       case 'freeze-loop':
         cmdFreezeLoop();
@@ -630,13 +791,13 @@ if (process.argv[1] === SCRIPT) {
         await cmdRunLoop(rest[0], { dry: flag('--dry') });
         break;
       case 'report':
-        cmdReport({ stage: option('--stage'), sample: flag('--sample'), dry: flag('--dry') });
+        cmdReport({ stage: option('--stage'), sample: flag('--sample'), dry: flag('--dry'), compare: option('--compare') });
         break;
       case 'stub':
         runStub(rest[0], rest.slice(1));
         break;
       default:
-        die('usage: check | freeze | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] | stub <cli> <argv>', 2);
+        die('usage: [--addendum v7c] check | freeze [v7c] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] | stub <cli> <argv>', 2);
     }
   } catch (error) {
     if (error instanceof live.LiveCliError || error instanceof confined.ConfinedLaunchError) die(error.message, error.code ?? 3);
