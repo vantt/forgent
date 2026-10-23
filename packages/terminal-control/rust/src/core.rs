@@ -673,6 +673,7 @@ impl<'a> Core<'a> {
             capabilities: self.driver.capabilities().into_iter().map(String::from).collect(),
             server_incarnation: self.driver.server_incarnation().ok(),
             anchor_pane,
+            socket_path: self.driver.socket_path(),
             agents: ask.agents.then(|| self.driver.agent_facts()),
         }
     }

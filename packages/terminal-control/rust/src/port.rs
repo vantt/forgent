@@ -178,6 +178,8 @@ pub struct CapabilitiesReport {
     pub capabilities: Vec<String>,
     pub server_incarnation: Option<ServerIncarnation>,
     pub anchor_pane: AnchorPane,
+    /// The socket the driver talks to; `None` when it cannot be named.
+    pub socket_path: Option<String>,
     /// Present only when the caller asked for it.
     pub agents: Option<AgentFacts>,
 }

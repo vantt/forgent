@@ -186,7 +186,7 @@ fn core_config(envelope: &Value) -> Result<(CoreConfig, Box<dyn PlacementPolicy>
 
 /// The caller's whole budget for this operation rides in `timeoutMs`; herdr commands may use
 /// nine tenths of it, so a stuck command is answered `unknown` before the caller gives up.
-fn herdr_config(envelope: &Value, started: Instant) -> Result<HerdrConfig, String> {
+fn herdr_config(envelope: &Value, started: Instant, inherited_socket: Option<String>) -> Result<HerdrConfig, String> {
     let mut config = HerdrConfig::new(match envelope.get("herdrBin") {
         None | Some(Value::Null) => String::new(),
         Some(v) => v.as_str().ok_or("herdrBin needs a string")?.to_string(),
@@ -212,9 +212,10 @@ fn herdr_config(envelope: &Value, started: Instant) -> Result<HerdrConfig, Strin
     }
     // herdr sets `HERDR_SOCKET_PATH` in every pane it creates, so a caller
     // running inside one reaches the same server the CLI would; the caller's own
-    // `env` still wins.
-    if config.socket_path.is_none() {
-        config.socket_path = std::env::var("HERDR_SOCKET_PATH").ok().filter(|p| !p.is_empty());
+    // `env` still wins, and a named session is never redirected to the inherited
+    // socket of another one.
+    if config.socket_path.is_none() && config.session.is_none() {
+        config.socket_path = inherited_socket.filter(|p| !p.is_empty());
     }
     Ok(config)
 }
@@ -310,6 +311,7 @@ fn dispatch(op: &str, core: &Core, request: &Value, anchor: Option<&str>) -> Res
                 "capabilities": report.capabilities,
                 "serverIncarnation": report.server_incarnation,
                 "anchorPane": report.anchor_pane,
+                "endpoint": { "socketPath": report.socket_path },
                 "defaults": defaults(),
                 "policies": POLICY_NAMES,
             });
@@ -394,7 +396,7 @@ pub fn main(args: &[String]) -> i32 {
         Ok(c) => c,
         Err(refusal) => return error(refusal.code, &refusal.message, EXIT_USAGE),
     };
-    let herdr = match herdr_config(&envelope, started) {
+    let herdr = match herdr_config(&envelope, started, std::env::var("HERDR_SOCKET_PATH").ok()) {
         Ok(c) => c,
         Err(message) => return usage(&message),
     };
@@ -466,6 +468,17 @@ mod tests {
     }
 
     #[test]
+    fn a_named_session_is_never_pointed_at_the_inherited_socket() {
+        let started = Instant::now();
+        let inherited = || Some("/cockpit/herdr.sock".to_string());
+        assert_eq!(herdr_config(&json!({}), started, inherited()).unwrap().socket_path.as_deref(), Some("/cockpit/herdr.sock"));
+        let named = herdr_config(&json!({ "env": { "HERDR_SESSION": "fgos-worker" } }), started, inherited()).unwrap();
+        assert_eq!((named.session.as_deref(), named.socket_path), (Some("fgos-worker"), None));
+        let both = herdr_config(&json!({ "env": { "HERDR_SESSION": "fgos-worker", "HERDR_SOCKET_PATH": "/own.sock" } }), started, inherited()).unwrap();
+        assert_eq!(both.socket_path.as_deref(), Some("/own.sock"), "the caller's own socket still wins");
+    }
+
+    #[test]
     fn the_anchor_pane_comes_from_the_envelope_env_only() {
         assert_eq!(anchor_pane(&json!({ "env": { "FGOS_HERDR_ANCHOR_PANE": " w1:p2 " } })), Some("w1:p2"));
         for none in [json!({}), json!({ "env": {} }), json!({ "env": { "FGOS_HERDR_ANCHOR_PANE": "  " } }), json!({ "request": { "anchorPane": "w1:p2" } })] {
@@ -476,9 +489,9 @@ mod tests {
     #[test]
     fn the_operation_budget_bounds_every_herdr_command() {
         let started = Instant::now();
-        assert!(herdr_config(&json!({ "timeoutMs": 0 }), started).is_err());
-        assert!(herdr_config(&json!({}), started).unwrap().deadline.is_none());
-        let deadline = herdr_config(&json!({ "timeoutMs": 10_000 }), started).unwrap().deadline.unwrap();
+        assert!(herdr_config(&json!({ "timeoutMs": 0 }), started, None).is_err());
+        assert!(herdr_config(&json!({}), started, None).unwrap().deadline.is_none());
+        let deadline = herdr_config(&json!({ "timeoutMs": 10_000 }), started, None).unwrap().deadline.unwrap();
         assert_eq!(deadline.duration_since(started), Duration::from_millis(9_000));
     }
 }

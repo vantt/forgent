@@ -67,6 +67,8 @@ test('every operation of the port answers through the route', () => {
   }
   assert.equal(capabilities.serverIncarnation.endpoint, socketPath);
   assert.equal(capabilities.serverIncarnation.pid, process.pid);
+  assert.equal(capabilities.endpoint.socketPath, socketPath, 'the socket the caller named is the endpoint');
+  assert.match(route('capabilities', {}, { env: { HERDR_SESSION: 'confined-1', HOME: '/home/op' } }).endpoint.socketPath, /\/\.config\/herdr\/sessions\/confined-1\/herdr\.sock$/, 'a named session answers its own socket');
   // The core's own defaults and policy registry are what setup writes and the contract names.
   const { layout, allocationGraceMs } = DEFAULT_TERMINAL_CONFIG;
   assert.deepEqual(

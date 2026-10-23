@@ -57,6 +57,25 @@ impl HerdrConfig {
         }
     }
 
+    /// The socket the CLI is pointed at: the caller's own, else the one herdr keeps
+    /// for the named session.
+    fn socket(&self) -> Option<String> {
+        self.socket_path.clone().filter(|p| !p.is_empty()).or_else(|| self.session.as_deref().and_then(|s| self.session_socket(s)))
+    }
+
+    /// herdr's socket layout, read off a live server: the default session keeps
+    /// `herdr.sock` in the config directory, every other session its own
+    /// directory under `sessions`. The one place the layout is written down.
+    fn session_socket(&self, session: &str) -> Option<String> {
+        let valid = session.starts_with(|c: char| c.is_ascii_lowercase())
+            && session.len() <= 32
+            && session.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '-');
+        let home = self.env.iter().find(|(k, _)| k == "HOME").map(|(_, v)| v.clone()).or_else(|| std::env::var("HOME").ok()).filter(|h| !h.is_empty());
+        let base = std::path::Path::new(&home.filter(|_| valid)?).join(".config").join("herdr");
+        let socket = if session == "default" { base.join("herdr.sock") } else { base.join("sessions").join(session).join("herdr.sock") };
+        Some(socket.to_string_lossy().into_owned())
+    }
+
     fn timeout(&self) -> Duration {
         let each = Duration::from_millis(if self.timeout_ms == 0 { DEFAULT_TIMEOUT_MS } else { self.timeout_ms });
         match self.deadline {
@@ -279,7 +298,7 @@ fn exec(config: &HerdrConfig, args: &[&str], timeout: Duration) -> DriverResult<
     if let Some(session) = &config.session {
         cmd.env("HERDR_SESSION", session);
     }
-    if let Some(socket) = &config.socket_path {
+    if let Some(socket) = config.socket() {
         cmd.env("HERDR_SOCKET_PATH", socket);
     }
     cmd.envs(config.env.iter().map(|(k, v)| (k, v)));
@@ -378,7 +397,7 @@ impl HerdrDriver {
         }
         // Without a socket from the caller the CLI itself says which socket it
         // follows (it honors `HERDR_SOCKET_PATH` from the inherited environment).
-        let endpoint = match self.config.socket_path.clone().filter(|p| !p.is_empty()) {
+        let endpoint = match self.config.socket() {
             Some(path) => path,
             None => {
                 let mut args = vec![];
@@ -629,6 +648,13 @@ impl TerminalDriver for HerdrDriver {
         self.require("layout.geometry")?;
         let result = self.run(&["pane", "layout", "--pane", pane])?;
         parse_layout(&result).ok_or_else(|| unknown("herdr pane layout answered an unexpected shape"))
+    }
+
+    fn socket_path(&self) -> Option<String> {
+        match self.config.session {
+            Some(_) => self.config.socket(),
+            None => self.config.socket().or_else(|| self.config.session_socket("default")),
+        }
     }
 
     fn agent_facts(&self) -> AgentFacts {

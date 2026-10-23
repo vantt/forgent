@@ -89,7 +89,7 @@
     "capabilities": {
       "input": { "agents": "optional boolean: also answer agentKinds and integrations (two more herdr reads; omitted otherwise)" },
       "results": ["capabilities"],
-      "meaning": "driver name, declared capability list (driver-capabilities.v1.json), current server incarnation or unknown, whether the pane the caller named in the envelope env FGOS_HERDR_ANCHOR_PANE resolves, the agent kinds and integration hooks when asked, the core's default for every config key and the registered placement policy names; doctor reads this"
+      "meaning": "driver name, declared capability list (driver-capabilities.v1.json), current server incarnation or unknown, the socket the driver talks to, whether the pane the caller named in the envelope env FGOS_HERDR_ANCHOR_PANE resolves, the agent kinds and integration hooks when asked, the core's default for every config key and the registered placement policy names; doctor reads this"
     },
     "reconcile-scan": {
       "input": { "olderThanMs": "integer >= 0" },
@@ -117,6 +117,7 @@
       "driver": "string",
       "capabilities": "string[]",
       "serverIncarnation": "serverIncarnation | null",
+      "endpoint": "{socketPath: string | null}: the socket the driver talks to, named without asking the server: the caller's own HERDR_SOCKET_PATH, else the one herdr keeps for the HERDR_SESSION the caller named (the default session's when it named none); null when no home directory is known or the session name is not one herdr accepts",
       "anchorPane": "{state: absent} when the caller named none, {state: resolved} when the driver finds the pane, {state: unresolvable, reason} otherwise (one driver read, only when a pane was named)",
       "agentKinds": "string[] | \"unknown\"; only when asked (agents: true): the kinds herdr's agent start accepts, \"unknown\" when its text cannot be read",
       "integrations": "object | \"unknown\"; only when asked: agent name -> current | outdated | not installed, \"unknown\" when herdr's text cannot be read",

@@ -187,6 +187,10 @@ pub trait TerminalDriver {
     fn label_pane(&self, pane: &str, label: &str) -> DriverResult<()>;
     /// Geometry of the tab holding `pane`: the rects the multiplexer reports, one read.
     fn layout_geometry(&self, pane: &str) -> DriverResult<TabGeometry>;
+    /// The socket the driver talks to, when it can be named without asking the server.
+    fn socket_path(&self) -> Option<String> {
+        None
+    }
     /// The agent kinds and integration hooks the multiplexer reports; unknown by default.
     fn agent_facts(&self) -> AgentFacts {
         AgentFacts::default()

@@ -138,20 +138,43 @@ fn split_ratio_is_the_share_the_existing_pane_keeps() {
 }
 
 #[test]
-fn session_and_socket_reach_herdr_through_its_environment() {
+fn a_session_names_its_own_socket_and_reaches_herdr_through_its_environment() {
     let dir = scratch("env");
+    let home = dir.join("home");
     let mut config = HerdrConfig::new(fake_bin());
     config.session = Some("confined-1".into());
     config.env.push(("FAKE_HERDR_LOG".into(), dir.join("log").to_string_lossy().into_owned()));
+    config.env.push(("HOME".into(), home.to_string_lossy().into_owned()));
     config.timeout_ms = 5_000;
-    // `status server` is the one command that takes the session as an argument.
-    config.socket_path = None;
-    config.env.push(("FAKE_HERDR_SOCKET".into(), "/nonexistent/herdr.sock".into()));
     let driver = HerdrDriver::new(config);
-    let _ = driver.server_incarnation();
+    let socket = home.join(".config/herdr/sessions/confined-1/herdr.sock").to_string_lossy().into_owned();
+    assert_eq!(driver.socket_path().as_deref(), Some(socket.as_str()));
+    match driver.server_incarnation() {
+        Err(Refusal::Unknown { reason }) => assert!(reason.contains(&socket), "the incarnation looks at the session's own socket: {reason}"),
+        other => panic!("nothing listens there, got {other:?}"),
+    }
     let log = std::fs::read_to_string(dir.join("log")).unwrap();
-    assert!(log.contains("--session\tconfined-1\tstatus\tserver\t--json"), "{log}");
+    assert!(!log.contains("status"), "a named session needs no `status server` to find its socket: {log}");
     let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn the_socket_follows_herdrs_layout_for_the_default_session_a_named_one_and_the_callers_own() {
+    let with = |session: Option<&str>, socket: Option<&str>| {
+        let mut config = HerdrConfig::new(fake_bin());
+        config.session = session.map(String::from);
+        config.socket_path = socket.map(String::from);
+        config.env.push(("HOME".into(), "/home/op".into()));
+        HerdrDriver::new(config).socket_path()
+    };
+    assert_eq!(with(None, None).as_deref(), Some("/home/op/.config/herdr/herdr.sock"), "no session is the default one");
+    assert_eq!(with(Some("default"), None).as_deref(), Some("/home/op/.config/herdr/herdr.sock"));
+    assert_eq!(with(Some("fgos-worker"), None).as_deref(), Some("/home/op/.config/herdr/sessions/fgos-worker/herdr.sock"));
+    assert_eq!(with(Some("fgos-worker"), Some("/own/herdr.sock")).as_deref(), Some("/own/herdr.sock"), "the caller's own socket wins");
+    assert_eq!(with(None, Some("/pane/herdr.sock")).as_deref(), Some("/pane/herdr.sock"));
+    for bad in ["", "Upper", "1st", "a/b", "..", "has space", &"x".repeat(33)] {
+        assert_eq!(with(Some(bad), None), None, "{bad:?} is not a session name herdr accepts");
+    }
 }
 
 #[test]

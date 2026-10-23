@@ -8,7 +8,7 @@
 // only be given a different one, by living in a different session.
 //
 // A private HOME is still worth having: it closes the second route, the
-// `$HOME/.config/herdr/herdr.sock` fallback, which a worker would otherwise
+// default socket under `$HOME`, the fallback a worker would otherwise
 // find with no environment variable at all. Neither measure closes the hole
 // alone, which is why the config door refuses `bypass` unless both are declared.
 //
@@ -22,7 +22,7 @@ import fs from 'node:fs';
 import net from 'node:net';
 import { spawn } from 'node:child_process';
 import { createRoundTerminalControl, resolveHerdrBin } from './terminal-slot.mjs';
-import { isolatedSessionEnv, socketPathForSession, assertNotOperatorSession, WorkerSessionError } from './worker-session.mjs';
+import { isolatedSessionEnv, assertNotOperatorSession, WorkerSessionError } from './worker-session.mjs';
 
 /** The session every confined worker shares unless an executor names another. */
 export const DEFAULT_WORKER_SESSION = 'fgos-worker';
@@ -39,6 +39,24 @@ function serverAnswers(terminalControl) {
   } catch {
     return false;
   }
+}
+
+/** The socket file of the session `terminalControl` addresses, as the terminal-control route names it.
+ * A route that does not answer proves nothing about the server, so nothing is started on its word. */
+function sessionSocket(terminalControl, sessionName) {
+  let socketPath;
+  let cause = 'it named no socket';
+  try {
+    socketPath = terminalControl.capabilities()?.endpoint?.socketPath;
+  } catch (error) {
+    cause = error?.message ?? String(error);
+  }
+  if (typeof socketPath === 'string' && socketPath !== '') return socketPath;
+  throw new WorkerSessionError(
+    'worker-session-server-unknown',
+    `worker-session-server-unknown: worker session "${sessionName}": the terminal-control route did not name its socket (${cause}); nothing was started.`,
+    { sessionName, cause },
+  );
 }
 
 /** One connect to the socket: resolves when a server accepts, rejects with the
@@ -114,10 +132,9 @@ export async function ensureWorkerSession(sessionName = DEFAULT_WORKER_SESSION, 
   // Before any process is started: never the operator's session.
   assertNotOperatorSession(sessionName, callerEnv);
 
-  const operatorHome = callerEnv?.HOME ?? process.env.HOME;
-  const socketPath = socketPathForSession(sessionName, { home: operatorHome });
-  const env = isolatedSessionEnv(callerEnv, sessionName, { home: operatorHome });
+  const env = isolatedSessionEnv(callerEnv, sessionName);
   const terminalControl = terminalControlFor(env);
+  const socketPath = sessionSocket(terminalControl, sessionName);
 
   // A server that died without unlinking leaves its socket file behind. Read
   // as "already up", that file wedges every confined dispatch from then on:
