@@ -734,7 +734,7 @@ impl<'a> Core<'a> {
         if let Some(done) = store.read_marker::<ReleasedMarker>(key, MarkerKind::Released).map_err(store_err)? {
             if done.disposition == Disposition::Retain && disposition == Disposition::Close && record.origin == Origin::Allocated {
                 return Ok(ReleaseOutcome::KeptUnknown {
-                    reason: "already retained; the pane closes when its retain expires".into(),
+                    reason: "already retained; once its retain time passes the pane is reported for a person to close".into(),
                 });
             }
             return Ok(ReleaseOutcome::Released { disposition: done.disposition });

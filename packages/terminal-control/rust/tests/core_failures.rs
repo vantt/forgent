@@ -255,7 +255,7 @@ fn close_after_retain_does_not_pretend_to_close() {
     core.allocate(&request("a", "g")).unwrap();
     core.release("a", Disposition::Retain, Some(1)).unwrap();
     let out = core.release("a", Disposition::Close, None).unwrap();
-    assert!(matches!(out, ReleaseOutcome::KeptUnknown { .. }), "{out:?}");
+    assert!(matches!(&out, ReleaseOutcome::KeptUnknown { reason } if reason.contains("reported for a person to close")), "the refusal says who closes it: {out:?}");
     assert!(driver.calls("pane.close").is_empty());
 }
 
