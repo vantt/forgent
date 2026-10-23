@@ -33,6 +33,8 @@ export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config,
   if (!store) throw new TypeError('a prepared consumer store is required');
   config ??= readEventStoreConfig(path.dirname(mainFgosDir));
   const attempts = rebuild ? config.rebuild.maxAttempts : MUTATION_ATTEMPTS;
+  // The store asks Git whether writes are admitted once, here, before any gate: a read never pays for it.
+  store.admitWrites(heldRanks);
   // Directories besides the main `.fgos` the transaction may write. By default the caller's own `.fgos`; a consumer
   // whose effects all land in the main cache (porting) passes `[]`, so a caller directory is never granted.
   const writeRoots = extraRoots ?? (path.resolve(mainFgosDir) === path.resolve(dir) ? [] : [dir]);

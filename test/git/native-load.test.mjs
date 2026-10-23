@@ -119,6 +119,7 @@ test('real append and read run in a hot section without a child process; Git ref
   const hot = path.join(temp, '.fgos');
   fs.mkdirSync(hot);
   try {
+    store.admitWrites([]);
     withStateTx(hot, () => {
       assert.throws(() => execFileSync(process.execPath, ['-e', '']), { code: 'exec-under-hot-lock' });
       assert.throws(() => createGitPublication({}, options), /exec-under-hot-lock/);

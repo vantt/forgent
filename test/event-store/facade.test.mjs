@@ -63,6 +63,7 @@ test('seal-like operations require held ranks and reject ranks 58 and 80 before 
 
 test('prefetched store survives a hot transaction while every Git route refuses by name', { skip: process.platform !== 'linux' }, t => {
   const { store, hot } = fixture(t);
+  store.admitWrites([]);
   withStateTx(hot, tx => {
     const result = store.append('project', [event], {}, 'fixture', [60]);
     assert.equal(store.readInGate(result.ack.origin, 'project', 0).events.length, 1);
@@ -165,7 +166,24 @@ test('hot-section release is one-shot and nested sections preserve the process g
 test('ownOrigin is explicitly absent until the first local append', t => {
   const { store, hot } = fixture(t);
   assert.equal(store.ownOrigin, null);
+  store.admitWrites([]);
   withStateTx(hot, () => store.append('project', [event], {}, 'fixture', [60]), { prefetched: { writer: 'fixture' } });
   assert.equal(typeof store.ownOrigin, 'string');
   assert.ok(store.ownOrigin.length > 0);
+});
+
+test('write admission is asked of Git outside the gate and never by a read; a gate write that skipped it is refused', t => {
+  const { store, hot } = fixture(t);
+  const inGate = () => withStateTx(hot, () => store.append('project', [event], {}, 'fixture', [60]), { prefetched: { writer: 'fixture' } });
+  // A read never settles admission, so the gate (rank 60) still has to be told first.
+  store.read({ streams: ['project'] }, []);
+  assert.throws(inGate, { code: 'event-store-admission-required' });
+  assert.equal(store.ownOrigin, null, 'a refused write left no trace');
+  store.admitWrites([]);
+  inGate();
+  assert.equal(typeof store.ownOrigin, 'string');
+  assert.throws(() => store.admitWrites([60]), { code: 'event-store-seal-under-state' });
+  // Outside the gate the first write settles admission itself.
+  const fresh = fixture(t);
+  assert.equal(fresh.store.append('project', [event], {}, 'fixture', []).events.length, 1);
 });

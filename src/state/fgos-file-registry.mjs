@@ -21,6 +21,7 @@ import path from 'node:path';
 
 export const FGOS_FILE = {
   STATE: 'state',
+  EVENT_HISTORY: 'eventHistory',
   PORTING_STATE: 'portingState',
   TOOL_STATUS: 'toolStatus',
   APPROVE_FAULT_LOG: 'approveFaultLog',
@@ -32,6 +33,7 @@ export const FGOS_FILE = {
 
 const FGOS_FILE_RESOLVERS = {
   [FGOS_FILE.STATE]: (fgosDir) => path.join(fgosDir, 'cache', 'state.json'),
+  [FGOS_FILE.EVENT_HISTORY]: (fgosDir) => path.join(fgosDir, 'cache', 'event-history.json'),
   [FGOS_FILE.PORTING_STATE]: (fgosDir) => path.join(fgosDir, 'cache', 'porting-state.json'),
   [FGOS_FILE.TOOL_STATUS]: (fgosDir) => path.join(fgosDir, 'runtime', 'tool-status.local.json'),
   [FGOS_FILE.APPROVE_FAULT_LOG]: (fgosDir) => path.join(fgosDir, 'logs', 'approve-post-success-faults.jsonl'),

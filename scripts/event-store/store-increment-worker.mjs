@@ -37,6 +37,8 @@ export function runWorker([repo,stateRoot,manifestPath,releaseRoot,index,count,b
     Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,2);
   }
   let snapshot;
+  // A consumer settles write admission before it enters the gate; the gate itself never asks Git.
+  store.admitWrites([]);
   for(let i=0;i<Number(count);i++){
     const start=performance.now();
     const readStart=performance.now();

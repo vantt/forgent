@@ -32,6 +32,8 @@ try {
     fs.unlinkSync(path.join(stream, 'hwm.json'));
     fs.appendFileSync(path.join(stream, 'active.jsonl'), '{torn');
   }
+  // The gate never asks Git for write admission; its consumer settles it before entering.
+  store.admitWrites([]);
   withStateTx(hot, () => {
     assert.throws(() => execFileSync(process.execPath, ['-e', '']), { code: 'exec-under-hot-lock' });
     fs.writeSync(2, 'ES_GATE_BEGIN\n');

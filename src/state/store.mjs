@@ -108,16 +108,18 @@ export function categoryOf(err) {
 // Full readers are forbidden under the hot mutex. Gate callbacks use tx.view.
 function readAllEvents(dir, options) {
   if (hotLockDepth() > 0) throw new StoreError('event-store-full-read-under-state', 'full Work history read inside state gate');
-  const { store } = prepareWorkStore(dir, getMainFgosDir(dir));
-  return readWorkState(store, options).events;
+  const mainFgosDir = getMainFgosDir(dir);
+  const { store } = prepareWorkStore(dir, mainFgosDir);
+  return readWorkState(store, { historyPath: resolveFgosFile(mainFgosDir, FGOS_FILE.EVENT_HISTORY), ...options }).events;
 }
 
 function currentView(dir) {
   if (hotLockDepth() > 0) throw new StoreError('event-store-full-read-under-state', 'currentView inside state gate');
   // A directory with no `.fgos/` has no Work store: a read never creates one, it reports an empty view.
   if (!fs.existsSync(dir)) return foldEvents([]);
-  const { store } = prepareWorkStore(dir, getMainFgosDir(dir));
-  return readWorkState(store, { cachePath: resolveFgosFile(getMainFgosDir(dir), FGOS_FILE.STATE) }).view;
+  const mainFgosDir = getMainFgosDir(dir);
+  const { store } = prepareWorkStore(dir, mainFgosDir);
+  return readWorkState(store, { cachePath: resolveFgosFile(mainFgosDir, FGOS_FILE.STATE), historyPath: resolveFgosFile(mainFgosDir, FGOS_FILE.EVENT_HISTORY) }).view;
 }
 
 function withStateAndRefresh(dir, fn, options) {
@@ -2049,8 +2051,9 @@ export function readRawEvents(dir, options) {
  */
 export function readAppliedEvents(dir) {
   if (hotLockDepth() > 0) throw new StoreError('event-store-full-read-under-state', 'full Work history read inside state gate');
-  const { store } = prepareWorkStore(dir, getMainFgosDir(dir));
-  const { events, view } = readWorkState(store, { cachePath: resolveFgosFile(getMainFgosDir(dir), FGOS_FILE.STATE) });
+  const mainFgosDir = getMainFgosDir(dir);
+  const { store } = prepareWorkStore(dir, mainFgosDir);
+  const { events, view } = readWorkState(store, { cachePath: resolveFgosFile(mainFgosDir, FGOS_FILE.STATE), historyPath: resolveFgosFile(mainFgosDir, FGOS_FILE.EVENT_HISTORY) });
   return appliedEvents(events, view);
 }
 

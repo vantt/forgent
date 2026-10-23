@@ -245,6 +245,46 @@ test('a cached view is reused after an append and after a seal, and refolded whe
   assert.equal(requests[3].cursor, undefined, 'a rebuild read never continues from a retained catch-up');
 });
 
+test('a process with no catch-up of its own continues from the history checkpoint, and a rebuild verifies from zero', t => {
+  const f = workFixture(t);
+  const history = path.join(f.hot, 'cache/event-history.json');
+  f.run(tx => tx.append({ type: 'work.add', payload: { id: 'one', title: 'one' } }));
+  f.store.seal('project', []);
+  // One handle per simulated process: the retained catch-up is keyed by the store object it was read through.
+  const session = () => {
+    const reports = [];
+    const wrapper = { ownOrigin: f.store.ownOrigin, read: (request, held) => {
+      const result = f.store.read(request, held);
+      reports.push({ request, report: result.checkpoint });
+      return result;
+    } };
+    return { wrapper, reports };
+  };
+  const first = session();
+  readWorkState(first.wrapper, { cachePath: f.cache, historyPath: history });
+  assert.deepEqual(first.reports[0].report, { continued: false, ignored: null, written: true, writeError: null });
+  assert.equal(first.reports[0].request.checkpoint.reuse, true);
+  assert.ok(fs.existsSync(history));
+
+  const second = session();
+  const events = readWorkState(second.wrapper, { cachePath: f.cache, historyPath: history }).events;
+  assert.equal(events.length, 1);
+  assert.equal(second.reports[0].report.continued, true, 'a fresh process continues from the file');
+  assert.equal(second.reports[0].report.written, false, 'nothing new was certified, so the file stays');
+
+  const rebuilt = session();
+  readWorkState(rebuilt.wrapper, { historyPath: history, rebuild: true });
+  assert.equal(rebuilt.reports[0].request.checkpoint.reuse, false);
+  assert.equal(rebuilt.reports[0].report.continued, false);
+  assert.equal(rebuilt.reports[0].report.written, true, 'a rebuild replaces the file');
+
+  fs.writeFileSync(history, '{"v":1,');
+  const damaged = session();
+  assert.equal(readWorkState(damaged.wrapper, { cachePath: f.cache, historyPath: history }).events.length, 1);
+  assert.match(damaged.reports[0].report.ignored, /checkpoint/);
+  assert.equal(damaged.reports[0].report.written, true, 'a damaged file is replaced');
+});
+
 test('lifecycle events seal after release with the native opportunistic route', t => {
   const f = workFixture(t);
   const event = f.run(tx => tx.append({ type: 'decision', payload: { text: 'seal this decision' } }));

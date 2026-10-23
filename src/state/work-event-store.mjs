@@ -40,15 +40,19 @@ function sameFoldedHistory(cached, read) {
 
 // What this process's last catch-up of a store folded. A cursor is only coverage and cannot stand in for a lost
 // view, so the reader needs the retained events beside it to walk just what is new (spec §15). A fresh process has
-// none and reads from zero once; a long-lived one (gateway, runner) then catches up incrementally.
+// none; it continues from the checkpoint file (`historyPath`, spec §15) when one matches the store, else reads from
+// zero once. A long-lived one (gateway, runner) then catches up incrementally.
 const retained = new WeakMap();
 
 /** Full history is read only outside the mutex. Legacy order stays untouched. A read that names a cache path
- * continues from this process's last catch-up; one without (rebuild) always verifies from zero. */
-export function readWorkState(store, { cachePath, heldRanks = [], requireComplete = false } = {}) {
+ * continues from this process's last catch-up; one without (rebuild) always verifies from zero. `historyPath` names
+ * the checkpoint file: a read holding no catch-up of its own continues from it, `rebuild` never does, and every read
+ * replaces it when it certified new commits. */
+export function readWorkState(store, { cachePath, historyPath, heldRanks = [], requireComplete = false, rebuild = false } = {}) {
   if (hotLockDepth() > 0) throw refusal('event-store-full-read-under-state');
   const prior = cachePath ? retained.get(store) : undefined;
-  const read = readStore(store, { streams: ['project'], ...(prior ? { cursor: prior.cursor, folded: prior.folded } : {}) }, heldRanks);
+  const read = readStore(store, { streams: ['project'], ...(prior ? { cursor: prior.cursor, folded: prior.folded } : {}),
+    ...(historyPath ? { checkpoint: { path: historyPath, reuse: !rebuild } } : {}) }, heldRanks);
   retained.set(store, { cursor: read.cursor, folded: read.sequence });
   if (requireComplete && (read.deferred.length || read.missing.length)) throw refusal('event-store-incomplete-history');
   const events = [...read.legacy.map(record => record.event), ...read.sequence];
@@ -80,7 +84,8 @@ export function withWorkState(dir, mainFgosDir, writer, fn, options = {}) {
   const prepared = options.store ? options : { ...prepareWorkStore(dir, mainFgosDir), ...options };
   return withConsumerState(dir, mainFgosDir, writer, fn, { ...prepared, policy: {
     stream: 'project', resource: 'state', fold: foldEvents, lifecycle, persist,
-    readState: (store, { heldRanks, rebuild }) => readWorkState(store, { heldRanks,
+    readState: (store, { heldRanks, rebuild }) => readWorkState(store, { heldRanks, rebuild,
+      historyPath: resolveFgosFile(mainFgosDir, FGOS_FILE.EVENT_HISTORY),
       ...(rebuild ? {} : { cachePath: resolveFgosFile(mainFgosDir, FGOS_FILE.STATE) }) }),
     prepareEvents(tx, events) {
       // Each event records what its writer saw. Existence rides every Work event so a record for a vanished
