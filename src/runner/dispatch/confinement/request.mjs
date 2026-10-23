@@ -452,6 +452,7 @@ export function buildConfinementRequest({
       transportDeadlines: context.transportDeadlines,
       closeAlways: context.closeAlways,
       dispatchBatchKey: context.dispatchBatchKey,
+      dispatchBatchSize: context.dispatchBatchSize,
       effectiveContract: context.effectiveContract,
       ...(blind && Array.isArray(context.contextRefs) ? { contextRefs: context.contextRefs } : {}),
     },
