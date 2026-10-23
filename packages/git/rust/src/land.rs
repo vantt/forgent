@@ -1,4 +1,4 @@
-//! Dormant Land transaction. The consumer owns verification and business settlement.
+//! Land transaction. The consumer owns verification and business settlement.
 use crate::{
     refs::Authority,
     scoped_commit::{checkout_resources, is_store_path, paths, require_no_native_state},
