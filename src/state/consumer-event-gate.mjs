@@ -2,6 +2,7 @@
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { readEventStoreConfig } from '../event-store/index.mjs';
+import { processSealCoalescer } from '../event-store/seal-coalescing.mjs';
 import { withStateTx, hotLockDepth, HotLockError } from './hot-lock.mjs';
 const refusal = code => Object.assign(new Error(code), { code });
 // Attempts an ordinary mutation spends re-reading after a foreign event or a seq recovery. It is its own budget:
@@ -22,7 +23,7 @@ function advance(cursor, events) {
  * An already-prepared store is also accepted (the same native facade, useful
  * to callers that already resolved repository authority).
  */
-export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config, rebuild = false, beforeGate, heldRanks = [], readRoots = [], extraRoots, policy, onTiming } = {}) {
+export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config, rebuild = false, beforeGate, heldRanks = [], readRoots = [], extraRoots, policy, onTiming, sealer = processSealCoalescer } = {}) {
   const measure = (stage, run) => {
     if (!onTiming) return run();
     const start = performance.now();
@@ -80,7 +81,7 @@ export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config,
       // Opportunistic failures do not turn an acknowledged mutation into a
       // refusal. Explicit seal/doctor retain the diagnostic failure surface.
       try {
-        if (sealedType) store.seal(stream, heldRanks, { opportunistic: true });
+        if (sealedType) sealer.seal(store, stream, heldRanks, config.seal.coalesceSec);
         else store.sealIfDue(stream, config.seal.intervalSec, heldRanks);
       } catch { /* The durable open batch remains available for the next seal. */ }
       return result;

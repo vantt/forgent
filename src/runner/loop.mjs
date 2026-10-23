@@ -68,6 +68,7 @@ import {
 } from '../state/store.mjs';
 import { readClaims, withMainState, getMainFgosDir } from '../state/runtime-coordination.mjs';
 import { maintainEventStore } from '../event-store/maintenance.mjs';
+import { processSealCoalescer } from '../event-store/seal-coalescing.mjs';
 import { DEFAULTS, truncateTitle } from '../state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, domainSteps, stepForPhase, classificationVocabulary } from '../state/domain-registry.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
@@ -1281,7 +1282,12 @@ async function claimAndDispatch(ctx) {
  * failure. An item that trips max-visits is still parked via `todo -> blocked`
  * (per D5) and reported in `parked`; a per-item halt stops further refills.
  */
-export async function runOnce(options = {}) {
+export function runOnce(options = {}) {
+  // The runner is a long-lived writer: its Work seals coalesce until a wave settles, the drain ends or the window closes.
+  return processSealCoalescer.scope(() => drainOnce(options));
+}
+
+async function drainOnce(options) {
   const log = options.log ?? ((...args) => console.log(...args));
   const dryRun = options.dryRun ?? false;
   const repoRoot = options.repoRoot ?? resolveRepoRoot(options.cwd ?? process.cwd());
@@ -1693,6 +1699,7 @@ export async function runOnce(options = {}) {
       const ctxBase ={ repoRoot, dir, config, worktreeDir, breaker, queue, log, ownershipStore, ownerIdentity };
       const settled = await Promise.allSettled(admitted.map((item) => claimAndDispatch({ ...ctxBase, item })));
 
+      processSealCoalescer.flush(); // a wave is a finished unit of work
       let progressed = false;
       for (const s of settled) {
         if (s.status === 'rejected') throw s.reason; // uncategorized real bug -> outer catch (exit 1)

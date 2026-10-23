@@ -9,6 +9,7 @@ import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { openStore, eventStoreConfig } from '../../src/event-store/index.mjs';
 import { withWorkState, readWorkState } from '../../src/state/work-event-store.mjs';
 import { hotLockDepth } from '../../src/state/hot-lock.mjs';
+import { createSealCoalescer } from '../../src/event-store/seal-coalescing.mjs';
 import { withConsumerState } from '../../src/state/consumer-event-gate.mjs';
 import { readRawEvents, currentEffectiveView } from '../../src/state/store.mjs';
 import { releaseClaimTx, readClaim, readClaims } from '../../src/state/runtime-coordination.mjs';
@@ -293,6 +294,65 @@ test('lifecycle events seal after release with the native opportunistic route', 
   const receipt = JSON.parse(fs.readFileSync(path.join(f.repo, '.git/fgos/events/project/sealed.json')));
   assert.equal(receipt.lastSeq, event.seq);
   assert.equal(f.store.read({ streams: ['project'] }, []).events[0].h, event.h);
+});
+
+function receiptSeq(f) {
+  const file = path.join(f.repo, '.git/fgos/events/project/sealed.json');
+  return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file)).lastSeq : 0;
+}
+
+test('a long-lived writer seals several lifecycle appends once, at the end of its unit of work', t => {
+  const f = workFixture(t);
+  const sealer = createSealCoalescer();
+  const decide = text => f.run(tx => tx.append({ type: 'decision', payload: { text } }), { sealer });
+  let last;
+  sealer.scope(() => {
+    decide('one'); decide('two'); last = decide('three');
+    assert.equal(receiptSeq(f), 0, 'the appends are durable but not sealed yet');
+    assert.equal(f.store.read({ streams: ['project'] }, []).events.length, 3, 'unsealed events are readable');
+    sealer.flush();
+    assert.equal(receiptSeq(f), last.seq, 'one seal covers all three');
+  });
+});
+
+test('a long-lived writer seals what is pending when it leaves its scope', t => {
+  const f = workFixture(t);
+  const sealer = createSealCoalescer();
+  let event;
+  sealer.scope(() => { event = f.run(tx => tx.append({ type: 'decision', payload: { text: 'pending' } }), { sealer }); });
+  assert.equal(receiptSeq(f), event.seq);
+});
+
+test('a writer killed with a pending seal loses no event and the next seal certifies it', async t => {
+  const f = workFixture(t);
+  const moduleUrl = new URL('../../src/state/work-event-store.mjs', import.meta.url).href;
+  const storeUrl = new URL('../../src/event-store/index.mjs', import.meta.url).href;
+  const sealUrl = new URL('../../src/event-store/seal-coalescing.mjs', import.meta.url).href;
+  const nativeUrl = new URL('../../src/git/native.mjs', import.meta.url).href;
+  const source = `
+    import { withWorkState } from ${JSON.stringify(moduleUrl)};
+    import { openStore } from ${JSON.stringify(storeUrl)};
+    import { processSealCoalescer } from ${JSON.stringify(sealUrl)};
+    import { loadNativeAddon } from ${JSON.stringify(nativeUrl)};
+    const [repo, stateRoot, hot, contract, loader, settings] = process.argv.slice(1);
+    const options = JSON.parse(loader);
+    const store = openStore(loadNativeAddon(options).resolveEventStore(repo, stateRoot, repo), 'phase-seven', [contract], options);
+    processSealCoalescer.scope(() => {
+      for (const text of ['a', 'b']) withWorkState(hot, hot, 'killed', tx => tx.append({ type: 'decision', payload: { text } }), { store, config: JSON.parse(settings) });
+      process.kill(process.pid, 'SIGKILL');
+    });
+  `;
+  const settings = JSON.stringify(eventStoreConfig({ eventStore: { seal: { intervalSec: 86400 } } }));
+  const exit = await new Promise((resolve, reject) => {
+    const p = spawn(process.execPath, ['--input-type=module', '-e', source, f.repo, f.stateRoot, f.hot, contract, JSON.stringify(loaderOptions), settings]);
+    p.on('error', reject);
+    p.on('exit', (code, signal) => resolve(signal ?? code));
+  });
+  assert.equal(exit, 'SIGKILL');
+  assert.equal(receiptSeq(f), 0, 'nothing was sealed by the killed writer');
+  assert.deepEqual(f.store.read({ streams: ['project'] }, []).events.map(e => e.payload.text), ['a', 'b'], 'both appends survived');
+  f.store.seal('project', []);
+  assert.equal(receiptSeq(f), 2, 'the next trigger certifies them');
 });
 
 test('two real processes sharing a gate fold both acknowledged batches into the cache', async t => {

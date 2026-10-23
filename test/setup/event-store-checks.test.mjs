@@ -122,6 +122,21 @@ test('a doctor run remembers a failed setup context instead of retrying it per r
   assert.equal(eventStoreDoctor(f.repo, f.ctx)('event-store-open-root').passed, true, 'a new run observes the repaired file');
 });
 
+test('doctor reports a malformed seal coalescing window on every row, and a repaired value passes', t => {
+  const f = fixture(t);
+  for (const bad of [0, -5, 2.5, '30', null]) {
+    writeProjectConfig(f.repo, { eventStore: { seal: { coalesceSec: bad } } });
+    const row = eventStoreDoctor(f.repo, f.ctx)('event-store-unsealed');
+    assert.equal(row.passed, false, `coalesceSec ${JSON.stringify(bad)}`);
+    assert.match(row.message, /event-store-config: invalid seal\.coalesceSec/);
+  }
+  writeProjectConfig(f.repo, { eventStore: { seal: { coalesceSec: 5 } } });
+  assert.equal(eventStoreDoctor(f.repo, f.ctx)('event-store-unsealed').passed, true);
+  assert.equal(eventStoreSetupContext(f.repo, f.ctx).config.seal.coalesceSec, 5);
+  writeProjectConfig(f.repo, {});
+  assert.equal(eventStoreSetupContext(f.repo, f.ctx).config.seal.coalesceSec, 30, 'the default is 30 seconds');
+});
+
 test('the ten Event Store rows and three fixes are registered and every row of a run shares one doctor', t => {
   const rows = DOCTOR_CHECKS.filter(({ id }) => id.startsWith('event-store-'));
   assert.deepEqual(rows.map(({ id }) => id).sort(), ['git-version', 'open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'sync', 'native-addon', 'legacy-layout', 'orphan-branches'].map(name => `event-store-${name}`).sort());

@@ -341,6 +341,7 @@
     "src/event-store/index.mjs": "infra",
     "src/event-store/native.mjs": "infra",
     "src/event-store/maintenance.mjs": "infra",
+    "src/event-store/seal-coalescing.mjs": "infra",
     "src/verbs/events/context.mjs": "use-case",
     "src/verbs/events/status.mjs": "use-case",
     "src/verbs/events/sync.mjs": "use-case",

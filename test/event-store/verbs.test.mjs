@@ -55,7 +55,7 @@ test('config merges project over global and validates integer boundaries; the Wo
   const f = fixture(t);
   fs.writeFileSync(f.ctx.globalConfigPath, JSON.stringify({ eventStore: { seal: { intervalSec: 10 }, sync: { intervalSec: 20 }, remote: 'backup' } }));
   writeProjectConfig(f.repo, { eventStore: { seal: { intervalSec: 30 }, remote: 'origin' } });
-  assert.deepEqual(readEventStoreConfig(f.repo, f.ctx.globalConfigPath), { seal: { intervalSec: 30 }, sync: { intervalSec: 20 }, rebuild: { maxAttempts: 5 }, remote: 'origin' });
+  assert.deepEqual(readEventStoreConfig(f.repo, f.ctx.globalConfigPath), { seal: { intervalSec: 30, coalesceSec: 30 }, sync: { intervalSec: 20 }, rebuild: { maxAttempts: 5 }, remote: 'origin' });
   writeRawProjectConfig(f.repo, '{ unrelated: half-written');
   // A file that exists but does not parse never lends its defaults to a publish decision: the write path and the
   // triggers get a config that does not push, the verbs and doctor get the error.
@@ -64,7 +64,7 @@ test('config merges project over global and validates integer boundaries; the Wo
   writeProjectConfig(f.repo, { unrelated: { broken: true }, eventStore: { sync: { intervalSec: -1 } } });
   assert.throws(() => readEventStoreConfig(f.repo, f.ctx.globalConfigPath), /event-store-config/);
   writeProjectConfig(f.repo, {});
-  for (const eventStore of [{ seal: { intervalSec: 0 } }, { sync: { intervalSec: -1 } }, { rebuild: { maxAttempts: 1.5 } }, { remote: '../bad' }]) assert.throws(() => eventStoreConfig({ eventStore }), /event-store-config/);
+  for (const eventStore of [{ seal: { intervalSec: 0 } }, { seal: { coalesceSec: 0 } }, { seal: { coalesceSec: 1.5 } }, { seal: { coalesceSec: '30' } }, { sync: { intervalSec: -1 } }, { rebuild: { maxAttempts: 1.5 } }, { remote: '../bad' }]) assert.throws(() => eventStoreConfig({ eventStore }), /event-store-config/);
   const { rebuilt } = await rebuildStoreUseCase(f.ctx);
   // A summary, never the view: the size of each collection, the view's revision, and what its cache covers.
   assert.deepEqual(rebuilt.map(({ consumer, counts }) => ({ consumer, counts })), [{ consumer: 'work', counts: { work: 0, decisions: 0 } }, { consumer: 'porting', counts: { porting: 0 } }]);
