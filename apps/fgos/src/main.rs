@@ -84,14 +84,8 @@ fn native_kind(route: &CommandRouteDescriptor, cli_args: &[std::ffi::OsString]) 
 /// in the legacy-node parser; the native parsers also take `--flag=value`, so
 /// the name stops at `=`, and a bare `--` ends flag parsing (what follows is
 /// positional).
-fn unknown_native_flag(
-    route: &CommandRouteDescriptor,
-    cli_args: &[std::ffi::OsString],
-) -> Option<String> {
-    let sub = cli_args
-        .get(1)
-        .and_then(|a| a.to_str())
-        .filter(|s| !s.starts_with('-'));
+fn unknown_native_flag(route: &CommandRouteDescriptor, cli_args: &[std::ffi::OsString]) -> Option<String> {
+    let sub = cli_args.get(1).and_then(|a| a.to_str()).filter(|s| !s.starts_with('-'));
     let accepted: &Vec<String> = match (&route.subcommand_flags, &route.accepted_flags) {
         (Some(by_sub), _) => by_sub.get(sub?)?,
         (None, Some(flags)) => flags,
@@ -187,10 +181,7 @@ fn main() {
     // command-routes.json or help.
     if args.get(1).is_some_and(|a| a == "internal") {
         if args.get(2).is_some_and(|a| a == "git-grant-check") {
-            let rest: Vec<String> = args[3..]
-                .iter()
-                .map(|a| a.to_string_lossy().into_owned())
-                .collect();
+            let rest: Vec<String> = args[3..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
             std::process::exit(fgos_distribution::git_grant::main(&rest));
         }
         // `holder-lock-helper <role>`: the roles a re-executed binary plays
@@ -201,26 +192,17 @@ fn main() {
         // `terminal-control <op>`: the key-addressed terminal port, one
         // operation per process (see `fgos_terminal_control::route`).
         if args.get(2).is_some_and(|a| a == "terminal-control") {
-            let rest: Vec<String> = args[3..]
-                .iter()
-                .map(|a| a.to_string_lossy().into_owned())
-                .collect();
+            let rest: Vec<String> = args[3..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
             std::process::exit(fgos_terminal_control::route::main(&rest));
         }
         // `seat-binding <op>`: the seat binding decision the Node payload must
         // not copy (see `fgos_seat_binding::route`).
         if args.get(2).is_some_and(|a| a == "seat-binding") {
-            let rest: Vec<String> = args[3..]
-                .iter()
-                .map(|a| a.to_string_lossy().into_owned())
-                .collect();
+            let rest: Vec<String> = args[3..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
             std::process::exit(fgos_seat_binding::route::main(&rest));
         }
         // The run supervisor's routes: supervise, gate, adopt, attempt-step.
-        let rest: Vec<String> = args[2..]
-            .iter()
-            .map(|a| a.to_string_lossy().into_owned())
-            .collect();
+        let rest: Vec<String> = args[2..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
         if let Some(route) = rest.first() {
             if let Some(code) = fgos_run_supervisor::route::main(route, &rest[1..]) {
                 std::process::exit(code);
