@@ -1538,7 +1538,7 @@ impl GitDriver {
 
 /// Why a missing object is the layout's doing rather than a damaged repository: a promisor
 /// remote or an alternate may hold it. A shallow boundary alone cuts history, never objects.
-fn object_gap_cause(layout: &RepoLayout) -> Option<&'static str> {
+pub(crate) fn object_gap_cause(layout: &RepoLayout) -> Option<&'static str> {
     if layout.promisor {
         Some("promisor-object-unavailable")
     } else if layout.alternates {

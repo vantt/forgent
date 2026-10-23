@@ -1135,12 +1135,8 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
             .ok_or_else(|| failure("invalid-object-header"))?;
         let fields: Vec<_> = text(&bytes[..end])?.split(' ').collect();
         if fields == [oid.as_str(), "missing"] {
-            if repo.layout.promisor || repo.layout.alternates {
-                return Err(failure(if repo.layout.promisor {
-                    "promisor-object-unavailable"
-                } else {
-                    "alternate-object-unavailable"
-                }));
+            if let Some(cause) = crate::driver::object_gap_cause(&repo.layout) {
+                return Err(failure(cause));
             }
             return Ok(ReadObject::Missing);
         }
