@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Runner and Workflow Land now recheck documentation lease admission through publication, refusing a non-holder when a lease is acquired after initial admission.
+- Runner and Workflow Land now recheck documentation lease admission through publication, refusing a non-holder when a lease is acquired after initial admission while allowing sequential lands onto a legitimately advanced target. Explicit target binding remains required for declared resolution files.
+- Workflow resume/answer now performs the existing locked ledger-tail repair before reading the recorded origin for lease admission, preserving recovery without admitting a new answer or execution from a non-holder.
 
 - Documentation: the documentation-cutover lease table now matches the fence-free holder-lock registry row shape.
 
