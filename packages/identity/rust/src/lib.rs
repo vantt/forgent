@@ -34,7 +34,7 @@ pub use proc_tree::{os_process_tree, ProcStat, ProcessTree};
 #[cfg(feature = "directory")]
 pub use mint::{claim_counter, claim_sequence, release_sequence, Claim, MAX_CLAIM_ATTEMPTS};
 #[cfg(feature = "directory")]
-pub use current::{current_session, machine_info, session_info, set_alias, CurrentSession, MachineInfo, SessionInfo};
+pub use current::{current_session, machine_info, session_for, session_info, set_alias, CurrentSession, MachineInfo, SessionInfo};
 #[cfg(feature = "directory")]
 pub use project::{project_info, project_init, ProjectInfo, ProjectMinted};
 #[cfg(feature = "provider")]
@@ -47,6 +47,6 @@ pub use provider::{
     IDENTITY_READ_OPERATION_ID, IDENTITY_WRITE_DESCRIPTOR, IDENTITY_WRITE_OPERATION_ID,
 };
 pub use resolve::{
-    env_identity, resolve, resolve_current, terminal_head, tree_identity, Source, WriterId, WriterIdentity,
+    env_identity, resolve, resolve_current, terminal_head, tree_identity, Source, WriterId, WriterIdentity, WriterKey,
     ENV_ORDER, MAX_ID_LENGTH, REGISTRY_FILE,
 };
