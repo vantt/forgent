@@ -1,0 +1,15 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:invariantChecks:v1
+$comment: "owner: work-state"
+description: "Shell commands that must pass before work returns or merges."
+type: object
+properties:
+  commands:
+    $comment: "justification: read from the trusted main checkout, spec section 5 rule 6; each project states its own checks"
+    description: Shell commands run at return and merge; each must exit 0, and an empty list runs no check.
+    type: array
+    items:
+      type: string
+      minLength: 1
+    x-fgos-scope: both
+    x-fgos-sensitivity: command

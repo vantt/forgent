@@ -1,0 +1,779 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc The runner: executors, capabilities, model policies, tier fallback, patterns and run limits.
+runner:
+  # @fgos:doc Settings of agent coordination.
+  coordination:
+    # @fgos:doc The organisation policy of coordination.
+    orgPolicy:
+      # @fgos:doc Outcomes that discharge an obligation. Default: ["accepted"].
+      dischargeOn: [accepted]
+  # @fgos:doc The executor registry: every executor a seat can be bound to, by id.
+  executors:
+    claude:
+      kind: agent
+      providerModel: claude
+      description: "Claude Code CLI, the one executor of the claude family: claude-cli and claude-cli-bwrap run headless, claude-herdr-bwrap runs a claude REPL in a herdr pane under the bwrap posture. bind() picks the pane invocation inside herdr and a cli one outside, so a capability gets claude in both places."
+      identity:
+        principalRef: "principal://claude"
+        runtimeBackendRef: "backend://claude-cli"
+        trustDomain: local-operator
+        egressClass: unrestricted
+      supports:
+        providerFamilies: [claude]
+        reasoningEffort: [low, medium, high]
+        skills: ["ak:cook"]
+        systemPrompt: false
+        toolGating: allowedTools
+      invocations:
+        - id: claude-cli
+          via: cli
+          adapter: cli-spawn
+          command: claude
+          args: ["-p", "{prompt}", "--model", "{model}", "--permission-mode", acceptEdits]
+        - id: claude-cli-bwrap
+          via: cli
+          adapter: cli-spawn
+          command: claude
+          args: ["-p", "{prompt}", "--model", "{model}"]
+          confinement:
+            backend: bwrap
+        - id: claude-herdr-bwrap
+          via: cli
+          adapter: herdr-spawn
+          command: claude
+          args: ["--model", "{model}"]
+          confinement:
+            backend: bwrap
+          interactiveMode:
+            exitCommand: "/exit"
+            kind: claude
+            trustStore:
+              kind: claude-json
+    glm:
+      kind: agent
+      description: "GLM 5.3 (z-ai/glm-5.3) through the pi CLI and OpenRouter, headless. Replaces the claude-CLI-through-gateway route."
+      allowCrossProvider: true
+      invocations:
+        - id: pi-cli-bwrap
+          via: cli
+          adapter: cli-spawn
+          command: pi
+          args:
+            - "--model"
+            - "{model}"
+            - "--thinking"
+            - medium
+            - "--tools"
+            - "read,write,edit,bash,grep,find,ls"
+            - "--mode"
+            - json
+            - "--approve"
+            - "-p"
+            - "{prompt}"
+          confinement:
+            backend: bwrap
+      providerModel: z-ai
+      supports:
+        skills: ["ak:cook"]
+    gitnexus:
+      kind: tool
+      description: "Code-graph blast radius"
+      for: [impact-analysis]
+      scanTarget: ".gitnexus"
+      responsibility: Verification
+      invocations:
+        - via: mcp
+          command: "mcp:gitnexus"
+          tools:
+            impact-analysis: mcp__gitnexus__impact
+    herdr:
+      kind: tool
+      for: [pane-labeling]
+      responsibility: Chrome
+      description: "herdr pane label writer (herdr pane rename) for /fgOS:terminal"
+      invocations:
+        - via: cli
+          command: herdr
+          args: []
+    openai:
+      kind: agent
+      description: "OpenAI provider, 2 bins merged into one executor (2026-09-17 provider-naming pass): codex CLI (native OpenAI Codex CLI) + pi CLI (multi-provider agent, --provider omitted -- each ~/.pi/accounts/<name> dir carries exactly one provider's credentials, confirmed via real invocation test). Invocation id = <bin>-<mode>-<account>, self-descriptive regardless of which bin actually runs. Both bins now use modelPolicies like every other executor."
+      providerModel: openai
+      allowCrossProvider: true
+      invocations:
+        - id: codex-cli-bwrap
+          via: cli
+          adapter: cli-spawn
+          command: codex
+          args:
+            - exec
+            - "--skip-git-repo-check"
+            - "-s"
+            - danger-full-access
+            - "--model"
+            - "{model}"
+            - "{prompt}"
+          confinement:
+            backend: bwrap
+        - id: pi-herdr
+          via: cli
+          adapter: herdr-spawn
+          confinement:
+            backend: bwrap
+          command: pi
+          args:
+            - "--model"
+            - "{model}"
+            - "--thinking"
+            - medium
+            - "--tools"
+            - "read,write,edit,bash,grep,find,ls"
+            - "--approve"
+          interactiveMode:
+            exitCommand: "/quit"
+            kind: pi
+        - id: codex-herdr
+          via: cli
+          adapter: herdr-spawn
+          confinement:
+            backend: bwrap
+          command: codex
+          args:
+            - "-s"
+            - danger-full-access
+            - "-a"
+            - never
+            - "--no-daemon"
+            - "--model"
+            - "{model}"
+          interactiveMode:
+            exitCommand: "/quit"
+            kind: codex
+            trustStore:
+              kind: codex-toml
+        - id: pi-cli-bwrap
+          via: cli
+          adapter: cli-spawn
+          command: pi
+          args:
+            - "--model"
+            - "{model}"
+            - "--thinking"
+            - medium
+            - "--tools"
+            - "read,write,edit,bash,grep,find,ls"
+            - "--mode"
+            - json
+            - "--approve"
+            - "-p"
+            - "{prompt}"
+          confinement:
+            backend: bwrap
+      supports:
+        skills: ["ak:cook"]
+    gemini:
+      kind: agent
+      description: "Gemini provider via omp (oh-my-pi); Antigravity CLI (agy) invocations removed 2026-10-16 (agy not installed, owner chose omp). Invocations: omp-herdr (herdr pane), omp-cli-bwrap (headless). The confined account comes from runner.providers.gemini.accounts in the global config."
+      allowCrossProvider: true
+      providerModel: gemini
+      invocations:
+        - id: omp-herdr
+          via: cli
+          adapter: herdr-spawn
+          confinement:
+            backend: bwrap
+          command: omp
+          args:
+            - "--model"
+            - "{model}"
+            - "--thinking"
+            - medium
+            - "--tools"
+            - "read,write,edit,bash,grep,glob"
+            - "--auto-approve"
+          interactiveMode:
+            exitCommand: "/exit"
+            kind: omp
+        - id: omp-cli-bwrap
+          via: cli
+          adapter: cli-spawn
+          command: omp
+          args:
+            - "--model"
+            - "{model}"
+            - "--thinking"
+            - medium
+            - "--tools"
+            - "read,write,edit,bash,grep,glob"
+            - "--mode"
+            - json
+            - "--auto-approve"
+            - "-p"
+            - "{prompt}"
+          confinement:
+            backend: bwrap
+      supports:
+        skills: ["ak:cook"]
+    xai:
+      kind: agent
+      description: "xai (Grok) provider via omp CLI (oh-my-pi, a pi fork); replaces the pi grok login that kept needing re-OAuth. omp reads its login through PI_CODING_AGENT_DIR like pi does. omp uses glob instead of ls/find. The account files are declared in the global config (providers.xai)."
+      allowCrossProvider: true
+      providerModel: xai
+      invocations:
+        - id: omp-cli-bwrap
+          via: cli
+          adapter: cli-spawn
+          command: omp
+          args:
+            - "--model"
+            - "{model}"
+            - "--thinking"
+            - medium
+            - "--tools"
+            - "read,write,edit,bash,grep,glob"
+            - "--mode"
+            - json
+            - "--auto-approve"
+            - "-p"
+            - "{prompt}"
+          confinement:
+            backend: bwrap
+        - id: omp-herdr
+          via: cli
+          adapter: herdr-spawn
+          confinement:
+            backend: bwrap
+          command: omp
+          args:
+            - "--model"
+            - "{model}"
+            - "--thinking"
+            - medium
+            - "--tools"
+            - "read,write,edit,bash,grep,glob"
+            - "--auto-approve"
+          interactiveMode:
+            exitCommand: "/exit"
+            kind: omp
+      supports:
+        skills: ["ak:cook"]
+    deepseek:
+      kind: agent
+      description: "DeepSeek provider via pi CLI, OpenRouter gateway account. --provider omitted -- account dir has a single provider (openrouter). Same account dir also serves other OpenRouter-hosted models (e.g. glm-cli's z-ai route uses a different account/mechanism); --model alone selects deepseek/* here. pi-herdr-openrouter runs the same pi account in a confined herdr pane."
+      allowCrossProvider: true
+      providerModel: deepseek
+      invocations:
+        - id: pi-cli-bwrap
+          via: cli
+          adapter: cli-spawn
+          command: pi
+          args:
+            - "--model"
+            - "{model}"
+            - "--thinking"
+            - medium
+            - "--tools"
+            - "read,write,edit,bash,grep,find,ls"
+            - "--mode"
+            - json
+            - "--approve"
+            - "-p"
+            - "{prompt}"
+          confinement:
+            backend: bwrap
+        - id: pi-herdr
+          via: cli
+          adapter: herdr-spawn
+          confinement:
+            backend: bwrap
+          command: pi
+          args:
+            - "--model"
+            - "{model}"
+            - "--thinking"
+            - medium
+            - "--tools"
+            - "read,write,edit,bash,grep,find,ls"
+            - "--approve"
+          interactiveMode:
+            exitCommand: "/quit"
+            kind: pi
+      supports:
+        skills: ["ak:cook"]
+  # @fgos:doc The capability catalog: what each capability is called, which executors serve it and how it is held.
+  capabilities:
+    impact-analysis:
+      description: "Code-graph blast radius"
+      aliases: [impact_analysis, "Impact Analysis"]
+      prefer: gitnexus
+    pane-labeling:
+      description: "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
+    advise:
+      description: "Async product-decision consult -- value comes from disagreement and never changes project state."
+      prefer:
+        - executor: claude
+          invocation: claude-cli-bwrap
+      confinement:
+        mode: required
+        policy: host-write-denied
+      serves:
+        outputKind: decision
+        mutates: false
+    execute:
+      description: "Compliance-driven work -- value comes from following the plan, changes files, and must pass verification."
+      prefer:
+        - executor: gemini
+        - executor: deepseek
+        - executor: glm
+        - claude
+      serves:
+        outputKind: change
+        mutates: true
+      tier: advanced
+    review:
+      description: "Independent read-only review of a non-code artifact (docs, design, spec, config) before merge/decision -- distinct from code:review (I19, core/skills/_shared/capability-catalog.md)."
+      confinement:
+        mode: required
+        policy: host-write-denied
+      serves:
+        outputKind: finding
+        mutates: false
+    fgos-coding-implement:
+      description: "code-implement work for the coding domain executing stage -- preferred executor gemini through omp, claude as fallback."
+      prefer:
+        - executor: gemini
+          invocation: omp-herdr
+        - executor: deepseek
+        - executor: glm
+        - claude
+      tier: advanced
+    "code:implement":
+      description: "Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)"
+      prefer:
+        - executor: gemini
+          invocation: omp-herdr
+        - executor: deepseek
+        - executor: glm
+        - claude
+      serves:
+        outputKind: change
+        domain: code
+        mutates: true
+    "code:review":
+      description: "Canonical coding review capability -- independent read-only review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md)."
+      prefer:
+        - executor: openai
+          invocation: codex-cli-bwrap
+        - executor: claude
+          invocation: claude-cli-bwrap
+      confinement:
+        mode: required
+        policy: host-write-denied
+      serves:
+        outputKind: finding
+        domain: code
+        mutates: false
+    "code:test":
+      description: "Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md)."
+      prefer:
+        - executor: gemini
+        - executor: deepseek
+        - executor: glm
+        - claude
+      serves:
+        outputKind: verification
+        domain: code
+    "code:debug":
+      description: "Canonical coding debug capability -- read-only root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md)."
+      prefer:
+        - executor: openai
+          invocation: codex-cli-bwrap
+        - executor: claude
+          invocation: claude-cli-bwrap
+      confinement:
+        mode: required
+        policy: host-write-denied
+      serves:
+        outputKind: finding
+        domain: code
+    "code:refactor":
+      description: "Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md)."
+      prefer:
+        - executor: gemini
+        - executor: deepseek
+        - executor: glm
+        - claude
+      serves:
+        outputKind: change
+        domain: code
+        mutates: true
+        behaviorPreserving: true
+    "marketing:research":
+      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+    "marketing:write":
+      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+    "marketing:publish":
+      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+    "architecture:frame":
+      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
+      prefer:
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: claude
+        - executor: deepseek
+      rigor: high
+      tier: flagship
+    "architecture:shape":
+      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
+      prefer:
+        - executor: openai
+        - executor: claude
+        - executor: gemini
+        - executor: xai
+        - executor: deepseek
+      rigor: critical
+      tier: flagship
+      maxTier: frontier
+    "architecture:critique":
+      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
+      prefer:
+        - executor: xai
+        - executor: gemini
+        - executor: openai
+        - executor: claude
+        - executor: deepseek
+      rigor: high
+      tier: flagship
+      maxTier: frontier
+      seats:
+        producer:
+          tier: frontier
+          prefer: [openai, claude]
+    "architecture:synthesize":
+      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
+      prefer:
+        - executor: claude
+        - executor: gemini
+        - executor: xai
+        - executor: openai
+        - executor: deepseek
+      rigor: critical
+      tier: flagship
+      maxTier: frontier
+      seats:
+        producer:
+          tier: frontier
+    "architecture:explain":
+      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: deepseek
+      rigor: critical
+      tier: flagship
+    "business:frame":
+      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+    "business:perspectives":
+      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
+      prefer: [gemini, deepseek, glm, claude, openai]
+    "business:critique":
+      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+    "business:synthesize":
+      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+      tier: standard
+    "business:plan":
+      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+    "delphi:propose":
+      description: "Workflow unit capability \"delphi:propose\" -- declare a \"prefer\" pool to choose which executors serve it."
+      prefer: [gemini, deepseek, glm, claude, openai]
+    "delphi:synthesize":
+      description: "Workflow unit capability \"delphi:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it."
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+      tier: standard
+    "group-cognition:explore":
+      description: "Workflow unit capability \"group-cognition:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
+      prefer: [gemini, deepseek, glm, claude, openai]
+    "group-cognition:critique":
+      description: "Workflow unit capability \"group-cognition:critique\" -- declare a \"prefer\" pool to choose which executors serve it."
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+    "group-cognition:synthesize":
+      description: "Workflow unit capability \"group-cognition:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it."
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+    "nominal-group:generate":
+      description: "Workflow unit capability \"nominal-group:generate\" -- declare a \"prefer\" pool to choose which executors serve it."
+      prefer: [gemini, deepseek, glm, claude, openai]
+    "nominal-group:share":
+      description: "Workflow unit capability \"nominal-group:share\" -- declare a \"prefer\" pool to choose which executors serve it."
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+    "nominal-group:vote":
+      description: "Workflow unit capability \"nominal-group:vote\" -- declare a \"prefer\" pool to choose which executors serve it."
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+    "nominal-group:rank":
+      description: "Workflow unit capability \"nominal-group:rank\" -- declare a \"prefer\" pool to choose which executors serve it."
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+    "coding:*":
+      tier: advanced
+    "coding:discover":
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+      description: "Workflow unit capability \"coding:discover\" -- declare a \"prefer\" pool to choose which executors serve it."
+    "coding:explore":
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+      description: "Workflow unit capability \"coding:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
+    "coding:plan":
+      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+    "coding:validate":
+      prefer:
+        - executor: claude
+        - executor: openai
+        - executor: gemini
+        - executor: xai
+        - executor: glm
+          invocation: pi-cli-bwrap
+      description: "Workflow unit capability \"coding:validate\" -- declare a \"prefer\" pool to choose which executors serve it."
+    "coding:implement":
+      prefer:
+        - executor: gemini
+          invocation: omp-herdr
+        - executor: deepseek
+        - executor: glm
+        - claude
+      description: "Workflow unit capability \"coding:implement\" -- declare a \"prefer\" pool to choose which executors serve it."
+    "docs:write":
+      description: "Canonical documentation authoring capability -- write or update documents (README, specs, guides) in the working tree; declare a \"prefer\" pool to choose which executors serve it."
+      serves:
+        outputKind: change
+        domain: docs
+        mutates: true
+      tier: flagship
+      prefer: [openai, claude]
+    "code:*":
+      roles:
+        red-team:
+          prefer: [xai]
+      tier: advanced
+    "marketing:*":
+      roles:
+        red-team:
+          prefer: [claude]
+  # @fgos:doc The model each family uses at each tier, by family then tier. Tier ladder, weakest first: nano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote | mini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ | standard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả | advanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan | flagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel | frontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng
+  modelPolicies:
+    claude:
+      nano: haiku
+      standard: sonnet
+      advanced: sonnet
+      flagship: opus
+      frontier: fable
+      mini:
+        model: haiku
+        effort: high
+    gemini:
+      nano: gemini-3.8-flash-low
+      standard: gemini-3.8-flash-medium
+      advanced: gemini-3.8-flash-high
+      flagship: gemini-4-argon-high
+      frontier: gemini-4-argon-high
+      mini: gemini-3.8-flash-low
+    openai:
+      nano:
+        model: gpt-6-luna
+        effort: low
+      standard: gpt-5.6-terra
+      advanced:
+        model: gpt-6.1-sol
+        effort: medium
+      flagship:
+        model: gpt-6.1-sol
+        effort: high
+      frontier: gpt-6-astra
+      mini:
+        model: gpt-6-luna
+        effort: high
+    z-ai:
+      nano: ["thehive/zai-org/glm-5.3-flash@thehive", "z-ai/glm-5.3-flash@openrouter"]
+      standard: ["thehive/zai-org/glm-5.3-flash@thehive", "z-ai/glm-5.3-flash@openrouter"]
+      advanced: "z-ai/glm-5.3@openrouter"
+      flagship: "z-ai/glm-5.3@openrouter"
+      frontier: "z-ai/glm-5.3@openrouter"
+      mini: ["thehive/zai-org/glm-5.3-flash@thehive", "z-ai/glm-5.3-flash@openrouter"]
+    xai:
+      nano: grok-4.3
+      standard: grok-4.3
+      advanced: grok-4.5
+      flagship: grok-4.7
+      frontier: grok-4.7
+      mini: grok-4.3
+    deepseek:
+      nano:
+        - "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive"
+        - "deepseek/deepseek-v4.1-flash@openrouter"
+      standard:
+        - "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive"
+        - "deepseek/deepseek-v4.1-flash@openrouter"
+      advanced: "deepseek/deepseek-v4-pro@openrouter"
+      flagship: "deepseek/deepseek-v4-pro@openrouter"
+      frontier: "deepseek/deepseek-v4-pro@openrouter"
+      mini:
+        - "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive"
+        - "deepseek/deepseek-v4.1-flash@openrouter"
+  # @fgos:doc The families a seat walks after a failure, per tier and in order. Tier ladder, weakest first: nano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote | mini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ | standard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả | advanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan | flagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel | frontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng
+  tierFallback:
+    # @fgos:doc Families tried in this order after the primary fails. Default: ["gemini","deepseek","z-ai","claude","openai"].
+    nano: [gemini, deepseek, z-ai, claude, openai]
+    # @fgos:doc Families tried in this order after the primary fails. Default: ["gemini","deepseek","z-ai","claude","openai"].
+    standard: [gemini, deepseek, z-ai, claude, openai]
+    # @fgos:doc Families tried in this order after the primary fails. Default: ["gemini","deepseek","z-ai","claude","openai"].
+    advanced: [gemini, deepseek, z-ai, claude, openai]
+    # @fgos:doc Families tried in this order after the primary fails. Default: ["claude","openai","gemini","xai","deepseek","z-ai"].
+    flagship: [claude, openai, gemini, xai, deepseek, z-ai]
+    # @fgos:doc Families tried in this order after the primary fails. Default: ["claude","openai","gemini","xai","deepseek","z-ai"].
+    frontier: [claude, openai, gemini, xai, deepseek, z-ai]
+    # @fgos:doc Families tried in this order after the primary fails. Default: ["gemini","deepseek","z-ai","claude","openai"].
+    mini: [gemini, deepseek, z-ai, claude, openai]
+  # @fgos:doc What a seat runs at when nothing else names it.
+  defaults:
+    # @fgos:doc The tier a seat runs at when nothing else names one. Values: nano | mini | standard | advanced | flagship | frontier. Default: standard.
+    tier: standard
+  # @fgos:doc Milliseconds one run may take before it is stopped. Minimum: 60000. Maximum: 14400000. Default: 900000.
+  timeoutMs: 900000
+  # @fgos:doc How many units run at once.
+  parallel:
+    # @fgos:doc Most root work items running at once. Minimum: 1. Default: 4.
+    maxRoots: 4
+    # @fgos:doc Most leaf work items running at once under one root. Minimum: 1. Default: 4.
+    maxLeavesPerRoot: 4
+  # @fgos:doc Runner-wide confinement setting.
+  confinement:
+    # @fgos:doc When true every capability must declare its own confinement. Default: false.
+    strict: false
+  # @fgos:doc Settings of the collaboration patterns.
+  patterns:
+    # @fgos:doc The rule applied when a pattern names none.
+    defaultRule:
+      # @fgos:doc Lowest rigor a unit that changes files may run at. Values: low | standard | high | critical. Default: standard.
+      mutatingMinRigor: standard
+    # @fgos:doc The reviewed pattern: rounds and checkers.
+    reviewed:
+      # @fgos:doc Most review rounds before the unit stops. Minimum: 1. Default: 2.
+      maxRounds: 2
+      # @fgos:doc The checker seats per rigor; each rigor includes the checkers of the weaker ones.
+      checkersByRigor:
+        # @fgos:doc Checker seats at this rigor. Default: ["reviewer"].
+        standard: [reviewer]
+        # @fgos:doc Checker seats at this rigor. Default: ["reviewer","red-team"].
+        high: [reviewer, red-team]
+        # @fgos:doc Checker seats at this rigor. Default: ["reviewer","red-team","tester"].
+        critical: [reviewer, red-team, tester]
+    # @fgos:doc Marker that this project reads the seat binding form of the config.
+    seatBinding:
+      # @fgos:doc Version of the seat binding form; the only value this release reads is 1. Default: 1.
+      schema: 1
+  # @fgos:doc Generated trees a unit write scope widens to when it touches their source. Default: [].
+  generatedPaths: []

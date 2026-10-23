@@ -1,0 +1,6 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc How the merge gate treats a failing iron-law check.
+ironLaw:
+  # @fgos:doc What the merge gate does when the iron-law check fails; ask stops and asks a person, warn reports and continues. Values: ask | warn. Default: ask.
+  level: ask

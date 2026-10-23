@@ -23,6 +23,13 @@ fn json_files(dir: &Path) -> Vec<PathBuf> {
         if path.file_name().is_some_and(|n| n == "json-schema-suite") {
             continue;
         }
+        // The pinned copy of this repository's own config: data in the config's format, not a contract.
+        if path
+            .file_name()
+            .is_some_and(|n| n == "authoring-source.config.json")
+        {
+            continue;
+        }
         if path.is_dir() {
             found.extend(json_files(&path));
         } else if path.extension().is_some_and(|e| e == "json") {

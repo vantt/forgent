@@ -1,0 +1,18 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc Remote, timers and retry limit of the event store.
+eventStore:
+  # @fgos:doc Name of the git remote the event store publishes to and fetches from; letters, digits, underscore and hyphen only. Default: origin.
+  remote: origin
+  # @fgos:doc The seal timer of the event store.
+  seal:
+    # @fgos:doc Seconds between seals of the open event segment. Minimum: 1. Default: 300.
+    intervalSec: 300
+  # @fgos:doc The sync timer of the event store.
+  sync:
+    # @fgos:doc Seconds between syncs with the remote; 0 turns the timer off. Minimum: 0. Default: 300.
+    intervalSec: 300
+  # @fgos:doc The rebuild limit of the event store.
+  rebuild:
+    # @fgos:doc Most attempts to rebuild the projection before giving up; 0 means no attempt. Minimum: 0. Default: 5.
+    maxAttempts: 5

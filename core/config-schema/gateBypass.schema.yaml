@@ -1,0 +1,10 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:gateBypass:v1
+$comment: "owner: work-state"
+description: "How far agent work may skip human approval gates."
+type: object
+properties:
+  level:
+    description: Gate bypass level for agent work; off approves nothing automatically and each higher level approves work up to that size.
+    type: string
+    enum: [off, light, standard, heavy]
