@@ -2,7 +2,7 @@
 //! verb. Bare `identity` answers the writer (`identity.writer`, read-only,
 //! the hook path); `identity machine|session|project|resolve|list` read
 //! (`identity.read`); `identity machine --alias`, `identity project
-//! --init|--new`, `identity session --register`, `identity list --prune` and
+//! --init|--new`, `identity session --register|--drop-role`, `identity list --prune` and
 //! `identity mint <kind>` write (`identity.write`).
 
 use crate::current::{current_session, machine_info, os_pid_facts, session_info, set_alias};
@@ -88,7 +88,7 @@ pub enum Verb {
     Writer,
     /// `machine [--alias <name>]`.
     Machine { alias: Option<String> },
-    /// `session [--register [--role lead:<LANE> [--take]]]`: this session's
+    /// `session [--register [--role lead:<LANE> [--take]] | --drop-role lead:<LANE>]`: this session's
     /// full id and handle, and its entry in the local directory.
     Session(SessionAction),
     /// `resolve <handle|lead:<LANE>>`: the one live session it names.
@@ -110,6 +110,8 @@ pub enum SessionAction {
     /// `--register`, or `--role`, which implies it: put this session in the
     /// local directory. `take` moves a role from its live holder.
     Register { role: Option<String>, take: bool },
+    /// `--drop-role lead:<LANE>`: remove that role from this session only.
+    DropRole { role: String },
 }
 
 /// What `identity project` does.
@@ -145,7 +147,7 @@ impl IdentityRequest {
             | Verb::Resolve { .. }
             | Verb::List { prune: false, .. } => IDENTITY_READ_OPERATION_ID,
             Verb::Machine { alias: Some(_) }
-            | Verb::Session(SessionAction::Register { .. })
+            | Verb::Session(SessionAction::Register { .. } | SessionAction::DropRole { .. })
             | Verb::Project(_)
             | Verb::List { prune: true, .. }
             | Verb::Mint { .. } => IDENTITY_WRITE_OPERATION_ID,
@@ -314,6 +316,11 @@ fn answer(request: &IdentityRequest) -> Result<serde_json::Value, Refusal> {
             SessionAction::Read => {
                 let current = current_session(&root, caller_pid(request), request.fgos_dir.as_deref())?;
                 Ok(serde_json::to_value(current.info).expect("SessionInfo always serializes"))
+            }
+            SessionAction::DropRole { role } => {
+                let listed =
+                    directory::drop_current_role(&root, caller_pid(request), request.fgos_dir.as_deref(), role)?;
+                Ok(serde_json::to_value(listed).expect("Listed always serializes"))
             }
             SessionAction::Register { role, take } => {
                 let cwd = std::env::current_dir().ok();

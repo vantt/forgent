@@ -1381,6 +1381,12 @@ fn identity_directory_registers_only_on_request_and_resolves_by_handle_and_role(
     identity_data(&run("beta", &["session", "--role", "lead:MAIL", "--take", "--json"]));
     assert_eq!(identity_data(&run("alpha", &["resolve", "lead:MAIL", "--json"]))["handle"], b.as_str());
 
+    let foreign = run("alpha", &["session", "--drop-role", "lead:MAIL"]);
+    assert_eq!(foreign.status.code(), Some(65), "alpha no longer holds the role beta took");
+    assert!(String::from_utf8_lossy(&foreign.stderr).contains("[role-not-held]"));
+    identity_data(&run("beta", &["session", "--drop-role", "lead:MAIL", "--json"]));
+    assert_eq!(run("alpha", &["resolve", "lead:MAIL"]).status.code(), Some(65));
+
     let missing = run("alpha", &["resolve", "claude-zzzz@fg-server"]);
     assert_eq!(missing.status.code(), Some(65));
     assert!(String::from_utf8_lossy(&missing.stderr).contains("[not-found]"));

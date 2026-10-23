@@ -447,6 +447,7 @@
       ],
       "session": [
         "dir",
+        "drop-role",
         "fgos-dir",
         "help",
         "json",

@@ -375,6 +375,52 @@ pub fn register_current(
     register(state_root, entry, take, &judge_here)
 }
 
+/// Removes `role` from the entry of the session `own_id`, and from no other:
+/// a session drops only what it holds itself, so a role of another live
+/// session can only move through `take` on a registration. Refused
+/// `invalid-role`, `not-registered` when `own_id` has no entry, and
+/// `role-not-held` when its entry lacks the role. Afterwards the role
+/// resolves `not-found` unless another session holds it.
+pub fn drop_role(root: &Path, own_id: &str, role: &str, judge: Judge) -> Result<Listed, Refusal> {
+    if role_problem(role).is_some() {
+        return Err(Refusal {
+            candidates: Vec::new(),
+            reason: "invalid-role",
+            detail: format!("role {role:?} is not `{ROLE_PREFIX}<LANE>` with a Convention lane-id"),
+        });
+    }
+    let Scan { rows, .. } = scan(root, judge)?;
+    let Some(row) = rows.into_iter().find(|row| row.entry.id == own_id) else {
+        return Err(Refusal {
+            candidates: Vec::new(),
+            reason: "not-registered",
+            detail: format!("{own_id} is not in the session directory, so it holds no role; register it first"),
+        });
+    };
+    if !row.entry.roles.iter().any(|held| held == role) {
+        return Err(Refusal {
+            candidates: row.entry.roles.clone(),
+            reason: "role-not-held",
+            detail: format!("{} does not hold {role}; it holds: {}", row.entry.handle, join(&row.entry.roles)),
+        });
+    }
+    let mut entry = row.entry;
+    entry.roles.retain(|held| held != role);
+    store(root, &entry, true)?;
+    Ok(Listed::of(&entry, row.verdict))
+}
+
+/// [`drop_role`] for the session the process `caller_pid` is.
+pub fn drop_current_role(
+    state_root: &Path,
+    caller_pid: u32,
+    fgos_dir: Option<&Path>,
+    role: &str,
+) -> Result<Listed, Refusal> {
+    let current = current_session(state_root, caller_pid, fgos_dir)?;
+    drop_role(state_root, &current.info.id, role, &judge_here)
+}
+
 /// The live session `query` names: a handle, or a role alias `lead:<LANE>`.
 /// Exactly one, else `ambiguous` or `not-found` with the candidates in the
 /// detail (the codes the mailbox uses for its names).

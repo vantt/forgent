@@ -179,6 +179,28 @@ fn a_role_held_by_a_live_session_is_refused_unless_taken() {
 }
 
 #[test]
+fn a_session_drops_only_its_own_role_and_it_then_resolves_not_found() {
+    let root = state_root();
+    let alive = judge(&[]);
+    directory::register(&root, entry("aaaa", Some(10), &["lead:MAIL", "lead:IDENT"]), false, &alive).unwrap();
+    directory::register(&root, entry("bbbb", Some(20), &["lead:HARDEN"]), false, &alive).unwrap();
+
+    let after = directory::drop_role(&root, "fg-abc234/aaaa", "lead:MAIL", &alive).unwrap();
+    assert_eq!(after.roles, ["lead:IDENT"]);
+    assert_eq!(directory::resolve(&root, "lead:MAIL", &alive).unwrap_err().reason, "not-found");
+    assert_eq!(directory::resolve(&root, "lead:IDENT", &alive).unwrap().handle, "claude-aaaa@fg");
+
+    let not_held = directory::drop_role(&root, "fg-abc234/aaaa", "lead:MAIL", &alive).unwrap_err();
+    assert_eq!(not_held.reason, "role-not-held");
+    assert_eq!(not_held.candidates, ["lead:IDENT"]);
+    // Another live session's role is out of reach: the caller names only itself.
+    assert_eq!(directory::drop_role(&root, "fg-abc234/aaaa", "lead:HARDEN", &alive).unwrap_err().reason, "role-not-held");
+    assert_eq!(directory::resolve(&root, "lead:HARDEN", &alive).unwrap().handle, "claude-bbbb@fg");
+    assert_eq!(directory::drop_role(&root, "fg-abc234/cccc", "lead:MAIL", &alive).unwrap_err().reason, "not-registered");
+    assert_eq!(directory::drop_role(&root, "fg-abc234/aaaa", "MAIL", &alive).unwrap_err().reason, "invalid-role");
+}
+
+#[test]
 fn a_role_must_be_lead_and_a_lane_id() {
     let root = state_root();
     let alive = judge(&[]);
