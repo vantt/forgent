@@ -154,6 +154,11 @@ pub fn doc_lines(node: &Value, standard: Option<&Value>) -> Vec<String> {
         .collect()
 }
 
+/// Whether a comment line is written in the doc form.
+pub(crate) fn is_doc_line(line: &str) -> bool {
+    line.starts_with(text("doc-prefix"))
+}
+
 /// What a person or tool reads above a key.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Block {
@@ -171,7 +176,7 @@ pub fn parse_block(comments: &Comments) -> Block {
     let mut block = Block::default();
     let mut run_open = true;
     for line in &comments.above {
-        let is_doc = line.starts_with(text("doc-prefix"));
+        let is_doc = is_doc_line(line);
         let why = line.strip_prefix(text("why-prefix")).and_then(|rest| {
             let (actor, reason) = rest.strip_prefix('[')?.split_once("] ")?;
             (!actor.is_empty() && !reason.trim().is_empty())

@@ -1,0 +1,530 @@
+{
+ "version": 1,
+ "about": "Owning cases of the comment renderer for an existing file (docs/platform/config/spec.md section 7). Shared `schemas` and `standard`. A case lays files out as the snapshot fixture does; input: files, optional mixed (an edit put beside the docs edit) and reason. Expect: findings ([path, kind] pairs of the scan of `scan` (default the project YAML), null when the scan is not run), code (the scan's refusal), files (path to the lines after the refresh), refresh ({code, keyword} refusal with every file left byte-identical, or no_dir, applied). Every case that writes is refreshed twice: the second run leaves the bytes unchanged and applies nothing.",
+ "schemas": {
+  "gateBypass": [
+   "type: object",
+   "description: Gate bypass settings.",
+   "properties:",
+   "  level: {type: string, enum: [off, light, standard, heavy], description: Gate bypass level for agent work.}"
+  ],
+  "limits": [
+   "type: object",
+   "description: |",
+   "  Resource limits.",
+   "  Second line of the description.",
+   "properties:",
+   "  count: {type: integer, minimum: 1, description: Parallel runs.}",
+   "  tags: {type: array, items: {type: string}}"
+  ],
+  "plain": [
+   "type: object",
+   "properties:",
+   "  x: {type: integer}"
+  ]
+ },
+ "standard": {
+  "gateBypass": [
+   "gateBypass:",
+   "  level: off"
+  ],
+  "limits": [
+   "limits:",
+   "  count: 4"
+  ]
+ },
+ "cases": [
+  {
+   "id": "docs-missing-on-described-keys",
+   "why": "spec 7: a described key with no doc line gets the render above its why, containers included",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  # @fgos:why [vantt] dogfood repo, lighter gates.",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "findings": [
+     [
+      "gateBypass",
+      "missing"
+     ],
+     [
+      "gateBypass.level",
+      "missing"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] dogfood repo, lighter gates.",
+      "  level: light"
+     ]
+    }
+   }
+  },
+  {
+   "id": "docs-drift-text-changed",
+   "why": "spec 7: a doc line that differs from the render is replaced (a description revision)",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  # @fgos:doc Old wording of the level.",
+      "  # @fgos:why [vantt] r1",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "findings": [
+     [
+      "gateBypass",
+      "missing"
+     ],
+     [
+      "gateBypass.level",
+      "drift"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] r1",
+      "  level: light"
+     ]
+    }
+   }
+  },
+  {
+   "id": "docs-drift-enum-changed",
+   "why": "spec 7: the allowed values are part of the render",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light. Default: off.",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "findings": [
+     [
+      "gateBypass",
+      "missing"
+     ],
+     [
+      "gateBypass.level",
+      "drift"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  level: light"
+     ]
+    }
+   }
+  },
+  {
+   "id": "docs-drift-standard-value-changed",
+   "why": "spec 7: the standard value (Default) is part of the render",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  # @fgos:doc Parallel runs. Minimum: 1. Default: 3.",
+      "  # @fgos:why [vantt] r2",
+      "  count: 8"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "findings": [
+     [
+      "limits",
+      "missing"
+     ],
+     [
+      "limits.count",
+      "drift"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Resource limits.",
+      "# @fgos:doc Second line of the description.",
+      "limits:",
+      "  # @fgos:doc Parallel runs. Minimum: 1. Default: 4.",
+      "  # @fgos:why [vantt] r2",
+      "  count: 8"
+     ]
+    }
+   }
+  },
+  {
+   "id": "docs-multi-line-description-one-line-each",
+   "why": "spec 7: a several-line description renders as one doc line per source line",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Resource limits.",
+      "limits:",
+      "  # @fgos:doc Parallel runs. Minimum: 1. Default: 4.",
+      "  # @fgos:why [vantt] r2",
+      "  count: 8"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "findings": [
+     [
+      "limits",
+      "drift"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Resource limits.",
+      "# @fgos:doc Second line of the description.",
+      "limits:",
+      "  # @fgos:doc Parallel runs. Minimum: 1. Default: 4.",
+      "  # @fgos:why [vantt] r2",
+      "  count: 8"
+     ]
+    }
+   }
+  },
+  {
+   "id": "docs-current-file-has-no-findings",
+   "why": "spec 7/acceptance 1: a file already rendered is left byte for byte",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] r",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "findings": []
+   }
+  },
+  {
+   "id": "docs-why-and-notes-keep-text-and-order",
+   "why": "spec 7: only the leading doc run is replaced; a note between doc and why, and a note after, stay in place",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  # @fgos:doc stale",
+      "  # note A",
+      "  # @fgos:why [someone-else] their reason",
+      "  # note B",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "findings": [
+     [
+      "gateBypass",
+      "missing"
+     ],
+     [
+      "gateBypass.level",
+      "drift"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # note A",
+      "  # @fgos:why [someone-else] their reason",
+      "  # note B",
+      "  level: light"
+     ]
+    }
+   }
+  },
+  {
+   "id": "docs-key-without-schema-node-untouched",
+   "why": "spec 7: a key no schema describes gets no doc line and keeps its notes",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "custom:",
+      "  # my note",
+      "  a: 1"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "findings": []
+   }
+  },
+  {
+   "id": "docs-described-section-without-description-untouched",
+   "why": "spec 7: a node with no description has nothing to render",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "plain:",
+      "  # @fgos:why [vantt] r",
+      "  x: 1"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "findings": []
+   }
+  },
+  {
+   "id": "docs-second-doc-run-stays-a-note",
+   "why": "spec 7: a doc line after the first run is a free note and survives the refresh",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  # @fgos:doc stale",
+      "  # note",
+      "  # @fgos:doc second run",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "findings": [
+     [
+      "gateBypass",
+      "missing"
+     ],
+     [
+      "gateBypass.level",
+      "drift"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # note",
+      "  # @fgos:doc second run",
+      "  level: light"
+     ]
+    }
+   }
+  },
+  {
+   "id": "docs-forged-doc-line-is-replaced",
+   "why": "spec 7: the comparison is with the render, not with the file's own text",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: any. Default: off.",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "findings": [
+     [
+      "gateBypass",
+      "missing"
+     ],
+     [
+      "gateBypass.level",
+      "drift"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  level: light"
+     ]
+    }
+   }
+  },
+  {
+   "id": "docs-list-value-is-one-key",
+   "why": "spec 7: a list is addressed as its key; nothing inside it is a key",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  tags:",
+      "    - a",
+      "    - b"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "findings": [
+     [
+      "limits",
+      "missing"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:doc Resource limits.",
+      "# @fgos:doc Second line of the description.",
+      "limits:",
+      "  tags:",
+      "    - a",
+      "    - b"
+     ]
+    }
+   }
+  },
+  {
+   "id": "docs-legacy-json-has-no-findings",
+   "why": "spec 7: a JSON file holds no comments; scanning it finds nothing and refresh refuses by id",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{\"gateBypass\": {\"level\": \"light\"}}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "findings": [],
+    "scan": "project/.fgos/config.json",
+    "refresh": {
+     "code": "config-format-legacy-json"
+    }
+   }
+  },
+  {
+   "id": "docs-refresh-with-a-set-is-refused",
+   "why": "spec 7: doc lines are never rewritten as part of another write",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass:",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "mixed": {
+     "set": "limits.count",
+     "value": 8
+    },
+    "reason": "because the load grew."
+   },
+   "expect": {
+    "findings": [
+     [
+      "gateBypass",
+      "missing"
+     ],
+     [
+      "gateBypass.level",
+      "missing"
+     ]
+    ],
+    "refresh": {
+     "code": "config-key-out-of-scope",
+     "keyword": "docs-edit-alone"
+    }
+   }
+  },
+  {
+   "id": "docs-refresh-on-absent-file-writes-nothing",
+   "why": "spec 7: no file, no refresh: nothing is created",
+   "input": {
+    "files": {},
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "findings": null,
+    "refresh": {
+     "no_dir": true,
+     "applied": []
+    }
+   }
+  },
+  {
+   "id": "docs-unparseable-file-is-refused",
+   "why": "spec 4/14: a file that does not parse is config-parse for the scan and the refresh",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "gateBypass: [unclosed"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-parse",
+    "refresh": {
+     "code": "config-parse"
+    }
+   }
+  }
+ ]
+}

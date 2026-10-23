@@ -13,6 +13,7 @@ use fgos_yaml_doc::{parse, CommentLoss, Profile, Segment, Value as Doc};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 
+use crate::docs;
 use crate::files::{read_beneath, select_source, LoadedFile, Source};
 use crate::files::{PRIVATE_DIR_MODE, PRIVATE_FILE_MODE, YAML_NAME};
 use crate::grammar::{block_for_changed_key, block_for_new_key, doc_lines, header_lines};
@@ -20,14 +21,18 @@ use crate::grammar::{Actor, Reason};
 use crate::locks::{scope_params, GLOBAL_CONFIG, PROJECT_CONFIG};
 use crate::schema::{json_at, json_put};
 use crate::scope::{judge, SourceKind};
-use crate::snapshot::{build, read_sources, Context, SessionClass, SnapshotError, SnapshotRequest};
+use crate::snapshot::{build, read_sources, Context, SessionClass, Snapshot};
+use crate::snapshot::{SnapshotError, SnapshotRequest};
 use crate::ConfigRefusal;
 
 const REASON_REQUIRED: &str = "config-comment-reason-required";
 
+/// `Docs` rewrites the `@fgos:doc` lines that differ from the render in every key of the file; it
+/// writes no value, needs no reason and is never part of another write (`docs-edit-alone`).
 pub enum Edit {
     Set { path: Vec<Segment>, value: Value },
     Unset { path: Vec<Segment> },
+    Docs,
 }
 
 pub struct WriteRequest {
@@ -151,6 +156,21 @@ pub fn commit_observed(
     let actor = Actor::from_writer(writer);
     let at = place(req)?;
     let seen = current(req, &at, false)?;
+    let refreshing = req.edits.iter().any(|edit| matches!(edit, Edit::Docs));
+    if refreshing && req.edits.len() > 1 {
+        let mut refusal = ConfigRefusal::new("config-key-out-of-scope");
+        refusal.detail_mut().keyword = Some("docs-edit-alone".into());
+        return Err(refusal.into());
+    }
+    // A file that is not there has no doc lines to refresh, and refreshing must not create it.
+    if refreshing && seen.is_none() {
+        return Ok(WriteResult {
+            writer_id: writer.id.to_string(),
+            new_revision: "absent".into(),
+            applied: Vec::new(),
+            notices: Vec::new(),
+        });
+    }
     // A write that changes nothing needs no reason: every edit sets what the key inherits already.
     let reason = match all_redundant(ctx, req, seen.as_ref(), at.2) {
         true => Reason::parse(&req.reason).ok(),
@@ -163,6 +183,7 @@ pub fn commit_observed(
                 json_put(&mut proposed, path, Some(value.clone()))
             }
             Edit::Unset { path } if !path.is_empty() => {}
+            Edit::Docs => {}
             // The document itself is no key.
             _ => return Err(ConfigRefusal::new("config-key-out-of-scope").into()),
         }
@@ -197,7 +218,15 @@ pub fn commit_observed(
     observe(Step::LockHeld)?;
     observe(Step::FirstCheck)?;
     let base = current(req, &at, true)?;
-    let (bytes, applied, notices) = edit(ctx, req, &actor, reason.as_ref(), base.as_ref(), name)?;
+    let (bytes, applied, notices) = produce(
+        ctx,
+        &req.edits,
+        req.acknowledge_comment_loss,
+        &actor,
+        reason.as_ref(),
+        base.as_ref(),
+        name,
+    )?;
     observe(Step::Edited)?;
     let mut result = WriteResult {
         writer_id: writer.id.to_string(),
@@ -240,8 +269,9 @@ pub fn commit_observed(
 
 type Edited = (Vec<u8>, Vec<(String, bool)>, Vec<(&'static str, String)>);
 
-/// Whether every edit sets a value equal to the standard on a key the file does not hold. A file
-/// that cannot be read here is not redundant; the transaction refuses it after the lock.
+/// Whether the edits write no value: each sets what the key inherits already on a key the file does
+/// not hold, or is the docs refresh. A file that cannot be read here is not redundant; the
+/// transaction refuses it after the lock.
 fn all_redundant(ctx: &Context, req: &WriteRequest, base: Option<&LoadedFile>, name: &str) -> bool {
     let held = match base {
         None => Ok(Value::Null),
@@ -254,14 +284,17 @@ fn all_redundant(ctx: &Context, req: &WriteRequest, base: Option<&LoadedFile>, n
                 ctx.standard.value_at(path) == Some(value) && json_at(&held, path).is_none()
             }
             Edit::Unset { .. } => false,
+            Edit::Docs => true,
         })
 }
 
 /// The produced bytes: every edit applied to one in-memory document, each key given its comment
-/// block. Nothing is written; any error discards the document.
-fn edit(
+/// block. Nothing is written; any error discards the document. The one producer of a file's bytes:
+/// the transaction and the migration both call it.
+pub(crate) fn produce(
     ctx: &Context,
-    req: &WriteRequest,
+    edits: &[Edit],
+    acknowledge: bool,
     actor: &Actor,
     reason: Option<&Reason>,
     base: Option<&LoadedFile>,
@@ -277,15 +310,21 @@ fn edit(
         Profile::StrictConfig,
         name,
     )?;
-    let loss = if req.acknowledge_comment_loss {
+    let loss = if acknowledge {
         CommentLoss::Acknowledge
     } else {
         CommentLoss::Refuse
     };
     let (mut applied, mut notices) = (Vec::new(), Vec::new());
     let node = |path: &[Segment]| Some(ctx.schemas.resolve(path)?.node.clone());
-    for edit in &req.edits {
-        let (Edit::Set { path, .. } | Edit::Unset { path }) = edit;
+    for edit in edits {
+        let (Edit::Set { path, .. } | Edit::Unset { path }) = edit else {
+            for change in docs::plan(ctx, &doc)? {
+                applied.push((format_path(&change.finding.path), false));
+                doc.set_comment_block(&change.finding.path, &change.block)?;
+            }
+            continue;
+        };
         let before = doc.to_json()?;
         let held = json_at(&before, path).is_some();
         // A value equal to the standard is no value: a no-op on a missing key, an unset on a present one.
@@ -329,7 +368,18 @@ fn edit(
 /// The effective value the produced file would give, against scope, placement and the schemas.
 fn validate(ctx: &Context, req: &WriteRequest, bytes: &[u8]) -> Result<(), SnapshotError> {
     let role = ["project", "global", "accounts"][req.target as usize];
-    let mut sources = read_sources(&req.roots)?;
+    snapshot_with(ctx, &req.roots, role, bytes).map(drop)
+}
+
+/// The snapshot with the source of `role` replaced by `bytes` (not yet on disk): the other sources
+/// are read as they are.
+pub(crate) fn snapshot_with(
+    ctx: &Context,
+    roots: &SnapshotRequest,
+    role: &str,
+    bytes: &[u8],
+) -> Result<Snapshot, SnapshotError> {
+    let mut sources = read_sources(roots)?;
     if let Some(source) = sources.iter_mut().find(|s| s.role == role) {
         let (revision, mode, parent) = (sha(bytes), 0, (0, 0));
         source.file = Some(LoadedFile {
@@ -339,5 +389,17 @@ fn validate(ctx: &Context, req: &WriteRequest, bytes: &[u8]) -> Result<(), Snaps
             parent,
         });
     }
-    build(ctx, &req.roots, &sources).map(drop)
+    build(ctx, roots, &sources)
+}
+
+/// Rewrite the `@fgos:doc` lines of `req.target` that differ from the render: [`commit_observed`]
+/// with the one docs edit. The reason and any edits of the request are not used.
+pub fn refresh(
+    ctx: &Context,
+    mut req: WriteRequest,
+    writer: &WriterIdentity,
+    observe: impl FnMut(Step) -> io::Result<()>,
+) -> Result<WriteResult, SnapshotError> {
+    req.edits = vec![Edit::Docs];
+    commit_observed(ctx, &req, writer, observe)
 }
