@@ -1309,9 +1309,12 @@ fn publication_config_cache_invalidates_and_transport_budget_is_caller_owned() {
     // The override affects actual transport, while local plumbing still works.
     port.write_blob(&repo, b"local").unwrap();
     let mapping = "+refs/fgos/events/*:refs/fgos/remotes/origin/events/*".to_owned();
-    assert!(port
+    // A borrowed child that runs out of time reads like a contained one, told apart by `detail.path`.
+    let timed_out = port
         .fetch_refs(&repo, "origin", std::slice::from_ref(&mapping))
-        .is_err());
+        .unwrap_err();
+    assert_eq!(timed_out.cause, "git-timeout");
+    assert_eq!(timed_out.detail.unwrap()["path"], "borrowed");
     let port = port.with_transport_timeout(std::time::Duration::from_secs(5));
     port.fetch_refs(&repo, "origin", &[mapping]).unwrap();
 }

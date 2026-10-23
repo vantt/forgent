@@ -1,7 +1,7 @@
 //! Exact, custody-backed commit transaction. Hooks run once, via Git.
 use crate::{
     driver::Output,
-    refs::{failure, recovery, Authority},
+    refs::Authority,
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
 };
@@ -340,7 +340,7 @@ pub(crate) fn compact_matches(
     intent: &Intent,
     repo: &RepoHandle,
 ) -> Result<bool> {
-    if compact.matches(intent).map_err(failure)? {
+    if compact.matches(intent)? {
         return Ok(true);
     }
     let mut legacy = intent.clone();
@@ -361,7 +361,7 @@ impl GitDriver {
         let resources = checkout_resources(repo)?;
         let legacy = format!("worktree:{}", root(repo)?.display());
         let current_binding = binding(handle(scope, repo)?)?;
-        for mut chain in wal.retained(100_000).map_err(failure)? {
+        for mut chain in wal.retained(100_000)? {
             let worktree = match &chain.intent().kind {
                 OperationKind::ScopedCommit(p) => &p.worktree,
                 OperationKind::Sync(p) => &p.worktree,
@@ -394,13 +394,12 @@ impl GitDriver {
                                 }
                                 .into(),
                             }),
-                        )
-                        .map_err(failure)?;
+                        )?;
                 }
                 if let Err(error) = (|| -> Result<()> {
                     if matches!(chain.intent().kind, OperationKind::Sync(_)) {
                         crate::refs::release_pin(self, repo, handle(scope, repo)?, wal, &chain)?;
-                        chain = wal.inspect(&chain.last().operation_id).map_err(failure)?;
+                        chain = wal.inspect(&chain.last().operation_id)?;
                     }
                     wal.compact(
                         &chain,
@@ -409,8 +408,7 @@ impl GitDriver {
                             scope,
                             binding: chain.intent().authority_binding.clone(),
                         },
-                    )
-                    .map_err(failure)?;
+                    )?;
                     Ok(())
                 })() {
                     warnings.push(format!("checkout-compaction-deferred: {error:?}"));
@@ -426,8 +424,7 @@ impl GitDriver {
                     binding: binding(handle(scope, repo)?)?,
                 },
                 chain.intent(),
-            )
-            .map_err(failure)?;
+            )?;
             if chain.outcome().is_none()
                 && matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared)
             {
@@ -442,8 +439,7 @@ impl GitDriver {
                     }
                 }
                 chain = wal
-                    .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                    .map_err(failure)?;
+                    .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
             }
             if chain.outcome().is_some() {
                 self.compact_checkout(repo, scope, wal, &chain)?;
@@ -464,29 +460,27 @@ impl GitDriver {
         if chain.outcome().is_none() {
             return Ok(());
         }
-        let mut terminal = wal.inspect(&chain.last().operation_id).map_err(failure)?;
+        let mut terminal = wal.inspect(&chain.last().operation_id)?;
         wal::PublicationAuthority::validate_publication_borrow(
             &Authority {
                 scope,
                 binding: binding(handle(scope, repo)?)?,
             },
             terminal.intent(),
-        )
-        .map_err(failure)?;
+        )?;
         if matches!(chain.intent().kind, OperationKind::Sync(_)) {
             // A rejected commit still owns the merge until abort.
             if self.merge_head(repo, scope)?.is_some() {
                 return Err(recovery("sync-rejected-merge-recovery-required"));
             }
             crate::refs::release_pin(self, repo, handle(scope, repo)?, wal, &terminal)?;
-            terminal = wal.inspect(&chain.last().operation_id).map_err(failure)?;
+            terminal = wal.inspect(&chain.last().operation_id)?;
         }
         let authority = Authority {
             scope,
             binding: binding(handle(scope, repo)?)?,
         };
-        wal.compact(&terminal, &WalReader { driver: self, repo }, &authority)
-            .map_err(failure)?;
+        wal.compact(&terminal, &WalReader { driver: self, repo }, &authority)?;
         Ok(())
     }
     pub(crate) fn compact_checkout_warning(
@@ -545,7 +539,7 @@ impl GitDriver {
         // directory timestamps. A peer at this baseline makes message-only
         // attribution ambiguous; a strictly older baseline does not.
         let mut newest = true;
-        for peer in wal.retained(100_000).map_err(failure)? {
+        for peer in wal.retained(100_000)? {
             let worktree = match &peer.intent().kind {
                 OperationKind::ScopedCommit(p) => &p.worktree,
                 OperationKind::Sync(p) => &p.worktree,
@@ -678,9 +672,9 @@ impl GitDriver {
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
         let mut scope = scope(repo, held)?;
-        let wal = Wal::open(repo).map_err(failure)?;
+        let wal = Wal::open(repo)?;
         crate::recovery::leaf(&mut scope, repo)?;
-        if let Some(compact) = wal.compacted(id).map_err(failure)? {
+        if let Some(compact) = wal.compacted(id)? {
             let intent = Intent {
                 kind: OperationKind::ScopedCommit(Box::new(wal::ScopedCommitIntent {
                     worktree: root(repo)?.to_string_lossy().into(),
@@ -704,8 +698,8 @@ impl GitDriver {
             }
             return compact.outcome().map_err(failure);
         }
-        if !wal.known_id(id).map_err(failure)? { return Err(failure("unknown-scoped-commit-operation")); }
-        let chain = wal.inspect(id).map_err(failure)?;
+        if !wal.known_id(id)? { return Err(failure("unknown-scoped-commit-operation")); }
+        let chain = wal.inspect(id)?;
         let OperationKind::ScopedCommit(payload) = &chain.intent().kind else {
             return Err(failure("not-scoped-commit-operation"));
         };
@@ -786,8 +780,7 @@ impl GitDriver {
             }
         };
         let terminal = wal
-            .append(&chain, Phase::Outcome(outcome.clone()))
-            .map_err(failure)?;
+            .append(&chain, Phase::Outcome(outcome.clone()))?;
         let _ = self.compact_checkout_warning(repo, &scope, &wal, &terminal);
         Ok(outcome)
     }
@@ -1065,11 +1058,11 @@ impl GitDriver {
         let scope = scope(repo, held)?;
         let mut own = BTreeSet::new();
         if let Some((writer, id)) = sync {
-            let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
+            let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
             let state = self.continue_sync_scoped(repo, &scope, &wal, writer, id, false)?;
             if state.state == "in-progress" || state.state == "rejected-open" {
                 own.extend(state.resolver_grant);
-                let chain = wal.inspect(id).map_err(failure)?;
+                let chain = wal.inspect(id)?;
                 for record in chain.records() {
                     if let Phase::SyncState { staged, .. } = &record.phase {
                         own.extend(staged.iter().cloned());
@@ -1169,8 +1162,8 @@ impl GitDriver {
                 },
             )
             .collect::<Result<Vec<_>>>()?;
-        let wal = Wal::open(repo).map_err(failure)?;
-        if let Some(compact) = wal.compacted(id).map_err(failure)? {
+        let wal = Wal::open(repo)?;
+        if let Some(compact) = wal.compacted(id)? {
             let mut intent = Intent {
                 kind: OperationKind::ScopedCommit(Box::new(wal::ScopedCommitIntent {
                     worktree: baseline.worktree.clone(),
@@ -1180,8 +1173,7 @@ impl GitDriver {
                     tree: baseline.head.clone(),
                     cutover_grant: None,
                 })),
-                request_digest: wal::canonical_digest(&(baseline, request, writer))
-                    .map_err(failure)?,
+                request_digest: wal::canonical_digest(&(baseline, request, writer))?,
                 repo_identity: wal.repository_identity().into(),
                 resource_set: checkout_resources(repo)?,
                 authority_binding: binding(handle(scope, repo)?)?,
@@ -1192,12 +1184,12 @@ impl GitDriver {
             };
             let ordinary = compact_matches(&compact, &intent, repo)?;
             intent.request_digest =
-                wal::canonical_digest(&(baseline, request, writer, "no-op")).map_err(failure)?;
+                wal::canonical_digest(&(baseline, request, writer, "no-op"))?;
             let noop = compact_matches(&compact, &intent, repo)?;
             if !ordinary && !noop {
                 return Err(failure("operation-id-reused"));
             }
-            return match compact.outcome().map_err(failure)? {
+            return match compact.outcome()? {
                 Outcome::Commit {
                     observed,
                     contract_violation,
@@ -1240,8 +1232,8 @@ impl GitDriver {
                 _ => Err(failure("commit-rejected")),
             };
         }
-        if wal.known_id(id).map_err(failure)? {
-            let old = wal.inspect(id).map_err(failure)?;
+        if wal.known_id(id)? {
+            let old = wal.inspect(id)?;
             if old.intent().authority_binding != binding(handle(scope, repo)?)?
                 || (old.intent().resource_set != checkout_resources(repo)?
                     && old.intent().resource_set
@@ -1379,8 +1371,7 @@ impl GitDriver {
             crate::refs::admission(&wal, id, &resources)?;
             let binding = binding(handle(scope, repo)?)?;
             let intent = Intent {
-                request_digest: wal::canonical_digest(&(baseline, request, writer, "no-op"))
-                    .map_err(failure)?,
+                request_digest: wal::canonical_digest(&(baseline, request, writer, "no-op"))?,
                 kind,
                 repo_identity: wal.repository_identity().into(),
                 resource_set: resources,
@@ -1391,13 +1382,12 @@ impl GitDriver {
                 next: Tip::Oid(baseline.head.clone()),
             };
             let authority = Authority { scope, binding };
-            let chain = match wal.begin(id, intent, &authority).map_err(failure)? {
+            let chain = match wal.begin(id, intent, &authority)? {
                 Begin::Created(c) => c,
                 _ => return Err(recovery("commit-attempt-recovery-required")),
             };
-            wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                .map_err(failure)?;
-            let terminal = wal.inspect(id).map_err(failure)?;
+            wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
+            let terminal = wal.inspect(id)?;
             let mut warnings = admission_warnings;
             warnings.extend(self.compact_checkout_warning(repo, scope, &wal, &terminal));
             return Ok(CommitResult {
@@ -1489,8 +1479,7 @@ impl GitDriver {
             crate::refs::admission(&wal, id, &resources)?;
             let authority_binding = binding(handle(scope, repo)?)?;
             let intent = Intent {
-                request_digest: wal::canonical_digest(&(baseline, request, writer))
-                    .map_err(failure)?,
+                request_digest: wal::canonical_digest(&(baseline, request, writer))?,
                 kind,
                 repo_identity: wal.repository_identity().into(),
                 resource_set: resources,
@@ -1504,16 +1493,15 @@ impl GitDriver {
                 scope,
                 binding: authority_binding,
             };
-            let chain = match wal.begin(id, intent, &authority).map_err(failure)? {
+            let chain = match wal.begin(id, intent, &authority)? {
                 Begin::Created(c) => c,
                 _ => return Err(recovery("commit-attempt-recovery-required")),
             };
-            let chain = wal.append(&chain, Phase::Prepared).map_err(failure)?;
+            let chain = wal.append(&chain, Phase::Prepared)?;
             if self.checkout_text(repo, scope, &["rev-parse", "HEAD"])? != baseline.head
                 || self.checkout_text(repo, scope, &["write-tree"])? != tree
             {
-                wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                    .map_err(failure)?;
+                wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
                 return Err(recovery("commit-prepared-state-changed"));
             }
             let attempted = wal
@@ -1524,8 +1512,7 @@ impl GitDriver {
                         expected: chain.intent().expected.clone(),
                         next: chain.intent().next.clone(),
                     },
-                )
-                .map_err(failure)?;
+                )?;
             // Config transports the selector to the Git-supplied hook environment.
             let context = format!("fgos.operationId={id}");
             let out = self.checkout_call(
@@ -1570,7 +1557,7 @@ impl GitDriver {
                     wal.append(
                         &attempted,
                         Phase::Outcome(Outcome::CommitRejected { cause: error.cause.clone() }),
-                    ).map_err(failure)?;
+                    )?;
                     return Err(error);
                 }
                 return Err(recovery("commit-effect-unknown"));
@@ -1627,8 +1614,7 @@ impl GitDriver {
                     }),
                     Some(&ref_durable),
                     &mut || Ok(()),
-                )
-                .map_err(failure)?,
+                )?,
             );
             Ok(CommitResult {
                 warnings: vec![],
@@ -1714,15 +1700,14 @@ impl GitDriver {
                 prepared = Err(recovery("commit-worktree-restore-required"));
             }
         }
-        if prepared.is_err() && wal.known_id(id).map_err(failure)? {
-            let chain = wal.inspect(id).map_err(failure)?;
+        if prepared.is_err() && wal.known_id(id)? {
+            let chain = wal.inspect(id)?;
             if matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared) {
-                wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                    .map_err(failure)?;
+                wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
             }
         }
-        if wal.known_id(id).map_err(failure)? {
-            let terminal = wal.inspect(id).map_err(failure)?;
+        if wal.known_id(id)? {
+            let terminal = wal.inspect(id)?;
             if terminal.outcome().is_some() {
                 let warnings = self.compact_checkout_warning(repo, scope, &wal, &terminal);
                 if let Ok(receipt) = &mut prepared {

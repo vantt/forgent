@@ -1,7 +1,7 @@
 //! Worktree administration. One rank-40 hold spans inspection and mutation.
 use crate::{
     driver::Policy,
-    refs::{admission, failure, install_pin, pending, recovery, release_pin, Authority},
+    refs::{admission, byte_path, install_pin, pending, release_pin, Authority},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
 };
@@ -457,7 +457,7 @@ impl GitDriver {
         if writer.is_empty() {
             return Err(failure("writer-required"));
         }
-        let mut resource_set = wal::worktree_resources(&kind).map_err(failure)?;
+        let mut resource_set = wal::worktree_resources(&kind)?;
         let existing = match &kind {
             OperationKind::WorktreeRemove { path, .. } => Some(path.as_ref()),
             OperationKind::WorktreeMove { source, .. } => Some(source.as_ref()),
@@ -473,9 +473,8 @@ impl GitDriver {
         }
         admission(wal, id, &resource_set)?;
         let request_digest =
-            wal::canonical_digest(&(&kind, &old, &next, writer)).map_err(failure)?;
-        let binding = wal::canonical_digest(&(wal.repository_identity(), "worktree-admin"))
-            .map_err(failure)?;
+            wal::canonical_digest(&(&kind, &old, &next, writer))?;
+        let binding = wal::canonical_digest(&(wal.repository_identity(), "worktree-admin"))?;
         let intent = Intent {
             kind,
             request_digest,
@@ -488,7 +487,7 @@ impl GitDriver {
             next,
         };
         let authority = Authority { scope, binding };
-        match wal.begin(id, intent, &authority).map_err(failure)? {
+        match wal.begin(id, intent, &authority)? {
             Begin::Created(chain) => {
                 let candidate = match chain.intent().candidate() {
                     Tip::Oid(s) => Oid::parse(s, repo.object_format()).map_err(failure)?,
@@ -523,8 +522,7 @@ impl GitDriver {
             .append(
                 chain,
                 Phase::Outcome(Outcome::Worktree { completed, details }),
-            )
-            .map_err(failure)?;
+            )?;
         release_pin(
             self,
             repo,
@@ -618,7 +616,7 @@ impl GitDriver {
             return Err(failure("invalid-session-id"));
         }
         let path = canonical_destination(&input.path)?;
-        let wal = Wal::open(repo).map_err(failure)?;
+        let wal = Wal::open(repo)?;
         if let Some(chain) = existing(&wal, id)? {
             let matches = match &chain.intent().kind {
                 OperationKind::WorktreeCreate {
@@ -704,17 +702,9 @@ impl GitDriver {
                 return Err(failure("worktree-branch-invalid"));
             }
             for fact in &rows {
-                if fact.prunable.is_some() || fact.locked.as_deref() == Some(b"initializing") {
-                    return Err(failure("worktree-registration-uncertain"));
-                }
                 // Reuse Git's inventory for HEAD facts, but retain reciprocal
                 // topology and rebase/bisect branch reservations on disk.
-                let target = if fact.bare { None } else {
-                    match self.resolve_topology(&byte_path(&fact.path)?, repo.trusted_main_root())? {
-                        ResolveRepo::Repository(target) => Some(target),
-                        _ => return Err(failure("worktree-registration-uncertain")),
-                    }
-                };
+                let target = self.registered_topology(repo, fact)?;
                 if crate::refs::branch_in_use(fact, target.as_ref(), branch)? {
                     return Err(failure("branch-in-use"));
                 }
@@ -757,8 +747,7 @@ impl GitDriver {
                     expected: chain.intent().expected.clone(),
                     next: chain.intent().next.clone(),
                 },
-            )
-            .map_err(failure)?;
+            )?;
         let result = (|| {
             let mut args = vec!["worktree", "add", "--quiet"];
             let branch;
@@ -858,7 +847,7 @@ impl GitDriver {
     ) -> Result<()> {
         let scope = self.worktree_scope(repo, held)?;
         let path = canonical_destination(path)?;
-        let wal = Wal::open(repo).map_err(failure)?;
+        let wal = Wal::open(repo)?;
         if let Some(chain) = existing(&wal, id)? {
             let matches = match &chain.intent().kind {
                 OperationKind::WorktreeRemove {
@@ -924,7 +913,7 @@ impl GitDriver {
         self.worktree_custody(repo, &scope, &path)?;
         self.worktree_clean(repo, &path)?;
         let discarded = if let Some(land_id) = discarded_land {
-            let land = wal.inspect(land_id).map_err(failure)?;
+            let land = wal.inspect(land_id)?;
             matches!(&land.intent().kind, OperationKind::Land(p) if p.candidate.worktree == path && p.candidate.candidate == handle.tip.as_str())
                 && land.intent().writer_identity == writer
                 && matches!(
@@ -993,8 +982,7 @@ impl GitDriver {
                     expected: chain.intent().expected.clone(),
                     next: Tip::Absent,
                 },
-            )
-            .map_err(failure)?;
+            )?;
         self.worktree_custody(repo, &scope, &path)?;
         self.worktree_not_live(&path, &mut warned)?;
         self.worktree_call(repo, &scope, &["worktree", "remove", "--", text(&path)?])
@@ -1026,7 +1014,7 @@ impl GitDriver {
         let scope = self.worktree_scope(repo, held)?;
         let source = canonical_destination(source)?;
         let destination = canonical_destination(destination)?;
-        let wal = Wal::open(repo).map_err(failure)?;
+        let wal = Wal::open(repo)?;
         if let Some(chain) = existing(&wal, id)? {
             let matches = match &chain.intent().kind {
                 OperationKind::WorktreeMove {
@@ -1127,8 +1115,7 @@ impl GitDriver {
                     expected: tip.clone(),
                     next: tip,
                 },
-            )
-            .map_err(failure)?;
+            )?;
         self.worktree_custody(repo, &scope, &source)?;
         self.worktree_not_live(&source, &mut warned)?;
         self.worktree_call(
@@ -1166,8 +1153,7 @@ impl GitDriver {
         #[cfg(unix)]
         admin_identity(&directory)?;
         #[cfg(not(unix))]
-        if fs::symlink_metadata(&directory)
-            .map_err(failure)?
+        if fs::symlink_metadata(&directory).map_err(failure)?
             .file_type()
             .is_symlink()
         {
@@ -1243,7 +1229,7 @@ impl GitDriver {
         if !missing(&path)? {
             return Err(failure("worktree-prune-path-present"));
         }
-        let wal = Wal::open(repo).map_err(failure)?;
+        let wal = Wal::open(repo)?;
         if existing(&wal, id)?.is_some() {
             return self.repair_worktree_locked(repo, &scope, id);
         }
@@ -1260,7 +1246,7 @@ impl GitDriver {
         if admin.join(common.trim_end()).canonicalize().map_err(failure)? != repo.common_dir() {
             return Err(recovery("worktree-admin-backlink-changed"));
         }
-        let scan = wal.scan(100_000).map_err(failure)?;
+        let scan = wal.scan(100_000)?;
         if !scan.complete || scan.entries.iter().any(|entry| entry.error.is_some()) {
             return Err(recovery("git-wal-unreadable"));
         }
@@ -1294,7 +1280,7 @@ impl GitDriver {
             .any(|name| name.starts_with(b"refs/") && !name.starts_with(b"refs/fgos/")) {
             return Err(failure("worktree-prune-tip-unreachable: registration preserved"));
         }
-        let evidence = wal::canonical_digest(&(owned, text(&path)?, &identity)).map_err(failure)?;
+        let evidence = wal::canonical_digest(&(owned, text(&path)?, &identity))?;
         let chain = self.begin_worktree(repo, &scope, &wal,
             OperationKind::WorktreeRemove {
                 path: text(&path)?.into(), registration: issue.registration.clone().into(),
@@ -1305,7 +1291,7 @@ impl GitDriver {
             }, writer, id, Tip::Oid(tip.as_str().into()), Tip::Absent)?;
         let attempted = wal.append(&chain, Phase::TargetAttempt {
             prior_target_attempt: None, expected: chain.intent().expected.clone(), next: Tip::Absent,
-        }).map_err(failure)?;
+        })?;
         self.prune_owned_registration(&scope, &admin, text(&path)?, &identity)
             .map_err(|error| pending(error, id))?;
         self.finish_worktree(repo, &scope, &wal, &attempted, true,
@@ -1321,9 +1307,9 @@ impl GitDriver {
         if held.iter().any(|h| h.as_ref().name() == "dispatch-cwd") {
             return Err(failure("worktree-prune-custody-not-allowed"));
         }
-        let wal = Wal::open(repo).map_err(failure)?;
+        let wal = Wal::open(repo)?;
         if !matches!(
-            wal.inspect(id).map_err(failure)?.intent().kind,
+            wal.inspect(id)?.intent().kind,
             OperationKind::WorktreeRemove { .. }
         ) {
             return Err(failure("worktree-prune-remove-evidence-required"));
@@ -1444,10 +1430,10 @@ impl GitDriver {
         scope: &LockScope<'_>,
         id: &str,
     ) -> Result<()> {
-        let wal = Wal::open(repo).map_err(failure)?;
-        let chain = wal.inspect(id).map_err(failure)?;
+        let wal = Wal::open(repo)?;
+        let chain = wal.inspect(id)?;
         let kind = &chain.intent().kind;
-        wal::worktree_resources(kind).map_err(failure)?;
+        wal::worktree_resources(kind)?;
         if chain.outcome().is_some() {
             return release_pin(
                 self,
@@ -1463,8 +1449,7 @@ impl GitDriver {
             .any(|r| matches!(r.phase, Phase::TargetAttempt { .. }))
         {
             let terminal = wal
-                .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                .map_err(failure)?;
+                .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
             return release_pin(
                 self,
                 repo,
@@ -1599,18 +1584,6 @@ impl GitDriver {
         Ok(())
     }
 }
-fn byte_path(bytes: &[u8]) -> Result<PathBuf> {
-    #[cfg(unix)]
-    {
-        use std::os::unix::ffi::OsStrExt;
-        Ok(Path::new(std::ffi::OsStr::from_bytes(bytes)).into())
-    }
-    #[cfg(not(unix))]
-    {
-        Ok(PathBuf::from(std::str::from_utf8(bytes).map_err(failure)?))
-    }
-}
-
 fn admin_identity(path: &Path) -> Result<String> {
     let m = fs::symlink_metadata(path).map_err(failure)?;
     if !m.is_dir() || m.file_type().is_symlink() {

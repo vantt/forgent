@@ -1,6 +1,6 @@
 //! Snapshot-backed checkout restore. Retained bytes and WAL precede reset.
 use crate::{
-    refs::{failure, recovery, Authority},
+    refs::Authority,
     scoped_commit::{self as checkout, SavedPath},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
@@ -734,13 +734,12 @@ impl GitDriver {
         let repo = self.checkout_repository(repo)?;
         let confirmed = confirmed_main_discard(&repo, request);
         let scope = checkout::scope(&repo, held)?;
-        wal::require_activation_fence(&repo).map_err(failure)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(failure)?;
-        if wal.known_id(id).map_err(failure)? {
-            if wal.compacted(id).map_err(failure)?.is_some() {
+        let wal = Wal::open_with(&repo, filesystem)?;
+        if wal.known_id(id)? {
+            if wal.compacted(id)?.is_some() {
                 return Err(failure("restore-already-acknowledged"));
             }
-            let chain = wal.inspect(id).map_err(failure)?;
+            let chain = wal.inspect(id)?;
             let OperationKind::Restore(p) = &chain.intent().kind else {
                 return Err(failure("operation-id-conflict"));
             };
@@ -778,12 +777,11 @@ impl GitDriver {
         if request.reapply_local_delta {
             for p in &snapshot.local_paths {
                 if snapshot.content_changes.contains(p) {
-                    let digest = wal.store_restore_snapshot(&snapshot).map_err(failure)?;
+                    let digest = wal.store_restore_snapshot(&snapshot)?;
                     let mut error = failure(format!("restore-reapply-required: restore-overlapping-content: {p}; snapshot:{digest}"));
                     let patch_path = if request.checkout_baseline.is_some() {
                         Some(
-                            wal.store_restore_patch(&preview.reference, id, &snapshot.staged_patch)
-                                .map_err(failure)?,
+                            wal.store_restore_patch(&preview.reference, id, &snapshot.staged_patch)?,
                         )
                     } else {
                         None
@@ -812,7 +810,7 @@ impl GitDriver {
         filesystem
             .checkpoint("restore-snapshot-captured")
             .map_err(failure)?;
-        let digest = wal.store_restore_snapshot(&snapshot).map_err(failure)?;
+        let digest = wal.store_restore_snapshot(&snapshot)?;
         let intent = Intent {
             kind: OperationKind::Restore(Box::new(RestoreIntent {
                 worktree: checkout::root(&repo)?.to_string_lossy().into(),
@@ -820,7 +818,7 @@ impl GitDriver {
                 request: request.clone(),
                 snapshot: digest.clone(),
             })),
-            request_digest: wal::canonical_digest(request).map_err(failure)?,
+            request_digest: wal::canonical_digest(request)?,
             repo_identity: wal.repository_identity().into(),
             resource_set: checkout::checkout_resources(&repo)?,
             authority_binding: checkout::binding(checkout::handle(&scope, &repo)?)?,
@@ -833,7 +831,7 @@ impl GitDriver {
             scope: &scope,
             binding: intent.authority_binding.clone(),
         };
-        let mut chain = match wal.begin(id, intent, &authority).map_err(failure)? {
+        let mut chain = match wal.begin(id, intent, &authority)? {
             Begin::Created(c) => c,
             _ => return Err(recovery("restore-operation-already-started")),
         };
@@ -847,26 +845,24 @@ impl GitDriver {
                 &Oid::parse(&request.expected_head, repo.object_format()).map_err(failure)?,
             )?;
         }
-        chain = wal.append(&chain, Phase::Prepared).map_err(failure)?;
+        chain = wal.append(&chain, Phase::Prepared)?;
         filesystem.checkpoint("restore-prepared").map_err(failure)?;
         // Re-read full facts and snapshot through the same config/custody door.
         let now = self.restore_checks(&repo, &scope, request)?;
         if now.status != preview.status
             || now.reference != preview.reference
-            || wal::canonical_digest(&self.restore_capture(&repo, &scope, &now, id, confirmed)?)
-                .map_err(failure)?
+            || wal::canonical_digest(&self.restore_capture(&repo, &scope, &now, id, confirmed)?)?
                 != digest
         {
             return Err(recovery("restore-snapshot-drift"));
         }
-        let _: Snapshot = wal.read_restore_snapshot(&digest).map_err(failure)?;
+        let _: Snapshot = wal.read_restore_snapshot(&digest)?;
         let patch_path = if request.checkout_baseline.is_some()
             && request.reapply_local_delta
             && !snapshot.staged_patch.is_empty()
         {
             Some(
-                wal.store_restore_patch(&preview.reference, id, &snapshot.staged_patch)
-                    .map_err(failure)?,
+                wal.store_restore_patch(&preview.reference, id, &snapshot.staged_patch)?,
             )
         } else {
             None
@@ -879,8 +875,7 @@ impl GitDriver {
                     expected: chain.intent().expected.clone(),
                     next: chain.intent().next.clone(),
                 },
-            )
-            .map_err(failure)?;
+            )?;
         filesystem
             .checkpoint("restore-before-reset")
             .map_err(failure)?;
@@ -914,7 +909,7 @@ impl GitDriver {
                     let path = checkout::root(&repo)?.join(name);
                     // Reset already replaced tracked paths; remove only captured paths absent from target.
                     if !self
-                        .paths_at_revision(
+                        .read_paths_at(
                             &repo,
                             &Oid::parse(&request.target, repo.object_format()).map_err(failure)?,
                             &[name.as_bytes().to_vec()],
@@ -1009,16 +1004,14 @@ impl GitDriver {
                 },
             )?;
             let post = wal
-                .store_restore_snapshot(&self.restore_capture(&repo, &scope, &after, id, confirmed)?)
-                .map_err(failure)?;
+                .store_restore_snapshot(&self.restore_capture(&repo, &scope, &after, id, confirmed)?)?;
             Ok(post)
         })();
         let mut warnings = vec![];
         match post_check {
             Ok(post) => {
                 chain = wal
-                    .append(&chain, Phase::RestoreApplied { snapshot: post })
-                    .map_err(failure)?;
+                    .append(&chain, Phase::RestoreApplied { snapshot: post })?;
             }
             Err(e) => warnings.push(format!("restore-post-check-failed: {}", e.cause)),
         }
@@ -1026,8 +1019,7 @@ impl GitDriver {
         let outcome = Outcome::Restore {
             state: "restored".into(),
         };
-        wal.append(&chain, Phase::Outcome(outcome.clone()))
-            .map_err(failure)?;
+        wal.append(&chain, Phase::Outcome(outcome.clone()))?;
         filesystem.checkpoint("restore-receipt").map_err(failure)?;
         if patch_path.is_some() {
             match wal.clear_restore_patch(&preview.reference, id, &snapshot.staged_patch) {
@@ -1053,13 +1045,13 @@ impl GitDriver {
     ) -> Result<Vec<String>> {
         let repo = self.checkout_repository(repo)?;
         let scope = checkout::scope(&repo, held)?;
-        let wal = Wal::open(&repo).map_err(failure)?;
-        if wal.compacted(id).map_err(failure)?.is_some() {
+        let wal = Wal::open(&repo)?;
+        if wal.compacted(id)?.is_some() {
             return Err(failure("restore-already-acknowledged"));
         }
-        let chain = wal.inspect(id).map_err(failure)?;
+        let chain = wal.inspect(id)?;
         let p = self.restore_evidence_authority(&repo, &scope, &chain, writer)?;
-        let saved: Snapshot = wal.read_restore_snapshot(&p.snapshot).map_err(failure)?;
+        let saved: Snapshot = wal.read_restore_snapshot(&p.snapshot)?;
         Ok(saved.paths.keys().cloned().collect())
     }
     /// Extract one saved path to a new file in a caller-owned directory. Never overwrite.
@@ -1075,13 +1067,13 @@ impl GitDriver {
         use std::io::Write;
         let repo = self.checkout_repository(repo)?;
         let scope = checkout::scope(&repo, held)?;
-        let wal = Wal::open(&repo).map_err(failure)?;
-        if wal.compacted(id).map_err(failure)?.is_some() {
+        let wal = Wal::open(&repo)?;
+        if wal.compacted(id)?.is_some() {
             return Err(failure("restore-already-acknowledged"));
         }
-        let chain = wal.inspect(id).map_err(failure)?;
+        let chain = wal.inspect(id)?;
         let p = self.restore_evidence_authority(&repo, &scope, &chain, writer)?;
-        let saved: Snapshot = wal.read_restore_snapshot(&p.snapshot).map_err(failure)?;
+        let saved: Snapshot = wal.read_restore_snapshot(&p.snapshot)?;
         fgos_scope_literal(name)?;
         let bytes = match saved.paths.get(name) {
             Some(SavedPath::File(bytes, _)) => bytes.clone(),
@@ -1190,11 +1182,11 @@ impl GitDriver {
     ) -> Result<()> {
         let repo = self.checkout_repository(repo)?;
         let scope = checkout::scope(&repo, held)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(failure)?;
-        if wal.compacted(id).map_err(failure)?.is_some() {
+        let wal = Wal::with_filesystem(repo.common_dir(), filesystem)?;
+        if wal.compacted(id)?.is_some() {
             return Err(failure("restore-already-acknowledged"));
         }
-        let chain = wal.inspect(id).map_err(failure)?;
+        let chain = wal.inspect(id)?;
         let p = self.restore_evidence_authority(&repo, &scope, &chain, writer)?;
         let mut digests = vec![p.snapshot.clone()];
         for record in chain.records() {
@@ -1209,19 +1201,18 @@ impl GitDriver {
             && !matches!(chain.last_state(), Phase::RestoreAcknowledged)
         {
             crate::refs::release_pin(self, &repo, checkout::handle(&scope, &repo)?, &wal, &chain)?;
-            wal.inspect(id).map_err(failure)?
+            wal.inspect(id)?
         } else {
             chain
         };
         let chain = if matches!(chain.last_state(), Phase::RestoreAcknowledged) {
             chain
         } else {
-            wal.append(&chain, Phase::RestoreAcknowledged)
-                .map_err(failure)?
+            wal.append(&chain, Phase::RestoreAcknowledged)?
         };
         // Release bytes while the durable acknowledgement and complete binding still exist.
         // An interrupted cleanup can therefore be retried without losing its inventory.
-        wal.release_restore_snapshots(&digests).map_err(failure)?;
+        wal.release_restore_snapshots(&digests)?;
         wal.compact_restore_ack(
             &chain,
             &crate::WalReader {
@@ -1232,8 +1223,7 @@ impl GitDriver {
                 scope: &scope,
                 binding: chain.intent().authority_binding.clone(),
             },
-        )
-        .map_err(failure)?;
+        )?;
         Ok(())
     }
     pub fn recover_restore(
@@ -1246,11 +1236,11 @@ impl GitDriver {
         let repo = self.checkout_repository(repo)?;
         let mut scope = checkout::scope(&repo, held)?;
         crate::recovery::leaf(&mut scope, &repo)?;
-        let wal = Wal::open(&repo).map_err(failure)?;
-        if wal.compacted(id).map_err(failure)?.is_some() {
+        let wal = Wal::open(&repo)?;
+        if wal.compacted(id)?.is_some() {
             return Err(failure("restore-already-acknowledged"));
         }
-        let chain = wal.inspect(id).map_err(failure)?;
+        let chain = wal.inspect(id)?;
         self.restore_observe(&repo, &scope, &wal, &chain, writer)
     }
     fn restore_observe<F: wal::FileSystem>(
@@ -1267,8 +1257,7 @@ impl GitDriver {
             scope,
             binding: chain.intent().authority_binding.clone(),
         };
-        wal::PublicationAuthority::validate_publication_borrow(&authority, chain.intent())
-            .map_err(failure)?;
+        wal::PublicationAuthority::validate_publication_borrow(&authority, chain.intent())?;
         let snapshot_error = wal.read_restore_snapshot::<Snapshot>(&p.snapshot).err();
         if let Some(error) = snapshot_error {
             let outcome = chain.outcome().cloned().unwrap_or_else(|| {
@@ -1281,8 +1270,7 @@ impl GitDriver {
                 }
             });
             if chain.outcome().is_none() {
-                wal.append(chain, Phase::Outcome(outcome.clone()))
-                    .map_err(failure)?;
+                wal.append(chain, Phase::Outcome(outcome.clone()))?;
             }
             return Ok(RestoreResult {
                 operation_id: chain.last().operation_id.clone(),
@@ -1298,8 +1286,7 @@ impl GitDriver {
             o.clone()
         } else if matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared) {
             self.restore_native_gate(repo, scope, confirmed)?;
-            wal.append(chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                .map_err(failure)?
+            wal.append(chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?
                 .outcome()
                 .unwrap()
                 .clone()
@@ -1328,7 +1315,7 @@ impl GitDriver {
                                 &chain.last().operation_id,
                                 confirmed,
                             ) {
-                                if wal::canonical_digest(&current).map_err(failure)? == *snapshot {
+                                if wal::canonical_digest(&current)? == *snapshot {
                                     state = "effectObservedOnly";
                                 }
                             }
@@ -1343,8 +1330,7 @@ impl GitDriver {
             let outcome = Outcome::Restore {
                 state: state.into(),
             };
-            wal.append(chain, Phase::Outcome(outcome.clone()))
-                .map_err(failure)?;
+            wal.append(chain, Phase::Outcome(outcome.clone()))?;
             outcome
         };
         Ok(RestoreResult {

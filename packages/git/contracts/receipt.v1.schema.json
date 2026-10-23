@@ -150,6 +150,12 @@
         "effectObservedOnly",
         "uncertain"
       ]
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [

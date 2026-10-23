@@ -53,13 +53,9 @@ pub fn sequence_ref(kind: &str) -> Result<RefName> {
             .bytes()
             .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-');
     if !valid {
-        return Err(failure_text("invalid-sequence-kind"));
+        return Err(failure("invalid-sequence-kind"));
     }
-    RefName::parse(&format!("{NAMESPACE}{kind}")).map_err(|e| failure_text(e.to_string()))
-}
-
-fn failure_text(cause: impl Into<String>) -> OperationError {
-    crate::refs::failure(cause.into())
+    RefName::parse(&format!("{NAMESPACE}{kind}")).map_err(|e| failure(e.to_string()))
 }
 
 impl GitDriver {
@@ -111,7 +107,7 @@ impl GitDriver {
         }
         let commit = self.checked(repo, &["cat-file", "commit", oid.as_str()], Policy::Inspect)?;
         let number =
-            commit_number(&commit).ok_or_else(|| failure_text("sequence-ref-malformed"))?;
+            commit_number(&commit).ok_or_else(|| failure("sequence-ref-malformed"))?;
         Ok(Some(SequenceTip { oid, number }))
     }
 
@@ -142,7 +138,7 @@ impl GitDriver {
                     std::slice::from_ref(&commit),
                     true,
                 )
-                .map_err(|e| failure_text(e.to_string()))?;
+                .map_err(|e| failure(e.to_string()))?;
                 let old = expected.map_or_else(
                     || "0".repeat(commit.as_str().len()),
                     |o| o.as_str().to_owned(),
@@ -273,13 +269,13 @@ impl GitDriver {
             return Err(out.error("sequence-read-failed"));
         }
         let text = std::str::from_utf8(&out.stdout)
-            .map_err(|_| failure_text("git-protocol-invalid-utf8"))?;
+            .map_err(|_| failure("git-protocol-invalid-utf8"))?;
         for line in text.lines() {
             if let Some((oid, advertised)) = line.split_once('\t') {
                 if advertised == name.as_str() {
                     return Ok(Some(
                         Oid::parse(oid, repo.object_format())
-                            .map_err(|e| failure_text(e.to_string()))?,
+                            .map_err(|e| failure(e.to_string()))?,
                     ));
                 }
             }
@@ -316,7 +312,7 @@ impl GitDriver {
                 .bytes()
                 .all(|b| b.is_ascii_alphanumeric() || b"-_.@".contains(&b));
         if !valid {
-            return Err(failure_text("invalid-sequence-claimant"));
+            return Err(failure("invalid-sequence-claimant"));
         }
         let tree = match repo.object_format() {
             ObjectFormat::Sha1 => EMPTY_TREE_SHA1,
@@ -349,15 +345,15 @@ impl GitDriver {
 /// ref has no such file and is flushed by git itself.
 fn sync_ref_file(repo: &RepoHandle, name: &RefName) -> Result<()> {
     match std::fs::File::open(repo.common_dir().join(name.as_str())) {
-        Ok(file) => file.sync_all().map_err(|e| failure_text(e.to_string())),
+        Ok(file) => file.sync_all().map_err(|e| failure(e.to_string())),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
-        Err(e) => Err(failure_text(e.to_string())),
+        Err(e) => Err(failure(e.to_string())),
     }
 }
 
 fn parse_oid(repo: &RepoHandle, bytes: &[u8]) -> Result<Oid> {
-    let text = std::str::from_utf8(bytes).map_err(|_| failure_text("git-protocol-invalid-utf8"))?;
-    Oid::parse(text.trim(), repo.object_format()).map_err(|e| failure_text(e.to_string()))
+    let text = std::str::from_utf8(bytes).map_err(|_| failure("git-protocol-invalid-utf8"))?;
+    Oid::parse(text.trim(), repo.object_format()).map_err(|e| failure(e.to_string()))
 }
 
 /// The number in the message of a raw commit: the text after the header's blank line.

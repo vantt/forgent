@@ -1,7 +1,7 @@
 //! Explicit non-event transfers. Remote transport is never enabled by another port.
 use crate::{
     driver::{Output, Policy},
-    refs::{admission, direct, failure, pending, receipt, recovery, sync_refs, tip, Authority},
+    refs::{admission, direct, pending, receipt, sync_refs, tip, zero_oid, Authority},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
 };
@@ -46,12 +46,7 @@ impl GitDriver {
         repo: &RepoHandle,
         grant: &RemoteGrant,
     ) -> Result<(String, &'static str)> {
-        if grant.name.is_empty()
-            || !grant
-                .name
-                .bytes()
-                .all(|b| b.is_ascii_alphanumeric() || b"_-".contains(&b))
-        {
+        if !wal::valid_id(&grant.name) {
             return Err(failure("remote-not-granted"));
         }
         let out = self.checked(repo, &["remote", "get-url", "--", &grant.name], Policy::Inspect)?;
@@ -223,11 +218,10 @@ impl GitDriver {
             }
         }
         let (url, scheme) = self.remote_target(repo, grant)?;
-        wal::require_activation_fence(repo).map_err(failure)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(failure)?;
+        let wal = Wal::open_with(repo, filesystem)?;
         let resources: Vec<String> = destinations.into_iter().map(str::to_owned).collect();
         admission(&wal, id, &resources)?;
-        let digest = wal::canonical_digest(&(push, &url, mappings, writer)).map_err(failure)?;
+        let digest = wal::canonical_digest(&(push, &url, mappings, writer))?;
         // Terminal replay returns its recorded acknowledgement, without a new
         // network request. A pending id can never send a second transfer.
         match wal.inspect(id) {
@@ -336,8 +330,7 @@ impl GitDriver {
                 "remote",
                 &grant.name,
                 &url,
-            ))
-            .map_err(failure)?,
+            ))?,
             writer_identity: writer.into(),
             object_format: repo.object_format(),
             expected: Tip::Absent,
@@ -347,7 +340,7 @@ impl GitDriver {
             scope: &scope,
             binding: intent.authority_binding.clone(),
         };
-        let chain = match wal.begin(id, intent, &authority).map_err(failure)? {
+        let chain = match wal.begin(id, intent, &authority)? {
             Begin::Created(c) => c,
             Begin::Existing(c) => {
                 return match c.outcome() {
@@ -374,7 +367,7 @@ impl GitDriver {
             }
             Begin::Compacted(_) => return Err(recovery("operation-recovery-required")),
         };
-        let chain = wal.append(&chain, Phase::Prepared).map_err(failure)?;
+        let chain = wal.append(&chain, Phase::Prepared)?;
         scope.validate().map_err(failure)?;
         let attempted = wal
             .append(
@@ -384,8 +377,7 @@ impl GitDriver {
                     expected: Tip::Absent,
                     next: Tip::Absent,
                 },
-            )
-            .map_err(failure)?;
+            )?;
         let mut install_attempted = false;
         let result = (|| {
             filesystem
@@ -464,11 +456,7 @@ impl GitDriver {
                         observations.push((name.as_str().into(), tip(&direct(self, repo, name)?)));
                         continue;
                     }
-                    let zero = "0".repeat(if repo.object_format() == ObjectFormat::Sha1 {
-                        40
-                    } else {
-                        64
-                    });
+                    let zero = zero_oid(repo.object_format());
                     let prior = old.clone();
                     let old = match old {
                         ExpectedTip::Oid(o) => o.as_str(),
@@ -540,8 +528,7 @@ impl GitDriver {
                     }
                     .into()],
                 }),
-            )
-            .map_err(failure)?;
+            )?;
             receipt(
                 id,
                 attempted.intent(),
@@ -667,8 +654,8 @@ impl GitDriver {
     pub fn recover_transfer(&self, repo: &RepoHandle, held: Vec<BorrowedHandle<'_>>, writer: &str, id: &str) -> Result<Outcome> {
         let mut scope = crate::refs::acquire_worktree_admin(repo, held)?;
         crate::recovery::leaf(&mut scope, repo)?;
-        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
-        let chain = wal.inspect(id).map_err(failure)?;
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
+        let chain = wal.inspect(id)?;
         if !matches!(chain.intent().kind, OperationKind::RemoteFetch {..} | OperationKind::RemotePush {..}) { return Err(failure("not-remote-transfer-operation")); }
         if chain.intent().writer_identity != writer || chain.intent().repo_identity != wal.repository_identity() { return Err(failure("remote-authority-mismatch")); }
         if let Some(o) = chain.outcome() { return Ok(o.clone()); }
@@ -677,7 +664,7 @@ impl GitDriver {
             let observations = chain.intent().resource_set.iter().map(|n| Ok((n.clone(), tip(&direct(self,repo,&RefName::parse(n).map_err(failure)?)?)))).collect::<Result<Vec<_>>>()?;
             Outcome::Transfer {acknowledged:false,unknown:true,observations,details:vec!["outcome-unknown; query remote before any new request".into()]}
         };
-        wal.append(&chain,Phase::Outcome(outcome.clone())).map_err(failure)?;
+        wal.append(&chain,Phase::Outcome(outcome.clone()))?;
         Ok(outcome)
     }
 }

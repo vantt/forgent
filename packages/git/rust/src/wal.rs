@@ -29,12 +29,33 @@ impl From<io::Error> for WalError {
         Self::Io(e)
     }
 }
+impl WalError {
+    /// The one kebab name of this failure; free-text diagnostics travel apart.
+    pub(crate) fn cause(&self) -> &'static str {
+        match self {
+            Self::Io(_) => "git-wal-io",
+            Self::Corrupt(_) => "git-wal-corrupt",
+            Self::Untrusted => "repository-identity-changed",
+            Self::OperationIdConflict => "operation-id-conflict",
+            Self::PublicationBorrowUnavailable => "publication-borrow-unavailable",
+            Self::Busy => "busy",
+            Self::RecoveryRequired => "operation-recovery-required",
+            Self::Unsupported => "git-wal-unsupported",
+            Self::FenceMissing => "git-fence-missing",
+        }
+    }
+    pub(crate) fn diagnostic(&self) -> Option<String> {
+        match self {
+            Self::Io(e) => Some(e.to_string()),
+            Self::Corrupt(text) => Some(text.clone()),
+            _ => None,
+        }
+    }
+}
 impl std::fmt::Display for WalError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if matches!(self, Self::FenceMissing) {
-            return write!(f, "git-fence-missing");
-        }
-        write!(f, "{self:?}")
+        write!(f, "{}", self.cause())?;
+        self.diagnostic().map_or(Ok(()), |text| write!(f, ": {text}"))
     }
 }
 impl std::error::Error for WalError {}
@@ -45,27 +66,7 @@ fn corrupt(s: &str) -> WalError {
 /// An injected filesystem checkpoint is called after each acknowledged WAL
 /// filesystem boundary. Returning an error simulates process loss, retaining
 /// all evidence. Durable-file provides the lower-level write/fsync boundaries.
-pub trait FileSystem: Send + Sync {
-    fn checkpoint(&self, step: &'static str) -> io::Result<()>;
-}
-// A shared injected filesystem controls both WAL and operation boundaries.
-impl<T: FileSystem + ?Sized> FileSystem for &T {
-    fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
-        (**self).checkpoint(step)
-    }
-}
-struct FaultAdapter<'a>(&'a dyn FileSystem);
-impl fgos_durable_file::FileSystem for FaultAdapter<'_> {
-    fn checkpoint(&self, step: &'static str) -> io::Result<()> {
-        self.0.checkpoint(step)
-    }
-}
-pub struct OsFileSystem;
-impl FileSystem for OsFileSystem {
-    fn checkpoint(&self, _: &'static str) -> io::Result<()> {
-        Ok(())
-    }
-}
+pub use fgos_durable_file::{FileSystem, OsFileSystem};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
@@ -188,7 +189,7 @@ pub enum Tip {
     Absent,
     Oid(String),
 }
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Attribution {
     ThisInvocationWonCas,
@@ -655,19 +656,14 @@ impl Intent {
                     return Err(corrupt("non-event resource"));
                 }
             }
-            match &self.kind {
-                OperationKind::RefUpdate { .. } | OperationKind::RefDelete => {
-                    if self.resource_set.len() != 1
-                        || !self.resource_set[0].starts_with("refs/heads/")
-                        || (matches!(self.kind, OperationKind::RefDelete)
-                            && (self.next != Tip::Absent || self.expected == Tip::Absent))
-                        || (matches!(self.kind, OperationKind::RefUpdate { .. })
-                            && self.next == Tip::Absent)
-                    {
-                        return Err(corrupt("refs binding"));
-                    }
-                }
-                _ => unreachable!(),
+            if self.resource_set.len() != 1
+                || !self.resource_set[0].starts_with("refs/heads/")
+                || (matches!(self.kind, OperationKind::RefDelete)
+                    && (self.next != Tip::Absent || self.expected == Tip::Absent))
+                || (matches!(self.kind, OperationKind::RefUpdate { .. })
+                    && self.next == Tip::Absent)
+            {
+                return Err(corrupt("refs binding"));
             }
             validate_tip(&self.expected, self.object_format)?;
             return validate_tip(&self.next, self.object_format);
@@ -680,17 +676,8 @@ impl Intent {
                 return Err(corrupt("publication resource"));
             }
         }
-        match &self.kind {
-            OperationKind::PublicationCas if self.resource_set.len() != 1 => {
-                return Err(corrupt("CAS resource set"))
-            }
-            OperationKind::RemoteFetch { url, refspecs, .. }
-            | OperationKind::RemotePush { url, refspecs, .. }
-                if url.is_empty() || refspecs.is_empty() =>
-            {
-                return Err(corrupt("remote binding"))
-            }
-            _ => (),
+        if self.kind == OperationKind::PublicationCas && self.resource_set.len() != 1 {
+            return Err(corrupt("CAS resource set"));
         }
         validate_tip(&self.expected, self.object_format)?;
         validate_tip(&self.next, self.object_format)
@@ -1037,9 +1024,9 @@ impl Directory {
                     .lock()
                     .is_ok_and(|seen| seen.contains(&key))
             {
-                child.file.sync_all()?;
+                fgos_durable_file::sync_directory(&child.path())?;
                 fsys.checkpoint("directory-fsync")?;
-                self.file.sync_all()?;
+                fgos_durable_file::sync_directory(&self.path())?;
                 fsys.checkpoint("parent-fsync")?;
                 if key.is_some() {
                     if let Ok(mut seen) = DURABLE_DIRECTORIES.lock() {
@@ -1108,11 +1095,15 @@ pub fn require_activation_fence(repo: &RepoHandle) -> WalResult<()> {
 }
 impl Wal<OsFileSystem> {
     pub fn open(repo: &RepoHandle) -> WalResult<Self> {
-        require_activation_fence(repo)?;
-        Self::with_filesystem(repo.common_dir(), OsFileSystem)
+        Self::open_with(repo, OsFileSystem)
     }
 }
 impl<F: FileSystem> Wal<F> {
+    /// The WAL of `repo` for writing: every writing door requires the activation fence first.
+    pub fn open_with(repo: &RepoHandle, fsys: F) -> WalResult<Self> {
+        require_activation_fence(repo)?;
+        Self::with_filesystem(repo.common_dir(), fsys)
+    }
     pub fn with_filesystem(common: &Path, fsys: F) -> WalResult<Self> {
         let canonical = common.canonicalize()?;
         if canonical != common {
@@ -1190,7 +1181,7 @@ impl<F: FileSystem> Wal<F> {
                 fs::remove_file(entry.path())?;
             }
         }
-        dir.file.sync_all()?;
+        fgos_durable_file::sync_directory(&dir.path())?;
         Ok(())
     }
     pub(crate) fn store_restore_snapshot<T: Serialize>(&self, value: &T) -> WalResult<String> {
@@ -1209,7 +1200,7 @@ impl<F: FileSystem> Wal<F> {
             &dir.path(),
             &digest,
             &bytes,
-            &FaultAdapter(&self.fs),
+            &self.fs,
             None,
             &mut || Ok(()),
             &[],
@@ -1237,7 +1228,7 @@ impl<F: FileSystem> Wal<F> {
             &dir.path(),
             &name,
             bytes,
-            &FaultAdapter(&self.fs),
+            &self.fs,
             None,
             &mut || Ok(()),
             &[],
@@ -1262,7 +1253,7 @@ impl<F: FileSystem> Wal<F> {
             return Ok(false);
         }
         fs::remove_file(path)?;
-        dir.file.sync_all()?;
+        fgos_durable_file::sync_directory(&dir.path())?;
         Ok(true)
     }
     pub(crate) fn release_restore_snapshots(&self, digests: &[String]) -> WalResult<()> {
@@ -1293,7 +1284,7 @@ impl<F: FileSystem> Wal<F> {
                 }
             }
         }
-        fs::File::open(dir.path())?.sync_all()?;
+        fgos_durable_file::sync_directory(&dir.path())?;
         Ok(())
     }
     pub(crate) fn read_restore_snapshot<T: serde::de::DeserializeOwned>(
@@ -1427,7 +1418,7 @@ impl<F: FileSystem> Wal<F> {
             &dir.path(),
             name,
             &bytes,
-            &FaultAdapter(&self.fs),
+            &self.fs,
             alongside,
             before_install,
             parents,
@@ -1725,7 +1716,6 @@ pub trait AuthorityAdmission {
 pub enum ObservedRef {
     Direct(Tip),
     Symbolic,
-    Unknown,
 }
 /// The operation layer implements these reads through the hardened Git driver.
 /// The resource and pin are derived here, never supplied by a recorded path.
@@ -1735,7 +1725,6 @@ pub trait RecoveryReader {
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Recovery {
-    Unprepared,
     FirstAttemptEligible,
     RecoveryRequired,
     EffectObservedOnly,
@@ -1759,7 +1748,7 @@ impl<F: FileSystem> Wal<F> {
         let target = reader.read_ref(&i.resource_set[0])?;
         let pin = reader.read_ref(&format!("refs/fgos/git-operations/{id}/candidate"))?;
         if matches!(c.last_state(), Phase::Intent(_)) {
-            return Ok(Recovery::Unprepared);
+            return Ok(Recovery::RecoveryRequired);
         }
         if !reader.candidate_intact(i)? {
             return Ok(Recovery::RecoveryRequired);
@@ -1978,6 +1967,16 @@ fn valid_compact_outcome(o: &[String]) -> bool {
     }
 }
 impl CompactReceipt {
+    /// What the entry's `digest` binds. Version 1 omitted expected/next, which
+    /// must never be guessed; version 3 adds the reference.
+    fn ledger_digest(&self) -> WalResult<String> {
+        let c = self;
+        match c.v {
+            1 => canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt)),
+            3 => canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt, &c.expected, &c.next, &c.reference)),
+            _ => canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt, &c.expected, &c.next)),
+        }
+    }
     /// Decode the durable terminal observation; request-specific expected/next
     /// and the processCrash-only receipt envelope are supplied by Publication.
     pub fn outcome(&self) -> WalResult<Outcome> {
@@ -2082,18 +2081,21 @@ impl<F: FileSystem> Wal<F> {
             Err(WalError::Io(e)) if e.kind() == io::ErrorKind::NotFound => return Ok(()),
             Err(e) => return Err(e),
         };
-        let records = compaction_suffix(&dir, id)?;
+        self.remove_operation(id, &dir, &compaction_suffix(&dir, id)?)
+    }
+    /// Removes an operation's records, then its directory, with a flush after each step.
+    /// Nothing else in the directory is touched: unexpected files are evidence.
+    fn remove_operation(&self, id: &str, dir: &Directory, records: &[Record]) -> WalResult<()> {
         for r in records {
             fs::remove_file(dir.path().join(record_name(r.sequence)))?;
             self.fs.checkpoint("remove-record")?;
         }
-        dir.file.sync_all()?;
+        fgos_durable_file::sync_directory(&dir.path())?;
         self.fs.checkpoint("removed-records-fsync")?;
         fs::remove_dir(self.root.path().join(id))?;
         self.fs.checkpoint("remove-operation")?;
-        self.root.file.sync_all()?;
-        self.fs.checkpoint("removed-operation-parent-fsync")?;
-        Ok(())
+        fgos_durable_file::sync_directory(&self.root.path())?;
+        Ok(self.fs.checkpoint("removed-operation-parent-fsync")?)
     }
     pub fn compacted(&self, id: &str) -> WalResult<Option<CompactReceipt>> {
         if !valid_id(id) {
@@ -2107,30 +2109,6 @@ impl<F: FileSystem> Wal<F> {
         };
         // Version 1 omitted expected/next. Keep its immutable binding and
         // exact-request replay readable; missing facts must never be guessed.
-        let d = if c.v == 1 {
-            canonical_digest(&(c.v, &c.id, &c.request, &c.binding, &c.receipt))?
-        } else if c.v == 3 {
-            canonical_digest(&(
-                c.v,
-                &c.id,
-                &c.request,
-                &c.binding,
-                &c.receipt,
-                &c.expected,
-                &c.next,
-                &c.reference,
-            ))?
-        } else {
-            canonical_digest(&(
-                c.v,
-                &c.id,
-                &c.request,
-                &c.binding,
-                &c.receipt,
-                &c.expected,
-                &c.next,
-            ))?
-        };
         let tips_valid = if c.v == 1 {
             c.expected.is_empty() && c.next.is_empty()
         } else {
@@ -2144,7 +2122,7 @@ impl<F: FileSystem> Wal<F> {
                 .as_ref()
                 .is_some_and(|r| RefName::parse(r).is_err())
             || c.id != id
-            || c.digest != d
+            || c.digest != c.ledger_digest()?
             || !digest_valid(&c.request)
             || !digest_valid(&c.binding)
             || !tips_valid
@@ -2234,28 +2212,7 @@ impl<F: FileSystem> Wal<F> {
             },
             digest: String::new(),
         };
-        c.digest = if c.v == 3 {
-            canonical_digest(&(
-                c.v,
-                &c.id,
-                &c.request,
-                &c.binding,
-                &c.receipt,
-                &c.expected,
-                &c.next,
-                &c.reference,
-            ))?
-        } else {
-            canonical_digest(&(
-                c.v,
-                &c.id,
-                &c.request,
-                &c.binding,
-                &c.receipt,
-                &c.expected,
-                &c.next,
-            ))?
-        };
+        c.digest = c.ledger_digest()?;
         if serde_json::to_vec(&c)
             .map_err(|_| corrupt("ledger serialize"))?
             .len()
@@ -2276,16 +2233,7 @@ impl<F: FileSystem> Wal<F> {
         let dir = self.operation(id, false)?;
         // No recursive remove: unexpected files (including failed-write temps)
         // are evidence. Leave them attributable by the durable ledger.
-        for r in &actual.records {
-            fs::remove_file(dir.path().join(record_name(r.sequence)))?;
-            self.fs.checkpoint("remove-record")?;
-        }
-        dir.file.sync_all()?;
-        self.fs.checkpoint("removed-records-fsync")?;
-        fs::remove_dir(self.root.path().join(id))?;
-        self.fs.checkpoint("remove-operation")?;
-        self.root.file.sync_all()?;
-        self.fs.checkpoint("removed-operation-parent-fsync")?;
+        self.remove_operation(id, &dir, &actual.records)?;
         Ok(c)
     }
 }
@@ -2666,7 +2614,7 @@ mod tests {
         let w = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
         let c = begun(&w, "one");
         let mut r = reader(c.intent());
-        assert_eq!(w.recover("one", &r).unwrap(), Recovery::Unprepared);
+        assert_eq!(w.recover("one", &r).unwrap(), Recovery::RecoveryRequired);
         let c = w.append(&c, Phase::Prepared).unwrap();
         assert_eq!(
             w.recover("one", &r).unwrap(),
@@ -3124,14 +3072,13 @@ mod tests {
             )
             .unwrap();
             let w = Wal::open(&repo).unwrap();
-            let oid = String::from_utf8(git(
+            let text = |bytes: Vec<u8>| String::from_utf8(bytes).unwrap().trim().to_owned();
+            let tree = text(git(&t.0, &["mktree"], Some(b"")));
+            let oid = text(git(
                 &t.0,
-                &["hash-object", "-w", "--stdin"],
-                Some(b"candidate"),
-            ))
-            .unwrap()
-            .trim()
-            .to_owned();
+                &["-c", "user.name=T", "-c", "user.email=t@example.invalid", "commit-tree", "-m", "candidate", &tree],
+                None,
+            ));
             let mut i = intent(&w);
             i.object_format = repo.object_format();
             i.next = Tip::Oid(oid.clone());
@@ -3150,6 +3097,12 @@ mod tests {
                 w.recover("real", &read).unwrap(),
                 Recovery::FirstAttemptEligible
             );
+            // The candidate must be a commit: a tree or a blob is never intact.
+            for not_a_commit in [tree.clone(), text(git(&t.0, &["hash-object", "-w", "--stdin"], Some(b"blob")))] {
+                let mut other = c.intent().clone();
+                other.next = Tip::Oid(not_a_commit);
+                assert!(!read.candidate_intact(&other).unwrap());
+            }
             let c = w
                 .append(
                     &c,

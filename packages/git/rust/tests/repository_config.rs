@@ -399,3 +399,12 @@ fn included_value_cannot_reuse_an_owned_local_wal_record() {
     assert_eq!(f.driver.remove_owned_hooks_config(&f.repo, &path, "preserve-included-remove").unwrap().status, "skippedExisting");
     assert_eq!(fs::read_to_string(included).unwrap(), contents);
 }
+
+#[test]
+fn a_remote_name_is_the_crate_name_grammar_everywhere_it_is_checked() {
+    // Mapping names, grants and operation ids share one grammar; no other case pins its edges.
+    assert!(fgos_git::publication_fetch_mappings("origin_2-b").is_ok());
+    for bad in ["", "a b", "a/b", &"x".repeat(81)] {
+        assert_eq!(fgos_git::publication_fetch_mappings(bad).unwrap_err().cause, "invalid-fetch-mapping-remote", "{bad:?}");
+    }
+}

@@ -649,6 +649,12 @@ fn retention_ages_only_valid_unreferenced_snapshots_and_known_temps() {
         assert!(directory.join(name).exists(), "{name}");
     }
 }
+/// A write-ahead-log filesystem failure is named by one cause; its text travels in `detail`.
+fn names_the_injected_io_failure(e: &fgos_git::OperationError, text: &str) {
+    assert_eq!(e.cause, "git-wal-io");
+    let diagnostic = e.detail.as_ref().and_then(|d| d["diagnostic"].as_str());
+    assert!(diagnostic.is_some_and(|d| d.contains(text)), "{e:?}");
+}
 struct AckInterruption;
 impl FileSystem for AckInterruption {
     fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
@@ -665,18 +671,11 @@ fn acknowledged_cleanup_can_resume_after_snapshot_release_failure() {
     f.driver
         .apply_restore(&f.repo, vec![], &request(&f, true), "fixture", "ack-retry")
         .unwrap();
-    assert!(f
+    let failed = f
         .driver
-        .acknowledge_restore_with_filesystem(
-            &f.repo,
-            vec![],
-            "fixture",
-            "ack-retry",
-            &AckInterruption
-        )
-        .unwrap_err()
-        .cause
-        .contains("interrupted acknowledged cleanup"));
+        .acknowledge_restore_with_filesystem(&f.repo, vec![], "fixture", "ack-retry", &AckInterruption)
+        .unwrap_err();
+    names_the_injected_io_failure(&failed, "interrupted acknowledged cleanup");
     let wal = Wal::open(&f.repo).unwrap();
     assert!(matches!(
         wal.inspect("ack-retry").unwrap().last().phase,
@@ -710,18 +709,11 @@ fn acknowledged_compaction_suffix_does_not_block_fresh_checkout_work() {
             "compact-interrupt",
         )
         .unwrap();
-    assert!(f
+    let failed = f
         .driver
-        .acknowledge_restore_with_filesystem(
-            &f.repo,
-            vec![],
-            "fixture",
-            "compact-interrupt",
-            &CompactionInterruption
-        )
-        .unwrap_err()
-        .cause
-        .contains("interrupted restore compaction"));
+        .acknowledge_restore_with_filesystem(&f.repo, vec![], "fixture", "compact-interrupt", &CompactionInterruption)
+        .unwrap_err();
+    names_the_injected_io_failure(&failed, "interrupted restore compaction");
     let scan = Wal::open(&f.repo).unwrap().scan(100).unwrap();
     assert!(scan.complete && scan.entries.iter().all(|e| e.error.is_none()));
     assert!(!f

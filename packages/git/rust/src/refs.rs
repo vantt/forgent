@@ -12,31 +12,9 @@ use std::{
     time::Duration,
 };
 
-pub(crate) fn failure(cause: impl std::fmt::Display) -> OperationError {
-    let cause = cause.to_string();
-    OperationError {
-        code: ResultCode::Refused,
-        cause,
-        retryable: false,
-        operation_id: None,
-        receipt: None,
-        exit_code: None,
-        signal: None,
-        stderr: vec![],
-        detail: None,
-    }
-}
-pub(crate) fn classified(code: ResultCode, cause: impl std::fmt::Display) -> OperationError {
-    OperationError {
-        code,
-        ..failure(cause)
-    }
-}
-pub(crate) fn recovery(cause: impl std::fmt::Display) -> OperationError {
-    classified(ResultCode::RecoveryRequired, cause)
-}
-pub(crate) fn stale(cause: impl std::fmt::Display) -> OperationError {
-    classified(ResultCode::Stale, cause)
+/// The all-zero id `update-ref` reads as "no such ref", in the repository's hash length.
+pub(crate) fn zero_oid(format: ObjectFormat) -> String {
+    "0".repeat(if format == ObjectFormat::Sha1 { 40 } else { 64 })
 }
 pub(crate) fn tip(value: &ExpectedTip) -> Tip {
     match value {
@@ -234,47 +212,71 @@ pub(crate) fn receipt(
         } else {
             Attribution::Uncertain
         },
+        warnings: vec![],
     })
 }
-pub(crate) fn sync_refs(repo: &RepoHandle, reference: &RefName) -> Result<()> {
+/// Every existing directory from the ref's parent up to the common dir (and
+/// `reftable/` for that backend): the directory chain of a ref created,
+/// changed or deleted. A reftable repository keeps no loose refs, so its chain
+/// is the table directory and the common dir.
+pub(crate) fn ref_dirs(repo: &RepoHandle, reference: &str) -> Result<Vec<PathBuf>> {
+    let common = repo.common_dir();
     if repo.layout().refs == RefStorage::Reftable {
-        fgos_durable_file::sync_directory(&repo.common_dir().join("reftable")).map_err(failure)?;
-        return fgos_durable_file::sync_directory(repo.common_dir()).map_err(failure);
+        return Ok(vec![common.join("reftable"), common.to_path_buf()]);
     }
-    let mut parent = repo
-        .common_dir()
-        .join(reference.as_str())
+    let mut dirs = Vec::new();
+    let mut path = common
+        .join(reference)
         .parent()
-        .unwrap()
-        .to_owned();
+        .ok_or_else(|| failure("untrusted-ref-directory"))?
+        .to_path_buf();
     loop {
-        match fs::symlink_metadata(&parent) {
-            Ok(m) if m.is_dir() && !m.file_type().is_symlink() => {
-                fgos_durable_file::sync_directory(&parent).map_err(failure)?
-            }
+        match fs::symlink_metadata(&path) {
+            Ok(meta) if meta.is_dir() && !meta.file_type().is_symlink() => dirs.push(path.clone()),
             Ok(_) => return Err(failure("untrusted-ref-directory")),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
             Err(e) => return Err(failure(e)),
         }
-        if parent == repo.common_dir() {
-            break;
+        if path == common {
+            return Ok(dirs);
         }
-        parent = parent
+        path = path
             .parent()
             .ok_or_else(|| failure("untrusted-ref-directory"))?
-            .to_owned();
+            .into();
     }
-    if repo.layout().refs == RefStorage::Reftable {
-        fgos_durable_file::sync_directory(&repo.common_dir().join("reftable")).map_err(failure)?;
-    }
-    Ok(())
+}
+/// Fsync a chain from `ref_dirs`, together when `concurrent`. A directory
+/// that a concurrent ref deletion pruned in the meantime has no entry left to
+/// make durable, and its removal is made durable by its parent, which is in
+/// the chain: it is skipped, never an error.
+pub(crate) fn sync_ref_dirs(dirs: &[PathBuf], concurrent: bool) -> std::io::Result<()> {
+    let one_by_one = || {
+        dirs.iter().try_for_each(|dir| match fgos_durable_file::sync_directory(dir) {
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+            other => other,
+        })
+    };
+    let synced = if concurrent {
+        let paths: Vec<&Path> = dirs.iter().map(PathBuf::as_path).collect();
+        match fgos_durable_file::sync_directories(&paths) {
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => one_by_one(),
+            other => other,
+        }
+    } else {
+        one_by_one()
+    };
+    synced.map_err(|e| std::io::Error::new(e.kind(), format!("directory-fsync: {e}")))
+}
+pub(crate) fn sync_refs(repo: &RepoHandle, reference: &RefName) -> Result<()> {
+    sync_ref_dirs(&ref_dirs(repo, reference.as_str())?, false).map_err(failure)
 }
 pub(crate) fn pending(mut e: OperationError, id: &str) -> OperationError {
     e.code = ResultCode::RecoveryRequired;
     e.operation_id = Some(id.into());
     e
 }
-fn path(bytes: &[u8]) -> Result<PathBuf> {
+pub(crate) fn byte_path(bytes: &[u8]) -> Result<PathBuf> {
     #[cfg(unix)]
     {
         use std::os::unix::ffi::OsStrExt;
@@ -294,11 +296,6 @@ pub(crate) fn install_pin(
 ) -> Result<()> {
     let pin =
         RefName::parse(&format!("refs/fgos/git-operations/{id}/candidate")).map_err(failure)?;
-    let zero = "0".repeat(if repo.object_format() == ObjectFormat::Sha1 {
-        40
-    } else {
-        64
-    });
     // A durable intent can outlive pin installation but precede Prepared.
     // Reuse only the exact candidate; a different/symbolic pin still refuses.
     if direct(driver, repo, &pin)? != ExpectedTip::Oid(candidate.clone()) {
@@ -310,7 +307,7 @@ pub(crate) fn install_pin(
                 "--no-deref",
                 pin.as_str(),
                 candidate.as_str(),
-                &zero,
+                &zero_oid(repo.object_format()),
             ]),
             &[],
             false,
@@ -358,8 +355,7 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
                 expected: Tip::Oid(candidate.clone()),
                 next: Tip::Absent,
             },
-        )
-        .map_err(failure)?
+        )?
     };
     match direct(driver, repo, &pin)? {
         ExpectedTip::Absent => (),
@@ -385,7 +381,7 @@ pub(crate) fn release_pin<F: wal::FileSystem>(
         _ => return Err(recovery("pin-release-recovery-required")),
     }
     sync_refs(repo, &pin)?;
-    wal.append(&release, Phase::PinReleased).map_err(failure)?;
+    wal.append(&release, Phase::PinReleased)?;
     Ok(())
 }
 impl GitDriver {
@@ -432,6 +428,24 @@ impl GitDriver {
             .collect())
     }
 
+    /// The topology of a registered checkout, `None` for a bare one. A registration that is
+    /// prunable, still initializing or does not resolve is uncertain, and nothing proceeds on it.
+    pub(crate) fn registered_topology(
+        &self,
+        repo: &RepoHandle,
+        fact: &WorktreeFact,
+    ) -> Result<Option<RepoHandle>> {
+        if fact.prunable.is_some() || fact.locked.as_deref() == Some(b"initializing") {
+            return Err(failure("worktree-registration-uncertain"));
+        }
+        if fact.bare {
+            return Ok(None);
+        }
+        match self.resolve_topology(&byte_path(&fact.path)?, repo.trusted_main_root())? {
+            ResolveRepo::Repository(r) => Ok(Some(r)),
+            _ => Err(failure("worktree-registration-uncertain")),
+        }
+    }
     pub(crate) fn checkouts(
         &self,
         repo: &RepoHandle,
@@ -441,33 +455,26 @@ impl GitDriver {
         loop {
             let page = self.list_worktrees(repo, cursor, 4096)?;
             for fact in page.entries {
-                if fact.prunable.is_some() || fact.locked.as_deref() == Some(b"initializing") {
-                    return Err(failure("worktree-registration-uncertain"));
-                }
-                let resolved = if fact.bare {
-                    None
-                } else {
-                    match self.resolve_topology(&path(&fact.path)?, repo.trusted_main_root())? {
-                        ResolveRepo::Repository(mut r) => {
-                            // Same checkout, same operation: reuse stamp-validated facts.
-                            // Other worktrees can have different worktree config.
-                            if let Some(config) = repo.checkout_config.as_ref().filter(|_| r.same_checkout(repo)) {
-                                r.object_format = repo.object_format;
-                                r.layout = repo.layout.clone();
-                                r.checkout_config = Some(std::sync::Mutex::new(
-                                    config.lock()
-                                        .map_err(|_| failure("config-cache-poisoned"))?.clone(),
-                                ));
-                            } else {
-                                r = match self.resolve_repo(&path(&fact.path)?, repo.trusted_main_root())? {
-                                    ResolveRepo::Repository(r) => r,
-                                    _ => return Err(failure("worktree-registration-uncertain")),
-                                };
-                            }
-                            Some(r)
-                        },
-                        _ => return Err(failure("worktree-registration-uncertain")),
+                let resolved = match self.registered_topology(repo, &fact)? {
+                    Some(mut r) => {
+                        // Same checkout, same operation: reuse stamp-validated facts.
+                        // Other worktrees can have different worktree config.
+                        if let Some(config) = repo.checkout_config.as_ref().filter(|_| r.same_checkout(repo)) {
+                            r.object_format = repo.object_format;
+                            r.layout = repo.layout.clone();
+                            r.checkout_config = Some(std::sync::Mutex::new(
+                                config.lock()
+                                    .map_err(|_| failure("config-cache-poisoned"))?.clone(),
+                            ));
+                        } else {
+                            r = match self.resolve_repo(&byte_path(&fact.path)?, repo.trusted_main_root())? {
+                                ResolveRepo::Repository(r) => r,
+                                _ => return Err(failure("worktree-registration-uncertain")),
+                            };
+                        }
+                        Some(r)
                     }
+                    None => None,
                 };
                 // Resolve registered admin HEAD, never a worker gitfile.
                 if let Some(r) = &resolved {
@@ -685,20 +692,17 @@ impl GitDriver {
                     .map(|p| p.to_string_lossy().into_owned()),
             }
         };
-        wal::require_activation_fence(repo).map_err(failure)?;
-        let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(recovery)?;
+        let wal = Wal::open_with(repo, filesystem)?;
         let resources = vec![name.as_str().into()];
         admission(&wal, id, &resources)?;
         let binding =
-            wal::canonical_digest(&(wal.repository_identity(), "refs", repo.trusted_main_root()))
-                .map_err(failure)?;
+            wal::canonical_digest(&(wal.repository_identity(), "refs", repo.trusted_main_root()))?;
         let authority = Authority {
             scope: &scope,
             binding: binding.clone(),
         };
         let intent = Intent {
-            request_digest: wal::canonical_digest(&(&kind, &resources, old, next, writer))
-                .map_err(failure)?,
+            request_digest: wal::canonical_digest(&(&kind, &resources, old, next, writer))?,
             kind,
             repo_identity: wal.repository_identity().into(),
             resource_set: resources,
@@ -708,7 +712,7 @@ impl GitDriver {
             expected: tip(old),
             next: tip(next),
         };
-        let chain = match wal.begin(id, intent, &authority).map_err(failure)? {
+        let chain = match wal.begin(id, intent, &authority)? {
             Begin::Created(c) => c,
             Begin::Existing(c) => {
                 if matches!(
@@ -740,8 +744,7 @@ impl GitDriver {
             Begin::Compacted(_) => return Err(recovery("operation-recovery-required")),
         };
         if direct(self, repo, name)? != *old {
-            wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                .map_err(failure)?;
+            wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
             return Err(stale("compare-and-swap-stale"));
         }
         // Reachability pin precedes prepared and the only target attempt.
@@ -753,7 +756,7 @@ impl GitDriver {
             },
         };
         install_pin(self, repo, admin, id, candidate)?;
-        let chain = wal.append(&chain, Phase::Prepared).map_err(failure)?;
+        let chain = wal.append(&chain, Phase::Prepared)?;
         scope.validate().map_err(failure)?;
         if let Some(target) = tree {
             let lease = scope
@@ -770,8 +773,7 @@ impl GitDriver {
                 .is_empty();
             if collision {
                 let terminal = wal
-                    .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                    .map_err(recovery)?;
+                    .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
                 release_pin(self, repo, admin, &wal, &terminal)?;
                 return Err(failure("checkout-preflight-failed"));
             }
@@ -789,8 +791,7 @@ impl GitDriver {
                 )?;
                 if !result.success {
                     let terminal = wal
-                        .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-                        .map_err(failure)?;
+                        .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
                     release_pin(self, repo, admin, &wal, &terminal)?;
                     return Err(result.error("checkout-preflight-failed"));
                 }
@@ -804,8 +805,7 @@ impl GitDriver {
                     expected: tip(old),
                     next: tip(next),
                 },
-            )
-            .map_err(failure)?;
+            )?;
         let effect = (|| {
             filesystem
                 .checkpoint("before-target-cas")
@@ -820,11 +820,7 @@ impl GitDriver {
                     return Err(recovery("checkout-dirty-recovery-required"));
                 }
             }
-            let zero = "0".repeat(if repo.object_format() == ObjectFormat::Sha1 {
-                40
-            } else {
-                64
-            });
+            let zero = zero_oid(repo.object_format());
             let old_text = match old {
                 ExpectedTip::Absent => zero.as_str(),
                 ExpectedTip::Oid(o) => o.as_str(),
@@ -858,8 +854,7 @@ impl GitDriver {
                         Phase::Outcome(Outcome::Loss {
                             observed: tip(&observed),
                         }),
-                    )
-                    .map_err(failure)?;
+                    )?;
                 release_pin(self, repo, admin, &wal, &terminal)?;
                 return Err(stale("compare-and-swap-stale"));
             }
@@ -909,8 +904,7 @@ impl GitDriver {
                         observed: tip(&observed),
                         attribution: wal::Attribution::ThisInvocationWonCas,
                     }),
-                )
-                .map_err(failure)?;
+                )?;
             release_pin(self, repo, admin, &wal, &terminal)?;
             receipt(
                 id,
@@ -1057,12 +1051,12 @@ impl GitDriver {
     pub fn recover_ref_operation(&self, repo: &RepoHandle, held: Vec<BorrowedHandle<'_>>, writer: &str, id: &str) -> Result<Outcome> {
         let mut scope = acquire_worktree_admin(repo, held)?;
         crate::recovery::leaf(&mut scope, repo)?;
-        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
-        let chain = wal.inspect(id).map_err(failure)?;
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
+        let chain = wal.inspect(id)?;
         let i = chain.intent();
         if !matches!(i.kind, OperationKind::RefUpdate {..} | OperationKind::RefDelete) { return Err(failure("not-ref-operation")); }
         if i.writer_identity != writer || i.repo_identity != wal.repository_identity()
-            || i.authority_binding != wal::canonical_digest(&(wal.repository_identity(), "refs", repo.trusted_main_root())).map_err(failure)? {
+            || i.authority_binding != wal::canonical_digest(&(wal.repository_identity(), "refs", repo.trusted_main_root()))? {
             return Err(failure("ref-authority-mismatch"));
         }
         if let Some(o) = chain.outcome() {
@@ -1081,7 +1075,7 @@ impl GitDriver {
                     return Err(recovery("ref-checkout-recovery-required"));
                 }
             }
-            if wal.native_lock_present(i).map_err(failure)? {
+            if wal.native_lock_present(i)? {
                 return Err(recovery("ref-checkout-or-native-state-recovery-required"));
             }
             let name = RefName::parse(&i.resource_set[0]).map_err(failure)?;
@@ -1089,7 +1083,7 @@ impl GitDriver {
             if observed == i.next { Outcome::Success { observed, attribution: wal::Attribution::EffectObservedOnly } }
             else { return Err(recovery("ref-effect-unknown")); }
         };
-        let terminal = wal.append(&chain, Phase::Outcome(outcome.clone())).map_err(failure)?;
+        let terminal = wal.append(&chain, Phase::Outcome(outcome.clone()))?;
         release_pin(self, repo, scope.handle("worktree-admin").expect("acquired"), &wal, &terminal)?;
         Ok(outcome)
     }

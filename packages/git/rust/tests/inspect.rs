@@ -78,6 +78,14 @@ fn inspect_real_repositories_byte_paths_pages_and_optional_locks() {
             driver.resolve_ref(&repo, &absent).unwrap(),
             RefValue::Absent
         ));
+        // A symbolic ref whose target is missing is listed by no pattern, yet it is not absent.
+        let dangling = RefName::parse("refs/heads/dangling").unwrap();
+        git(&repo_path, &["symbolic-ref", dangling.as_str(), "refs/heads/nowhere"]);
+        assert!(matches!(
+            driver.resolve_ref(&repo, &dangling).unwrap(),
+            RefValue::Symbolic(target) if target.as_str() == "refs/heads/nowhere"
+        ));
+        git(&repo_path, &["symbolic-ref", "--delete", dangling.as_str()]);
         assert!(
             matches!(driver.resolve_trunk(&repo, None).unwrap(), TrunkFact::Known(r) if r.as_str()=="refs/heads/trunk")
         );
@@ -205,7 +213,7 @@ fn inspect_real_repositories_byte_paths_pages_and_optional_locks() {
             "object-read-limit"
         );
         let paths = driver
-            .paths_at_revision(&repo, &first, &[weird.to_vec(), b"absent".to_vec()], 4096)
+            .read_paths_at(&repo, &first, &[weird.to_vec(), b"absent".to_vec()], 4096)
             .unwrap();
         assert!(matches!(&paths[0].value,PathValue::Blob(bytes) if bytes==b"first\0bytes"));
         assert!(matches!(paths[1].value, PathValue::Absent));

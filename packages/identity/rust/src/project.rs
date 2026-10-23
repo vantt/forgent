@@ -10,7 +10,7 @@
 use crate::errors::Error;
 use crate::provider::Refusal;
 use crate::text::{iso_utc_now, random_hex128, slug};
-use fgos_git::{GitDriver, OperationError, PathValue, RefValue, RepoHandle, TrunkFact};
+use fgos_git::{GitDriver, Inspect, OperationError, PathValue, RefValue, RepoHandle, TrunkFact};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -135,7 +135,7 @@ pub fn remote_tracks(driver: &GitDriver, repo: &RepoHandle) -> Result<bool, Oper
     let RefValue::Direct(commit) = driver.resolve_ref(repo, &trunk)? else {
         return Ok(false);
     };
-    let reads = driver.paths_at_revision(repo, &commit, &[FILE.as_bytes().to_vec()], MAX_FILE_BYTES)?;
+    let reads = driver.read_paths_at(repo, &commit, &[FILE.as_bytes().to_vec()], MAX_FILE_BYTES)?;
     Ok(reads
         .into_iter()
         .any(|read| matches!(read.value, PathValue::Blob(_) | PathValue::NotABlob(_))))

@@ -53,8 +53,14 @@ impl std::error::Error for InstallError {
 /// Write all bytes, sync the file, install without replacement, remove the
 /// temporary link and sync the parent. Errors preserve the observed effect.
 /// Existing targets (including symlinks) are never opened or overwritten.
-pub trait FileSystem {
+pub trait FileSystem: Send + Sync {
     fn checkpoint(&self, step: &'static str) -> io::Result<()>;
+}
+// A shared injected filesystem controls every boundary of an operation.
+impl<T: FileSystem + ?Sized> FileSystem for &T {
+    fn checkpoint(&self, step: &'static str) -> io::Result<()> {
+        (**self).checkpoint(step)
+    }
 }
 pub struct OsFileSystem;
 impl FileSystem for OsFileSystem {

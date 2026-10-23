@@ -1,6 +1,5 @@
 //! One repair door for native index artifacts. Unknown evidence never authorizes a move.
 use crate::{
-    refs::{failure, recovery},
     wal::{self, Phase, Wal},
     *,
 };
@@ -151,8 +150,7 @@ fn state(path: &Path) -> Result<(File, u64, u64, String)> {
             m.ctime(),
             m.ctime_nsec(),
             bytes,
-        ))
-        .map_err(failure)?;
+        ))?;
         Ok((file, m.dev(), m.ino(), digest))
     }
     #[cfg(not(unix))]
@@ -178,8 +176,8 @@ impl GitDriver {
     ) -> Result<()> {
         let scope = crate::scoped_commit::scope(repo, held)?;
         scope.validate().map_err(failure)?;
-        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
-        let chain = wal.inspect(id).map_err(failure)?;
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
+        let chain = wal.inspect(id)?;
         self.index_lock_operation(repo, &chain)?;
         if facts::judge_here(&child.to_record()) != facts::Verdict::Alive {
             return Err(recovery("native-lock-owner-not-live-at-record"));
@@ -196,8 +194,7 @@ impl GitDriver {
                 Err(recovery("native-lock-evidence-already-recorded"))
             };
         }
-        wal.append(&chain, Phase::NativeLockOwned(artifact))
-            .map_err(failure)?;
+        wal.append(&chain, Phase::NativeLockOwned(artifact))?;
         Ok(())
     }
     fn index_lock_operation(&self, repo: &RepoHandle, chain: &wal::Chain) -> Result<()> {
@@ -232,8 +229,8 @@ impl GitDriver {
         filesystem: &F,
     ) -> Result<NativeLockReport> {
         let scope = crate::scoped_commit::scope(repo, held)?;
-        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(failure)?;
-        let chain = wal.inspect(id).map_err(failure)?;
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
+        let chain = wal.inspect(id)?;
         self.index_lock_operation(repo, &chain)?;
         let path = repo.git_dir().join("index.lock");
         let owned = chain.records().iter().rev().find_map(|r| match &r.phase {
