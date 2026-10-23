@@ -5,13 +5,13 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for how an fgOS event becomes durable, how it is sealed into git objects on per-machine refs, how it is shared across machines, and how it is read back
 Design status: Signed by the owner on 2026-10-17 (D-ADR0055). It is the contract for starting implementation under the gates of section 23; it does not claim the design is proven.
-Implementation status: Dormant on main: crate, Node facade and combined addon present, consumer registry empty. Store layer proven by the store part of the section 23.2 gate on 2026-10-20 (plans/reports/verification-261020-2012-event-store-store-proof-gate.md); the Work consumer, its cutover and the gate items that need it are pending in the WORK lane
+Implementation status: Store layer proven by the store part of the section 23.2 gate on 2026-10-20 (plans/reports/verification-261020-2012-event-store-store-proof-gate.md). Work and porting are registered consumers on the Work cutover branch (`work/es-cutover`): the readers, triggers, Land policy, verbs and doctor rows are implemented, parity is exact on copies of all three workspace repositories and the retired families are gone from the tree (plans/reports/verification-261023-1630-work-cutover-parity-and-docs.md). Still open before acceptance: the candidate-release runs of section 23.2 items 1-4, 5 (real forge), 6-8 and 10-11, and the repository's own `fgos events migrate` (the report's matrix lists each)
 Canonical: Yes (D-ADR0055, 2026-10-17)
 
 Owner: Event Store component
 Source (planned): packages/event-store/rust (crate fgos-event-store); Node facade src/event-store/ over the one combined N-API addon that links fgos-event-store and fgos-git (section 17)
 Contracts (planned): packages/event-store/contracts/
-Last reviewed: 2026-10-20
+Last reviewed: 2026-10-23
 Supersedes: L3 clauses 1 and 4 in docs/platform-foundations.md (D-ID ae461c8b, superseded by D-ADR0055); D-ADR0003 data layout
 Related:
 - docs/platform-foundations.md (L3, L7, L10)
@@ -491,7 +491,7 @@ The usual verbs (`fgos list`, `show`, `ready` and the others) read the consumer'
 | `fgos events sync` | Section 14 |
 | `fgos events status [--json]` | Store id, machine id, every ref and tip, per stream unsealed count and oldest unsealed age, closed segments pending, last receipt, last fetch and push with result, own ref ahead/behind its mirror, a missing fetch refspec, orphan branch streams, deferred events and their missing predecessors (section 12), the guarantee level of the open root |
 | `fgos events export [--stream <s>] [--since <cursor>] [--format jsonl|legacy-layout] --out <dir>` | Canonical-order JSONL, or the legacy file layout with a parity report (section 18) |
-| `fgos rebuild` | The existing rebuild verb (`src/cli/command-registry.mjs:1427`) stays the one rebuild door: it drops every registered consumer cache and refolds from the store |
+| `fgos rebuild` | The existing rebuild verb (`src/cli/command-registry.mjs:1510`) stays the one rebuild door: it drops every registered consumer cache and refolds from the store |
 
 ## 16. Seal cadence and loss budget
 
@@ -1190,3 +1190,10 @@ Dated clarification with no protocol change: a process that reads the same store
 - Section 11 (repeat read): each prepared store keeps the answer of its last complete read (one that deferred nothing) together with the inputs it came from: the ordered tips of every event ref and mirror, the legacy refs, the own local files and the legacy files of the current HEAD. A later read observes all of those again from the real store, on every call, and returns the remembered answer only when each of them is identical and the caller holds exactly the history that answer covers (same cursor, same events). Any difference, a moved or replaced ref, a changed local file, another HEAD commit with other legacy files, or a caller holding another history, reads normally and replaces the memo. There is no time or call-count rule and nothing is skipped that could differ: the cost of a repeat read is the real observations (one ref listing and the HEAD reads) and no walk, certification, ordering or fold.
 - Section 11 (legacy history): the legacy events one HEAD commit, one set of legacy refs and one query give are parsed, ordered and digested once per process (the answer is content-addressed, like the fence and the inventory above). A caller that names the digest of the legacy history it already holds is not sent it again; the Node facade keeps the raw records of its last read and still returns each caller events parsed for that read alone.
 - The read answer no longer carries `fullOrder` across the Node boundary: nothing in Node used it, and it grew with the legacy history.
+
+## Work cutover proof gate (2026-10-23)
+
+Dated clarification with no protocol change, made with the Work part of the section 23.2 gate ([report](../../../plans/reports/verification-261023-1630-work-cutover-parity-and-docs.md)):
+
+- Section 23.2 item 9 asks for the addon "in both the npm package and the legacy-node payload". The npm install channel is retired (owner decision, plan refresh Q-W1 superseded 2026-10-22) and ships no addon: on it Work verbs and `fgos events` refuse with `git-addon-unavailable`, naming the missing addon. Item 9 is therefore met by the legacy-node payload alone: the addon loads from the staged release, activation refuses a linux-x64 payload without `components.nativeAddon`, and `event-store-native-addon` has setup and doctor vectors. Work verbs also refuse on Windows (`event-store-unsupported-platform`).
+- Section 19 describes the code the cutover deletes. On the Work cutover branch every row is gone from the tree; the cited lines belong to the pre-cutover tree. The standing proof is the reader census in `test/event-store/door.test.mjs`: no product file reads the retired event files or imports a reader of them. The tracked event files and the `.gitattributes` `merge=union` line of a repository leave in that repository's own `fgos events migrate` commit.

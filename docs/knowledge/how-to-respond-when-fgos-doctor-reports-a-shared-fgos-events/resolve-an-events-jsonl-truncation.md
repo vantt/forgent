@@ -9,6 +9,9 @@ mode: how-to
 ---
 # How to respond when `fgos doctor` reports a shared `.fgos/events.jsonl` truncation
 
+**Superseded (Event Store cutover, 2026-10):** Work's events no longer live in a tracked `.fgos/events.jsonl`. They are open logs under the Git common directory, sealed into `refs/fgos/events/<machine-id>`, and the Event Store verifies hashes and contiguity itself. The `events-jsonl-not-truncated` doctor row, the truncation mark sidecar and `scripts/events-jsonl-truncation-guard.mjs` are removed, so there is no truncation break to acknowledge and no mark to re-baseline. A damaged history now stops a read with `corrupt-log` (exit 5); see `docs/specs/work-state.md` ("Bố cục dữ liệu, thứ tự và xung đột") and `docs/platform/event-store/spec.md`. Everything below is kept as a record of the procedure for the retired layout.
+
+
 Use this when `fgos doctor` (as part of `npm test && node bin/fgos.mjs
 doctor`, or run standalone) fails the `events-jsonl-not-truncated` check,
 reporting a `content-mismatch`, `regressed`, or `log-emptied` break.
