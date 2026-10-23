@@ -77,13 +77,10 @@
     "RepositoryConfig": [
       "inspectHooks",
       "ensureHooks",
-      "removeOwnedHooksConfig",
-      "recover"
+      "removeOwnedHooksConfig"
     ],
     "Remote": [
-      "fetchRefs",
-      "pushRefs",
-      "inspectRemote"
+      "pushRefs"
     ],
     "Recovery": [
       "inspectOperation",
@@ -100,7 +97,6 @@
       "readObject",
       "walkCommits",
       "compareAndSwap",
-      "fetchRefs",
       "pushRefs",
       "ensureFetchMapping",
       "recover",

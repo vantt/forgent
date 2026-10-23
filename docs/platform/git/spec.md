@@ -119,7 +119,7 @@ All mutations require operation id, validated repository, writer and **declared 
 | SafeRestore | preview/apply/recover/listSnapshot/extractPath/acknowledge; full locked checks and durable snapshot before destructive effect. `apply` may carry `reapplyLocalDelta`: after the snapshot and the restore to the new tip, the captured local delta is applied to index and tree; a failed reapply leaves the durable snapshot and returns `recovery-required` (replaces `resyncWorktree`'s `reset --hard` + `apply --index`) |
 | Checkpoint adapter | checkpointTrackedFiles; detachable, consumer-selected **non-event** tracked payload only |
 | RepositoryConfig | publicationFetchMappings(remote), ensureFetchMapping, ensureHooks, removeOwnedHooksConfig; local config, user settings preserved, provenance |
-| Remote | fetchRefs, pushRefs, inspectRemote; explicit mapping, no implicit all-refs or default push-config mutation |
+| Remote | pushRefs (the Node arm; `fetch_refs` and `inspect_remote` stay in the Rust driver with no Node arm); explicit mapping, no implicit all-refs or default push-config mutation |
 | Recovery | inspectOperation, listPending, reconcile; actual disk/ref checks and idempotent results |
 | Publication | restricted plumbing; section 4. Event Store is the only production writer of event refs |
 

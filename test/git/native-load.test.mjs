@@ -381,12 +381,6 @@ test('umask 002 driver directories are created safely, repaired by setup, and di
     process.env.XDG_CONFIG_HOME = path.join(trustedHome, '.config');
     assert.equal(checkGit(repo, 'git-repository-config', options).passed, true);
     assert.match(checkGit(repo, 'git-component-compatible', options).message, /^info: .+: .+; .+/);
-    const {createGitRemote} = await import(new URL('../git/index.mjs', process.argv[3]));
-    const bare = path.join(root, 'bare');
-    execFileSync('git', ['init', '-q', '--bare', bare]);
-    git('remote', 'add', 'helper-proof', bare);
-    const remotePort = createGitRemote({stateRoot:old,repoPath:repo,trustedMain:repo,writer:'fixture'}, options);
-    assert.deepEqual(remotePort.inspectRemote({remoteGrant:{name:'helper-proof',pinnedUrl:bare},refs:['refs/heads/trunk']}), []);
     if (priorHome === undefined) delete process.env.HOME; else process.env.HOME = priorHome;
     if (priorXdg === undefined) delete process.env.XDG_CONFIG_HOME; else process.env.XDG_CONFIG_HOME = priorXdg;
 

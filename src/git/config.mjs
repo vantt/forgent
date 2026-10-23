@@ -6,7 +6,7 @@ export function createGitRepositoryConfig(options, loaderOptions) {
   outside();
   const native = loadNativeAddon(loaderOptions);
   const port = new native.GitRepositoryConfig(options.stateRoot, options.repoPath, options.trustedMain);
-  return Object.freeze(Object.fromEntries(['inspectHooks', 'ensureHooks', 'removeOwnedHooksConfig', 'recover'].map(method => [method, args => {
+  return Object.freeze(Object.fromEntries(['inspectHooks', 'ensureHooks', 'removeOwnedHooksConfig'].map(method => [method, args => {
     outside(); return port.call(method, args);
   }])));
 }
