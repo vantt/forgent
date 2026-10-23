@@ -59,6 +59,7 @@ import * as v7e from '../../scripts/lib/mailbox-behaviour-v7e.mjs';
 import { runStub } from './mailbox-behaviour-stub.mjs';
 import { rolesCarrying, startRecorder } from '../../scripts/lib/mailbox-role-recorder.mjs';
 import { installOmpHook, installPiHook } from '../../src/setup/agent-hooks.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
 const STUB = fileURLToPath(new URL('./mailbox-behaviour-stub.mjs', import.meta.url));
@@ -1209,7 +1210,7 @@ async function fixtureRun(cli, { subagent = false, tag }) {
     extension: (paths) => path.join(paths.ws, `.${cli}`, 'extensions', 'fgos-hooks.ts'),
     extraEnv: (paths) => ({ MBX_CAPTURE: path.join(paths.ws, capture) }),
     layOut: (paths) => {
-      writeJson(path.join(paths.ws, '.fgos', 'config.json'), { mailbox: { enabled: true } });
+      writeProjectConfig(paths.ws, { mailbox: { enabled: true } });
       (cli === 'pi' ? installPiHook : installOmpHook)(paths.ws);
       const shim = path.join(paths.ws, '.fgos', 'installation', 'bin', 'fgos');
       fs.mkdirSync(path.dirname(shim), { recursive: true });
