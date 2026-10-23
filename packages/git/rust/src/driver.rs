@@ -2083,67 +2083,36 @@ impl Inspect for GitDriver {
     fn resolve_head(&self, repo: &RepoHandle) -> Result<HeadFact> {
         self.require_floor()?;
         self.preflight(repo)?;
-        let symbolic = || -> Result<Option<RefName>> {
-            let out = self.invoke(
-                Some(repo),
-                &repo.trusted_main_root,
-                &["symbolic-ref", "--quiet", "HEAD"],
-                Policy::Inspect,
-                None,
-                true,
-                4096,
-                Duration::from_secs(30),
-            )?;
-            if out.success {
-                let name = std::str::from_utf8(&out.stdout)
-                    .map_err(|_| failure("invalid-head-target"))?
-                    .trim_end_matches('\n');
-                Ok(Some(
-                    RefName::parse(name).map_err(|_| failure("invalid-head-target"))?,
-                ))
-            } else if out.code == Some(1) {
-                Ok(None)
-            } else {
-                Err(out.error("head-observation-failed"))
-            }
+        let head = |args: &[&str]| {
+            self.invoke(Some(repo), &repo.trusted_main_root, args, Policy::Inspect, None, true, 4096, Duration::from_secs(30))
         };
-        let target = symbolic()?;
-        let out = self.invoke(
-            Some(repo),
-            &repo.trusted_main_root,
-            &["rev-parse", "--verify", "--quiet", "HEAD^{commit}"],
-            Policy::Inspect,
-            None,
-            true,
-            4096,
-            Duration::from_secs(30),
-        )?;
-        if target != symbolic()? {
-            return Err(failure("head-changed-during-read"));
-        }
+        let target_of = |name: &str| RefName::parse(name).map_err(|_| failure("invalid-head-target"));
+        // One child answers a born HEAD: its commit, then its symbolic name (`HEAD` itself when detached).
+        let out = head(&["rev-parse", "HEAD^{commit}", "--symbolic-full-name", "HEAD"])?;
         if out.success {
-            let value = std::str::from_utf8(&out.stdout)
-                .map_err(|_| failure("invalid-head-oid"))?
-                .trim_end_matches('\n');
-            let commit =
-                Oid::parse(value, repo.object_format()).map_err(|_| failure("invalid-head-oid"))?;
-            return Ok(match target {
-                Some(target) => HeadFact::Attached { target, commit },
-                None => HeadFact::Detached { commit },
+            let text = line(&out.stdout).map_err(|_| failure("invalid-head-oid"))?;
+            let (value, name) = text.split_once('\n').ok_or_else(|| failure("invalid-head-oid"))?;
+            let commit = Oid::parse(value, repo.object_format()).map_err(|_| failure("invalid-head-oid"))?;
+            return Ok(match name {
+                "HEAD" => HeadFact::Detached { commit },
+                name => HeadFact::Attached { target: target_of(name)?, commit },
             });
         }
-        if let Some(target) = target {
-            let page =
-                self.list_refs(
-                    repo,
-                    &[RefPrefix::parse(target.as_str())
-                        .map_err(|_| failure("invalid-head-target"))?],
-                    None,
-                    100_000,
-                )?;
+        // Not born: a symbolic HEAD whose target is not listed is unborn.
+        let symbolic = head(&["symbolic-ref", "--quiet", "HEAD"])?;
+        if symbolic.success {
+            let target = target_of(line(&symbolic.stdout).map_err(|_| failure("invalid-head-target"))?)?;
+            let page = self.list_refs(
+                repo,
+                &[RefPrefix::parse(target.as_str()).map_err(|_| failure("invalid-head-target"))?],
+                None,
+                100_000,
+            )?;
             if !page.entries.iter().any(|e| e.name == target) && page.complete {
                 return Ok(HeadFact::Unborn { target });
             }
+        } else if symbolic.code != Some(1) {
+            return Err(symbolic.error("head-observation-failed"));
         }
         Err(out.error(layout_cause(&repo.layout, "head-object-unavailable")))
     }
