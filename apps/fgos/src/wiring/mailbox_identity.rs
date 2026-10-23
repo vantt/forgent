@@ -16,7 +16,7 @@
 //! role delivery names the holder in the report, and candidates are cut to
 //! this record's heads, never the machine's sessions.
 use fgos_identity::directory::{register_writer, resolve, ROLE_PREFIX};
-use fgos_identity::resolve::{WriterKey as IdentityKey, ENV_ORDER};
+use fgos_identity::resolve::{HeadRef, WriterKey as IdentityKey, ENV_ORDER};
 use fgos_identity::session::cli_of;
 use fgos_identity::{session_for, Candidate, Liveness as IdentityLiveness, SessionInfo};
 use fgos_mailbox::hook::shell::BoundHead;
@@ -85,25 +85,30 @@ fn identity_key<'a>(key: &'a WriterKey, cli: &Cli) -> Option<IdentityKey<'a>> {
 /// Its own handle is resolved read-only first: found with its own id, done;
 /// found with another id, a handle collision, nothing registered; not
 /// found, Identity's `register_writer` door with the key from the payload
-/// and the head process the hook verified. Returns the hook-outcome reason
-/// when it did not hold; nothing is retried in this process.
+/// and the head process the hook verified, named by its pid and start time
+/// (Identity refuses `head-not-live` when the pid now runs another process).
+/// Returns the hook-outcome reason when it did not hold; nothing is retried
+/// in this process.
 ///
-/// Known limits, both inside the same-user boundary of spec §8 item 3:
-/// - Identity's door takes the head's pid and reads its process facts
-///   again, so a pid reused in the milliseconds between the hook's caller
-///   check and that read would record another process's liveness (Identity
-///   will take the verified start time with the pid; adapted when it lands).
-/// - The watchdog may end the process inside Identity's durable write and
-///   leave its temporary file in Identity's directory. Identity's scan reads
-///   only `*.json` entries, so the file is never counted or resolved; it only
-///   takes disk space until removed.
+/// Known limit, inside the same-user boundary of spec §8 item 3: the
+/// watchdog may end the process inside Identity's durable write and leave
+/// its temporary file in Identity's directory. Identity's scan reads only
+/// `*.json` entries, so the file is never counted or resolved; it only takes
+/// disk space until removed.
 pub fn ensure_registered(state_root: &Path, cli: &Cli, head: &BoundHead) -> Option<String> {
     let refused = |reason: &str| Some(format!("ident:{reason}"));
     let Some(key) = identity_key(&head.writer, cli) else {
         return refused("no-session-variable");
     };
-    let head_pid = head.head.record.pid.map(|pid| pid.0);
-    let own = match session_for(state_root, &key, head_pid) {
+    let record = &head.head.record;
+    let (Some(pid), Some(start_time)) = (record.pid, record.start_time.clone()) else {
+        return refused("head-unknown");
+    };
+    let head_ref = HeadRef {
+        pid: pid.0,
+        start_time,
+    };
+    let own = match session_for(state_root, &key, Some(&head_ref)) {
         Ok(session) => session.info,
         Err(refusal) => return refused(refusal.reason),
     };
@@ -111,10 +116,7 @@ pub fn ensure_registered(state_root: &Path, cli: &Cli, head: &BoundHead) -> Opti
         Ok(listed) if listed.id == own.id => None,
         Ok(_) => Some("ident-handle-in-use".to_string()),
         Err(refusal) if refusal.reason == "not-found" => {
-            let Some(pid) = head.head.record.pid else {
-                return refused("head-unknown");
-            };
-            register_writer(state_root, None, &key, pid.0, &[], false)
+            register_writer(state_root, None, &key, &head_ref, &[], false)
                 .err()
                 .and_then(|refusal| refused(refusal.reason))
         }
@@ -258,7 +260,74 @@ fn ours_only(candidates: &[Candidate], ours: &[(&HeadView, SessionInfo)]) -> Vec
 
 #[cfg(test)]
 mod tests {
-    use super::is_alias;
+    use super::{ensure_registered, is_alias};
+    use fgos_mailbox::hook::shell::BoundHead;
+    use fgos_mailbox::hook::HeadFacts;
+    use fgos_mailbox_core::{Cli, WriterKey};
+    use std::path::PathBuf;
+
+    /// A fresh Identity state root with a machine id, under the target's
+    /// temporary space.
+    fn state_root(tag: &str) -> PathBuf {
+        let root = std::env::temp_dir().join(format!("mbx-ident-{tag}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(&root).unwrap();
+        fgos_identity::machine::mint(&root, "wiring-test").unwrap();
+        root
+    }
+
+    /// This test process as a verified head, its start time replaced by `start_time` when given.
+    fn bound(writer: &str, start_time: Option<&str>) -> BoundHead {
+        let mut record = fgos_process::facts::identity_of(fgos_process::ProcId(std::process::id()))
+            .unwrap()
+            .to_record();
+        if let Some(stale) = start_time {
+            record.start_time = Some(stale.to_string());
+        }
+        BoundHead {
+            writer: WriterKey::new(writer).unwrap(),
+            head: HeadFacts {
+                record,
+                own_suffix: None,
+                handle: None,
+            },
+            registered: None,
+        }
+    }
+
+    fn entries(root: &std::path::Path) -> usize {
+        std::fs::read_dir(fgos_identity::directory::directory(root))
+            .map(|dir| {
+                dir.filter(|e| {
+                    e.as_ref()
+                        .is_ok_and(|e| e.path().extension().is_some_and(|x| x == "json"))
+                })
+                .count()
+            })
+            .unwrap_or(0)
+    }
+
+    #[test]
+    fn a_head_whose_start_time_no_longer_matches_its_pid_is_refused_head_not_live_and_nothing_is_registered(
+    ) {
+        let claude = Cli::new("claude").unwrap();
+        let stale = state_root("stale");
+        assert_eq!(
+            ensure_registered(&stale, &claude, &bound("wiring-stale-head", Some("1"))).as_deref(),
+            Some("ident:head-not-live")
+        );
+        assert_eq!(entries(&stale), 0);
+        // The falsifier: the same head with its verified start time registers.
+        let live = state_root("live");
+        assert_eq!(
+            ensure_registered(&live, &claude, &bound("wiring-live-head", None)),
+            None
+        );
+        assert_eq!(entries(&live), 1);
+        for root in [stale, live] {
+            let _ = std::fs::remove_dir_all(root);
+        }
+    }
 
     #[test]
     fn text_with_an_at_sign_a_slash_or_a_lead_prefix_is_an_alias_and_every_other_text_a_mailbox_name(

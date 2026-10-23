@@ -954,8 +954,7 @@ fn a_post_tool_use_drain_for_a_pointer_mode_cli_claims_nothing_and_emits_the_poi
 }
 
 #[test]
-fn a_repeating_pointer_stamps_the_last_drain_once_per_new_mail_and_writes_nothing_on_later_calls()
-{
+fn a_repeating_pointer_stamps_the_last_drain_once_per_new_mail_and_writes_nothing_on_later_calls() {
     // Both pointer reasons: the mode, and mail too large for the step.
     let too_large = "x".repeat(step_bound(Adapter::Codex) as usize);
     for (mut drain, body) in [
@@ -981,7 +980,10 @@ fn a_repeating_pointer_stamps_the_last_drain_once_per_new_mail_and_writes_nothin
         drain.send("peer", &body, false);
         let after_new = pointer_of(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
         assert_eq!(after_new.count, 2);
-        assert!(Begun::Pointer(after_new).state_changed(), "new mail is stamped once");
+        assert!(
+            Begun::Pointer(after_new).state_changed(),
+            "new mail is stamped once"
+        );
         assert!(drain.state.binding(&drain.writer).unwrap().last_drain_at > stamp);
         assert!(!drain
             .hook(HookEvent::PostToolUse, files::POST_TOOL_USE)
@@ -998,11 +1000,24 @@ fn a_claim_left_in_flight_beside_too_large_mail_is_offered_again_once_its_deadli
     let small = drain.send("peer", "small", false);
     // Claimed, but its write failed, so it was never finished.
     let first = take(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
-    assert_eq!(first.items.iter().map(|i| i.id.clone()).collect::<Vec<_>>(), vec![small.clone()]);
-    assert!(matches!(drain.state_of(&small), MessageState::InFlight { .. }));
+    assert_eq!(
+        first.items.iter().map(|i| i.id.clone()).collect::<Vec<_>>(),
+        vec![small.clone()]
+    );
+    assert!(matches!(
+        drain.state_of(&small),
+        MessageState::InFlight { .. }
+    ));
 
     drain.now += limits().in_flight_ttl_sec + 1;
     let again = take(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
-    assert_eq!(again.items.iter().map(|i| (i.id.clone(), i.attempt)).collect::<Vec<_>>(), vec![(small, 2)]);
+    assert_eq!(
+        again
+            .items
+            .iter()
+            .map(|i| (i.id.clone(), i.attempt))
+            .collect::<Vec<_>>(),
+        vec![(small, 2)]
+    );
     assert_eq!(again.too_large, 1);
 }
