@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "about": "What `fgos config migrate` carries over from a legacy project file (docs/platform/config/spec.md section 13). `reason` is the text after the migrate tag on every value kept. `retired` are paths no release reads any more: dropped from the result and listed in the report; a map left empty by the drop goes with it.",
+  "reason": "carried over from config.json, reason never recorded",
+  "retired": [
+    {
+      "path": "lock.predecessorKillWaitMs",
+      "reason": "Holder-lock stopped reading it when its Node facade moved onto the in-process door.",
+      "commit": "a620881e7"
+    }
+  ]
+}

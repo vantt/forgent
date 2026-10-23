@@ -71,17 +71,17 @@ pub struct WriteResult {
     pub notices: Vec<(&'static str, String)>,
 }
 
-fn conflict(reason: &str) -> SnapshotError {
+pub(crate) fn conflict(reason: &str) -> SnapshotError {
     let mut refusal = ConfigRefusal::new("config-write-conflict");
     refusal.detail_mut().keyword = Some(reason.to_string());
     refusal.into()
 }
 
-fn sha(bytes: &[u8]) -> String {
+pub(crate) fn sha(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))
 }
 
-fn io_error(error: impl ToString) -> SnapshotError {
+pub(crate) fn io_error(error: impl ToString) -> SnapshotError {
     io::Error::other(error.to_string()).into()
 }
 
@@ -126,11 +126,34 @@ fn current(
 }
 
 /// The directory of the target (created when missing, never through a symlink) and who it is now.
-fn dir_identity(root: &Path, dir: &Path, mode: u32) -> Result<DirIdentity, SnapshotError> {
+pub(crate) fn dir_identity(
+    root: &Path,
+    dir: &Path,
+    mode: u32,
+) -> Result<DirIdentity, SnapshotError> {
     match ensure_dir_beneath(root, dir, mode).and_then(|d| d.identity()) {
         Err(BeneathError::Refused(_)) => Err(ConfigRefusal::new("config-path-symlink").into()),
         Err(BeneathError::Io(error)) => Err(error.into()),
         Ok(identity) => Ok(identity),
+    }
+}
+
+/// Takes `lock` for the caller's scope; a lock that stays held is a conflict, the loser writes nothing.
+pub(crate) fn hold(
+    lock: &str,
+    fgos_dir: &Path,
+    lock_root: &Path,
+    wait_ms: u64,
+) -> Result<LockScope<'static>, SnapshotError> {
+    let mut scope = LockScope::seeded(Vec::new()).map_err(io_error)?;
+    match scope.acquire(lock, &scope_params(fgos_dir, lock_root), Wait::Ms(wait_ms)) {
+        Ok(_) => Ok(scope),
+        Err(ScopeError::Acquire(why))
+            if matches!(*why, Acquire::Held { .. } | Acquire::Timeout { .. }) =>
+        {
+            Err(conflict("lock-held"))
+        }
+        Err(other) => Err(io_error(other)),
     }
 }
 
@@ -201,20 +224,7 @@ pub fn commit_observed(
     } else {
         (GLOBAL_CONFIG, PathBuf::new())
     };
-    let mut scope = LockScope::seeded(Vec::new()).map_err(io_error)?;
-    match scope.acquire(
-        lock,
-        &scope_params(&fgos_dir, &req.lock_root),
-        Wait::Ms(req.lock_wait_ms),
-    ) {
-        Ok(_) => {}
-        Err(ScopeError::Acquire(why))
-            if matches!(*why, Acquire::Held { .. } | Acquire::Timeout { .. }) =>
-        {
-            return Err(conflict("lock-held"))
-        }
-        Err(other) => return Err(io_error(other)),
-    }
+    let _scope = hold(lock, &fgos_dir, &req.lock_root, req.lock_wait_ms)?;
     observe(Step::LockHeld)?;
     observe(Step::FirstCheck)?;
     let base = current(req, &at, true)?;

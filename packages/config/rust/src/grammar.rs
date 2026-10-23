@@ -69,6 +69,23 @@ impl Reason {
     }
 }
 
+impl Reason {
+    /// The reason of a value carried over from a legacy file: it names the migration as its source.
+    pub fn migrated(text: &str) -> Result<Reason, ConfigRefusal> {
+        let text = Reason::parse(text)?;
+        Ok(Reason(format!(
+            "{} {}",
+            self::text("migrated-source-tag"),
+            text.0
+        )))
+    }
+}
+
+/// Whether a `@fgos:why` reason is the one a migration wrote (doctor lists these until a person replaces them).
+pub fn is_migrated_reason(reason: &str) -> bool {
+    reason.starts_with(text("migrated-source-tag"))
+}
+
 /// Who wrote a value: always the writer identity, never caller text.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Actor(String);
@@ -157,6 +174,11 @@ pub fn doc_lines(node: &Value, standard: Option<&Value>) -> Vec<String> {
 /// Whether a comment line is written in the doc form.
 pub(crate) fn is_doc_line(line: &str) -> bool {
     line.starts_with(text("doc-prefix"))
+}
+
+/// Whether a line starts the grammar (`@fgos:`): text carried from outside must never.
+pub(crate) fn is_grammar_line(line: &str) -> bool {
+    line.starts_with(text("forbidden-line-start"))
 }
 
 /// What a person or tool reads above a key.

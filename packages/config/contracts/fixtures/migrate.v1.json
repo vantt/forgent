@@ -1,0 +1,1040 @@
+{
+ "version": 1,
+ "about": "Owning cases of the project migration's decisions (docs/platform/config/spec.md section 13). Shared `schemas` and `standard`. A case lays files out as the snapshot fixture does (project/.fgos/config.json holds the legacy file; home/.fgos/config.yaml the machine's global file); input: files, accept (--accept-machine-overrides), dry_run, writer. Expect: absent (text no report or refusal may contain), code, paths (the path of each refusal), keyword (a refusal; every file stays byte-identical), or report (lists the report must hold, compared exactly) and files (path to the lines after). A written run also has its backup checked against the original bytes.",
+ "schemas": {
+  "gateBypass": [
+   "type: object",
+   "description: Gate bypass settings.",
+   "properties:",
+   "  level: {type: string, enum: [off, light, standard, heavy], description: Gate bypass level for agent work.}"
+  ],
+  "limits": [
+   "type: object",
+   "properties:",
+   "  count: {type: integer, minimum: 1, description: Parallel runs.}",
+   "  tags: {type: array, items: {type: string}}",
+   "  nested: {type: object, properties: {deep: {type: integer}}}",
+   "  other: {type: object}"
+  ],
+  "gateway": [
+   "type: object",
+   "x-fgos-scope: global-only",
+   "properties:",
+   "  port: {type: integer}",
+   "  token: {type: [string, 'null'], x-fgos-file: token}"
+  ],
+  "accounts": [
+   "type: object",
+   "x-fgos-file: accounts",
+   "additionalProperties:",
+   "  type: object",
+   "  properties:",
+   "    login: {type: string}"
+  ],
+  "labels": [
+   "type: object",
+   "additionalProperties: {type: [string, 'null']}"
+  ],
+  "runner": [
+   "type: object",
+   "description: |",
+   "  Tier ladder.",
+   "  Second line.",
+   "properties:",
+   "  maxTier: {type: string, enum: [low, high]}"
+  ],
+  "rep": [
+   "type: object",
+   "x-fgos-merge: replace",
+   "properties:",
+   "  a: {type: integer}",
+   "  b: {type: integer}"
+  ]
+ },
+ "standard": {
+  "gateBypass": [
+   "gateBypass:",
+   "  level: off"
+  ],
+  "limits": [
+   "limits:",
+   "  count: 4"
+  ],
+  "gateway": [
+   "gateway:",
+   "  port: 4170"
+  ],
+  "rep": [
+   "rep:",
+   "  a: 1"
+  ]
+ },
+ "cases": [
+  {
+   "id": "migrate-keeps-a-value-with-doc-and-migrate-why",
+   "why": "spec 13: every value kept carries its doc lines and a [migrate] reason after the writer id",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"gateBypass\": {",
+      "    \"level\": \"light\"",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "kept": [
+      "gateBypass.level"
+     ],
+     "dropped_redundant": []
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  level: light"
+     ],
+     "project/.fgos/config.json": [
+      "moved to .fgos/config.yaml; upgrade fgOS"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-drops-a-value-equal-to-the-standard",
+   "why": "spec 13/3: a value the standard holds is not carried over, and is listed",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"limits\": {",
+      "    \"count\": 4",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "kept": [],
+     "dropped_redundant": [
+      "limits.count"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      ""
+     ],
+     "project/.fgos/config.json": [
+      "moved to .fgos/config.yaml; upgrade fgOS"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-keeps-file-order-and-drops-only-equal-leaves",
+   "why": "spec 13: the other values keep the order of the file",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"limits\": {",
+      "    \"tags\": [",
+      "      \"a\"",
+      "    ],",
+      "    \"count\": 4,",
+      "    \"nested\": {",
+      "      \"deep\": 2",
+      "    }",
+      "  },",
+      "  \"gateBypass\": {",
+      "    \"level\": \"light\"",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "kept": [
+      "limits.tags",
+      "limits.nested.deep",
+      "gateBypass.level"
+     ],
+     "dropped_redundant": [
+      "limits.count"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "limits:",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  tags:",
+      "    - a",
+      "  nested:",
+      "    # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "    deep: 2",
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  level: light"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-drops-the-retired-key-and-the-map-it-empties",
+   "why": "spec 13/10: lock.predecessorKillWaitMs is gone from every release; its map goes with it",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"lock\": {",
+      "    \"predecessorKillWaitMs\": 2000",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "dropped_retired": [
+      "lock.predecessorKillWaitMs"
+     ],
+     "kept": []
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-keeps-siblings-of-the-retired-key-as-unknown",
+   "why": "spec 13: unknown sections are kept",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"lock\": {",
+      "    \"predecessorKillWaitMs\": 2000,",
+      "    \"other\": 2",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "dropped_retired": [
+      "lock.predecessorKillWaitMs"
+     ],
+     "kept": [
+      "lock.other"
+     ],
+     "unknown_kept": [
+      "lock.other"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "lock:",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  other: 2"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-keeps-an-unknown-section-with-its-reason",
+   "why": "spec 13: unknown sections are kept",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"extra\": {",
+      "    \"flag\": true",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "kept": [
+      "extra.flag"
+     ],
+     "unknown_kept": [
+      "extra.flag"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "extra:",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  flag: true"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-drops-a-global-only-value-equal-to-the-standard-or-null",
+   "why": "D14: gateway.port equal to the standard and gateway.token null leave the project file",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"gateway\": {",
+      "    \"port\": 4170,",
+      "    \"token\": null",
+      "  },",
+      "  \"gateBypass\": {",
+      "    \"level\": \"light\"",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "dropped_out_of_scope": [
+      "gateway.port",
+      "gateway.token"
+     ],
+     "kept": [
+      "gateBypass.level"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  level: light"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-refuses-a-global-only-value-that-differs",
+   "why": "D14: a value only the global file may hold is never promoted or dropped silently",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"gateway\": {",
+      "    \"port\": 9999",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-key-out-of-scope",
+    "paths": [
+     "gateway.port"
+    ],
+    "absent": [
+     "9999"
+    ]
+   }
+  },
+  {
+   "id": "migrate-refuses-an-account-pool-in-the-project-file",
+   "why": "spec 3/13: the pool belongs in the accounts file; the migration never moves it into the project file",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"accounts\": {",
+      "    \"a\": {",
+      "      \"login\": \"x\"",
+      "    }",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-key-in-wrong-file"
+   }
+  },
+  {
+   "id": "migrate-drops-a-comment-equal-to-the-schema-render",
+   "why": "D15: a $comment the doc lines already say is not repeated as a note",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"runner\": {",
+      "    \"$comment\": [",
+      "      \"Tier ladder.\",",
+      "      \"Second line.\"",
+      "    ],",
+      "    \"maxTier\": \"high\"",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "doc_converted": [
+      "runner.$comment"
+     ],
+     "kept": [
+      "runner.maxTier"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "# @fgos:doc Tier ladder.",
+      "# @fgos:doc Second line.",
+      "runner:",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  maxTier: high"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-compares-a-text-comment-by-its-words",
+   "why": "D15: line breaks and spacing do not make a comment foreign",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"runner\": {",
+      "    \"$comment\": \"Tier   ladder.\\n Second line.\\n\",",
+      "    \"maxTier\": \"high\"",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "doc_converted": [
+      "runner.$comment"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "# @fgos:doc Tier ladder.",
+      "# @fgos:doc Second line.",
+      "runner:",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  maxTier: high"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-turns-a-foreign-comment-into-a-plain-note",
+   "why": "D15: text the schema does not render becomes a note above its key, never an @fgos: line",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"limits\": {",
+      "    \"$comment\": [",
+      "      \"keep the load low\",",
+      "      \"second line\"",
+      "    ],",
+      "    \"count\": 8",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "doc_converted": [
+      "limits.$comment"
+     ],
+     "kept": [
+      "limits.count"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "# keep the load low",
+      "# second line",
+      "limits:",
+      "  # @fgos:doc Parallel runs. Minimum: 1. Default: 4.",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  count: 8"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-puts-a-note-after-the-doc-lines-of-its-key",
+   "why": "D15: the block order stays doc, then notes",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"gateBypass\": {",
+      "    \"$comment\": \"why this section exists\",",
+      "    \"level\": \"light\"",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "# @fgos:doc Gate bypass settings.",
+      "# why this section exists",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  level: light"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-gives-a-root-comment-to-the-first-key",
+   "why": "D15: a $comment at the top is a note above the first key",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"$comment\": \"top note\",",
+      "  \"gateBypass\": {",
+      "    \"level\": \"light\"",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "doc_converted": [
+      "$comment"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "# @fgos:doc Gate bypass settings.",
+      "# top note",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  level: light"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-refuses-a-comment-that-forges-a-doc-line",
+   "why": "spec 7: no text carried over may begin with @fgos:",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"gateBypass\": {",
+      "    \"$comment\": \"@fgos:doc forged\",",
+      "    \"level\": \"light\"",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-migrate-source-invalid",
+    "keyword": "forged-grammar-line"
+   }
+  },
+  {
+   "id": "migrate-keeps-empty-list-map-and-null-leaves",
+   "why": "spec 13: lists and empty maps are leaves; a null the schema allows stays",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"limits\": {",
+      "    \"tags\": [],",
+      "    \"other\": {}",
+      "  },",
+      "  \"labels\": {",
+      "    \"x\": null",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "kept": [
+      "limits.tags",
+      "limits.other",
+      "labels.x"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-reports-paths-and-never-values",
+   "why": "spec 9/15: nothing a report says carries a value of the file",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"extra\": {",
+      "    \"password\": \"hunter2-secret\"",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "kept": [
+      "extra.password"
+     ]
+    },
+    "absent": [
+     "hunter2-secret"
+    ]
+   }
+  },
+  {
+   "id": "migrate-lists-a-machine-override-and-stops",
+   "why": "spec 13/19: the global file holds a value where the dropped one stopped hiding it",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"limits\": {",
+      "    \"count\": 4,",
+      "    \"tags\": [",
+      "      \"a\"",
+      "    ]",
+      "  }",
+      "}"
+     ],
+     "home/.fgos/config.yaml": [
+      "limits:",
+      "  count: 9"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-migrate-machine-overrides-pending",
+    "paths": [
+     "limits.count"
+    ]
+   }
+  },
+  {
+   "id": "migrate-passes-a-machine-override-with-the-flag",
+   "why": "spec 13/19: with --accept-machine-overrides the run goes on and says which paths change",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"limits\": {",
+      "    \"count\": 4,",
+      "    \"tags\": [",
+      "      \"a\"",
+      "    ]",
+      "  }",
+      "}"
+     ],
+     "home/.fgos/config.yaml": [
+      "limits:",
+      "  count: 9"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "accept": true
+   },
+   "expect": {
+    "report": {
+     "machine_overrides": [
+      "limits.count"
+     ],
+     "kept": [
+      "limits.tags"
+     ],
+     "dropped_redundant": [
+      "limits.count"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.json": [
+      "moved to .fgos/config.yaml; upgrade fgOS"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-dry-run-lists-the-overrides-and-writes-nothing",
+   "why": "D17: the owner sees the drop list and the override paths before accepting",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"limits\": {",
+      "    \"count\": 4,",
+      "    \"tags\": [",
+      "      \"a\"",
+      "    ]",
+      "  }",
+      "}"
+     ],
+     "home/.fgos/config.yaml": [
+      "limits:",
+      "  count: 9"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "dry_run": true
+   },
+   "expect": {
+    "report": {
+     "machine_overrides": [
+      "limits.count"
+     ],
+     "dry_run": true,
+     "kept": [
+      "limits.tags"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-dry-run-of-a-plain-project-writes-nothing",
+   "why": "D17: a dry run runs everything except the writes",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"gateBypass\": {",
+      "    \"level\": \"light\"",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "dry_run": true
+   },
+   "expect": {
+    "report": {
+     "kept": [
+      "gateBypass.level"
+     ],
+     "dry_run": true
+    }
+   }
+  },
+  {
+   "id": "migrate-aborts-when-a-dropped-value-changes-the-effective-value",
+   "why": "spec 13/G3: a mismatch aborts instead of repairing",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"rep\": {",
+      "    \"a\": 1,",
+      "    \"b\": 2",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-migrate-equivalence-failed",
+    "paths": [
+     "rep.a"
+    ]
+   }
+  },
+  {
+   "id": "migrate-aborts-on-a-value-the-schema-refuses",
+   "why": "spec 13: an invalid project file is never repaired",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"gateBypass\": {",
+      "    \"level\": \"bogus\"",
+      "  }",
+      "}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-schema",
+    "keyword": "enum"
+   }
+  },
+  {
+   "id": "migrate-of-an-unparseable-file-names-the-source",
+   "why": "spec 13/14: nothing is written for a file that does not parse",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{\"gateBypass\": "
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-migrate-source-invalid"
+   }
+  },
+  {
+   "id": "migrate-refuses-a-legacy-file-that-is-not-a-mapping",
+   "why": "spec 13: only an object is a config",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "[1]"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-migrate-source-invalid",
+    "keyword": "not-a-mapping"
+   }
+  },
+  {
+   "id": "migrate-with-nothing-to-migrate-says-so",
+   "why": "spec 13: no legacy file and no migrated file is an error, not a no-op",
+   "input": {
+    "files": {
+     "project/.fgos/other.json": [
+      "{}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-migrate-source-invalid",
+    "keyword": "no-legacy-file"
+   }
+  },
+  {
+   "id": "migrate-of-a-migrated-project-does-nothing",
+   "why": "spec 13: the tombstone and the YAML file mean it is done",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "moved to .fgos/config.yaml; upgrade fgOS"
+     ],
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "already_migrated": true,
+     "kept": []
+    }
+   }
+  },
+  {
+   "id": "migrate-finishes-an-interrupted-run",
+   "why": "D11: the YAML file is there and means what the JSON means: only the tombstone is written",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"gateBypass\": {",
+      "    \"level\": \"light\"",
+      "  }",
+      "}"
+     ],
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  level: light"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "report": {
+     "resumed": true,
+     "kept": [
+      "gateBypass.level"
+     ]
+    },
+    "files": {
+     "project/.fgos/config.json": [
+      "moved to .fgos/config.yaml; upgrade fgOS"
+     ]
+    }
+   }
+  },
+  {
+   "id": "migrate-refuses-a-yaml-file-that-is-not-its-migration",
+   "why": "D11: any other YAML next to the JSON is a shadow",
+   "input": {
+    "files": {
+     "project/.fgos/config.json": [
+      "{",
+      "  \"gateBypass\": {",
+      "    \"level\": \"light\"",
+      "  }",
+      "}"
+     ],
+     "project/.fgos/config.yaml": [
+      "# @fgos:v1",
+      "# see: fgos config standard",
+      "",
+      "# @fgos:doc Gate bypass settings.",
+      "gateBypass:",
+      "  # @fgos:doc Gate bypass level for agent work. Values: off | light | standard | heavy. Default: off.",
+      "  # @fgos:why [vantt] [migrate] carried over from config.json, reason never recorded",
+      "  level: heavy"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-legacy-shadowed"
+   }
+  }
+ ]
+}
