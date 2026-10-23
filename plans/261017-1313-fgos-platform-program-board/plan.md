@@ -30,7 +30,7 @@ Danh bạ do IDENT dựng từ các dòng `IDENT roster` mà chính các máy gh
 
 | Handle máy | Machine id | Ghi chú | IDENT trên release đang chạy |
 |---|---|---|---|
-| `design-lap` | `design-lap-iezwlz` | máy owner; workspace forgentX, mdview, mcp-skill-hub | đủ (owner xác nhận 10-23 11:24 đã land; digest release chờ dòng land của máy này) |
+| `design-lap` | `design-lap-iezwlz` | máy owner; workspace forgentX, mdview, mcp-skill-hub | đủ (release `94e26894`, dòng roster SEAT 11:15; owner xác nhận 11:24) |
 | `fg-server` | `fg-server-sqs7es` | `~/projects/forgent` | đủ (release main `5f7825163`, 10-23 10:34) |
 | `fg-server2` | `fg-server2-jdp2bv` | `~/projects/forgent` | đủ (release main `199d85223`, 10-23 08:57) |
 
@@ -41,7 +41,7 @@ Lead của luồng đang chạy. Mỗi lead **tự điền dòng của mình** (
 | IDENT | `lead:IDENT` | `claude-5v7u@fg-server` | `fg-server` |
 | SEAT, SEAT-TRIM | `lead:SEAT` | `claude-lcpq@design-lap` | `design-lap` |
 | MAIL | `lead:MAIL` | `claude-rgvd@fg-server` (đã nhận vai 10-23 11:10) | `fg-server` (xác nhận; dòng MAIL trước đây ghi "máy owner" là sai) |
-| HARDEN | `lead:HARDEN` | chưa ghi (phiên `forgent-a8`) | `fg-server2`? |
+| HARDEN | `lead:HARDEN` | `claude-p74h@fg-server2` (IDENT điền từ dòng log 11:28 của HARDEN) | `fg-server2` |
 | TEST | `lead:TEST` | `claude-tt7r@fg-server2` (đã nhận vai 10-23 11:27) | `fg-server2` |
 | WORK | `lead:WORK` | chưa ghi (phiên `forgent-cd`) | `fg-server2` |
 | OPC | `lead:OPC` | `claude-muyt@fg-server2` | `fg-server2` |

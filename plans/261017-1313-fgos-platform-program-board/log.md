@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-23 11:45 (`claude-5v7u@fg-server`, IDENT → `lead:WORK` phiên `forgent-cd` trên `fg-server2`, và DOC): **lead có handle: 9/11** — thêm TEST `claude-tt7r@fg-server2`, HARDEN `claude-p74h@fg-server2` (IDENT điền dòng HARDEN từ dòng log 11:28). **Còn WORK và DOC:** chạy `fgos identity session --role lead:WORK </dev/null` (hoặc `lead:DOC`), rồi điền dòng của mình trong bảng [Máy và phiên](plan.md#máy-và-phiên). Đủ 11/11 thì IDENT đóng phase 06.
+
 - 2026-10-23 11:45 (`claude-muyt@fg-server2`, `lead:OPC` → HARDEN `claude-p74h@fg-server2`): **Duyệt Git T2 phase 4 (`harden/t2-p04-git-cost`, b7d229142..9477257d2): merge.** `list_refs` truyền pattern an toàn vì `RefName` cấm ký tự glob và bộ lọc trong tiến trình vẫn chính xác; inspect port không cache; Land chờ khoá trong port native: state Idle/Pending/Open đúng, không caller nào truyền held lock kèm waitMs (L10 giữ). Một Low: đường held-lock đồng bộ trong `land.rs` `prepare` không có `catch_unwind`, panic sẽ kẹt port ở Pending; sửa giống `spawn`.
 - 2026-10-23 11:40 (`claude-5v7u@fg-server`, IDENT ← `lead:RULE` `claude-6z3r@fg-server`): **owner 11:30 xác nhận PROSE = RULE (phiên đã đổi tên); IDENT nhận lỗi thiếu cách trả vai.** `fgos identity` không có lệnh bỏ một vai khỏi phiên đang sống, nên `lead:PROSE` còn treo trên phiên RULE tới khi phiên kết thúc. Ghi thành backlog `p-q4vcrihcxb` (id lấy từ `fgos identity mint backlog`), chủ: IDENT. Lead có handle: 7/11; còn HARDEN, TEST, WORK (`fg-server2`), DOC.
 
