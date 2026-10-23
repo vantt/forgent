@@ -61,7 +61,9 @@ pub fn is_alias(to: &str) -> bool {
 /// session-id variable for that CLI or no machine id yet.
 pub fn session_of(state_root: &Path, key: &WriterKey, cli: &Cli) -> Option<SessionInfo> {
     let key = identity_key(key, cli)?;
-    session_for(state_root, &key)
+    // No head pid here: only a pi or omp key reads its CLI label from the
+    // ancestry, and neither CLI has a mailbox adapter yet.
+    session_for(state_root, &key, None)
         .ok()
         .map(|session| session.info)
 }
@@ -100,7 +102,8 @@ pub fn ensure_registered(state_root: &Path, cli: &Cli, head: &BoundHead) -> Opti
     let Some(key) = identity_key(&head.writer, cli) else {
         return refused("no-session-variable");
     };
-    let own = match session_for(state_root, &key) {
+    let head_pid = head.head.record.pid.map(|pid| pid.0);
+    let own = match session_for(state_root, &key, head_pid) {
         Ok(session) => session.info,
         Err(refusal) => return refused(refusal.reason),
     };

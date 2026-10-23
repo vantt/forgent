@@ -949,6 +949,7 @@ fn identity_of(root: &Path, source: &str, key: &str) -> fgos_identity::SessionIn
     fgos_identity::session_for(
         root,
         &fgos_identity::resolve::WriterKey { source, value: key },
+        None,
     )
     .unwrap()
     .info
