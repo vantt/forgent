@@ -409,7 +409,7 @@ impl<'a> Core<'a> {
             group_key: request.group_key.clone(),
             tabs,
             group_panes,
-            request: PlaceRequest { label: request.display.tab_label(&request.group_key) },
+            request: PlaceRequest { label: request.display.tab_label(&request.group_key), group_size: request.group_size },
             limits: self.config.limits,
         };
         match self.policy.place(&input) {

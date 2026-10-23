@@ -1,0 +1,58 @@
+{
+  "name": "even-group-size-4-352x69-first-split",
+  "policy": "even-split",
+  "input": {
+    "groupKey": "g",
+    "tabs": [
+      {
+        "tabId": "t1",
+        "area": {
+          "x": 0,
+          "y": 0,
+          "width": 352,
+          "height": 69
+        },
+        "panes": [
+          {
+            "paneId": "p1",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 352,
+              "height": 69
+            }
+          }
+        ]
+      }
+    ],
+    "groupPanes": [
+      {
+        "key": "k1",
+        "tabId": "t1",
+        "paneId": "p1",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 352,
+          "height": 69
+        }
+      }
+    ],
+    "request": {
+      "label": "w",
+      "groupSize": 4
+    },
+    "limits": {
+      "minCols": 80,
+      "minRows": 20,
+      "maxPanesPerTab": 8
+    }
+  },
+  "expected": {
+    "split": {
+      "anchorKey": "k1",
+      "direction": "right",
+      "ratio": 0.25
+    }
+  }
+}

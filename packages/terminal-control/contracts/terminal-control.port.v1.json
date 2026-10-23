@@ -23,7 +23,7 @@
   },
   "operations": {
     "allocate": {
-      "input": { "key": "key", "groupKey": "groupKey", "display": "display", "cwd": "optional absolute path: working directory of the new pane's shell", "env": "optional object of string: environment of the new pane's shell" },
+      "input": { "key": "key", "groupKey": "groupKey", "display": "display", "groupSize": "optional integer: how many panes the caller's batch opens in all; the placement policy sizes them equally when it is given", "cwd": "optional absolute path: working directory of the new pane's shell", "env": "optional object of string: environment of the new pane's shell" },
       "results": ["slot", "unsupported", "unknown"],
       "effects": [
         "places a new pane through the placement policy (placement-policy.v1.json) when the driver has layout.geometry, otherwise splits the newest live group pane down at 0.3 and applies maxPanesPerTab by pane count",

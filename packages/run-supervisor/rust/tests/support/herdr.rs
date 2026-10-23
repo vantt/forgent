@@ -89,7 +89,7 @@ impl FakeHerdr {
     /// The controller's half: a slot for `key` before the supervisor starts.
     pub fn allocate(&self, key: &str) {
         self.with_core(|core| {
-            let request = AllocateRequest { key: key.into(), group_key: "g".into(), display: Display { title: Some(key.into()), ..Default::default() }, cwd: None, env: Default::default() };
+            let request = AllocateRequest { key: key.into(), group_key: "g".into(), display: Display { title: Some(key.into()), ..Default::default() }, group_size: None, cwd: None, env: Default::default() };
             core.allocate(&request).expect("allocate");
         });
     }

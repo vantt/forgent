@@ -1,5 +1,6 @@
 {
   "name": "tie-direction-beats-anchor-order",
+  "policy": "measured-split",
   "input": {
     "groupKey": "g",
     "tabs": [

@@ -3,8 +3,8 @@
   "description": "Pluggable placement policy. The core measures (layout.geometry), asks the policy where to put the next pane, applies the decision, then measures again. The policy is a pure deterministic function tested with geometry fixtures; it never changes ownership or lifecycle and never closes a pane.",
   "registry": {
     "config": "terminal.layout.policy",
-    "default": "measured-split",
-    "names": ["measured-split"]
+    "default": "even-split",
+    "names": ["even-split", "measured-split"]
   },
   "input": {
     "groupKey": "groupKey",
@@ -16,7 +16,7 @@
       }
     ],
     "groupPanes": [{ "key": "key", "tabId": "string", "paneId": "string", "rect": "rect" }],
-    "request": { "label": "string" },
+    "request": { "label": "string", "groupSize": "optional integer: panes the caller's batch opens in all; absent when unknown" },
     "limits": { "minCols": "integer >= 1", "minRows": "integer >= 1", "maxPanesPerTab": "integer >= 1" }
   },
   "output": {
@@ -31,6 +31,12 @@
     "tieBreak": "smaller child score, then direction right before down, then the anchor that comes first in groupPanes order",
     "childSizes": "right: floor(width*0.5) and width-floor(width*0.5); down: floor(height*0.5) and height-floor(height*0.5); measured on herdr: 352 -> 176+176, 69 -> 35+34"
   },
+  "evenSplit": {
+    "rule": "n = panes the tab holds after this one, wanted = n plus what is left of the batch (groupSize minus live group panes, at least 1), capped at maxPanesPerTab; shape(count) = the most columns c <= count with area.width / c >= minCols, rows = ceil(count / c), refused when area.height / rows < minRows, columns = ceil(count / rows); the largest wanted down to n that has a shape sets the columns, none -> try the next tab of the group, then newTab",
+    "placement": "fewer columns than the shape -> split the rightmost group pane right; otherwise split the largest group pane of the column that holds fewest panes down; a split whose children would fall under the minimum (whichever way herdr rounds) is skipped, and when nothing fits the policy answers newTab",
+    "ratio": "groupSize absent: 0.5. groupSize present: 1/q where q is the number of panes the anchor's space must still hold (columns still missing plus one for a right split, the column's final pane count minus its current count plus one for a down split, at least 2), so the batch ends with equal panes; panes that join later are not rebalanced",
+    "measuredWidth": "the shape reads the measured tab width per cell against minCols, never a screen ratio"
+  },
   "noGeometry": "when the driver lacks layout.geometry no policy runs: the core splits the newest live group pane down at 0.3 and opens a new tab at maxPanesPerTab panes",
-  "fixtures": "policy-fixtures/*.json: {name, input, expected}"
+  "fixtures": "policy-fixtures/*.json: {name, policy, input, expected}; policy names the registry entry the fixture is run against"
 }

@@ -2021,6 +2021,7 @@ export async function executeAssignment(assignment, opts = {}) {
             ?? effectiveAssignment.unitRunId
             ?? effectiveAssignment.provenance?.unitRunId
             ?? (effectiveAssignment.provenance?.kind === 'unit-run' ? effectiveAssignment.assignmentId?.split('/')[0] : undefined),
+          dispatchBatchSize: opts.dispatchBatchSize,
           anchorPaneId: process.env.FGOS_HERDR_ANCHOR_PANE?.trim() || undefined,
           terminalConfig: opts.terminalConfig,
           workLabel: workLabelOf(effectiveAssignment),
