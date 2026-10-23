@@ -20,7 +20,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { BWRAP_DRIVER_VERSION, prepareBwrapSync } from '../drivers/bwrap.mjs';
+import { BWRAP_DRIVER_VERSION, CONFINED_MARKER_ENV, prepareBwrapSync } from '../drivers/bwrap.mjs';
 import { MACHINE_PRIVATE_ROOTS, resolveConfinementResources } from '../resources.mjs';
 import { BUILTIN_POLICIES, BUILTIN_POLICY_IDS } from '../policies.mjs';
 
@@ -609,6 +609,7 @@ function probeMachinePrivateHiddenIn({ bwrapBin, root, blind, brokenConfig }) {
       const fs = require('fs');
       const code = (fn) => { try { fn(); return 'ok'; } catch (e) { return e.code; } };
       process.stdout.write(JSON.stringify({
+        marker: process.env[${JSON.stringify(CONFINED_MARKER_ENV)}],
         accounts: code(() => fs.readFileSync(${JSON.stringify(planted[0])})),
         token: code(() => fs.readFileSync(${JSON.stringify(planted[1])})),
         entries: (() => { try { return fs.readdirSync(${JSON.stringify(privateDir)}).length; } catch (e) { return e.code; } })(),
@@ -634,6 +635,7 @@ function probeMachinePrivateHiddenIn({ bwrapBin, root, blind, brokenConfig }) {
     const workspaceWritable = grants.some((g) => g.resource === 'workspace' && g.access !== 'read');
     const outboxHostSide = fs.existsSync(outboxFile) && fs.readFileSync(outboxFile, 'utf8') === 'WRITTEN';
     const ok = Boolean(seen)
+      && seen.marker === '1'
       && seen.accounts === 'ENOENT'
       && seen.token === 'ENOENT'
       && seen.entries === 0

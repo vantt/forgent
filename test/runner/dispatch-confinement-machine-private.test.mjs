@@ -11,7 +11,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { assessBwrap, prepareBwrap } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
+import { assessBwrap, prepareBwrap, CONFINED_MARKER_ENV } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
 import {
   MACHINE_PRIVATE_ROOTS,
@@ -85,6 +85,14 @@ async function prepared(host, options) {
 }
 
 const indexOfFlag = (head, flag, target) => head.findIndex((arg, i) => arg === flag && head[i + 1] === target);
+
+test('every confined launch sets the one marker variable the Config session class reads, under the same name', async () => {
+  const host = makeHost({ withPrivate: false });
+  const { head } = await prepared(host, {});
+  assert.equal(indexOfFlag(head, '--setenv', CONFINED_MARKER_ENV) > 0 && head[indexOfFlag(head, '--setenv', CONFINED_MARKER_ENV) + 2], '1');
+  const rustSource = fs.readFileSync(new URL('../../packages/config/rust/src/session.rs', import.meta.url), 'utf8');
+  assert.match(rustSource, new RegExp(`pub const CONFINED_MARKER: &str = "${CONFINED_MARKER_ENV}";`), 'the crate and the driver name the same variable');
+});
 
 test('the machine-private roots are data in the contract, first entry the private directory of the host home', () => {
   assert.deepEqual([...MACHINE_PRIVATE_ROOTS], ['{home}/.fgos/private']);

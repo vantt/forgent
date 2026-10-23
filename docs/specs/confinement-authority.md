@@ -1273,6 +1273,13 @@ case vào probe, không thêm cơ chế.
   confine (mask sẽ che mất chính thứ worker được cấp). Từ chối, không bao giờ chạy mà không che.
 - **Attestation** ghi các root đó trong `hiddenRoots` (field của §9.2); `effectiveControls.hostRead`
   vẫn là giá trị của policy (`allow`), nên `hiddenRoots` mới là chỗ nói chính xác điều gì được che.
+- **Dấu báo "đang bị confine"**: driver bwrap đặt biến môi trường `FGOS_CONFINED=1` cho mọi worker
+  (một dòng `--setenv`, hằng `CONFINED_MARKER_ENV` trong `drivers/bwrap.mjs`); Config đọc nó để biết
+  session đang confine (`session_class`, `packages/config/rust/src/session.rs`, hằng cùng tên được
+  test ghim bằng nhau) và từ chối lịch sự thay vì để lệnh vỡ trên file thiếu. Đây là thông tin cho
+  session, **không phải ranh giới bảo mật**: worker tự bỏ được biến này, và khi đó chỉ mất lời từ
+  chối lịch sự; không hành vi nào bảo vệ dữ liệu dựa vào nó, ranh giới là sandbox (mask ở trên).
+  Probe `machine-private-hidden` khẳng định worker thật thấy biến này.
 - **Probe `machine-private-hidden`** (thuộc bộ probe chuẩn, không chỉ dispatch blind): dưới từng
   built-in policy (`host-write-denied`, `workspace-write`), worker không đọc được file đặt trong
   một `{home}/.fgos/private` giả dựng (`ENOENT`, thư mục rỗng), vẫn ghi được outbox, workspace cư
