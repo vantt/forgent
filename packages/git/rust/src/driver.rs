@@ -2314,15 +2314,24 @@ impl Inspect for GitDriver {
         if cursor.as_ref().is_some_and(|c| c.binding != binding) {
             return Err(refusal("ref-cursor-query-mismatch"));
         }
-        let bytes = self.checked(
-            repo,
-            &[
-                "for-each-ref",
-                "--sort=refname",
-                "--format=%(refname)%00%(objectname)%00%(symref)",
-            ],
-            Policy::Inspect,
-        )?;
+        // for-each-ref matches a pattern literally only up to a slash, so a
+        // prefix that is not a directory needs the two wildcard forms to select
+        // every ref that starts with those bytes. The filter below stays exact.
+        let mut args = vec![
+            "for-each-ref".to_owned(),
+            "--sort=refname".to_owned(),
+            "--format=%(refname)%00%(objectname)%00%(symref)".to_owned(),
+        ];
+        for prefix in &binding {
+            if prefix.ends_with('/') {
+                args.push(prefix.clone());
+            } else {
+                args.push(format!("{prefix}*"));
+                args.push(format!("{prefix}*/**"));
+            }
+        }
+        let args: Vec<&str> = args.iter().map(String::as_str).collect();
+        let bytes = self.checked(repo, &args, Policy::Inspect)?;
         let mut entries = Vec::new();
         let mut more = false;
         for line in bytes.split(|b| *b == b'\n').filter(|l| !l.is_empty()) {
