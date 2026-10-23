@@ -236,6 +236,72 @@
    }
   },
   {
+   "id": "write-redundant-set-needs-no-reason",
+   "why": "spec 7: setting what the key inherits already is a no-op, so the missing reason is not refused",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "gateBypass.level",
+      "value": "off"
+     }
+    ],
+    "reason": "   ",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "applied": [],
+    "notices": [
+     [
+      "redundant-noop",
+      "gateBypass.level"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "write-a-real-edit-beside-a-redundant-one-still-needs-a-reason",
+   "why": "spec 7: the reason rule applies as soon as one edit changes the file",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "edits": [
+     {
+      "set": "gateBypass.level",
+      "value": "off"
+     },
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "   ",
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "code": "config-comment-reason-required"
+   }
+  },
+  {
    "id": "write-redundant-set-on-a-present-key-becomes-unset",
    "why": "D14: the key goes back to inheriting the standard",
    "input": {

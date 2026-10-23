@@ -23,6 +23,8 @@ use crate::scope::{judge, SourceKind};
 use crate::snapshot::{build, read_sources, Context, SessionClass, SnapshotError, SnapshotRequest};
 use crate::ConfigRefusal;
 
+const REASON_REQUIRED: &str = "config-comment-reason-required";
+
 pub enum Edit {
     Set { path: Vec<Segment>, value: Value },
     Unset { path: Vec<Segment> },
@@ -146,9 +148,14 @@ pub fn commit_observed(
     if req.roots.class == SessionClass::Confined {
         return Err(ConfigRefusal::new("config-write-confined").into());
     }
-    let (actor, reason) = (Actor::from_writer(writer), Reason::parse(&req.reason)?);
+    let actor = Actor::from_writer(writer);
     let at = place(req)?;
-    current(req, &at, false)?;
+    let seen = current(req, &at, false)?;
+    // A write that changes nothing needs no reason: every edit sets what the key inherits already.
+    let reason = match all_redundant(ctx, req, seen.as_ref(), at.2) {
+        true => Reason::parse(&req.reason).ok(),
+        false => Some(Reason::parse(&req.reason)?),
+    };
     let mut proposed = Value::Null;
     for edit in &req.edits {
         match edit {
@@ -190,7 +197,7 @@ pub fn commit_observed(
     observe(Step::LockHeld)?;
     observe(Step::FirstCheck)?;
     let base = current(req, &at, true)?;
-    let (bytes, applied, notices) = edit(ctx, req, &actor, &reason, base.as_ref(), name)?;
+    let (bytes, applied, notices) = edit(ctx, req, &actor, reason.as_ref(), base.as_ref(), name)?;
     observe(Step::Edited)?;
     let mut result = WriteResult {
         writer_id: writer.id.to_string(),
@@ -233,13 +240,30 @@ pub fn commit_observed(
 
 type Edited = (Vec<u8>, Vec<(String, bool)>, Vec<(&'static str, String)>);
 
+/// Whether every edit sets a value equal to the standard on a key the file does not hold. A file
+/// that cannot be read here is not redundant; the transaction refuses it after the lock.
+fn all_redundant(ctx: &Context, req: &WriteRequest, base: Option<&LoadedFile>, name: &str) -> bool {
+    let held = match base {
+        None => Ok(Value::Null),
+        Some(file) => parse(&file.bytes, Profile::StrictConfig, name).and_then(|doc| doc.to_json()),
+    };
+    let Ok(held) = held else { return false };
+    !req.edits.is_empty()
+        && req.edits.iter().all(|edit| match edit {
+            Edit::Set { path, value } => {
+                ctx.standard.value_at(path) == Some(value) && json_at(&held, path).is_none()
+            }
+            Edit::Unset { .. } => false,
+        })
+}
+
 /// The produced bytes: every edit applied to one in-memory document, each key given its comment
 /// block. Nothing is written; any error discards the document.
 fn edit(
     ctx: &Context,
     req: &WriteRequest,
     actor: &Actor,
-    reason: &Reason,
+    reason: Option<&Reason>,
     base: Option<&LoadedFile>,
     name: &str,
 ) -> Result<Edited, SnapshotError> {
@@ -259,17 +283,7 @@ fn edit(
         CommentLoss::Refuse
     };
     let (mut applied, mut notices) = (Vec::new(), Vec::new());
-    // The schema node of a path with the standard value as the `Default` its doc line shows.
-    let node = |path: &[Segment]| {
-        let mut node = ctx.schemas.resolve(path)?.node.clone();
-        node["default"] = ctx
-            .standard
-            .value_at(path)
-            .filter(|v| !v.is_object())
-            .cloned()
-            .unwrap_or_default();
-        Some(node)
-    };
+    let node = |path: &[Segment]| Some(ctx.schemas.resolve(path)?.node.clone());
     for edit in &req.edits {
         let (Edit::Set { path, .. } | Edit::Unset { path }) = edit;
         let before = doc.to_json()?;
@@ -283,6 +297,7 @@ fn edit(
             }
             _ => None,
         };
+        let reason = reason.ok_or_else(|| ConfigRefusal::new(REASON_REQUIRED))?;
         applied.push((format_path(path), value.is_none()));
         let Some(value) = value else {
             doc.remove(path, loss)?;
