@@ -24,7 +24,7 @@
     "tabId": "string",
     "paneId": "string",
     "allocatedAt": "epoch ms",
-    "display": { "label": "string", "role": "optional string", "agent": "optional string", "model": "optional string" },
+    "display": { "id": "optional string", "title": "optional string", "role": "optional string", "agent": "optional string", "model": "optional string", "session": "optional string" },
     "origin": { "enum": ["allocated", "attached"] }
   },
   "markers": {

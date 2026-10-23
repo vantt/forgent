@@ -7,16 +7,63 @@ use crate::driver::AgentFacts;
 use serde::{Deserialize, Serialize};
 
 /// Display data written to the terminal and the record; never read back to
-/// decide anything.
+/// decide anything. Ids are kept whole here; the visible label is built from
+/// them in one place, [`Display::tab_label`] and [`Display::pane_label`].
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Display {
-    pub label: String,
+    /// The work item or run the slot serves; the label shows its first 8 characters.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+    /// What the work is called; the label shows its first 24 characters.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub role: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub agent: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub model: Option<String>,
+    /// The session of a person's own pane; the label shows its first 8 characters.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub session: Option<String>,
+}
+
+const LABEL_SEPARATOR: &str = " · ";
+const SHORT_ID_CHARS: usize = 8;
+const TITLE_CHARS: usize = 24;
+
+/// The first `max` characters of `text` with whitespace runs collapsed to one space; `None` when nothing is left.
+fn shortened(text: Option<&String>, max: usize) -> Option<String> {
+    let collapsed = text?.split_whitespace().collect::<Vec<_>>().join(" ");
+    let cut: String = collapsed.chars().take(max).collect();
+    let cut = cut.trim_end().to_string();
+    (!cut.is_empty()).then_some(cut)
+}
+
+impl Display {
+    /// `<short id> · <title>`; either part alone when the other is missing; the group key when both are.
+    pub fn tab_label(&self, group_key: &str) -> String {
+        let parts: Vec<String> = [shortened(self.id.as_ref(), SHORT_ID_CHARS), shortened(self.title.as_ref(), TITLE_CHARS)]
+            .into_iter()
+            .flatten()
+            .collect();
+        if parts.is_empty() { group_key.to_string() } else { parts.join(LABEL_SEPARATOR) }
+    }
+
+    /// A person's own pane (a session is named): `<tab label> | fg.ssid:<first 8>`. A worker pane (a role is
+    /// named): `<role> · <model>`, the agent when no model is known. Any other pane: the tab label.
+    pub fn pane_label(&self, group_key: &str) -> String {
+        if let Some(session) = shortened(self.session.as_ref(), SHORT_ID_CHARS) {
+            return format!("{} | fg.ssid:{session}", self.tab_label(group_key));
+        }
+        match shortened(self.role.as_ref(), TITLE_CHARS) {
+            Some(role) => match shortened(self.model.as_ref().or(self.agent.as_ref()), usize::MAX) {
+                Some(model) => format!("{role}{LABEL_SEPARATOR}{model}"),
+                None => role,
+            },
+            None => self.tab_label(group_key),
+        }
+    }
 }
 
 /// Identity of a process root: what `launch` returns and `inspect` reports.

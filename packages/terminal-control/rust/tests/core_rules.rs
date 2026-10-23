@@ -124,6 +124,50 @@ fn an_allocated_pane_carries_its_display_label_in_a_new_tab_and_after_a_split() 
     assert_eq!(driver.calls("label.pane"), vec![format!("label.pane {} label-g", first.pane_id), format!("label.pane {} label-g", second.pane_id)]);
 }
 
+fn display(id: Option<&str>, title: Option<&str>) -> Display {
+    Display { id: id.map(Into::into), title: title.map(Into::into), ..Display::default() }
+}
+
+#[test]
+fn labels_are_built_from_short_ids_and_titles_of_at_most_24_characters_in_one_place() {
+    // Tab label: `<first 8 of the id> · <title cut at 24>`, one part alone when the other is missing, the group key when both are.
+    let work = display(Some("tsk-1lvxq7m2h9"), Some("fix terminal layout"));
+    assert_eq!(work.tab_label("g"), "tsk-1lvx · fix terminal layout");
+    let long = display(Some("tsk-1lvxq7m2h9"), Some("  a very long title\nthat runs past the limit "));
+    assert_eq!(long.tab_label("g"), "tsk-1lvx · a very long title that r");
+    assert_eq!(display(Some("run-9f3a"), Some("tới lượt người dùng soạn thảo văn bản dài")).tab_label("g"), "run-9f3a · tới lượt người dùng soạn");
+    assert_eq!(display(Some("tsk-1lvxq7m2h9"), None).tab_label("g"), "tsk-1lvx");
+    assert_eq!(display(None, Some("only a title")).tab_label("g"), "only a title");
+    assert_eq!(display(None, Some("   ")).tab_label("unit-g"), "unit-g");
+    // Worker pane: `<role> · <model>`, the agent when no model is known, the role alone, else the tab label.
+    let worker = Display { role: Some("producer".into()), model: Some("claude-sonnet".into()), agent: Some("claude".into()), ..work.clone() };
+    assert_eq!(worker.pane_label("g"), "producer · claude-sonnet");
+    assert_eq!(Display { model: None, ..worker.clone() }.pane_label("g"), "producer · claude");
+    assert_eq!(Display { model: None, agent: None, ..worker.clone() }.pane_label("g"), "producer");
+    assert_eq!(work.pane_label("g"), "tsk-1lvx · fix terminal layout");
+    // A person's own pane names its session by the first 8 characters, after the tab label.
+    let own = Display { session: Some("0123456789abcdef".into()), ..work.clone() };
+    assert_eq!(own.pane_label("g"), "tsk-1lvx · fix terminal layout | fg.ssid:01234567");
+    assert_eq!(Display { title: None, ..own }.pane_label("g"), "tsk-1lvx | fg.ssid:01234567");
+}
+
+#[test]
+fn the_tab_and_the_worker_pane_take_their_labels_from_the_display_and_an_overflow_tab_is_numbered() {
+    // 100x20 keeps every pane in a tab of its own, so the group overflows.
+    let driver = MemDriver::new(100, 20);
+    let core = core(&driver, &MeasuredSplit, state_dir("label-format"));
+    let mut a = request("a", "g");
+    a.display = Display { role: Some("producer".into()), model: Some("claude-sonnet".into()), ..display(Some("tsk-1lvxq7m2h9"), Some("fix terminal layout")) };
+    core.allocate(&a).unwrap();
+    let mut b = request("b", "g");
+    b.display = Display { role: Some("judge".into()), model: Some("gpt-5".into()), ..a.display.clone() };
+    core.allocate(&b).unwrap();
+    let tabs: Vec<_> = driver.tabs.borrow().iter().map(|t| t.1.clone()).collect();
+    assert_eq!(tabs, vec!["tsk-1lvx · fix terminal layout", "tsk-1lvx · fix terminal layout (2)"]);
+    let panes: Vec<_> = driver.calls("label.pane").iter().map(|c| c.split_once(' ').and_then(|(_, rest)| rest.split_once(' ')).map(|(_, l)| l.to_string()).unwrap()).collect();
+    assert_eq!(panes, vec!["producer · claude-sonnet", "judge · gpt-5"]);
+}
+
 /// A policy that always splits, so the core's own re-measure is what protects
 /// the minimum.
 struct AlwaysSplit;

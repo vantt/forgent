@@ -58,7 +58,7 @@ before(async () => {
   const projectRoot = path.join(scratch, 'project');
   fs.mkdirSync(path.join(projectRoot, 'bin'), { recursive: true });
   fs.writeFileSync(path.join(projectRoot, 'bin', 'fgos.mjs'), 'console.log(JSON.stringify({ capability: "pane-labeling" }, null, 1));\n');
-  renameArgs = ['tsk-x', projectRoot];
+  renameArgs = ['tsk-1lvxq7m2h9', projectRoot];
   allocationsDir = () => {
     const root = path.join(harness.stateRoot, 'terminal', 'herdr');
     const [incarnation] = fs.existsSync(root) ? fs.readdirSync(root) : [];
@@ -108,15 +108,16 @@ const records = () => {
 
 test('rename.sh attaches the caller pane and labels it through the port', () => {
   const pane = openPane('own');
-  const r = run('terminal/rename.sh', renameArgs, { HERDR_PANE_ID: pane });
+  const r = run('terminal/rename.sh', [...renameArgs, 'fix terminal layout'], { HERDR_PANE_ID: pane });
   assert.equal(r.status, 0, r.stderr);
   const dir = allocationsDir();
   const record = JSON.parse(fs.readFileSync(path.join(dir, 'sess-skill.json'), 'utf8'));
   assert.equal(record.origin, 'attached');
   assert.equal(record.paneId, pane);
+  assert.equal(record.display.id, 'tsk-1lvxq7m2h9', 'the record keeps the whole id');
   const rename = fake.calls().find((c) => c[0] === 'pane' && c[1] === 'rename' && c[2] === pane);
   assert.ok(rename, 'a pane rename reached herdr');
-  assert.match(rename[3], /^tsk-x/);
+  assert.equal(rename[3], 'tsk-1lvx \u00b7 fix terminal layout | fg.ssid:sess-ski');
   assert.equal(fake.closedPaneIds().length, 0);
 });
 
@@ -128,7 +129,8 @@ test('rename.sh without FGOS_SESSION_ID keys and labels the pane with the writer
   assert.equal(record.paneId, pane);
   const rename = fake.calls().find((c) => c[0] === 'pane' && c[1] === 'rename' && c[2] === pane);
   assert.ok(rename, 'a pane rename reached herdr');
-  assert.match(rename[3], /fg\.ssid:codex-thread-skill/);
+  // The label shows the first 8 characters of the session id and, with no title known, the short id alone.
+  assert.equal(rename[3], 'tsk-1lvx | fg.ssid:codex-th');
 });
 
 test('rename.sh without herdr does nothing and exits 0', () => {

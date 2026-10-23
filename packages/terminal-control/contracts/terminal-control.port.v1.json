@@ -11,11 +11,14 @@
   },
   "display": {
     "fields": {
-      "label": "string; tab label for the group and pane label for the slot",
-      "role": "optional string",
-      "agent": "optional string",
-      "model": "optional string"
+      "id": "optional string; the work item or run, kept whole in the record; labels show its first 8 characters",
+      "title": "optional string; labels show its first 24 characters",
+      "role": "optional string; a pane with a role is labelled `<role> · <model>`",
+      "agent": "optional string; stands in for a missing model",
+      "model": "optional string",
+      "session": "optional string; marks a person's own pane, labelled `<short id> · <title> | fg.ssid:<first 8>`"
     },
+    "labels": "the core builds them from these fields: tab `<short id> · <title>` (the group key when both are missing; an overflow tab adds ` (n)`), worker pane `<role> · <model>`, own pane as above",
     "rule": "display is written to the terminal and the record only; no code reads it back to decide anything"
   },
   "operations": {

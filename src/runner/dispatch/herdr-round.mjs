@@ -334,7 +334,7 @@ export async function prepareTerminalAttempt(ctx) {
   const {
     attemptId, runDir: rawRunDir, cwd, repoRoot, prompt, workId, tier, model, runId,
     herdrBin, fullEnv, confinement, permissionMode, agentKind, delivery = 'inline',
-    trustStore, trustAccountSource, attemptEnv, dispatchBatchKey, anchorPaneId, terminalConfig,
+    trustStore, trustAccountSource, attemptEnv, dispatchBatchKey, anchorPaneId, terminalConfig, workLabel,
   } = ctx;
   const roundNumber = 1;
   const runDir = path.resolve(rawRunDir);
@@ -394,7 +394,7 @@ export async function prepareTerminalAttempt(ctx) {
     herdrEnv: sessionEnv,
     config: { ...terminalRouteConfig(projectRoot), ...(terminalConfig ?? {}) },
   });
-  const display = slotDisplay({ groupKey, agent: agentKind, model, role: rawContract?.assignment?.role });
+  const display = slotDisplay({ ...workLabel, agent: agentKind, model, role: rawContract?.assignment?.role });
 
   const abandon = async () => {
     try { await tc.releaseAsync({ key, groupKey, disposition: 'close' }); } catch { /* the pane is the port's to reconcile */ }

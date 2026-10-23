@@ -234,7 +234,7 @@ fn send_and_read_reach_the_pane_of_the_key() {
     assert!(matches!(core.send("a", Some("late"), None, false).unwrap(), SendOutcome::ForegroundNotAgent { reason } if reason.contains("no live process")));
     assert_eq!(driver.calls("send.").len(), 2);
     assert_eq!(core.read("a", None, None).unwrap(), format!("screen of {}", slot.pane_id));
-    core.label("a", &Display { label: "new".into(), ..Display::default() }).unwrap();
+    core.label("a", &Display { title: Some("new".into()), ..Display::default() }).unwrap();
     assert_eq!(driver.calls("label.pane"), vec![format!("label.pane {} label-g", slot.pane_id), format!("label.pane {} new", slot.pane_id)]);
 }
 

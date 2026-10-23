@@ -92,7 +92,7 @@ test('a caller anchor pane joins the group, so the batch opens beside it and nev
   // The anchor is the caller's own pane: its shell is this process.
   const { dir, fake } = fakeWith({ panes: [{}, {}], shellPid: process.pid });
   try {
-    const own = createTerminalControl({ herdrBin: fake.herdrBin }).allocate({ key: 'caller-own', groupKey: 'caller-tab', display: { label: 'caller' } });
+    const own = createTerminalControl({ herdrBin: fake.herdrBin }).allocate({ key: 'caller-own', groupKey: 'caller-tab', display: { title: 'caller' } });
     assert.equal(own.result, 'slot');
     const beside = await seat({ dir, fake, name: 'beside', groupKey: 'batch-anchor', anchorPaneId: own.slot.paneId });
     const splits = verbs(fake, 'pane', 'split');
@@ -257,8 +257,8 @@ test('an agy trust entry a seat wrote is removed by the step; one the person alr
 test('the brief a reviewer reads says its claim needs assessment.verdict; the producer\'s does not', { skip, timeout: 120_000 }, async () => {
   const { dir, fake } = fakeWith({ panes: [{}, {}] });
   try {
-    await seat({ dir, fake, name: 'producer', groupKey: 'g-roles', effectiveContract: { mutation: 'mutating', assignment: { role: 'producer', operation: 'implement-item' } } });
-    await seat({ dir, fake, name: 'reviewer', groupKey: 'g-roles', effectiveContract: { mutation: 'read-only', assignment: { role: 'reviewer', operation: 'review-item' } } });
+    await seat({ dir, fake, name: 'producer', groupKey: 'g-roles', workLabel: { id: 'tsk-1lvxq7m2h9', title: 'fix terminal layout' }, effectiveContract: { mutation: 'mutating', assignment: { role: 'producer', operation: 'implement-item' } } });
+    await seat({ dir, fake, name: 'reviewer', groupKey: 'g-roles', workLabel: { id: 'tsk-1lvxq7m2h9', title: 'fix terminal layout' }, effectiveContract: { mutation: 'read-only', assignment: { role: 'reviewer', operation: 'review-item' } } });
     assert.match(fs.readFileSync(path.join(dir, 'run-reviewer', 'brief-1.md'), 'utf8'), /"assessment\.verdict" is required for this assessment role/);
     assert.doesNotMatch(fs.readFileSync(path.join(dir, 'run-producer', 'brief-1.md'), 'utf8'), /assessment\.verdict/);
     // The role reaches the port with the display data, not only the brief.
@@ -269,6 +269,9 @@ test('the brief a reviewer reads says its claim needs assessment.verdict; the pr
     };
     assert.equal(recordOf('cmd_reviewer').display.role, 'reviewer');
     assert.equal(recordOf('cmd_producer').display.role, 'producer');
+    // The person reads the id and title on the tab and the role and model on each pane.
+    assert.deepEqual(verbs(fake, 'tab', 'create').map(labelOf), ['tsk-1lvx \u00b7 fix terminal layout']);
+    assert.deepEqual(verbs(fake, 'pane', 'rename').map((call) => call[call.length - 1]), ['producer \u00b7 sonnet', 'reviewer \u00b7 sonnet']);
   } finally { fake.cleanup(); }
 });
 

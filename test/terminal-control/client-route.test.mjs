@@ -58,7 +58,7 @@ const shellForeground = { env: { ...herdrEnv, FAKE_HERDR_FOREGROUND: 'shell' } }
 // capability probing, the incarnation owner) is owned by the crate's own tests.
 test('every operation of the port answers through the route', () => {
   const tc = client(shellForeground);
-  const display = { label: 'client-route', role: 'worker' };
+  const display = { title: 'client-route', role: 'worker' };
 
   const capabilities = tc.capabilities();
   assert.equal(capabilities.result, 'capabilities');
@@ -93,7 +93,7 @@ test('every operation of the port answers through the route', () => {
   assert.equal(foreign.result, 'unknown');
   assert.match(foreign.reason, /^pane-not-owned: /, 'a pane whose shell is not an ancestor of the caller is refused by name');
 
-  assert.equal(route('label', { key: 'k-one', display: { label: 'renamed' } }, shellForeground).result, 'ok');
+  assert.equal(route('label', { key: 'k-one', display: { title: 'renamed' } }, shellForeground).result, 'ok');
   // Only the pane's shell holds the foreground: nothing is typed, and the route names why.
   const refused = route('send', { key: 'k-one', text: 'hello', submit: true }, shellForeground);
   assert.equal(refused.result, 'foreground-not-agent');
@@ -126,7 +126,7 @@ test('unknown keys and a missing herdr come back as results, not exceptions', ()
   assert.match(unknown.reason, /no allocation record/);
 
   const absent = createTerminalControl({ hostBin: HOST_BIN, herdrBin: path.join(scratch, 'no-herdr'), env: herdrEnv });
-  const refused = absent.allocate({ key: 'k-absent', groupKey: 'g-absent', display: { label: 'x' } });
+  const refused = absent.allocate({ key: 'k-absent', groupKey: 'g-absent', display: { title: 'x' } });
   assert.equal(refused.result, 'unsupported');
 });
 

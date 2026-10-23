@@ -44,9 +44,10 @@ fgos_terminal_call() {
     | "$bin" internal terminal-control "$op" --protocol 1 --json 2>/dev/null
 }
 
-# fgos_terminal_attach <key> <pane>: take the caller's own pane. Exit 0 when
-# the port answered with a slot; a pane that is not the caller's own is refused
-# by the port (`pane-not-owned`), which is exit 1 here.
+# fgos_terminal_attach <key> <pane> [<display-json>]: take the caller's own pane,
+# recording the display facts when given. Exit 0 when the port answered with a
+# slot; a pane that is not the caller's own is refused by the port
+# (`pane-not-owned`), which is exit 1 here.
 fgos_terminal_attach() {
-  fgos_terminal_call attach "{\"key\":$(fgos_json_str "$1"),\"pane\":$(fgos_json_str "$2")}" | grep -q '"result":"slot"'
+  fgos_terminal_call attach "{\"key\":$(fgos_json_str "$1"),\"pane\":$(fgos_json_str "$2")${3:+,\"display\":$3}}" | grep -q '"result":"slot"'
 }

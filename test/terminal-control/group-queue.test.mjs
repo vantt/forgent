@@ -33,7 +33,7 @@ const events = () => (fs.existsSync(timeline) ? fs.readFileSync(timeline, 'utf8'
 test('calls of one group never overlap; another group runs alongside', async () => {
   fs.rmSync(timeline, { force: true });
   const tc = createTerminalControl({ hostBin: recorder });
-  const display = { label: 'q' };
+  const display = { title: 'q' };
   const jobs = [
     ...[1, 2, 3, 4, 5].map((n) => tc.allocateAsync({ key: `a${n}`, groupKey: 'group-a', display })),
     tc.releaseAsync({ key: 'a1', disposition: 'close' }),
@@ -65,8 +65,8 @@ test('calls of one group never overlap; another group runs alongside', async () 
 test('a failed call does not stall the calls queued behind it', async () => {
   fs.rmSync(timeline, { force: true });
   const tc = createTerminalControl({ hostBin: recorder });
-  const first = tc.allocateAsync({ key: 'fails', groupKey: 'g-fail', display: { label: 'x' } });
-  const second = tc.allocateAsync({ key: 'after', groupKey: 'g-fail', display: { label: 'x' } });
+  const first = tc.allocateAsync({ key: 'fails', groupKey: 'g-fail', display: { title: 'x' } });
+  const second = tc.allocateAsync({ key: 'after', groupKey: 'g-fail', display: { title: 'x' } });
   assert.equal((await first).result, 'unknown');
   assert.equal((await second).result, 'slot');
 });
@@ -79,8 +79,8 @@ test('closing a key whose group is unknown is refused, not run outside the queue
 
 test('a route error rejects its own call and the queue moves on', async () => {
   const tc = createTerminalControl({ hostBin: path.join(scratch, 'missing-host') });
-  const bad = tc.allocateAsync({ key: 'k1', groupKey: 'g-err', display: { label: 'x' } });
-  const next = tc.allocateAsync({ key: 'k2', groupKey: 'g-err', display: { label: 'x' } });
+  const bad = tc.allocateAsync({ key: 'k1', groupKey: 'g-err', display: { title: 'x' } });
+  const next = tc.allocateAsync({ key: 'k2', groupKey: 'g-err', display: { title: 'x' } });
   await assert.rejects(bad, (e) => e.code === 'terminal-control-no-host-binary');
   await assert.rejects(next, (e) => e.code === 'terminal-control-no-host-binary');
 });

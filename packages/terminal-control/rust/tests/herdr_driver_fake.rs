@@ -436,7 +436,7 @@ mod incarnation {
         let fake = fake_at("count2", &sock).env("FAKE_HERDR_FOREGROUND", "shell").env("FAKE_HERDR_SHELL_PID", &std::process::id().to_string());
         let driver = fake.driver();
         let core = Core::new(&driver, &MeasuredSplit, core_config(&fake));
-        let allocate = |key: &str| AllocateRequest { key: key.into(), group_key: "g".into(), display: Display { label: key.into(), ..Default::default() }, cwd: None, env: Default::default() };
+        let allocate = |key: &str| AllocateRequest { key: key.into(), group_key: "g".into(), display: Display { title: Some(key.into()), ..Default::default() }, cwd: None, env: Default::default() };
         let spec = LaunchSpec { command: "true".into(), args: vec![], cwd: "/".into(), env: Default::default(), expect: None };
         // Commands herdr was asked to run by one operation; the probe at construction is not counted.
         let ran = |op: &dyn Fn()| {
@@ -458,7 +458,7 @@ mod incarnation {
             ("send refused at a shell", ran(&|| drop(core.send("k1", Some("hello"), None, false).unwrap()))),
             ("read", ran(&|| drop(core.read("k1", Some(5), None).unwrap()))),
             ("inspect", ran(&|| drop(core.inspect("k1", false)))),
-            ("label", ran(&|| core.label("k1", &Display { label: "renamed".into(), ..Default::default() }).unwrap())),
+            ("label", ran(&|| core.label("k1", &Display { title: Some("renamed".into()), ..Default::default() }).unwrap())),
             ("capabilities asking for the agent facts", ran(&|| drop(core.capabilities(CapabilitiesAsk { agents: true, ..Default::default() })))),
             ("reconcile-scan over six records", ran(&|| drop(core.reconcile_scan(0).unwrap()))),
             ("release close", ran(&|| drop(core.release("k2", Disposition::Close, None).unwrap()))),
@@ -497,7 +497,7 @@ mod incarnation {
         let fake = fake_at("shell-fg2", &sock).env("FAKE_HERDR_FOREGROUND", "shell");
         let driver = fake.driver();
         let core = Core::new(&driver, &MeasuredSplit, core_config(&fake));
-        core.allocate(&AllocateRequest { key: "k".into(), group_key: "g".into(), display: Display { label: "shell-fg".into(), ..Default::default() }, cwd: None, env: Default::default() }).unwrap();
+        core.allocate(&AllocateRequest { key: "k".into(), group_key: "g".into(), display: Display { title: Some("shell-fg".into()), ..Default::default() }, cwd: None, env: Default::default() }).unwrap();
 
         let typed = fake.dir.join("typed");
         let prompted = fake.dir.join("prompted");

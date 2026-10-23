@@ -242,7 +242,7 @@ impl<'a> Core<'a> {
         }
         // Display only: a pane that cannot be named is still a usable, recorded slot.
         if self.has("label") {
-            let _ = self.driver.label_pane(&created.pane_id, &request.display.label);
+            let _ = self.driver.label_pane(&created.pane_id, &request.display.pane_label(&request.group_key));
         }
         Ok(Allocation {
             slot: Slot { tab_id: created.tab_id, pane_id: created.pane_id },
@@ -338,7 +338,8 @@ impl<'a> Core<'a> {
         let group = self.live_group(store, &request.group_key)?;
         // A group's second and later tabs carry their ordinal so two tabs never share a name.
         let tabs_open = group.iter().map(|l| l.record.tab_id.as_str()).collect::<std::collections::BTreeSet<_>>().len();
-        let tab_label = if tabs_open == 0 { request.display.label.clone() } else { format!("{} ({})", request.display.label, tabs_open + 1) };
+        let base_label = request.display.tab_label(&request.group_key);
+        let tab_label = if tabs_open == 0 { base_label } else { format!("{base_label} ({})", tabs_open + 1) };
         if group.is_empty() {
             return self.new_tab(request, &tab_label);
         }
@@ -408,7 +409,7 @@ impl<'a> Core<'a> {
             group_key: request.group_key.clone(),
             tabs,
             group_panes,
-            request: PlaceRequest { label: request.display.label.clone() },
+            request: PlaceRequest { label: request.display.tab_label(&request.group_key) },
             limits: self.config.limits,
         };
         match self.policy.place(&input) {
@@ -690,7 +691,7 @@ impl<'a> Core<'a> {
         self.need("label")?;
         let (store, _) = self.open()?;
         let record = self.live_record(&store, key)?;
-        self.driver.label_pane(&record.pane_id, &display.label)
+        self.driver.label_pane(&record.pane_id, &display.pane_label(&record.group_key))
     }
 
     /// What the driver can do. A named anchor pane is answered by whether the

@@ -347,7 +347,7 @@ pub fn request(key: &str, group: &str) -> AllocateRequest {
     AllocateRequest {
         key: key.into(),
         group_key: group.into(),
-        display: Display { label: format!("label-{group}"), ..Display::default() },
+        display: Display { title: Some(format!("label-{group}")), ..Display::default() },
         cwd: None,
         env: Default::default(),
     }

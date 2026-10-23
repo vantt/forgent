@@ -233,7 +233,7 @@ test('terminal-allocations warns about a slot that was allocated and never launc
   const fixtures = path.dirname(FAKE_HERDR);
   fs.writeFileSync(bareShell, `#!/bin/sh\nif [ "$1" = pane ] && [ "$2" = process-info ]; then cat "${fixtures}/pane-process-info-shell.json"; exit 0; fi\nexec "${FAKE_HERDR}" "$@"\n`, { mode: 0o755 });
   const tc = realClient({ allocationGraceMs: 0 }, bareShell);
-  const slot = tc.allocate({ key: 'doctor-stuck-slot', groupKey: 'doctor-group', display: { label: 'stuck', role: 'worker' } });
+  const slot = tc.allocate({ key: 'doctor-stuck-slot', groupKey: 'doctor-group', display: { title: 'stuck', role: 'worker' } });
   assert.equal(slot.result, 'slot');
   const before = fs.existsSync(log) ? fs.readFileSync(log, 'utf8') : '';
   const root = workspace('alloc-stuck', { allocationGraceMs: 0 });
