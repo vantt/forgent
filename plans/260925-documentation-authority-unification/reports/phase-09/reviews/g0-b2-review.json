@@ -1,0 +1,656 @@
+{
+ "batch": "g0-b2",
+ "commit": "8a9385eca",
+ "verdicts": [
+  {
+   "id": "claim_a0843b462d3bf38fde961cbb25ca58a0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "f029912a0e4c608766ace0af653159831ae90d9372db42d0c42340c197c66110",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-51 at 8a9385eca, same heading ancestry ('6. WorkspaceActivationBinding'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_b1302fab2b069f48ae2cc5e5ae9353f7",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "8f43ef7f4156aaacb372835e1112fa18ccbb7e6c86f4305942e0b7ce190ac67f",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-52 at 8a9385eca, same heading ancestry ('6. WorkspaceActivationBinding'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_4b867492e168a488b4d812642f2aad61",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "c531647a87fee2b535663d8208e4dc2ad2e63a2ca0288fc3bfa0ce467d5d8346",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-53 at 8a9385eca, same heading ancestry ('6. WorkspaceActivationBinding'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_25d3080e64bc69696f28d89967456930",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "ae93ce3e1ad186d9d03c3bb3972af231bb7a4f8e84512e6f173fc46eabaa6412",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-55 at 8a9385eca, same heading ancestry ('6. WorkspaceActivationBinding'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_377f8ce648788d30644f3bc51bfe5381",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "e5ca65b2d39bde43c92d317ea1333f72a9b49876f118b19c7b948052d0e579bf",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-56 at 8a9385eca, same heading ancestry ('6. WorkspaceActivationBinding'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_2d797473f60376ca54f9086ff0856496",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "aea158cefa151ce74f44825d2d3f627775a89b2eac3991d75f3992a8b3af0e57",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-57 at 8a9385eca, same heading ancestry ('6. WorkspaceActivationBinding'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_f44d55f008d91c249201a984ce908b79",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "673db82936342a345e307a8ced5c4c17b487908f842da9a8afa187ba7c58cb8e",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-58 at 8a9385eca, same heading ancestry ('6. WorkspaceActivationBinding'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_5802544189befbf7e8e93082025a321f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "f2d4f0b786640f908765ffc7fb11e44aa64f3a85867e187ad0839862991f94cd",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-59 at 8a9385eca, same heading ancestry ('6. WorkspaceActivationBinding'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_627c2ef29f032273927e9dfb2f6590ee",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "531bc128fd8f45a372b84e1d6a9b4c5e9eb066f163e9466b8aeeaffff7b61224",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-60 at 8a9385eca, same heading ancestry ('6. WorkspaceActivationBinding'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_d1fbe2ed17042364fd3798e8f1acb938",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "975bb3acfb1d5126c48733a09c0a4557349bde8b561a6e446245638da7359648",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-61 at 8a9385eca, same heading ancestry ('6. WorkspaceActivationBinding'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_655efd23210f4e37ebb981dab1d3572d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "75d6fbcac4437f7c624d85ae3db4cbe98c2e36960543c7a7de282458a00853d0",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-62 at 8a9385eca, same heading ancestry ('6. WorkspaceActivationBinding'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_ba307bc371864f9cec89f991fef61744",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "f61ecb0982aff38fccc339f63f900333b142c77edc3bf3a81475e1da0cd20637",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-63 at 8a9385eca, same heading ancestry ('6. WorkspaceActivationBinding'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_3673677485dd4449067c9e5074623e1a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "8a8c23db31b361175cedf18c4ea60b1d73cca62929a2b614221245ea4d0e5ef8",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Source runtime-identity-and-activation.md#unheaded-block-64 carried verbatim at target unheaded-block-29 under '6. WorkspaceActivationBinding'; target adds a dated 2026-10-14 status note marking the bootstrap-context permission as unimplemented design (verified: preflight_candidate in packages/distribution/rust/src/init.rs never executes candidate code); must-not obligation kept, no clause dropped."
+  },
+  {
+   "id": "claim_ba9547c5587487b5a423db3dfbd2a593",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "ecef649b01ae6af831a0753398c1b40b0ddb9e74872598fd2e1f80e9d97f7fd0",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-65 at 8a9385eca, same heading ancestry ('6. WorkspaceActivationBinding'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_107a23bb29dcf6db15e2471d7e77590b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "32ed2911ff1cb102556457cedcb09bc826245f9788d7bbef7333a241086f071b",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Source runtime-identity-and-activation.md#unheaded-block-66 carried verbatim at target unheaded-block-31 under '6. WorkspaceActivationBinding'; target adds a dated 2026-10-14 status note marking the bootstrap-context permission as unimplemented design (verified: preflight_candidate in packages/distribution/rust/src/init.rs never executes candidate code); must-not obligation kept, no clause dropped."
+  },
+  {
+   "id": "claim_9b88f0158d85f69a82792e4b47f72022",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "40cb40633c1a753b9140f038c950b0f9e3f6fca783d150fb7e5afd632ee6c36f",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-67 at 8a9385eca, same heading ancestry ('7. Invocation Lease'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_5d408ebec2a9651d66e1dceb37b133aa",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "b22a1bf29af635a2fa8f8d593692878239ab56d84cfaf0bb70be2a260ec4f9f2",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-68 at 8a9385eca, same heading ancestry ('7. Invocation Lease'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_644be2fa35959c10348a048777c5f1b9",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "919d064f8cbfa7f6abf89139762a28f95200027af4ee47be7622a1f0477d9467",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-69 at 8a9385eca, same heading ancestry ('7. Invocation Lease'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_6db1dcef195562e8c4244f6ad6d0a032",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "2f00a2e21af4baa9ff6f7b734375e38f03760f2b5df675d2e2fd51c57c9b27e6",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-70 at 8a9385eca, same heading ancestry ('7. Invocation Lease'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_a56575cde3ab1f361ab6e7079699886f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "bfada3f3bcdc0eb2a4692ad0e47c6b0f9abe924bcb696d6280e76d7ebdd82049",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-71 at 8a9385eca, same heading ancestry ('7. Invocation Lease'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_14de31f9e2756afe4d30767125f2f302",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "4663939697cf0098b09b08a54c91cfe2e471a4eecad6c79508a6912f1fbcb033",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-72 at 8a9385eca, same heading ancestry ('7. Invocation Lease'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_3ef278de1f3aec5f3020e1aa0b5ce269",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "f153f76b254dd82057f8dbe652345e2015b37d540a348bf8ce9de26bb7d8acc7",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-73 at 8a9385eca, same heading ancestry ('7. Invocation Lease'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_566ba6b6f52ab7360edd78e376c925ba",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "9fe9790da17f25ab91565b1e9634449645f7c6557453f56d212a3547e9de964f",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-74 at 8a9385eca, same heading ancestry ('7. Invocation Lease'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_902e921806fa75a30ff3879ae1f85761",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "a5633affea672349ecb1a2e635122e8e2013f6e2bea0253266790d282e4e99dd",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-75 at 8a9385eca, same heading ancestry ('7. Invocation Lease'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_13dd8473351e86bde28b379f9fbeb00f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "9f2d050264e54653f50353dc19996bbd2feed45374d1584ce187974a8c1d6c24",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-76 at 8a9385eca, same heading ancestry ('7. Invocation Lease'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_9abe48d0f9a2dc345830741d5ab789c8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "d2b7742d66dca70f890aea7612004a29827723264040e8ca854bb14d041f3bf6",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-77 at 8a9385eca, same heading ancestry ('7. Invocation Lease'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_9b6a43d8cd95739a1b4b582898073233",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "bd47e8b09b22234f7d214b5f29610ed474ccc7e5e7608f2c1978629cb2e92402",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-78 at 8a9385eca, same heading ancestry ('7. Invocation Lease'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_bee69c9fafc3e15fc38dd82f1b54acc9",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "e6bab077bf75e883ac826cf0f222afde0304466e7bcbcd40eab5bb503c98bc46",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-102 at 8a9385eca, same heading ancestry ('10. MigrationJournal'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_4a2a23337b8495f1940fd9e3226e9d31",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "afb1dc67bf59be9efcc449d1b15ffa9a5cbf6c8869a29a4b18237106fe102333",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-103 at 8a9385eca, same heading ancestry ('10. MigrationJournal'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_181a82457153d16a123d8c3378c30c98",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "c08c0b5d586c6783f6c35ad0b993afacc26b961800806922de0c710dfad7fe16",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-104 at 8a9385eca, same heading ancestry ('10. MigrationJournal'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_c6869299794e7b0b8faebb525521af54",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "95e47bb3821804dc249b272633b7f95ff9dc825be58ae2f4e8c407d61d14a4ef",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-105 at 8a9385eca, same heading ancestry ('10. MigrationJournal'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_bbe6d0ce5f2af5471b4b0f830209f3c6",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "9fcf06c7a6613de9514f60185bb78de813dd70d208abb1ed0ddfdee8249a64da",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-106 at 8a9385eca, same heading ancestry ('10. MigrationJournal'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_573f1ab0c14672c3e3d1893b96f5e6ef",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "6fe0b121505a48d680aad2fad3e9c016e66d271de6087949c4191f2ea7496dd3",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-107 at 8a9385eca, same heading ancestry ('10. MigrationJournal'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_491998778e598a5385e78b541e33bff8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "2beddad4a831ab80e49e1f7ab45468bb6c2592ea70aead4c5109a012b7ec774b",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-108 at 8a9385eca, same heading ancestry ('10. MigrationJournal'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_bd90f346258ea0333f0e9b09949a2bae",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "baa8517192745056a908d4186623c6e39cfffea3f7778d74ff62f22eb16e4ced",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-109 at 8a9385eca, same heading ancestry ('10. MigrationJournal'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_5a5a447d501facb835101fcf15cf5f9d",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "bd11710e287d7617b7a8f17a288159fb38cb402fce0975f96401b77658dbf012",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-110 at 8a9385eca, same heading ancestry ('10. MigrationJournal'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_0d7b6c7bb749583718df925f63a8ba7f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "6e4ca2b1c4a49591c52f2f1f690e86ae71adfde8cff0e3dfe65fbae9b97c69b8",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-111 at 8a9385eca, same heading ancestry ('10. MigrationJournal'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_eb0ec8c42d305f6fc227246824a4e360",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "0a846402eefaf49cb117be4a2c87be3054704d448fa5454dc9cf62e5c19f5239",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-112 at 8a9385eca, same heading ancestry ('10. MigrationJournal'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_30369b94b606096331ba0ac8215dfe6f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "5f3beac26da02d87a1952d16c0dc1b94a055fb2cba6d28fb99515ce78b307305",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-113 at 8a9385eca, same heading ancestry ('10. MigrationJournal'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_3a0164aced10388208f0c748829bf990",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "1df2a48c7196f7715a205705481783735a44f381740972b89ce17cff7d153ab6",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-114 at 8a9385eca, same heading ancestry ('10. MigrationJournal'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_ec133e4ac5ee546b775219835450cb9a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "96feac1dccf714291a3efd92fd6695ea5db4270768ab24352ac529f80b0ae273",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-115 at 8a9385eca, same heading ancestry ('10. MigrationJournal'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_6ed197b95e7f9801fa8298694177e5d0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "c283c3d5382c84ced52a8555fb5eca423ae7be71b02937c5474006645f9d4ac3",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-116 at 8a9385eca, same heading ancestry ('Existing Project Adoption'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_a144f2fd3dd53acd12feeb7e72607de9",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "216d22e9de83ecc054a0bc1389457469c4905d213d2c4ad6c98bc35268a4c5dd",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-117 at 8a9385eca, same heading ancestry ('Existing Project Adoption'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_2929202af5d9245fafd9c8fe0055e494",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "60cea539f50a82957eb0539538c2143253c14f0f55a4776cc871d6eb6b3473b2",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-118 at 8a9385eca, same heading ancestry ('Existing Project Adoption'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_ed503fa8fc58ad877bf8c8faa3f7958b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "adfe7145c2ba9ce6cc651e786e7af648da6478762443644e8eeaee596d575da1",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-119 at 8a9385eca, same heading ancestry ('Existing Project Adoption'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_26bc6a190eda16e49745b6bcc7fbc379",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "d391e6ca22d33522a504ec61e80b46a3a76ddab6dfc79eee57ce05488e3b19e6",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-120 at 8a9385eca, same heading ancestry ('Existing Project Adoption'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_a5d4be2b9bafbb6afe85aa62070351e0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "253b090264aff008fdb5af5a00371e92054cb7ce13cbfbd97c1ab81d6daf229c",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-121 at 8a9385eca, same heading ancestry ('Existing Project Adoption'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_b0de344d5a30b83c57e0ff1b963c4c43",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "b2e03b5532621283798f09a54ef4b76233694d0e5e66b4d105ffdf196723f9ae",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-122 at 8a9385eca, same heading ancestry ('Existing Project Adoption'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_89796d37e2377576e2e7202f34b08ea8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "f0a57829c10a1b38db9b51ae8995e7238dad18721fe8832c5318c2cc1a747d9e",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Target unit byte-identical to source runtime-identity-and-activation.md#unheaded-block-123 at 8a9385eca, same heading ancestry ('Existing Project Adoption'); full carriage in the area's retained-source section of contracts/activation-binding.md."
+  },
+  {
+   "id": "claim_83a4a91369ae5c2fd8959d7835a2f76e",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-step09-main-import-accounting.json",
+   "bindingSha256": "609e5fb5fbe705ba148c22c546244f3fadf563e8d9024122765a67b2399baf83",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+   "verdict": "REWORK",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": false
+   },
+   "reason": "activation-binding.md#unheaded-block-19 carries the pre-88a702f6f source text (sourceUnitDigest 06a65a23...): 'On Windows, fgctl init/upgrade/repair refuse with lock-driver-unavailable until the Windows lock driver exists'. At 8a9385eca the legacy source runtime-identity-and-activation.md#unheaded-block-54 (digest e617921c...) says the same locks work on Windows through LockFileEx (holder-lock driver/windows.rs exists). Current source passage is unbound and the target keeps a superseded Windows claim; recompose the target unit from the current source and rebind (likely also a source-context-and-post-pin-recomposition item)."
+  }
+ ]
+}

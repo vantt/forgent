@@ -1,0 +1,786 @@
+{
+ "batch": "g7-c5",
+ "commit": "8a9385eca",
+ "verdicts": [
+  {
+   "patchSpecId": "file:.githooks/pre-commit",
+   "path": ".githooks/pre-commit",
+   "beforeSha256": "6892588186705ff83c5860e3bc57235f4c099ce8980c896af3e3208cbae4d683",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Both refusal messages retarget the moved how-to; sibling consumers src/runner/merge.mjs and test/runner/merge.test.mjs are individually parked (tracked)."
+  },
+  {
+   "patchSpecId": "file:AGENTS.md",
+   "path": "AGENTS.md",
+   "beforeSha256": "30f6499b652d02e15f1f24144dd90731a1ad49a312e968dae3b04fc11cd7227d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Repoints system-overview, reading-map, D-ADR0030 (decision-file anchor resolves) and distribution spec correctly. Remaining docs/specs/platform-foundations.md (L29/L151/L163), 'area spec under docs/specs/' (L40) and docs/specs/<area>.md (L14/L75) are individually parked (park families carry-foundations-and-retired-decision-narratives / split-area-holder-mapping, matrix rows r00728-r00763), not dropped by this spec. Fgos Effective Instructions block is a render of core/instructions/platform-laws.md."
+  },
+  {
+   "patchSpecId": "file:apps/fgos-gateway/src/gateway.rs",
+   "path": "apps/fgos-gateway/src/gateway.rs",
+   "beforeSha256": "24439c4bc70c23b47979f1d3aa853b653828d73b1b3d7a1264c03f94c5de4a47",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Runtime contract read path (L1187) and test fixture move with the yaml; target is byte-identical to the legacy yaml. Pre-existing (not introduced): cited ':54-59' for servers.url is stale in both copies (servers block is at L57-59). mcp.rs consumer composed in another batch."
+  },
+  {
+   "patchSpecId": "file:apps/fgos-gateway/web/src/App.test.tsx",
+   "path": "apps/fgos-gateway/web/src/App.test.tsx",
+   "beforeSha256": "36dcbe12fd1175058dcfae826d0b141be00cd48018aba178477754b71c55384e",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:apps/fgos-gateway/web/src/App.tsx",
+   "path": "apps/fgos-gateway/web/src/App.tsx",
+   "beforeSha256": "e773360e01f1b4851b8390cb8cf975e4cdcb04dbd9327aa21aac36ce9b52978e",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:apps/fgos-gateway/web/src/api/client.ts",
+   "path": "apps/fgos-gateway/web/src/api/client.ts",
+   "beforeSha256": "462686f57dabbbfb487309df49aa276224d1866b8b970248b0166d770f4d63cb",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:apps/fgos-gateway/web/src/api/errors.ts",
+   "path": "apps/fgos-gateway/web/src/api/errors.ts",
+   "beforeSha256": "177282665dd0ed07aeaa6242bd7bfb9b8e0561fd57e9971aba736517d6be65b5",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:apps/fgos-gateway/web/src/api/types.ts",
+   "path": "apps/fgos-gateway/web/src/api/types.ts",
+   "beforeSha256": "ee921f18e8b6b4a0b5b0e37e4739488254c1b0dc9b90871e1de28cd21d3969fa",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:apps/fgos-gateway/web/src/lib/network.ts",
+   "path": "apps/fgos-gateway/web/src/lib/network.ts",
+   "beforeSha256": "167d4741830756c229f6b492defa0a2d809e5f1bfc057daee54c5eaf9cf11319",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+   "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+   "beforeSha256": "66493b27c3dede73be383d786cf5342ed7770fad9a9bbbf982adac0e01b6056e",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+   "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+   "beforeSha256": "c9716c0cb1e719e2e3701dd494cf3265c4512cd544813a72180eca7624d8611b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:core/instructions/platform-laws.md",
+   "path": "core/instructions/platform-laws.md",
+   "beforeSha256": "4b834fa5ea7db1d9637a3126a7a96f7758be2f1650131411c4e69b3a91ac6f90",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Authority statement moves to docs/platform/platform-foundations.md, matching minimum-constitution singleton holder. All 11 anchors resolve under the repo's generate-doc-inventory slug; they do not match GitHub's raw slug (em dash -> '--'), same as the legacy anchors, so not a regression. AGENTS.md render follows via regeneration."
+  },
+  {
+   "patchSpecId": "file:core/skills/_shared/catchup-self-recovery.md",
+   "path": "core/skills/_shared/catchup-self-recovery.md",
+   "beforeSha256": "47260927356224b244adab9dfe2318f3817c5b182ea69f3def67935281bee370",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:core/skills/_shared/citation-format.md",
+   "path": "core/skills/_shared/citation-format.md",
+   "beforeSha256": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:core/skills/_shared/executor-dispatch-fallback.md",
+   "path": "core/skills/_shared/executor-dispatch-fallback.md",
+   "beforeSha256": "1ddb25179a37b27b49feaaa52c8c8d7c367a9f522607a9caf7abedbe78ef1f29",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:core/skills/fgos-clarifying/SKILL.md",
+   "path": "core/skills/fgos-clarifying/SKILL.md",
+   "beforeSha256": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:core/skills/fgos-indexing/SKILL.md",
+   "path": "core/skills/fgos-indexing/SKILL.md",
+   "beforeSha256": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:core/skills/fgos-researching/SKILL.md",
+   "path": "core/skills/fgos-researching/SKILL.md",
+   "beforeSha256": "a08b3797131892f339e15b18aba9792ff3fc5d448261cafd59264b2d5ce2f9c8",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:core/task-specs/fgos-indexing.md",
+   "path": "core/task-specs/fgos-indexing.md",
+   "beforeSha256": "4a23450a73f61c2cc9bc63a5b7eee88eb44d07855a76a8d37c5943edc27e63fd",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:domains/coding/AGENTS.md",
+   "path": "domains/coding/AGENTS.md",
+   "beforeSha256": "f0b4079e790b0c85f56be179670e2c8bf0026b8759e4db602a8006bef469a924",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:domains/coding/skills/fgos-coding-discovering/SKILL.md",
+   "path": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+   "beforeSha256": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+   "path": "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+   "beforeSha256": "6b188d5ee25ba155e7988e694d7a0dafef07589cbdbd51b304d6c54449564042",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+   "path": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+   "beforeSha256": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor path is line-wrapped inside the directory name, mirroring the legacy wrap; resolves when rejoined. Not a new break."
+  },
+  {
+   "patchSpecId": "file:domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+   "path": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+   "beforeSha256": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor paths resolve; second path is line-wrapped mid-name, mirroring the legacy wrap. Not a new break."
+  },
+  {
+   "patchSpecId": "file:domains/coding/skills/fgos-coding-shaping/SKILL.md",
+   "path": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+   "beforeSha256": "04d749a7f036cf4f29caa8c82c5bd79426046508ef3cf8d71e47e0b5c72ea432",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:herdr-dashboard/src/pane_scan.rs",
+   "path": "herdr-dashboard/src/pane_scan.rs",
+   "beforeSha256": "4e71fa33d2081c4e36bee7c0d90c5c85cbb7a203bce86117e9a43e408ad0ec10",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:packages/distribution/rust/src/manifest.rs",
+   "path": "packages/distribution/rust/src/manifest.rs",
+   "beforeSha256": "cc45d293313bf2de2b912293a52dc1f76214eb4c06b56b28f90ab52d640d274a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Drops the runtime-identity-and-activation.md §5 citation and retargets to release-manifest.md#2-frozen-schema-v1-shape; this follows the recorded L12-62 judgment (record reference-002293: types implement frozen schema/field invariants, sections 2-4 carry the claim). The §5 source text is carried verbatim in release-manifest.md 'Retained Runtime Identity And Activation Source Detail'."
+  },
+  {
+   "patchSpecId": "file:plans/reports/phase-lead-261018-2025-controller-death-p06-doctor-docs-changelog.md",
+   "path": "plans/reports/phase-lead-261018-2025-controller-death-p06-doctor-docs-changelog.md",
+   "beforeSha256": "04321ac50fee6fd96b40efb45dd09a9d7499b6f222a38a4d245632092eef6f1d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "PF-I011/PF-I012 -> PF-I022/PF-I023 is the reconciliation recorded in phase-08 owner-answers.md:26 (main rows renumbered on collision); ledger rows 92-93 hold the controller-death and cwd-lease intents."
+  },
+  {
+   "patchSpecId": "file:plugins/fgOS/skills/cleanup-loop/SKILL.md",
+   "path": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+   "beforeSha256": "952474402b90ec3582ad8b55e1c5a03cfc98c11630c3b7c522bb244a235ed871",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:plugins/fgOS/skills/retro-loop/SKILL.md",
+   "path": "plugins/fgOS/skills/retro-loop/SKILL.md",
+   "beforeSha256": "b134815fe10d13c4351a4d5f11b5e18db796b086afacc2767a062c218f7c892d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:plugins/fgOS/skills/terminal/SKILL.md",
+   "path": "plugins/fgOS/skills/terminal/SKILL.md",
+   "beforeSha256": "65fdc9d4360dce4ed0c859879160e57bda72157b9edff99b3bff429b27c9e294",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:scripts/backfill-status-category.mjs",
+   "path": "scripts/backfill-status-category.mjs",
+   "beforeSha256": "559976e36826b535131e2638e024186a051182339b8012b89b857efa4422582f",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:scripts/check-doc-candidate-status.mjs",
+   "path": "scripts/check-doc-candidate-status.mjs",
+   "beforeSha256": "f06732e0f838efe638a4df8372cd3d934e4b61dfcea0ec69cb129b94c556ab94",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Comment retarget is correct for the doc-governance.md -> docs/platform/governance.md move, but becomes true only when the parked r26 reader patch to scripts/check-doc-constitution.mjs:221/264 is composed in the same cutover (tracked park, blocker b137-b139)."
+  },
+  {
+   "patchSpecId": "file:scripts/herdr-cockpit.sh",
+   "path": "scripts/herdr-cockpit.sh",
+   "beforeSha256": "486b87ae6e1ffd877971dd21b0fec7d375c8b83d0e83f1972cfa4b700720eddd",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:scripts/next-doc-id.mjs",
+   "path": "scripts/next-doc-id.mjs",
+   "beforeSha256": "7e88c69cf6c78b4cce5240d3fcc34a1182fc963933435827a58974df5458bc9d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:src/intake/discovery.mjs",
+   "path": "src/intake/discovery.mjs",
+   "beforeSha256": "6da596afa6d305cd8431a7f79659c04449bfe7ecd793bc5600fd11cd2cff9c1b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:src/intake/plan.mjs",
+   "path": "src/intake/plan.mjs",
+   "beforeSha256": "c3c72be35468420d9f42bcf23a0bdec9e48a11c1f4d8dd6bb4b9be09f4c60dc6",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:src/intake/verify-pattern-check.mjs",
+   "path": "src/intake/verify-pattern-check.mjs",
+   "beforeSha256": "1cfe3feb6375b999c4b851f6e9ef8fce7b1fb1209a81c29dd0a043939cb69e0c",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Constant keeps the same filename, so test/intake/judge-verify-second-pass-stability.test.mjs:71 regex still matches; #the-trap section holds the reporter-format gotcha."
+  },
+  {
+   "patchSpecId": "file:src/runner/dispatch/assignment-runner.mjs",
+   "path": "src/runner/dispatch/assignment-runner.mjs",
+   "beforeSha256": "189752bbe501819986037a1e0fbb9c56681e6b7d034da921f5fe313fccac560b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:src/runner/dispatch/confinement/authority.mjs",
+   "path": "src/runner/dispatch/confinement/authority.mjs",
+   "beforeSha256": "e618d5997f85e200c50f6459c43f08f31852bbd6cefb6c27c128c4e845c78709",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:src/runner/dispatch/confinement/backend-registry.mjs",
+   "path": "src/runner/dispatch/confinement/backend-registry.mjs",
+   "beforeSha256": "8c07146b675d4ad1086c88685de4a521c7004bc00de39e20d2dbb99d96bfa1ff",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:src/runner/dispatch/confinement/policies.mjs",
+   "path": "src/runner/dispatch/confinement/policies.mjs",
+   "beforeSha256": "cc531111c8fc233ca9557d5ba89ab119ad3c4870145dc9ffcc865fcd87599d1f",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:src/runner/dispatch/confinement/request.mjs",
+   "path": "src/runner/dispatch/confinement/request.mjs",
+   "beforeSha256": "aba50726b489db9763742539c462cf269461943576472c71e84d2d7fe248f185",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:src/runner/dispatch/herdr-round.mjs",
+   "path": "src/runner/dispatch/herdr-round.mjs",
+   "beforeSha256": "d964dcab21c72000fa01f4c37bc0a70f0124cc0812e4a94742f355f5b2fb0a20",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:src/runner/dispatch/run-lock.mjs",
+   "path": "src/runner/dispatch/run-lock.mjs",
+   "beforeSha256": "6163eab9be0fa44f6ac4b80d800ddc6fc615a23d698b392df63f427e2356c53d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:src/runner/dispatch/transport.mjs",
+   "path": "src/runner/dispatch/transport.mjs",
+   "beforeSha256": "10e62b5eb4514e169bb1b96b4db4198ec21179797ddbe0f642a37b56372dc134",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+   "path": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+   "beforeSha256": "845861f6c8d55ab31e656fb6a54b6c3f6a51507fd02352de15146b7b08cd474a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:src/state/events-jsonl-truncation-guard.mjs",
+   "path": "src/state/events-jsonl-truncation-guard.mjs",
+   "beforeSha256": "93bb6efa390d3e8a58b84399dc90c0b50298c96d6bc4876620deb37d08068965",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "test/setup/checks.test.mjs:383 matches by basename; registrations.mjs composed separately."
+  },
+  {
+   "patchSpecId": "file:src/state/gate-bypass.mjs",
+   "path": "src/state/gate-bypass.mjs",
+   "beforeSha256": "723e40beb662fb094a4ee832fa0755cfc554d01c7623cf411eeda1092e9247b8",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:src/state/priority-formula.mjs",
+   "path": "src/state/priority-formula.mjs",
+   "beforeSha256": "5a1767b93f0155567472eb059899aa993a147ecc0e0aaf75dafe8e93da72d6fe",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:src/state/replay.mjs",
+   "path": "src/state/replay.mjs",
+   "beforeSha256": "258dd5a97b47007efba895b45cac5fb000695cab25d6e4e68cb2925f99463032",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:test/cli/fgos-merge.test.mjs",
+   "path": "test/cli/fgos-merge.test.mjs",
+   "beforeSha256": "e6ecac9546eb9fea6188b88179883c7c1212c8048c5f0cc2e1347c1fd3cfed3d",
+   "verdict": "REWORK",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": false
+   },
+   "reason": "Hunk @@ -922,8 +922,8 @@, added line 2 ('+' empty line after the rejoined comment): inserts an unrelated blank line inside the test body that detaches the comment from the assert it explains; drop it (net -1 line), keep the single-line path rewrite."
+  },
+  {
+   "patchSpecId": "file:test/docs/decisions-corpus-retired.test.mjs",
+   "path": "test/docs/decisions-corpus-retired.test.mjs",
+   "beforeSha256": "fd8b2e38773f33f71a6507876a7f5d2cc4bd1b61f9bbd8a4246e7f56a29b18b2",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Retargeted runner and system-overview narrative targets replayed: each holds exactly one retired-section heading, same ### id set as legacy, runner keeps '### 0032 — Cổng Iron Law'. Remaining docs/specs/* targets and test titles are in the parked family (7 items)."
+  },
+  {
+   "patchSpecId": "file:test/intake/plan.test.mjs",
+   "path": "test/intake/plan.test.mjs",
+   "beforeSha256": "420f8279615e5f2415ce61b8c6ff53a7e11863d9e737f4f16c1d6a68f044d062",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:test/report/enduser-index.test.mjs",
+   "path": "test/report/enduser-index.test.mjs",
+   "beforeSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Uses REAL_DEMO_DOC_PATH (imported from the fixture, edited in step); knowledge doc frontmatter type how-to and title match the asserted values; enduser-index-generate already scans docs/knowledge."
+  },
+  {
+   "patchSpecId": "file:test/report/helpers/docs-index-state-fixture.mjs",
+   "path": "test/report/helpers/docs-index-state-fixture.mjs",
+   "beforeSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:test/runner/dispatch-worker-home.test.mjs",
+   "path": "test/runner/dispatch-worker-home.test.mjs",
+   "beforeSha256": "af466a08f94b3daca86d4fce1e18d47b9973cc20ad10be78e9dea677df91d2e5",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:test/runner/dispatch-worker-session.test.mjs",
+   "path": "test/runner/dispatch-worker-session.test.mjs",
+   "beforeSha256": "ce16de65fa9b60c94ae08b26ad37e9d8ac4c6f4766796d3a6570be0cbfa0c6c4",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:test/runner/prompt-templates.test.mjs",
+   "path": "test/runner/prompt-templates.test.mjs",
+   "beforeSha256": "fd208d60c7d244155735ff6ab272ae7a8b00489b40a5c6ba2a042355edb14a1f",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  },
+  {
+   "patchSpecId": "file:test/state/status-category.test.mjs",
+   "path": "test/state/status-category.test.mjs",
+   "beforeSha256": "72b5ef557874f62cd46c9c3ceff229ee7a90520e642a5da5dc5e50989f7e1424",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Path-only successor retarget; target (and anchor if any) resolves at the review commit and carries the cited claim; no other bytes changed."
+  }
+ ]
+}

@@ -1,0 +1,890 @@
+{
+ "batch": "g7-c2",
+ "commit": "8a9385eca",
+ "verdicts": [
+  {
+   "patchSpecId": "file:docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+   "path": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+   "beforeSha256": "335f841c251e26b20e1d90df286f78893539447312917f348215b80691dcd221",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+   "path": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+   "beforeSha256": "cd5a163ad56d54b8dbeb6adef4c66a46a3a117d94030ecd22059cfa76faacef5",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md",
+   "path": "docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md",
+   "beforeSha256": "cfc6a567001d8b5e428947fb961b7131e1762d7915ea89dfc36f4d4f3e316df8",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md",
+   "path": "docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md",
+   "beforeSha256": "1313d1321b7d2a78eebbcb829bbc00e20722e195197e197be2a097aa1fd38105",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-t/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md",
+   "path": "docs/knowledge/fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-t/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md",
+   "beforeSha256": "4d8e3db9eeec998c41754c26f58b1261129483b66c5a5e01e84ae287732d829c",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/fgos-choke-point-survey-ranked-priority-table/fgos-choke-point-ranked-priority.md",
+   "path": "docs/knowledge/fgos-choke-point-survey-ranked-priority-table/fgos-choke-point-ranked-priority.md",
+   "beforeSha256": "f61d2f9593247a79448e68fbfa7ca6a2f493520b412c1d5d5e0ce8f9cec89a9d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md",
+   "path": "docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md",
+   "beforeSha256": "f75d9cae8528ae9133005c486ab199b3371240ce107f899285c537c68fdd68c0",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/fgos-discover-claim-via-pick-not-take/fgos-discover-claim-via-pick-not-take.md",
+   "path": "docs/knowledge/fgos-discover-claim-via-pick-not-take/fgos-discover-claim-via-pick-not-take.md",
+   "beforeSha256": "6dfccb72d3bb6bab46aa19363bf2f015fb8068246757fdde47430c4c5204ff62",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md",
+   "path": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md",
+   "beforeSha256": "ad742609be038caf09f1539018617985e8005b0108b89ebeced77b4e038b6f1d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+   "path": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+   "beforeSha256": "f2e595c0d9a9e0a28343550650724c837bb88b009453643b630c2cb1c03504c9",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling/fgos-slots-verb-output-fields.md",
+   "path": "docs/knowledge/fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling/fgos-slots-verb-output-fields.md",
+   "beforeSha256": "309d2306a7640fb9ed998ee566c1418e5876c66c111b291c9a9d1aecaa8e6ad0",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
+   "path": "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
+   "beforeSha256": "624096b072563c683d65524afdbc8ce9388ef7b397a53f1306ae66015e11d895",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md",
+   "path": "docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md",
+   "beforeSha256": "842f0b17e2a079038d822d3c852129a770380d9cb89224c40e7818a093601784",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
+   "path": "docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
+   "beforeSha256": "e3ed833f548343d2890007ac979ef7733f1f507809d9c4a39fbeca4a0d8d820d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md",
+   "path": "docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md",
+   "beforeSha256": "1221fe9e42fc8e502336111d5aaeb32eb5cf6b9e7953d63e3e5a4a0355790f88",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+   "path": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+   "beforeSha256": "0c5fb0a517eabc77270d2fdc9dbe9511b7161e580d4394d6927c8256fb209b82",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-add-a-new-createworktree-call-site-without-hand-writi/add-a-new-createworktree-call-site.md",
+   "path": "docs/knowledge/how-to-add-a-new-createworktree-call-site-without-hand-writi/add-a-new-createworktree-call-site.md",
+   "beforeSha256": "0f4e629f27e87bec8f74454beadf73ebf3a05a886ba19e2588c5a05bdd66b925",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
+   "path": "docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md",
+   "beforeSha256": "2f87936ff3b34e2b010a9ddafb4b71498b85d2a6c88ba1ec7b5141f2092d16ea",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md",
+   "path": "docs/knowledge/how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md",
+   "beforeSha256": "e77131726159bebaf17b9a38b9974931d90164889aca0b8292383ed356820194",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
+   "path": "docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
+   "beforeSha256": "f952ed43669de1f53ddd0de6a0638e58f509d9c7ecca381638999ddae0b34f18",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md",
+   "path": "docs/knowledge/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md",
+   "beforeSha256": "ba9c6556e0b732dd6d568f6e23a31861a49359e631032c7817ca3ef3dbcfa739",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+   "path": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+   "beforeSha256": "c4c6f331c0babff2a992795d0ddb79d8e8979a25eb73eaa04bd45a33dadb4508",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+   "path": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+   "beforeSha256": "2a5b3538928a48760ac7d12b69c1ac8f246ad18bb00b15f69c4cdd72655655eb",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-close-out-a-work-item-whose-real-work-was-already-don/close-out-a-work-item-already-done-before-claim.md",
+   "path": "docs/knowledge/how-to-close-out-a-work-item-whose-real-work-was-already-don/close-out-a-work-item-already-done-before-claim.md",
+   "beforeSha256": "07e7ae9b6c9cb82166a173ca7080c05d467ce3fc964f15449dd88adddfc92c75",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-compute-a-parallel-dispatch-wave-schedule/compute-a-parallel-dispatch-wave-schedule.md",
+   "path": "docs/knowledge/how-to-compute-a-parallel-dispatch-wave-schedule/compute-a-parallel-dispatch-wave-schedule.md",
+   "beforeSha256": "7314f45f7cd7ead7674a191cb4d14c5858ed42b3094fa989535551924d77be48",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md",
+   "path": "docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md",
+   "beforeSha256": "a035697208d154d300edb351600eab8e461c2dc528957594c95b72004527af9d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-declare-footprint-when-fgos-coding-planning-splits-an/declare-footprint-when-fgos-planning-splits-an-item.md",
+   "path": "docs/knowledge/how-to-declare-footprint-when-fgos-coding-planning-splits-an/declare-footprint-when-fgos-planning-splits-an-item.md",
+   "beforeSha256": "63ab10697f6f761084aadc066b46043b58f6e805e77be1e63efead0c070e302c",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+   "path": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+   "beforeSha256": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-grant-a-nested-claude-p-executor-call-its-own-scoped/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md",
+   "path": "docs/knowledge/how-to-grant-a-nested-claude-p-executor-call-its-own-scoped/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md",
+   "beforeSha256": "1abca99e51bdc7f8500c688b549ddc831d30ae93cc9eeadb8d7d4afe7d0d38b9",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md",
+   "path": "docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md",
+   "beforeSha256": "9a6eb886b832172f4e059f000a99ca95139a5150115a25af568e93dd728c37d3",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos/pass-a-caller-supplied-verdict-to-discover-or-decompose.md",
+   "path": "docs/knowledge/how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos/pass-a-caller-supplied-verdict-to-discover-or-decompose.md",
+   "beforeSha256": "b1acdcb28d00a15495ee01712089c9fb5a806c00a23970e536df96a232d7465a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-s/recognize-a-claude-code-hook-spawn-enoent-failure.md",
+   "path": "docs/knowledge/how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-s/recognize-a-claude-code-hook-spawn-enoent-failure.md",
+   "beforeSha256": "018d70650e43c5581e5e29747232be1b514d5fbc13ad01e622d3f893ee54eeb3",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md",
+   "path": "docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md",
+   "beforeSha256": "5acf88d76e1a437c85661672129003116298037972bcb18151e1d63e82141c0e",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+   "path": "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+   "beforeSha256": "e552fb38bc9b1fbb415512b2ab0975703dfe8295621a89bb9a25e61efcda7144",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-recover-a-blocked-merge-conflict-item-when-fgos-catch/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md",
+   "path": "docs/knowledge/how-to-recover-a-blocked-merge-conflict-item-when-fgos-catch/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md",
+   "beforeSha256": "34113d4abada8b419df858ebe4fe3507110a9294d3f42490a91493e9c16b18c2",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation/recover-a-stuck-doing-claim-after-worktree-creation-failure.md",
+   "path": "docs/knowledge/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation/recover-a-stuck-doing-claim-after-worktree-creation-failure.md",
+   "beforeSha256": "456db3126fffc12422cada04e46ad0e699cad632790361d7c14471c58ccc9965",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+   "path": "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+   "beforeSha256": "580077e82919d354ca2e905d5ee54e0c40f86fd1b745c3163a53384c5951ff2c",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+   "path": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+   "beforeSha256": "7f647ad2b7018ed4f490179321407228cb13dd2a9176d2241e9218593d4c569a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+   "path": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+   "beforeSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md",
+   "path": "docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md",
+   "beforeSha256": "88f14ab11fee895292e401b9a6df75cded6b493691012c173c589cd936ebbb04",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+   "path": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+   "beforeSha256": "1a8538b7cdea6dd66d14df178bef307bad333305eaae3a9a3893c0c96a662605",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+   "path": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+   "beforeSha256": "ec9f6195763d768c6470a0b3751bf82f3043b5ddd6be7ff88401ed8d2ed4307a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+   "path": "docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+   "beforeSha256": "627526f65f8b85949f2538f35c3fc9814959a4c958caac1a5b329372ad8062dd",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+   "path": "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+   "beforeSha256": "b1b62aed4f6eb7afe365aca1d66053643d33f659f67d61d719b8d021e42bb467",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md",
+   "path": "docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md",
+   "beforeSha256": "460e526a3d5602d2a541b836a770a0a9609134cd5c1325c422f5d640ca05461b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md",
+   "path": "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md",
+   "beforeSha256": "abfe5ba54e0f8b9a9a10434f4d42da0290e03e7ff5a6ed8ce6d19611e8800ebf",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-wire-a-headless-function-through-an-agent-executor-ex/wire-a-headless-function-through-an-agent-executor-executor.md",
+   "path": "docs/knowledge/how-to-wire-a-headless-function-through-an-agent-executor-ex/wire-a-headless-function-through-an-agent-executor-executor.md",
+   "beforeSha256": "f4b936f885ab8718273d76695bb31753337e4658d5a59b3a2ef78f3ef6e74018",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+   "path": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+   "beforeSha256": "e3a689245637d27598a70e5d8c16e9b52da82bc20de08553f9a84d714b541944",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+   "path": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+   "beforeSha256": "ab941bc9e9b8b531ebb4a7691b35a40d0a10d1a78f891b1c2f625cbbb9f3ed20",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/how-to-write-a-doctor-check-that-detects-real-shell-function/write-a-doctor-check-that-detects-real-shell-function-breakage.md",
+   "path": "docs/knowledge/how-to-write-a-doctor-check-that-detects-real-shell-function/write-a-doctor-check-that-detects-real-shell-function-breakage.md",
+   "beforeSha256": "42c956d24e8cbfd593b2eb9a375b5d021ba7b3c3cd9e8d282d859ef0780820af",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md",
+   "path": "docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md",
+   "beforeSha256": "d3991c9270878746b3c5dc6d17936ad381bcb5f71adfb54faf5a11b18d3b81f3",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-c/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md",
+   "path": "docs/knowledge/merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-c/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md",
+   "beforeSha256": "0b34d05f9bd86fe47585a6730af2f79a25be7a4df010146f0aa17e5c45048aa1",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/sync-an-fgos-item-whose-fix-already-shipped-outside-the-norm/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md",
+   "path": "docs/knowledge/sync-an-fgos-item-whose-fix-already-shipped-outside-the-norm/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md",
+   "beforeSha256": "d3a29cd51e566b3a8656bc13dc5e016be37494661778d8a172c7bae5d00ee472",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/test-suite-legibility-dedup-cleanup-before-after-numbers/test-suite-legibility-cleanup-numbers.md",
+   "path": "docs/knowledge/test-suite-legibility-dedup-cleanup-before-after-numbers/test-suite-legibility-cleanup-numbers.md",
+   "beforeSha256": "9d4677368cca92eb069be6b028effa1bb484c678024a9ddfdba855303c82b0a9",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/the-9-findings-from-the-2026-08-14-fable-code-review-audit-o/worktree-merge-lifecycle-audit-260814-findings.md",
+   "path": "docs/knowledge/the-9-findings-from-the-2026-08-14-fable-code-review-audit-o/worktree-merge-lifecycle-audit-260814-findings.md",
+   "beforeSha256": "24042e18ae5b8c3ca71e5085814eb642accdf27e113898ce99e2687878700a1a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md",
+   "path": "docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md",
+   "beforeSha256": "eee0b18bdb5811771ab781465aefd624c246097749b8f8c723be70f026b39e25",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/the-coding-classify-intake-executor-s-full-lifecycle-created/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md",
+   "path": "docs/knowledge/the-coding-classify-intake-executor-s-full-lifecycle-created/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md",
+   "beforeSha256": "25598d584fa2b67ca394edb7fa5efe80aae96ad73db26a4251131c1cbc715703",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md",
+   "path": "docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md",
+   "beforeSha256": "fba456b4197a31c6b68d82ecb2778d8215d4b560a6c6a4dce22b3b4726c3eb67",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+   "path": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+   "beforeSha256": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+   "path": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+   "beforeSha256": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+   "path": "docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md",
+   "beforeSha256": "f91baac1a8063f72d26ad09dc95d224aa3ee1378569995b04a789594a258fae4",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-a-leaf-claim-can-now-be-refused-and-why-status-done-alre/pick-leaf-fork-and-sibling-merge-guard.md",
+   "path": "docs/knowledge/why-a-leaf-claim-can-now-be-refused-and-why-status-done-alre/pick-leaf-fork-and-sibling-merge-guard.md",
+   "beforeSha256": "98e78fc45684528d3f05d9839739672b0c5644ac5cf22d413e3dad4a8a1558e5",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-a-leaf-to-root-approve-no-longer-requires-the-shared-mai/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md",
+   "path": "docs/knowledge/why-a-leaf-to-root-approve-no-longer-requires-the-shared-mai/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md",
+   "beforeSha256": "d90a8506653a79e1e3582962750aefd1067a78dbb6f2021bef0bbf3379a97ebc",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md",
+   "path": "docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md",
+   "beforeSha256": "2a198f439b177132df8da137c98088ba2e54e12447bd6991741b24a7352d532d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-a-single-done-status-split-into-delivered-retrospective/why-done-split-into-delivered-retrospective-cleanup-done.md",
+   "path": "docs/knowledge/why-a-single-done-status-split-into-delivered-retrospective/why-done-split-into-delivered-retrospective-cleanup-done.md",
+   "beforeSha256": "b6667baa9a53693818408cbb76dfad39df4c0248f1e642617dfa08e057fef800",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-a-work-branch-must-never-be-git-checkout-d-directly-on-t/direct-branch-checkout-on-main-checkout-instead-of-worktree.md",
+   "path": "docs/knowledge/why-a-work-branch-must-never-be-git-checkout-d-directly-on-t/direct-branch-checkout-on-main-checkout-instead-of-worktree.md",
+   "beforeSha256": "b5249681b2f77f04d4182b45a96a0fbe3c3815bbef5e4d7eb9f4c645e48f329e",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-an-is-ancestor-of-main-verify-check-can-never-pass-throu/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve.md",
+   "path": "docs/knowledge/why-an-is-ancestor-of-main-verify-check-can-never-pass-throu/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve.md",
+   "beforeSha256": "25c9c71ad8e08fb4802dd4d08695cfcb5c6035f577a6aac89bbd6eb3a8baea98",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md",
+   "path": "docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md",
+   "beforeSha256": "22a1ddab689a956c84266ac29e4fdab14335c7855662c3ca8f231cf099ab28b0",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Every hunk replaces only a dead legacy reference (docs/how-to|explanation|reference|decisions|specs) with its unique docs/knowledge or docs/platform successor; each target file exists at 8a9385eca, each #anchor resolves via scripts/list-doc-anchors.mjs anchorExists, and each anchored section contains the cited content. Surrounding prose is byte-identical, so no claim is changed. Legacy references left in the file are covered by step-03 preserve or parked records, not by this spec."
+  }
+ ]
+}

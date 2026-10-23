@@ -1,0 +1,552 @@
+{
+ "batch": "g0-b3",
+ "commit": "8a9385eca",
+ "verdicts": [
+  {
+   "id": "claim_211f0b98400863f2a0e9b9cdaa2259fe",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "bindingSha256": "039165fefba742fec917c5eebc8751dcffd30995a06ee5bc231db53f3d6e6dab",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s3-host-invocation-boundary-gaps.json#registryGaps[10] The verbatim decision footer (95a357e2...). For an s3 row, the source occurrence k/8 is checked at 02106766 (registered anchors 144/149/161/170/235/244/268/280 = decisions 0005/0008/0020/0021/0028/0029/0031/0032) against the same decision's footer at the current target anchor. The rationale text cites the stale target ordinals 176/179, but the binding fields are correct."
+  },
+  {
+   "id": "claim_1d8baa1def0cea7595b62de99846b489",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "bindingSha256": "f5f2a92942a3f3843981c2c2139bdfe45b827b6ab36580f7a22f08f47c212859",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s3-host-invocation-boundary-gaps.json#registryGaps[11] The verbatim decision footer (95a357e2...). For an s3 row, the source occurrence k/8 is checked at 02106766 (registered anchors 144/149/161/170/235/244/268/280 = decisions 0005/0008/0020/0021/0028/0029/0031/0032) against the same decision's footer at the current target anchor. The rationale text cites the stale target ordinals 176/179, but the binding fields are correct."
+  },
+  {
+   "id": "claim_012bfa2639fb107eeb3baee4fb502f54",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "bindingSha256": "e7275a940a22d28be787e3d3472a3ba476d3d5d6d860c2815a0450cb8defcdf2",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s3-host-invocation-boundary-gaps.json#registryGaps[12] The verbatim decision footer (95a357e2...). For an s3 row, the source occurrence k/8 is checked at 02106766 (registered anchors 144/149/161/170/235/244/268/280 = decisions 0005/0008/0020/0021/0028/0029/0031/0032) against the same decision's footer at the current target anchor. The rationale text cites the stale target ordinals 176/179, but the binding fields are correct."
+  },
+  {
+   "id": "claim_99806d8b21d05eb7a8e8744d765bea00",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "bindingSha256": "a97212f44408f126babb4c9d6c4daf177412286971307ae244b8838b1fd44392",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s3-host-invocation-boundary-gaps.json#registryGaps[13] The verbatim decision footer (95a357e2...). For an s3 row, the source occurrence k/8 is checked at 02106766 (registered anchors 144/149/161/170/235/244/268/280 = decisions 0005/0008/0020/0021/0028/0029/0031/0032) against the same decision's footer at the current target anchor. The rationale text cites the stale target ordinals 176/179, but the binding fields are correct."
+  },
+  {
+   "id": "claim_a6f43d98b3eebe97802fd01a4ac7863b",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "bindingSha256": "9d3254197ae821200742f9a726c39f23ae5ce9e6f2d173a779f6f4fb773ce808",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s3-host-invocation-boundary-gaps.json#registryGaps[14] The verbatim decision footer (95a357e2...). For an s3 row, the source occurrence k/8 is checked at 02106766 (registered anchors 144/149/161/170/235/244/268/280 = decisions 0005/0008/0020/0021/0028/0029/0031/0032) against the same decision's footer at the current target anchor. The rationale text cites the stale target ordinals 176/179, but the binding fields are correct."
+  },
+  {
+   "id": "claim_b91c86788522c3516bef2c7bab859093",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "bindingSha256": "67cc9c1d4271b880cb0ba781f973441e63c560e71cf81fcb71fc0e8813a789b3",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s3-host-invocation-boundary-gaps.json#registryGaps[15] supersede. The whole line is carried. The only change is a named refinement: the refusal is narrowed to `execute --for` without an executor, and RUL76's reopening is recorded inline. No condition is dropped."
+  },
+  {
+   "id": "claim_76d404ea624a10455d7a14debe2b2a95",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "bindingSha256": "721f2607c07dff12781fbb2ff26bf22a696455846b44eeee1b7c10879f1b6a54",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s3-host-invocation-boundary-gaps.json#registryGaps[16] supersede (whole Data Dictionary table). Every source row is carried. The changes are additive, plus named replacements: timeoutMs is now a default with a 4h cap (RUL96), and the state.lock became a holder-lock kernel mutex. This is the L12-102 whole-block rule."
+  },
+  {
+   "id": "claim_97479b13a60800e856813bfd4f0cbb78",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "bindingSha256": "36da022efdb9fee90c3d6f246b19036d25e02c7f8c620a40bf556ecd2f6a5886",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s3-host-invocation-boundary-gaps.json#registryGaps[7] The verbatim decision footer (95a357e2...). For an s3 row, the source occurrence k/8 is checked at 02106766 (registered anchors 144/149/161/170/235/244/268/280 = decisions 0005/0008/0020/0021/0028/0029/0031/0032) against the same decision's footer at the current target anchor. The rationale text cites the stale target ordinals 176/179, but the binding fields are correct."
+  },
+  {
+   "id": "claim_50dca4885019ac5125d941ea5a86f448",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "bindingSha256": "033a80c119f21b9f2980922dac9c5589233ff97e8dcfa662b85b2991ddb9a584",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s3-host-invocation-boundary-gaps.json#registryGaps[8] The verbatim decision footer (95a357e2...). For an s3 row, the source occurrence k/8 is checked at 02106766 (registered anchors 144/149/161/170/235/244/268/280 = decisions 0005/0008/0020/0021/0028/0029/0031/0032) against the same decision's footer at the current target anchor. The rationale text cites the stale target ordinals 176/179, but the binding fields are correct."
+  },
+  {
+   "id": "claim_07ae72c4d2c93884a120cf2ca12250a8",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "bindingSha256": "db6b941768864f56ce272b00c01d6ee2d04e44cb659c0630869b78f87d192951",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s3-host-invocation-boundary-gaps.json#registryGaps[9] The verbatim decision footer (95a357e2...). For an s3 row, the source occurrence k/8 is checked at 02106766 (registered anchors 144/149/161/170/235/244/268/280 = decisions 0005/0008/0020/0021/0028/0029/0031/0032) against the same decision's footer at the current target anchor. The rationale text cites the stale target ordinals 176/179, but the binding fields are correct."
+  },
+  {
+   "id": "claim_b7876fcb567891ddc8431cdab2f2dab0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+   "bindingSha256": "b7f5476832a7b71092078813e95caf02ecef6bbb8571d2e82d4a8582ad450c88",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s5-root-boundary-sync.json#registryGaps[35] supersede (Pointers block). The removed main-checkout-lock.mjs line is replaced by the repo-locks.mjs holder-lock line (deletion named). The other lines are carried with named RUL93/holder-lock updates. This is the L12-102 whole-block rule."
+  },
+  {
+   "id": "claim_c2cb6de3e8b1288ed15fcd60f3154bbb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+   "bindingSha256": "721f2607c07dff12781fbb2ff26bf22a696455846b44eeee1b7c10879f1b6a54",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s5-root-boundary-sync.json#registryGaps[36] supersede. Same Data Dictionary block as s3[16]. Additive changes, plus the named RUL96 and holder-lock replacements."
+  },
+  {
+   "id": "claim_a63132a3f76d6b8ea05461c48c818836",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "b7f5476832a7b71092078813e95caf02ecef6bbb8571d2e82d4a8582ad450c88",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[0] supersede (Pointers block, later source version). The changed lines have named replacements (holder-lock, parseAccountPin RUL106, repo-locks.mjs). Nothing is dropped without a successor."
+  },
+  {
+   "id": "claim_f64fa4a36030f89feab71dc5943015c0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "e7ba1132d459be47f816376badacb6debd540d561b78fce3df09a067c3e9205f",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[1] partial-carry. The architecture-advisory opening is carried in unheaded-block-125. The rewritten historical line is verbatim in the a42 residual (row SHA 92ca20e4 OK, file SHA 4be07f52 OK)."
+  },
+  {
+   "id": "claim_2afd573c3c2205adb49a698535fbf864",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[10] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  },
+  {
+   "id": "claim_298fc2ef185e234bd4b65f047f70ecec",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[11] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  },
+  {
+   "id": "claim_09dd63bd1aaf9b4b6078de434144efb0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[12] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  },
+  {
+   "id": "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[13] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  },
+  {
+   "id": "claim_cad110bd532badff055f69c0a236644a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[14] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  },
+  {
+   "id": "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[15] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  },
+  {
+   "id": "claim_b2afbadf035b6374ed73289b388f5d20",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[16] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  },
+  {
+   "id": "claim_33c41de79cf4a52288035a9656c09735",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[17] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  },
+  {
+   "id": "claim_fa95d7f496a850ef197d25f18ad6f760",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[18] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  },
+  {
+   "id": "claim_77a827ba40c328bd2c4d6a8ec713df65",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "85855abf8c5a5fceafec391037508977411da6e10b6adf87d46f02ebe7a84cc3",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[19] partial-carry. Only the 'bỏ hoàn toàn' list line changed (PolicyPatch prefer* is now named as still read). The old line is verbatim in the residual, and its SHA is verified."
+  },
+  {
+   "id": "claim_004b47fc284721eff96cfa890f85aac0",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[2] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  },
+  {
+   "id": "claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "aa837577f33ff398c608a989437f6d0dfaa43d3a1d0548beba55324b42cb340b",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[20] partial-carry. The source line is carried with an appended consent-gate rule. The original line is in the residual, and its SHA is verified."
+  },
+  {
+   "id": "claim_93d5f2d34cf452029462ea39674fd255",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "39e6b2b6692d65bfc7f03ebd33d2991cd478e6839892a5d4df5800755487a0e4",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[21] partial-carry. Insertions only (unit.started, resumeUnitRunId). The old line is verbatim in the residual, and its SHA is verified."
+  },
+  {
+   "id": "claim_8f8191c13e179af31ad39593af9fe716",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "b471fe1f9b3a26b6dac68716cff142b08301265bd855d37ce6343677d57458f8",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[22] supersede. All 18 source lines are carried verbatim. The only addition is the herdr prompt-delivery bullet."
+  },
+  {
+   "id": "claim_74a47937380f03ed75fa755f0faccffb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "59978927fe3e3ebbdc8f8d621e3f6a7e6aeea0ed317333efbbafa9d243b82ddf",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[23] partial-carry. The source line is carried with an appended owner-quarantine sentence. The old line is in the residual, and its SHA is verified."
+  },
+  {
+   "id": "claim_20a5804444535524364c0049e5bc87dd",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "721f2607c07dff12781fbb2ff26bf22a696455846b44eeee1b7c10879f1b6a54",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "REWORK",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": false
+   },
+   "reason": "s9-runner-01.json#registryGaps[24] partial-carry remainder is stale. The residual (row SHA 47a5cc72..., primaryTarget digest 43f03eb4... is not the current ad50d1b4...) lists only the '| 1 |' line. The source '| 1b | Provider-capacity inventory/state' line, whose state.lock is now a holder-lock kernel mutex, is neither verbatim in unheaded-block-9 nor in the remainder. Refresh the residual, or justify the line as a named replacement."
+  },
+  {
+   "id": "claim_072766aafbaf01714df1aa65347a1d24",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "249ffb0ef7ad235c547821b36141f680d93a0eac51ba29c8015e5c61d33cfe40",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[25] partial-carry. The RUL73 line is carried with an inline 'ĐÃ BỊ THAY bởi RUL95' marker. The old line is in the residual, and its SHA is verified."
+  },
+  {
+   "id": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "21bedc86c0bbe65e5a11e78501ed07463c970822a7bafad640ffb8a885e8e48d",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "REWORK",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": false
+   },
+   "reason": "s9-runner-01.json#registryGaps[26] Misbound anchor: targetAnchor unheaded-block-92 is the RUL76 line (docs/specs/runner.md:1096); the source RUL77..RUL97 Business Rules passage is now unheaded-block-93 (runner.md:1098-1152). The bound unit carries none of the source lines (0/26). Rebind to unheaded-block-93 at its current digest."
+  },
+  {
+   "id": "claim_d5ba1eda7530b865fec747ee0adbc102",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "21bedc86c0bbe65e5a11e78501ed07463c970822a7bafad640ffb8a885e8e48d",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "REWORK",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": false
+   },
+   "reason": "s9-runner-01.json#registryGaps[27] Misbound anchor: same defect as registryGaps[26]. unheaded-block-92 is RUL76, while the RUL77.. passage is unheaded-block-93; 22 of the 23 source lines are neither in the bound unit nor in the residual. Rebind to unheaded-block-93 and refresh the residual primaryTarget (it is still on stale digest 3b974a9c...)."
+  },
+  {
+   "id": "claim_41571c8f42f542be1f44c9371fad823a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "b3b0d2022cd81664da0f87dd0a1970f63de66abda07be8a3324deb1bfe9cb533",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[28] partial-carry. All 8 changed STR65 lock lines are verbatim in the sync2300 residual (row SHA 6bc73a23 OK, file SHA 69c36aaa OK). The residual primaryTarget digest is stale (325f9c8c, not the current 97ebe38b), but nothing is uncovered."
+  },
+  {
+   "id": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "b7f5476832a7b71092078813e95caf02ecef6bbb8571d2e82d4a8582ad450c88",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "REWORK",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": false
+   },
+   "reason": "s9-runner-01.json#registryGaps[29] partial-carry remainder is stale. The sync2300 residual (primaryTarget 29fd80cd... is not the current 443f8e74...) covers 2 of the 6 changed source lines. Four lines (the loop.mjs runner.lock path, the account-pin capacityProviderOf->parseAccountPin change, the run-timeout.mjs lock-ttl clause, and the catchup line) are neither verbatim in unheaded-block-101 nor in the remainder. Refresh the residual."
+  },
+  {
+   "id": "claim_f4058f068a378962aaf237ae038db5af",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "ade8b814f84de86007f6096741a68aa7f5b445dfa565d496c7eead88a2a36e79",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[3] partial-carry. The changed line (architecture-advisory/business-discussion enablement) is verbatim in the residual, and the residual SHA is verified."
+  },
+  {
+   "id": "claim_69311391fbb9b1cf924197e6063e5cad",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[4] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  },
+  {
+   "id": "claim_c1d4ad0697013185af2572dd0a944024",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[5] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  },
+  {
+   "id": "claim_79fd838ebf7eb7bbaa72efa619535671",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[6] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  },
+  {
+   "id": "claim_99f595d515a3a60d4796192d78e67eae",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[7] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  },
+  {
+   "id": "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[8] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  },
+  {
+   "id": "claim_b3960a6316827da8f49bc10a9221b4c5",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+   "bindingSha256": "880cc5b75ebff112eb29733a45a1359686a116c604ebacf5475a027e46f49c41",
+   "targetOwner": "docs/specs/runner.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "s9-runner-01.json#registryGaps[9] Old ID of the repeated footer, bound to the 8-member contextual identical-unit group per owner L9-15. All 8 member anchors/digests/ancestry/text were rechecked at 8a9385eca. The text is verbatim."
+  }
+ ]
+}

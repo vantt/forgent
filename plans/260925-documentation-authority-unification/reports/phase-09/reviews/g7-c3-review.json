@@ -1,0 +1,890 @@
+{
+ "batch": "g7-c3",
+ "commit": "8a9385eca",
+ "verdicts": [
+  {
+   "patchSpecId": "file:docs/knowledge/why-checkmergestillresolves-can-false-positive-after-a-root/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md",
+   "path": "docs/knowledge/why-checkmergestillresolves-can-false-positive-after-a-root/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md",
+   "beforeSha256": "1125cb274a451615e583b9607186cf6345e9297553907ea863eaa4b26a06772c",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-o/why-the-retrospective-content-gate-checked-the-wrong-fields.md",
+   "path": "docs/knowledge/why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-o/why-the-retrospective-content-gate-checked-the-wrong-fields.md",
+   "beforeSha256": "addb9073214616efb359f7f9d7a77c789dc3b71cb21c2a2fd7691fff2302a02c",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
+   "path": "docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
+   "beforeSha256": "1d419499c1f0fad727a3dded7ff5e1f73c92f50fef4c45a1c76013920233414a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
+   "path": "docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
+   "beforeSha256": "b06349f25aa7eaf60e75331ba1d9f67eebc85e438f41f467e7b5dab15834363b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s/context-md-enforcement-scope.md",
+   "path": "docs/knowledge/why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s/context-md-enforcement-scope.md",
+   "beforeSha256": "15b709ea8f430507be6c62d3893548694ceb94621c6740f5997d1384ba8200b4",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-decide-for-execute-for-impact-analysis-reported-unavaila/why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back.md",
+   "path": "docs/knowledge/why-decide-for-execute-for-impact-analysis-reported-unavaila/why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back.md",
+   "beforeSha256": "03fc5d0b05633d7d730ddbcc730c209bacd17a23d46c592f7bc15166fbe40a60",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md",
+   "path": "docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md",
+   "beforeSha256": "e9df4a30d1c6072041c8c7d8598380e5ab19e3e7cc5f943a31b02092c8037d23",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-dispatch-binding-moved-from-name-keying-to-needs-for-cap/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md",
+   "path": "docs/knowledge/why-dispatch-binding-moved-from-name-keying-to-needs-for-cap/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md",
+   "beforeSha256": "e56c40506ac92875f41cd7363169d4ca3bdb83545969641eac23be3a9db508b0",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-execution-fan-out-reuses-computeschedule-not-selectwave/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md",
+   "path": "docs/knowledge/why-execution-fan-out-reuses-computeschedule-not-selectwave/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md",
+   "beforeSha256": "af12b1df2aba62579085df863ddc19a40a7118fc12c2948809d0809b64a58b96",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 4 citation repoint(s) to existing successors (3 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-executor-aware-backend-dispatch-exists/agent-executor-executor-aware-dispatch.md",
+   "path": "docs/knowledge/why-executor-aware-backend-dispatch-exists/agent-executor-executor-aware-dispatch.md",
+   "beforeSha256": "321a6118452e014a53b98b14a305b8fac5612ef70ee98c657df9270a8af99c7e",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 4 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+   "path": "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+   "beforeSha256": "45f94e96f9c10ce7394e99c65594d661b638692359bd09e174ddac002320381b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-cleanup-next-keeps-exit-code-classification-instead/why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call.md",
+   "path": "docs/knowledge/why-fgos-cleanup-next-keeps-exit-code-classification-instead/why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call.md",
+   "beforeSha256": "87ff4e1dac4a63b231a2b27806806108d832db3df3e35de26f0a7279c6d9fc7f",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+   "path": "docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+   "beforeSha256": "d5e03cd0c0a9920b4d25234bee2b96c595fa0dde872ef09613dae15e9416e24d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
+   "path": "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
+   "beforeSha256": "b8dbc8707f92e19c57b1adb1f23aac55a2dcf3e8aafb6f072833787b626e93a8",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md",
+   "path": "docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md",
+   "beforeSha256": "28d6d89b11c53f01910ec418862e496a7f240063cf3048f998124bf1c5f8b4b8",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-detects-post-land-drift-among-sibling-leaves-by-int/why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint.md",
+   "path": "docs/knowledge/why-fgos-detects-post-land-drift-among-sibling-leaves-by-int/why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint.md",
+   "beforeSha256": "6f17c1efb7f7db4b4ab921a803b4fb5939e6260c112fe0d109b5bfa7007a0131",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-discover-could-overwrite-an-already-locked-verify-c/discovery-decompose-reporoot-verify-overwrite.md",
+   "path": "docs/knowledge/why-fgos-discover-could-overwrite-an-already-locked-verify-c/discovery-decompose-reporoot-verify-overwrite.md",
+   "beforeSha256": "15ec7e208391f609137d56e2397c668393ee99ae5b217c752bb5e12f5bf19a15",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-discover-next-shrank-to-a-picker/why-discover-next-shrank-to-a-picker.md",
+   "path": "docs/knowledge/why-fgos-discover-next-shrank-to-a-picker/why-discover-next-shrank-to-a-picker.md",
+   "beforeSha256": "4f44fe79fdd27c88e918c5a00926de537755881b4adb04c80859659a5385f793",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-dispatch-splits-into-gather-packets-with-a-second-e/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md",
+   "path": "docs/knowledge/why-fgos-dispatch-splits-into-gather-packets-with-a-second-e/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md",
+   "beforeSha256": "e7ec6d2ba18bc1cd41fa72215c03f98d58aa4040b840e5d5fb7414f6effe8964",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolati/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md",
+   "path": "docs/knowledge/why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolati/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md",
+   "beforeSha256": "e20b5bc070cf729ec3f95d9e2f704454b4b9b64db7f248e2c216c56d8b4c8ee7",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-fgos-runner-died-in-every-agent-shell/harness-shell-snapshot-strips-underscore-prefixed-helper-functions.md",
+   "path": "docs/knowledge/why-fgos-fgos-runner-died-in-every-agent-shell/harness-shell-snapshot-strips-underscore-prefixed-helper-functions.md",
+   "beforeSha256": "2d88b59f205e349e60c687f0dd45d7ae7b452e0451f3f31cb68cc0bf877ff5d0",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md",
+   "path": "docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md",
+   "beforeSha256": "b29c111e501fee2d74c9d81cbf05fc0511951a0aa0e99abc4727053b42dcde69",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md",
+   "path": "docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md",
+   "beforeSha256": "c16bf530bba9255808133858f022e2e08b45c024a0590251967613af70627277",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-keeps-growing-the-same-decision-logic-in-more-than/fgos-choke-point-pattern.md",
+   "path": "docs/knowledge/why-fgos-keeps-growing-the-same-decision-logic-in-more-than/fgos-choke-point-pattern.md",
+   "beforeSha256": "b45738cfa7cdf2187249153b30dca5fec64309b573a7fb3e38fa90b976e27103",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 5 citation repoint(s) to existing successors (4 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md",
+   "path": "docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md",
+   "beforeSha256": "5719baf6bf9bd472947ca9ced5a3a0bbb8d914a219c19b2d4dd766f1b9a053ac",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md",
+   "path": "docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md",
+   "beforeSha256": "5bfdaefc98c510cb85ee63faa51239581a4564a797d5349eeece7a2c12ec4e9d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md",
+   "path": "docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md",
+   "beforeSha256": "2f517cd1f7a16aa01de1d86b822497d94273f69e5e5f1f4635065dfe7e0dd376",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 6 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+   "path": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+   "beforeSha256": "83dd80030a6195067a4c59cdb578ac34e574d5475be42c19c3d1497a1eb7e7db",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md",
+   "path": "docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md",
+   "beforeSha256": "f469fa839ebf32362dc1c36c54214f7139c22eec424d801ad45bdbeb49be8435",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 3 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
+   "path": "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
+   "beforeSha256": "f477e051c28843a44890300e6bcac49b644364629ad7109c251e86e66be4ae33",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md",
+   "path": "docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md",
+   "beforeSha256": "49e7dc8f39520448a9fa129f188ccfd490321252dfddcd1620d0488e1d4860b9",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+   "path": "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+   "beforeSha256": "8c1dd8db19f4bbe54ba90ab9ec4f16e69906b43c9894be87d5b35ec0babb1a84",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-started-recording-mergedsha-and-mergedinto-on-the-d/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md",
+   "path": "docs/knowledge/why-fgos-started-recording-mergedsha-and-mergedinto-on-the-d/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md",
+   "beforeSha256": "c5505f67234d9209bab7eb9af7bf61060cb7f187a1499e83b3f9609fb28a0146",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 3 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+   "path": "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+   "beforeSha256": "fe55f43e065c29fe3dc2a6cc3f1787ade4b4574322af20ae913f6726bcd195a7",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-uninstall-shipped-as-two-pieces/fgos-uninstall-feature-overview.md",
+   "path": "docs/knowledge/why-fgos-uninstall-shipped-as-two-pieces/fgos-uninstall-feature-overview.md",
+   "beforeSha256": "6a71703b2f1e64985d653e8fd82c7c2b8d52bede41f11a59171fd3786cb445a3",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md",
+   "path": "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md",
+   "beforeSha256": "2dd7698fbdc5aaaf83971dbac5bcab099f90763e65fc7bcbc19709adf09a7838",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+   "path": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+   "beforeSha256": "062af6c9bf24067dd2c739af0ad913014dc068b95ea6165393a51e324a19522f",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md",
+   "path": "docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md",
+   "beforeSha256": "d0c5864dab33c83d4e42cd966104952d1f29576dec4d4df738213e1954791c2e",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-intake-classification-moved-to-after-clarify-and-back-to/intake-classification-moves-after-clarify-and-back-to-the-owning-domain.md",
+   "path": "docs/knowledge/why-intake-classification-moved-to-after-clarify-and-back-to/intake-classification-moves-after-clarify-and-back-to-the-owning-domain.md",
+   "beforeSha256": "83eb01b4ef6195790f0105fe4dff836662b17dd5847e1c2cd178bd0fc6cee7f5",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-judgediscovery-judgedecompose-run-a-second-independent-j/judge-verdict-second-pass-semantic-check.md",
+   "path": "docs/knowledge/why-judgediscovery-judgedecompose-run-a-second-independent-j/judge-verdict-second-pass-semantic-check.md",
+   "beforeSha256": "368825821224bbb384d4807b973c845707b291b5fc88c5873cf42a5281a845c0",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-main-checkout-hook-wired-reported-a-false-negative-on-an/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md",
+   "path": "docs/knowledge/why-main-checkout-hook-wired-reported-a-false-negative-on-an/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md",
+   "beforeSha256": "c042758613c38d11a73235a5d4242d18421939ebcc8a41108d63c45fd07cce37",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md",
+   "path": "docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md",
+   "beforeSha256": "0af5e2b9e32d366135284b452edde73f8fc1d1507e1beeb850d95b5b71d407e5",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not/why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name.md",
+   "path": "docs/knowledge/why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not/why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name.md",
+   "beforeSha256": "33b6d7ac26f3b80d4c8155465603d063723095b689ed8b71a5298c6b413e92ad",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-mergetree-groups-by-parent-and-sorts-recursively-by-bloc/why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks.md",
+   "path": "docs/knowledge/why-mergetree-groups-by-parent-and-sorts-recursively-by-bloc/why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks.md",
+   "beforeSha256": "accbc9b3b34449dc43362941baa186205becf51162cefc0639f293a786674acd",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md",
+   "path": "docs/knowledge/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md",
+   "beforeSha256": "bd7b41fad86b31df2aeb779ed7d5278ce0fdb84d02ba2da6e9073b671fc9ffb4",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-resolveplan-s-decompose-verdict-no-longer-treats-the-pre/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md",
+   "path": "docs/knowledge/why-resolveplan-s-decompose-verdict-no-longer-treats-the-pre/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md",
+   "beforeSha256": "fd41b1809659ad5b5e34a3ad2ebaf1ea86639c9bbf6f50e8ad7b2c09b9af8421",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-return-s-blocked-friction-hint-checks-real-output-not-th/why-returns-blocked-friction-hints-at-a-fgos-dependent-verify-by-output-not-string-match.md",
+   "path": "docs/knowledge/why-return-s-blocked-friction-hint-checks-real-output-not-th/why-returns-blocked-friction-hints-at-a-fgos-dependent-verify-by-output-not-string-match.md",
+   "beforeSha256": "b05caaea2c00d62457ecc702a1d9c04c4cac2aae07701f574271d5d52163d342",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-runner-config-splits-capability-curated-vocab-executor-n/why-capability-executor-and-capacity-are-three-separate-concepts.md",
+   "path": "docs/knowledge/why-runner-config-splits-capability-curated-vocab-executor-n/why-capability-executor-and-capacity-are-three-separate-concepts.md",
+   "beforeSha256": "17f3d9220d7e36c2dabf350e26eaf86c24dcaceaa55928bddd356bd65df837bb",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+   "path": "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+   "beforeSha256": "108ec9e58c3f720454a6949aad1a687f28d507e504cb416bec1d571ee8f0ab02",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+   "path": "docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md",
+   "beforeSha256": "9e4e9b80adf24affa29bd09ac8cee6e6f899341e9b5d7950abcd4140fad3aa44",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md",
+   "path": "docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md",
+   "beforeSha256": "c118ef423ecbfc5bd260709f010b5f977cfffc1c0812c8ff8fad17b28074d827",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+   "path": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+   "beforeSha256": "7cf21351c63b388bb6d6fdba95f7351fc3fbd3c632de2b97f81aa7dd60878048",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+   "path": "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+   "beforeSha256": "a66490ef5283c0e51ce78f5565ead3ce54cf7e7e0ebd283cd03c615b31be9544",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 4 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+   "path": "docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+   "beforeSha256": "7e181e8a4f754c4d33bfcae2f8e18cc93ea372eb878eca3fb532910c59677f76",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+   "path": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+   "beforeSha256": "6140cc8ffe078af0f134362f60c032e633c413da36c96621fc1342fb9b743598",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+   "path": "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+   "beforeSha256": "6e66d7b812d8b9ba0a748ac9c824d53e990dd442596a5558b74de2351068b8f9",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+   "path": "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+   "beforeSha256": "3dd951c1355ef5cdc335d12f57954edeb7e90628bb42e0ab311f6f5d9d4ef4e7",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 4 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+   "path": "docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+   "beforeSha256": "12c8cb390f839db3791eb37bf1765e96550549fb08490f9e50e8b6419e99268a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+   "path": "docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+   "beforeSha256": "e0a05376da5ee6e1c34334aec846766cf8d068bff87464b0b632b99cd7eca60b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+   "path": "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+   "beforeSha256": "1cbc795929d012368ede09260f179a75576defb1c1c3a17c4f56ce2d1245ac81",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+   "path": "docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+   "beforeSha256": "7bfa0d8af1bbbb8cbc48ffacedc710b7b879ae3b4a5b4611f383b115c2981623",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md",
+   "path": "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md",
+   "beforeSha256": "76374ba65e53d2ac73b4a89bbdf995ec54d7b1ba6ba34445ccda83357547c666",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md",
+   "path": "docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md",
+   "beforeSha256": "5ada81e933888a03e387baf8e614b5d4bca3b8307443241e7524ac687f66a080",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 2 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md",
+   "path": "docs/knowledge/why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md",
+   "beforeSha256": "76bc924026b31c1a8f8ac9e8521ccd2ec55f26ab493ce96516f21e6dc3a51bca",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
+   "path": "docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
+   "beforeSha256": "4fb03d17657b334ccdf5f3a8dea55357f8fc5964f6511de4819c6d94a3fd3e0b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/work-item-priority-calculated-formula-and-intent-s-retiremen/priority-formula-and-intent-retirement.md",
+   "path": "docs/knowledge/work-item-priority-calculated-formula-and-intent-s-retiremen/priority-formula-and-intent-retirement.md",
+   "beforeSha256": "6eaf8a9eca523a4eab98549a28ab7c190b551d23414d0ff96c2b5e9e92c382b7",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 3 citation repoint(s) to existing successors (0 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md",
+   "path": "docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md",
+   "beforeSha256": "cf92920a8a721b0bba1b6dc080e89f7f103a65c175d333a5a64d5d0db9383033",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 3 citation repoint(s) to existing successors (2 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  },
+  {
+   "patchSpecId": "file:docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md",
+   "path": "docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md",
+   "beforeSha256": "4d8a7fc2492d9336fbf69e578667db72cbe6200c428c51f950af77f747c2211a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "bytes==beforeSha256; fuzz=0 forward==expectedAfterSha256, rollback==beforeSha256; 1 citation repoint(s) to existing successors (1 anchored, all pass scripts/list-doc-anchors.mjs --check), each equal to a step-03 patch edge (target+anchor) on the same file digest; no non-citation byte change; remaining legacy mentions are recorded preserve/parked edges"
+  }
+ ]
+}

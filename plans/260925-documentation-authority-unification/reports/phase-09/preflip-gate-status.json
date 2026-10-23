@@ -5,10 +5,11 @@
   {
    "gateId": "changed-binding-independent-review",
    "g": "G0",
-   "status": "unmet",
+   "status": "partial",
    "evidence": [],
-   "commit": null,
-   "pin": null
+   "commit": "8a9385eca",
+   "pin": null,
+   "note": "b3 38/4, b4 20/2, b2 49/1 so far; b1, b5 running"
   },
   {
    "gateId": "L12-96-uncomposed-duty",
@@ -61,10 +62,19 @@
   {
    "gateId": "composition-independent-review",
    "g": "G7",
-   "status": "unmet",
-   "evidence": [],
-   "commit": null,
-   "pin": null
+   "status": "partial",
+   "evidence": [
+    "reviews/g7-c1-review.json",
+    "reviews/g7-c2-review.json",
+    "reviews/g7-c3-review.json",
+    "reviews/g7-c4-review.json",
+    "reviews/g7-c5-review.json",
+    "reviews/g7-c6-review.json",
+    "reviews/g7-c7-review.json"
+   ],
+   "commit": "8a9385eca",
+   "pin": null,
+   "note": "385/387 APPROVE at 8a9385eca; 2 REWORK (c5 fgos-merge.test.mjs stray blank line; c7 fix-bare-citation-findings.md RUL home); 36 deferred to G9; parks pending (D2)"
   },
   {
    "gateId": "L12-129-archive-ref-and-checkout",

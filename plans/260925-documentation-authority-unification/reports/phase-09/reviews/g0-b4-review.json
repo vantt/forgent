@@ -1,0 +1,292 @@
+{
+ "batch": "g0-b4",
+ "commit": "8a9385eca",
+ "verdicts": [
+  {
+   "id": "claim_af89c4e6063eb43c4e690c3fdd430677",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "bindingSha256": "d55462cb59e887c96e75d7d96d5c22416d7745d0ee0345dc672054595a68ec65",
+   "targetOwner": "docs/platform/component-boundary.md",
+   "verdict": "REWORK",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": false,
+    "semantic": true
+   },
+   "reason": "docs/platform/component-boundary.md#unheaded-block-11: unit changed after the binding by 6bee0a74f (Config row text); current textDigest 17b94e60c0e07542ce67f6b9df5b7d705b1ed2207f3c706df1f407b8680138e9 != bound b8232055...; rebind needed. Content carriage itself is sound (supersede; only the Workflow row is renamed per D-ADR0070). | binding: declared bindingHashEncoding (compact sorted JSON + LF of 4 fields) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_0f4d968b593902731bd334f9ed2af711",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+   "bindingSha256": "1ba20d185a5e396d6f5b6a466cc67fa903cc96aa6b729bb3cf7851e778b64b65",
+   "targetOwner": "docs/specs/distribution.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Same-file supersede of a historical Data Dictionary version; all source rows kept; removed items (provider-capacity-lock-stale, herdr-available, workflow-pools-satisfy-independence, coordination-abandoned-claims, runner-rigor-config, mutating-assignment-binding-snapshot, state.lock) are retired in code. The current unit carries the claim forward to the docs/platform/packaging-distribution/spec.md#unheaded-block-86 rows (pending). Concern: the current row 7/7b lists are stale against the code; the canonical list lives in setup-doctor-registry.md. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_f7b23e10496a2460c655bbcd0c765cfb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "7fac8032ad6bf64d65f1aa2083737a3ea9668a0a384c743fbdf55a7c9abbbd01",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Verbatim move (source runtime-identity-and-activation.md unit located by sourceUnitDigest at 88a702f6f); retained under release-manifest contract appendix with same ancestry; correct owning contract. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_34af5eabebda68848f5a4f158e81702f",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "200b6a39864b3c18af1d3774c67fe744ee4919c1022bdca5ecdf288c4346c11b",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Verbatim move (source runtime-identity-and-activation.md unit located by sourceUnitDigest at 88a702f6f); retained under release-manifest contract appendix with same ancestry; correct owning contract. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_c809de74f3631def7b3b3098a6290c9a",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "afe5d31eb016484dffcedbd92e5c3a4ed28a5868d686166d7b2b2cb0bc6886c9",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Verbatim move (source runtime-identity-and-activation.md unit located by sourceUnitDigest at 88a702f6f); retained under release-manifest contract appendix with same ancestry; correct owning contract. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_4ece2063c9e19d3693005ab4de9f86a1",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "21e05c1cb265b2420dbea1335beef9e17a21895096cff1c3834275684bcccec4",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Verbatim move (source runtime-identity-and-activation.md unit located by sourceUnitDigest at 88a702f6f); retained under release-manifest contract appendix with same ancestry; correct owning contract. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_ef427cea4a40a9001dcf5f004d5cda64",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "524e8f58ae58dcb94781df8d7f32ce4a71a79d9fb7bda0f879371eb710eccc26",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Verbatim move (source runtime-identity-and-activation.md unit located by sourceUnitDigest at 88a702f6f); retained under release-manifest contract appendix with same ancestry; correct owning contract. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_5b308c0d698cf4b6e679cefd4b72159e",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "a1f1d537587625fb897e85b24ee3b6b1f54db649a8789cec74c4420fd44af429",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Move verbatim except relative link rewritten ../host-invocation-routing/... -> ../../../architect/host-invocation-routing/...; same destination (file exists); correct owning contract. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_e53e994efd41de413243c7feb18609f5",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "e67826cbb8bba3f877d553e0fbdf57144c31af27433b1caaadae557c2170683c",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Verbatim move (source runtime-identity-and-activation.md unit located by sourceUnitDigest at 88a702f6f); retained under release-manifest contract appendix with same ancestry; correct owning contract. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_3153b26f053448afc0c13f85a80b2337",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "89d684fa01a7975f7b7bd95f0197a31b967c64e03a86c37c4a566c9a5bcb7762",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Verbatim move (source runtime-identity-and-activation.md unit located by sourceUnitDigest at 88a702f6f); retained under release-manifest contract appendix with same ancestry; correct owning contract. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_4486d8c871bc7cace22f5877da298119",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "9128cdae48e4d93f25da8828762ac67a77d493ca8157169ac69a797a12bd9969",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Verbatim move (source runtime-identity-and-activation.md unit located by sourceUnitDigest at 88a702f6f); retained under release-manifest contract appendix with same ancestry; correct owning contract. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_53faf89f35a824288c56245cbe2ad881",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "15d480ee969a653394cd95ca68cbb48fab6ac9c833a18838b83a66e384e9e3e6",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Verbatim move (source runtime-identity-and-activation.md unit located by sourceUnitDigest at 88a702f6f); retained under release-manifest contract appendix with same ancestry; correct owning contract. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_4181e74c1b213526e0047eb5d8a3d2ac",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "c25eccd4616d2aca762ea64b45dfc0b7e24c6d876d02eb07cd32bc351b6da44b",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Verbatim move (source runtime-identity-and-activation.md unit located by sourceUnitDigest at 88a702f6f); retained under release-manifest contract appendix with same ancestry; correct owning contract. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_2ce83669de6ea1d99233cd5dfee3de09",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "8efbf5cf38475b716d99c9631ff99c4685a9e6d636b4e2d445ea96d2929c0239",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Verbatim move (source runtime-identity-and-activation.md unit located by sourceUnitDigest at 88a702f6f); retained under release-manifest contract appendix with same ancestry; correct owning contract. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_ab15836d7a655b68626a332fa0667efb",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "638d406059b1eb6698958bad1a9deeb364b6a84318b5b3373d5c6d421e6b540a",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Verbatim move (source runtime-identity-and-activation.md unit located by sourceUnitDigest at 88a702f6f); retained under release-manifest contract appendix with same ancestry; correct owning contract. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_bb2261debf9bf9f07bb9a0841991d1a2",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+   "bindingSha256": "c7f8e47a7c2a1c31ba1e51a92e4d7dce131e362c079f86042d42869f48849b37",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Verbatim move (source runtime-identity-and-activation.md unit located by sourceUnitDigest at 88a702f6f); retained under release-manifest contract appendix with same ancestry; correct owning contract. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_5c58459a3d4fb3c94d3d177ae5ff71ad",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "bindingSha256": "e2daf30d61913394626e79aca01888cd9e2493c72f517b650068ffc5c455bbf0",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Verbatim move of distribution.md 'Contributor hooks setup' block into setup-doctor-registry retained appendix; claims consistent with code (no install lifecycle hook in package.json; pre-commit convention warnings only; main-checkout-hook-wired registered). Doc check/fix inventory (143 checks / 32 fixes) equals src/setup/registrations.mjs. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_1b418e3e2ee62a83adc1420a4967de62",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "bindingSha256": "5976f01cfe037592b370f91efb96cb3de97ed3dbe55fb39320373d5a9db54072",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Verbatim move of distribution.md 'Doctor' block; read-only/--strict exit claims match bin/fgos.mjs:5261; config-not-stale registered. Doc check/fix inventory equals src/setup/registrations.mjs (143/32). | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_891db485a75cdb558cf725c3315f3857",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+   "bindingSha256": "4b41e5935a778eb41ccc0b1b5caec15f53d98ff0e11cd6e5e3cf1d49a2c8b170",
+   "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "verdict": "REWORK",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": false
+   },
+   "reason": "setup-doctor-registry.md:205-209 (#unheaded-block-30, C-F9 line 207): the unit says in the present tense that setup attempts the `lock-fences` cutover fix (row 7b) and that the merge adds a `lock` config default (`predecessorKillWaitMs: 2000`). Neither exists in src/setup/registrations.mjs: there is no `lock-fences` registerFix and no `lock` registerConfigDefault, and src/ has no predecessorKillWaitMs. The fence mechanism was removed at 51e36b06b. The source claim is fully carried, but this target text claims behaviour that was removed. Mark it historical or drop it. Rows 5g/7b point into another document. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_26f62a1ae1abc17d0f02706788bfd399",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+   "bindingSha256": "1ba20d185a5e396d6f5b6a466cc67fa903cc96aa6b729bb3cf7851e778b64b65",
+   "targetOwner": "docs/specs/distribution.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Same-file supersede of a historical Data Dictionary version; all source rows kept; removed items (provider-capacity-lock-stale, herdr-available, workflow-pools-satisfy-independence, coordination-abandoned-claims, runner-rigor-config, mutating-assignment-binding-snapshot, state.lock) are retired in code. The current unit carries the claim forward to the docs/platform/packaging-distribution/spec.md#unheaded-block-86 rows (pending). Concern: the current row 7/7b lists are stale against the code; the canonical list lives in setup-doctor-registry.md. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+   "bindingSha256": "1ba20d185a5e396d6f5b6a466cc67fa903cc96aa6b729bb3cf7851e778b64b65",
+   "targetOwner": "docs/specs/distribution.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Same-file supersede of a historical Data Dictionary version; all source rows kept; removed items (provider-capacity-lock-stale, herdr-available, workflow-pools-satisfy-independence, coordination-abandoned-claims, runner-rigor-config, mutating-assignment-binding-snapshot, state.lock) are retired in code. The current unit carries the claim forward to the docs/platform/packaging-distribution/spec.md#unheaded-block-86 rows (pending). Concern: the current row 7/7b lists are stale against the code; the canonical list lives in setup-doctor-registry.md. | binding: legacy encoding sha256(json.dumps({targetOwner,targetAnchor,targetUnitDigest,targetAncestry,successorGroup}, sort_keys=True, ensure_ascii=False)) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  },
+  {
+   "id": "claim_b741539a16b6eb2792ca6c4178b23671",
+   "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+   "bindingSha256": "1221dfd5b7548c66328b51535f46502b54982ee89dae1b2037abd5b612994e01",
+   "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+   "verdict": "APPROVE",
+   "checks": {
+    "bindingDigest": true,
+    "unitDigest": true,
+    "semantic": true
+   },
+   "reason": "Same-file supersede of the how-to 4.2 project-config check table. The removed rows runner-rigor-config and model-policy-tier-coverage are no longer registered. All 28 listed check ids are registered in src/setup/registrations.mjs. | binding: declared bindingHashEncoding (compact sorted JSON + LF of 4 fields) reproduced; unit: extractMarkdownConservationUnits textDigest; ancestry recomputed equal."
+  }
+ ]
+}

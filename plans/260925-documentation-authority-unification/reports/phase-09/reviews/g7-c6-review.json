@@ -1,0 +1,396 @@
+{
+ "batch": "g7-c6",
+ "commit": "8a9385eca",
+ "verdicts": [
+  {
+   "patchSpecId": "file:docs/platform/agent-confinement/README.md",
+   "path": "docs/platform/agent-confinement/README.md",
+   "beforeSha256": "2ee76f9364637f691e28941d445100fdda7dd8a7df8ba827c2dc51db90a2967d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Candidate Related: legacy docs/specs/confinement-authority.md -> sibling docs/platform/agent-confinement/spec.md (switchboard row 59 successor); metadata only, target exists."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+   "beforeSha256": "efda4957905c9cf31d86278a9af77b61987eb9c5998c8f8210a1d79c6defaea5",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Same Related-line successor swap to docs/platform/agent-confinement/spec.md; target exists; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+   "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+   "beforeSha256": "8a86884e59a7432f24bf2c3a5d23bfdbb4c908c48d7a9ee3c5d4344559540b9d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Same Related-line successor swap to docs/platform/agent-confinement/spec.md; target exists; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+   "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+   "beforeSha256": "7f706076d2ec787168a311fc77b84728c2e59ef7b6f95984b72ad5791bb0e95b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Same Related-line successor swap to docs/platform/agent-confinement/spec.md; target exists; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-confinement/spec.md",
+   "path": "docs/platform/agent-confinement/spec.md",
+   "beforeSha256": "36c3552767fdf9acd5748cf5d85861091cdb48688fc9ee8cbe1117a2995b38b9",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "RUL75 citation docs/specs/runner.md -> runner/subcomponents/h-6979005beaf7/spec.md#business-rules; anchor ok (list-doc-anchors), RUL75 present at L162 with same rule; parenthetical claim unchanged."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-protocol/spec.md",
+   "path": "docs/platform/agent-protocol/spec.md",
+   "beforeSha256": "6bd368bab828957e2deded14d6f3bf8c571a8ff44eefa45e61f7eb30a506b0bd",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Related docs/specs/runner.md -> docs/platform/runner/spec.md; exists; path-only."
+  },
+  {
+   "patchSpecId": "file:docs/platform/architecture-map.md",
+   "path": "docs/platform/architecture-map.md",
+   "beforeSha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "CTR011 spec pointer -> docs/platform/agent-confinement/spec.md; contract row text unchanged."
+  },
+  {
+   "patchSpecId": "file:docs/platform/claude-plugin/README.md",
+   "path": "docs/platform/claude-plugin/README.md",
+   "beforeSha256": "7eca6170bdd2a6b20530fbcaaa9b3bb0168eb443782b03eed9f693e25c4cd3be",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Candidate Related docs/specs/fgos-plugin.md -> docs/platform/claude-plugin/spec.md (switchboard row 60 successor); exists."
+  },
+  {
+   "patchSpecId": "file:docs/platform/claude-plugin/spec.md",
+   "path": "docs/platform/claude-plugin/spec.md",
+   "beforeSha256": "428f4043212d8b0fc7e635957f956db9be01549b6ddc9c9228cf5a79da8007bb",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Two work-state pointers -> docs/platform/work-state/spec.md and #11-business-rules; anchor ok; ownership claim unchanged."
+  },
+  {
+   "patchSpecId": "file:docs/platform/coexistence/spec.md",
+   "path": "docs/platform/coexistence/spec.md",
+   "beforeSha256": "954d7bc90bb7ee28a45c8f9c5a48fdb3fab119e06e0d902ffdfce438cb5b4d5f",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Approval-gate pointer -> runner/operations/h-51f5cd7279fd.md#cổng-duyệt-pr-nội-bộ-approval-gate-reviewapprovereject (repo anchor ok); worker dispatch-contract pointer -> routing-handoff-contract.md#khung-prompt-4-phần per reviewed decision (owner-answers L548, rows 01326/06621). Non-blocking: GitHub-rendered slug of the first anchor has a double hyphen."
+  },
+  {
+   "patchSpecId": "file:docs/platform/decision-citation-drift/README.md",
+   "path": "docs/platform/decision-citation-drift/README.md",
+   "beforeSha256": "6c18bebabf692771dee73392928a0522f63249286acf682932b624e0c7e04030",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Candidate Related -> docs/platform/decision-citation-drift/spec.md; exists."
+  },
+  {
+   "patchSpecId": "file:docs/platform/distillery/README.md",
+   "path": "docs/platform/distillery/README.md",
+   "beforeSha256": "4ac9209e28284f5d3e233fa87839405318a7496d862bec90ee184299e69b2ef7",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Candidate Related -> docs/platform/distillery/spec.md; exists."
+  },
+  {
+   "patchSpecId": "file:docs/platform/observe/README.md",
+   "path": "docs/platform/observe/README.md",
+   "beforeSha256": "8bf9f34ce3e795b1576813c8fe80005ef003613c4d68a3b90fb9fb96054f3be5",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Candidate Related -> docs/platform/observe/spec.md; exists."
+  },
+  {
+   "patchSpecId": "file:docs/platform/observe/decisions/observe-component-architecture.md",
+   "path": "docs/platform/observe/decisions/observe-component-architecture.md",
+   "beforeSha256": "e9c67f18fb66c7ae9144db38da213de5adea71c258e95e6565c079f4e0ffd265",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Candidate Related -> docs/platform/observe/spec.md; exists."
+  },
+  {
+   "patchSpecId": "file:docs/platform/run-supervisor/spec.md",
+   "path": "docs/platform/run-supervisor/spec.md",
+   "beforeSha256": "91cb0302588801a989846109d6a7c9298c28b842709195618f7c22d02ef19011",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Related runner.md/distribution.md -> runner/spec.md and packaging-distribution/spec.md (switchboard row 56); both exist."
+  },
+  {
+   "patchSpecId": "file:docs/platform/system-architecture/architecture/architecture-intent.md",
+   "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+   "beforeSha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Three docs/architect/agent-coordination paths -> docs/platform/agent-coordination equivalents (all exist). Remaining docs/architect refs in the file are owned parks (readiness parkOwners rec090, 9 members), not omitted by this spec."
+  },
+  {
+   "patchSpecId": "file:docs/platform/system-overview/spec.md",
+   "path": "docs/platform/system-overview/spec.md",
+   "beforeSha256": "b027026ae37327e96ce572c9a06fdaebf7d5146625c1abeb10b3bdcb033b0e54",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "work-state/runner/decision-citation-drift/distillery pointers -> relative ../<area>/spec.md and absolute successor anchors; all anchors ok; remaining bare spec names L42/44/45/47/48 are owned parks (6 members). Prose unchanged."
+  },
+  {
+   "patchSpecId": "file:docs/platform/terminal-control/spec.md",
+   "path": "docs/platform/terminal-control/spec.md",
+   "beforeSha256": "e52b3c825a65b4c03771a77ff2fc721eb1345775128baa33fe18b48f3306631d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "docs/specs/reading-map.md -> docs/reading-map.md per frozen decision (transitional-switchboard L209, maps-01794); exists."
+  },
+  {
+   "patchSpecId": "file:docs/platform/ui-spec/architecture/components/C01-item-card.md",
+   "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+   "beforeSha256": "23ff53b38e19a4560db14acd42183d23e792c6228221e7d066fd053e51e4a988",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Two herdr-web-dashboard section pointers -> successor #view-the-taskboard/#retire-a-work-item; anchors ok, cited sections byte-identical to legacy."
+  },
+  {
+   "patchSpecId": "file:docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+   "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+   "beforeSha256": "ebd9cab58f559b5052bfdc73328dd398d3b8940826eb1a49503bf71508a7bdbf",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "-> #answer-a-parked-question; anchor ok; section identical."
+  },
+  {
+   "patchSpecId": "file:docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+   "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+   "beforeSha256": "02a74857d6f7a0cd1f69e4ec38c54489d3b918e110764edb267306e250b4a6cf",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "-> #approve-a-merge; anchor ok; section identical."
+  },
+  {
+   "patchSpecId": "file:docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+   "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+   "beforeSha256": "56968d7d764d9519bd62f61a20b975dcd3a38407c092c55a684095ab97f87b81",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "-> #behaviors-operations (parent of Add/Edit, both §labels kept); anchor ok. Non-blocking nit: #add-a-work-item/#edit-a-work-item exist and would be more precise."
+  },
+  {
+   "patchSpecId": "file:docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+   "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+   "beforeSha256": "5942bed6b8819ac41f02afcf5d1a7978f30078c5e602a6e1fb9307669d82968a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "-> #sign-in; anchor ok; section identical."
+  },
+  {
+   "patchSpecId": "file:docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+   "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+   "beforeSha256": "66c29168cf76703b4d80e331b134233e2c6585a77a942cd0689eee6881e5deaa",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "-> #view-the-taskboard; anchor ok; section identical."
+  },
+  {
+   "patchSpecId": "file:docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+   "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+   "beforeSha256": "7d6b64b8f5572c88fd034272101c35f9f4824008bacbcae94f9bd72ef2b55cf9",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "-> #view-a-tasks-detail; anchor ok; section identical."
+  },
+  {
+   "patchSpecId": "file:docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+   "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+   "beforeSha256": "4b3ffdbdb28fba7323c9361ac0b7f61646fc2f67a3a504dce7cbdddcdc59caf1",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "-> #data-dictionary; Data Dictionary identical, row 4 still 'Question needing an answer'."
+  },
+  {
+   "patchSpecId": "file:docs/platform/ui-spec/architecture/spec.config.yaml",
+   "path": "docs/platform/ui-spec/architecture/spec.config.yaml",
+   "beforeSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "YAML comment product source of truth -> docs/platform/herdr-web-dashboard/spec.md; comment only, YAML structure unchanged."
+  },
+  {
+   "patchSpecId": "file:docs/platform/ui-spec/contracts/20-domain-rules.md",
+   "path": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+   "beforeSha256": "adadb49a002cad09d4df9541f9907cab8bb0a28655ac25eea7389c76e2636e1f",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "-> #business-rules; R1-R11 all present in successor. Successor R5 wording was updated (port/toggle) independently of this patch; this file does not restate R5 details."
+  },
+  {
+   "patchSpecId": "file:docs/platform/ui-spec/contracts/30-states-and-errors.md",
+   "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+   "beforeSha256": "ba00ae2b6fabb389308c763efe779c577d33532afee5bea1c693cba5517c2f04",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "-> #edge-cases-settled; anchor ok; 'never been parked' case present, section identical."
+  },
+  {
+   "patchSpecId": "file:docs/platform/ui-spec/spec.md",
+   "path": "docs/platform/ui-spec/spec.md",
+   "beforeSha256": "436782fa67de9576dd20c28c7f2b960a4a5c11316689afbd81ad7bdc0c6880d6",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Product source of truth -> docs/platform/herdr-web-dashboard/spec.md; exists; path-only."
+  }
+ ]
+}

@@ -1,0 +1,539 @@
+{
+ "batch": "g7-c4",
+ "commit": "8a9385eca",
+ "verdicts": [
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/README.md",
+   "path": "docs/platform/agent-coordination/README.md",
+   "beforeSha256": "a0a5aa8e1899e97ef1f250c1c4365f9735709dd2e1f17a80a684f9acaf7c99f0",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Related + decision-0062 pointer -> runner/decisions/h-36d872fbb0e5.md#0062-...; anchor resolves (extractMarkdownConservationUnits); note text unchanged."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/architecture/README.md",
+   "path": "docs/platform/agent-coordination/architecture/README.md",
+   "beforeSha256": "164d48cf0386988457af6447eb9a6cd5600765610f649b3ec179628ed8df98df",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+   "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+   "beforeSha256": "29a94c3bac47c039b65b9ab0879e5867de4035fe6962b27d33cf4957e9d4574d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Related + decision-0062 pointer; anchor resolves; claim text unchanged."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/architecture/evidence-and-results.md",
+   "path": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+   "beforeSha256": "916fe71f475cad3e19f137283017d3c732912354051e5b526a2ee4fff744a346",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+   "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+   "beforeSha256": "848999421de92c2840c86b3cbe459d3fb58fce4b8d0a718557547eacebbe7614",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+   "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+   "beforeSha256": "87959922ca6a7fd9ad225c802c95367734077b6df6b9cb92a8b9ae131204a9c6",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/architecture/protocol-model.md",
+   "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
+   "beforeSha256": "726b5d36a7a0ee13be3b795cacf856be63394b0e4d42481ef1f1641a6d840967",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/architecture/run-handle.md",
+   "path": "docs/platform/agent-coordination/architecture/run-handle.md",
+   "beforeSha256": "a5b3d04dbc725ba2248ed07fd24144cc2e3ffd4031ae2fc23d6088d12f50581b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/architecture/runtime-model.md",
+   "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
+   "beforeSha256": "bb7d7f863fa4168f636b4e1fe9a6c914c06fdda3f2b39adfa3840189c1e69f90",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+   "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+   "beforeSha256": "9c1cf88b17b728fda5a6d18e1d8d57de2b719bb0f50d9ded28947ffda8b8c2e7",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+   "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+   "beforeSha256": "d7189aa5fcfd50500457ac1fab647dc687b58303153703a1c530fa63c38126f9",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/architecture/work-integration.md",
+   "path": "docs/platform/agent-coordination/architecture/work-integration.md",
+   "beforeSha256": "12741378ece5a65b7d8c01bbb3e98eb568ab7ca2514018f08733700c0220c05d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+   "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+   "beforeSha256": "0fc67b5f0acddf1e3971d3c6d9cfa55e2593aa8811c1365864f73f3c88034c9a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Related pointer + final action stale-assignment-provenance-citation: assignment-runner.mjs:349-385/495-516/973-975 verified at 8a9385eca (provenance.kind checks at 351,370,514,974). Line 39 docs/specs/runner.md:3072-3081 is individually parked (f04503), not this spec."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+   "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+   "beforeSha256": "3e63f3cc25d8f0a1aa9e7638d8187406ad882796b1f03e9b7ec63d94841b65a3",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+   "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+   "beforeSha256": "9bc319cc98fc2be021eb34b207adff37cdf29a051e3da2b655c3b11880b3cfe0",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+   "path": "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+   "beforeSha256": "3cc1928aec230839162c8fdc2dc37c47bcd54eac67de4b50857f1ffa5a230653",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
+   "path": "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
+   "beforeSha256": "67e9ce7843b88e6ebe0b7688b0e00f1490bfaedf718c1e5853826a3f98eabe8e",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+   "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+   "beforeSha256": "36a638a0bcc156ac4aab3866514f3a875330fa0d6c5f609dcd989d5c21023bbd",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Related pointer + final action stale-execution-budget-citation: execution-contract.mjs:372-383 verified = budget object/timeoutMs/maxRuns/telemetry-only tokens; dropped 345-346 was role validation (now 346-347), not the budget sentence it was attached to; no claim text changed. Line 67 runner.md:3058 parked (f04511)."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+   "path": "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+   "beforeSha256": "7304aaaffd81ebf4dd9ebc580f171330c03e0cb2596835e04b24e630a41e2cd6",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+   "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+   "beforeSha256": "3e3784c6d5b9f6be51f824483be037040395a263cfb26eadae4a1762dc44427b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/decisions/README.md",
+   "path": "docs/platform/agent-coordination/decisions/README.md",
+   "beforeSha256": "79b3e6cbec432e90302c268dce74fcdde52e54138325a92c12aebb4579979d80",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+   "path": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+   "beforeSha256": "92ab5eaaa4c71e0c608ca98f2af80223dcba72b71d2c8117b02382ae8f456ed8",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Related pointer only; line 20 Superseded-by docs/specs/runner.md deliberately preserved (L12-26 history-file rule, matrix f04521 preserved-history)."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
+   "path": "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
+   "beforeSha256": "9b8fbd656ba0424b16dc4e036613faeaaac50280dc159c0c7dc39841d71ab7ba",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Related pointer only; line 20 Superseded-by preserved per L12-26 history-file rule."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
+   "path": "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
+   "beforeSha256": "909c0b05f248fff0ad1ea243a00b7b07df13e6e7a51153be81755658f8a64530",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Related pointer only; line 20 Superseded-by preserved per L12-26 history-file rule."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/playbooks/README.md",
+   "path": "docs/platform/agent-coordination/playbooks/README.md",
+   "beforeSha256": "bb30bd431390f4791b4f722434adecccb85b302f964f7b3c0e54fc8feb9cd953",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+   "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+   "beforeSha256": "f5dd4ea468dbf1cfcee48ecc0aa9de20fa3925a8b134ec1d2a37f1a50d819827",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+   "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+   "beforeSha256": "f2586e6b0be3aaa0b2c6530bb4961a8d4b80d33e55b40b02acb34e65eb5d7a27",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+   "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+   "beforeSha256": "aeb5be5b11a8b6144756c1578d122095e599b7781f46f89889bdcc1a7d52ab45",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+   "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+   "beforeSha256": "e8f78ba9a72e660df02eaf498231ecedd51826ada7a9b8f02b5ea234ceb2da66",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+   "path": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+   "beforeSha256": "87d1eb6b945b6344aa6841484bf3c3b58c69f74e3566f1e5184ce9b0e70a8be6",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "decision-0062 pointer; anchor resolves; claim text unchanged."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+   "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+   "beforeSha256": "3cccc8cff795fe5b589c19f8aed2e9bc23594ead0aa39009dba1be0eb52b37e6",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Related pointer only; line 105 docs/specs/reading-map.md is individually parked (f06394, reading-map merge), not this spec."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/proposals/README.md",
+   "path": "docs/platform/agent-coordination/proposals/README.md",
+   "beforeSha256": "591ae7799242fc7c5c4f89383565f1c7eb1b37128c5f9e0f519263e08387f535",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+   "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+   "beforeSha256": "4b5425c7104d77f69f4beaf6f00e96950042ce8a81efbedf148cd42c117d13fb",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Related + 3 decision-record pointers (Lop-con-thieu, 0034, Lich-su-quyet-dinh section containing 0026 Native-First + 0034 rename); all anchors resolve; wording \"runner spec's (<decision record>)\" slightly loose but no claim change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+   "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+   "beforeSha256": "6283f064d761fc87f746031a2d12da027c06bbea5be85e5a45365ed8d2df4088",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/spec.md",
+   "path": "docs/platform/agent-coordination/spec.md",
+   "beforeSha256": "1306d4f34b42fb2f6eaf9aff1dfb894e300e989975ab0ba9a0842847f24d22c9",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Related, Superseded-by and 2 body links -> docs/platform/runner/spec.md (../runner/spec.md resolves); ownership claims unchanged."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/verification/README.md",
+   "path": "docs/platform/agent-coordination/verification/README.md",
+   "beforeSha256": "da761fbeb9673b7c71caae2d0b3ef9cad64bceebb50ff38581e34e7e7799c6f5",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/vision.md",
+   "path": "docs/platform/agent-coordination/vision.md",
+   "beforeSha256": "10489471593b367b403a34a84f003e3587016f6d51096e4a04eaad668094be8c",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/vocabulary/README.md",
+   "path": "docs/platform/agent-coordination/vocabulary/README.md",
+   "beforeSha256": "5c687417e9a05a64d35f66de12b46b4b462fef0c45f296e90ad17d5b19d42a09",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+   "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+   "beforeSha256": "f1d218d61037b623fd05d40247f36463cdd6461841278c4cc85c0c43a49c7803",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single Related-list pointer docs/specs/runner.md -> docs/platform/runner/spec.md (exists; runner area candidate spec, provenance docs/specs/runner.md); no other change."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+   "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+   "beforeSha256": "6ae9d176df352daeec9b335040b7672706cf6f6719ae79fb5c2c9b85111faafb",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Related + Layer Map ownership pointer -> docs/platform/runner/spec.md; claim unchanged."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+   "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+   "beforeSha256": "f1af5a4cf9705322fd21d12ce41e4fa9a0138ca9792e1c14b5f32606a1fb6318",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Related pointer only; line 31 platform-foundations.md:210-219 parked (f06456)."
+  }
+ ]
+}

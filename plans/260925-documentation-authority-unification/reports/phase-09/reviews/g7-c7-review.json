@@ -1,0 +1,617 @@
+{
+ "batch": "g7-c7",
+ "commit": "8a9385eca",
+ "verdicts": [
+  {
+   "patchSpecId": "file:docs/coexistence.md",
+   "path": "docs/coexistence.md",
+   "beforeSha256": "287b6013a2416aa86fe16b6cd705d78dd57d4ca190f0b61971521c7506e525e4",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/contracts/fgos-gateway-api-v1.yaml",
+   "path": "docs/contracts/fgos-gateway-api-v1.yaml",
+   "beforeSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/distillery/porting-log.md",
+   "path": "docs/distillery/porting-log.md",
+   "beforeSha256": "31125ff7b60fb6d26d7e6118263352e0f30516eab6c0fd5891c5c6315814f805",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/explanation/assert-plan-evidence-current-tree-fallback.md",
+   "path": "docs/explanation/assert-plan-evidence-current-tree-fallback.md",
+   "beforeSha256": "9ac6ea7c59eb18dcb291c2cd2386f5bbc0edec49e8d2f2b2b63967955317a6a0",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/explanation/branch-content-mismatch-fgos-exclusion.md",
+   "path": "docs/explanation/branch-content-mismatch-fgos-exclusion.md",
+   "beforeSha256": "4b60c91ab0897fb3f262c9563e9b387bda35fc4b7e6e288c55d7deaaff58ac35",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/explanation/d3-goal-check-rationale-trace.md",
+   "path": "docs/explanation/d3-goal-check-rationale-trace.md",
+   "beforeSha256": "791dff01958326399c04dd402fdf43f63a93b5359e5fdddac4d2f45be197a7ad",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/explanation/eventlog-sweep-checkpoint-redesign.md",
+   "path": "docs/explanation/eventlog-sweep-checkpoint-redesign.md",
+   "beforeSha256": "0b2458b2d9fcd8e3f1ffe4dd55dcabec781a776dc677ffccbe42af61fc1fbe7d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/explanation/events-jsonl-opportunistic-truncation-check.md",
+   "path": "docs/explanation/events-jsonl-opportunistic-truncation-check.md",
+   "beforeSha256": "a100e178f0834551d357fc5a1c484dad56464016486f81361bf7ff4676047992",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/explanation/fgos-lifecycle-tracking-concurrent-desync.md",
+   "path": "docs/explanation/fgos-lifecycle-tracking-concurrent-desync.md",
+   "beforeSha256": "16344f3f744ad817a02d72b05e3f9934313b403b4b737fbef4a6053df16ebf4b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/explanation/herdr-orchestrator-terminology-boundary.md",
+   "path": "docs/explanation/herdr-orchestrator-terminology-boundary.md",
+   "beforeSha256": "d7cdf87db715d14b410a48210814c1471c9f8c7f3d289899018b93805abd5dbb",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/explanation/herdr-spawn-adapter-fresh-pane.md",
+   "path": "docs/explanation/herdr-spawn-adapter-fresh-pane.md",
+   "beforeSha256": "401803a81915681269a31491eb09abbb841ee58574e99199ec7e7bb330a573b5",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/explanation/main-checkout-reset-ancestor-commit-loss-guard.md",
+   "path": "docs/explanation/main-checkout-reset-ancestor-commit-loss-guard.md",
+   "beforeSha256": "e3b23281624b9ba9f24bdafbcc6231394ee88ce50b4ec16e795063f527db096f",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/explanation/mergedsha-missing-unreproduced-race.md",
+   "path": "docs/explanation/mergedsha-missing-unreproduced-race.md",
+   "beforeSha256": "48468ee0d3997c19a36110a4bc5016c3b8e86d66d5cfc42ba51e024897f1b1fe",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md",
+   "path": "docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md",
+   "beforeSha256": "b4103283f59f112d7300767cdd238244a9f5f20a673f0ec710101e6ba34ff975",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/explanation/return-approve-background-execution-guidance.md",
+   "path": "docs/explanation/return-approve-background-execution-guidance.md",
+   "beforeSha256": "97d4c97c2fe6cc8cd8cd1a0f1447372549f9a9fd18c1db6b3696c0294f2e27b8",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/explanation/skill-prose-cleanup-design.md",
+   "path": "docs/explanation/skill-prose-cleanup-design.md",
+   "beforeSha256": "dab6d6d6ce981510a7a006b163931436c14bf86fa91af81b493d484f38f9b07a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/explanation/worker-prompt-iron-law-evidence-timing.md",
+   "path": "docs/explanation/worker-prompt-iron-law-evidence-timing.md",
+   "beforeSha256": "636ef97b006cc877b95274704ec2c7ee29a69da82ffcd3e837be06767e8e10bd",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/explanation/worktree-manual-merge-fgos-blob-safety-net.md",
+   "path": "docs/explanation/worktree-manual-merge-fgos-blob-safety-net.md",
+   "beforeSha256": "97a644fa5a29da7929e98c485e2e445a03a0073ec38b54ce14b340237d14a858",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+   "path": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+   "beforeSha256": "2a906dc8d7a912d9c72c6cb494e95bfba958103153a0dadb57a07b1fbdecb1a2",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/how-to/configure-and-operate-agent-confinement.md",
+   "path": "docs/how-to/configure-and-operate-agent-confinement.md",
+   "beforeSha256": "37e20cd8865be2066cc2d013ecbf871cc4210fc28c0f579f3b84ecb638c77f7e",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-alternative-and-composite-reopen.md",
+   "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-alternative-and-composite-reopen.md",
+   "beforeSha256": "71a122831e2a1c2e3c716fac30e6ac708b98c5151998abb5b9926a27bbfbbdd5",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-clarification-and-challenge.md",
+   "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-clarification-and-challenge.md",
+   "beforeSha256": "19e1487f1afbfb7cb272f7b659ff5e731ed8c17e1fa6c32de46d6d319f7ceadc",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-clear-start.md",
+   "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-clear-start.md",
+   "beforeSha256": "b255714e4fcadf04bb7fe48237b3563bbd60e0ec19ec22aa8de07ad82a04ced8",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-decision-request-and-resume.md",
+   "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-decision-request-and-resume.md",
+   "beforeSha256": "0046e27b51177c7d4b8b0c9fe54abbb89c7c7f1e9322f890e0b7d70bcb9e7d70",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-final-decision-and-defer.md",
+   "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-final-decision-and-defer.md",
+   "beforeSha256": "2dd5e30d0e1d0857fe89aba1e841f54659592c5ae2f59af2b95584c23d4cdbc1",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-heterogeneous-and-homogeneous-roster.md",
+   "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-heterogeneous-and-homogeneous-roster.md",
+   "beforeSha256": "3a24d99141ef2e073181a87943c118f2df843f3a2bb227ac86536f5cf8fa08eb",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-material-context-reopen.md",
+   "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-material-context-reopen.md",
+   "beforeSha256": "0255e7a9f986eae96b953cab6a1b3dc18caecfae15ddc071301a1e8a45866335",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/how-to/coordination-examples/architecture-advisory-panel-v1-unclear-start.md",
+   "path": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-unclear-start.md",
+   "beforeSha256": "89fc17ee00a7ccc254a6d3c10d26a137894e51340b34671ba45ec55ab860ba49",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/how-to/fix-bare-citation-findings.md",
+   "path": "docs/how-to/fix-bare-citation-findings.md",
+   "beforeSha256": "11d8cb55ff745f5cce515eb3617327fd396b4e25a0adbddb682ebbc32caf9961",
+   "verdict": "REWORK",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": false
+   },
+   "reason": "Hunk @@ -34,7 +34,7 @@, new line 37: the example says runner rules are 'defined there' in `docs/platform/runner/spec.md`, but that file defines 0 RUL<n> rules (all 97 runner RULs live in `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md` ## Business Rules). So the 'where the gloss text comes from' instruction now names the wrong rule home. Retarget to `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules`, as specs 30/31/32 in this batch already do for RUL40/RUL61."
+  },
+  {
+   "patchSpecId": "file:docs/how-to/use-fgos-architecture-panel.md",
+   "path": "docs/how-to/use-fgos-architecture-panel.md",
+   "beforeSha256": "9494cd9bb1854187bc6a54540394264d91ccdedc503d0187b7ea7f98f7f34c2a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/io-contract.md",
+   "path": "docs/io-contract.md",
+   "beforeSha256": "2368be78c05693c7a845fe33fd906837d9164fb93ca03c0b63a683efeeb7fd11",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "0011 now points to retired-decision-history #7 and RUL61 to the h-6979005beaf7 business rules, both verified. The untouched 0014 and `docs/specs/work-state.md` §envelope sites are recorded carry/blocked edges (P8-DOC-GAP-02, §Danh tính người ghi carry), not misses."
+  },
+  {
+   "patchSpecId": "file:docs/operator-runbook-herdr-cockpit.md",
+   "path": "docs/operator-runbook-herdr-cockpit.md",
+   "beforeSha256": "5c5b7d6c6d80c4822586376676176e58d3434536f774bea50e162b20990840da",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/reading-map.md",
+   "path": "docs/reading-map.md",
+   "beforeSha256": "df623495b2a5c1d0de40a66c9ef801091e88bdf76fb46effa4cdf4d0e8e2f54b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Pointer swaps only. All 46 anchors in the batch resolve via scripts/list-doc-anchors.mjs anchorExists. Cited RUL40/53/61/84/89/93 are verified inside h-6979005beaf7 ## Business Rules, and RUL45/RUL60 inside work-state ## 11. The remaining docs/specs|docs/architect tokens are recorded non-patch edges owned by other gates."
+  },
+  {
+   "patchSpecId": "file:docs/reference/dispatch-module-boundaries.md",
+   "path": "docs/reference/dispatch-module-boundaries.md",
+   "beforeSha256": "99cf0a339d63912ea095fe4bb2fcd5a5f18064f467029c3365f0d6ed8eb0dde9",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/routing-handoff-contract.md",
+   "path": "docs/routing-handoff-contract.md",
+   "beforeSha256": "535dd0f61113aab54dcc9637c9f19ef5eb409a21fe515feddbae239a33ec1e81",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/ui-spec/00-overview.md",
+   "path": "docs/ui-spec/00-overview.md",
+   "beforeSha256": "76af5d449a69613a2cd3871e5b898934f8b57db685d0d87d1cb4eb3375ff71d7",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/ui-spec/20-domain-rules.md",
+   "path": "docs/ui-spec/20-domain-rules.md",
+   "beforeSha256": "cefbf0207b8492ffaffff1f23e13494e94f1343cd9ae4ae1fd82a187dc212e32",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/ui-spec/30-states-and-errors.md",
+   "path": "docs/ui-spec/30-states-and-errors.md",
+   "beforeSha256": "5fe51d275b13c958c865da6c8a0bf60142506e1c5c637829afa23e9b0579736e",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/ui-spec/components/C01-item-card.md",
+   "path": "docs/ui-spec/components/C01-item-card.md",
+   "beforeSha256": "3c31c82cef06bb6f819b4bf8a37fe8f7afa2991daff0a180f827f8b66641ab0a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/ui-spec/modals/M01-answer-question.md",
+   "path": "docs/ui-spec/modals/M01-answer-question.md",
+   "beforeSha256": "6c459c08d0ad35c362181fac748b68c765c60441597049e3e3c00c8485a61f23",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/ui-spec/modals/M02-approve-merge.md",
+   "path": "docs/ui-spec/modals/M02-approve-merge.md",
+   "beforeSha256": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/ui-spec/modals/M03-add-edit-item.md",
+   "path": "docs/ui-spec/modals/M03-add-edit-item.md",
+   "beforeSha256": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/ui-spec/screens/S01-sign-in.md",
+   "path": "docs/ui-spec/screens/S01-sign-in.md",
+   "beforeSha256": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/ui-spec/screens/S02-taskboard.md",
+   "path": "docs/ui-spec/screens/S02-taskboard.md",
+   "beforeSha256": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/ui-spec/screens/S03-task-detail.md",
+   "path": "docs/ui-spec/screens/S03-task-detail.md",
+   "beforeSha256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/ui-spec/screens/S04-questions-needing-answer.md",
+   "path": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+   "beforeSha256": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  },
+  {
+   "patchSpecId": "file:docs/ui-spec/spec.config.yaml",
+   "path": "docs/ui-spec/spec.config.yaml",
+   "beforeSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Successor pointer swap only: the target file and anchor resolve at 8a9385eca, the anchored section matches the citing sentence, no claim text changed, no unrelated edit."
+  }
+ ]
+}

@@ -1,0 +1,955 @@
+{
+ "batch": "g7-c1",
+ "commit": "8a9385eca",
+ "verdicts": [
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/README.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+   "beforeSha256": "fcb4e76bb918cec17c8d833abf8104957909794f9475fc805e0b46eef92a35ee",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+   "beforeSha256": "7322f48aae09a8f0474dff36976bf89d4e90c1a7cd0c27ac718311c68fb51476",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
+   "beforeSha256": "44583d97aa123e556e59e1bf2df83c010bcd17943c7783b18008ce8c08815c56",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
+   "beforeSha256": "337a8434c51b1e72aa0944e01c9db3daae5da16ca2ccd1995e4decfa148a99e9",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
+   "beforeSha256": "05b1c7ceba3a89083d8fc1dd3565db2fcd27ce9ed1a588b5653a41bcb0369ba7",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md",
+   "beforeSha256": "cd4f9064ace300da4a752c04c3a091eba598dba0b8e1d2d9050383f77877b616",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md",
+   "beforeSha256": "94d0bd5ebe83755e5a14422e455c20e6c9dab09f5ced70f0e6c34d46b105d317",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+   "beforeSha256": "dd12830b9f191b0182b16daa4942bec55b41593d1cfe8061792ecca5f42d019f",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md",
+   "beforeSha256": "138c4eefc7fdb7d702586d2951f11aeed7ae4ba1c0955bfd895922185c3e2d92",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+   "beforeSha256": "b18256aa248efdcb884ca4df66b25da2abc63b9d1c93a2e06a6d7dccfd52fc59",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
+   "beforeSha256": "c6cfad4c026309f70f772452d657dd1cb748929abb83dedfbdaa8f9afc6a9d50",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+   "beforeSha256": "a1ae971fb4d7cf344269017c6679a28dc99dfe321946fce5bc565ef8e25a5f09",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md",
+   "beforeSha256": "36e3264a2dc695a6ee00f89df32f1542624b5c4c01272597726df0e070b127d3",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md",
+   "beforeSha256": "11c25a2b3f26acd7d04b6debb29df9684fe53d61fa48dc13359fa50c86a8688d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md",
+   "beforeSha256": "3a9a96dc3be9ea7d8818ced5870d9289ffa28299be93e5d19855a6ae3030111a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+   "beforeSha256": "7b10274c9528f2ac3e304f3edb11c09ce9083979917e384a65a8a54156b04809",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md",
+   "beforeSha256": "8693fefc4020ecee41bd8e37384f37049cbc33e555952ae9a97090b4535b502b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+   "beforeSha256": "268af8311d9e1f0dc91579d75ba43174395362e5f33346a3911524cb00229064",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+   "beforeSha256": "e005edcfa74d8745286a261247ee5ab09193e34c90a3ef3cc3cd51a27e94378a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
+   "beforeSha256": "26ce4d27a2f8b90f65797587b7f43858197bb65966a9acba72e9dd090c5852d0",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md",
+   "beforeSha256": "9b2060aaa38a81f3af5667dd0322a82b1236932cae1750901cbf9aa19510d365",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md",
+   "beforeSha256": "05d0d9904b1585e51ad9e68d08222dbccaeb17a6c33ae82ee586c5a8c5076a40",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md",
+   "beforeSha256": "641e53d699bed08b8bc1a2560d34782af56d6a6f06ffd223bf03651cb18bd89a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md",
+   "beforeSha256": "9b6a2a82e9ef0f03b398b920806da34590518285669fe5035f6fe6370d899dfe",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md",
+   "beforeSha256": "7cabdda6aa024a58c620dc0db7aba105f42e066df52cdece07a48e0e4b3944ce",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+   "beforeSha256": "c120616f2ef08d3436082fce5723096abc10a8b0139fd05d4831c5f3b8d3e786",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+   "beforeSha256": "378ddfb0b9ee7ac7fb1ae64bf78132657a62a215983ac81fea89b27b0144925a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+   "beforeSha256": "5993832e16b9f9c083c70ab559ded77ee40611699900a8501048956a8d673ee2",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+   "beforeSha256": "5e24133ed6af0fd697eceeec9f89314343f53e1b9d4c9ee14b848f6e47c531e8",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+   "beforeSha256": "83b15457c3df4736e1f8599311713d7edc1845de2e15b9b6cc6348370d5d7cf3",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+   "beforeSha256": "e10f823de2e7971378e617bdd8eecc2a5603bb064dbbac994355f41d1693bc46",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+   "beforeSha256": "ece76b2f2c2e51502dad9fa950e3f04341651e5c12b17adb96197d7bff59b8d6",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+   "beforeSha256": "68caae1d33be3dc6f94375bdf3aa25e8aee90ce46b00975e3559f44224faa082",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+   "beforeSha256": "5a4f9f9209d843b392693f6613243d8172cef807a8c86b719a8dbf9e4eaa4075",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+   "beforeSha256": "2e4cfa172517ff749aa840bce13f2a687909242e409b6175c3c9d28285600c6b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+   "beforeSha256": "23b3f9740d69fccac393be7f9e5b81544b654f344220f421ca7d4878f47728bd",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+   "beforeSha256": "024296d84c79542f793c408efc75e2c3089e682e31bd5518a35c997d24c46aeb",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+   "beforeSha256": "7d08a6824a122fe1eb19ae97f7e4d37395f900c4ac380bf42340e6952c1fb387",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+   "beforeSha256": "4bcc7cbff043ba85e5b41f4e14f9954966c861a0f8f39259fb0050f4431cbc5d",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+   "beforeSha256": "8d1e5a682927463a5ef6fac777040a08d2389b78c697985327a0c8f7bbc30cd6",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+   "beforeSha256": "b6e18afd8dcc39f52877ea77a836cc45a5f5f7ccce937dc5c8863a913ab0f5bd",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+   "beforeSha256": "de04beab895a45657097eae7dd8d2bcc8dd8ad888f5f661a44cf63a56ba97446",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+   "beforeSha256": "641542f2f68685579c498d1b2ec067dc056e46ea0b44782fc019ec212f3d1873",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
+   "beforeSha256": "8dd0dca9b7fa9fe292617af44f7db4f83a841bc3a0e6b1394a0224e1bab6eb07",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
+   "beforeSha256": "d272fe276db3a6b29828803f5b59caa32bc0ea4ba8039bfbce18edfcb66fdf31",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+   "beforeSha256": "8114708dd784265bb50d7daf8093bb550bb4ff55f9bb49e1dd1b6a80cab2384c",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+   "beforeSha256": "e44cdc1e389036e9013dac23a8eee07cc696ae1e577cd90682a08476a1b1ca6f",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+   "beforeSha256": "8b0629c39c72db62ea6bd1b7dc5bac2ee80436d5db7ee9ba72a078c56bb729a4",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md",
+   "beforeSha256": "7541a5f027caf273459b72b36fe635ebd7262db1a28a5dee4bf8fb8ac9b4df41",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+   "beforeSha256": "ce7bbb19c2f0a3880c24cb983df45a69bcfbcd344ea053aaf5ef2f1a9f59a0f2",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+   "beforeSha256": "2d42b9eae83cd0c19183ca7c50a0e9b3fc959b497750f88deb7a71579476ab0b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+   "beforeSha256": "150dc5f95a94a0e0addc9789bf196635ab90a26e1b61ecee33c128806850420c",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+   "beforeSha256": "8a38625d069995729408e380fbb13b94a28c1fb7b048e3b4d43c7f6bc9044e64",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+   "beforeSha256": "68995fdfc911f40d52bedfb39bd05cf31d135e67a81bbd34f475a891193ce66e",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+   "beforeSha256": "84b1b55b1864360075d21d32da2b9bba07a151aad393dcc11539239ee7501bc1",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+   "beforeSha256": "a41b3d29e10acf28e75f0e1d2cecdfa5c65feac5c72dcff1906335b75c66daf8",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+   "beforeSha256": "1d49e4d8a239fd0a5cebda8b65be30b480f5733f48e55539e16874c9519a618b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+   "beforeSha256": "fc65852d0612eaa6556520014e2a377976d1e691d2828fd5bc2deecc7c004ae3",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/spec.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/spec.md",
+   "beforeSha256": "5610ecb432d5458add306daed63d04b9baa590d2dbbc8d390fff40ab8c74fe7a",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+   "beforeSha256": "ae2eaf9f4e9dc5378b3666da02f0d400029f102ce0ed2d01a36907ceb967942f",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+   "beforeSha256": "79c603b606b3dc27b6bbd8637ebf8686e9fda2b884d036f9dec12df36aea8103",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
+   "beforeSha256": "5a27d9dab4ffd936948174f231ebeac8b95a55e03149189501cd1fcf127fe021",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/vision.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
+   "beforeSha256": "0bc5655a72cb5fb06754a2448a48cf57bcb66ed9a4d154ea8bb36fdbd1af9657",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+   "beforeSha256": "a63d2d508214c7d414bcac819a7ec415f6e1169291b28bf7a5520201ea937900",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md",
+   "beforeSha256": "23b76d492c80579e73be3a44e96cdac73d75bef4ff4066bd5fa749300e336282",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md",
+   "beforeSha256": "420853736e8f1a7b8488a70ec3d2ee398b975867091ff4bc12e613590d6fbeb6",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
+   "beforeSha256": "282210b38026e6b7b1349865798b5073558791ba9a918a51322057890e94d77e",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md",
+   "beforeSha256": "4a5cbc0c2be348d6ed60be11afb1a1ed17c9300226c63bcb276a49d85015aa6b",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+   "beforeSha256": "a19434c03d3e6bc924f15dfb17578befc433b33814316b80c78dc22d7cfe92cb",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md",
+   "beforeSha256": "491d90a6755cdb6ef0f17b2befd8861c29cf101c87d7a9938ebf2721e133a9d6",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
+   "beforeSha256": "9c8f5d8e2a55ddf88950fe4ca069cf8cdd46ef9213d77b9d8666ebbc813800f5",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/legacy/architecture/system-context.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/legacy/architecture/system-context.md",
+   "beforeSha256": "faa90b316286f190e01a800ad9a2c27cd5d9e1aeb8d22adaebaaf727f62a09ea",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  },
+  {
+   "patchSpecId": "file:docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+   "path": "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+   "beforeSha256": "60a61d421faa9cd83d7625c3068aedb604a5edd02f78840c82cd445ba64e919e",
+   "verdict": "APPROVE",
+   "checks": {
+    "hash": true,
+    "forward": true,
+    "rollback": true,
+    "semantic": true
+   },
+   "reason": "Single hunk @@ -14,7 +14,7 @@ retargets wrapper Related entry L17 docs/specs/runner.md -> docs/platform/runner/spec.md (exists, whole-file holder, not self, not already listed) per L12-34(4); Provenance/Superseded-by/framing (L9/L19/L23) and Literal Snapshot carriage untouched per L12-35(3)/L12-26(5,8); spec diff == step-03 record diff; no other edit."
+  }
+ ]
+}
