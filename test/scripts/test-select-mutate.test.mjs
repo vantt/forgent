@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { removeWorktree } from '../../src/runner/worktree.mjs';
-import { classifyMutant, classifyOneMutant, relatedFilesForRule, runNightlyMutations, runRelatedCaptured as realRunRelated, symlinkSharedDirs, headCheckouts } from '../../scripts/test-select-mutate.mjs';
+import { classifyMutant, classifyOneMutant, relatedFilesForRule, runNightlyMutations, runRelatedCaptured as realRunRelated, symlinkSharedDirs, headCheckouts, checkoutCargoTarget } from '../../scripts/test-select-mutate.mjs';
 
 test('symlinkSharedDirs: symlinks node_modules always, target only when the repo root has one', () => {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'symlink-shared-repo-'));
@@ -260,6 +260,13 @@ test('classifyOneMutant: invalid when the mutant find string is not present in t
   const runRelated = () => ({ status: 0, signal: null, stderr: '' });
   const { classification } = classifyOneMutant({ mutant, rule, worktreePath, runRelated });
   assert.equal(classification, 'invalid');
+});
+
+test('a throwaway checkout builds into a Cargo target of its own, never the one the checkout under test uses', () => {
+  assert.equal(checkoutCargoTarget({ CARGO_TARGET_DIR: '/shared/target' }), path.join('/shared/target', 'mutation-checkout'));
+  const repoTarget = path.join(process.cwd(), 'target');
+  assert.notEqual(checkoutCargoTarget({}), repoTarget);
+  assert.equal(path.dirname(checkoutCargoTarget({})), repoTarget, 'kept beside it, so it stays warm across runs');
 });
 
 test('relatedFilesForRule dedupes directTests + boundaryTests and returns [] for a missing rule', () => {
