@@ -16,9 +16,13 @@ import {
   cellOfRunId,
   cellOpen,
   cellProgress,
+  loopConfigs,
+  loopPrompt,
   nextHarnessAction,
   pinOf,
   pinProblems,
+  PEER_FILE,
+  REGISTER_FIRST,
   readResults,
   recoverLedger,
   renderInstruction,
@@ -127,4 +131,19 @@ test('the stage order rotates every round over the same cells', () => {
   assert.deepEqual([...stageOrder(cells, 1)].sort((a, b) => a.id.localeCompare(b.id)), [...first].sort((a, b) => a.id.localeCompare(b.id)));
   assert.equal(stageOrder(cells, 1)[0].id, first[1].id);
   assert.notEqual(first[0].cli, first[1].cli, 'the CLI alternates');
+});
+
+test('the loop trust runs one way, alternating its direction over each pair, and only the second head is told a name', () => {
+  const configs = loopConfigs();
+  assert.equal(configs.length, 12);
+  for (const pair of ['CC', 'CX']) {
+    const mine = configs.filter((c) => c.pair === pair);
+    assert.deepEqual(mine.map((c) => c.trust), ['aa-trusts-bb', 'bb-trusts-aa', 'aa-trusts-bb', 'bb-trusts-aa', 'aa-trusts-bb', 'bb-trusts-aa']);
+  }
+  const data = { scenarios: { 'S1-aa': 'Ask agent {peer} to count.', 'S4-bb': 'Settle it with {peer}.' }, sideWork: 'Side work.' };
+  assert.equal(loopPrompt(data, 'S1', 'aa', 'ws-claude-3f'), 'Ask agent ws-claude-3f to count.\nSide work.', 'started second: told the name');
+  const first = loopPrompt(data, 'S1', 'aa', null);
+  assert.ok(first.startsWith(`${REGISTER_FIRST}\n`), 'started first with a peer to reach: registers before its peer starts');
+  assert.ok(first.includes(`the agent named in the file ${PEER_FILE}`));
+  assert.equal(loopPrompt(data, 'S1', 'bb', null), 'Side work.', 'no scenario: no name needed');
 });

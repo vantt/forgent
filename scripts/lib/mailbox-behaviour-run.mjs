@@ -412,26 +412,41 @@ export async function runOne(ctx, cell, runId) {
 
 // ---------------------------------------------------------------- the loop test
 
-/** The loop test's configurations: pairs CC and CX, scenarios S1-S4 at the contract limits, and S2 at two lowered limits. */
+/**
+ * The loop test's configurations: pairs CC and CX, scenarios S1-S4 at the contract limits,
+ * and S2 at two lowered limits. A head's mailbox name is drawn at registration (Claude Code
+ * 2.1.309 derives its session name's suffix from random bytes while its stable-address flag
+ * is off; Codex heads get a drawn suffix), so neither head can name the other at launch and
+ * trust is one-way: the head started second is told the first's name and trusts it. The
+ * direction alternates over each pair's configurations, so each way is measured in half.
+ */
 export function loopConfigs() {
   const forced = { 'F-wake': { mailbox: { wake: { maxPerExchange: 1 } } }, 'F-depth': { mailbox: { chain: { maxDepth: 0 } } } };
   return ['CC', 'CX'].flatMap((pair) => [
     ...['S1', 'S2', 'S3', 'S4'].map((scenario) => ({ id: `${pair}-${scenario}`, pair, scenario, limits: null })),
     ...Object.entries(forced).map(([name, limits]) => ({ id: `${pair}-${name}`, pair, scenario: 'S2', limits })),
-  ]);
+  ].map((config, i) => ({ ...config, trust: i % 2 === 0 ? 'aa-trusts-bb' : 'bb-trusts-aa' })));
 }
+
+/** How a head started first, before its peer exists, names the peer: through a file the harness writes once the peer registered. */
+export const PEER_FILE = 'peer.txt';
+const PEER_BY_FILE = `the agent named in the file ${PEER_FILE} (wait for that file with: until [ -f ${PEER_FILE} ]; do sleep 2; done)`;
+/** The first line of a head started first that must register before it learns its peer: one tool call. */
+export const REGISTER_FIRST = 'Before anything else, run: ls';
 
 const deepMerge = (a, b) => Object.fromEntries([...new Set([...Object.keys(a), ...Object.keys(b)])].map((k) => [k, a[k] && typeof a[k] === 'object' && b[k] && typeof b[k] === 'object' ? deepMerge(a[k], b[k]) : (b[k] ?? a[k])]));
 
 /**
  * The prompt of one head of a loop run: its scenario text (when it has one) with `{peer}`
- * filled in, then the side work. `bb` starts first and cannot know `aa`'s name, which
- * exists only once `aa` registers: in S4 its `{peer}` reads "the agent that messages you".
+ * filled in, then the side work. A head started second gets its peer's name. A head started
+ * first that has a scenario (it must reach its peer) first runs one command, so it registers
+ * before its peer starts, and reads the peer's name from a file the harness writes once the
+ * peer registered; one with no scenario needs no name.
  */
 export function loopPrompt(data, scenario, role, peerName) {
   const text = data.scenarios[`${scenario}-${role}`];
-  const peer = peerName ?? 'the agent that messages you';
-  return [text ? text.trimEnd().replaceAll('{peer}', peer) : null, data.sideWork.trimEnd()].filter(Boolean).join('\n');
+  const body = [text ? text.trimEnd().replaceAll('{peer}', peerName ?? PEER_BY_FILE) : null, data.sideWork.trimEnd()].filter(Boolean).join('\n');
+  return text && !peerName ? `${REGISTER_FIRST}\n${body}` : body;
 }
 
 // S0's pure-acknowledgement rule (plans/reports/research-261020-1814-mailbox-real-agent-loop-test.md), verbatim.
@@ -453,9 +468,10 @@ function maxSendsInWindow(messages, windowMs) {
 }
 
 /**
- * One loop run of `config` as `runId`: two heads (`bb` first, then `aa` once `bb` has
- * registered, told `bb`'s name and trusting it) each in its own confined launch over one
- * fresh project, ended when both exited or at the hard stop. Appends one line to
+ * One loop run of `config` as `runId`: two heads each in its own confined launch over one
+ * fresh project. The trusted head starts first; once it registered, the other starts, told
+ * its name and trusting it; once that one registered, its name goes into the peer file for
+ * the first. Ended when both exited or at the hard stop. Appends one line to
  * `ctx.loopResultsFile` with the record's numbers and each head's exit as the harness saw it.
  */
 export async function runLoop(ctx, config, runId) {
@@ -475,10 +491,11 @@ export async function runLoop(ctx, config, runId) {
     const args = cliArgs(cli, { settings: paths.settings, ws: paths.ws, lastMessage, instruction: renderInstruction(data.instruction, trusted), prompt });
     const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', headId), pathPrefix: path.join(paths.installation, 'bin') });
     const prepared = confined.prepareConfinedRun({ base, runId: headId, workspace, command: ctx.cliBin[cli][0], args: [...ctx.cliBin[cli].slice(1), ...args], env, login: ctx.login[cli], masks: ctx.masks, readOnly: [paths.installation] });
-    const hooks = role === 'bb'
+    const first = !Object.keys(heads).length;
+    const hooks = first
       ? confined.layOutRunProject(paths, { cli, release: ctx.release, shim: ctx.shim, config: config.limits ? deepMerge(project, config.limits) : project })
       : confined.installRunRows(paths, cli);
-    if (role === 'bb' && config.scenario === 'S1') {
+    if (first && config.scenario === 'S1') {
       fs.mkdirSync(path.join(paths.ws, 'data'));
       for (let i = 1; i <= 7; i += 1) fs.writeFileSync(path.join(paths.ws, 'data', `file-${i}.txt`), `${i}\n`);
       for (let i = 1; i <= 3; i += 1) fs.writeFileSync(path.join(paths.ws, 'data', `note-${i}.md`), `${i}\n`);
@@ -497,15 +514,22 @@ export async function runLoop(ctx, config, runId) {
     return head;
   };
   const bindingOf = (head) => Object.values(snapshotOf(path.join(workspace, 'ws'))?.bindings ?? {}).find((b) => JSON.parse(b.head).pidNs === head.run.entry.pidNs);
-  const bb = launch('bb', null, []);
-  let bbBinding = null;
-  while (!bbBinding && !bb.exit && Date.now() - startedAt < WAIT_CAP_MS) {
-    bbBinding = bindingOf(bb);
-    await sleep(200);
-  }
+  const registered = async (head) => {
+    for (let b = null; Date.now() - startedAt < 2 * WAIT_CAP_MS; await sleep(200)) {
+      b = bindingOf(head);
+      if (b || head.exit) return b;
+    }
+    return null;
+  };
+  const [firstRole, secondRole] = config.trust === 'aa-trusts-bb' ? ['bb', 'aa'] : ['aa', 'bb'];
   let endReason = null;
-  if (!bbBinding) endReason = 'error: bb did not register';
-  else launch('aa', bbBinding.name, [bbBinding.name]);
+  const firstBinding = await registered(launch(firstRole, null, []));
+  if (!firstBinding) endReason = `error: ${firstRole} did not register`;
+  else {
+    const secondBinding = await registered(launch(secondRole, firstBinding.name, [firstBinding.name]));
+    if (!secondBinding) endReason = `error: ${secondRole} did not register`;
+    else fs.writeFileSync(path.join(workspace, 'ws', PEER_FILE), `${secondBinding.name}\n`);
+  }
   while (!endReason) {
     const messages = snapshotOf(path.join(workspace, 'ws'))?.messages ?? [];
     if (Object.values(heads).every((h) => h.exit)) endReason = 'own stop';
@@ -541,6 +565,7 @@ export async function runLoop(ctx, config, runId) {
     pair: config.pair,
     scenario: config.scenario,
     limits: config.limits,
+    trust: config.trust,
     dry: Boolean(ctx.dry),
     endReason: errors.length && endReason === 'own stop' ? `error: ${errors.join(', ')}` : endReason,
     messages: messages.length,

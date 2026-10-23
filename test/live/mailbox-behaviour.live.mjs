@@ -305,10 +305,14 @@ async function cmdRunStage(stage, { dry }) {
   say(`stage ${stage}: every cell done`);
 }
 
-/** A dry loop's stub commands: aa messages bb by name; bb works long enough to see it. */
-const dryLoopPrompt = (role, peer) => (role === 'aa'
-  ? `1. Run: fgos mailbox send --to ${peer} --wake -- "MBX-LOOP-HELLO"\n2. Run: sleep 2\n3. Run: sleep 2`
-  : '1. Run: ls\n2. Run: sleep 5\n3. Run: sleep 3');
+/** A dry loop's stub commands: aa messages bb, by the name it was given or the one the peer file holds; bb works long enough to see it. */
+const dryLoopPrompt = (role, peer) => {
+  if (role === 'bb') return '1. Run: ls\n2. Run: sleep 5\n3. Run: sleep 3';
+  const hello = '--wake -- "MBX-LOOP-HELLO"';
+  return peer
+    ? `1. Run: fgos mailbox send --to ${peer} ${hello}\n2. Run: sleep 2\n3. Run: sleep 2`
+    : `1. Run: ls\n2. Run: until [ -f ${runs.PEER_FILE} ]; do sleep 1; done; fgos mailbox send --to "$(cat ${runs.PEER_FILE})" ${hello}\n3. Run: sleep 2\n4. Run: sleep 2`;
+};
 
 async function cmdRunLoop(which, { dry }) {
   const configs = runs.loopConfigs().filter((c) => which === 'all' || c.id === which);
@@ -415,7 +419,8 @@ async function cmdCheck() {
     }
   }
   const loopCtx = { ...ctx, dryPrompt: dryLoopPrompt };
-  for (const config of runs.loopConfigs().filter((c) => c.scenario === 'S1')) {
+  // One loop run per pair and trust direction.
+  for (const config of runs.loopConfigs().filter((c) => !c.limits && (c.scenario === 'S1' || c.scenario === 'S2'))) {
     const n = runs.readResults(ctx.loopResultsFile).filter((r) => r.config === config.id).length + 1;
     const { line } = await runs.runLoop(loopCtx, config, `loop.${config.id}.${String(n).padStart(3, '0')}`);
     const ok = line.endReason === 'own stop' && line.messages >= 1 && line.recordedAtEnd === 0 && Object.values(line.heads).every((h) => h.exit?.code === 0 && h.left === 0);
